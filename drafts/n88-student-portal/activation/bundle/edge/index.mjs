@@ -82,6 +82,11 @@ var deployment_inactive_default = {
       "N88_INGRESS_KEY"
     ],
     trust: "Cloudflare external HTTPS cf metadata; deny CF-Worker; signed allowlist/body/source/time/nonce; durable replay receipt"
+  },
+  credentialContract: {
+    format: "six-v1",
+    pattern: "^1[0-9]{5}$",
+    capacity: 1e5
   }
 };
 
@@ -193,7 +198,7 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
                 if (issued?.revoked !== true || live(db, m)) fail();
                 rows.push({ ...base, status: "skipped", reason: "revoked" });
               } else {
-                if (!/^1[0-9]{11}$/.test(issued?.code || "") || issued.credentialVersion !== expectedVersion + 1 || !live(db, m)) fail();
+                if (!/^1[0-9]{5}$/.test(issued?.code || "") || issued.credentialVersion !== expectedVersion + 1 || !live(db, m)) fail();
                 rows.push({ ...base, credentialVersion: issued.credentialVersion, status: "created" });
                 secrets.push({ studentId: m.studentId, code: issued.code });
               }
@@ -239,51 +244,67 @@ function createPgClassResolver({ teachingId: boundTeachingId } = {}) {
 function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 1024 * 1024 } = {}) {
   if (!repository?.transaction || !Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail();
   const tables2 = { numericCredentials: "numeric_credentials", numericSessions: "numeric_sessions", numericRates: "numeric_rates", classReceipts: "class_credential_receipts" };
-  return Object.freeze({ transaction: (action) => repository.transaction(async (db, ports) => {
-    if (typeof ports?.query !== "function") fail();
-    const extra = {}, original = {};
-    let bytes = 0;
-    for (const [name, table] of Object.entries(tables2)) {
-      const r = await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`, [maxRows + 1, maxBytes - bytes]);
+  return Object.freeze({
+    // Existing global advisory lock + fenced COMMIT, without credential reads.
+    claimAttempt: (action) => repository.transaction(async (_db, ports) => {
+      const r = await ports.query("select payload from n88_private.numeric_rates limit $1", [maxRows + 1]);
       if (r.rows.length > maxRows) fail();
-      extra[name] = r.rows.map((r2) => {
-        if (!r2.payload) fail();
-        bytes += Buffer3.byteLength(JSON.stringify(r2.payload));
-        if (bytes > maxBytes) fail();
-        return r2.payload;
-      });
-      original[name] = structuredClone(extra[name]);
-    }
-    const state = new Proxy(extra, { get: (o, k) => k in tables2 ? o[k] : db[k], set: (o, k, v) => {
-      if (k in tables2) o[k] = v;
-      else db[k] = v;
-      return true;
-    } });
-    const value = await action(state, ports);
-    bytes = 0;
-    for (const [name, table] of Object.entries(tables2)) {
-      if (extra[name].length > maxRows) fail();
-      const pk2 = (r) => name === "classReceipts" ? JSON.stringify([r.ownerId, r.requestId]) : name === "numericRates" ? r.key : r.id;
-      const before = new Map(original[name].map((r) => [pk2(r), r])), after = new Map(extra[name].map((r) => [pk2(r), r]));
-      if (after.size !== extra[name].length) fail();
-      for (const [key2, row] of before) if (!after.has(key2)) {
-        if (name === "numericCredentials" || name === "classReceipts") fail();
-        if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [key2])).rowCount !== 1) fail();
+      const state = { numericRates: r.rows.map((r2) => r2.payload) };
+      const allowed = await action(state, ports);
+      if (state.numericRates.length > maxRows) fail();
+      const keys = new Set(state.numericRates.map((r2) => r2.key));
+      for (const row of r.rows) if (!keys.has(row.payload.key)) await ports.query("delete from n88_private.numeric_rates where row_key=$1", [row.payload.key]);
+      for (const row of state.numericRates) await ports.query("insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload", [row.key, JSON.stringify(row)]);
+      return allowed;
+    }),
+    transaction: (action) => repository.transaction(async (db, ports) => {
+      if (typeof ports?.query !== "function") fail();
+      const extra = {}, original = {};
+      let bytes = 0;
+      for (const [name, table] of Object.entries(tables2)) {
+        const r = await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`, [maxRows + 1, maxBytes - bytes]);
+        if (r.rows.length > maxRows) fail();
+        extra[name] = r.rows.map((r2) => {
+          if (!r2.payload) fail();
+          bytes += Buffer3.byteLength(JSON.stringify(r2.payload));
+          if (bytes > maxBytes) fail();
+          return r2.payload;
+        });
+        original[name] = structuredClone(extra[name]);
       }
-      for (const [key2, row] of after) {
-        bytes += Buffer3.byteLength(JSON.stringify(row));
-        if (bytes > maxBytes) fail();
-        if (before.has(key2) && JSON.stringify(before.get(key2)) === JSON.stringify(row)) continue;
-        const ack = before.has(key2) ? await ports.query(`update n88_private.${table} set payload=$2::jsonb where row_key=$1`, [key2, JSON.stringify(row)]) : await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb)`, [key2, JSON.stringify(row)]);
-        if (ack.rowCount !== 1) fail();
+      const state = new Proxy(extra, { get: (o, k) => k in tables2 ? o[k] : db[k], set: (o, k, v) => {
+        if (k in tables2) o[k] = v;
+        else db[k] = v;
+        return true;
+      } });
+      const value = await action(state, ports);
+      bytes = 0;
+      for (const [name, table] of Object.entries(tables2)) {
+        if (extra[name].length > maxRows) fail();
+        const pk2 = (r) => name === "classReceipts" ? JSON.stringify([r.ownerId, r.requestId]) : name === "numericRates" ? r.key : r.id;
+        const before = new Map(original[name].map((r) => [pk2(r), r])), after = new Map(extra[name].map((r) => [pk2(r), r]));
+        if (after.size !== extra[name].length) fail();
+        for (const [key2, row] of before) if (!after.has(key2)) {
+          if (name === "numericCredentials" || name === "classReceipts") fail();
+          if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [key2])).rowCount !== 1) fail();
+        }
+        for (const [key2, row] of after) {
+          bytes += Buffer3.byteLength(JSON.stringify(row));
+          if (bytes > maxBytes) fail();
+          if (before.has(key2) && JSON.stringify(before.get(key2)) === JSON.stringify(row)) continue;
+          const ack = before.has(key2) ? await ports.query(`update n88_private.${table} set payload=$2::jsonb where row_key=$1`, [key2, JSON.stringify(row)]) : await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb)`, [key2, JSON.stringify(row)]);
+          if (ack.rowCount !== 1) fail();
+        }
       }
-    }
-    return value;
-  }) });
+      return value;
+    })
+  });
 }
 
 // drafts/n88-student-portal/numeric-credentials.mjs
 import { randomInt as randomInt2, randomBytes as randomBytes2, randomUUID as randomUUID2, createHmac as createHmac2, createHash as createHash3, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
+var CREDENTIAL_FORMAT = "six-v1";
+var CREDENTIAL_CAPACITY = 1e5;
 var NUMERIC_POLICY = Object.freeze({
   collisionBudget: 128,
   sessionMs: 8 * 60 * 6e4,
@@ -292,11 +313,11 @@ var NUMERIC_POLICY = Object.freeze({
   globalAttempts: 100,
   maxRateKeys: 1e4
 });
-var generateNumericCredential = () => "1" + String(randomInt2(0, 1e11)).padStart(11, "0");
+var generateNumericCredential = () => "1" + String(randomInt2(0, 1e5)).padStart(5, "0");
 function normalizeNumericCredential(value) {
   if (typeof value !== "string" || value.length > 80) return null;
   const code = value.replace(/^ +| +$/g, "");
-  return /^1[0-9]{11}$/.test(code) ? code : null;
+  return /^1[0-9]{5}$/.test(code) ? code : null;
 }
 var fail2 = () => {
   throw Error("n88_numeric_unavailable");
@@ -341,10 +362,11 @@ function createNumericCredentialOperations({
     const previous = db.numericCredentials.filter((c2) => identity(c2, m) && c2.revokedAt === null);
     if (previous.length > 1 || previous.length && !rotate) fail2();
     if (!Number.isSafeInteger(expectedVersion + 1)) fail2();
+    if (db.numericCredentials.filter((c2) => c2.format === CREDENTIAL_FORMAT).length >= CREDENTIAL_CAPACITY) fail2();
     let code, reserved;
     for (let attempt = 0; attempt < NUMERIC_POLICY.collisionBudget; attempt++) {
       code = generate();
-      if (typeof code !== "string" || !/^1[0-9]{11}$/.test(code)) fail2();
+      if (typeof code !== "string" || !/^1[0-9]{5}$/.test(code)) fail2();
       reserved = reservation(code);
       if (!db.numericCredentials.some((c2) => c2.reservation === reserved)) break;
       code = null;
@@ -355,6 +377,7 @@ function createNumericCredentialOperations({
       ownerId: m.ownerId,
       studentId: m.studentId,
       version: expectedVersion + 1,
+      format: CREDENTIAL_FORMAT,
       keyVersion: activeKeyVersion,
       reservation: reserved,
       verifier: "",
@@ -376,14 +399,13 @@ function createNumericCredentialOperations({
     if (!repository?.transaction || typeof verifyIngress !== "function" || typeof project !== "function" || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail2();
     return async (request) => {
       try {
-        return response(await repository.transaction(async (db, ports) => {
-          const ingress = await verifyIngress(request, ports);
-          const { headers = {}, method, body = {} } = request;
-          const path = request.path.startsWith("/student/") ? "/api/n88" + request.path : request.path;
-          if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || method === "POST" && (headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied2();
-          const time2 = now();
-          const token = /(?:^|;\s*)__Secure-n88-student=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || "")?.[1];
-          if (path === "/api/n88/student/claim" && method === "POST") {
+        const claim = (request.path === "/student/claim" || request.path === "/api/n88/student/claim") && request.method === "POST";
+        if (claim) {
+          if (typeof repository.claimAttempt !== "function") return response(denied2());
+          const allowed = await repository.claimAttempt(async (db, ports) => {
+            const ingress = await verifyIngress(request, ports);
+            if (!ingress?.clientKey) return false;
+            const time2 = now();
             db.numericRates = db.numericRates.filter((r) => r.until > time2);
             const budgets = [[mac2(reservationKey, "client-rate", ingress.clientKey), NUMERIC_POLICY.clientAttempts], ["global", NUMERIC_POLICY.globalAttempts]];
             let blocked = false;
@@ -393,7 +415,18 @@ function createNumericCredentialOperations({
               if (!b || b.count >= max) blocked = true;
               if (b) b.count = Math.min(max, b.count + 1);
             }
-            if (blocked) return denied2();
+            return !blocked;
+          });
+          if (!allowed) return response(denied2());
+        }
+        return response(await repository.transaction(async (db, ports) => {
+          const ingress = claim ? { clientKey: "prepaid" } : await verifyIngress(request, ports);
+          const { headers = {}, method, body = {} } = request;
+          const path = request.path.startsWith("/student/") ? "/api/n88" + request.path : request.path;
+          if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || method === "POST" && (headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied2();
+          const time2 = now();
+          const token = /(?:^|;\s*)__Secure-n88-student=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || "")?.[1];
+          if (path === "/api/n88/student/claim" && method === "POST") {
             const code = normalizeNumericCredential(body.code);
             if (!code) return denied2();
             const c2 = db.numericCredentials.find((c3) => c3.reservation === reservation(code));

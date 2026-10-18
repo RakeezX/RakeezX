@@ -1,0 +1,41 @@
+{
+  "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "checks": [
+    {
+      "name": "affected_syntax_and_patch_whitespace",
+      "status": "PASS",
+      "evidence": "node --check passed for all 23 changed/new modules; git diff --check passed. No full Vite build or unrelated suite.",
+      "paths": [
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs",
+        "drafts/n88-student-portal/class-credentials.mjs",
+        "drafts/n88-student-portal/client/student-entry.js",
+        "drafts/n88-student-portal/current-review.mjs",
+        "drafts/n88-student-portal/integrated-bundle.mjs",
+        "drafts/n88-student-portal/integrated-review.mjs",
+        "drafts/n88-student-portal/numeric-credentials.mjs",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "tests/fixtures/n88-integrated-class/native-pg.mjs",
+        "tests/n88-integrated-class-artifacts.mjs",
+        "tests/n88-integrated-class-boundaries.mjs",
+        "tests/n88-integrated-class-diagnose.mjs",
+        "tests/n88-integrated-class-final.mjs",
+        "tests/n88-integrated-class-journey.mjs",
+        "tests/n88-integrated-class-launcher.mjs",
+        "tests/n88-integrated-class-projection.mjs",
+        "tests/n88-integrated-class-sql-identities.mjs",
+        "tests/n88-six-digit-redaction.mjs",
+        "tests/n88-six-digit-security.mjs"
+      ]
+    },
+    {
+      "name": "prior_migrations_immutable",
+      "status": "PASS",
+      "evidence": "Both prior staged migration paths are unchanged against supplied base."
+    }
+  ]
+}

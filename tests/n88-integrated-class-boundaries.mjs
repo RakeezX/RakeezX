@@ -1,3 +1,4 @@
+import {redactN88,diagnosticError} from './n88-six-digit-redaction.mjs';
 /** AI: changed composed service boundaries on owned native PG; no hosted calls. */
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
@@ -5,7 +6,7 @@ import {readFile,writeFile} from 'node:fs/promises';
 import {startIntegratedReview} from '../drafts/n88-student-portal/integrated-review.mjs';
 import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
 import {A,SESSION} from './fixtures/n88-existing-host/provider.mjs';
-const taskId='continuous-n88-integrated-class-student-journey-20261018',runId='01c87cee-6ed3-4bf6-a51c-503fa03b1248';
+const taskId='continuous-n88-six-digit-unified-student-code-20261018',runId='5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45';
 const base='C:/Users/Abody/Projects/RakeezX',taskFile=base+'/artifacts/ops-supervisor-v4/queue/'+taskId+'.json';
 const lease=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',base+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-RuntimeRoot',base+'/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId],{encoding:'utf8',windowsHide:true,timeout:20000}).trim();
 const report={taskId,runId,checks:[],cleanup:{}};let review,owned=false,failed;
@@ -59,7 +60,7 @@ try{
   const identity=(await q(await readFile('drafts/n88-student-portal/activation/integrated-identities.inactive.sql','utf8'))).rows[0].identities;
   assert.equal(identity.negative_access.anon_private,false);assert.equal(identity.negative_access.backend_auth,false);assert.equal(identity.negative_access.backend_guard_member,false);
   assert.ok(identity.helpers.some(h=>h.name==='lock_projection_sources'&&h.owner==='n88_guard'));
-  await writeFile('drafts/n88-student-portal/activation/integrated-expected-identities.json',JSON.stringify({sourceOnly:true,migrationVersions:['20261018034356','20261018102843'],identities:identity},null,2)+'\n');
+  await writeFile('drafts/n88-student-portal/activation/integrated-expected-identities.json',JSON.stringify({sourceOnly:true,migrationVersions:['20261018034356','20261018102843','20261018110713'],identities:identity},null,2)+'\n');
   check('extended_sql_identity_readback','Extended roles/helpers/ACL/policies read back from actual native PG; backend has no Auth/schema access or guard membership and browser roles have no private access. Exact current expected identity artifact exported; no hosted claim.');
   // Actual account guard clears a held roster after owner deactivation. No credentials are issued here.
   await withIsolatedLocalBrowser({taskFile,runId,url:review.url,timeoutMs:60000},async({createContext})=>{
@@ -71,6 +72,6 @@ try{
     assert.equal(await p.locator('[data-delivery]').count(),0);
     check('actual_ui_delayed_owner_change','Actual account/store route with held native-service roster response; deactivating owner clears UI, and late response cannot restore roster or secret delivery sheet.');
   });
-}catch(e){failed=e;report.failure={message:e.code==='ERR_ASSERTION'?'Assertion failed (values omitted)':e.message.replace(/1[0-9]{11}/g,'[REDACTED]'),stack:e.stack?.split('\n').filter(l=>l.includes(' at ')).slice(0,5)};}
-finally{review?.testing.release();await review?.close();report.cleanup.ownedHttpAndNativePgClosed=true;if(owned)report.cleanup.lease=lease('release');await writeFile('tests/n88-integrated-class-boundaries.json',JSON.stringify(report,null,2)+'\n');}
-if(failed){console.error(report.failure);process.exitCode=1;}else console.log('N88 composed service boundary checks PASS');
+}catch(e){failed=e;report.failure=diagnosticError(e);}
+finally{review?.testing.release();await review?.close();report.cleanup.ownedHttpAndNativePgClosed=true;if(owned)report.cleanup.lease=lease('release');await writeFile('tests/n88-six-digit-boundaries.json',JSON.stringify(redactN88(report),null,2)+'\n');}
+if(failed){console.error(redactN88(report.failure));process.exitCode=1;}else console.log('N88 composed service boundary checks PASS');

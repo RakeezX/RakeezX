@@ -1,8 +1,8 @@
 /** AI: inactive universal student transport; no identity lookup, storage or diagnostics. */
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
 
-export const normalizeStudentCode = value => normalizeDateTimeDigits(value).replace(/ /g, '');
-export const validStudentCode = value => typeof value === 'string' && /^1[0-9]{11}$/.test(value);
+export const normalizeStudentCode = value => typeof value === 'string' ? normalizeDateTimeDigits(value).replace(/ /g, '') : '';
+export const validStudentCode = value => typeof value === 'string' && /^1[0-9]{5}$/.test(value);
 const fail = (kind = 'unavailable', retryAfter = 0) => Object.assign(new Error('Student access unavailable'), { kind, retryAfter });
 const object = value => value && typeof value === 'object' && !Array.isArray(value);
 const text = value => typeof value === 'string' && value.length <= 2000;

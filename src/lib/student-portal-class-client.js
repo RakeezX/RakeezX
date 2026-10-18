@@ -83,7 +83,7 @@ export function createClassPortalClient({ request, getContext = () => null, time
           if (!s || seen.has(s.studentId)) return false;
           seen.add(s.studentId);
           if (kind === 'created') {
-            if (!exact(entry, ['studentId','enrollmentId','credentialVersion','credential']) || s.hasActiveCode || entry.enrollmentId !== s.enrollmentId || !revision(entry.credentialVersion) || entry.credentialVersion <= s.credentialVersion || typeof entry.credential !== 'string' || !/^1[0-9]{11}$/.test(entry.credential)) return false;
+            if (!exact(entry, ['studentId','enrollmentId','credentialVersion','credential']) || s.hasActiveCode || entry.enrollmentId !== s.enrollmentId || !revision(entry.credentialVersion) || entry.credentialVersion <= s.credentialVersion || typeof entry.credential !== 'string' || !/^1[0-9]{5}$/.test(entry.credential)) return false;
           } else if (!exact(entry, ['studentId','reason']) || !['existing','revoked','conflict','unavailable','not_current'].includes(entry.reason) || kind === 'skipped' && !(entry.reason === 'existing' && s.hasActiveCode || entry.reason === 'revoked' && !s.hasActiveCode && s.credentialVersion > 0)) return false;
         }
         return (d.uncertain || seen.size === r.students.length) && new Set(d.created.map(e => e.credential)).size === d.created.length;
@@ -103,6 +103,6 @@ export function createClassPortalClient({ request, getContext = () => null, time
     if (!exact(body, ['studentId','enrollmentId','revision','credentialVersion','requestId'])) deny('review_required');
     const s = r.students.find(s => s.studentId === body.studentId);
     if (!s || s.credentialVersion < 1 || ['enrollmentId','revision','credentialVersion'].some(k => body[k] !== s[k])) deny('review_required');
-    return mutate(teachingId, body, action, d => exact(d, action === 'rotate' ? ['rotated','studentId','enrollmentId','credentialVersion','credential'] : ['revoked','studentId','enrollmentId','credentialVersion']) && d[action === 'rotate' ? 'rotated' : 'revoked'] === true && d.studentId === s.studentId && d.enrollmentId === s.enrollmentId && revision(d.credentialVersion) && d.credentialVersion === s.credentialVersion + (action === 'rotate' ? 1 : 0) && (action !== 'rotate' || typeof d.credential === 'string' && /^1[0-9]{11}$/.test(d.credential)));
+    return mutate(teachingId, body, action, d => exact(d, action === 'rotate' ? ['rotated','studentId','enrollmentId','credentialVersion','credential'] : ['revoked','studentId','enrollmentId','credentialVersion']) && d[action === 'rotate' ? 'rotated' : 'revoked'] === true && d.studentId === s.studentId && d.enrollmentId === s.enrollmentId && revision(d.credentialVersion) && d.credentialVersion === s.credentialVersion + (action === 'rotate' ? 1 : 0) && (action !== 'rotate' || typeof d.credential === 'string' && /^1[0-9]{5}$/.test(d.credential)));
   }
 }

@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "checks": [
+    {
+      "name": "actual_universal_entry_no_truncation_or_five_digit_claim",
+      "status": "PASS",
+      "evidence": "Actual current launcher app DOM/handlers/CSS: six-digit help/pattern/min/max; seven-digit paste and excess insertion reject before native truncation; five digits cannot submit; defined Arabic paste normalizes six ASCII digits. No claim request/credential persisted; blank login screenshot."
+    },
+    {
+      "name": "exact_review_launcher_start_and_owned_stop",
+      "status": "PASS",
+      "evidence": "Actual PowerShell launcher returns live actual-app teacher URL, /student HTTP 200 and PID/birth receipt; owned -Stop gracefully closes HTTP/native PG and removes owned cluster. Receipt removed by this test only; no browser replay or hosted call."
+    }
+  ],
+  "cleanup": {
+    "lease": "RELEASED integration"
+  }
+}

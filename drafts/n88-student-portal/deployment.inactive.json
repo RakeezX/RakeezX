@@ -77,5 +77,10 @@
       "N88_INGRESS_KEY"
     ],
     "trust": "Cloudflare external HTTPS cf metadata; deny CF-Worker; signed allowlist/body/source/time/nonce; durable replay receipt"
+  },
+  "credentialContract": {
+    "format": "six-v1",
+    "pattern": "^1[0-9]{5}$",
+    "capacity": 100000
   }
 }

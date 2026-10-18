@@ -2,8 +2,8 @@
 var normalizeDateTimeDigits = (value) => String(value ?? "").replace(/[\u0660-\u0669\u06f0-\u06f9]/g, (digit) => String(digit.charCodeAt(0) - (digit <= "\u0669" ? 1632 : 1776)));
 
 // src/lib/student-portal-unified-client.js
-var normalizeStudentCode = (value) => normalizeDateTimeDigits(value).replace(/ /g, "");
-var validStudentCode = (value) => typeof value === "string" && /^1[0-9]{11}$/.test(value);
+var normalizeStudentCode = (value) => typeof value === "string" ? normalizeDateTimeDigits(value).replace(/ /g, "") : "";
+var validStudentCode = (value) => typeof value === "string" && /^1[0-9]{5}$/.test(value);
 var fail = (kind = "unavailable", retryAfter = 0) => Object.assign(new Error("Student access unavailable"), { kind, retryAfter });
 var object = (value) => value && typeof value === "object" && !Array.isArray(value);
 var text = (value) => typeof value === "string" && value.length <= 2e3;
@@ -128,7 +128,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   };
   function entry(message = "") {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p id="n88-code-help">\u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0627\u0644\u0634\u062E\u0635\u064A: 12 \u0631\u0642\u0645\u064B\u0627 \u064A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1. \u0627\u0633\u062A\u062E\u062F\u0645 \u0627\u0644\u0623\u0631\u0642\u0627\u0645 0\u20139.</p><form data-claim><label for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><input id="n88-unified-code" type="text" inputmode="numeric" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form></section>`);
+    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p id="n88-code-help">\u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0627\u0644\u0634\u062E\u0635\u064A: 6 \u0623\u0631\u0642\u0627\u0645 \u064A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1. \u0627\u0633\u062A\u062E\u062F\u0645 \u0627\u0644\u0623\u0631\u0642\u0627\u0645 0\u20139.</p><form data-claim><label for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form></section>`);
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -172,7 +172,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     input2.value = "";
     if (!validStudentCode(code)) {
       code = "";
-      entry("\u0627\u0633\u062A\u062E\u062F\u0645 12 \u0631\u0642\u0645\u064B\u0627 \u064A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1.");
+      entry("\u0627\u0633\u062A\u062E\u062F\u0645 6 \u0623\u0631\u0642\u0627\u0645 \u064A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1.");
       root.querySelector("input")?.setAttribute("aria-invalid", "true");
       return;
     }
@@ -183,8 +183,31 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     });
   };
   const input = (event) => {
-    if (event.target.matches("[data-claim] input")) event.target.value = normalizeStudentCode(event.target.value);
+    if (event.target.matches("[data-claim] input")) {
+      event.target.setCustomValidity("");
+      event.target.removeAttribute("aria-invalid");
+      event.target.value = normalizeStudentCode(event.target.value);
+    }
   };
+  const rejectOverflow = (event, pasted = false) => {
+    const field = event.target;
+    if (!field.matches("[data-claim] input")) return;
+    const added = pasted ? event.clipboardData?.getData("text") : event.data;
+    if (typeof added !== "string") return;
+    const proposed = field.value.slice(0, field.selectionStart ?? field.value.length) + added + field.value.slice(field.selectionEnd ?? field.value.length);
+    if (normalizeStudentCode(proposed).length > 6) {
+      event.preventDefault();
+      field.value = "";
+      field.setCustomValidity("\u0627\u0633\u062A\u062E\u062F\u0645 \u0631\u0645\u0632\u064B\u0627 \u0645\u0646 6 \u0623\u0631\u0642\u0627\u0645 \u062F\u0648\u0646 \u0627\u062E\u062A\u0635\u0627\u0631.");
+      field.setAttribute("aria-invalid", "true");
+    } else if (pasted) {
+      event.preventDefault();
+      field.value = normalizeStudentCode(proposed);
+      input({ target: field });
+    }
+  };
+  const beforeInput = (event) => rejectOverflow(event);
+  const paste = (event) => rejectOverflow(event, true);
   const click = (event) => {
     if (event.target.closest("[data-read]")) void run(() => client.read());
     if (event.target.closest("[data-end]")) void run(() => client.end(), true);
@@ -206,6 +229,8 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
       if (enabled) void run(() => client.read());
     }
   };
+  root.addEventListener("beforeinput", beforeInput);
+  root.addEventListener("paste", paste);
   root.addEventListener("submit", submit);
   root.addEventListener("input", input);
   root.addEventListener("click", click);
@@ -225,6 +250,8 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     root.classList.remove("n88-unified");
     if (previousDir === null) root.removeAttribute("dir");
     else root.setAttribute("dir", previousDir);
+    root.removeEventListener("beforeinput", beforeInput);
+    root.removeEventListener("paste", paste);
     root.removeEventListener("submit", submit);
     root.removeEventListener("input", input);
     root.removeEventListener("click", click);

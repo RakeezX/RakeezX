@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "checks": [],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true
+  },
+  "failures": [
+    {
+      "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-six-digit-unified-student-code-20261018.json -RuntimeRoot C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4 -WaitSeconds 0 -OwnerToken 5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45\nC:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\resource-lease.ps1 : Exception calling \"ReadAllText\" with \r\n\"2\" argument(s): \"The process cannot access the file 'C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attem\r\npts\\continuous-n88-six-digit-unified-student-code-20261018\\5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45\\checkpoint.json' \r\nbecause it is being used by another process.\"\r\n    + CategoryInfo          : NotSpecified: (:) [resource-lease.ps1], MethodInvocationException\r\n    + FullyQualifiedErrorId : IOException,resource-lease.ps1\r\n \r\n",
+      "stack": [
+        "    at genericNodeError (node:internal/errors:985:15)",
+        "    at wrappedFn (node:internal/errors:539:14)",
+        "    at checkExecSyncError (node:child_process:942:11)",
+        "    at execFileSync (node:child_process:978:15)",
+        "    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-six-digit-unified-student-code-20261018/tests/n88-integrated-class-journey.mjs:10:21)"
+      ]
+    }
+  ]
+}

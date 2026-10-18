@@ -1,4 +1,7 @@
-# N88 — integrated class/student journey, source-only LOCAL_READY
+# N88 — historical integrated class/student journey, source-only LOCAL_READY
+
+Current six-digit amendment: [N88_SIX_DIGIT_UNIFIED_CODE.md](N88_SIX_DIGIT_UNIFIED_CODE.md).
+The twelve-digit evidence below remains historical; it does not certify changed artifacts.
 
 AI-authored. Task `continuous-n88-integrated-class-student-journey-20261018`, run
 `01c87cee-6ed3-4bf6-a51c-503fa03b1248`. Base:

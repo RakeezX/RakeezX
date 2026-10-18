@@ -31,7 +31,7 @@ insert into rakeezx.attendance("id","owner_id","revision","student_id","teaching
 insert into rakeezx.logs("id","owner_id","revision","student_id","teaching_id","kind","delta","deleted_at") values('log','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','student','teaching','participation',2,null);
 insert into rakeezx.logs("id","owner_id","revision","student_id","teaching_id","kind","delta","deleted_at") values('log-other','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','other','teaching','participation',10,null);
 insert into rakeezx.enrollments(owner_id,id,student_id,section_id,revision,status,start_date) values('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','enrollment-other','other','class',1,'active','2026-08-01');
-insert into n88_private.contexts values('n88_integrated_synthetic_01','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true);
+insert into n88_private.contexts values('n88_integrated_synthetic_01','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true) on conflict(owner_id) do nothing;
 
 -- Second student must also have the canonical atomic subitem projection.
 insert into rakeezx.scores(owner_id,id,student_id,item_id,revision,value,manual_value,derived_value) values('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','score-other-subitems','other','subitems',1,2,null,2);

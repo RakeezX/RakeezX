@@ -1,3 +1,4 @@
+-- Historical integrated schema source. Current installation MUST append six-digit-schema.inactive.sql; never rewrite staged history.
 -- AI-authored, UNAPPLIED local proposal. Not included in activation manifest.
 -- After exact existing N88 private schema/roles; CLI-staged local integration only.
 -- JSON payloads are bounded, typed by this server codec, and contain NO plaintext.

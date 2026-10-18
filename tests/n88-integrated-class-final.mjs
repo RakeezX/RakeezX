@@ -1,3 +1,4 @@
+import {redactN88,diagnosticError} from './n88-six-digit-redaction.mjs';
 /** AI: final changed projection/SQL and UI lost-ACK/data-layout boundaries only. */
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
@@ -5,7 +6,7 @@ import {readFile,writeFile} from 'node:fs/promises';
 import {startIntegratedReview} from '../drafts/n88-student-portal/integrated-review.mjs';
 import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
 import {A} from './fixtures/n88-existing-host/provider.mjs';
-const taskId='continuous-n88-integrated-class-student-journey-20261018',runId='01c87cee-6ed3-4bf6-a51c-503fa03b1248';
+const taskId='continuous-n88-six-digit-unified-student-code-20261018',runId='5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45';
 const base='C:/Users/Abody/Projects/RakeezX',taskFile=base+'/artifacts/ops-supervisor-v4/queue/'+taskId+'.json';
 const lease=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',base+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-RuntimeRoot',base+'/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId],{encoding:'utf8',windowsHide:true,timeout:20000}).trim();
 const report={taskId,runId,checks:[],cleanup:{}};let review,owned=false,failed;
@@ -44,6 +45,6 @@ try{
     assert.equal((await q('select count(*)::int as n from n88_private.numeric_credentials')).rows[0].n,4);
     check('actual_ui_lost_ack_selective_recovery_and_data_layout','Actual class UI: adding third canonical student, missing-only batch loses ACK after commit, UI reports uncertainty without codes, reload/list+retry skips all three, selective rotate recovers only that student. Actual populated student page inspected at 390/1280 RTL/no overflow, screenshots contain no credential.');
   });
-}catch(e){failed=e;report.failure={message:e.code==='ERR_ASSERTION'?'Assertion failed (values omitted)':e.message.replace(/1[0-9]{11}/g,'[REDACTED]'),stack:e.stack?.split('\n').filter(l=>l.includes(' at ')).slice(0,5)};}
-finally{await review?.close();report.cleanup.ownedHttpAndNativePgClosed=true;if(owned)report.cleanup.lease=lease('release');await writeFile('tests/n88-integrated-class-final.json',JSON.stringify(report,null,2)+'\n');}
-if(failed){console.error(report.failure);process.exitCode=1;}else console.log('N88 final changed projection/SQL/UI boundaries PASS');
+}catch(e){failed=e;report.failure=diagnosticError(e);}
+finally{await review?.close();report.cleanup.ownedHttpAndNativePgClosed=true;if(owned)report.cleanup.lease=lease('release');await writeFile('tests/n88-six-digit-final.json',JSON.stringify(redactN88(report),null,2)+'\n');}
+if(failed){console.error(redactN88(report.failure));process.exitCode=1;}else console.log('N88 final changed projection/SQL/UI boundaries PASS');

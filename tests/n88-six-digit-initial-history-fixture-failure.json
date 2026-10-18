@@ -1,0 +1,31 @@
+{
+  "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "checks": [
+    {
+      "name": "six_digit_crypto_string_boundaries_collision_tombstones_capacity_namespace",
+      "status": "PASS",
+      "evidence": "Actual issuer/validators: both endpoints, invalid types/lengths, defined Arabic/Persian UI normalization; 128 cryptographic samples. Across owners a retained revoked reservation exhausts exactly 128 collision draws without mutation. [REDACTED] six-v1 metadata reservations deny before RNG; [REDACTED] historical metadata records do not count as six-digit occupancy. No brute-force claims."
+    },
+    {
+      "name": "whole_report_locator_stack_call_log_redaction",
+      "status": "PASS",
+      "evidence": "Bounded synthetic failure sanitizes six-digit secret in message, locator/call log, nested report, page error and stack before persistence/console. Fabricated secret never recorded."
+    }
+  ],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "namespace": "six-v1",
+  "failure": {
+    "message": "duplicate key value violates unique constraint \"contexts_owner_id_key\"",
+    "stack": [
+      "    at C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\n77-native-pg17\\client\\node_modules\\pg\\lib\\client.js:545:17",
+      "    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+      "    at async startNativePg (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-six-digit-unified-student-code-20261018/tests/fixtures/n88-integrated-class/native-pg.mjs:72:5)",
+      "    at async startIntegratedReview (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-six-digit-unified-student-code-20261018/drafts/n88-student-portal/integrated-review.mjs:15:12)",
+      "    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-six-digit-unified-student-code-20261018/tests/n88-six-digit-security.mjs:45:10"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "checks": [
+    {
+      "name": "n88_current_inactive_bundle_hashes_and_private_student_graph",
+      "status": "PASS",
+      "evidence": "114 current LF source hashes and 9 output hashes verified. Private student graph excludes account/Auth/store/analytics/Sync, no external imports. Generated gateway default OFF reads only N88_ENABLED. Static format/artifact qualification only; current extended security fixture remains BLOCKED and live activation OFF."
+    },
+    {
+      "name": "n88_offline_shell_dependencies_and_private_cache_exclusion",
+      "status": "PASS",
+      "evidence": "Executed actual sw.js fetch handler: /api/n88 and /s bypass cache entirely; offline runtime JS uses cached shell response; all shell files exist and new runtime/view/style dependencies are listed. Synthetic VM only, not live SW certification."
+    },
+    {
+      "name": "n88_new_teacher_shell_dependencies_and_universal_private_exclusions",
+      "status": "PASS",
+      "evidence": "Actual SW fetch handler in synthetic VM bypasses /student, /api/n88/student, teacher API and /n88-private assets; new class module/client/CSS present in shell. No live browser/SW-cache certification claimed."
+    },
+    {
+      "name": "extended_metadata_readback_tamper_guards",
+      "status": "PASS",
+      "evidence": "Offline verifier accepts matching extended identity envelope and rejects BYPASSRLS, migration-version, enabled-state and project drift; actual native identities exported by boundary test, no hosted readback claimed."
+    }
+  ]
+}

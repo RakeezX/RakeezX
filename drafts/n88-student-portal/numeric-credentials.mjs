@@ -2,14 +2,16 @@
 import { randomInt, randomBytes, randomUUID, createHmac, createHash, timingSafeEqual } from 'node:crypto';
 import { PRIVATE_HEADERS } from './service.mjs';
 
+export const CREDENTIAL_FORMAT = 'six-v1';
+export const CREDENTIAL_CAPACITY = 100_000;
 export const NUMERIC_POLICY = Object.freeze({ collisionBudget: 128, sessionMs: 8*60*60_000,
   windowMs: 15*60_000, clientAttempts: 6, globalAttempts: 100, maxRateKeys: 10000 });
-export const generateNumericCredential = () => '1' + String(randomInt(0, 100_000_000_000)).padStart(11, '0');
+export const generateNumericCredential = () => '1' + String(randomInt(0, 100_000)).padStart(5, '0');
 // Explicit paste policy: remove leading/trailing ASCII SPACE only. No other coercion.
 export function normalizeNumericCredential(value) {
   if (typeof value !== 'string' || value.length > 80) return null;
   const code = value.replace(/^ +| +$/g, '');
-  return /^1[0-9]{11}$/.test(code) ? code : null;
+  return /^1[0-9]{5}$/.test(code) ? code : null;
 }
 const fail = () => { throw Error('n88_numeric_unavailable'); };
 const active = m => m?.status === 'active' && m.endDate === null && m.studentActive === true && m.classActive === true;
@@ -52,16 +54,18 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
     const previous=db.numericCredentials.filter(c=>identity(c,m) && c.revokedAt===null);
     if(previous.length>1 || previous.length && !rotate) fail();
     if(!Number.isSafeInteger(expectedVersion+1)) fail();
+    // Historical tombstones stay reserved but do not count as six-digit occupancy.
+    if(db.numericCredentials.filter(c=>c.format===CREDENTIAL_FORMAT).length>=CREDENTIAL_CAPACITY) fail();
     let code, reserved;
     for(let attempt=0;attempt<NUMERIC_POLICY.collisionBudget;attempt++) {
-      code=generate(); if(typeof code!=='string' || !/^1[0-9]{11}$/.test(code)) fail();
+      code=generate(); if(typeof code!=='string' || !/^1[0-9]{5}$/.test(code)) fail();
       reserved=reservation(code);
       if(!db.numericCredentials.some(c=>c.reservation===reserved)) break;
       code=null;
     }
     if(!code) fail(); // no scan/sequential fallback, and old credential untouched
     const c={id:randomUUID(),ownerId:m.ownerId,studentId:m.studentId,version:expectedVersion+1,
-      keyVersion:activeKeyVersion,reservation:reserved,verifier:'',revokedAt:null};
+      format:CREDENTIAL_FORMAT,keyVersion:activeKeyVersion,reservation:reserved,verifier:'',revokedAt:null};
     c.verifier=verifier(code,c);
     previous.forEach(c=>revokeCredential(db,c)); db.numericCredentials.push(c);
     return {code,credentialVersion:c.version}; // caller may expose ONLY after COMMIT ACK
@@ -75,15 +79,39 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
   };
 
   /** Compose into SAME authenticated ingress/repository as existing service. ingress
-   * MUST consume its signed replay receipt in this transaction. No body/source fallback.
+   * consumes its signed replay receipt in the independently committed attempt phase for claims. No body/source fallback.
    * project is the existing bounded, explicitly teacher-published own-member projection.
    */
   function createStudentHandler({repository,verifyIngress,origin,project}) {
     if(!repository?.transaction || typeof verifyIngress!=='function' || typeof project!=='function' ||
        new URL(origin).origin!==origin || !origin.startsWith('https://')) fail();
     return async request => {
-      try { return response(await repository.transaction(async(db,ports)=>{
-        const ingress=await verifyIngress(request,ports);
+      try {
+        const claim=(request.path==='/student/claim'||request.path==='/api/n88/student/claim')&&request.method==='POST';
+        // Commit verified ingress and budgets BEFORE loading credential state.
+        // Later authentication/session/source rollback cannot undo this debit.
+        if(claim) {
+          if(typeof repository.claimAttempt!=='function')return response(denied());
+          const allowed=await repository.claimAttempt(async(db,ports)=>{
+            const ingress=await verifyIngress(request,ports);
+            if(!ingress?.clientKey)return false;
+            const time=now();
+            // Debit BOTH durable budgets before format checking or credential lookup.
+            db.numericRates=db.numericRates.filter(r=>r.until>time);
+            const budgets=[[mac(reservationKey,'client-rate',ingress.clientKey),NUMERIC_POLICY.clientAttempts],['global',NUMERIC_POLICY.globalAttempts]];
+            let blocked=false;
+            for(const [key,max] of budgets) {
+              let b=db.numericRates.find(b=>b.key===key);
+              if(!b && db.numericRates.length<NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b={key,count:0,until:time+NUMERIC_POLICY.windowMs});
+              if(!b || b.count>=max) blocked=true;
+              if(b) b.count=Math.min(max,b.count+1);
+            }
+            return !blocked;
+          });
+          if(!allowed)return response(denied());
+        }
+        return response(await repository.transaction(async(db,ports)=>{
+        const ingress=claim ? {clientKey:'prepaid'} : await verifyIngress(request,ports);
         const {headers={},method,body={}}=request;
         const path=request.path.startsWith('/student/')?'/api/n88'+request.path:request.path;
         if(!ingress?.clientKey || headers['sec-fetch-site'] && headers['sec-fetch-site']!=='same-origin' ||
@@ -91,17 +119,6 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
         const time=now();
         const token=/(?:^|;\s*)__Secure-n88-student=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || '')?.[1];
         if(path==='/api/n88/student/claim' && method==='POST') {
-          // Debit BOTH durable budgets before format checking or credential lookup.
-          db.numericRates=db.numericRates.filter(r=>r.until>time);
-          const budgets=[[mac(reservationKey,'client-rate',ingress.clientKey),NUMERIC_POLICY.clientAttempts],['global',NUMERIC_POLICY.globalAttempts]];
-          let blocked=false;
-          for(const [key,max] of budgets) {
-            let b=db.numericRates.find(b=>b.key===key);
-            if(!b && db.numericRates.length<NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b={key,count:0,until:time+NUMERIC_POLICY.windowMs});
-            if(!b || b.count>=max) blocked=true;
-            if(b) b.count=Math.min(max,b.count+1);
-          }
-          if(blocked) return denied();
           const code=normalizeNumericCredential(body.code);
           if(!code) return denied();
           const c=db.numericCredentials.find(c=>c.reservation===reservation(code));

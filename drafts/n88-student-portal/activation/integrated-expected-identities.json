@@ -2,7 +2,8 @@
   "sourceOnly": true,
   "migrationVersions": [
     "20261018034356",
-    "20261018102843"
+    "20261018102843",
+    "20261018110713"
   ],
   "identities": {
     "auth": [
@@ -181,6 +182,28 @@
         ],
         "prosecdef": true,
         "definition_md5": "df9caa7dfe1c24c70938911167346479"
+      },
+      {
+        "args": "",
+        "name": "numeric_allocation_lock",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition_md5": "6f586693210d9252b4927f1266528242"
+      },
+      {
+        "args": "",
+        "name": "numeric_six_capacity_guard",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition_md5": "fe5f3b9463b80b033d9d74c7a6f59b22"
       },
       {
         "args": "",
@@ -3673,6 +3696,11 @@
         "tablename": "numeric_credentials"
       },
       {
+        "indexdef": "CREATE INDEX numeric_six_reservations ON n88_private.numeric_credentials USING btree (((payload ->> 'format'::text))) WHERE ((payload ->> 'format'::text) = 'six-v1'::text)",
+        "indexname": "numeric_six_reservations",
+        "tablename": "numeric_credentials"
+      },
+      {
         "indexdef": "CREATE UNIQUE INDEX numeric_rates_pkey ON n88_private.numeric_rates USING btree (row_key)",
         "indexname": "numeric_rates_pkey",
         "tablename": "numeric_rates"
@@ -3724,6 +3752,18 @@
         "tgenabled": "O",
         "definition": "CREATE TRIGGER class_receipts_immutable BEFORE INSERT OR DELETE OR UPDATE ON n88_private.class_credential_receipts FOR EACH ROW EXECUTE FUNCTION n88_private.class_receipt_guard()",
         "table_name": "n88_private.class_credential_receipts"
+      },
+      {
+        "name": "numeric_allocation_lock",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER numeric_allocation_lock BEFORE INSERT ON n88_private.numeric_credentials FOR EACH STATEMENT EXECUTE FUNCTION n88_private.numeric_allocation_lock()",
+        "table_name": "n88_private.numeric_credentials"
+      },
+      {
+        "name": "numeric_six_capacity",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER numeric_six_capacity AFTER INSERT ON n88_private.numeric_credentials REFERENCING NEW TABLE AS new_reservations FOR EACH STATEMENT EXECUTE FUNCTION n88_private.numeric_six_capacity_guard()",
+        "table_name": "n88_private.numeric_credentials"
       },
       {
         "name": "numeric_tombstones",
@@ -4007,6 +4047,14 @@
         "condeferrable": false
       },
       {
+        "name": "numeric_credentials_format_fields",
+        "contype": "c",
+        "definition": "CHECK ((((payload - ARRAY['id'::text, 'ownerId'::text, 'studentId'::text, 'version'::text, 'reservation'::text, 'verifier'::text, 'keyVersion'::text, 'revokedAt'::text, 'format'::text]) = '{}'::jsonb) AND ((NOT (payload ? 'format'::text)) OR COALESCE(((payload ->> 'format'::text) = 'six-v1'::text), false))))",
+        "table_name": "n88_private.numeric_credentials",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
         "name": "numeric_credentials_id_key",
         "contype": "u",
         "definition": "UNIQUE (id)",
@@ -4058,14 +4106,6 @@
         "name": "numeric_credentials_payload_check2",
         "contype": "c",
         "definition": "CHECK ((payload ?& ARRAY['id'::text, 'ownerId'::text, 'studentId'::text, 'version'::text, 'reservation'::text, 'verifier'::text, 'keyVersion'::text, 'revokedAt'::text]))",
-        "table_name": "n88_private.numeric_credentials",
-        "convalidated": true,
-        "condeferrable": false
-      },
-      {
-        "name": "numeric_credentials_payload_check3",
-        "contype": "c",
-        "definition": "CHECK (((payload - ARRAY['id'::text, 'ownerId'::text, 'studentId'::text, 'version'::text, 'reservation'::text, 'verifier'::text, 'keyVersion'::text, 'revokedAt'::text]) = '{}'::jsonb))",
         "table_name": "n88_private.numeric_credentials",
         "convalidated": true,
         "condeferrable": false

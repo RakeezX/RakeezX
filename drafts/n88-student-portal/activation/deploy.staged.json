@@ -2,7 +2,7 @@
   "aiAuthored": true,
   "enabled": false,
   "projectId": "xlrubcwjqktzzunrvuns",
-  "migration": "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
+  "migration": "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
   "function": {
     "name": "n88-student-portal",
     "entry": "bundle/edge/index.mjs",
@@ -73,29 +73,38 @@
   "n44Changes": false,
   "migrations": [
     "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
-    "supabase/migrations/20261018102843_n88_integrated_class_staged.sql"
+    "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
+    "supabase/migrations/20261018110713_n88_six_digit_staged.sql"
   ],
   "requiredPreflight": [
     "prior-20261018-preflight.inactive.sql (before fresh baseline only)",
     "integrated-preflight.inactive.sql (after baseline, before extension)",
-    "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families"
+    "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families",
+    "six-digit-preflight.inactive.sql (after integrated extension, before six-v1 amendment)"
   ],
   "qualification": {
-    "state": "LOCAL_READY",
+    "state": "BLOCKED",
     "scope": "inactive source-only local application/service/PG preparation",
-    "actualAppJourney": "tests/n88-integrated-class-journey.json",
-    "changedServiceBoundaries": "tests/n88-integrated-class-boundaries.json",
-    "finalProjectionSqlAndUi": "tests/n88-integrated-class-final-service.json",
+    "actualAppJourney": "tests/n88-six-digit-journey.json",
+    "changedServiceBoundaries": "tests/n88-six-digit-security.json",
     "currentExpectedIdentitySnapshot": "integrated-expected-identities.json",
     "metadataContract": "integrated-metadata-contract.json",
     "readbackVerifier": "../integrated-readback.mjs",
     "baselineExpectedIdentitySnapshot": "prior-20261018-expected-identities.json",
     "activationPermitted": false,
-    "dependentFormatAmendment": {
-      "requiredBeforeLiveActivation": true,
-      "approvedNextFormat": "six total numeric digits beginning 1",
-      "controllerSource": "n88-six-digit-unified-student-code-20261018.json",
-      "scope": "separate dependent card after this integration delivery; not activated by this worker"
+    "unchangedProjectionEvidence": "tests/n88-integrated-class-final-service.json",
+    "sixDigitAmendment": {
+      "sourceReady": false,
+      "liveActivation": false,
+      "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+      "evidence": "docs/automation-evidence/20261018/N88_SIX_DIGIT_UNIFIED_CODE.md",
+      "blocker": "Extended historical-reservation fixture failed twice at duplicate seed owner context; exact seed correction saved, not rerun under second-unchanged-blocker rule."
     }
+  },
+  "credentialContract": {
+    "format": "six-v1",
+    "pattern": "^1[0-9]{5}$",
+    "capacity": 100000,
+    "historicalReservationRewrite": false
   }
 }

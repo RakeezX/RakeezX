@@ -20,7 +20,7 @@ async function main() {
   const stop=()=>requested('signal');process.once('SIGINT',stop);process.once('SIGTERM',stop);
   try {
     review=await startReview({ttl});const identity=processIdentity(process.pid);
-    const publicReceipt={aiAuthored:true,pid:identity.pid,birth:identity.birth,executable:identity.executable,commandLine:identity.commandLine,url:review.url,expiresAt:review.expiresAt,phase:review.phase,postgres:review.postgres,status:'running'};
+    const publicReceipt={aiAuthored:true,credentialFormat:'six-v1',pid:identity.pid,birth:identity.birth,executable:identity.executable,commandLine:identity.commandLine,url:review.url,expiresAt:review.expiresAt,phase:review.phase,postgres:review.postgres,status:'running'};
     await writeFile(receipt,JSON.stringify(publicReceipt,null,2)+'\n',{flag:'wx'});
     watch=setInterval(async()=>{try{const request=JSON.parse((await readFile(path.join(review.phase,'shutdown.request.json'),'utf8')).replace(/^\uFEFF/,''));if(request.pid===identity.pid&&request.birth===identity.birth)requested('owned-request');}catch{}},250);
     const reason=await Promise.race([signal,review.expired.then(()=>'expired')]);

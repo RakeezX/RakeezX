@@ -71,7 +71,7 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
               if(issued?.revoked!==true || live(db,m)) fail();
               rows.push({...base,status:'skipped',reason:'revoked'});
             } else {
-              if(!/^1[0-9]{11}$/.test(issued?.code || '') || issued.credentialVersion!==expectedVersion+1 || !live(db,m)) fail();
+              if(!/^1[0-9]{5}$/.test(issued?.code || '') || issued.credentialVersion!==expectedVersion+1 || !live(db,m)) fail();
               rows.push({...base,credentialVersion:issued.credentialVersion,status:'created'});
               secrets.push({studentId:m.studentId,code:issued.code});
             }
@@ -122,7 +122,20 @@ export function createPgClassResolver({teachingId:boundTeachingId}={}) {
 export function withCredentialRepository(repository,{maxRows=10000,maxBytes=4*1024*1024}={}) {
   if(!repository?.transaction || !Number.isSafeInteger(maxRows) || maxRows<1 || maxRows>10000 || !Number.isSafeInteger(maxBytes) || maxBytes<1024 || maxBytes>16*1024*1024) fail();
   const tables={numericCredentials:'numeric_credentials',numericSessions:'numeric_sessions',numericRates:'numeric_rates',classReceipts:'class_credential_receipts'};
-  return Object.freeze({transaction:action=>repository.transaction(async(db,ports)=>{
+  return Object.freeze({
+    // Existing global advisory lock + fenced COMMIT, without credential reads.
+    claimAttempt:action=>repository.transaction(async(_db,ports)=>{
+      const r=await ports.query('select payload from n88_private.numeric_rates limit $1',[maxRows+1]);
+      if(r.rows.length>maxRows)fail();
+      const state={numericRates:r.rows.map(r=>r.payload)};
+      const allowed=await action(state,ports);
+      if(state.numericRates.length>maxRows)fail();
+      const keys=new Set(state.numericRates.map(r=>r.key));
+      for(const row of r.rows)if(!keys.has(row.payload.key))await ports.query('delete from n88_private.numeric_rates where row_key=$1',[row.payload.key]);
+      for(const row of state.numericRates)await ports.query('insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload',[row.key,JSON.stringify(row)]);
+      return allowed;
+    }),
+    transaction:action=>repository.transaction(async(db,ports)=>{
     if(typeof ports?.query!=='function') fail();
     const extra={},original={};let bytes=0;
     for(const [name,table] of Object.entries(tables)) {

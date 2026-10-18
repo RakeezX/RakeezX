@@ -13,11 +13,11 @@ export function processIdentity(pid) {
   assert.ok(Number.isSafeInteger(pid)&&pid>0);
   return JSON.parse(execFileSync(powershell,['-NoProfile','-NonInteractive','-Command',`$p=Get-CimInstance Win32_Process -Filter 'ProcessId = ${pid}'; if($p){@{pid=$p.ProcessId;birth=$p.CreationDate.ToUniversalTime().ToString('o');executable=$p.ExecutablePath;commandLine=$p.CommandLine}|ConvertTo-Json -Compress}else{'null'}`],{encoding:'utf8',windowsHide:true,timeout:10000}));
 }
-export async function startNativePg(root) {
+export async function startNativePg(root,{historicalReservationFixture=false}={}) {
   const {Client,Pool}=createRequire(import.meta.url)(canonicalRoot+'/artifacts/n77-native-pg17/client/node_modules/pg');
   const parent=path.join(root,'tests/fixtures/n88-integrated-class'),phase=path.join(parent,'owned-'+randomUUID()),data=path.join(phase,'data');
   await mkdir(phase,{recursive:false});
-  const marker={pid:process.pid,birth:processIdentity(process.pid).birth,data};
+  const marker={credentialFormat:'six-v1',pid:process.pid,birth:processIdentity(process.pid).birth,data};
   await writeFile(path.join(phase,'owner.json'),JSON.stringify(marker),{flag:'wx'});
   const env={SystemRoot:'C:\\Windows',WINDIR:'C:\\Windows',PATH:bin+';C:\\Windows\\System32',TEMP:phase,TMP:phase,LANG:'C'};
   const cmd=(file,args,stdio='pipe')=>execFileSync(file,args,{env,encoding:'utf8',windowsHide:true,timeout:30000,stdio,maxBuffer:1024*1024});
@@ -60,9 +60,23 @@ export async function startNativePg(root) {
     await admin.query('set role postgres');
     await admin.query(await readFile(path.join(root,'supabase/migrations/20261018034356_n88_exact_activation_staged.sql'),'utf8'));
     await admin.query(await readFile(path.join(root,'supabase/migrations/20261018102843_n88_integrated_class_staged.sql'),'utf8'));
+    if(historicalReservationFixture){
+      // Owned fabricated pre-amendment record; no plaintext credential or prior DB reuse.
+      await admin.query("insert into n88_private.contexts(namespace,owner_id,active) values('n88_integrated_synthetic_01','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true) on conflict(owner_id) do nothing");
+      const id=randomUUID();
+      await admin.query('insert into n88_private.numeric_credentials(row_key,payload) values($1,$2::jsonb)',[id,JSON.stringify({id,ownerId:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',studentId:'historical-fixture',version:1,reservation:'c'.repeat(64),verifier:'d'.repeat(64),keyVersion:'v1',revokedAt:1})]);
+    }
+    await admin.query(await readFile(path.join(root,'drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql'),'utf8'));
+    await admin.query(await readFile(path.join(root,'supabase/migrations/20261018110713_n88_six_digit_staged.sql'),'utf8'));
     await admin.query('reset role');
     await admin.query(await readFile(path.join(parent,'seed.sql'),'utf8'));
     pool=new Pool(config);
-    return {phase,identity,port,close,fixtureQuery:(...a)=>admin.query(...a),async acquire(){const c=await pool.connect();try{await c.query('set role n88_backend');return {query:(...a)=>c.query(...a),release:e=>c.release(e)};}catch(e){c.release(e);throw e;}}};
+    return {phase,identity,port,close,async restart(){
+      await pool.end();await admin.end();await prove();
+      control(['-D',data,'-m','fast','-w','-t','20','stop']);started=false;
+      assert.equal(processIdentity(identity.pid),null);identity=null;
+      control(['-D',data,'-l',path.join(phase,'server.log'),'-w','-t','20','start']);started=true;await prove();
+      admin=new Client(config);await admin.connect();pool=new Pool(config);
+    },fixtureQuery:(...a)=>admin.query(...a),async acquire(){const c=await pool.connect();try{await c.query('set role n88_backend');return {query:(...a)=>c.query(...a),release:e=>c.release(e)};}catch(e){c.release(e);throw e;}}};
   } catch(e) {await close();throw e;}
 }

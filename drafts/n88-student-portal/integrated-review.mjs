@@ -11,16 +11,21 @@ import {createWebEntry} from './web-entry.mjs';
 import {createCloudflareEntry} from './cloudflare-entry.mjs';
 import {readCanonical} from './integrated-service.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
-export async function startIntegratedReview({ttl=14400}={}) {
-  const pg=await startNativePg(root);let server,timer,closed=false,expire;
+export async function startIntegratedReview({ttl=14400,historicalReservationFixture=false}={}) {
+  const pg=await startNativePg(root,{historicalReservationFixture});let server,timer,closed=false,expire;
   const expired=new Promise(ok=>{expire=ok;});
   const close=async()=>{if(closed)return;closed=true;clearTimeout(timer);if(server?.listening){server.closeAllConnections();await new Promise(ok=>server.close(ok));}await pg.close();};
   try {
     const origin='https://synthetic.invalid',provider=providerFixture(),ingressKey=randomBytes(32);
     const manifest=JSON.parse(await readFile(path.join(root,'drafts/n88-student-portal/deployment.inactive.json'),'utf8'));
-    const edge=createWebEntry({...manifest,origin,authUrl,apiKey:'FABRICATED_API_KEY',secretKey:randomBytes(32),ingressKey,
-      numericKey:randomBytes(32),reservationKey:randomBytes(32),acquire:()=>pg.acquire(),fetch:provider.fetch,sourceOnly:false,canonicalReadback:true,privateIngressReadback:true});
-    const gateway=createCloudflareEntry({fetch:(u,i)=>edge(new Request(u,i))});
+    let failure=null,syntheticSource='192.0.2.1';
+    const options={...manifest,origin,authUrl,apiKey:'FABRICATED_API_KEY',secretKey:randomBytes(32),ingressKey,
+      numericKey:randomBytes(32),reservationKey:randomBytes(32),acquire:async()=>{const c=await pg.acquire();return {release:e=>c.release(e),query:(sql,...args)=>{
+        if(failure && sql.includes(failure)){failure=null;throw Error('Synthetic transaction failure');}
+        return c.query(sql,...args);
+      }};},fetch:provider.fetch,sourceOnly:false,canonicalReadback:true,privateIngressReadback:true};
+    let edge=createWebEntry(options),peer=createWebEntry(options),alternate=false;
+    const gateway=createCloudflareEntry({fetch:(u,i)=>{alternate=!alternate;return (alternate?edge:peer)(new Request(u,i));}});
     const env={N88_ENABLED:'true',N88_PUBLIC_ORIGIN:origin,N88_EDGE_URL:authUrl+'/functions/v1/n88-student-portal',N88_INGRESS_KEY:ingressKey.toString('hex')};
     let localOrigin,loseAck=false,holdNext=false,release,held;
     const calls=[];
@@ -33,7 +38,7 @@ export async function startIntegratedReview({ttl=14400}={}) {
         if(u.pathname.startsWith('/api/n88/')) {
           if(u.search)return send(400,'Unavailable');
           let size=0;const chunks=[];for await(const b of req){size+=b.length;if(size>4096)return send(413,'Unavailable');chunks.push(b);}
-          const body=Buffer.concat(chunks),headers=new Headers(req.headers);headers.set('origin',origin);headers.set('cf-connecting-ip','192.0.2.1');
+          const body=Buffer.concat(chunks),headers=new Headers(req.headers);headers.set('origin',origin);headers.set('cf-connecting-ip',syntheticSource);
           const request=new Request(origin+u.pathname,{method:req.method,headers,...(body.length?{body}:{})});Object.defineProperty(request,'cf',{value:{tlsVersion:'TLSv1.3'}});
           const result=await gateway(request,env);calls.push({action:u.pathname.split('/').at(-1),status:result.status});
           if(holdNext){holdNext=false;held?.();await new Promise(ok=>{release=ok;});}
@@ -54,7 +59,7 @@ export async function startIntegratedReview({ttl=14400}={}) {
         else if(u.pathname==='/review/bootstrap.js')file='tests/fixtures/n88-integrated-class/bootstrap.js';
         else return send(404,'Unavailable');
         source=await readFile(path.join(root,file));
-        if(file==='index.html'||file==='drafts/n88-student-portal/client/student.html')source=source.toString().replace('<body>','<body><aside role="note" dir="rtl"><strong>مراجعة محلية ببيانات مصطنعة؛ الخدمة الحية غير مفعلة.</strong> <a href="/#/teaching/teaching">فصل المعلم المصطنع</a> · <a href="/student" target="_blank" rel="noopener noreferrer">صفحة دخول الطالب الموحّدة</a><p>افتح مساحة الطلاب من الفصل، اختر الحقول واحفظها، ثم أنشئ الرموز وسلّم رمزًا واحدًا لكل طالب. أغلق عرض الرموز لمسحها. لا تستخدم بيانات حقيقية.</p></aside>');
+        if(file==='index.html'||file==='drafts/n88-student-portal/client/student.html')source=source.toString().replace('<body>','<body><aside role="note" dir="rtl"><strong>مراجعة محلية ببيانات مصطنعة؛ الخدمة الحية غير مفعلة.</strong> <a href="/#/teaching/teaching">فصل المعلم المصطنع — رموز من 6 أرقام</a> · <a href="/student" target="_blank" rel="noopener noreferrer">صفحة دخول الطالب الموحّدة</a><p>افتح مساحة الطلاب من الفصل، اختر الحقول واحفظها، ثم أنشئ الرموز وسلّم رمزًا واحدًا لكل طالب. أغلق عرض الرموز لمسحها. لا تستخدم بيانات حقيقية.</p></aside>');
         if(file==='src/app.js') {
           source=source.toString().replaceAll('\r\n','\n');const a=source.indexOf('    // Restore the cached identity immediately'),b=source.indexOf("  } catch (err) {\n    console.error('[rakeezx] فشل",a);
           if(a<0||b<a)throw Error('Actual app bootstrap changed');
@@ -72,6 +77,8 @@ export async function startIntegratedReview({ttl=14400}={}) {
     await new Promise((ok,fail)=>{server.once('error',fail);server.listen(0,'127.0.0.1',ok);});localOrigin='http://127.0.0.1:'+server.address().port;
     timer=setTimeout(expire,ttl*1000);
     return {url:localOrigin+'/#/teaching/teaching',studentUrl:localOrigin+'/student',phase:pg.phase,postgres:{...pg.identity,port:pg.port},expiresAt:new Date(Date.now()+ttl*1000).toISOString(),close,expired,
-      testing:{calls,provider,query:pg.fixtureQuery,loseAck:()=>{loseAck=true;},hold:()=>{holdNext=true;return new Promise(ok=>{held=ok;});},release:()=>{release?.();release=null;}}};
+      testing:{calls,provider,serviceInstances:2,restart:async()=>{await pg.restart();edge=createWebEntry(options);peer=createWebEntry(options);},
+        trustedSource:n=>{if(!Number.isInteger(n)||n<1||n>254)throw Error('Synthetic source required');syntheticSource='192.0.2.'+n;},
+        failSession:()=>{failure='insert into n88_private.numeric_sessions';},query:pg.fixtureQuery,loseAck:()=>{loseAck=true;},hold:()=>{holdNext=true;return new Promise(ok=>{held=ok;});},release:()=>{release?.();release=null;}}};
   }catch(e){await close();throw e;}
 }

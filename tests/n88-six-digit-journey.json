@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "checks": [
+    {
+      "name": "n88_actual_app_class_batch_to_universal_student_same_service_pg_journey",
+      "status": "PASS",
+      "evidence": "Actual app shell/hash route/store and account lease guard; two students batch/skip, universal numeric login through signed gateway/Auth/restricted native PG, reload, 390/1280 source CSS/screenshots. No credentials retained."
+    },
+    {
+      "name": "n88_canonical_projection_visibility_score_task_and_current_identity_isolation",
+      "status": "PASS",
+      "evidence": "Canonical teacher-model grades [8,0,null,4,8,4], regular/late/required/future work, own profile and other student isolation; server hides all six fields; selective rotation/revocation kills only target sessions; revoked batch does not resurrect. Lease expiry denies before network."
+    }
+  ],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "failures": [],
+  "pageErrors": [],
+  "stage": "students"
+}

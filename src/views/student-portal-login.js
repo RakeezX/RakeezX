@@ -18,7 +18,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   };
   function entry(message = '') {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">دخول الطالب</h1><p id="n88-code-help">أدخل رمزك الشخصي: 12 رقمًا يبدأ بالرقم 1. استخدم الأرقام 0–9.</p><form data-claim><label for="n88-unified-code">رمز الدخول</label><input id="n88-unified-code" type="text" inputmode="numeric" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form></section>`);
+    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">دخول الطالب</h1><p id="n88-code-help">أدخل رمزك الشخصي: 6 أرقام يبدأ بالرقم 1. استخدم الأرقام 0–9.</p><form data-claim><label for="n88-unified-code">رمز الدخول</label><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form></section>`);
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -53,10 +53,29 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if (!event.target.matches('[data-claim]')) return;
     event.preventDefault(); if (busy || !enabled) return;
     const input = root.querySelector('input'); let code = normalizeStudentCode(input.value); input.value = '';
-    if (!validStudentCode(code)) { code = ''; entry('استخدم 12 رقمًا يبدأ بالرقم 1.'); root.querySelector('input')?.setAttribute('aria-invalid', 'true'); return; }
+    if (!validStudentCode(code)) { code = ''; entry('استخدم 6 أرقام يبدأ بالرقم 1.'); root.querySelector('input')?.setAttribute('aria-invalid', 'true'); return; }
     void run(() => { const pending = client.claim(code); code = ''; return pending; });
   };
-  const input = event => { if (event.target.matches('[data-claim] input')) event.target.value = normalizeStudentCode(event.target.value); };
+  const input = event => { if (event.target.matches('[data-claim] input')) {
+    event.target.setCustomValidity(''); event.target.removeAttribute('aria-invalid');
+    event.target.value = normalizeStudentCode(event.target.value);
+  } };
+  // Reject overlong paste/insertion before native maxlength can silently truncate it.
+  const rejectOverflow = (event, pasted = false) => {
+    const field = event.target;
+    if (!field.matches('[data-claim] input')) return;
+    const added = pasted ? event.clipboardData?.getData('text') : event.data;
+    if (typeof added !== 'string') return;
+    const proposed = field.value.slice(0, field.selectionStart ?? field.value.length) + added + field.value.slice(field.selectionEnd ?? field.value.length);
+    if (normalizeStudentCode(proposed).length > 6) {
+      event.preventDefault(); field.value = '';
+      field.setCustomValidity('استخدم رمزًا من 6 أرقام دون اختصار.'); field.setAttribute('aria-invalid', 'true');
+    } else if (pasted) {
+      event.preventDefault(); field.value = normalizeStudentCode(proposed); input({target:field});
+    }
+  };
+  const beforeInput = event => rejectOverflow(event);
+  const paste = event => rejectOverflow(event, true);
   const click = event => {
     if (event.target.closest('[data-read]')) void run(() => client.read());
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
@@ -65,7 +84,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const hide = () => clear();
   const visible = () => { if (doc.visibilityState === 'hidden') clear(); };
   const pageshow = event => { if (event.persisted) { clear(); if (enabled) void run(() => client.read()); } };
-  root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
+  root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
   win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
   entry();
   const ready = enabled ? run(() => client.read()) : Promise.resolve();
@@ -73,7 +92,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if (disposed) return;
     clear(); disposed = true; clearTimeout(timer); client?.dispose?.(); root.replaceChildren(); style.remove();
     root.classList.remove('n88-unified'); if (previousDir === null) root.removeAttribute('dir'); else root.setAttribute('dir', previousDir);
-    root.removeEventListener('submit', submit); root.removeEventListener('input', input); root.removeEventListener('click', click);
+    root.removeEventListener('beforeinput', beforeInput); root.removeEventListener('paste', paste); root.removeEventListener('submit', submit); root.removeEventListener('input', input); root.removeEventListener('click', click);
     win.removeEventListener('pagehide', hide); win.removeEventListener('pageshow', pageshow); doc.removeEventListener('visibilitychange', visible);
   } };
 }

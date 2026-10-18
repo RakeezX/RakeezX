@@ -1,3 +1,4 @@
+import {redactN88,diagnosticError} from './n88-six-digit-redaction.mjs';
 /** AI: current canonical projection vs actual teacher store/model entry, no browser or service. */
 import 'fake-indexeddb/auto';
 import assert from 'node:assert/strict';
@@ -33,5 +34,5 @@ let projected=compare();assert.equal(projected.grades.items[0].value,0);assert.e
 c.items.push(clone(c.items.find(i=>i.id==='old-direct'),'old-direct-duplicate',{}));c.items.find(i=>i.id==='old-attendance').penalty=3;
 projected=compare();assert.equal(projected.grades.items[0].value,null);assert.equal(projected.grades.items[4].value,null);
 assert.equal(JSON.stringify(projected).includes('old-class'),false);
-await writeFile('tests/n88-integrated-class-projection.json',JSON.stringify({taskId:'continuous-n88-integrated-class-student-journey-20261018',runId:'01c87cee-6ed3-4bf6-a51c-503fa03b1248',checks:[{name:'canonical_grade_context_matches_actual_teacher_store',status:'PASS',evidence:'All nine teacher context function bodies match current store. Real studentContext/itemScore equals isolated canonical projection for direct zero, automatic participation/attendance transferred context, subitems, unrecorded values, ambiguous group and incompatible automatic settings; source identifiers absent.'}]},null,2)+'\n');
+await writeFile('tests/n88-six-digit-projection.json',JSON.stringify({taskId:'continuous-n88-six-digit-unified-student-code-20261018',runId:'5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45',checks:[{name:'canonical_grade_context_matches_actual_teacher_store',status:'PASS',evidence:'All nine teacher context function bodies match current store. Real studentContext/itemScore equals isolated canonical projection for direct zero, automatic participation/attendance transferred context, subitems, unrecorded values, ambiguous group and incompatible automatic settings; source identifiers absent.'}]},null,2)+'\n');
 console.log('N88 canonical projection/actual teacher store equivalence PASS');
