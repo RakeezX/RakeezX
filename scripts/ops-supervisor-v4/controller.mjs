@@ -161,9 +161,16 @@ export function exhaustedLiveFixture(result) {
     && /(?:consumed|exhausted)/i.test(reason) && /(?:retired|forbidden|not permitted|no .*replacement)/i.test(reason);
 }
 
+export function missingProviderTransport(result) {
+  if (result?.state !== 'BLOCKED' || result.blockerType !== 'network') return false;
+  const reason = String(result.blocker ?? ''), next = String(result.nextAction ?? '');
+  return /ipv6|session pooler/i.test(reason)
+    && /unavailable|not (?:been )?(?:supplied|provided)|lacks? (?:ipv6 )?connectivity|cannot reach/i.test(reason)
+    && /host:port|provider.supplied|ipv6.capable custodian/i.test(next);
+}
 export function workerBlockerClass(result) {
   // A preserved real failure remains blocked; a new worker cannot replenish a retired one-pair phase.
-  if (exhaustedLiveFixture(result)) return 'external';
+  if (exhaustedLiveFixture(result) || missingProviderTransport(result)) return 'external';
   return result?.blockerType === 'auth' ? 'external' : result?.blockerType;
 }
 export function classifyFailure(message, explicit = null) {
@@ -787,24 +794,25 @@ export class Controller {
     } catch (error) { await this.failure(task, 'Worker launch failed: ' + error.message, 'environment'); }
   }
   async isolateCompletedAuthBlocker(task, processes) {
-    if (task.status !== 'retry_wait' || task.failureClass !== 'auth' || !task.attempt?.runId) return false;
+    if (task.status !== 'retry_wait' || !['auth', 'network'].includes(task.failureClass) || !task.attempt?.runId) return false;
     const checkpoint = await readJson(task.attempt.checkpointPath);
     const result = await readJson(task.attempt.outputPath);
     if (!checkpoint?.finishedAt || checkpoint.taskId !== task.id || checkpoint.runId !== task.attempt.runId
       || checkpoint.sessionId && task.sessionId && checkpoint.sessionId !== task.sessionId
       || result?.taskId !== task.id || result.runId !== task.attempt.runId
-      || result.state !== 'BLOCKED' || result.blockerType !== 'auth') return false;
+      || result.state !== 'BLOCKED' || result.blockerType !== task.failureClass
+      || result.blockerType !== 'auth' && !missingProviderTransport(result)) return false;
     if (workerProcesses(task, checkpoint, processes).length) return false;
     const reason = result.blocker || result.summary;
     if (!reason || clean(reason) !== task.lastFailure) return false;
     task.failureReclassificationHistory = [...(task.failureReclassificationHistory ?? []), {
-      at: this.now(), runId: task.attempt.runId, from: 'auth', to: 'external',
-      reason: 'Completed worker downstream authentication blocker is task-scoped, not a Codex runtime outage',
+      at: this.now(), runId: task.attempt.runId, from: task.failureClass, to: 'external',
+      reason: task.failureClass === 'auth' ? 'Completed worker downstream authentication blocker is task-scoped, not a Codex runtime outage' : 'Completed worker lacks an exact provider connection input; resume requires changed input rather than a blind network retry',
       originalFailure: task.lastFailure, originalRetryAt: task.retryAt,
       originalInfrastructureRetries: task.infrastructureRetries, resultPath: task.attempt.outputPath,
     }];
     await this.failure(task, reason, 'external');
-    await this.event('task_auth_blocker_isolated', { taskId: task.id, runId: task.attempt.runId });
+    await this.event(result.blockerType === 'auth' ? 'task_auth_blocker_isolated' : 'task_network_prerequisite_isolated', { taskId: task.id, runId: task.attempt.runId });
     return true;
   }
   async reconcile(task, processes) {
@@ -1048,7 +1056,7 @@ export class Controller {
     let processes;
     try { processes = await this.inventory(); }
     catch (error) { this.issues.push({ code: 'PROCESS_INVENTORY_UNAVAILABLE', message: clean(error.message) }); await this.snapshot(paused, false); return; }
-    for (const task of this.jobs.filter(t => t.status === 'retry_wait' && t.failureClass === 'auth')) {
+    for (const task of this.jobs.filter(t => t.status === 'retry_wait' && ['auth', 'network'].includes(t.failureClass))) {
       try { await this.isolateCompletedAuthBlocker(task, processes); }
       catch (error) { this.issues.push({ code: 'SCOPED_AUTH_RECONCILE_FAILED', taskId: task.id, message: clean(error.message) }); }
     }
