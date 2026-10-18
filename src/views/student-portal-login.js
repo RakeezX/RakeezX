@@ -1,4 +1,5 @@
 /** AI: reusable actual student page, deliberately unregistered in the teacher app. */
+import { brandLockup } from '../lib/brand.js';
 import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData } from '../lib/student-portal-unified-client.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const displayNumber = value => value === null ? 'لم تُرصد' : escape(value);
@@ -13,7 +14,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const enabled = readiness?.enabled === true && !!client;
   const paint = content => {
     if (disposed) return;
-    root.innerHTML = `<header><span class="n88-unified-brand">رَكيز المعلم</span><span>مساحة الطالب</span></header><main>${content}</main>`;
+    root.innerHTML = `<header>${brandLockup({ compact: true })}<span class="n88-unified-space">مساحة الطالب</span></header><main>${content}</main>`;
     root.querySelector('h1')?.focus();
   };
   function entry(message = '') {
@@ -25,13 +26,16 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   function show(raw) {
     const data = projectUnifiedStudentData(raw);
     const profile = data.profile;
-    let content = `<h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p>${escape(profile.classLabel)}</p>` : ''}<div class="n88-unified-actions"><button data-read>تحديث</button><button data-end>إنهاء الجلسة</button></div><div class="n88-unified-sections">`;
+    let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end>إنهاء الجلسة</button></div></div><div class="n88-unified-sections">`;
     if (data.grades) {
-      content += `<section><h2>درجاتي</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">البند</th><th scope="col">الدرجة</th><th scope="col">من</th></tr></thead><tbody>${data.grades.items.map(item => `<tr><th scope="row">${escape(item.label)}${item.status !== undefined ? `<small>${escape({recorded:'مرصودة',unrecorded:'لم تُرصد'}[item.status]||'')}</small>` : ''}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join('')}</tbody></table></div>${data.grades.total ? `<p>المجموع: ${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</p>` : ''}</section>`;
+      content += `<section class="n88-unified-grades"><h2>درجاتي</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">البند</th><th scope="col">الدرجة</th><th scope="col">من</th></tr></thead><tbody>${data.grades.items.map(item => `<tr><th scope="row">${escape(item.label)}${item.status !== undefined ? `<small>${escape({recorded:'مرصودة',unrecorded:'لم تُرصد'}[item.status]||'')}</small>` : ''}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join('')}</tbody></table></div>${data.grades.total ? `<p class="n88-unified-total">المجموع: <b dir="ltr">${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</b></p>` : ''}</section>`;
     }
     for (const [key, label] of Object.entries({ required: 'المطلوب مني', completed: 'الأعمال المكتملة', scheduled: 'الأعمال القادمة' })) {
       if (!Object.hasOwn(data.work || {}, key)) continue;
-      content += `<section data-section="${key}"><h2>${label}</h2>${data.work[key].length ? data.work[key].map(item => `<article><h3>${escape(item.title)}</h3>${item.instruction !== undefined ? `<p>${escape(item.instruction)}</p>` : ''}${item.startDate ? `<p>يبدأ: <span dir="ltr">${escape(item.startDate)}</span></p>` : ''}${item.dueDate ? `<p>التسليم: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ''}${item.completionState !== undefined ? `<p>${escape({unrecorded:'لم يُرصد إنجاز',regular:'مكتمل',late:'مكتمل متأخر'}[item.completionState])}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}</article>`).join('') : '<p>لا توجد أعمال منشورة في هذا القسم.</p>'}</section>`;
+      content += `<section data-section="${key}"><h2>${label}<span class="n88-unified-count" aria-label="عدد الأعمال">${data.work[key].length}</span></h2>${data.work[key].length ? data.work[key].map(item => {
+        const detail = `${item.instruction !== undefined ? `<p class="n88-unified-instruction">${escape(item.instruction)}</p>` : ''}${item.startDate ? `<p>يبدأ: <span dir="ltr">${escape(item.startDate)}</span></p>` : ''}${item.dueDate ? `<p>التسليم: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ''}${item.completionState !== undefined ? `<p>${escape({unrecorded:'لم يُرصد إنجاز',regular:'مكتمل',late:'مكتمل متأخر'}[item.completionState])}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}`;
+        return detail ? `<details class="n88-unified-work"><summary><span>${escape(item.title)}</span><span class="n88-unified-detail-hint">التفاصيل</span></summary><div class="n88-unified-detail">${detail}</div></details>` : `<article class="n88-unified-work"><h3>${escape(item.title)}</h3></article>`;
+      }).join('') : '<p class="n88-unified-empty">لا توجد أعمال منشورة في هذا القسم.</p>'}</section>`;
     }
     paint(content + '</div>');
   }

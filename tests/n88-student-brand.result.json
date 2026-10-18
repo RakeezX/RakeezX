@@ -1,0 +1,149 @@
+{
+  "taskId": "continuous-n88-branded-student-example-20261018",
+  "runId": "4e41fc23-9424-493d-a20a-e4e13184b113",
+  "checks": [
+    {
+      "name": "n88_branded_student_postlogin_example_responsive_visible_fields",
+      "status": "PASS",
+      "evidence": "Actual component + app.css + compact lockup: 390/698/1280 light/dark, zero/null, ordered work groups, click/keyboard details, >=44px controls, no horizontal overflow; six screenshots."
+    },
+    {
+      "name": "n88_student_cosmetic_change_existing_session_clear_and_private_graph",
+      "status": "PASS",
+      "evidence": "Actual unchanged client with synthetic read/end ports: omitted fields/private values absent, 410/503/429, cooldown, end/pagehide/clear and stale response suppression; six-digit pattern, no-store/no-referrer/credentials/redirect preserved, empty storage. Recursive pure JS graph recorded."
+    },
+    {
+      "name": "n88_student_brand_syntax_scope_and_launcher",
+      "status": "PASS",
+      "evidence": "node --check component, example server and focused test; final git diff --check after removing two doc trailing spaces; exact allowed paths only. Existing client/runtime/sw unchanged. Actual CLI HTTP200/no-store/no-referrer; orphan after terminal Ctrl+C identified and owned process stopped. Six screenshots visually inspected. Original findings preserved."
+    }
+  ],
+  "visual": [
+    {
+      "width": 390,
+      "theme": "light",
+      "screenshot": "tests/fixtures/n88-student-brand/evidence/390-light.png",
+      "overflow": false,
+      "detailsKeyboard": true,
+      "colors": {
+        "background": "rgb(244, 247, 245)",
+        "text": "rgb(21, 37, 61)"
+      }
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "screenshot": "tests/fixtures/n88-student-brand/evidence/390-dark.png",
+      "overflow": false,
+      "detailsKeyboard": true,
+      "colors": {
+        "background": "rgb(13, 21, 17)",
+        "text": "rgb(238, 241, 245)"
+      }
+    },
+    {
+      "width": 698,
+      "theme": "light",
+      "screenshot": "tests/fixtures/n88-student-brand/evidence/698-light.png",
+      "overflow": false,
+      "detailsKeyboard": true,
+      "colors": {
+        "background": "rgb(244, 247, 245)",
+        "text": "rgb(21, 37, 61)"
+      }
+    },
+    {
+      "width": 698,
+      "theme": "dark",
+      "screenshot": "tests/fixtures/n88-student-brand/evidence/698-dark.png",
+      "overflow": false,
+      "detailsKeyboard": true,
+      "colors": {
+        "background": "rgb(13, 21, 17)",
+        "text": "rgb(238, 241, 245)"
+      }
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "screenshot": "tests/fixtures/n88-student-brand/evidence/1280-light.png",
+      "overflow": false,
+      "detailsKeyboard": true,
+      "colors": {
+        "background": "rgb(244, 247, 245)",
+        "text": "rgb(21, 37, 61)"
+      }
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "screenshot": "tests/fixtures/n88-student-brand/evidence/1280-dark.png",
+      "overflow": false,
+      "detailsKeyboard": true,
+      "colors": {
+        "background": "rgb(13, 21, 17)",
+        "text": "rgb(238, 241, 245)"
+      }
+    }
+  ],
+  "graph": [
+    {
+      "path": "src/views/student-portal-login.js",
+      "sha256": "9d1e453977e35a2c8fda8bf58e260c3b28b6e6752a70c37ca2f0d9c6d909902f"
+    },
+    {
+      "path": "src/lib/brand.js",
+      "sha256": "0b46aa8ad014afd3b84163bdb2e002e486b606ee9e1ea370b44ca64894c087d5"
+    },
+    {
+      "path": "src/lib/dom.js",
+      "sha256": "8b26581da0652916d48211fa55abfc6ac8fa927c3d659a3afc5a3ca649966657"
+    },
+    {
+      "path": "src/lib/rakeez-datetime-values.js",
+      "sha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7"
+    },
+    {
+      "path": "src/lib/visible-numerals.js",
+      "sha256": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575"
+    },
+    {
+      "path": "src/lib/visible-viewport.js",
+      "sha256": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a"
+    },
+    {
+      "path": "src/lib/student-portal-unified-client.js",
+      "sha256": "7a2dd93f2a3c24e91d30e00f6651b81dd03ee4f52c8b24e57b369a143c9f4677"
+    }
+  ],
+  "cleanup": {
+    "serverClosed": true,
+    "browserOwnedByCanonicalHelper": true
+  },
+  "url": "http://127.0.0.1:18988/",
+  "visualInspection": "All six actual component screenshots opened and inspected: Arabic identity/copy/details legible; compact profile, RTL order and light/dark tokens coherent.",
+  "launcher": {
+    "command": "node tests/fixtures/n88-student-brand/server.mjs",
+    "url": "http://127.0.0.1:18988/",
+    "ttlMinutes": 20,
+    "actualCLIStart": true,
+    "httpStatus": 200,
+    "cacheControl": "no-store",
+    "referrerPolicy": "no-referrer",
+    "actualModuleReference": true,
+    "ownedStop": "Automated terminal Ctrl+C left node child; matched PID35572, birth2026-10-18T15:38:11.624806+03:00, PPID8380 and exact node server command; stopped only that owned process; subsequent loopback refusal checked."
+  },
+  "sharedGeneratedManifestRefresh": "Deferred explicitly to dependent N88 guidance/integration task; existing global generated hashes are not asserted current.",
+  "preservedVerificationFindings": [
+    {
+      "name": "CLI cleanup probe",
+      "initial": "FAIL: unexpected listener after terminal Ctrl+C",
+      "correction": "Matched owned PID/birth/parent/command and stopped only owned example process; HTTP connection refusal confirmed."
+    },
+    {
+      "name": "staged whitespace check",
+      "initial": "FAIL: two trailing Markdown line-break spaces in doc task/run lines",
+      "correction": "Removed two trailing spaces, final staged diff check PASS."
+    }
+  ]
+}
