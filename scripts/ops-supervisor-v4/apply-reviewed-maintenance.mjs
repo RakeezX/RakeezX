@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { verifiedDeployment, verifiedSourceOnlyPublication } from './controller.mjs';
 import { validateControllerReload, buildControllerReloadScript } from './reviewed-controller-reload.mjs';
+import { HISTORICAL_RUNTIME_MODE, verifyHistoricalRuntimeSupersession } from './historical-runtime-supersession.mjs';
 
 const SELF = 'scripts/ops-supervisor-v4/apply-reviewed-maintenance.mjs';
 const WIN_PS = 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
@@ -110,6 +111,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     insist(typeof card.productId === 'string' && typeof card.scopeKey === 'string' && Array.isArray(card.allowedPaths) && Array.isArray(card.requiredChecks) && card.requiredChecks.every(x => typeof x === 'string' && x.length), 'Incomplete source card: ' + card.id);
     insist(typeof materialReason === 'string' && materialReason.trim().length >= 15, 'A concrete material repair is required');
   }
+  if (payload.cardUpdates.some(update => update.card.completionMode === HISTORICAL_RUNTIME_MODE)) insist(payload.requireNoActiveWorkers === true && allowed.length === 0, 'Historical classification requires explicit no-active-worker guards');
   if (payload.cardUpdates.length) {
     const file = payload.files.find(x => x.repoPath === payload.sourceCardFile);
     insist(file && file.repoPath.startsWith('scripts/ops-supervisor-v4/') && file.repoPath.endsWith('.json'), 'Reviewed source card wrapper is missing');
@@ -218,7 +220,7 @@ export function verifiedSourceOnlyDeclarationRepair(task, result, update) {
     && SHA256.test(proof.reviewedFixtureSha256??'') && proof.reason?.length>=50;
 }
 
-export function verifyInactiveIdentity(task, result, update, activationId) {
+export function verifyInactiveIdentity(task, result, update, activationId, historicalContext = null) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
   insist(task.status === e.status && (task.status === 'blocked' || task.status === 'delivery' && update.card.completionMode === 'deferred_by_po') && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
@@ -274,7 +276,8 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && Object.entries(update.card).every(([key,value]) => ['objective','completionMode','verificationRepair'].includes(key) || same(value,task[key]))
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  const historicalSupersession = update.card.completionMode === HISTORICAL_RUNTIME_MODE && verifyHistoricalRuntimeSupersession(task, result, update, historicalContext);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -339,7 +342,23 @@ export function reviewedSourcePreimageMatches(remoteBytes, opsBytes, canonicalBy
     && sha256(canonicalBytes) === file.expectedCanonicalSha256;
 }
 
-export function revisedTask(task, update, commit, at) {
+export function revisedTask(task, update, commit, at, historicalContext = null) {
+  if (update.card.completionMode === HISTORICAL_RUNTIME_MODE) {
+    insist(historicalContext?.result, 'Original unchanged result is required for historical classification');
+    verifyInactiveIdentity(task, historicalContext.result, update, task.activationId, historicalContext);
+    const event = { at, commit, kind: 'reviewed-material-maintenance', effect: 'historical-source-supersession-only', reason: update.materialReason,
+      previousRunId: task.attempt.runId, sessionId: task.sessionId, preservedCandidateSha: task.candidateSha, preservedResultBaseSha: task.baseSha,
+      previousFailure: task.lastFailure, originalResultSha256: update.card.historicalSupersession.originalResultSha256,
+      originalReceiptSha256: update.card.historicalSupersession.originalReceiptSha256, replacementTaskId: update.card.supersededBy,
+      replacementPublishedSha: update.card.supersedingPublishedSha, coverageEvidencePath: update.card.historicalSupersession.coverageEvidencePath,
+      coverageEvidenceSha256: update.card.historicalSupersession.coverageEvidenceSha256 };
+    return { ...structuredClone(task), ...structuredClone(update.card), status: 'blocked', failureClass: 'external',
+      lastFailure: 'SUPERSEDED_BY_VERIFIED_DELIVERY: ' + update.card.supersededBy + ' published as ' + update.card.supersedingPublishedSha,
+      nextDeliveryAt: null, retryAt: null, deliveryOwner: null, updatedAt: at,
+      recoveryHistory: [...(task.recoveryHistory ?? []), event], historicalSupersessionHistory: [...(task.historicalSupersessionHistory ?? []), event],
+      supersessionEvidence: { taskId: update.card.supersededBy, publishedSha: update.card.supersedingPublishedSha, at,
+        classificationOnly: true, coverageEvidencePath: event.coverageEvidencePath, coverageEvidenceSha256: event.coverageEvidenceSha256 } };
+  }
   const saved = structuredClone(task);
   const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt?.runId ?? null, sessionId: task.sessionId ?? null, preservedCandidateSha: update.expected.candidateSha ?? null, previousQueuedCandidateSha: task.candidateSha ?? null, previousQueuedBaseSha: task.baseSha ?? null, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha ?? null, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
 
@@ -480,7 +499,25 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     const resultPath = path.join(rt, 'attempts', update.card.id, run, 'result.json'); noLinks(resultPath);
     insist(equalPath(task.resultPath ?? task.attempt?.outputPath, resultPath), 'Unexpected result path: ' + task.id);
     const resultBytes = fs.readFileSync(resultPath), result = parse(resultBytes);
-    verifyInactiveIdentity(task, result, update, payload.activationId);
+    let historicalContext = null;
+    if (update.card.completionMode === HISTORICAL_RUNTIME_MODE) {
+      insist(update.card.supersededBy === 'continuous-n88-six-digit-unified-student-code-20261018', 'Only the exact reviewed N88 replacement may be read');
+      const replacementPath = path.join(rt, 'queue', update.card.supersededBy + '.json'); noLinks(replacementPath);
+      const replacementBytes = fs.readFileSync(replacementPath), replacement = parse(replacementBytes);
+      const integrationPath = path.join(rt, 'queue', 'continuous-n88-integrated-class-student-journey-20261018.json'); noLinks(integrationPath);
+      const integration = json(integrationPath);
+      insist(replacement.id === update.card.supersededBy && integration.id === 'continuous-n88-integrated-class-student-journey-20261018', 'Historical replacement/integration identity changed');
+      const replacementReceiptPath = path.join(rt, 'delivery', replacement.id, 'receipt.json'); noLinks(replacementReceiptPath);
+      const integrationReceiptPath = path.join(rt, 'delivery', integration.id, 'receipt.json'); noLinks(integrationReceiptPath);
+      const coverageSpec = payload.files.find(file => file.repoPath === update.card.historicalSupersession?.coverageEvidencePath);
+      insist(coverageSpec && coverageSpec.sha256 === update.card.historicalSupersession.coverageEvidenceSha256, 'Reviewed historical coverage file is missing');
+      historicalContext = { result, resultSha256: sha256(resultBytes), replacement, replacementSha256: sha256(replacementBytes), integration,
+        replacementReceiptSha256: sha256(fs.readFileSync(replacementReceiptPath)), integrationReceiptSha256: sha256(fs.readFileSync(integrationReceiptPath)),
+        coverage: JSON.parse(coverageSpec.content), coverageSha256: sha256(Buffer.from(coverageSpec.content, 'utf8')),
+        assertAncestor: (older, newer) => { git(['merge-base', '--is-ancestor', older, newer], task.worktreePath); },
+        readPublishedBlob: (publishedSha, repoPath) => git(['rev-parse', publishedSha + ':' + repoPath], task.worktreePath) };
+    }
+    verifyInactiveIdentity(task, result, update, payload.activationId, historicalContext);
     insist(equalPath(task.worktreePath, path.join(root, '.worktrees', task.id)), 'Task worktree is outside its owned path');
     noLinks(task.worktreePath);
     insist(git(['rev-parse', 'HEAD'], task.worktreePath) === update.expected.candidateSha, 'Worktree HEAD differs from preserved candidate: ' + task.id);
@@ -506,7 +543,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
 
     const owners = task.lastWorkerReap.owners, alive = inventory(owners.map(p => p.pid));
     for (const saved of owners) insist(!alive.some(p => p.pid === saved.pid && utcTicks(p.createdAt) === utcTicks(saved.createdAt)), 'An owned worker process remains alive: ' + task.id);
-    return { file, raw, task, resultSha256: sha256(resultBytes), candidateSha: result.candidateSha };
+    return { file, raw, task, resultSha256: sha256(resultBytes), candidateSha: result.candidateSha, historicalContext };
   }
   try {
     noLinks(evidenceRoot); fs.mkdirSync(evidenceRoot, { recursive: true });
@@ -622,7 +659,10 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       replaceGuarded(catalogPath, bytes(catalog), sha256(beforeCatalog)); receipt.catalogUpdated = true; record('CATALOG_UPDATED');
       for (const update of payload.cardUpdates) {
         insist(pausedIdle(), 'Pause lost during activation');
-        const state = queueBefore.get(update.card.id), revised = revisedTask(state.task, update, commit, at);
+        const previous = queueBefore.get(update.card.id);
+        const state = update.card.completionMode === HISTORICAL_RUNTIME_MODE ? exactInactive(update) : previous;
+        insist(sha256(state.raw) === sha256(previous.raw), 'Queue changed during historical classification');
+        const revised = revisedTask(state.task, update, commit, at, state.historicalContext);
         replaceGuarded(state.file, bytes(revised), sha256(state.raw));
         receipt.activatedTasks.push({ id: revised.id, status: revised.status, sessionId: revised.sessionId ?? null, runId: revised.attempt?.runId ?? null, candidateSha: revised.candidateSha ?? null, reason: update.materialReason }); record('CARD_ACTIVATED');
       }

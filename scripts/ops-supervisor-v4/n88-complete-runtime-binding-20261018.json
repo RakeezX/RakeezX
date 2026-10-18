@@ -47,12 +47,31 @@
         "liveStudentAccessActivation": false
       },
       "releaseAuthority": "LatestPO18Oct01:04 explicitly asks finishN88; permits reversible runtime binding implementation, own fabricated local journey and originalpublisher source-only inactive release. Hosted schema/Auth/private student access activation and secrets remain separately bounded.",
-      "completionMode": "repair_source_verification_paths",
+      "completionMode": "superseded_n88_runtime_by_verified_delivery",
       "verificationPathRepair": {
         "previousResultSha256": "68580c11d22fdc02d6ac664a3d4b2817ea30aa388182662c933948a0ea3e3ace",
         "previousPathsSha256": "e8778ce1e17fe8e0e123ca0101dbb7e7be69ebbc1d0b780396d2084ff790b1b6",
         "reviewedFixtureSha256": "2e507e34adec981dcf7bc2d9bb59ad83eecd9a61e98a35def1824068174ea116",
         "reason": "PM sourcecard guessed a module filename before implementation. The candidate has tested runtime.mjs and http-adapter.mjs in the original allowed scope; correct only verification metadata, preserving checks, source, session, candidate and publisher."
+      },
+      "supersededBy": "continuous-n88-six-digit-unified-student-code-20261018",
+      "supersedingPublishedSha": "5818ce1be00be34cfc94bc9dfae5dafe137dfd94",
+      "historicalSupersession": {
+        "version": 1,
+        "originalResultSha256": "218a1adafb82e8f10d99057a14551272b5fd14621ec8819b988e24ba8dff00b7",
+        "originalFailureSha256": "0b50035a19c38687f6eb97eba0aa3822788850fbb75b420ec60587afb6d37e2b",
+        "originalReceiptSha256": "f6a3a452d74dfaaa5f7e6a3035911c9094bcc63e7c9d206c44b9d6c2245bbaaa",
+        "replacementQueueSha256": "443c430abc035132f719e24dd31548c50f1c95b8c7ec06882e0e03768e73f29a",
+        "replacementReceiptSha256": "4998d4cbf182ffdff8196a7066c795737a0f6359dceae427bf2917faaf3b8bcd",
+        "integrationReceiptSha256": "5380190624529b566c1ec47d2872af6cc7e1df5a9422e7b6b7906acb72b35cb4",
+        "coverageEvidencePath": "docs/automation-evidence/20261018/N88_HISTORICAL_RUNTIME_SUPERSESSION.json",
+        "coverageEvidenceSha256": "785fdd0cdf978a454742b686a5f9c7998b8195ef525aff5e1131b8f3b133b810",
+        "reviewedVerificationPaths": [
+          "drafts/n88-student-portal/runtime.mjs",
+          "drafts/n88-student-portal/http-adapter.mjs",
+          "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+        ],
+        "reason": "The exact old inactive LOCAL_READY runtime attempt failed only on a guessed verification filename; later verified integrated E and dependent F deliveries include its candidate ancestry. Classify this original blocked attempt as historically superseded without claiming its failed receipt was published or granting hosted activation."
       }
     }
   ]

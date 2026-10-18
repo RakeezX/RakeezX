@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "kind": "n88-historical-runtime-supersession-coverage",
+  "recordedAt": "2026-10-18T11:59:44.443Z",
+  "original": {
+    "taskId": "continuous-n88-complete-runtime-binding-20261018",
+    "candidateSha": "51f2c62e53dd710cde755acba03b8d409794f43b",
+    "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+    "sessionId": "01a14beb-21c2-7cd0-b42d-ed8a4441c24f",
+    "runId": "3813f899-434f-4b6f-b989-dd20fdbdb698",
+    "resultSha256": "218a1adafb82e8f10d99057a14551272b5fd14621ec8819b988e24ba8dff00b7",
+    "failure": "VERIFICATION_ASSET_MISSING: Required source asset is missing: drafts/n88-student-portal/runtime-http.mjs",
+    "verificationPaths": [
+      "drafts/n88-student-portal/runtime.mjs",
+      "drafts/n88-student-portal/http-adapter.mjs",
+      "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+    ]
+  },
+  "replacement": {
+    "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
+    "candidateSha": "04fdbf5eea63465ebb15b0dc1418e9d864ed8497",
+    "baseSha": "df94a3c43681a4ee1842ac938e025a51cf8920e7",
+    "publishedSha": "5818ce1be00be34cfc94bc9dfae5dafe137dfd94",
+    "receiptSha256": "4998d4cbf182ffdff8196a7066c795737a0f6359dceae427bf2917faaf3b8bcd"
+  },
+  "integration": {
+    "taskId": "continuous-n88-integrated-class-student-journey-20261018",
+    "publishedSha": "df94a3c43681a4ee1842ac938e025a51cf8920e7",
+    "receiptSha256": "5380190624529b566c1ec47d2872af6cc7e1df5a9422e7b6b7906acb72b35cb4"
+  },
+  "inheritedPaths": [
+    {
+      "repoPath": "drafts/n88-student-portal/runtime.mjs",
+      "blobSha": "a743afe24577a9ebe74d26c06a40fe00fd566417"
+    },
+    {
+      "repoPath": "drafts/n88-student-portal/http-adapter.mjs",
+      "blobSha": "8dc0a02a0893a69f95170d8cb3224c6cc6ded609"
+    },
+    {
+      "repoPath": "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md",
+      "blobSha": "ad356191c65c6df269823455b2f45d1e80b9d9da"
+    }
+  ],
+  "originalPublicationClaimed": false,
+  "productSuccessClaimed": false,
+  "liveActivationClaimed": false,
+  "limitation": "Later verified E/F implementation and actual Git ancestry support historical supersession only. The original failed publication receipt remains failed; no claim that every historical runtime asset was separately served, no hosted activation or PO acceptance.",
+  "sourceTriage": "artifacts/ops-supervisor-v4/intake-evidence/po-1247-integrated-students-20261018/old-attempt-triage-current.json"
+}
