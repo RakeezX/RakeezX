@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n88-compact-teacher-portal-20261018",
+  "runId": "a2cc5ee3-395f-456f-a814-6ea5cd0e4080",
+  "checks": [],
+  "steps": [],
+  "cleanup": {
+    "ownedServerClosed": true
+  },
+  "failure": {
+    "stage": "startup",
+    "message": "Command failed: powershell.exe -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-compact-teacher-portal-20261018.json -RuntimeRoot C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4 -WaitSeconds 0 -OwnerToken a2cc5ee3-395f-456f-a814-6ea5cd0e4080",
+    "location": [
+      "n88-compact-teacher.mjs:7:21",
+      "n88-compact-teacher.mjs:10:15"
+    ]
+  }
+}

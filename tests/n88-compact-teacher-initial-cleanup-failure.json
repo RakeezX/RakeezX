@@ -1,0 +1,7 @@
+{
+  "taskId": "continuous-n88-compact-teacher-portal-20261018",
+  "runId": "a2cc5ee3-395f-456f-a814-6ea5cd0e4080",
+  "check": "initial_browser_attempt_cleanup",
+  "status": "FAIL",
+  "evidence": "Initial browser attempt exited during finally: resource-lease.ps1 ReadAllText(checkpoint.json) failed because the file was being used by another process. The earlier UI exception was not saved by that initial harness; no UI PASS is inferred. Owned HTTP server/browser had closed before release. A subsequent explicit ownership-checked helper release returned RELEASED integration. Harness now records cleanup failure without dropping the original result. Later empty-roster fixture and draft-loss failures remain in their timestamped original files."
+}

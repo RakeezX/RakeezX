@@ -1,0 +1,24 @@
+{
+  "taskId": "continuous-n88-compact-teacher-portal-20261018",
+  "runId": "a2cc5ee3-395f-456f-a814-6ea5cd0e4080",
+  "checks": [
+    {
+      "name": "n88_compact_teacher_additional_recovery_keyboard_policy_expiry",
+      "status": "PASS",
+      "evidence": "No native share port: exact message remains manually deliverable after explicit action only. Keyboard disclosure/focus; externally advanced policy CAS discards draft with explicit concise explanation. Committed mutation followed by failed read: no success inference, one contextual retry and no write until authorized list. Pagehide while read pending: generation invalidation; returning coalesces into exactly one fresh read after old response. Real route unmount disposes old DOM; no credentials in local/session storage. Session expiry timer synchronously wipes credential DOM and removes write controls. Actual offline lease invalidation: same-document current guard denies, immediate plaintext wipe."
+    }
+  ],
+  "steps": [
+    "No native share port: exact message remains manually deliverable after explicit action only.",
+    "Keyboard disclosure/focus; externally advanced policy CAS discards draft with explicit concise explanation.",
+    "Committed mutation followed by failed read: no success inference, one contextual retry and no write until authorized list.",
+    "Pagehide while read pending: generation invalidation; returning coalesces into exactly one fresh read after old response.",
+    "Real route unmount disposes old DOM; no credentials in local/session storage.",
+    "Session expiry timer synchronously wipes credential DOM and removes write controls.",
+    "Actual offline lease invalidation: same-document current guard denies, immediate plaintext wipe."
+  ],
+  "cleanup": {
+    "ownedServerClosed": true,
+    "lease": "RELEASED integration"
+  }
+}

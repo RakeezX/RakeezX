@@ -1,17 +1,32 @@
-/* AI: section inside the existing RAKEEZ class shell; no replacement brand/header. */
-.n88-class{color:var(--text);font-family:var(--font);line-height:1.8;overflow-wrap:anywhere}
-.n88-class *{box-sizing:border-box}.n88-class h2{margin-block:0 12px}.n88-class button{min-height:44px;white-space:normal}
-.n88-class-actions{display:flex;flex-wrap:wrap;gap:8px}.n88-class-roster{list-style:none;padding:0;margin-block:16px}
-.n88-class-roster>li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-bottom:1px solid var(--line,var(--border))}
-.n88-class-roster span{display:block;color:var(--text-2)}.n88-class fieldset{border:1px solid var(--border);border-radius:var(--radius,12px);padding:16px;min-width:0}
-.n88-class-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-block:12px}
-.n88-class-fields label{display:flex;align-items:center;gap:8px;min-height:44px}.n88-class input[type=checkbox]{width:20px;height:20px;accent-color:var(--brand)}
-.n88-class-delivery{margin-block:16px;padding:16px;border:2px solid var(--brand)}.n88-class-delivery ul{list-style:none;padding:0}.n88-class-delivery li{display:flex;flex-wrap:wrap;gap:12px;margin-block:8px}.n88-class-delivery input{font:inherit;max-width:100%;width:16ch;letter-spacing:.1em}.n88-class button:disabled{opacity:.55;cursor:not-allowed}
-@media(max-width:600px){.n88-class-roster>li{align-items:stretch;flex-direction:column}.n88-class-actions>button{flex:1}.n88-class-fields{grid-template-columns:1fr 1fr}}
-@media print{body:has(.n88-class-delivery) *{visibility:hidden!important}body .n88-class-delivery,body .n88-class-delivery *{visibility:visible!important}.n88-class-delivery{position:absolute;inset:0;background:white;color:black;border:0}.n88-class-delivery button{display:none!important}}
-
-/* Current recovered codes remain ephemeral; never include them in printed reports. */
-.n88-class [data-code]{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-block:8px}
-.n88-class [data-code] input{font:inherit;width:9ch;max-width:100%;letter-spacing:.1em}
-.n88-class [data-manual]{font:inherit;width:100%;min-height:10em}
+/* AI: compact teacher section using the existing RAKEEZ tokens and controls. */
+.n88-class{color:var(--text);font-family:var(--font);line-height:var(--lh-body);overflow-wrap:anywhere;min-width:0}
+.n88-class *{box-sizing:border-box}
+.n88-class-toolbar{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);flex-wrap:wrap}
+.n88-class-purpose{margin:0;color:var(--text-2)}
+.n88-class button,.n88-class summary{min-height:var(--tap);min-width:var(--tap)}
+.n88-class button{white-space:normal;padding-inline:var(--sp-3)}
+.n88-class-status{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.n88-class-status p{margin-block:var(--sp-2);color:var(--text-2);font-size:var(--fs-sm)}
+.n88-class-status p:empty{margin:0}
+.n88-class-actions{display:flex;flex-wrap:wrap;gap:var(--sp-1)}
+.n88-class-roster{list-style:none;padding:0;margin-block:var(--sp-3);border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg-elev)}
+.n88-class-roster>li{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-3)}
+.n88-class-roster>li+li{border-top:1px solid var(--border)}
+.n88-class-student{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2) var(--sp-4);min-width:0;flex:1}
+.n88-class-student strong{font-weight:var(--fw-semibold)}
+.n88-class-student span{color:var(--text-2);font-size:var(--fs-sm)}
+.n88-class [data-code] input{font:inherit;font-family:var(--font-num);font-weight:var(--fw-semibold);width:8.5ch;min-width:8.5ch;max-width:100%;letter-spacing:.12em;text-align:center;min-height:var(--tap);padding:var(--sp-1);background:var(--bg-sunk);color:var(--text);border:1px solid var(--border);border-radius:var(--r-sm)}
+.n88-class-settings{border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg-elev)}
+.n88-class summary{cursor:pointer;padding:var(--sp-3);font-weight:var(--fw-semibold)}
+.n88-class fieldset{border:0;padding:var(--sp-3);min-width:0;margin:0}
+.n88-class legend{color:var(--text-2);font-size:var(--fs-sm)}
+.n88-class-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.n88-class-fields label{display:flex;align-items:center;gap:var(--sp-2);min-height:var(--tap)}
+.n88-class input[type=checkbox]{width:20px;height:20px;flex:none;accent-color:var(--brand)}
+.n88-class button:disabled{opacity:.55;cursor:not-allowed}
+.n88-class :is(button,input,summary,textarea):focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.n88-class [data-confirm]{margin-top:var(--sp-3)}
+.n88-class [data-confirm] h3{font-size:var(--fs-section);margin:0}
+.n88-class [data-manual]{font:inherit;width:100%;min-height:10em;margin-top:var(--sp-3)}
+@media(max-width:760px){.n88-class-roster>li{align-items:stretch;flex-direction:column}.n88-class-actions>button{flex:1}.n88-class-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media print{.n88-class [data-code],.n88-class [data-manual]{display:none!important}}
