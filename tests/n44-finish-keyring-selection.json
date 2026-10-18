@@ -1,0 +1,74 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "f10ecd10-e180-4d0b-a749-bcf75f316f11",
+  "recordedAt": "2026-10-18T16:27:45Z",
+  "suppliedBaseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "refreshedBaseSha": "91a353c46b52fd61070480c9bf008a5bbe43e685",
+  "preservedCandidateSha": "f27acde40de6b9588854636f4b985fe10456a1ef",
+  "state": "BLOCKED",
+  "blockerType": "environment",
+  "stage": "Phase0 official Cloudflare keyring selection",
+  "custodyContractCorrection": {
+    "accepted": true,
+    "previousDiagnosisSuperseded": "A dedicated role-provisioning API is not required. The activated card sanctions client-encrypted SCRAM verifier SQL through protected official CLI --file and Edge custody through protected --env-file.",
+    "exactLogin": "n44_service_login",
+    "localCustodyProof": "NOT_RUN: stopped at the explicit one-attempt Cloudflare environment gate before secret generation or DDL.",
+    "originalReceiptPreserved": "tests/n44-finish-prerequisites.json"
+  },
+  "sourceReconciliation": {
+    "remote": "git ls-remote origin refs/heads/main, then git fetch origin main",
+    "remoteMain": "91a353c46b52fd61070480c9bf008a5bbe43e685",
+    "upstreamChangesSinceSuppliedBase": [
+      "docs/automation-evidence/20261018/N44_CUSTODY_CHANNEL_CORRECTION.md",
+      "scripts/ops-supervisor-v4/n44-finish-bounded-service-activation-20261018.json"
+    ],
+    "applicationOrPinnedSourceChangedUpstream": false,
+    "action": "Merged current main into saved candidate; no reset, main push or Product publication. Original code/pins and proof receipts retained."
+  },
+  "authSelection": {
+    "attemptCount": 1,
+    "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018",
+    "node": "v24.19.0",
+    "nodeExecutable": "C:/Program Files/nodejs/node.exe",
+    "npmEntry": "C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js",
+    "npmArguments": ["exec", "--offline", "--package=wrangler@4.148.0", "--", "wrangler", "whoami", "--json"],
+    "overridePresenceBeforeChild": {
+      "CLOUDFLARE_AUTH_USE_KEYRING": false,
+      "CF_API_TOKEN": false,
+      "CLOUDFLARE_API_TOKEN": false,
+      "CF_API_KEY": false,
+      "CLOUDFLARE_API_KEY": false,
+      "CF_EMAIL": false,
+      "CLOUDFLARE_EMAIL": false
+    },
+    "childKeyringExplicitlyEnabled": true,
+    "childOmittedNames": ["CF_API_TOKEN", "CLOUDFLARE_API_TOKEN", "CF_API_KEY", "CLOUDFLARE_API_KEY", "CF_EMAIL", "CLOUDFLARE_EMAIL"],
+    "globalEnvironmentChanged": false,
+    "credentialStoreReadOrExported": false,
+    "newOAuthFlow": false,
+    "result": {
+      "exitCode": 3221226505,
+      "signal": null,
+      "loggedIn": null,
+      "accountCount": null,
+      "outputFields": [],
+      "stderrPresent": true,
+      "uvTeardownAssertion": true
+    },
+    "diagnosticLimit": "Exact redacted observation preserved. JSON parsing failed; authentication state UNKNOWN, not proven logged out. Assertion detector matched stderr; full stdout/stderr and full assertion text suppressed and not retained. No additional invocation to recover diagnostics.",
+    "priorComparison": "Canonical intake-evidence/po-1628-finish-20261018/wrangler-execution-comparison.json records root exit0/loggedIn=true and N88 worker assertion. That earlier success is not a successful N44 child result."
+  },
+  "checks": [
+    { "name": "n44_fresh_exact_project_policy_and_secure_provider_custody_prerequisites", "status": "FAIL", "evidence": "One corrected official npm/keyring whoami exited3221226505, produced no parseable success JSON and matched assertion detector. Explicit card stop condition reached before mutation. Earlier Supabase/project/policy evidence retained without a new freshness claim." },
+    { "name": "n44_scram_protected_input_custody_and_cleanup", "status": "NOT_RUN", "evidence": "Protected-file/SCRAM channel accepted; no special API requested. Implementation/local verifier-login proof and secret generation not started after Cloudflare stop condition." },
+    { "name": "n44_exact_once_schema_and_private_role_readback", "status": "NOT_RUN", "evidence": "No schema/login operation attempted by this run; no new catalog freshness or hosted role proof claimed." },
+    { "name": "n44_nonsending_real_service_ingress_source_config_readback", "status": "NOT_RUN", "evidence": "No Edge/Worker/route/cron/secret writes or mounted protocol proof. Provider environment prerequisite unresolved." },
+    { "name": "n44_truthful_browser_default_off_user_gesture_and_not_run_device_delivery", "status": "NOT_RUN", "evidence": "Unchanged browser/SW flags OFF. No permission, device registration, Auth fixture, message, private click or zero-open-client reception proof." },
+    { "name": "saved_candidate_and_unchanged_evidence_reconciliation", "status": "PASS", "evidence": "Saved f27acde candidate preserved; current remote main merged. Upstream diff exactly two operating-contract/card files, no application/pinned source changes. Original pin and51-source/6-bundle identity receipt reused; no old suites rerun." },
+    { "name": "owned_resource_disposition", "status": "PASS", "evidence": "Synchronous whoami child returned. No server/browser, phase lease, secret file, database/login, fixture or provider resource created; nothing newly owned needs disarm. Historical fixture functions not invoked or changed." }
+  ],
+  "mutations": { "providerWrites": 0, "newMigrations": 0, "newLogins": 0, "newAuthIds": 0, "personalRowsRead": 0, "studentMutations": 0, "secretsGenerated": 0, "secretFilesCreated": 0, "deviceRegistrations": 0, "realSends": 0, "cronActivation": 0 },
+  "retryCondition": "Materially correct worker-context official npm/Wrangler OS-keyring execution failure and obtain successful redacted whoami in that corrected context. No unchanged retry, new OAuth, root/other-worker proxy, plaintext fallback, credential extraction or security-policy change. Then resume saved candidate/session with already-authorized SCRAM/protected-file local custody proof before live DDL; recheck only genuinely stale prerequisites.",
+  "acceptance": "In-app acceptance preserved. Nonsending service readiness blocked; real OS delivery NOT_RUN. N44 OPEN; N78 deferred. No Product publication or closure claimed."
+}
