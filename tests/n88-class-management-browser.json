@@ -1,0 +1,31 @@
+{
+  "taskId": "continuous-n88-integrated-class-management-20261018",
+  "runId": "48654997-1a32-4af7-aa5e-c3882d2731f6",
+  "check": "n88_class_roster_batch_selective_actions_visibility_actual_ui",
+  "status": "PASS",
+  "checks": [
+    {
+      "width": 390,
+      "status": "PASS",
+      "coverage": "30-student roster/RTL/no overflow, six explicit fields+ACK, 19 created/10 skipped/1 failed, retry only missing, doubleclick, bounded copy/print/clear, selective confirmation+rotate/revoke, lost ACK readback, explicit uncertain partial ACK, context drift, delayed owner switch, sheet cleared on owner switch/expiry, no storage/log/URL secrets, dispose"
+    },
+    {
+      "width": 1280,
+      "status": "PASS",
+      "coverage": "30-student roster/RTL/no overflow, six explicit fields+ACK, 19 created/10 skipped/1 failed, retry only missing, doubleclick, bounded copy/print/clear, selective confirmation+rotate/revoke, lost ACK readback, explicit uncertain partial ACK, context drift, delayed owner switch, sheet cleared on owner switch/expiry, no storage/log/URL secrets, dispose"
+    }
+  ],
+  "limits": "Actual unregistered module only, synthetic HTTP fixture; no live Auth/owner/store composition, real student access, service activation, Production or PO acceptance.",
+  "sourceSha256": {
+    "src/views/student-portal-class.js": "4df9bec57d25bebbd01c243311ac5bb3c61b4a6c76c3bd3c7bdb2254d0d399c8",
+    "src/lib/student-portal-class-client.js": "d221ae2043342624b0cc466738299e4a56a69300ee2846565180af2369562ed8",
+    "src/styles/student-portal-class.css": "aa357f0a9cc8e840d05d32e6f357fb013a7a2e6a0156f208c055f18af5cf4cd1",
+    "src/styles/app.css": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270",
+    "tests/n88-class-management-client.mjs": "37dcda58b7bf123fcf21aa4c26acfed3a6629ec1c6182ba40a5ad4cf0f87303e",
+    "tests/n88-class-management-browser.mjs": "cc27e9a2196f76c890261ac9437e744b0fdbc905db10911189159b3477b0aaf7",
+    "tests/fixtures/n88-class-management/entry.js": "b65a97972367932327a5f48bd52bf107936453701eac42acef9204632fae23aa",
+    "tests/fixtures/n88-class-management/server.mjs": "8a7117abbf21e933ce87a7efa73fa903f1414c536e18e8eddbf0ec6570d064b9",
+    "tests/fixtures/n88-class-management/index.html": "0407ffde5a3d263075245ad6df7e07aa6d1ef3b1c9fd675985383f4beea9798c"
+  },
+  "resources": "Owned loopback server closed; isolated helper closed owned browser/contexts in finally; no global live-browser lease used."
+}
