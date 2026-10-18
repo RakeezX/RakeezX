@@ -1,0 +1,67 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "recordedAt": "2026-10-18T20:09:29.519Z",
+  "sourceCandidate": "3a0f4942ee0d382c921c994747c17e1f91a732f5",
+  "blocker": {
+    "stage": "restricted SESSION pooler connect",
+    "sqlstate": "28P01",
+    "authenticationSucceeded": false,
+    "unchangedRetry": false,
+    "passwordRotatedAfterDenial": false,
+    "alternateChannelAttempted": false
+  },
+  "completed": {
+    "migrationsAppliedAndExactReadBack": 2,
+    "typedPrivateRoutinesExactReadBack": 42,
+    "loginCreationAcknowledged": true
+  },
+  "disarm": {
+    "ownedLoginDisabled": true,
+    "backendMembershipRevoked": true,
+    "flags": {
+      "rolcanlogin": false,
+      "rolsuper": false,
+      "rolbypassrls": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false,
+      "rolreplication": false,
+      "backend_member": false
+    },
+    "metadataReadBack": true,
+    "existingRolesUnchanged": true
+  },
+  "custody": {
+    "newSecretsGeneratedLocally": true,
+    "valuesReturned": false,
+    "sharedCloudflareSecretsGenerated": false,
+    "providerKeysInstalled": false,
+    "protectedDirectory": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/n44-live/owned-8288de34-7362-4946-b319-79a28e864be8.tmp",
+    "retainedFiles": [
+      "owner.json",
+      "recovery.dpapi"
+    ],
+    "retainedRecovery": "CurrentUser DPAPI ciphertext under fresh current-user-only directory",
+    "plaintextTransientInputsAbsent": true,
+    "rawSecretsOrVerifiersRetainedInEvidence": false
+  },
+  "notRun": {
+    "edgeFunctionDeploy": true,
+    "cloudflareWorkerDeploy": true,
+    "ingressRoute": true,
+    "schedulerCron": true,
+    "serviceEnable": true,
+    "privateTableHostedFixture": true,
+    "authFixture": true,
+    "notificationPermission": true,
+    "deviceRegistration": true,
+    "actualPushOrMessage": true,
+    "zeroOpenClientOsReception": true
+  },
+  "noPersonalRowsRead": true,
+  "noCanonicalOrStudentWrites": true,
+  "noAuthConfigurationChange": true,
+  "noLoggingConfigurationChange": true,
+  "noFrontendPublication": true,
+  "temporaryFunctions": "None created/invoked by this N44 run; no temporary-function cleanup or external Push proof inferred. Unrelated historical functions untouched."
+}

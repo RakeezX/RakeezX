@@ -102,15 +102,15 @@ export async function execute(action,value){
   const ca=await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/supabase-prod-ca-2021.crt','utf8');
   if(createHash('sha256').update(ca).digest('hex')!=='700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7')fail('n44_ca_mismatch');
   const host='aws-0-ap-south-1.pooler.supabase.com',client=new Client({host,port:5432,user:'n44_service_login.'+project,password:state.password,database:'postgres',ssl:{ca,rejectUnauthorized:true,servername:host,minVersion:'TLSv1.2'},connectionTimeoutMillis:5000,statement_timeout:3000,query_timeout:4000,application_name:'n44-private-server'});
-  try{await client.connect();const before=(await client.query('select session_user as login,current_user as role,pg_backend_pid() as pid,(select ssl from pg_stat_ssl where pid=pg_backend_pid()) as upstream_ssl')).rows[0];
+  let sessionStage='connect';try{await client.connect();sessionStage='identity';const before=(await client.query('select session_user as login,current_user as role,pg_backend_pid() as pid,(select ssl from pg_stat_ssl where pid=pg_backend_pid()) as upstream_ssl')).rows[0];
    if(before.login!=='n44_service_login'||before.role!==before.login||!before.upstream_ssl||!client.connection.stream.authorized)fail('n44_tls_role_mismatch');
-   await client.query('set role n44_backend');await client.query('begin');const after=(await client.query('select current_user as role,pg_backend_pid() as pid')).rows[0];await client.query('rollback');if(after.role!=='n44_backend'||after.pid!==before.pid)fail('n44_session_transport_mismatch');
-   const esbuild=createRequire(import.meta.url)('C:/Users/Abody/AppData/Local/npm-cache/_npx/32026684e21afda6/node_modules/esbuild/lib/main.js');
+   sessionStage='set_role';await client.query('set role n44_backend');await client.query('begin');const after=(await client.query('select current_user as role,pg_backend_pid() as pid')).rows[0];await client.query('rollback');if(after.role!=='n44_backend'||after.pid!==before.pid)fail('n44_session_transport_mismatch');
+   sessionStage='local_guard_bundle';const esbuild=createRequire(import.meta.url)('C:/Users/Abody/AppData/Local/npm-cache/_npx/32026684e21afda6/node_modules/esbuild/lib/main.js');
    const unused={name:'unused-packages',setup(b){b.onResolve({filter:/^(pg|@supabase\/auth-js|@noble\/curves\/nist.js|web-push|ipaddr.js)$/},a=>({path:a.path,namespace:'unused',sideEffects:false}));b.onLoad({filter:/.*/,namespace:'unused'},()=>({contents:'export default {};export const p256={};export class AuthClient {}',loader:'js'}));}};
    const bundle=await esbuild.build({stdin:{contents:"export {assertPrivateDatabaseSession} from './drafts/n44-push/existing-host.mjs';",resolveDir:root},bundle:true,format:'esm',platform:'node',write:false,plugins:[unused],logLevel:'silent'});
-   const {assertPrivateDatabaseSession}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].contents).toString('base64'));await assertPrivateDatabaseSession(client);
+   const {assertPrivateDatabaseSession}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].contents).toString('base64'));sessionStage='source_guard';await assertPrivateDatabaseSession(client);
    state.loginVerified=true;await save(state);return {restrictedLoginAndSetRole:true,sessionMode:true,tls:client.connection.stream.getProtocol(),hostnameVerified:true,upstreamSsl:true,actualSourcePrivacyBoundary:true};
-  }finally{await client.end().catch(()=>{});}
+  }catch(e){const safeCode=/^[A-Z0-9_]{3,60}$/.test(e.code??'')?e.code:'UNCLASSIFIED';await writeFile(base+'/hosted-session-diagnostic.json',JSON.stringify({projectId:project,runId:run,status:'FAIL',stage:sessionStage,code:safeCode,privateDiagnosticsSuppressed:true},null,2)+'\n');if(/^n44_/.test(e.message))throw e;fail('n44_session_'+sessionStage+'_'+safeCode);}finally{await client.end().catch(()=>{});}
  }
  if(action==='--install-env'){
   if(!state.loginVerified||!state.ingress||!state.scheduler||state.installed)fail('n44_install_gate_missing');
@@ -138,6 +138,14 @@ export async function execute(action,value){
   await sqlEnv({N44_ENABLED:'false',N44_DELIVERY_ENABLED:'false'});
   if(state.loginAcknowledged)await sqlFile('alter role n44_service_login nologin;');
   state.serviceEnabled=false;state.disarmed=true;await save(state);return {edgeDisabled:true,deliveryDisabled:true,ownedLoginDisabled:!!state.loginAcknowledged};
+ }
+ if(action==='--disarm-login'){
+  if(!state.loginAcknowledged||state.installed||state.serviceEnabled)fail('n44_login_disarm_scope_mismatch');
+  await sqlFile('begin;alter role n44_service_login nologin;revoke n44_backend from n44_service_login;commit;');
+  const r=await sqlFile("select rolcanlogin,rolsuper,rolbypassrls,rolcreatedb,rolcreaterole,rolreplication,pg_has_role('n44_service_login','n44_backend','member') as backend_member from pg_roles where rolname='n44_service_login';");
+  if(r.rows?.length!==1||Object.values(r.rows[0]).some(Boolean))fail('n44_login_disarm_readback_failed');
+  state.disarmed=true;state.loginVerified=false;await save(state);
+  return {ownedLoginDisabled:true,backendMembershipRevoked:true,restrictedFlagReadback:r.rows[0],encryptedRecoveryRetained:true,providerRuntimeEverEnabled:false};
  }
  fail('n44_unknown_action');
 }

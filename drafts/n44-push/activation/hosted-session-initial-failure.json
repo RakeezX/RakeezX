@@ -1,0 +1,8 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "loginCreationAcknowledged": true,
+  "status": "FAIL",
+  "code": "n44_custody_failed_private_diagnostics_suppressed",
+  "diagnosticLimitation": "Initial custodian did not retain failing session stage/SQLSTATE. Actual authentication or denial not inferred. Separate local source-guard bundle PASS; one bounded stage/code-only diagnostic added, no password or role changed."
+}

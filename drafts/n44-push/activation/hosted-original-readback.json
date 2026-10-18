@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-10-18T20:04:37.295Z",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "source": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
+  "status": "PASS",
+  "differentKeys": [],
+  "initialComparatorFailure": "JSON.stringify compared object property order; reused captured metadata with structural equality, no provider query repeated"
+}

@@ -1,0 +1,58 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "state": "BLOCKED",
+  "blockerType": "auth",
+  "sourceCandidate": "3a0f4942ee0d382c921c994747c17e1f91a732f5",
+  "baseSha": "5dae233e59356003d2cdf71abd1a1f12bd9d4c2f",
+  "suppliedBaseSha": "91a353c46b52fd61070480c9bf008a5bbe43e685",
+  "recordedAt": "2026-10-18T20:11:45.454Z",
+  "checks": [
+    {
+      "name": "n44_fresh_exact_project_policy_and_secure_provider_custody_prerequisites",
+      "status": "FAIL",
+      "evidence": "Actual correct project/source preflight and supported policy PASS; native Cloudflare account/absence PASS and source-bound privacy/RSA capability reused. Protected input/SCRAM local proof PASS. Exact newly created restricted SESSION pooler login rejected28P01 at connect; no TLS/session/role readiness inferred. See hosted-session-diagnostic.json and hosted-disposition.json."
+    },
+    {
+      "name": "n44_exact_once_schema_and_private_role_readback",
+      "status": "PASS",
+      "evidence": "Provider history20261018200406 original SHA03979346... and20261018200508 private boundary SHAe38579bf... exactly equal actual source bytes; full original identity and42 private routine owner/invoker/ACL hashes match. Original backend/guard preserved. Exact new login disarmed and membership revoked after authentication denial."
+    },
+    {
+      "name": "n44_nonsending_real_service_ingress_source_config_readback",
+      "status": "NOT_RUN",
+      "evidence": "No Edge/Worker/route/cron/secret installation or service enable performed after restricted login denial. Native identity/absence and catalog responses are not mounted service/readiness proof."
+    },
+    {
+      "name": "n44_truthful_browser_default_off_user_gesture_and_not_run_device_delivery",
+      "status": "NOT_RUN",
+      "evidence": "Unchanged browser enabled=false/publicKey=null and SW flagfalse. In-app acceptance retained. No permission, actual registration, hosted Auth fixture, private click, message or zero-open-client OS reception proof."
+    },
+    {
+      "name": "n44_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "tests/n44-finish-boundary.result.json: actual owned PG17.6 logs under observed provider default/ddl/error-parameter0 retain errors/DDL, omit fabricated plaintext/base64 canary and original DETAIL;42 fixed typed invoker operations preserve SQLSTATE, native rows/counts, owner/source/CAS/nonce/clock, actual40001 retry, rollback and durable ACK. Hosted exact definitions/ACL match; no hosted private-canary/log-behavior test claimed."
+    },
+    {
+      "name": "n44_client_scram_and_protected_input_custody",
+      "status": "PASS",
+      "evidence": "Actual local n44_service_login SCRAM authentication/NOINHERIT/SET ROLE/Auth negative and password-absent/verifier-DDL-present proof; fresh current-user-only owned input read/non-echo/cleanup PASS. CurrentUser DPAPI recovery retained; actual shared provider key handoff/env installation NOT_RUN."
+    },
+    {
+      "name": "owned_resource_cleanup_and_live_disarm",
+      "status": "PASS",
+      "evidence": "tests/n44-finish-cleanup.json: all5 exact owned local clusters stopped and0 matching processes; owned live lease RELEASED. hosted-disposition.json: restricted login NOLOGIN/backend membership revoked and flagsfalse confirmed; protected SQL/env input absent, encrypted recovery retained. No temporary function created or old fixture touched."
+    }
+  ],
+  "blocker": "Actual newly created exact restricted n44_service_login SESSION pooler authentication rejected PostgreSQL28P01 at connect. No cause beyond authentication rejection or restricted-session success inferred. Login disabled and backend membership revoked after refusal.",
+  "retryCondition": "Materially correct this exact sanctioned restricted SESSION pooler authentication condition before resuming saved candidate/session. Preserve encrypted recovery and disabled login; do not repeat unchanged connect, rotate credentials speculatively, use privileged/other-worker proxy, replay either applied migration, or repeat old suites. Retain all source/role/TLS/custody/provider/config and NOT_RUN gates.",
+  "history": "drafts/n44-push/activation/hosted-migration-history.json",
+  "initialFailuresPreserved": [
+    "tests/n44-finish-boundary.failure-1792353259415.json",
+    "tests/n44-finish-boundary.failure-1792353360810.json",
+    "drafts/n44-push/activation/hosted-original-readback.json",
+    "drafts/n44-push/activation/hosted-session-initial-failure.json"
+  ],
+  "hostedBehaviorLimit": "No private-table hosted transaction, Auth/owner/device fixture or hosted log-canary test. No service deployed/enabled, real send or Product publication; N44 OPEN/N78 deferred."
+}

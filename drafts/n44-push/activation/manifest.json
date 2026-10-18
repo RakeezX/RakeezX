@@ -76,7 +76,7 @@
     "scripts/n44-activation-readback.mjs": "ea6e9e3851735a07e3a9e6831cb02cdf40258635fda05d73e0d4f1daec23936c",
     "supabase/migrations/20261018044448_n44_exact_activation_staged.sql": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
     "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
-    "scripts/n44-activation-custody.mjs": "40fb3e8a72e197b24248e7a5b64f1678948cf94c29527826c5e2224d5059aec4",
+    "scripts/n44-activation-custody.mjs": "402286e6f162c40002f2abfa1a5e70e6f0566131d2c23f2d766dc7998433e9c9",
     "drafts/n44-push/activation/build-error-boundary.mjs": "86cf5cd24c60cb75b821863f1ecd2de6944a34abb69e60442bb633d991e4a5d8",
     "drafts/n44-push/activation/metadata-contract.json": "a8d893d890e243dee110746ef80f937c2525fc4415f3293672c47e29d1146963",
     "drafts/n44-push/activation/preflight.inactive.sql": "5e4f5cdd5cac95899d6aa9f9c22ed5501f5b46bbce5c0a355b313181cd8cbaa7",

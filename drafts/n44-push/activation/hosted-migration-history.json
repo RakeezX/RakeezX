@@ -1,0 +1,29 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "sourceCandidate": "3a0f4942ee0d382c921c994747c17e1f91a732f5",
+  "readOnlyHistoryVerification": true,
+  "migrations": [
+    {
+      "file": "supabase/migrations/20261018044448_n44_exact_activation_staged.sql",
+      "providerVersion": "20261018200406",
+      "providerName": "n44_exact_activation_staged",
+      "providerStatements": 1,
+      "sourceAndProviderSha256": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
+      "applyAcknowledged": true,
+      "exactIdentities": true
+    },
+    {
+      "file": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+      "providerVersion": "20261018200508",
+      "providerName": "n44_private_error_boundary_staged",
+      "providerStatements": 1,
+      "sourceAndProviderSha256": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
+      "applyAcknowledged": true,
+      "exactBoundaryIdentities": 42
+    }
+  ],
+  "originalVersionsNotForged": true,
+  "personalRowsRead": 0,
+  "backfills": 0,
+  "authConfigurationChanges": 0
+}

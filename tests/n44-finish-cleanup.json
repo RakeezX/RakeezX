@@ -1,0 +1,40 @@
+{
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "checkedAt": "2026-10-18T20:10:48.2673333Z",
+  "status": "PASS",
+  "phases": [
+    {
+      "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-900eab21-43ab-43bf-86a5-2c9efef9dc02",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-900eab21-43ab-43bf-86a5-2c9efef9dc02\\data",
+      "pidFileAbsent": true,
+      "matchingProcesses": 0
+    },
+    {
+      "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-9bb9793f-3f43-4b11-9af6-3c46bf0a5611",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-9bb9793f-3f43-4b11-9af6-3c46bf0a5611\\data",
+      "pidFileAbsent": true,
+      "matchingProcesses": 0
+    },
+    {
+      "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-e8d46fab-9e26-448f-ab68-b08aa017f8ca",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-e8d46fab-9e26-448f-ab68-b08aa017f8ca\\data",
+      "pidFileAbsent": true,
+      "matchingProcesses": 0
+    },
+    {
+      "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-f5205e86-86b9-4ba8-988d-a4a431467f34",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-f5205e86-86b9-4ba8-988d-a4a431467f34\\data",
+      "pidFileAbsent": true,
+      "matchingProcesses": 0
+    },
+    {
+      "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-f66e0174-f6de-4c19-9cb7-4fee8bb99146",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-f66e0174-f6de-4c19-9cb7-4fee8bb99146\\data",
+      "pidFileAbsent": true,
+      "matchingProcesses": 0
+    }
+  ],
+  "cleanup": "Harness marker/PID/birth/data proof and graceful pg_ctl stop; fresh exact owned-directory absence readback; retained stopped checkpoints, no deletion or process kill",
+  "liveMutationLease": "RELEASED live-mutation by exact current owner",
+  "browserOrServerLeaseAcquired": false
+}
