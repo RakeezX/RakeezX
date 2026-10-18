@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "at": "2026-10-18T08:56:47.829Z",
+  "taskId": "continuous-n88-current-functional-review-20261018",
+  "candidateSha": "f2401a002a8b0f609eb8948deba6bfd25fb7cc08",
+  "publishedSha": "e21e623a59a886c8a8b64038a94df7ac32ee8ae6",
+  "receiptSha256": "982470bff378a97c7bbc45288d79d52b8bb283323fd1baf3bb88c5d9143f3c4d",
+  "reviewedFixtureSha256": "e4cc3644f3fbeddbfa36ffd20203cb704d8bcd365796744cef993c6602f987e7",
+  "reason": "Correct parent intake omission of explicit inert source-only preparationAuthority already present in original releaseAuthority. Preserve every candidate/base/session/run/receipt/check and scope; no redeploy, no live activation and no Product claim beyond source-only delivery.",
+  "checks": {
+    "newExactAuthorityGuardAndNegativeCases": "PASS",
+    "existingSessionRunCandidateSourceIdentityGuards": "PASS",
+    "total": 20,
+    "initialFailure": "One preexisting assertion expected the old message for a mismatched source hash, while the current guard rejected with latest-owned-maintenance-chain. Corrected expected message only; rejection preserved."
+  },
+  "constraints": {
+    "noCheckRemoved": true,
+    "noReceiptRewritten": true,
+    "noLiveAuthorityAdded": true,
+    "noProductCodeChanged": true,
+    "requireNoActiveWorkers": true
+  }
+}

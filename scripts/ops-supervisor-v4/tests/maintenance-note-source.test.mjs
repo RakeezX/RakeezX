@@ -12,7 +12,7 @@ test('accepts exact approved-note source when catalog has no row',()=>{
 });
 test('rejects missing or mismatched approved-note identity',()=>{
   assert.throws(()=>catalogSourceBinding([],task,update,'scripts/ops-supervisor-v4/other.json',sha),/Approved-note source identity changed/);
-  assert.throws(()=>catalogSourceBinding([],task,update,'scripts/ops-supervisor-v4/note-card.json','b'.repeat(64)),/Approved-note source identity changed/);
+  assert.throws(()=>catalogSourceBinding([],task,update,'scripts/ops-supervisor-v4/note-card.json','b'.repeat(64)),/Approved-note source is not the latest reviewed owned maintenance chain/);
 });
 test('retains exact catalog-backed behavior',()=>{
   const row={...task,approvedNote:undefined};

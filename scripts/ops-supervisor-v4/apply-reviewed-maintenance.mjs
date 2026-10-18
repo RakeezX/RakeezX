@@ -163,6 +163,29 @@ export function verifiedSourcePathRepair(task,result,update) {
   && Object.entries(card).every(([k,v])=>['objective','completionMode','verificationPaths','verificationPathRepair'].includes(k)||same(v,task[k]));
 }
 
+// Exact N88 card declaration repair: the original authority already permitted
+// inert source-only publication. Preserve every provider/served/check proof.
+export function verifiedSourceOnlyDeclarationRepair(task, result, update) {
+  const card=update.card, proof=card.verificationRepair, d=task.deliveryReceipt, a=card.preparationAuthority;
+  return task.id==='continuous-n88-current-functional-review-20261018'
+    && card.completionMode==='reconcile_source_only_declaration'
+    && task.status==='blocked' && task.lastFailure==='Publisher returned incomplete or mismatched deployment proof'
+    && !task.preparationAuthority && !task.liveMutation && !task.liveAuthorizationRef
+    && !card.liveMutation && !card.liveAuthorizationRef && /source-only inert launcher release/i.test(task.releaseAuthority??'')
+    && a?.publication===true && a.publicationScope==='inert inactive source-only local N88 review launcher'
+    && ['realData','hostedSchemaChange','AuthRLSChange','realSend','liveStudentAccessActivation'].every(k=>a[k]===false)
+    && Object.keys(a).length===7
+    && result.state==='LOCAL_READY' && result.blockerType==='none' && !result.blocker
+    && result.checks?.length>0 && result.checks.every(c=>c.status==='PASS')
+    && same(card.requiredChecks,task.requiredChecks) && same(card.allowedPaths,task.allowedPaths)
+    && card.requiredChecks.every(name=>result.checks.some(c=>c.name===name&&c.status==='PASS'))
+    && Object.entries(card).every(([key,value])=>['objective','completionMode','verificationRepair','preparationAuthority'].includes(key)||same(value,task[key]))
+    && d?.productSourceChangeObserved===false && d.changedAssets?.length===0
+    && verifiedDeployment({...task,preparationAuthority:a},d)
+    && proof?.publishedSha===d.publishedSha && proof.priorReceiptSha256===sha256(bytes(d))
+    && SHA256.test(proof.reviewedFixtureSha256??'') && proof.reason?.length>=50;
+}
+
 export function verifyInactiveIdentity(task, result, update, activationId) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
@@ -219,7 +242,7 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && Object.entries(update.card).every(([key,value]) => ['objective','completionMode','verificationRepair'].includes(key) || same(value,task[key]))
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -305,6 +328,15 @@ export function revisedTask(task, update, commit, at) {
     saved.deliveryOwner = null; saved.nextDeliveryAt = null;
     saved.publisherReconciliation = { at, commit, publishedSha: task.deliveryReceipt.publishedSha,
       originalDeliveryReceiptSha256: sha256(bytes(task.deliveryReceipt)), reason: update.materialReason };
+  }
+
+  if (update.card.completionMode === 'reconcile_source_only_declaration') {
+    insist(verifiedSourceOnlyDeclarationRepair(task,json(task.resultPath),update), 'Source-only declaration repair no longer qualifies');
+    insist(verifiedDeployment(saved,saved.deliveryReceipt), 'Source-only receipt no longer verifies with explicit original authority');
+    saved.status='awaiting_po'; saved.productionVerifiedAt=saved.deliveryReceipt.verifiedAt;
+    saved.deliveryOwner=null; saved.nextDeliveryAt=null;
+    saved.publisherReconciliation={at,commit,publishedSha:saved.deliveryReceipt.publishedSha,
+      originalDeliveryReceiptSha256:sha256(bytes(task.deliveryReceipt)),reason:update.materialReason,sourceOnly:true};
   }
 
   if (update.card.completionMode==='reconcile_observed_publication') {
