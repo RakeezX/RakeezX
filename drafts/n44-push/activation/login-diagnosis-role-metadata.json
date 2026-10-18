@@ -1,0 +1,20 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "302c7ad5-8592-4800-b8d3-d724837eb913",
+  "source": "Actual connected execute_sql READ ONLY, exact task-created role only",
+  "role": "n44_service_login",
+  "metadata": {
+    "rolcanlogin": false,
+    "rolinherit": false,
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "rolreplication": false,
+    "rolconnlimit": -1,
+    "rolvaliduntil": null,
+    "backend_member": false
+  },
+  "meaning": "Owned disarm remains in place. No configured expiry or restrictive connection limit was found. These metadata do not establish the cause of the prior28P01 or permit authentication retry.",
+  "scope": "No other role/credential, Auth account/session or personal row read. No LOGIN/membership/credential/security/logging/ACL change."
+}

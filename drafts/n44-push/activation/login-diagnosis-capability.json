@@ -1,0 +1,10 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "302c7ad5-8592-4800-b8d3-d724837eb913",
+  "channel": "Actual connected Supabase execute_sql, read-only capability metadata only",
+  "managementRole": "postgres",
+  "ownVerifierNameRead": true,
+  "ownVerifierRead": true,
+  "credentialValuesReadOrReturned": false,
+  "scope": "Existing capability only; any own verifier format check is restricted to the protected CLI file and boolean outputs. No privilege expansion."
+}
