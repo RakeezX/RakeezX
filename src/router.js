@@ -34,6 +34,7 @@ const ROUTES = [
   { path: '/archive/year/:yearId/term/:termId', load: () => import('./views/archive-detail.js') },
   { path: '/calendar',                  load: () => import('./views/calendar.js') },
   { path: '/settings',                  load: () => import('./views/settings.js') },
+  { path: '/settings/email-status',     load: () => import('./views/email-status.js') },
   { path: '/settings/notifications',    load: () => import('./views/notification-settings.js') },
   { path: '/settings/backup',           load: () => import('./views/backup.js') },
   { path: '/support',                   load: () => import('./views/support.js') },

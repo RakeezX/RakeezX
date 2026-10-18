@@ -63,6 +63,8 @@ const SHELL = [
   './src/app.js',
   './src/lib/app-update.js',
   './src/router.js',
+  './src/views/email-status.js',
+  './src/styles/settings.css',
   './src/lib/student-portal-client.js',
   './src/lib/student-portal-runtime.js',
   './src/views/student-portal.js',

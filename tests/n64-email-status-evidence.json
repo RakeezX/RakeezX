@@ -1,0 +1,52 @@
+{
+  "taskId": "continuous-n64-account-email-status-page-20261018",
+  "runId": "68be00d0-2ba9-4a83-9cea-8bdc30ee77ee",
+  "scope": "Actual app account/store, DOM, handlers and source CSS; synthetic HTTP only; no live certification",
+  "results": [
+    {
+      "width": 390,
+      "actualAccountEntry": true,
+      "pending": true,
+      "completedOnFreshMatchingRead": true,
+      "returnDeduplicated": true,
+      "reloadCurrentWithoutFalseSuccess": true,
+      "errorNeutral": true,
+      "wrongOwnerGuard": true,
+      "lateUnmount": true,
+      "sessionSwitchCleared": true,
+      "lateSessionResponseIgnored": true,
+      "noSessionNeutral": true,
+      "readonlyAuthRequests": 12
+    },
+    {
+      "width": 1280,
+      "actualAccountEntry": true,
+      "pending": true,
+      "completedOnFreshMatchingRead": true,
+      "returnDeduplicated": true,
+      "reloadCurrentWithoutFalseSuccess": true,
+      "errorNeutral": true,
+      "wrongOwnerGuard": true,
+      "lateUnmount": true,
+      "sessionSwitchCleared": true,
+      "lateSessionResponseIgnored": true,
+      "noSessionNeutral": true,
+      "readonlyAuthRequests": 12
+    }
+  ],
+  "offlineImports": true,
+  "hashes": {
+    "src/views/email-status.js": "b6a4043dcbcce74550ef645fdf87bd620d8726cd58769579bd397c1384e6d915",
+    "src/router.js": "951e2f592af84558ba550dc6adc8e3298cdd1c06b5974d94b4dabe728096042a",
+    "src/views/settings.js": "677404c5b921a30046aec31a1f2db1a42a456c7f141321f846d47b964feed652",
+    "src/styles/settings.css": "77cc44b1c2a9bf42fd42d6864e5dd5243b9ae122af658617baf4599848497b3f",
+    "sw.js": "a67d9f5f0eeb8b98e33e98a88b6f3501925aaa695d75dc5ac4a3f9ac69106384",
+    "src/lib/cloud.js": "df9fc3d3cf8305bb91e3abacbf52a9f7166f3aa6d19a93a121cee4a42399ae84",
+    "src/lib/settings-profile-ui.js": "15ca897b5df26403a77d687c7f16cf6b159a3df4861d2320efa492d820bcb7f3",
+    "tests/n64-confirmed-email-state.test.mjs": "2d4995d5765d0e89ec0a8358992849837d19e152538f3fb5deda49d2d2a82ae6",
+    "tests/n64-confirmed-email-evidence.json": "72efa56e3c52efded1121709dce62ba7aa02c3d8e215fa404d6d847c992c4800"
+  },
+  "priorCloudHashMatches": false,
+  "priorRecordedCloudHash": "992bf9d6d26cdb49b582088275f4df7e5d7df99715ebebeedd2b28744948d08f",
+  "ownedBrowserAndServerClosed": true
+}
