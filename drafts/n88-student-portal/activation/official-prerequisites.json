@@ -1,0 +1,69 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "bb64e011-c3c1-417b-9e99-af05ee0f8f09",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "observedDate": "2026-10-18",
+  "phase": "PHASE0_STOPPED_BEFORE_HOSTED_MUTATION",
+  "migrationIdentityMismatch": {
+    "path": "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
+    "cardSha256": "f48be5c930c4567632caa94b59f28a1e19a31a82c208f03aa5cfbbe184252ae1",
+    "actualGitBaseAndWorktreeLfSha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
+    "diagnosis": "Card SHA equals CRLF serialization of identical preserved LF SQL. First five hashes match. Exact-byte assertion failed; no SQL/card rewrite. Resolve identity metadata before hosted apply."
+  },
+  "source": "Fresh origin/main and HEAD both matched baseSha before edits. Final teacher presentation reused; private bundle asset URLs repaired.",
+  "cloudflare": {
+    "preservedSuccessfulReceipt": "artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/cloudflare-auth-verified.json",
+    "preservedSuccessfulAt": "2026-10-18T16:05:08.6208434Z",
+    "cliVersion": "4.148.0",
+    "cliEntry": "C:/Users/Abody/AppData/Local/npm-cache/_npx/32026684e21afda6/node_modules/wrangler/bin/wrangler.js",
+    "currentWorkerReadbackCommand": "node <cliEntry> whoami --json",
+    "currentWorkerReadback": {
+      "stdout": "{\"loggedIn\":false}",
+      "stderr": "Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\\win\\async.c, line 94",
+      "processExitCode": 3221226505,
+      "secondApprovedLauncher": "Remote Desktop Commander, Abdullah-MSI; PID 19572 completed with the same stdout and assertion",
+      "meaning": "Worker cannot currently exercise the previously authenticated provider channel. This does not overturn the successful human authorization receipt. No new login, token extraction or credential/profile copy attempted. Stop unchanged attempts."
+    },
+    "operationHelp": ["secret put", "secret list", "secret bulk", "deploy", "versions", "deployments"],
+    "privateLoggingReadback": "NOT_RUN: no zone Logpush/analytics disposition readback obtained; Wrangler root help exposes no such operation. Source observability=false is not provider proof.",
+    "routesOrSecretsChanged": false
+  },
+  "supabase": {
+    "cliVersion": "2.120.0",
+    "confirmedSupportedHelp": ["secrets set --env-file --project-ref", "secrets list --project-ref", "db query --file --project-ref (Management API)", "ssl-enforcement get --project-ref --experimental"],
+    "secretList": {"successful": true, "n88NamesPresent": [], "plaintextValuesReturned": false, "providerDigestsRetained": false, "secretsSet": false},
+    "restrictedPasswordCustody": "Not provisioned. CLI has protected-file input capability; this is not proof of password custody, backup or no SQL logging. No password was sent through MCP SQL.",
+    "sslEnforcementReadOnly": {"command": "ssl-enforcement get", "currentConfigDatabase": false, "writes": false, "meaning": "Provider enforcement status only; restricted-role verified TLS connection has NOT_RUN. Client must continue to verify TLS; do not relax it or change project enforcement here."},
+    "freshCatalog": {"currentUser": "postgres", "database": "postgres", "n88PrivateExists": false, "n88BackendExists": false, "n88GuardExists": false, "n88OrFixtureNamedFunctions": []},
+    "freshManagementLists": {"requiredSixN88MigrationsPresent": [], "latestListedMigration": "20261015082719_n90_unified_student_grade_import", "n88StudentPortalFunctionPresent": false},
+    "fullPhase1CatalogComparison": "NOT_RUN: prerequisite capability/custody gates unresolved; no schema was applied merely to consume allowance. Fresh complete baseline comparison still required before each absent migration.",
+    "fixtureProvisioning": "No existing N88 or fixture-named database function returned by catalog-only query. Available connector inventory has no Auth user provisioning tool; CLI root has no Auth-user administration command. Existing unrelated temporary fixture functions are not an N88 provisioning grant. No privileged Auth proxy or account creation guessed. A sanctioned narrowly scoped hosted fabricated teacher provisioning channel is still required."
+  },
+  "disposition": {
+    "appliedMigrations": [],
+    "functionsDeployed": [],
+    "createdTemporaryFunctions": [],
+    "temporaryFunctionCleanup": "No N88 temporary function was present in fresh provider list or created by this run; no N88 cleanup/disarm mutation needed. Unrelated existing historical functions were left untouched and are not live-gate proof.",
+    "createdFabricatedTeachers": 0,
+    "createdFabricatedStudents": 0,
+    "fixtureCleanup": "Not needed: no hosted fixture provisioned or consumed; no identity retired/reactivated and no tombstone/nonce ledger touched.",
+    "privateRowsRead": 0,
+    "realDataMutations": 0,
+    "messagesSent": 0,
+    "secretValuesReadOrGenerated": 0,
+    "hostedWrites": 0,
+    "teacherReadiness": false,
+    "officialTrialUrl": null,
+    "intendedStudentUrlAfterVerifiedActivation": "https://rakeezx.com/student"
+  },
+  "retryCondition": "Resolve the sixth migration card CRLF/LF identity metadata without rewriting immutable SQL; make the already authorized OS-keyring Wrangler session usable by the existing worker process without new OAuth or credential extraction; identify sanctioned private logging/custody and narrowly scoped fabricated Auth provisioning channels. Resume this exact saved candidate/session only after material correction; rerun fresh catalogs before any hosted DDL.",
+  "officialReferences": [
+    "https://supabase.com/docs/reference/cli/supabase-secrets-set",
+    "https://supabase.com/docs/reference/cli/supabase-db-query",
+    "https://supabase.com/docs/guides/database/postgres/roles",
+    "https://developers.cloudflare.com/workers/wrangler/commands/",
+    "https://developers.cloudflare.com/logs/logpush/logpush-job/datasets/zone/http_requests/"
+  ]
+}

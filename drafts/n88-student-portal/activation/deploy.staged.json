@@ -31,7 +31,12 @@
     "assetAllowlist": [
       "assets/student.mjs",
       "styles/app.css",
-      "styles/student-portal-login.css"
+      "styles/student-portal-login.css",
+      "assets/brand/header-light-standard.svg",
+      "assets/brand/header-light-compact.svg",
+      "assets/brand/header-dark-standard.svg",
+      "assets/brand/header-dark-compact.svg",
+      "assets/brand/icon-192.png"
     ],
     "fallbackToAccountApp": false,
     "headers": {

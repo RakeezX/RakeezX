@@ -18,10 +18,22 @@ const manifest={aiAuthored:true,sourceOnly:true,enabled:false,projectId:'xlrubcw
   externalDependencies:{pg:'8.23.1','@supabase/auth-js':'2.118.0'},
   gates:{edgeEnabled:false,cloudflareEnabled:false,browserReadiness:false,routes:[],cron:[]}};
 const absolute={name:'actual-app-absolute-imports',setup(build){build.onResolve({filter:/^\/src\//},args=>({path:path.resolve('.'+args.path)}));}};
+// Bundled import.meta.url is the output module, not the original source file.
+// Keep the shared app sources intact and pin only this private document's assets.
+const brandAssets=['header-light-standard.svg','header-light-compact.svg','header-dark-standard.svg','header-dark-compact.svg','icon-192.png'];
+const privateAssets={name:'private-document-asset-urls',setup(build){
+  build.onLoad({filter:/[\\/]src[\\/](lib[\\/]brand|views[\\/]student-portal-login)\.js$/},async({path:file})=>{
+    let contents=await readFile(file,'utf8');
+    if(path.basename(file)==='brand.js')for(const asset of brandAssets)
+      contents=contents.replace(`new URL('../../assets/${asset}', import.meta.url)`,`new URL('/n88-private/assets/brand/${asset}', import.meta.url)`);
+    else contents=contents.replace("new URL('../styles/student-portal-login.css', import.meta.url)","new URL('/n88-private/styles/student-portal-login.css', import.meta.url)");
+    return {contents,loader:'js',resolveDir:path.dirname(file)};
+  });
+}};
 for(const [name,entry,options]of [
   ['edge/index.mjs','supabase/functions/n88-student-portal/index.ts',{platform:'neutral',external:['node:*','pg','@supabase/auth-js']}],
   ['cloudflare/worker.mjs','drafts/n88-student-portal/cloudflare-entry.mjs',{platform:'browser'}],
-  ['private/assets/student.mjs','drafts/n88-student-portal/client/student-entry.js',{platform:'browser',plugins:[absolute]}]
+  ['private/assets/student.mjs','drafts/n88-student-portal/client/student-entry.js',{platform:'browser',plugins:[absolute,privateAssets]}]
 ]) {
   const result=await esbuild.build({entryPoints:[entry],bundle:true,format:'esm',target:'es2022',write:false,metafile:true,logLevel:'silent',...options});
   assert.equal(result.outputFiles.length,1);
@@ -52,13 +64,21 @@ for(const [name,source]of Object.entries(copies)) {
 }
 const importMap=JSON.stringify({imports:JSON.parse(await readFile(out+'edge/deno.json','utf8')).imports},null,2)+'\n';
 await writeFile(out+'edge/import_map.json',importMap);manifest.outputs['edge/import_map.json']=sha(importMap);
+manifest.binarySources={};
+for(const asset of brandAssets){
+  const source='assets/'+asset,name='private/assets/brand/'+asset;
+  const content=asset.endsWith('.svg')?(await readFile(source,'utf8')).replaceAll('\r\n','\n'):await readFile(source);
+  await mkdir(path.dirname(out+name),{recursive:true});await writeFile(out+name,content);
+  if(asset.endsWith('.svg'))manifest.sources[source]=sha(content);else manifest.binarySources[source]=sha(content);
+  manifest.outputs[name]=sha(content);
+}
 // Transform ONLY existing app document asset URLs; no replacement UI/template.
 let html=(await readFile('drafts/n88-student-portal/client/student.html','utf8')).replaceAll('\r\n','\n')
   .replace('/src/styles/app.css','/n88-private/styles/app.css').replace('/src/styles/student-portal-login.css','/n88-private/styles/student-portal-login.css')
   .replace('/drafts/n88-student-portal/client/student-entry.js','/n88-private/assets/student.mjs');
 await writeFile(out+'private/student.html',html);manifest.outputs['private/student.html']=sha(html);
 manifest.sources['drafts/n88-student-portal/client/student.html']=await textHash('drafts/n88-student-portal/client/student.html');
-// Runtime new URL('../styles/student-portal.css', import.meta.url) resolves to /styles as copied above.
+// Runtime stylesheet and brand URLs are pinned by privateAssets above.
 const worker=await readFile(out+'cloudflare/worker.mjs','utf8');assert.ok(!worker.includes('node:'));
 const browser=await readFile(out+'private/assets/student.mjs','utf8');
 assert.match(browser,/enabled: false/);assert.ok(!/serviceWorker\.register|registerSW\(/.test(browser));

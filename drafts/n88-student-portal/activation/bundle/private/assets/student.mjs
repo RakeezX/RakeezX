@@ -141,11 +141,11 @@ var focusableSelector = [
 
 // src/lib/brand.js
 var BRAND_NAME = "\u0631\u064E\u0643\u064A\u0632 \u0627\u0644\u0645\u0639\u0644\u0645";
-var APP_ICON_URL = new URL("../../assets/icon-192.png", import.meta.url).href;
-var HEADER_LIGHT_URL = new URL("../../assets/header-light-standard.svg", import.meta.url).href;
-var HEADER_LIGHT_COMPACT_URL = new URL("../../assets/header-light-compact.svg", import.meta.url).href;
-var HEADER_DARK_URL = new URL("../../assets/header-dark-standard.svg", import.meta.url).href;
-var HEADER_DARK_COMPACT_URL = new URL("../../assets/header-dark-compact.svg", import.meta.url).href;
+var APP_ICON_URL = new URL("/n88-private/assets/brand/icon-192.png", import.meta.url).href;
+var HEADER_LIGHT_URL = new URL("/n88-private/assets/brand/header-light-standard.svg", import.meta.url).href;
+var HEADER_LIGHT_COMPACT_URL = new URL("/n88-private/assets/brand/header-light-compact.svg", import.meta.url).href;
+var HEADER_DARK_URL = new URL("/n88-private/assets/brand/header-dark-standard.svg", import.meta.url).href;
+var HEADER_DARK_COMPACT_URL = new URL("/n88-private/assets/brand/header-dark-compact.svg", import.meta.url).href;
 function brandLockup({ compact = false, prominent = false, caption = "" } = {}) {
   const width = compact ? 295 : 345;
   const height = compact ? 52 : 56;
@@ -167,7 +167,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   root.dir = "rtl";
   const style = doc.createElement("link");
   style.rel = "stylesheet";
-  style.href = new URL("../styles/student-portal-login.css", import.meta.url).href;
+  style.href = new URL("/n88-private/styles/student-portal-login.css", import.meta.url).href;
   doc.head.append(style);
   const enabled = readiness2?.enabled === true && !!client;
   const paint = (content) => {
