@@ -6,6 +6,7 @@ import pg from 'pg';
 import manifest from './deployment.inactive.json' with {type:'json'};
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
+import {assertVerifiedBoundary} from './activation/private-error-boundary.mjs';
 // Source-side error redaction cannot prevent the database server logging DETAIL.
 // Read only effective session settings before granting the repository this client.
 export async function assertPrivateDatabaseSession(client) {
@@ -24,11 +25,14 @@ export async function assertPrivateDatabaseSession(client) {
   // capture a completed private statement; missing extension settings are inert.
   const explainSafe=r && (r.explain_duration==null || r.explain_duration==='-1' ||
     /^\d+$/.test(r.explain_duration) && Number(r.explain_duration)>3000 && r.explain_nested==='off');
-  if(result.rows?.length!==1 || !r || r.role!=='n88_backend' || r.error_verbosity!=='terse' ||
+  if(result.rows?.length!==1 || !r || r.role!=='n88_backend' || !['terse','default'].includes(r.error_verbosity) ||
     r.error_parameters!=='0' || !['none','ddl'].includes(r.statements) ||
     r.duration!=='-1' || r.duration_sample!=='-1' || Number(r.transaction_sample)!==0 ||
     r.transaction_sample==null || ![null,'none'].includes(r.audit) || !explainSafe)
     throw Error('n88_database_unavailable');
+  // Even terse cannot make an arbitrary private query safe. Verify the exact
+  // typed routines, source identities, owner, invoker mode and narrow ACL first.
+  await assertVerifiedBoundary(client);
 }
 export function createExistingHost(readEnv) {
   if(readEnv('N88_ENABLED')!=='true')return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});

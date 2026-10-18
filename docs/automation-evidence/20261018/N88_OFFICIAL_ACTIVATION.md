@@ -201,3 +201,61 @@ and credential-custody gate without violating the no-logging-downgrade boundary.
 No global logging reduction, new parameter privileges, managed policy change or
 SQL rewrite was attempted. Resume the same candidate/session after that material
 correction; fresh phase baselines remain mandatory immediately before DDL.
+
+## Typed database boundary — run6085920e
+
+The18:56 scope correction is implemented as one append-only private migration,
+76 statically typed SECURITY INVOKER routines, and a finite repository mapping.
+The original six SQL files/pins are unchanged. PostgreSQL infers each operation's
+native parameter and result types through Parse/Describe without executing it.
+Arguments cross the wire as bound ASCII; decoding and casts occur inside the
+exception block. Its new exception preserves SQLSTATE with a fixed MESSAGE and
+empty DETAIL/HINT. No caller-supplied SQL, SECURITY DEFINER executor or new JSON
+result codec exists. Each acquisition verifies exact SHA256 routine definitions,
+signature, postgres owner, invoker/search_path and owner+n88_backend EXECUTE ACL.
+
+The actual owned PostgreSQL17.6 default/ddl/error_parameter0 fixture passed five
+induced private-error classes and actual server-log inspection: canary/plaintext
+and encoded parameter absent, original constraint details absent, errors and DDL
+audit still present. Real repository paths passed owner/source/session locks and
+all13 canonical-family reads, wrong-owner omission, guidance stale CAS, callback
+rollback and durable COMMIT-ACK loss without replay. Numeric, bigint beyond JS
+safe integer, bytea, escaped/null arrays and timestamps round-tripped through PG
+without adding a JSON result conversion. The session guard rejects unknown
+capture posture and missing/wrong routine identities. These are local service
+proofs, not hosted acceptance or new UI/device evidence.
+
+Original local failures are preserved in the error-boundary history artifacts.
+A combined process-termination/recursive-removal cleanup command was denied by
+tool policy; it was not retried through another surface. The exact owned PG data
+directory was safely stopped with pg_ctl(exit0). The Node test then exited;
+that stopped synthetic directory remains quarantined/untracked, excluded from
+the candidate. Later tests released clients and closed their owned clusters.
+
+Fresh provider metadata confirms project ACTIVE_HEALTHY, all seven N88 migration
+versions absent and no N88 Edge function. Existing native identity, Logpush,
+header/transform, RSA3072/OAEP/DPAPI custody, UI and unchanged E/F/G/H proofs were
+reused. No hosted writes, roles, keys, fixture or route changes occurred. The
+original six migration allowances remain unconsumed; the new seventh is pinned
+in the same inert manifest before any hosted apply.
+
+The next actual transport prerequisite failed: the direct hostname has no A
+record, its AAAA record was observed, and connecting to that exact IPv6 address
+returned ENETUNREACH before TLS or authentication. This limits the current local
+custodian; it does not establish an Edge-network outage. Supabase documents an
+existing IPv4 session pooler, but says its project-specific host cannot be
+composed from the region. Host/port metadata only has been requested. No new
+account, paid IPv4 option, guessed hostname, credential-store read, proxy or
+OAuth flow was attempted. All readiness remains OFF; hosted teacher/student/ACK
+and sole-publisher gates are NOT_RUN.
+
+Resume this exact candidate only with that provider-supplied reachable TLS
+endpoint or sanctioned IPv6-capable custodian, then perform the existing protected
+SCRAM/encrypted custody and fresh imminent-phase baselines/readbacks. Do not
+repeat these unchanged local proofs or claim the frontend is service-ready.
+See [local boundary proof](../../../tests/n88-official-activation-error-boundary.json)
+and [transport/absence receipt](../../../drafts/n88-student-portal/activation/transport-prerequisite-readback.json).
+Design references: PostgreSQL17 [error trapping](https://www.postgresql.org/docs/17/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING),
+[RAISE fields](https://www.postgresql.org/docs/17/plpgsql-errors-and-messages.html),
+[function privileges](https://www.postgresql.org/docs/17/sql-createfunction.html)
+and Supabase [connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres).

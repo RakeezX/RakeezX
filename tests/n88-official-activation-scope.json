@@ -1,19 +1,19 @@
 {
   "aiAuthored": true,
   "taskId": "continuous-n88-official-student-portal-activation-20261018",
-  "runId": "bb64e011-c3c1-417b-9e99-af05ee0f8f09",
+  "runId": "6085920e-db53-474e-9ba9-d2e1efa73012",
   "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
-  "at": "2026-10-18T16:15:34.723Z",
+  "at": "2026-10-18T19:16:49.520Z",
   "checks": [
     {
       "name": "exact_inert_graph_and_preserved_migrations",
       "status": "PASS",
-      "evidence": "All source/output/binary hashes verified; six migrations unchanged from base; service bundles unchanged; no hosted apply."
+      "evidence": "All source/output/binary hashes verified; original six migrations unchanged from base; one exact seventh boundary migration pinned before apply. Only Edge graph changed; provider/config/private UI outputs unchanged; activation OFF."
     },
     {
       "name": "exact_card_migration_bytes",
-      "status": "FAIL",
-      "evidence": "Sixth card SHA matches CRLF serialization; preserved Git/base/worktree SQL is LF. Original exact-hash assertion failed; no SQL/card rewrite or hosted apply."
+      "status": "PASS",
+      "evidence": "All six byte identities match corrected current card."
     },
     {
       "name": "unchanged_evidence_reuse",
@@ -21,12 +21,11 @@
       "evidence": "Six service/crypto/budget/recovery/guidance/teacher reports unchanged from base. Four-case browser evidence reused with identical UI/document/styles/logo bytes."
     }
   ],
-  "initialFailure": {
-    "check": "exact_card_migration_bytes",
-    "message": "AssertionError: supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
-    "actual": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
-    "expected": "f48be5c930c4567632caa94b59f28a1e19a31a82c208f03aa5cfbbe184252ae1"
+  "boundaryMigration": {
+    "path": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
+    "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
   },
+  "priorPinFailurePreserved": "tests/n88-official-activation-scope.json in candidate76a58 and Git history; old CRLF pin superseded by exact LF metadata correction",
   "migrationHashes": [
     {
       "path": "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
@@ -70,11 +69,11 @@
     },
     {
       "path": "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
-      "authorizedSha256": "f48be5c930c4567632caa94b59f28a1e19a31a82c208f03aa5cfbbe184252ae1",
+      "authorizedSha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
       "actualSha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
       "lfSha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
       "crlfSha256": "f48be5c930c4567632caa94b59f28a1e19a31a82c208f03aa5cfbbe184252ae1",
-      "exact": false
+      "exact": true
     }
   ],
   "reused": [

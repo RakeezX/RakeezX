@@ -290,3 +290,40 @@ and delivery method. Do not put codes in URLs/logs/screenshots. No live credenti
 Stop via the launcher `-Stop -Receipt <returned receiptPath>`; otherwise its existing TTL
 closes owned HTTP/PostgreSQL resources. The launcher uses this checkout's source, never
 the canonical working tree's Product files.
+
+## Typed private error boundary — PO18October18:56 correction
+
+The six original staged migrations remain byte-identical. The only additional
+migration is `20261018185300_n88_private_error_boundary_staged.sql` (append-only,
+76 SECURITY INVOKER routines; EXECUTE only postgres owner and n88_backend).
+`activation/error-boundary-contract.json` records the finite source SQL mapping,
+inferred native parameter/result types and exact migration SHA256. No routine
+accepts SQL text. Bound ASCII parameters are decoded/cast inside the exception
+block; private failures rethrow a fixed message with their original SQLSTATE.
+There is no new JSON result codec, parameter/logger grant, managed Auth change,
+source write or logging reduction.
+
+Every repository private operation now uses that mapping. Unknown SQL is denied
+before PostgreSQL. The connection checks effective capture posture and the exact
+routine SHA256 definitions/signatures/owner/invoker/search_path/ACL before access.
+Observed default/ddl posture is admitted only with that verified boundary and
+error-parameter suppression. Missing, changed or unreadable metadata fails closed.
+
+The focused native PG17 proof uses default verbosity, ddl logging and error
+parameter0, inspects actual server logs, and covers unique/FK/check/cast/permission
+failures, owner/source/session locks, guidance CAS, rollback, lost durable COMMIT
+ACK and native type roundtrips. See `tests/n88-official-activation-error-boundary.json`.
+Earlier compiler/fixture failures and the cleanup tool denial remain recorded;
+the stopped residual synthetic fixture is not a candidate artifact.
+
+No hosted migration, LOGIN/password/secret, fixture, function/Worker, route or
+readiness operation has been performed. Fresh provider lists show all seven
+versions absent and no N88 Edge function. The current local custodian cannot
+reach the observed IPv6-only direct database (ENETUNREACH before TLS/Auth).
+`activation/transport-prerequisite-readback.json` records this narrower network
+limit, not a provider outage or missing OAuth. Obtain the existing project's
+provider-supplied session-pooler host/port or a sanctioned IPv6-capable runtime;
+never guess the host, purchase IPv4, export credentials or repeat unchanged proofs.
+Fresh phase baselines and actual restricted TLS/source/ACL readbacks still gate
+hosted apply and validation. Official teacher/student publication stays with the
+sole publisher after service gates pass; no current official trial URL is claimed.

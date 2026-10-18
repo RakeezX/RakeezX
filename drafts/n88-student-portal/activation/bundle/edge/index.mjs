@@ -1,5 +1,5 @@
 // drafts/n88-student-portal/existing-host.mjs
-import { Buffer as Buffer11 } from "node:buffer";
+import { Buffer as Buffer12 } from "node:buffer";
 import pg from "pg";
 
 // drafts/n88-student-portal/deployment.inactive.json
@@ -94,11 +94,11 @@ var deployment_inactive_default = {
 };
 
 // drafts/n88-student-portal/web-entry.mjs
-import { Buffer as Buffer10 } from "node:buffer";
+import { Buffer as Buffer11 } from "node:buffer";
 import { timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 
 // drafts/n88-student-portal/runtime.mjs
-import { Buffer as Buffer9 } from "node:buffer";
+import { Buffer as Buffer10 } from "node:buffer";
 import { isIP } from "node:net";
 
 // drafts/n88-student-portal/task-guidance.mjs
@@ -548,15 +548,15 @@ var text = (value) => typeof value === "string" && value.length > 0 && value.len
 var hash = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 var uuid = (value) => typeof value === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(value);
 function validateVisibilityPolicy(policy) {
-  const fail6 = () => {
+  const fail7 = () => {
     throw new TypeError("n88_visibility_invalid");
   };
-  if (!exact(policy, ["version", "ownerId", "studentId", "enrollmentId", "classId", "termId", "scopeStamp", "fields", "sources"]) || policy.version !== VISIBILITY_VERSION || !hash(policy.scopeStamp) || !["ownerId", "studentId", "enrollmentId", "classId", "termId"].every((key2) => text(policy[key2])) || !exact(policy.fields, VISIBILITY_FIELDS) || Object.values(policy.fields).some((value) => typeof value !== "boolean") || !Array.isArray(policy.sources) || policy.sources.length > 2e3) fail6();
+  if (!exact(policy, ["version", "ownerId", "studentId", "enrollmentId", "classId", "termId", "scopeStamp", "fields", "sources"]) || policy.version !== VISIBILITY_VERSION || !hash(policy.scopeStamp) || !["ownerId", "studentId", "enrollmentId", "classId", "termId"].every((key2) => text(policy[key2])) || !exact(policy.fields, VISIBILITY_FIELDS) || Object.values(policy.fields).some((value) => typeof value !== "boolean") || !Array.isArray(policy.sources) || policy.sources.length > 2e3) fail7();
   const ids = /* @__PURE__ */ new Set(), sources = /* @__PURE__ */ new Set();
   for (const source of policy.sources) {
-    if (!exact(source, ["kind", "sourceId", "publicationId", "stamp"]) || !["item", "subitem"].includes(source.kind) || !text(source.sourceId) || !uuid(source.publicationId) || !hash(source.stamp)) fail6();
+    if (!exact(source, ["kind", "sourceId", "publicationId", "stamp"]) || !["item", "subitem"].includes(source.kind) || !text(source.sourceId) || !uuid(source.publicationId) || !hash(source.stamp)) fail7();
     const key2 = JSON.stringify([source.kind, source.sourceId]);
-    if (ids.has(source.publicationId) || sources.has(key2)) fail6();
+    if (ids.has(source.publicationId) || sources.has(key2)) fail7();
     ids.add(source.publicationId);
     sources.add(key2);
   }
@@ -1455,7 +1455,2430 @@ function createIntegratedService(options, adapter, baseRepository) {
 }
 
 // drafts/n88-student-portal/postgres-repository.mjs
+import { Buffer as Buffer6 } from "node:buffer";
+
+// drafts/n88-student-portal/activation/private-error-boundary.mjs
 import { Buffer as Buffer5 } from "node:buffer";
+
+// drafts/n88-student-portal/activation/error-boundary-contract.json
+var error_boundary_contract_default = {
+  version: 1,
+  encoding: "bound-base64-pg-text-v1",
+  controls: [
+    "begin isolation level read committed",
+    "commit",
+    "release savepoint n88_member_recovery",
+    "rollback to savepoint n88_member_recovery",
+    "savepoint n88_member_recovery",
+    "select pg_advisory_xact_lock(1312307256, 88)",
+    "select set_config('statement_timeout',$1,true),set_config('lock_timeout',$2,true),set_config('idle_in_transaction_session_timeout',$3,true),set_config('search_path','pg_catalog',true),set_config('TimeZone','UTC',true),set_config('DateStyle','ISO, YMD',true),set_config('synchronous_commit','on',true)"
+  ],
+  sources: [
+    {
+      file: "drafts/n88-student-portal/canonical-adapter.mjs",
+      sha256: "8adcb9958f559b26d9d090bccab7d070308b8b649eff97ebbe49fdc00b87b458"
+    },
+    {
+      file: "drafts/n88-student-portal/class-credentials.mjs",
+      sha256: "97d4c4bb6580a53ae49d20cf95dc48620c8e59ad91b665fb23f811b833f516ad"
+    },
+    {
+      file: "drafts/n88-student-portal/auth-verifier.mjs",
+      sha256: "3f50b305d2754bb676afdbfe6051ed892e0019875c5fe1985dff61d7a2ef60c1"
+    },
+    {
+      file: "drafts/n88-student-portal/web-entry.mjs",
+      sha256: "fe079ed58f6b066d3b23048a51f5c96e0ea318ca7eca0caa9e825cd4a071bef5"
+    },
+    {
+      file: "drafts/n88-student-portal/integrated-service.mjs",
+      sha256: "2190d7b615fb09a546d62e083f063eb3b230ba24a64667cd3da3f1045c649ac2"
+    },
+    {
+      file: "drafts/n88-student-portal/code-recovery.mjs",
+      sha256: "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55"
+    },
+    {
+      file: "drafts/n88-student-portal/task-guidance.mjs",
+      sha256: "a3b929b13ce02d05a211cf9eb078cf3f3403a3ec6db04a7271f3c878741de88a"
+    },
+    {
+      file: "drafts/n88-student-portal/postgres-repository.mjs",
+      sha256: "239bb6c146eaf61e9e9598e6e69a74e79e5a43cf4ad4d6922a62c72715069443"
+    }
+  ],
+  operations: [
+    {
+      sql: "delete from n88_private.class_credential_receipts where row_key=$1",
+      name: "boundary_7df61daf6fc50a8d06ed8a29",
+      parameters: [
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.contexts where namespace=$1",
+      name: "boundary_3d90c7fa0fac5598b1e1bb6c",
+      parameters: [
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.credentials where id=$1",
+      name: "boundary_3212e88aaa7d7eb7950a7158",
+      parameters: [
+        "uuid"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.guess_budgets where key=$1",
+      name: "boundary_0886008cf6c0da2968564042",
+      parameters: [
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.memberships where owner_id=$1 and class_id=$2 and student_id=$3 and enrollment_id=$4",
+      name: "boundary_8ab6a6674ff3f98609cccf79",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.numeric_attempts where row_key=$1",
+      name: "boundary_541e1603c6f1fd9d4bfd9638",
+      parameters: [
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.numeric_credentials where row_key=$1",
+      name: "boundary_bf3541bec260c19aeaf147e0",
+      parameters: [
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.numeric_rates where row_key=$1",
+      name: "boundary_f824c60ac8562824f8a15aeb",
+      parameters: [
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.numeric_sessions where row_key=$1",
+      name: "boundary_82d5bc8d4ddbfb141c068308",
+      parameters: [
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.publications where id=$1",
+      name: "boundary_7405cad4b228853c8a7a5267",
+      parameters: [
+        "uuid"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n88_private.sessions where id=$1",
+      name: "boundary_d556945d2d95f6add8f9ccb4",
+      parameters: [
+        "uuid"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "insert into n88_private.class_credential_receipts(row_key,payload) values($1,$2::jsonb)",
+      name: "boundary_5bd93436112ac6e1081b19e5",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.class_credential_receipts(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      name: "boundary_3cfa500ea5d8a72f35432655",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.class_visibility(owner_id,class_id,term_id,payload) values($1::uuid,$2,$3,$4::jsonb) on conflict(owner_id,class_id,term_id) do update set payload=excluded.payload",
+      name: "boundary_98693bf59f6ec88385d1a2e8",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.code_recovery(row_key,payload) values($1,$2::jsonb) on conflict(key_version,nonce) do nothing",
+      name: "boundary_ac418692d93da9a37ef4d438",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.contexts (namespace,owner_id,active) values ($1,$2,$3)",
+      name: "boundary_857bc5c5bf5d0480e3feddef",
+      parameters: [
+        "text",
+        "uuid",
+        "boolean"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.credentials (id,namespace,owner_id,student_id,version,verifier,entry_verifier,revoked_at) values ($1,$2,$3,$4,$5,$6,$7,$8)",
+      name: "boundary_8505c9e47aa85eab7abcbe9a",
+      parameters: [
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.guess_budgets (key,count,until_at) values ($1,$2,$3)",
+      name: "boundary_ec7d0eb73f55bc0a5eb0503e",
+      parameters: [
+        "text",
+        "integer",
+        "timestamp with time zone"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.memberships (owner_id,class_id,student_id,enrollment_id,revision,status,end_date,student_active,class_active,label,canonical_stamp,active) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+      name: "boundary_39534a0df755e773bcc021c2",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "date",
+        "boolean",
+        "boolean",
+        "text",
+        "text",
+        "boolean"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_attempts(row_key,payload) values($1,$2::jsonb)",
+      name: "boundary_2a8e33366f34f64e735098e6",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_attempts(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      name: "boundary_529c57f7292a540a297bb56a",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_credentials(row_key,payload) values($1,$2::jsonb)",
+      name: "boundary_9e91362aab78847b4a47db61",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_credentials(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      name: "boundary_b594ab1d10c68ceac544f2f4",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb)",
+      name: "boundary_576116ad97aa1134011b5787",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      name: "boundary_54df59eab3551edda375b0b3",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_sessions(row_key,payload) values($1,$2::jsonb)",
+      name: "boundary_0ea5712c847150d0ad160f76",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.numeric_sessions(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      name: "boundary_a71168a3808c25e88da242ab",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.publications (id,owner_id,class_id,student_id,enrollment_id,source_teaching_id,source_item_id,title,instruction,deadline,status,published) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+      name: "boundary_944e29878190b042600a43aa",
+      parameters: [
+        "uuid",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "date",
+        "text",
+        "boolean"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.sessions (id,credential_id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier,token_hash,expires_at,revoked_at,canonical_stamp) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+      name: "boundary_7f808429affeb651ad77cae5",
+      parameters: [
+        "uuid",
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone",
+        "timestamp with time zone",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n88_private.task_guidance(owner_id,class_id,term_id,teaching_id,subitem_id,payload) values($1::uuid,$2,$3,$4,$5,$6::jsonb) on conflict(owner_id,class_id,term_id,teaching_id,subitem_id) do update set payload=excluded.payload",
+      name: "boundary_0f039dccf91dfe6f4bc30ece",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "rollback",
+      name: "boundary_da25480fb483e6ce3d30f1a1",
+      parameters: [],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "ROLLBACK"
+    },
+    {
+      sql: 'select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,item_id,name,value,"order",start_date,due_date,late_points from rakeezx.score_subitems where owner_id=$1::uuid order by id limit $2) x) bounded',
+      name: "boundary_ad2e84fec89ba9c5b1fd5f20",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_0e8834ccf4cac5f256e9a2ad",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status from rakeezx.years where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_e42d2de24a5b2a9d458219d0",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status,name from rakeezx.students where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_7700d235b1326b49506b1222",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,item_id,value,manual_value,derived_value from rakeezx.scores where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_4f1ae4e620baf4b52e65c866",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,section_id,status,start_date,end_date from rakeezx.enrollments where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_38603fea89bb426312fb13d0",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,subitem_id,checked,completion_state from rakeezx.score_subitem_completions where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_2c10f3346e981b9ed2dc8305",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,kind,delta from rakeezx.logs where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_7eaf0e6ad46189c16f430c17",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,session_id,status from rakeezx.attendance where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_4b08189b1399c922f5d61eb4",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,date,status from rakeezx.sessions where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_c1e4d457aa8a6c7bd31e5277",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: 'select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,name,max,"order",auto,per_point,penalty,score_mode,portability_group_id from rakeezx.items where owner_id=$1::uuid order by id limit $2) x) bounded',
+      name: "boundary_c365a70fb8ff3318f2e1f14c",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,archived_at,grade,label,name from rakeezx.sections where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_b75844e451c72d86ecce7361",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x) bounded",
+      name: "boundary_218f1146d50bdae36e06ce85",
+      parameters: [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select id,credential_id,namespace,owner_id,class_id,student_id,enrollment_id,version::text as version,membership_revision::text as membership_revision,entry_verifier,token_hash,(extract(epoch from expires_at)*1000)::text as expires_at,(extract(epoch from revoked_at)*1000)::text as revoked_at,canonical_stamp from n88_private.sessions limit $1) t) bounded",
+      name: "boundary_7212828c13ad9de67788e95a",
+      parameters: [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "bounded_row",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select id,namespace,owner_id,student_id,version::text as version,verifier,entry_verifier,(extract(epoch from revoked_at)*1000)::text as revoked_at from n88_private.credentials limit $1) t) bounded",
+      name: "boundary_b03c8ea8391678ae71b8031e",
+      parameters: [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "bounded_row",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select id,owner_id,class_id,student_id,enrollment_id,source_teaching_id,source_item_id,title,instruction,deadline::text as deadline,status,published from n88_private.publications limit $1) t) bounded",
+      name: "boundary_529c1bf7ab8f896422e93ff3",
+      parameters: [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "bounded_row",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select key,count::text as count,(extract(epoch from until_at)*1000)::text as until_at from n88_private.guess_budgets limit $1) t) bounded",
+      name: "boundary_c17a55bfb4d6e130fbbe3e4d",
+      parameters: [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "bounded_row",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select namespace,owner_id,active from n88_private.contexts limit $1) t) bounded",
+      name: "boundary_6445f4cd91ac31e4400b91b5",
+      parameters: [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "bounded_row",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select owner_id,class_id,student_id,enrollment_id,revision::text as revision,status,end_date::text as end_date,student_active,class_active,label,canonical_stamp,active from n88_private.memberships limit $1) t) bounded",
+      name: "boundary_d77d8b0fcafaf2d6444a9283",
+      parameters: [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "bounded_row",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload\n      from (select row_to_json(x)::text as payload from (\n        select e.owner_id,e.id as enrollment_id,e.section_id,e.student_id,e.revision::text as revision,\n          e.status,e.end_date::text as end_date,e.deleted_at is null as enrollment_present,\n          s.status='active' and s.deleted_at is null as student_active,left(s.name,300) as label,\n          c.status='active' and c.deleted_at is null and y.status='active' and y.deleted_at is null as class_active,\n          s.revision::text as student_revision,c.revision::text as section_revision,y.revision::text as year_revision\n        from rakeezx.enrollments e join rakeezx.students s on s.owner_id=e.owner_id and s.id=e.student_id\n        join rakeezx.sections c on c.owner_id=e.owner_id and c.id=e.section_id\n        join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id\n        where e.owner_id=any($1::uuid[]) order by e.owner_id,e.id limit $2\n      ) x) bounded",
+      name: "boundary_5c9fc4857874ea5002e6604f",
+      parameters: [
+        "uuid[]",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload\n      from (select row_to_json(x)::text as payload from (\n        select i.owner_id,i.id as item_id,left(i.name,160) as title,t.id as teaching_id,t.section_id,\n          i.revision::text as item_revision,t.revision::text as teaching_revision,term.revision::text as term_revision\n        from rakeezx.items i join rakeezx.teachings t on t.owner_id=i.owner_id and t.id=i.teaching_id\n        join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id\n        join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id\n        where i.owner_id=any($1::uuid[]) and i.deleted_at is null and t.deleted_at is null\n          and term.deleted_at is null and term.status='active' and term.year_id=c.year_id\n          and i.auto is null order by i.owner_id,i.id limit $2\n      ) x) bounded",
+      name: "boundary_7dfce5786c5f02dcc6e78f35",
+      parameters: [
+        "uuid[]",
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.class_credential_receipts limit $1",
+      name: "boundary_7241eedcf190b772374229ea",
+      parameters: [
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_attempts limit $1",
+      name: "boundary_663dba1cb7b909fd24ac94e2",
+      parameters: [
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_credentials limit $1",
+      name: "boundary_fada095ce38b422ccf61f489",
+      parameters: [
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_rates limit $1",
+      name: "boundary_017a62b1b935f2eb760ae1e8",
+      parameters: [
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_sessions limit $1",
+      name: "boundary_e9d8defc0078b184176ffedf",
+      parameters: [
+        "bigint",
+        "integer"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select n88_private.consume_ingress($1::uuid,$2::bigint) as accepted",
+      name: "boundary_f47daacda1442e346327b60d",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "accepted",
+          type: "boolean",
+          oid: 16
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select n88_private.lock_canonical_sources($1::uuid,$2::integer)",
+      name: "boundary_fd19cd46f568a4ae38795f6d",
+      parameters: [
+        "uuid",
+        "integer"
+      ],
+      output: [
+        {
+          name: "lock_canonical_sources",
+          type: "void",
+          oid: 2278
+        }
+      ],
+      effect: false,
+      voidResult: true,
+      command: "SELECT"
+    },
+    {
+      sql: "select n88_private.lock_projection_sources($1::uuid,$2::integer)",
+      name: "boundary_522656818781827547d463af",
+      parameters: [
+        "uuid",
+        "integer"
+      ],
+      output: [
+        {
+          name: "lock_projection_sources",
+          type: "void",
+          oid: 2278
+        }
+      ],
+      effect: false,
+      voidResult: true,
+      command: "SELECT"
+    },
+    {
+      sql: "select payload from n88_private.class_visibility where owner_id=$1::uuid and class_id=$2 and term_id=$3",
+      name: "boundary_b44d6bc61d9a2d54becc9173",
+      parameters: [
+        "uuid",
+        "text",
+        "text"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1",
+      name: "boundary_36aea132fd3436ff82bed847",
+      parameters: [
+        "uuid"
+      ],
+      output: [
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select subitem_id,teaching_id,case when sum(octet_length(payload::text)) over(order by teaching_id,subitem_id rows unbounded preceding)<=2097152 then payload::text else null end as bounded_payload from n88_private.task_guidance where owner_id=$1::uuid and class_id=$2 and term_id=$3 and ($4::text is null or teaching_id=$4) order by teaching_id,subitem_id limit 2001",
+      name: "boundary_c0c8bf88c9afd629c6d80e9f",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      output: [
+        {
+          name: "subitem_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "teaching_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "bounded_payload",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select t.id,t.section_id,t.revision::text as teaching_revision,\n      term.revision::text as term_revision from rakeezx.teachings t\n      join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id\n      join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id\n      join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id\n      where t.owner_id=$1::uuid and t.id=$2 and t.deleted_at is null\n        and term.deleted_at is null and term.status='active' and term.year_id=c.year_id\n        and c.deleted_at is null and c.status='active' and y.deleted_at is null and y.status='active'",
+      name: "boundary_15ce9f3bf91799d8d16c15e4",
+      parameters: [
+        "uuid",
+        "text"
+      ],
+      output: [
+        {
+          name: "id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "section_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "teaching_revision",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "term_revision",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select user_id,session_id from n88_private.lock_current_session($1::uuid,$2::uuid)",
+      name: "boundary_988735ac2a1a18389fa0bd91",
+      parameters: [
+        "uuid",
+        "uuid"
+      ],
+      output: [
+        {
+          name: "user_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "session_id",
+          type: "uuid",
+          oid: 2950
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "update n88_private.class_credential_receipts set payload=$2::jsonb where row_key=$1",
+      name: "boundary_fbd717658ec0391f83b6ca1e",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.contexts set owner_id=$2,active=$3 where namespace=$1",
+      name: "boundary_e132519164f58f14ceaa901e",
+      parameters: [
+        "text",
+        "uuid",
+        "boolean"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.credentials set namespace=$2,owner_id=$3,student_id=$4,version=$5,verifier=$6,entry_verifier=$7,revoked_at=$8 where id=$1",
+      name: "boundary_08056655f7c73fdf53693a15",
+      parameters: [
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.guess_budgets set count=$2,until_at=$3 where key=$1",
+      name: "boundary_2743c40170e1429751d7cce8",
+      parameters: [
+        "text",
+        "integer",
+        "timestamp with time zone"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.memberships set revision=$5,status=$6,end_date=$7,student_active=$8,class_active=$9,label=$10,canonical_stamp=$11,active=$12 where owner_id=$1 and class_id=$2 and student_id=$3 and enrollment_id=$4",
+      name: "boundary_dc3c6d47e9eefd6fefb577c1",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "date",
+        "boolean",
+        "boolean",
+        "text",
+        "text",
+        "boolean"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.numeric_attempts set payload=$2::jsonb where row_key=$1",
+      name: "boundary_8926885bfe3455b81ae48704",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.numeric_credentials set payload=$2::jsonb where row_key=$1",
+      name: "boundary_f8de722d3598965d1cab8cd6",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.numeric_rates set payload=$2::jsonb where row_key=$1",
+      name: "boundary_81d29f136a65d7b7fb3e22b7",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.numeric_sessions set payload=$2::jsonb where row_key=$1",
+      name: "boundary_8c4937430e36c8e787e93929",
+      parameters: [
+        "text",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.publications set owner_id=$2,class_id=$3,student_id=$4,enrollment_id=$5,source_teaching_id=$6,source_item_id=$7,title=$8,instruction=$9,deadline=$10,status=$11,published=$12 where id=$1",
+      name: "boundary_fa9d3af42f20a68890242235",
+      parameters: [
+        "uuid",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "date",
+        "text",
+        "boolean"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n88_private.sessions set credential_id=$2,namespace=$3,owner_id=$4,class_id=$5,student_id=$6,enrollment_id=$7,version=$8,membership_revision=$9,entry_verifier=$10,token_hash=$11,expires_at=$12,revoked_at=$13,canonical_stamp=$14 where id=$1",
+      name: "boundary_a0e680634378c9709f443e76",
+      parameters: [
+        "uuid",
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone",
+        "timestamp with time zone",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    }
+  ],
+  migration: {
+    path: "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
+    sha256: "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+  }
+};
+
+// drafts/n88-student-portal/activation/error-boundary-identities.json
+var error_boundary_identities_default = [
+  {
+    name: "boundary_017a62b1b935f2eb760ae1e8",
+    definition: "ad8422183f03522f2cf4fb61e10234bd9deb4d9afa0d9fa1c095e2723c7f3482",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_08056655f7c73fdf53693a15",
+    definition: "b6d4ee3f5c65b801a1994cfad2d155bb78eca9894bcdee3c36aac86228bc23f1",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_0886008cf6c0da2968564042",
+    definition: "a896dce5b6ab4765b817991d0e63f0fdd7defe72f31cdf5c55d252c0484e0130",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_0e8834ccf4cac5f256e9a2ad",
+    definition: "a8cc18cd9705dc81930fec74bb85b14d4e57d19a93d895cf5318a5a87b3234f7",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_0ea5712c847150d0ad160f76",
+    definition: "766c104178bfb3fce514e8f7a913209bd12517a5e6fe32ec8843487727268618",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_0f039dccf91dfe6f4bc30ece",
+    definition: "5a6788e94ca627e4780160d9763d41b7bd9ca4439c599f0ac5072de6f0c015ec",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_15ce9f3bf91799d8d16c15e4",
+    definition: "6681ab3f0aaa37114e24bc9bbc6a09f35f7f8600ae487e32d2c6d79bcae772fb",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_218f1146d50bdae36e06ce85",
+    definition: "4630fcaa6b373f72693e6ea1b3f46dec4ce429254d7158cba30c669265b31090",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_2743c40170e1429751d7cce8",
+    definition: "c866c6f9d731dd96b9e7a09c09a0ae5b5e158be7f1e48109be996fccc7d3efcc",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_2a8e33366f34f64e735098e6",
+    definition: "04678ead252ae91ab98546e1f78684a4f3f3069e9009738dbd63c32d5ab75628",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_2c10f3346e981b9ed2dc8305",
+    definition: "459bb1477268348aec77ae632ff83b038e070b1ae8ee8aa21f928a4b24b97d0f",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_3212e88aaa7d7eb7950a7158",
+    definition: "f501f787912d3546d6278a79bdb34ab0fd1048242f320859315d204e31cd7a63",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_36aea132fd3436ff82bed847",
+    definition: "960363079de3518c5fc0e14af32fc6999d0c41d6070a4001b278509b9acf777f",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_38603fea89bb426312fb13d0",
+    definition: "623879b0dddc1dc6eeec6da5f6a68adcef63d8bfb233119c88af92d50be42175",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_39534a0df755e773bcc021c2",
+    definition: "643a4426a6572f347d3c29a80deb593f351535155e539caa36842551f09d5bb9",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_3cfa500ea5d8a72f35432655",
+    definition: "02008954d6fd13a5b288064c784c886d50a49207d48822a5ce2eda75f922d788",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_3d90c7fa0fac5598b1e1bb6c",
+    definition: "1c06f2a2880d7ff8ad62fa41f8172a464af1e097385211f43444675370feda22",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_4b08189b1399c922f5d61eb4",
+    definition: "23b21c17cb48cc20ddf9ea50fdc307a7738ccf8cb7b273756e736badf462ad1f",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_4f1ae4e620baf4b52e65c866",
+    definition: "e14386418910aa6dac1847260f95f05e30c9be6ffa7301cfebaafd3f5eeda7b7",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_522656818781827547d463af",
+    definition: "43a02a5179b55a57dbb0230ae678187dae9e989badf324f7518a71a61101ce8a",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_529c1bf7ab8f896422e93ff3",
+    definition: "33f29a040de7715ead47705ad9acadf11f658daf4f7d77f3a82de5d8de10274c",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_529c57f7292a540a297bb56a",
+    definition: "d8680cb3f457d1144c390e9759f4d170943d4eb46bb4c2416275868bff7b7ef9",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_541e1603c6f1fd9d4bfd9638",
+    definition: "e262b8fce50ec2734de479de75745eb980bf9f300667b8b8a3136f0ea6957e19",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_54df59eab3551edda375b0b3",
+    definition: "bfb02e7ef9779d91c982fd0cf9460d3430df4a592cf3cf437a92f32e00a9c745",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_576116ad97aa1134011b5787",
+    definition: "c5c1a58e256b47278e3d6ca6b18af3523e612a561373b2bc7a02d73cc9b8c0c8",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_5bd93436112ac6e1081b19e5",
+    definition: "cb155ead3497fc6809d2545ba460cf4ac8f76f3a7546dbb563afb5c0498ccf11",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_5c9fc4857874ea5002e6604f",
+    definition: "a869572dd14041fdb2749ddb2105f02d27266ca8a597c86b0ce9e0b502c3001a",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_6445f4cd91ac31e4400b91b5",
+    definition: "ca3f9a055a2689c884fa2b984de94f8f3e9e1013bf7249899a530631a16d3dcd",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_663dba1cb7b909fd24ac94e2",
+    definition: "126dc30a800aea5a6179ac661a0bc695f237790ab5187b4cb7e457598e8d8f27",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7212828c13ad9de67788e95a",
+    definition: "007b4d108cff11e6ad06f26d060ac37dd2b32a6713364285e2f57679f47196b0",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7241eedcf190b772374229ea",
+    definition: "83f5051a828b2bf8494937be1d5c2ac8c3a631eafd1455851cfd613ee1b34705",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7405cad4b228853c8a7a5267",
+    definition: "4c90c97ee3a76fe180fd8123c0161e15947d13aea34562a7407d5d99f2bee5fe",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7700d235b1326b49506b1222",
+    definition: "e8d60e7ff5098c2dedb3629b7cc57f947c16c28fa8f503b1159793f5c6b73a08",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7df61daf6fc50a8d06ed8a29",
+    definition: "461f1cf7aa2c5823b427028163ec547113594c427c6b4b6404746c5d70479f70",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7dfce5786c5f02dcc6e78f35",
+    definition: "42e1f98a379cb42e24f4518ffb50e005fcddcd4c770c9ecf7b9aa6ec0f5a0a75",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7eaf0e6ad46189c16f430c17",
+    definition: "c5f79324ec66d55f23c2bcc64afb1f31d9073b45469e32fbbd1f9e1c7c50a142",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7f808429affeb651ad77cae5",
+    definition: "a9494c2bbb40ce22076d3f2f4594a3bd2bdcc0c66f4cf3bfaea707b6ffaba173",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text, p13 text, p14 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_81d29f136a65d7b7fb3e22b7",
+    definition: "7a893aa26f6e962a8006524225049a44c404fcacfcb8fc789f6fc62e90c0012e",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_82d5bc8d4ddbfb141c068308",
+    definition: "ab80e115c5f97c4e8e8ed9d8693fa70c85f0a412ff568ca86d07e9a12a2c1fd2",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_8505c9e47aa85eab7abcbe9a",
+    definition: "49fcd5e37c20cbe115c2e48be888713b08eaf353bcc6042a5c23ebcbdc1ff915",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_857bc5c5bf5d0480e3feddef",
+    definition: "480323908094fab241d130309ce128361753993624a1480ed0f4b7434508bd9e",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_8926885bfe3455b81ae48704",
+    definition: "a500a3cdfe0d7c29390d0c379dd4911b44f6cec2cf377472a4456d72224fb295",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_8ab6a6674ff3f98609cccf79",
+    definition: "31c37b9f2136e484082360906c5541c83b80d4864ba99bf6b35dc0fd965e0755",
+    arguments: "p1 text, p2 text, p3 text, p4 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_8c4937430e36c8e787e93929",
+    definition: "0985aa5e0ffee29c6c6d79531133993577d6377a958da5354ac7f5a5e20ff1f7",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_944e29878190b042600a43aa",
+    definition: "526d2c07734c3c727fc216dff567c33ff3cd5fb61ebac566640a3cc59c560455",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_98693bf59f6ec88385d1a2e8",
+    definition: "217cf2a2f74bc71dead4eaff9200a4655ab3ae81c836516610345abc5903ea8d",
+    arguments: "p1 text, p2 text, p3 text, p4 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_988735ac2a1a18389fa0bd91",
+    definition: "820b181a5858b8ffb71db4f67d303fbb5ba8cdfef99365f779734230e13f53ab",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_9e91362aab78847b4a47db61",
+    definition: "825b1b5e41641ad1ebe4a7737452587eb31f38e80e6207fb98cb3e8e1b33f8d9",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_a0e680634378c9709f443e76",
+    definition: "f44750571117bbe017851c37aa35fe6dc662f6c96fb7f80badef66c5f04d9df4",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text, p13 text, p14 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_a71168a3808c25e88da242ab",
+    definition: "2bf1bb4d0689e1a14503c05e239c287f6652b2488fd36077b768c3d3d3283b43",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_ac418692d93da9a37ef4d438",
+    definition: "d19653b054e5b972f2e23fedc431ac01aaf92daa5dab4c3fff5a5f682942c23e",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_ad2e84fec89ba9c5b1fd5f20",
+    definition: "f31685c46fc1761ab2b24f72284527a1bcbd7547727bacfa0439ffc88b0f5ea3",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_b03c8ea8391678ae71b8031e",
+    definition: "2f923d8926c50ddf914e645913f70fe468d41d0b7400b4e16b49faa1f74b086a",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_b44d6bc61d9a2d54becc9173",
+    definition: "4411a875c7eb5086d29a42bcc90ac7dbebb144a6735d4acff3b2f6bf124a7a82",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_b594ab1d10c68ceac544f2f4",
+    definition: "98a34e56d8d81ebb2906e8ebcdc292af532aacb6a998df0d757d4bdb7cc3af3b",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_b75844e451c72d86ecce7361",
+    definition: "d093ceaae66054c4a7a881d2430fdae06f15c935885f2d6af1c7fc461f1f714f",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_bf3541bec260c19aeaf147e0",
+    definition: "ce486e129038dbf97d29aa477fb93676b1a9671e16c8a4d01e878e8ae8de3cc3",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_c0c8bf88c9afd629c6d80e9f",
+    definition: "43ea53ded05e3694b8ed623ee124c7bd0ca1dbe6d861f3adeae6a77289f19da0",
+    arguments: "p1 text, p2 text, p3 text, p4 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_c17a55bfb4d6e130fbbe3e4d",
+    definition: "a87dcc303a7fdfe9447819a99d097562c47f0cb036f379c1a4ad50434fe46fed",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_c1e4d457aa8a6c7bd31e5277",
+    definition: "d3142c193c0ccf0b4f344a1eeb4d545551a67b0626aecb62c3b9c9b3442dcf2d",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_c365a70fb8ff3318f2e1f14c",
+    definition: "1ba973d727104171a93f95e99f3748f9783bad00df755c0f726abadaf6c7a3c5",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_d556945d2d95f6add8f9ccb4",
+    definition: "70425a13cb560b5d2dc3d323932865422b9b8c743f61606209d566b041579417",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_d77d8b0fcafaf2d6444a9283",
+    definition: "0cb4a4fc11af24430203494d63f9beb6bd4e9a5075b10cc657d260b0c30992e1",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_da25480fb483e6ce3d30f1a1",
+    definition: "65898ab88b559617ef1d141efaeb4fb0f332ea85fb2fdb738cc8a51def0b5c9f",
+    arguments: "",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_dc3c6d47e9eefd6fefb577c1",
+    definition: "3d0833b14db2260e82a9dae9d738dd0fc81bbf4c727abc2e3a083961e2ad3b74",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_e132519164f58f14ceaa901e",
+    definition: "6d86b5e404aec1ae81276512d3fe2c60dcf190ad3daa11339ed1e249b751e1f3",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_e42d2de24a5b2a9d458219d0",
+    definition: "8bdbaf199f15e00f4c00fbe28297ccd4b90ae06b174a2c0b9dfb871a17d6e5f4",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_e9d8defc0078b184176ffedf",
+    definition: "2aa3549d5c2f388337d8e3565d10452c6ceea55e907d2b99656bce3b0d2e26b4",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_ec7d0eb73f55bc0a5eb0503e",
+    definition: "63c949a642acda85ca80a2e6526dff3787ffecebd6b45654ef79616973ccff2c",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_f47daacda1442e346327b60d",
+    definition: "f83946afa6d20471ddfbcccba3bd1c7395d996563b3f68fa2baaf8ec2bfe0152",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_f824c60ac8562824f8a15aeb",
+    definition: "8330256e81d7ccddefa6ea7e343a7348a12e250b1c813c360111dc68ef76a877",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_f8de722d3598965d1cab8cd6",
+    definition: "4196f188626de98726603ca49c785e7ed359d8106c7eaea8d43817959f8b0202",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_fa9d3af42f20a68890242235",
+    definition: "fb3351a5f5cd33e0e45d153293d0086c07a852447aa282f5e8028ea3f483b4c0",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_fada095ce38b422ccf61f489",
+    definition: "a5d78bebfb17ca08486219e4f570ea98102ff882d10ad13fb0d64352cefc8cdd",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_fbd717658ec0391f83b6ca1e",
+    definition: "2940286aa89ea8338258c30439aae923df49d954a9755b691d0f1c0f51c4fa4c",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_fd19cd46f568a4ae38795f6d",
+    definition: "f3916dfe9dc2a9a52704bb905c576cf74c8789e84e449e8c6bda78ded9fcff00",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n88_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  }
+];
+
+// drafts/n88-student-portal/activation/private-error-boundary.mjs
+var fail4 = () => {
+  throw Error("n88_database_unavailable");
+};
+var verified = /* @__PURE__ */ new WeakSet();
+var operations = new Map(error_boundary_contract_default.operations.map((o) => [o.sql, o]));
+var controls = new Set(error_boundary_contract_default.controls);
+var boundaryCatalogSql = `select p.proname as name,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,
+    pg_get_function_identity_arguments(p.oid) as arguments,p.prosecdef as definer,
+    r.rolname as owner,p.proconfig as config,
+    (select array_agg(coalesce(gr.rolname,'PUBLIC')||':'||a.privilege_type order by coalesce(gr.rolname,'PUBLIC'),a.privilege_type)
+      from aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a left join pg_roles gr on gr.oid=a.grantee) as acl
+    from pg_proc p join pg_namespace n on n.oid=p.pronamespace join pg_roles r on r.oid=p.proowner
+    where n.nspname='n88_private' and p.proname like 'boundary_%' order by p.proname`;
+async function assertVerifiedBoundary(client) {
+  verified.delete(client);
+  const r = await client.query(boundaryCatalogSql);
+  if (error_boundary_identities_default.length !== operations.size || JSON.stringify(r.rows) !== JSON.stringify(error_boundary_identities_default)) fail4();
+  verified.add(client);
+}
+function pgText(value) {
+  if (value === null) return null;
+  if (typeof value === "string" || typeof value === "bigint" || typeof value === "boolean") return String(value);
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (Buffer5.isBuffer(value)) return "\\x" + value.toString("hex");
+  if (value instanceof Date && Number.isFinite(value.getTime())) return value.toISOString();
+  if (Array.isArray(value)) return "{" + value.map((v) => v === null ? "NULL" : Array.isArray(v) ? pgText(v) : '"' + pgText(v).replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"').join(",") + "}";
+  fail4();
+}
+async function privateQuery(client, sql, values = []) {
+  if (!verified.has(client) || !Array.isArray(values)) fail4();
+  if (controls.has(sql)) {
+    if (sql.startsWith("select set_config")) {
+      if (values.length !== 3 || values.some((v) => typeof v !== "string" || !/^\d{1,5}$/.test(v) || Number(v) < 1 || Number(v) > 6e4)) fail4();
+    } else if (values.length) fail4();
+    return client.query(sql, values);
+  }
+  const op = operations.get(sql);
+  if (!op || values.length !== op.parameters.length) fail4();
+  const wire = values.map(encodeBoundaryParameter);
+  const result2 = await client.query(`select * from n88_private.${op.name}(${wire.map((_, i) => "$" + (i + 1) + "::text").join(",")})`, wire);
+  if (op.effect) {
+    const count = result2.rows?.[0]?.affected;
+    if (result2.rows?.length !== 1 || !/^\d+$/.test(count) || !Number.isSafeInteger(Number(count))) fail4();
+    return { ...result2, command: op.command, rowCount: Number(count), rows: [] };
+  }
+  if (op.voidResult) return { ...result2, rows: result2.rows.map(() => ({ [op.output[0].name]: "" })) };
+  return result2;
+}
+var encodeBoundaryParameter = (value) => value === null ? null : Buffer5.from(pgText(value), "utf8").toString("base64");
+
+// drafts/n88-student-portal/postgres-repository.mjs
 var unavailable = () => new Error("n88_repository_unavailable");
 var must = (test) => {
   if (!test) throw unavailable();
@@ -1606,7 +4029,7 @@ function snapshot(state, limits) {
     must(total <= limits.total);
     maps[name] = /* @__PURE__ */ new Map();
     for (const r of state[name]) {
-      const values = encode(name, r), json = JSON.stringify(r), size = Buffer5.byteLength(json);
+      const values = encode(name, r), json = JSON.stringify(r), size = Buffer6.byteLength(json);
       must(size <= limits.rowBytes);
       bytes += size;
       must(bytes <= limits.bytes);
@@ -1659,7 +4082,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
     };
     const query = async (text2, values = []) => {
       fence();
-      const r = await c.query(text2, values);
+      const r = await privateQuery(c, text2, values);
       fence();
       return r;
     };
@@ -1676,6 +4099,8 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       clearTimeout(acquireTimer);
       fence();
       must(c && typeof c.query === "function" && typeof c.release === "function");
+      await assertVerifiedBoundary(c);
+      fence();
       await query("begin isolation level read committed");
       begun = true;
       await query(
@@ -1692,12 +4117,12 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         state[name] = result3.rows.map((row) => {
           exact4(row, ["bounded_row"]);
           must(typeof row.bounded_row === "string");
-          transferred += Buffer5.byteLength(row.bounded_row);
+          transferred += Buffer6.byteLength(row.bounded_row);
           must(transferred <= limits.bytes);
           return decode(name, JSON.parse(row.bounded_row));
         });
         count += state[name].length;
-        bytes += Buffer5.byteLength(JSON.stringify(state[name]));
+        bytes += Buffer6.byteLength(JSON.stringify(state[name]));
         must(bytes <= limits.bytes);
       }
       const original = snapshot(state, limits);
@@ -1767,10 +4192,10 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
 }
 
 // drafts/n88-student-portal/canonical-adapter.mjs
-import { Buffer as Buffer6 } from "node:buffer";
+import { Buffer as Buffer7 } from "node:buffer";
 import { createHash as createHash7 } from "node:crypto";
 var CANONICAL_TABLES = Object.freeze(["years", "terms", "sections", "students", "enrollments", "teachings", "items"]);
-var fail4 = () => {
+var fail5 = () => {
   throw Error("n88_canonical_unavailable");
 };
 var key = (m) => JSON.stringify([m.ownerId, m.classId, m.studentId, m.enrollmentId]);
@@ -1779,9 +4204,9 @@ var id2 = (parts) => {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20, 32)}`;
 };
 function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = {}) {
-  if (!Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail4();
+  if (!Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail5();
   return async (db, { query }, ownerId) => {
-    if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(ownerId) || !db.contexts.some((c) => c.ownerId === ownerId && c.active)) fail4();
+    if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(ownerId) || !db.contexts.some((c) => c.ownerId === ownerId && c.active)) fail5();
     await query("select n88_private.lock_canonical_sources($1::uuid,$2::integer)", [ownerId, maxRows]);
     const owners = [ownerId];
     const result2 = await query(`select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload
@@ -1796,12 +4221,12 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
         join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id
         where e.owner_id=any($1::uuid[]) order by e.owner_id,e.id limit $2
       ) x) bounded`, [owners, maxRows + 1, maxBytes]);
-    if (result2.rows.length > maxRows) fail4();
+    if (result2.rows.length > maxRows) fail5();
     let bytes = 0;
     const read = (row) => {
-      if (typeof row.payload !== "string") fail4();
-      bytes += Buffer6.byteLength(row.payload);
-      if (bytes > maxBytes) fail4();
+      if (typeof row.payload !== "string") fail5();
+      bytes += Buffer7.byteLength(row.payload);
+      if (bytes > maxBytes) fail5();
       return JSON.parse(row.payload);
     };
     const previous = new Map(db.memberships.map((m) => [key(m), m]));
@@ -1812,9 +4237,9 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
     }
     for (const row of result2.rows) {
       const r = read(row), revision2 = Number(r.revision);
-      if (!/^[1-9][0-9]*$/.test(r.revision) || !Number.isSafeInteger(revision2)) fail4();
+      if (!/^[1-9][0-9]*$/.test(r.revision) || !Number.isSafeInteger(revision2)) fail5();
       const revisions = [r.revision, r.student_revision, r.section_revision, r.year_revision];
-      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail4();
+      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail5();
       const canonicalStamp = createHash7("sha256").update(JSON.stringify(["n88-lineage-v1", ...revisions])).digest("hex");
       const m = {
         ownerId: r.owner_id,
@@ -1829,7 +4254,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
         classActive: r.class_active,
         label: r.label
       };
-      if (!owners.includes(m.ownerId)) fail4();
+      if (!owners.includes(m.ownerId)) fail5();
       const old = previous.get(key(m));
       if (old) Object.assign(old, m);
       else {
@@ -1852,17 +4277,17 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
           and term.deleted_at is null and term.status='active' and term.year_id=c.year_id
           and i.auto is null order by i.owner_id,i.id limit $2
       ) x) bounded`, [owners, maxRows + 1, maxBytes - bytes]);
-    if (source.rows.length > maxRows) fail4();
+    if (source.rows.length > maxRows) fail5();
     const current = /* @__PURE__ */ new Set();
     for (const row of source.rows) {
       const r = read(row);
       const revisions = [r.item_revision, r.teaching_revision, r.term_revision];
-      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail4();
+      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail5();
       for (const m of db.memberships.filter((m2) => m2.ownerId === r.owner_id && m2.classId === r.section_id && m2.status === "active" && !m2.endDate && m2.studentActive && m2.classActive)) {
         const publicationId = id2([m.ownerId, m.enrollmentId, m.canonicalStamp, r.teaching_id, r.item_id, ...revisions]);
         current.add(publicationId);
         const existing = db.publications.find((p) => p.id === publicationId);
-        if (existing && (key(existing) !== key(m) || existing.source.teachingId !== r.teaching_id || existing.source.itemId !== r.item_id)) fail4();
+        if (existing && (key(existing) !== key(m) || existing.source.teachingId !== r.teaching_id || existing.source.itemId !== r.item_id)) fail5();
         const prior = db.publications.find((p) => key(p) === key(m) && p.source.teachingId === r.teaching_id && p.source.itemId === r.item_id);
         if (!existing) db.publications.push({
           id: publicationId,
@@ -1877,7 +4302,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
           status: prior?.status || "todo",
           published: false
         });
-        if (db.publications.length > maxRows) fail4();
+        if (db.publications.length > maxRows) fail5();
       }
     }
     db.publications = db.publications.filter((p) => p.ownerId !== ownerId || current.has(p.id));
@@ -1885,18 +4310,18 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
 }
 
 // drafts/n88-student-portal/http-adapter.mjs
-import { Buffer as Buffer7 } from "node:buffer";
+import { Buffer as Buffer8 } from "node:buffer";
 
 // drafts/n88-student-portal/auth-verifier.mjs
-import { Buffer as Buffer8 } from "node:buffer";
+import { Buffer as Buffer9 } from "node:buffer";
 import { AuthClient } from "@supabase/auth-js";
 var uuid3 = (s) => typeof s === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(s);
-var fail5 = () => {
+var fail6 = () => {
   throw Error("n88_auth_configuration");
 };
 function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch, authDeadlineMs = 2e3, now = Date.now }) {
   const url = new URL(authUrl);
-  if (url.origin !== authUrl || url.protocol !== "https:" || !apiKey || typeof send !== "function" || !Number.isInteger(authDeadlineMs) || authDeadlineMs < 20 || authDeadlineMs > 5e3) fail5();
+  if (url.origin !== authUrl || url.protocol !== "https:" || !apiKey || typeof send !== "function" || !Number.isInteger(authDeadlineMs) || authDeadlineMs < 20 || authDeadlineMs > 5e3) fail6();
   const issuer = authUrl + "/auth/v1";
   return async (authorization, parentSignal, { query, beforeCommit } = {}) => {
     if (typeof query !== "function" || typeof authorization !== "string" || !/^Bearer [A-Za-z0-9._-]{20,8192}$/.test(authorization)) return null;
@@ -1916,7 +4341,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
       const boundedFetch = async (target, init = {}) => {
         fence();
         const u = new URL(target);
-        if (u.origin !== authUrl || ![issuer + "/user", issuer + "/.well-known/jwks.json"].includes(u.href) || init.method && init.method !== "GET") fail5();
+        if (u.origin !== authUrl || ![issuer + "/user", issuer + "/.well-known/jwks.json"].includes(u.href) || init.method && init.method !== "GET") fail6();
         const response2 = await send(u.href, { ...init, redirect: "error", cache: "no-store", credentials: "omit", signal: abort.signal });
         let n = 0;
         const parts = [];
@@ -1936,7 +4361,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
           reader.releaseLock();
         }
         fence();
-        return new Response(Buffer8.concat(parts), { status: response2.status, headers: response2.headers });
+        return new Response(Buffer9.concat(parts), { status: response2.status, headers: response2.headers });
       };
       const auth = new AuthClient({
         url: issuer,
@@ -1948,10 +4373,10 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
         skipAutoInitialize: true,
         debug: false
       });
-      const verified = await auth.getClaims(token);
+      const verified2 = await auth.getClaims(token);
       fence();
-      if (verified.error || !verified.data?.claims) return null;
-      const c = verified.data.claims, sec = Math.floor(now() / 1e3);
+      if (verified2.error || !verified2.data?.claims) return null;
+      const c = verified2.data.claims, sec = Math.floor(now() / 1e3);
       if (c.iss !== issuer || !(c.aud === "authenticated" || Array.isArray(c.aud) && c.aud.length === 1 && c.aud[0] === "authenticated") || c.role !== "authenticated" || !uuid3(c.sub) || !uuid3(c.session_id) || c.is_anonymous === true || !Number.isSafeInteger(c.exp) || c.exp <= sec || !Number.isSafeInteger(c.iat) || c.iat > sec || c.iat >= c.exp || c.nbf !== void 0 && (!Number.isSafeInteger(c.nbf) || c.nbf > sec)) return null;
       const current = await query("select user_id,session_id from n88_private.lock_current_session($1::uuid,$2::uuid)", [c.sub, c.session_id]);
       fence();
@@ -1981,7 +4406,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
 // drafts/n88-student-portal/runtime.mjs
 var REQUIRED_ENV = Object.freeze(["N88_PUBLIC_ORIGIN", "N88_DATABASE_URL", "N88_HMAC_KEY", "N88_AUTH_URL", "N88_AUTH_API_KEY", "N88_INGRESS_KEY"]);
 function deploymentPreflight({ origin, authUrl, apiKey, secretKey, acquire, canonicalReadback, privateIngressReadback, sourceOnly = true }) {
-  if (sourceOnly !== false || typeof acquire !== "function" || canonicalReadback !== true || privateIngressReadback !== true || !Buffer9.isBuffer(secretKey) || secretKey.length < 32 || typeof apiKey !== "string" || !apiKey || ![origin, authUrl].every((u) => {
+  if (sourceOnly !== false || typeof acquire !== "function" || canonicalReadback !== true || privateIngressReadback !== true || !Buffer10.isBuffer(secretKey) || secretKey.length < 32 || typeof apiKey !== "string" || !apiKey || ![origin, authUrl].every((u) => {
     try {
       const x = new URL(u);
       return x.origin === u && x.protocol === "https:" && !x.username && !x.password;
@@ -2064,7 +4489,7 @@ var privateResponse = (status = 503) => new Response('{"error":"unavailable"}', 
 
 // drafts/n88-student-portal/web-entry.mjs
 function createWebEntry(options) {
-  if (!Buffer10.isBuffer(options.ingressKey) || options.ingressKey.length !== 32) throw Error("n88_ingress_configuration");
+  if (!Buffer11.isBuffer(options.ingressKey) || options.ingressKey.length !== 32) throw Error("n88_ingress_configuration");
   const envelopes = /* @__PURE__ */ new WeakMap(), now = options.now || Date.now;
   const verifier = createTeacherVerifier(options);
   const adapter = {
@@ -2101,7 +4526,7 @@ function createWebEntry(options) {
         const bytes = decodeBytes(envelope.body);
         if (bytes.length > 4096) return privateResponse(413);
         const expected = await mac(options.ingressKey, signingText({ origin: options.origin, path, method, headers: h, bodyHash: await sha(bytes), time: time2, nonce, source }));
-        if (!timingSafeEqual3(Buffer10.from(expected, "hex"), Buffer10.from(signature, "hex"))) return privateResponse(401);
+        if (!timingSafeEqual3(Buffer11.from(expected, "hex"), Buffer11.from(signature, "hex"))) return privateResponse(401);
         let body = {};
         if (bytes.length) body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
         if (!body || Array.isArray(body) || typeof body !== "object" || method === "GET" && bytes.length) return privateResponse(400);
@@ -2148,8 +4573,9 @@ async function assertPrivateDatabaseSession(client) {
     current_setting('auto_explain.log_nested_statements',true) as explain_nested`);
   const r = result2.rows?.[0];
   const explainSafe = r && (r.explain_duration == null || r.explain_duration === "-1" || /^\d+$/.test(r.explain_duration) && Number(r.explain_duration) > 3e3 && r.explain_nested === "off");
-  if (result2.rows?.length !== 1 || !r || r.role !== "n88_backend" || r.error_verbosity !== "terse" || r.error_parameters !== "0" || !["none", "ddl"].includes(r.statements) || r.duration !== "-1" || r.duration_sample !== "-1" || Number(r.transaction_sample) !== 0 || r.transaction_sample == null || ![null, "none"].includes(r.audit) || !explainSafe)
+  if (result2.rows?.length !== 1 || !r || r.role !== "n88_backend" || !["terse", "default"].includes(r.error_verbosity) || r.error_parameters !== "0" || !["none", "ddl"].includes(r.statements) || r.duration !== "-1" || r.duration_sample !== "-1" || Number(r.transaction_sample) !== 0 || r.transaction_sample == null || ![null, "none"].includes(r.audit) || !explainSafe)
     throw Error("n88_database_unavailable");
+  await assertVerifiedBoundary(client);
 }
 function createExistingHost(readEnv) {
   if (readEnv("N88_ENABLED") !== "true") return Object.freeze({ handle: async () => privateResponse(), close: async () => {
@@ -2166,7 +4592,7 @@ function createExistingHost(readEnv) {
   const key2 = (n) => {
     const s = required(n);
     if (!/^[a-f0-9]{64}$/.test(s)) throw Error("n88_key_configuration");
-    return Buffer11.from(s, "hex");
+    return Buffer12.from(s, "hex");
   };
   if (required("N88_SERVICE_REVISION") !== deployment_inactive_default.serviceRevision) throw Error("n88_service_readback_missing");
   const secretKey = key2("N88_HMAC_KEY"), ingressKey = key2("N88_INGRESS_KEY"), numericKey = key2("N88_NUMERIC_KEY"), reservationKey = key2("N88_RESERVATION_KEY");

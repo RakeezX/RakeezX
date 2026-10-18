@@ -1,18 +1,18 @@
 {
   "aiAuthored": true,
   "taskId": "continuous-n88-official-student-portal-activation-20261018",
-  "runId": "4c5a66bc-5348-4e74-86a2-2ce6b2b5eec9",
-  "at": "2026-10-18T18:49:36.070Z",
+  "runId": "6085920e-db53-474e-9ba9-d2e1efa73012",
+  "at": "2026-10-18T19:16:17.021Z",
   "checks": [
     {
       "name": "actual_source_private_session_guard",
       "status": "PASS",
-      "evidence": "Actual source function exercised in20 metadata cases: safe restricted session admitted; owner/admin/verbosity/parameter/statement/duration/audit/explain variants rejected. One read-only metadata query precedes private access; no logging configuration mutation. Actual observed default-verbosity configuration rejected."
+      "evidence": "Actual source guard exercised in 22 metadata cases. Observed default/ddl/error-parameter0 is accepted only with all exact boundary identities/ACL verified. Missing/modified boundary, unknown capture posture, owner/admin, unsafe parameter/statement/duration/audit/explain settings rejected. Read-only metadata only; no logging change."
     },
     {
       "name": "actual_bound_service_acquire_failure",
       "status": "PASS",
-      "evidence": "Actual signed gateway -> actual Web/service/repository -> createExistingHost bound Pool acquisition returned generic unavailable401 and destroyed the client on unsafe effective logging. Exactly one metadata query, zero private/canonical queries. Only transport/Auth packages fabricated; no live credentials or network."
+      "evidence": "Actual signed gateway -> Web/service/repository -> bound Pool acquisition returns generic401 and destroys client when observed default posture has no matching boundary. Exactly two metadata queries, zero private/canonical operations. Only DB/Auth transport packages fabricated; no live credentials/network."
     }
   ],
   "hostedWrites": 0,

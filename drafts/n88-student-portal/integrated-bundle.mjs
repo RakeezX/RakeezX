@@ -18,6 +18,13 @@ const manifest={aiAuthored:true,sourceOnly:true,enabled:false,projectId:'xlrubcw
   externalDependencies:{pg:'8.23.1','@supabase/auth-js':'2.118.0'},
   gates:{edgeEnabled:false,cloudflareEnabled:false,browserReadiness:false,routes:[],cron:[]}};
 const absolute={name:'actual-app-absolute-imports',setup(build){build.onResolve({filter:/^\/src\//},args=>({path:path.resolve('.'+args.path)}));}};
+const boundary=JSON.parse(await readFile(dir+'error-boundary-contract.json','utf8'));
+manifest.privateErrorBoundary={revision:'typed-private-boundary-v1',migration:boundary.migration,
+  routines:boundary.operations.length,contractSha256:await textHash(dir+'error-boundary-contract.json'),
+  identitiesSha256:await textHash(dir+'error-boundary-identities.json'),security:'INVOKER',executeGrantee:'n88_backend',
+  hostedApplied:false,readbackRequiredBeforePrivateQuery:true,localEvidence:'tests/n88-official-activation-error-boundary.json'};
+for(const file of [boundary.migration.path,dir+'build-error-boundary.mjs',dir+'error-boundary-contract.json',dir+'error-boundary-identities.json',dir+'private-error-boundary.mjs',
+  'tests/n88-official-activation-error-boundary.mjs','tests/n88-official-activation-error-boundary.json'])manifest.sources[file]=await textHash(file);
 // Bundled import.meta.url is the output module, not the original source file.
 // Keep the shared app sources intact and pin only this private document's assets.
 const brandAssets=['header-light-standard.svg','header-light-compact.svg','header-dark-standard.svg','header-dark-compact.svg','icon-192.png'];

@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "postgres": "17.6",
+  "posture": {
+    "verbosity": "default",
+    "statements": "ddl",
+    "parameters": "-1",
+    "error_parameters": "0"
+  },
+  "routines": 76,
+  "migration": {
+    "path": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
+    "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+  },
+  "cases": [
+    {
+      "name": "unique",
+      "sqlstate": "23505",
+      "sanitized": true,
+      "transactionAborted": true
+    },
+    {
+      "name": "foreign-key",
+      "sqlstate": "23503",
+      "sanitized": true,
+      "transactionAborted": true
+    },
+    {
+      "name": "check",
+      "sqlstate": "23514",
+      "sanitized": true,
+      "transactionAborted": true
+    },
+    {
+      "name": "cast-inside-boundary",
+      "sqlstate": "22P02",
+      "sanitized": true,
+      "transactionAborted": true
+    },
+    {
+      "name": "permission",
+      "sqlstate": "42501",
+      "sanitized": true,
+      "transactionAborted": true
+    }
+  ],
+  "seams": [
+    "actual owner/source/auth lock/commit guard and all thirteen canonical family reads",
+    "guidance stale CAS rejected without overwriting revision1",
+    "callback error rolls back private state",
+    "lost durable COMMIT ACK returns unavailable without replay; fresh read observes committed state",
+    "bigint beyond JS safe integer preserved as exact text; null preserved; uuid[] owner parameters preserved",
+    "actual native PG numeric/bigint/bytea/escaped array/null/timestamp wire roundtrip with no JSON result codec"
+  ],
+  "unknownSqlRejected": true,
+  "missingAndWrongBoundaryRejected": true,
+  "nativeResultParity": true,
+  "actualServerLogs": {
+    "errorsPresent": true,
+    "ddlAuditPresent": true,
+    "privateCanaryAbsent": true,
+    "privateParameterAbsent": true,
+    "originalDetailAbsent": true
+  },
+  "hostedOperations": 0
+}
