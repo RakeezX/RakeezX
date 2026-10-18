@@ -1,0 +1,52 @@
+{
+  "taskId": "continuous-n64-inline-email-change-guidance-20261018",
+  "runId": "da509851-6aa9-431c-8f46-2765a12bc2d5",
+  "status": "PASS",
+  "results": [
+    {
+      "width": 390,
+      "currentEmailVisible": true,
+      "pendingGuidanceVisible": true,
+      "singleChangeAction": true,
+      "extraPageLinkAbsent": true,
+      "manualCheckAbsent": true,
+      "invalidInput": true,
+      "sending": true,
+      "acceptedGuidance": true,
+      "verifiedOutcomeAfterFreshMatchingRead": true,
+      "requestErrorRetry": true,
+      "closeAvailable": true,
+      "compatibilityRendersOrdinarySettings": true,
+      "reloadDoesNotRepeatSuccess": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1280,
+      "currentEmailVisible": true,
+      "pendingGuidanceVisible": true,
+      "singleChangeAction": true,
+      "extraPageLinkAbsent": true,
+      "manualCheckAbsent": true,
+      "invalidInput": true,
+      "sending": true,
+      "acceptedGuidance": true,
+      "verifiedOutcomeAfterFreshMatchingRead": true,
+      "requestErrorRetry": true,
+      "closeAvailable": true,
+      "compatibilityRendersOrdinarySettings": true,
+      "reloadDoesNotRepeatSuccess": true,
+      "noHorizontalOverflow": true
+    }
+  ],
+  "sourceSha256": {
+    "src/views/settings.js": "f1c8c4aaca38099b77cf3a30995af8c94672f4c0b321179ba6fa98222724e23c",
+    "src/router.js": "b252f838df395928eb033c359daafcfdcc57d86b537cebaee43c4ade4e8316e4",
+    "src/styles/app.css": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270",
+    "src/lib/settings-profile-ui.js": "15ca897b5df26403a77d687c7f16cf6b159a3df4861d2320efa492d820bcb7f3",
+    "src/lib/cloud.js": "df9fc3d3cf8305bb91e3abacbf52a9f7166f3aa6d19a93a121cee4a42399ae84",
+    "sw.js": "8c6bc5dfb421f5f3042837f51aa8e1b15b9f275e9637b9f19808663d0a2b87d3"
+  },
+  "scope": "Actual RAKEEZ application DOM, handlers, account/store fixture and source CSS at 390/1280; isolated loopback HTTP; synthetic provider responses only; no real account or message; owned browser/server closed.",
+  "reusedProofs": "tests/n64-auto-pending-evidence.json covers automatic status refresh, current-owner/session fencing, pending/completion semantics, neutral errors/retry, cooldown and reload without false success. src/lib/cloud.js and src/lib/settings-profile-ui.js behavior were unchanged.",
+  "confirmationLanding": "Confirmation link destination and automatic landing remain unchanged and are not delivered by this task."
+}

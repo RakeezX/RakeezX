@@ -86,6 +86,10 @@ function emailChangeSheet(currentEmail, submit) {
         </label>
         <div class="field__error" role="alert" data-email-change-error hidden></div>
         <div class="field__hint" role="status" data-email-change-sending hidden>جارٍ إرسال طلب تغيير البريد… يمكنك إغلاق النافذة ومتابعة استخدام الإعدادات.</div>
+        <div class="settings-email-feedback" role="status" data-email-change-accepted hidden>
+          <p>أُرسل طلب التغيير. سيبقى بريدك الحالي معتمدًا حتى يؤكد الخادم التغيير.</p>
+          <p>أكمل التأكيد من الرسالتين في بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. بعد التأكيد، ارجع إلى الإعدادات لتحديث الحالة تلقائيًا، أو حدّث الصفحة.</p>
+        </div>
       </form>
     `,
     foot: html`
@@ -117,8 +121,8 @@ function emailChangeSheet(currentEmail, submit) {
       const message = await submit(result.email);
       if (!root.isConnected) return;
       if (!message) {
-        const status = root.querySelector('[data-email-change-sending]');
-        status.textContent = 'أُرسل طلب التغيير. بعد تأكيد الرسالتين، ارجع إلى الإعدادات لتحديث الحالة تلقائيًا. إذا لم تظهر الحالة الجديدة، حدّث الصفحة.';
+        root.querySelector('[data-email-change-sending]').hidden = true;
+        root.querySelector('[data-email-change-accepted]').hidden = false;
         button.remove();
         root.querySelector('.sheet__foot [data-sheet-close]').focus({ preventScroll: true });
         return;
@@ -396,9 +400,8 @@ const settings = {
                 <span class="field__label">البريد الإلكتروني الحالي</span>
                 <div class="settings-email-line">
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
-                  ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
+                  ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تغيير'}</button>` : ''}
                 </div>
-                <a class="btn btn--quiet btn--sm" href="#/settings/email-status">حالة البريد الإلكتروني وتعليمات التأكيد</a>
                 ${emailView.verificationError ? html`<p class="field__hint" role="status">${emailView.verificationError} <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification" aria-busy=${emailView.verifying ? 'true' : 'false'} ${emailView.verifying ? 'disabled' : ''}>${emailView.verifying ? 'جارٍ التحقق…' : 'إعادة المحاولة'}</button></p>` : ''}
                 ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
                   ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بعد تأكيد الرسالتين، تُحدَّث الحالة تلقائيًا عند العودة إلى الإعدادات. إذا لم تظهر الحالة الجديدة، حدّث الصفحة.</span>${emailView.verifying ? html` <span data-email-change-checking>جارٍ التحقق من حالة البريد…</span>` : ''}</div>
