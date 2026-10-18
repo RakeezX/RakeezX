@@ -1,0 +1,44 @@
+{
+  "taskId": "continuous-n88-compact-teacher-portal-20261018",
+  "runId": "a2cc5ee3-395f-456f-a814-6ea5cd0e4080",
+  "checks": [
+    {
+      "name": "n88_compact_teacher_responsive_390_698_1280_light_dark_actual_app",
+      "status": "PASS",
+      "evidence": "Six masked actual application shell/class route screenshots and geometry checks; source CSS and handlers, fresh contexts."
+    },
+    {
+      "name": "n88_compact_teacher_automatic_refetch_retry_recovery_and_stale_owner_guards",
+      "status": "PASS",
+      "evidence": "See steps: mount/return/focus/context/postcommit, coalescing, unknown ACK/read retry, delayed stale response, actual account ownership guard."
+    },
+    {
+      "name": "n88_compact_teacher_copy_share_visibility_semantics_and_disjoint_scope",
+      "status": "PASS",
+      "evidence": "Exact delivery text, manual fallbacks, legacy selective confirmations and explicit ACK/CAS settings save; task-owned fabricated ports only."
+    }
+  ],
+  "steps": [
+    "actual shell/class route mount: one authorized list, real owner-bound dispatch guard",
+    "exact name/code/universalURL/instructions; sync clipboard and async share failure manual fallback; unsaved disclosure preserved",
+    "focus/pageshow/visible/subscription coalescing, same recovered code, no implicit settings save",
+    "pagehide wipe, authorized return read, unchanged-context draft survives",
+    "explicit six-field save with policy/roster CAS and validated ACK then refetch",
+    "mutation wake events coalesced into one postcommit list; no duplicate requests or mutation replay",
+    "unknown ACK: one review action, writes disabled until fresh list, no replay",
+    "read failure wipes credentials and offers one authorized retry",
+    "legacy explicit selective rotate and consequences, revoke confirmation/cancel, postcommit authorized recovery",
+    "context switch during delayed read: immediate wipe and queued fresh authorized read; stale result discarded",
+    "actual account owner/store guard rejects foreign owner and immediately wipes plaintext",
+    "actual shell 390px light: no overflow, 44px targets, six disclosure fields, masked screenshot",
+    "actual shell 698px light: no overflow, 44px targets, six disclosure fields, masked screenshot",
+    "actual shell 1280px light: no overflow, 44px targets, six disclosure fields, masked screenshot",
+    "actual shell 390px dark: no overflow, 44px targets, six disclosure fields, masked screenshot",
+    "actual shell 698px dark: no overflow, 44px targets, six disclosure fields, masked screenshot",
+    "actual shell 1280px dark: no overflow, 44px targets, six disclosure fields, masked screenshot"
+  ],
+  "cleanup": {
+    "ownedServerClosed": true,
+    "lease": "RELEASED integration"
+  }
+}

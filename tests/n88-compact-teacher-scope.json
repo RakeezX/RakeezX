@@ -1,0 +1,43 @@
+{
+  "baseSha": "859de68d4e3368b2b42e52540da4a9aa7647926d",
+  "checks": [
+    {
+      "name": "n88_compact_teacher_scope_syntax_and_reused_security_graph",
+      "status": "PASS",
+      "evidence": "Only teacher view/CSS source changes. Client/runtime/store/router/app/SW/backend/service/SQL/shared fixtures unchanged from delivered H. Five exact historical proof SHA256 values verified, not rerun. Default readiness remains OFF."
+    }
+  ],
+  "reusedProofs": {
+    "tests/n88-six-digit-recovery.json": "9fd5fddb9a2a7961dc0b93d0f173adb734b939233435d268bc0ac51d8d2d7407",
+    "tests/n88-six-digit-recovery-context.json": "4feae5ee381241697439bb9be6576a23e97c2f2ef5a7d7ceaf290616e0597f79",
+    "tests/n88-six-digit-shared-network.json": "64f12a375cb5d0960ab73133605f6146749033be63b3c0c74869fba38b341a99",
+    "tests/n88-six-digit-shared-flood-window.json": "185c96dd0b69d1e9ca1e2f89bba5ba1290d3da206c8f1f49464f07450fe30418",
+    "tests/n88-six-digit-security.json": "27289091e104a6a49816c2166a4c355d44bd78dee2661cc46cca41000da18122"
+  },
+  "changedPaths": [
+    "docs/automation-evidence/20261018/N88_COMPACT_TEACHER_PORTAL.md",
+    "src/styles/student-portal-class.css",
+    "src/views/student-portal-class.js",
+    "tests/fixtures/n88-compact-teacher/1280-dark.png",
+    "tests/fixtures/n88-compact-teacher/1280-light.png",
+    "tests/fixtures/n88-compact-teacher/390-dark.png",
+    "tests/fixtures/n88-compact-teacher/390-light.png",
+    "tests/fixtures/n88-compact-teacher/698-dark.png",
+    "tests/fixtures/n88-compact-teacher/698-light.png",
+    "tests/fixtures/n88-compact-teacher/ports.js",
+    "tests/fixtures/n88-compact-teacher/server.mjs",
+    "tests/n88-compact-teacher-failure-1792327122285.json",
+    "tests/n88-compact-teacher-failure-1792327240781.json",
+    "tests/n88-compact-teacher-failure-1792327258015.json",
+    "tests/n88-compact-teacher-failure-1792327327465.json",
+    "tests/n88-compact-teacher-failure-1792327349702.json",
+    "tests/n88-compact-teacher-failure-1792327384121.json",
+    "tests/n88-compact-teacher-initial-cleanup-failure.json",
+    "tests/n88-compact-teacher-recovery.json",
+    "tests/n88-compact-teacher-recovery.mjs",
+    "tests/n88-compact-teacher-scope.json",
+    "tests/n88-compact-teacher-scope.mjs",
+    "tests/n88-compact-teacher.json",
+    "tests/n88-compact-teacher.mjs"
+  ]
+}
