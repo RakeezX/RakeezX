@@ -291,3 +291,22 @@ closed. Only two fabricated students may later be changed; bulk issuance of the
 existing class is forbidden. The fresh original13-table source catalog matches
 the saved snapshot exactly. See session-pooler-preparation.json and the focused
 session-pooler/SCRAM receipts. These prerequisites do not claim hosted readiness.
+
+Hosted phase stopped on an exact identity mismatch (run 1b9971f9).
+The first immutable migration applied once, recorded by the provider as
+20261018194329 / n88_exact_activation_staged_20261018034356. Its stored SQL SHA256
+matches e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c.
+Post-apply identity comparison differs only at memberships[2].inherit_option:
+actual true, expected false. Narrow grantor readback identifies the postgres-
+granted n88_guard membership in postgres; the separate supabase_admin edge has
+inherit false. No grant/revoke, expected-baseline rewrite or second migration
+was attempted. Both N88 roles remain NOLOGIN with restricted flags.
+
+No real keys/passwords were generated, no secrets installed, no service/Worker
+deployed, no public route/readiness enabled and no hosted fixture mutated.
+The owned empty preparation directory was removed with marker-checked,
+nonrecursive cleanup. Browser, live-mutation and integration leases released.
+The earlier rejected fixture cleanup remains untouched. See
+activation/hosted-phase1-membership-mismatch.json for exact provider disposition.
+Resume requires a separately scoped approved resolution of this membership
+contract mismatch, then skip the already-applied source-bound first migration.
