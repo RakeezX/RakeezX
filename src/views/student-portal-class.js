@@ -5,46 +5,66 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;'
 const labels = { name:'اسم الطالب', class:'الفصل', grades:'الدرجات', required:'المهام المطلوبة', completed:'المهام المكتملة', scheduled:'المهام المجدولة' };
 /** AI: per-source drafts stay fenced to the exact class/session/source snapshot. */
 export function mountTaskGuidance(root,{client,getContext,subscribe}) {
- let disposed=false,busy=false,sequence=0,bound=null,tasks=[],selected=null,message='',drafts=new Map(),opened=false;
+ let disposed=false,busy=false,saving=false,sequence=0,bound=null,tasks=[],selected=null,message='',drafts=new Map(),opened=false,readError=false,uncertain=new Set(),suspended=false,queued=false,wakeTimer,operationSequence=0;
  const current=()=>{try{return classContextKey(getContext());}catch{return null;}};
- const reset=()=>{sequence++;bound=current();tasks=[];selected=null;drafts.clear();message='';};
+ const reset=()=>{sequence++;bound=current();tasks=[];selected=null;drafts.clear();message='';readError=false;uncertain.clear();opened=false;};
+ const state=()=>{const task=tasks.find(t=>t.subitemId===selected),draft=task&&(drafts.get(selected)||task);return {task,draft,stale:!!(draft&&task&&(draft.sourceStamp!==task.sourceStamp||draft.revision!==task.revision))};};
+ const empty=d=>!d.executionInstructions.trim()&&!d.deliveryInstructions.trim();
+ const unchanged=(t,d)=>t.executionInstructions===d.executionInstructions&&t.deliveryInstructions===d.deliveryInstructions;
+ function updateControls(){
+  const {task,draft,stale}=state(),form=root.querySelector('[data-guidance]');if(!task||!form)return;
+  const clearing=empty(draft);form.querySelector('[data-clear]').hidden=!clearing;
+  if(!clearing)form.elements.confirmClear.checked=false;
+  form.querySelector('[data-guidance-count]').textContent=`${draft.executionInstructions.length} / 400 · ${draft.deliveryInstructions.length} / 400`;
+  form.querySelector('[type=submit]').disabled=busy||readError||uncertain.has(selected)||stale||!current()||(!task.needsRepublication&&unchanged(task,draft))||(clearing&&!form.elements.confirmClear.checked);
+ }
  function draw(){
   if(disposed)return;
   if(bound!==current())reset();
   opened=root.querySelector('details')?.open??opened;
-  const task=tasks.find(t=>t.subitemId===selected),draft=task&&(drafts.get(selected)||task),stale=draft&&task&&(draft.sourceStamp!==task.sourceStamp||draft.revision!==task.revision);
-  root.innerHTML=`<details class="n88-task-guidance" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم</summary><p>اختر مهمة منشورة. النص للتوضيح فقط؛ لا يستقبل ملفات أو تسليمات.</p><p role="status">${esc(message)}</p>${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:'<p>لا توجد مهام منشورة متاحة. اختر حقول المهام واحفظها أولًا.</p>'}${task?`<form data-guidance><fieldset ${busy||!current()?'disabled':''}><legend>${esc(task.title)}</legend>${task.needsRepublication?'<p>تغيّر المصدر أو النشر؛ راجع التعليمات وانشرها عمدًا من جديد.</p>':''}${stale?'<p>تغيّرت نسخة المهمة. مسودتك محفوظة محليًا؛ راجع النسخة الحالية قبل النشر.</p><button type="button" data-guidance-revalidate>راجعت المهمة الحالية؛ احتفظ بالمسودة</button>':''}<label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="3">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="3">${esc(draft.deliveryInstructions)}</textarea></label><small>400 حرف لكل حقل. أسطر نصية فقط.</small><label><input type="checkbox" name="confirmClear"> أؤكد مسح التعليمات إذا كان الحقلان فارغين</label><button class="btn" type="submit" ${stale?'disabled':''}>حفظ ونشر التعليمات</button></fieldset></form>`:''}<button class="btn" type="button" data-guidance-refresh ${busy?'disabled':''}>تحديث المهام</button></details>`;
+  const focus=root.contains(root.ownerDocument.activeElement)?root.ownerDocument.activeElement:null;
+  const selection=focus?.tagName==='TEXTAREA'?[focus.selectionStart,focus.selectionEnd]:null;
+  const focusKey=focus&&(focus.name||[...focus.attributes].find(a=>a.name.startsWith('data-guidance-'))?.name);
+  const {task,draft,stale}=state();
+  root.innerHTML=`<details class="n88-task-guidance" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body"><p role="status" aria-live="polite">${esc(message||(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy?'جارٍ قراءة المهام…':''))}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&!busy&&!readError?'<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>':''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="2">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="2">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><label data-clear hidden><input type="checkbox" name="confirmClear"> أؤكد نشر المهمة دون تعليمات</label><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
+  updateControls();
+  if(focusKey){const next=[...root.querySelectorAll('button,select,textarea,input')].find(e=>e.name===focusKey||e.hasAttribute(focusKey));next?.focus({preventScroll:true});if(next&&selection)next.setSelectionRange(...selection);}
  }
+ function scheduleRead(){if(disposed||suspended)return;if(busy){if(operationSequence!==sequence)queued=true;return;}clearTimeout(wakeTimer);wakeTimer=setTimeout(()=>void refresh(),40);}
  async function refresh(){
-  if(disposed||busy)return;
-  if(bound!==current())reset();const k=bound,g=++sequence;
+  if(disposed||suspended)return;
+  if(bound!==current())reset();
+  if(busy){if(operationSequence!==sequence)queued=true;return;}
+  clearTimeout(wakeTimer);const k=bound,g=++sequence;
   if(!k||!client?.listGuidance){tasks=[];draw();return;}
-  busy=true;draw();
-  try{const result=await client.listGuidance(getContext().teachingId);if(disposed||g!==sequence||k!==current())return;tasks=result.tasks;if(!tasks.some(t=>t.subitemId===selected))selected=tasks[0]?.subitemId||null;}
-  catch{if(g===sequence){tasks=[];message='تعذّرت القراءة؛ لم تُنشر أي تعليمات. المسودة محفوظة حتى تحديث المهمة.';}}
-  finally{busy=false;if(!disposed){if(k!==current())reset();draw();}}
+  busy=true;operationSequence=g;draw();
+  try{const result=await client.listGuidance(getContext().teachingId);if(disposed||g!==sequence||k!==current())return;tasks=result.tasks;if(readError)message='';readError=false;if(!tasks.some(t=>t.subitemId===selected))selected=tasks[0]?.subitemId||null;
+   const ids=new Set(tasks.map(t=>t.subitemId));for(const id of drafts.keys())if(!ids.has(id))drafts.delete(id);
+  }
+  catch{if(g===sequence&&k===current()){readError=true;message='تعذّرت قراءة الحالة. مسودتك محفوظة.';}}
+  finally{busy=false;if(!disposed){if(k!==current())reset();draw();if(queued){queued=false;scheduleRead();}}}
  }
- const input=e=>{if(bound!==current()){reset();draw();return;}if(!e.target.closest('[data-guidance]'))return;const task=tasks.find(t=>t.subitemId===selected);if(!task)return;const form=root.querySelector('form');drafts.set(selected,{...(drafts.get(selected)||task),executionInstructions:form.elements.executionInstructions.value,deliveryInstructions:form.elements.deliveryInstructions.value});};
- const change=e=>{if(e.target.matches('[data-guidance-source]')){selected=e.target.value;message='';draw();}};
- const click=e=>{if(bound!==current()){reset();draw();return;}if(e.target.closest('[data-guidance-refresh]'))void refresh();if(e.target.closest('[data-guidance-revalidate]')){const task=tasks.find(t=>t.subitemId===selected),draft=drafts.get(selected);if(task&&draft){drafts.set(selected,{...draft,sourceStamp:task.sourceStamp,revision:task.revision});draw();}}};
+ const input=e=>{if(bound!==current()){reset();draw();return;}if(!e.target.closest('[data-guidance]'))return;const {task}=state();if(!task)return;const form=root.querySelector('form');drafts.set(selected,{...(drafts.get(selected)||task),executionInstructions:form.elements.executionInstructions.value,deliveryInstructions:form.elements.deliveryInstructions.value});updateControls();};
+ const change=e=>{if(bound!==current()){reset();draw();return;}if(e.target.matches('[data-guidance-source]')){selected=e.target.value;message='';draw();}else if(e.target.name==='confirmClear')updateControls();};
+ const click=e=>{if(bound!==current()){reset();draw();return;}if(e.target.closest('[data-guidance-refresh]'))void refresh();if(e.target.closest('[data-guidance-revalidate]')&&!busy&&!readError){const {task,draft}=state();if(task&&draft){drafts.set(selected,{...draft,sourceStamp:task.sourceStamp,revision:task.revision});uncertain.delete(selected);message='';draw();}}};
  const submit=async e=>{
   if(!e.target.matches('[data-guidance]'))return;e.preventDefault();
   if(busy||bound!==current()){if(bound!==current())reset();draw();return;}
-  const task=tasks.find(t=>t.subitemId===selected),d=drafts.get(selected)||task;
-  if(!task||d.sourceStamp!==task.sourceStamp||d.revision!==task.revision)return;
-  const guidance={subitemId:task.subitemId,sourceStamp:d.sourceStamp,revision:d.revision,executionInstructions:d.executionInstructions,deliveryInstructions:d.deliveryInstructions,confirmClear:e.target.elements.confirmClear.checked};
-  if(!guidance.executionInstructions.trim()&&!guidance.deliveryInstructions.trim()&&!guidance.confirmClear){message='أكد مسح التعليمات أولًا.';draw();return;}
-  const k=bound,g=++sequence;busy=true;message='جارٍ حفظ التعليمات…';draw();
+  const {task,draft:d,stale}=state();
+  if(!task||stale||uncertain.has(selected)||readError||!current()||(!task.needsRepublication&&unchanged(task,d)))return;
+  const guidance={subitemId:task.subitemId,sourceStamp:d.sourceStamp,revision:d.revision,executionInstructions:d.executionInstructions,deliveryInstructions:d.deliveryInstructions,confirmClear:empty(d)&&e.target.elements.confirmClear.checked};
+  if(empty(d)&&!guidance.confirmClear)return;
+  const k=bound,g=++sequence;operationSequence=g;saving=true;busy=true;message='جارٍ حفظ التعليمات…';draw();
   try{await client.saveGuidance(getContext().teachingId,guidance);if(disposed||k!==current()||g!==sequence)return;drafts.delete(task.subitemId);message='حُفظت التعليمات وأُقرّ نشرها.';}
-  catch{if(k===current()&&g===sequence)message='تعذّر تأكيد النشر. مسودتك محفوظة؛ حدّث المهام وراجع الحالة قبل إعادة المحاولة.';}
-  finally{busy=false;if(!disposed){if(k!==current())reset();draw();await refresh();}}
+  catch{if(k===current()&&g===sequence){uncertain.add(task.subitemId);message='تعذّر تأكيد النشر. راجع الحالة قبل المحاولة.';}}
+  finally{saving=false;busy=false;if(!disposed){if(k!==current())reset();queued=false;draw();await refresh();}}
  };
- const changed=()=>{if(bound!==current()){reset();draw();}void refresh();};
- const win=root.ownerDocument.defaultView,hide=()=>{reset();tasks=[];draw();},wake=()=>void refresh();
+ const changed=()=>{if(bound!==current()){reset();draw();}scheduleRead();};
+ const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);reset();tasks=[];draw();},wake=()=>{if(root.ownerDocument.visibilityState==='visible'){suspended=false;scheduleRead();}};
  root.addEventListener('input',input);root.addEventListener('change',change);root.addEventListener('click',click);root.addEventListener('submit',submit);
- win.addEventListener('pagehide',hide);win.addEventListener('pageshow',wake);
- const unsub=subscribe(changed);reset();void refresh();
- return {refresh,contextChanged:changed,dispose(){disposed=true;sequence++;drafts.clear();unsub?.();win.removeEventListener('pagehide',hide);win.removeEventListener('pageshow',wake);root.removeEventListener('input',input);root.removeEventListener('change',change);root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.replaceChildren();}};
+ win.addEventListener('pagehide',hide);win.addEventListener('pageshow',wake);win.addEventListener('focus',wake);root.ownerDocument.addEventListener('visibilitychange',wake);
+ const unsub=subscribe(changed);reset();scheduleRead();
+ return {refresh,contextChanged:changed,dispose(){disposed=true;sequence++;clearTimeout(wakeTimer);drafts.clear();unsub?.();win.removeEventListener('pagehide',hide);win.removeEventListener('pageshow',wake);win.removeEventListener('focus',wake);root.ownerDocument.removeEventListener('visibilitychange',wake);root.removeEventListener('input',input);root.removeEventListener('change',change);root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.replaceChildren();}};
 }
 export function mountClassPortal(root, { client, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), share = typeof navigator.share==='function' ? data=>navigator.share(data) : null, requestId = () => crypto.randomUUID() } = {}) {
   let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer, wakeTimer, readWork = null, mutating = false, queued = false, suspended = false, retry = false, draft = null, draftRevision = null, settingsOpen = false;
@@ -61,13 +81,13 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     const ready = !!client && !!key(), writable = ready && !!roster && !busy;
     const focused = root.ownerDocument.activeElement;
     const focusAction = root.contains(focused) ? { action: focused.dataset.action, index: focused.dataset.index, name: focused.name } : null;
-    settingsOpen = root.querySelector('details')?.open ?? settingsOpen;
+    settingsOpen = panel.querySelector('.n88-class-settings')?.open ?? settingsOpen;
     root.setAttribute('aria-busy', String(busy));
     panel.innerHTML = `<section aria-label="مساحة طلاب الفصل">
-      <div class="n88-class-toolbar"><p class="n88-class-purpose">رموز دخول الطلاب إلى مساحتهم الدراسية.</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable ? 'disabled' : ''}>إنشاء الرموز</button>` : ''}</div>
+      <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'رموز الدخول · '+esc(roster.students.length) : 'رموز دخول الطلاب'}</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0) ? 'disabled' : ''}>إنشاء الرموز الناقصة</button>` : ''}</div>
       <div class="n88-class-status"><p role="status" aria-live="polite">${esc(message || (ready ? (busy ? 'جارٍ قراءة القائمة…' : '') : 'مساحة الطلاب غير مفعّلة حاليًا.'))}</p>${retry && ready ? `<button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>مراجعة القائمة</button>` : ''}</div>
-      ${roster ? `<ul class="n88-class-roster" aria-label="طلاب ${esc(classLabel())}">${roster.students.map((s, index) => `<li><div class="n88-class-student"><strong>${esc(s.label)}</strong>${s.credential ? `<div data-code><input readonly autocomplete="off" dir="ltr" aria-label="رمز ${esc(s.label)}" value="${esc(s.credential)}"></div>` : `<span>${s.recoveryStatus==='legacy' ? 'رمز قديم لا يُسترجع؛ اختر تغيير لاستبداله' : s.hasActiveCode ? 'الرمز مخفي؛ راجع القائمة لإظهاره' : 'بلا رمز فعّال'}</span>`}</div><div class="n88-class-actions">${s.credential ? `<button class="btn" data-action="copy-student" data-index="${index}" aria-label="نسخ رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>نسخ</button><button class="btn" data-action="share-student" data-index="${index}" aria-label="مشاركة رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>مشاركة</button>` : ''}<button class="btn" data-action="review-rotate" data-index="${index}" aria-label="تغيير رمز ${esc(s.label)}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير</button><button class="btn" data-action="review-revoke" data-index="${index}" aria-label="إلغاء وصول ${esc(s.label)}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء</button></div></li>`).join('')}</ul>
-      <details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب</summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر الحقول ثم احفظها</legend><div class="n88-class-fields">${PORTAL_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${(draft ?? roster.visibility)[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}
+      ${roster ? `<ul class="n88-class-roster" aria-label="طلاب ${esc(classLabel())}">${!roster.students.length?'<li class="n88-roster-empty">لا يوجد طلاب في هذا الفصل.</li>':''}${roster.students.map((s, index) => `<li><div class="n88-class-student"><strong>${esc(s.label)}</strong>${s.credential ? `<div data-code><input readonly autocomplete="off" dir="ltr" aria-label="رمز ${esc(s.label)}" value="${esc(s.credential)}"></div>` : `<span>${s.recoveryStatus==='legacy' ? 'رمز قديم غير مسترجع' : s.hasActiveCode ? 'الرمز مخفي؛ راجع القائمة لإظهاره' : 'بلا رمز فعّال'}</span>`}</div><div class="n88-class-actions">${s.credential ? `<button class="btn" data-action="copy-student" data-index="${index}" aria-label="نسخ رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>نسخ</button><button class="btn" data-action="share-student" data-index="${index}" aria-label="مشاركة رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>مشاركة</button>` : ''}<details class="n88-student-more"><summary aria-label="إجراءات ${esc(s.label)}" data-index="${index}">المزيد</summary><div class="n88-student-more-panel"><button class="btn" data-action="review-rotate" data-index="${index}" aria-label="تغيير رمز ${esc(s.label)}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" aria-label="إلغاء وصول ${esc(s.label)}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></details></div></li>`).join('')}</ul>
+      <details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${PORTAL_FIELDS.filter(f=>roster.visibility[f]).length} من ${PORTAL_FIELDS.length}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر الحقول ثم احفظها</legend><div class="n88-class-fields">${PORTAL_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${(draft ?? roster.visibility)[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}
       ${selected && writable ? `<section class="card" data-confirm aria-label="تأكيد العملية"><h3>${esc(selected.student.label)}</h3><p>${selected.action === 'rotate' ? 'تغيير الرمز يُبطل الرمز السابق وجميع جلساته. سلّم البديل لهذا الطالب وحده بعد التحقق من هويته.' : 'إلغاء الوصول يُبطل الرمز الحالي وجميع جلساته، ولن يستطيع الطالب الدخول به.'}</p><div class="n88-class-actions"><button class="btn" data-action="confirm">${selected.action === 'rotate' ? 'تأكيد تغيير الرمز' : 'تأكيد إلغاء الوصول'}</button><button class="btn" data-action="cancel">تراجع</button></div></section>` : ''}
       ${outcomes.length ? `<ul data-outcomes>${outcomes.map(line => `<li>${esc(line)}</li>`).join('')}</ul>` : ''}</section>`;
     if (focusAction) [...root.querySelectorAll('button,input')].find(el => focusAction.action ? el.dataset.action === focusAction.action && el.dataset.index === focusAction.index : focusAction.name && el.name === focusAction.name)?.focus({preventScroll:true});
@@ -103,7 +123,6 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
         const result = await client.listClass(context().teachingId);
         if (valid(g, k)) {
           roster = result;
-          void guidance.refresh();
           if (draft && draftRevision !== result.policyRevision) { draft = null; draftRevision = null; message = 'تغيّرت إعدادات الحقول؛ راجع اختيارك من جديد.'; }
           else message = '';
         }
@@ -137,6 +156,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
       clearSecrets(); roster = null; queued = false; retry = true; message = 'نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير.';
     } finally { mutating = false; busy = !!readWork; if (!disposed) { if (key() !== boundKey) invalidate(); draw(); if (queued) { queued = false; scheduleRead(); } } }
   }
+  const keydown = e => { if(e.key==='Escape'){const menu=e.target.closest('.n88-student-more[open]');if(menu){menu.open=false;menu.querySelector('summary').focus();e.preventDefault();}} };
   const click = e => {
     const button = e.target.closest('[data-action]'); if (!button || !root.contains(button) || disposed) return;
     if (key() !== boundKey) { invalidate(); void refresh(); return; }
@@ -199,14 +219,14 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   const wake = () => { if (root.ownerDocument.visibilityState === 'visible') { suspended = false; scheduleRead(); } };
   const pagehide = () => { suspended = true; clearTimeout(wakeTimer); invalidate(); busy = mutating || !!readWork; message = 'الرموز مخفية حتى مراجعة القائمة.'; draw(); };
   const win = root.ownerDocument.defaultView;
-  root.addEventListener('click', click); root.addEventListener('submit', submit); root.addEventListener('change', change);
+  root.addEventListener('keydown', keydown); root.addEventListener('click', click); root.addEventListener('submit', submit); root.addEventListener('change', change);
   win.addEventListener('pagehide', pagehide); win.addEventListener('pageshow', wake); win.addEventListener('focus', wake);
   root.ownerDocument.addEventListener('visibilitychange', wake);
   const unsubscribe = subscribe(changed); void refresh();
   return { contextChanged: changed, refresh, dispose() {
     guidance.dispose(); clearSecrets(); disposed = true; generation++; clearTimeout(expiryTimer); clearTimeout(wakeTimer);
     roster = null; selected = null; draft = null; unsubscribe?.();
-    root.removeEventListener('click', click); root.removeEventListener('submit', submit); root.removeEventListener('change', change);
+    root.removeEventListener('keydown', keydown); root.removeEventListener('click', click); root.removeEventListener('submit', submit); root.removeEventListener('change', change);
     win.removeEventListener('pagehide', pagehide); win.removeEventListener('pageshow', wake); win.removeEventListener('focus', wake);
     root.ownerDocument.removeEventListener('visibilitychange', wake); root.replaceChildren();
   } };

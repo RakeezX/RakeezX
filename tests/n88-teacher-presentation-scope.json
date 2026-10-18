@@ -1,0 +1,181 @@
+{
+  "taskId": "continuous-n88-teacher-presentation-finish-20261018",
+  "runId": "7af8a31d-e389-4e1d-aa87-8460a7b402d7",
+  "baseSha": "207ee9666aadef9bcc609be57cd5b24bf1ab3fb8",
+  "checks": [
+    {
+      "name": "n88_teacher_final_scope_syntax_and_unchanged_service_security_proofs",
+      "status": "PASS",
+      "evidence": "Only teacher view/CSS Product source changed; scoped syntax and git diff --check PASS. Eight delivered proof files byte-identical to observed origin/main baseline; unchanged lib/runtime/API/Auth/SQL/service/store/router/app/SW/grade/student graph. Readiness OFF. No build/service/hosted qualification rerun."
+    }
+  ],
+  "sourceSha256": {
+    "src/views/student-portal-class.js": "d3a65dbfb0632b20e5476b418c6745293ae5d4699bdd7d9c8de7250dce75becb",
+    "src/styles/student-portal-class.css": "2fd289df95b753a1db66d9f859d597d2210519444732e61657ece8a50246b323"
+  },
+  "reusedProofs": [
+    {
+      "file": "tests/n88-task-guidance.json",
+      "sha256": "32d78ff146e33defb3ad1a7e027989d3002d2d00b53dee389f20b559375dae51",
+      "baseBlobSha": "406a522fc70f4652490bf9d2329968f9ab42fe80",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    },
+    {
+      "file": "tests/n88-integrated-class-final-service.json",
+      "sha256": "463627ce78bb65c7c4db76a2bf16cb840331c1eb3030b6f1af021f38701ecbbf",
+      "baseBlobSha": "31f0e6605d29590776d3ec20e98195bab82db08b",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    },
+    {
+      "file": "tests/n88-native-postgres-qualification.result.json",
+      "sha256": "2cd2ef799d2e074c291b58f9bac0f22a473deeeebc469b8b4b6f02959780ea59",
+      "baseBlobSha": "9537e07402343554564c23f6aa6962440a93d13a",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    },
+    {
+      "file": "tests/n88-six-digit-recovery.json",
+      "sha256": "9fd5fddb9a2a7961dc0b93d0f173adb734b939233435d268bc0ac51d8d2d7407",
+      "baseBlobSha": "052531f7a02c867c33b64b1eb40ae87a87ac13a3",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    },
+    {
+      "file": "tests/n88-six-digit-recovery-context.json",
+      "sha256": "4feae5ee381241697439bb9be6576a23e97c2f2ef5a7d7ceaf290616e0597f79",
+      "baseBlobSha": "2eca983731c5fd9737c2a9ac4761ea674e40cb02",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    },
+    {
+      "file": "tests/n88-six-digit-security.json",
+      "sha256": "27289091e104a6a49816c2166a4c355d44bd78dee2661cc46cca41000da18122",
+      "baseBlobSha": "d5e56185bcc06ec8b9cd03135912d12f0c5c73b1",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    },
+    {
+      "file": "tests/n88-six-digit-shared-network.json",
+      "sha256": "64f12a375cb5d0960ab73133605f6146749033be63b3c0c74869fba38b341a99",
+      "baseBlobSha": "72c49e031ac26707c7e2a8d648db4df02050652e",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    },
+    {
+      "file": "tests/n88-six-digit-shared-flood-window.json",
+      "sha256": "185c96dd0b69d1e9ca1e2f89bba5ba1290d3da206c8f1f49464f07450fe30418",
+      "baseBlobSha": "b8b69a4f8474ce29565d1ee6314eb62a6272f44d",
+      "scope": "Only unchanged service/Auth/crypto/35-student/scoring evidence is reused; changed teacher interactions separately tested."
+    }
+  ],
+  "syntaxFiles": [
+    "src/views/student-portal-class.js",
+    "tests/n88-teacher-presentation.mjs",
+    "tests/n88-teacher-presentation-scope.mjs",
+    "tests/fixtures/n88-teacher-presentation/server.mjs",
+    "tests/fixtures/n88-teacher-presentation/ports.js"
+  ],
+  "screenshots": [
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/1280-dark-compact.png",
+      "sha256": "c7ec0447d5af652040a5b8d1226fcd2b59e340ed9675baf8de1d0d59e235b23e"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/1280-dark-editors.png",
+      "sha256": "423c50cdfb0e8f44557bf6c13471d47657d3bca65992fcadda0abb527f60e19e"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/1280-dark-menu.png",
+      "sha256": "e69aeede40dd4bc7403c92237eda7f37e1af51fa32717e6e9d04e1d4f4034a71"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/1280-light-compact.png",
+      "sha256": "e130cfaafbd7e633296ea276854fa715d1c1b3cddcb7dba365c92ef06e43d15c"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/1280-light-editors.png",
+      "sha256": "e0a513c37dc9265f2288303525bba6a2adadb75c91f7296548431609e4ca4fe0"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/1280-light-menu.png",
+      "sha256": "27235a69921eaceae370c3d93269430fb07d696d09027d3a9ccbbab66d70c12a"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/390-dark-compact.png",
+      "sha256": "b2364606aeef07f03d0d4af43f345f17ec5d4f20d7689ad5aea231c8361337e8"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/390-dark-editors.png",
+      "sha256": "0bd8cc6ce63c6f9d88e44148794c298f12da31a16d176ade89c0102dfb943b19"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/390-dark-menu.png",
+      "sha256": "ce6ca4d39b265fdd4308c9859703a10d394b37a4f7036baf622f9bd02ed930f3"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/390-light-compact.png",
+      "sha256": "49088586097be3411434e8894c23fa888bf7a52d0e68b5fc141ccad6098d3937"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/390-light-editors.png",
+      "sha256": "cc293c8c36500c33ab1389721e0672a16d1c70d6bdb0ad3c8722ead2fcbdc0df"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/390-light-menu.png",
+      "sha256": "3a558d180eecbbddd0093bef02540fce2cfbfcea3eb966dcc2d604f0d16f6fa5"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/698-dark-compact.png",
+      "sha256": "41820298560fd8a401e51c14f1d40a79e545d709bcf936bb5d76150b4003c654"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/698-dark-editors.png",
+      "sha256": "1189d986172986fd532726300c12dc677f413fae17e5de5153406feb6958ae0b"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/698-dark-menu.png",
+      "sha256": "b553504d6c0c04769d79ad900c9748608f41119fbf567dc4dffa987ee9a4f7e5"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/698-light-compact.png",
+      "sha256": "b1db21880a15386910266dc4c2e5d50e07834f5d23cf7143de78087937126f23"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/698-light-editors.png",
+      "sha256": "804ffc880da03718b560a4abec2069a8f4341a6c5f8e8121a6fb658f29c4f190"
+    },
+    {
+      "file": "tests/fixtures/n88-teacher-presentation/698-light-menu.png",
+      "sha256": "feab29c81011dc6cf15a3d57c7891123bc2c7918d53860ac00db36a8139a4957"
+    }
+  ],
+  "changedPaths": [
+    "docs/automation-evidence/20261018/N88_TEACHER_PRESENTATION_FINISH.md",
+    "src/styles/student-portal-class.css",
+    "src/views/student-portal-class.js",
+    "tests/fixtures/n88-teacher-presentation/1280-dark-compact.png",
+    "tests/fixtures/n88-teacher-presentation/1280-dark-editors.png",
+    "tests/fixtures/n88-teacher-presentation/1280-dark-menu.png",
+    "tests/fixtures/n88-teacher-presentation/1280-light-compact.png",
+    "tests/fixtures/n88-teacher-presentation/1280-light-editors.png",
+    "tests/fixtures/n88-teacher-presentation/1280-light-menu.png",
+    "tests/fixtures/n88-teacher-presentation/390-dark-compact.png",
+    "tests/fixtures/n88-teacher-presentation/390-dark-editors.png",
+    "tests/fixtures/n88-teacher-presentation/390-dark-menu.png",
+    "tests/fixtures/n88-teacher-presentation/390-light-compact.png",
+    "tests/fixtures/n88-teacher-presentation/390-light-editors.png",
+    "tests/fixtures/n88-teacher-presentation/390-light-menu.png",
+    "tests/fixtures/n88-teacher-presentation/698-dark-compact.png",
+    "tests/fixtures/n88-teacher-presentation/698-dark-editors.png",
+    "tests/fixtures/n88-teacher-presentation/698-dark-menu.png",
+    "tests/fixtures/n88-teacher-presentation/698-light-compact.png",
+    "tests/fixtures/n88-teacher-presentation/698-light-editors.png",
+    "tests/fixtures/n88-teacher-presentation/698-light-menu.png",
+    "tests/fixtures/n88-teacher-presentation/ports.js",
+    "tests/fixtures/n88-teacher-presentation/server.mjs",
+    "tests/n88-teacher-presentation-failure-1792330708325.json",
+    "tests/n88-teacher-presentation-failure-1792330737502.json",
+    "tests/n88-teacher-presentation-failure-1792330775608.json",
+    "tests/n88-teacher-presentation-failure-1792330916910.json",
+    "tests/n88-teacher-presentation-failure-1792330980582.json",
+    "tests/n88-teacher-presentation-scope.json",
+    "tests/n88-teacher-presentation-scope.mjs",
+    "tests/n88-teacher-presentation.json",
+    "tests/n88-teacher-presentation.mjs"
+  ]
+}

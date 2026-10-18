@@ -1,0 +1,26 @@
+{
+  "taskId": "continuous-n88-teacher-presentation-finish-20261018",
+  "runId": "7af8a31d-e389-4e1d-aa87-8460a7b402d7",
+  "checks": [
+    {
+      "name": "n88_teacher_final_guidance_menus_drafts_clear_and_contextual_recovery",
+      "status": "PASS",
+      "evidence": "Native keyboard disclosure/secondary action Escape and focus; deliberate legacy rotate/cancel and revoke; exact copy/share text and preserved field draft through redraw and explicit save. Guidance initially collapsed; one selector/two labels; no-op disabled, conditional explicit empty confirmation, source drafts across selection and one coalesced return read. Lost postcommit and precommit ACK preserve drafts, require review, never replay; stale revision/source revalidated and exact new CAS sent; one contextual read-error recovery. Delayed old-context read discarded, pagehide clears guidance/credential plaintext, new return reads only, actual account/store owner guard denies and wipes changed entry point. Expiry clears guidance and codes; actual route unmount disposes the old DOM/listeners. Focus and text selection survive safe guidance reads."
+    },
+    {
+      "name": "n88_teacher_final_presentation_actual_responsive_light_dark",
+      "status": "PASS",
+      "evidence": "Actual app shell/route/view/client/source CSS with fabricated long-name, recoverable/legacy/missing-code roster and guidance sources. Six 390/698/1280 light/dark fresh contexts: compact/menu/expanded masked screenshots, 44px targets, whole-document and code-input no overflow, full names. No code plaintext in reports/screenshots."
+    }
+  ],
+  "steps": [
+    "Native keyboard disclosure/secondary action Escape and focus; deliberate legacy rotate/cancel and revoke; exact copy/share text and preserved field draft through redraw and explicit save.",
+    "Guidance initially collapsed; one selector/two labels; no-op disabled, conditional explicit empty confirmation, source drafts across selection and one coalesced return read. Lost postcommit and precommit ACK preserve drafts, require review, never replay; stale revision/source revalidated and exact new CAS sent; one contextual read-error recovery.",
+    "Delayed old-context read discarded, pagehide clears guidance/credential plaintext, new return reads only, actual account/store owner guard denies and wipes changed entry point.",
+    "Expiry clears guidance and codes; actual route unmount disposes the old DOM/listeners. Focus and text selection survive safe guidance reads."
+  ],
+  "cleanup": {
+    "serverClosed": true,
+    "lease": "RELEASED integration"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n88-teacher-presentation-finish-20261018",
+  "runId": "7af8a31d-e389-4e1d-aa87-8460a7b402d7",
+  "checks": [],
+  "steps": [
+    "Native keyboard disclosure/secondary action Escape and focus; deliberate legacy rotate/cancel and revoke; exact copy/share text and preserved field draft through redraw and explicit save."
+  ],
+  "cleanup": {
+    "serverClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "failure": {
+    "stage": "safe return",
+    "message": "Assertion failed; private values omitted",
+    "location": "at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-presentation-finish-20261018/tests/n88-teacher-presentation.mjs:34:406"
+  }
+}

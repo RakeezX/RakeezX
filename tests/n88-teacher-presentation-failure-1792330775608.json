@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n88-teacher-presentation-finish-20261018",
+  "runId": "7af8a31d-e389-4e1d-aa87-8460a7b402d7",
+  "checks": [],
+  "steps": [
+    "Native keyboard disclosure/secondary action Escape and focus; deliberate legacy rotate/cancel and revoke; exact copy/share text and preserved field draft through redraw and explicit save."
+  ],
+  "cleanup": {
+    "serverClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "retryState": {
+    "open": true,
+    "visible": true,
+    "html": "<button class=\"btn\" type=\"button\" data-guidance-refresh=\"\">مراجعة الحالة</button>"
+  },
+  "retryClick": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-guidance-refresh]')\u001b[22m\n\u001b[2m    - locator resolved to <button class=\"btn\" type=\"button\" data-guidance-refresh=\"\">مراجعة الحالة</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is not stable\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m  - element was detached from the DOM, retrying\u001b[22m\n",
+  "failure": {
+    "stage": "read error recovery",
+    "message": "locator.click: Timeout 8000ms exceeded.",
+    "location": "at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-teacher-presentation-finish-20261018\\tests\\n88-teacher-presentation.mjs:40:612"
+  }
+}
