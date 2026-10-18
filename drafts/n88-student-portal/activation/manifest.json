@@ -100,6 +100,9 @@
     }
   },
   "sources": {
+    "supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de",
+    "tests/n88-official-activation-membership.mjs": "3ebcf15ba3d07a93bb189c4a796447bb7fc701e1efa318d2753ad3fce84bb6d6",
+    "tests/n88-official-activation-membership.json": "f70aff2c8b61b970bbfebb25f5aaa97bea0e3ace42d73ed3fea103b78397f6f7",
     "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76",
     "drafts/n88-student-portal/activation/build-error-boundary.mjs": "25c8bf06044b52c54b6c6a5c6c29ceedf293ba05b8445bf9ddbe2a63a839aeec",
     "drafts/n88-student-portal/activation/error-boundary-contract.json": "eb93ab6817f5103819b42678c5c3b3c351c044c60fd7121394441f344919a5da",
@@ -214,7 +217,7 @@
     "drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql": "79eeb73999a6edcc81e2683a5ccb64feb58ecd73a26ca924e3391ccf72ec4417",
     "tests/n88-six-digit-redaction.mjs": "7e31c4634798898cf157a06f51c84585efce246da6b559fdf0343bfda294bbbe",
     "tests/n88-six-digit-security.mjs": "27b802cd8fd7d47cdcc34f514d8849361dc07d81f9c72479c09e1b94542c45e1",
-    "drafts/n88-student-portal/integrated-bundle.mjs": "bc97f014c870a2ad4d6ee80512aafe8473818a32a3bc25409b35f26e032eb571",
+    "drafts/n88-student-portal/integrated-bundle.mjs": "c566f820387a8da0e18b0c42d81b1f731ce652003d87f37c8521a9f51d24e2a1",
     "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
     "index.html": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
     "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
@@ -503,6 +506,22 @@
     "browserReadiness": false,
     "routes": [],
     "cron": []
+  },
+  "privateMembershipCorrection": {
+    "source": "supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql",
+    "sha256": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de",
+    "placement": "after source-bound M1, before M2",
+    "role": "n88_guard",
+    "member": "postgres",
+    "grantor": "postgres",
+    "inheritBefore": true,
+    "inheritAfter": false,
+    "adminUnchanged": false,
+    "setUnchanged": false,
+    "allOtherEdgesAndFlagsUnchanged": true,
+    "originalExpectedIdentityUnchanged": true,
+    "localEvidence": "tests/n88-official-activation-membership.json",
+    "hostedApplied": false
   },
   "privateErrorBoundary": {
     "revision": "typed-private-boundary-v1",

@@ -19,6 +19,9 @@ const manifest={aiAuthored:true,sourceOnly:true,enabled:false,projectId:'xlrubcw
   gates:{edgeEnabled:false,cloudflareEnabled:false,browserReadiness:false,routes:[],cron:[]}};
 const absolute={name:'actual-app-absolute-imports',setup(build){build.onResolve({filter:/^\/src\//},args=>({path:path.resolve('.'+args.path)}));}};
 const boundary=JSON.parse(await readFile(dir+'error-boundary-contract.json','utf8'));
+const membershipRepair='supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql';
+manifest.privateMembershipCorrection={source:membershipRepair,sha256:await textHash(membershipRepair),placement:'after source-bound M1, before M2',role:'n88_guard',member:'postgres',grantor:'postgres',inheritBefore:true,inheritAfter:false,adminUnchanged:false,setUnchanged:false,allOtherEdgesAndFlagsUnchanged:true,originalExpectedIdentityUnchanged:true,localEvidence:'tests/n88-official-activation-membership.json',hostedApplied:false};
+for(const file of [membershipRepair,'tests/n88-official-activation-membership.mjs','tests/n88-official-activation-membership.json'])manifest.sources[file]=await textHash(file);
 manifest.privateErrorBoundary={revision:'typed-private-boundary-v1',migration:boundary.migration,
   routines:boundary.operations.length,contractSha256:await textHash(dir+'error-boundary-contract.json'),
   identitiesSha256:await textHash(dir+'error-boundary-identities.json'),security:'INVOKER',executeGrantee:'n88_backend',

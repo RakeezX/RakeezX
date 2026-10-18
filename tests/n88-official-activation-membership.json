@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "localPostgres": "17.6",
+  "source": "supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql",
+  "sha256": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de",
+  "twoGrantorPosture": true,
+  "onlyTargetInheritChanged": true,
+  "negativeCases": [
+    "missing edge",
+    "altered SET",
+    "altered provider ADMIN",
+    "unexpected membership",
+    "changed role flag"
+  ],
+  "noPartialSideEffects": true,
+  "hostedWrites": 0,
+  "primaryDocumentation": "https://www.postgresql.org/docs/17/sql-grant.html"
+}
