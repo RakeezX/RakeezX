@@ -25,6 +25,8 @@ manifest.privateErrorBoundary={revision:'typed-private-boundary-v1',migration:bo
   hostedApplied:false,readbackRequiredBeforePrivateQuery:true,localEvidence:'tests/n88-official-activation-error-boundary.json'};
 for(const file of [boundary.migration.path,dir+'build-error-boundary.mjs',dir+'error-boundary-contract.json',dir+'error-boundary-identities.json',dir+'private-error-boundary.mjs',
   'tests/n88-official-activation-error-boundary.mjs','tests/n88-official-activation-error-boundary.json'])manifest.sources[file]=await textHash(file);
+manifest.privateDatabaseTransport={projectId:'xlrubcwjqktzzunrvuns',host:'aws-0-ap-south-1.pooler.supabase.com',port:5432,mode:'session',role:'n88_backend',tls:{verifyHostname:true,rejectUnauthorized:true,minVersion:'TLSv1.2',ca:JSON.parse(await readFile(dir+'ca/provenance.json','utf8'))},preAuthenticationEvidence:'tests/n88-official-activation-session-pooler.json',restrictedSessionReadbackRequired:true};
+for(const file of ['drafts/n88-student-portal/official-activation.mjs',dir+'ca/supabase-prod-ca-2021.crt',dir+'ca/provenance.json','tests/n88-official-activation-session-pooler.mjs','tests/n88-official-activation-session-pooler.json','tests/n88-official-activation-scram.mjs','tests/n88-official-activation-scram.json'])manifest.sources[file]=await textHash(file);
 // Bundled import.meta.url is the output module, not the original source file.
 // Keep the shared app sources intact and pin only this private document's assets.
 const brandAssets=['header-light-standard.svg','header-light-compact.svg','header-dark-standard.svg','header-dark-compact.svg','icon-192.png'];

@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "1b9971f9-e3ae-4e07-9d05-52923064dd91",
+  "at": "2026-10-18T19:29:55.478Z",
+  "host": "aws-0-ap-south-1.pooler.supabase.com",
+  "port": 5432,
+  "mode": "session",
+  "modeEvidence": "supabase-session-pooler-readonly.json; provider Connect UI, not inferred from region",
+  "authenticationAttempted": false,
+  "hostedWrites": 0,
+  "trustedCaFingerprint256": "80:70:25:AD:50:D4:ED:21:9D:2C:9C:7D:29:9C:00:4F:82:4E:B0:0C:F7:F6:5A:FE:F6:07:D0:7B:72:E6:CA:FA",
+  "ipv4": [
+    "3.111.105.85",
+    "65.0.195.55"
+  ],
+  "result": {
+    "status": "PASS",
+    "stage": "verified-tls-no-auth",
+    "authorized": true,
+    "protocol": "TLSv1.3",
+    "hostnameVerified": true,
+    "peerFingerprint256": "03:70:9C:A4:4D:1B:06:E4:50:4D:A0:A8:3B:6C:A0:65:76:1E:DC:70:4C:D5:63:4B:CC:38:94:FD:5C:7B:32:48"
+  },
+  "socketsClosed": true
+}

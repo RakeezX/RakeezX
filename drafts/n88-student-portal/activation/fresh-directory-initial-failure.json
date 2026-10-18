@@ -1,0 +1,10 @@
+{
+  "runId":"1b9971f9-e3ae-4e07-9d05-52923064dd91",
+  "phase":"C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-official-student-portal-activation-20261018\\drafts\\n88-student-portal\\activation\\owned-custody-1b9971f9-e3ae-4e07-9d05-52923064dd91.tmp",
+  "status":"FAIL",
+  "cause":"PowerShell.Security module could not be loaded before Set-Acl execution",
+  "readOnlyDiagnostic":"CommandNotFoundException: Get-Acl found in Microsoft.PowerShell.Security but module could not be loaded; in-memory DirectorySecurity descriptor PASS.",
+  "secretsGenerated":false,
+  "hostedWrites":0,
+  "correction":"Use the standard .NET Directory.SetAccessControl/GetAccessControl APIs for the same explicitly authorized fresh owned directory only; no module/config/security policy changes. Do not retry old denied process or recursive cleanup."
+}

@@ -1,0 +1,6 @@
+{
+  "status":"FAIL",
+  "scope":"owned local PostgreSQL fixture only",
+  "evidence":"Actual restricted SCRAM login/role assertions passed, but immediate log assertion after asynchronous pg_reload_conf found no ALTER ROLE audit line.",
+  "correction":"Require the actual effective default/ddl/error-parameter0 settings in the same local backend before issuing verifier DDL. No logging downgrade, hosted write or secret output."
+}

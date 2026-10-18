@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "scope": "fresh owned local PG17 only; not hosted TLS or custody installation",
+  "rawEntropyBytes": 32,
+  "algorithm": "SCRAM-SHA-256",
+  "iterations": 16384,
+  "actualRestrictedPasswordAuthentication": true,
+  "roleFlags": {
+    "role": "n88_backend",
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "rolreplication": false
+  },
+  "ddlAuditRetained": true,
+  "rawPasswordAbsentFromSqlAndLogs": true,
+  "verifierNotCopiedToEvidence": true,
+  "hostedWrites": 0
+}

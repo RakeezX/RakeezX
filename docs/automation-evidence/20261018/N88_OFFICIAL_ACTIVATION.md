@@ -259,3 +259,35 @@ Design references: PostgreSQL17 [error trapping](https://www.postgresql.org/docs
 [RAISE fields](https://www.postgresql.org/docs/17/plpgsql-errors-and-messages.html),
 [function privileges](https://www.postgresql.org/docs/17/sql-createfunction.html)
 and Supabase [connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres).
+
+## Material session-pooler repair — run1b9971f9
+
+The provider-observed session pooler resolves the direct IPv6 blocker. Actual
+DNS/TCP succeeded. System trust initially failed SELF_SIGNED_CERT_IN_CHAIN;
+the official Studio SSLConfiguration -> useCustomContent -> custom-content.json
+chain supplies the exact Supabase Root2021 download URL. Its public CA was
+downloaded over verified HTTPS, checked and pinned. TLSv1.3 with CA and hostname
+verification then passed before authentication. No global trust, certificate
+bypass, transaction pooler, provider setting or paid option changed.
+
+Actual service configuration now admits only this project/role/host/database on
+session5432 (or its named direct endpoint), rejecting foreign hosts/projects,
+transaction6543, SSL URL overrides and wrong CA. The composed source guard tests
+pass. A focused native PG SCRAM login proof passed with the actual custodian
+derivation, original32-byte entropy, restricted flags and retained verifier DDL
+audit; raw password was absent. The first asynchronous log-readiness failure is
+preserved. Old boundary/crypto/UI/provider suites were reused unchanged.
+
+Official CLI protected-file read capability actually passed after adding its
+documented --linked flag; no credentials or values were read. Fresh secret-folder
+preparation first failed because PowerShell.Security cmdlets could not load.
+Read-only diagnosis established a module defect, not an ACL refusal; standard
+.NET APIs sealed/read back a fresh current-user-only folder. No global module,
+ACL or policy repair occurred; no old rejected cleanup was retried.
+
+The designated test teacher was grounded by normal UI and exact owned teaching
+metadata, without token/storage/Auth-row reads. Browser lease released, panel
+closed. Only two fabricated students may later be changed; bulk issuance of the
+existing class is forbidden. The fresh original13-table source catalog matches
+the saved snapshot exactly. See session-pooler-preparation.json and the focused
+session-pooler/SCRAM receipts. These prerequisites do not claim hosted readiness.

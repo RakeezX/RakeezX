@@ -327,3 +327,29 @@ never guess the host, purchase IPv4, export credentials or repeat unchanged proo
 Fresh phase baselines and actual restricted TLS/source/ACL readbacks still gate
 hosted apply and validation. Official teacher/student publication stays with the
 sole publisher after service gates pass; no current official trial URL is claimed.
+
+## Verified IPv4 Session pooler transport — run1b9971f9
+
+The provider Connect UI supplied `aws-0-ap-south-1.pooler.supabase.com:5432`,
+database postgres, restricted username `n88_backend.xlrubcwjqktzzunrvuns`.
+The direct IPv6 failure is preserved and was not retried. DNS and TLSv1.3 with
+hostname verification now PASS using the Root2021 CA from the exact download
+template in Supabase's first-party Studio source. Initial system-trust failure
+SELF_SIGNED_CERT_IN_CHAIN and the unrelated public-download404 remain historical.
+No OS trust, certificate bypass, provider SSL setting or paid option changed.
+
+The service accepts only the named direct endpoint or this session endpoint,
+the same project/restricted role, postgres database and port5432. Transaction
+pooling6543, foreign project/host, URL SSL overrides and wrong CA are rejected.
+The required CA is pinned to its public source SHA256 in the service and manifest.
+Actual authenticated session identity, stable backend transaction semantics,
+upstream SSL, boundary source/ACL and capture guard remain prerequisites before
+private operations. A successful unauthenticated TLS handshake is not that proof.
+
+`official-activation.mjs` is an explicit custodian, inert at import. It uses fresh
+current-user protected resources, CurrentUser DPAPI recovery custody, public-key
+only provider ingress handoff, and protected official CLI files. Only a derived
+SCRAM verifier enters role DDL; raw password/keys never enter tool arguments or
+SQL. CLI diagnostics are suppressed and temporary SQL/env inputs removed in
+finally. An attempted LOGIN change is consumed even on ambiguous failure; no
+automatic password reset/replay. Seven source/ACL readbacks must pass first.

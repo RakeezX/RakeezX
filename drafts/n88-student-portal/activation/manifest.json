@@ -107,6 +107,13 @@
     "drafts/n88-student-portal/activation/private-error-boundary.mjs": "c17ed676799033cda3b4bd2d39ee185d298c256d62c8878fb595b8a69cf96f99",
     "tests/n88-official-activation-error-boundary.mjs": "0b84f13aae427302e8bb2712ed60a9c84fc433c0dfec8f00764488fa02fef1ed",
     "tests/n88-official-activation-error-boundary.json": "96a1e5e792b0ebf42bb3281130f5c84b7a7cba78a6b851be1672720301587510",
+    "drafts/n88-student-portal/official-activation.mjs": "1d38bb6a8a9a7fde0a76b0067075094d52265f9316f243ab489778d0e552f532",
+    "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
+    "drafts/n88-student-portal/activation/ca/provenance.json": "82cbea55c25279317503a264d455ccb33d5be54952b072e088ba5e6cd6f582d4",
+    "tests/n88-official-activation-session-pooler.mjs": "9f38a6b6a81efddcd68f7aa6a96c09be9b3a372c9626e54159e387070499b26c",
+    "tests/n88-official-activation-session-pooler.json": "cce44bfb4a86e4def414e0e956663834659c651e827ae8eab757682815118dcd",
+    "tests/n88-official-activation-scram.mjs": "ad60ed0591898d03b29ee2036ae81c196f882100afc1acad24dfb1e808108f97",
+    "tests/n88-official-activation-scram.json": "8701b6ffd67b42ea589bd763ae1243835569e4089f898f90e7582dc5fb567fb9",
     "drafts/n88-student-portal/deployment.inactive.json": "8ffc87ebba3fea0050849fde852cd70a7e38a9f859f734cf3c19217e285761be",
     "src/lib/score-foundation.js": "d759fbec5a53638f2e05873df76db734430c8aafdc8b069bcdbbd23708e9af48",
     "src/models.js": "c3799c0dbd8089d1faf39c68cacb0f49495a8afd91cc28f9e3b5a6ba8eef0d2b",
@@ -127,7 +134,7 @@
     "drafts/n88-student-portal/runtime.mjs": "0c2abe8d798b302656c4a13d46c2ada6035b1e1afa2401c7c1a1c5a553e8b2c2",
     "drafts/n88-student-portal/web-protocol.mjs": "22b77196c6b514c6911785373b907b78b23275c57d7042351e85613a2b4c774c",
     "drafts/n88-student-portal/web-entry.mjs": "fe079ed58f6b066d3b23048a51f5c96e0ea318ca7eca0caa9e825cd4a071bef5",
-    "drafts/n88-student-portal/existing-host.mjs": "2801955e82726fbffa5f91496b5b01eda44374e12580a83f9170edf2e5177996",
+    "drafts/n88-student-portal/existing-host.mjs": "956ab0258389d6f42ceba552e48ba97d1c5bd04ac3d649a587f0b10da552e1ff",
     "supabase/functions/n88-student-portal/index.ts": "591d1fae83050d391db2300cb6026eca7f41e61787cce677bee499c0bbacf7b6",
     "drafts/n88-student-portal/cloudflare-entry.mjs": "0783901aaa1b793587aef871055574e3a49fefc46d075db345c9390efbe42c80",
     "src/lib/student-portal-unified-client.js": "f9db53a368d670784e1cb5122b7dac057b2e3da4a4900eb034ed33ae2c54188b",
@@ -201,13 +208,13 @@
     "tests/n88-six-digit-shared-launcher.mjs": "2a8eeac80819c70141ea078b651293f271520c25bfd4ab184825c561f056633b",
     "tests/n88-six-digit-shared-artifacts.mjs": "3449115e5db6f2db91dd7e121eef72e1b437fcdba5c6b26f5475e09ed793a0a7",
     "tests/n88-six-digit-shared-flood-window.mjs": "76246587b972b7610ee36b48018d465476c17ba5abb822e1c813fb232a99b971",
-    "drafts/n88-student-portal/ACTIVATION.md": "b5544ebe1d40eec654a453401c69585aa817a0778311d9aba812d75b62b5e00f",
+    "drafts/n88-student-portal/ACTIVATION.md": "bdfbcf8587432f5fddeae21ef98e29536fed4ca3af327234ee884396e7edf0d5",
     "drafts/n88-student-portal/six-digit-schema.inactive.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
     "supabase/migrations/20261018110713_n88_six_digit_staged.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
     "drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql": "79eeb73999a6edcc81e2683a5ccb64feb58ecd73a26ca924e3391ccf72ec4417",
     "tests/n88-six-digit-redaction.mjs": "7e31c4634798898cf157a06f51c84585efce246da6b559fdf0343bfda294bbbe",
     "tests/n88-six-digit-security.mjs": "27b802cd8fd7d47cdcc34f514d8849361dc07d81f9c72479c09e1b94542c45e1",
-    "drafts/n88-student-portal/integrated-bundle.mjs": "14f315099950ff08d18cae10d626859749fdd98f83cf5117751a19cefb34bfa8",
+    "drafts/n88-student-portal/integrated-bundle.mjs": "bc97f014c870a2ad4d6ee80512aafe8473818a32a3bc25409b35f26e032eb571",
     "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
     "index.html": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
     "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
@@ -253,7 +260,7 @@
     "drafts/n88-student-portal/package-lock.json": "014b58d8a27a30c8e9d13cf0211f0ef12d90007c41e295cfa330d95d0459d88a"
   },
   "outputs": {
-    "edge/index.mjs": "56329f55557326dc386e5b5ff0168cfee42cf2bd6826c299ecd3437be684b86d",
+    "edge/index.mjs": "a5834682f9904df63a2ec539176e6f00a95eb45c25d5d941ec9b381af10842a8",
     "cloudflare/worker.mjs": "d3867a9f96278c2c4ae4e270df3284789c4b1a2704e07fcee6789e0f0daec32d",
     "private/assets/student.mjs": "f88d908955ca2039816a6e8233b4a47de0ac8f450095449c7ce892a4ab37f0dc",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
@@ -300,6 +307,11 @@
       "imports": [
         {
           "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
           "kind": "import-statement",
           "external": true
         },
@@ -506,6 +518,30 @@
     "hostedApplied": false,
     "readbackRequiredBeforePrivateQuery": true,
     "localEvidence": "tests/n88-official-activation-error-boundary.json"
+  },
+  "privateDatabaseTransport": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "host": "aws-0-ap-south-1.pooler.supabase.com",
+    "port": 5432,
+    "mode": "session",
+    "role": "n88_backend",
+    "tls": {
+      "verifyHostname": true,
+      "rejectUnauthorized": true,
+      "minVersion": "TLSv1.2",
+      "ca": {
+        "source": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt",
+        "primarySource": "https://raw.githubusercontent.com/supabase/supabase/master/apps/studio/hooks/custom-content/custom-content.json",
+        "subject": "C=US\nST=Delware\nL=New Castle\nO=Supabase Inc\nCN=Supabase Root 2021 CA",
+        "issuer": "C=US\nST=Delware\nL=New Castle\nO=Supabase Inc\nCN=Supabase Root 2021 CA",
+        "validFrom": "Apr 28 10:56:53 2021 GMT",
+        "validTo": "Apr 26 10:56:53 2031 GMT",
+        "fingerprint256": "80:70:25:AD:50:D4:ED:21:9D:2C:9C:7D:29:9C:00:4F:82:4E:B0:0C:F7:F6:5A:FE:F6:07:D0:7B:72:E6:CA:FA",
+        "sha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7"
+      }
+    },
+    "preAuthenticationEvidence": "tests/n88-official-activation-session-pooler.json",
+    "restrictedSessionReadbackRequired": true
   },
   "binarySources": {
     "assets/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951"

@@ -1,5 +1,6 @@
 // drafts/n88-student-portal/existing-host.mjs
 import { Buffer as Buffer12 } from "node:buffer";
+import { createHash as createHash8 } from "node:crypto";
 import pg from "pg";
 
 // drafts/n88-student-portal/deployment.inactive.json
@@ -4588,7 +4589,9 @@ function createExistingHost(readEnv) {
   const origin = required("N88_PUBLIC_ORIGIN"), authUrl = required("N88_AUTH_URL"), dbUrl = required("N88_DATABASE_URL");
   const db = new URL(dbUrl);
   const username = decodeURIComponent(db.username);
-  if (!["postgres:", "postgresql:"].includes(db.protocol) || !(username === "n88_backend" || /^n88_backend\.[a-z0-9]{20}$/.test(username)) || !db.password || db.search || db.hash) throw Error("n88_database_configuration");
+  const direct = db.hostname === "db.xlrubcwjqktzzunrvuns.supabase.co" && username === "n88_backend";
+  const session = db.hostname === "aws-0-ap-south-1.pooler.supabase.com" && username === "n88_backend.xlrubcwjqktzzunrvuns";
+  if (!["postgres:", "postgresql:"].includes(db.protocol) || !(direct || session) || !["", "5432"].includes(db.port) || db.pathname !== "/postgres" || !db.password || db.search || db.hash) throw Error("n88_database_configuration");
   const key2 = (n) => {
     const s = required(n);
     if (!/^[a-f0-9]{64}$/.test(s)) throw Error("n88_key_configuration");
@@ -4602,10 +4605,11 @@ function createExistingHost(readEnv) {
   const versions = required("N88_RECOVERY_VERSIONS").split(",");
   if (versions.length > 8 || new Set(versions).size !== versions.length || versions.some((v) => !/^[A-Za-z0-9_-]{1,40}$/.test(v))) throw Error("n88_configuration");
   const recoveryKeys = new Map(versions.map((v) => [v, key2("N88_RECOVERY_KEY_" + v)]));
-  const ca = readEnv("N88_DATABASE_CA_CERT");
+  const ca = required("N88_DATABASE_CA_CERT").replaceAll("\r\n", "\n");
+  if (createHash8("sha256").update(ca).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n88_database_ca_configuration");
   const pool = new pg.Pool({
     connectionString: dbUrl,
-    ssl: { rejectUnauthorized: true, ...ca ? { ca } : {} },
+    ssl: { rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2", ca },
     max: 2,
     connectionTimeoutMillis: 1e3,
     idleTimeoutMillis: 1e4,

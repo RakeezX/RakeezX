@@ -2,6 +2,7 @@
  * No service-role key, new account, SDK Auth flow, migrations or runtime fixtures.
  */
 import {Buffer} from 'node:buffer';
+import {createHash} from 'node:crypto';
 import pg from 'pg';
 import manifest from './deployment.inactive.json' with {type:'json'};
 import {createWebEntry} from './web-entry.mjs';
@@ -40,7 +41,10 @@ export function createExistingHost(readEnv) {
   const origin=required('N88_PUBLIC_ORIGIN'),authUrl=required('N88_AUTH_URL'),dbUrl=required('N88_DATABASE_URL');
   const db=new URL(dbUrl);
   const username=decodeURIComponent(db.username);
-  if(!['postgres:','postgresql:'].includes(db.protocol) || !(username==='n88_backend' || /^n88_backend\.[a-z0-9]{20}$/.test(username)) || !db.password || db.search || db.hash)throw Error('n88_database_configuration');
+  const direct=db.hostname==='db.xlrubcwjqktzzunrvuns.supabase.co'&&username==='n88_backend';
+  const session=db.hostname==='aws-0-ap-south-1.pooler.supabase.com'&&username==='n88_backend.xlrubcwjqktzzunrvuns';
+  if(!['postgres:','postgresql:'].includes(db.protocol) || !(direct||session) || !['','5432'].includes(db.port) ||
+    db.pathname!=='/postgres' || !db.password || db.search || db.hash)throw Error('n88_database_configuration');
   const key=n=>{const s=required(n);if(!/^[a-f0-9]{64}$/.test(s))throw Error('n88_key_configuration');return Buffer.from(s,'hex');};
   // Physical deployment gate; readback/authorization evidence still required.
   if(required('N88_SERVICE_REVISION')!==manifest.serviceRevision)throw Error('n88_service_readback_missing');
@@ -52,8 +56,11 @@ export function createExistingHost(readEnv) {
   const versions=required('N88_RECOVERY_VERSIONS').split(',');
   if(versions.length>8||new Set(versions).size!==versions.length||versions.some(v=>!/^[A-Za-z0-9_-]{1,40}$/.test(v)))throw Error('n88_configuration');
   const recoveryKeys=new Map(versions.map(v=>[v,key('N88_RECOVERY_KEY_'+v)]));
-  const ca=readEnv('N88_DATABASE_CA_CERT');
-  const pool=new pg.Pool({connectionString:dbUrl,ssl:{rejectUnauthorized:true,...(ca?{ca}:{})},max:2,
+  // Provider's published Root2021 CA, scoped to this client only. No OS trust or
+  // verification downgrade. Session-mode5432 preserves session/transaction fences.
+  const ca=required('N88_DATABASE_CA_CERT').replaceAll('\r\n','\n');
+  if(createHash('sha256').update(ca).digest('hex')!=='700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7')throw Error('n88_database_ca_configuration');
+  const pool=new pg.Pool({connectionString:dbUrl,ssl:{rejectUnauthorized:true,servername:db.hostname,minVersion:'TLSv1.2',ca},max:2,
     connectionTimeoutMillis:1000,idleTimeoutMillis:10000,statement_timeout:3000,query_timeout:4000,
     application_name:'n88-private-server',allowExitOnIdle:true});
   // No raw pg errors/SQL/parameters in platform logs.
