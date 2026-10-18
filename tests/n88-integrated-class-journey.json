@@ -1,19 +1,23 @@
 {
   "taskId": "continuous-n88-integrated-class-student-journey-20261018",
-  "runId": "c9f4a227-4930-456c-881d-6ffd2ce095fd",
-  "checks": [],
+  "runId": "01c87cee-6ed3-4bf6-a51c-503fa03b1248",
+  "checks": [
+    {
+      "name": "n88_actual_app_class_batch_to_universal_student_same_service_pg_journey",
+      "status": "PASS",
+      "evidence": "Actual app shell/hash route/store and account lease guard; two students batch/skip, universal numeric login through signed gateway/Auth/restricted native PG, reload, 390/1280 source CSS/screenshots. No credentials retained."
+    },
+    {
+      "name": "n88_canonical_projection_visibility_score_task_and_current_identity_isolation",
+      "status": "PASS",
+      "evidence": "Canonical teacher-model grades [8,0,null,4,8,4], regular/late/required/future work, own profile and other student isolation; server hides all six fields; selective rotation/revocation kills only target sessions; revoked batch does not resurrect. Lease expiry denies before network."
+    }
+  ],
   "cleanup": {
     "ownedHttpAndNativePgClosed": true,
     "lease": "RELEASED integration"
   },
-  "failures": [
-    {
-      "message": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: /مساحة الطلاب/ }).first() to be visible\u001b[22m\n",
-      "stack": [
-        "    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-integrated-class-student-journey-20261018\\tests\\n88-integrated-class-journey.mjs:18:92",
-        "    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)",
-        "    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-integrated-class-student-journey-20261018/tests/n88-integrated-class-journey.mjs:15:3"
-      ]
-    }
-  ]
+  "failures": [],
+  "pageErrors": [],
+  "stage": "students"
 }

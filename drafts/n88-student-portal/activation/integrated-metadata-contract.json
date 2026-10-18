@@ -1,0 +1,697 @@
+{
+  "sourceOnly": true,
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "capturedSha256": "b0abdcb656880f0660d43d4678ce1191fb8ccd7eed2e957f519d33aa5f55f334",
+  "required": [
+    {
+      "table": "years",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "years",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "years",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "years",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "years",
+      "column": "status",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "year_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "status",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "start_date",
+      "udt": "date",
+      "captured": true
+    },
+    {
+      "table": "terms",
+      "column": "end_date",
+      "udt": "date",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "year_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "status",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "archived_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "grade",
+      "udt": "int4",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "label",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "sections",
+      "column": "name",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "students",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "students",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "students",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "students",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "students",
+      "column": "status",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "students",
+      "column": "name",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "student_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "section_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "status",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "start_date",
+      "udt": "date",
+      "captured": true
+    },
+    {
+      "table": "enrollments",
+      "column": "end_date",
+      "udt": "date",
+      "captured": true
+    },
+    {
+      "table": "teachings",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "teachings",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "teachings",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "teachings",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "teachings",
+      "column": "section_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "teachings",
+      "column": "term_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "teachings",
+      "column": "subject_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "teaching_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "name",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "max",
+      "udt": "numeric",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "order",
+      "udt": "int4",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "auto",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "per_point",
+      "udt": "numeric",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "penalty",
+      "udt": "numeric",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "score_mode",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "items",
+      "column": "portability_group_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "scores",
+      "column": "id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "revision",
+      "udt": "int8",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "student_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "item_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "value",
+      "udt": "numeric",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "manual_value",
+      "udt": "numeric",
+      "captured": false
+    },
+    {
+      "table": "scores",
+      "column": "derived_value",
+      "udt": "numeric",
+      "captured": false
+    },
+    {
+      "table": "score_subitems",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "item_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "name",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "value",
+      "udt": "numeric",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "order",
+      "udt": "int4",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "start_date",
+      "udt": "date",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "due_date",
+      "udt": "date",
+      "captured": true
+    },
+    {
+      "table": "score_subitems",
+      "column": "late_points",
+      "udt": "numeric",
+      "captured": true
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": false
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "revision",
+      "udt": "int8",
+      "captured": false
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": false
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "student_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "subitem_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "checked",
+      "udt": "bool",
+      "captured": false
+    },
+    {
+      "table": "score_subitem_completions",
+      "column": "completion_state",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "sessions",
+      "column": "id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "sessions",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": true
+    },
+    {
+      "table": "sessions",
+      "column": "revision",
+      "udt": "int8",
+      "captured": true
+    },
+    {
+      "table": "sessions",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": true
+    },
+    {
+      "table": "sessions",
+      "column": "teaching_id",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "sessions",
+      "column": "date",
+      "udt": "date",
+      "captured": true
+    },
+    {
+      "table": "sessions",
+      "column": "status",
+      "udt": "text",
+      "captured": true
+    },
+    {
+      "table": "attendance",
+      "column": "id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "attendance",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": false
+    },
+    {
+      "table": "attendance",
+      "column": "revision",
+      "udt": "int8",
+      "captured": false
+    },
+    {
+      "table": "attendance",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": false
+    },
+    {
+      "table": "attendance",
+      "column": "student_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "attendance",
+      "column": "teaching_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "attendance",
+      "column": "session_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "attendance",
+      "column": "status",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "owner_id",
+      "udt": "uuid",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "revision",
+      "udt": "int8",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "deleted_at",
+      "udt": "timestamptz",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "student_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "teaching_id",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "kind",
+      "udt": "text",
+      "captured": false
+    },
+    {
+      "table": "logs",
+      "column": "delta",
+      "udt": "int4",
+      "captured": false
+    }
+  ],
+  "missingFromCapturedMetadata": [
+    "scores.id",
+    "scores.owner_id",
+    "scores.revision",
+    "scores.deleted_at",
+    "scores.student_id",
+    "scores.item_id",
+    "scores.value",
+    "scores.manual_value",
+    "scores.derived_value",
+    "score_subitem_completions.id",
+    "score_subitem_completions.owner_id",
+    "score_subitem_completions.revision",
+    "score_subitem_completions.deleted_at",
+    "score_subitem_completions.student_id",
+    "score_subitem_completions.subitem_id",
+    "score_subitem_completions.checked",
+    "score_subitem_completions.completion_state",
+    "attendance.id",
+    "attendance.owner_id",
+    "attendance.revision",
+    "attendance.deleted_at",
+    "attendance.student_id",
+    "attendance.teaching_id",
+    "attendance.session_id",
+    "attendance.status",
+    "logs.id",
+    "logs.owner_id",
+    "logs.revision",
+    "logs.deleted_at",
+    "logs.student_id",
+    "logs.teaching_id",
+    "logs.kind",
+    "logs.delta"
+  ],
+  "note": "Absent captured fields are NOT claimed verified; all required columns/types/topology/revision metadata must pass fresh authorized preflight before live activation."
+}

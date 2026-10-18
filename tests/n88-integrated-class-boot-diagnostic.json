@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n88-integrated-class-student-journey-20261018",
+  "runId": "01c87cee-6ed3-4bf6-a51c-503fa03b1248",
+  "errors": [],
+  "failedResources": [],
+  "lease": "ACQUIRED integration",
+  "dom": "تعذّر فتح سجلّك\nInvalid resolved Product database name\nإن كنت في وضع التصفح الخاص فافتح التطبيق في نافذة عادية، وتأكد أن تخزين المواقع مسموح.\nأعد المحاولة",
+  "state": {
+    "fixture": false,
+    "layout": false,
+    "links": []
+  },
+  "release": "RELEASED integration"
+}

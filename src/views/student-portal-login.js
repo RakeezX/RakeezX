@@ -1,7 +1,7 @@
 /** AI: reusable actual student page, deliberately unregistered in the teacher app. */
 import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData } from '../lib/student-portal-unified-client.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const displayNumber = value => value === null ? 'لم تُنشر' : escape(value);
+const displayNumber = value => value === null ? 'لم تُرصد' : escape(value);
 
 export function mountUnifiedStudentPortal(root, { client, readiness = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
@@ -27,7 +27,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     const profile = data.profile;
     let content = `<h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p>${escape(profile.classLabel)}</p>` : ''}<div class="n88-unified-actions"><button data-read>تحديث</button><button data-end>إنهاء الجلسة</button></div><div class="n88-unified-sections">`;
     if (data.grades) {
-      content += `<section><h2>درجاتي</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">البند</th><th scope="col">الدرجة</th><th scope="col">من</th></tr></thead><tbody>${data.grades.items.map(item => `<tr><th scope="row">${escape(item.label)}${item.status !== undefined ? `<small>${escape(item.status)}</small>` : ''}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join('')}</tbody></table></div>${data.grades.total ? `<p>المجموع: ${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</p>` : ''}</section>`;
+      content += `<section><h2>درجاتي</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">البند</th><th scope="col">الدرجة</th><th scope="col">من</th></tr></thead><tbody>${data.grades.items.map(item => `<tr><th scope="row">${escape(item.label)}${item.status !== undefined ? `<small>${escape({recorded:'مرصودة',unrecorded:'لم تُرصد'}[item.status]||'')}</small>` : ''}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join('')}</tbody></table></div>${data.grades.total ? `<p>المجموع: ${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</p>` : ''}</section>`;
     }
     for (const [key, label] of Object.entries({ required: 'المطلوب مني', completed: 'الأعمال المكتملة', scheduled: 'الأعمال القادمة' })) {
       if (!Object.hasOwn(data.work || {}, key)) continue;

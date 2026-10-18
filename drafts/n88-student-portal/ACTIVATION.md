@@ -1,56 +1,46 @@
-# N88 integrated class preparation — BLOCKED checkpoint
+# N88 integrated class source preparation — LOCAL_READY, live OFF
 
-AI-authored, 18 October 2026. Current source remains inactive. This checkpoint is
-not LOCAL_READY, a hosted activation bundle qualification, deployment, or PO acceptance.
+AI-authored. Current evidence and exact scope:
+[Integrated class/student journey](../../docs/automation-evidence/20261018/N88_INTEGRATED_CLASS_STUDENT_JOURNEY.md).
+This is local inactive source readiness, not hosted/private access activation or
+Product closure. This card's twelve-digit contract is implemented; the newer
+six-digit decision is a dependent controller card required before live activation.
 
-The new entry is #/teaching/:id/student-portal inside the actual app; /student is
-the separate universal twelve-digit login document. Service composition uses the
-existing Auth verifier, signed ingress, restricted PostgreSQL repository and
-canonical locks. Legacy four-digit/private-link HTTP operations are excluded from
-the new gateway route allowlist. No hosted operation was run.
+Teacher entry: actual `#/teaching/:id/student-portal`; student document: `/student`.
+The real account shell/store/owner command/lease and signed Auth/PG composition
+were exercised. Retired four-digit/private-link runtime entry points cannot
+activate old controls. The private student graph excludes account/Auth/SDK/
+analytics/store/Sync/SW.
 
-The additive CLI-created proposal is
-`supabase/migrations/20261018102843_n88_integrated_class_staged.sql`.
-The original 20261018034356 proposal is preserved unchanged. It is NOT known to be
-applied on a hosted service. Fresh baseline installation and additive extension
-are separate ordered steps; never reapply either by guessing migration history.
-
-The current bundle manifest contains NEW hashes, not a reuse of the previous
-78-source certification. `prior-20261018-*` retains historical manifests and
-identities. Current extended helper/grant/policy readback has NOT been exported
-and qualified; the baseline expected identities are insufficient for activation.
-
-Actual whole-app synthetic UI check failed twice waiting for the teacher hub's
-student-portal entry. Initial evidence and current failure are retained in
-`tests/n88-integrated-class-initial-boot-failure.json` and
-`tests/n88-integrated-class-journey.json`. Do not rerun unchanged. Diagnose the
-actual document boot/account presentation with sanitized console/DOM evidence,
-correct the concrete fixture or implementation defect, then resume this exact
-candidate. No student codes were persisted or captured in screenshots.
-
-Executable review command from the repository root:
+Review command (actual launcher and owned graceful stop tested):
 `powershell -NoProfile -File drafts/n88-student-portal/current-review-launch.ps1`
-This is a diagnostic local review command, NOT a verified successful review. It
-uses fresh owned native PG, fabricated account boot, actual application shell,
-store, route and CSS; it never contacts hosted Auth or private student data.
-The existing receipt/TTL/owned graceful-stop controls remain.
+It returns the actual loopback teacher URL and a fresh receipt under
+`tests/fixtures/n88-integrated-class/receipts`. Stop only its owner with the same
+launcher and `-Stop -Receipt <returned receipt>`. Boot/readiness substitutions
+are synthetic/local only; no hosted calls or real identities are involved.
 
-Remaining before LOCAL_READY: actual class/roster route renders with valid
-synthetic account context; complete batch/lost-ACK/retry/two-student isolation,
-canonical projection and selective rotate/revoke journey; current term/roster/
-owner/session guards; 390/1280 inspection; export extended local SQL identities
-and certify the exact inactive bundle/offline exclusions. New service composition
-has not passed these gates. Default N88_ENABLED and browser readiness stay OFF.
+Current exact artifacts:
 
-Separately authorized live operations after local qualification: metadata-only
-readback of all consumed columns/types, PK/FK/revision/RLS/role/helper identities;
-verify migration history; apply only absent approved baseline/extension versions;
-read back exact extended identities; provision restricted backend login and
-independent ingress/numeric/reservation keys through secret custody; deploy exact
-Edge and gateway bundles; configure /student private document/assets, TLS, log
-redaction and no-cache; only then enable service and a separately reviewed
-browser-readiness diff. Generic frontend publishing performs none of these.
-No SQL/Auth/RLS/secret provisioning or live activation is authorized here.
+- Preserved baseline migration 20261018034356 and additive proposal 20261018102843.
+- `activation/integrated-metadata-contract.json` and typed preflight: 109 consumed
+  columns; 76 captured matches, 33 require fresh actual metadata before activation.
+- `activation/integrated-identities.inactive.sql` and
+  `integrated-expected-identities.json`: actual local private constraints/indexes/
+  triggers, role/helper/ACL/policy identities, including global uniqueness.
+- `integrated-readback.mjs`: strict offline comparison of authorized metadata-only
+  project/migration/disabled-state envelope and all extended identities.
+- `activation/manifest.json`: regenerated Edge, gateway, private student and actual
+  account class graphs/current hashes. Prior manifests remain historical; old
+  77/78-source certification does not certify modified modules.
+- `activation/deploy.staged.json`: exact inactive proposal, all live switches OFF,
+  no routes/cron/preview; dependent six-digit amendment required before activation.
+
+Scoped actual app/service/PG, lost ACK/retry, rotation/revocation, projection and
+teacher-model equivalence, current identity/Auth/rate/privacy and 390/1280 checks
+are recorded in the linked evidence. Original failures/checkpoint 2fe8981 remain.
+Fresh hosted metadata/service/Auth-policy, secret custody and served activation
+gates remain separate. The frontend publisher does not apply SQL or deploy
+service functions. The historical contracts below are evidence, not current UX.
 
 ## Historical preparation (superseded contracts; evidence only)
 

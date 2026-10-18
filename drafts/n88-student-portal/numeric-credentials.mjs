@@ -84,7 +84,8 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
     return async request => {
       try { return response(await repository.transaction(async(db,ports)=>{
         const ingress=await verifyIngress(request,ports);
-        const {headers={},method,path,body={}}=request;
+        const {headers={},method,body={}}=request;
+        const path=request.path.startsWith('/student/')?'/api/n88'+request.path:request.path;
         if(!ingress?.clientKey || headers['sec-fetch-site'] && headers['sec-fetch-site']!=='same-origin' ||
            method==='POST' && (headers.origin!==origin || headers['x-n88-csrf']!=='1' || headers['content-type']!=='application/json')) return denied();
         const time=now();

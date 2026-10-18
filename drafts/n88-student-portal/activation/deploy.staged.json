@@ -31,7 +31,6 @@
     "assetAllowlist": [
       "assets/student.mjs",
       "styles/app.css",
-      "styles/student-portal.css",
       "styles/student-portal-login.css"
     ],
     "fallbackToAccountApp": false,
@@ -82,10 +81,21 @@
     "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families"
   ],
   "qualification": {
-    "state": "BLOCKED",
+    "state": "LOCAL_READY",
+    "scope": "inactive source-only local application/service/PG preparation",
     "actualAppJourney": "tests/n88-integrated-class-journey.json",
-    "currentExpectedIdentitySnapshot": null,
+    "changedServiceBoundaries": "tests/n88-integrated-class-boundaries.json",
+    "finalProjectionSqlAndUi": "tests/n88-integrated-class-final-service.json",
+    "currentExpectedIdentitySnapshot": "integrated-expected-identities.json",
+    "metadataContract": "integrated-metadata-contract.json",
+    "readbackVerifier": "../integrated-readback.mjs",
     "baselineExpectedIdentitySnapshot": "prior-20261018-expected-identities.json",
-    "activationPermitted": false
+    "activationPermitted": false,
+    "dependentFormatAmendment": {
+      "requiredBeforeLiveActivation": true,
+      "approvedNextFormat": "six total numeric digits beginning 1",
+      "controllerSource": "n88-six-digit-unified-student-code-20261018.json",
+      "scope": "separate dependent card after this integration delivery; not activated by this worker"
+    }
   }
 }

@@ -1,3 +1,5 @@
+import { html } from '../lib/dom.js';
+import * as store from '../store.js';
 /** AI: injected teacher pilot only; current server auth selects owner. Actual staged app binding; no service activation. */
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export async function mountTeacherInvitations(root, { client, copy = text => navigator.clipboard.writeText(text), print = () => window.print() }) {
@@ -73,24 +75,12 @@ export async function mountTeacherInvitations(root, { client, copy = text => nav
       root.removeEventListener('submit', submit); root.removeEventListener('click', click); root.ownerDocument.defaultView.removeEventListener('pagehide', clear); } };
 }
 
-// AI: lazy route in the existing authenticated app. No alternative login flow.
-let routeHandle, routeGeneration = 0, routeRoot;
+// AI: old per-student route leads only to the current class UI, never a private-link issuer.
 export default {
-  title: () => 'مساحة الطالب',
-  back: p => '#/student/' + encodeURIComponent(p.id),
-  render: () => '<div data-student-service><p role="status">جارٍ التحقق من إتاحة مساحة الطالب…</p></div>',
-  afterPaint(root, params) {
-    const target = root.querySelector('[data-student-service]');
-    if (!target || target === routeRoot) return;
-    routeHandle?.dispose(); routeRoot = target;
-    const generation = ++routeGeneration;
-    void Promise.all([import('../lib/student-portal-runtime.js'), import('../lib/cloud.js'), import('../store.js')]).then(([runtime, cloud, store]) => {
-      if (generation !== routeGeneration || !target.isConnected) return;
-      routeHandle = runtime.mountTeacherService(target, {
-        getBinding: write => runtime.teacherBinding({ cloud, store, studentId: params.id }, write),
-        subscribe: fn => { const a = cloud.subscribe(fn), b = store.subscribe(fn); return () => { a(); b(); }; },
-      });
-    }).catch(() => { if (generation === routeGeneration) target.textContent = 'مساحة الطالب غير متاحة حاليًا.'; });
-  },
-  onUnmount() { routeGeneration++; routeHandle?.dispose(); routeHandle = null; routeRoot = null; },
+  title: () => 'مساحة الطالب',back:p=>'#/student/'+encodeURIComponent(p.id),
+  render(p){
+    const member=store.activeEnrollment(p.id);
+    const teachings=member?store.teachings().filter(t=>t.sectionId===member.sectionId).filter(t=>{try{store.assertClassOperationsAccess(t.id);return true;}catch{return false;}}):[];
+    return html`<section><p>تُدار رموز الطلاب والحقول المنشورة من داخل الفصل، وصفحة دخول الطلاب الموحّدة هي /student.</p>${teachings.map(t=>html`<a class="btn" href="#/teaching/${t.id}/student-portal">مساحة طلاب الفصل — ${store.getSubject(t.subjectId)?.name||'المادة'}</a>`)}${!teachings.length?html`<p role="status">تعذّر التحقق من فصل نشط تابع للحساب الحالي.</p>`:''}</section>`;
+  }
 };

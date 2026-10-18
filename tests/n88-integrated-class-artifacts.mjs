@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import vm from 'node:vm';
+import {verifyIntegratedReadback} from '../drafts/n88-student-portal/integrated-readback.mjs';
 import {offlineChecks} from './n88-client-binding-guards.mjs';
-const checks=[],report={taskId:'continuous-n88-integrated-class-student-journey-20261018',runId:'c9f4a227-4930-456c-881d-6ffd2ce095fd',checks};
+const checks=[],report={taskId:'continuous-n88-integrated-class-student-journey-20261018',runId:'01c87cee-6ed3-4bf6-a51c-503fa03b1248',checks};
 const dir='drafts/n88-student-portal/activation/',manifest=JSON.parse(await readFile(dir+'manifest.json','utf8'));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 for(const [p,h]of Object.entries(manifest.sources))assert.equal(hash((await readFile(p,'utf8')).replaceAll('\r\n','\n')),h,p);
@@ -17,7 +18,7 @@ assert.equal(deployment.enabled,false);assert.equal(deployment.function.enabled,
 const worker=await import('../drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs');const reads=[];
 const env=new Proxy({},{get(_t,k){reads.push(k);if(k==='N88_ENABLED')return 'false';throw Error('Disabled key read');}});
 assert.equal((await worker.default.fetch(new Request('https://synthetic.invalid/api/n88/student/read'),env)).status,503);assert.deepEqual(reads,['N88_ENABLED']);
-checks.push({name:'n88_current_inactive_bundle_hashes_and_private_student_graph',status:'PASS',evidence:`${Object.keys(manifest.sources).length} current LF source hashes and ${Object.keys(manifest.outputs).length} output hashes verified. Private student graph excludes account/Auth/store/analytics/Sync, no external imports. Generated gateway default OFF reads only N88_ENABLED. Activation qualification explicitly BLOCKED.`});
+checks.push({name:'n88_current_inactive_bundle_hashes_and_private_student_graph',status:'PASS',evidence:`${Object.keys(manifest.sources).length} current LF source hashes and ${Object.keys(manifest.outputs).length} output hashes verified. Private student graph excludes account/Auth/store/analytics/Sync, no external imports. Generated gateway default OFF reads only N88_ENABLED. Source-only local qualification complete; live activation explicitly OFF.`});
 await offlineChecks(report);
 const handlers={},source=await readFile('sw.js','utf8');const shell=vm.runInNewContext(source+';SHELL',{self:{addEventListener:(n,fn)=>{handlers[n]=fn;},location:{origin:'https://synthetic.invalid'}},console,URL,Request,Response,Set,Promise});
 for(const p of ['src/lib/student-portal-class-client.js','src/views/student-portal-class.js','src/styles/student-portal-class.css'])assert.ok(shell.includes('./'+p));
@@ -25,4 +26,9 @@ for(const pathname of ['/student','/student/','/api/n88/student/read','/api/n88/
   let intercepted=false;handlers.fetch({request:{method:'GET',url:'https://synthetic.invalid'+pathname,mode:'navigate'},respondWith:()=>{intercepted=true;}});assert.equal(intercepted,false);
 }
 checks.push({name:'n88_new_teacher_shell_dependencies_and_universal_private_exclusions',status:'PASS',evidence:'Actual SW fetch handler in synthetic VM bypasses /student, /api/n88/student, teacher API and /n88-private assets; new class module/client/CSS present in shell. No live browser/SW-cache certification claimed.'});
-await writeFile('tests/n88-integrated-class-artifacts.json',JSON.stringify(report,null,2)+'\n');console.log('N88 scoped static bundle/SW checks PASS; UI remains blocked.');
+const expected=JSON.parse(await readFile(dir+'integrated-expected-identities.json','utf8'));
+const fabricated={projectId:'xlrubcwjqktzzunrvuns',mode:'metadata-only',personalRowsRead:0,enabled:false,capturedAt:new Date().toISOString(),migrationVersions:expected.migrationVersions,identities:expected.identities};
+assert.match(verifyIntegratedReadback(fabricated,expected),/identities match/);
+for(const mutate of [a=>{a.identities.roles[0].rolbypassrls=true;},a=>{a.migrationVersions=['20261018034356'];},a=>{a.enabled=true;},a=>{a.projectId='wrong';}]){const bad=structuredClone(fabricated);mutate(bad);assert.throws(()=>verifyIntegratedReadback(bad,expected));}
+checks.push({name:'extended_metadata_readback_tamper_guards',status:'PASS',evidence:'Offline verifier accepts matching extended identity envelope and rejects BYPASSRLS, migration-version, enabled-state and project drift; actual native identities exported by boundary test, no hosted readback claimed.'});
+await writeFile('tests/n88-integrated-class-artifacts.json',JSON.stringify(report,null,2)+'\n');console.log('N88 scoped static bundle/SW checks PASS; source-only local readiness; no hosted activation.');

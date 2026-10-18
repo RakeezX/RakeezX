@@ -4,7 +4,7 @@ import {execFileSync} from 'node:child_process';
 import {readFile,writeFile} from 'node:fs/promises';
 import {startIntegratedReview} from '../drafts/n88-student-portal/integrated-review.mjs';
 import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
-const taskId='continuous-n88-integrated-class-student-journey-20261018',runId='c9f4a227-4930-456c-881d-6ffd2ce095fd';
+const taskId='continuous-n88-integrated-class-student-journey-20261018',runId='01c87cee-6ed3-4bf6-a51c-503fa03b1248';
 const canonical='C:/Users/Abody/Projects/RakeezX',taskFile=canonical+'/artifacts/ops-supervisor-v4/queue/'+taskId+'.json';
 const lease=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',canonical+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-RuntimeRoot',canonical+'/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId],{encoding:'utf8',windowsHide:true,timeout:20000}).trim();
 const report={taskId,runId,checks:[],cleanup:{},failures:[]};let review,owned=false,failed;
@@ -14,23 +14,28 @@ try {
   review=await startIntegratedReview({ttl:180});
   await withIsolatedLocalBrowser({taskFile,runId,url:review.url,timeoutMs:120000},async({createContext})=>{
     const context=await createContext({viewport:{width:390,height:900},locale:'ar-SA'}),page=await context.newPage();
-    const errors=[];page.on('pageerror',e=>errors.push(e.message));
+    const errors=[];report.pageErrors=errors;page.on('pageerror',e=>errors.push(e.message));
+    page.on('response',r=>{if(r.status()>=400)(report.resourceErrors??=[]).push({path:new URL(r.url()).pathname,status:r.status()});});
+    report.stage='hub';
     await page.goto(review.url);await page.getByRole('link',{name:/مساحة الطلاب/}).first().waitFor();
-    assert.equal(await page.locator('.layout').count(),1);
+    assert.equal(await page.locator('.layout').count(),1);report.stage='class';
     await page.getByRole('link',{name:/مساحة الطلاب/}).first().click();
     await page.locator('.n88-class-roster>li').last().waitFor();assert.equal(await page.locator('.n88-class-roster>li').count(),2);
     assert.equal(await page.locator('[data-visibility] input:checked').count(),0);
     for(const f of ['name','class','grades','required','completed','scheduled'])await page.locator(`[name=${f}]`).check();
     await page.locator('[data-visibility] button').click();await page.getByRole('status').filter({hasText:'أقرّ الخادم حفظ'}).waitFor();
+    report.stage='visibility';
     const refresh=async()=>{await page.locator('[data-action=refresh]').click();await page.locator('.n88-class-roster>li').last().waitFor();};
     await refresh();await page.locator('[data-action=batch]').click();await page.locator('[data-delivery]').waitFor();
+    report.stage='batch';
     let codes=await page.locator('[data-delivery] input').evaluateAll(els=>els.map(e=>e.value));
     assert.ok(codes.length===2&&codes.every(c=>/^1[0-9]{11}$/.test(c))&&codes[0]!==codes[1]);
     // Sorted roster: other, student. Secrets remain test-memory only, never persisted or photographed.
     await page.locator('[data-action=close-sheet]').click();await refresh();
     await page.locator('[data-action=batch]').click();await page.getByRole('status').filter({hasText:'موجود مسبقًا: 2'}).waitFor();assert.equal(await page.locator('[data-delivery]').count(),0);
+    report.stage='students';
     const students=[];
-    for(const code of codes){const c=await createContext({viewport:{width:390,height:900}}),p=await c.newPage();await p.goto(review.studentUrl);await p.locator('[data-claim] input').waitFor();await p.locator('[data-claim] input').fill(code);await p.locator('[data-claim] button').click();await p.getByRole('heading',{name:'مساحتي الدراسية'}).waitFor();students.push({context:c,page:p});}
+    for(const code of codes){const c=await createContext({viewport:{width:390,height:900}}),p=await c.newPage();await p.goto(review.studentUrl);await p.locator('[data-claim] input').waitFor();await p.locator('[data-claim] input').fill(code);await p.locator('[data-claim] button').click();try{await p.getByRole('heading',{name:'مساحتي الدراسية'}).waitFor({timeout:10000});}catch(e){report.studentFailure={text:await p.locator('main').innerText(),calls:review.testing.calls.slice(-8)};throw e;}students.push({context:c,page:p});}
     const p=students[1].page,other=students[0].page;
     assert.match(await p.locator('main').innerText(),/طالب اصطناعي/);assert.ok(!(await p.locator('main').innerText()).includes('OTHER_NAME'));
     assert.match(await other.locator('main').innerText(),/OTHER_NAME/);

@@ -109,7 +109,7 @@ function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch } = {
 
 // src/views/student-portal-login.js
 var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-var displayNumber = (value) => value === null ? "\u0644\u0645 \u062A\u064F\u0646\u0634\u0631" : escape(value);
+var displayNumber = (value) => value === null ? "\u0644\u0645 \u062A\u064F\u0631\u0635\u062F" : escape(value);
 function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
   let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0;
@@ -137,7 +137,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     const profile = data.profile;
     let content = `<h1 tabindex="-1">\u0645\u0633\u0627\u062D\u062A\u064A \u0627\u0644\u062F\u0631\u0627\u0633\u064A\u0629</h1>${profile?.name !== void 0 ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ""}${profile?.classLabel !== void 0 ? `<p>${escape(profile.classLabel)}</p>` : ""}<div class="n88-unified-actions"><button data-read>\u062A\u062D\u062F\u064A\u062B</button><button data-end>\u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062C\u0644\u0633\u0629</button></div><div class="n88-unified-sections">`;
     if (data.grades) {
-      content += `<section><h2>\u062F\u0631\u062C\u0627\u062A\u064A</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">\u0627\u0644\u0628\u0646\u062F</th><th scope="col">\u0627\u0644\u062F\u0631\u062C\u0629</th><th scope="col">\u0645\u0646</th></tr></thead><tbody>${data.grades.items.map((item) => `<tr><th scope="row">${escape(item.label)}${item.status !== void 0 ? `<small>${escape(item.status)}</small>` : ""}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join("")}</tbody></table></div>${data.grades.total ? `<p>\u0627\u0644\u0645\u062C\u0645\u0648\u0639: ${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</p>` : ""}</section>`;
+      content += `<section><h2>\u062F\u0631\u062C\u0627\u062A\u064A</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">\u0627\u0644\u0628\u0646\u062F</th><th scope="col">\u0627\u0644\u062F\u0631\u062C\u0629</th><th scope="col">\u0645\u0646</th></tr></thead><tbody>${data.grades.items.map((item) => `<tr><th scope="row">${escape(item.label)}${item.status !== void 0 ? `<small>${escape({ recorded: "\u0645\u0631\u0635\u0648\u062F\u0629", unrecorded: "\u0644\u0645 \u062A\u064F\u0631\u0635\u062F" }[item.status] || "")}</small>` : ""}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join("")}</tbody></table></div>${data.grades.total ? `<p>\u0627\u0644\u0645\u062C\u0645\u0648\u0639: ${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</p>` : ""}</section>`;
     }
     for (const [key, label] of Object.entries({ required: "\u0627\u0644\u0645\u0637\u0644\u0648\u0628 \u0645\u0646\u064A", completed: "\u0627\u0644\u0623\u0639\u0645\u0627\u0644 \u0627\u0644\u0645\u0643\u062A\u0645\u0644\u0629", scheduled: "\u0627\u0644\u0623\u0639\u0645\u0627\u0644 \u0627\u0644\u0642\u0627\u062F\u0645\u0629" })) {
       if (!Object.hasOwn(data.work || {}, key)) continue;

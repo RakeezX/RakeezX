@@ -2,6 +2,7 @@
 import * as store from '/src/store.js';
 import * as cloud from '/src/lib/cloud.js';
 import {runtimeOfflineLease} from '/src/lib/offline-lease.js';
+import {accountWorkspaceDatabaseName} from '/src/lib/workspaces.js';
 import {makeProfile,makeDevice} from '/src/models.js';
 export async function bootstrap() {
   const c=await (await fetch('/review/context',{cache:'no-store'})).json();
@@ -9,7 +10,7 @@ export async function bootstrap() {
   cloud.setMockAuth(user,session);localStorage.setItem(cloud.AUTH_STORAGE_KEY,JSON.stringify(session));
   cloud.setMockBackend({});
   const restore={protocol:'CORE_V2',restoreId:'synthetic-restore',manifestHash:'synthetic-manifest',completedAt:1};
-  const workspace={id:'n88-synthetic',type:'account',authUserId:c.ownerId,ownershipState:'claimed',syncEligible:true,databaseName:'n88-integrated-synthetic',broadcastChannelName:'n88-integrated-synthetic',leaseGeneration:JSON.stringify([1,null,restore,null])};
+  const workspace={id:'n88-synthetic',type:'account',authUserId:c.ownerId,ownershipState:'claimed',syncEligible:true,databaseName:await accountWorkspaceDatabaseName(c.ownerId),broadcastChannelName:'n88-integrated-synthetic',leaseGeneration:JSON.stringify([1,null,restore,null])};
   store.activateWorkspace(workspace);
   Object.assign(store.state,c.canonical,{ready:true,profile:{...makeProfile(),name:'معلم التجربة المصطنع',profileStatus:'READY'},
     device:{...makeDevice(),activeYearId:'year',activeTermId:'term',initialRestoreReceipt:{...restore,ownerId:c.ownerId}}});

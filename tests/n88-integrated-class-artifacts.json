@@ -1,11 +1,11 @@
 {
   "taskId": "continuous-n88-integrated-class-student-journey-20261018",
-  "runId": "c9f4a227-4930-456c-881d-6ffd2ce095fd",
+  "runId": "01c87cee-6ed3-4bf6-a51c-503fa03b1248",
   "checks": [
     {
       "name": "n88_current_inactive_bundle_hashes_and_private_student_graph",
       "status": "PASS",
-      "evidence": "60 current LF source hashes and 9 output hashes verified. Private student graph excludes account/Auth/store/analytics/Sync, no external imports. Generated gateway default OFF reads only N88_ENABLED. Activation qualification explicitly BLOCKED."
+      "evidence": "109 current LF source hashes and 9 output hashes verified. Private student graph excludes account/Auth/store/analytics/Sync, no external imports. Generated gateway default OFF reads only N88_ENABLED. Source-only local qualification complete; live activation explicitly OFF."
     },
     {
       "name": "n88_offline_shell_dependencies_and_private_cache_exclusion",
@@ -16,6 +16,11 @@
       "name": "n88_new_teacher_shell_dependencies_and_universal_private_exclusions",
       "status": "PASS",
       "evidence": "Actual SW fetch handler in synthetic VM bypasses /student, /api/n88/student, teacher API and /n88-private assets; new class module/client/CSS present in shell. No live browser/SW-cache certification claimed."
+    },
+    {
+      "name": "extended_metadata_readback_tamper_guards",
+      "status": "PASS",
+      "evidence": "Offline verifier accepts matching extended identity envelope and rejects BYPASSRLS, migration-version, enabled-state and project drift; actual native identities exported by boundary test, no hosted readback claimed."
     }
   ]
 }

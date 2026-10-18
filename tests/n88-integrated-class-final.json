@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n88-integrated-class-student-journey-20261018",
+  "runId": "01c87cee-6ed3-4bf6-a51c-503fa03b1248",
+  "checks": [
+    {
+      "name": "final_typed_migration_and_identity_readback",
+      "status": "PASS",
+      "evidence": "Exact CLI-created additive migration with all 109 consumed-column type gates applied only to fresh owned native PG; extended helper/role/ACL/policy identities equal exported expected snapshot. No hosted DDL."
+    },
+    {
+      "name": "final_arabic_grade_labels_and_actual_data_layout",
+      "status": "PASS",
+      "evidence": "Actual populated student page and class route inspected at 390/1280; unrecorded is distinct from zero, Arabic status labels, current class heading and synthetic review guidance; unchanged service proof reused."
+    }
+  ],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  }
+}

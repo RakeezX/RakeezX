@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n88-integrated-class-student-journey-20261018",
+  "runId": "01c87cee-6ed3-4bf6-a51c-503fa03b1248",
+  "checks": [
+    {
+      "name": "exact_review_launcher_start_and_owned_stop",
+      "status": "PASS",
+      "evidence": "Actual PowerShell launcher returns live actual-app teacher URL, /student HTTP 200 and PID/birth receipt; owned -Stop gracefully closes HTTP/native PG and removes owned cluster. Receipt removed by this test only; no browser replay or hosted call."
+    }
+  ],
+  "cleanup": {
+    "lease": "RELEASED integration"
+  }
+}

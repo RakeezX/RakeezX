@@ -18,7 +18,7 @@ if ($Help -or $Extra -contains '--help') {
 }
 if ($Extra.Count) { throw 'Unknown arguments. Use --help.' }
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
-$receipts = Join-Path $root 'tests/fixtures/n88-current-review/receipts'
+$receipts = Join-Path $root 'tests/fixtures/n88-integrated-class/receipts'
 $entry = Join-Path $PSScriptRoot 'current-review.mjs'
 if (-not $Receipt) {
   if ($Stop) { throw 'Stop requires the exact receipt path.' }

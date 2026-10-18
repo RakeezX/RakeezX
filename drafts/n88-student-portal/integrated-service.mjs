@@ -50,7 +50,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
     if(!teaching || !term || term.startDate&&term.startDate>today() || term.endDate&&term.endDate<today())return null;
     return {...resolved,canonical,termId:term.id};
   }
-  const inputFor=(s,m)=>({canonical:s.canonical,ownerId:s.ownerId,classId:s.classId,termId:s.termId,studentId:m.studentId,enrollmentId:m.enrollmentId,now:today()});
+  const inputFor=(s,m)=>({teacherContextVersion:'n88-canonical-teacher-context-v1',canonical:s.canonical,ownerId:s.ownerId,classId:s.classId,termId:s.termId,studentId:m.studentId,enrollmentId:m.enrollmentId,now:today()});
   async function policies(ports,ownerId,classId,termId) {
     const r=await ports.query('select payload from n88_private.class_visibility where owner_id=$1::uuid and class_id=$2 and term_id=$3',[ownerId,classId,termId]);
     return r.rows[0]?.payload||{revision:0,fields:fieldsOff(),members:[]};
@@ -64,7 +64,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
     return projectStudentPortal({...inputFor(s,m),visibility:stored||null});
   }});
   return async request=>{
-    if(request.path.startsWith('/student/'))return student({...request,path:'/api/n88'+request.path});
+    if(request.path.startsWith('/student/'))return student(request);
     const match=/^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility)$/.exec(request.path);
     if(!match || request.method!=='POST')return deny();
     const action=match[1],body=request.body||{},binding=body.binding;

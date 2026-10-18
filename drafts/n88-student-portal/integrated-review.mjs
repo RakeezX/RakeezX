@@ -54,6 +54,7 @@ export async function startIntegratedReview({ttl=14400}={}) {
         else if(u.pathname==='/review/bootstrap.js')file='tests/fixtures/n88-integrated-class/bootstrap.js';
         else return send(404,'Unavailable');
         source=await readFile(path.join(root,file));
+        if(file==='index.html'||file==='drafts/n88-student-portal/client/student.html')source=source.toString().replace('<body>','<body><aside role="note" dir="rtl"><strong>مراجعة محلية ببيانات مصطنعة؛ الخدمة الحية غير مفعلة.</strong> <a href="/#/teaching/teaching">فصل المعلم المصطنع</a> · <a href="/student" target="_blank" rel="noopener noreferrer">صفحة دخول الطالب الموحّدة</a><p>افتح مساحة الطلاب من الفصل، اختر الحقول واحفظها، ثم أنشئ الرموز وسلّم رمزًا واحدًا لكل طالب. أغلق عرض الرموز لمسحها. لا تستخدم بيانات حقيقية.</p></aside>');
         if(file==='src/app.js') {
           source=source.toString().replaceAll('\r\n','\n');const a=source.indexOf('    // Restore the cached identity immediately'),b=source.indexOf("  } catch (err) {\n    console.error('[rakeezx] فشل",a);
           if(a<0||b<a)throw Error('Actual app bootstrap changed');

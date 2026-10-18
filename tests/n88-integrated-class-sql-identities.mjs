@@ -1,0 +1,20 @@
+/** AI: exact private schema catalog qualification, owned local PG only. */
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {readFile,writeFile} from 'node:fs/promises';
+import {startNativePg} from './fixtures/n88-integrated-class/native-pg.mjs';
+const taskId='continuous-n88-integrated-class-student-journey-20261018',runId='01c87cee-6ed3-4bf6-a51c-503fa03b1248';
+const base='C:/Users/Abody/Projects/RakeezX',taskFile=base+'/artifacts/ops-supervisor-v4/queue/'+taskId+'.json';
+const lease=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',base+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-RuntimeRoot',base+'/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId],{encoding:'utf8',windowsHide:true,timeout:20000}).trim();
+const report={taskId,runId,checks:[],cleanup:{}};let pg,owned=false;
+try{
+  assert.match(lease('acquire'),/^(ACQUIRED|ALREADY OWNED)/);owned=true;pg=await startNativePg(process.cwd());
+  const identities=(await pg.fixtureQuery(await readFile('drafts/n88-student-portal/activation/integrated-identities.inactive.sql','utf8'))).rows[0].identities;
+  assert.ok(identities.private_constraints.some(c=>c.table_name==='n88_private.numeric_credentials'&&c.definition==='UNIQUE (reservation)'));
+  assert.ok(identities.private_indexes.some(i=>i.indexname==='numeric_one_active_student'&&i.indexdef.includes('WHERE (revoked_at IS NULL)')));
+  assert.ok(identities.private_triggers.some(t=>t.name==='numeric_tombstones'&&t.tgenabled==='O'));
+  assert.ok(identities.private_triggers.some(t=>t.name==='class_receipts_immutable'&&t.tgenabled==='O'));
+  await writeFile('drafts/n88-student-portal/activation/integrated-expected-identities.json',JSON.stringify({sourceOnly:true,migrationVersions:['20261018034356','20261018102843'],identities},null,2)+'\n');
+  report.checks.push({name:'exact_extended_private_constraints_indexes_and_triggers',status:'PASS',evidence:'Actual native PG catalog exports all private constraints/indexes/noninternal triggers plus existing helpers/roles/grants/policies. Global reservation UNIQUE, one-active-owner/student partial index and credential/receipt immutability triggers present and enabled. No hosted metadata or personal-row claim.'});
+}finally{await pg?.close();report.cleanup.nativePgClosed=true;if(owned)report.cleanup.lease=lease('release');await writeFile('tests/n88-integrated-class-sql-identities.json',JSON.stringify(report,null,2)+'\n');}
+console.log('N88 exact private schema catalog identities PASS');

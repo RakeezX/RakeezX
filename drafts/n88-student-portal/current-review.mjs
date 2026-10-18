@@ -5,7 +5,7 @@ import path from 'node:path';
 import {startIntegratedReview} from './integrated-review.mjs';
 import {processIdentity} from '../../tests/fixtures/n88-current-review/native-pg.mjs';
 export const root=fileURLToPath(new URL('../../',import.meta.url));
-const fixture=path.join(root,'tests/fixtures/n88-current-review');
+const fixture=path.join(root,'tests/fixtures/n88-integrated-class');
 export function ttlSeconds(value=14400){const n=Number(value);if(!Number.isInteger(n)||n<1||n>28800)throw Error('TTL must be 1..28800 seconds');return n;}
 export const startReview=({ttl=14400}={})=>startIntegratedReview({ttl:ttlSeconds(ttl)});
 export const help='N88 current synthetic review (Windows, installed native PG17.6).\nnode drafts/n88-student-portal/current-review.mjs --receipt <local receipt.json> [--ttl-seconds 14400]\nTTL: 1..28800 seconds; default 4 hours, maximum 8.\nUse current-review-launch.ps1 to launch hidden, read the teacher URL, or request owned graceful shutdown. No hosted service is enabled.';
@@ -13,7 +13,7 @@ async function main() {
   const args=process.argv.slice(2);if(args.includes('--help')){console.log(help);return;}
   const options={};for(let i=0;i<args.length;i+=2){if(!['--receipt','--ttl-seconds'].includes(args[i])||!args[i+1]||options[args[i]])throw Error('Invalid arguments');options[args[i]]=args[i+1];}
   const ttl=ttlSeconds(options['--ttl-seconds']),receipt=path.resolve(options['--receipt']||'');
-  if(!receipt.startsWith(path.join(fixture,'receipts')+path.sep)||path.extname(receipt)!=='.json')throw Error('Receipt must be a fresh JSON file in tests/fixtures/n88-current-review/receipts');
+  if(!receipt.startsWith(path.join(fixture,'receipts')+path.sep)||path.extname(receipt)!=='.json')throw Error('Receipt must be a fresh JSON file in tests/fixtures/n88-integrated-class/receipts');
   await mkdir(path.dirname(receipt),{recursive:true});
   try{await stat(receipt);throw Error('Receipt already exists');}catch(e){if(e.code!=='ENOENT')throw e;}
   let review,watch,requested;const signal=new Promise(ok=>{requested=ok;});

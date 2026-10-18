@@ -378,7 +378,8 @@ function createNumericCredentialOperations({
       try {
         return response(await repository.transaction(async (db, ports) => {
           const ingress = await verifyIngress(request, ports);
-          const { headers = {}, method, path, body = {} } = request;
+          const { headers = {}, method, body = {} } = request;
+          const path = request.path.startsWith("/student/") ? "/api/n88" + request.path : request.path;
           if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || method === "POST" && (headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied2();
           const time2 = now();
           const token = /(?:^|;\s*)__Secure-n88-student=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || "")?.[1];
@@ -447,9 +448,6 @@ function createNumericCredentialOperations({
   }
   return Object.freeze({ issueMember, rotateMember, revokeMember, createStudentHandler });
 }
-
-// drafts/n88-student-portal/student-projection.mjs
-import { createHash as createHash4 } from "node:crypto";
 
 // src/lib/score-foundation.js
 function scoreCents(value, { allowBlank = false } = {}) {
@@ -523,6 +521,12 @@ var GRADES = [
 ];
 var gradeLabel = (v) => GRADES.find((g) => g.v === Number(v))?.label ?? "";
 var sectionLabel = (sec) => sec ? `${gradeLabel(sec.grade)} / ${sec.label}` : "";
+function normalizeSectionLabel(label) {
+  return String(label ?? "").trim().replace(/\s+/g, " ").replace(/[٠-٩]/g, (digit) => String("\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669".indexOf(digit))).replace(/[۰-۹]/g, (digit) => String("\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9".indexOf(digit))).replace(/[إأآٱ]/g, "\u0627");
+}
+function normalizeSearchText(text2) {
+  return normalizeSectionLabel(text2).toLowerCase();
+}
 function isValidRecessPosition(afterPeriod, count) {
   const position = Number(afterPeriod);
   const periods = Number(count);
@@ -759,6 +763,126 @@ function studentTotal(items, ctx) {
     pctOfAll: outOfAll > 0 ? earned / outOfAll * 100 : null
   };
 }
+function indexScores(scores) {
+  const out = /* @__PURE__ */ Object.create(null);
+  for (const s of scores) {
+    if (s.deleted) continue;
+    out[s.itemId] = s;
+  }
+  return out;
+}
+
+// drafts/n88-student-portal/canonical-grade-context.mjs
+function canonicalGradeContext(state, studentId, teachingId) {
+  const live2 = (rows) => rows.filter((r) => !r.deleted);
+  const getTeaching = (id3) => live2(state.teachings).find((r) => r.id === id3) ?? null;
+  const getSection = (id3) => live2(state.sections).find((r) => r.id === id3) ?? null;
+  const items = (id3) => sortByOrder(live2(state.items).filter((r) => r.teachingId === id3));
+  const scoresOf = (id3) => live2(state.scores).filter((r) => r.studentId === id3);
+  const enrollmentsOf = (id3) => live2(state.enrollments).filter((r) => r.studentId === id3);
+  const logsOf = (id3) => live2(state.logs).filter((r) => r.studentId === id3);
+  const attendanceOf = (id3) => live2(state.attendance).filter((r) => r.studentId === id3);
+  function portableGroup(item) {
+    return item && !item.deleted && item.scoreMode !== "subitems" && typeof item.portabilityGroupId === "string" && item.portabilityGroupId.trim() ? item.portabilityGroupId : null;
+  }
+  function scoreForItem(studentId2, itemId) {
+    return scoresOf(studentId2).find((score) => score.itemId === itemId) ?? null;
+  }
+  function portableGradeScore(studentId2, item) {
+    const direct = scoreForItem(studentId2, item?.id);
+    if (direct) return direct;
+    const group = portableGroup(item);
+    const teaching = getTeaching(item?.teachingId);
+    if (!group || !teaching || item.auto) return null;
+    if (items(teaching.id).filter((candidate) => portableGroup(candidate) === group).length !== 1) return null;
+    const targetSection = getSection(teaching.sectionId);
+    const targetEnrollment = enrollmentsOf(studentId2).find((enrollment) => enrollment.sectionId === teaching.sectionId);
+    if (!targetSection || !targetEnrollment) return null;
+    const transferredSections = new Set(enrollmentsOf(studentId2).filter((enrollment) => enrollment.status === "transferred").map((enrollment) => enrollment.sectionId));
+    const candidates = [];
+    for (const sourceTeaching of live2(state.teachings)) {
+      if (sourceTeaching.id === teaching.id || sourceTeaching.subjectId !== teaching.subjectId || sourceTeaching.termId !== teaching.termId || !transferredSections.has(sourceTeaching.sectionId) || getSection(sourceTeaching.sectionId)?.yearId !== targetSection.yearId || getSection(sourceTeaching.sectionId)?.grade !== targetSection.grade) continue;
+      const matches = items(sourceTeaching.id).filter((candidate) => !candidate.auto && portableGroup(candidate) === group);
+      if (matches.length !== 1) continue;
+      const score = scoreForItem(studentId2, matches[0].id);
+      if (score) candidates.push(score);
+    }
+    return candidates.length === 1 ? candidates[0] : null;
+  }
+  function portableScoresByItem(studentId2, tchId) {
+    const directScores = indexScores(scoresOf(studentId2));
+    const out = /* @__PURE__ */ Object.create(null);
+    for (const item of items(tchId)) {
+      const score = directScores[item.id] ?? portableGradeScore(studentId2, item);
+      if (score) out[item.id] = score;
+    }
+    return out;
+  }
+  function automaticItemIdentity(item) {
+    if (!item?.auto) return null;
+    const name = normalizeSearchText(item.name);
+    if (!name) return null;
+    return `${item.auto}\0${name}`;
+  }
+  function automaticItemKey(item) {
+    const identity2 = automaticItemIdentity(item);
+    const max = Number(item?.max);
+    if (!identity2 || !Number.isFinite(max) || max <= 0) return null;
+    const factor = item.auto === "participation" ? Number(item.perPoint ?? 1) : item.auto === "attendance" ? Number(item.penalty ?? 1) : null;
+    if (!Number.isFinite(factor) || factor <= 0) return null;
+    return `${identity2}\0${max}\0${factor}`;
+  }
+  function dedupeRecords(records) {
+    return [...new Map(records.map((record) => [record.id, record])).values()];
+  }
+  function compatibleAutomaticTeachingIds(studentId2, item) {
+    const teaching = getTeaching(item?.teachingId);
+    const group = portableGroup(item);
+    const key2 = automaticItemKey(item);
+    if (!teaching || !key2) return null;
+    if (!group) return /* @__PURE__ */ new Set([teaching.id]);
+    const targetMatches = items(teaching.id).filter((candidate) => portableGroup(candidate) === group);
+    if (targetMatches.length !== 1 || automaticItemKey(targetMatches[0]) !== key2) return null;
+    const targetSection = getSection(teaching.sectionId);
+    const targetEnrollment = enrollmentsOf(studentId2).find((enrollment) => enrollment.sectionId === teaching.sectionId);
+    if (!targetSection || !targetEnrollment) return /* @__PURE__ */ new Set([teaching.id]);
+    const transferredSections = new Set(enrollmentsOf(studentId2).filter((enrollment) => enrollment.status === "transferred").map((enrollment) => enrollment.sectionId));
+    const teachingIds = /* @__PURE__ */ new Set([teaching.id]);
+    for (const sourceTeaching of live2(state.teachings)) {
+      if (sourceTeaching.id === teaching.id || sourceTeaching.subjectId !== teaching.subjectId || sourceTeaching.termId !== teaching.termId || !transferredSections.has(sourceTeaching.sectionId) || getSection(sourceTeaching.sectionId)?.yearId !== targetSection.yearId || getSection(sourceTeaching.sectionId)?.grade !== targetSection.grade) continue;
+      const sameItem = items(sourceTeaching.id).filter((candidate) => portableGroup(candidate) === group);
+      if (!sameItem.length) continue;
+      if (sameItem.length !== 1 || automaticItemKey(sameItem[0]) !== key2) return null;
+      teachingIds.add(sourceTeaching.id);
+    }
+    return teachingIds;
+  }
+  function portableAutomaticByItem(studentId2, tchId) {
+    const out = /* @__PURE__ */ Object.create(null);
+    for (const item of items(tchId).filter((candidate) => candidate.auto)) {
+      const teachingIds = compatibleAutomaticTeachingIds(studentId2, item);
+      if (!teachingIds) {
+        out[item.id] = null;
+        continue;
+      }
+      if (item.auto === "participation") {
+        out[item.id] = {
+          logs: dedupeRecords(logsOf(studentId2).filter((log) => teachingIds.has(log.teachingId) && log.kind === "participation")),
+          classHasParticipation: live2(state.logs).some((log) => teachingIds.has(log.teachingId) && log.kind === "participation")
+        };
+      } else if (item.auto === "attendance") {
+        out[item.id] = {
+          attendance: dedupeRecords(attendanceOf(studentId2).filter((record) => teachingIds.has(record.teachingId)))
+        };
+      }
+    }
+    return out;
+  }
+  return { scoresByItem: portableScoresByItem(studentId, teachingId), automaticByItem: portableAutomaticByItem(studentId, teachingId) };
+}
+
+// drafts/n88-student-portal/student-projection.mjs
+import { createHash as createHash4 } from "node:crypto";
 
 // drafts/n88-student-portal/visibility-policy.mjs
 var VISIBILITY_FIELDS = Object.freeze(["name", "class", "grades", "required", "completed", "scheduled"]);
@@ -883,13 +1007,13 @@ function projectStudentPortal(input) {
   if (enabled("class")) (out.profile ??= {}).classLabel = sectionLabel(s.section);
   if (enabled("grades")) {
     const published = s.items.filter((item) => grant("item", item));
-    if (published.some((item) => item.portabilityGroupId)) deny(CANONICAL_PROJECTION_REQUIREMENTS.unavailable.portableGrades);
+    if (published.some((item) => item.portabilityGroupId) && input.teacherContextVersion !== "n88-canonical-teacher-context-v1") deny(CANONICAL_PROJECTION_REQUIREMENTS.unavailable.portableGrades);
     const contexts = /* @__PURE__ */ new Map();
     for (const teaching of s.teachings) {
       const logs = s.rows.logs.filter((row) => active3(row) && row.teachingId === teaching.id);
       const sessions = s.rows.sessions.filter((row) => active3(row) && row.teachingId === teaching.id);
       const ctx = {
-        scoresByItem: /* @__PURE__ */ Object.create(null),
+        ...canonicalGradeContext(s.rows, studentId, teaching.id),
         logs: logs.filter((row) => row.studentId === studentId),
         classHasParticipation: logs.some((row) => row.kind === "participation"),
         attendance: s.rows.attendance.filter((row) => active3(row) && row.studentId === studentId && row.teachingId === teaching.id && sessions.some((session) => session.id === row.sessionId))
@@ -989,7 +1113,7 @@ function createIntegratedService(options, adapter, baseRepository) {
     if (!teaching || !term || term.startDate && term.startDate > today() || term.endDate && term.endDate < today()) return null;
     return { ...resolved, canonical, termId: term.id };
   }
-  const inputFor = (s, m) => ({ canonical: s.canonical, ownerId: s.ownerId, classId: s.classId, termId: s.termId, studentId: m.studentId, enrollmentId: m.enrollmentId, now: today() });
+  const inputFor = (s, m) => ({ teacherContextVersion: "n88-canonical-teacher-context-v1", canonical: s.canonical, ownerId: s.ownerId, classId: s.classId, termId: s.termId, studentId: m.studentId, enrollmentId: m.enrollmentId, now: today() });
   async function policies(ports, ownerId, classId, termId) {
     const r = await ports.query("select payload from n88_private.class_visibility where owner_id=$1::uuid and class_id=$2 and term_id=$3", [ownerId, classId, termId]);
     return r.rows[0]?.payload || { revision: 0, fields: fieldsOff(), members: [] };
@@ -1003,7 +1127,7 @@ function createIntegratedService(options, adapter, baseRepository) {
     return projectStudentPortal({ ...inputFor(s, m), visibility: stored || null });
   } });
   return async (request) => {
-    if (request.path.startsWith("/student/")) return student({ ...request, path: "/api/n88" + request.path });
+    if (request.path.startsWith("/student/")) return student(request);
     const match = /^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility)$/.exec(request.path);
     if (!match || request.method !== "POST") return deny2();
     const action = match[1], body = request.body || {}, binding = body.binding;

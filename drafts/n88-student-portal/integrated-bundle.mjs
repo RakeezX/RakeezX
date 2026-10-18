@@ -31,6 +31,10 @@ for(const [name,entry,options]of [
     manifest.sources[file]=await textHash(file);
   }
 }
+// Record actual account class dependency graph without introducing a second teacher artifact.
+const teacherGraph=await esbuild.build({entryPoints:['src/views/student-portal-class.js'],bundle:true,format:'esm',platform:'browser',target:'es2022',write:false,metafile:true,logLevel:'silent',plugins:[absolute]});
+manifest.graphs.teacherClass={inputs:Object.keys(teacherGraph.metafile.inputs).sort(),delivery:'existing account application and source offline shell; no separate teacher bundle'};
+for(const input of manifest.graphs.teacherClass.inputs)manifest.sources[input.split('?')[0]]=await textHash(input.split('?')[0]);
 const copies={
   'edge/deno.json':'supabase/functions/n88-student-portal/deno.json',
   'edge/deno.lock':'supabase/functions/n88-student-portal/deno.lock',
@@ -57,7 +61,7 @@ const browser=await readFile(out+'private/assets/student.mjs','utf8');
 assert.match(browser,/enabled: false/);assert.ok(!/serviceWorker\.register|registerSW\(/.test(browser));
 const wrangler=`# AI: generated inactive config; existing zone only, no route or preview.\nname = "rakeez-n88-private-ingress"\nmain = "bundle/cloudflare/worker.mjs"\ncompatibility_date = "2026-10-01"\nworkers_dev = false\npreview_urls = false\nroutes = []\n[vars]\nN88_ENABLED = "false"\n[observability]\nenabled = false\n`;
 await writeFile(dir+'wrangler.staged.toml',wrangler);
-for(const file of ['drafts/n88-student-portal/integrated-bundle.mjs','drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/integrated-schema.inactive.sql','src/router.js','src/lib/student-portal-runtime.js','src/views/student-portal-class.js','src/lib/student-portal-class-client.js','src/styles/student-portal-class.css','src/views/teaching-hub.js','src/views/students.js','sw.js','supabase/migrations/20261018102843_n88_integrated_class_staged.sql',dir+'integrated-preflight.inactive.sql',
+for(const file of ['drafts/n88-student-portal/integrated-bundle.mjs','drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/integrated-schema.inactive.sql','index.html','src/app.js','src/lib/app-update.js','drafts/n88-student-portal/current-review.mjs','drafts/n88-student-portal/current-review-launch.ps1','drafts/n88-student-portal/integrated-review.mjs','tests/fixtures/n88-integrated-class/bootstrap.js','tests/fixtures/n88-integrated-class/canonical-extension.sql','tests/fixtures/n88-integrated-class/seed.sql','tests/fixtures/n88-integrated-class/native-pg.mjs','src/router.js','src/lib/student-portal-runtime.js','src/views/student-portal-class.js','src/lib/student-portal-class-client.js','src/styles/student-portal-class.css','src/views/teaching-hub.js','src/views/students.js','sw.js','supabase/migrations/20261018102843_n88_integrated_class_staged.sql',dir+'integrated-preflight.inactive.sql',dir+'integrated-metadata-contract.json',dir+'integrated-identities.inactive.sql',dir+'integrated-expected-identities.json','drafts/n88-student-portal/integrated-readback.mjs','src/views/student-portal-teacher.js',
   'supabase/migrations/20261018034356_n88_exact_activation_staged.sql',dir+'preflight.inactive.sql',dir+'readback.inactive.sql',dir+'identities.inactive.sql',dir+'expected-identities.json',dir+'wrangler.staged.toml',dir+'deploy.staged.json',dir+'toolchain.json',dir+'.gitattributes',
   dir+'metadata-contract.json',dir+'supabase.staged.toml',...['schema-proposal.sql','postgres-repository-schema.sql','canonical-state-schema.inactive.sql','canonical-lock.inactive.sql','auth-session.inactive.sql','ingress.inactive.sql','roles.inactive.sql'].map(f=>'drafts/n88-student-portal/'+f),
   'supabase/functions/n88-student-portal/config.inactive.toml','drafts/n88-student-portal/package-lock.json'])manifest.sources[file]=await textHash(file);

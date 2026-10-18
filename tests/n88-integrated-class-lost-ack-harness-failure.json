@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n88-integrated-class-student-journey-20261018",
+  "runId": "01c87cee-6ed3-4bf6-a51c-503fa03b1248",
+  "checks": [],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "failure": {
+    "message": "Unexpected token 'U', \"Unavailable\" is not valid JSON",
+    "stack": [
+      "    at JSON.parse (<anonymous>)",
+      "    at parseJSONFromBytes (node:internal/deps/undici/undici:4394:19)",
+      "    at successSteps (node:internal/deps/undici/undici:7048:27)",
+      "    at readAllBytes (node:internal/deps/undici/undici:5965:13)",
+      "    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+    ]
+  }
+}

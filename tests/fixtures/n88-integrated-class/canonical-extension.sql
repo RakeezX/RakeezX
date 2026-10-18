@@ -22,3 +22,11 @@ alter table rakeezx.attendance enable row level security;alter table rakeezx.att
 create table rakeezx.logs(id text not null,owner_id uuid not null,revision bigint not null,deleted_at timestamptz,student_id text,teaching_id text,kind text,delta integer,primary key(owner_id,id),foreign key(owner_id) references auth.users(id) on delete cascade);
 alter table rakeezx.logs owner to postgres;
 alter table rakeezx.logs enable row level security;alter table rakeezx.logs force row level security;
+
+-- AI: exact consumed parent/child dependencies from 0001/0033, with natural uniqueness.
+alter table rakeezx.scores add foreign key(owner_id,student_id) references rakeezx.students(owner_id,id) on delete cascade,add foreign key(owner_id,item_id) references rakeezx.items(owner_id,id) on delete cascade,add unique(owner_id,student_id,item_id);
+alter table rakeezx.score_subitems add foreign key(owner_id,item_id) references rakeezx.items(owner_id,id) on delete cascade;
+alter table rakeezx.score_subitem_completions add foreign key(owner_id,student_id) references rakeezx.students(owner_id,id) on delete cascade,add foreign key(owner_id,subitem_id) references rakeezx.score_subitems(owner_id,id) on delete cascade,add unique(owner_id,student_id,subitem_id);
+alter table rakeezx.sessions add foreign key(owner_id,teaching_id) references rakeezx.teachings(owner_id,id) on delete cascade;
+alter table rakeezx.attendance add foreign key(owner_id,student_id) references rakeezx.students(owner_id,id) on delete cascade,add foreign key(owner_id,teaching_id) references rakeezx.teachings(owner_id,id) on delete cascade,add foreign key(owner_id,session_id) references rakeezx.sessions(owner_id,id) on delete cascade,add unique(owner_id,student_id,session_id);
+alter table rakeezx.logs add foreign key(owner_id,student_id) references rakeezx.students(owner_id,id) on delete cascade,add foreign key(owner_id,teaching_id) references rakeezx.teachings(owner_id,id) on delete cascade;

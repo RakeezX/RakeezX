@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n88-integrated-class-student-journey-20261018",
+  "runId": "01c87cee-6ed3-4bf6-a51c-503fa03b1248",
+  "checks": [
+    {
+      "name": "final_typed_migration_and_identity_readback",
+      "status": "PASS",
+      "evidence": "Exact CLI-created additive migration with all 109 consumed-column type gates applied only to fresh owned native PG; extended helper/role/ACL/policy identities equal exported expected snapshot. No hosted DDL."
+    },
+    {
+      "name": "native_portable_projection_matches_current_app_store",
+      "status": "PASS",
+      "evidence": "Published transferred direct grade is zero and exactly equals current actual teacher store/studentContext across native canonical source; all other direct/automatic/subitem values stay equal. Fresh reload reads owner/database/receipt and canonical rows in the same document."
+    },
+    {
+      "name": "actual_ui_lost_ack_selective_recovery_and_data_layout",
+      "status": "PASS",
+      "evidence": "Actual class UI: adding third canonical student, missing-only batch loses ACK after commit, UI reports uncertainty without codes, reload/list+retry skips all three, selective rotate recovers only that student. Actual populated student page inspected at 390/1280 RTL/no overflow, screenshots contain no credential."
+    }
+  ],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  }
+}

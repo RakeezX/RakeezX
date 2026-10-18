@@ -1,3 +1,4 @@
+import { canonicalGradeContext } from './canonical-grade-context.mjs';
 // AI: callable inactive server projection. Does not authorize a session or query.
 import { createHash } from 'node:crypto';
 import { itemScore, studentTotal, sectionLabel, sortByOrder } from '../../src/models.js';
@@ -90,9 +91,7 @@ export function studentPortalProjectionQuality(input) {
   const s = readScope(input);
   return {
     version: 'n88-projection-quality-v1',
-    grades: s.items.some(item => item.portabilityGroupId)
-      ? { available: false, requirement: CANONICAL_PROJECTION_REQUIREMENTS.unavailable.portableGrades }
-      : { available: true, provenance: 'models.itemScore/studentTotal + score-foundation.projectSubitemScore; current canonical rows' },
+    grades: s.items.some(item=>item.portabilityGroupId) && input.teacherContextVersion!=='n88-canonical-teacher-context-v1' ? {available:false,requirement:CANONICAL_PROJECTION_REQUIREMENTS.unavailable.portableGrades} : { available: true, provenance: 'models.itemScore/studentTotal + score-foundation.projectSubitemScore; current canonical rows' },
     work: { available: true, provenance: 'score_subitems + own score_subitem_completions.checked/completion_state',
       coverage: 'Current subitem definitions only; required = unrecorded and not future start; completed = recorded regular/late; scheduled = unrecorded future start.',
       unavailable: CANONICAL_PROJECTION_REQUIREMENTS.unavailable.assignments },
@@ -112,13 +111,13 @@ export function projectStudentPortal(input) {
 
   if (enabled('grades')) {
     const published = s.items.filter(item => grant('item', item));
-    // No new scoring/transfer rules. Unsupported portable families fail closed.
-    if (published.some(item => item.portabilityGroupId)) deny(CANONICAL_PROJECTION_REQUIREMENTS.unavailable.portableGrades);
+    // Only the integrated locked reader certifies complete teacher context.
+    if(published.some(item=>item.portabilityGroupId) && input.teacherContextVersion!=='n88-canonical-teacher-context-v1') deny(CANONICAL_PROJECTION_REQUIREMENTS.unavailable.portableGrades);
     const contexts = new Map();
     for (const teaching of s.teachings) {
       const logs = s.rows.logs.filter(row => active(row) && row.teachingId === teaching.id);
       const sessions = s.rows.sessions.filter(row => active(row) && row.teachingId === teaching.id);
-      const ctx = { scoresByItem: Object.create(null), logs: logs.filter(row => row.studentId === studentId),
+      const ctx = { ...canonicalGradeContext(s.rows,studentId,teaching.id), logs: logs.filter(row => row.studentId === studentId),
         classHasParticipation: logs.some(row => row.kind === 'participation'),
         attendance: s.rows.attendance.filter(row => active(row) && row.studentId === studentId && row.teachingId === teaching.id && sessions.some(session => session.id === row.sessionId)) };
       for (const item of published.filter(item => item.teachingId === teaching.id)) {

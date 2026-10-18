@@ -1,3 +1,4 @@
+import { html } from '../lib/dom.js';
 /** AI: reusable existing-class section; no route, runtime import, publication or network at import time. */
 import { classContextKey, PORTAL_FIELDS } from '../lib/student-portal-class-client.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
@@ -97,7 +98,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
 
 // Integration must supply actual service binding and class context. This adapter stays unavailable by default.
 let routeHandle,routeGeneration=0,routeRoot;
-export default { title: () => 'مساحة طلاب الفصل', back:p=>'#/teaching/'+encodeURIComponent(p.id),render: () => '<div data-class-portal></div>',
+export default { title: () => 'مساحة طلاب الفصل', back:p=>'#/teaching/'+encodeURIComponent(p.id),render: () => html`<div data-class-portal></div>`,
   afterPaint(root,params) {
     const target=root.querySelector('[data-class-portal]');if(!target||target===routeRoot)return;
     routeHandle?.dispose();routeRoot=target;const generation=++routeGeneration;
@@ -105,7 +106,7 @@ export default { title: () => 'مساحة طلاب الفصل', back:p=>'#/teach
     if(!root.ownerDocument.querySelector('[data-n88-class-style]')){link.dataset.n88ClassStyle='';root.ownerDocument.head.append(link);}
     void Promise.all([import('../lib/student-portal-runtime.js'),import('../lib/cloud.js'),import('../store.js')]).then(([runtime,cloud,store])=>{
       if(generation!==routeGeneration||!target.isConnected)return;
-      routeHandle=runtime.mountClassService(target,{getBinding:write=>runtime.classBinding({cloud,store,teachingId:params.id},write),
+      routeHandle=runtime.mountClassService(target,{classLabel:()=>store.sectionLabel(store.getSection(store.getTeaching(params.id)?.sectionId)),getBinding:write=>runtime.classBinding({cloud,store,teachingId:params.id},write),
         subscribe:fn=>{const a=cloud.subscribe(fn),b=store.subscribe(fn);return()=>{a();b();};}});
     }).catch(()=>{if(generation===routeGeneration)target.textContent='مساحة الطلاب غير متاحة حاليًا.';});
   },
