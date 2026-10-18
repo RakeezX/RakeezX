@@ -1,0 +1,140 @@
+/** AI-authored, INACTIVE server-only extension. No environment/network at import. */
+import { randomInt, randomBytes, randomUUID, createHmac, createHash, timingSafeEqual } from 'node:crypto';
+import { PRIVATE_HEADERS } from './service.mjs';
+
+export const NUMERIC_POLICY = Object.freeze({ collisionBudget: 128, sessionMs: 8*60*60_000,
+  windowMs: 15*60_000, clientAttempts: 6, globalAttempts: 100, maxRateKeys: 10000 });
+export const generateNumericCredential = () => '1' + String(randomInt(0, 100_000_000_000)).padStart(11, '0');
+// Explicit paste policy: remove leading/trailing ASCII SPACE only. No other coercion.
+export function normalizeNumericCredential(value) {
+  if (typeof value !== 'string' || value.length > 80) return null;
+  const code = value.replace(/^ +| +$/g, '');
+  return /^1[0-9]{11}$/.test(code) ? code : null;
+}
+const fail = () => { throw Error('n88_numeric_unavailable'); };
+const active = m => m?.status === 'active' && m.endDate === null && m.studentActive === true && m.classActive === true;
+const identity = (a,b) => a.ownerId === b.ownerId && a.studentId === b.studentId;
+const tokenHash = token => createHash('sha256').update(token).digest('hex');
+const cookie = (value, age) => `__Secure-n88-student=${value}; Path=/api/n88/student; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;
+const denied = () => ({status:401, body:{error:'unavailable'}, cookie:cookie('',0)});
+const response = r => ({...r, headers:{...PRIVATE_HEADERS,...(r.cookie ? {'Set-Cookie':r.cookie} : {})}});
+
+/** One stable reservation key is required across verifier-key rotations. Never discard
+ * retired reservations or change this key without a separately designed migration.
+ * keys is a Map(version -> >=32-byte Buffer); activeKeyVersion selects new verifiers.
+ */
+export function createNumericCredentialOperations({ keys, activeKeyVersion, reservationKey,
+  now = Date.now, generate = generateNumericCredential }) {
+  if (!(keys instanceof Map) || !keys.size || !/^[A-Za-z0-9_-]{1,40}$/.test(activeKeyVersion || '') ||
+      !keys.has(activeKeyVersion) || !Buffer.isBuffer(reservationKey) || reservationKey.length<32 ||
+      [...keys].some(([v,k]) => !/^[A-Za-z0-9_-]{1,40}$/.test(v) || !Buffer.isBuffer(k) || k.length<32)) fail();
+  keys = new Map([...keys].map(([v,k])=>[v,Buffer.from(k)])); reservationKey=Buffer.from(reservationKey);
+  const mac = (key, domain, ...parts) => createHmac('sha256',key).update(JSON.stringify(['n88-numeric-v1',domain,...parts])).digest('hex');
+  const reservation = code => mac(reservationKey,'global-reservation',code);
+  const verifier = (code, c) => mac(keys.get(c.keyVersion),'credential',c.ownerId,c.studentId,c.version,code);
+  function current(db,c) {
+    if (!db.contexts.some(x=>x.ownerId===c.ownerId && x.active === true)) return null;
+    const members=db.memberships.filter(m=>identity(m,c) && active(m));
+    return members.length===1 ? members[0] : null;
+  }
+  function revokeCredential(db,c) {
+    if(c.revokedAt===null) c.revokedAt=now();
+    for(const s of db.numericSessions) if(s.credentialId===c.id && s.revokedAt===null) s.revokedAt=now();
+  }
+  function version(db,m) { return Math.max(0,...db.numericCredentials.filter(c=>identity(c,m)).map(c=>c.version)); }
+  function check(db,m,expectedVersion) {
+    const canonical=current(db,m);
+    if(!canonical || canonical.enrollmentId!==m.enrollmentId || canonical.revision!==m.revision ||
+       canonical.canonicalStamp!==m.canonicalStamp || version(db,m)!==expectedVersion) fail();
+  }
+  function issue(db,m,expectedVersion,{rotate=false}={}) {
+    check(db,m,expectedVersion);
+    const previous=db.numericCredentials.filter(c=>identity(c,m) && c.revokedAt===null);
+    if(previous.length>1 || previous.length && !rotate) fail();
+    if(!Number.isSafeInteger(expectedVersion+1)) fail();
+    let code, reserved;
+    for(let attempt=0;attempt<NUMERIC_POLICY.collisionBudget;attempt++) {
+      code=generate(); if(typeof code!=='string' || !/^1[0-9]{11}$/.test(code)) fail();
+      reserved=reservation(code);
+      if(!db.numericCredentials.some(c=>c.reservation===reserved)) break;
+      code=null;
+    }
+    if(!code) fail(); // no scan/sequential fallback, and old credential untouched
+    const c={id:randomUUID(),ownerId:m.ownerId,studentId:m.studentId,version:expectedVersion+1,
+      keyVersion:activeKeyVersion,reservation:reserved,verifier:'',revokedAt:null};
+    c.verifier=verifier(code,c);
+    previous.forEach(c=>revokeCredential(db,c)); db.numericCredentials.push(c);
+    return {code,credentialVersion:c.version}; // caller may expose ONLY after COMMIT ACK
+  }
+  const issueMember=(db,m,{expectedVersion})=>issue(db,m,expectedVersion);
+  const rotateMember=(db,m,{expectedVersion})=>issue(db,m,expectedVersion,{rotate:true});
+  const revokeMember=(db,m,{expectedVersion})=>{
+    check(db,m,expectedVersion);
+    for(const c of db.numericCredentials.filter(c=>identity(c,m))) revokeCredential(db,c);
+    return {revoked:true,credentialVersion:expectedVersion};
+  };
+
+  /** Compose into SAME authenticated ingress/repository as existing service. ingress
+   * MUST consume its signed replay receipt in this transaction. No body/source fallback.
+   * project is the existing bounded, explicitly teacher-published own-member projection.
+   */
+  function createStudentHandler({repository,verifyIngress,origin,project}) {
+    if(!repository?.transaction || typeof verifyIngress!=='function' || typeof project!=='function' ||
+       new URL(origin).origin!==origin || !origin.startsWith('https://')) fail();
+    return async request => {
+      try { return response(await repository.transaction(async(db,ports)=>{
+        const ingress=await verifyIngress(request,ports);
+        const {headers={},method,path,body={}}=request;
+        if(!ingress?.clientKey || headers['sec-fetch-site'] && headers['sec-fetch-site']!=='same-origin' ||
+           method==='POST' && (headers.origin!==origin || headers['x-n88-csrf']!=='1' || headers['content-type']!=='application/json')) return denied();
+        const time=now();
+        const token=/(?:^|;\s*)__Secure-n88-student=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || '')?.[1];
+        if(path==='/api/n88/student/claim' && method==='POST') {
+          // Debit BOTH durable budgets before format checking or credential lookup.
+          db.numericRates=db.numericRates.filter(r=>r.until>time);
+          const budgets=[[mac(reservationKey,'client-rate',ingress.clientKey),NUMERIC_POLICY.clientAttempts],['global',NUMERIC_POLICY.globalAttempts]];
+          let blocked=false;
+          for(const [key,max] of budgets) {
+            let b=db.numericRates.find(b=>b.key===key);
+            if(!b && db.numericRates.length<NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b={key,count:0,until:time+NUMERIC_POLICY.windowMs});
+            if(!b || b.count>=max) blocked=true;
+            if(b) b.count=Math.min(max,b.count+1);
+          }
+          if(blocked) return denied();
+          const code=normalizeNumericCredential(body.code);
+          if(!code) return denied();
+          const c=db.numericCredentials.find(c=>c.reservation===reservation(code));
+          if(!c || c.revokedAt!==null || !keys.has(c.keyVersion) || !/^[a-f0-9]{64}$/.test(c.verifier) ||
+             !timingSafeEqual(Buffer.from(c.verifier,'hex'),Buffer.from(verifier(code,c),'hex'))) return denied();
+          if(typeof ports?.synchronizeOwner!=='function') fail();
+          await ports.synchronizeOwner(c.ownerId);
+          const m=current(db,c); if(!m) return denied();
+          if(token) for(const s of db.numericSessions) if(s.tokenHash===tokenHash(token)) s.revokedAt=time;
+          const fresh=randomBytes(32).toString('base64url');
+          db.numericSessions=db.numericSessions.filter(s=>s.expiresAt>time && s.revokedAt===null);
+          if(db.numericSessions.length>=10000) fail();
+          db.numericSessions.push({id:randomUUID(),credentialId:c.id,ownerId:c.ownerId,studentId:c.studentId,
+            classId:m.classId,enrollmentId:m.enrollmentId,membershipRevision:m.revision,canonicalStamp:m.canonicalStamp,
+            version:c.version,tokenHash:tokenHash(fresh),expiresAt:time+NUMERIC_POLICY.sessionMs,revokedAt:null});
+          return {status:200,body:{claimed:true},cookie:cookie(fresh,NUMERIC_POLICY.sessionMs/1000)};
+        }
+        const s=token && db.numericSessions.find(s=>s.tokenHash===tokenHash(token));
+        if(path==='/api/n88/student/end' && method==='POST') {
+          if(s) s.revokedAt=time;
+          return {status:200,body:{ended:true},cookie:cookie('',0)};
+        }
+        if(path!=='/api/n88/student/read' || method!=='GET' || !s || s.revokedAt!==null || s.expiresAt<=time) return denied();
+        const c=db.numericCredentials.find(c=>c.id===s.credentialId && identity(c,s) && c.version===s.version && c.revokedAt===null);
+        if(!c) return denied();
+        if(typeof ports?.synchronizeOwner!=='function') fail();
+        await ports.synchronizeOwner(c.ownerId);
+        const m=current(db,c);
+        if(!m || m.enrollmentId!==s.enrollmentId || m.classId!==s.classId || m.revision!==s.membershipRevision || m.canonicalStamp!==s.canonicalStamp) {
+          s.revokedAt=time; return denied();
+        }
+        return {status:200,body:await project(db,m,ports)};
+      })); } catch { return response(denied()); } // no SQL/error/credential enumeration
+    };
+  }
+  return Object.freeze({issueMember,rotateMember,revokeMember,createStudentHandler});
+}
