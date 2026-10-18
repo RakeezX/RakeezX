@@ -1,0 +1,89 @@
+{
+  "taskId": "continuous-n107-name-match-file-maximum-20261018",
+  "runId": "5a197e3e-6537-4e50-b57e-6e303d020622",
+  "checks": [
+    {
+      "name": "existing",
+      "status": "PASS",
+      "evidence": "Actual single preview/handlers/source CSS and owned account: same item exact max30 canonical request ACK before one durable grade receipt; old19 blank and untouched zero unchanged."
+    },
+    {
+      "name": "partial-max",
+      "status": "PASS",
+      "evidence": "Two exact max stages: first ACK survives second lost ACK/reload, only second immutable request replays, all max ACKs precede one grade receipt."
+    },
+    {
+      "name": "lost-reload",
+      "status": "PASS",
+      "evidence": "Actual single preview/handlers/source CSS and owned account: same item exact max30 canonical request ACK before one durable grade receipt; old19 blank and untouched zero unchanged."
+    },
+    {
+      "name": "rejected",
+      "status": "PASS",
+      "evidence": "Durable max rejection survives reload and explicit resume sends no retry/grade."
+    },
+    {
+      "name": "delayed-double",
+      "status": "PASS",
+      "evidence": "Actual single preview/handlers/source CSS and owned account: same item exact max30 canonical request ACK before one durable grade receipt; old19 blank and untouched zero unchanged."
+    },
+    {
+      "name": "lower-conflict",
+      "status": "PASS",
+      "evidence": "Absent student score19 blocks max10 before any mutation; no clamp/rescale or duplicate."
+    },
+    {
+      "name": "owner",
+      "status": "PASS",
+      "evidence": "Actual UI confirmation with changed owner dispatches neither max nor grade."
+    },
+    {
+      "name": "term",
+      "status": "PASS",
+      "evidence": "Actual UI confirmation with changed owner dispatches neither max nor grade."
+    },
+    {
+      "name": "session-during-ack",
+      "status": "PASS",
+      "evidence": "Session changes while normal max transport is in flight: no grade dispatch/success."
+    },
+    {
+      "name": "item-drift",
+      "status": "PASS",
+      "evidence": "Item changes during asynchronous grade preflight after max ACK: fresh UI/store check blocks grade command."
+    },
+    {
+      "name": "blank-only",
+      "status": "PASS",
+      "evidence": "Declared maximum applies with blank file cells; canonical max ACK, unchanged19/zero and no unnecessary grade command."
+    },
+    {
+      "name": "new-default",
+      "status": "PASS",
+      "evidence": "Same defaultItemsFor: actual creation ACK then unique created homework ID max10→20 ACK then one grade receipt; zero/blank preserved."
+    },
+    {
+      "name": "new-default-blank",
+      "status": "PASS",
+      "evidence": "Same defaultItemsFor: actual creation ACK then unique created homework ID max10→20 ACK then one grade receipt; zero/blank preserved."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "55b7452925db0f845a8ae640e500cf32965a66ca199672c2a3f4d2bc9d013913",
+    "src/store.js": "2cebcffb646f2d9d8b58b06449399b9d86ba4b37aa62cc391fae2c80371fd421",
+    "src/lib/sync.js": "b7993c4289c1368223c48e6a4ff79c9b8a68bd7679c5cf8c6b02cd3297d11cea",
+    "src/lib/sync-v2.js": "0934f59aa0194cae8f636464bf6c829916204e49eb645289c1f780fc496e217d",
+    "src/lib/grade-transfer.js": "211047b8bbb2ae41de107a59f4009cd48e7a53f88e31a2ba11a90f25c969ed5b",
+    "src/models.js": "c3799c0dbd8089d1faf39c68cacb0f49495a8afd91cc28f9e3b5a6ba8eef0d2b",
+    "src/styles/components.css": "b175be9dafe966e7f89ffa63b601f73cb71e259e03c1f27a53fd0451f7d3a9d7",
+    "tests/n107-name-max-browser.mjs": "339d85a2348c63a9f4b679f52c6e4645a7cf17c91d2e6ecc5cfef20be4e2145d"
+  },
+  "previousFailures": [
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:154:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:195:17\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-name-match-file-maximum-20261018/tests/n107-name-max-browser.mjs:157:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:154:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:195:17\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-name-match-file-maximum-20261018/tests/n107-name-max-browser.mjs:157:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:154:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:195:17\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-name-match-file-maximum-20261018/tests/n107-name-max-browser.mjs:157:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:154:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:194:12\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-name-match-file-maximum-20261018/tests/n107-name-max-browser.mjs:157:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:154:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-name-match-file-maximum-20261018\\tests\\n107-name-max-browser.mjs:199:12\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-name-match-file-maximum-20261018/tests/n107-name-max-browser.mjs:157:2"
+  ]
+}

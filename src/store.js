@@ -34,7 +34,7 @@ import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js'
 import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js?n100=automatic-safe-v1';
 import { classGroups } from './lib/class-import-file.js';
 import { previewStudentRows, importContext, confirmStudentImport } from './lib/student-import.js';
-import { reviewGradeTransfer, gradeCommand } from './lib/grade-transfer.js';
+import { reviewGradeTransfer, gradeCommand, isTransferItem, importScoreBinding, importItemBinding } from './lib/grade-transfer.js';
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
@@ -2764,13 +2764,19 @@ export async function saveClassFileImportContinuation(value, { expectedTeachingI
   assertLeaseWritable();
   if(!expectedTeachingId || value && (value.ownerId!==workspace.authUserId || value.databaseName!==workspace.databaseName))
     throw Error('CLASS_FILE_CONTINUATION_OWNER');
-  const committed=await db.applyBatch({device:{}},{prepare(current){
+  const committed=await db.applyBatch({device:{},outbox:{}},{prepare(current){
     verifyCurrent();assertLeaseWritable();
     if(assertClassImportAccess()!==workspace || cloud.session!==session)throw Error('CLASS_FILE_CONTINUATION_CONTEXT');
     const device=current.device.find(row=>row.id==='device'), prior=device?.classFileImportContinuation;
     if(!device)throw Error('CLASS_FILE_CONTINUATION_DEVICE');
     if(prior && (prior.ownerId!==workspace.authUserId || prior.databaseName!==workspace.databaseName ||
         prior.created?.teachingId!==expectedTeachingId))throw Error('CLASS_FILE_CONTINUATION_CHANGED');
+    if(!value && prior?.maxProgress?.some(stage=>current.outbox.some(row=>row.mutationId===stage.mutationId && row.state!=='superseded')))
+      throw Error('طلب تغيير العظمى المعلّق محفوظ بهويته؛ استكمله أو عالج رفض المزامنة قبل إلغاء المراجعة.');
+    if(value && prior?.maxProgress){
+      if(prior.input!==value.input || JSON.stringify(prior.maximumReview)!==JSON.stringify(value.maximumReview))throw Error('CLASS_FILE_CONTINUATION_CHANGED');
+      value={...value,maxProgress:prior.maxProgress};
+    }
     return {device:{put:[{...device,classFileImportContinuation:value,updatedAt:now()}]}};
   }});
   if(activeWorkspace===workspace && cloud.session===session){
@@ -4442,6 +4448,80 @@ export function reviewGradeImport(teachingId, input) {
   input.rows.slice(1).forEach((row, i) => { input.newStudentIds[i + 2] ??= { id: uid(), enrollmentId: uid() }; });
   return reviewGradeTransfer({ ...input, allowNewStudents: true, roster, items, scores: state.scores, teaching, term,
     ownerId: activeWorkspace?.authUserId, databaseName: activeWorkspace?.databaseName });
+}
+
+// Recheck the same acknowledged maximum stage during the asynchronous grade preflight.
+export function assertImportMaximumReviewCurrent(review) {
+  const saved=state.device?.classFileImportContinuation;
+  for(const change of review.maxChanges??[]){
+    const stage=saved?.maxProgress?.find(r=>r.itemId===change.itemId), item=state.items.find(i=>i.id===change.itemId);
+    const ack=item?.importMaximumReceipt, before=JSON.parse(change.item);
+    if(!stage || !isTransferItem(item??{deleted:true}) || ack?.mutationId!==stage.mutationId || ack.outcome!=='applied' || ack.conflicts ||
+       Number(item.max)!==change.max || ack.max!==change.max || item.serverRevision!==ack.revision ||
+       Object.keys(SYNC_V2_SCHEMAS.items.fields).filter(k=>k!=='max').some(k=>JSON.stringify(item[k]??null)!==JSON.stringify(before[k]??null)) ||
+       importScoreBinding(state.scores.filter(r=>r.itemId===change.itemId))!==change.scores)
+      throw Error('تغيّر أثر الاستيراد أو سياقه؛ يلزم مراجعة جديدة قبل حفظ درجات إضافية.');
+  }
+}
+
+// AI-authored N107: ordinary max-only Sync mutation with a durable request checkpoint.
+// No scoring configuration command, rescaling or invented server revision.
+export async function confirmImportMaximums(review, { verifyCurrent = () => {} } = {}) {
+  const workspace=assertClassImportAccess(), session=cloud.session;
+  const guard=()=>{verifyCurrent();assertLeaseWritable();assertClassOperationsAccess(review.teachingId);
+    if(activeWorkspace!==workspace || cloud.session!==session || cloud.user?.id!==review.ownerId ||
+       workspace.databaseName!==review.databaseName || activeTerm()?.id!==review.termId)throw Error('IMPORT_CHANGED');};
+  guard();
+  await db.applyBatch({device:{},items:{},scores:{},outbox:{}},{prepare(current){
+    guard();
+    const device=current.device.find(r=>r.id==='device'), saved=device?.classFileImportContinuation;
+    if(!saved || saved.created?.teachingId!==review.teachingId || saved.ownerId!==review.ownerId ||
+       saved.databaseName!==review.databaseName)throw Error('IMPORT_CHANGED');
+    if(JSON.stringify(saved.maximumReview)!==JSON.stringify(review))throw Error('IMPORT_CHANGED');
+    if(saved.maxProgress)return {device:{},items:{},scores:{},outbox:{}};
+    const puts=[],commands=[],progress=[];
+    for(const change of review.maxChanges??[]){
+      const item=current.items.find(i=>i.id===change.itemId);
+      if(!item || !isTransferItem(item) || item.teachingId!==review.teachingId || item.ownerId && item.ownerId!==review.ownerId || !(change.max>0 && change.max<=9999.99) || !/^\d+(?:\.\d{1,2})?$/.test(String(change.max)) || importItemBinding(item)!==importItemBinding(JSON.parse(change.item)) || importScoreBinding(current.scores.filter(r=>r.itemId===change.itemId))!==change.scores ||
+         current.outbox.some(r=>r.state!=='superseded' && (r.store==='items' && r.recordId===change.itemId || r.store==='scores' && current.scores.some(sc=>sc.id===r.recordId && sc.itemId===change.itemId))) || item.syncConflicts?.length)
+        throw Error('IMPORT_CHANGED');
+      const next={...item,max:change.max,updatedAt:now()};
+      assertOperationalWritesAllowed({items:[next]});
+      const command=outboxEntry('items',next,['max'],'patch',item);
+      if(!command)throw Error('IMPORT_CHANGED');
+      command.importMaximum=true;
+      puts.push(next);commands.push(command);progress.push({...change,mutationId:command.mutationId});
+    }
+    return {items:{put:puts},scores:{},outbox:{put:commands},device:{put:[{...device,
+      classFileImportContinuation:{...saved,maxProgress:progress}}]}};
+  }});
+  guard();
+  await absorb([{store:'device',id:'device'},...(review.maxChanges??[]).map(r=>({store:'items',id:r.itemId}))]);
+  const engine=createSyncV2Engine({ownershipGuard:runtimeSyncOwnershipGuard,currentAuthenticatedUserId:()=>cloud.user?.id??null});
+  const saved=(await db.get('device','device')).classFileImportContinuation;
+  for(const stage of saved.maxProgress){
+    guard();
+    const row=(await db.getAll('outbox')).find(r=>r.mutationId===stage.mutationId);
+    if(row?.state==='rejected')throw Error('رُفض تغيير العظمى؛ لم تُرسل درجات. راجع التعارض قبل طلب جديد.');
+    if(row)await engine.dispatchPending({onlyMutationId:stage.mutationId});
+    guard();
+    const pending=(await db.getAll('outbox')).find(r=>r.mutationId===stage.mutationId);
+    if(pending?.state==='rejected')throw Error('رُفض تغيير العظمى؛ لم تُرسل درجات. راجع التعارض قبل طلب جديد.');
+    const item=await db.get('items',stage.itemId), ack=item?.importMaximumReceipt;
+    if(ack?.mutationId===stage.mutationId && (ack.outcome!=='applied' || ack.conflicts || ack.max!==stage.max))
+      throw Error('تعارض إيصال تغيير العظمى؛ لم تُرسل درجات. ألغِ المراجعة وعالج المزامنة ثم راجع الملف.');
+    if(!ack || ack.mutationId!==stage.mutationId || ack.outcome!=='applied' || ack.conflicts ||
+       ack.max!==stage.max || ack.revision!==item.serverRevision || !(ack.revision>stage.revision) ||
+       Number(item.max)!==stage.max || !isTransferItem(item) || item.syncConflicts?.length ||
+       importScoreBinding(await db.getAll('scores').then(rows=>rows.filter(r=>r.itemId===stage.itemId)))!==stage.scores ||
+       (await db.getAll('outbox')).some(r=>r.store==='items' && r.recordId===stage.itemId && r.state!=='superseded'))
+      throw Error('لم يتأكد إيصال تغيير العظمى. الطلب محفوظ بهويته؛ لم تُرسل درجات.');
+    // All other item semantics must equal the approved item; canonical metadata alone may evolve.
+    const before=JSON.parse(stage.item), fields=Object.keys(SYNC_V2_SCHEMAS.items.fields).filter(k=>k!=='max');
+    if(fields.some(k=>JSON.stringify(item[k]??null)!==JSON.stringify(before[k]??null)))throw Error('IMPORT_CHANGED');
+  }
+  await absorb([{store:'device',id:'device'},...saved.maxProgress.map(r=>({store:'items',id:r.itemId}))]);
+  guard();return saved.maxProgress;
 }
 
 export async function confirmGradeImport(review, { overwriteConfirmed = false, enrollmentConfirmed = false, approved = false, verifyCurrent = () => {} } = {}) {
