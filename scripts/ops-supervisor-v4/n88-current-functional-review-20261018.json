@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-current-functional-review-20261018",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -850,
+      "scopeKey": "n88-current-functional-review",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n88-service-activation-candidate-20261018"
+      ],
+      "objective": "Latest actual PO18October continuation explicitly requests a REAL page to try N88, reusing completed work and not another presentation mock. N107 file fix has first priority and independent scope. Read current canonical instructions/latest N88 row and published exact candidate evidence at origin/main; original canonical checkout is old/dirty, do not use old local src. Existing N88 client publication a6a02a5 and exact activation publication54722e0 are source-only; no hosted service/private student access enabled. Build a useful repeatable loopback manual-review launcher using the CURRENT ACTUAL application and full service chain, not old teacher-controller/local-preview and not #/n88-invite-lab. Reuse createWebEntry, createCloudflareEntry, runtime-http, restricted Postgres repository and real client composition in src/lib/student-portal-runtime.js -> src/views/student-portal.js/teacher.js with existing CSS and actual student HTML/entry. Read tests/fixtures/n88-client-binding/entry.js and journey.mjs plus current owned native PG launcher for concrete same-source integrated composition. Extract only minimal review server/launcher, fabricated Auth provider/source identities and disposable LOCAL PG using exact current staged activation/migrations. Do not change production app/service/SQL/flags or build an in-memory alternative pretending to be final service. Actual current PIN1000..9999 issue, generated private student link, claim, publish activity, student read/update, revoke path must use the current actual transport/handlers/PG service. Same units tested already: reuse valid source-bound native SQL/crypto/PIN/owner evidence without rerunning broad completed suites; only new review composition and link actual UI need a focused smoke at390/1280. Clearly show Arabic banner outside existing core product views: تجربة تشغيلية ببيانات مصطنعة؛ الخدمة الحية غير مفعلة. Include straightforward Arabic how-to with prefilled fabricated teacher/student and clear teacher page -> issue code/link -> student code -> publish/read -> revoke. Source-only production document should remain disabled; review loopback readiness true only inside isolated local server. Bind127.0.0.1 only, allowlisted static resources/no directory listing, no credentials/personal profiles/SW/remote network, no hosted Supabase probing/schema/Auth/RLS/config/functions/keys/access activation, real students/account writes/sends or paid services. Secrets and private invitation/session values must stay memory/local synthetic context only, not console/public docs/URL queries/screenshots. No original attached N107 CSV access. Create one launcher with --help and bounded TTL(default4hours maximum8) plus exact owned process PID/birth, loopback URL and expiresAt receipt, hidden on Windows and clean owned HTTP/PG resources on expiry/signal; never kill unknown processes, never alter STOP/leases. During worker smoke, start owned review process and stop it completely. Deliver code and concise evidence with exact command so the parent operator can start the review Preview after publisher delivery; do NOT leave child service running merely to survive runner cleanup, and do not require launching another Codex/Product worker. Parent running a reviewed local Preview server is allowed and is not a Product executor. Source-only files may be released by existing publisher and final user loopback link opened by parent after verified delivery. No realN88 usability/PO closure claim. Report exact outstanding live activation operations already prepared in current activation doc, no generic request for permission or duplicate activation bundle. Preserve current accepted look and actual product journeys; no redesigned UI, no generic lab, no new planning/review worker. Return matching final JSON with actual candidate/base/worktree/check.\nDECLARATION REPAIR18October: Correct parent intake omission of explicit inert source-only preparationAuthority already present in original releaseAuthority. Preserve every candidate/base/session/run/receipt/check and scope; no redeploy, no live activation and no Product claim beyond source-only delivery.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/current-review.mjs",
+        "drafts/n88-student-portal/current-review-launch.ps1",
+        "tests/n88-current-review*.mjs",
+        "tests/n88-current-review*.json",
+        "tests/fixtures/n88-current-review/**",
+        "docs/automation-evidence/20261018/N88_CURRENT_FUNCTIONAL_REVIEW.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/current-review.mjs",
+        "docs/automation-evidence/20261018/N88_CURRENT_FUNCTIONAL_REVIEW.md"
+      ],
+      "requiredChecks": [
+        "n88_current_actual_client_gateway_service_pg_manual_review_journey"
+      ],
+      "acceptance": [
+        "Repeatable loopback page uses current actual client/gateway/service/restricted PG and fabricated data only; current issue/PIN/claim/publish/read/revoke works.",
+        "Operator has tested launcher/help/TTL/owned cleanup and one simple teacher link to start manual review; no stale prototype substitution.",
+        "Production live student capability remains OFF; current exact activation bundle/evidence reused and remaining service scope truthful."
+      ],
+      "releaseAuthority": "Latest PO18October explicitly requests actual N88 review page and completion of authorized remaining preparation. Existing synthetic-only PO gate permits actual current app+service local Preview with fabricated identities and disposable owned loopback PG, and sole publisher source-only inert launcher release. No hosted schema/Auth/RLS/secrets/function/route or real student access activation.",
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inert inactive source-only local N88 review launcher",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "liveStudentAccessActivation": false
+      },
+      "completionMode": "reconcile_source_only_declaration",
+      "verificationRepair": {
+        "publishedSha": "e21e623a59a886c8a8b64038a94df7ac32ee8ae6",
+        "priorReceiptSha256": "982470bff378a97c7bbc45288d79d52b8bb283323fd1baf3bb88c5d9143f3c4d",
+        "reviewedFixtureSha256": "e4cc3644f3fbeddbfa36ffd20203cb704d8bcd365796744cef993c6602f987e7",
+        "reason": "Correct parent intake omission of explicit inert source-only preparationAuthority already present in original releaseAuthority. Preserve every candidate/base/session/run/receipt/check and scope; no redeploy, no live activation and no Product claim beyond source-only delivery."
+      }
+    }
+  ]
+}
