@@ -18,11 +18,12 @@ export async function startIntegratedReview({ttl=14400,historicalReservationFixt
   try {
     const origin='https://synthetic.invalid',provider=providerFixture(),ingressKey=randomBytes(32);
     const manifest=JSON.parse(await readFile(path.join(root,'drafts/n88-student-portal/deployment.inactive.json'),'utf8'));
-    let failure=null,commitFailure=null,teacherCommitFailure=null,admissionFailure=false,syntheticSource='192.0.2.1',sessionGate,sessionEntered,releaseSession;
+    let failure=null,commitFailure=null,teacherCommitFailure=null,admissionFailure=false,guidanceCommitFailure=null,syntheticSource='192.0.2.1',sessionGate,sessionEntered,releaseSession;
     const metrics={credentialReads:0,recoveryReads:0};
     const options={...manifest,origin,authUrl,apiKey:'FABRICATED_API_KEY',secretKey:randomBytes(32),ingressKey,
-      numericKey:randomBytes(32),reservationKey:randomBytes(32),recoveryKeys:new Map([['r1',randomBytes(32)]]),recoveryActiveKeyVersion:'r1',acquire:async()=>{const c=await pg.acquire();let sessionWrite=false,attemptWrite=false,teacherWrite=false;return {release:e=>c.release(e),query:async(sql,...args)=>{
+      numericKey:randomBytes(32),reservationKey:randomBytes(32),recoveryKeys:new Map([['r1',randomBytes(32)]]),recoveryActiveKeyVersion:'r1',acquire:async()=>{const c=await pg.acquire();let sessionWrite=false,attemptWrite=false,teacherWrite=false,guidanceWrite=false;return {release:e=>c.release(e),query:async(sql,...args)=>{
         if(sql.includes('from n88_private.code_recovery'))metrics.recoveryReads++;
+        if(sql.includes('insert into n88_private.task_guidance'))guidanceWrite=true;
         if(sql.includes('insert into n88_private.numeric_credentials'))teacherWrite=true;
         if(sql.includes('from n88_private.numeric_credentials'))metrics.credentialReads++;
         if(sql.includes('insert into n88_private.numeric_attempts'))attemptWrite=true;
@@ -30,6 +31,7 @@ export async function startIntegratedReview({ttl=14400,historicalReservationFixt
         if(sql.includes('insert into n88_private.numeric_sessions')) {
           sessionWrite=true;if(sessionGate){sessionEntered();await sessionGate;}
         }
+        if(sql==='commit' && guidanceWrite && guidanceCommitFailure){const mode=guidanceCommitFailure;guidanceCommitFailure=null;if(mode==='after')await c.query(sql,...args);throw Error('Synthetic guidance COMMIT uncertainty');}
         if(sql==='commit' && teacherWrite && teacherCommitFailure){const mode=teacherCommitFailure;teacherCommitFailure=null;if(mode==='after')await c.query(sql,...args);throw Error('Synthetic teacher COMMIT uncertainty');}
         if(sql==='commit' && sessionWrite && commitFailure){const mode=commitFailure;commitFailure=null;if(mode==='after')await c.query(sql,...args);throw Error('Synthetic unknown session COMMIT');}
         if(sql==='commit' && attemptWrite && admissionFailure){admissionFailure=false;await c.query(sql,...args);throw Error('Synthetic admission ACK loss');}
@@ -88,7 +90,7 @@ export async function startIntegratedReview({ttl=14400,historicalReservationFixt
     await new Promise((ok,fail)=>{server.once('error',fail);server.listen(0,'127.0.0.1',ok);});localOrigin='http://127.0.0.1:'+server.address().port;
     timer=setTimeout(expire,ttl*1000);
     return {url:localOrigin+'/#/teaching/teaching',studentUrl:localOrigin+'/student',phase:pg.phase,postgres:{...pg.identity,port:pg.port},expiresAt:new Date(Date.now()+ttl*1000).toISOString(),close,expired,
-      testing:{numericOptions:()=>({keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey}),failTeacherCommit:mode=>{teacherCommitFailure=mode;},failMemberAck:()=>{failure='release savepoint n88_member_recovery';},failEnvelope:()=>{failure='insert into n88_private.code_recovery';},recoveryOptions:()=>({keys:options.recoveryKeys,activeKeyVersion:options.recoveryActiveKeyVersion}),setRecovery:(keys,version)=>{options.recoveryKeys=keys;options.recoveryActiveKeyVersion=version;edge=createWebEntry(options);peer=createWebEntry(options);},calls,provider,metrics,serviceInstances:2,acquire:pg.acquire,repositoryOptions:{limits:manifest.limits,timing:manifest.timing},restart:async()=>{await pg.restart();edge=createWebEntry(options);peer=createWebEntry(options);},
+      testing:{failGuidanceCommit:mode=>{guidanceCommitFailure=mode;},numericOptions:()=>({keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey}),failTeacherCommit:mode=>{teacherCommitFailure=mode;},failMemberAck:()=>{failure='release savepoint n88_member_recovery';},failEnvelope:()=>{failure='insert into n88_private.code_recovery';},recoveryOptions:()=>({keys:options.recoveryKeys,activeKeyVersion:options.recoveryActiveKeyVersion}),setRecovery:(keys,version)=>{options.recoveryKeys=keys;options.recoveryActiveKeyVersion=version;edge=createWebEntry(options);peer=createWebEntry(options);},calls,provider,metrics,serviceInstances:2,acquire:pg.acquire,repositoryOptions:{limits:manifest.limits,timing:manifest.timing},restart:async()=>{await pg.restart();edge=createWebEntry(options);peer=createWebEntry(options);},
         trustedSource:n=>{if(!Number.isInteger(n)||n<1||n>254)throw Error('Synthetic source required');syntheticSource='192.0.2.'+n;},
         failSessionCommit:mode=>{if(!['before','after'].includes(mode))throw Error('Synthetic fault required');commitFailure=mode;},
         failAdmissionAck:()=>{admissionFailure=true;},

@@ -2,7 +2,7 @@
   "aiAuthored": true,
   "enabled": false,
   "projectId": "xlrubcwjqktzzunrvuns",
-  "migration": "supabase/migrations/20261018115648_n88_code_recovery_staged.sql",
+  "migration": "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
   "function": {
     "name": "n88-student-portal",
     "entry": "bundle/edge/index.mjs",
@@ -80,7 +80,8 @@
     "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
     "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
     "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
-    "supabase/migrations/20261018115648_n88_code_recovery_staged.sql"
+    "supabase/migrations/20261018115648_n88_code_recovery_staged.sql",
+    "supabase/migrations/20261018125611_n88_task_guidance_staged.sql"
   ],
   "requiredPreflight": [
     "prior-20261018-preflight.inactive.sql (before fresh baseline only)",
@@ -88,13 +89,14 @@
     "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families",
     "six-digit-preflight.inactive.sql (after integrated extension, before six-v1 amendment)",
     "shared-network-preflight.inactive.sql (after six-v1, before attempt/epoch amendment; compare prior-shared-budget-expected-identities.json first)",
-    "recovery-preflight.inactive.sql (after shared budget, compare full prior-recovery-integrated-expected-identities.json; no repeat apply)"
+    "recovery-preflight.inactive.sql (after shared budget, compare full prior-recovery-integrated-expected-identities.json; no repeat apply)",
+    "task-guidance-preflight.inactive.sql (after all five prior versions; compare prior-task-guidance-integrated-expected-identities.json; no repeat apply)"
   ],
   "qualification": {
     "state": "LOCAL_READY",
     "scope": "inactive source-only local application/service/PG preparation",
-    "actualAppJourney": "tests/n88-six-digit-recovery.json",
-    "changedServiceBoundaries": "tests/n88-six-digit-recovery.json",
+    "actualAppJourney": "tests/n88-task-guidance.json",
+    "changedServiceBoundaries": "tests/n88-task-guidance.json",
     "currentExpectedIdentitySnapshot": "integrated-expected-identities.json",
     "metadataContract": "integrated-metadata-contract.json",
     "readbackVerifier": "../integrated-readback.mjs",
@@ -122,6 +124,13 @@
       "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
       "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
       "evidence": "docs/automation-evidence/20261018/N88_TEACHER_CODE_RECOVERY_SHARE.md"
+    },
+    "taskGuidanceAmendment": {
+      "sourceReady": true,
+      "liveActivation": false,
+      "taskId": "continuous-n88-task-execution-delivery-guidance-20261018",
+      "runId": "da437f4d-bfbe-42af-bcbc-33996358d071",
+      "evidence": "docs/automation-evidence/20261018/N88_TASK_EXECUTION_DELIVERY_GUIDANCE.md"
     }
   },
   "credentialContract": {
@@ -167,5 +176,18 @@
     "legacy": "honest hash-only, explicit selective rotate only",
     "unknownCommit": "freshly authorized current list may recover only proven current credential; no reissue inference",
     "retention": "private append-only encrypted generations and permanent nonce tombstones; never reveal revoked/historical generations"
+  },
+  "taskGuidanceContract": {
+    "revision": "canonical-task-guidance-v1",
+    "maxCharsPerField": 400,
+    "fields": [
+      "executionInstructions",
+      "deliveryInstructions"
+    ],
+    "privateMetadata": "n88_private.task_guidance",
+    "canonicalWrites": false,
+    "unknownCommit": "retain draft; reread committed state; explicit source/CAS revalidation before retry",
+    "sourceChange": "omit until deliberate revalidation and republication",
+    "hostedApplied": false
   }
 }

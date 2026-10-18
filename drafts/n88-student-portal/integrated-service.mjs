@@ -1,3 +1,4 @@
+import {readTaskGuidance,authorizedGuidanceSources,guidanceTeacherList,saveTaskGuidance} from './task-guidance.mjs';
 /** AI: inactive class/universal composition in the existing fenced PG transaction. */
 import {createHash,randomUUID} from 'node:crypto';
 import {withCredentialRepository,createClassCredentialOperations,createPgClassResolver} from './class-credentials.mjs';
@@ -73,11 +74,11 @@ export function createIntegratedService(options,adapter,baseRepository) {
     if(terms.length!==1)throw Error('n88_current_term');
     const s={ownerId:m.ownerId,classId:m.classId,termId:terms[0].id,canonical},policy=await policies(ports,m.ownerId,m.classId,s.termId);
     const stored=policy.members.find(p=>p.studentId===m.studentId&&p.enrollmentId===m.enrollmentId);
-    return projectStudentPortal({...inputFor(s,m),visibility:stored||null});
+    return projectStudentPortal({...inputFor(s,m),visibility:stored||null,taskGuidance:await readTaskGuidance(ports,s)});
   }});
   return async request=>{
     if(request.path.startsWith('/student/'))return student(request);
-    const match=/^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility)$/.exec(request.path);
+    const match=/^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)$/.exec(request.path);
     if(!match || request.method!=='POST')return deny();
     const action=match[1],body=request.body||{},binding=body.binding;
     if(!binding || Object.keys(binding).length!==bindingKeys.length || !bindingKeys.every(k=>typeof binding[k]==='string'&&binding[k].length>0&&binding[k].length<=200) || binding.teachingId!==body.teachingId)return deny();
@@ -89,7 +90,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
     const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input).then(s=>s&&s.classId===binding.classId&&s.termId===binding.termId?s:null);
     const ops=createClassCredentialOperations({repository,...credentials,...recovering,origin:options.origin,verifyIngress:adapter.verifyIngress,verifyTeacher,resolveClass});
     // Operations preserve their transaction/commit ACK. UI adaptation never exposes a precommit secret.
-    if(action==='visibility' || action==='list') {
+    if(action==='visibility' || action==='list' || action.startsWith('guidance-')) {
       try{return await repository.transaction(async(db,ports)=>{
         const h=request.headers||{};
         if(!await adapter.verifyIngress(request,ports) || h.origin!==options.origin||h['x-n88-csrf']!=='1'||h['content-type']!=='application/json'||h['sec-fetch-site']&&h['sec-fetch-site']!=='same-origin')return deny();
@@ -100,7 +101,14 @@ export function createIntegratedService(options,adapter,baseRepository) {
         if(members.length>2000||new Set(members.map(m=>m.studentId)).size!==members.length||members.some(m=>db.memberships.filter(x=>x.ownerId===m.ownerId&&x.studentId===m.studentId&&x.status==='active'&&!x.endDate&&x.studentActive&&x.classActive).length!==1))return deny();
         const rosterRevision=hash([s.teachingId,s.revision,members.sort((a,b)=>a.studentId.localeCompare(b.studentId)).map(m=>[m.studentId,m.enrollmentId,m.revision,m.canonicalStamp])]);
         let p=await policies(ports,s.ownerId,s.classId,s.termId),data;
-        if(action==='visibility') {
+        if(action.startsWith('guidance-')) {
+          const sources=authorizedGuidanceSources(s,members,p,inputFor),stored=await readTaskGuidance(ports,s);
+          if(action==='guidance-list') data={tasks:guidanceTeacherList(sources,stored)};
+          else {
+            if(Object.keys(body).sort().join(',')!=='binding,guidance,requestId,teachingId'||typeof body.requestId!=='string'||body.requestId.length>100)return deny();
+            data=await saveTaskGuidance(ports,s,sources.find(x=>x.subitemId===body.guidance?.subitemId),stored,body.guidance);
+          }
+        }else if(action==='visibility') {
           if(p.revision!==body.policyRevision||body.expectedRosterRevision!==rosterRevision||!body.fields||Object.keys(body.fields).length!==6||!VISIBILITY_FIELDS.every(f=>typeof body.fields[f]==='boolean'))return deny();
           const membersPolicy=members.map(m=>{const input=inputFor(s,m),b=studentPortalPublicationBindings(input);return {version:'n88-visibility-v1',ownerId:s.ownerId,studentId:m.studentId,enrollmentId:m.enrollmentId,classId:s.classId,termId:s.termId,scopeStamp:b.scopeStamp,fields:body.fields,sources:b.sources.map(src=>({...src,publicationId:randomUUID()}))};});
           p={revision:p.revision+1,fields:body.fields,members:membersPolicy};

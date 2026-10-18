@@ -1,3 +1,4 @@
+import {guidanceForStudent} from './task-guidance.mjs';
 import { canonicalGradeContext } from './canonical-grade-context.mjs';
 // AI: callable inactive server projection. Does not authorize a session or query.
 import { createHash } from 'node:crypto';
@@ -156,7 +157,7 @@ export function projectStudentPortal(input) {
     const completionState = subitemCompletionState(completions[0]);
     const { startDate, dueDate } = normalizeSubitemDatesAndPoints(definition);
     const family = completionState !== 'unrecorded' ? 'completed' : startDate && startDate > s.today ? 'scheduled' : 'required';
-    if (enabled(family)) out.work[family].push({ id: publication.publicationId, title: definition.name, startDate, dueDate, completionState });
+    if (enabled(family)) out.work[family].push({ id: publication.publicationId, title: definition.name, startDate, dueDate, completionState, ...guidanceForStudent(input,definition,publication) });
   }
   return out;
 }

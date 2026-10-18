@@ -24,7 +24,8 @@ var deployment_inactive_default = {
   requiredReadbacks: [
     "private SQL/helper identities + ACL/FKs",
     "existing Auth issuer/JWKS/user/session",
-    "Cloudflare external ingress + log custody + TLS"
+    "Cloudflare external ingress + log custody + TLS",
+    "task_guidance exact private metadata schema/RLS/role/constraints after separately authorized staged amendment"
   ],
   sourceOnly: true,
   routes: [
@@ -35,7 +36,9 @@ var deployment_inactive_default = {
     "/api/n88/teacher/class/visibility",
     "/api/n88/student/claim",
     "/api/n88/student/read",
-    "/api/n88/student/end"
+    "/api/n88/student/end",
+    "/api/n88/teacher/class/guidance-list",
+    "/api/n88/teacher/class/guidance-save"
   ],
   limits: {
     contexts: 10,
@@ -98,542 +101,8 @@ import { timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 import { Buffer as Buffer9 } from "node:buffer";
 import { isIP } from "node:net";
 
-// drafts/n88-student-portal/integrated-service.mjs
-import { createHash as createHash5, randomUUID as randomUUID4 } from "node:crypto";
-
-// drafts/n88-student-portal/class-credentials.mjs
-import { Buffer as Buffer3 } from "node:buffer";
+// drafts/n88-student-portal/task-guidance.mjs
 import { createHash as createHash2 } from "node:crypto";
-
-// drafts/n88-student-portal/service.mjs
-import { Buffer as Buffer2 } from "node:buffer";
-import { randomBytes, randomUUID, randomInt, createHash, createHmac, timingSafeEqual } from "node:crypto";
-var POLICY = Object.freeze({
-  sessionMs: 8 * 60 * 6e4,
-  rateWindowMs: 15 * 6e4,
-  sourceAttempts: 6,
-  contextAttempts: 30,
-  globalAttempts: 100,
-  failureWindowMs: 864e5,
-  contextFailures: 60,
-  globalFailures: 500,
-  maxRateKeys: 1e4
-});
-var PRIVATE_HEADERS = Object.freeze({
-  "Cache-Control": "no-store, private",
-  "Referrer-Policy": "no-referrer",
-  "X-Robots-Tag": "noindex, nofollow, noarchive",
-  "X-Content-Type-Options": "nosniff",
-  Vary: "Cookie"
-});
-
-// drafts/n88-student-portal/class-credentials.mjs
-var fail = () => {
-  throw Error("n88_class_unavailable");
-};
-var hash = (value) => createHash2("sha256").update(JSON.stringify(value)).digest("hex");
-var active = (m) => m.status === "active" && m.endDate === null && m.studentActive === true && m.classActive === true;
-var id = (value) => typeof value === "string" && value.length > 0 && value.length <= 240 && !value.includes("\0");
-var requestId = (value) => typeof value === "string" && /^[A-Za-z0-9_-]{16,100}$/.test(value);
-var version = (db, m) => Math.max(0, ...db.numericCredentials.filter((c) => c.ownerId === m.ownerId && c.studentId === m.studentId).map((c) => c.version));
-var live = (db, m) => db.numericCredentials.some((c) => c.ownerId === m.ownerId && c.studentId === m.studentId && c.revokedAt === null);
-var result = (status, body) => ({ status, body, headers: { ...PRIVATE_HEADERS } });
-var denied = () => result(401, { error: "unavailable" });
-var replay = (receipt) => receipt.results.map((r) => r.status === "created" ? { ...r, status: "uncertain", recovery: "refresh_current_roster" } : { ...r });
-var summary = (rows) => Object.fromEntries(["created", "skipped", "failed", "uncertain"].map((s) => [s, rows.filter((r) => r.status === s).length]));
-function createClassCredentialOperations({ repository, verifyTeacher, verifyIngress, origin, resolveClass, issueMember, rotateMember, revokeMember }) {
-  if (!repository?.transaction || [verifyTeacher, verifyIngress, resolveClass, issueMember, rotateMember, revokeMember].some((f) => typeof f !== "function") || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail();
-  return Object.freeze({ forRequest(request) {
-    async function run(action, teachingId, input = {}) {
-      try {
-        return await repository.transaction(async (db, ports) => {
-          const ingress = await verifyIngress(request, ports), headers = request.headers || {};
-          if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || action === "list" && request.method !== "GET" || action !== "list" && (request.method !== "POST" || headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied();
-          const auth = await verifyTeacher(request, ports);
-          if (!auth?.ownerId || !auth.sessionId || auth.current !== true || typeof ports?.synchronizeOwner !== "function") return denied();
-          await ports.synchronizeOwner(auth.ownerId);
-          const scope = await resolveClass(db, ports, auth, teachingId, input);
-          if (!scope || scope.ownerId !== auth.ownerId || scope.current !== true || !id(scope.teachingId) || !id(scope.classId) || !id(scope.revision)) return denied();
-          if (teachingId !== null && scope.teachingId !== teachingId) return denied();
-          const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === scope.classId && active(m));
-          if (members.length > 2e3 || new Set(members.map((m) => m.studentId)).size !== members.length) return denied();
-          if (members.some((m) => db.memberships.filter((x) => x.ownerId === m.ownerId && x.studentId === m.studentId && active(x)).length !== 1)) return denied();
-          members.sort((a, b) => a.studentId.localeCompare(b.studentId));
-          const rosterRevision = hash([scope.teachingId, scope.revision, members.map((m) => [m.studentId, m.enrollmentId, m.revision, m.canonicalStamp])]);
-          if (action === "list") return result(200, { teachingId: scope.teachingId, rosterRevision, students: members.map((m) => ({
-            studentId: m.studentId,
-            enrollmentId: m.enrollmentId,
-            revision: m.revision,
-            label: m.label,
-            credentialVersion: version(db, m),
-            hasActiveCredential: live(db, m)
-          })) });
-          if (!requestId(input.requestId)) return denied();
-          const binding = hash([action, scope.teachingId, input.expectedRosterRevision ?? null, input.studentId ?? null, input.enrollmentId ?? null, input.revision ?? null, input.credentialVersion ?? null]);
-          const prior = db.classReceipts.find((r) => r.ownerId === auth.ownerId && r.requestId === input.requestId);
-          if (prior) {
-            if (prior.binding !== binding) return result(409, { error: "stale_request" });
-            const rows2 = replay(prior);
-            return result(200, { requestId: input.requestId, replayed: true, results: rows2, counts: summary(rows2) });
-          }
-          if (db.classReceipts.length >= 1e4) fail();
-          if (action === "batch" && input.expectedRosterRevision !== rosterRevision) return result(409, { error: "roster_changed" });
-          let selected = members;
-          if (action !== "batch") {
-            selected = members.filter((m) => m.studentId === input.studentId && m.enrollmentId === input.enrollmentId && m.revision === input.revision);
-            if (selected.length !== 1 || !Number.isSafeInteger(input.credentialVersion) || input.credentialVersion < 0 || version(db, selected[0]) !== input.credentialVersion) return result(409, { error: "member_changed" });
-          }
-          const rows = [], secrets = [];
-          for (const m of selected) {
-            const expectedVersion = version(db, m);
-            const base = { studentId: m.studentId, enrollmentId: m.enrollmentId, credentialVersion: expectedVersion };
-            if (action === "batch" && expectedVersion > 0) {
-              rows.push({ ...base, status: "skipped", reason: live(db, m) ? "existing" : "revoked_rotate_required" });
-              continue;
-            }
-            const rowCount = rows.length, secretCount = secrets.length;
-            const before = structuredClone({ credentials: db.numericCredentials, sessions: db.numericSessions });
-            try {
-              await ports.query("savepoint n88_member_recovery");
-              const issued = await { batch: issueMember, rotate: rotateMember, revoke: revokeMember }[action](db, m, { expectedVersion }, ports);
-              if (action === "revoke") {
-                if (issued?.revoked !== true || live(db, m)) fail();
-                rows.push({ ...base, status: "skipped", reason: "revoked" });
-              } else {
-                if (!/^1[0-9]{5}$/.test(issued?.code || "") || issued.credentialVersion !== expectedVersion + 1 || !live(db, m)) fail();
-                rows.push({ ...base, credentialVersion: issued.credentialVersion, status: "created" });
-                secrets.push({ studentId: m.studentId, code: issued.code });
-              }
-              await ports.query("release savepoint n88_member_recovery");
-            } catch {
-              await ports.query("rollback to savepoint n88_member_recovery");
-              await ports.query("release savepoint n88_member_recovery");
-              rows.length = rowCount;
-              secrets.length = secretCount;
-              db.numericCredentials = before.credentials;
-              db.numericSessions = before.sessions;
-              rows.push({ ...base, status: "failed", reason: "unavailable" });
-            }
-          }
-          db.classReceipts.push({ ownerId: auth.ownerId, requestId: input.requestId, binding, results: structuredClone(rows) });
-          return result(200, { requestId: input.requestId, replayed: false, results: rows, counts: summary(rows), secrets });
-        });
-      } catch {
-        return result(503, { error: "unavailable", outcome: "uncertain", recovery: "reload_with_same_request_id" });
-      }
-    }
-    return Object.freeze({
-      listClass: (teachingId) => run("list", teachingId),
-      issueMissingClassCodes: (teachingId, input) => run("batch", teachingId, input),
-      rotate: (input) => run("rotate", null, input),
-      revoke: (input) => run("revoke", null, input)
-    });
-  } });
-}
-function createPgClassResolver({ teachingId: boundTeachingId } = {}) {
-  return async (db, ports, auth, teachingId, input) => {
-    const requested = teachingId ?? boundTeachingId;
-    if (!id(requested) || typeof ports?.query !== "function") return null;
-    const r = await ports.query(`select t.id,t.section_id,t.revision::text as teaching_revision,
-      term.revision::text as term_revision from rakeezx.teachings t
-      join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id
-      join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id
-      join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id
-      where t.owner_id=$1::uuid and t.id=$2 and t.deleted_at is null
-        and term.deleted_at is null and term.status='active' and term.year_id=c.year_id
-        and c.deleted_at is null and c.status='active' and y.deleted_at is null and y.status='active'`, [auth.ownerId, requested]);
-    if (r.rows.length !== 1) return null;
-    const t = r.rows[0];
-    if (teachingId === null && !db.memberships.some((m) => m.ownerId === auth.ownerId && m.classId === t.section_id && m.studentId === input.studentId && m.enrollmentId === input.enrollmentId && active(m))) return null;
-    return { ownerId: auth.ownerId, classId: t.section_id, teachingId: t.id, current: true, revision: hash([t.teaching_revision, t.term_revision]) };
-  };
-}
-function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 1024 * 1024 } = {}) {
-  if (!repository?.transaction || !Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail();
-  const tables2 = { numericCredentials: "numeric_credentials", numericSessions: "numeric_sessions", numericRates: "numeric_rates", numericAttempts: "numeric_attempts", classReceipts: "class_credential_receipts" };
-  const proofs = /* @__PURE__ */ new WeakSet();
-  const api = {
-    // Existing global advisory lock + fenced COMMIT, without credential reads.
-    claimAttempt: (action) => repository.transaction(async (_db, ports) => {
-      const state = {}, original = {};
-      let bytes = 0;
-      for (const [name, table] of [["numericRates", "numeric_rates"], ["numericAttempts", "numeric_attempts"]]) {
-        const r = await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`, [maxRows + 1, maxBytes - bytes]);
-        if (r.rows.length > maxRows) fail();
-        state[name] = r.rows.map(({ payload }) => {
-          if (!payload) fail();
-          bytes += Buffer3.byteLength(JSON.stringify(payload));
-          if (bytes > maxBytes) fail();
-          return payload;
-        });
-        original[name] = structuredClone(state[name]);
-      }
-      const allowed = await action(state, ports);
-      bytes = 0;
-      for (const [name, table] of [["numericRates", "numeric_rates"], ["numericAttempts", "numeric_attempts"]]) {
-        if (state[name].length > maxRows) fail();
-        const pk2 = (r) => name === "numericRates" ? r.key : r.id;
-        const after = new Map(state[name].map((r) => [pk2(r), r]));
-        if (after.size !== state[name].length) fail();
-        const before = new Map(original[name].map((r) => [pk2(r), r]));
-        for (const row of original[name]) if (!after.has(pk2(row))) {
-          if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [pk2(row)])).rowCount !== 1) fail();
-        }
-        for (const row of state[name]) {
-          bytes += Buffer3.byteLength(JSON.stringify(row));
-          if (bytes > maxBytes) fail();
-          if (before.has(pk2(row)) && JSON.stringify(before.get(pk2(row))) === JSON.stringify(row)) continue;
-          if ((await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload`, [pk2(row), JSON.stringify(row)])).rowCount !== 1) fail();
-        }
-      }
-      return allowed;
-    }),
-    commitAttemptSession: async (id3, action) => {
-      const committed = await api.transaction(async (db, ports) => {
-        const a = db.numericAttempts.find((a2) => a2.id === id3);
-        if (!a || a.sessionId !== null || a.settled) fail();
-        const before = new Set(db.numericSessions.map((s) => s.id));
-        const value = await action(db, ports);
-        const fresh = db.numericSessions.filter((s) => !before.has(s.id));
-        if (fresh.length > 1) fail();
-        if (fresh.length === 1) {
-          if (fresh[0].revokedAt !== null) fail();
-          a.sessionId = fresh[0].id;
-        }
-        return { value, receipt: fresh.length ? structuredClone(a) : null };
-      });
-      const proof = committed.receipt ? Object.freeze(committed.receipt) : null;
-      if (proof) proofs.add(proof);
-      return { value: committed.value, proof };
-    },
-    settleAttempt: async (proof, time2) => {
-      if (!proof || !proofs.has(proof) || !Number.isSafeInteger(time2)) return false;
-      return api.transaction(async (db) => {
-        const a = db.numericAttempts.find((a2) => a2.id === proof.id);
-        if (!a || a.settled || a.until <= time2 || JSON.stringify(a) !== JSON.stringify(proof) || !db.numericSessions.some((s) => s.id === a.sessionId)) return false;
-        const buckets = a.buckets.map((b) => db.numericRates.find((r) => r.key === b.key && r.epoch === b.epoch && r.until === b.until && r.until > time2));
-        if (buckets.length !== 2 || new Set(buckets).size !== 2 || buckets.some((b) => !b || b.count < 1)) return false;
-        for (const b of buckets) b.count--;
-        a.settled = true;
-        return true;
-      });
-    },
-    transaction: (action) => repository.transaction(async (db, ports) => {
-      if (typeof ports?.query !== "function") fail();
-      const extra = {}, original = {};
-      let bytes = 0;
-      for (const [name, table] of Object.entries(tables2)) {
-        const r = await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`, [maxRows + 1, maxBytes - bytes]);
-        if (r.rows.length > maxRows) fail();
-        extra[name] = r.rows.map((r2) => {
-          if (!r2.payload) fail();
-          bytes += Buffer3.byteLength(JSON.stringify(r2.payload));
-          if (bytes > maxBytes) fail();
-          return r2.payload;
-        });
-        original[name] = structuredClone(extra[name]);
-      }
-      const state = new Proxy(extra, { get: (o, k) => k in tables2 ? o[k] : db[k], set: (o, k, v) => {
-        if (k in tables2) o[k] = v;
-        else db[k] = v;
-        return true;
-      } });
-      const value = await action(state, ports);
-      bytes = 0;
-      for (const [name, table] of Object.entries(tables2)) {
-        if (extra[name].length > maxRows) fail();
-        const pk2 = (r) => name === "classReceipts" ? JSON.stringify([r.ownerId, r.requestId]) : name === "numericRates" ? r.key : r.id;
-        const before = new Map(original[name].map((r) => [pk2(r), r])), after = new Map(extra[name].map((r) => [pk2(r), r]));
-        if (after.size !== extra[name].length) fail();
-        for (const [key2, row] of before) if (!after.has(key2)) {
-          if (name === "numericCredentials" || name === "classReceipts") fail();
-          if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [key2])).rowCount !== 1) fail();
-        }
-        for (const [key2, row] of after) {
-          bytes += Buffer3.byteLength(JSON.stringify(row));
-          if (bytes > maxBytes) fail();
-          if (before.has(key2) && JSON.stringify(before.get(key2)) === JSON.stringify(row)) continue;
-          const ack = before.has(key2) ? await ports.query(`update n88_private.${table} set payload=$2::jsonb where row_key=$1`, [key2, JSON.stringify(row)]) : await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb)`, [key2, JSON.stringify(row)]);
-          if (ack.rowCount !== 1) fail();
-        }
-      }
-      return value;
-    })
-  };
-  return Object.freeze(api);
-}
-
-// drafts/n88-student-portal/code-recovery.mjs
-import { Buffer as Buffer4 } from "node:buffer";
-import { randomBytes as randomBytes2, randomUUID as randomUUID2, createCipheriv, createDecipheriv } from "node:crypto";
-var fail2 = () => {
-  throw Error("n88_recovery_unavailable");
-};
-var ver = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(v);
-var exact = (o, ks) => o && Object.keys(o).length === ks.length && ks.every((k) => Object.hasOwn(o, k));
-var fields = ["id", "credentialId", "generation", "envelopeVersion", "algorithm", "keyVersion", "nonce", "ciphertext", "tag"];
-function createCodeRecovery({ keys, activeKeyVersion, otherKeys = [] } = {}) {
-  if (!(keys instanceof Map) || !keys.size || keys.size > 8 || !ver(activeKeyVersion) || !keys.has(activeKeyVersion) || [...keys].some(([v, k]) => !ver(v) || !Buffer4.isBuffer(k) || k.length !== 32) || new Set([...keys.values()].map((k) => k.toString("hex"))).size !== keys.size || [...keys.values()].some((k) => otherKeys.some((o) => Buffer4.isBuffer(o) && k.equals(o)))) fail2();
-  keys = new Map([...keys].map(([v, k]) => [v, Buffer4.from(k)]));
-  const aad = (c, e) => Buffer4.from(JSON.stringify(["n88-code-recovery", e.id, e.envelopeVersion, e.algorithm, e.keyVersion, c.id, c.version, c.ownerId, c.studentId, c.format, e.generation]));
-  function seal(c, code, generation = 1) {
-    if (c.revokedAt !== null || c.format !== "six-v1" || !/^1[0-9]{5}$/.test(code) || !Number.isSafeInteger(generation) || generation < 1) fail2();
-    const e = { id: randomUUID2(), credentialId: c.id, generation, envelopeVersion: 1, algorithm: "AES-256-GCM", keyVersion: activeKeyVersion, nonce: randomBytes2(12).toString("hex") };
-    const cipher = createCipheriv("aes-256-gcm", keys.get(activeKeyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
-    cipher.setAAD(aad(c, e));
-    e.ciphertext = Buffer4.concat([cipher.update(code, "ascii"), cipher.final()]).toString("hex");
-    e.tag = cipher.getAuthTag().toString("hex");
-    return e;
-  }
-  function open(c, e) {
-    try {
-      if (c.revokedAt !== null || c.format !== "six-v1" || !exact(e, fields) || e.credentialId !== c.id || e.envelopeVersion !== 1 || e.algorithm !== "AES-256-GCM" || !keys.has(e.keyVersion) || !Number.isSafeInteger(e.generation) || e.generation < 1 || !/^[a-f0-9]{24}$/.test(e.nonce) || !/^[a-f0-9]{12}$/.test(e.ciphertext) || !/^[a-f0-9]{32}$/.test(e.tag)) fail2();
-      const d = createDecipheriv("aes-256-gcm", keys.get(e.keyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
-      d.setAAD(aad(c, e));
-      d.setAuthTag(Buffer4.from(e.tag, "hex"));
-      const code = Buffer4.concat([d.update(Buffer4.from(e.ciphertext, "hex")), d.final()]).toString("ascii");
-      if (!/^1[0-9]{5}$/.test(code)) fail2();
-      return code;
-    } catch {
-      fail2();
-    }
-  }
-  async function read(ports, c) {
-    const r = await ports.query("select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1", [c.id]);
-    return r.rows.length ? { status: "recoverable", credential: open(c, r.rows[0].payload) } : { status: "legacy", credential: null };
-  }
-  async function append(ports, c, code, generation = 1) {
-    for (let n = 0; n < 8; n++) {
-      const e = seal(c, code, generation);
-      const r = await ports.query(`insert into n88_private.code_recovery(row_key,payload) values($1,$2::jsonb) on conflict(key_version,nonce) do nothing`, [e.id, JSON.stringify(e)]);
-      if (r.rowCount === 1) return;
-    }
-    fail2();
-  }
-  async function rewrap(ports, c, expectedGeneration) {
-    const r = await ports.query("select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1", [c.id]);
-    if (r.rows.length !== 1 || r.rows[0].payload.generation !== expectedGeneration) fail2();
-    await append(ports, c, open(c, r.rows[0].payload), expectedGeneration + 1);
-  }
-  return Object.freeze({ read, append, rewrap, seal, open });
-}
-
-// drafts/n88-student-portal/numeric-credentials.mjs
-import { randomInt as randomInt2, randomBytes as randomBytes3, randomUUID as randomUUID3, createHmac as createHmac2, createHash as createHash3, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
-var CREDENTIAL_FORMAT = "six-v1";
-var CREDENTIAL_CAPACITY = 1e5;
-var NUMERIC_POLICY = Object.freeze({
-  collisionBudget: 128,
-  sessionMs: 8 * 60 * 6e4,
-  windowMs: 15 * 6e4,
-  clientAttempts: 6,
-  globalAttempts: 100,
-  maxRateKeys: 1e4,
-  sourceRequests: 120,
-  globalRequests: 1200,
-  maxAttempts: 1e4
-});
-var generateNumericCredential = () => "1" + String(randomInt2(0, 1e5)).padStart(5, "0");
-function normalizeNumericCredential(value) {
-  if (typeof value !== "string" || value.length > 80) return null;
-  const code = value.replace(/^ +| +$/g, "");
-  return /^1[0-9]{5}$/.test(code) ? code : null;
-}
-var fail3 = () => {
-  throw Error("n88_numeric_unavailable");
-};
-var active2 = (m) => m?.status === "active" && m.endDate === null && m.studentActive === true && m.classActive === true;
-var identity = (a, b) => a.ownerId === b.ownerId && a.studentId === b.studentId;
-var tokenHash = (token) => createHash3("sha256").update(token).digest("hex");
-var cookie = (value, age) => `__Secure-n88-student=${value}; Path=/api/n88/student; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;
-var denied2 = () => ({ status: 401, body: { error: "unavailable" }, cookie: cookie("", 0) });
-var response = (r) => ({ ...r, headers: { ...PRIVATE_HEADERS, ...r.cookie ? { "Set-Cookie": r.cookie } : {} } });
-function createNumericCredentialOperations({
-  keys,
-  activeKeyVersion,
-  reservationKey,
-  now = Date.now,
-  generate = generateNumericCredential
-}) {
-  if (!(keys instanceof Map) || !keys.size || !/^[A-Za-z0-9_-]{1,40}$/.test(activeKeyVersion || "") || !keys.has(activeKeyVersion) || !Buffer.isBuffer(reservationKey) || reservationKey.length < 32 || [...keys].some(([v, k]) => !/^[A-Za-z0-9_-]{1,40}$/.test(v) || !Buffer.isBuffer(k) || k.length < 32)) fail3();
-  keys = new Map([...keys].map(([v, k]) => [v, Buffer.from(k)]));
-  reservationKey = Buffer.from(reservationKey);
-  const mac2 = (key2, domain, ...parts) => createHmac2("sha256", key2).update(JSON.stringify(["n88-numeric-v1", domain, ...parts])).digest("hex");
-  const reservation = (code) => mac2(reservationKey, "global-reservation", code);
-  const verifier = (code, c) => mac2(keys.get(c.keyVersion), "credential", c.ownerId, c.studentId, c.version, code);
-  function current(db, c) {
-    if (!db.contexts.some((x) => x.ownerId === c.ownerId && x.active === true)) return null;
-    const members = db.memberships.filter((m) => identity(m, c) && active2(m));
-    return members.length === 1 ? members[0] : null;
-  }
-  function revokeCredential(db, c) {
-    if (c.revokedAt === null) c.revokedAt = now();
-    for (const s of db.numericSessions) if (s.credentialId === c.id && s.revokedAt === null) s.revokedAt = now();
-  }
-  function version2(db, m) {
-    return Math.max(0, ...db.numericCredentials.filter((c) => identity(c, m)).map((c) => c.version));
-  }
-  function check(db, m, expectedVersion) {
-    const canonical = current(db, m);
-    if (!canonical || canonical.enrollmentId !== m.enrollmentId || canonical.revision !== m.revision || canonical.canonicalStamp !== m.canonicalStamp || version2(db, m) !== expectedVersion) fail3();
-  }
-  function issue(db, m, expectedVersion, { rotate = false } = {}) {
-    check(db, m, expectedVersion);
-    const previous = db.numericCredentials.filter((c2) => identity(c2, m) && c2.revokedAt === null);
-    if (previous.length > 1 || previous.length && !rotate) fail3();
-    if (!Number.isSafeInteger(expectedVersion + 1)) fail3();
-    if (db.numericCredentials.filter((c2) => c2.format === CREDENTIAL_FORMAT).length >= CREDENTIAL_CAPACITY) fail3();
-    let code, reserved;
-    for (let attempt = 0; attempt < NUMERIC_POLICY.collisionBudget; attempt++) {
-      code = generate();
-      if (typeof code !== "string" || !/^1[0-9]{5}$/.test(code)) fail3();
-      reserved = reservation(code);
-      if (!db.numericCredentials.some((c2) => c2.reservation === reserved)) break;
-      code = null;
-    }
-    if (!code) fail3();
-    const c = {
-      id: randomUUID3(),
-      ownerId: m.ownerId,
-      studentId: m.studentId,
-      version: expectedVersion + 1,
-      format: CREDENTIAL_FORMAT,
-      keyVersion: activeKeyVersion,
-      reservation: reserved,
-      verifier: "",
-      revokedAt: null
-    };
-    c.verifier = verifier(code, c);
-    previous.forEach((c2) => revokeCredential(db, c2));
-    db.numericCredentials.push(c);
-    return { code, credentialVersion: c.version };
-  }
-  const issueMember = (db, m, { expectedVersion }) => issue(db, m, expectedVersion);
-  const rotateMember = (db, m, { expectedVersion }) => issue(db, m, expectedVersion, { rotate: true });
-  const revokeMember = (db, m, { expectedVersion }) => {
-    check(db, m, expectedVersion);
-    for (const c of db.numericCredentials.filter((c2) => identity(c2, m))) revokeCredential(db, c);
-    return { revoked: true, credentialVersion: expectedVersion };
-  };
-  function createStudentHandler({ repository, verifyIngress, origin, project }) {
-    if (!repository?.transaction || typeof verifyIngress !== "function" || typeof project !== "function" || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail3();
-    return async (request) => {
-      try {
-        const claim = (request.path === "/student/claim" || request.path === "/api/n88/student/claim") && request.method === "POST";
-        let attempt;
-        if (claim) {
-          if (typeof repository.claimAttempt !== "function" || typeof repository.commitAttemptSession !== "function" || typeof repository.settleAttempt !== "function") return response(denied2());
-          attempt = await repository.claimAttempt(async (db, ports) => {
-            const ingress = await verifyIngress(request, ports);
-            if (!ingress?.clientKey) return false;
-            const time2 = now();
-            db.numericRates = db.numericRates.filter((r) => r.until > time2);
-            db.numericAttempts = db.numericAttempts.filter((a2) => a2.until > time2);
-            const source = mac2(reservationKey, "client-rate", ingress.clientKey);
-            const get = (key2, max) => {
-              let b = db.numericRates.find((b2) => b2.key === key2);
-              if (!b && db.numericRates.length < NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b = { key: key2, count: 0, until: time2 + NUMERIC_POLICY.windowMs, epoch: randomUUID3() });
-              if (b && !b.epoch) b.epoch = randomUUID3();
-              return b;
-            };
-            let blocked = false;
-            for (const [key2, max] of [[mac2(reservationKey, "source-flood", ingress.clientKey), NUMERIC_POLICY.sourceRequests], [mac2(reservationKey, "global-flood"), NUMERIC_POLICY.globalRequests]]) {
-              const b = get(key2, max);
-              if (!b || b.count >= max) blocked = true;
-              if (b) b.count = Math.min(max, b.count + 1);
-            }
-            if (blocked) return null;
-            const budgets = [[source, NUMERIC_POLICY.clientAttempts], ["global", NUMERIC_POLICY.globalAttempts]], buckets = [];
-            for (const [key2, max] of budgets) {
-              const b = get(key2, max);
-              if (!b || b.count >= max) blocked = true;
-              if (b) buckets.push(b);
-            }
-            if (blocked || db.numericAttempts.length >= NUMERIC_POLICY.maxAttempts) return null;
-            for (const b of buckets) b.count++;
-            const a = {
-              id: randomUUID3(),
-              buckets: buckets.map(({ key: key2, epoch, until }) => ({ key: key2, epoch, until })),
-              until: Math.max(...buckets.map((b) => b.until)),
-              sessionId: null,
-              settled: false
-            };
-            db.numericAttempts.push(a);
-            return a.id;
-          });
-          if (!attempt) return response(denied2());
-        }
-        const authenticate = async (db, ports) => {
-          const ingress = claim ? { clientKey: "prepaid" } : await verifyIngress(request, ports);
-          const { headers = {}, method, body = {} } = request;
-          const path = request.path.startsWith("/student/") ? "/api/n88" + request.path : request.path;
-          if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || method === "POST" && (headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied2();
-          const time2 = now();
-          const token = /(?:^|;\s*)__Secure-n88-student=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || "")?.[1];
-          if (path === "/api/n88/student/claim" && method === "POST") {
-            const code = normalizeNumericCredential(body.code);
-            if (!code) return denied2();
-            const c2 = db.numericCredentials.find((c3) => c3.reservation === reservation(code));
-            if (!c2 || c2.revokedAt !== null || !keys.has(c2.keyVersion) || !/^[a-f0-9]{64}$/.test(c2.verifier) || !timingSafeEqual2(Buffer.from(c2.verifier, "hex"), Buffer.from(verifier(code, c2), "hex"))) return denied2();
-            if (typeof ports?.synchronizeOwner !== "function") fail3();
-            await ports.synchronizeOwner(c2.ownerId);
-            const m2 = current(db, c2);
-            if (!m2) return denied2();
-            if (token) {
-              for (const s2 of db.numericSessions) if (s2.tokenHash === tokenHash(token)) s2.revokedAt = time2;
-            }
-            const fresh = randomBytes3(32).toString("base64url");
-            db.numericSessions = db.numericSessions.filter((s2) => s2.expiresAt > time2 && s2.revokedAt === null);
-            if (db.numericSessions.length >= 1e4) fail3();
-            db.numericSessions.push({
-              id: randomUUID3(),
-              credentialId: c2.id,
-              ownerId: c2.ownerId,
-              studentId: c2.studentId,
-              classId: m2.classId,
-              enrollmentId: m2.enrollmentId,
-              membershipRevision: m2.revision,
-              canonicalStamp: m2.canonicalStamp,
-              version: c2.version,
-              tokenHash: tokenHash(fresh),
-              expiresAt: time2 + NUMERIC_POLICY.sessionMs,
-              revokedAt: null
-            });
-            return { status: 200, body: { claimed: true }, cookie: cookie(fresh, NUMERIC_POLICY.sessionMs / 1e3) };
-          }
-          const s = token && db.numericSessions.find((s2) => s2.tokenHash === tokenHash(token));
-          if (path === "/api/n88/student/end" && method === "POST") {
-            if (s) s.revokedAt = time2;
-            return { status: 200, body: { ended: true }, cookie: cookie("", 0) };
-          }
-          if (path !== "/api/n88/student/read" || method !== "GET" || !s || s.revokedAt !== null || s.expiresAt <= time2) return denied2();
-          const c = db.numericCredentials.find((c2) => c2.id === s.credentialId && identity(c2, s) && c2.version === s.version && c2.revokedAt === null);
-          if (!c) return denied2();
-          if (typeof ports?.synchronizeOwner !== "function") fail3();
-          await ports.synchronizeOwner(c.ownerId);
-          const m = current(db, c);
-          if (!m || m.enrollmentId !== s.enrollmentId || m.classId !== s.classId || m.revision !== s.membershipRevision || m.canonicalStamp !== s.canonicalStamp) {
-            s.revokedAt = time2;
-            return denied2();
-          }
-          return { status: 200, body: await project(db, m, ports) };
-        };
-        if (!claim) return response(await repository.transaction(authenticate));
-        const committed = await repository.commitAttemptSession(attempt, authenticate);
-        if (committed.proof) {
-          try {
-            await repository.settleAttempt(committed.proof, now());
-          } catch {
-          }
-        }
-        return response(committed.value);
-      } catch {
-        return response(denied2());
-      }
-    };
-  }
-  return Object.freeze({ issueMember, rotateMember, revokeMember, createStudentHandler });
-}
 
 // src/lib/score-foundation.js
 function scoreCents(value, { allowBlank = false } = {}) {
@@ -1068,24 +537,24 @@ function canonicalGradeContext(state, studentId, teachingId) {
 }
 
 // drafts/n88-student-portal/student-projection.mjs
-import { createHash as createHash4 } from "node:crypto";
+import { createHash } from "node:crypto";
 
 // drafts/n88-student-portal/visibility-policy.mjs
 var VISIBILITY_FIELDS = Object.freeze(["name", "class", "grades", "required", "completed", "scheduled"]);
 var VISIBILITY_VERSION = "n88-visibility-v1";
 var object = (value) => value && typeof value === "object" && !Array.isArray(value);
-var exact2 = (value, keys) => object(value) && Object.keys(value).every((key2) => keys.includes(key2));
+var exact = (value, keys) => object(value) && Object.keys(value).every((key2) => keys.includes(key2));
 var text = (value) => typeof value === "string" && value.length > 0 && value.length <= 300;
-var hash2 = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
+var hash = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 var uuid = (value) => typeof value === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(value);
 function validateVisibilityPolicy(policy) {
   const fail6 = () => {
     throw new TypeError("n88_visibility_invalid");
   };
-  if (!exact2(policy, ["version", "ownerId", "studentId", "enrollmentId", "classId", "termId", "scopeStamp", "fields", "sources"]) || policy.version !== VISIBILITY_VERSION || !hash2(policy.scopeStamp) || !["ownerId", "studentId", "enrollmentId", "classId", "termId"].every((key2) => text(policy[key2])) || !exact2(policy.fields, VISIBILITY_FIELDS) || Object.values(policy.fields).some((value) => typeof value !== "boolean") || !Array.isArray(policy.sources) || policy.sources.length > 2e3) fail6();
+  if (!exact(policy, ["version", "ownerId", "studentId", "enrollmentId", "classId", "termId", "scopeStamp", "fields", "sources"]) || policy.version !== VISIBILITY_VERSION || !hash(policy.scopeStamp) || !["ownerId", "studentId", "enrollmentId", "classId", "termId"].every((key2) => text(policy[key2])) || !exact(policy.fields, VISIBILITY_FIELDS) || Object.values(policy.fields).some((value) => typeof value !== "boolean") || !Array.isArray(policy.sources) || policy.sources.length > 2e3) fail6();
   const ids = /* @__PURE__ */ new Set(), sources = /* @__PURE__ */ new Set();
   for (const source of policy.sources) {
-    if (!exact2(source, ["kind", "sourceId", "publicationId", "stamp"]) || !["item", "subitem"].includes(source.kind) || !text(source.sourceId) || !uuid(source.publicationId) || !hash2(source.stamp)) fail6();
+    if (!exact(source, ["kind", "sourceId", "publicationId", "stamp"]) || !["item", "subitem"].includes(source.kind) || !text(source.sourceId) || !uuid(source.publicationId) || !hash(source.stamp)) fail6();
     const key2 = JSON.stringify([source.kind, source.sourceId]);
     if (ids.has(source.publicationId) || sources.has(key2)) fail6();
     ids.add(source.publicationId);
@@ -1123,8 +592,8 @@ var deny = (requirement = "current_membership_and_policy") => {
   error.requirement = requirement;
   throw error;
 };
-var digest = (value) => createHash4("sha256").update(JSON.stringify(value)).digest("hex");
-var active3 = (row) => row && row.deleted === false && row.deletedAt == null && row.archivedAt == null && row.status !== "archived";
+var digest = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+var active = (row) => row && row.deleted === false && row.deletedAt == null && row.archivedAt == null && row.status !== "archived";
 var revision = (row) => {
   if (!/^[1-9][0-9]*$/.test(String(row?.revision ?? ""))) deny("canonical_revision");
   return [row.id, String(row.revision)];
@@ -1153,12 +622,12 @@ function readScope(input) {
   const one = (table, id3) => rows[table].find((row) => row.id === id3);
   const student = one("students", studentId), section = one("sections", classId), term = one("terms", termId);
   const year = one("years", section?.yearId), enrollment = one("enrollments", enrollmentId);
-  if (![student, section, term, year, enrollment].every(active3) || [student, section, term, year, enrollment].some((row) => row.status !== "active") || term.yearId !== section.yearId || enrollment.studentId !== studentId || enrollment.sectionId !== classId || enrollment.endDate != null || date(enrollment.startDate) && enrollment.startDate > today || date(term.startDate) && term.startDate > today || date(term.endDate) && term.endDate < today) deny();
-  const current = rows.enrollments.filter((row) => active3(row) && row.studentId === studentId && row.status === "active" && row.endDate == null && active3(one("sections", row.sectionId)) && one("sections", row.sectionId).yearId === year.id);
+  if (![student, section, term, year, enrollment].every(active) || [student, section, term, year, enrollment].some((row) => row.status !== "active") || term.yearId !== section.yearId || enrollment.studentId !== studentId || enrollment.sectionId !== classId || enrollment.endDate != null || date(enrollment.startDate) && enrollment.startDate > today || date(term.startDate) && term.startDate > today || date(term.endDate) && term.endDate < today) deny();
+  const current = rows.enrollments.filter((row) => active(row) && row.studentId === studentId && row.status === "active" && row.endDate == null && active(one("sections", row.sectionId)) && one("sections", row.sectionId).yearId === year.id);
   if (current.length !== 1 || current[0].id !== enrollmentId) deny("unique_current_enrollment");
-  const teachings = rows.teachings.filter((row) => active3(row) && row.sectionId === classId && row.termId === termId);
-  const items = sortByOrder(rows.items.filter((row) => active3(row) && teachings.some((t) => t.id === row.teachingId)));
-  const definitions = sortByOrder(rows.scoreSubitems.filter((row) => active3(row) && items.some((item) => item.id === row.itemId && item.scoreMode === "subitems")));
+  const teachings = rows.teachings.filter((row) => active(row) && row.sectionId === classId && row.termId === termId);
+  const items = sortByOrder(rows.items.filter((row) => active(row) && teachings.some((t) => t.id === row.teachingId)));
+  const definitions = sortByOrder(rows.scoreSubitems.filter((row) => active(row) && items.some((item) => item.id === row.itemId && item.scoreMode === "subitems")));
   const scopeStamp = digest([
     "n88-scope-v1",
     ...scopeKeys.map((key2) => input[key2]),
@@ -1196,20 +665,20 @@ function projectStudentPortal(input) {
     if (published.some((item) => item.portabilityGroupId) && input.teacherContextVersion !== "n88-canonical-teacher-context-v1") deny(CANONICAL_PROJECTION_REQUIREMENTS.unavailable.portableGrades);
     const contexts = /* @__PURE__ */ new Map();
     for (const teaching of s.teachings) {
-      const logs = s.rows.logs.filter((row) => active3(row) && row.teachingId === teaching.id);
-      const sessions = s.rows.sessions.filter((row) => active3(row) && row.teachingId === teaching.id);
+      const logs = s.rows.logs.filter((row) => active(row) && row.teachingId === teaching.id);
+      const sessions = s.rows.sessions.filter((row) => active(row) && row.teachingId === teaching.id);
       const ctx = {
         ...canonicalGradeContext(s.rows, studentId, teaching.id),
         logs: logs.filter((row) => row.studentId === studentId),
         classHasParticipation: logs.some((row) => row.kind === "participation"),
-        attendance: s.rows.attendance.filter((row) => active3(row) && row.studentId === studentId && row.teachingId === teaching.id && sessions.some((session) => session.id === row.sessionId))
+        attendance: s.rows.attendance.filter((row) => active(row) && row.studentId === studentId && row.teachingId === teaching.id && sessions.some((session) => session.id === row.sessionId))
       };
       for (const item of published.filter((item2) => item2.teachingId === teaching.id)) {
-        const scores = s.rows.scores.filter((row) => active3(row) && row.studentId === studentId && row.itemId === item.id);
+        const scores = s.rows.scores.filter((row) => active(row) && row.studentId === studentId && row.itemId === item.id);
         if (scores.length > 1) deny("unique_student_item_score");
         const score = scores[0];
         if (item.scoreMode === "subitems" && !item.auto) {
-          const completions = s.rows.scoreSubitemCompletions.filter((row) => active3(row) && row.studentId === studentId);
+          const completions = s.rows.scoreSubitemCompletions.filter((row) => active(row) && row.studentId === studentId);
           if (new Set(completions.map((row) => row.subitemId)).size !== completions.length) deny("unique_student_subitem_completion");
           const projection = projectSubitemScore(
             item,
@@ -1237,19 +706,612 @@ function projectStudentPortal(input) {
   if (out.work) for (const definition of s.definitions) {
     const publication = grant("subitem", definition);
     if (!publication) continue;
-    const completions = s.rows.scoreSubitemCompletions.filter((row) => active3(row) && row.studentId === studentId && row.subitemId === definition.id);
+    const completions = s.rows.scoreSubitemCompletions.filter((row) => active(row) && row.studentId === studentId && row.subitemId === definition.id);
     if (completions.length > 1) deny("unique_student_subitem_completion");
     const completionState = subitemCompletionState(completions[0]);
     const { startDate, dueDate } = normalizeSubitemDatesAndPoints(definition);
     const family = completionState !== "unrecorded" ? "completed" : startDate && startDate > s.today ? "scheduled" : "required";
-    if (enabled(family)) out.work[family].push({ id: publication.publicationId, title: definition.name, startDate, dueDate, completionState });
+    if (enabled(family)) out.work[family].push({ id: publication.publicationId, title: definition.name, startDate, dueDate, completionState, ...guidanceForStudent(input, definition, publication) });
   }
   return out;
 }
 
+// drafts/n88-student-portal/task-guidance.mjs
+var hash2 = (v) => createHash2("sha256").update(JSON.stringify(v)).digest("hex");
+var exact2 = (o, keys) => o && typeof o === "object" && !Array.isArray(o) && Object.keys(o).length === keys.length && keys.every((k) => Object.hasOwn(o, k));
+var validGuidanceText = (v) => typeof v === "string" && v.length <= 400 && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]|<\/?[A-Za-z][^>]*>|<!--|javascript\s*:/i.test(v);
+var validGuidanceInput = (v) => exact2(v, ["subitemId", "sourceStamp", "revision", "executionInstructions", "deliveryInstructions", "confirmClear"]) && typeof v.subitemId === "string" && v.subitemId.length > 0 && v.subitemId.length <= 200 && /^[a-f0-9]{64}$/.test(v.sourceStamp) && Number.isSafeInteger(v.revision) && v.revision >= 0 && validGuidanceText(v.executionInstructions) && validGuidanceText(v.deliveryInstructions) && typeof v.confirmClear === "boolean" && (v.executionInstructions.trim() || v.deliveryInstructions.trim() || v.confirmClear);
+async function readTaskGuidance(ports, s) {
+  const r = await ports.query("select subitem_id,teaching_id,case when sum(octet_length(payload::text)) over(order by teaching_id,subitem_id rows unbounded preceding)<=2097152 then payload::text else null end as bounded_payload from n88_private.task_guidance where owner_id=$1::uuid and class_id=$2 and term_id=$3 and ($4::text is null or teaching_id=$4) order by teaching_id,subitem_id limit 2001", [s.ownerId, s.classId, s.termId, s.teachingId || null]);
+  if (r.rows.length > 2e3 || r.rows.some((r2) => typeof r2.bounded_payload !== "string")) throw Error("n88_guidance_unavailable");
+  return r.rows.map((r2) => ({ subitem_id: r2.subitem_id, teaching_id: r2.teaching_id, payload: JSON.parse(r2.bounded_payload) }));
+}
+function authorizedGuidanceSources(s, members, policy, inputFor) {
+  const sources = /* @__PURE__ */ new Map();
+  for (const m of [...members].sort((a, b) => a.studentId.localeCompare(b.studentId))) {
+    const input = inputFor(s, m), visibility = policy.members.find((p2) => p2.studentId === m.studentId && p2.enrollmentId === m.enrollmentId);
+    if (!visibility) continue;
+    let b, p;
+    try {
+      b = studentPortalPublicationBindings(input);
+      p = projectStudentPortal({ ...input, visibility });
+    } catch {
+      continue;
+    }
+    for (const task of Object.values(p.work || {}).flat()) {
+      const publication = visibility.sources.find((x) => x.kind === "subitem" && x.publicationId === task.id), src = b.sources.find((x) => x.kind === "subitem" && x.sourceId === publication?.sourceId && x.stamp === publication.stamp);
+      const row = s.canonical.scoreSubitems.find((x) => x.id === src?.sourceId), item = s.canonical.items.find((x) => x.id === row?.itemId);
+      if (!row || item?.teachingId !== s.teachingId) continue;
+      const entry = sources.get(row.id) || { subitemId: row.id, title: row.name, bindings: [] };
+      entry.bindings.push({ studentId: m.studentId, enrollmentId: m.enrollmentId, scopeStamp: b.scopeStamp, stamp: src.stamp, publicationId: task.id });
+      sources.set(row.id, entry);
+    }
+  }
+  return [...sources.values()].map((x) => ({ ...x, sourceStamp: hash2([s.ownerId, s.classId, s.termId, s.teachingId, policy.revision, x.subitemId, x.bindings]) }));
+}
+function guidanceTeacherList(sources, stored) {
+  return sources.map((src) => {
+    const p = stored.find((r) => r.subitem_id === src.subitemId)?.payload, valid = p?.sourceStamp === src.sourceStamp;
+    return { subitemId: src.subitemId, title: src.title, sourceStamp: src.sourceStamp, revision: p?.revision || 0, executionInstructions: valid ? p.executionInstructions : "", deliveryInstructions: valid ? p.deliveryInstructions : "", needsRepublication: !!p && !valid };
+  });
+}
+async function saveTaskGuidance(ports, s, source, stored, input) {
+  if (!validGuidanceInput(input) || !source || input.sourceStamp !== source.sourceStamp) throw Error("n88_guidance_unavailable");
+  const old = stored.find((r) => r.subitem_id === input.subitemId)?.payload;
+  if ((old?.revision || 0) !== input.revision) throw Error("n88_guidance_unavailable");
+  const payload = { revision: input.revision + 1, sourceStamp: source.sourceStamp, executionInstructions: input.executionInstructions, deliveryInstructions: input.deliveryInstructions, bindings: source.bindings };
+  await ports.query("insert into n88_private.task_guidance(owner_id,class_id,term_id,teaching_id,subitem_id,payload) values($1::uuid,$2,$3,$4,$5,$6::jsonb) on conflict(owner_id,class_id,term_id,teaching_id,subitem_id) do update set payload=excluded.payload", [s.ownerId, s.classId, s.termId, s.teachingId, input.subitemId, JSON.stringify(payload)]);
+  return { saved: true, subitemId: input.subitemId, revision: payload.revision, sourceStamp: source.sourceStamp };
+}
+function guidanceForStudent(input, definition, publication) {
+  const item = input.canonical.items.find((x) => x.id === definition.itemId);
+  const p = input.taskGuidance?.find((r) => r.subitem_id === definition.id && r.teaching_id === item?.teachingId)?.payload;
+  if (!p || !validGuidanceText(p.executionInstructions) || !validGuidanceText(p.deliveryInstructions)) return {};
+  const current = studentPortalPublicationBindings(input), src = current.sources.find((x) => x.kind === "subitem" && x.sourceId === definition.id);
+  if (!p.bindings.some((b) => b.studentId === input.studentId && b.enrollmentId === input.enrollmentId && b.scopeStamp === current.scopeStamp && b.stamp === src?.stamp && b.publicationId === publication.publicationId)) return {};
+  return { ...p.executionInstructions.trim() ? { executionInstructions: p.executionInstructions } : {}, ...p.deliveryInstructions.trim() ? { deliveryInstructions: p.deliveryInstructions } : {} };
+}
+
+// drafts/n88-student-portal/integrated-service.mjs
+import { createHash as createHash6, randomUUID as randomUUID4 } from "node:crypto";
+
+// drafts/n88-student-portal/class-credentials.mjs
+import { Buffer as Buffer3 } from "node:buffer";
+import { createHash as createHash4 } from "node:crypto";
+
+// drafts/n88-student-portal/service.mjs
+import { Buffer as Buffer2 } from "node:buffer";
+import { randomBytes, randomUUID, randomInt, createHash as createHash3, createHmac, timingSafeEqual } from "node:crypto";
+var POLICY = Object.freeze({
+  sessionMs: 8 * 60 * 6e4,
+  rateWindowMs: 15 * 6e4,
+  sourceAttempts: 6,
+  contextAttempts: 30,
+  globalAttempts: 100,
+  failureWindowMs: 864e5,
+  contextFailures: 60,
+  globalFailures: 500,
+  maxRateKeys: 1e4
+});
+var PRIVATE_HEADERS = Object.freeze({
+  "Cache-Control": "no-store, private",
+  "Referrer-Policy": "no-referrer",
+  "X-Robots-Tag": "noindex, nofollow, noarchive",
+  "X-Content-Type-Options": "nosniff",
+  Vary: "Cookie"
+});
+
+// drafts/n88-student-portal/class-credentials.mjs
+var fail = () => {
+  throw Error("n88_class_unavailable");
+};
+var hash3 = (value) => createHash4("sha256").update(JSON.stringify(value)).digest("hex");
+var active2 = (m) => m.status === "active" && m.endDate === null && m.studentActive === true && m.classActive === true;
+var id = (value) => typeof value === "string" && value.length > 0 && value.length <= 240 && !value.includes("\0");
+var requestId = (value) => typeof value === "string" && /^[A-Za-z0-9_-]{16,100}$/.test(value);
+var version = (db, m) => Math.max(0, ...db.numericCredentials.filter((c) => c.ownerId === m.ownerId && c.studentId === m.studentId).map((c) => c.version));
+var live = (db, m) => db.numericCredentials.some((c) => c.ownerId === m.ownerId && c.studentId === m.studentId && c.revokedAt === null);
+var result = (status, body) => ({ status, body, headers: { ...PRIVATE_HEADERS } });
+var denied = () => result(401, { error: "unavailable" });
+var replay = (receipt) => receipt.results.map((r) => r.status === "created" ? { ...r, status: "uncertain", recovery: "refresh_current_roster" } : { ...r });
+var summary = (rows) => Object.fromEntries(["created", "skipped", "failed", "uncertain"].map((s) => [s, rows.filter((r) => r.status === s).length]));
+function createClassCredentialOperations({ repository, verifyTeacher, verifyIngress, origin, resolveClass, issueMember, rotateMember, revokeMember }) {
+  if (!repository?.transaction || [verifyTeacher, verifyIngress, resolveClass, issueMember, rotateMember, revokeMember].some((f) => typeof f !== "function") || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail();
+  return Object.freeze({ forRequest(request) {
+    async function run(action, teachingId, input = {}) {
+      try {
+        return await repository.transaction(async (db, ports) => {
+          const ingress = await verifyIngress(request, ports), headers = request.headers || {};
+          if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || action === "list" && request.method !== "GET" || action !== "list" && (request.method !== "POST" || headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied();
+          const auth = await verifyTeacher(request, ports);
+          if (!auth?.ownerId || !auth.sessionId || auth.current !== true || typeof ports?.synchronizeOwner !== "function") return denied();
+          await ports.synchronizeOwner(auth.ownerId);
+          const scope = await resolveClass(db, ports, auth, teachingId, input);
+          if (!scope || scope.ownerId !== auth.ownerId || scope.current !== true || !id(scope.teachingId) || !id(scope.classId) || !id(scope.revision)) return denied();
+          if (teachingId !== null && scope.teachingId !== teachingId) return denied();
+          const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === scope.classId && active2(m));
+          if (members.length > 2e3 || new Set(members.map((m) => m.studentId)).size !== members.length) return denied();
+          if (members.some((m) => db.memberships.filter((x) => x.ownerId === m.ownerId && x.studentId === m.studentId && active2(x)).length !== 1)) return denied();
+          members.sort((a, b) => a.studentId.localeCompare(b.studentId));
+          const rosterRevision = hash3([scope.teachingId, scope.revision, members.map((m) => [m.studentId, m.enrollmentId, m.revision, m.canonicalStamp])]);
+          if (action === "list") return result(200, { teachingId: scope.teachingId, rosterRevision, students: members.map((m) => ({
+            studentId: m.studentId,
+            enrollmentId: m.enrollmentId,
+            revision: m.revision,
+            label: m.label,
+            credentialVersion: version(db, m),
+            hasActiveCredential: live(db, m)
+          })) });
+          if (!requestId(input.requestId)) return denied();
+          const binding = hash3([action, scope.teachingId, input.expectedRosterRevision ?? null, input.studentId ?? null, input.enrollmentId ?? null, input.revision ?? null, input.credentialVersion ?? null]);
+          const prior = db.classReceipts.find((r) => r.ownerId === auth.ownerId && r.requestId === input.requestId);
+          if (prior) {
+            if (prior.binding !== binding) return result(409, { error: "stale_request" });
+            const rows2 = replay(prior);
+            return result(200, { requestId: input.requestId, replayed: true, results: rows2, counts: summary(rows2) });
+          }
+          if (db.classReceipts.length >= 1e4) fail();
+          if (action === "batch" && input.expectedRosterRevision !== rosterRevision) return result(409, { error: "roster_changed" });
+          let selected = members;
+          if (action !== "batch") {
+            selected = members.filter((m) => m.studentId === input.studentId && m.enrollmentId === input.enrollmentId && m.revision === input.revision);
+            if (selected.length !== 1 || !Number.isSafeInteger(input.credentialVersion) || input.credentialVersion < 0 || version(db, selected[0]) !== input.credentialVersion) return result(409, { error: "member_changed" });
+          }
+          const rows = [], secrets = [];
+          for (const m of selected) {
+            const expectedVersion = version(db, m);
+            const base = { studentId: m.studentId, enrollmentId: m.enrollmentId, credentialVersion: expectedVersion };
+            if (action === "batch" && expectedVersion > 0) {
+              rows.push({ ...base, status: "skipped", reason: live(db, m) ? "existing" : "revoked_rotate_required" });
+              continue;
+            }
+            const rowCount = rows.length, secretCount = secrets.length;
+            const before = structuredClone({ credentials: db.numericCredentials, sessions: db.numericSessions });
+            try {
+              await ports.query("savepoint n88_member_recovery");
+              const issued = await { batch: issueMember, rotate: rotateMember, revoke: revokeMember }[action](db, m, { expectedVersion }, ports);
+              if (action === "revoke") {
+                if (issued?.revoked !== true || live(db, m)) fail();
+                rows.push({ ...base, status: "skipped", reason: "revoked" });
+              } else {
+                if (!/^1[0-9]{5}$/.test(issued?.code || "") || issued.credentialVersion !== expectedVersion + 1 || !live(db, m)) fail();
+                rows.push({ ...base, credentialVersion: issued.credentialVersion, status: "created" });
+                secrets.push({ studentId: m.studentId, code: issued.code });
+              }
+              await ports.query("release savepoint n88_member_recovery");
+            } catch {
+              await ports.query("rollback to savepoint n88_member_recovery");
+              await ports.query("release savepoint n88_member_recovery");
+              rows.length = rowCount;
+              secrets.length = secretCount;
+              db.numericCredentials = before.credentials;
+              db.numericSessions = before.sessions;
+              rows.push({ ...base, status: "failed", reason: "unavailable" });
+            }
+          }
+          db.classReceipts.push({ ownerId: auth.ownerId, requestId: input.requestId, binding, results: structuredClone(rows) });
+          return result(200, { requestId: input.requestId, replayed: false, results: rows, counts: summary(rows), secrets });
+        });
+      } catch {
+        return result(503, { error: "unavailable", outcome: "uncertain", recovery: "reload_with_same_request_id" });
+      }
+    }
+    return Object.freeze({
+      listClass: (teachingId) => run("list", teachingId),
+      issueMissingClassCodes: (teachingId, input) => run("batch", teachingId, input),
+      rotate: (input) => run("rotate", null, input),
+      revoke: (input) => run("revoke", null, input)
+    });
+  } });
+}
+function createPgClassResolver({ teachingId: boundTeachingId } = {}) {
+  return async (db, ports, auth, teachingId, input) => {
+    const requested = teachingId ?? boundTeachingId;
+    if (!id(requested) || typeof ports?.query !== "function") return null;
+    const r = await ports.query(`select t.id,t.section_id,t.revision::text as teaching_revision,
+      term.revision::text as term_revision from rakeezx.teachings t
+      join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id
+      join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id
+      join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id
+      where t.owner_id=$1::uuid and t.id=$2 and t.deleted_at is null
+        and term.deleted_at is null and term.status='active' and term.year_id=c.year_id
+        and c.deleted_at is null and c.status='active' and y.deleted_at is null and y.status='active'`, [auth.ownerId, requested]);
+    if (r.rows.length !== 1) return null;
+    const t = r.rows[0];
+    if (teachingId === null && !db.memberships.some((m) => m.ownerId === auth.ownerId && m.classId === t.section_id && m.studentId === input.studentId && m.enrollmentId === input.enrollmentId && active2(m))) return null;
+    return { ownerId: auth.ownerId, classId: t.section_id, teachingId: t.id, current: true, revision: hash3([t.teaching_revision, t.term_revision]) };
+  };
+}
+function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 1024 * 1024 } = {}) {
+  if (!repository?.transaction || !Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail();
+  const tables2 = { numericCredentials: "numeric_credentials", numericSessions: "numeric_sessions", numericRates: "numeric_rates", numericAttempts: "numeric_attempts", classReceipts: "class_credential_receipts" };
+  const proofs = /* @__PURE__ */ new WeakSet();
+  const api = {
+    // Existing global advisory lock + fenced COMMIT, without credential reads.
+    claimAttempt: (action) => repository.transaction(async (_db, ports) => {
+      const state = {}, original = {};
+      let bytes = 0;
+      for (const [name, table] of [["numericRates", "numeric_rates"], ["numericAttempts", "numeric_attempts"]]) {
+        const r = await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`, [maxRows + 1, maxBytes - bytes]);
+        if (r.rows.length > maxRows) fail();
+        state[name] = r.rows.map(({ payload }) => {
+          if (!payload) fail();
+          bytes += Buffer3.byteLength(JSON.stringify(payload));
+          if (bytes > maxBytes) fail();
+          return payload;
+        });
+        original[name] = structuredClone(state[name]);
+      }
+      const allowed = await action(state, ports);
+      bytes = 0;
+      for (const [name, table] of [["numericRates", "numeric_rates"], ["numericAttempts", "numeric_attempts"]]) {
+        if (state[name].length > maxRows) fail();
+        const pk2 = (r) => name === "numericRates" ? r.key : r.id;
+        const after = new Map(state[name].map((r) => [pk2(r), r]));
+        if (after.size !== state[name].length) fail();
+        const before = new Map(original[name].map((r) => [pk2(r), r]));
+        for (const row of original[name]) if (!after.has(pk2(row))) {
+          if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [pk2(row)])).rowCount !== 1) fail();
+        }
+        for (const row of state[name]) {
+          bytes += Buffer3.byteLength(JSON.stringify(row));
+          if (bytes > maxBytes) fail();
+          if (before.has(pk2(row)) && JSON.stringify(before.get(pk2(row))) === JSON.stringify(row)) continue;
+          if ((await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload`, [pk2(row), JSON.stringify(row)])).rowCount !== 1) fail();
+        }
+      }
+      return allowed;
+    }),
+    commitAttemptSession: async (id3, action) => {
+      const committed = await api.transaction(async (db, ports) => {
+        const a = db.numericAttempts.find((a2) => a2.id === id3);
+        if (!a || a.sessionId !== null || a.settled) fail();
+        const before = new Set(db.numericSessions.map((s) => s.id));
+        const value = await action(db, ports);
+        const fresh = db.numericSessions.filter((s) => !before.has(s.id));
+        if (fresh.length > 1) fail();
+        if (fresh.length === 1) {
+          if (fresh[0].revokedAt !== null) fail();
+          a.sessionId = fresh[0].id;
+        }
+        return { value, receipt: fresh.length ? structuredClone(a) : null };
+      });
+      const proof = committed.receipt ? Object.freeze(committed.receipt) : null;
+      if (proof) proofs.add(proof);
+      return { value: committed.value, proof };
+    },
+    settleAttempt: async (proof, time2) => {
+      if (!proof || !proofs.has(proof) || !Number.isSafeInteger(time2)) return false;
+      return api.transaction(async (db) => {
+        const a = db.numericAttempts.find((a2) => a2.id === proof.id);
+        if (!a || a.settled || a.until <= time2 || JSON.stringify(a) !== JSON.stringify(proof) || !db.numericSessions.some((s) => s.id === a.sessionId)) return false;
+        const buckets = a.buckets.map((b) => db.numericRates.find((r) => r.key === b.key && r.epoch === b.epoch && r.until === b.until && r.until > time2));
+        if (buckets.length !== 2 || new Set(buckets).size !== 2 || buckets.some((b) => !b || b.count < 1)) return false;
+        for (const b of buckets) b.count--;
+        a.settled = true;
+        return true;
+      });
+    },
+    transaction: (action) => repository.transaction(async (db, ports) => {
+      if (typeof ports?.query !== "function") fail();
+      const extra = {}, original = {};
+      let bytes = 0;
+      for (const [name, table] of Object.entries(tables2)) {
+        const r = await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`, [maxRows + 1, maxBytes - bytes]);
+        if (r.rows.length > maxRows) fail();
+        extra[name] = r.rows.map((r2) => {
+          if (!r2.payload) fail();
+          bytes += Buffer3.byteLength(JSON.stringify(r2.payload));
+          if (bytes > maxBytes) fail();
+          return r2.payload;
+        });
+        original[name] = structuredClone(extra[name]);
+      }
+      const state = new Proxy(extra, { get: (o, k) => k in tables2 ? o[k] : db[k], set: (o, k, v) => {
+        if (k in tables2) o[k] = v;
+        else db[k] = v;
+        return true;
+      } });
+      const value = await action(state, ports);
+      bytes = 0;
+      for (const [name, table] of Object.entries(tables2)) {
+        if (extra[name].length > maxRows) fail();
+        const pk2 = (r) => name === "classReceipts" ? JSON.stringify([r.ownerId, r.requestId]) : name === "numericRates" ? r.key : r.id;
+        const before = new Map(original[name].map((r) => [pk2(r), r])), after = new Map(extra[name].map((r) => [pk2(r), r]));
+        if (after.size !== extra[name].length) fail();
+        for (const [key2, row] of before) if (!after.has(key2)) {
+          if (name === "numericCredentials" || name === "classReceipts") fail();
+          if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [key2])).rowCount !== 1) fail();
+        }
+        for (const [key2, row] of after) {
+          bytes += Buffer3.byteLength(JSON.stringify(row));
+          if (bytes > maxBytes) fail();
+          if (before.has(key2) && JSON.stringify(before.get(key2)) === JSON.stringify(row)) continue;
+          const ack = before.has(key2) ? await ports.query(`update n88_private.${table} set payload=$2::jsonb where row_key=$1`, [key2, JSON.stringify(row)]) : await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb)`, [key2, JSON.stringify(row)]);
+          if (ack.rowCount !== 1) fail();
+        }
+      }
+      return value;
+    })
+  };
+  return Object.freeze(api);
+}
+
+// drafts/n88-student-portal/code-recovery.mjs
+import { Buffer as Buffer4 } from "node:buffer";
+import { randomBytes as randomBytes2, randomUUID as randomUUID2, createCipheriv, createDecipheriv } from "node:crypto";
+var fail2 = () => {
+  throw Error("n88_recovery_unavailable");
+};
+var ver = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(v);
+var exact3 = (o, ks) => o && Object.keys(o).length === ks.length && ks.every((k) => Object.hasOwn(o, k));
+var fields = ["id", "credentialId", "generation", "envelopeVersion", "algorithm", "keyVersion", "nonce", "ciphertext", "tag"];
+function createCodeRecovery({ keys, activeKeyVersion, otherKeys = [] } = {}) {
+  if (!(keys instanceof Map) || !keys.size || keys.size > 8 || !ver(activeKeyVersion) || !keys.has(activeKeyVersion) || [...keys].some(([v, k]) => !ver(v) || !Buffer4.isBuffer(k) || k.length !== 32) || new Set([...keys.values()].map((k) => k.toString("hex"))).size !== keys.size || [...keys.values()].some((k) => otherKeys.some((o) => Buffer4.isBuffer(o) && k.equals(o)))) fail2();
+  keys = new Map([...keys].map(([v, k]) => [v, Buffer4.from(k)]));
+  const aad = (c, e) => Buffer4.from(JSON.stringify(["n88-code-recovery", e.id, e.envelopeVersion, e.algorithm, e.keyVersion, c.id, c.version, c.ownerId, c.studentId, c.format, e.generation]));
+  function seal(c, code, generation = 1) {
+    if (c.revokedAt !== null || c.format !== "six-v1" || !/^1[0-9]{5}$/.test(code) || !Number.isSafeInteger(generation) || generation < 1) fail2();
+    const e = { id: randomUUID2(), credentialId: c.id, generation, envelopeVersion: 1, algorithm: "AES-256-GCM", keyVersion: activeKeyVersion, nonce: randomBytes2(12).toString("hex") };
+    const cipher = createCipheriv("aes-256-gcm", keys.get(activeKeyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
+    cipher.setAAD(aad(c, e));
+    e.ciphertext = Buffer4.concat([cipher.update(code, "ascii"), cipher.final()]).toString("hex");
+    e.tag = cipher.getAuthTag().toString("hex");
+    return e;
+  }
+  function open(c, e) {
+    try {
+      if (c.revokedAt !== null || c.format !== "six-v1" || !exact3(e, fields) || e.credentialId !== c.id || e.envelopeVersion !== 1 || e.algorithm !== "AES-256-GCM" || !keys.has(e.keyVersion) || !Number.isSafeInteger(e.generation) || e.generation < 1 || !/^[a-f0-9]{24}$/.test(e.nonce) || !/^[a-f0-9]{12}$/.test(e.ciphertext) || !/^[a-f0-9]{32}$/.test(e.tag)) fail2();
+      const d = createDecipheriv("aes-256-gcm", keys.get(e.keyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
+      d.setAAD(aad(c, e));
+      d.setAuthTag(Buffer4.from(e.tag, "hex"));
+      const code = Buffer4.concat([d.update(Buffer4.from(e.ciphertext, "hex")), d.final()]).toString("ascii");
+      if (!/^1[0-9]{5}$/.test(code)) fail2();
+      return code;
+    } catch {
+      fail2();
+    }
+  }
+  async function read(ports, c) {
+    const r = await ports.query("select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1", [c.id]);
+    return r.rows.length ? { status: "recoverable", credential: open(c, r.rows[0].payload) } : { status: "legacy", credential: null };
+  }
+  async function append(ports, c, code, generation = 1) {
+    for (let n = 0; n < 8; n++) {
+      const e = seal(c, code, generation);
+      const r = await ports.query(`insert into n88_private.code_recovery(row_key,payload) values($1,$2::jsonb) on conflict(key_version,nonce) do nothing`, [e.id, JSON.stringify(e)]);
+      if (r.rowCount === 1) return;
+    }
+    fail2();
+  }
+  async function rewrap(ports, c, expectedGeneration) {
+    const r = await ports.query("select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1", [c.id]);
+    if (r.rows.length !== 1 || r.rows[0].payload.generation !== expectedGeneration) fail2();
+    await append(ports, c, open(c, r.rows[0].payload), expectedGeneration + 1);
+  }
+  return Object.freeze({ read, append, rewrap, seal, open });
+}
+
+// drafts/n88-student-portal/numeric-credentials.mjs
+import { randomInt as randomInt2, randomBytes as randomBytes3, randomUUID as randomUUID3, createHmac as createHmac2, createHash as createHash5, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
+var CREDENTIAL_FORMAT = "six-v1";
+var CREDENTIAL_CAPACITY = 1e5;
+var NUMERIC_POLICY = Object.freeze({
+  collisionBudget: 128,
+  sessionMs: 8 * 60 * 6e4,
+  windowMs: 15 * 6e4,
+  clientAttempts: 6,
+  globalAttempts: 100,
+  maxRateKeys: 1e4,
+  sourceRequests: 120,
+  globalRequests: 1200,
+  maxAttempts: 1e4
+});
+var generateNumericCredential = () => "1" + String(randomInt2(0, 1e5)).padStart(5, "0");
+function normalizeNumericCredential(value) {
+  if (typeof value !== "string" || value.length > 80) return null;
+  const code = value.replace(/^ +| +$/g, "");
+  return /^1[0-9]{5}$/.test(code) ? code : null;
+}
+var fail3 = () => {
+  throw Error("n88_numeric_unavailable");
+};
+var active3 = (m) => m?.status === "active" && m.endDate === null && m.studentActive === true && m.classActive === true;
+var identity = (a, b) => a.ownerId === b.ownerId && a.studentId === b.studentId;
+var tokenHash = (token) => createHash5("sha256").update(token).digest("hex");
+var cookie = (value, age) => `__Secure-n88-student=${value}; Path=/api/n88/student; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;
+var denied2 = () => ({ status: 401, body: { error: "unavailable" }, cookie: cookie("", 0) });
+var response = (r) => ({ ...r, headers: { ...PRIVATE_HEADERS, ...r.cookie ? { "Set-Cookie": r.cookie } : {} } });
+function createNumericCredentialOperations({
+  keys,
+  activeKeyVersion,
+  reservationKey,
+  now = Date.now,
+  generate = generateNumericCredential
+}) {
+  if (!(keys instanceof Map) || !keys.size || !/^[A-Za-z0-9_-]{1,40}$/.test(activeKeyVersion || "") || !keys.has(activeKeyVersion) || !Buffer.isBuffer(reservationKey) || reservationKey.length < 32 || [...keys].some(([v, k]) => !/^[A-Za-z0-9_-]{1,40}$/.test(v) || !Buffer.isBuffer(k) || k.length < 32)) fail3();
+  keys = new Map([...keys].map(([v, k]) => [v, Buffer.from(k)]));
+  reservationKey = Buffer.from(reservationKey);
+  const mac2 = (key2, domain, ...parts) => createHmac2("sha256", key2).update(JSON.stringify(["n88-numeric-v1", domain, ...parts])).digest("hex");
+  const reservation = (code) => mac2(reservationKey, "global-reservation", code);
+  const verifier = (code, c) => mac2(keys.get(c.keyVersion), "credential", c.ownerId, c.studentId, c.version, code);
+  function current(db, c) {
+    if (!db.contexts.some((x) => x.ownerId === c.ownerId && x.active === true)) return null;
+    const members = db.memberships.filter((m) => identity(m, c) && active3(m));
+    return members.length === 1 ? members[0] : null;
+  }
+  function revokeCredential(db, c) {
+    if (c.revokedAt === null) c.revokedAt = now();
+    for (const s of db.numericSessions) if (s.credentialId === c.id && s.revokedAt === null) s.revokedAt = now();
+  }
+  function version2(db, m) {
+    return Math.max(0, ...db.numericCredentials.filter((c) => identity(c, m)).map((c) => c.version));
+  }
+  function check(db, m, expectedVersion) {
+    const canonical = current(db, m);
+    if (!canonical || canonical.enrollmentId !== m.enrollmentId || canonical.revision !== m.revision || canonical.canonicalStamp !== m.canonicalStamp || version2(db, m) !== expectedVersion) fail3();
+  }
+  function issue(db, m, expectedVersion, { rotate = false } = {}) {
+    check(db, m, expectedVersion);
+    const previous = db.numericCredentials.filter((c2) => identity(c2, m) && c2.revokedAt === null);
+    if (previous.length > 1 || previous.length && !rotate) fail3();
+    if (!Number.isSafeInteger(expectedVersion + 1)) fail3();
+    if (db.numericCredentials.filter((c2) => c2.format === CREDENTIAL_FORMAT).length >= CREDENTIAL_CAPACITY) fail3();
+    let code, reserved;
+    for (let attempt = 0; attempt < NUMERIC_POLICY.collisionBudget; attempt++) {
+      code = generate();
+      if (typeof code !== "string" || !/^1[0-9]{5}$/.test(code)) fail3();
+      reserved = reservation(code);
+      if (!db.numericCredentials.some((c2) => c2.reservation === reserved)) break;
+      code = null;
+    }
+    if (!code) fail3();
+    const c = {
+      id: randomUUID3(),
+      ownerId: m.ownerId,
+      studentId: m.studentId,
+      version: expectedVersion + 1,
+      format: CREDENTIAL_FORMAT,
+      keyVersion: activeKeyVersion,
+      reservation: reserved,
+      verifier: "",
+      revokedAt: null
+    };
+    c.verifier = verifier(code, c);
+    previous.forEach((c2) => revokeCredential(db, c2));
+    db.numericCredentials.push(c);
+    return { code, credentialVersion: c.version };
+  }
+  const issueMember = (db, m, { expectedVersion }) => issue(db, m, expectedVersion);
+  const rotateMember = (db, m, { expectedVersion }) => issue(db, m, expectedVersion, { rotate: true });
+  const revokeMember = (db, m, { expectedVersion }) => {
+    check(db, m, expectedVersion);
+    for (const c of db.numericCredentials.filter((c2) => identity(c2, m))) revokeCredential(db, c);
+    return { revoked: true, credentialVersion: expectedVersion };
+  };
+  function createStudentHandler({ repository, verifyIngress, origin, project }) {
+    if (!repository?.transaction || typeof verifyIngress !== "function" || typeof project !== "function" || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail3();
+    return async (request) => {
+      try {
+        const claim = (request.path === "/student/claim" || request.path === "/api/n88/student/claim") && request.method === "POST";
+        let attempt;
+        if (claim) {
+          if (typeof repository.claimAttempt !== "function" || typeof repository.commitAttemptSession !== "function" || typeof repository.settleAttempt !== "function") return response(denied2());
+          attempt = await repository.claimAttempt(async (db, ports) => {
+            const ingress = await verifyIngress(request, ports);
+            if (!ingress?.clientKey) return false;
+            const time2 = now();
+            db.numericRates = db.numericRates.filter((r) => r.until > time2);
+            db.numericAttempts = db.numericAttempts.filter((a2) => a2.until > time2);
+            const source = mac2(reservationKey, "client-rate", ingress.clientKey);
+            const get = (key2, max) => {
+              let b = db.numericRates.find((b2) => b2.key === key2);
+              if (!b && db.numericRates.length < NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b = { key: key2, count: 0, until: time2 + NUMERIC_POLICY.windowMs, epoch: randomUUID3() });
+              if (b && !b.epoch) b.epoch = randomUUID3();
+              return b;
+            };
+            let blocked = false;
+            for (const [key2, max] of [[mac2(reservationKey, "source-flood", ingress.clientKey), NUMERIC_POLICY.sourceRequests], [mac2(reservationKey, "global-flood"), NUMERIC_POLICY.globalRequests]]) {
+              const b = get(key2, max);
+              if (!b || b.count >= max) blocked = true;
+              if (b) b.count = Math.min(max, b.count + 1);
+            }
+            if (blocked) return null;
+            const budgets = [[source, NUMERIC_POLICY.clientAttempts], ["global", NUMERIC_POLICY.globalAttempts]], buckets = [];
+            for (const [key2, max] of budgets) {
+              const b = get(key2, max);
+              if (!b || b.count >= max) blocked = true;
+              if (b) buckets.push(b);
+            }
+            if (blocked || db.numericAttempts.length >= NUMERIC_POLICY.maxAttempts) return null;
+            for (const b of buckets) b.count++;
+            const a = {
+              id: randomUUID3(),
+              buckets: buckets.map(({ key: key2, epoch, until }) => ({ key: key2, epoch, until })),
+              until: Math.max(...buckets.map((b) => b.until)),
+              sessionId: null,
+              settled: false
+            };
+            db.numericAttempts.push(a);
+            return a.id;
+          });
+          if (!attempt) return response(denied2());
+        }
+        const authenticate = async (db, ports) => {
+          const ingress = claim ? { clientKey: "prepaid" } : await verifyIngress(request, ports);
+          const { headers = {}, method, body = {} } = request;
+          const path = request.path.startsWith("/student/") ? "/api/n88" + request.path : request.path;
+          if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || method === "POST" && (headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied2();
+          const time2 = now();
+          const token = /(?:^|;\s*)__Secure-n88-student=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || "")?.[1];
+          if (path === "/api/n88/student/claim" && method === "POST") {
+            const code = normalizeNumericCredential(body.code);
+            if (!code) return denied2();
+            const c2 = db.numericCredentials.find((c3) => c3.reservation === reservation(code));
+            if (!c2 || c2.revokedAt !== null || !keys.has(c2.keyVersion) || !/^[a-f0-9]{64}$/.test(c2.verifier) || !timingSafeEqual2(Buffer.from(c2.verifier, "hex"), Buffer.from(verifier(code, c2), "hex"))) return denied2();
+            if (typeof ports?.synchronizeOwner !== "function") fail3();
+            await ports.synchronizeOwner(c2.ownerId);
+            const m2 = current(db, c2);
+            if (!m2) return denied2();
+            if (token) {
+              for (const s2 of db.numericSessions) if (s2.tokenHash === tokenHash(token)) s2.revokedAt = time2;
+            }
+            const fresh = randomBytes3(32).toString("base64url");
+            db.numericSessions = db.numericSessions.filter((s2) => s2.expiresAt > time2 && s2.revokedAt === null);
+            if (db.numericSessions.length >= 1e4) fail3();
+            db.numericSessions.push({
+              id: randomUUID3(),
+              credentialId: c2.id,
+              ownerId: c2.ownerId,
+              studentId: c2.studentId,
+              classId: m2.classId,
+              enrollmentId: m2.enrollmentId,
+              membershipRevision: m2.revision,
+              canonicalStamp: m2.canonicalStamp,
+              version: c2.version,
+              tokenHash: tokenHash(fresh),
+              expiresAt: time2 + NUMERIC_POLICY.sessionMs,
+              revokedAt: null
+            });
+            return { status: 200, body: { claimed: true }, cookie: cookie(fresh, NUMERIC_POLICY.sessionMs / 1e3) };
+          }
+          const s = token && db.numericSessions.find((s2) => s2.tokenHash === tokenHash(token));
+          if (path === "/api/n88/student/end" && method === "POST") {
+            if (s) s.revokedAt = time2;
+            return { status: 200, body: { ended: true }, cookie: cookie("", 0) };
+          }
+          if (path !== "/api/n88/student/read" || method !== "GET" || !s || s.revokedAt !== null || s.expiresAt <= time2) return denied2();
+          const c = db.numericCredentials.find((c2) => c2.id === s.credentialId && identity(c2, s) && c2.version === s.version && c2.revokedAt === null);
+          if (!c) return denied2();
+          if (typeof ports?.synchronizeOwner !== "function") fail3();
+          await ports.synchronizeOwner(c.ownerId);
+          const m = current(db, c);
+          if (!m || m.enrollmentId !== s.enrollmentId || m.classId !== s.classId || m.revision !== s.membershipRevision || m.canonicalStamp !== s.canonicalStamp) {
+            s.revokedAt = time2;
+            return denied2();
+          }
+          return { status: 200, body: await project(db, m, ports) };
+        };
+        if (!claim) return response(await repository.transaction(authenticate));
+        const committed = await repository.commitAttemptSession(attempt, authenticate);
+        if (committed.proof) {
+          try {
+            await repository.settleAttempt(committed.proof, now());
+          } catch {
+          }
+        }
+        return response(committed.value);
+      } catch {
+        return response(denied2());
+      }
+    };
+  }
+  return Object.freeze({ issueMember, rotateMember, revokeMember, createStudentHandler });
+}
+
 // drafts/n88-student-portal/integrated-service.mjs
 var deny2 = () => ({ status: 401, body: { error: "unavailable" }, headers: PRIVATE_HEADERS });
-var hash3 = (v) => createHash5("sha256").update(JSON.stringify(v)).digest("hex");
+var hash4 = (v) => createHash6("sha256").update(JSON.stringify(v)).digest("hex");
 var camel = (s) => s.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
 var sqlNames = { scoreSubitems: "score_subitems", scoreSubitemCompletions: "score_subitem_completions" };
 var numeric = /* @__PURE__ */ new Set(["max", "value", "manualValue", "derivedValue", "perPoint", "penalty", "latePoints"]);
@@ -1322,11 +1384,11 @@ function createIntegratedService(options, adapter, baseRepository) {
     if (terms.length !== 1) throw Error("n88_current_term");
     const s = { ownerId: m.ownerId, classId: m.classId, termId: terms[0].id, canonical }, policy = await policies(ports, m.ownerId, m.classId, s.termId);
     const stored = policy.members.find((p) => p.studentId === m.studentId && p.enrollmentId === m.enrollmentId);
-    return projectStudentPortal({ ...inputFor(s, m), visibility: stored || null });
+    return projectStudentPortal({ ...inputFor(s, m), visibility: stored || null, taskGuidance: await readTaskGuidance(ports, s) });
   } });
   return async (request) => {
     if (request.path.startsWith("/student/")) return student(request);
-    const match = /^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility)$/.exec(request.path);
+    const match = /^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)$/.exec(request.path);
     if (!match || request.method !== "POST") return deny2();
     const action = match[1], body = request.body || {}, binding = body.binding;
     if (!binding || Object.keys(binding).length !== bindingKeys.length || !bindingKeys.every((k) => typeof binding[k] === "string" && binding[k].length > 0 && binding[k].length <= 200) || binding.teachingId !== body.teachingId) return deny2();
@@ -1336,7 +1398,7 @@ function createIntegratedService(options, adapter, baseRepository) {
     };
     const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input).then((s) => s && s.classId === binding.classId && s.termId === binding.termId ? s : null);
     const ops = createClassCredentialOperations({ repository, ...credentials, ...recovering, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });
-    if (action === "visibility" || action === "list") {
+    if (action === "visibility" || action === "list" || action.startsWith("guidance-")) {
       try {
         return await repository.transaction(async (db, ports) => {
           const h = request.headers || {};
@@ -1348,9 +1410,16 @@ function createIntegratedService(options, adapter, baseRepository) {
           if (!s) return deny2();
           const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === s.classId && m.status === "active" && !m.endDate && m.studentActive && m.classActive);
           if (members.length > 2e3 || new Set(members.map((m) => m.studentId)).size !== members.length || members.some((m) => db.memberships.filter((x) => x.ownerId === m.ownerId && x.studentId === m.studentId && x.status === "active" && !x.endDate && x.studentActive && x.classActive).length !== 1)) return deny2();
-          const rosterRevision = hash3([s.teachingId, s.revision, members.sort((a, b) => a.studentId.localeCompare(b.studentId)).map((m) => [m.studentId, m.enrollmentId, m.revision, m.canonicalStamp])]);
+          const rosterRevision = hash4([s.teachingId, s.revision, members.sort((a, b) => a.studentId.localeCompare(b.studentId)).map((m) => [m.studentId, m.enrollmentId, m.revision, m.canonicalStamp])]);
           let p = await policies(ports, s.ownerId, s.classId, s.termId), data2;
-          if (action === "visibility") {
+          if (action.startsWith("guidance-")) {
+            const sources = authorizedGuidanceSources(s, members, p, inputFor), stored = await readTaskGuidance(ports, s);
+            if (action === "guidance-list") data2 = { tasks: guidanceTeacherList(sources, stored) };
+            else {
+              if (Object.keys(body).sort().join(",") !== "binding,guidance,requestId,teachingId" || typeof body.requestId !== "string" || body.requestId.length > 100) return deny2();
+              data2 = await saveTaskGuidance(ports, s, sources.find((x) => x.subitemId === body.guidance?.subitemId), stored, body.guidance);
+            }
+          } else if (action === "visibility") {
             if (p.revision !== body.policyRevision || body.expectedRosterRevision !== rosterRevision || !body.fields || Object.keys(body.fields).length !== 6 || !VISIBILITY_FIELDS.every((f) => typeof body.fields[f] === "boolean")) return deny2();
             const membersPolicy = members.map((m) => {
               const input = inputFor(s, m), b = studentPortalPublicationBindings(input);
@@ -1426,7 +1495,7 @@ var tables = {
   rates: { sql: "guess_budgets", pk: ["key"], fields: ["key", "count", "until"], cols: ["key", "count", "until_at"] }
 };
 var names = Object.keys(tables);
-var exact3 = (o, keys) => must(o && Object.getPrototypeOf(o) === Object.prototype && Object.keys(o).length === keys.length && keys.every((k) => Object.hasOwn(o, k)));
+var exact4 = (o, keys) => must(o && Object.getPrototypeOf(o) === Object.prototype && Object.keys(o).length === keys.length && keys.every((k) => Object.hasOwn(o, k)));
 var str = (s, max, min = 1) => must(typeof s === "string" && s.length >= min && s.length <= max && !s.includes("\0"));
 var uuid2 = (s) => must(typeof s === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(s));
 var hex = (s) => must(typeof s === "string" && /^[a-f0-9]{64}$/.test(s));
@@ -1447,7 +1516,7 @@ var date2 = (s) => {
 var namespace = (s) => must(typeof s === "string" && /^[A-Za-z0-9_-]{24,64}$/.test(s));
 var active4 = (r) => r.status === "active" && r.endDate === null && r.studentActive && r.classActive;
 function validate(name, r) {
-  exact3(r, tables[name].fields);
+  exact4(r, tables[name].fields);
   for (const k of ["ownerId", "id", "credentialId"]) if (Object.hasOwn(r, k)) uuid2(r[k]);
   for (const k of ["classId", "studentId", "enrollmentId"]) if (Object.hasOwn(r, k)) str(r[k], 240);
   if (Object.hasOwn(r, "namespace")) namespace(r.namespace);
@@ -1465,7 +1534,7 @@ function validate(name, r) {
   }
   if (name === "sessions") time(r.expiresAt);
   if (name === "publications") {
-    exact3(r.source, ["teachingId", "itemId"]);
+    exact4(r.source, ["teachingId", "itemId"]);
     str(r.source.teachingId, 240);
     str(r.source.itemId, 240);
     str(r.title, 160);
@@ -1489,7 +1558,7 @@ function encode(name, r) {
 }
 function decode(name, row) {
   const t = tables[name];
-  exact3(row, t.cols);
+  exact4(row, t.cols);
   let r;
   if (name === "publications") r = {
     id: row.id,
@@ -1528,7 +1597,7 @@ var queries = Object.fromEntries(names.map((name) => {
 }));
 var pk = (name, values) => tables[name].pk.map((k) => values[tables[name].cols.indexOf(k)]);
 function snapshot(state, limits) {
-  exact3(state, names);
+  exact4(state, names);
   let total = 0, bytes = 0;
   const maps = {};
   for (const name of names) {
@@ -1567,12 +1636,12 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
 } }) {
   must(typeof synchronize === "function");
   must(typeof acquire === "function");
-  exact3(limits, [...names, "total", "bytes", "rowBytes"]);
+  exact4(limits, [...names, "total", "bytes", "rowBytes"]);
   for (const k of names) safe(limits[k], 1, 1e4);
   safe(limits.total, 1, 5e4);
   safe(limits.bytes, 1024, 64 * 1024 * 1024);
   safe(limits.rowBytes, 128, 32768);
-  exact3(timing, ["acquireMs", "transactionMs", "cleanupMs", "statementMs", "lockMs"]);
+  exact4(timing, ["acquireMs", "transactionMs", "cleanupMs", "statementMs", "lockMs"]);
   for (const k of Object.keys(timing)) safe(timing[k], 1, 6e4);
   must(timing.acquireMs <= timing.transactionMs && timing.statementMs <= timing.transactionMs && timing.lockMs <= timing.statementMs);
   limits = { ...limits };
@@ -1621,7 +1690,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         const result3 = await query(queries[name].read, [bound + 1, limits.rowBytes, limits.bytes - transferred]);
         must(result3.rows.length <= bound);
         state[name] = result3.rows.map((row) => {
-          exact3(row, ["bounded_row"]);
+          exact4(row, ["bounded_row"]);
           must(typeof row.bounded_row === "string");
           transferred += Buffer5.byteLength(row.bounded_row);
           must(transferred <= limits.bytes);
@@ -1699,14 +1768,14 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
 
 // drafts/n88-student-portal/canonical-adapter.mjs
 import { Buffer as Buffer6 } from "node:buffer";
-import { createHash as createHash6 } from "node:crypto";
+import { createHash as createHash7 } from "node:crypto";
 var CANONICAL_TABLES = Object.freeze(["years", "terms", "sections", "students", "enrollments", "teachings", "items"]);
 var fail4 = () => {
   throw Error("n88_canonical_unavailable");
 };
 var key = (m) => JSON.stringify([m.ownerId, m.classId, m.studentId, m.enrollmentId]);
 var id2 = (parts) => {
-  const h = createHash6("sha256").update(JSON.stringify(["n88-publication-v1", ...parts])).digest("hex");
+  const h = createHash7("sha256").update(JSON.stringify(["n88-publication-v1", ...parts])).digest("hex");
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20, 32)}`;
 };
 function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = {}) {
@@ -1746,7 +1815,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
       if (!/^[1-9][0-9]*$/.test(r.revision) || !Number.isSafeInteger(revision2)) fail4();
       const revisions = [r.revision, r.student_revision, r.section_revision, r.year_revision];
       if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail4();
-      const canonicalStamp = createHash6("sha256").update(JSON.stringify(["n88-lineage-v1", ...revisions])).digest("hex");
+      const canonicalStamp = createHash7("sha256").update(JSON.stringify(["n88-lineage-v1", ...revisions])).digest("hex");
       const m = {
         ownerId: r.owner_id,
         classId: r.section_id,
@@ -1933,7 +2002,7 @@ function composeService(options, adapter) {
 }
 
 // drafts/n88-student-portal/web-protocol.mjs
-var ROUTE = /^\/api\/n88\/(?:teacher\/class\/(?:list|issue-missing|rotate|revoke|visibility)|student\/(?:claim|read|end))$/;
+var ROUTE = /^\/api\/n88\/(?:teacher\/class\/(?:list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)|student\/(?:claim|read|end))$/;
 var FORWARDED = Object.freeze(["authorization", "cookie", "origin", "content-type", "x-n88-csrf", "sec-fetch-site"]);
 var decodeBytes = (value) => {
   if (typeof value !== "string" || value.length > 5464 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value)) throw Error("n88_envelope");

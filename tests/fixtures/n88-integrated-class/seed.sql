@@ -35,3 +35,10 @@ insert into n88_private.contexts values('n88_integrated_synthetic_01','aaaaaaaa-
 
 -- Second student must also have the canonical atomic subitem projection.
 insert into rakeezx.scores(owner_id,id,student_id,item_id,revision,value,manual_value,derived_value) values('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','score-other-subitems','other','subitems',1,2,null,2);
+
+-- AI: coherent fabricated examples for the current canonical-task review (no scoring changes).
+update rakeezx.students set name='عبدالله سالم' where id='student';
+update rakeezx.score_subitems set name='تدريب الكسور — الدرس السابق' where id='regular';
+update rakeezx.score_subitems set name='مراجعة جدول الضرب' where id='late';
+update rakeezx.score_subitems set name='تطبيق مقارنة الكسور' where id='overdue';
+update rakeezx.score_subitems set name='نشاط الأنماط العددية' where id='future';

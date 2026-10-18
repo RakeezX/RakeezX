@@ -1,3 +1,4 @@
+import {validGuidanceList,validGuidanceAck} from './student-portal-task-guidance-client.js';
 /** AI: inactive class transport. Server authorization is mandatory; context is a fence, never authority. */
 export const PORTAL_FIELDS = Object.freeze(['name', 'class', 'grades', 'required', 'completed', 'scheduled']);
 const bindingKeys = ['ownerId', 'sessionId', 'leaseId', 'teachingId', 'classId', 'termId', 'contextRevision'];
@@ -64,6 +65,17 @@ export function createClassPortalClient({ request, getContext = () => null, time
     return work.finally(() => { roster = null; if (pending === work) pending = null; });
   }
   return Object.freeze({
+    async listGuidance(teachingId) {
+      if(pending) deny('busy');
+      return call('guidance-list',teachingId,{},validGuidanceList);
+    },
+    async saveGuidance(teachingId,guidance) {
+      if(pending) deny('busy');
+      const requestId=crypto.randomUUID(), c=context(teachingId);
+      const work=call('guidance-save',teachingId,{requestId,guidance},d=>validGuidanceAck(d,guidance),c);
+      pending=work;
+      try{return await work;}finally{if(pending===work)pending=null;}
+    },
     async listClass(teachingId) {
       if (pending) deny('busy');
       const c = context(teachingId), sequence = ++readSequence;

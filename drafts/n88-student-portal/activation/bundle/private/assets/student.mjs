@@ -41,7 +41,7 @@ function projectUnifiedStudentData(data) {
     if (!object(data.work)) throw fail();
     result.work = {};
     for (const section of ["required", "completed", "scheduled"]) if (Object.hasOwn(data.work, section)) {
-      result.work[section] = list(data.work[section], { id: text, title: text, instruction: text, deadline: text, status: text, startDate: (v) => v === null || text(v), dueDate: (v) => v === null || text(v), completionState: (v) => ["unrecorded", "regular", "late"].includes(v) }, ["id", "title"]);
+      result.work[section] = list(data.work[section], { id: text, title: text, instruction: text, executionInstructions: (v) => text(v) && v.length <= 400, deliveryInstructions: (v) => text(v) && v.length <= 400, deadline: text, status: text, startDate: (v) => v === null || text(v), dueDate: (v) => v === null || text(v), completionState: (v) => ["unrecorded", "regular", "late"].includes(v) }, ["id", "title"]);
     }
   }
   return result;
@@ -107,6 +107,55 @@ function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch } = {
   });
 }
 
+// src/lib/dom.js
+var ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+var esc = (v) => v === null || v === void 0 ? "" : String(v).replace(/[&<>"']/g, (c) => ESC_MAP[c]);
+var RAW = /* @__PURE__ */ Symbol("raw");
+var raw = (s) => ({
+  [RAW]: true,
+  value: String(s ?? ""),
+  toString() {
+    return this.value;
+  }
+});
+var flatten = (v) => {
+  if (v === null || v === void 0 || v === false) return "";
+  if (v[RAW]) return v.value;
+  if (Array.isArray(v)) return v.map(flatten).join("");
+  return esc(v);
+};
+function html(strings, ...values) {
+  let out = strings[0];
+  for (let i = 0; i < values.length; i++) out += flatten(values[i]) + strings[i + 1];
+  return raw(out);
+}
+var focusableSelector = [
+  "[autofocus]",
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])'
+].join(",");
+
+// src/lib/brand.js
+var BRAND_NAME = "\u0631\u064E\u0643\u064A\u0632 \u0627\u0644\u0645\u0639\u0644\u0645";
+var APP_ICON_URL = new URL("../../assets/icon-192.png", import.meta.url).href;
+var HEADER_LIGHT_URL = new URL("../../assets/header-light-standard.svg", import.meta.url).href;
+var HEADER_LIGHT_COMPACT_URL = new URL("../../assets/header-light-compact.svg", import.meta.url).href;
+var HEADER_DARK_URL = new URL("../../assets/header-dark-standard.svg", import.meta.url).href;
+var HEADER_DARK_COMPACT_URL = new URL("../../assets/header-dark-compact.svg", import.meta.url).href;
+function brandLockup({ compact = false, prominent = false, caption = "" } = {}) {
+  const width = compact ? 295 : 345;
+  const height = compact ? 52 : 56;
+  return html`<span class="brand-lockup ${prominent ? "brand-lockup--prominent" : ""}" role="img" aria-label="${BRAND_NAME}">
+    <img class="brand-lockup__image brand-lockup__image--light" src="${compact ? HEADER_LIGHT_COMPACT_URL : HEADER_LIGHT_URL}" width="${width}" height="${height}" alt="" aria-hidden="true">
+    <img class="brand-lockup__image brand-lockup__image--dark" src="${compact ? HEADER_DARK_COMPACT_URL : HEADER_DARK_URL}" width="${width}" height="${height}" alt="" aria-hidden="true">
+    ${caption ? html`<span class="brand-lockup__caption">${caption}</span>` : ""}
+  </span>`;
+}
+
 // src/views/student-portal-login.js
 var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var displayNumber = (value) => value === null ? "\u0644\u0645 \u062A\u064F\u0631\u0635\u062F" : escape(value);
@@ -123,7 +172,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   const enabled = readiness2?.enabled === true && !!client;
   const paint = (content) => {
     if (disposed) return;
-    root.innerHTML = `<header><span class="n88-unified-brand">\u0631\u064E\u0643\u064A\u0632 \u0627\u0644\u0645\u0639\u0644\u0645</span><span>\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628</span></header><main>${content}</main>`;
+    root.innerHTML = `<header>${brandLockup({ compact: true })}<span class="n88-unified-space">\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628</span></header><main>${content}</main>`;
     root.querySelector("h1")?.focus();
   };
   function entry(message = "") {
@@ -132,16 +181,19 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
   }
-  function show(raw) {
-    const data = projectUnifiedStudentData(raw);
+  function show(raw2) {
+    const data = projectUnifiedStudentData(raw2);
     const profile = data.profile;
-    let content = `<h1 tabindex="-1">\u0645\u0633\u0627\u062D\u062A\u064A \u0627\u0644\u062F\u0631\u0627\u0633\u064A\u0629</h1>${profile?.name !== void 0 ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ""}${profile?.classLabel !== void 0 ? `<p>${escape(profile.classLabel)}</p>` : ""}<div class="n88-unified-actions"><button data-read>\u062A\u062D\u062F\u064A\u062B</button><button data-end>\u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062C\u0644\u0633\u0629</button></div><div class="n88-unified-sections">`;
+    let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">\u0645\u0633\u0627\u062D\u062A\u064A \u0627\u0644\u062F\u0631\u0627\u0633\u064A\u0629</h1>${profile?.name !== void 0 ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ""}${profile?.classLabel !== void 0 ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ""}</div><div class="n88-unified-actions"><button data-read>\u062A\u062D\u062F\u064A\u062B</button><button data-end>\u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062C\u0644\u0633\u0629</button></div></div><div class="n88-unified-sections">`;
     if (data.grades) {
-      content += `<section><h2>\u062F\u0631\u062C\u0627\u062A\u064A</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">\u0627\u0644\u0628\u0646\u062F</th><th scope="col">\u0627\u0644\u062F\u0631\u062C\u0629</th><th scope="col">\u0645\u0646</th></tr></thead><tbody>${data.grades.items.map((item) => `<tr><th scope="row">${escape(item.label)}${item.status !== void 0 ? `<small>${escape({ recorded: "\u0645\u0631\u0635\u0648\u062F\u0629", unrecorded: "\u0644\u0645 \u062A\u064F\u0631\u0635\u062F" }[item.status] || "")}</small>` : ""}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join("")}</tbody></table></div>${data.grades.total ? `<p>\u0627\u0644\u0645\u062C\u0645\u0648\u0639: ${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</p>` : ""}</section>`;
+      content += `<section class="n88-unified-grades"><h2>\u062F\u0631\u062C\u0627\u062A\u064A</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">\u0627\u0644\u0628\u0646\u062F</th><th scope="col">\u0627\u0644\u062F\u0631\u062C\u0629</th><th scope="col">\u0645\u0646</th></tr></thead><tbody>${data.grades.items.map((item) => `<tr><th scope="row">${escape(item.label)}${item.status !== void 0 ? `<small>${escape({ recorded: "\u0645\u0631\u0635\u0648\u062F\u0629", unrecorded: "\u0644\u0645 \u062A\u064F\u0631\u0635\u062F" }[item.status] || "")}</small>` : ""}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join("")}</tbody></table></div>${data.grades.total ? `<p class="n88-unified-total">\u0627\u0644\u0645\u062C\u0645\u0648\u0639: <b dir="ltr">${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</b></p>` : ""}</section>`;
     }
     for (const [key, label] of Object.entries({ required: "\u0627\u0644\u0645\u0637\u0644\u0648\u0628 \u0645\u0646\u064A", completed: "\u0627\u0644\u0623\u0639\u0645\u0627\u0644 \u0627\u0644\u0645\u0643\u062A\u0645\u0644\u0629", scheduled: "\u0627\u0644\u0623\u0639\u0645\u0627\u0644 \u0627\u0644\u0642\u0627\u062F\u0645\u0629" })) {
       if (!Object.hasOwn(data.work || {}, key)) continue;
-      content += `<section data-section="${key}"><h2>${label}</h2>${data.work[key].length ? data.work[key].map((item) => `<article><h3>${escape(item.title)}</h3>${item.instruction !== void 0 ? `<p>${escape(item.instruction)}</p>` : ""}${item.startDate ? `<p>\u064A\u0628\u062F\u0623: <span dir="ltr">${escape(item.startDate)}</span></p>` : ""}${item.dueDate ? `<p>\u0627\u0644\u062A\u0633\u0644\u064A\u0645: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ""}${item.completionState !== void 0 ? `<p>${escape({ unrecorded: "\u0644\u0645 \u064A\u064F\u0631\u0635\u062F \u0625\u0646\u062C\u0627\u0632", regular: "\u0645\u0643\u062A\u0645\u0644", late: "\u0645\u0643\u062A\u0645\u0644 \u0645\u062A\u0623\u062E\u0631" }[item.completionState])}</p>` : ""}${item.deadline !== void 0 ? `<p>\u0627\u0644\u0645\u0648\u0639\u062F: <span dir="ltr">${escape(item.deadline)}</span></p>` : ""}${item.status !== void 0 ? `<p>${escape(item.status)}</p>` : ""}</article>`).join("") : "<p>\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0639\u0645\u0627\u0644 \u0645\u0646\u0634\u0648\u0631\u0629 \u0641\u064A \u0647\u0630\u0627 \u0627\u0644\u0642\u0633\u0645.</p>"}</section>`;
+      content += `<section data-section="${key}"><h2>${label}<span class="n88-unified-count" aria-label="\u0639\u062F\u062F \u0627\u0644\u0623\u0639\u0645\u0627\u0644">${data.work[key].length}</span></h2>${data.work[key].length ? data.work[key].map((item) => {
+        const detail = `${item.executionInstructions !== void 0 ? `<h3>\u062A\u0639\u0644\u064A\u0645\u0627\u062A \u0627\u0644\u062A\u0646\u0641\u064A\u0630</h3><p class="n88-guidance-text">${escape(item.executionInstructions)}</p>` : ""}${item.deliveryInstructions !== void 0 ? `<h3>\u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062A\u0633\u0644\u064A\u0645</h3><p class="n88-guidance-text">${escape(item.deliveryInstructions)}</p>` : ""}${item.instruction !== void 0 ? `<p class="n88-unified-instruction">${escape(item.instruction)}</p>` : ""}${item.startDate ? `<p>\u064A\u0628\u062F\u0623: <span dir="ltr">${escape(item.startDate)}</span></p>` : ""}${item.dueDate ? `<p>\u0627\u0644\u062A\u0633\u0644\u064A\u0645: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ""}${item.completionState !== void 0 ? `<p>${escape({ unrecorded: "\u0644\u0645 \u064A\u064F\u0631\u0635\u062F \u0625\u0646\u062C\u0627\u0632", regular: "\u0645\u0643\u062A\u0645\u0644", late: "\u0645\u0643\u062A\u0645\u0644 \u0645\u062A\u0623\u062E\u0631" }[item.completionState])}</p>` : ""}${item.deadline !== void 0 ? `<p>\u0627\u0644\u0645\u0648\u0639\u062F: <span dir="ltr">${escape(item.deadline)}</span></p>` : ""}${item.status !== void 0 ? `<p>${escape(item.status)}</p>` : ""}`;
+        return detail ? `<details class="n88-unified-work"><summary><span>${escape(item.title)}</span><span class="n88-unified-detail-hint">\u0627\u0644\u062A\u0641\u0627\u0635\u064A\u0644</span></summary><div class="n88-unified-detail">${detail}</div></details>` : `<article class="n88-unified-work"><h3>${escape(item.title)}</h3></article>`;
+      }).join("") : '<p class="n88-unified-empty">\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0639\u0645\u0627\u0644 \u0645\u0646\u0634\u0648\u0631\u0629 \u0641\u064A \u0647\u0630\u0627 \u0627\u0644\u0642\u0633\u0645.</p>'}</section>`;
     }
     paint(content + "</div>");
   }

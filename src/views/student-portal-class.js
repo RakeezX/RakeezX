@@ -3,9 +3,54 @@ import { html } from '../lib/dom.js';
 import { classContextKey, PORTAL_FIELDS } from '../lib/student-portal-class-client.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const labels = { name:'اسم الطالب', class:'الفصل', grades:'الدرجات', required:'المهام المطلوبة', completed:'المهام المكتملة', scheduled:'المهام المجدولة' };
+/** AI: per-source drafts stay fenced to the exact class/session/source snapshot. */
+export function mountTaskGuidance(root,{client,getContext,subscribe}) {
+ let disposed=false,busy=false,sequence=0,bound=null,tasks=[],selected=null,message='',drafts=new Map(),opened=false;
+ const current=()=>{try{return classContextKey(getContext());}catch{return null;}};
+ const reset=()=>{sequence++;bound=current();tasks=[];selected=null;drafts.clear();message='';};
+ function draw(){
+  if(disposed)return;
+  if(bound!==current())reset();
+  opened=root.querySelector('details')?.open??opened;
+  const task=tasks.find(t=>t.subitemId===selected),draft=task&&(drafts.get(selected)||task),stale=draft&&task&&(draft.sourceStamp!==task.sourceStamp||draft.revision!==task.revision);
+  root.innerHTML=`<details class="n88-task-guidance" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم</summary><p>اختر مهمة منشورة. النص للتوضيح فقط؛ لا يستقبل ملفات أو تسليمات.</p><p role="status">${esc(message)}</p>${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:'<p>لا توجد مهام منشورة متاحة. اختر حقول المهام واحفظها أولًا.</p>'}${task?`<form data-guidance><fieldset ${busy||!current()?'disabled':''}><legend>${esc(task.title)}</legend>${task.needsRepublication?'<p>تغيّر المصدر أو النشر؛ راجع التعليمات وانشرها عمدًا من جديد.</p>':''}${stale?'<p>تغيّرت نسخة المهمة. مسودتك محفوظة محليًا؛ راجع النسخة الحالية قبل النشر.</p><button type="button" data-guidance-revalidate>راجعت المهمة الحالية؛ احتفظ بالمسودة</button>':''}<label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="3">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="3">${esc(draft.deliveryInstructions)}</textarea></label><small>400 حرف لكل حقل. أسطر نصية فقط.</small><label><input type="checkbox" name="confirmClear"> أؤكد مسح التعليمات إذا كان الحقلان فارغين</label><button class="btn" type="submit" ${stale?'disabled':''}>حفظ ونشر التعليمات</button></fieldset></form>`:''}<button class="btn" type="button" data-guidance-refresh ${busy?'disabled':''}>تحديث المهام</button></details>`;
+ }
+ async function refresh(){
+  if(disposed||busy)return;
+  if(bound!==current())reset();const k=bound,g=++sequence;
+  if(!k||!client?.listGuidance){tasks=[];draw();return;}
+  busy=true;draw();
+  try{const result=await client.listGuidance(getContext().teachingId);if(disposed||g!==sequence||k!==current())return;tasks=result.tasks;if(!tasks.some(t=>t.subitemId===selected))selected=tasks[0]?.subitemId||null;}
+  catch{if(g===sequence){tasks=[];message='تعذّرت القراءة؛ لم تُنشر أي تعليمات. المسودة محفوظة حتى تحديث المهمة.';}}
+  finally{busy=false;if(!disposed){if(k!==current())reset();draw();}}
+ }
+ const input=e=>{if(bound!==current()){reset();draw();return;}if(!e.target.closest('[data-guidance]'))return;const task=tasks.find(t=>t.subitemId===selected);if(!task)return;const form=root.querySelector('form');drafts.set(selected,{...(drafts.get(selected)||task),executionInstructions:form.elements.executionInstructions.value,deliveryInstructions:form.elements.deliveryInstructions.value});};
+ const change=e=>{if(e.target.matches('[data-guidance-source]')){selected=e.target.value;message='';draw();}};
+ const click=e=>{if(bound!==current()){reset();draw();return;}if(e.target.closest('[data-guidance-refresh]'))void refresh();if(e.target.closest('[data-guidance-revalidate]')){const task=tasks.find(t=>t.subitemId===selected),draft=drafts.get(selected);if(task&&draft){drafts.set(selected,{...draft,sourceStamp:task.sourceStamp,revision:task.revision});draw();}}};
+ const submit=async e=>{
+  if(!e.target.matches('[data-guidance]'))return;e.preventDefault();
+  if(busy||bound!==current()){if(bound!==current())reset();draw();return;}
+  const task=tasks.find(t=>t.subitemId===selected),d=drafts.get(selected)||task;
+  if(!task||d.sourceStamp!==task.sourceStamp||d.revision!==task.revision)return;
+  const guidance={subitemId:task.subitemId,sourceStamp:d.sourceStamp,revision:d.revision,executionInstructions:d.executionInstructions,deliveryInstructions:d.deliveryInstructions,confirmClear:e.target.elements.confirmClear.checked};
+  if(!guidance.executionInstructions.trim()&&!guidance.deliveryInstructions.trim()&&!guidance.confirmClear){message='أكد مسح التعليمات أولًا.';draw();return;}
+  const k=bound,g=++sequence;busy=true;message='جارٍ حفظ التعليمات…';draw();
+  try{await client.saveGuidance(getContext().teachingId,guidance);if(disposed||k!==current()||g!==sequence)return;drafts.delete(task.subitemId);message='حُفظت التعليمات وأُقرّ نشرها.';}
+  catch{if(k===current()&&g===sequence)message='تعذّر تأكيد النشر. مسودتك محفوظة؛ حدّث المهام وراجع الحالة قبل إعادة المحاولة.';}
+  finally{busy=false;if(!disposed){if(k!==current())reset();draw();await refresh();}}
+ };
+ const changed=()=>{if(bound!==current()){reset();draw();}void refresh();};
+ const win=root.ownerDocument.defaultView,hide=()=>{reset();tasks=[];draw();},wake=()=>void refresh();
+ root.addEventListener('input',input);root.addEventListener('change',change);root.addEventListener('click',click);root.addEventListener('submit',submit);
+ win.addEventListener('pagehide',hide);win.addEventListener('pageshow',wake);
+ const unsub=subscribe(changed);reset();void refresh();
+ return {refresh,contextChanged:changed,dispose(){disposed=true;sequence++;drafts.clear();unsub?.();win.removeEventListener('pagehide',hide);win.removeEventListener('pageshow',wake);root.removeEventListener('input',input);root.removeEventListener('change',change);root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.replaceChildren();}};
+}
 export function mountClassPortal(root, { client, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), share = typeof navigator.share==='function' ? data=>navigator.share(data) : null, requestId = () => crypto.randomUUID() } = {}) {
   let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer, wakeTimer, readWork = null, mutating = false, queued = false, suspended = false, retry = false, draft = null, draftRevision = null, settingsOpen = false;
   root.classList.add('n88-class'); root.dir = 'rtl';
+  const panel=root.ownerDocument.createElement('div'),guidanceRoot=root.ownerDocument.createElement('div');root.append(panel,guidanceRoot);
+  const guidance=mountTaskGuidance(guidanceRoot,{client,getContext,subscribe});
   const context = () => { try { return getContext(); } catch { return null; } };
   const key = () => classContextKey(context());
   const valid = (g, k) => !disposed && g === generation && k !== null && k === key();
@@ -18,7 +63,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     const focusAction = root.contains(focused) ? { action: focused.dataset.action, index: focused.dataset.index, name: focused.name } : null;
     settingsOpen = root.querySelector('details')?.open ?? settingsOpen;
     root.setAttribute('aria-busy', String(busy));
-    root.innerHTML = `<section aria-label="مساحة طلاب الفصل">
+    panel.innerHTML = `<section aria-label="مساحة طلاب الفصل">
       <div class="n88-class-toolbar"><p class="n88-class-purpose">رموز دخول الطلاب إلى مساحتهم الدراسية.</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable ? 'disabled' : ''}>إنشاء الرموز</button>` : ''}</div>
       <div class="n88-class-status"><p role="status" aria-live="polite">${esc(message || (ready ? (busy ? 'جارٍ قراءة القائمة…' : '') : 'مساحة الطلاب غير مفعّلة حاليًا.'))}</p>${retry && ready ? `<button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>مراجعة القائمة</button>` : ''}</div>
       ${roster ? `<ul class="n88-class-roster" aria-label="طلاب ${esc(classLabel())}">${roster.students.map((s, index) => `<li><div class="n88-class-student"><strong>${esc(s.label)}</strong>${s.credential ? `<div data-code><input readonly autocomplete="off" dir="ltr" aria-label="رمز ${esc(s.label)}" value="${esc(s.credential)}"></div>` : `<span>${s.recoveryStatus==='legacy' ? 'رمز قديم لا يُسترجع؛ اختر تغيير لاستبداله' : s.hasActiveCode ? 'الرمز مخفي؛ راجع القائمة لإظهاره' : 'بلا رمز فعّال'}</span>`}</div><div class="n88-class-actions">${s.credential ? `<button class="btn" data-action="copy-student" data-index="${index}" aria-label="نسخ رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>نسخ</button><button class="btn" data-action="share-student" data-index="${index}" aria-label="مشاركة رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>مشاركة</button>` : ''}<button class="btn" data-action="review-rotate" data-index="${index}" aria-label="تغيير رمز ${esc(s.label)}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير</button><button class="btn" data-action="review-revoke" data-index="${index}" aria-label="إلغاء وصول ${esc(s.label)}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء</button></div></li>`).join('')}</ul>
@@ -30,7 +75,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
 
   // AI: invalidate synchronously, coalesce only reads; never queue a mutation.
   function invalidate(nextKey = key()) {
-    generation++; clearSecrets(); roster = null; selected = null; outcomes = []; retry = false;
+    guidance.contextChanged(); generation++; clearSecrets(); roster = null; selected = null; outcomes = []; retry = false;
     if (nextKey !== boundKey) { draft = null; draftRevision = null; settingsOpen = false; }
     boundKey = nextKey; clearTimeout(expiryTimer);
   }
@@ -58,6 +103,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
         const result = await client.listClass(context().teachingId);
         if (valid(g, k)) {
           roster = result;
+          void guidance.refresh();
           if (draft && draftRevision !== result.policyRevision) { draft = null; draftRevision = null; message = 'تغيّرت إعدادات الحقول؛ راجع اختيارك من جديد.'; }
           else message = '';
         }
@@ -158,7 +204,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   root.ownerDocument.addEventListener('visibilitychange', wake);
   const unsubscribe = subscribe(changed); void refresh();
   return { contextChanged: changed, refresh, dispose() {
-    clearSecrets(); disposed = true; generation++; clearTimeout(expiryTimer); clearTimeout(wakeTimer);
+    guidance.dispose(); clearSecrets(); disposed = true; generation++; clearTimeout(expiryTimer); clearTimeout(wakeTimer);
     roster = null; selected = null; draft = null; unsubscribe?.();
     root.removeEventListener('click', click); root.removeEventListener('submit', submit); root.removeEventListener('change', change);
     win.removeEventListener('pagehide', pagehide); win.removeEventListener('pageshow', wake); win.removeEventListener('focus', wake);

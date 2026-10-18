@@ -44,3 +44,6 @@
 .n88-unified-empty{color:var(--text-2,#52645b);font-size:14px;margin:0}
 @media(max-width:700px){.n88-unified{padding:16px}.n88-unified-sections{grid-template-columns:1fr}.n88-unified-entry,.n88-unified-sections>section{padding:20px}.n88-unified-profile{align-items:start;flex-direction:column;gap:16px;padding-block:24px}.n88-unified-actions{width:100%}.n88-unified-actions button{flex:1}.n88-unified th,.n88-unified td{padding-inline:4px}}
 @media print{.n88-unified form,.n88-unified-actions{display:none}}
+
+/* AI: escaped multiline task guidance. */
+.n88-guidance-text { white-space: pre-wrap; overflow-wrap: anywhere; }

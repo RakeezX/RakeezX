@@ -5,7 +5,8 @@
     "20261018102843",
     "20261018110713",
     "20261018114113",
-    "20261018115648"
+    "20261018115648",
+    "20261018125611"
   ],
   "identities": {
     "auth": [
@@ -125,6 +126,12 @@
       },
       {
         "relname": "sessions",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "task_guidance",
         "relrowsecurity": true,
         "independently_owned": true,
         "relforcerowsecurity": false
@@ -407,6 +414,17 @@
         "policyname": "n88_backend_only",
         "schemaname": "n88_private",
         "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "task_guidance",
+        "policyname": "task_guidance_backend",
+        "schemaname": "n88_private",
+        "with_check": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))"
       },
       {
         "cmd": "SELECT",
@@ -1017,6 +1035,24 @@
       {
         "grantee": "n88_backend",
         "table_name": "sessions",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
         "table_schema": "n88_private",
         "privilege_type": "UPDATE"
       }
@@ -2767,6 +2803,132 @@
       },
       {
         "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "payload",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "payload",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "payload",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "subitem_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "subitem_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "subitem_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "teaching_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "teaching_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "teaching_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "term_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "term_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "task_guidance",
+        "column_name": "term_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
         "table_name": "attendance",
         "column_name": "deleted_at",
         "table_schema": "rakeezx",
@@ -3984,6 +4146,11 @@
         "indexdef": "CREATE UNIQUE INDEX sessions_token_hash_key ON n88_private.sessions USING btree (token_hash)",
         "indexname": "sessions_token_hash_key",
         "tablename": "sessions"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX task_guidance_pkey ON n88_private.task_guidance USING btree (owner_id, class_id, term_id, teaching_id, subitem_id)",
+        "indexname": "task_guidance_pkey",
+        "tablename": "task_guidance"
       }
     ],
     "private_triggers": [
@@ -4695,6 +4862,118 @@
         "contype": "u",
         "definition": "UNIQUE (token_hash)",
         "table_name": "n88_private.sessions",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_class_id_check",
+        "contype": "c",
+        "definition": "CHECK (((length(class_id) >= 1) AND (length(class_id) <= 200)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_owner_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES n88_private.contexts(owner_id)",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof(payload) = 'object'::text) AND (octet_length((payload)::text) <= 1048576)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check1",
+        "contype": "c",
+        "definition": "CHECK ((payload ?& ARRAY['revision'::text, 'sourceStamp'::text, 'executionInstructions'::text, 'deliveryInstructions'::text, 'bindings'::text]))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check2",
+        "contype": "c",
+        "definition": "CHECK (((payload - ARRAY['revision'::text, 'sourceStamp'::text, 'executionInstructions'::text, 'deliveryInstructions'::text, 'bindings'::text]) = '{}'::jsonb))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check3",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof((payload -> 'revision'::text)) = 'number'::text) AND (((payload ->> 'revision'::text))::bigint > 0)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check4",
+        "contype": "c",
+        "definition": "CHECK (((payload ->> 'sourceStamp'::text) ~ '^[a-f0-9]{64}$'::text))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check5",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof((payload -> 'executionInstructions'::text)) = 'string'::text) AND (length((payload ->> 'executionInstructions'::text)) <= 400)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check6",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof((payload -> 'deliveryInstructions'::text)) = 'string'::text) AND (length((payload ->> 'deliveryInstructions'::text)) <= 400)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_payload_check7",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof((payload -> 'bindings'::text)) = 'array'::text) AND (jsonb_array_length((payload -> 'bindings'::text)) <= 2000)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (owner_id, class_id, term_id, teaching_id, subitem_id)",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_subitem_id_check",
+        "contype": "c",
+        "definition": "CHECK (((length(subitem_id) >= 1) AND (length(subitem_id) <= 200)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_teaching_id_check",
+        "contype": "c",
+        "definition": "CHECK (((length(teaching_id) >= 1) AND (length(teaching_id) <= 200)))",
+        "table_name": "n88_private.task_guidance",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "task_guidance_term_id_check",
+        "contype": "c",
+        "definition": "CHECK (((length(term_id) >= 1) AND (length(term_id) <= 200)))",
+        "table_name": "n88_private.task_guidance",
         "convalidated": true,
         "condeferrable": false
       }

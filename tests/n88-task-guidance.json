@@ -1,0 +1,77 @@
+{
+  "taskId": "continuous-n88-task-execution-delivery-guidance-20261018",
+  "runId": "da437f4d-bfbe-42af-bcbc-33996358d071",
+  "checks": [
+    {
+      "name": "n88_task_guidance_actual_teacher_save_same_student_task_pg_ack_and_durability",
+      "status": "PASS",
+      "evidence": "Actual whole-app owner-bound teacher class client/service/restricted nativePG: both fields edited and saved, ACK then same canonical student task renders multiline text; teacher/student reload; failed precommit and lost postcommit ACK preserve draft and show uncertainty, committed state read back. 390/1280 source CSS screenshots with credential masks."
+    },
+    {
+      "name": "n88_task_guidance_owner_source_cas_visibility_removal_plaintext_and_failedsave",
+      "status": "PASS",
+      "evidence": "Restricted PG restart durability; canonical scoring/tasks/completions unchanged by guidance writes; owner/class/term/expiry, stale source and CAS, unknown keys/type/markup/length/empty-confirm negatives. Hide/republication/revision/deletion/current enrollment omit text server-side; explicit clear tombstone; browser roles denied metadata. Original unchanged E/F/H safeguards reused."
+    }
+  ],
+  "cleanup": {
+    "httpAndPgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "priorAttempts": [
+    {
+      "failure": {
+        "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-task-execution-delivery-guidance-20261018.json -RuntimeRoot C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4 -WaitSeconds 0 -OwnerToken da437f4d-bfbe-42af-bcbc-33996358d071"
+      },
+      "checks": [],
+      "cleanup": {
+        "httpAndPgClosed": true
+      }
+    },
+    {
+      "stage": "failed-save-draft",
+      "failure": {
+        "stage": "failed-save-draft",
+        "message": "Assertion failed; values omitted"
+      },
+      "checks": [],
+      "cleanup": {
+        "httpAndPgClosed": true,
+        "lease": "RELEASED integration"
+      }
+    },
+    {
+      "stage": "ui-expired-owner",
+      "failure": {
+        "stage": "ui-expired-owner",
+        "location": "    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-task-execution-delivery-guidance-20261018/tests/n88-task-guidance.mjs:61:94",
+        "message": "Assertion failed; values omitted"
+      },
+      "checks": [],
+      "cleanup": {
+        "httpAndPgClosed": true,
+        "lease": "RELEASED integration"
+      }
+    },
+    {
+      "stage": "identities",
+      "failure": null,
+      "checks": [
+        {
+          "name": "n88_task_guidance_actual_teacher_save_same_student_task_pg_ack_and_durability",
+          "status": "PASS",
+          "evidence": "Actual whole-app owner-bound teacher class client/service/restricted nativePG: both fields edited and saved, ACK then same canonical student task renders multiline text; teacher/student reload; failed precommit and lost postcommit ACK preserve draft and show uncertainty, committed state read back. 390/1280 source CSS screenshots with credential masks."
+        },
+        {
+          "name": "n88_task_guidance_owner_source_cas_visibility_removal_plaintext_and_failedsave",
+          "status": "PASS",
+          "evidence": "Restricted PG restart durability; canonical scoring/tasks/completions unchanged by guidance writes; owner/class/term/expiry, stale source and CAS, unknown keys/type/markup/length/empty-confirm negatives. Hide/republication/revision/deletion/current enrollment omit text server-side; explicit clear tombstone; browser roles denied metadata. Original unchanged E/F/H safeguards reused."
+        }
+      ],
+      "cleanup": {
+        "httpAndPgClosed": true,
+        "lease": "RELEASED integration"
+      }
+    }
+  ],
+  "stage": "identities"
+}

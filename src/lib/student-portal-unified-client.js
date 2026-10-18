@@ -41,7 +41,7 @@ export function projectUnifiedStudentData(data) {
     if (!object(data.work)) throw fail();
     result.work = {};
     for (const section of ['required', 'completed', 'scheduled']) if (Object.hasOwn(data.work, section)) {
-      result.work[section] = list(data.work[section], { id: text, title: text, instruction: text, deadline: text, status: text, startDate: v => v === null || text(v), dueDate: v => v === null || text(v), completionState: v => ['unrecorded','regular','late'].includes(v) }, ['id', 'title']);
+      result.work[section] = list(data.work[section], { id: text, title: text, instruction: text, executionInstructions: v=>text(v)&&v.length<=400, deliveryInstructions: v=>text(v)&&v.length<=400, deadline: text, status: text, startDate: v => v === null || text(v), dueDate: v => v === null || text(v), completionState: v => ['unrecorded','regular','late'].includes(v) }, ['id', 'title']);
     }
   }
   return result;

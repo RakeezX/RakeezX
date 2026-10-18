@@ -1,0 +1,34 @@
+{
+  "taskId": "continuous-n88-task-execution-delivery-guidance-20261018",
+  "runId": "da437f4d-bfbe-42af-bcbc-33996358d071",
+  "checks": [
+    {
+      "name": "changed_javascript_syntax",
+      "status": "PASS",
+      "evidence": "node --check passed for 21 affected JS modules, including final generated bundles."
+    }
+  ],
+  "files": [
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs",
+    "drafts/n88-student-portal/current-review.mjs",
+    "drafts/n88-student-portal/integrated-bundle.mjs",
+    "drafts/n88-student-portal/integrated-review.mjs",
+    "drafts/n88-student-portal/integrated-service.mjs",
+    "drafts/n88-student-portal/student-projection.mjs",
+    "drafts/n88-student-portal/web-protocol.mjs",
+    "src/lib/student-portal-class-client.js",
+    "src/lib/student-portal-unified-client.js",
+    "src/views/student-portal-class.js",
+    "src/views/student-portal-login.js",
+    "sw.js",
+    "tests/fixtures/n88-integrated-class/native-pg.mjs",
+    "drafts/n88-student-portal/task-guidance-review.mjs",
+    "drafts/n88-student-portal/task-guidance.mjs",
+    "src/lib/student-portal-task-guidance-client.js",
+    "tests/n88-task-guidance-artifacts.mjs",
+    "tests/n88-task-guidance-review.mjs",
+    "tests/n88-task-guidance.mjs"
+  ]
+}

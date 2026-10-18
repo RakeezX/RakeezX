@@ -1,5 +1,5 @@
 // drafts/n88-student-portal/web-protocol.mjs
-var ROUTE = /^\/api\/n88\/(?:teacher\/class\/(?:list|issue-missing|rotate|revoke|visibility)|student\/(?:claim|read|end))$/;
+var ROUTE = /^\/api\/n88\/(?:teacher\/class\/(?:list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)|student\/(?:claim|read|end))$/;
 var FORWARDED = Object.freeze(["authorization", "cookie", "origin", "content-type", "x-n88-csrf", "sec-fetch-site"]);
 var encodeBytes = (bytes) => btoa(String.fromCharCode(...bytes));
 var hex = (bytes) => Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, "0")).join("");

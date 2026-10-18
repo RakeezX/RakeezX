@@ -1,0 +1,70 @@
+{
+  "taskId": "continuous-n88-task-execution-delivery-guidance-20261018",
+  "runId": "da437f4d-bfbe-42af-bcbc-33996358d071",
+  "baseSha": "fdbd680f1f2fd8dfe8cda3daac22fa52475f0681",
+  "dependencyDeliveries": [
+    {
+      "taskId": "continuous-n88-compact-teacher-portal-20261018",
+      "candidateSha": "b0b4d6a5b42844c3061e478eb43826706275cd14",
+      "publishedSha": "17ccf849e52a4771a5e983be0181c254e08acd96",
+      "verifiedAt": "2026-10-18T12:50:10.401Z",
+      "servedAssetEvidence": true
+    },
+    {
+      "taskId": "continuous-n88-branded-student-example-20261018",
+      "candidateSha": "b3dfa2558db3bff53aec6787334413e6e3a2f327",
+      "publishedSha": "9e6e88b6d8797d0ba586128e3a04906e9382d38e",
+      "verifiedAt": "2026-10-18T12:42:20.354Z",
+      "servedAssetEvidence": true
+    },
+    {
+      "taskId": "continuous-n64-inline-email-change-guidance-20261018",
+      "candidateSha": "9f4df330f97bba5bd3e346ea4dafa62f85359a47",
+      "publishedSha": "80c98b7056da6723b9d6aa85b8b1ed33727542e6",
+      "verifiedAt": "2026-10-18T12:41:08.844Z",
+      "servedAssetEvidence": true
+    },
+    {
+      "taskId": "continuous-n107-name-match-file-maximum-20261018",
+      "candidateSha": "6dc63a83c4941b83609783bd53e2df89edbba4b0",
+      "publishedSha": "fdbd680f1f2fd8dfe8cda3daac22fa52475f0681",
+      "verifiedAt": "2026-10-18T12:54:43.683Z",
+      "servedAssetEvidence": true
+    }
+  ],
+  "reusedEvidence": [
+    {
+      "path": "tests/n88-integrated-class-final-service.json",
+      "sha256": "463627ce78bb65c7c4db76a2bf16cb840331c1eb3030b6f1af021f38701ecbbf"
+    },
+    {
+      "path": "tests/n88-six-digit-security.json",
+      "sha256": "27289091e104a6a49816c2166a4c355d44bd78dee2661cc46cca41000da18122"
+    },
+    {
+      "path": "tests/n88-six-digit-shared-network.json",
+      "sha256": "64f12a375cb5d0960ab73133605f6146749033be63b3c0c74869fba38b341a99"
+    },
+    {
+      "path": "tests/n88-six-digit-shared-flood-window.json",
+      "sha256": "185c96dd0b69d1e9ca1e2f89bba5ba1290d3da206c8f1f49464f07450fe30418"
+    },
+    {
+      "path": "tests/n88-six-digit-recovery.json",
+      "sha256": "9fd5fddb9a2a7961dc0b93d0f173adb734b939233435d268bc0ac51d8d2d7407"
+    },
+    {
+      "path": "tests/n88-six-digit-recovery-context.json",
+      "sha256": "4feae5ee381241697439bb9be6576a23e97c2f2ef5a7d7ceaf290616e0597f79"
+    }
+  ],
+  "checks": [
+    {
+      "name": "n88_task_guidance_merged_inactive_bundle_readback_and_actual_review",
+      "status": "PASS",
+      "evidence": "One final offline bundle from merged four-dependency source; exact LF source and output hashes, new CLI SQL twin, full restricted-PG metadata readback and mismatch rejection; preserved all old migrations/prior-current snapshots. Actual same-source populated launcher and owned cleanup PASS. Actual SW install/offline fallback for new teacher import and private exclusion handlers exercised with synthetic cache/network ports; no live SW claim. All runtime/student/provider switches OFF; unchanged credential/budget/recovery/scoring/Auth proofs source-bound and reused."
+    }
+  ],
+  "hostedOperations": "NOT_RUN",
+  "liveActivation": false
+}

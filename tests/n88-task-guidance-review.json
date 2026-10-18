@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n88-task-execution-delivery-guidance-20261018",
+  "runId": "da437f4d-bfbe-42af-bcbc-33996358d071",
+  "checks": [
+    {
+      "name": "same_source_populated_current_review_launcher",
+      "status": "PASS",
+      "evidence": "Unmodified hidden PowerShell launch/owned receipt and shutdown path launches current worktree actual teacher/student app and restricted PG. Fresh examples published through actual authenticated service; task guidance and canonical status populated, teacher code entered only into actual student form. No credentials captured/logged."
+    }
+  ],
+  "cleanup": {
+    "httpClosed": true,
+    "postgresStopped": true,
+    "ownedFilesRemoved": true,
+    "lease": "RELEASED integration"
+  }
+}

@@ -19,7 +19,8 @@
   "requiredReadbacks": [
     "private SQL/helper identities + ACL/FKs",
     "existing Auth issuer/JWKS/user/session",
-    "Cloudflare external ingress + log custody + TLS"
+    "Cloudflare external ingress + log custody + TLS",
+    "task_guidance exact private metadata schema/RLS/role/constraints after separately authorized staged amendment"
   ],
   "sourceOnly": true,
   "routes": [
@@ -30,7 +31,9 @@
     "/api/n88/teacher/class/visibility",
     "/api/n88/student/claim",
     "/api/n88/student/read",
-    "/api/n88/student/end"
+    "/api/n88/student/end",
+    "/api/n88/teacher/class/guidance-list",
+    "/api/n88/teacher/class/guidance-save"
   ],
   "limits": {
     "contexts": 10,

@@ -258,3 +258,35 @@ message; clipboard failure offers a manual ephemeral field. Current owner/class/
 lease changes, failed reauthorization, unmount/pagehide and stale async results erase it.
 The final-source current review launcher uses fresh Arabic synthetic students and the same
 actual class/universal student/gateway/Auth/restrictedPG path. All live flags remain OFF.
+
+Current task-guidance amendment (AI, local/inert only): the CLI-created
+`20261018125611_n88_task_guidance_staged.sql` adds only PRIVATE task metadata after
+the five preserved migrations. Compare full `prior-task-guidance-integrated-expected-identities.json`
+and `task-guidance-preflight.inactive.sql` before any separately authorized application;
+then compare the new `integrated-expected-identities.json` with the existing readback verifier.
+No hosted application/readback was performed. Supabase migrations and function deployment
+remain separate prerequisites; the frontend publisher does neither.
+
+Two plain-text fields, 400 UTF-16 code units each at the server boundary, are saved through
+the existing authenticated teacher-class transaction. Canonical owner/class/teaching/term,
+current membership, scope/source revision and publication IDs are resolved server-side.
+Guidance has its own revision CAS, commit ACK and explicit empty-clear confirmation;
+no score/completion writes. Stale/hidden/deleted/unpublished work omits text before the
+student response. A later source/publication change requires deliberate republication.
+Markup/scripts/control characters are rejected; mathematical `1 < 2` and line breaks
+remain escaped text. No upload/submission/send operation is introduced.
+
+Same-source populated local review: from this checkout, run
+`powershell -NoProfile -File drafts/n88-student-portal/current-review-launch.ps1`.
+Open the returned teacher URL, choose **مساحة الطلاب**, then **تعليمات المهام وطريقة التسليم**.
+Select **تطبيق مقارنة الكسور**, edit both fields and choose **حفظ ونشر التعليمات**.
+For removal, empty both fields, check the clear confirmation and save. On uncertain save,
+the draft remains in memory; refresh tasks, inspect committed state and deliberately
+revalidate a changed revision before trying again. Changing context clears that draft.
+The fresh synthetic review starts with published examples and two fabricated students.
+Read عبدالله سالم's code only from his teacher row; open `/student` on the SAME returned
+origin and type it in the login form. Expand his actual required task to see the example
+and delivery method. Do not put codes in URLs/logs/screenshots. No live credentials needed.
+Stop via the launcher `-Stop -Receipt <returned receiptPath>`; otherwise its existing TTL
+closes owned HTTP/PostgreSQL resources. The launcher uses this checkout's source, never
+the canonical working tree's Product files.

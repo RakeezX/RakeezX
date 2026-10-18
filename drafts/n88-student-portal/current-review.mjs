@@ -3,11 +3,12 @@ import {readFile,writeFile,mkdir,stat} from 'node:fs/promises';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import path from 'node:path';
 import {startIntegratedReview} from './integrated-review.mjs';
+import {prepareGuidanceExamples} from './task-guidance-review.mjs';
 import {processIdentity} from '../../tests/fixtures/n88-current-review/native-pg.mjs';
 export const root=fileURLToPath(new URL('../../',import.meta.url));
 const fixture=path.join(root,'tests/fixtures/n88-integrated-class');
 export function ttlSeconds(value=14400){const n=Number(value);if(!Number.isInteger(n)||n<1||n>28800)throw Error('TTL must be 1..28800 seconds');return n;}
-export const startReview=({ttl=14400}={})=>startIntegratedReview({ttl:ttlSeconds(ttl)});
+export const startReview=async({ttl=14400}={})=>{const review=await startIntegratedReview({ttl:ttlSeconds(ttl)});try{return await prepareGuidanceExamples(review);}catch(e){await review.close();throw e;}};
 export const help='N88 current synthetic review (Windows, installed native PG17.6).\nnode drafts/n88-student-portal/current-review.mjs --receipt <local receipt.json> [--ttl-seconds 14400]\nTTL: 1..28800 seconds; default 4 hours, maximum 8.\nUse current-review-launch.ps1 to launch hidden, read the teacher URL, or request owned graceful shutdown. No hosted service is enabled.';
 async function main() {
   const args=process.argv.slice(2);if(args.includes('--help')){console.log(help);return;}

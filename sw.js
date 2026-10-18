@@ -66,6 +66,7 @@ const SHELL = [
   './src/lib/student-portal-client.js',
   './src/lib/student-portal-runtime.js',
   './src/lib/student-portal-class-client.js',
+  './src/lib/student-portal-task-guidance-client.js',
   './src/views/student-portal-class.js',
   './src/styles/student-portal-class.css',
   './src/views/student-portal.js',
