@@ -1,0 +1,94 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "d313ead3-74ae-4820-a20f-c3de41f820e2",
+  "recordedAt": "2026-10-18T16:19:38Z",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "remoteMainObserved": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "state": "BLOCKED",
+  "stage": "Phase0 secure restricted-DB credential provisioning",
+  "project": {
+    "source": "Actual connected Supabase get_project in this run",
+    "id": "xlrubcwjqktzzunrvuns",
+    "name": "RakeezX Main",
+    "status": "ACTIVE_HEALTHY",
+    "databaseVersion": "17.6.1.166"
+  },
+  "catalog": {
+    "source": "Actual connected execute_sql; BEGIN READ ONLY, 5s statement timeout, ROLLBACK; catalog/history metadata only",
+    "observedAt": "2026-10-18T16:17:47.753298Z",
+    "database": "postgres",
+    "managementRole": "postgres",
+    "migration20261018044448Present": false,
+    "n44PrivateSchemaPresent": false,
+    "existingN44Roles": [],
+    "personalRowsRead": 0
+  },
+  "edge": {
+    "source": "Actual connected list_edge_functions in this run",
+    "n44NotificationsPresent": false,
+    "supportNotificationWorker": { "version": 7, "status": "ACTIVE", "changed": false },
+    "otherHistoricalFunctions": "Unchanged; ACTIVE catalog labels are not cleanup/disarm proof. No retired fixture invoked or reactivated."
+  },
+  "acceptedPrerequisiteEvidence": {
+    "root": "artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/",
+    "cloudflare": {
+      "file": "cloudflare-auth-verified.json",
+      "observedAt": "2026-10-18T16:05:08.6208434Z",
+      "loggedIn": true,
+      "accountCount": 1,
+      "storage": "OS keyring",
+      "scope": "Authenticated capability evidence only; exact zone, routes, deployed sources and logging posture NOT_RUN. No repeated OAuth flow."
+    },
+    "sessionPolicy": {
+      "file": "n44-session-policy-dashboard-readonly.json",
+      "observedAt": "2026-10-18T16:07:28.711Z",
+      "timeboxSeconds": null,
+      "inactivityTimeoutSeconds": null,
+      "singleSessionPerUser": false,
+      "metadataSha256": "df9ef3fdd246f968f03e20679e9843817f3b22983e19ff6626769920f236fc91",
+      "runtimeApprovalCreated": false,
+      "scope": "Accepted first-party current form readback under this card. Supported profile; no daily renewal or default assumption. No activation performed."
+    }
+  },
+  "custodyInventory": {
+    "source": "One-pass installed CLI --help and name/presence inventory; no profile caches or credential values read",
+    "supabaseCli": "2.120.0",
+    "wranglerCli": "4.148.0",
+    "supabaseDbCommands": ["diff", "dump", "push", "pull", "reset", "lint", "start", "query", "advisors", "schema"],
+    "dbQueryInputs": ["sql argument", "--file", "--db-url", "--linked", "--local", "--project-ref"],
+    "supabaseSecretCommands": ["list", "set", "unset"],
+    "supabaseSecretSetInputs": ["NAME=VALUE", "--env-file"],
+    "wranglerSecretCommands": ["put", "delete", "list", "bulk"],
+    "projectSecretListExitCode": 0,
+    "projectN44SecretNames": [],
+    "processN44DatabaseUrlPresent": false,
+    "processN44CryptoJsonPresent": false,
+    "missing": "No sanctioned non-echoing restricted-DB LOGIN provisioning/rotation and server-custody connection handoff interface is available in the connected tools or inspected installed CLI commands. SQL/migration tools accept SQL text; db query offers SQL/file inputs, not a separate secure role-password field. Edge secret storage does not itself create the restricted database login. No existing N44 connection custody was supplied.",
+    "notAttempted": "No password SQL, management credential extraction, privileged DB URL substitution, secret-file search, new integration, dependency installation, or provider write."
+  },
+  "sourceIdentity": {
+    "pins": {
+      "supabase/migrations/20261018044448_n44_exact_activation_staged.sql": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
+      "drafts/n44-push/activation/manifest.json": "ec2c2d583f4042db68656818c86e0bcab1bad9c7c4e5ef594c5b285a60adfa49",
+      "drafts/n44-push/activation/deploy.staged.json": "3574213c0e30a8c7cd4f0150c544977205912dfdf0e9f211a83553dfdfdb5db1"
+    },
+    "pinEncoding": "Exact file bytes; all three also equal UTF-8 LF canonical hashes",
+    "manifestSourcesMatched": 51,
+    "manifestBundleOutputsMatched": 6,
+    "mismatches": [],
+    "priorActivationEvidence": "tests/n44-activation-required.result.json; unchanged source proofs retained, not rerun or promoted to hosted acceptance",
+    "browserConfiguration": "PUSH_CONFIGURATION enabled=false/publicKey=null; N44_PUSH_ENABLED=false (source inspection only, not rendered UI evidence)"
+  },
+  "checks": [
+    { "name": "n44_fresh_exact_project_policy_and_secure_provider_custody_prerequisites", "status": "FAIL", "evidence": "Project, supported policy, CLI secret-store capability and exact source pins verified; secure restricted-DB LOGIN provisioning/custody channel missing. Stop before DDL." },
+    { "name": "n44_exact_once_schema_and_private_role_readback", "status": "NOT_RUN", "evidence": "Migration, private schema and roles absent. No apply: Phase0 prerequisite failed. Full metadata preflight/readback deferred to an authorized apply after custody exists." },
+    { "name": "n44_nonsending_real_service_ingress_source_config_readback", "status": "NOT_RUN", "evidence": "No N44 Edge, ingress, scheduler, route, binding, hosted TLS/role/logging or mounted protocol activation/readback performed." },
+    { "name": "n44_truthful_browser_default_off_user_gesture_and_not_run_device_delivery", "status": "NOT_RUN", "evidence": "Browser/SW source remains OFF with no public key. No browser opened, permission requested, device registration, Auth fixture, push, zero-open-client OS receipt or private click proof attempted." },
+    { "name": "n44_exact_pinned_source_and_bundle_identity", "status": "PASS", "evidence": "3 card pins, 51 manifest source hashes and 6 exact bundle output hashes match. No application behavior changed; prior accepted local proofs not repeated." },
+    { "name": "owned_resource_disposition", "status": "PASS", "evidence": "This run acquired no browser/server/integration/live-mutation lease, started no persistent service and performed no provider write; no new fixture or secret requires cleanup. Prior cleanup receipt remains tests/n44-activation-cleanup.json, not a new hosted cleanup claim." }
+  ],
+  "mutations": { "providerWrites": 0, "newMigrations": 0, "newAuthIds": 0, "personalRowsRead": 0, "studentMutations": 0, "deviceRegistrations": 0, "realSends": 0, "cronActivation": 0 },
+  "retryCondition": "Provide an approved non-echoing channel that creates/revokes the exact NOINHERIT NOBYPASSRLS LOGIN member of n44_backend and hands its verified-TLS connection directly to server-only custody, without password literals in SQL/tool arguments/history/artifacts/logs. Resume this saved task/candidate only after that material capability exists; do not repeat unchanged local suites, OAuth or policy discovery. Recheck freshness/pins and exact remaining preflight/provider/disable gates before any apply.",
+  "acceptance": "Service readiness blocked; real OS delivery NOT_RUN; N44 remains OPEN and N78 deferred. No Production or PO acceptance claimed."
+}
