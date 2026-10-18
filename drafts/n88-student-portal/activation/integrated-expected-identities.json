@@ -4,7 +4,8 @@
     "20261018034356",
     "20261018102843",
     "20261018110713",
-    "20261018114113"
+    "20261018114113",
+    "20261018115648"
   ],
   "identities": {
     "auth": [
@@ -52,6 +53,12 @@
       },
       {
         "relname": "class_visibility",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "code_recovery",
         "relrowsecurity": true,
         "independently_owned": true,
         "relforcerowsecurity": false
@@ -233,6 +240,17 @@
         ],
         "prosecdef": false,
         "definition_md5": "e3780a18161923e8f69f79834459687f"
+      },
+      {
+        "args": "",
+        "name": "recovery_immutable",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition_md5": "f29263afae2a165c1679643e54317806"
       }
     ],
     "policies": [
@@ -255,6 +273,17 @@
         ],
         "tablename": "class_visibility",
         "policyname": "class_visibility_backend",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "code_recovery",
+        "policyname": "recovery_backend",
         "schemaname": "n88_private",
         "with_check": "true"
       },
@@ -729,6 +758,18 @@
       },
       {
         "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
         "table_name": "contexts",
         "table_schema": "n88_private",
         "privilege_type": "DELETE"
@@ -1120,6 +1161,90 @@
         "column_name": "term_id",
         "table_schema": "n88_private",
         "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "credential_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "credential_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "generation",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "generation",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "key_version",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "key_version",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "nonce",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "nonce",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "payload",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "payload",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "row_key",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "code_recovery",
+        "column_name": "row_key",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
       },
       {
         "grantee": "n88_backend",
@@ -3701,6 +3826,21 @@
         "tablename": "class_visibility"
       },
       {
+        "indexdef": "CREATE UNIQUE INDEX code_recovery_credential_id_generation_key ON n88_private.code_recovery USING btree (credential_id, generation)",
+        "indexname": "code_recovery_credential_id_generation_key",
+        "tablename": "code_recovery"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX code_recovery_key_version_nonce_key ON n88_private.code_recovery USING btree (key_version, nonce)",
+        "indexname": "code_recovery_key_version_nonce_key",
+        "tablename": "code_recovery"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX code_recovery_pkey ON n88_private.code_recovery USING btree (row_key)",
+        "indexname": "code_recovery_pkey",
+        "tablename": "code_recovery"
+      },
+      {
         "indexdef": "CREATE UNIQUE INDEX contexts_namespace_owner_id_key ON n88_private.contexts USING btree (namespace, owner_id)",
         "indexname": "contexts_namespace_owner_id_key",
         "tablename": "contexts"
@@ -3854,6 +3994,12 @@
         "table_name": "n88_private.class_credential_receipts"
       },
       {
+        "name": "recovery_immutable",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER recovery_immutable BEFORE DELETE OR UPDATE ON n88_private.code_recovery FOR EACH ROW EXECUTE FUNCTION n88_private.recovery_immutable()",
+        "table_name": "n88_private.code_recovery"
+      },
+      {
         "name": "numeric_attempt_binding",
         "tgenabled": "O",
         "definition": "CREATE TRIGGER numeric_attempt_binding BEFORE UPDATE ON n88_private.numeric_attempts FOR EACH ROW EXECUTE FUNCTION n88_private.numeric_attempt_binding_guard()",
@@ -3965,6 +4111,78 @@
         "contype": "p",
         "definition": "PRIMARY KEY (owner_id, class_id, term_id)",
         "table_name": "n88_private.class_visibility",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_check",
+        "contype": "c",
+        "definition": "CHECK (((row_key = (payload ->> 'id'::text)) AND (generation >= 1)))",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_check1",
+        "contype": "c",
+        "definition": "CHECK (COALESCE((((payload ->> 'envelopeVersion'::text) = '1'::text) AND ((payload ->> 'algorithm'::text) = 'AES-256-GCM'::text) AND (key_version ~ '^[A-Za-z0-9_-]{1,40}$'::text) AND (nonce ~ '^[a-f0-9]{24}$'::text) AND ((payload ->> 'ciphertext'::text) ~ '^[a-f0-9]{12}$'::text) AND ((payload ->> 'tag'::text) ~ '^[a-f0-9]{32}$'::text)), false))",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_credential_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (credential_id) REFERENCES n88_private.numeric_credentials(id) DEFERRABLE INITIALLY DEFERRED",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": true
+      },
+      {
+        "name": "code_recovery_credential_id_generation_key",
+        "contype": "u",
+        "definition": "UNIQUE (credential_id, generation)",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_key_version_nonce_key",
+        "contype": "u",
+        "definition": "UNIQUE (key_version, nonce)",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_payload_check",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof(payload) = 'object'::text) AND (octet_length((payload)::text) <= 1024)))",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_payload_check1",
+        "contype": "c",
+        "definition": "CHECK ((payload ?& ARRAY['id'::text, 'credentialId'::text, 'generation'::text, 'envelopeVersion'::text, 'algorithm'::text, 'keyVersion'::text, 'nonce'::text, 'ciphertext'::text, 'tag'::text]))",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_payload_check2",
+        "contype": "c",
+        "definition": "CHECK (((payload - ARRAY['id'::text, 'credentialId'::text, 'generation'::text, 'envelopeVersion'::text, 'algorithm'::text, 'keyVersion'::text, 'nonce'::text, 'ciphertext'::text, 'tag'::text]) = '{}'::jsonb))",
+        "table_name": "n88_private.code_recovery",
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "code_recovery_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (row_key)",
+        "table_name": "n88_private.code_recovery",
         "convalidated": true,
         "condeferrable": false
       },

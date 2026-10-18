@@ -14,7 +14,7 @@ export function validPortalFields(fields) {
   return exact(fields, PORTAL_FIELDS) && PORTAL_FIELDS.every(k => typeof fields[k] === 'boolean');
 }
 function validStudent(s) {
-  return exact(s, ['studentId','enrollmentId','revision','label','hasActiveCode','credentialVersion']) && id(s.studentId) && id(s.enrollmentId) && revision(s.revision) && typeof s.label === 'string' && s.label.length <= 200 && typeof s.hasActiveCode === 'boolean' && revision(s.credentialVersion);
+  return exact(s, ['studentId','enrollmentId','revision','label','hasActiveCode','credentialVersion','recoveryStatus','credential']) && id(s.studentId) && id(s.enrollmentId) && revision(s.revision) && typeof s.label === 'string' && s.label.length <= 200 && typeof s.hasActiveCode === 'boolean' && revision(s.credentialVersion) && ['recoverable','legacy','inactive'].includes(s.recoveryStatus) && (s.recoveryStatus==='recoverable' ? s.hasActiveCode && typeof s.credential==='string' && /^1[0-9]{5}$/.test(s.credential) : s.credential===null && (s.recoveryStatus==='legacy' ? s.hasActiveCode : !s.hasActiveCode));
 }
 export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000 } = {}) {
   if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000) deny('invalid_configuration');
@@ -70,7 +70,7 @@ export function createClassPortalClient({ request, getContext = () => null, time
       roster = null;
       const data = await call('list', teachingId, {}, d => exact(d, ['classId','rosterRevision','policyRevision','students','visibility']) && d.classId === c.binding.classId && rosterRevision(d.rosterRevision) && revision(d.policyRevision) && validPortalFields(d.visibility) && Array.isArray(d.students) && d.students.length <= 2000 && d.students.every(validStudent) && new Set(d.students.map(s => s.studentId)).size === d.students.length && new Set(d.students.map(s => s.enrollmentId)).size === d.students.length, c);
       if (sequence !== readSequence) deny('review_required');
-      roster = structuredClone(data); rosterKey = c.key; return data;
+      roster = {...data,students:data.students.map(({credential,...s})=>s)}; rosterKey = c.key; return data;
     },
     issueMissingClassCodes(teachingId, body) {
       const { r } = snapshot(teachingId);

@@ -1,0 +1,68 @@
+{
+  "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
+  "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
+  "checks": [
+    {
+      "name": "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "drafts/n88-student-portal/class-credentials.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "drafts/n88-student-portal/code-recovery.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "drafts/n88-student-portal/current-review.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "drafts/n88-student-portal/existing-host.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "drafts/n88-student-portal/integrated-bundle.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "drafts/n88-student-portal/integrated-review.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "drafts/n88-student-portal/integrated-service.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "src/lib/student-portal-class-client.js",
+      "status": "PASS"
+    },
+    {
+      "name": "src/views/student-portal-class.js",
+      "status": "PASS"
+    },
+    {
+      "name": "tests/fixtures/n88-integrated-class/native-pg.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "tests/n88-six-digit-recovery-artifacts.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "tests/n88-six-digit-recovery-context.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "tests/n88-six-digit-recovery-launcher.mjs",
+      "status": "PASS"
+    },
+    {
+      "name": "tests/n88-six-digit-recovery.mjs",
+      "status": "PASS"
+    }
+  ],
+  "whitespace": "PASS",
+  "fullViteBuild": "NOT_RUN: independent publisher owns build; offline affected service/browser artifact graphs bundled"
+}

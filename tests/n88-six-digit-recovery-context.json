@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
+  "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
+  "checks": [
+    {
+      "name": "recovery_current_membership_failed_reauthorization_unmount_logout",
+      "status": "PASS",
+      "evidence": "Current canonical membership removal excludes the exact old student/code before envelope query; stale selective rotation denies. Restoring valid membership preserves same code/version. Actual desktop class source CSS/handlers: failed teacher reauthorization immediately wipes codes; successful refresh recovers unchanged; route unmount/reopen and logout clear ephemeral DOM. No private output or screenshots."
+    }
+  ],
+  "cleanup": {
+    "httpAndPgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "stage": "actual-signout"
+}

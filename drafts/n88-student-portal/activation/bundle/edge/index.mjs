@@ -1,5 +1,5 @@
 // drafts/n88-student-portal/existing-host.mjs
-import { Buffer as Buffer10 } from "node:buffer";
+import { Buffer as Buffer11 } from "node:buffer";
 import pg from "pg";
 
 // drafts/n88-student-portal/deployment.inactive.json
@@ -91,15 +91,15 @@ var deployment_inactive_default = {
 };
 
 // drafts/n88-student-portal/web-entry.mjs
-import { Buffer as Buffer9 } from "node:buffer";
+import { Buffer as Buffer10 } from "node:buffer";
 import { timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 
 // drafts/n88-student-portal/runtime.mjs
-import { Buffer as Buffer8 } from "node:buffer";
+import { Buffer as Buffer9 } from "node:buffer";
 import { isIP } from "node:net";
 
 // drafts/n88-student-portal/integrated-service.mjs
-import { createHash as createHash5, randomUUID as randomUUID3 } from "node:crypto";
+import { createHash as createHash5, randomUUID as randomUUID4 } from "node:crypto";
 
 // drafts/n88-student-portal/class-credentials.mjs
 import { Buffer as Buffer3 } from "node:buffer";
@@ -139,7 +139,7 @@ var version = (db, m) => Math.max(0, ...db.numericCredentials.filter((c) => c.ow
 var live = (db, m) => db.numericCredentials.some((c) => c.ownerId === m.ownerId && c.studentId === m.studentId && c.revokedAt === null);
 var result = (status, body) => ({ status, body, headers: { ...PRIVATE_HEADERS } });
 var denied = () => result(401, { error: "unavailable" });
-var replay = (receipt) => receipt.results.map((r) => r.status === "created" ? { ...r, status: "uncertain", recovery: "deliberate_rotate_required" } : { ...r });
+var replay = (receipt) => receipt.results.map((r) => r.status === "created" ? { ...r, status: "uncertain", recovery: "refresh_current_roster" } : { ...r });
 var summary = (rows) => Object.fromEntries(["created", "skipped", "failed", "uncertain"].map((s) => [s, rows.filter((r) => r.status === s).length]));
 function createClassCredentialOperations({ repository, verifyTeacher, verifyIngress, origin, resolveClass, issueMember, rotateMember, revokeMember }) {
   if (!repository?.transaction || [verifyTeacher, verifyIngress, resolveClass, issueMember, rotateMember, revokeMember].some((f) => typeof f !== "function") || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail();
@@ -191,9 +191,11 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
               rows.push({ ...base, status: "skipped", reason: live(db, m) ? "existing" : "revoked_rotate_required" });
               continue;
             }
+            const rowCount = rows.length, secretCount = secrets.length;
             const before = structuredClone({ credentials: db.numericCredentials, sessions: db.numericSessions });
             try {
-              const issued = await { batch: issueMember, rotate: rotateMember, revoke: revokeMember }[action](db, m, { expectedVersion });
+              await ports.query("savepoint n88_member_recovery");
+              const issued = await { batch: issueMember, rotate: rotateMember, revoke: revokeMember }[action](db, m, { expectedVersion }, ports);
               if (action === "revoke") {
                 if (issued?.revoked !== true || live(db, m)) fail();
                 rows.push({ ...base, status: "skipped", reason: "revoked" });
@@ -202,7 +204,12 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
                 rows.push({ ...base, credentialVersion: issued.credentialVersion, status: "created" });
                 secrets.push({ studentId: m.studentId, code: issued.code });
               }
+              await ports.query("release savepoint n88_member_recovery");
             } catch {
+              await ports.query("rollback to savepoint n88_member_recovery");
+              await ports.query("release savepoint n88_member_recovery");
+              rows.length = rowCount;
+              secrets.length = secretCount;
               db.numericCredentials = before.credentials;
               db.numericSessions = before.sessions;
               rows.push({ ...base, status: "failed", reason: "unavailable" });
@@ -356,8 +363,63 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
   return Object.freeze(api);
 }
 
+// drafts/n88-student-portal/code-recovery.mjs
+import { Buffer as Buffer4 } from "node:buffer";
+import { randomBytes as randomBytes2, randomUUID as randomUUID2, createCipheriv, createDecipheriv } from "node:crypto";
+var fail2 = () => {
+  throw Error("n88_recovery_unavailable");
+};
+var ver = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(v);
+var exact = (o, ks) => o && Object.keys(o).length === ks.length && ks.every((k) => Object.hasOwn(o, k));
+var fields = ["id", "credentialId", "generation", "envelopeVersion", "algorithm", "keyVersion", "nonce", "ciphertext", "tag"];
+function createCodeRecovery({ keys, activeKeyVersion, otherKeys = [] } = {}) {
+  if (!(keys instanceof Map) || !keys.size || keys.size > 8 || !ver(activeKeyVersion) || !keys.has(activeKeyVersion) || [...keys].some(([v, k]) => !ver(v) || !Buffer4.isBuffer(k) || k.length !== 32) || new Set([...keys.values()].map((k) => k.toString("hex"))).size !== keys.size || [...keys.values()].some((k) => otherKeys.some((o) => Buffer4.isBuffer(o) && k.equals(o)))) fail2();
+  keys = new Map([...keys].map(([v, k]) => [v, Buffer4.from(k)]));
+  const aad = (c, e) => Buffer4.from(JSON.stringify(["n88-code-recovery", e.id, e.envelopeVersion, e.algorithm, e.keyVersion, c.id, c.version, c.ownerId, c.studentId, c.format, e.generation]));
+  function seal(c, code, generation = 1) {
+    if (c.revokedAt !== null || c.format !== "six-v1" || !/^1[0-9]{5}$/.test(code) || !Number.isSafeInteger(generation) || generation < 1) fail2();
+    const e = { id: randomUUID2(), credentialId: c.id, generation, envelopeVersion: 1, algorithm: "AES-256-GCM", keyVersion: activeKeyVersion, nonce: randomBytes2(12).toString("hex") };
+    const cipher = createCipheriv("aes-256-gcm", keys.get(activeKeyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
+    cipher.setAAD(aad(c, e));
+    e.ciphertext = Buffer4.concat([cipher.update(code, "ascii"), cipher.final()]).toString("hex");
+    e.tag = cipher.getAuthTag().toString("hex");
+    return e;
+  }
+  function open(c, e) {
+    try {
+      if (c.revokedAt !== null || c.format !== "six-v1" || !exact(e, fields) || e.credentialId !== c.id || e.envelopeVersion !== 1 || e.algorithm !== "AES-256-GCM" || !keys.has(e.keyVersion) || !Number.isSafeInteger(e.generation) || e.generation < 1 || !/^[a-f0-9]{24}$/.test(e.nonce) || !/^[a-f0-9]{12}$/.test(e.ciphertext) || !/^[a-f0-9]{32}$/.test(e.tag)) fail2();
+      const d = createDecipheriv("aes-256-gcm", keys.get(e.keyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
+      d.setAAD(aad(c, e));
+      d.setAuthTag(Buffer4.from(e.tag, "hex"));
+      const code = Buffer4.concat([d.update(Buffer4.from(e.ciphertext, "hex")), d.final()]).toString("ascii");
+      if (!/^1[0-9]{5}$/.test(code)) fail2();
+      return code;
+    } catch {
+      fail2();
+    }
+  }
+  async function read(ports, c) {
+    const r = await ports.query("select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1", [c.id]);
+    return r.rows.length ? { status: "recoverable", credential: open(c, r.rows[0].payload) } : { status: "legacy", credential: null };
+  }
+  async function append(ports, c, code, generation = 1) {
+    for (let n = 0; n < 8; n++) {
+      const e = seal(c, code, generation);
+      const r = await ports.query(`insert into n88_private.code_recovery(row_key,payload) values($1,$2::jsonb) on conflict(key_version,nonce) do nothing`, [e.id, JSON.stringify(e)]);
+      if (r.rowCount === 1) return;
+    }
+    fail2();
+  }
+  async function rewrap(ports, c, expectedGeneration) {
+    const r = await ports.query("select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1", [c.id]);
+    if (r.rows.length !== 1 || r.rows[0].payload.generation !== expectedGeneration) fail2();
+    await append(ports, c, open(c, r.rows[0].payload), expectedGeneration + 1);
+  }
+  return Object.freeze({ read, append, rewrap, seal, open });
+}
+
 // drafts/n88-student-portal/numeric-credentials.mjs
-import { randomInt as randomInt2, randomBytes as randomBytes2, randomUUID as randomUUID2, createHmac as createHmac2, createHash as createHash3, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
+import { randomInt as randomInt2, randomBytes as randomBytes3, randomUUID as randomUUID3, createHmac as createHmac2, createHash as createHash3, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
 var CREDENTIAL_FORMAT = "six-v1";
 var CREDENTIAL_CAPACITY = 1e5;
 var NUMERIC_POLICY = Object.freeze({
@@ -377,7 +439,7 @@ function normalizeNumericCredential(value) {
   const code = value.replace(/^ +| +$/g, "");
   return /^1[0-9]{5}$/.test(code) ? code : null;
 }
-var fail2 = () => {
+var fail3 = () => {
   throw Error("n88_numeric_unavailable");
 };
 var active2 = (m) => m?.status === "active" && m.endDate === null && m.studentActive === true && m.classActive === true;
@@ -393,7 +455,7 @@ function createNumericCredentialOperations({
   now = Date.now,
   generate = generateNumericCredential
 }) {
-  if (!(keys instanceof Map) || !keys.size || !/^[A-Za-z0-9_-]{1,40}$/.test(activeKeyVersion || "") || !keys.has(activeKeyVersion) || !Buffer.isBuffer(reservationKey) || reservationKey.length < 32 || [...keys].some(([v, k]) => !/^[A-Za-z0-9_-]{1,40}$/.test(v) || !Buffer.isBuffer(k) || k.length < 32)) fail2();
+  if (!(keys instanceof Map) || !keys.size || !/^[A-Za-z0-9_-]{1,40}$/.test(activeKeyVersion || "") || !keys.has(activeKeyVersion) || !Buffer.isBuffer(reservationKey) || reservationKey.length < 32 || [...keys].some(([v, k]) => !/^[A-Za-z0-9_-]{1,40}$/.test(v) || !Buffer.isBuffer(k) || k.length < 32)) fail3();
   keys = new Map([...keys].map(([v, k]) => [v, Buffer.from(k)]));
   reservationKey = Buffer.from(reservationKey);
   const mac2 = (key2, domain, ...parts) => createHmac2("sha256", key2).update(JSON.stringify(["n88-numeric-v1", domain, ...parts])).digest("hex");
@@ -413,25 +475,25 @@ function createNumericCredentialOperations({
   }
   function check(db, m, expectedVersion) {
     const canonical = current(db, m);
-    if (!canonical || canonical.enrollmentId !== m.enrollmentId || canonical.revision !== m.revision || canonical.canonicalStamp !== m.canonicalStamp || version2(db, m) !== expectedVersion) fail2();
+    if (!canonical || canonical.enrollmentId !== m.enrollmentId || canonical.revision !== m.revision || canonical.canonicalStamp !== m.canonicalStamp || version2(db, m) !== expectedVersion) fail3();
   }
   function issue(db, m, expectedVersion, { rotate = false } = {}) {
     check(db, m, expectedVersion);
     const previous = db.numericCredentials.filter((c2) => identity(c2, m) && c2.revokedAt === null);
-    if (previous.length > 1 || previous.length && !rotate) fail2();
-    if (!Number.isSafeInteger(expectedVersion + 1)) fail2();
-    if (db.numericCredentials.filter((c2) => c2.format === CREDENTIAL_FORMAT).length >= CREDENTIAL_CAPACITY) fail2();
+    if (previous.length > 1 || previous.length && !rotate) fail3();
+    if (!Number.isSafeInteger(expectedVersion + 1)) fail3();
+    if (db.numericCredentials.filter((c2) => c2.format === CREDENTIAL_FORMAT).length >= CREDENTIAL_CAPACITY) fail3();
     let code, reserved;
     for (let attempt = 0; attempt < NUMERIC_POLICY.collisionBudget; attempt++) {
       code = generate();
-      if (typeof code !== "string" || !/^1[0-9]{5}$/.test(code)) fail2();
+      if (typeof code !== "string" || !/^1[0-9]{5}$/.test(code)) fail3();
       reserved = reservation(code);
       if (!db.numericCredentials.some((c2) => c2.reservation === reserved)) break;
       code = null;
     }
-    if (!code) fail2();
+    if (!code) fail3();
     const c = {
-      id: randomUUID2(),
+      id: randomUUID3(),
       ownerId: m.ownerId,
       studentId: m.studentId,
       version: expectedVersion + 1,
@@ -454,7 +516,7 @@ function createNumericCredentialOperations({
     return { revoked: true, credentialVersion: expectedVersion };
   };
   function createStudentHandler({ repository, verifyIngress, origin, project }) {
-    if (!repository?.transaction || typeof verifyIngress !== "function" || typeof project !== "function" || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail2();
+    if (!repository?.transaction || typeof verifyIngress !== "function" || typeof project !== "function" || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail3();
     return async (request) => {
       try {
         const claim = (request.path === "/student/claim" || request.path === "/api/n88/student/claim") && request.method === "POST";
@@ -470,8 +532,8 @@ function createNumericCredentialOperations({
             const source = mac2(reservationKey, "client-rate", ingress.clientKey);
             const get = (key2, max) => {
               let b = db.numericRates.find((b2) => b2.key === key2);
-              if (!b && db.numericRates.length < NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b = { key: key2, count: 0, until: time2 + NUMERIC_POLICY.windowMs, epoch: randomUUID2() });
-              if (b && !b.epoch) b.epoch = randomUUID2();
+              if (!b && db.numericRates.length < NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b = { key: key2, count: 0, until: time2 + NUMERIC_POLICY.windowMs, epoch: randomUUID3() });
+              if (b && !b.epoch) b.epoch = randomUUID3();
               return b;
             };
             let blocked = false;
@@ -490,7 +552,7 @@ function createNumericCredentialOperations({
             if (blocked || db.numericAttempts.length >= NUMERIC_POLICY.maxAttempts) return null;
             for (const b of buckets) b.count++;
             const a = {
-              id: randomUUID2(),
+              id: randomUUID3(),
               buckets: buckets.map(({ key: key2, epoch, until }) => ({ key: key2, epoch, until })),
               until: Math.max(...buckets.map((b) => b.until)),
               sessionId: null,
@@ -513,18 +575,18 @@ function createNumericCredentialOperations({
             if (!code) return denied2();
             const c2 = db.numericCredentials.find((c3) => c3.reservation === reservation(code));
             if (!c2 || c2.revokedAt !== null || !keys.has(c2.keyVersion) || !/^[a-f0-9]{64}$/.test(c2.verifier) || !timingSafeEqual2(Buffer.from(c2.verifier, "hex"), Buffer.from(verifier(code, c2), "hex"))) return denied2();
-            if (typeof ports?.synchronizeOwner !== "function") fail2();
+            if (typeof ports?.synchronizeOwner !== "function") fail3();
             await ports.synchronizeOwner(c2.ownerId);
             const m2 = current(db, c2);
             if (!m2) return denied2();
             if (token) {
               for (const s2 of db.numericSessions) if (s2.tokenHash === tokenHash(token)) s2.revokedAt = time2;
             }
-            const fresh = randomBytes2(32).toString("base64url");
+            const fresh = randomBytes3(32).toString("base64url");
             db.numericSessions = db.numericSessions.filter((s2) => s2.expiresAt > time2 && s2.revokedAt === null);
-            if (db.numericSessions.length >= 1e4) fail2();
+            if (db.numericSessions.length >= 1e4) fail3();
             db.numericSessions.push({
-              id: randomUUID2(),
+              id: randomUUID3(),
               credentialId: c2.id,
               ownerId: c2.ownerId,
               studentId: c2.studentId,
@@ -547,7 +609,7 @@ function createNumericCredentialOperations({
           if (path !== "/api/n88/student/read" || method !== "GET" || !s || s.revokedAt !== null || s.expiresAt <= time2) return denied2();
           const c = db.numericCredentials.find((c2) => c2.id === s.credentialId && identity(c2, s) && c2.version === s.version && c2.revokedAt === null);
           if (!c) return denied2();
-          if (typeof ports?.synchronizeOwner !== "function") fail2();
+          if (typeof ports?.synchronizeOwner !== "function") fail3();
           await ports.synchronizeOwner(c.ownerId);
           const m = current(db, c);
           if (!m || m.enrollmentId !== s.enrollmentId || m.classId !== s.classId || m.revision !== s.membershipRevision || m.canonicalStamp !== s.canonicalStamp) {
@@ -1012,20 +1074,20 @@ import { createHash as createHash4 } from "node:crypto";
 var VISIBILITY_FIELDS = Object.freeze(["name", "class", "grades", "required", "completed", "scheduled"]);
 var VISIBILITY_VERSION = "n88-visibility-v1";
 var object = (value) => value && typeof value === "object" && !Array.isArray(value);
-var exact = (value, keys) => object(value) && Object.keys(value).every((key2) => keys.includes(key2));
+var exact2 = (value, keys) => object(value) && Object.keys(value).every((key2) => keys.includes(key2));
 var text = (value) => typeof value === "string" && value.length > 0 && value.length <= 300;
 var hash2 = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 var uuid = (value) => typeof value === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(value);
 function validateVisibilityPolicy(policy) {
-  const fail5 = () => {
+  const fail6 = () => {
     throw new TypeError("n88_visibility_invalid");
   };
-  if (!exact(policy, ["version", "ownerId", "studentId", "enrollmentId", "classId", "termId", "scopeStamp", "fields", "sources"]) || policy.version !== VISIBILITY_VERSION || !hash2(policy.scopeStamp) || !["ownerId", "studentId", "enrollmentId", "classId", "termId"].every((key2) => text(policy[key2])) || !exact(policy.fields, VISIBILITY_FIELDS) || Object.values(policy.fields).some((value) => typeof value !== "boolean") || !Array.isArray(policy.sources) || policy.sources.length > 2e3) fail5();
+  if (!exact2(policy, ["version", "ownerId", "studentId", "enrollmentId", "classId", "termId", "scopeStamp", "fields", "sources"]) || policy.version !== VISIBILITY_VERSION || !hash2(policy.scopeStamp) || !["ownerId", "studentId", "enrollmentId", "classId", "termId"].every((key2) => text(policy[key2])) || !exact2(policy.fields, VISIBILITY_FIELDS) || Object.values(policy.fields).some((value) => typeof value !== "boolean") || !Array.isArray(policy.sources) || policy.sources.length > 2e3) fail6();
   const ids = /* @__PURE__ */ new Set(), sources = /* @__PURE__ */ new Set();
   for (const source of policy.sources) {
-    if (!exact(source, ["kind", "sourceId", "publicationId", "stamp"]) || !["item", "subitem"].includes(source.kind) || !text(source.sourceId) || !uuid(source.publicationId) || !hash2(source.stamp)) fail5();
+    if (!exact2(source, ["kind", "sourceId", "publicationId", "stamp"]) || !["item", "subitem"].includes(source.kind) || !text(source.sourceId) || !uuid(source.publicationId) || !hash2(source.stamp)) fail6();
     const key2 = JSON.stringify([source.kind, source.sourceId]);
-    if (ids.has(source.publicationId) || sources.has(key2)) fail5();
+    if (ids.has(source.publicationId) || sources.has(key2)) fail6();
     ids.add(source.publicationId);
     sources.add(key2);
   }
@@ -1229,6 +1291,17 @@ var bindingKeys = ["ownerId", "sessionId", "leaseId", "teachingId", "classId", "
 function createIntegratedService(options, adapter, baseRepository) {
   const repository = withCredentialRepository(baseRepository);
   const credentials = createNumericCredentialOperations({ keys: /* @__PURE__ */ new Map([["v1", options.numericKey]]), activeKeyVersion: "v1", reservationKey: options.reservationKey });
+  const recovery = createCodeRecovery({ keys: options.recoveryKeys, activeKeyVersion: options.recoveryActiveKeyVersion, otherKeys: [options.numericKey, options.reservationKey, options.ingressKey, options.secretKey] });
+  const ownedCredential = (db, m) => {
+    const cs = db.numericCredentials.filter((c) => c.ownerId === m.ownerId && c.studentId === m.studentId && c.revokedAt === null);
+    if (cs.length > 1) throw Error("n88_recovery_unavailable");
+    return cs[0];
+  };
+  const recovering = Object.fromEntries(["issueMember", "rotateMember"].map((action) => [action, async (db, m, input, ports) => {
+    const result2 = credentials[action](db, m, input), c = ownedCredential(db, m);
+    await recovery.append(ports, c, result2.code);
+    return result2;
+  }]));
   const today = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh", year: "numeric", month: "2-digit", day: "2-digit" }).format(/* @__PURE__ */ new Date());
   async function scope(db, ports, auth, teachingId, input = {}) {
     const resolved = await createPgClassResolver()(db, ports, auth, teachingId, input);
@@ -1262,7 +1335,7 @@ function createIntegratedService(options, adapter, baseRepository) {
       return auth?.ownerId === binding.ownerId && auth.sessionId === binding.sessionId ? auth : null;
     };
     const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input).then((s) => s && s.classId === binding.classId && s.termId === binding.termId ? s : null);
-    const ops = createClassCredentialOperations({ repository, ...credentials, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });
+    const ops = createClassCredentialOperations({ repository, ...credentials, ...recovering, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });
     if (action === "visibility" || action === "list") {
       try {
         return await repository.transaction(async (db, ports) => {
@@ -1274,21 +1347,23 @@ function createIntegratedService(options, adapter, baseRepository) {
           const s = await resolveClass(db, ports, auth, body.teachingId, body);
           if (!s) return deny2();
           const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === s.classId && m.status === "active" && !m.endDate && m.studentActive && m.classActive);
+          if (members.length > 2e3 || new Set(members.map((m) => m.studentId)).size !== members.length || members.some((m) => db.memberships.filter((x) => x.ownerId === m.ownerId && x.studentId === m.studentId && x.status === "active" && !x.endDate && x.studentActive && x.classActive).length !== 1)) return deny2();
           const rosterRevision = hash3([s.teachingId, s.revision, members.sort((a, b) => a.studentId.localeCompare(b.studentId)).map((m) => [m.studentId, m.enrollmentId, m.revision, m.canonicalStamp])]);
           let p = await policies(ports, s.ownerId, s.classId, s.termId), data2;
           if (action === "visibility") {
             if (p.revision !== body.policyRevision || body.expectedRosterRevision !== rosterRevision || !body.fields || Object.keys(body.fields).length !== 6 || !VISIBILITY_FIELDS.every((f) => typeof body.fields[f] === "boolean")) return deny2();
             const membersPolicy = members.map((m) => {
               const input = inputFor(s, m), b = studentPortalPublicationBindings(input);
-              return { version: "n88-visibility-v1", ownerId: s.ownerId, studentId: m.studentId, enrollmentId: m.enrollmentId, classId: s.classId, termId: s.termId, scopeStamp: b.scopeStamp, fields: body.fields, sources: b.sources.map((src) => ({ ...src, publicationId: randomUUID3() })) };
+              return { version: "n88-visibility-v1", ownerId: s.ownerId, studentId: m.studentId, enrollmentId: m.enrollmentId, classId: s.classId, termId: s.termId, scopeStamp: b.scopeStamp, fields: body.fields, sources: b.sources.map((src) => ({ ...src, publicationId: randomUUID4() })) };
             });
             p = { revision: p.revision + 1, fields: body.fields, members: membersPolicy };
             await ports.query("insert into n88_private.class_visibility(owner_id,class_id,term_id,payload) values($1::uuid,$2,$3,$4::jsonb) on conflict(owner_id,class_id,term_id) do update set payload=excluded.payload", [s.ownerId, s.classId, s.termId, JSON.stringify(p)]);
             data2 = { updated: true, policyRevision: p.revision, fields: p.fields };
-          } else data2 = { classId: s.classId, rosterRevision, policyRevision: p.revision, visibility: p.fields, students: members.map((m) => {
-            const cs = db.numericCredentials.filter((c) => c.ownerId === m.ownerId && c.studentId === m.studentId);
-            return { studentId: m.studentId, enrollmentId: m.enrollmentId, revision: m.revision, label: m.label, hasActiveCode: cs.some((c) => c.revokedAt === null), credentialVersion: Math.max(0, ...cs.map((c) => c.version)) };
-          }) };
+          } else data2 = { classId: s.classId, rosterRevision, policyRevision: p.revision, visibility: p.fields, students: await Promise.all(members.map(async (m) => {
+            const cs = db.numericCredentials.filter((c2) => c2.ownerId === m.ownerId && c2.studentId === m.studentId);
+            const c = ownedCredential(db, m), r2 = c ? await recovery.read(ports, c) : { status: "inactive", credential: null };
+            return { recoveryStatus: r2.status, credential: r2.credential, studentId: m.studentId, enrollmentId: m.enrollmentId, revision: m.revision, label: m.label, hasActiveCode: cs.some((c2) => c2.revokedAt === null), credentialVersion: Math.max(0, ...cs.map((c2) => c2.version)) };
+          })) };
           return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2 }, headers: PRIVATE_HEADERS };
         });
       } catch {
@@ -1311,7 +1386,7 @@ function createIntegratedService(options, adapter, baseRepository) {
 }
 
 // drafts/n88-student-portal/postgres-repository.mjs
-import { Buffer as Buffer4 } from "node:buffer";
+import { Buffer as Buffer5 } from "node:buffer";
 var unavailable = () => new Error("n88_repository_unavailable");
 var must = (test) => {
   if (!test) throw unavailable();
@@ -1351,7 +1426,7 @@ var tables = {
   rates: { sql: "guess_budgets", pk: ["key"], fields: ["key", "count", "until"], cols: ["key", "count", "until_at"] }
 };
 var names = Object.keys(tables);
-var exact2 = (o, keys) => must(o && Object.getPrototypeOf(o) === Object.prototype && Object.keys(o).length === keys.length && keys.every((k) => Object.hasOwn(o, k)));
+var exact3 = (o, keys) => must(o && Object.getPrototypeOf(o) === Object.prototype && Object.keys(o).length === keys.length && keys.every((k) => Object.hasOwn(o, k)));
 var str = (s, max, min = 1) => must(typeof s === "string" && s.length >= min && s.length <= max && !s.includes("\0"));
 var uuid2 = (s) => must(typeof s === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(s));
 var hex = (s) => must(typeof s === "string" && /^[a-f0-9]{64}$/.test(s));
@@ -1372,7 +1447,7 @@ var date2 = (s) => {
 var namespace = (s) => must(typeof s === "string" && /^[A-Za-z0-9_-]{24,64}$/.test(s));
 var active4 = (r) => r.status === "active" && r.endDate === null && r.studentActive && r.classActive;
 function validate(name, r) {
-  exact2(r, tables[name].fields);
+  exact3(r, tables[name].fields);
   for (const k of ["ownerId", "id", "credentialId"]) if (Object.hasOwn(r, k)) uuid2(r[k]);
   for (const k of ["classId", "studentId", "enrollmentId"]) if (Object.hasOwn(r, k)) str(r[k], 240);
   if (Object.hasOwn(r, "namespace")) namespace(r.namespace);
@@ -1390,7 +1465,7 @@ function validate(name, r) {
   }
   if (name === "sessions") time(r.expiresAt);
   if (name === "publications") {
-    exact2(r.source, ["teachingId", "itemId"]);
+    exact3(r.source, ["teachingId", "itemId"]);
     str(r.source.teachingId, 240);
     str(r.source.itemId, 240);
     str(r.title, 160);
@@ -1414,7 +1489,7 @@ function encode(name, r) {
 }
 function decode(name, row) {
   const t = tables[name];
-  exact2(row, t.cols);
+  exact3(row, t.cols);
   let r;
   if (name === "publications") r = {
     id: row.id,
@@ -1453,7 +1528,7 @@ var queries = Object.fromEntries(names.map((name) => {
 }));
 var pk = (name, values) => tables[name].pk.map((k) => values[tables[name].cols.indexOf(k)]);
 function snapshot(state, limits) {
-  exact2(state, names);
+  exact3(state, names);
   let total = 0, bytes = 0;
   const maps = {};
   for (const name of names) {
@@ -1462,7 +1537,7 @@ function snapshot(state, limits) {
     must(total <= limits.total);
     maps[name] = /* @__PURE__ */ new Map();
     for (const r of state[name]) {
-      const values = encode(name, r), json = JSON.stringify(r), size = Buffer4.byteLength(json);
+      const values = encode(name, r), json = JSON.stringify(r), size = Buffer5.byteLength(json);
       must(size <= limits.rowBytes);
       bytes += size;
       must(bytes <= limits.bytes);
@@ -1492,12 +1567,12 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
 } }) {
   must(typeof synchronize === "function");
   must(typeof acquire === "function");
-  exact2(limits, [...names, "total", "bytes", "rowBytes"]);
+  exact3(limits, [...names, "total", "bytes", "rowBytes"]);
   for (const k of names) safe(limits[k], 1, 1e4);
   safe(limits.total, 1, 5e4);
   safe(limits.bytes, 1024, 64 * 1024 * 1024);
   safe(limits.rowBytes, 128, 32768);
-  exact2(timing, ["acquireMs", "transactionMs", "cleanupMs", "statementMs", "lockMs"]);
+  exact3(timing, ["acquireMs", "transactionMs", "cleanupMs", "statementMs", "lockMs"]);
   for (const k of Object.keys(timing)) safe(timing[k], 1, 6e4);
   must(timing.acquireMs <= timing.transactionMs && timing.statementMs <= timing.transactionMs && timing.lockMs <= timing.statementMs);
   limits = { ...limits };
@@ -1546,14 +1621,14 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         const result3 = await query(queries[name].read, [bound + 1, limits.rowBytes, limits.bytes - transferred]);
         must(result3.rows.length <= bound);
         state[name] = result3.rows.map((row) => {
-          exact2(row, ["bounded_row"]);
+          exact3(row, ["bounded_row"]);
           must(typeof row.bounded_row === "string");
-          transferred += Buffer4.byteLength(row.bounded_row);
+          transferred += Buffer5.byteLength(row.bounded_row);
           must(transferred <= limits.bytes);
           return decode(name, JSON.parse(row.bounded_row));
         });
         count += state[name].length;
-        bytes += Buffer4.byteLength(JSON.stringify(state[name]));
+        bytes += Buffer5.byteLength(JSON.stringify(state[name]));
         must(bytes <= limits.bytes);
       }
       const original = snapshot(state, limits);
@@ -1623,10 +1698,10 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
 }
 
 // drafts/n88-student-portal/canonical-adapter.mjs
-import { Buffer as Buffer5 } from "node:buffer";
+import { Buffer as Buffer6 } from "node:buffer";
 import { createHash as createHash6 } from "node:crypto";
 var CANONICAL_TABLES = Object.freeze(["years", "terms", "sections", "students", "enrollments", "teachings", "items"]);
-var fail3 = () => {
+var fail4 = () => {
   throw Error("n88_canonical_unavailable");
 };
 var key = (m) => JSON.stringify([m.ownerId, m.classId, m.studentId, m.enrollmentId]);
@@ -1635,9 +1710,9 @@ var id2 = (parts) => {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20, 32)}`;
 };
 function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = {}) {
-  if (!Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail3();
+  if (!Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail4();
   return async (db, { query }, ownerId) => {
-    if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(ownerId) || !db.contexts.some((c) => c.ownerId === ownerId && c.active)) fail3();
+    if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(ownerId) || !db.contexts.some((c) => c.ownerId === ownerId && c.active)) fail4();
     await query("select n88_private.lock_canonical_sources($1::uuid,$2::integer)", [ownerId, maxRows]);
     const owners = [ownerId];
     const result2 = await query(`select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload
@@ -1652,12 +1727,12 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
         join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id
         where e.owner_id=any($1::uuid[]) order by e.owner_id,e.id limit $2
       ) x) bounded`, [owners, maxRows + 1, maxBytes]);
-    if (result2.rows.length > maxRows) fail3();
+    if (result2.rows.length > maxRows) fail4();
     let bytes = 0;
     const read = (row) => {
-      if (typeof row.payload !== "string") fail3();
-      bytes += Buffer5.byteLength(row.payload);
-      if (bytes > maxBytes) fail3();
+      if (typeof row.payload !== "string") fail4();
+      bytes += Buffer6.byteLength(row.payload);
+      if (bytes > maxBytes) fail4();
       return JSON.parse(row.payload);
     };
     const previous = new Map(db.memberships.map((m) => [key(m), m]));
@@ -1668,9 +1743,9 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
     }
     for (const row of result2.rows) {
       const r = read(row), revision2 = Number(r.revision);
-      if (!/^[1-9][0-9]*$/.test(r.revision) || !Number.isSafeInteger(revision2)) fail3();
+      if (!/^[1-9][0-9]*$/.test(r.revision) || !Number.isSafeInteger(revision2)) fail4();
       const revisions = [r.revision, r.student_revision, r.section_revision, r.year_revision];
-      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail3();
+      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail4();
       const canonicalStamp = createHash6("sha256").update(JSON.stringify(["n88-lineage-v1", ...revisions])).digest("hex");
       const m = {
         ownerId: r.owner_id,
@@ -1685,7 +1760,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
         classActive: r.class_active,
         label: r.label
       };
-      if (!owners.includes(m.ownerId)) fail3();
+      if (!owners.includes(m.ownerId)) fail4();
       const old = previous.get(key(m));
       if (old) Object.assign(old, m);
       else {
@@ -1708,17 +1783,17 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
           and term.deleted_at is null and term.status='active' and term.year_id=c.year_id
           and i.auto is null order by i.owner_id,i.id limit $2
       ) x) bounded`, [owners, maxRows + 1, maxBytes - bytes]);
-    if (source.rows.length > maxRows) fail3();
+    if (source.rows.length > maxRows) fail4();
     const current = /* @__PURE__ */ new Set();
     for (const row of source.rows) {
       const r = read(row);
       const revisions = [r.item_revision, r.teaching_revision, r.term_revision];
-      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail3();
+      if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail4();
       for (const m of db.memberships.filter((m2) => m2.ownerId === r.owner_id && m2.classId === r.section_id && m2.status === "active" && !m2.endDate && m2.studentActive && m2.classActive)) {
         const publicationId = id2([m.ownerId, m.enrollmentId, m.canonicalStamp, r.teaching_id, r.item_id, ...revisions]);
         current.add(publicationId);
         const existing = db.publications.find((p) => p.id === publicationId);
-        if (existing && (key(existing) !== key(m) || existing.source.teachingId !== r.teaching_id || existing.source.itemId !== r.item_id)) fail3();
+        if (existing && (key(existing) !== key(m) || existing.source.teachingId !== r.teaching_id || existing.source.itemId !== r.item_id)) fail4();
         const prior = db.publications.find((p) => key(p) === key(m) && p.source.teachingId === r.teaching_id && p.source.itemId === r.item_id);
         if (!existing) db.publications.push({
           id: publicationId,
@@ -1733,7 +1808,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
           status: prior?.status || "todo",
           published: false
         });
-        if (db.publications.length > maxRows) fail3();
+        if (db.publications.length > maxRows) fail4();
       }
     }
     db.publications = db.publications.filter((p) => p.ownerId !== ownerId || current.has(p.id));
@@ -1741,18 +1816,18 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
 }
 
 // drafts/n88-student-portal/http-adapter.mjs
-import { Buffer as Buffer6 } from "node:buffer";
+import { Buffer as Buffer7 } from "node:buffer";
 
 // drafts/n88-student-portal/auth-verifier.mjs
-import { Buffer as Buffer7 } from "node:buffer";
+import { Buffer as Buffer8 } from "node:buffer";
 import { AuthClient } from "@supabase/auth-js";
 var uuid3 = (s) => typeof s === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(s);
-var fail4 = () => {
+var fail5 = () => {
   throw Error("n88_auth_configuration");
 };
 function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch, authDeadlineMs = 2e3, now = Date.now }) {
   const url = new URL(authUrl);
-  if (url.origin !== authUrl || url.protocol !== "https:" || !apiKey || typeof send !== "function" || !Number.isInteger(authDeadlineMs) || authDeadlineMs < 20 || authDeadlineMs > 5e3) fail4();
+  if (url.origin !== authUrl || url.protocol !== "https:" || !apiKey || typeof send !== "function" || !Number.isInteger(authDeadlineMs) || authDeadlineMs < 20 || authDeadlineMs > 5e3) fail5();
   const issuer = authUrl + "/auth/v1";
   return async (authorization, parentSignal, { query, beforeCommit } = {}) => {
     if (typeof query !== "function" || typeof authorization !== "string" || !/^Bearer [A-Za-z0-9._-]{20,8192}$/.test(authorization)) return null;
@@ -1772,7 +1847,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
       const boundedFetch = async (target, init = {}) => {
         fence();
         const u = new URL(target);
-        if (u.origin !== authUrl || ![issuer + "/user", issuer + "/.well-known/jwks.json"].includes(u.href) || init.method && init.method !== "GET") fail4();
+        if (u.origin !== authUrl || ![issuer + "/user", issuer + "/.well-known/jwks.json"].includes(u.href) || init.method && init.method !== "GET") fail5();
         const response2 = await send(u.href, { ...init, redirect: "error", cache: "no-store", credentials: "omit", signal: abort.signal });
         let n = 0;
         const parts = [];
@@ -1792,7 +1867,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
           reader.releaseLock();
         }
         fence();
-        return new Response(Buffer7.concat(parts), { status: response2.status, headers: response2.headers });
+        return new Response(Buffer8.concat(parts), { status: response2.status, headers: response2.headers });
       };
       const auth = new AuthClient({
         url: issuer,
@@ -1837,7 +1912,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
 // drafts/n88-student-portal/runtime.mjs
 var REQUIRED_ENV = Object.freeze(["N88_PUBLIC_ORIGIN", "N88_DATABASE_URL", "N88_HMAC_KEY", "N88_AUTH_URL", "N88_AUTH_API_KEY", "N88_INGRESS_KEY"]);
 function deploymentPreflight({ origin, authUrl, apiKey, secretKey, acquire, canonicalReadback, privateIngressReadback, sourceOnly = true }) {
-  if (sourceOnly !== false || typeof acquire !== "function" || canonicalReadback !== true || privateIngressReadback !== true || !Buffer8.isBuffer(secretKey) || secretKey.length < 32 || typeof apiKey !== "string" || !apiKey || ![origin, authUrl].every((u) => {
+  if (sourceOnly !== false || typeof acquire !== "function" || canonicalReadback !== true || privateIngressReadback !== true || !Buffer9.isBuffer(secretKey) || secretKey.length < 32 || typeof apiKey !== "string" || !apiKey || ![origin, authUrl].every((u) => {
     try {
       const x = new URL(u);
       return x.origin === u && x.protocol === "https:" && !x.username && !x.password;
@@ -1920,7 +1995,7 @@ var privateResponse = (status = 503) => new Response('{"error":"unavailable"}', 
 
 // drafts/n88-student-portal/web-entry.mjs
 function createWebEntry(options) {
-  if (!Buffer9.isBuffer(options.ingressKey) || options.ingressKey.length !== 32) throw Error("n88_ingress_configuration");
+  if (!Buffer10.isBuffer(options.ingressKey) || options.ingressKey.length !== 32) throw Error("n88_ingress_configuration");
   const envelopes = /* @__PURE__ */ new WeakMap(), now = options.now || Date.now;
   const verifier = createTeacherVerifier(options);
   const adapter = {
@@ -1957,7 +2032,7 @@ function createWebEntry(options) {
         const bytes = decodeBytes(envelope.body);
         if (bytes.length > 4096) return privateResponse(413);
         const expected = await mac(options.ingressKey, signingText({ origin: options.origin, path, method, headers: h, bodyHash: await sha(bytes), time: time2, nonce, source }));
-        if (!timingSafeEqual3(Buffer9.from(expected, "hex"), Buffer9.from(signature, "hex"))) return privateResponse(401);
+        if (!timingSafeEqual3(Buffer10.from(expected, "hex"), Buffer10.from(signature, "hex"))) return privateResponse(401);
         let body = {};
         if (bytes.length) body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
         if (!body || Array.isArray(body) || typeof body !== "object" || method === "GET" && bytes.length) return privateResponse(400);
@@ -2006,12 +2081,16 @@ function createExistingHost(readEnv) {
   const key2 = (n) => {
     const s = required(n);
     if (!/^[a-f0-9]{64}$/.test(s)) throw Error("n88_key_configuration");
-    return Buffer10.from(s, "hex");
+    return Buffer11.from(s, "hex");
   };
   if (required("N88_SERVICE_REVISION") !== deployment_inactive_default.serviceRevision) throw Error("n88_service_readback_missing");
   const secretKey = key2("N88_HMAC_KEY"), ingressKey = key2("N88_INGRESS_KEY"), numericKey = key2("N88_NUMERIC_KEY"), reservationKey = key2("N88_RESERVATION_KEY");
   if (new Set([secretKey, ingressKey, numericKey, reservationKey].map((k) => k.toString("hex"))).size !== 4) throw Error("n88_separate_keys_required");
   if (secretKey.equals(ingressKey)) throw Error("n88_separate_keys_required");
+  const recoveryActiveKeyVersion = required("N88_RECOVERY_ACTIVE_VERSION");
+  const versions = required("N88_RECOVERY_VERSIONS").split(",");
+  if (versions.length > 8 || new Set(versions).size !== versions.length || versions.some((v) => !/^[A-Za-z0-9_-]{1,40}$/.test(v))) throw Error("n88_configuration");
+  const recoveryKeys = new Map(versions.map((v) => [v, key2("N88_RECOVERY_KEY_" + v)]));
   const ca = readEnv("N88_DATABASE_CA_CERT");
   const pool = new pg.Pool({
     connectionString: dbUrl,
@@ -2052,6 +2131,8 @@ function createExistingHost(readEnv) {
       ingressKey,
       numericKey,
       reservationKey,
+      recoveryKeys,
+      recoveryActiveKeyVersion,
       acquire,
       sourceOnly: false,
       canonicalReadback: true,

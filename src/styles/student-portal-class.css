@@ -9,3 +9,9 @@
 .n88-class-delivery{margin-block:16px;padding:16px;border:2px solid var(--brand)}.n88-class-delivery ul{list-style:none;padding:0}.n88-class-delivery li{display:flex;flex-wrap:wrap;gap:12px;margin-block:8px}.n88-class-delivery input{font:inherit;max-width:100%;width:16ch;letter-spacing:.1em}.n88-class button:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:600px){.n88-class-roster>li{align-items:stretch;flex-direction:column}.n88-class-actions>button{flex:1}.n88-class-fields{grid-template-columns:1fr 1fr}}
 @media print{body:has(.n88-class-delivery) *{visibility:hidden!important}body .n88-class-delivery,body .n88-class-delivery *{visibility:visible!important}.n88-class-delivery{position:absolute;inset:0;background:white;color:black;border:0}.n88-class-delivery button{display:none!important}}
+
+/* Current recovered codes remain ephemeral; never include them in printed reports. */
+.n88-class [data-code]{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-block:8px}
+.n88-class [data-code] input{font:inherit;width:9ch;max-width:100%;letter-spacing:.1em}
+.n88-class [data-manual]{font:inherit;width:100%;min-height:10em}
+@media print{.n88-class [data-code],.n88-class [data-manual]{display:none!important}}

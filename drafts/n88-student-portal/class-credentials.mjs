@@ -11,7 +11,7 @@ const version=(db,m)=>Math.max(0,...db.numericCredentials.filter(c=>c.ownerId===
 const live=(db,m)=>db.numericCredentials.some(c=>c.ownerId===m.ownerId && c.studentId===m.studentId && c.revokedAt===null);
 const result=(status,body)=>({status,body,headers:{...PRIVATE_HEADERS}});
 const denied=()=>result(401,{error:'unavailable'});
-const replay=receipt=>receipt.results.map(r=>r.status==='created' ? {...r,status:'uncertain',recovery:'deliberate_rotate_required'} : {...r});
+const replay=receipt=>receipt.results.map(r=>r.status==='created' ? {...r,status:'uncertain',recovery:'refresh_current_roster'} : {...r});
 const summary=rows=>Object.fromEntries(['created','skipped','failed','uncertain'].map(s=>[s,rows.filter(r=>r.status===s).length]));
 
 /** resolveClass must lock CURRENT canonical teaching/term/source under ports.query;
@@ -64,9 +64,11 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
           const base={studentId:m.studentId,enrollmentId:m.enrollmentId,credentialVersion:expectedVersion};
           // Explicit revocation is never silently undone by a later missing-only batch.
           if(action==='batch' && expectedVersion>0) {rows.push({...base,status:'skipped',reason:live(db,m)?'existing':'revoked_rotate_required'});continue;}
+          const rowCount=rows.length,secretCount=secrets.length;
           const before=structuredClone({credentials:db.numericCredentials,sessions:db.numericSessions});
           try {
-            const issued=await ({batch:issueMember,rotate:rotateMember,revoke:revokeMember}[action])(db,m,{expectedVersion});
+            await ports.query('savepoint n88_member_recovery');
+            const issued=await ({batch:issueMember,rotate:rotateMember,revoke:revokeMember}[action])(db,m,{expectedVersion},ports);
             if(action==='revoke') {
               if(issued?.revoked!==true || live(db,m)) fail();
               rows.push({...base,status:'skipped',reason:'revoked'});
@@ -75,7 +77,11 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
               rows.push({...base,credentialVersion:issued.credentialVersion,status:'created'});
               secrets.push({studentId:m.studentId,code:issued.code});
             }
+            await ports.query('release savepoint n88_member_recovery');
           } catch {
+            await ports.query('rollback to savepoint n88_member_recovery');
+            await ports.query('release savepoint n88_member_recovery');
+            rows.length=rowCount;secrets.length=secretCount;
             // Injected helpers are transaction-local only. Roll back this member's
             // tentative mutations; other members may succeed with honest partial counts.
             db.numericCredentials=before.credentials;db.numericSessions=before.sessions;

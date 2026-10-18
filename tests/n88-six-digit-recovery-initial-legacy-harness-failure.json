@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
+  "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
+  "checks": [
+    {
+      "name": "n88_teacher_active_code_aead_durability_rotation_tamper_and_restricted_role_guards",
+      "status": "PASS",
+      "evidence": "Actual restricted nativePG + two alternating gateway/service instances: same active code/version across list, restart; encrypted-only append-only storage, AEAD wrong key/AAD/nonce/tag/truncation/version rejection; supported old-version decrypt and CAS ciphertext rewrap with fresh nonce, no credential/reservation change; duplicate nonce and backend update/delete/browser/Auth scan denied. Fresh expired/foreign/banned/current-class/term denials happen before envelope query."
+    }
+  ],
+  "cleanup": {
+    "httpAndPgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "stage": "legacy",
+  "failure": {
+    "stage": "legacy",
+    "message": "n88_repository_unavailable"
+  }
+}

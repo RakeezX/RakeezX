@@ -2,7 +2,7 @@
   "aiAuthored": true,
   "enabled": false,
   "projectId": "xlrubcwjqktzzunrvuns",
-  "migration": "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
+  "migration": "supabase/migrations/20261018115648_n88_code_recovery_staged.sql",
   "function": {
     "name": "n88-student-portal",
     "entry": "bundle/edge/index.mjs",
@@ -50,7 +50,8 @@
       "N88_DATABASE_CA_CERT",
       "N88_HMAC_KEY",
       "N88_NUMERIC_KEY",
-      "N88_RESERVATION_KEY"
+      "N88_RESERVATION_KEY",
+      "N88_RECOVERY_KEY_<version>"
     ],
     "sharedEdgeAndCloudflare": [
       "N88_INGRESS_KEY"
@@ -59,7 +60,9 @@
       "N88_PUBLIC_ORIGIN",
       "N88_AUTH_URL",
       "N88_AUTH_API_KEY",
-      "N88_SERVICE_REVISION"
+      "N88_SERVICE_REVISION",
+      "N88_RECOVERY_ACTIVE_VERSION",
+      "N88_RECOVERY_VERSIONS"
     ],
     "cloudflareExistingBindings": [
       "N88_PUBLIC_ORIGIN",
@@ -67,7 +70,8 @@
     ],
     "valuesIncluded": false,
     "databaseRole": "n88_backend",
-    "provisionLoginOnlyAfterSeparateApproval": true
+    "provisionLoginOnlyAfterSeparateApproval": true,
+    "recoveryVersionCustody": "Immutable version->dedicated random32byte material, never alias/rebind/reuse versions or material; retain supported old decrypt keys or CAS rewrap all owned active envelopes with fresh nonce before retiring. Never export keys/values; never reset codes for missing keys."
   },
   "cron": [],
   "n44Changes": false,
@@ -75,20 +79,22 @@
     "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
     "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
     "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
-    "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql"
+    "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
+    "supabase/migrations/20261018115648_n88_code_recovery_staged.sql"
   ],
   "requiredPreflight": [
     "prior-20261018-preflight.inactive.sql (before fresh baseline only)",
     "integrated-preflight.inactive.sql (after baseline, before extension)",
     "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families",
     "six-digit-preflight.inactive.sql (after integrated extension, before six-v1 amendment)",
-    "shared-network-preflight.inactive.sql (after six-v1, before attempt/epoch amendment; compare prior-shared-budget-expected-identities.json first)"
+    "shared-network-preflight.inactive.sql (after six-v1, before attempt/epoch amendment; compare prior-shared-budget-expected-identities.json first)",
+    "recovery-preflight.inactive.sql (after shared budget, compare full prior-recovery-integrated-expected-identities.json; no repeat apply)"
   ],
   "qualification": {
     "state": "LOCAL_READY",
     "scope": "inactive source-only local application/service/PG preparation",
-    "actualAppJourney": "tests/n88-six-digit-journey.json",
-    "changedServiceBoundaries": "tests/n88-six-digit-shared-network.json",
+    "actualAppJourney": "tests/n88-six-digit-recovery.json",
+    "changedServiceBoundaries": "tests/n88-six-digit-recovery.json",
     "currentExpectedIdentitySnapshot": "integrated-expected-identities.json",
     "metadataContract": "integrated-metadata-contract.json",
     "readbackVerifier": "../integrated-readback.mjs",
@@ -109,6 +115,13 @@
       "taskId": "continuous-n88-shared-network-success-budget-20261018",
       "runId": "151cbf7c-52a6-4fc7-96a5-b899497b8c6f",
       "evidence": "docs/automation-evidence/20261018/N88_SHARED_NETWORK_SUCCESS_BUDGET.md"
+    },
+    "teacherRecoveryAmendment": {
+      "sourceReady": true,
+      "liveActivation": false,
+      "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
+      "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
+      "evidence": "docs/automation-evidence/20261018/N88_TEACHER_CODE_RECOVERY_SHARE.md"
     }
   },
   "credentialContract": {
@@ -130,5 +143,29 @@
     },
     "maxAttempts": 10000,
     "unknownCommit": "retain-charge-no-automatic-recovery"
+  },
+  "recoveryContract": {
+    "revision": "teacher-active-code-aead-v1",
+    "algorithm": "AES-256-GCM",
+    "envelopeVersion": 1,
+    "nonceBytes": 12,
+    "tagBytes": 16,
+    "keyBytes": 32,
+    "nonceLedger": "append-only UNIQUE(key_version,nonce), retained across revoked credentials/rewrap/restarts; eight fresh-nonce collision attempts only",
+    "aad": [
+      "envelopeId",
+      "envelopeVersion",
+      "algorithm",
+      "keyVersion",
+      "credentialId",
+      "credentialVersion",
+      "ownerId",
+      "studentId",
+      "format",
+      "generation"
+    ],
+    "legacy": "honest hash-only, explicit selective rotate only",
+    "unknownCommit": "freshly authorized current list may recover only proven current credential; no reissue inference",
+    "retention": "private append-only encrypted generations and permanent nonce tombstones; never reveal revoked/historical generations"
   }
 }

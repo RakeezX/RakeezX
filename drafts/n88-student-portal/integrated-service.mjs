@@ -1,6 +1,7 @@
 /** AI: inactive class/universal composition in the existing fenced PG transaction. */
 import {createHash,randomUUID} from 'node:crypto';
 import {withCredentialRepository,createClassCredentialOperations,createPgClassResolver} from './class-credentials.mjs';
+import {createCodeRecovery} from './code-recovery.mjs';
 import {createNumericCredentialOperations} from './numeric-credentials.mjs';
 import {projectStudentPortal,studentPortalPublicationBindings,CANONICAL_PROJECTION_REQUIREMENTS} from './student-projection.mjs';
 import {VISIBILITY_FIELDS} from './visibility-policy.mjs';
@@ -43,6 +44,15 @@ const bindingKeys=['ownerId','sessionId','leaseId','teachingId','classId','termI
 export function createIntegratedService(options,adapter,baseRepository) {
   const repository=withCredentialRepository(baseRepository);
   const credentials=createNumericCredentialOperations({keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey});
+  const recovery=createCodeRecovery({keys:options.recoveryKeys,activeKeyVersion:options.recoveryActiveKeyVersion,otherKeys:[options.numericKey,options.reservationKey,options.ingressKey,options.secretKey]});
+  const ownedCredential=(db,m)=>{
+    const cs=db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId&&c.revokedAt===null);
+    if(cs.length>1)throw Error('n88_recovery_unavailable');return cs[0];
+  };
+  const recovering=Object.fromEntries(['issueMember','rotateMember'].map(action=>[action,async(db,m,input,ports)=>{
+    const result=credentials[action](db,m,input),c=ownedCredential(db,m);
+    await recovery.append(ports,c,result.code);return result;
+  }]));
   const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Riyadh',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   async function scope(db,ports,auth,teachingId,input={}) {
     const resolved=await createPgClassResolver()(db,ports,auth,teachingId,input);
@@ -77,7 +87,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
       return auth?.ownerId===binding.ownerId&&auth.sessionId===binding.sessionId?auth:null;
     };
     const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input).then(s=>s&&s.classId===binding.classId&&s.termId===binding.termId?s:null);
-    const ops=createClassCredentialOperations({repository,...credentials,origin:options.origin,verifyIngress:adapter.verifyIngress,verifyTeacher,resolveClass});
+    const ops=createClassCredentialOperations({repository,...credentials,...recovering,origin:options.origin,verifyIngress:adapter.verifyIngress,verifyTeacher,resolveClass});
     // Operations preserve their transaction/commit ACK. UI adaptation never exposes a precommit secret.
     if(action==='visibility' || action==='list') {
       try{return await repository.transaction(async(db,ports)=>{
@@ -87,6 +97,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
         await ports.synchronizeOwner(auth.ownerId);
         const s=await resolveClass(db,ports,auth,body.teachingId,body);if(!s)return deny();
         const members=db.memberships.filter(m=>m.ownerId===auth.ownerId&&m.classId===s.classId&&m.status==='active'&&!m.endDate&&m.studentActive&&m.classActive);
+        if(members.length>2000||new Set(members.map(m=>m.studentId)).size!==members.length||members.some(m=>db.memberships.filter(x=>x.ownerId===m.ownerId&&x.studentId===m.studentId&&x.status==='active'&&!x.endDate&&x.studentActive&&x.classActive).length!==1))return deny();
         const rosterRevision=hash([s.teachingId,s.revision,members.sort((a,b)=>a.studentId.localeCompare(b.studentId)).map(m=>[m.studentId,m.enrollmentId,m.revision,m.canonicalStamp])]);
         let p=await policies(ports,s.ownerId,s.classId,s.termId),data;
         if(action==='visibility') {
@@ -95,7 +106,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
           p={revision:p.revision+1,fields:body.fields,members:membersPolicy};
           await ports.query('insert into n88_private.class_visibility(owner_id,class_id,term_id,payload) values($1::uuid,$2,$3,$4::jsonb) on conflict(owner_id,class_id,term_id) do update set payload=excluded.payload',[s.ownerId,s.classId,s.termId,JSON.stringify(p)]);
           data={updated:true,policyRevision:p.revision,fields:p.fields};
-        }else data={classId:s.classId,rosterRevision,policyRevision:p.revision,visibility:p.fields,students:members.map(m=>{const cs=db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId);return {studentId:m.studentId,enrollmentId:m.enrollmentId,revision:m.revision,label:m.label,hasActiveCode:cs.some(c=>c.revokedAt===null),credentialVersion:Math.max(0,...cs.map(c=>c.version))};})};
+        }else data={classId:s.classId,rosterRevision,policyRevision:p.revision,visibility:p.fields,students:await Promise.all(members.map(async m=>{const cs=db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId);const c=ownedCredential(db,m),r=c?await recovery.read(ports,c):{status:'inactive',credential:null};return {recoveryStatus:r.status,credential:r.credential,studentId:m.studentId,enrollmentId:m.enrollmentId,revision:m.revision,label:m.label,hasActiveCode:cs.some(c=>c.revokedAt===null),credentialVersion:Math.max(0,...cs.map(c=>c.version))};}))};
         return {status:200,body:{ack:true,binding,requestId:body.requestId??null,data},headers:PRIVATE_HEADERS};
       });}catch{return {...deny(),status:503};}
     }

@@ -1,0 +1,8 @@
+{
+  "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
+  "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
+  "status": "FAIL",
+  "phase": "module-loading-before-leases",
+  "error": "ERR_MODULE_NOT_FOUND @supabase/auth-js",
+  "correction": "Existing locked16 packages restored with npm ci --offline --ignore-scripts --prefix drafts/n88-student-portal; no dependency or config change"
+}

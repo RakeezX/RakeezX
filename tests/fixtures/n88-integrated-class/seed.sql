@@ -4,7 +4,7 @@ insert into rakeezx.years("id","owner_id","revision","status","deleted_at") valu
 insert into rakeezx.terms("id","owner_id","revision","year_id","status","start_date","end_date","deleted_at") values('term','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','year','active','2026-08-01','2027-01-01',null);
 insert into rakeezx.sections("id","owner_id","revision","year_id","grade","label","status","deleted_at") values('class','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','year',4,'أ','active',null);
 insert into rakeezx.students("id","owner_id","revision","name","status","deleted_at") values('student','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','طالب اصطناعي','active',null);
-insert into rakeezx.students("id","owner_id","revision","name","status","deleted_at") values('other','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','OTHER_NAME','active',null);
+insert into rakeezx.students("id","owner_id","revision","name","status","deleted_at") values('other','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','خالد أحمد','active',null);
 insert into rakeezx.enrollments("id","owner_id","revision","student_id","section_id","start_date","end_date","status","deleted_at") values('enrollment','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','student','class','2026-08-01',null,'active',null);
 insert into rakeezx.teachings("id","owner_id","revision","section_id","term_id","subject_id","deleted_at") values('teaching','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','class','term','subject',null);
 insert into rakeezx.items("id","owner_id","revision","name","teaching_id","max","score_mode","order","deleted_at") values('direct','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','1','مباشر','teaching',10,'direct',0,null);

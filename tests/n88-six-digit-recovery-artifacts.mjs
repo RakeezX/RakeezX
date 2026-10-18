@@ -1,0 +1,34 @@
+/** AI: current recovery source/bundle/readback graph only, no hosted activation. */
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {verifyIntegratedReadback} from '../drafts/n88-student-portal/integrated-readback.mjs';
+const dir='drafts/n88-student-portal/activation/',sha=b=>createHash('sha256').update(b).digest('hex');
+const m=JSON.parse(await readFile(dir+'manifest.json','utf8')),d=JSON.parse(await readFile(dir+'deploy.staged.json','utf8'));
+for(const [p,h]of Object.entries(m.sources))assert.equal(sha((await readFile(p,'utf8')).replaceAll('\r\n','\n')),h,p);
+for(const [p,h]of Object.entries(m.outputs))assert.equal(sha(await readFile(dir+'bundle/'+p)),h,p);
+assert.equal(d.enabled,false);assert.equal(d.function.enabled,false);assert.equal(d.privateDocument.browserReadiness,false);assert.equal(d.qualification.activationPermitted,false);
+assert.equal(m.migrationGeneration.version,'20261018115648');assert.equal(d.migrations.length,5);assert.equal(new Set(d.migrations).size,5);
+assert.equal((await readFile(d.migration,'utf8')).replaceAll('\r\n','\n'),(await readFile('drafts/n88-student-portal/code-recovery.inactive.sql','utf8')).replaceAll('\r\n','\n'));
+assert.deepEqual(m.recoveryContract,d.recoveryContract);assert.equal(d.recoveryContract.algorithm,'AES-256-GCM');
+assert.ok(d.secretCustody.edgeOnly.includes('N88_RECOVERY_KEY_<version>'));assert.equal(d.secretCustody.valuesIncluded,false);
+const prior=JSON.parse(await readFile(dir+'prior-recovery-manifest.json','utf8'));
+assert.deepEqual(m.budgetContract,prior.budgetContract);assert.deepEqual(m.credentialContract,prior.credentialContract);
+assert.equal(m.sources['sw.js'],prior.sources['sw.js']);assert.deepEqual(m.graphs['private/assets/student.mjs'],prior.graphs['private/assets/student.mjs']);
+assert.deepEqual(m.graphs.teacherClass.inputs,prior.graphs.teacherClass.inputs); // no added startup dependency; existing SW evidence reused
+assert.ok(!m.graphs['private/assets/student.mjs'].inputs.some(x=>/recovery|numeric|cloud\.js|store\.js|auth|analytics|sync|ownership|teacher/i.test(x)));
+assert.ok(m.graphs['edge/index.mjs'].inputs.includes('drafts/n88-student-portal/code-recovery.mjs'));
+assert.equal(m.sources['drafts/n88-student-portal/numeric-credentials.mjs'],prior.sources['drafts/n88-student-portal/numeric-credentials.mjs']);
+const expected=JSON.parse(await readFile(dir+'integrated-expected-identities.json','utf8'));
+assert.equal(expected.migrationVersions.at(-1),'20261018115648');assert.ok(expected.identities.tables.some(t=>t.relname==='code_recovery'&&t.relrowsecurity));
+const envelope={projectId:'xlrubcwjqktzzunrvuns',mode:'metadata-only',personalRowsRead:0,enabled:false,capturedAt:new Date().toISOString(),...expected};
+assert.match(verifyIntegratedReadback(envelope,expected),/identities match/);
+const wrong=structuredClone(envelope);wrong.identities.tables=wrong.identities.tables.filter(t=>t.relname!=='code_recovery');assert.throws(()=>verifyIntegratedReadback(wrong,expected));
+const gateway=await import('../drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs');const reads=[];
+const env=new Proxy({},{get:(_t,k)=>{reads.push(k);if(k==='N88_ENABLED')return 'false';throw Error('Disabled key read');}});
+assert.equal((await gateway.default.fetch(new Request('https://synthetic.invalid/api/n88/student/read'),env)).status,503);assert.deepEqual(reads,['N88_ENABLED']);
+const focused=JSON.parse(await readFile('tests/n88-six-digit-recovery.json','utf8'));assert.equal(focused.failure,undefined);assert.equal(focused.checks.length,3);assert.ok(focused.checks.every(c=>c.status==='PASS'));
+const context=JSON.parse(await readFile('tests/n88-six-digit-recovery-context.json','utf8'));assert.equal(context.failure,undefined);assert.equal(context.checks[0].status,'PASS');
+const launcher=JSON.parse(await readFile('tests/n88-six-digit-recovery-launcher.json','utf8'));assert.equal(launcher.failure,undefined);assert.equal(launcher.checks[0].status,'PASS');
+const report={taskId:focused.taskId,runId:focused.runId,checks:[{name:'n88_recovery_commit_ack_budget_compatibility_and_inactive_review_graph',status:'PASS',evidence:'Recovery report proves envelope/credential atomicity, rollback/unknown COMMIT/refetch, legacy selective rotate/revoke, concurrent CAS and changed-path failure budget. Exact final LF source/output graphs, fifth CLI migration twin and recovery catalog identity/readback negatives verified; dedicated inactive server key names only. Original G numeric module/budgets, SW hash and student/startup import graphs unchanged; G35-IP/flood proof reused. Current launcher receipt/stopped resources PASS. All activation switches OFF; hosted gates NOT_RUN.'}]};
+await writeFile('tests/n88-six-digit-recovery-artifacts.json',JSON.stringify(report,null,2)+'\n');console.log('N88 recovery inactive graph PASS');

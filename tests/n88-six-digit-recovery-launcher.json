@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
+  "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
+  "checks": [
+    {
+      "name": "final_source_review_launcher",
+      "status": "PASS",
+      "evidence": "Actual hidden PowerShell launcher returns six-v1/committed-success-settlement-v1 receipt and actual teacher class/student documents over owned loopback HTTP. Owned PID/birth shutdown closes server/native PG and removes cluster; own receipt removed. Current recovery receipt and fifth-migration preflight verified; actual app DOM is covered by recovery report."
+    }
+  ],
+  "cleanup": {
+    "lease": "RELEASED integration"
+  }
+}

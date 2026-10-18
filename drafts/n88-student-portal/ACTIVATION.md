@@ -207,3 +207,54 @@ against the same fabricated gateway/Auth/native PG; its receipt now identifies
 `committed-success-settlement-v1`. N88_ENABLED, routes and browser readiness stay OFF.
 This source-only amendment neither authorizes nor performs hosted migration/service
 application, real identities, messages or student access activation.
+
+## CURRENT teacher recovery policy — explicit PO 18 October, supersedes one-time display
+
+NEW six-v1 codes are durably recoverable by the freshly authenticated current owner,
+through the same current class list. Reopen/refetch returns the SAME code/version;
+never rotate on refresh or unavailable keys. Hash-only preexisting credentials remain
+honestly legacy/nonrecoverable until an explicit selective teacher rotation. Old
+copies cannot be erased; rotate/revoke invalidates their authentication and sessions.
+Historical review receipts and earlier staged migrations remain unchanged.
+
+Append the fifth CLI-generated migration `20261018115648_n88_code_recovery_staged.sql`
+only after exact four-version baseline comparison and `recovery-preflight.inactive.sql`.
+Current catalog readback must match `integrated-expected-identities.json`, including
+private code_recovery constraints, RLS, SELECT/INSERT-only backend grants and no browser
+grants. No hosted SQL/application/readback or private access is authorized by this preparation.
+
+Dedicated Edge-only AES-256-GCM custody: inactive names `N88_RECOVERY_VERSIONS`
+(comma-separated supported versions, max8), `N88_RECOVERY_ACTIVE_VERSION`, and
+`N88_RECOVERY_KEY_<version>` (exact32 randombytes as64 lowercasehex). No actual values
+are supplied/retrieved here. Keys MUST differ from every verifier/reservation/ingress
+and HMAC key. A custodian binds each version immutably to unique material, never aliases
+old material under another version, never rebinds/recycles a version, and never deletes
+nonce history. Protect/custody/back up keys and ciphertext independently, server-only;
+no arguments, logs, browser artifacts, source, telemetry or reports may contain values.
+Two instances/restarts share the same versioned keyring and durable append-only unique
+(key_version,nonce) ledger. Each seal draws a fresh CSPRNG96-bit nonce and128-bit tag;
+eight bounded new-nonce proposals handle proven uniqueness conflicts, never transaction
+or unknown-COMMIT retries. AAD binds envelope ID and credential ID/version, owner/student, format and
+envelope algorithm/version/key/generation. Wrong/missing/unknown keys or malformed/
+tampered envelopes produce generic unavailable without rotation or identity diagnostics.
+
+Retain deliberately supported old decrypt versions during key rotation. The local-tested
+server-only rewrap port runs inside the existing fenced/global-lock transaction, checks
+expected envelope generation CAS, decrypts the exact active credential, then appends a
+new generation with fresh nonce and unchanged code/verifier/reservation/version. Retire
+an old decrypt version only after separately authorized complete rewrap/readback and
+backup custody decision. Historical encrypted generations remain private nonce tombstones;
+current list selects latest exact active credential only, never revoked/historical codes.
+This is NOT live provider key configuration evidence. Fresh activation must separately
+read back binding names/versions (never secret values), exact service/migration identities,
+roles, no-store/private gateway and the final inactive asset graph; enable nothing until
+that bounded gate is authorized and satisfied. The frontend publisher cannot do this.
+
+Teacher plaintext exists only in the authorized no-store response and ephemeral DOM/memory.
+Per-student user-gesture copy/native share contains bounded canonical name, exact code,
+trusted current app origin `/student` and Arabic entry instructions. No code URL, auto-send,
+contacts, screenshot, printable report or persistent handout. Cancellation is not a sent
+message; clipboard failure offers a manual ephemeral field. Current owner/class/session/
+lease changes, failed reauthorization, unmount/pagehide and stale async results erase it.
+The final-source current review launcher uses fresh Arabic synthetic students and the same
+actual class/universal student/gateway/Auth/restrictedPG path. All live flags remain OFF.

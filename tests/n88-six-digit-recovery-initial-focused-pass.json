@@ -1,0 +1,26 @@
+{
+  "taskId": "continuous-n88-teacher-code-recovery-share-20261018",
+  "runId": "72d3c8a3-8a69-4e86-8cee-e6c37034035e",
+  "checks": [
+    {
+      "name": "n88_teacher_active_code_aead_durability_rotation_tamper_and_restricted_role_guards",
+      "status": "PASS",
+      "evidence": "Actual restricted nativePG + two alternating gateway/service instances: same active code/version across list, restart; encrypted-only append-only storage, AEAD wrong key/AAD/nonce/tag/truncation/version rejection; supported old-version decrypt and CAS ciphertext rewrap with fresh nonce, no credential/reservation change; duplicate nonce and backend update/delete/browser/Auth scan denied. Fresh expired/foreign/banned/current-class/term denials happen before envelope query."
+    },
+    {
+      "name": "n88_recovery_commit_ack_budget_compatibility",
+      "status": "PASS",
+      "evidence": "Envelope insert rollback and before-COMMIT failure disclose no code; after-COMMIT lost ACK recovers server-proven version1 on freshly authorized list, repeated missing-only creation skips unchanged. Legacy hash-only preserved until explicit per-row rotate; old copy/session deny, revoke suppresses reveal. Concurrent list/batch/rotate honors CAS. Focused five-wrong + success + sixth-wrong boundary remains; unchanged G35-IP/flood proof reused."
+    },
+    {
+      "name": "n88_actual_class_reopen_same_code_copy_share_legacy_and_current_owner_guards",
+      "status": "PASS",
+      "evidence": "Actual whole application class route/owner-bound store + source CSS on fresh 390px synthetic HTTP contexts: refetch/reload exact same codes, Arabic names, precise per-student Arabic name/code/absolute universalURL/instructions through injected copy/share ports, no automatic share; cancellation/manual copy fallback honest; persistence scan excludes codes/envelopes. Expired lease and owner switch synchronously wipe DOM, delayed list cannot restore; same actual universal student login succeeds with no code URL. No screenshots or clipboard/send operations."
+    }
+  ],
+  "cleanup": {
+    "httpAndPgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "stage": "actual-app"
+}

@@ -3,33 +3,26 @@ import { html } from '../lib/dom.js';
 import { classContextKey, PORTAL_FIELDS } from '../lib/student-portal-class-client.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const labels = { name:'اسم الطالب', class:'الفصل', grades:'الدرجات', required:'المهام المطلوبة', completed:'المهام المكتملة', scheduled:'المهام المجدولة' };
-export function mountClassPortal(root, { client, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), print = () => window.print(), requestId = () => crypto.randomUUID() } = {}) {
-  let generation = 0, disposed = false, busy = false, roster = null, selected = null, sheet = [], outcomes = [], message = '', boundKey = null, expiryTimer;
+export function mountClassPortal(root, { client, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), share = typeof navigator.share==='function' ? data=>navigator.share(data) : null, requestId = () => crypto.randomUUID() } = {}) {
+  let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer;
   root.classList.add('n88-class'); root.dir = 'rtl';
   const context = () => { try { return getContext(); } catch { return null; } };
   const key = () => classContextKey(context());
   const valid = (g, k) => !disposed && g === generation && k !== null && k === key();
-  const clearSecrets = () => { sheet = []; root.querySelector('[data-delivery]')?.remove(); };
+  const clearSecrets = () => { if(roster)for(const s of roster.students)s.credential=null; root.querySelectorAll('[data-code],[data-manual]').forEach(el=>el.remove()); root.querySelector('[data-delivery]')?.remove(); };
+  const shareText=s=>`مرحبًا ${s.label}،\nرمز دخولك: ${s.credential}\n${new URL('/student',root.ownerDocument.defaultView.location.origin).href}\nافتح صفحة الطالب وأدخل الرمز لعرض مساحتك الدراسية.`;
   function draw() {
     if (disposed) return;
     const ready = !!client && !!key(), writable = ready && !!roster && !busy;
-    root.innerHTML = `<section aria-label="مساحة طلاب الفصل"><h2>${esc(classLabel())} — مساحة الطلاب</h2><p>صفحة دخول موحّدة للطلاب برمز شخصي من 6 أرقام يبدأ بـ1. يبقى الرمز حتى تغييره أو إلغائه. لا تُرسل رسائل تلقائيًا ولا يمكن استرجاع رمز سابق.</p>
+    root.innerHTML = `<section aria-label="مساحة طلاب الفصل"><h2>${esc(classLabel())} — مساحة الطلاب</h2><p>صفحة دخول موحّدة للطلاب برمز شخصي من 6 أرقام يبدأ بـ1. يبقى الرمز حتى تغييره أو إلغائه. يمكنك الرجوع إلى الرمز الحالي ونسخه ومشاركته. أنت تختار طريقة تسليمه؛ لا تُرسل رسائل تلقائيًا.</p>
       <p role="status" aria-live="polite">${esc(message || (ready ? 'جارٍ قراءة قائمة الفصل…' : 'مساحة الطلاب غير مفعّلة حاليًا. لا تتوفر عمليات كتابة.'))}</p>
       ${ready ? `<div class="n88-class-actions"><button class="btn btn--primary" data-action="batch" ${!writable ? 'disabled' : ''}>إنشاء رموز الطلاب</button><button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>تحديث ومراجعة القائمة</button></div><p>الإنشاء للطلاب الذين ليس لديهم رمز فعّال فقط؛ إعادة المحاولة لا تغيّر الرموز الموجودة.</p>` : ''}
-      ${roster ? `<p>${roster.students.length} طالبًا في القائمة الحالية</p><ul class="n88-class-roster">${roster.students.map((s, index) => `<li><div><strong>${esc(s.label)}</strong><span>${s.hasActiveCode ? 'لديه رمز فعّال — غير قابل للاسترجاع' : 'بلا رمز فعّال'}</span></div><div class="n88-class-actions"><button class="btn" data-action="review-rotate" data-index="${index}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></li>`).join('')}</ul>
+      ${roster ? `<p>${roster.students.length} طالبًا في القائمة الحالية</p><ul class="n88-class-roster">${roster.students.map((s, index) => `<li><div><strong>${esc(s.label)}</strong><span>${s.credential ? 'رمزه الحالي' : s.recoveryStatus==='legacy' ? 'رمز قديم غير قابل للاسترجاع — اختر تغيير رمز هذا الطالب فقط لإنشاء بديل؛ يُبطل الرمز السابق وجلساته' : s.hasActiveCode ? 'يلزم تحديث القائمة لإظهار الرمز' : 'بلا رمز فعّال'}</span>${s.credential ? `<div data-code><input readonly autocomplete="off" dir="ltr" aria-label="رمز ${esc(s.label)}" value="${esc(s.credential)}"><button class="btn" data-action="copy-student" data-index="${index}" ${!writable ? 'disabled' : ''}>نسخ رسالة الطالب</button>${share ? `<button class="btn" data-action="share-student" data-index="${index}" ${!writable ? 'disabled' : ''}>مشاركة رسالة الطالب</button>` : ''}</div>` : ''}</div><div class="n88-class-actions"><button class="btn" data-action="review-rotate" data-index="${index}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></li>`).join('')}</ul>
       <form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>الحقول التي تظهر لطلاب هذا الفصل</legend><p>لا يظهر أي حقل إلا باختيارك وحفظه. هذه الإعدادات لا تنشئ درجات أو حالات إنجاز.</p><div class="n88-class-fields">${PORTAL_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${roster.visibility[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn btn--primary" type="submit">حفظ الحقول الظاهرة</button></fieldset></form>` : ''}
       ${selected && writable ? `<section class="card" data-confirm><h3>${esc(selected.student.label)}</h3><p>${selected.action === 'rotate' ? 'تغيير الرمز يُبطل الرمز السابق وجميع جلساته. سلّم البديل لهذا الطالب وحده بعد التحقق من هويته.' : 'إلغاء الوصول يُبطل الرمز الحالي وجميع جلساته، ولن يستطيع الطالب الدخول به.'}</p><button class="btn" data-action="confirm">${selected.action === 'rotate' ? 'تأكيد تغيير الرمز' : 'تأكيد إلغاء الوصول'}</button><button class="btn" data-action="cancel">تراجع</button></section>` : ''}
       ${outcomes.length ? `<ul data-outcomes>${outcomes.map(line => `<li>${esc(line)}</li>`).join('')}</ul>` : ''}<div data-sheet-host></div></section>`;
-    if (sheet.length) {
-      const host = root.querySelector('[data-sheet-host]');
-      host.innerHTML = '<section class="card n88-class-delivery" data-delivery aria-label="تسليم الرموز"><h3>تسليم الرموز الجديدة</h3><p>هذا العرض مؤقت. سلّم كل رمز لصاحبه فقط، ثم أغلقه لمسح الرموز.</p><ul></ul><button class="btn" data-action="copy">نسخ للتسليم</button><button class="btn" data-action="print">طباعة للتسليم</button><button class="btn" data-action="close-sheet">إغلاق ومسح الرموز</button></section>';
-      const ul = host.querySelector('ul');
-      for (const entry of sheet) {
-        const li = root.ownerDocument.createElement('li'), label = root.ownerDocument.createElement('span'), code = root.ownerDocument.createElement('input');
-        label.textContent = entry.label; code.value = entry.credential; code.readOnly = true; code.dir = 'ltr'; code.autocomplete = 'off'; code.setAttribute('aria-label', 'رمز ' + entry.label); li.append(label, code); ul.append(li);
-      }
-    }
   }
+
   async function refresh() {
     if (disposed) return;
     const g = ++generation, k = key(); boundKey = k; busy = true; roster = null; selected = null; outcomes = []; clearSecrets(); message = ''; draw();
@@ -48,7 +41,9 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
       const result = await operation(oldRoster);
       if (!valid(g, k)) return;
       success(result, oldRoster); roster = null;
-      message += ' حدّث القائمة وراجعها قبل أي إجراء آخر.';
+      const outcomeMessage=message,outcomeLines=outcomes;
+      busy=false;const refreshing=refresh(),refreshGeneration=generation;await refreshing;
+      if(valid(refreshGeneration,k)&&roster){message=outcomeMessage;outcomes=outcomeLines;draw();}
     } catch {
       if (!valid(g, k)) return;
       roster = null; clearSecrets(); message = 'لم يتأكد اكتمال العملية. قد تكون نُفّذت؛ حدّث القائمة وراجع الحالة قبل إعادة المحاولة. لا يُفترض النجاح.';
@@ -58,16 +53,21 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     const button = e.target.closest('[data-action]'); if (!button || !root.contains(button) || disposed) return;
     if (key() !== boundKey) { void refresh(); return; }
     const action = button.dataset.action;
-    if (action === 'close-sheet') { clearSecrets(); draw(); return; }
-    if (action === 'copy' && sheet.length) { try { Promise.resolve(copy(sheet.map(s => s.label + ': ' + s.credential).join('\n'))).catch(() => {}); } catch { /* manual copy remains */ } return; }
-    if (action === 'print' && sheet.length) { print(); return; }
     if (busy) return;
     if (action === 'refresh') { void refresh(); return; }
     if (!roster) return;
+    if(action==='copy-student'||action==='share-student') {
+      const s=roster.students[Number(button.dataset.index)];if(!s?.credential)return;
+      const g=generation,k=key(),text=shareText(s);
+      try {Promise.resolve(action==='copy-student'?copy(text):share?.({text})).then(()=>{
+        if(valid(g,k)){message=action==='copy-student'?'نُسخت رسالة الطالب. اختر طريقة تسليمها.':'اكتملت نافذة المشاركة؛ لا نؤكد إرسال رسالة.';draw();}
+      }).catch(()=>{if(valid(g,k)){message=action==='copy-student'?'تعذّر النسخ؛ حدّد الرسالة وانسخها يدويًا.':'أُلغيت المشاركة أو تعذّرت؛ لم يُؤكّد الإرسال.';draw();if(action==='copy-student'){const area=root.ownerDocument.createElement('textarea');area.dataset.manual='';area.readOnly=true;area.value=text;root.append(area);area.select();}}});}
+      catch {message='تعذّر النسخ أو المشاركة. حدّد الرمز يدويًا.';draw();}return;
+    }
     if (action === 'cancel') { selected = null; draw(); return; }
     if (action.startsWith('review-')) { const student = roster.students[Number(button.dataset.index)]; if (student && (student.hasActiveCode || action === 'review-rotate' && student.credentialVersion > 0)) { clearSecrets(); selected = { student, action: action.slice(7) }; draw(); root.querySelector('[data-confirm] button')?.focus(); } return; }
     if (action === 'batch') void perform(r => client.issueMissingClassCodes(context().teachingId, { requestId: requestId(), expectedRosterRevision: r.rosterRevision }), (result, r) => {
-      sheet = result.created.map(s => ({ label: r.students.find(m => m.studentId === s.studentId).label, credential: s.credential }));
+
       const reasons = { existing:'رمزه موجود؛ لم يتغير', revoked:'أُلغي وصوله؛ يلزم تغيير انتقائي', conflict:'تغيّرت بياناته؛ يلزم تحديث القائمة', unavailable:'تعذّر الإنشاء', not_current:'لم يعد ضمن القائمة الحالية' };
       outcomes = [...result.skipped, ...result.failed].map(s => r.students.find(m => m.studentId === s.studentId).label + ': ' + reasons[s.reason]);
       const reported = new Set([...result.created, ...result.skipped, ...result.failed].map(s => s.studentId));
@@ -78,7 +78,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
       const { student: s, action: command } = selected;
       void perform(() => client[command]({ studentId: s.studentId, enrollmentId: s.enrollmentId, revision: s.revision, credentialVersion: s.credentialVersion, requestId: requestId() }), result => {
         message = command === 'rotate' ? 'أُقرّ تغيير الرمز وإبطال السابق وجلساته.' : 'أُقرّ إلغاء الرمز والوصول وجلساته.';
-        if (command === 'rotate') sheet = [{ label: s.label, credential: result.credential }];
+
       });
     }
   };
