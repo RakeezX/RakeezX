@@ -4,7 +4,7 @@ import { html, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { isDemo } from '../lib/demo.js';
 import { classGroups, detectClassNameColumn } from '../lib/class-import-file.js';
-import { GRADES, gradeLabel, sectionLabel } from '../models.js';
+import { GRADES, gradeLabel, sectionLabel, defaultItemsFor } from '../models.js';
 import { classKoshoofBundle, downloadKoshoofBundle } from '../lib/class-koshoof-bundle.js';
 import { repaint } from '../repaint.js';
 
@@ -33,11 +33,15 @@ function assertFileCurrent() {
 async function rosterRecovery(id = hub.existing) {
   return (await store.gradeImportRecovery()).filter(row => row.recordId === id);
 }
+// AI-authored N107: preview the same definition resolver used by createTeaching.
+// Prospective revisions exist only in review data; never write or dispatch them.
+const prospectiveItems = defaultItemsFor('prospective').map((item,i)=>({...item,id:`prospective-default-${i}`,serverRevision:1}));
+const destinationItems = () => hub.kind === 'existing' && hub.existing ? store.teachingContext(hub.existing).items : prospectiveItems;
 function resetDestination() {
   draft = {};
   if (!transfer.rows) return;
-  const items = hub.kind === 'existing' && hub.existing ? store.teachingContext(hub.existing).items : [];
-  Object.assign(transfer, suggestGradeMappings(transfer.rows[0], items, {teachingId:hub.existing,ownerId:workspace?.authUserId}),
+  const items = destinationItems();
+  Object.assign(transfer, suggestGradeMappings(transfer.rows[0], items, {teachingId:hub.kind === 'existing' ? hub.existing : 'prospective',ownerId:workspace?.authUserId}),
     { review:null, newStudentIds:{}, studentChoices:{}, message:'', recovery:[], created:null });
   transfer.mappings = transfer.mappings.map(m => m.kind === 'new' ? {...m,id:crypto.randomUUID()} : m);
   const current = transfer, destination = hub.existing, kind = hub.kind;
@@ -51,7 +55,7 @@ function reviewNewRoster() {
   if (transfer.importMode === 'grades') {
     // Semantic proposal only. Receipt identities are bound after normal Sync; never dispatch prospective IDs.
     transfer.mappings=transfer.mappings.map(m=>m.kind==='new'?{...m,confirmed:true}:m);
-    proposal = reviewGradeTransfer({...transfer,idColumn:-1,roster:[],items:[],scores:[],
+    proposal = reviewGradeTransfer({...transfer,idColumn:-1,roster:[],items:prospectiveItems,scores:[],
       teaching:{id:'prospective',sectionId:'prospective',termId:review.termId,serverRevision:1},
       term:store.activeTerm(),ownerId:workspace.authUserId,databaseName:workspace.databaseName,allowNewStudents:true,
       newStudentIds:Object.fromEntries(transfer.rows.slice(1).map((_,i)=>[i+2,{id:`prospective-${i}`,enrollmentId:`prospective-enrollment-${i}`}]))});
@@ -137,7 +141,7 @@ function setupBinding(teachingId) {
 }
 
 function transferPanel(teachingId) {
-  const { items } = teachingId ? store.teachingContext(teachingId) : { items: [] };
+  const items = teachingId ? store.teachingContext(teachingId).items : prospectiveItems;
   if (transferRoute !== location.hash) {
     transferRoute = location.hash;
     const request = new URLSearchParams(location.hash.split('?')[1]);
@@ -280,6 +284,7 @@ async function transferConfirm(el, retry = false) {
     }
     const teaching = store.getTeaching(reviewed?.teachingId ?? current.created?.teachingId);
     const savedNames = current.created?.added ?? reviewed?.names?.length ?? reviewed?.newStudents?.length ?? 0;
+    await clearRosterContinuation(current);
     current.rows = null; current.review = null; current.created = null;current.plan=null; draft = {}; current.error = false; current.successTeaching = teaching?.id;
     current.message = teaching ? `${teachingLabel(teaching)} · الأسماء المحفوظة: ${savedNames} · الأسماء المعلقة: 0${reviewed?.cells?.length ? ` · الدرجات المحفوظة: ${reviewed.cells.length}` : ''}` : 'تم تأكيد إيصال الطلب المحفوظ.';
   } catch (error) { current.message = error.message; current.error = true; }
@@ -337,7 +342,7 @@ const transferActions = {
         const detected = detectClassNameColumn(rows);
         rows = detected.header < 0 ? [['اسم الطالب'], ...rows] : rows.slice(detected.header);
         bind(); if (transfer !== current || fileSession !== cloud.session || allowed()) return;
-        transfer.rows = rows; transfer.fileName = file.name; Object.assign(transfer, suggestGradeMappings(rows[0], params.id ? store.teachingContext(params.id).items : [], {teachingId:params.id,ownerId:store.getActiveWorkspace()?.authUserId}));
+        transfer.rows = rows; transfer.fileName = file.name; Object.assign(transfer, suggestGradeMappings(rows[0], params.id ? store.teachingContext(params.id).items : prospectiveItems, {teachingId:params.id ?? 'prospective',ownerId:store.getActiveWorkspace()?.authUserId}));
         transfer.mappings = transfer.mappings.map(m => m.kind === 'new' ? {...m,id:crypto.randomUUID()} : m);
         if (transfer.nameColumn < 0) transfer.nameColumn = detected.mapping.name;
         const suggested = transfer.mappings.flatMap((m,c) => m.kind !== 'ignore' ? [c] : []);
@@ -409,7 +414,7 @@ function focus(root) {
 // AI-authored N107: one immutable semantic approval, bounded foreground continuation.
 const importChanged = () => Error('تغيّر أثر الاستيراد أو سياقه؛ يلزم مراجعة جديدة قبل حفظ درجات إضافية.');
 const planInput = () => JSON.stringify([transfer.fileName,transfer.rows,transfer.nameColumn,transfer.idColumn,transfer.mappings,transfer.studentChoices,transfer.importMode,draft.manual]);
-const academicBinding = row => JSON.stringify(row, (key,value)=>['serverRevision','syncCreatePending','ownerId','updatedAt'].includes(key)?undefined:value);
+const academicBinding = row => JSON.stringify(row, (key,value)=>['serverRevision','syncCreatePending','ownerId','updatedAt','canonicalId','serverCanonical','fieldRevisions','syncConflicts'].includes(key)?undefined:value);
 function capturePlan() {
   return Object.freeze({workspace:store.getActiveWorkspace(),workspaceBinding:JSON.stringify(store.getActiveWorkspace()),session:cloud.session,scope,route:location.hash,
     year:academicBinding(store.activeYear()),term:academicBinding(store.activeTerm()),input:planInput(),
@@ -422,7 +427,7 @@ function assertPlan(current, plan) {
       academicBinding(store.activeYear()) !== plan.year || academicBinding(store.activeTerm()) !== plan.term ||
       planInput() !== plan.input || Date.now() > plan.expires) throw importChanged();
 }
-const itemSemantics = items => JSON.stringify(items.map(i=>[i.id,i.name,i.max,i.auto,i.scoreMode,i.deleted]).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))));
+const itemSemantics = items => JSON.stringify(items.map(i=>[i.name,i.max,i.auto??null,i.scoreMode??'direct',!!i.deleted]).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))));
 function gradeSemantics(review) {
   return JSON.stringify({entries:review.entries.map(({row,student,item,max,old,original,value})=>({row,student,item,max,old,original,value})),
     items:review.newItems,overwrites:review.overwrites,rejected:review.rejected});
@@ -445,7 +450,15 @@ function boundGradeReview(current, plan) {
   const parents=[teaching,store.getSection(receipt.sectionId),store.getSubject(teaching.subjectId),...context.roster,
     ...store.state.enrollments.filter(e=>!e.deleted && e.sectionId===receipt.sectionId)];
   if(parents.some(r=>!(Number(r.serverRevision)>0) || r.syncCreatePending))throw Error('GRADE_CONTEXT_INVALID');
-  const actual=store.reviewGradeImport(receipt.teachingId,{...current,rows,idColumn:original[0].length,mappings:[...current.mappings,{kind:'ignore'}],studentChoices:{}});
+  const mappings=current.mappings.map(mapping=>{
+    if(mapping.kind!=='existing')return mapping;
+    const expected=prospectiveItems.find(item=>item.id===mapping.itemId);
+    if(!expected)throw importChanged();
+    const matches=context.items.filter(item=>isTransferItem(item) && item.name===expected.name && Number(item.max)===Number(expected.max));
+    if(matches.length!==1)throw importChanged();
+    return {...mapping,itemId:matches[0].id};
+  });
+  const actual=store.reviewGradeImport(receipt.teachingId,{...current,rows,idColumn:original[0].length,mappings:[...mappings,{kind:'ignore'}],studentChoices:{}});
   if(actual.newStudents.length || gradeSemantics(actual)!==gradeSemantics(proposal) || actual.entries.some(e=>byName.get(e.student)!==e.studentId))throw importChanged();
   return actual;
 }
@@ -463,6 +476,32 @@ function waitForCreation(current,plan) {
     check();
   });
 }
+// Owner-database device state only: retain the reviewed file while creation ACKs
+// are pending. Reload never starts a write; the teacher explicitly resumes.
+async function saveRosterContinuation(current) {
+  const plan=current.plan;assertPlan(current,plan);
+  await store.saveClassFileImportContinuation({version:1,ownerId:workspace.authUserId,databaseName:workspace.databaseName,
+    year:plan.year,term:plan.term,expires:plan.expires,route:plan.route,input:plan.input,proposal:plan.proposal,
+    classReview:plan.classReview,created:current.created,createdItems:current.createdItems}, {verifyCurrent:()=>assertPlan(current,plan)});
+  assertPlan(current,plan);
+}
+function restoreRosterContinuation() {
+  const saved=store.state.device?.classFileImportContinuation;
+  if(!saved || saved.version!==1 || saved.ownerId!==workspace?.authUserId || saved.databaseName!==workspace?.databaseName ||
+      !saved.created?.teachingId)return;
+  const stale=saved.year!==academicBinding(store.activeYear()) || saved.term!==academicBinding(store.activeTerm()) || Date.now()>saved.expires;
+  const [fileName,rows,nameColumn,idColumn,mappings,studentChoices,importMode,manual]=JSON.parse(saved.input);
+  draft={manual,review:saved.classReview,proposal:JSON.parse(saved.proposal)};
+  transfer={...emptyTransfer(),fileName,rows,nameColumn,idColumn,mappings,studentChoices,importMode,
+    reasons:suggestGradeMappings(rows[0],prospectiveItems,{teachingId:'prospective',ownerId:workspace.authUserId}).reasons,
+    created:saved.created,createdItems:saved.createdItems,needsReview:stale,stage:stale?'انتهت المراجعة أو تغيّر سياقها؛ عُد إلى سياق الطلب وراجعه من جديد، أو ألغِ المراجعة.':'الأسماء محفوظة؛ استكمل الطلب المحفوظ بعد المزامنة.'};
+  hub.kind='new';transfer.plan=Object.freeze({...capturePlan(),expires:saved.expires});
+}
+async function clearRosterContinuation(current) {
+  const saved=store.state.device?.classFileImportContinuation;
+  if(saved?.ownerId===store.getActiveWorkspace()?.authUserId && saved.created?.teachingId===current.created?.teachingId)
+    await store.saveClassFileImportContinuation(null,{expectedTeachingId:current.created.teachingId});
+}
 async function continueRoster(current) {
   const plan=current.plan;
   try {
@@ -471,6 +510,7 @@ async function continueRoster(current) {
     assertPlan(current,plan);current.stage='حفظ الدرجات';current.review=actual;repaint();
     await store.confirmGradeImport(actual,{approved:true,verifyCurrent:()=>{assertPlan(current,plan);const fresh=boundGradeReview(current,plan);if(JSON.stringify(fresh)!==JSON.stringify(actual))throw importChanged();}});
     assertPlan(current,plan);
+    await clearRosterContinuation(current);
     current.rows=null;current.review=null;current.plan=null;current.created=null;draft={};current.successTeaching=actual.teachingId;
     hub.kind='existing';hub.existing=actual.teachingId;
     current.message=`اكتمل الاستيراد. الأسماء المحفوظة: ${plan.classReview.names.length} · الدرجات المحفوظة: ${actual.cells.length}`;current.error=false;
@@ -486,7 +526,7 @@ const classImport = { actions: {
       assertPlan(current,plan);
       const receipt=await store.confirmClassImport(review,true,{verifyCurrent:()=>assertPlan(current,plan)});
       assertPlan(current,plan);draft.failed=false;
-      if(draft.proposal?.cells.length){current.created=receipt;current.createdItems=itemSemantics(store.teachingContext(receipt.teachingId).items);current.stage='حفظ الفصل والطلاب';await continueRoster(current);}
+      if(draft.proposal?.cells.length){current.created=receipt;current.createdItems=itemSemantics(store.teachingContext(receipt.teachingId).items);current.stage='حفظ الفصل والطلاب';await saveRosterContinuation(current);await continueRoster(current);}
       else {hub.kind='existing';hub.existing=receipt.teachingId;current.plan=null;current.rows=null;current.review=null;current.successTeaching=receipt.teachingId;current.message=`اكتمل الاستيراد. الأسماء المحفوظة: ${receipt.added}${current.importMode==='grades'?' · لا توجد درجات مدخلة في الملف؛ لم تُنشأ بنود درجات من الكشف.':''}`;draft={};}
     }catch(error){if(transfer===current && draft===currentDraft){draft.failed=true;current.message=error.message;current.error=true;}}
     finally{current.busy=false;current.writing=false;if(transfer===current)repaint();}
@@ -498,17 +538,24 @@ const classImport = { actions: {
       const original=JSON.parse(plan.input)[1],ids=new Map(current.created.students.map(s=>[s.name,s.id]));
       const column=original[0].length;
       current.rows=original.map((row,i)=>[...Array.from({length:column},(_,c)=>row[c]??''),i?ids.get(String(row[current.nameColumn]??'').replace(/\s+/g,' ').trim())??'':'معرف ركيز المحفوظ']);
-      current.idColumn=column;current.mappings=[...current.mappings.slice(0,column),{kind:'ignore'}];
+      const items=store.teachingContext(current.created.teachingId).items;
+      current.idColumn=column;current.mappings=[...current.mappings.slice(0,column).map((mapping,c)=>{
+        if(mapping.kind!=='existing')return mapping;
+        const expected=prospectiveItems.find(item=>item.id===mapping.itemId);
+        const matches=expected?items.filter(item=>isTransferItem(item) && item.name===expected.name && Number(item.max)===Number(expected.max)):[];
+        if(matches.length===1)return {...mapping,itemId:matches[0].id};
+        current.reasons[c]='exception';return {kind:'ignore'};
+      }),{kind:'ignore'}];
       current.plan=null;current.needsReview=true;current.editMapping=true;current.page=0;
       hub.existing=current.created.teachingId;hub.kind='existing';draft={};
       current.review=store.reviewGradeImport(hub.existing,current);current.message='تغيّر أثر الخطة السابقة. راجع الأثر الحالي وأكّده صراحة قبل أي حفظ جديد.';
     }catch(error){current.message=error.message;current.error=true;}
     repaint();
   },
-  async 'roster-resume'(){if(locked() || !transfer.plan || transfer.recovery.length)return;transfer.busy=true;transfer.writing=true;await continueRoster(transfer);},
+  async 'roster-resume'(){if(locked() || !transfer.plan || transfer.needsReview || transfer.recovery.length)return;transfer.busy=true;transfer.writing=true;await continueRoster(transfer);},
   'class-import-reset'(){cancelImport();},
 }};
-function cancelImport(){const current=transfer;current.cancelled=true;current.stopWait?.();draft={};transfer={...emptyTransfer(),recovery:current.recovery,message:'أُغلقت المراجعة. أي بيانات حُفظت سابقًا تبقى محفوظة.'};repaint();}
+function cancelImport(){const current=transfer;clearRosterContinuation(current).catch(()=>{});current.cancelled=true;current.stopWait?.();draft={};transfer={...emptyTransfer(),recovery:current.recovery,message:'أُغلقت المراجعة. أي بيانات حُفظت سابقًا تبقى محفوظة.'};repaint();}
 function compactReview(review,creation) {
   const entries=creation ? transfer.rows.slice(1).map((r,i)=>({row:i+2,name:String(r[transfer.nameColumn]??''),status:'new'})) : review.entries;
   const grades=review?.cells ? review : null, blank=grades && grades.entries.every(e=>e.value===null);
@@ -557,7 +604,8 @@ function contextRoute(p = {}) {
   hub.fileFlow = true;
   hub.existing = id || '';
   hub.selected = new Set(hub.existing ? [hub.existing] : []);
-  const current = transfer; rosterRecovery().then(rows=>{if(transfer === current){current.recovery=rows;repaint();}});
+  restoreRosterContinuation();
+  const current = transfer; rosterRecovery(current.created?.teachingId).then(rows=>{if(transfer === current){current.recovery=rows;repaint();}});
 }
 const locked = () => draft.busy || transfer.busy || transfer.writing;
 function tabs() {

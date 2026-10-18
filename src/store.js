@@ -2692,6 +2692,11 @@ export async function resolveSubjectSelection({ token, customName = '' } = {}, {
 
 // AI: private review capabilities bind one file group to one immutable account
 // checkpoint. Partial receipts survive a failed child; they never auto-replay.
+const classImportFingerprint = (name,row) => {
+  if(activeWorkspace?.type==='account' && row?.ownerId!=null && row.ownerId!==activeWorkspace.authUserId)
+    throw Error('CLASS_IMPORT_FOREIGN_PARENT');
+  return JSON.stringify(visibleSyncValue(name,row));
+};
 const classImportReviews = new WeakMap();
 let classImportBusy = false;
 export function reviewClassImport(group) {
@@ -2709,7 +2714,7 @@ export function reviewClassImport(group) {
   const review = { grade: canonical.grade, label: canonical.label, subject: canonical.subject,
     names: Object.freeze([...canonical.preview.names]), yearId: activeYear().id, termId: activeTerm().id };
   classImportReviews.set(review, { workspace, session: cloud.session, source: JSON.stringify(review),
-    year: JSON.stringify(activeYear()), term: JSON.stringify(activeTerm()), section: null, teaching: null,
+    year: classImportFingerprint('years',activeYear()), term: classImportFingerprint('terms',activeTerm()), section: null, teaching: null,
     deviceTerm: JSON.stringify([state.device.activeYearId, state.device.activeTermId]), students: [],
     sectionFingerprint: null, teachingFingerprint: null, added: 0, busy: false });
   return Object.freeze(review);
@@ -2717,7 +2722,7 @@ export function reviewClassImport(group) {
 function verifyClassImportBinding(review, receipt) {
   const workspace = assertClassImportAccess();
   if (workspace !== receipt.workspace || cloud.session !== receipt.session || JSON.stringify(review) !== receipt.source ||
-      JSON.stringify(activeYear()) !== receipt.year || JSON.stringify(activeTerm()) !== receipt.term) {
+      classImportFingerprint('years',activeYear()) !== receipt.year || classImportFingerprint('terms',activeTerm()) !== receipt.term) {
     throw Error('تغيّر الحساب أو السنة أو الفصل الدراسي. أعد رفع الملف ومراجعته.');
   }
 }
@@ -2727,11 +2732,11 @@ function verifyClassImport(review, receipt) {
     Number(row.grade) === review.grade && normalizeSectionLabel(row.label) === normalizeSectionLabel(review.label));
   if (receipt.section) {
     if (matches.length !== 1 || matches[0].id !== receipt.section.id ||
-        JSON.stringify(getSection(receipt.section.id)) !== receipt.sectionFingerprint) throw Error('تغيّر الفصل. راجع المحفوظ قبل المحاولة.');
+        classImportFingerprint('sections',getSection(receipt.section.id)) !== receipt.sectionFingerprint) throw Error('تغيّر الفصل. راجع المحفوظ قبل المحاولة.');
     validateTeachingContext(receipt.section.id, review.termId);
     if (receipt.teaching) {
       assertClassOperationsAccess(receipt.teaching.id);
-      if (JSON.stringify(getTeaching(receipt.teaching.id)) !== receipt.teachingFingerprint) throw Error('تغيّرت مادة الفصل. راجع المحفوظ.');
+      if (classImportFingerprint('teachings',getTeaching(receipt.teaching.id)) !== receipt.teachingFingerprint) throw Error('تغيّرت مادة الفصل. راجع المحفوظ.');
     }
     const roster = sectionRoster(receipt.section.id);
     if (roster.length !== receipt.added || JSON.stringify(roster.map(row => row.name).sort()) !==
@@ -2745,12 +2750,32 @@ function verifyPersistedClassImport(review, receipt, current) {
   const matches = current.sections.filter(row => !row.deleted && row.yearId === review.yearId &&
     Number(row.grade) === review.grade && normalizeSectionLabel(row.label) === normalizeSectionLabel(review.label));
   if (receipt.section ? matches.length !== 1 || matches[0].id !== receipt.section.id ||
-      JSON.stringify(matches[0]) !== receipt.sectionFingerprint : matches.length) throw Error('تغيّر الفصل المحفوظ في نافذة أخرى. راجع الكشوف.');
-  if (receipt.teaching && JSON.stringify(current.teachings.find(row => row.id === receipt.teaching.id)) !== receipt.teachingFingerprint) throw Error('تغيّرت مادة الفصل المحفوظة.');
+      classImportFingerprint('sections',matches[0]) !== receipt.sectionFingerprint : matches.length) throw Error('تغيّر الفصل المحفوظ في نافذة أخرى. راجع الكشوف.');
+  if (receipt.teaching && classImportFingerprint('teachings',current.teachings.find(row => row.id === receipt.teaching.id)) !== receipt.teachingFingerprint) throw Error('تغيّرت مادة الفصل المحفوظة.');
   if (receipt.section && current.enrollments.some(row => !row.deleted && row.sectionId === receipt.section.id)) throw Error('تغيّر كشف الطلاب المحفوظ. راجعه قبل الاستيراد.');
-  if (current.years && JSON.stringify(current.years.find(row => row.id === review.yearId)) !== receipt.year ||
-      current.terms && JSON.stringify(current.terms.find(row => row.id === review.termId)) !== receipt.term) throw Error('تغيّرت السنة أو الفصل الدراسي المحفوظ.');
+  if (current.years && classImportFingerprint('years',current.years.find(row => row.id === review.yearId)) !== receipt.year ||
+      current.terms && classImportFingerprint('terms',current.terms.find(row => row.id === review.termId)) !== receipt.term) throw Error('تغيّرت السنة أو الفصل الدراسي المحفوظ.');
   if (current.device && JSON.stringify([current.device[0]?.activeYearId, current.device[0]?.activeTermId]) !== receipt.deviceTerm) throw Error('تغيّر الفصل الدراسي في نافذة أخرى.');
+}
+// AI-authored N107: one owner-bound local continuation; never enters Sync or backup.
+// Compare inside the durable transaction so another tab's draft cannot be erased.
+export async function saveClassFileImportContinuation(value, { expectedTeachingId = value?.created?.teachingId, verifyCurrent = () => {} } = {}) {
+  const workspace=assertClassImportAccess(), session=cloud.session;
+  assertLeaseWritable();
+  if(!expectedTeachingId || value && (value.ownerId!==workspace.authUserId || value.databaseName!==workspace.databaseName))
+    throw Error('CLASS_FILE_CONTINUATION_OWNER');
+  const committed=await db.applyBatch({device:{}},{prepare(current){
+    verifyCurrent();assertLeaseWritable();
+    if(assertClassImportAccess()!==workspace || cloud.session!==session)throw Error('CLASS_FILE_CONTINUATION_CONTEXT');
+    const device=current.device.find(row=>row.id==='device'), prior=device?.classFileImportContinuation;
+    if(!device)throw Error('CLASS_FILE_CONTINUATION_DEVICE');
+    if(prior && (prior.ownerId!==workspace.authUserId || prior.databaseName!==workspace.databaseName ||
+        prior.created?.teachingId!==expectedTeachingId))throw Error('CLASS_FILE_CONTINUATION_CHANGED');
+    return {device:{put:[{...device,classFileImportContinuation:value,updatedAt:now()}]}};
+  }});
+  if(activeWorkspace===workspace && cloud.session===session){
+    state.device=committed.device.put[0];broadcast([{store:'device',id:'device'}]);
+  }
 }
 export function classImportReceipt(review) {
   const receipt = classImportReviews.get(review);
@@ -2784,13 +2809,13 @@ export async function confirmClassImport(review, approved = false, { verifyCurre
     if (!receipt.section) {
       verifyCurrent(); verifyClassImport(review, receipt);
       receipt.section = await createSection({ yearId: review.yearId, grade: review.grade, label: review.label, name: `${review.grade}/${review.label}` }, guard);
-      receipt.sectionFingerprint = JSON.stringify(getSection(receipt.section.id));
+      receipt.sectionFingerprint = classImportFingerprint('sections',getSection(receipt.section.id));
       verifyCurrent(); verifyClassImport(review, receipt);
     }
     if (!receipt.teaching) {
       verifyCurrent(); verifyClassImport(review, receipt);
       receipt.teaching = await createTeaching({ sectionId: receipt.section.id, subjectId: subject.id, termId: review.termId }, guard);
-      receipt.teachingFingerprint = JSON.stringify(receipt.teaching);
+      receipt.teachingFingerprint = classImportFingerprint('teachings',receipt.teaching);
       verifyCurrent(); verifyClassImport(review, receipt);
     }
     if (!receipt.added && review.names.length) {

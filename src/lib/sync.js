@@ -565,6 +565,11 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     if (pullError) throw pullError;
     const pushed = await v2Engine.dispatchPending();
     madeProgress = pushed.acknowledged > 0;
+    // AI-authored N107: publish durable ACK revisions before unrelated trailing
+    // failures. This is local reconciliation, never whole-run success.
+    if (madeProgress && acknowledgedContext.workspace === store.getActiveWorkspace() &&
+        acknowledgedContext.session === cloud.session && cloudOwnershipAccess('pull').allowed)
+      await store.refreshSyncedState();
     if (pushed.ownershipBlocked) {
       stopOwnershipBlockedScheduling({ reason: pushed.blockReason });
       return false;

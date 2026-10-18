@@ -1,0 +1,110 @@
+{
+  "taskId": "continuous-n107-file-import-sync-item-matching-20261018",
+  "runId": "306e6dd3-905a-49ed-9396-aaaf676e1344",
+  "checks": [
+    {
+      "name": "immediate_normal_ack_and_durable_grades",
+      "status": "PASS",
+      "evidence": "Actual app DOM/handlers/CSS, grade11/section2/PE, 28 fabricated rows; normal owned creation commands, default item ACK, explicit max mismatch consent, existing activity/homework destinations, durable 31 scores including zero; blanks/equal values preserve grades, five unique items, no pending outbox/draft."
+    },
+    {
+      "name": "delayed_normal_ack_and_durable_grades",
+      "status": "PASS",
+      "evidence": "Actual app DOM/handlers/CSS, grade11/section2/PE, 28 fabricated rows; normal owned creation commands, default item ACK, explicit max mismatch consent, existing activity/homework destinations, durable 31 scores including zero; blanks/equal values preserve grades, five unique items, no pending outbox/draft."
+    },
+    {
+      "name": "partial-reload_normal_ack_and_durable_grades",
+      "status": "PASS",
+      "evidence": "Actual app DOM/handlers/CSS, grade11/section2/PE, 28 fabricated rows; normal owned creation commands, default item ACK, explicit max mismatch consent, existing activity/homework destinations, durable 31 scores including zero; blanks/equal values preserve grades, five unique items, no pending outbox/draft."
+    },
+    {
+      "name": "expired-reload_normal_ack_and_durable_grades",
+      "status": "PASS",
+      "evidence": "Actual app DOM/handlers/CSS, grade11/section2/PE, 28 fabricated rows; normal owned creation commands, default item ACK, explicit max mismatch consent, existing activity/homework destinations, durable 31 scores including zero; blanks/equal values preserve grades, five unique items, no pending outbox/draft."
+    },
+    {
+      "name": "lost-receipt_normal_ack_and_durable_grades",
+      "status": "PASS",
+      "evidence": "Actual app DOM/handlers/CSS, grade11/section2/PE, 28 fabricated rows; normal owned creation commands, default item ACK, explicit max mismatch consent, existing activity/homework destinations, durable 31 scores including zero; blanks/equal values preserve grades, five unique items, no pending outbox/draft."
+    },
+    {
+      "name": "rejected_grade_receipt_retained_on_reload",
+      "status": "PASS",
+      "evidence": "No grades committed, exact rejected owner-bound command retained; reload offers explicit disposition, no retry/new request."
+    },
+    {
+      "name": "rejected_parent_blocks_grades",
+      "status": "PASS",
+      "evidence": "Real creation outbox receives 409; dependency rejection stays durable and no grade command is dispatched."
+    },
+    {
+      "name": "session_switch_stops_grade_dispatch",
+      "status": "PASS",
+      "evidence": "Actual account UI, normal creation ACK, held async grade capability; context change rejects before grade command."
+    },
+    {
+      "name": "term_switch_stops_grade_dispatch",
+      "status": "PASS",
+      "evidence": "Actual account UI, normal creation ACK, held async grade capability; context change rejects before grade command."
+    },
+    {
+      "name": "owner_switch_stops_grade_dispatch",
+      "status": "PASS",
+      "evidence": "Actual account UI, normal creation ACK, held async grade capability; context change rejects before grade command."
+    },
+    {
+      "name": "expiry_switch_stops_grade_dispatch",
+      "status": "PASS",
+      "evidence": "Actual account UI, normal creation ACK, held async grade capability; context change rejects before grade command."
+    },
+    {
+      "name": "item-drift_switch_stops_grade_dispatch",
+      "status": "PASS",
+      "evidence": "Actual account UI, normal creation ACK, held async grade capability; context change rejects before grade command."
+    },
+    {
+      "name": "cancel_stops_continuation",
+      "status": "PASS",
+      "evidence": "Cancel retains saved names and normal outbox; no grade request or retained file draft."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "217409165cb1fae65618302f96cb4cf57b3488f9ad8741d944eb5384aa1688bd",
+    "src/store.js": "f85540d9a7f14fae629cd895a78c9774f18a60998108c7071d3c20bae3d5dcd2",
+    "src/lib/sync.js": "5733a305fb63fe63e6e073ffb3d05a5a9716bf16753ba8628de14d2bea6bd713",
+    "src/lib/grade-transfer.js": "1111b142cc220b3a6d7660f7c716cc282ef52ac4a58933d851a46636451619ca",
+    "src/models.js": "c3799c0dbd8089d1faf39c68cacb0f49495a8afd91cc28f9e3b5a6ba8eef0d2b",
+    "src/styles/components.css": "b175be9dafe966e7f89ffa63b601f73cb71e259e03c1f27a53fd0451f7d3a9d7",
+    "tests/fixtures/n107-file-sync/roster.csv": "be451a1b3b6e9020755fd386117b466ec1b1476ca21ae02cb437521c2bf112c8"
+  },
+  "previousFailures": [
+    "page.evaluate: TypeError: s.getItem is not a function\n    at eval (eval at evaluate (:311:30), <anonymous>:4:80)\n    at Array.filter (<anonymous>)\n    at eval (eval at evaluate (:311:30), <anonymous>:4:68)\n    at async <anonymous>:337:30\n    at saved (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-file-import-sync-item-matching-20261018\\tests\\n107-file-sync-browser.mjs:171:40)\n    at verifySaved (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-file-import-sync-item-matching-20261018\\tests\\n107-file-sync-browser.mjs:178:21)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-file-import-sync-item-matching-20261018\\tests\\n107-file-sync-browser.mjs:252:23\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:193:2",
+    "AssertionError [ERR_ASSERTION]: zero durably saved\n    at verifySaved (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:188:9)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:252:17\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:193:2",
+    "page.evaluate: Error: GRADE_NEW_ITEM_CONFIRM_REQUIRED\n    at http://127.0.0.1:49718/src/lib/grade-transfer.js:70:146\n    at Array.forEach (<anonymous>)\n    at reviewGradeTransfer (http://127.0.0.1:49718/src/lib/grade-transfer.js:65:12)\n    at Module.reviewGradeImport (http://127.0.0.1:49718/src/store.js:4419:10)\n    at eval (eval at evaluate (:311:30), <anonymous>:5:21)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-file-import-sync-item-matching-20261018\\tests\\n107-file-sync-browser.mjs:255:31\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:193:2",
+    "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok((await saved(page)).outbox.some(r=>r.state==='error'))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:227:13\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:193:2",
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-roster-file-flow]') to be visible\u001b[22m\n\n    at visit (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-file-import-sync-item-matching-20261018\\tests\\n107-file-sync-browser.mjs:101:130)\n    at async prepare (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-file-import-sync-item-matching-20261018\\tests\\n107-file-sync-browser.mjs:99:2)\n    at async fresh (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-file-import-sync-item-matching-20261018\\tests\\n107-file-sync-browser.mjs:148:60)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:205:25\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-file-import-sync-item-matching-20261018/tests/n107-file-sync-browser.mjs:195:2"
+  ],
+  "sourceRegression": {
+    "baseline": "Normal creation ACK reached empty outbox but canonicalId/serverCanonical changed year/term fingerprint: foreground import falsely reported changed context, no grades; new-class activities/homework proposed as duplicates.",
+    "privateAttachment": "Verified SHA256/1823 bytes/28 rows/6 columns locally. Only fabricated names/values and header/blank/type shape retained."
+  },
+  "supportingChecks": [
+    {
+      "name": "mapping_and_existing_class_mutation",
+      "status": "PASS",
+      "evidence": "node --test tests/n107-file-sync-mapping.test.mjs tests/n107-classes-import-mutation.test.mjs: 9/9"
+    },
+    {
+      "name": "durable_continuation_owner_and_metadata",
+      "status": "PASS",
+      "evidence": "node --test tests/n107-file-sync-state.test.mjs: 3/3"
+    },
+    {
+      "name": "syntax_diff_privacy",
+      "status": "PASS",
+      "evidence": "Changed Product/test JavaScript node --check; git diff --check; no original student names in candidate files or evidence JSON; attachment remains outside worktree."
+    }
+  ],
+  "resourceCleanup": "Canonical isolated contexts/browser finally closed; task-owned loopback server closeAllConnections/close completed; no live/shared browser lease."
+}
