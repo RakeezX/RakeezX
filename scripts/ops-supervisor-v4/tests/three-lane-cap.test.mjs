@@ -31,7 +31,7 @@ async function fixture(t, extraAdapters = {}) {
   const state = { time: Date.parse('2026-10-12T12:00:00Z'), processes: [], launches: [], publishes: [], runtime };
   const config = { version: 5, maxWorkers: 1, defaultModel: 'fixture-no-model-call', controller: { activationId: ACTIVATION, productionUrl: 'https://rakeezx.com', codexPath: 'fixture-not-an-executable' } };
   await writeJson(path.join(runtime, 'workflow-v5.json'), config);
-  const adapters = { testOnly: true, now: () => state.time, inventory: async () => state.processes,
+  const adapters = { testOnly: true, records: {}, now: () => state.time, inventory: async () => state.processes,
     prepare: async task => { task.baseSha ??= BASE; task.worktreePath ??= path.join(runtime, 'worktree-' + task.id); task.cwd = task.worktreePath; },
     validate: async (_task, receipt) => receipt,
     launch: async (task, spec) => { state.launches.push(structuredClone(spec)); return 4000 + state.launches.length; },
@@ -51,14 +51,22 @@ async function fixture(t, extraAdapters = {}) {
 }
 
 
-test('three independent workers use the approved cap and fourth remains pending',async t=>{
- const s=await fixture(t); const f=path.join(s.runtime,'workflow-v5.json'); const c=await readJson(f);c.maxWorkers=3;await writeJson(f,c);
- for(const id of ['n77','n71','n58','n99'])await s.add(card(id,{allowedPaths:['src/'+id+'.js']}));
- await s.tick();assert.equal(s.launches.length,3);assert.equal((await s.get('n99')).status,'pending');
+test('five independent workers use the approved cap and sixth remains pending',async t=>{
+ const s=await fixture(t); const f=path.join(s.runtime,'workflow-v5.json'); const c=await readJson(f);c.maxWorkers=5;await writeJson(f,c);
+ for(const id of ['n77','n71','n58','n99','n88','n90'])await s.add(card(id,{allowedPaths:['src/'+id+'.js']}));
+ await s.tick();assert.equal(s.launches.length,5);assert.equal((await s.get('n99')).status,'pending');
+ assert.equal((await readJson(path.join(s.runtime,'ACTIVE_TASKS.json'))).supportedMaxWorkers,5);
 });
-test('three-lane cap still serializes intersecting paths',async t=>{
- const s=await fixture(t);const f=path.join(s.runtime,'workflow-v5.json');const c=await readJson(f);c.maxWorkers=3;await writeJson(f,c);
+test('five-worker cap still serializes intersecting paths',async t=>{
+ const s=await fixture(t);const f=path.join(s.runtime,'workflow-v5.json');const c=await readJson(f);c.maxWorkers=5;await writeJson(f,c);
  await s.add(card('n77',{priority:1,allowedPaths:['src/store.js']}));await s.add(card('n58',{priority:2,allowedPaths:['src/store.js']}));await s.add(card('n71',{priority:3,allowedPaths:['src/styles/app.css']}));
  await s.tick();assert.equal(s.launches.length,2);assert.equal((await s.get('n58')).status,'pending');
 });
-test('unapproved capacity and zero remain rejected',async t=>{const s=await fixture(t);const f=path.join(s.runtime,'workflow-v5.json');for(const n of [0,4,8]){const c=await readJson(f);c.maxWorkers=n;await writeJson(f,c);await assert.rejects(s.controller.loadConfig(),/maxWorkers/);}});
+test('four workers are accepted within the approved cap',async t=>{const s=await fixture(t);const f=path.join(s.runtime,'workflow-v5.json');const c=await readJson(f);c.maxWorkers=4;await writeJson(f,c);await s.controller.loadConfig();assert.equal(s.controller.config.maxWorkers,4);});
+test('unapproved and noninteger capacity remain rejected',async t=>{const s=await fixture(t);const f=path.join(s.runtime,'workflow-v5.json');for(const n of [0,6,8,-1,2.5,null]){const c=await readJson(f);c.maxWorkers=n;await writeJson(f,c);await assert.rejects(s.controller.loadConfig(),/maxWorkers/);}});
+test('five-worker capacity retains one publisher and the oldest delivery lane',async t=>{
+ const s=await fixture(t);const f=path.join(s.runtime,'workflow-v5.json');const c=await readJson(f);c.maxWorkers=5;await writeJson(f,c);
+ for(const [id,offset] of [['n77',0],['n88',1]])await s.add(card(id,{status:'delivery',candidateSha:CANDIDATE,baseSha:BASE,worktreePath:s.runtime,deliveryQueuedAt:new Date(s.time+offset).toISOString(),nextDeliveryAt:new Date(s.time).toISOString()}));
+ await s.tick();await new Promise(resolve=>setImmediate(resolve));await s.tick();await s.tick();
+ assert.equal(s.publishes.length,1);assert.equal(s.publishes[0].taskId,'n77');assert.equal((await s.get('n88')).status,'delivery');
+});

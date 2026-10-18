@@ -414,7 +414,7 @@ export class Controller {
   async loadConfig() {
     const config = await readJson(this.configPath);
     if (!config?.controller?.activationId || !ID.test(config.controller.activationId)) throw new Error('An explicit valid controller.activationId is required');
-    if (![1, 2, 3].includes(Number(config.maxWorkers))) throw new Error('maxWorkers must be 1, 2 or 3');
+    if (!Number.isInteger(Number(config.maxWorkers)) || Number(config.maxWorkers) < 1 || Number(config.maxWorkers) > 5) throw new Error('maxWorkers must be an integer from 1 to 5');
     if (!config.controller.codexPath && !this.testOnly) throw new Error('controller.codexPath must name the tested Codex executable');
     if (!this.testOnly && !await exists(config.controller.codexPath)) throw new Error('Configured Codex executable is unavailable; no new workers started');
     if (config.controller.repoRoot) this.repo = path.resolve(config.controller.repoRoot);
@@ -1031,7 +1031,7 @@ export class Controller {
     const health = summarizeQueueHealth(this.jobs, this.noteCache?.openProducts, this.now());
     await this.persistSnapshot({ version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId,
       activationId: this.config.controller.activationId, controllerAlive: true, processInventoryKnown: inventoryKnown, paused,
-      maxWorkers: Number(this.config.maxWorkers), runningCount: this.jobs.filter(t => t.status === 'running').length,
+      supportedMaxWorkers: 5, maxWorkers: Number(this.config.maxWorkers), runningCount: this.jobs.filter(t => t.status === 'running').length,
       blockedCount: health.blockedAttempts, historicalBlockedCount: health.historicalBlockedAttempts, actionableBlockedCount: health.actionableBlockedAttempts, actionableBlockedProductCount: health.actionableBlockedProductCount, actionableBlockedByProduct: health.actionableBlockedByProduct, verifiedPublicationReceipts: health.verifiedPublicationReceipts, verifiedPublishedProductCount: health.verifiedPublishedProductCount, medianMinutesFromCardToVerifiedPublication: health.medianMinutesFromCardToVerifiedPublication, lastVerifiedDeliveryAt: health.lastVerifiedDeliveryAt, awaitingPOProductCount: new Set(this.jobs.filter(t => t.status === 'awaiting_po').map(t => t.productId)).size, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
       active: active.map(t => ({ id: t.id, productId: t.productId, status: t.status, runnerPid: t.runnerPid, sessionId: t.sessionId, candidateSha: t.candidateSha })),
       tasks: this.jobs.map(t => ({ id: t.id, productId: t.productId, status: t.status, retryAt: t.retryAt, nextDeliveryAt: t.nextDeliveryAt, lastFailure: t.lastFailure })),

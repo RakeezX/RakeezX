@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "preparedAt": "2026-10-18T10:00:51.7726600Z",
+  "worktree": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\ops-continuation-archive-20261018",
+  "baseSha": "e597351809935528fd208302b65190da1d21e5d6",
+  "state": "PREPARED_ONLY_NOT_APPLIED",
+  "authority": "Latest PO2026-10-18 permits up to five independent Product workers through existing controller and one publisher",
+  "changedFiles": [
+    {
+      "repoPath": "scripts/ops-supervisor-v4/controller.mjs",
+      "preparedSha256": "a7c5df8cfb49b0c8f5c1a05d80b9a7152fdf60f5ab9266e8aac652eb8f469fb6",
+      "canonicalPreimageSha256": "3e9de4b4c83105ad9c31a7ce056cca46b9cc7008e6cc5d84095150c287c25b9b"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/apply-reviewed-maintenance.mjs",
+      "preparedSha256": "cf508aa5f90b00dcaa47dcff10cb4dc8c35199078891308fda7a3e745695d5b3",
+      "canonicalPreimageSha256": "e9fd3ce2e0e0c8dbcdd8f247094da49bd491f753c7f1157acf60481c74efb07e"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/reviewed-controller-reload.mjs",
+      "preparedSha256": "b41865a0a10032a8ab5b2380a38aed326aa2b468665f7dfda807ab2679dc1b09",
+      "canonicalPreimageSha256": null
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/tests/three-lane-cap.test.mjs",
+      "preparedSha256": "da287e46b9ea17c2cece085fa929266d8a1d5b61e93c30917f63bf0e62d25057",
+      "canonicalPreimageSha256": "db4ac7936a97d4571ed317017ea0bd791cbd38f2ec36c1959edda189e434b8d0"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/tests/maintenance-runtime-config.test.mjs",
+      "preparedSha256": "24f7aeb26137b2ff9ef0147f17614d579c09dbf1a70f9a7ff22e708a8bec7788",
+      "canonicalPreimageSha256": null
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/tests/controller-reload.test.mjs",
+      "preparedSha256": "7c156c97ebbe1adc2e399ed94f95466459b4e5e8738f09a9cedc12be2fe662df",
+      "canonicalPreimageSha256": null
+    }
+  ],
+  "checks": [
+    {
+      "command": "node --test scripts/ops-supervisor-v4/tests/three-lane-cap.test.mjs scripts/ops-supervisor-v4/tests/maintenance-runtime-config.test.mjs scripts/ops-supervisor-v4/tests/controller-reload.test.mjs scripts/ops-supervisor-v4/tests/maintenance-result-binding.test.mjs scripts/ops-supervisor-v4/tests/maintenance-pending-supersession.test.mjs scripts/ops-supervisor-v4/tests/maintenance-note-source.test.mjs scripts/ops-supervisor-v4/tests/evidence-maintenance.test.mjs",
+      "name": "focused_capacity_runtime_reload_and_existing_maintenance_guards",
+      "evidence": "Generated reload PowerShell was executed only with shadowed fixture commands for every process/scheduler mutation. Success and nine failure/race scenarios passed; no native process or Scheduled Task mutation occurred.",
+      "status": "PASS",
+      "failed": 0,
+      "passed": 64,
+      "durationMs": 11142.111,
+      "skipped": 0
+    },
+    {
+      "status": "PASS",
+      "name": "diff_whitespace",
+      "command": "git diff --check"
+    }
+  ],
+  "mutationsPerformed": [
+    "isolated worktree prepared source/tests and this evidence only"
+  ],
+  "notPerformed": [
+    "canonical writes",
+    "runtime config writes",
+    "queue writes",
+    "owned or foreign guard changes",
+    "actual controller reload",
+    "Git commit",
+    "Git push",
+    "helper apply",
+    "Product tests or release"
+  ],
+  "application": {
+    "stage3": "Helper releases only its exact owned STOP/maintenance lock in finally. Existing controller admits source-linked pending Product cards; do not launch workers manually.",
+    "stage1": "Existing canonical helper installs reviewed code and module using clean isolated ops checkout. Keep runtime maxWorkers3.",
+    "guard": "Never run old standalone reload artifact: it lacks an owned lock/STOP mutation window.",
+    "stage2": "New helper invocation may use files=[] cardUpdates=[] requireNoActiveWorkers=true controllerReload plus runtimeConfigUpdate. It acquires owned lock/STOP, installs no Product code, reloads existing Scheduled Task once, waits new paused snapshot supportedMaxWorkers5, then changes maxWorkers only and waits fresh maxWorkers5 acknowledgement."
+  },
+  "runtimeConfigUpdateTemplate": {
+    "expectedMaxWorkers": 3,
+    "expectedSha256": "eb20f685b203dd9f640db4cf192625fd1294b53cd9a83190d3b299141b1696d0",
+    "reason": "Latest PO authorizes up to five independent Product workers through the current controller, with overlapping scope serialized and one publisher.",
+    "maxWorkers": 5,
+    "authorityRef": "po-20261018-five-independent-workers"
+  },
+  "controllerReloadTemplate": {
+    "expectedControllerSha256": "a7c5df8cfb49b0c8f5c1a05d80b9a7152fdf60f5ab9266e8aac652eb8f469fb6",
+    "reason": "Reload the reviewed capacity controller through the same existing Scheduled Task under helper-owned pause and exact process identity guards.",
+    "expectedScheduledActionSha256": "9523f564917a0c87412ac4dcb2e52b4f7772f58193b5ee591cc8f7d0986a1ac6",
+    "expectedStartOpsSha256": "d65f3f363f3c5c75234f1a69062f7564941376dd4e0f668d16a15a6e72d2103c",
+    "expectedIdentity": {
+      "instanceId": "d85651d3-aec6-4848-9713-bef4544768f8",
+      "createdAt": "10/17/2026 23:07:16",
+      "pid": 25488
+    },
+    "authorityRef": "po-20261018-five-independent-workers",
+    "expectedScheduledLauncherSha256": "d32b410ec400649c27ad46686cb7374ed881f799a162dbbcdc2b42dd52f43183"
+  },
+  "templatesNeedFreshReadBeforeApply": true
+}

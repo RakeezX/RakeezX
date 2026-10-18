@@ -6,6 +6,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { verifiedDeployment, verifiedSourceOnlyPublication } from './controller.mjs';
+import { validateControllerReload, buildControllerReloadScript } from './reviewed-controller-reload.mjs';
 
 const SELF = 'scripts/ops-supervisor-v4/apply-reviewed-maintenance.mjs';
 const WIN_PS = 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
@@ -45,6 +46,34 @@ export function permittedRepoPath(relative, date = new Date().toISOString().slic
   if (relative.startsWith('docs/automation-evidence/' + date.replaceAll('-', '') + '/')) return !parts.some(p => /^(private|secrets?|credentials?|tokens?)$/i.test(p));
   return relative.startsWith('scripts/ops-supervisor-v4/') && !parts.some(p => /^(private|runtime|artifacts|queue|attempts|sessions?|leases|node_modules|\.git|\.env(?:\..*)?)$/i.test(p)) && !/\.(?:sql|pem|key|pfx|p12)$/i.test(relative);
 }
+// A dedicated operation for the one canonical capacity field. Runtime paths and
+// complete replacement configs deliberately remain outside files[].
+export function validateRuntimeConfigUpdate(update) {
+  insist(update && typeof update === 'object' && !Array.isArray(update), 'Expected a runtimeConfigUpdate object');
+  safeObject(update);
+  const keys = ['expectedSha256', 'expectedMaxWorkers', 'maxWorkers', 'authorityRef', 'reason'];
+  insist(Object.keys(update).length === keys.length && Object.keys(update).every(key => keys.includes(key)), 'Only the reviewed maxWorkers field may change');
+  insist(SHA256.test(update.expectedSha256 ?? ''), 'Expected runtime config SHA256');
+  for (const key of ['expectedMaxWorkers', 'maxWorkers']) insist(Number.isInteger(update[key]) && update[key] >= 1 && update[key] <= 5, 'Invalid runtime ' + key);
+  insist(update.maxWorkers !== update.expectedMaxWorkers, 'Runtime capacity update has no change');
+  insist(ID.test(update.authorityRef ?? '') && update.authorityRef.startsWith('po-'), 'A PO authority reference is required for runtime capacity');
+  insist(typeof update.reason === 'string' && update.reason.trim().length >= 20 && update.reason.length <= 1000, 'A concrete runtime capacity reason is required');
+  return structuredClone(update);
+}
+export function prepareRuntimeConfigUpdate(raw, update, activationId) {
+  validateRuntimeConfigUpdate(update);
+  insist(Buffer.isBuffer(raw) && sha256(raw) === update.expectedSha256, 'Runtime config changed since review');
+  const current = parse(raw); safeObject(current);
+  insist(current?.version === 5 && current.controller?.activationId === activationId, 'Runtime config activation/version changed');
+  insist(current.maxWorkers === update.expectedMaxWorkers, 'Runtime capacity differs from review');
+  const content = bytes({ ...current, maxWorkers: update.maxWorkers });
+  return { content, beforeSha256: sha256(raw), afterSha256: sha256(content), previousMaxWorkers: current.maxWorkers,
+    maxWorkers: update.maxWorkers, authorityRef: update.authorityRef, reason: update.reason };
+}
+export function verifyRuntimeConfigConsumer(snapshot, update) {
+  validateRuntimeConfigUpdate(update);
+  insist(snapshot.supportedMaxWorkers === 5, 'Live controller has not loaded reviewed five-worker capacity support');
+}
 export function validatePayload(payload, date = new Date().toISOString().slice(0, 10)) {
   safeObject(payload);
   insist(payload?.version === 1, 'Expected payload version 1');
@@ -53,7 +82,9 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
   insist(equalPath(payload.runtimeRoot, path.win32.join(payload.repoRoot, 'artifacts', 'ops-supervisor-v4')), 'Runtime must be the canonical ops runtime');
   insist(!equalPath(payload.repoRoot, payload.opsWorktree), 'An isolated ops worktree is required');
   insist(typeof payload.commitMessage === 'string' && payload.commitMessage.length <= 300 && /\[AI\]/.test(payload.commitMessage) && !/[\r\n\x00]/.test(payload.commitMessage), 'Expected one AI-identified commit subject');
-  insist(Array.isArray(payload.files) && payload.files.length > 0, 'No reviewed files');
+  const runtimeConfigUpdate = Object.hasOwn(payload, 'runtimeConfigUpdate') ? validateRuntimeConfigUpdate(payload.runtimeConfigUpdate) : null;
+  const controllerReload = Object.hasOwn(payload, 'controllerReload') ? validateControllerReload(payload.controllerReload) : null;
+  insist(Array.isArray(payload.files) && (payload.files.length > 0 || runtimeConfigUpdate || controllerReload), 'No reviewed files, runtime capacity update or controller reload');
   const paths = new Set();
   for (const file of payload.files) {
     insist(permittedRepoPath(file.repoPath, date), 'Outside permitted ops/instruction paths: ' + file.repoPath);
@@ -65,6 +96,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
   insist(Array.isArray(allowed) && allowed.every(id => ID.test(id)) && new Set(allowed).size === allowed.length, 'Invalid active-task exceptions');
   const requireNoActiveWorkers = payload.requireNoActiveWorkers ?? allowed.length === 0;
   insist(typeof requireNoActiveWorkers === 'boolean' && !(requireNoActiveWorkers && allowed.length), 'Conflicting worker guards');
+  if (runtimeConfigUpdate || controllerReload) insist(payload.requireNoActiveWorkers === true && allowed.length === 0, 'Capacity/reload maintenance requires explicit no-active-worker guards');
   insist(Array.isArray(payload.cardUpdates), 'cardUpdates must be an array');
   const taskIds = new Set();
   for (const update of payload.cardUpdates) {
@@ -85,7 +117,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     insist(wrapper.activationId === payload.activationId && Array.isArray(wrapper.tasks) && wrapper.tasks.length === taskIds.size, 'Source wrapper activation or task count mismatch');
     for (const update of payload.cardUpdates) insist(wrapper.tasks.filter(c => c.id === update.card.id).length === 1 && same(wrapper.tasks.find(c => c.id === update.card.id), update.card), 'Source wrapper differs from card payload: ' + update.card.id);
   }
-  return { taskId: payload.taskId, files: payload.files.map(f => f.repoPath), taskIds: [...taskIds], allowActiveTaskIds: allowed, requireNoActiveWorkers };
+  return { taskId: payload.taskId, files: payload.files.map(f => f.repoPath), taskIds: [...taskIds], allowActiveTaskIds: allowed, requireNoActiveWorkers, runtimeConfigUpdate, controllerReload };
 }
 
 // Keep all 100 ns digits; Date.parse alone incorrectly equates nearby births.
@@ -362,7 +394,7 @@ export function revisedTask(task, update, commit, at) {
   return saved;
 }
 
-const ps = script => execFileSync(WIN_PS, ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from("$ErrorActionPreference='Stop'\n" + script, 'utf16le').toString('base64')], { encoding: 'utf8', windowsHide: true, timeout: 20000, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 4 * 1024 * 1024 }).trim();
+const ps = (script, timeout = 20000) => execFileSync(WIN_PS, ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from("$ErrorActionPreference='Stop'\n" + script, 'utf16le').toString('base64')], { encoding: 'utf8', windowsHide: true, timeout, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 4 * 1024 * 1024 }).trim();
 function inventory(pids) {
   const ids = [...new Set(pids)];
   insist(ids.length && ids.every(n => Number.isSafeInteger(n) && n > 0), 'Invalid process identity');
@@ -409,8 +441,10 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
   const ownerBytes = bytes(owner);
   fs.writeFileSync(lockPath, ownerBytes, { flag: 'wx' });
   const evidenceRoot = path.join(rt, 'maintenance', payload.taskId, token);
-  const receipt = { version: 1, ...owner, status: 'LOCKED', evidenceRoot, steps: [], committed: false, pushed: false, opsWrittenPaths: [], installedPaths: [], catalogUpdated: false, activatedTasks: [], touchedWorkerProcesses: [] };
-  let ownStop = false, stopBytes, pausedAt = 0, controller, beforeCatalog;
+  const receipt = { version: 1, ...owner, status: 'LOCKED', evidenceRoot, steps: [], committed: false, pushed: false, opsWrittenPaths: [], installedPaths: [], runtimeConfigUpdated: false, controllerReloadAttempted: false, catalogUpdated: false, activatedTasks: [], touchedWorkerProcesses: [] };
+  let ownStop = false, stopBytes, pausedAt = 0, controller, beforeCatalog, controllerReloaded = false;
+  const runtimeConfigPath = path.join(rt, 'workflow-v5.json');
+  let runtimeConfigBefore, runtimeConfigPlan;
   const queueBefore = new Map(), sourceBindings = new Map(), opsPreimageHashes = new Map();
   const record = (stage, detail = {}) => { receipt.stage = stage; receipt.steps.push({ at: new Date().toISOString(), stage, ...detail }); replaceGuarded(path.join(evidenceRoot, 'progress.json'), bytes(receipt), sha256(read(path.join(evidenceRoot, 'progress.json')))); };
   const ownsLock = () => read(lockPath)?.equals(ownerBytes) === true;
@@ -426,6 +460,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     insist(active.controllerPid === id.pid && active.instanceId === id.instanceId && active.controllerAlive === true && active.processInventoryKnown === true, 'Unverified controller snapshot');
     insist((active.active ?? []).every(t => plan.allowActiveTaskIds.includes(t.id)), 'An unapproved active task is present');
     if (plan.requireNoActiveWorkers) insist((active.active ?? []).length === 0 && active.runningCount === 0, 'Maintenance requires no active workers');
+    if (plan.runtimeConfigUpdate && (!plan.controllerReload || controllerReloaded)) verifyRuntimeConfigConsumer(active, plan.runtimeConfigUpdate);
     return active;
   }
   function pausedIdle() {
@@ -476,10 +511,16 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
   try {
     noLinks(evidenceRoot); fs.mkdirSync(evidenceRoot, { recursive: true });
     record('LOCKED');
-    const config = json(path.join(rt, 'workflow-v5.json'));
+    noLinks(runtimeConfigPath); runtimeConfigBefore = fs.readFileSync(runtimeConfigPath);
+    const config = parse(runtimeConfigBefore);
     insist(config.controller?.activationId === payload.activationId, 'Activation changed');
+    if (plan.runtimeConfigUpdate) runtimeConfigPlan = prepareRuntimeConfigUpdate(runtimeConfigBefore, plan.runtimeConfigUpdate, payload.activationId);
     insist(!fs.existsSync(stopPath) && !fs.existsSync(path.join(rt, 'STOP-REFILL')), 'An existing stop marker requires its owner; it will not be removed');
     controller = json(path.join(rt, 'CONTROLLER_IDENTITY.json')); receipt.controllerBefore = controller;
+    if (plan.controllerReload) {
+      const expected = plan.controllerReload.expectedIdentity;
+      insist(controller.pid === expected.pid && controller.instanceId === expected.instanceId && utcTicks(controller.createdAt) === utcTicks(expected.createdAt), 'Controller reload identity differs from review');
+    }
     const prePause = inspectController();
     insist(Date.now() - Date.parse(prePause.at) < 25000 && Date.parse(prePause.at) <= Date.now() + 1000 && !prePause.deliveryInFlight && !fs.existsSync(path.join(rt, 'leases', 'integration.json')), 'Before STOP: a fresh publisher-idle snapshot is required');
     receipt.activeBefore = prePause.active; record('PRE_PAUSE_VERIFIED', { activeTaskIds: prePause.active.map(t => t.id) });
@@ -530,6 +571,10 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       if (original !== null) { const backup = path.join(evidenceRoot, 'before-files', file.repoPath); fs.mkdirSync(path.dirname(backup), { recursive: true }); fs.writeFileSync(backup, original, { flag: 'wx' }); }
     }
     fs.writeFileSync(path.join(evidenceRoot, 'catalog-before.json'), beforeCatalog, { flag: 'wx' });
+    if (runtimeConfigPlan) {
+      insist(sha256(read(runtimeConfigPath)) === runtimeConfigPlan.beforeSha256, 'Runtime config changed before maintenance');
+      fs.writeFileSync(path.join(evidenceRoot, 'runtime-config-before.json'), runtimeConfigBefore, { flag: 'wx' });
+    }
     for (const [id, state] of queueBefore) fs.writeFileSync(path.join(evidenceRoot, id + '.before.json'), state.raw, { flag: 'wx' });
     record('PREFLIGHT_VERIFIED', { candidates: [...queueBefore].map(([id, s]) => ({ id, candidateSha: s.candidateSha, resultSha256: s.resultSha256, sessionId: s.task.sessionId ?? null, runId: s.task.attempt?.runId ?? null, supersedingPublishedSha: s.supersedingPublishedSha ?? null })) });
 
@@ -551,6 +596,17 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     for (const file of payload.files) {
       replaceGuarded(path.join(root, file.repoPath), Buffer.from(file.content, 'utf8'), file.expectedCanonicalSha256); receipt.installedPaths.push(file.repoPath); record('INSTALLING');
     }
+    if (plan.controllerReload) {
+      insist(pausedIdle(), 'Pause lost before reviewed controller reload');
+      for (const file of ['scripts/ops-supervisor-v4/controller.mjs', 'scripts/ops-supervisor-v4/start-ops.ps1', 'artifacts/ops-supervisor-v4/operator-monitor/launch-ops-no-console.vbs']) noLinks(path.join(root, file));
+      receipt.controllerReloadAttempted = true; record('CONTROLLER_RELOAD_STARTED');
+      const script = buildControllerReloadScript({ reload: plan.controllerReload, repoRoot: root, runtimeRoot: rt, activationId: payload.activationId,
+        maintenanceLockSha256: sha256(ownerBytes), stopSha256: sha256(stopBytes), pauseStartedAt: new Date(pausedAt).toISOString(), evidenceRoot });
+      const reloaded = JSON.parse(ps(script, 55000));
+      insist(reloaded.status === 'RELOADED_SINGLE_CURRENT_CONTROLLER' && reloaded.scheduledStarts === 1 && reloaded.controllerLockEdited === false && reloaded.queueEdited === false, 'Reviewed controller reload proof is incomplete');
+      controller = reloaded.newIdentity; controllerReloaded = true;
+      receipt.controllerReload = reloaded; insist(pausedIdle(), 'Replacement controller is not paused and idle'); record('CONTROLLER_RELOADED');
+    }
     insist(pausedIdle(), 'Pause lost before card activation');
     insist(sha256(read(catalogPath)) === sha256(beforeCatalog), 'Catalog changed before activation');
     for (const update of payload.cardUpdates) { const fresh = exactInactive(update); insist(sha256(fresh.raw) === sha256(queueBefore.get(update.card.id).raw), 'Queue changed before activation: ' + update.card.id); }
@@ -571,10 +627,25 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         receipt.activatedTasks.push({ id: revised.id, status: revised.status, sessionId: revised.sessionId ?? null, runId: revised.attempt?.runId ?? null, candidateSha: revised.candidateSha ?? null, reason: update.materialReason }); record('CARD_ACTIVATED');
       }
     }
+    if (runtimeConfigPlan) {
+      insist(pausedIdle(), 'Pause lost before runtime capacity update');
+      replaceGuarded(runtimeConfigPath, runtimeConfigPlan.content, runtimeConfigPlan.beforeSha256);
+      receipt.runtimeConfigUpdated = true;
+      const { content, ...binding } = runtimeConfigPlan;
+      receipt.runtimeConfigUpdate = { ...binding, updatedAt: new Date().toISOString() }; record('RUNTIME_CONFIG_UPDATED');
+      let observed;
+      for (let i = 0; i < 20; i++) {
+        const fresh = pausedIdle();
+        if (fresh?.maxWorkers === runtimeConfigPlan.maxWorkers && Date.parse(fresh.at) >= Date.parse(receipt.runtimeConfigUpdate.updatedAt)) { observed = fresh; break; }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      insist(observed, 'No fresh controller acknowledgement of reviewed runtime capacity');
+      receipt.runtimeConfigUpdate.observedAt = observed.at; record('RUNTIME_CONFIG_OBSERVED');
+    }
     receipt.activeAfter = json(path.join(rt, 'ACTIVE_TASKS.json')).active;
     receipt.status = 'INSTALLED_AND_ACTIVATED'; record('COMPLETE');
   } catch (error) {
-    receipt.status = receipt.committed || receipt.opsWrittenPaths.length || receipt.pushed || receipt.installedPaths.length || receipt.activatedTasks.length ? 'PARTIAL_FAILURE' : 'FAILED'; receipt.error = safeError(error);
+    receipt.status = receipt.committed || receipt.opsWrittenPaths.length || receipt.pushed || receipt.installedPaths.length || receipt.runtimeConfigUpdated || receipt.controllerReloadAttempted || receipt.activatedTasks.length ? 'PARTIAL_FAILURE' : 'FAILED'; receipt.error = safeError(error);
     try { record('FAILED'); } catch (loggingError) { receipt.evidenceError = safeError(loggingError); }
   } finally {
     receipt.cleanupErrors = [];
