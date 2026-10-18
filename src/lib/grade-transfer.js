@@ -2,7 +2,11 @@ import { previewStudentRows, validStudentImportName } from './student-import.js'
 import { gradeNumber } from './grade-transfer-parsers.js';
 
 export const gradeNameKey = value => String(value ?? '').normalize('NFC').replace(/[\s\u0640\u064B-\u065F\u0670]/g, '').toLowerCase();
-export const isTransferItem = item => !item.deleted && !item.auto && (item.scoreMode ?? 'direct') === 'direct';
+// Canonical metadata refreshes do not change reviewed grade-preservation facts.
+export const importScoreBinding = scores => JSON.stringify([...scores].sort((a,b)=>String(a.id).localeCompare(String(b.id))).map(s=>
+  [s.id,s.itemId,s.studentId,s.value??null,s.manualValue??s.value??null,s.derivedValue??0,!!s.deleted,Number(s.serverRevision??0),s.ownerId??null,!!s.locked,s.syncConflicts??[]]));
+export const importItemBinding = item => JSON.stringify(item,(key,value)=>['updatedAt','canonicalId','serverCanonical','fieldRevisions','importMaximumReceipt'].includes(key)?undefined:value);
+export const isTransferItem = item => !item.deleted && !item.auto && !item.readOnly && !item.locked && !item.parentId && (item.scoreMode ?? 'direct') === 'direct';
 
 // AI-authored N105: proposals only; no mutation or implicit confirmation.
 export function suggestGradeMappings(headers, items, { teachingId, ownerId } = {}) {
@@ -12,7 +16,7 @@ export function suggestGradeMappings(headers, items, { teachingId, ownerId } = {
     const label = String(value ?? '').normalize('NFC').trim();
     const match = label.match(/^(.+?)\s*\(العظمى\s+([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]{1,2})?)\)$/u);
     const max = match ? Number(digits(match[2]).replace('٫','.')) : null;
-    return {label, name:match?.[1].trim(), max, canonical:match && max > 0 && max <= 9999.99 ? key(match[1])+':'+max : key(label)};
+    return {label, name:match?.[1].trim(), max: max > 0 && max <= 9999.99 ? max : null, canonical:match && max > 0 && max <= 9999.99 ? key(match[1])+':'+max : key(label)};
   });
   const uniqueColumn = label => {
     const found = parsed.flatMap((h,c) => key(h.label) === key(label) ? [c] : []);
@@ -31,10 +35,9 @@ export function suggestGradeMappings(headers, items, { teachingId, ownerId } = {
     const unique = parsed.filter(other => other.canonical === h.canonical).length === 1 &&
       parsed.filter(other => key(other.name ?? other.label) === key(h.name ?? h.label)).length === 1;
     if (unique && sameName.length === 1 && Number(sameName[0].serverRevision) > 0 &&
-        Number.isFinite(Number(sameName[0].max)) && Number(sameName[0].max) > 0 &&
-        (h.max === null || h.max === Number(sameName[0].max))) {
+        Number.isFinite(Number(sameName[0].max)) && Number(sameName[0].max) > 0) {
       targets[c] = sameName[0].id;
-      return {kind:'existing',itemId:sameName[0].id};
+      return {kind:'existing',itemId:sameName[0].id,...(h.max !== null ? {fileMax:h.max} : {})};
     }
     if (unique && !sameName.length && h.name && h.name.length <= 50 && !/[()]/.test(h.name) && h.max > 0 && h.max <= 9999.99) {
       reasons[c] = 'proposal';
@@ -61,7 +64,7 @@ export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings,
   const columns = rows[0].length;
   if (nameColumn >= columns || !Number.isInteger(idColumn) || idColumn < -1 || idColumn >= columns || nameColumn === idColumn || mappings.length !== columns) throw new Error('GRADE_MAPPING_INVALID');
   if (Object.keys(studentChoices).some(row => !/^[1-9]\d*$/.test(row) || Number(row) < 2 || Number(row) > rows.length)) throw new Error('GRADE_STUDENT_CHOICE_STALE');
-  const selected = [], newItems = [], used = new Set();
+  const selected = [], newItems = [], maxChanges = [], used = new Set();
   mappings.forEach((mapping, column) => {
     if (column === nameColumn || column === idColumn || mapping.kind === 'ignore') return;
     let item;
@@ -73,6 +76,20 @@ export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings,
     } else if (mapping.kind === 'existing') {
       item = items.find(i => i.id === mapping.itemId && i.teachingId === teaching.id && isTransferItem(i));
       if (!item || item.ownerId && item.ownerId !== ownerId || !(Number(item.serverRevision) > 0) || !Number.isFinite(Number(item.max)) || Number(item.max) <= 0) throw new Error('GRADE_ITEM_UNAVAILABLE');
+      if (mapping.fileMax != null) {
+        const max = gradeNumber(mapping.fileMax);
+        if (!(max > 0) || max > 9999.99) throw Error('GRADE_MAPPING_INVALID');
+        if (max !== Number(item.max)) {
+          const existing = scores.filter(s => s.itemId === item.id);
+          // Separate transactions: even a reviewed overwrite cannot make an unsafe lower max atomic.
+          if (existing.some(s => s.ownerId && s.ownerId !== ownerId || s.locked || s.syncCreatePending || s.syncConflicts?.length || !s.deleted && !(Number(s.serverRevision)>0) ||
+              !s.deleted && (s.value != null && (!Number.isFinite(Number(s.value)) || Number(s.value) > max))))
+            throw Error('لا يمكن خفض العظمى: توجد درجات محفوظة تتجاوز حد الملف أو سجلات مقفلة؛ عالج التعارض ثم راجع الملف.');
+          maxChanges.push({itemId:item.id,oldMax:Number(item.max),max,revision:item.serverRevision,
+            item:JSON.stringify(item),scores:importScoreBinding(existing)});
+          item = {...item,max};
+        }
+      }
     } else throw new Error('GRADE_MAPPING_INVALID');
     if (used.has(item.id)) throw new Error('GRADE_DUPLICATE_ITEM');
     used.add(item.id); selected.push({ column, item });
@@ -123,7 +140,7 @@ export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings,
     }
   }
   return { ownerId, databaseName, rosterBinding:rosterChoiceBinding({roster,teaching,ownerId,databaseName}), teachingId: teaching.id, termId: term.id, teachingRevision: teaching.serverRevision,
-    entries, rejected, unchanged, additions, overwrites, capped, newStudents, sectionId: teaching.sectionId, newItems: newItems.filter(i => cells.some(c => c.itemId === i.id)), cells };
+    maxChanges, entries, rejected, unchanged, additions, overwrites, capped, newStudents, sectionId: teaching.sectionId, newItems: newItems.filter(i => cells.some(c => c.itemId === i.id)), cells };
 }
 
 export function gradeCommand(review, overwriteConfirmed, enrollmentConfirmed = false) {

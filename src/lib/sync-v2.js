@@ -6,6 +6,7 @@
  * that V2C can wire into runtime store actions after the server cutover.
  */
 
+import { importScoreBinding } from './grade-transfer.js';
 import { REPAIR_PROTOCOL, REPAIR_STORES, repairAuditId, repairSnapshot, buildSessionRepairPlan, sessionRepairEntry } from './session-recovery.js';
 import * as databaseDefault from './db.js';
 import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, applyScoreSubitemCommand, applyScoreConfigurationCommand, applyScoreDistributionCopyCommand, getScoreDomainSnapshot, fetchRecords } from './cloud.js';
@@ -1036,11 +1037,29 @@ export function createSyncV2Engine({
   async function markAttempt(mutation, expectedWorkspace = null) {
     let locked = mutation;
     const contextualCreate = mutation.store === 'sessions' && mutation.op === 'create' && mutation.patch?.calendar_context;
-    await database.applyBatch(mutation.sessionRepairOf ? Object.fromEntries(REPAIR_STORES.map(name => [name, {}])) : contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
+    await database.applyBatch(mutation.importMaximum === true ? {outbox:{},device:{},items:{},scores:{},teachings:{},terms:{},sections:{}} : mutation.sessionRepairOf ? Object.fromEntries(REPAIR_STORES.map(name => [name, {}])) : contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
         if (pendingFoundationGroup(current.outbox, existing)) throw Object.assign(Error('Atomic calendar repair owns this request'), { code: 'N58_REPAIR_PENDING' });
+        if (existing.importMaximum === true) {
+          const saved=current.device.find(r=>r.id==='device')?.classFileImportContinuation;
+          const stage=saved?.maxProgress?.find(r=>r.mutationId===existing.mutationId), review=saved?.maximumReview;
+          const device=current.device.find(r=>r.id==='device'), item=current.items.find(r=>r.id===existing.recordId);
+          const teaching=current.teachings.find(r=>r.id===review?.teachingId), term=current.terms.find(r=>r.id===review?.termId);
+          const section=current.sections.find(r=>r.id===teaching?.sectionId), workspace=ownershipGuard.getWorkspace();
+          const access=ownershipGuard.cloudAccess({operation:'dispatch',authenticatedUserId:currentAuthenticatedUserId(),command:existing});
+          if (!stage || !item || !access.allowed || workspace!==expectedWorkspace || saved.ownerId!==existing.ownerId ||
+              saved.databaseName!==workspace?.databaseName || device.activeTermId!==review.termId || device.activeYearId!==term?.yearId ||
+              !teaching || teaching.deleted || teaching.serverRevision!==review.teachingRevision || !term || term.deleted || term.status!=='active' ||
+              !section || section.deleted || section.status==='archived' || item.deleted || item.auto || (item.scoreMode??'direct')!=='direct' ||
+              Number(item.max)!==stage.max || !existing.envelopeLocked && (existing.baseRevision!==stage.revision || item.serverRevision!==stage.revision))
+            throw Error('Import maximum reviewed context changed');
+          const before=JSON.parse(stage.item);
+          if (Object.keys(SYNC_V2_SCHEMAS.items.fields).filter(k=>k!=='max').some(k=>JSON.stringify(item[k]??null)!==JSON.stringify(before[k]??null)) ||
+              importScoreBinding(current.scores.filter(r=>r.itemId===stage.itemId))!==stage.scores)
+            throw Error('Import maximum preservation facts changed');
+        }
         if (existing.sessionRepairOf) {
           if (repairOwner() !== existing.ownerId || expectedWorkspace && ownershipGuard.getWorkspace() !== expectedWorkspace) throw Error('Repair owner/workspace changed');
           const audit = current.outbox.find(x => x.id === repairAuditId(existing.sessionRepairOf));
@@ -1116,6 +1135,12 @@ export function createSyncV2Engine({
   async function reconcileReceipt(mutation, result, expectedWorkspace = null) {
     const resultMutationId = result?.mutationId;
     if (resultMutationId !== mutation.mutationId) throw new Error('Sync V2 receipt mutationId mismatch');
+    if (mutation.importMaximum === true) {
+      const access=ownershipGuard.cloudAccess({operation:'dispatch',authenticatedUserId:currentAuthenticatedUserId(),command:mutation});
+      if (!access.allowed || ownershipGuard.getWorkspace()!==expectedWorkspace || result.canonical?.owner_id!==mutation.ownerId ||
+          result.canonical?.id!==mutation.recordId || result.canonicalId!==mutation.recordId)
+        throw Error('Import maximum receipt context/identity mismatch');
+    }
     if (['years', 'terms'].includes(mutation.store) && ownershipGuard.getWorkspace()?.type === 'account') {
       const access = ownershipGuard.cloudAccess({ operation: 'dispatch',
         authenticatedUserId: currentAuthenticatedUserId(), command: mutation });
@@ -1197,6 +1222,11 @@ export function createSyncV2Engine({
           };
         });
         next = overlayMutations(next, pendingForRecord(rebasedOutbox, mutation.store, [canonicalId]), canonical?.deleted === true);
+        if (mutation.importMaximum === true && mutation.store === 'items') {
+          next.importMaximumReceipt = {mutationId:mutation.mutationId,outcome:result.outcome,
+            max:Number(canonical?.max),revision:resultRevision,
+            conflicts:!!result.conflictedGroups?.length || !!diagnostic || result.canonical?.owner_id!==mutation.ownerId};
+        }
 
         if (canonicalId !== sourceId) writes[mutation.store].remove.push(sourceId);
         pushUniquePut(writes[mutation.store], next);
@@ -1671,6 +1701,8 @@ export function createSyncV2Engine({
       // those envelopes unchanged until the stored receipt is reconciled.
       if (pendingFoundationGroup(await database.getAll('outbox'), original)) { result.blocked++; continue; }
       if (onlyMutationId && original.mutationId !== onlyMutationId) continue;
+      // N107 is a foreground reviewed stage; reload/ordinary background Sync never starts it.
+      if (original.importMaximum === true && onlyMutationId !== original.mutationId) {result.blocked++;continue;}
       if (result.attempted >= maxMutations) break;
       if (original.state === 'rejected') {
         if (linkedSessionRepair(original, allRows)) { result.blocked++; continue; }
@@ -2054,7 +2086,7 @@ export function createSyncV2Engine({
         continue;
       }
 
-      const repairWorkspace = live.sessionRepairOf ? ownershipGuard.getWorkspace() : null;
+      const repairWorkspace = live.sessionRepairOf || live.importMaximum === true ? ownershipGuard.getWorkspace() : null;
       const repairContextCurrent = () => !repairWorkspace || ownershipGuard.getWorkspace() === repairWorkspace &&
         currentAuthenticatedUserId() === live.ownerId;
       if (live.sessionRepairOf) {
