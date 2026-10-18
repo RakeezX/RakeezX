@@ -2,7 +2,7 @@
   "aiAuthored": true,
   "enabled": false,
   "projectId": "xlrubcwjqktzzunrvuns",
-  "migration": "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+  "migration": "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
   "function": {
     "name": "n88-student-portal",
     "entry": "bundle/edge/index.mjs",
@@ -12,7 +12,7 @@
     "stagedProjectConfigFragment": "supabase.staged.toml",
     "gatewayVerifyJwt": false,
     "enabled": false,
-    "revision": "n88-existing-host-v1"
+    "revision": "n88-integrated-class-v1"
   },
   "cloudflare": {
     "config": "wrangler.staged.toml",
@@ -24,11 +24,16 @@
   "privateDocument": {
     "enabled": false,
     "liveRewrites": [],
-    "proposedExistingOriginPathPattern": "^/s/[A-Za-z0-9_-]{43}$",
+    "proposedExistingOriginPathPattern": "^/student$",
     "document": "bundle/private/student.html",
     "assetMount": "/n88-private/",
     "assetDirectory": "bundle/private/",
-    "assetAllowlist": ["assets/student.mjs", "styles/app.css", "styles/student-portal.css"],
+    "assetAllowlist": [
+      "assets/student.mjs",
+      "styles/app.css",
+      "styles/student-portal.css",
+      "styles/student-portal-login.css"
+    ],
     "fallbackToAccountApp": false,
     "headers": {
       "Cache-Control": "private, no-store",
@@ -41,14 +46,46 @@
     "browserReadiness": false
   },
   "secretCustody": {
-    "edgeOnly": ["N88_DATABASE_URL", "N88_DATABASE_CA_CERT", "N88_HMAC_KEY"],
-    "sharedEdgeAndCloudflare": ["N88_INGRESS_KEY"],
-    "edgeExistingPublicBindings": ["N88_PUBLIC_ORIGIN", "N88_AUTH_URL", "N88_AUTH_API_KEY", "N88_SERVICE_REVISION"],
-    "cloudflareExistingBindings": ["N88_PUBLIC_ORIGIN", "N88_EDGE_URL"],
+    "edgeOnly": [
+      "N88_DATABASE_URL",
+      "N88_DATABASE_CA_CERT",
+      "N88_HMAC_KEY",
+      "N88_NUMERIC_KEY",
+      "N88_RESERVATION_KEY"
+    ],
+    "sharedEdgeAndCloudflare": [
+      "N88_INGRESS_KEY"
+    ],
+    "edgeExistingPublicBindings": [
+      "N88_PUBLIC_ORIGIN",
+      "N88_AUTH_URL",
+      "N88_AUTH_API_KEY",
+      "N88_SERVICE_REVISION"
+    ],
+    "cloudflareExistingBindings": [
+      "N88_PUBLIC_ORIGIN",
+      "N88_EDGE_URL"
+    ],
     "valuesIncluded": false,
     "databaseRole": "n88_backend",
     "provisionLoginOnlyAfterSeparateApproval": true
   },
   "cron": [],
-  "n44Changes": false
+  "n44Changes": false,
+  "migrations": [
+    "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+    "supabase/migrations/20261018102843_n88_integrated_class_staged.sql"
+  ],
+  "requiredPreflight": [
+    "prior-20261018-preflight.inactive.sql (before fresh baseline only)",
+    "integrated-preflight.inactive.sql (after baseline, before extension)",
+    "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families"
+  ],
+  "qualification": {
+    "state": "BLOCKED",
+    "actualAppJourney": "tests/n88-integrated-class-journey.json",
+    "currentExpectedIdentitySnapshot": null,
+    "baselineExpectedIdentitySnapshot": "prior-20261018-expected-identities.json",
+    "activationPermitted": false
+  }
 }

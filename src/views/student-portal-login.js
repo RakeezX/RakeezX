@@ -31,7 +31,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     }
     for (const [key, label] of Object.entries({ required: 'المطلوب مني', completed: 'الأعمال المكتملة', scheduled: 'الأعمال القادمة' })) {
       if (!Object.hasOwn(data.work || {}, key)) continue;
-      content += `<section data-section="${key}"><h2>${label}</h2>${data.work[key].length ? data.work[key].map(item => `<article><h3>${escape(item.title)}</h3>${item.instruction !== undefined ? `<p>${escape(item.instruction)}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}</article>`).join('') : '<p>لا توجد أعمال منشورة في هذا القسم.</p>'}</section>`;
+      content += `<section data-section="${key}"><h2>${label}</h2>${data.work[key].length ? data.work[key].map(item => `<article><h3>${escape(item.title)}</h3>${item.instruction !== undefined ? `<p>${escape(item.instruction)}</p>` : ''}${item.startDate ? `<p>يبدأ: <span dir="ltr">${escape(item.startDate)}</span></p>` : ''}${item.dueDate ? `<p>التسليم: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ''}${item.completionState !== undefined ? `<p>${escape({unrecorded:'لم يُرصد إنجاز',regular:'مكتمل',late:'مكتمل متأخر'}[item.completionState])}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}</article>`).join('') : '<p>لا توجد أعمال منشورة في هذا القسم.</p>'}</section>`;
     }
     paint(content + '</div>');
   }

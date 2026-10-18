@@ -41,7 +41,7 @@ export function projectUnifiedStudentData(data) {
     if (!object(data.work)) throw fail();
     result.work = {};
     for (const section of ['required', 'completed', 'scheduled']) if (Object.hasOwn(data.work, section)) {
-      result.work[section] = list(data.work[section], { id: text, title: text, instruction: text, deadline: text, status: text }, ['id', 'title']);
+      result.work[section] = list(data.work[section], { id: text, title: text, instruction: text, deadline: text, status: text, startDate: v => v === null || text(v), dueDate: v => v === null || text(v), completionState: v => ['unrecorded','regular','late'].includes(v) }, ['id', 'title']);
     }
   }
   return result;
@@ -69,7 +69,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
         const retry = Number(response.headers?.get('Retry-After'));
         throw fail(response.status === 429 ? 'rate' : [401, 403, 410].includes(response.status) ? 'session' : 'unavailable', response.status === 429 ? Math.min(300, Math.max(1, Number.isFinite(retry) ? retry : 30)) : 0);
       }
-      if (action === 'end') return null;
+      if (action === 'end' || action === 'claim') return null;
       const data = await response.json();
       if (checkpoint !== generation) throw fail('stale');
       return projectUnifiedStudentData(data);
@@ -79,7 +79,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     } finally { clearTimeout(timeout); body = null; if (checkpoint === generation) controller = null; }
   }
   return Object.freeze({
-    claim(value) { let code = normalizeStudentCode(value); if (!validStudentCode(code)) return Promise.reject(fail('format')); const pending = call('claim', { code }); code = ''; return pending; },
+    claim(value) { let code = normalizeStudentCode(value); if (!validStudentCode(code)) return Promise.reject(fail('format')); const pending = call('claim', { code }).then(() => call('read')); code = ''; return pending; },
     read: () => call('read'), end: () => call('end', {}), invalidate, dispose() { disposed = true; invalidate(); }
   });
 }

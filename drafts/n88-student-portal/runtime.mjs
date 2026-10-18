@@ -1,7 +1,7 @@
 /** AI: SOURCE ONLY. No listener, environment, credentials or network at import. */
 import { Buffer } from 'node:buffer';
 import { isIP } from 'node:net';
-import { createPortalService } from './service.mjs';
+import { createIntegratedService } from './integrated-service.mjs';
 import { createPostgresRepository } from './postgres-repository.mjs';
 import { createCanonicalAdapter } from './canonical-adapter.mjs';
 import { createHttpAdapter } from './http-adapter.mjs';
@@ -17,8 +17,7 @@ export function composeService(options,adapter) {
   deploymentPreflight(options);
   const repository=createPostgresRepository({acquire:options.acquire,limits:options.limits,timing:options.timing,
     synchronize:createCanonicalAdapter(options.canonicalBounds)});
-  return createPortalService({repository,origin:options.origin,secretKey:options.secretKey,
-    verifyIngress:adapter.verifyIngress,verifyTeacher:adapter.verifyTeacher});
+  return createIntegratedService(options,adapter,repository);
 }
 /** Retained direct TLS adapter; Edge uses Web Request entry instead. */
 export function composeRuntime(options) {

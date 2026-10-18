@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v72';
+const VERSION = 'rakeezx-v73';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -67,6 +67,9 @@ const SHELL = [
   './src/styles/settings.css',
   './src/lib/student-portal-client.js',
   './src/lib/student-portal-runtime.js',
+  './src/lib/student-portal-class-client.js',
+  './src/views/student-portal-class.js',
+  './src/styles/student-portal-class.css',
   './src/views/student-portal.js',
   './src/views/student-portal-teacher.js',
   './src/styles/student-portal.css',
@@ -264,7 +267,7 @@ self.addEventListener('fetch', (event) => {
   // Do not cache API/Supabase requests or anything cross-origin
   if (url.origin !== self.location.origin) return;
   // Private service responses and private entry navigation never enter any shell cache.
-  if (/^\/(?:api\/(?:n88|n44)(?:\/|$)|s\/)/.test(url.pathname) || url.pathname === '/__n44_device_consent') return;
+  if (/^\/(?:api\/(?:n88|n44)(?:\/|$)|s\/|student(?:\/|$)|n88-private(?:\/|$))/.test(url.pathname) || url.pathname === '/__n44_device_consent') return;
   // Ignore non-http(s) requests like chrome-extension://
   if (!url.protocol.startsWith('http')) return;
 

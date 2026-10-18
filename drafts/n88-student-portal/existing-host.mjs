@@ -16,7 +16,8 @@ export function createExistingHost(readEnv) {
   const key=n=>{const s=required(n);if(!/^[a-f0-9]{64}$/.test(s))throw Error('n88_key_configuration');return Buffer.from(s,'hex');};
   // Physical deployment gate; readback/authorization evidence still required.
   if(required('N88_SERVICE_REVISION')!==manifest.serviceRevision)throw Error('n88_service_readback_missing');
-  const secretKey=key('N88_HMAC_KEY'),ingressKey=key('N88_INGRESS_KEY');
+  const secretKey=key('N88_HMAC_KEY'),ingressKey=key('N88_INGRESS_KEY'),numericKey=key('N88_NUMERIC_KEY'),reservationKey=key('N88_RESERVATION_KEY');
+  if(new Set([secretKey,ingressKey,numericKey,reservationKey].map(k=>k.toString('hex'))).size!==4)throw Error('n88_separate_keys_required');
   if(secretKey.equals(ingressKey))throw Error('n88_separate_keys_required');
   const ca=readEnv('N88_DATABASE_CA_CERT');
   const pool=new pg.Pool({connectionString:dbUrl,ssl:{rejectUnauthorized:true,...(ca?{ca}:{})},max:2,
@@ -35,7 +36,7 @@ export function createExistingHost(readEnv) {
     finally{waiting--;}
   };
   try {
-    const handle=createWebEntry({...manifest,origin,authUrl,apiKey:required('N88_AUTH_API_KEY'),secretKey,ingressKey,acquire,
+    const handle=createWebEntry({...manifest,origin,authUrl,apiKey:required('N88_AUTH_API_KEY'),secretKey,ingressKey,numericKey,reservationKey,acquire,
       sourceOnly:false,canonicalReadback:true,privateIngressReadback:true});
     return Object.freeze({handle,close:()=>pool.end()});
   }catch{void pool.end();throw Error('n88_configuration');}

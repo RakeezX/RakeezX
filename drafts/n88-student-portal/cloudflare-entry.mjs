@@ -36,7 +36,7 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       const responseBytes=await readBytes(result.body,2*1024*1024,abort.signal);
       if(!result.ok)return privateResponse(result.status>=500?503:401);
       const reply=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(responseBytes));
-      if(!reply || Object.keys(reply).sort().join(',')!=='body,cookie,status' || ![200,400,401,413,503].includes(reply.status) ||
+      if(!reply || Object.keys(reply).sort().join(',')!=='body,cookie,status' || ![200,400,401,409,413,429,503].includes(reply.status) ||
         reply.cookie!==null && (typeof reply.cookie!=='string' || reply.cookie.length>4096))return privateResponse();
       const out=new Headers(PRIVATE_WEB_HEADERS);if(reply.cookie)out.set('set-cookie',reply.cookie);
       return new Response(JSON.stringify(reply.body),{status:reply.status,headers:out});

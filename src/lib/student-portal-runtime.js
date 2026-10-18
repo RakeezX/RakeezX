@@ -3,10 +3,46 @@ import { createStudentPortalClient } from './student-portal-client.js';
 import { mountStudentPortal } from '../views/student-portal.js';
 import { mountTeacherInvitations } from '../views/student-portal-teacher.js';
 import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
+import { createClassPortalClient } from './student-portal-class-client.js';
+import { mountClassPortal } from '../views/student-portal-class.js';
 
 // Change only through a separately authorized, service-evidenced activation diff.
 export const PORTAL_READINESS = Object.freeze({ enabled: false, serviceRevision: null });
-const ready = r => r?.enabled === true && r.serviceRevision === 'n88-existing-host-v1';
+const ready = r => r?.enabled === true && r.serviceRevision === 'n88-integrated-class-v1';
+
+/** Current account/store/lease fence. JWT session ID is only an echo fence;
+ * the server independently verifies the bearer and exact current Auth session. */
+export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipGuard},write=false) {
+  const w=store.getActiveWorkspace(),ownerId=cloud.user?.id,session=cloud.session;
+  const teaching=store.getTeaching(teachingId),term=store.activeTerm();
+  if(!ownerId || !session?.access_token || cloud.authStatus().state!=='authenticated' || w?.type!=='account'||w.authUserId!==ownerId ||
+    !teaching || teaching.termId!==term?.id || store.isTeachingArchived(teaching))throw Error('unavailable');
+  store.assertClassOperationsAccess(teachingId);
+  const command=write?guard.bindNewCommand({ownerId}):null;
+  const access=guard.cloudAccess({operation:write?'dispatch':'read',authenticatedUserId:ownerId,command});
+  if(!access.allowed || access.workspaceOwnerId!==ownerId)throw Error('unavailable');
+  store.assertLeaseWritable();
+  const payload=JSON.parse(atob(session.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+  const validUntil=Number(payload.exp)*1000;
+  if(typeof payload.session_id!=='string'||!Number.isFinite(validUntil)||validUntil<=Date.now())throw Error('unavailable');
+  const context={enabled:true,ownerId,sessionId:payload.session_id,leaseId:w.id,
+    teachingId,classId:teaching.sectionId,termId:term.id,contextRevision:JSON.stringify([teaching.revision??1,term.revision??1]),validUntil};
+  return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,session.access_token,context])};
+}
+export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel}={}) {
+  if(!ready(readiness)){unavailable(root);return {dispose(){root.replaceChildren();}};}
+  let initial;try{initial=getBinding(false);}catch{unavailable(root);return {dispose(){root.replaceChildren();}};}
+  let disposed=false;
+  const current=write=>{const b=getBinding(write);if(disposed||b.key!==initial.key)throw Error('unavailable');return b;};
+  const getContext=()=>{try{return current(false).context;}catch{return null;}};
+  const client=createClassPortalClient({getContext,request:async(path,init)=>{
+    const b=current(true);
+    const response=await send(path,{...init,headers:{...init.headers,Authorization:'Bearer '+b.token}});
+    current(false);return {ok:response.ok,async json(){const data=await response.json();current(false);return data;}};
+  }});
+  const handle=mountClassPortal(root,{client,getContext,subscribe,classLabel});
+  return {dispose(){disposed=true;handle.dispose();}};
+}
 export function unavailable(root) {
   root.replaceChildren();
   const message = root.ownerDocument.createElement('p');

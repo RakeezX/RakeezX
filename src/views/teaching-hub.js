@@ -10,6 +10,7 @@ import studentsView, { canOpenRoster, classAccessFeedback } from './students.js'
 import teachingsView, { addSubjectToClass } from './teachings.js';
 
 const TOOLS = (id) => [
+  { href: `#/teaching/${id}/student-portal`, icon: 'students', title: 'مساحة الطلاب', sub: 'رموز الدخول والحقول المنشورة' },
   { href: `#/teaching/${id}/class-rules`, icon: 'book', title: 'هدف وميثاق الصف', sub: 'الهدف الرئيسي والميثاق' },
   { href: `#/teaching/${id}/quicklog`, icon: 'spark', title: 'الرصد السريع', sub: 'مشاركة وسلوك أثناء الحصة' },
   { href: `#/teaching/${id}/picker`, icon: 'picker', title: 'القرعة', sub: 'اختيار عادل لا يكرّر أحدًا' },

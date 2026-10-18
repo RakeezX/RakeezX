@@ -46,6 +46,7 @@ function requireRoster(params, workspace = store.getActiveWorkspace()) {
 export function rosterFileActions(params) {
   if (!canOpenRoster(params)) return '';
   return html`<div class="roster-entry-actions" role="group" aria-label="استيراد وتصدير الكشوف">
+    <a class="btn roster-toolbar-action" href="#/teaching/${params.id}/student-portal">مساحة الطلاب</a>
     <a class="btn roster-toolbar-action" data-act="file-import" href="#/teaching/${params.id}/koshoof" aria-label="استيراد وتصدير الكشوف">${icon('upload')} استيراد وتصدير الكشوف</a>
   </div>`;
 }

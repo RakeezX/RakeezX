@@ -15,7 +15,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     root.innerHTML = `<section aria-label="مساحة طلاب الفصل"><h2>${esc(classLabel())} — مساحة الطلاب</h2><p>صفحة دخول موحّدة للطلاب برمز شخصي من 12 رقمًا يبدأ بـ1. يبقى الرمز حتى تغييره أو إلغائه. لا تُرسل رسائل تلقائيًا ولا يمكن استرجاع رمز سابق.</p>
       <p role="status" aria-live="polite">${esc(message || (ready ? 'جارٍ قراءة قائمة الفصل…' : 'مساحة الطلاب غير مفعّلة حاليًا. لا تتوفر عمليات كتابة.'))}</p>
       ${ready ? `<div class="n88-class-actions"><button class="btn btn--primary" data-action="batch" ${!writable ? 'disabled' : ''}>إنشاء رموز الطلاب</button><button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>تحديث ومراجعة القائمة</button></div><p>الإنشاء للطلاب الذين ليس لديهم رمز فعّال فقط؛ إعادة المحاولة لا تغيّر الرموز الموجودة.</p>` : ''}
-      ${roster ? `<p>${roster.students.length} طالبًا في القائمة الحالية</p><ul class="n88-class-roster">${roster.students.map((s, index) => `<li><div><strong>${esc(s.label)}</strong><span>${s.hasActiveCode ? 'لديه رمز فعّال — غير قابل للاسترجاع' : 'بلا رمز فعّال'}</span></div><div class="n88-class-actions"><button class="btn" data-action="review-rotate" data-index="${index}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></li>`).join('')}</ul>
+      ${roster ? `<p>${roster.students.length} طالبًا في القائمة الحالية</p><ul class="n88-class-roster">${roster.students.map((s, index) => `<li><div><strong>${esc(s.label)}</strong><span>${s.hasActiveCode ? 'لديه رمز فعّال — غير قابل للاسترجاع' : 'بلا رمز فعّال'}</span></div><div class="n88-class-actions"><button class="btn" data-action="review-rotate" data-index="${index}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></li>`).join('')}</ul>
       <form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>الحقول التي تظهر لطلاب هذا الفصل</legend><p>لا يظهر أي حقل إلا باختيارك وحفظه. هذه الإعدادات لا تنشئ درجات أو حالات إنجاز.</p><div class="n88-class-fields">${PORTAL_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${roster.visibility[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn btn--primary" type="submit">حفظ الحقول الظاهرة</button></fieldset></form>` : ''}
       ${selected && writable ? `<section class="card" data-confirm><h3>${esc(selected.student.label)}</h3><p>${selected.action === 'rotate' ? 'تغيير الرمز يُبطل الرمز السابق وجميع جلساته. سلّم البديل لهذا الطالب وحده بعد التحقق من هويته.' : 'إلغاء الوصول يُبطل الرمز الحالي وجميع جلساته، ولن يستطيع الطالب الدخول به.'}</p><button class="btn" data-action="confirm">${selected.action === 'rotate' ? 'تأكيد تغيير الرمز' : 'تأكيد إلغاء الوصول'}</button><button class="btn" data-action="cancel">تراجع</button></section>` : ''}
       ${outcomes.length ? `<ul data-outcomes>${outcomes.map(line => `<li>${esc(line)}</li>`).join('')}</ul>` : ''}<div data-sheet-host></div></section>`;
@@ -64,10 +64,10 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     if (action === 'refresh') { void refresh(); return; }
     if (!roster) return;
     if (action === 'cancel') { selected = null; draw(); return; }
-    if (action.startsWith('review-')) { const student = roster.students[Number(button.dataset.index)]; if (student?.hasActiveCode) { clearSecrets(); selected = { student, action: action.slice(7) }; draw(); root.querySelector('[data-confirm] button')?.focus(); } return; }
+    if (action.startsWith('review-')) { const student = roster.students[Number(button.dataset.index)]; if (student && (student.hasActiveCode || action === 'review-rotate' && student.credentialVersion > 0)) { clearSecrets(); selected = { student, action: action.slice(7) }; draw(); root.querySelector('[data-confirm] button')?.focus(); } return; }
     if (action === 'batch') void perform(r => client.issueMissingClassCodes(context().teachingId, { requestId: requestId(), expectedRosterRevision: r.rosterRevision }), (result, r) => {
       sheet = result.created.map(s => ({ label: r.students.find(m => m.studentId === s.studentId).label, credential: s.credential }));
-      const reasons = { existing:'رمزه موجود؛ لم يتغير', conflict:'تغيّرت بياناته؛ يلزم تحديث القائمة', unavailable:'تعذّر الإنشاء', not_current:'لم يعد ضمن القائمة الحالية' };
+      const reasons = { existing:'رمزه موجود؛ لم يتغير', revoked:'أُلغي وصوله؛ يلزم تغيير انتقائي', conflict:'تغيّرت بياناته؛ يلزم تحديث القائمة', unavailable:'تعذّر الإنشاء', not_current:'لم يعد ضمن القائمة الحالية' };
       outcomes = [...result.skipped, ...result.failed].map(s => r.students.find(m => m.studentId === s.studentId).label + ': ' + reasons[s.reason]);
       const reported = new Set([...result.created, ...result.skipped, ...result.failed].map(s => s.studentId));
       outcomes.push(...r.students.filter(s => !reported.has(s.studentId)).map(s => s.label + ': نتيجة غير مؤكدة؛ راجع القائمة'));
@@ -96,6 +96,17 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
 }
 
 // Integration must supply actual service binding and class context. This adapter stays unavailable by default.
-export default { title: () => 'مساحة طلاب الفصل', render: () => '<div data-class-portal></div>',
-  afterPaint(root) { this.handle?.dispose(); this.handle = mountClassPortal(root.querySelector('[data-class-portal]')); },
-  onUnmount() { this.handle?.dispose(); this.handle = null; } };
+let routeHandle,routeGeneration=0,routeRoot;
+export default { title: () => 'مساحة طلاب الفصل', back:p=>'#/teaching/'+encodeURIComponent(p.id),render: () => '<div data-class-portal></div>',
+  afterPaint(root,params) {
+    const target=root.querySelector('[data-class-portal]');if(!target||target===routeRoot)return;
+    routeHandle?.dispose();routeRoot=target;const generation=++routeGeneration;
+    const link=root.ownerDocument.createElement('link');link.rel='stylesheet';link.href=new URL('../styles/student-portal-class.css',import.meta.url).href;
+    if(!root.ownerDocument.querySelector('[data-n88-class-style]')){link.dataset.n88ClassStyle='';root.ownerDocument.head.append(link);}
+    void Promise.all([import('../lib/student-portal-runtime.js'),import('../lib/cloud.js'),import('../store.js')]).then(([runtime,cloud,store])=>{
+      if(generation!==routeGeneration||!target.isConnected)return;
+      routeHandle=runtime.mountClassService(target,{getBinding:write=>runtime.classBinding({cloud,store,teachingId:params.id},write),
+        subscribe:fn=>{const a=cloud.subscribe(fn),b=store.subscribe(fn);return()=>{a();b();};}});
+    }).catch(()=>{if(generation===routeGeneration)target.textContent='مساحة الطلاب غير متاحة حاليًا.';});
+  },
+  onUnmount() { routeGeneration++;routeHandle?.dispose();routeHandle=null;routeRoot=null; } };

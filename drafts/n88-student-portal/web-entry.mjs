@@ -34,7 +34,7 @@ export function createWebEntry(options) {
           !envelope.headers.every(v=>typeof v==='string' && v.length<=8200))return privateResponse(400);
         const {path,method}=envelope,h=new Headers(FORWARDED.map((n,i)=>[n,envelope.headers[i]]));
         const cookie=h.get('cookie')||'';
-        if(cookie.length>4096 || (cookie.match(/(?:^|;\s*)__Secure-n88=/g)||[]).length>1 ||
+        if(cookie.length>4096 || (cookie.match(/(?:^|;\s*)__Secure-n88-student=/g)||[]).length>1 ||
           (h.get('authorization')||'').length>8200 || h.get('sec-fetch-site') && h.get('sec-fetch-site')!=='same-origin' || h.has('content-encoding'))return privateResponse(400);
         if(method==='POST' && (h.get('origin')!==options.origin || h.get('content-type')!=='application/json' || h.get('x-n88-csrf')!=='1'))return privateResponse(401);
         const bytes=decodeBytes(envelope.body);if(bytes.length>4096)return privateResponse(413);

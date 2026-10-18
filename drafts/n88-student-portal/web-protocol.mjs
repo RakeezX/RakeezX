@@ -1,6 +1,6 @@
 /** AI: shared pure Web API protocol. No app/SDK imports or environment defaults. */
 export const PREFIX='/api/n88';
-export const ROUTE=/^\/api\/n88\/(?:teacher\/(?:students|issue|publish|revoke)|s\/[A-Za-z0-9_-]{43}\/(?:claim|read|logout))$/;
+export const ROUTE=/^\/api\/n88\/(?:teacher\/class\/(?:list|issue-missing|rotate|revoke|visibility)|student\/(?:claim|read|end))$/;
 export const FORWARDED=Object.freeze(['authorization','cookie','origin','content-type','x-n88-csrf','sec-fetch-site']);
 export const encodeBytes=bytes=>btoa(String.fromCharCode(...bytes));
 export const decodeBytes=value=>{

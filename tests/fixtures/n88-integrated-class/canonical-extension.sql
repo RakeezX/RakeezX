@@ -1,0 +1,24 @@
+-- AI: synthetic consumed-column replica; never hosted DDL. Existing real schema already has these fields.
+alter table rakeezx.terms add start_date date,add end_date date;
+alter table rakeezx.sections add grade int,add label text,add name text,add archived_at timestamptz;
+alter table rakeezx.enrollments add start_date date;
+alter table rakeezx.teachings add subject_id text;
+alter table rakeezx.items add max numeric,add "order" int,add per_point numeric,add penalty numeric,add score_mode text,add portability_group_id text;
+create table rakeezx.scores(id text not null,owner_id uuid not null,revision bigint not null,deleted_at timestamptz,student_id text,item_id text,value numeric,manual_value numeric,derived_value numeric,primary key(owner_id,id),foreign key(owner_id) references auth.users(id) on delete cascade);
+alter table rakeezx.scores owner to postgres;
+alter table rakeezx.scores enable row level security;alter table rakeezx.scores force row level security;
+create table rakeezx.score_subitems(id text not null,owner_id uuid not null,revision bigint not null,deleted_at timestamptz,item_id text,name text,value numeric,"order" integer,start_date date,due_date date,late_points numeric,primary key(owner_id,id),foreign key(owner_id) references auth.users(id) on delete cascade);
+alter table rakeezx.score_subitems owner to postgres;
+alter table rakeezx.score_subitems enable row level security;alter table rakeezx.score_subitems force row level security;
+create table rakeezx.score_subitem_completions(id text not null,owner_id uuid not null,revision bigint not null,deleted_at timestamptz,student_id text,subitem_id text,checked boolean,completion_state text,primary key(owner_id,id),foreign key(owner_id) references auth.users(id) on delete cascade);
+alter table rakeezx.score_subitem_completions owner to postgres;
+alter table rakeezx.score_subitem_completions enable row level security;alter table rakeezx.score_subitem_completions force row level security;
+create table rakeezx.sessions(id text not null,owner_id uuid not null,revision bigint not null,deleted_at timestamptz,teaching_id text,date date,status text,primary key(owner_id,id),foreign key(owner_id) references auth.users(id) on delete cascade);
+alter table rakeezx.sessions owner to postgres;
+alter table rakeezx.sessions enable row level security;alter table rakeezx.sessions force row level security;
+create table rakeezx.attendance(id text not null,owner_id uuid not null,revision bigint not null,deleted_at timestamptz,student_id text,teaching_id text,session_id text,status text,primary key(owner_id,id),foreign key(owner_id) references auth.users(id) on delete cascade);
+alter table rakeezx.attendance owner to postgres;
+alter table rakeezx.attendance enable row level security;alter table rakeezx.attendance force row level security;
+create table rakeezx.logs(id text not null,owner_id uuid not null,revision bigint not null,deleted_at timestamptz,student_id text,teaching_id text,kind text,delta integer,primary key(owner_id,id),foreign key(owner_id) references auth.users(id) on delete cascade);
+alter table rakeezx.logs owner to postgres;
+alter table rakeezx.logs enable row level security;alter table rakeezx.logs force row level security;

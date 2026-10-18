@@ -1,5 +1,5 @@
 // drafts/n88-student-portal/web-protocol.mjs
-var ROUTE = /^\/api\/n88\/(?:teacher\/(?:students|issue|publish|revoke)|s\/[A-Za-z0-9_-]{43}\/(?:claim|read|logout))$/;
+var ROUTE = /^\/api\/n88\/(?:teacher\/class\/(?:list|issue-missing|rotate|revoke|visibility)|student\/(?:claim|read|end))$/;
 var FORWARDED = Object.freeze(["authorization", "cookie", "origin", "content-type", "x-n88-csrf", "sec-fetch-site"]);
 var encodeBytes = (bytes) => btoa(String.fromCharCode(...bytes));
 var hex = (bytes) => Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -94,7 +94,7 @@ function createCloudflareEntry({ fetch: send = globalThis.fetch, now = Date.now 
       const responseBytes = await readBytes(result.body, 2 * 1024 * 1024, abort.signal);
       if (!result.ok) return privateResponse(result.status >= 500 ? 503 : 401);
       const reply = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(responseBytes));
-      if (!reply || Object.keys(reply).sort().join(",") !== "body,cookie,status" || ![200, 400, 401, 413, 503].includes(reply.status) || reply.cookie !== null && (typeof reply.cookie !== "string" || reply.cookie.length > 4096)) return privateResponse();
+      if (!reply || Object.keys(reply).sort().join(",") !== "body,cookie,status" || ![200, 400, 401, 409, 413, 429, 503].includes(reply.status) || reply.cookie !== null && (typeof reply.cookie !== "string" || reply.cookie.length > 4096)) return privateResponse();
       const out = new Headers(PRIVATE_WEB_HEADERS);
       if (reply.cookie) out.set("set-cookie", reply.cookie);
       return new Response(JSON.stringify(reply.body), { status: reply.status, headers: out });

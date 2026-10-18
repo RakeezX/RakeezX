@@ -33,7 +33,7 @@ if ($Stop) {
   $owned = Get-CimInstance Win32_Process -Filter "ProcessId = $($r.pid)"
   if (-not $owned -or $owned.CreationDate.ToUniversalTime().ToString('o') -ne $r.birth -or $owned.ExecutablePath -ne $r.executable -or $owned.CommandLine -ne $r.commandLine) { throw 'Process identity mismatch; no process touched.' }
   $phase = [IO.Path]::GetFullPath($r.phase)
-  $fixture = Join-Path $root 'tests/fixtures/n88-current-review'
+  $fixture = Join-Path $root 'tests/fixtures/n88-integrated-class'
   if ([IO.Path]::GetDirectoryName($phase) -ne $fixture -or -not [IO.Path]::GetFileName($phase).StartsWith('owned-')) { throw 'Owned phase mismatch.' }
   @{pid=$r.pid;birth=$r.birth} | ConvertTo-Json -Compress | Set-Content -LiteralPath (Join-Path $phase 'shutdown.request.json') -Encoding UTF8
   $deadline = [DateTime]::UtcNow.AddSeconds(40)

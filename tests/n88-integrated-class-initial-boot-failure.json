@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n88-integrated-class-student-journey-20261018",
+  "runId": "c9f4a227-4930-456c-881d-6ffd2ce095fd",
+  "checks": [],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "failures": [
+    {
+      "message": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: /مساحة الطلاب/ }).first() to be visible\u001b[22m\n",
+      "stack": [
+        "    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-integrated-class-student-journey-20261018\\tests\\n88-integrated-class-journey.mjs:18:92",
+        "    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)",
+        "    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-integrated-class-student-journey-20261018/tests/n88-integrated-class-journey.mjs:15:3"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2144 @@
+{
+  "aiAuthored": true,
+  "provenance": "Owned local PostgreSQL 17.6 staged migration; expected identities for later hosted comparison, NOT hosted readback",
+  "identities": {
+    "auth": [
+      {
+        "owner": "supabase_auth_admin",
+        "relname": "sessions",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "owner": "supabase_auth_admin",
+        "relname": "users",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    ],
+    "roles": [
+      {
+        "rolname": "n88_backend",
+        "rolsuper": false,
+        "rolinherit": false,
+        "rolcanlogin": false,
+        "rolcreatedb": false,
+        "rolbypassrls": false,
+        "rolcreaterole": false,
+        "rolreplication": false
+      },
+      {
+        "rolname": "n88_guard",
+        "rolsuper": false,
+        "rolinherit": false,
+        "rolcanlogin": false,
+        "rolcreatedb": false,
+        "rolbypassrls": false,
+        "rolcreaterole": false,
+        "rolreplication": false
+      }
+    ],
+    "tables": [
+      {
+        "relname": "contexts",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "credentials",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "guess_budgets",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "ingress_receipts",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "memberships",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "publications",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "sessions",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": false
+      }
+    ],
+    "helpers": [
+      {
+        "args": "p_nonce uuid, p_expiry bigint",
+        "name": "consume_ingress",
+        "owner": "n88_guard",
+        "proacl": "{n88_guard=X/n88_guard,n88_backend=X/n88_guard}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": true,
+        "definition_md5": "814562ff8660bfe1308d3de4f7c82796"
+      },
+      {
+        "args": "p_owner uuid, p_max integer",
+        "name": "lock_canonical_sources",
+        "owner": "n88_guard",
+        "proacl": "{n88_guard=X/n88_guard,n88_backend=X/n88_guard}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": true,
+        "definition_md5": "397679264e92a73e3e6d4160e4d04946"
+      },
+      {
+        "args": "p_user uuid, p_session uuid",
+        "name": "lock_current_session",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres,n88_backend=X/postgres}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": true,
+        "definition_md5": "73de8066edfcefd6bc505a7efec33ba4"
+      },
+      {
+        "args": "p_owner uuid",
+        "name": "lock_owner_key",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres,n88_guard=X/postgres}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": true,
+        "definition_md5": "997dc184762897c94bf865ab950f98f0"
+      }
+    ],
+    "policies": [
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "contexts",
+        "policyname": "n88_backend_only",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "credentials",
+        "policyname": "n88_backend_only",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "guess_budgets",
+        "policyname": "n88_backend_only",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "ingress_receipts",
+        "policyname": "n88_guard_receipts",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "memberships",
+        "policyname": "n88_backend_only",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "publications",
+        "policyname": "n88_backend_only",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "sessions",
+        "policyname": "n88_backend_only",
+        "schemaname": "n88_private",
+        "with_check": "true"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "enrollments",
+        "policyname": "n88_canonical_read",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "enrollments",
+        "policyname": "n88_guard_lock",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "items",
+        "policyname": "n88_canonical_read",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "items",
+        "policyname": "n88_guard_lock",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "sections",
+        "policyname": "n88_canonical_read",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "sections",
+        "policyname": "n88_guard_lock",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "students",
+        "policyname": "n88_canonical_read",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "students",
+        "policyname": "n88_guard_lock",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "teachings",
+        "policyname": "n88_canonical_read",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "teachings",
+        "policyname": "n88_guard_lock",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "terms",
+        "policyname": "n88_canonical_read",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "terms",
+        "policyname": "n88_guard_lock",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_backend"
+        ],
+        "tablename": "years",
+        "policyname": "n88_canonical_read",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n88.canonical_owner'::text, true))",
+        "roles": [
+          "n88_guard"
+        ],
+        "tablename": "years",
+        "policyname": "n88_guard_lock",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      }
+    ],
+    "management": {
+      "role": "postgres",
+      "bypassrls": true,
+      "superuser": false,
+      "auth_create": false,
+      "auth_owner_member": false
+    },
+    "memberships": [
+      {
+        "role": "n88_backend",
+        "member": "postgres",
+        "set_option": false,
+        "admin_option": true,
+        "inherit_option": false
+      },
+      {
+        "role": "n88_guard",
+        "member": "postgres",
+        "set_option": false,
+        "admin_option": true,
+        "inherit_option": false
+      },
+      {
+        "role": "n88_guard",
+        "member": "postgres",
+        "set_option": false,
+        "admin_option": false,
+        "inherit_option": false
+      }
+    ],
+    "table_grants": [
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "table_schema": "n88_private",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "table_schema": "n88_private",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "table_schema": "n88_private",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "ingress_receipts",
+        "table_schema": "n88_private",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "ingress_receipts",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "ingress_receipts",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "table_schema": "n88_private",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "table_schema": "n88_private",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "table_schema": "n88_private",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      }
+    ],
+    "column_grants": [
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "active",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "active",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "active",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "contexts",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "entry_verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "entry_verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "entry_verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "revoked_at",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "revoked_at",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "revoked_at",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "version",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "version",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "credentials",
+        "column_name": "version",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "count",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "count",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "count",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "key",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "key",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "key",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "until_at",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "until_at",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "guess_budgets",
+        "column_name": "until_at",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "ingress_receipts",
+        "column_name": "expires_at",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "ingress_receipts",
+        "column_name": "expires_at",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "ingress_receipts",
+        "column_name": "nonce",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "ingress_receipts",
+        "column_name": "nonce",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "active",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "active",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "active",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "canonical_stamp",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "canonical_stamp",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "canonical_stamp",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "class_active",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "class_active",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "class_active",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "end_date",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "end_date",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "end_date",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "label",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "label",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "label",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "revision",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "revision",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "revision",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "status",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "status",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "status",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "student_active",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "student_active",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "student_active",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "memberships",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "deadline",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "deadline",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "deadline",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "instruction",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "instruction",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "instruction",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "published",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "published",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "published",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "source_item_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "source_item_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "source_item_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "source_teaching_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "source_teaching_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "source_teaching_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "status",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "status",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "status",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "title",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "title",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "publications",
+        "column_name": "title",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "canonical_stamp",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "canonical_stamp",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "canonical_stamp",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "class_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "credential_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "credential_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "credential_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "enrollment_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "entry_verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "entry_verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "entry_verifier",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "expires_at",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "expires_at",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "expires_at",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "membership_revision",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "membership_revision",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "membership_revision",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "namespace",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "owner_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "revoked_at",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "revoked_at",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "revoked_at",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "student_id",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "token_hash",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "token_hash",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "token_hash",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "version",
+        "table_schema": "n88_private",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "version",
+        "table_schema": "n88_private",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sessions",
+        "column_name": "version",
+        "table_schema": "n88_private",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "end_date",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "enrollments",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "enrollments",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "enrollments",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "section_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "enrollments",
+        "column_name": "student_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "items",
+        "column_name": "auto",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "items",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "items",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "items",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "items",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "items",
+        "column_name": "name",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "items",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "items",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "items",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "items",
+        "column_name": "teaching_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sections",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sections",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "sections",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "sections",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sections",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "sections",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sections",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sections",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "sections",
+        "column_name": "year_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "students",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "students",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "students",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "students",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "students",
+        "column_name": "name",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "students",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "students",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "students",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "students",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "teachings",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "teachings",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "teachings",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "teachings",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "teachings",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "teachings",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "teachings",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "teachings",
+        "column_name": "section_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "teachings",
+        "column_name": "term_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "terms",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "terms",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "terms",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "terms",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "terms",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "terms",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "terms",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "terms",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "terms",
+        "column_name": "year_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "years",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "years",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "years",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "years",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "years",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_guard",
+        "table_name": "years",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "years",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n88_backend",
+        "table_name": "years",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      }
+    ],
+    "negative_access": {
+      "anon_private": false,
+      "backend_auth": false,
+      "backend_guard_member": false,
+      "backend_session_scan": false,
+      "authenticated_private": false
+    },
+    "auth_policy_count": 0
+  }
+}

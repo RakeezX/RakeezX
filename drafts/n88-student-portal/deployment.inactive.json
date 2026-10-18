@@ -11,7 +11,9 @@
     "N88_AUTH_URL",
     "N88_AUTH_API_KEY",
     "N88_INGRESS_KEY",
-    "N88_SERVICE_REVISION"
+    "N88_SERVICE_REVISION",
+    "N88_NUMERIC_KEY",
+    "N88_RESERVATION_KEY"
   ],
   "requiredTrustedPorts": [],
   "requiredReadbacks": [
@@ -21,13 +23,14 @@
   ],
   "sourceOnly": true,
   "routes": [
-    "/api/n88/teacher/students",
-    "/api/n88/teacher/issue",
-    "/api/n88/teacher/publish",
-    "/api/n88/teacher/revoke",
-    "/api/n88/s/<private-entry>/claim",
-    "/api/n88/s/<private-entry>/read",
-    "/api/n88/s/<private-entry>/logout"
+    "/api/n88/teacher/class/list",
+    "/api/n88/teacher/class/issue-missing",
+    "/api/n88/teacher/class/rotate",
+    "/api/n88/teacher/class/revoke",
+    "/api/n88/teacher/class/visibility",
+    "/api/n88/student/claim",
+    "/api/n88/student/read",
+    "/api/n88/student/end"
   ],
   "limits": {
     "contexts": 10,
@@ -64,7 +67,7 @@
     "sqlErrorDetail": false,
     "metrics": "fixed operation/status counters only; no owner/student/path/token labels"
   },
-  "serviceRevision": "n88-existing-host-v1",
+  "serviceRevision": "n88-integrated-class-v1",
   "ingress": {
     "entry": "drafts/n88-student-portal/cloudflare-entry.mjs",
     "environmentNames": [
