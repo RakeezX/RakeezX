@@ -1,0 +1,21 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-current-functional-review-20261018",
+  "runId": "02c487b0-7239-4750-b293-5ce1e9c480c1",
+  "baseSha": "522bc6d991aceb90cb2ff83982f6a26d0e75a002",
+  "startedAt": "2026-10-18T08:41:07.188Z",
+  "checks": [
+    {
+      "name": "launcher_help_and_ttl_bounds",
+      "status": "PASS",
+      "evidence": "Node and PowerShell --help; default 14400s/max 28800s; invalid/over-limit TTL rejected before child startup."
+    },
+    {
+      "name": "current_review_execution",
+      "status": "FAIL",
+      "evidence": "Focused smoke failed; original sanitized stack recorded in worker output. No private inputs retained."
+    }
+  ],
+  "cleanup": {},
+  "finishedAt": "2026-10-18T08:41:08.611Z"
+}

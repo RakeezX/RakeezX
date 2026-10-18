@@ -1,0 +1,39 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-current-functional-review-20261018",
+  "runId": "02c487b0-7239-4750-b293-5ce1e9c480c1",
+  "baseSha": "522bc6d991aceb90cb2ff83982f6a26d0e75a002",
+  "startedAt": "2026-10-18T08:41:33.770Z",
+  "checks": [
+    {
+      "name": "launcher_help_and_ttl_bounds",
+      "status": "PASS",
+      "evidence": "Node and PowerShell --help; default 14400s/max 28800s; invalid/over-limit TTL rejected before child startup."
+    },
+    {
+      "name": "source_bound_evidence_and_production_off",
+      "status": "PASS",
+      "evidence": "77 activation source hashes match; unrelated published N44 Sync observer delta explicitly recorded, not certified as unchanged. Existing PIN/crypto/native SQL/owner evidence reused. Production readiness, deployment and staged activation remain OFF."
+    },
+    {
+      "name": "current_review_execution",
+      "status": "FAIL",
+      "evidence": "Focused smoke failed; original sanitized stack recorded in worker output. No private inputs retained."
+    }
+  ],
+  "cleanup": {
+    "leaseRelease": "RELEASED integration"
+  },
+  "unrelatedCurrentSource": {
+    "file": "src/lib/sync.js",
+    "sha256": "82b20757759730cf40bbf817bc65c5e5a387edfd1af0ef5008c1125d5b320a03",
+    "publication": "f4a948b3410d416d81aae155527916eebfb8134e",
+    "scope": "Sync ACK observers, not executed by this local review"
+  },
+  "reusedEvidence": [
+    "tests/n88-client-binding.result.json",
+    "tests/n88-native-postgres-qualification.result.json",
+    "tests/n88-activation-postgres.result.json"
+  ],
+  "finishedAt": "2026-10-18T08:42:46.557Z"
+}

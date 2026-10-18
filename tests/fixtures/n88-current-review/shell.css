@@ -1,0 +1,5 @@
+/* AI: review instructions only; Product CSS and views are unchanged. */
+.n88-review { margin: 12px auto; padding: 16px; max-width: 800px; border: 1px solid var(--border, #ddd); border-radius: 12px; background: var(--surface, #fff); line-height: 1.8; overflow-wrap: anywhere; }
+.n88-review ol { padding-inline-start: 24px; }
+.n88-review a { display: inline-block; margin-inline-end: 16px; text-decoration: underline; }
+.n88-review [hidden] { display: none; }
