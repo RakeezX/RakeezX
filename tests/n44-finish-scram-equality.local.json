@@ -1,0 +1,32 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "4c096417-b07a-4bc5-b8c1-538c9d9b1260",
+  "recordedAt": "2026-10-18T20:30:23.237Z",
+  "scope": "Fresh owned native PG17.6 synthetic SCRAM equality only; no canonical schema, migrations or old suite.",
+  "hostedAuthenticationAttempts": 0,
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseReleased": true,
+    "syntheticDdlLogNotCopiedToEvidence": true,
+    "stoppedClusterRetained": true
+  },
+  "nativeScramLogin": true,
+  "correct": {
+    "roleStillOwnedAndDisabled": true,
+    "publicChallengeShapeValid": true,
+    "storedKeyMatchesRecoveredCredential": true,
+    "serverKeyMatchesRecoveredCredential": true
+  },
+  "wrong": {
+    "roleStillOwnedAndDisabled": true,
+    "publicChallengeShapeValid": true,
+    "storedKeyMatchesRecoveredCredential": false,
+    "serverKeyMatchesRecoveredCredential": false
+  },
+  "rawPasswordsAbsentFromServerLog": true,
+  "fixedOwnRoleOnly": true,
+  "sourceSha256": "f90420b97cc3e0bd30de7addadc36b46e497effa924aed5bc76660dd241c2be4",
+  "status": "PASS",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-5c4d71a9-350c-43b4-a1f4-207a145071f9"
+}
