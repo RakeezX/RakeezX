@@ -118,7 +118,7 @@ function emailChangeSheet(currentEmail, submit) {
       if (!root.isConnected) return;
       if (!message) {
         const status = root.querySelector('[data-email-change-sending]');
-        status.textContent = 'أُرسل طلب التغيير. بعد تأكيد الرسالتين، ارجع إلى هذه النافذة للتحقق من التغيير.';
+        status.textContent = 'أُرسل طلب التغيير. بعد تأكيد الرسالتين، ارجع إلى الإعدادات لتحديث الحالة تلقائيًا. إذا لم تظهر الحالة الجديدة، حدّث الصفحة.';
         button.remove();
         root.querySelector('.sheet__foot [data-sheet-close]').focus({ preventScroll: true });
         return;
@@ -398,12 +398,12 @@ const settings = {
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
                   ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
                 </div>
-                ${emailView.verificationError ? html`<p class="field__hint" role="status">${emailView.verificationError} <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification" aria-busy="${emailView.verifying ? 'true' : 'false'}" ${emailView.verifying ? 'disabled' : ''}>${emailView.verifying ? 'جارٍ التحقق…' : 'إعادة المحاولة'}</button></p>` : ''}
+                ${emailView.verificationError ? html`<p class="field__hint" role="status">${emailView.verificationError} <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification" aria-busy=${emailView.verifying ? 'true' : 'false'} ${emailView.verifying ? 'disabled' : ''}>${emailView.verifying ? 'جارٍ التحقق…' : 'إعادة المحاولة'}</button></p>` : ''}
                 ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
-                  ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</span> <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification" data-email-change-check aria-busy="${emailView.verifying ? 'true' : 'false'}" ${emailView.verifying ? 'disabled' : ''}>${emailView.verifying ? 'جارٍ التحقق…' : 'تحقق من التغيير'}</button></div>
+                  ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بعد تأكيد الرسالتين، تُحدَّث الحالة تلقائيًا عند العودة إلى الإعدادات. إذا لم تظهر الحالة الجديدة، حدّث الصفحة.</span>${emailView.verifying ? html` <span data-email-change-checking>جارٍ التحقق من حالة البريد…</span>` : ''}</div>
                     <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
                       <summary>كيف أكمل تأكيد البريد؟</summary>
-                      <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>
+                      <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. ثم ارجع إلى الإعدادات لتحديث الحالة تلقائيًا، أو حدّث الصفحة. لا يُعتمد التغيير هنا حتى يؤكده الخادم.</p>
                     </details>`
                     : emailFeedback.completed ? html`<p class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span></p>` : ''}
                 ${emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
@@ -674,7 +674,7 @@ const settings = {
       }).catch(() => {
         if (!active()) return;
         // Failure is neutral, never evidence of completion or grounds to clear data.
-        view.verificationError = 'تعذر التحقق من البريد. أعد المحاولة.';
+        view.verificationError = 'تعذر التحقق من البريد الآن. يمكنك إعادة المحاولة أو العودة لاحقًا أو تحديث الصفحة. لم يُثبت اكتمال التغيير.';
       }).finally(() => {
         if (emailVerificationInFlight === flight) emailVerificationInFlight = null;
         view.verifying = false;
@@ -698,7 +698,8 @@ const settings = {
       window.removeEventListener('focus', checkOnReturn);
       document.removeEventListener('visibilitychange', checkOnReturn);
     };
-    verifyEmail();
+    // Each settings mount needs a fresh owner-bound read, even for cached context.
+    verifyEmail(true);
     refreshAccountContract()
       .then(() => { if (request === accountContractRequest) { accountContractUnavailable = false; repaint(); } })
       .catch(() => {

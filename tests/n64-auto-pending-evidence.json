@@ -1,0 +1,88 @@
+{
+  "taskId": "continuous-n64-automatic-pending-status-20261018",
+  "runId": "6861a024-18c5-420c-8a43-3a7a3c198ff2",
+  "status": "PASS",
+  "results": [
+    {
+      "width": 1280,
+      "freshMountDespiteCache": true,
+      "originalDocumentAutomaticCompletion": true,
+      "firstConfirmationPending": true,
+      "pendingMustBeCleared": true,
+      "failureNeutralAndRetry": true,
+      "inFlightJoin": true,
+      "cooldown": {
+        "gets": 0,
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "unchangedAppEventBaseline": {
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "wrongOwnerRejected": true,
+      "ownerSwitchRejected": true,
+      "noSessionAndUnmountCleanup": true,
+      "actualReloadRecovery": true,
+      "reloadReads": 2,
+      "responsiveNoOverflow": true,
+      "realAccountStoreEntry": true
+    },
+    {
+      "width": 390,
+      "freshMountDespiteCache": true,
+      "originalDocumentAutomaticCompletion": true,
+      "firstConfirmationPending": true,
+      "pendingMustBeCleared": true,
+      "failureNeutralAndRetry": true,
+      "inFlightJoin": true,
+      "cooldown": {
+        "gets": 0,
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "unchangedAppEventBaseline": {
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "wrongOwnerRejected": true,
+      "ownerSwitchRejected": true,
+      "noSessionAndUnmountCleanup": true,
+      "actualReloadRecovery": true,
+      "reloadReads": 2,
+      "responsiveNoOverflow": true,
+      "realAccountStoreEntry": true
+    }
+  ],
+  "sourceSha256": {
+    "src/views/settings.js": "2ba3e8ce05d846b2398355952b4d9d4b6938c33a72f173d55fd42b35c4570e94",
+    "src/lib/cloud.js": "df9fc3d3cf8305bb91e3abacbf52a9f7166f3aa6d19a93a121cee4a42399ae84",
+    "sw.js": "0a56da4523daf079a8c5cba2834fddc5853ec52214519558e9125a10f155ca32"
+  },
+  "reusedCloudCRLFSha256": "992bf9d6d26cdb49b582088275f4df7e5d7df99715ebebeedd2b28744948d08f",
+  "preservedInitialFailures": [
+    "Error: expect(locator).toBeVisible() failed\n\nLocator: locator('[data-email-change-completed]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.be.visible\" with timeout 5000ms\n  - waiting for locator('[data-email-change-completed]')\n\n    at captureRawStack (C:\\Users\\Abody\\Projects\\RakeezX\\node_modules\\playwright-core\\lib\\coreBundle.js:9681:17)\n    at callMatcherAsStep (C:\\Users\\Abody\\Projects\\RakeezX\\node_modules\\playwright\\lib\\matchers\\expect.js:13310:57)\n    at Object.toBeVisible (C:\\Users\\Abody\\Projects\\RakeezX\\node_modules\\playwright\\lib\\matchers\\expect.js:13300:23)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n64-automatic-pending-status-20261018\\tests\\n64-pending-status-browser.mjs:148:66\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n64-automatic-pending-status-20261018/tests/n64-pending-status-browser.mjs:20:2"
+  ],
+  "reusedEvidence": "tests/n64-bounded-verification-evidence.json: unchanged cloud owner/deadline/dedup/late-response/refresh implementation; no live certification.",
+  "scope": "Actual application DOM/handlers/source CSS over isolated loopback with fabricated provider. Existing helper incomplete Sync fixtures retained, no whole-Sync claim.",
+  "ownedBrowserAndServerClosed": true,
+  "checks": [
+    {
+      "name": "n64_automatic_original_settings_return_reload_pending_to_verified_without_manual_button",
+      "status": "PASS",
+      "evidence": "node tests/n64-pending-status-browser.mjs: real app, fabricated provider, original document at 390/1280; fresh mount despite cache, first confirmation pending, matching email still pending until provider clears it, automatic completion, real reload current email recovery; affected screenshots inspected."
+    },
+    {
+      "name": "n64_automatic_pending_failure_owner_unmount_and_event_coalescing",
+      "status": "PASS",
+      "evidence": "Same focused run: neutral network failure/error retry, one held request during event/action storm, 30s cooldown with zero added read/write/paint/Sync over app baseline, wrong-owner and in-flight owner switch rejected by actual cloud guard, no-session and unmount cleanup. Unchanged cloud deadline/late-response evidence reused by SHA."
+    }
+  ],
+  "visualInspection": "390/1280 actual settings email field: readable pending guidance and refresh fallback, no manual check control, current email and completion state readable; no horizontal overflow. Element centered before screenshots to avoid fixed navigation covering the affected region.",
+  "initialFailureResolution": "Initial reload assertion incorrectly required an ephemeral success banner. Boot performed a fresh owner verification before settings captured the old pending request. Reload now verifies fresh current email, no pending/manual control, observed GETs and same-document owner/store checkpoint. Original-document completion banner assertions remain mandatory. Initial failure retained above.",
+  "cleanup": "Owned browser/contexts and task loopback Vite server closed in finally; no listener on 21664 after run. Canonical isolated local phase requires no shared browser lease."
+}
