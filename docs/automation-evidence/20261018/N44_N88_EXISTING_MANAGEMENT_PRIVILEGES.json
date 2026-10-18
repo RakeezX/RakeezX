@@ -1,0 +1,71 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "readOnly": true,
+  "personalRowsRead": 0,
+  "hostedMutation": false,
+  "sources": [
+    {
+      "sha256": "b1d75cb0a667ba994a67465c9e2cb68a6f869a73b8e78ceb2bef830e60714600",
+      "evidence": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "mode": "catalog-only-readonly",
+        "personalRowsRead": 0,
+        "data": {
+          "authUsage": true,
+          "capturedAt": "2026-10-18T04:43:42.063254+00:00",
+          "columnLocks": [
+            {
+              "table": "auth.users",
+              "column": "id",
+              "select": true,
+              "update": true
+            },
+            {
+              "table": "auth.users",
+              "column": "banned_until",
+              "select": true,
+              "update": true
+            },
+            {
+              "table": "auth.sessions",
+              "column": "id",
+              "select": true,
+              "update": true
+            },
+            {
+              "table": "auth.sessions",
+              "column": "user_id",
+              "select": true,
+              "update": true
+            },
+            {
+              "table": "auth.sessions",
+              "column": "not_after",
+              "select": true,
+              "update": true
+            }
+          ],
+          "currentUser": "postgres",
+          "sessionUser": "postgres",
+          "personalRowsRead": 0
+        }
+      }
+    },
+    {
+      "sha256": "4cea73327250f6ff37221b32fc544a9758a6857fd7bace5fbb4517ff62f82351",
+      "evidence": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "mode": "catalog-only-readonly",
+        "personalRowsRead": 0,
+        "data": {
+          "capturedAt": "2026-10-18T04:48:17.125873+00:00",
+          "currentUser": "postgres",
+          "sessionUser": "postgres",
+          "databaseCreate": true,
+          "personalRowsRead": 0,
+          "authUsersIdReferences": true
+        }
+      }
+    }
+  ]
+}
