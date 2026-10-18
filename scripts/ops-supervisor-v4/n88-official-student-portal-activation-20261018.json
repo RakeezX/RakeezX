@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-official-student-portal-activation-20261018",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -1175,
+      "scopeKey": "n88-official-hosted-private-service-activation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "resourceClass": "live-mutation",
+      "liveAuthorizationRef": "PO-20261018-1628-N88-official-if-ready",
+      "dependsOn": [
+        "continuous-n88-teacher-presentation-finish-20261018",
+        "continuous-n88-task-execution-delivery-guidance-20261018"
+      ],
+      "objective": "Latest direct PO18October16:28Saudi requests compact polished N88 teacher experience and official Rakeez deployment when ready for actual trial; finish the remaining concrete service activation within this exact scope. This is a real conditional activation card, not another qualification/prototype/reviewer. Existing controller dispatches, original sequential publisher alone publishes Product frontend. Start from current origin/main after the presentation dependency, never the stale canonical working tree. Preserve all delivered candidates/evidence and reuse unchanged E/F/G/H/task-guidance proofs. Read latest N88 row, current ACTIVATION/deploy manifest and po-1628-finish-20261018/n88-activation-readonly-scope.json. Reference inactive source publication207ee9666aadef9bcc609be57cd5b24bf1ab3fb8; current UI dependency may change presentation hashes only. Current fresh management list returned NO N88 migration among the required six and NO n88-student-portal function; do not report either applied/deployed. Fresh exact catalogs still gate applying anything.\n\nPHASE0 — Complete prerequisite capability/custody readback BEFORE any hosted DDL/login/route/readiness write. Available Supabase MCP supports exact migration/SQL/function operations but has no dedicated Edge-secret setter or Cloudflare management. Discover actual approved installed CLI --help and current relevant official docs; names/boolean custody status only. Existing logged-in CLI may provide the sanctioned channel; inspect only existence/operation capability, never retrieve/export credentials or request new accounts/subscription. Do not use SQL server-side filesystem/OS functions, management-proxy Edge functions, secret scraping, browser session cloning, ACL/policy overrides, or an operation already refused under N64/N36. No broad Auth-config change, new managed Auth policy/grant or disabling RLS. If an actual operation is missing or rejected, save exact safe evidence/action/channel and useful fully prepared candidate; BLOCKED is truthful, not a pretext to retry via another tool or leave service half activated. Do not apply schema merely to consume the allowance while known custody/ingress is unavailable.\n\nPHASE1 — Named project xlrubcwjqktzzunrvuns only. Fresh catalog-only readback of consumed canonical columns/types/PK/FK/revision triggers/RLS, full current grade families, Auth.users/sessions status-column/RLS/ownership contracts, exact existing management privileges and private N88 identities; no actual personal row reads. Preserve already proven postgres REFERENCES/column-lock privileges; do not invent grants. Compare current managed Auth RLS-enabled/zero-policy reality; existing exact private helpers retain management postgres owner with narrow EXECUTE ACL, no n88_backend Auth grants/global BYPASSRLS/superuser/managed-table policy changes. Respect existing same-owner canonical fences and bounded locks. Verify all six current migration identities/history and each phase's current preflight/expected catalog snapshot. Apply at most the six exact preserved staged migrations in order ONLY if truly absent and exact baseline matches: 20261018034356,20261018102843,20261018110713,20261018114113,20261018115648,20261018125611. Use apply_migration for hosted DDL. If already applied, compare exact current identity and skip; do not replay/rewrite. No combined guessed db push of unrelated repository migrations. A mismatch stops this card with precise diff before mutation. No source-row backfill or real-data edits. Record migration/version/readback identity and service candidate together.\n\nPHASE2 — Private existing-provider custody, no plaintext secret in arguments/tool outputs/logs/source/screenshots/reports. Provision only the restricted n88_backend LOGIN/password and verified DB TLS via approved custodian channel if supported; never send its password in MCP SQL. Dedicated distinct random server secrets for N88_HMAC_KEY,N88_NUMERIC_KEY,N88_RESERVATION_KEY,N88_INGRESS_KEY and versioned AES recovery key; configure exact names from current deploy.staged.json. Recovery version->key material immutable, no alias/rebinding/reuse, preserve backup/decrypt keys and permanent nonce/tombstone ledger. Cloudflare gets only ingress key+public origin/upstream bindings, never DB/verifier/reservation/recovery keys. Never substitute existing service-role for restricted DB role or export any secret to browser. Source project Auth public key may be used privately in correct SDK config; do not print it needlessly. A supported protected ignored local env file may bridge a credential-custodian operation only if values stay out of process args/transcripts and is cleaned under owned-resource rules; no broad search of credential stores.\n\nPHASE3 — Same-service exact packaging after UI dependency: refresh current manifest/source graph/inert bundle once as needed for changed source only; preserve prior-history artifacts and staged SQL. Deploy exact n88-student-portal bundle/deno config/lock to named Supabase project with verify_jwt=false ONLY because actual entry independently verifies signed transport and teacher bearer, and student code route is intentionally unauthenticated until claim. Do not disable existing unrelated functions/gateway. Initially N88_ENABLED false and no public route. Read provider deployed revision/source identity, configuration names and required no private logging/body/error-DETAIL capture. Configure existing rakeezx.com Cloudflare signed transport /api/n88/*, external ingress/IP/TLS transformations, no Worker subrequests, observability/routes/preview restrictions; no new host/account/cost. Actual provider zone logs/analytics/Logpush private capture disposition must be read back, not inferred from source observability false. Private /student and /n88-private exact assets only with no-store/no-referrer/noindex/CSP; fallback to account app forbidden; never cache private routes in SW. Current entry must include actual approved brand image assets referenced by UI in exact safe allowlist if missing, never broad assetmount. Enable service only for bounded fabricated-hosted validation once schema/role/custody/logging readback succeeds, while teacher readiness stays OFF.\n\nPHASE4 — Hosted validation only with new clearly fabricated owned N88 identities through an existing approved narrowly scoped provisioning mechanism; zero real pupil/teacher row mutations, zero emails/WhatsApp/messages, no actual student-code logs/screenshots. No guess of fixture account creation or privileged Auth proxy: if this prerequisite has no sanctioned channel, record exact blocker. Scope one fabricated teacher-owned section/two fabricated students and its own minimal canonical task/grade fixture only, no production real records. Test exact current service route -> teacher-owned list/generate/read-same-code/reload -> selective rotate/revoke -> universal student claim/read -> chosen fields/current tasks/guidance, owner/source/session negative and actual durable commit ACK. Test wrong owner, hidden/revised source omission, old rotated/revoked session, generic invalid-code failure and no-store/private page headers. Reuse unchanged local crypto/rate/two-instance/nativePG/35-pupil evidence by source identity; do not rerun old full suites. Own fixture cleanup/disposition must preserve tombstones/nonce history and use existing supported fenced lifecycle; no blind cascade or arbitrary cleanup SQL. Real-device current browser proof only in an isolated approved browser phase/shared lease; never personal browsing disruption. New exposure, exact bound runtime and cookie/header/permission paths justify these targeted hosted checks. Do not claim device evidence from HTTP200.\n\nPHASE5 — Once actual hosted gates pass, enable ONLY current class portal PORTAL_READINESS n88-integrated-class-v1, actual /student private document and intended official teacher access affordance via original publisher. No retired private-link/four-digit route activation. User sees compact official teacher page inside Rakeez; after deliberate create/copy/share their students can use universal https://rakeezx.com/student with six total digits beginning1 and same owner-published fields. No automatic messages or auto-issue/auto-publish real fields. Read back exact provider version/current source and official teacher/student changed assets/headers/route; source-only generic publication is not live proof. A two-phase frontend rollout may be necessary; do not forge LOCAL_READY before service prerequisites exist. If actual runtime/hosted handling exposes a bounded defect in allowed code, correct only that concrete defect and rerun impacted check; no product redesign/scoring rewrite. On failure keep private feature unavailable; disabling this owned feature's routes/flags is allowed, preserving data and all unrelated services. Return exact task/run/base/candidate/check JSON, actual hosted receipt/fixture disposition and official trial URL. No Product CLOSED without actual delegated truthful acceptance.\n\nCurrent root capability evidence is saved at artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/provider-gates-current.json. Supabase official CLI2.120.0 is AUTHENTICATED and supplies config pull --dry-run plus secrets operations; the initial local config-not-found setup was corrected ONLY in owned provider-readonly/ workspace. That dry-run returned actual timeout/inactivity0s without remote writes, but singleton is still UNKNOWN and must not be guessed. CloudflareWrangler4.148.0 is present from the existing cache; its OS keyring dependency was prepared. Its one five-minute device flow EXPIRED without user completion. Do not repeat discovery/test suites or another OAuth flow unless user is actually ready, and do not provision anything while this genuine external prerequisite is unresolved. All profile reads, custody and exact hosting gates still apply; no permission re-ask for already authorized release. Restoring pinned official CLI dependencies from existing cache is ordinary setup, not a new service/account.\n\nNEW VERIFIED PREREQUISITE (supersedes only prior Cloudflare-login blocker): human explicitly renewed and completed official Wrangler Device Authorization. CLI4.148.0 process85877 exited0 Successfully logged in; fresh whoami confirms loggedIn=true, one account, OAuth Token with user:read/offline_access/account:read/workers_scripts:write/workers_routes:write/zone:read, OS keyring. Metadata-only evidence cloudflare-auth-verified.json and updated provider-gates-current.json in current intake. Do not request the same login again or extract the OAuth token. Existing CLI/service channels may now be exercised within this exact card; discover actual operation help and complete secure custody/fixture/logging prerequisites before DDL. Missing a different capability is not proof Cloudflare login failed. Root is separately reading N44-only singleton policy via dedicated authenticated dashboard; do not duplicate that action. Final compact teacher candidate5497dd57c9bfe3a259057e616ca7b24a60b1f54b was verified published as5046e82968cb0055db7a99aea41d65dcb71b2a60 at2026-10-18T13:48:25.520Z. Use current remote main and refresh only the actually changed final graph metadata. Source-aligned actual local review runs at127.0.0.1:50296 until2026-10-18T17:56:13.627Z; not a live service proof. N44 service card remains unadmitted while its own metadata prerequisite is unresolved, so this worker owns its scoped Product work alone. No manual root Product executor or paid qualification loop.\n\nMATERIAL PROVIDER CHANNEL UPDATE — 2026-10-18T17:01:25.010Z: latest direct PO explicitly approved adding the official Cloudflare MCP connection (Full access. go ahead), then completed the exact requested-scopes Authorize flow and replied تم. Official Codex mcp add installed ONLY rakeez_cloudflare at https://mcp.cloudflare.com/mcp; official mcp login exited0 Successfully logged in, mcp list shows enabled/o_auth. The automatic overly broad default OAuth request was cancelled before authorization; only the recorded limited Workers scripts/bind/routes/observability-read, zone-read, account/logs-read and normal identity/offline scopes were requested and shown in consent. Metadata-only evidence is cloudflare-official-mcp-connected.json in current intake. This explicitly supersedes the old no-new-integration restriction ONLY for this already installed, human-authorized exact connection and existing named services/routes. It does not authorize another integration, new subscription, Auth callback change, real messages or broader resource operations.\n\nResume the SAME saved session/candidate. Use native rakeez_cloudflare MCP tools discovered in the resumed session; first read opaque identity and exact account metadata, then discover exact approved API schemas and deployed config/versions. Root CLI OAuth success does not prove native worker availability or backend readiness; retain real outcome. Do not extract OAuth tokens, inspect/copy credential files, weaken filesystem/policy/security, create a privileged proxy, or invoke root/another worker as credential proxy. Do not repeat Wrangler whoami/login: its same corrected child already failed with no JSON/native exit3221226505. No additional unchanged tests. Native MCP is a newly authorized provider channel, not a workaround for any actual N64/N36 refusal.\n\nSecure key transport remains a PRE-DDL capability gate. MCP secret values must NEVER occur in tool code/arguments/results/logs. Exact provider Code Mode execute is documented to run inside isolated Dynamic Workers, not a local shell. If its actual sandbox supports standard cryptographic random generation and WebCrypto RSA-OAEP/SHA-256, a bounded encrypted handoff is an allowed custody implementation: generate an owned local >=3072-bit RSA recipient key in process memory, persist only encrypted private recovery under existing current-user OS protection if needed, send ONLY its public key to the provider sandbox, generate the fresh shared ingress secret in provider memory, bind it only to the exact approved owned Worker, and return ONLY RSA-OAEP ciphertext to the local custodian for protected official Supabase --env-file installation. No secret literal in tool code/output, no new proxy/host/endpoint, no arbitrary cross-provider fetch or raw key export, no provider credential extraction, no environment/logging downgrade. Prove the exact sandbox crypto/envelope roundtrip with an ephemeral throwaway secret and NO provider writes first; do not assume support. This is an optional safe implementation, not a required new product protocol. If actual native APIs cannot meet this custody contract, preserve the precise capability result and stop before DDL rather than transmitting a raw secret. All existing independent secret separation/recovery/nonce/TLS and actual no-private-logging gates remain unchanged. Cloudflare's primary description: https://github.com/cloudflare/mcp/blob/main/README.md and https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/.\n\nN88 EXACT METADATA/FIXTURE CORRECTION: the sixth staged SQL is byte-identical in saved candidate76a58 and base5046e829. Its canonical Git LF SHA256 is d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060; the old f48be5 pin was the exact same bytes serialized as CRLF. n88-migration-pin-serialization-correction.json proves both; first five pins already match. Correct this card metadata only; NEVER rewrite/replay SQL to satisfy a pin. All six still require fresh absence/baseline/readback before any apply.\n\nThe human has now designated an EXISTING dedicated all-fabricated Rakeez test teacher, opened in Chrome, and confirmed completion. The sole matching official Rakeez tab2005438157 is on section tch:sec:8d78704e-fd86-4b95-aa92-83957740daf6, digital-skills. Use only this explicitly designated test owner through normal authenticated Rakeez UI; max one existing teacher/two clearly fabricated students/minimal own fixture. No new Auth user creation/management grant, no credential/password/token/cookie extraction, no account impersonation or private real row reads. If exact owner cannot be grounded through normal test UI/canonical owned fixture metadata, save that precise mismatch without guessing. Browser calls remain scoped DOM actions in this test tab with the existing lease; no personal unrelated tabs/native mouse interruption. Root has read only tab metadata so far, not account/student rows. This replaces the earlier missing fixture-account designation; it does not claim hosted trial PASS. Original maxFabricatedTeachers1 is an existing test teacher reuse limit, not authority to create a new Auth account.\n\nRestricted n88_backend LOGIN custody may use the same PostgreSQL documented client-encrypted SCRAM-SHA-256 verifier approach as the N44 correction: fresh >=32-byte random raw password stays in memory/protected Edge env handoff; protected official Supabase db query --file receives ONLY the derived verifier, never plaintext SQL/tool args/output. A verifier is sensitive too; suppress raw results/details and remove owned temporary inputs in finally. Verify exact fresh n88_backend flags/ACL and TLS current_user; no unrelated existing login/password reset, new direct Auth/canonical grants, superuser/BYPASSRLS or managed policy change. One affected SCRAM/custody proof is justified; reuse existing crypto/nativePG/browser proofs. Current supported provider session-policy evidence false/null/null is already in n44-session-policy-dashboard-readonly.json; do not duplicate that dashboard read. N44 is separately blocked/pending and scopesOverlap owns serialization. After true service/fixture/header/logging readiness, original publisher enables the existing compact teacher UI and /student. Preserve UI candidate5497dd57/published5046e829 and private packaging fix76a58; no redesign, no automatic codes/messages/fields.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "drafts/n88-student-portal/client/student-entry.js",
+        "drafts/n88-student-portal/client/student.html",
+        "src/router.js",
+        "src/views/teaching-hub.js",
+        "src/views/students.js",
+        "sw.js",
+        "_routes.json",
+        "_headers",
+        "_redirects",
+        "drafts/n88-student-portal/activation/**",
+        "drafts/n88-student-portal/ACTIVATION.md",
+        "drafts/n88-student-portal/deployment.inactive.json",
+        "drafts/n88-student-portal/integrated-bundle.mjs",
+        "drafts/n88-student-portal/integrated-readback.mjs",
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "drafts/n88-student-portal/web-entry.mjs",
+        "supabase/functions/n88-student-portal/**",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "tests/n88-official-activation*.mjs",
+        "tests/n88-official-activation*.json",
+        "tests/fixtures/n88-official-activation/**",
+        "docs/automation-evidence/20261018/N88_OFFICIAL_ACTIVATION.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "drafts/n88-student-portal/ACTIVATION.md"
+      ],
+      "requiredChecks": [
+        "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+        "n88_official_exact_provider_ingress_private_document_and_no_logging",
+        "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+        "n88_official_publisher_readiness_route_and_served_behavior"
+      ],
+      "acceptance": [
+        "Exact existing migration identities are freshly compared, applied at most once only where absent; unchanged proofs/history retained and no managed Auth policy/global privilege or real source mutation.",
+        "Actual restricted DB, provider custody/version names, exact service code/config, private logging/TLS/route/document readbacks pass; no secret/browser/service-role leak.",
+        "One bounded hosted fabricated-only teacher/student flow proves current code recovery/rotation/revoke/visibility/guidance and authoritative owner/source/session/ACK handling; fixture disposition recorded.",
+        "Only after prerequisites pass, original publisher enables verified official class page and universal /student; unavailable channels produce exact BLOCKED evidence and preserved prepared candidate, never false live readiness."
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261018-1628-N88-official-if-ready",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "origin": "https://rakeezx.com",
+        "scope": "Only existing six staged private N88 migrations/service roles/custody/current exact hosted service+ingress+private-document/readiness activation after prerequisites, with bounded fabricated hosted validation. No actual user data test or sending, no managed Auth policy/security/callback change.",
+        "maxExistingMigrations": 6,
+        "migrationIdentities": [
+          {
+            "path": "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+            "sha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c"
+          },
+          {
+            "path": "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
+            "sha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c"
+          },
+          {
+            "path": "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
+            "sha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff"
+          },
+          {
+            "path": "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
+            "sha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd"
+          },
+          {
+            "path": "supabase/migrations/20261018115648_n88_code_recovery_staged.sql",
+            "sha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5"
+          },
+          {
+            "path": "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
+            "sha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060"
+          }
+        ],
+        "maxNewMigrations": 0,
+        "maxFabricatedTeachers": 1,
+        "maxFabricatedStudents": 2,
+        "realEmails": 0,
+        "realMessages": 0,
+        "realPupilMutations": 0,
+        "newAccountsOrSubscriptions": 0,
+        "credentialExtraction": false,
+        "managedAuthChange": false,
+        "sourceScoringChange": false,
+        "version": 1,
+        "officialCloudflareConnection": {
+          "serverName": "rakeez_cloudflare",
+          "endpoint": "https://mcp.cloudflare.com/mcp",
+          "evidence": "cloudflare-official-mcp-connected.json",
+          "humanApproved": true,
+          "oauthLoginSucceeded": true,
+          "nativeAccountReadbackRequired": true,
+          "noRawSecretToolArguments": true
+        },
+        "existingFabricatedTeacher": {
+          "chromeTabId": "2005438157",
+          "origin": "https://rakeezx.com",
+          "sectionId": "tch:sec:8d78704e-fd86-4b95-aa92-83957740daf6",
+          "humanDesignated": true,
+          "newAuthUsers": 0,
+          "maxStudents": 2,
+          "normalUiOnlyNoTokenExport": true
+        }
+      },
+      "releaseAuthority": "Latest direct PO explicitly asks N88 official deployment when ready for actual use and completion of remaining work. Authorizes the exact conditional private-service/schema/role/provider-custody/route/readiness operations named here after current safety prerequisites, not a generic review-only hold. Use only existing sanctioned access; a real missing channel/refusal remains binding. Product frontend publication remains the original sole publisher; no real data test, messages, new expense, Auth configuration or managed Auth policy changes."
+    }
+  ]
+}
