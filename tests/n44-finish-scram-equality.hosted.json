@@ -1,0 +1,29 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "4c096417-b07a-4bc5-b8c1-538c9d9b1260",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-18T20:30:45.210Z",
+  "authenticationAttempts": 0,
+  "providerWrites": 0,
+  "credentialChanges": 0,
+  "rawPrivateValuesReturned": false,
+  "provenance": {
+    "sourceSha256": "f90420b97cc3e0bd30de7addadc36b46e497effa924aed5bc76660dd241c2be4",
+    "localProofSha256": "3faf75c5c3a5d3289790c69e516d9e3fadd36ccb5472e5c9bd821d3dd814ec98",
+    "protocol": [
+      "https://www.rfc-editor.org/rfc/rfc5802#section-3",
+      "https://www.rfc-editor.org/rfc/rfc7677#section-3"
+    ],
+    "priorDiagnosis": "tests/n44-finish-login-diagnosis.result.json"
+  },
+  "comparison": {
+    "publicChallengeShapeValid": true,
+    "roleStillOwnedAndDisabled": true,
+    "serverKeyMatchesRecoveredCredential": true,
+    "storedKeyMatchesRecoveredCredential": true
+  },
+  "status": "MATCH_EXTERNAL_AUTH_BLOCKER",
+  "disposition": "Owned role remains NOLOGIN with no membership. No authentication, password update, role restore, migration or deployment performed.",
+  "ownedTransientInputAbsent": true
+}
