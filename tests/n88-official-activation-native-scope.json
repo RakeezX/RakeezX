@@ -1,0 +1,65 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "8698a850-ff9c-488d-8516-328eed2c356d",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "preservedCandidate": "76a58af8bb139a146abc11b556009b4b17f1dd2e",
+  "at": "2026-10-18T17:09:13.497Z",
+  "checks": [
+    {
+      "name": "corrected_card_exact_six_pins",
+      "status": "PASS",
+      "evidence": "All six actual byte hashes match the corrected active card; SQL unchanged from base. Historical CRLF assertion failure retained in prior scope report."
+    },
+    {
+      "name": "saved_candidate_evidence_and_cleanup",
+      "status": "PASS",
+      "evidence": "Manifest/deploy package and prior four-case actual browser report unchanged from76a58; no browser rerun. Protected throwaway handoff passes; owned encrypted recipient removed; no hosted writes."
+    }
+  ],
+  "migrations": [
+    {
+      "path": "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+      "sha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c"
+    },
+    {
+      "path": "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
+      "sha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c"
+    },
+    {
+      "path": "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
+      "sha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff"
+    },
+    {
+      "path": "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
+      "sha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd"
+    },
+    {
+      "path": "supabase/migrations/20261018115648_n88_code_recovery_staged.sql",
+      "sha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5"
+    },
+    {
+      "path": "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
+      "sha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060"
+    }
+  ],
+  "reused": [
+    {
+      "path": "drafts/n88-student-portal/activation/manifest.json",
+      "sha256": "a0670f8116949b88001d859dfc96a02589582ebcda5aff62284f2cd7345bd2c9"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/deploy.staged.json",
+      "sha256": "40660f6a0a0c2cd158f44cd873b3072804b3cbba068199721a9518f2dcfa74eb"
+    },
+    {
+      "path": "tests/n88-official-activation-private-assets.json",
+      "sha256": "3edefd85293c7a75d53cc3559da8e43fbb5624eeab684e8ee926f5984b0a179f"
+    },
+    {
+      "path": "tests/n88-official-activation-scope.json",
+      "sha256": "2e16cd254eac2a94b9375df533b134cda4a152144610408c82f3754f103b3bcb"
+    }
+  ],
+  "productionProof": false
+}

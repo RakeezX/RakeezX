@@ -1,0 +1,64 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "8698a850-ff9c-488d-8516-328eed2c356d",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "preservedCandidate": "76a58af8bb139a146abc11b556009b4b17f1dd2e",
+  "observedDate": "2026-10-18",
+  "phase": "PHASE0_STOPPED_BEFORE_PROVIDER_OR_DATABASE_WRITES",
+  "supersedes": {
+    "wranglerAvailabilityBlocker": "Native official rakeez_cloudflare MCP is available and authenticated. No Wrangler whoami/login repeated; original failure remains historical.",
+    "sixthMigrationPin": "Corrected current card uses canonical LF SHA d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060. All six exact pins now match unchanged SQL; original f48be5 CRLF failure retained.",
+    "fixtureAccountDesignation": "Human designated existing fabricated teacher in tab2005438157 and section tch:sec:8d78704e-fd86-4b95-aa92-83957740daf6. No new Auth user channel is needed or authorized. Tab/owner/student rows were not inspected in this run because provider prerequisites already blocked; designation is not hosted journey proof."
+  },
+  "identity": {
+    "opaqueProfileId": "user:f028efb8dfc85c090fff8d4b0954b271",
+    "accountId": "1c9ae85e766968a4269a7ac505f9a693",
+    "accountName": "RakeezX Account",
+    "accountRead": {"status": 200, "success": true, "accountCount": 1},
+    "zoneId": "1aefe7f448c93a8af637a718ac2cd101",
+    "zoneName": "rakeezx.com",
+    "zoneStatus": "active",
+    "zoneRead": {"status": 200, "success": true},
+    "ownedWorkerListRead": {"status": 200, "success": true, "rakeez-n88-private-ingressPresent": false}
+  },
+  "actualProviderBlocker": {
+    "tool": "mcp__rakeez_cloudflare__execute",
+    "operation": "GET /accounts/1c9ae85e766968a4269a7ac505f9a693/logpush/jobs",
+    "error": "Cloudflare API error: 10000: Authentication error",
+    "firstObservation": "Independent reads were batched; API exception initially prevented attributing the failed member.",
+    "attribution": "One sequential per-operation diagnostic preserved individual outcomes: exact zone and owned Worker list both200; account Logpush operation alone returned10000. No further attempt of denied operation, credential proxy, alternative credential route or broader permission request.",
+    "meaning": "Authenticated native connection does not currently authorize the required account-level Logpush disposition readback. Account logs configuration remains UNKNOWN; neither disabled source observability nor an empty owned Worker list proves no private capture. No service/schema/secret provisioning while this prerequisite is unresolved.",
+    "zoneLogpushAndProviderLogging": "NOT_RUN in this worker after the account-level rejection; no raw traffic logs, request bodies, cookies or personal rows queried."
+  },
+  "custodyCapability": {
+    "actualSandbox": {"crypto": true, "getRandomValues": true, "subtleImportKey": true, "subtleEncrypt": true},
+    "roundtrip": "PASS: native provider WebCrypto RSA-OAEP/SHA-256 to3072-bit local recipient; ephemeral CSPRNG32-byte plaintext generated only in sandbox; tools transmitted public JWK and ciphertext only. Local recipient protected by CurrentUser DPAPI; decrypted bounded envelope and tamper rejection proved; owned DPAPI ciphertext/directory removed.",
+    "evidence": "tests/n88-official-activation-custody-probe.json",
+    "originalHarnessFailure": "tests/n88-official-activation-custody-initial-failure.json",
+    "actualIngressRecoveryOrDatabaseSecretProvisioned": false,
+    "edgeEnvInstallation": "NOT_RUN; successful throwaway encryption is capability proof only, not actual shared key custody/backup, secret installation or service readiness."
+  },
+  "disposition": {
+    "providerWrites": 0,
+    "appliedMigrations": [],
+    "databaseLoginChanges": 0,
+    "edgeSecretsInstalled": 0,
+    "cloudflareSecretsInstalled": 0,
+    "functionsDeployed": [],
+    "workersDeployed": [],
+    "routesChanged": [],
+    "existingFixtureAccountAccessed": false,
+    "createdAuthUsers": 0,
+    "fabricatedStudentsCreatedOrMutated": 0,
+    "realRowsReadOrMutated": 0,
+    "messagesSent": 0,
+    "temporaryFunctionCleanup": "No temporary function created in either saved attempt; preserved prior provider list showed no N88 function. No owned hosted resource needed disarm; unrelated historical functions untouched. No new function list claimed.",
+    "fixtureLifecycle": "No hosted identity provisioned/consumed/retired/reactivated; no nonce/tombstone record touched.",
+    "browserOrServerStarted": false,
+    "priorUiEvidence": "Reused unchanged tests/n88-official-activation-private-assets.json from saved76a58 candidate; no repeated Preview/browser suite.",
+    "teacherReadiness": false,
+    "officialTrialUrl": null
+  },
+  "retryCondition": "Exact account-level Logpush readback must succeed through the already approved native connection, or the same required private logging disposition must be supplied by an explicitly approved owner readback. Do not retry the identical10000 or route around it. Preserve candidate/session; only after material access/evidence correction perform remaining logging/custody and fresh phase-specific catalog gates before any DDL."
+}

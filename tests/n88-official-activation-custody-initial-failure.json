@@ -1,0 +1,24 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "8698a850-ff9c-488d-8516-328eed2c356d",
+  "at": "2026-10-18T17:04:26.515Z",
+  "purpose": "Throwaway encrypted handoff capability only; no provider secret installation or write",
+  "algorithm": "RSA-OAEP",
+  "hash": "SHA-256",
+  "modulusBits": 3072,
+  "checks": [],
+  "cleanup": {
+    "recipientProcessClosing": true,
+    "privateKeyLifetime": "process-memory-only",
+    "ownedFilesCreated": 0
+  },
+  "providerWrites": 0,
+  "plaintextOrPrivateKeyPersisted": false,
+  "failure": "Recipient expired without ciphertext",
+  "originalHarnessDiagnostics": [
+    "write_stdin failed: stdin is closed for this session; rerun exec_command with tty=true to keep stdin open",
+    "TTY launch rejected: CreateProcessW pwsh.exe failed: Access is denied. (os error 5)"
+  ],
+  "resolution": "No further PTY launch attempted or policy/config changed. Used the explicitly permitted noninteractive CurrentUser DPAPI encrypted-recipient handoff; only public JWK/ciphertext external inputs. Original recipient expired and process completion was observed before corrected probe."
+}

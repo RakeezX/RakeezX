@@ -61,3 +61,46 @@ local proofs and all original failures; no unchanged qualification or login loop
 
 CLI capability references: [Supabase secret inputs](https://supabase.com/docs/reference/cli/supabase-secrets-set),
 [Wrangler commands](https://developers.cloudflare.com/workers/wrangler/commands/).
+
+## Resumed native provider phase — run8698a850, 18 October
+
+The saved candidate76a58 and its UI/package evidence remain unchanged. The corrected
+active card now matches all six actual LF migration byte hashes; SQL was never
+rewritten. Original failed scope evidence remains intact. The user has designated
+an existing all-fabricated test teacher; creating a new Auth account is neither
+needed nor authorized. No designated test tab or student rows were accessed yet.
+
+The newly approved native `rakeez_cloudflare` connection is available. Opaque identity,
+the expected sole account, active rakeezx.com zone and absence of the owned N88 Worker
+were actually read back. This supersedes the historical Wrangler availability
+blocker; no Wrangler retry or new login occurred.
+
+The actual account Logpush disposition operation was rejected:
+`GET /accounts/1c9ae85e766968a4269a7ac505f9a693/logpush/jobs` returned
+`Cloudflare API error: 10000: Authentication error`. Initial batched reads did not
+identify the failed member; one per-operation diagnostic established zone/Worker
+reads200 and this exact rejection. No further retry or alternative credential
+route followed. Required private logging readback is still unavailable, so no
+DDL, LOGIN/password, secret installation, service deployment or route activation
+was attempted. This is a real provider access blocker, not a missing card path.
+
+An actual pre-DDL throwaway encrypted handoff passed independently: Cloudflare's
+native sandbox provides CSPRNG/WebCrypto and encrypted a fresh32-byte transient
+value to a3072-bit RSA-OAEP/SHA-256 recipient. Only public JWK and ciphertext crossed
+tool boundaries. The local recipient used current-user DPAPI for its temporary
+encrypted private key; decryption/envelope validation and tamper rejection passed,
+and owned encrypted files/directory were removed. No actual service secret or
+backup was created. Initial closed-stdin/denied-PTY harness failure is retained;
+the corrected noninteractive path uses no PTY or security/configuration changes.
+
+See [native provider receipt](../../../drafts/n88-student-portal/activation/native-channel-readback.json),
+[custody proof](../../../tests/n88-official-activation-custody-probe.json),
+[original harness failure](../../../tests/n88-official-activation-custody-initial-failure.json)
+and [corrected-pin/reuse evidence](../../../tests/n88-official-activation-native-scope.json).
+Full hosted acceptance gates remain NOT_RUN. No hosted fixture was consumed or
+temporary service created, so no hosted cleanup/disarm was required. Original
+publisher remains responsible for frontend delivery after actual service gates.
+
+Resume only after material correction of the exact Logpush access/evidence gate.
+The native encrypted handoff is demonstrated capability, not live key installation
+or permission to bypass provider denial. Official trial URL remains unavailable.
