@@ -121,20 +121,66 @@ export function createPgClassResolver({teachingId:boundTeachingId}={}) {
  */
 export function withCredentialRepository(repository,{maxRows=10000,maxBytes=4*1024*1024}={}) {
   if(!repository?.transaction || !Number.isSafeInteger(maxRows) || maxRows<1 || maxRows>10000 || !Number.isSafeInteger(maxBytes) || maxBytes<1024 || maxBytes>16*1024*1024) fail();
-  const tables={numericCredentials:'numeric_credentials',numericSessions:'numeric_sessions',numericRates:'numeric_rates',classReceipts:'class_credential_receipts'};
-  return Object.freeze({
+  const tables={numericCredentials:'numeric_credentials',numericSessions:'numeric_sessions',numericRates:'numeric_rates',numericAttempts:'numeric_attempts',classReceipts:'class_credential_receipts'};
+  // Capabilities never cross HTTP or survive process restart. Unknown COMMIT has
+  // no capability, even if its session/receipt later exists in PG. No auto-recovery
+  // refund: abandoned receipts expire with their original bounded windows.
+  const proofs=new WeakSet();
+  const api={
     // Existing global advisory lock + fenced COMMIT, without credential reads.
     claimAttempt:action=>repository.transaction(async(_db,ports)=>{
-      const r=await ports.query('select payload from n88_private.numeric_rates limit $1',[maxRows+1]);
-      if(r.rows.length>maxRows)fail();
-      const state={numericRates:r.rows.map(r=>r.payload)};
-      const allowed=await action(state,ports);
-      if(state.numericRates.length>maxRows)fail();
-      const keys=new Set(state.numericRates.map(r=>r.key));
-      for(const row of r.rows)if(!keys.has(row.payload.key))await ports.query('delete from n88_private.numeric_rates where row_key=$1',[row.payload.key]);
-      for(const row of state.numericRates)await ports.query('insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload',[row.key,JSON.stringify(row)]);
+      const state={},original={};let bytes=0;
+      for(const [name,table] of [['numericRates','numeric_rates'],['numericAttempts','numeric_attempts']]) {
+        const r=await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`,[maxRows+1,maxBytes-bytes]);
+        if(r.rows.length>maxRows)fail();
+        state[name]=r.rows.map(({payload})=>{if(!payload)fail();bytes+=Buffer.byteLength(JSON.stringify(payload));if(bytes>maxBytes)fail();return payload;});
+        original[name]=structuredClone(state[name]);
+      }
+      const allowed=await action(state,ports);bytes=0;
+      for(const [name,table] of [['numericRates','numeric_rates'],['numericAttempts','numeric_attempts']]) {
+        if(state[name].length>maxRows)fail();
+        const pk=r=>name==='numericRates'?r.key:r.id;
+        const after=new Map(state[name].map(r=>[pk(r),r]));if(after.size!==state[name].length)fail();
+        const before=new Map(original[name].map(r=>[pk(r),r]));
+        for(const row of original[name])if(!after.has(pk(row)))if((await ports.query(`delete from n88_private.${table} where row_key=$1`,[pk(row)])).rowCount!==1)fail();
+        for(const row of state[name]) {
+          bytes+=Buffer.byteLength(JSON.stringify(row));if(bytes>maxBytes)fail();
+          if(before.has(pk(row)) && JSON.stringify(before.get(pk(row)))===JSON.stringify(row))continue;
+          if((await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload`,[pk(row),JSON.stringify(row)])).rowCount!==1)fail();
+        }
+      }
       return allowed;
     }),
+    commitAttemptSession:async(id,action)=>{
+      const committed=await api.transaction(async(db,ports)=>{
+        const a=db.numericAttempts.find(a=>a.id===id);
+        if(!a || a.sessionId!==null || a.settled)fail();
+        const before=new Set(db.numericSessions.map(s=>s.id));
+        const value=await action(db,ports);
+        const fresh=db.numericSessions.filter(s=>!before.has(s.id));
+        if(fresh.length>1)fail();
+        if(fresh.length===1) {
+          if(fresh[0].revokedAt!==null)fail();
+          a.sessionId=fresh[0].id;
+        }
+        return {value,receipt:fresh.length?structuredClone(a):null};
+      }); // returns only AFTER existing fenced durable COMMIT ACK
+      const proof=committed.receipt?Object.freeze(committed.receipt):null;
+      if(proof)proofs.add(proof);
+      return {value:committed.value,proof};
+    },
+    settleAttempt:async(proof,time)=>{
+      if(!proof || !proofs.has(proof) || !Number.isSafeInteger(time))return false;
+      return api.transaction(async(db)=>{
+        const a=db.numericAttempts.find(a=>a.id===proof.id);
+        if(!a || a.settled || a.until<=time || JSON.stringify(a)!==JSON.stringify(proof) ||
+          !db.numericSessions.some(s=>s.id===a.sessionId))return false;
+        const buckets=a.buckets.map(b=>db.numericRates.find(r=>r.key===b.key && r.epoch===b.epoch && r.until===b.until && r.until>time));
+        if(buckets.length!==2 || new Set(buckets).size!==2 || buckets.some(b=>!b || b.count<1))return false;
+        for(const b of buckets)b.count--;
+        a.settled=true;return true;
+      }); // receipt and both debits settle atomically, under SAME global PG lock
+    },
     transaction:action=>repository.transaction(async(db,ports)=>{
     if(typeof ports?.query!=='function') fail();
     const extra={},original={};let bytes=0;
@@ -167,5 +213,6 @@ export function withCredentialRepository(repository,{maxRows=10000,maxBytes=4*10
       }
     }
     return value;
-  })});
+  })};
+  return Object.freeze(api);
 }

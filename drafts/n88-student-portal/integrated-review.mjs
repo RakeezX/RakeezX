@@ -18,10 +18,18 @@ export async function startIntegratedReview({ttl=14400,historicalReservationFixt
   try {
     const origin='https://synthetic.invalid',provider=providerFixture(),ingressKey=randomBytes(32);
     const manifest=JSON.parse(await readFile(path.join(root,'drafts/n88-student-portal/deployment.inactive.json'),'utf8'));
-    let failure=null,syntheticSource='192.0.2.1';
+    let failure=null,commitFailure=null,admissionFailure=false,syntheticSource='192.0.2.1',sessionGate,sessionEntered,releaseSession;
+    const metrics={credentialReads:0};
     const options={...manifest,origin,authUrl,apiKey:'FABRICATED_API_KEY',secretKey:randomBytes(32),ingressKey,
-      numericKey:randomBytes(32),reservationKey:randomBytes(32),acquire:async()=>{const c=await pg.acquire();return {release:e=>c.release(e),query:(sql,...args)=>{
+      numericKey:randomBytes(32),reservationKey:randomBytes(32),acquire:async()=>{const c=await pg.acquire();let sessionWrite=false,attemptWrite=false;return {release:e=>c.release(e),query:async(sql,...args)=>{
+        if(sql.includes('from n88_private.numeric_credentials'))metrics.credentialReads++;
+        if(sql.includes('insert into n88_private.numeric_attempts'))attemptWrite=true;
         if(failure && sql.includes(failure)){failure=null;throw Error('Synthetic transaction failure');}
+        if(sql.includes('insert into n88_private.numeric_sessions')) {
+          sessionWrite=true;if(sessionGate){sessionEntered();await sessionGate;}
+        }
+        if(sql==='commit' && sessionWrite && commitFailure){const mode=commitFailure;commitFailure=null;if(mode==='after')await c.query(sql,...args);throw Error('Synthetic unknown session COMMIT');}
+        if(sql==='commit' && attemptWrite && admissionFailure){admissionFailure=false;await c.query(sql,...args);throw Error('Synthetic admission ACK loss');}
         return c.query(sql,...args);
       }};},fetch:provider.fetch,sourceOnly:false,canonicalReadback:true,privateIngressReadback:true};
     let edge=createWebEntry(options),peer=createWebEntry(options),alternate=false;
@@ -77,8 +85,13 @@ export async function startIntegratedReview({ttl=14400,historicalReservationFixt
     await new Promise((ok,fail)=>{server.once('error',fail);server.listen(0,'127.0.0.1',ok);});localOrigin='http://127.0.0.1:'+server.address().port;
     timer=setTimeout(expire,ttl*1000);
     return {url:localOrigin+'/#/teaching/teaching',studentUrl:localOrigin+'/student',phase:pg.phase,postgres:{...pg.identity,port:pg.port},expiresAt:new Date(Date.now()+ttl*1000).toISOString(),close,expired,
-      testing:{calls,provider,serviceInstances:2,restart:async()=>{await pg.restart();edge=createWebEntry(options);peer=createWebEntry(options);},
+      testing:{calls,provider,metrics,serviceInstances:2,acquire:pg.acquire,repositoryOptions:{limits:manifest.limits,timing:manifest.timing},restart:async()=>{await pg.restart();edge=createWebEntry(options);peer=createWebEntry(options);},
         trustedSource:n=>{if(!Number.isInteger(n)||n<1||n>254)throw Error('Synthetic source required');syntheticSource='192.0.2.'+n;},
+        failSessionCommit:mode=>{if(!['before','after'].includes(mode))throw Error('Synthetic fault required');commitFailure=mode;},
+        failAdmissionAck:()=>{admissionFailure=true;},
+        failSettlement:()=>{failure='update n88_private.numeric_rates';},
+        pauseSession:()=>{sessionGate=new Promise(ok=>{releaseSession=()=>{sessionGate=null;ok();};setTimeout(()=>releaseSession?.(),700).unref();});return new Promise(ok=>{sessionEntered=ok;});},
+        releaseSession:()=>releaseSession?.(),
         failSession:()=>{failure='insert into n88_private.numeric_sessions';},query:pg.fixtureQuery,loseAck:()=>{loseAck=true;},hold:()=>{holdNext=true;return new Promise(ok=>{held=ok;});},release:()=>{release?.();release=null;}}};
   }catch(e){await close();throw e;}
 }

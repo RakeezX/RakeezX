@@ -243,20 +243,74 @@ function createPgClassResolver({ teachingId: boundTeachingId } = {}) {
 }
 function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 1024 * 1024 } = {}) {
   if (!repository?.transaction || !Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail();
-  const tables2 = { numericCredentials: "numeric_credentials", numericSessions: "numeric_sessions", numericRates: "numeric_rates", classReceipts: "class_credential_receipts" };
-  return Object.freeze({
+  const tables2 = { numericCredentials: "numeric_credentials", numericSessions: "numeric_sessions", numericRates: "numeric_rates", numericAttempts: "numeric_attempts", classReceipts: "class_credential_receipts" };
+  const proofs = /* @__PURE__ */ new WeakSet();
+  const api = {
     // Existing global advisory lock + fenced COMMIT, without credential reads.
     claimAttempt: (action) => repository.transaction(async (_db, ports) => {
-      const r = await ports.query("select payload from n88_private.numeric_rates limit $1", [maxRows + 1]);
-      if (r.rows.length > maxRows) fail();
-      const state = { numericRates: r.rows.map((r2) => r2.payload) };
+      const state = {}, original = {};
+      let bytes = 0;
+      for (const [name, table] of [["numericRates", "numeric_rates"], ["numericAttempts", "numeric_attempts"]]) {
+        const r = await ports.query(`select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.${table} limit $1`, [maxRows + 1, maxBytes - bytes]);
+        if (r.rows.length > maxRows) fail();
+        state[name] = r.rows.map(({ payload }) => {
+          if (!payload) fail();
+          bytes += Buffer3.byteLength(JSON.stringify(payload));
+          if (bytes > maxBytes) fail();
+          return payload;
+        });
+        original[name] = structuredClone(state[name]);
+      }
       const allowed = await action(state, ports);
-      if (state.numericRates.length > maxRows) fail();
-      const keys = new Set(state.numericRates.map((r2) => r2.key));
-      for (const row of r.rows) if (!keys.has(row.payload.key)) await ports.query("delete from n88_private.numeric_rates where row_key=$1", [row.payload.key]);
-      for (const row of state.numericRates) await ports.query("insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload", [row.key, JSON.stringify(row)]);
+      bytes = 0;
+      for (const [name, table] of [["numericRates", "numeric_rates"], ["numericAttempts", "numeric_attempts"]]) {
+        if (state[name].length > maxRows) fail();
+        const pk2 = (r) => name === "numericRates" ? r.key : r.id;
+        const after = new Map(state[name].map((r) => [pk2(r), r]));
+        if (after.size !== state[name].length) fail();
+        const before = new Map(original[name].map((r) => [pk2(r), r]));
+        for (const row of original[name]) if (!after.has(pk2(row))) {
+          if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [pk2(row)])).rowCount !== 1) fail();
+        }
+        for (const row of state[name]) {
+          bytes += Buffer3.byteLength(JSON.stringify(row));
+          if (bytes > maxBytes) fail();
+          if (before.has(pk2(row)) && JSON.stringify(before.get(pk2(row))) === JSON.stringify(row)) continue;
+          if ((await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload`, [pk2(row), JSON.stringify(row)])).rowCount !== 1) fail();
+        }
+      }
       return allowed;
     }),
+    commitAttemptSession: async (id3, action) => {
+      const committed = await api.transaction(async (db, ports) => {
+        const a = db.numericAttempts.find((a2) => a2.id === id3);
+        if (!a || a.sessionId !== null || a.settled) fail();
+        const before = new Set(db.numericSessions.map((s) => s.id));
+        const value = await action(db, ports);
+        const fresh = db.numericSessions.filter((s) => !before.has(s.id));
+        if (fresh.length > 1) fail();
+        if (fresh.length === 1) {
+          if (fresh[0].revokedAt !== null) fail();
+          a.sessionId = fresh[0].id;
+        }
+        return { value, receipt: fresh.length ? structuredClone(a) : null };
+      });
+      const proof = committed.receipt ? Object.freeze(committed.receipt) : null;
+      if (proof) proofs.add(proof);
+      return { value: committed.value, proof };
+    },
+    settleAttempt: async (proof, time2) => {
+      if (!proof || !proofs.has(proof) || !Number.isSafeInteger(time2)) return false;
+      return api.transaction(async (db) => {
+        const a = db.numericAttempts.find((a2) => a2.id === proof.id);
+        if (!a || a.settled || a.until <= time2 || JSON.stringify(a) !== JSON.stringify(proof) || !db.numericSessions.some((s) => s.id === a.sessionId)) return false;
+        const buckets = a.buckets.map((b) => db.numericRates.find((r) => r.key === b.key && r.epoch === b.epoch && r.until === b.until && r.until > time2));
+        if (buckets.length !== 2 || new Set(buckets).size !== 2 || buckets.some((b) => !b || b.count < 1)) return false;
+        for (const b of buckets) b.count--;
+        a.settled = true;
+        return true;
+      });
+    },
     transaction: (action) => repository.transaction(async (db, ports) => {
       if (typeof ports?.query !== "function") fail();
       const extra = {}, original = {};
@@ -298,7 +352,8 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
       }
       return value;
     })
-  });
+  };
+  return Object.freeze(api);
 }
 
 // drafts/n88-student-portal/numeric-credentials.mjs
@@ -311,7 +366,10 @@ var NUMERIC_POLICY = Object.freeze({
   windowMs: 15 * 6e4,
   clientAttempts: 6,
   globalAttempts: 100,
-  maxRateKeys: 1e4
+  maxRateKeys: 1e4,
+  sourceRequests: 120,
+  globalRequests: 1200,
+  maxAttempts: 1e4
 });
 var generateNumericCredential = () => "1" + String(randomInt2(0, 1e5)).padStart(5, "0");
 function normalizeNumericCredential(value) {
@@ -400,26 +458,50 @@ function createNumericCredentialOperations({
     return async (request) => {
       try {
         const claim = (request.path === "/student/claim" || request.path === "/api/n88/student/claim") && request.method === "POST";
+        let attempt;
         if (claim) {
-          if (typeof repository.claimAttempt !== "function") return response(denied2());
-          const allowed = await repository.claimAttempt(async (db, ports) => {
+          if (typeof repository.claimAttempt !== "function" || typeof repository.commitAttemptSession !== "function" || typeof repository.settleAttempt !== "function") return response(denied2());
+          attempt = await repository.claimAttempt(async (db, ports) => {
             const ingress = await verifyIngress(request, ports);
             if (!ingress?.clientKey) return false;
             const time2 = now();
             db.numericRates = db.numericRates.filter((r) => r.until > time2);
-            const budgets = [[mac2(reservationKey, "client-rate", ingress.clientKey), NUMERIC_POLICY.clientAttempts], ["global", NUMERIC_POLICY.globalAttempts]];
-            let blocked = false;
-            for (const [key2, max] of budgets) {
+            db.numericAttempts = db.numericAttempts.filter((a2) => a2.until > time2);
+            const source = mac2(reservationKey, "client-rate", ingress.clientKey);
+            const get = (key2, max) => {
               let b = db.numericRates.find((b2) => b2.key === key2);
-              if (!b && db.numericRates.length < NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b = { key: key2, count: 0, until: time2 + NUMERIC_POLICY.windowMs });
+              if (!b && db.numericRates.length < NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b = { key: key2, count: 0, until: time2 + NUMERIC_POLICY.windowMs, epoch: randomUUID2() });
+              if (b && !b.epoch) b.epoch = randomUUID2();
+              return b;
+            };
+            let blocked = false;
+            for (const [key2, max] of [[mac2(reservationKey, "source-flood", ingress.clientKey), NUMERIC_POLICY.sourceRequests], [mac2(reservationKey, "global-flood"), NUMERIC_POLICY.globalRequests]]) {
+              const b = get(key2, max);
               if (!b || b.count >= max) blocked = true;
               if (b) b.count = Math.min(max, b.count + 1);
             }
-            return !blocked;
+            if (blocked) return null;
+            const budgets = [[source, NUMERIC_POLICY.clientAttempts], ["global", NUMERIC_POLICY.globalAttempts]], buckets = [];
+            for (const [key2, max] of budgets) {
+              const b = get(key2, max);
+              if (!b || b.count >= max) blocked = true;
+              if (b) buckets.push(b);
+            }
+            if (blocked || db.numericAttempts.length >= NUMERIC_POLICY.maxAttempts) return null;
+            for (const b of buckets) b.count++;
+            const a = {
+              id: randomUUID2(),
+              buckets: buckets.map(({ key: key2, epoch, until }) => ({ key: key2, epoch, until })),
+              until: Math.max(...buckets.map((b) => b.until)),
+              sessionId: null,
+              settled: false
+            };
+            db.numericAttempts.push(a);
+            return a.id;
           });
-          if (!allowed) return response(denied2());
+          if (!attempt) return response(denied2());
         }
-        return response(await repository.transaction(async (db, ports) => {
+        const authenticate = async (db, ports) => {
           const ingress = claim ? { clientKey: "prepaid" } : await verifyIngress(request, ports);
           const { headers = {}, method, body = {} } = request;
           const path = request.path.startsWith("/student/") ? "/api/n88" + request.path : request.path;
@@ -473,7 +555,16 @@ function createNumericCredentialOperations({
             return denied2();
           }
           return { status: 200, body: await project(db, m, ports) };
-        }));
+        };
+        if (!claim) return response(await repository.transaction(authenticate));
+        const committed = await repository.commitAttemptSession(attempt, authenticate);
+        if (committed.proof) {
+          try {
+            await repository.settleAttempt(committed.proof, now());
+          } catch {
+          }
+        }
+        return response(committed.value);
       } catch {
         return response(denied2());
       }

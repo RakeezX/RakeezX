@@ -1,0 +1,56 @@
+{
+  "taskId": "continuous-n88-shared-network-success-budget-20261018",
+  "runId": "151cbf7c-52a6-4fc7-96a5-b899497b8c6f",
+  "checks": [
+    {
+      "name": "n88_shared_network_35_valid_students_actual_gateway_auth_pg_serial_concurrent",
+      "status": "PASS",
+      "evidence": "35 distinct teacher-issued credentials, one trusted provider IP: all 35 serial + all 35 in concurrent waves of four succeed through alternating two service instances, signed gateway/current teacher Auth/restricted native PG. 70 durable sessions, global guess charge zero. No credential values persisted."
+    },
+    {
+      "name": "all_request_flood_independent_of_success",
+      "status": "PASS",
+      "evidence": "One source completes exactly 120 actual successful claims (including serial/concurrent scenario); the 121st denies before credential state reads with unchanged zero guess charge. All-request durable source120/global1200 per 15min are distinct from failed-guess6/global100."
+    },
+    {
+      "name": "five_wrong_valid_next_wrong_exhausted_known_valid_source_isolation",
+      "status": "PASS",
+      "evidence": "Five wrong + committed valid success leaves five charges; next wrong reaches six; known-valid then denies before numeric credential reads. Another source wrong adds an independent global charge; its success leaves global seven and cannot unlock the first source. Forged claimed/source/IP/body/forwarded headers do not change admission."
+    },
+    {
+      "name": "session_rollback_unknown_commit_admission_crash_failed_settlement_restart_retry",
+      "status": "PASS",
+      "evidence": "Session insert rollback, unacknowledged COMMIT before execution, actual COMMIT with lost acknowledgement, independently committed admission ACK loss (crash boundary), and settlement-write failure all retain own durable charge. Unknown actual COMMIT adds one session but returns generic denial and no credit. Native PG AND both services restarted; rates and abandoned/unsettled receipts persist exactly. Successful retry only refunds its own new debit, not five earlier charges; sixth failure exhausts source."
+    },
+    {
+      "name": "malformed_unknown_revoked_uniform_durable_denial",
+      "status": "PASS",
+      "evidence": "Malformed, valid-shaped unknown and revoked credentials all return identical 401/unavailable and retain source/global charges; browser success claims cannot settle them. Existing revoked tombstone untouched."
+    },
+    {
+      "name": "global_failed_guesses_across_sources_restart",
+      "status": "PASS",
+      "evidence": "Exactly 100 malformed failed guesses across 17 trusted sources accumulate globally. Fresh-source valid credential cannot unlock global exhaustion and is denied before numeric lookup, also after service/native PG restart."
+    },
+    {
+      "name": "bounded_handler_backpressure",
+      "status": "PASS",
+      "evidence": "Separate adversarial case holds one owned session write briefly while 20 bounded malformed requests arrive. Existing eight-handler ceiling per instance rejects excess with generic503/unavailable; admitted malformed/auth failures retain generic401/unavailable. Repository connection/acquisition/lock/deadline fences remain unchanged. Not used as the 35-student concurrency proof."
+    },
+    {
+      "name": "n88_attempt_debit_settlement_once_failure_retention_restart_two_instance_guards",
+      "status": "PASS",
+      "evidence": "Actual restricted-PG repositories: proof minted only for new session COMMIT, independent of returned claimed flag. Opaque capability rejects guessed/cloned/foreign-instance receipt. Duplicate concurrent settlement applies exactly once, replay false, counts never negative; other source four failures untouched. claimed:true without session has no proof. Expired-window and replacement epoch reject without decrement; SQL binding trigger rejects source mutation. Abandoned receipt remains charged."
+    },
+    {
+      "name": "actual_application_teacher_student_review_entry",
+      "status": "PASS",
+      "evidence": "Final source served over owned loopback HTTP, canonical isolated fresh browser contexts: actual app class route/store/owner binding and source CSS show fabricated35 roster; universal student DOM/handlers log in through same signed gateway/restricted PG, reload own committed session, no mobile overflow, zero guess charge. No lookalike HTML or screenshots/calllogs containing secrets. Existing unchanged projection/format/teacher safety proofs reused."
+    }
+  ],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "stage": "actual-app"
+}

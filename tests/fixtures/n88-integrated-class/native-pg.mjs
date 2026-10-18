@@ -68,6 +68,8 @@ export async function startNativePg(root,{historicalReservationFixture=false}={}
     }
     await admin.query(await readFile(path.join(root,'drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql'),'utf8'));
     await admin.query(await readFile(path.join(root,'supabase/migrations/20261018110713_n88_six_digit_staged.sql'),'utf8'));
+    await admin.query(await readFile(path.join(root,'drafts/n88-student-portal/activation/shared-network-preflight.inactive.sql'),'utf8'));
+    await admin.query(await readFile(path.join(root,'supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql'),'utf8'));
     await admin.query('reset role');
     await admin.query(await readFile(path.join(parent,'seed.sql'),'utf8'));
     pool=new Pool(config);

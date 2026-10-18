@@ -1,0 +1,11 @@
+{
+  "taskId": "continuous-n88-shared-network-success-budget-20261018",
+  "runId": "151cbf7c-52a6-4fc7-96a5-b899497b8c6f",
+  "checks": [
+    {
+      "name": "n88_shared_network_source_global_flood_isolation_uniform_denial_inactive_activation",
+      "status": "PASS",
+      "evidence": "Current LF source and exact output hashes verified; fresh fourth CLI migration equals proposal, native readback includes private attempts/RLS/guard. Missing attempt-table identity rejects. Separate numeric budgets explicit, six-v1 unchanged, all readiness/activation OFF and disabled gateway reads no secrets. Unchanged browser graph/SW hashes reuse prior exclusions. Actual source/global/flood/uniform-denial proof is in shared-network report."
+    }
+  ]
+}

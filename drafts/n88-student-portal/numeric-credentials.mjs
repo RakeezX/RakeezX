@@ -5,7 +5,8 @@ import { PRIVATE_HEADERS } from './service.mjs';
 export const CREDENTIAL_FORMAT = 'six-v1';
 export const CREDENTIAL_CAPACITY = 100_000;
 export const NUMERIC_POLICY = Object.freeze({ collisionBudget: 128, sessionMs: 8*60*60_000,
-  windowMs: 15*60_000, clientAttempts: 6, globalAttempts: 100, maxRateKeys: 10000 });
+  windowMs: 15*60_000, clientAttempts: 6, globalAttempts: 100, maxRateKeys: 10000,
+  sourceRequests: 120, globalRequests: 1200, maxAttempts: 10000 });
 export const generateNumericCredential = () => '1' + String(randomInt(0, 100_000)).padStart(5, '0');
 // Explicit paste policy: remove leading/trailing ASCII SPACE only. No other coercion.
 export function normalizeNumericCredential(value) {
@@ -90,27 +91,46 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
         const claim=(request.path==='/student/claim'||request.path==='/api/n88/student/claim')&&request.method==='POST';
         // Commit verified ingress and budgets BEFORE loading credential state.
         // Later authentication/session/source rollback cannot undo this debit.
+        let attempt;
         if(claim) {
-          if(typeof repository.claimAttempt!=='function')return response(denied());
-          const allowed=await repository.claimAttempt(async(db,ports)=>{
+          if(typeof repository.claimAttempt!=='function' || typeof repository.commitAttemptSession!=='function' || typeof repository.settleAttempt!=='function')return response(denied());
+          attempt=await repository.claimAttempt(async(db,ports)=>{
             const ingress=await verifyIngress(request,ports);
             if(!ingress?.clientKey)return false;
             const time=now();
-            // Debit BOTH durable budgets before format checking or credential lookup.
+            // Flood counts ALL requests and is never refunded. Guess counts include
+            // provisional inflight requests, and only own COMMIT-proven success settles.
             db.numericRates=db.numericRates.filter(r=>r.until>time);
-            const budgets=[[mac(reservationKey,'client-rate',ingress.clientKey),NUMERIC_POLICY.clientAttempts],['global',NUMERIC_POLICY.globalAttempts]];
-            let blocked=false;
-            for(const [key,max] of budgets) {
+            db.numericAttempts=db.numericAttempts.filter(a=>a.until>time);
+            const source=mac(reservationKey,'client-rate',ingress.clientKey);
+            const get=(key,max)=>{
               let b=db.numericRates.find(b=>b.key===key);
-              if(!b && db.numericRates.length<NUMERIC_POLICY.maxRateKeys) db.numericRates.push(b={key,count:0,until:time+NUMERIC_POLICY.windowMs});
-              if(!b || b.count>=max) blocked=true;
-              if(b) b.count=Math.min(max,b.count+1);
+              if(!b && db.numericRates.length<NUMERIC_POLICY.maxRateKeys)db.numericRates.push(b={key,count:0,until:time+NUMERIC_POLICY.windowMs,epoch:randomUUID()});
+              if(b && !b.epoch)b.epoch=randomUUID(); // retain legacy counts/window
+              return b;
+            };
+            let blocked=false;
+            for(const [key,max] of [[mac(reservationKey,'source-flood',ingress.clientKey),NUMERIC_POLICY.sourceRequests],[mac(reservationKey,'global-flood'),NUMERIC_POLICY.globalRequests]]) {
+              const b=get(key,max);if(!b || b.count>=max)blocked=true;
+              if(b)b.count=Math.min(max,b.count+1);
             }
-            return !blocked;
+            if(blocked)return null;
+            const budgets=[[source,NUMERIC_POLICY.clientAttempts],['global',NUMERIC_POLICY.globalAttempts]],buckets=[];
+            for(const [key,max] of budgets) {
+              const b=get(key,max);
+              if(!b || b.count>=max) blocked=true;
+              if(b)buckets.push(b);
+            }
+            // Exhaustion denies BEFORE lookup, without inventing an attempt/credit.
+            if(blocked || db.numericAttempts.length>=NUMERIC_POLICY.maxAttempts)return null;
+            for(const b of buckets)b.count++;
+            const a={id:randomUUID(),buckets:buckets.map(({key,epoch,until})=>({key,epoch,until})),
+              until:Math.max(...buckets.map(b=>b.until)),sessionId:null,settled:false};
+            db.numericAttempts.push(a);return a.id;
           });
-          if(!allowed)return response(denied());
+          if(!attempt)return response(denied());
         }
-        return response(await repository.transaction(async(db,ports)=>{
+        const authenticate=async(db,ports)=>{
         const ingress=claim ? {clientKey:'prepaid'} : await verifyIngress(request,ports);
         const {headers={},method,body={}}=request;
         const path=request.path.startsWith('/student/')?'/api/n88'+request.path:request.path;
@@ -151,7 +171,16 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
           s.revokedAt=time; return denied();
         }
         return {status:200,body:await project(db,m,ports)};
-      })); } catch { return response(denied()); } // no SQL/error/credential enumeration
+      };
+        if(!claim)return response(await repository.transaction(authenticate));
+        // The repository creates an opaque capability ONLY after acknowledged
+        // COMMIT of a new session bound to this admission. No response flag is proof.
+        const committed=await repository.commitAttemptSession(attempt,authenticate);
+        if(committed.proof) {
+          try{await repository.settleAttempt(committed.proof,now());}catch{/* conservative charge retention */}
+        }
+        return response(committed.value);
+      } catch { return response(denied()); } // no SQL/error/credential enumeration
     };
   }
   return Object.freeze({issueMember,rotateMember,revokeMember,createStudentHandler});

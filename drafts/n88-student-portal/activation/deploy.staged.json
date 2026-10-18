@@ -2,7 +2,7 @@
   "aiAuthored": true,
   "enabled": false,
   "projectId": "xlrubcwjqktzzunrvuns",
-  "migration": "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
+  "migration": "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
   "function": {
     "name": "n88-student-portal",
     "entry": "bundle/edge/index.mjs",
@@ -74,19 +74,21 @@
   "migrations": [
     "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
     "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
-    "supabase/migrations/20261018110713_n88_six_digit_staged.sql"
+    "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
+    "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql"
   ],
   "requiredPreflight": [
     "prior-20261018-preflight.inactive.sql (before fresh baseline only)",
     "integrated-preflight.inactive.sql (after baseline, before extension)",
     "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families",
-    "six-digit-preflight.inactive.sql (after integrated extension, before six-v1 amendment)"
+    "six-digit-preflight.inactive.sql (after integrated extension, before six-v1 amendment)",
+    "shared-network-preflight.inactive.sql (after six-v1, before attempt/epoch amendment; compare prior-shared-budget-expected-identities.json first)"
   ],
   "qualification": {
     "state": "LOCAL_READY",
     "scope": "inactive source-only local application/service/PG preparation",
     "actualAppJourney": "tests/n88-six-digit-journey.json",
-    "changedServiceBoundaries": "tests/n88-six-digit-security.json",
+    "changedServiceBoundaries": "tests/n88-six-digit-shared-network.json",
     "currentExpectedIdentitySnapshot": "integrated-expected-identities.json",
     "metadataContract": "integrated-metadata-contract.json",
     "readbackVerifier": "../integrated-readback.mjs",
@@ -100,6 +102,13 @@
       "evidence": "docs/automation-evidence/20261018/N88_SIX_DIGIT_UNIFIED_CODE.md",
       "verifiedRunId": "f6931c38-05f6-4d7d-bf8c-0a9e3ba95681",
       "reusedUiEvidenceRunId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45"
+    },
+    "sharedNetworkAmendment": {
+      "sourceReady": true,
+      "liveActivation": false,
+      "taskId": "continuous-n88-shared-network-success-budget-20261018",
+      "runId": "151cbf7c-52a6-4fc7-96a5-b899497b8c6f",
+      "evidence": "docs/automation-evidence/20261018/N88_SHARED_NETWORK_SUCCESS_BUDGET.md"
     }
   },
   "credentialContract": {
@@ -107,5 +116,19 @@
     "pattern": "^1[0-9]{5}$",
     "capacity": 100000,
     "historicalReservationRewrite": false
+  },
+  "budgetContract": {
+    "revision": "committed-success-settlement-v1",
+    "windowMs": 900000,
+    "failedGuesses": {
+      "source": 6,
+      "global": 100
+    },
+    "allRequests": {
+      "source": 120,
+      "global": 1200
+    },
+    "maxAttempts": 10000,
+    "unknownCommit": "retain-charge-no-automatic-recovery"
   }
 }

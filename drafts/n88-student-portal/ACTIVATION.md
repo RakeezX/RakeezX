@@ -182,3 +182,28 @@ fields and progress; no student name, class, owner, scores or source IDs.
 
 Current local evidence and retained original failures are recorded in
 `docs/automation-evidence/20261018/N88_EXISTING_HOST_COMPLETION.md`.
+
+## Current shared-network budget amendment — 18 October 2026
+
+The current source appends `shared-network-budget.inactive.sql` via fresh CLI-created
+`20261018114113_n88_shared_network_budget_staged.sql`, AFTER all three earlier staged
+migrations. Run `activation/shared-network-preflight.inactive.sql` before this fourth
+amendment; separately authorized hosted work must compare the full prior metadata
+snapshot `activation/prior-shared-budget-expected-identities.json` first. Earlier
+migration files and dated proofs remain unchanged. Current manifest/readback describes
+four versions, the new private attempt binding guard and the epoch-aware rate payload.
+
+Failed-guess limits remain source6/global100 per15minutes. Every admitted claim also
+consumes independent source120/global1200 request-flood budgets; those never refund.
+Only an opaque in-process repository capability minted AFTER a new session's durable
+COMMIT acknowledgement can settle its own original source/global/epoch/window debit
+once. No browser flag/receipt is accepted. Failed/unknown session outcomes retain debit;
+a restart never recovers an ambiguous success into credit. Receipts expire with their
+original windows and bounded cleanup occurs on the next admitted ingress phase.
+
+Current evidence: `docs/automation-evidence/20261018/N88_SHARED_NETWORK_SUCCESS_BUDGET.md`.
+The unchanged launcher serves the final actual teacher class/universal student routes
+against the same fabricated gateway/Auth/native PG; its receipt now identifies
+`committed-success-settlement-v1`. N88_ENABLED, routes and browser readiness stay OFF.
+This source-only amendment neither authorizes nor performs hosted migration/service
+application, real identities, messages or student access activation.

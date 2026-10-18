@@ -10,6 +10,7 @@ param(
 $ErrorActionPreference = 'Stop'
 if ($Help -or $Extra -contains '--help') {
   Write-Output 'N88 local synthetic review only. Live service remains disabled.'
+  Write-Output 'Current six-v1 source uses committed-success settlement and separate durable all-request flood budgets.'
   Write-Output 'Start: powershell -NoProfile -File drafts/n88-student-portal/current-review-launch.ps1 [-TtlSeconds 14400] [-Receipt <path>]'
   Write-Output 'Stop:  powershell -NoProfile -File drafts/n88-student-portal/current-review-launch.ps1 -Stop -Receipt <returned receipt path>'
   Write-Output 'TTL defaults to 4 hours, maximum 8 hours. Returns teacher URL, exact PID/birth and expiresAt. Installed Node/PG only; no downloads.'

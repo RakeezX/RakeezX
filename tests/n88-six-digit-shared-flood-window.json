@@ -1,0 +1,15 @@
+{
+  "taskId": "continuous-n88-shared-network-success-budget-20261018",
+  "runId": "151cbf7c-52a6-4fc7-96a5-b899497b8c6f",
+  "checks": [
+    {
+      "name": "global_all_request_flood_and_elapsed_window",
+      "status": "PASS",
+      "evidence": "Two actual trusted sources identify shared all-request bucket. Owned fabricated high-water1199 permits one committed success, then rejects fresh-source valid claim before numeric lookup at1200; global failed-guess remains zero. NativePG/service restart retains flood cap. Explicit elapsed-window fixture allows next real claim with new epoch/count1, no transfer of prior debit/credit. Source120 cap is independently exercised by120 actual successes in main report."
+    }
+  ],
+  "cleanup": {
+    "ownedHttpAndNativePgClosed": true,
+    "lease": "RELEASED integration"
+  }
+}

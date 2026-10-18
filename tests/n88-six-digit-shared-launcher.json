@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n88-shared-network-success-budget-20261018",
+  "runId": "151cbf7c-52a6-4fc7-96a5-b899497b8c6f",
+  "checks": [
+    {
+      "name": "final_source_review_launcher",
+      "status": "PASS",
+      "evidence": "Actual hidden PowerShell launcher returns six-v1/committed-success-settlement-v1 receipt and actual teacher class/student documents over owned loopback HTTP. Owned PID/birth shutdown closes server/native PG and removes cluster; own receipt removed. Actual app DOM login is covered by shared-network report."
+    }
+  ],
+  "cleanup": {
+    "lease": "RELEASED integration"
+  }
+}
