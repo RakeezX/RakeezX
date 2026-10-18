@@ -120,7 +120,7 @@
     "drafts/n88-student-portal/runtime.mjs": "0c2abe8d798b302656c4a13d46c2ada6035b1e1afa2401c7c1a1c5a553e8b2c2",
     "drafts/n88-student-portal/web-protocol.mjs": "22b77196c6b514c6911785373b907b78b23275c57d7042351e85613a2b4c774c",
     "drafts/n88-student-portal/web-entry.mjs": "fe079ed58f6b066d3b23048a51f5c96e0ea318ca7eca0caa9e825cd4a071bef5",
-    "drafts/n88-student-portal/existing-host.mjs": "5507ba08fc97258ce38c2ca3904a11d93ba3d81842e8029e313896c355c92e74",
+    "drafts/n88-student-portal/existing-host.mjs": "afff928c72ec1c54233323cc77fc9308f3f0e2e0216cafbd29ef2c366f2fc989",
     "supabase/functions/n88-student-portal/index.ts": "591d1fae83050d391db2300cb6026eca7f41e61787cce677bee499c0bbacf7b6",
     "drafts/n88-student-portal/cloudflare-entry.mjs": "0783901aaa1b793587aef871055574e3a49fefc46d075db345c9390efbe42c80",
     "src/lib/student-portal-unified-client.js": "f9db53a368d670784e1cb5122b7dac057b2e3da4a4900eb034ed33ae2c54188b",
@@ -246,7 +246,7 @@
     "drafts/n88-student-portal/package-lock.json": "014b58d8a27a30c8e9d13cf0211f0ef12d90007c41e295cfa330d95d0459d88a"
   },
   "outputs": {
-    "edge/index.mjs": "e7450e699b9e12b00b749d17b11f929b2fc8ad108defbedd94ce835e5966cc55",
+    "edge/index.mjs": "f5af76747a4f7b4b07471482d76f261776101b62f3ac4389feec6764f4f8fdd6",
     "cloudflare/worker.mjs": "d3867a9f96278c2c4ae4e270df3284789c4b1a2704e07fcee6789e0f0daec32d",
     "private/assets/student.mjs": "f88d908955ca2039816a6e8233b4a47de0ac8f450095449c7ce892a4ab37f0dc",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",

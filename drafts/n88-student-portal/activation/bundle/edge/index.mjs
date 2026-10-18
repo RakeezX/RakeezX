@@ -2135,6 +2135,22 @@ function createWebEntry(options) {
 }
 
 // drafts/n88-student-portal/existing-host.mjs
+async function assertPrivateDatabaseSession(client) {
+  const result2 = await client.query(`select current_user as role,
+    current_setting('log_error_verbosity') as error_verbosity,
+    current_setting('log_parameter_max_length_on_error') as error_parameters,
+    current_setting('log_statement') as statements,
+    current_setting('log_min_duration_statement') as duration,
+    current_setting('log_min_duration_sample') as duration_sample,
+    current_setting('log_transaction_sample_rate') as transaction_sample,
+    current_setting('pgaudit.log',true) as audit,
+    (select setting from pg_settings where name='auto_explain.log_min_duration') as explain_duration,
+    current_setting('auto_explain.log_nested_statements',true) as explain_nested`);
+  const r = result2.rows?.[0];
+  const explainSafe = r && (r.explain_duration == null || r.explain_duration === "-1" || /^\d+$/.test(r.explain_duration) && Number(r.explain_duration) > 3e3 && r.explain_nested === "off");
+  if (result2.rows?.length !== 1 || !r || r.role !== "n88_backend" || r.error_verbosity !== "terse" || r.error_parameters !== "0" || !["none", "ddl"].includes(r.statements) || r.duration !== "-1" || r.duration_sample !== "-1" || Number(r.transaction_sample) !== 0 || r.transaction_sample == null || ![null, "none"].includes(r.audit) || !explainSafe)
+    throw Error("n88_database_unavailable");
+}
 function createExistingHost(readEnv) {
   if (readEnv("N88_ENABLED") !== "true") return Object.freeze({ handle: async () => privateResponse(), close: async () => {
   } });
@@ -2181,7 +2197,7 @@ function createExistingHost(readEnv) {
     let client;
     try {
       client = await pool.connect();
-      if ((await client.query("select current_user as role")).rows[0]?.role !== "n88_backend") throw Error("n88_database_role");
+      await assertPrivateDatabaseSession(client);
       return client;
     } catch {
       client?.release(Error("n88_database_unavailable"));

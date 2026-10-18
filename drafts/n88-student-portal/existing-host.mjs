@@ -6,6 +6,30 @@ import pg from 'pg';
 import manifest from './deployment.inactive.json' with {type:'json'};
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
+// Source-side error redaction cannot prevent the database server logging DETAIL.
+// Read only effective session settings before granting the repository this client.
+export async function assertPrivateDatabaseSession(client) {
+  const result=await client.query(`select current_user as role,
+    current_setting('log_error_verbosity') as error_verbosity,
+    current_setting('log_parameter_max_length_on_error') as error_parameters,
+    current_setting('log_statement') as statements,
+    current_setting('log_min_duration_statement') as duration,
+    current_setting('log_min_duration_sample') as duration_sample,
+    current_setting('log_transaction_sample_rate') as transaction_sample,
+    current_setting('pgaudit.log',true) as audit,
+    (select setting from pg_settings where name='auto_explain.log_min_duration') as explain_duration,
+    current_setting('auto_explain.log_nested_statements',true) as explain_nested`);
+  const r=result.rows?.[0];
+  // Statements have a hard3s timeout. An explain threshold above that cannot
+  // capture a completed private statement; missing extension settings are inert.
+  const explainSafe=r && (r.explain_duration==null || r.explain_duration==='-1' ||
+    /^\d+$/.test(r.explain_duration) && Number(r.explain_duration)>3000 && r.explain_nested==='off');
+  if(result.rows?.length!==1 || !r || r.role!=='n88_backend' || r.error_verbosity!=='terse' ||
+    r.error_parameters!=='0' || !['none','ddl'].includes(r.statements) ||
+    r.duration!=='-1' || r.duration_sample!=='-1' || Number(r.transaction_sample)!==0 ||
+    r.transaction_sample==null || ![null,'none'].includes(r.audit) || !explainSafe)
+    throw Error('n88_database_unavailable');
+}
 export function createExistingHost(readEnv) {
   if(readEnv('N88_ENABLED')!=='true')return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});
   const required=n=>{const v=readEnv(n);if(typeof v!=='string' || !v)throw Error('n88_configuration');return v;};
@@ -35,7 +59,7 @@ export function createExistingHost(readEnv) {
     let client;
     try {
       client=await pool.connect();
-      if((await client.query('select current_user as role')).rows[0]?.role!=='n88_backend')throw Error('n88_database_role');
+      await assertPrivateDatabaseSession(client);
       return client;
     }catch{client?.release(Error('n88_database_unavailable'));throw Error('n88_database_unavailable');}
     finally{waiting--;}

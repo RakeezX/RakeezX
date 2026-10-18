@@ -146,3 +146,58 @@ Resume this saved session only after a material correction supplies the exact
 authorized transformation metadata readback; refresh phase baselines before DDL.
 Logpush emptiness alone is not full private-logging/ingress readiness. Actual
 service, hosted fixture and original-publisher acceptance gates remain unrun.
+
+## Read-scope correction and database privacy guard — run4c5a66bc
+
+The approved read-only scope correction resolved the managed-header refusal:
+the exact GET returned200. All listed managed request transforms are disabled,
+including `remove_visitor_ip_headers`. The zone has no entrypoint in the exact
+`http_log_custom_fields`, `http_request_late_transform` or `http_request_transform`
+phases (provider10003 could-not-find, not a permission failure). No settings changed.
+Prior successful Logpush, native identity, catalog and encrypted custody proofs
+were reused; no OAuth/crypto/browser/full-suite repetition occurred.
+
+The next actual pre-DDL privacy readback found PostgreSQL
+`log_error_verbosity=default`, `log_statement=ddl`,
+`log_parameter_max_length_on_error=0` and `log_min_error_statement=error`.
+`n88_backend` remains absent. Error bind suppression does not remove server
+DETAIL/HINT/CONTEXT fields, and application-side catches do not control that
+server sink. A direct literal SCRAM-verifier ALTER ROLE also cannot be assumed
+private under DDL logging. No verifier/password/key was generated or sent to
+hosted SQL, and no actual private leak was induced or observed.
+
+A concrete source guard now checks the effective restricted session before the
+repository receives its connection. It rejects server DETAIL capture, private
+statement/parameter logging, sampling/audit capture and unsafe explain thresholds.
+It preserves current_user=n88_backend and destroys an unsafe/unreadable client
+through the existing generic unavailable path. It never changes logging, grants
+SET privileges or alters provider configuration. Statement timeouts/verified TLS,
+owner/source/session/ACK guards and all six immutable migrations remain intact.
+
+The actual exported guard passed20 metadata cases. The actual signed gateway ->
+Web entry -> service/repository -> bound Pool acquisition rejected the observed
+default-verbosity fixture with generic401, released the connection and issued
+exactly one metadata query and zero private/canonical queries. Only DB/Auth
+transport packages were fabricated, no server or browser. Initial fixture
+configuration/header/status-expectation failures remain preserved. These checks
+prove the new guard, not an activated backend or physical-device journey.
+
+The inert Edge bundle was refreshed only for this changed source; Cloudflare,
+private document/CSS/brand and teacher graphs are unchanged. All live gates remain
+OFF. Provider/database writes, fixtures, messages, deployment and publication
+remain zero. Nothing owned was deployed or needs hosted disarm/cleanup.
+
+See [provider/database privacy receipt](../../../drafts/n88-student-portal/activation/provider-privacy-readback.json),
+[bound service guard proof](../../../tests/n88-official-activation-db-privacy.json)
+and [original fixture failures](../../../tests/n88-official-activation-db-privacy-initial-failure.json).
+PostgreSQL's [logging contract](https://www.postgresql.org/docs/17/runtime-config-logging.html)
+and Supabase's [logging configuration](https://supabase.com/docs/guides/database/postgres/postgres-log-config)
+explain the observed sink. Existing provider transport and protected SCRAM recipes
+remain available; neither is falsely reported as a missing named provisioning API.
+
+Activation is BLOCKED until a supported, explicitly authorized per-service
+no-private-DETAIL/no-secret-capture disposition satisfies the actual session guard
+and credential-custody gate without violating the no-logging-downgrade boundary.
+No global logging reduction, new parameter privileges, managed policy change or
+SQL rewrite was attempted. Resume the same candidate/session after that material
+correction; fresh phase baselines remain mandatory immediately before DDL.
