@@ -35,6 +35,7 @@ const importMap=JSON.stringify({imports:JSON.parse(await readFile(out+'edge/deno
 await writeFile(out+'edge/import_map.json',importMap);manifest.outputs['edge/import_map.json']=hash(importMap);
 for(const file of ['scripts/n44-activation-prepare.mjs','scripts/n44-activation-bundle.mjs','scripts/n44-activation-readback.mjs',
  'supabase/migrations/20261018044448_n44_exact_activation_staged.sql',
+ 'supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql','scripts/n44-activation-custody.mjs','drafts/n44-push/activation/build-error-boundary.mjs',
  ...['metadata-contract.json','preflight.inactive.sql','readback.inactive.sql','identities.inactive.sql','expected-identities.json','deploy.staged.json','supabase.staged.toml','wrangler.staged.toml','scheduler.staged.toml','toolchain.json','client-readiness.json','.gitattributes'].map(f=>dir+f),
  ...['schema-proposal.sql','existing-host.inactive.sql','canonical-source.inactive.sql','package-lock.json','deployment.inactive.json'].map(f=>'drafts/n44-push/'+f)])manifest.sources[file]=await textHash(file);
 await writeFile(dir+'manifest.json',JSON.stringify(manifest,null,2)+'\n');

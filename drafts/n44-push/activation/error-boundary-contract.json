@@ -1,0 +1,1047 @@
+{
+  "version": 1,
+  "encoding": "bound-base64-pg-text-v1",
+  "controls": [
+    "begin",
+    "begin isolation level read committed",
+    "commit",
+    "release savepoint n44_owner",
+    "rollback",
+    "rollback to savepoint n44_owner",
+    "savepoint n44_owner",
+    "set local idle_in_transaction_session_timeout='10000ms'",
+    "set local idle_in_transaction_session_timeout='15000ms'",
+    "set local lock_timeout='1000ms'",
+    "set local lock_timeout='3000ms'",
+    "set local statement_timeout='3000ms'",
+    "set local statement_timeout='6000ms'",
+    "set local synchronous_commit=on"
+  ],
+  "sources": [
+    {
+      "file": "drafts/n44-push/postgres-repository.mjs",
+      "sha256": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd"
+    },
+    {
+      "file": "drafts/n44-push/backend.mjs",
+      "sha256": "eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2"
+    },
+    {
+      "file": "drafts/n44-push/auth-verifier.mjs",
+      "sha256": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b"
+    },
+    {
+      "file": "drafts/n44-push/canonical-source.mjs",
+      "sha256": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355"
+    }
+  ],
+  "operations": [
+    {
+      "sql": "delete from n44_push_draft.budgets where owner_id=$1 and budget_key=$2",
+      "name": "boundary_9e1807d6f453dbedb9809f39",
+      "parameters": [
+        "uuid",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.contexts where (owner_id,workspace_id,device_id) in\n      (select c.owner_id,c.workspace_id,c.device_id from n44_push_draft.contexts c where c.owner_id=$1 and c.session_expires_at_ms<$2\n       and not exists(select 1 from n44_push_draft.registrations r where r.owner_id=c.owner_id and r.workspace_id=c.workspace_id and r.device_id=c.device_id)\n       and not exists(select 1 from n44_push_draft.events e where e.owner_id=c.owner_id and e.workspace_id=c.workspace_id and e.device_id=c.device_id)\n       order by c.workspace_id,c.device_id limit 100)",
+      "name": "boundary_4d3cee78bbdb4f757213f84a",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.contexts where owner_id=$1 and workspace_id=$2 and device_id=$3",
+      "name": "boundary_8d32ef84bf2998c8aec71bd2",
+      "parameters": [
+        "uuid",
+        "text",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.deliveries where owner_id=$1 and workspace_id=$2 and device_id=$3 and event_id=$4",
+      "name": "boundary_1f67d69c789e10b899db588c",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.endpoint_claims where owner_id=$1 and fingerprint=$2 and registration_id=$3",
+      "name": "boundary_a100b221e6220eb46733c104",
+      "parameters": [
+        "uuid",
+        "text",
+        "uuid"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.events where owner_id=$1 and expires_at_ms<$2",
+      "name": "boundary_697dbe22cb8ee13cb70e0454",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5",
+      "name": "boundary_f12b405d648c662c0a1bf70b",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.ingress_nonces where nonce in(select nonce from n44_push_draft.ingress_nonces where expires_at_ms<$1 order by expires_at_ms limit 100 for update skip locked)",
+      "name": "boundary_f4119f9243f2c69562d54a9a",
+      "parameters": [
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.ingress_rates where key in(select key from n44_push_draft.ingress_rates where expires_at_ms<$1 order by expires_at_ms limit 100 for update skip locked)",
+      "name": "boundary_958d83492a17880874f4d951",
+      "parameters": [
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n44_push_draft.registrations where owner_id=$1 and registration_id=$2",
+      "name": "boundary_0963bbb5e4e36d2618b76f49",
+      "parameters": [
+        "uuid",
+        "uuid"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "insert into n44_push_draft.budgets (owner_id,budget_key,bucket,count,expires_at_ms) values ($1,$2,$3,$4,$5) on conflict (owner_id,budget_key) do update set bucket=excluded.bucket,count=excluded.count,expires_at_ms=excluded.expires_at_ms",
+      "name": "boundary_72b37da672df631cd5ffdf89",
+      "parameters": [
+        "uuid",
+        "text",
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.contexts (owner_id,workspace_id,device_id,active,session_id,session_revision,session_expires_at_ms,consent_revision,push_consent,preferences) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) on conflict (owner_id,workspace_id,device_id) do update set active=excluded.active,session_id=excluded.session_id,session_revision=excluded.session_revision,session_expires_at_ms=excluded.session_expires_at_ms,consent_revision=excluded.consent_revision,push_consent=excluded.push_consent,preferences=excluded.preferences",
+      "name": "boundary_2d3d6a94c46add59c6218ca9",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "boolean",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "boolean",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.deliveries (owner_id,workspace_id,device_id,event_id,registration_id,kind,action_path,expires_at_ms,attempts,state,started_at_ms,next_at_ms) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) on conflict (owner_id,workspace_id,device_id,event_id) do update set registration_id=excluded.registration_id,kind=excluded.kind,action_path=excluded.action_path,expires_at_ms=excluded.expires_at_ms,attempts=excluded.attempts,state=excluded.state,started_at_ms=excluded.started_at_ms,next_at_ms=excluded.next_at_ms",
+      "name": "boundary_57d83ba2323270546aa35a7a",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "uuid",
+        "text",
+        "text",
+        "bigint",
+        "smallint",
+        "text",
+        "bigint",
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.endpoint_claims(fingerprint,owner_id,registration_id) values ($1,$2,$3)",
+      "name": "boundary_571c1a4b4896750f1651fee0",
+      "parameters": [
+        "text",
+        "uuid",
+        "uuid"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.events values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+      "name": "boundary_08b402c7cddf335f98d6f8b1",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "bigint",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.ingress_nonces(nonce,scope,expires_at_ms) values($1,$2,$3) on conflict do nothing returning nonce",
+      "name": "boundary_2c43bf7a0025aee704aaf82a",
+      "parameters": [
+        "uuid",
+        "text",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "nonce",
+          "type": "uuid",
+          "oid": 2950
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.ingress_rates(key,bucket,count,expires_at_ms,kind) values($1,$2,1,$3,$5)\n   on conflict(key) do update set bucket=excluded.bucket,count=case when ingress_rates.bucket=excluded.bucket then ingress_rates.count+1 else 1 end,expires_at_ms=excluded.expires_at_ms\n   where ingress_rates.bucket<>excluded.bucket or ingress_rates.count<$4 returning count",
+      "name": "boundary_20790036fac6c275f03edd5b",
+      "parameters": [
+        "text",
+        "bigint",
+        "bigint",
+        "integer",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "count",
+          "type": "integer",
+          "oid": 23
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.owner_clock(owner_id,high_water_ms) values ($1,0) on conflict (owner_id) do nothing",
+      "name": "boundary_57d6dbe5ee3c94681d78bab0",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n44_push_draft.registrations (owner_id,registration_id,workspace_id,device_id,session_id,session_revision,consent_revision,state,expires_at_ms,sealed,fingerprint,binding_fingerprint) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) on conflict (owner_id,registration_id) do update set workspace_id=excluded.workspace_id,device_id=excluded.device_id,session_id=excluded.session_id,session_revision=excluded.session_revision,consent_revision=excluded.consent_revision,state=excluded.state,expires_at_ms=excluded.expires_at_ms,sealed=excluded.sealed,fingerprint=excluded.fingerprint,binding_fingerprint=excluded.binding_fingerprint",
+      "name": "boundary_833ceede5c0a62e801d753b1",
+      "parameters": [
+        "uuid",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "text",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "select (extract(epoch from (($1::date+$2::time) at time zone $3))*1000)::bigint::text as ms",
+      "name": "boundary_350c9c4a986b92433b3dd0eb",
+      "parameters": [
+        "date",
+        "time without time zone",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "ms",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select * from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and event_id=$4",
+      "name": "boundary_93cef969458b6f604774a29e",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "owner_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "workspace_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "device_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_kind",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_stamp",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "due_at_ms",
+          "type": "bigint",
+          "oid": 20
+        },
+        {
+          "name": "expires_at_ms",
+          "type": "bigint",
+          "oid": 20
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select * from n44_push_draft.events where owner_id=$1 order by workspace_id,device_id,event_id limit 101",
+      "name": "boundary_4c02517c5dfbdffd1c5b454c",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [
+        {
+          "name": "owner_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "workspace_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "device_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_kind",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_stamp",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "due_at_ms",
+          "type": "bigint",
+          "oid": 20
+        },
+        {
+          "name": "expires_at_ms",
+          "type": "bigint",
+          "oid": 20
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select budget_key,bucket::text as bucket,count,expires_at_ms::text as expires_at_ms from n44_push_draft.budgets where owner_id=$1 limit $2",
+      "name": "boundary_7336f6d16dcf854f092f8756",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "budget_key",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "bucket",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "count",
+          "type": "integer",
+          "oid": 23
+        },
+        {
+          "name": "expires_at_ms",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select distinct source_stamp from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5",
+      "name": "boundary_fccb5d5603d6024dad280c6a",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "source_stamp",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select e.*,r.registration_id from n44_push_draft.events e\n   join n44_push_draft.registrations r on r.owner_id=e.owner_id and r.workspace_id=e.workspace_id and r.device_id=e.device_id\n   left join n44_push_draft.deliveries d on d.owner_id=e.owner_id and d.workspace_id=e.workspace_id and d.device_id=e.device_id and d.event_id=e.event_id\n   where e.due_at_ms<=$1 and e.expires_at_ms>$1 and r.state='active' and r.expires_at_ms>$1\n   and (d.state is null or d.state='retry' and d.next_at_ms<=$1)\n   and (e.due_at_ms,e.owner_id,e.workspace_id,e.device_id,e.event_id,r.registration_id)>($2,$3::uuid,$4,$5,$6,$7::uuid)\n   order by e.due_at_ms,e.owner_id,e.workspace_id,e.device_id,e.event_id,r.registration_id limit $8",
+      "name": "boundary_ed6266829f26128220d17b4f",
+      "parameters": [
+        "bigint",
+        "bigint",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "uuid",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "owner_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "workspace_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "device_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_kind",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "source_stamp",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "due_at_ms",
+          "type": "bigint",
+          "oid": 20
+        },
+        {
+          "name": "expires_at_ms",
+          "type": "bigint",
+          "oid": 20
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        },
+        {
+          "name": "registration_id",
+          "type": "uuid",
+          "oid": 2950
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select event_id from n44_push_draft.events where owner_id=$1 limit 101",
+      "name": "boundary_b7889ac22eace9e5a9d26592",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [
+        {
+          "name": "event_id",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select fingerprint,registration_id from n44_push_draft.endpoint_claims where owner_id=$1 limit $2",
+      "name": "boundary_0657f8ea1df759451545fc97",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "fingerprint",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "registration_id",
+          "type": "uuid",
+          "oid": 2950
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select floor(extract(epoch from clock_timestamp())*1000)::bigint::text as now_ms",
+      "name": "boundary_023fe46060e1428d8c69aecf",
+      "parameters": [],
+      "output": [
+        {
+          "name": "now_ms",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select high_water_ms::text as high_water_ms from n44_push_draft.owner_clock where owner_id=$1 for update",
+      "name": "boundary_357fab36c862af9b35603721",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [
+        {
+          "name": "high_water_ms",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select key from n44_push_draft.ingress_rates where kind=$1 limit 2049",
+      "name": "boundary_09d8680e5bc700fdfd80e133",
+      "parameters": [
+        "text"
+      ],
+      "output": [
+        {
+          "name": "key",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select n44_push_draft.read_source($1::uuid,$2::text,$3::text) as source",
+      "name": "boundary_e5608f0030522cd46dc1e398",
+      "parameters": [
+        "uuid",
+        "text",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "source",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select nonce from n44_push_draft.ingress_nonces where scope=$1 limit $2",
+      "name": "boundary_9f189e29d3d1075a21008022",
+      "parameters": [
+        "text",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "nonce",
+          "type": "uuid",
+          "oid": 2950
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select owner_id from n44_push_draft.owner_clock where next_cleanup_ms<=$1 order by next_cleanup_ms,owner_id limit $2 for update skip locked",
+      "name": "boundary_cb6b899cd42acdb1d185e923",
+      "parameters": [
+        "bigint",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "owner_id",
+          "type": "uuid",
+          "oid": 2950
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select owner_id from n44_push_draft.owner_clock where owner_id=$1 for update",
+      "name": "boundary_eaec15024b66e2fdb8d82ac8",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [
+        {
+          "name": "owner_id",
+          "type": "uuid",
+          "oid": 2950
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select pg_advisory_xact_lock(44001,hashtext($1))",
+      "name": "boundary_8c5c3b9f064a030860af0a50",
+      "parameters": [
+        "text"
+      ],
+      "output": [
+        {
+          "name": "pg_advisory_xact_lock",
+          "type": "void",
+          "oid": 2278
+        }
+      ],
+      "effect": false,
+      "voidResult": true,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select pg_advisory_xact_lock(44002,hashtext($1))",
+      "name": "boundary_60c5663ba998b06c67fa4941",
+      "parameters": [
+        "text"
+      ],
+      "output": [
+        {
+          "name": "pg_advisory_xact_lock",
+          "type": "void",
+          "oid": 2278
+        }
+      ],
+      "effect": false,
+      "voidResult": true,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select registration_id,workspace_id,device_id,session_id,session_revision,consent_revision,state,expires_at_ms::text as expires_at_ms,sealed,fingerprint,binding_fingerprint from n44_push_draft.registrations where owner_id=$1 limit $2",
+      "name": "boundary_08270c0bd4eb5e36c5b58065",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "registration_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "workspace_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "device_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "session_revision",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "consent_revision",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "expires_at_ms",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "sealed",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "fingerprint",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "binding_fingerprint",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)",
+      "name": "boundary_ad31702f95cafad7fa108a0b",
+      "parameters": [
+        "uuid",
+        "uuid"
+      ],
+      "output": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "session_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "not_after_ms",
+          "type": "bigint",
+          "oid": 20
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select workspace_id,device_id,active,session_id,session_revision,session_expires_at_ms::text as session_expires_at_ms,consent_revision,push_consent,preferences::text as preferences from n44_push_draft.contexts where owner_id=$1 limit $2",
+      "name": "boundary_768e347f711092582bf45865",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "workspace_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "device_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "oid": 16
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "session_revision",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "session_expires_at_ms",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "consent_revision",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "push_consent",
+          "type": "boolean",
+          "oid": 16
+        },
+        {
+          "name": "preferences",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select workspace_id,device_id,event_id,registration_id,kind,action_path,expires_at_ms::text as expires_at_ms,attempts,state,started_at_ms::text as started_at_ms,next_at_ms::text as next_at_ms from n44_push_draft.deliveries where owner_id=$1 limit $2",
+      "name": "boundary_fa37dbfb7c54ef1196b0e5fb",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "workspace_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "device_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "registration_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "action_path",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "expires_at_ms",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "attempts",
+          "type": "smallint",
+          "oid": 21
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "started_at_ms",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "next_at_ms",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "update n44_push_draft.owner_clock set high_water_ms=$2 where owner_id=$1",
+      "name": "boundary_bb27477c2541b2ec5f1428a1",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n44_push_draft.owner_clock set next_cleanup_ms=$2 where owner_id=$1",
+      "name": "boundary_34c39487076c19af0100723c",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    }
+  ],
+  "migration": {
+    "path": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    "sha256": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83"
+  }
+}

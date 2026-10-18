@@ -4,6 +4,1701 @@ import process2 from "node:process";
 if (!globalThis.Buffer) globalThis.Buffer = Buffer2;
 if (!globalThis.process) globalThis.process = process2;
 
+// drafts/n44-push/activation/private-error-boundary.mjs
+import { Buffer as Buffer3 } from "node:buffer";
+
+// drafts/n44-push/activation/error-boundary-contract.json
+var error_boundary_contract_default = {
+  version: 1,
+  encoding: "bound-base64-pg-text-v1",
+  controls: [
+    "begin",
+    "begin isolation level read committed",
+    "commit",
+    "release savepoint n44_owner",
+    "rollback",
+    "rollback to savepoint n44_owner",
+    "savepoint n44_owner",
+    "set local idle_in_transaction_session_timeout='10000ms'",
+    "set local idle_in_transaction_session_timeout='15000ms'",
+    "set local lock_timeout='1000ms'",
+    "set local lock_timeout='3000ms'",
+    "set local statement_timeout='3000ms'",
+    "set local statement_timeout='6000ms'",
+    "set local synchronous_commit=on"
+  ],
+  sources: [
+    {
+      file: "drafts/n44-push/postgres-repository.mjs",
+      sha256: "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd"
+    },
+    {
+      file: "drafts/n44-push/backend.mjs",
+      sha256: "eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2"
+    },
+    {
+      file: "drafts/n44-push/auth-verifier.mjs",
+      sha256: "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b"
+    },
+    {
+      file: "drafts/n44-push/canonical-source.mjs",
+      sha256: "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355"
+    }
+  ],
+  operations: [
+    {
+      sql: "delete from n44_push_draft.budgets where owner_id=$1 and budget_key=$2",
+      name: "boundary_9e1807d6f453dbedb9809f39",
+      parameters: [
+        "uuid",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.contexts where (owner_id,workspace_id,device_id) in\n      (select c.owner_id,c.workspace_id,c.device_id from n44_push_draft.contexts c where c.owner_id=$1 and c.session_expires_at_ms<$2\n       and not exists(select 1 from n44_push_draft.registrations r where r.owner_id=c.owner_id and r.workspace_id=c.workspace_id and r.device_id=c.device_id)\n       and not exists(select 1 from n44_push_draft.events e where e.owner_id=c.owner_id and e.workspace_id=c.workspace_id and e.device_id=c.device_id)\n       order by c.workspace_id,c.device_id limit 100)",
+      name: "boundary_4d3cee78bbdb4f757213f84a",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.contexts where owner_id=$1 and workspace_id=$2 and device_id=$3",
+      name: "boundary_8d32ef84bf2998c8aec71bd2",
+      parameters: [
+        "uuid",
+        "text",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.deliveries where owner_id=$1 and workspace_id=$2 and device_id=$3 and event_id=$4",
+      name: "boundary_1f67d69c789e10b899db588c",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.endpoint_claims where owner_id=$1 and fingerprint=$2 and registration_id=$3",
+      name: "boundary_a100b221e6220eb46733c104",
+      parameters: [
+        "uuid",
+        "text",
+        "uuid"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.events where owner_id=$1 and expires_at_ms<$2",
+      name: "boundary_697dbe22cb8ee13cb70e0454",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5",
+      name: "boundary_f12b405d648c662c0a1bf70b",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.ingress_nonces where nonce in(select nonce from n44_push_draft.ingress_nonces where expires_at_ms<$1 order by expires_at_ms limit 100 for update skip locked)",
+      name: "boundary_f4119f9243f2c69562d54a9a",
+      parameters: [
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.ingress_rates where key in(select key from n44_push_draft.ingress_rates where expires_at_ms<$1 order by expires_at_ms limit 100 for update skip locked)",
+      name: "boundary_958d83492a17880874f4d951",
+      parameters: [
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "delete from n44_push_draft.registrations where owner_id=$1 and registration_id=$2",
+      name: "boundary_0963bbb5e4e36d2618b76f49",
+      parameters: [
+        "uuid",
+        "uuid"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "DELETE"
+    },
+    {
+      sql: "insert into n44_push_draft.budgets (owner_id,budget_key,bucket,count,expires_at_ms) values ($1,$2,$3,$4,$5) on conflict (owner_id,budget_key) do update set bucket=excluded.bucket,count=excluded.count,expires_at_ms=excluded.expires_at_ms",
+      name: "boundary_72b37da672df631cd5ffdf89",
+      parameters: [
+        "uuid",
+        "text",
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.contexts (owner_id,workspace_id,device_id,active,session_id,session_revision,session_expires_at_ms,consent_revision,push_consent,preferences) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) on conflict (owner_id,workspace_id,device_id) do update set active=excluded.active,session_id=excluded.session_id,session_revision=excluded.session_revision,session_expires_at_ms=excluded.session_expires_at_ms,consent_revision=excluded.consent_revision,push_consent=excluded.push_consent,preferences=excluded.preferences",
+      name: "boundary_2d3d6a94c46add59c6218ca9",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "boolean",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "boolean",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.deliveries (owner_id,workspace_id,device_id,event_id,registration_id,kind,action_path,expires_at_ms,attempts,state,started_at_ms,next_at_ms) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) on conflict (owner_id,workspace_id,device_id,event_id) do update set registration_id=excluded.registration_id,kind=excluded.kind,action_path=excluded.action_path,expires_at_ms=excluded.expires_at_ms,attempts=excluded.attempts,state=excluded.state,started_at_ms=excluded.started_at_ms,next_at_ms=excluded.next_at_ms",
+      name: "boundary_57d83ba2323270546aa35a7a",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "uuid",
+        "text",
+        "text",
+        "bigint",
+        "smallint",
+        "text",
+        "bigint",
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.endpoint_claims(fingerprint,owner_id,registration_id) values ($1,$2,$3)",
+      name: "boundary_571c1a4b4896750f1651fee0",
+      parameters: [
+        "text",
+        "uuid",
+        "uuid"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.events values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+      name: "boundary_08b402c7cddf335f98d6f8b1",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "bigint",
+        "jsonb"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.ingress_nonces(nonce,scope,expires_at_ms) values($1,$2,$3) on conflict do nothing returning nonce",
+      name: "boundary_2c43bf7a0025aee704aaf82a",
+      parameters: [
+        "uuid",
+        "text",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "nonce",
+          type: "uuid",
+          oid: 2950
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.ingress_rates(key,bucket,count,expires_at_ms,kind) values($1,$2,1,$3,$5)\n   on conflict(key) do update set bucket=excluded.bucket,count=case when ingress_rates.bucket=excluded.bucket then ingress_rates.count+1 else 1 end,expires_at_ms=excluded.expires_at_ms\n   where ingress_rates.bucket<>excluded.bucket or ingress_rates.count<$4 returning count",
+      name: "boundary_20790036fac6c275f03edd5b",
+      parameters: [
+        "text",
+        "bigint",
+        "bigint",
+        "integer",
+        "text"
+      ],
+      output: [
+        {
+          name: "count",
+          type: "integer",
+          oid: 23
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.owner_clock(owner_id,high_water_ms) values ($1,0) on conflict (owner_id) do nothing",
+      name: "boundary_57d6dbe5ee3c94681d78bab0",
+      parameters: [
+        "uuid"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "insert into n44_push_draft.registrations (owner_id,registration_id,workspace_id,device_id,session_id,session_revision,consent_revision,state,expires_at_ms,sealed,fingerprint,binding_fingerprint) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) on conflict (owner_id,registration_id) do update set workspace_id=excluded.workspace_id,device_id=excluded.device_id,session_id=excluded.session_id,session_revision=excluded.session_revision,consent_revision=excluded.consent_revision,state=excluded.state,expires_at_ms=excluded.expires_at_ms,sealed=excluded.sealed,fingerprint=excluded.fingerprint,binding_fingerprint=excluded.binding_fingerprint",
+      name: "boundary_833ceede5c0a62e801d753b1",
+      parameters: [
+        "uuid",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "text",
+        "text"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "INSERT"
+    },
+    {
+      sql: "select (extract(epoch from (($1::date+$2::time) at time zone $3))*1000)::bigint::text as ms",
+      name: "boundary_350c9c4a986b92433b3dd0eb",
+      parameters: [
+        "date",
+        "time without time zone",
+        "text"
+      ],
+      output: [
+        {
+          name: "ms",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select * from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and event_id=$4",
+      name: "boundary_93cef969458b6f604774a29e",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      output: [
+        {
+          name: "owner_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "workspace_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "device_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "event_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_kind",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_stamp",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "due_at_ms",
+          type: "bigint",
+          oid: 20
+        },
+        {
+          name: "expires_at_ms",
+          type: "bigint",
+          oid: 20
+        },
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select * from n44_push_draft.events where owner_id=$1 order by workspace_id,device_id,event_id limit 101",
+      name: "boundary_4c02517c5dfbdffd1c5b454c",
+      parameters: [
+        "uuid"
+      ],
+      output: [
+        {
+          name: "owner_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "workspace_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "device_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "event_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_kind",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_stamp",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "due_at_ms",
+          type: "bigint",
+          oid: 20
+        },
+        {
+          name: "expires_at_ms",
+          type: "bigint",
+          oid: 20
+        },
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select budget_key,bucket::text as bucket,count,expires_at_ms::text as expires_at_ms from n44_push_draft.budgets where owner_id=$1 limit $2",
+      name: "boundary_7336f6d16dcf854f092f8756",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "budget_key",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "bucket",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "count",
+          type: "integer",
+          oid: 23
+        },
+        {
+          name: "expires_at_ms",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select distinct source_stamp from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5",
+      name: "boundary_fccb5d5603d6024dad280c6a",
+      parameters: [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text"
+      ],
+      output: [
+        {
+          name: "source_stamp",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select e.*,r.registration_id from n44_push_draft.events e\n   join n44_push_draft.registrations r on r.owner_id=e.owner_id and r.workspace_id=e.workspace_id and r.device_id=e.device_id\n   left join n44_push_draft.deliveries d on d.owner_id=e.owner_id and d.workspace_id=e.workspace_id and d.device_id=e.device_id and d.event_id=e.event_id\n   where e.due_at_ms<=$1 and e.expires_at_ms>$1 and r.state='active' and r.expires_at_ms>$1\n   and (d.state is null or d.state='retry' and d.next_at_ms<=$1)\n   and (e.due_at_ms,e.owner_id,e.workspace_id,e.device_id,e.event_id,r.registration_id)>($2,$3::uuid,$4,$5,$6,$7::uuid)\n   order by e.due_at_ms,e.owner_id,e.workspace_id,e.device_id,e.event_id,r.registration_id limit $8",
+      name: "boundary_ed6266829f26128220d17b4f",
+      parameters: [
+        "bigint",
+        "bigint",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "uuid",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "owner_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "workspace_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "device_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "event_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_kind",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "source_stamp",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "due_at_ms",
+          type: "bigint",
+          oid: 20
+        },
+        {
+          name: "expires_at_ms",
+          type: "bigint",
+          oid: 20
+        },
+        {
+          name: "payload",
+          type: "jsonb",
+          oid: 3802
+        },
+        {
+          name: "registration_id",
+          type: "uuid",
+          oid: 2950
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select event_id from n44_push_draft.events where owner_id=$1 limit 101",
+      name: "boundary_b7889ac22eace9e5a9d26592",
+      parameters: [
+        "uuid"
+      ],
+      output: [
+        {
+          name: "event_id",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select fingerprint,registration_id from n44_push_draft.endpoint_claims where owner_id=$1 limit $2",
+      name: "boundary_0657f8ea1df759451545fc97",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "fingerprint",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "registration_id",
+          type: "uuid",
+          oid: 2950
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select floor(extract(epoch from clock_timestamp())*1000)::bigint::text as now_ms",
+      name: "boundary_023fe46060e1428d8c69aecf",
+      parameters: [],
+      output: [
+        {
+          name: "now_ms",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select high_water_ms::text as high_water_ms from n44_push_draft.owner_clock where owner_id=$1 for update",
+      name: "boundary_357fab36c862af9b35603721",
+      parameters: [
+        "uuid"
+      ],
+      output: [
+        {
+          name: "high_water_ms",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select key from n44_push_draft.ingress_rates where kind=$1 limit 2049",
+      name: "boundary_09d8680e5bc700fdfd80e133",
+      parameters: [
+        "text"
+      ],
+      output: [
+        {
+          name: "key",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select n44_push_draft.read_source($1::uuid,$2::text,$3::text) as source",
+      name: "boundary_e5608f0030522cd46dc1e398",
+      parameters: [
+        "uuid",
+        "text",
+        "text"
+      ],
+      output: [
+        {
+          name: "source",
+          type: "jsonb",
+          oid: 3802
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select nonce from n44_push_draft.ingress_nonces where scope=$1 limit $2",
+      name: "boundary_9f189e29d3d1075a21008022",
+      parameters: [
+        "text",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "nonce",
+          type: "uuid",
+          oid: 2950
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select owner_id from n44_push_draft.owner_clock where next_cleanup_ms<=$1 order by next_cleanup_ms,owner_id limit $2 for update skip locked",
+      name: "boundary_cb6b899cd42acdb1d185e923",
+      parameters: [
+        "bigint",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "owner_id",
+          type: "uuid",
+          oid: 2950
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select owner_id from n44_push_draft.owner_clock where owner_id=$1 for update",
+      name: "boundary_eaec15024b66e2fdb8d82ac8",
+      parameters: [
+        "uuid"
+      ],
+      output: [
+        {
+          name: "owner_id",
+          type: "uuid",
+          oid: 2950
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select pg_advisory_xact_lock(44001,hashtext($1))",
+      name: "boundary_8c5c3b9f064a030860af0a50",
+      parameters: [
+        "text"
+      ],
+      output: [
+        {
+          name: "pg_advisory_xact_lock",
+          type: "void",
+          oid: 2278
+        }
+      ],
+      effect: false,
+      voidResult: true,
+      command: "SELECT"
+    },
+    {
+      sql: "select pg_advisory_xact_lock(44002,hashtext($1))",
+      name: "boundary_60c5663ba998b06c67fa4941",
+      parameters: [
+        "text"
+      ],
+      output: [
+        {
+          name: "pg_advisory_xact_lock",
+          type: "void",
+          oid: 2278
+        }
+      ],
+      effect: false,
+      voidResult: true,
+      command: "SELECT"
+    },
+    {
+      sql: "select registration_id,workspace_id,device_id,session_id,session_revision,consent_revision,state,expires_at_ms::text as expires_at_ms,sealed,fingerprint,binding_fingerprint from n44_push_draft.registrations where owner_id=$1 limit $2",
+      name: "boundary_08270c0bd4eb5e36c5b58065",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "registration_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "workspace_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "device_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "session_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "session_revision",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "consent_revision",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "state",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "expires_at_ms",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "sealed",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "fingerprint",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "binding_fingerprint",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)",
+      name: "boundary_ad31702f95cafad7fa108a0b",
+      parameters: [
+        "uuid",
+        "uuid"
+      ],
+      output: [
+        {
+          name: "user_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "session_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "not_after_ms",
+          type: "bigint",
+          oid: 20
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select workspace_id,device_id,active,session_id,session_revision,session_expires_at_ms::text as session_expires_at_ms,consent_revision,push_consent,preferences::text as preferences from n44_push_draft.contexts where owner_id=$1 limit $2",
+      name: "boundary_768e347f711092582bf45865",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "workspace_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "device_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "active",
+          type: "boolean",
+          oid: 16
+        },
+        {
+          name: "session_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "session_revision",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "session_expires_at_ms",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "consent_revision",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "push_consent",
+          type: "boolean",
+          oid: 16
+        },
+        {
+          name: "preferences",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "select workspace_id,device_id,event_id,registration_id,kind,action_path,expires_at_ms::text as expires_at_ms,attempts,state,started_at_ms::text as started_at_ms,next_at_ms::text as next_at_ms from n44_push_draft.deliveries where owner_id=$1 limit $2",
+      name: "boundary_fa37dbfb7c54ef1196b0e5fb",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [
+        {
+          name: "workspace_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "device_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "event_id",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "registration_id",
+          type: "uuid",
+          oid: 2950
+        },
+        {
+          name: "kind",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "action_path",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "expires_at_ms",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "attempts",
+          type: "smallint",
+          oid: 21
+        },
+        {
+          name: "state",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "started_at_ms",
+          type: "text",
+          oid: 25
+        },
+        {
+          name: "next_at_ms",
+          type: "text",
+          oid: 25
+        }
+      ],
+      effect: false,
+      voidResult: false,
+      command: "SELECT"
+    },
+    {
+      sql: "update n44_push_draft.owner_clock set high_water_ms=$2 where owner_id=$1",
+      name: "boundary_bb27477c2541b2ec5f1428a1",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    },
+    {
+      sql: "update n44_push_draft.owner_clock set next_cleanup_ms=$2 where owner_id=$1",
+      name: "boundary_34c39487076c19af0100723c",
+      parameters: [
+        "uuid",
+        "bigint"
+      ],
+      output: [],
+      effect: true,
+      voidResult: false,
+      command: "UPDATE"
+    }
+  ],
+  migration: {
+    path: "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    sha256: "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83"
+  }
+};
+
+// drafts/n44-push/activation/error-boundary-identities.json
+var error_boundary_identities_default = [
+  {
+    name: "boundary_023fe46060e1428d8c69aecf",
+    definition: "6b7ba7d24e9cce0f49c256a1b3a1b2da72a2bd6d8957b2af54b3bd00da6dfe8a",
+    arguments: "",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_0657f8ea1df759451545fc97",
+    definition: "c9f6423c42991ed64400e2cb2839db1a161408b446967ebfab02ffac21e36e4b",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_08270c0bd4eb5e36c5b58065",
+    definition: "0dab7d29ed1e00d0f82c38903b9f63397a86387df370bb947c488cfdf295f866",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_08b402c7cddf335f98d6f8b1",
+    definition: "48c55b0f90a0ba9b80786e7563afabd5331b43700af6b6860284242d9506495d",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_0963bbb5e4e36d2618b76f49",
+    definition: "6704818c21e61d24bd31cc39ca998bd5b4c2a7b16bd1d9378d13817007c9578c",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_09d8680e5bc700fdfd80e133",
+    definition: "764153b014af270a0821983c4c538d13938071a42a79d6b0b3febcd7e89ce5c3",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_1f67d69c789e10b899db588c",
+    definition: "879a719ec4f18038a4b1476b9b11a746768cb990624e66a4c39ac05436af38c0",
+    arguments: "p1 text, p2 text, p3 text, p4 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_20790036fac6c275f03edd5b",
+    definition: "8db65360da73c8b97ae1ec65d57e0b3510f2988f20e322e86885f07399d88e7f",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_2c43bf7a0025aee704aaf82a",
+    definition: "642c30eecdcef523e8b2a7142a4eb6816448c83dfcf3b5a1afd0320d54010609",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_2d3d6a94c46add59c6218ca9",
+    definition: "0842058d676aa11144e0e90ee31ab6e9802f27728f24a107dfb465d3475f48a7",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_34c39487076c19af0100723c",
+    definition: "4b8ce2718f376ddd41a7f72fb1cd145f6fbf8bb090e762c723efaa2549cfa05f",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_350c9c4a986b92433b3dd0eb",
+    definition: "b7ec7f7a06181d8849d6245f9fde9cf54f52130e827bc19455f6089c91c4e5f4",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_357fab36c862af9b35603721",
+    definition: "f46e2b6b1b93196e81ca4492940bb6172eda7e2f5d9ee7eba3dc69880467c8fd",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_4c02517c5dfbdffd1c5b454c",
+    definition: "0888da3efd3d1f45c7ae91412d48e7bad0f7898828a7190b3f9fd2a3697c4f92",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_4d3cee78bbdb4f757213f84a",
+    definition: "11ae2f873cceaee441ca17e31d34b51f7c0930e724c52e1b687df174606b50ec",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_571c1a4b4896750f1651fee0",
+    definition: "8c48ae2a00f29cf7916b871fb2745c450ed7c11077a8be375bdf73a3441c8840",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_57d6dbe5ee3c94681d78bab0",
+    definition: "a041154032c9dead6a4580344057b5377b672623adfe9619e106616a719962da",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_57d83ba2323270546aa35a7a",
+    definition: "f38050eeb33d2ce054b05042e0f838e7446288777cc55f2ba4a60c205257cdc7",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_60c5663ba998b06c67fa4941",
+    definition: "d168ece5f15bc2ddcd27ca22d8d2d1198244b4ee66eee4051e67c7c17c66df9f",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_697dbe22cb8ee13cb70e0454",
+    definition: "83a96bfc271a769e857ae7abba92d686286bfb4fcd6e5cade4d0193012d7ce30",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_72b37da672df631cd5ffdf89",
+    definition: "3d448724473f44286e8fa45346e11550ae2b70d4ccddec99bf3638c450ab0754",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_7336f6d16dcf854f092f8756",
+    definition: "bac0350c7d9e21eb403c882faef77cde13f0980ae875d5b406b470987e5e9b15",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_768e347f711092582bf45865",
+    definition: "20b9afc9240ce140fc7e90da626360f1a648196030ec6d98d8d3f70894f36305",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_833ceede5c0a62e801d753b1",
+    definition: "a652fc6ecc26875c5ac0b4426cf8b5d048cd4c6e3483542dbe1b5ca33ca25b28",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text, p9 text, p10 text, p11 text, p12 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_8c5c3b9f064a030860af0a50",
+    definition: "b9e31640bd0a199f61f8601a4e1c1ae99c37084f38f5fe51ed450e054b795e10",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_8d32ef84bf2998c8aec71bd2",
+    definition: "47b1fecfe6f9f7e851a51ac9aee5a5cb671eb190eb7ffa73038559f5f4c4a71a",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_93cef969458b6f604774a29e",
+    definition: "6654410b53244ab822bea950e876643902e178e361a6d5fc308b92a72ae28e56",
+    arguments: "p1 text, p2 text, p3 text, p4 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_958d83492a17880874f4d951",
+    definition: "e0a757b6955b8852a4a7eff87b25531586ee1de5ddd5b1a1cf07d630c83cd6a1",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_9e1807d6f453dbedb9809f39",
+    definition: "4d81625006d47f5a9c149d87b4c25f9b2721a5327a08d7a07dc97db2c6f02ff4",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_9f189e29d3d1075a21008022",
+    definition: "f4e274f73b116ee085e3f24c2bda924655fb849f667663d3136bf3fb2280c299",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_a100b221e6220eb46733c104",
+    definition: "b9ebf10f2af7802d20a09d50372c16be32faf6de89676d26d3fa62a0f0ce03aa",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_ad31702f95cafad7fa108a0b",
+    definition: "c748072917110f4b38a8e8039cd889e509c38b9318e5f1dbbdbdacb1aa38f605",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_b7889ac22eace9e5a9d26592",
+    definition: "e5a08b064271fb43a0b234bbfca633dfd03156d2af4de7daebd55183cfb245a0",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_bb27477c2541b2ec5f1428a1",
+    definition: "fe51fa1db070aa369e3c4bead685d7cac733763a937cf158498b76fa088b5238",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_cb6b899cd42acdb1d185e923",
+    definition: "53fdc29597d19464166f65c0ed95a86c4952bb81bbf419bf8e08858cf3387309",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_e5608f0030522cd46dc1e398",
+    definition: "e0c9d2497567ff3e51c1f87d06423748f11e7688bda8dae5ac10cf5f8f692355",
+    arguments: "p1 text, p2 text, p3 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_eaec15024b66e2fdb8d82ac8",
+    definition: "de0186de5483860bad38aaeabcb5887a18ebbff8f5fe950dd61ac161ac2ef32e",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_ed6266829f26128220d17b4f",
+    definition: "2d2ebdbc6e97ef728e01ed2a07fd2f9ba1ea637496610e2557afb5c18b5a7e77",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text, p6 text, p7 text, p8 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_f12b405d648c662c0a1bf70b",
+    definition: "b8dd7f0dbeec25531739960199897cb9ad9631adb316c6ab4a6c6169db1fe152",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_f4119f9243f2c69562d54a9a",
+    definition: "52cf917d65f7d86feed3fe31db37f16cbfd040652c107d69600062b74411ca9e",
+    arguments: "p1 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_fa37dbfb7c54ef1196b0e5fb",
+    definition: "1a1c845e0931caf143733c4b962be21a1d6bb35e87f3e58030739d1a2d4933d4",
+    arguments: "p1 text, p2 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  },
+  {
+    name: "boundary_fccb5d5603d6024dad280c6a",
+    definition: "cbc64c00ecd24a9828880e98bc29917626a3d25c04494afaf9c174aee242870a",
+    arguments: "p1 text, p2 text, p3 text, p4 text, p5 text",
+    definer: false,
+    owner: "postgres",
+    config: [
+      "search_path=pg_catalog"
+    ],
+    acl: [
+      "n44_backend:EXECUTE",
+      "postgres:EXECUTE"
+    ]
+  }
+];
+
+// drafts/n44-push/activation/private-error-boundary.mjs
+var fail = () => {
+  throw Error("n44_database_unavailable");
+};
+var verified = /* @__PURE__ */ new WeakSet();
+var operations = new Map(error_boundary_contract_default.operations.map((o) => [o.sql, o]));
+var controls = new Set(error_boundary_contract_default.controls);
+var boundaryCatalogSql = `select p.proname as name,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,
+    pg_get_function_identity_arguments(p.oid) as arguments,p.prosecdef as definer,
+    r.rolname as owner,p.proconfig as config,
+    (select array_agg(coalesce(gr.rolname,'PUBLIC')||':'||a.privilege_type order by coalesce(gr.rolname,'PUBLIC'),a.privilege_type)
+      from aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a left join pg_roles gr on gr.oid=a.grantee) as acl
+    from pg_proc p join pg_namespace n on n.oid=p.pronamespace join pg_roles r on r.oid=p.proowner
+    where n.nspname='n44_push_draft' and p.proname like 'boundary_%' order by p.proname`;
+async function assertVerifiedBoundary(client) {
+  verified.delete(client);
+  const r = await client.query(boundaryCatalogSql);
+  if (error_boundary_identities_default.length !== operations.size || JSON.stringify(r.rows) !== JSON.stringify(error_boundary_identities_default)) fail();
+  verified.add(client);
+}
+function pgText(value) {
+  if (value === null) return null;
+  if (typeof value === "string" || typeof value === "bigint" || typeof value === "boolean") return String(value);
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (Buffer3.isBuffer(value)) return "\\x" + value.toString("hex");
+  if (value instanceof Date && Number.isFinite(value.getTime())) return value.toISOString();
+  if (Array.isArray(value)) return "{" + value.map((v) => v === null ? "NULL" : Array.isArray(v) ? pgText(v) : '"' + pgText(v).replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"').join(",") + "}";
+  fail();
+}
+async function privateQuery(client, sql, values = []) {
+  if (!verified.has(client) || !Array.isArray(values)) fail();
+  if (controls.has(sql)) {
+    if (sql.startsWith("select set_config")) {
+      if (values.length !== 3 || values.some((v) => typeof v !== "string" || !/^\d{1,5}$/.test(v) || Number(v) < 1 || Number(v) > 6e4)) fail();
+    } else if (values.length) fail();
+    return client.query(sql, values);
+  }
+  const op = operations.get(sql);
+  if (!op || values.length !== op.parameters.length) fail();
+  const wire = values.map((v, i) => encodeBoundaryParameter(v !== null && typeof v === "object" && !Buffer3.isBuffer(v) && !(v instanceof Date) && !Array.isArray(v) && ["json", "jsonb"].includes(op.parameters[i]) ? JSON.stringify(v) : v));
+  const result2 = await client.query(`select * from n44_push_draft.${op.name}(${wire.map((_, i) => "$" + (i + 1) + "::text").join(",")})`, wire);
+  if (op.effect) {
+    const count = result2.rows?.[0]?.affected;
+    if (result2.rows?.length !== 1 || !/^\d+$/.test(count) || !Number.isSafeInteger(Number(count))) fail();
+    return { ...result2, command: op.command, rowCount: Number(count), rows: [] };
+  }
+  if (op.voidResult) return { ...result2, rows: result2.rows.map(() => ({ [op.output[0].name]: "" })) };
+  return result2;
+}
+var encodeBoundaryParameter = (value) => value === null ? null : Buffer3.from(pgText(value), "utf8").toString("base64");
+
 // drafts/n44-push/session-policy.mjs
 var N44_SERVICE_REVISION = "n44-browser-service-v2";
 function supportedSessionPolicy(profile, now = Date.now(), sourceSha) {
@@ -12,7 +1707,7 @@ function supportedSessionPolicy(profile, now = Date.now(), sourceSha) {
 var policySessionRevision = (sessionId, profile) => sessionId + ":" + profile.approvalId;
 
 // drafts/n44-push/existing-host.mjs
-import { Buffer as Buffer6 } from "node:buffer";
+import { Buffer as Buffer7 } from "node:buffer";
 import pg from "pg";
 import { p256 as p2562 } from "@noble/curves/nist.js";
 
@@ -157,32 +1852,32 @@ function createRegistrationBoundary({
 var policies = /* @__PURE__ */ new Map([
   ["https://fcm.googleapis.com", /^\/(?:wp|fcm\/send)\/[A-Za-z0-9_:-]{1,1900}$/]
 ]);
-var fail = () => {
+var fail2 = () => {
   throw Error("n44_crypto_unavailable");
 };
 function approvedProviderOrigins(origins = []) {
-  if (!Array.isArray(origins) || origins.some((s) => !policies.has(s)) || new Set(origins).size !== origins.length) fail();
+  if (!Array.isArray(origins) || origins.some((s) => !policies.has(s)) || new Set(origins).size !== origins.length) fail2();
   return Object.freeze([...origins]);
 }
 function decode64(s, length) {
-  if (typeof s !== "string" || s.length > 8192 || !/^[A-Za-z0-9_-]+$/.test(s)) fail();
+  if (typeof s !== "string" || s.length > 8192 || !/^[A-Za-z0-9_-]+$/.test(s)) fail2();
   const b = Buffer.from(s, "base64url");
-  if (b.toString("base64url") !== s || length !== void 0 && b.length !== length) fail();
+  if (b.toString("base64url") !== s || length !== void 0 && b.length !== length) fail2();
   return b;
 }
 function validatePoint(s) {
   const point = decode64(s, 65);
-  if (point[0] !== 4) fail();
+  if (point[0] !== 4) fail2();
   const parsed = p256.Point.fromHex(point);
   parsed.assertValidity();
-  if (!Buffer.from(parsed.toBytes(false)).equals(point)) fail();
+  if (!Buffer.from(parsed.toBytes(false)).equals(point)) fail2();
   return point;
 }
 function trustedSubscription(raw, origins) {
   const sub = validateSubscription(raw, origins);
-  if (!sub) fail();
+  if (!sub) fail2();
   const u = new URL(sub.endpoint);
-  if (u.search || !policies.get(u.origin)?.test(u.pathname)) fail();
+  if (u.search || !policies.get(u.origin)?.test(u.pathname)) fail2();
   validatePoint(sub.keys.p256dh);
   decode64(sub.keys.auth, 16);
   return sub;
@@ -199,7 +1894,7 @@ function publicAddress(address, family) {
 }
 
 // drafts/n44-push/subscription-protector.mjs
-var fail2 = () => {
+var fail3 = () => {
   throw Error("n44_crypto_unavailable");
 };
 var kid = (s) => typeof s === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(s);
@@ -218,21 +1913,21 @@ function createSubscriptionProtector({
 } = {}) {
   const origins = approvedProviderOrigins(providerOrigins);
   function ring(input) {
-    if (!(input instanceof Map) || input.size < 1 || input.size > 8) fail2();
+    if (!(input instanceof Map) || input.size < 1 || input.size > 8) fail3();
     const out = /* @__PURE__ */ new Map();
     for (const [name, key] of input) {
-      if (!kid(name) || !Buffer.isBuffer(key) || key.length !== 32) fail2();
+      if (!kid(name) || !Buffer.isBuffer(key) || key.length !== 32) fail3();
       out.set(name, Buffer.from(key));
     }
     return out;
   }
   const seals = ring(sealingKeys), endpoints = ring(endpointHmacKeys), bindings = ring(bindingHmacKeys);
-  if (!kid(activeVapidKeyId) || !seals.has(activeKeyId) || !endpoints.has(fingerprintKeyId) || !bindings.has(fingerprintKeyId) || endpoints.size !== bindings.size || [...endpoints.keys()].some((k) => !bindings.has(k))) fail2();
+  if (!kid(activeVapidKeyId) || !seals.has(activeKeyId) || !endpoints.has(fingerprintKeyId) || !bindings.has(fingerprintKeyId) || endpoints.size !== bindings.size || [...endpoints.keys()].some((k) => !bindings.has(k))) fail3();
   for (const [left, right] of [[seals, endpoints], [seals, bindings], [endpoints, bindings]])
-    for (const a of left.values()) for (const b of right.values()) if (timingSafeEqual(a, b)) fail2();
+    for (const a of left.values()) for (const b of right.values()) if (timingSafeEqual(a, b)) fail3();
   let closed = false;
   const check = (signal) => {
-    if (closed || signal?.aborted || !origins.length) fail2();
+    if (closed || signal?.aborted || !origins.length) fail3();
   };
   const fingerprints = (sub, hkid, vapidKeyId) => ({
     fingerprint: createHmac("sha256", endpoints.get(hkid)).update("n44-endpoint\0").update(sub.endpoint).digest("hex"),
@@ -268,7 +1963,7 @@ function createSubscriptionProtector({
         check(signal);
         return Object.freeze({ sealed, fingerprint: e.fingerprint, bindingFingerprint: e.bindingFingerprint });
       } catch {
-        fail2();
+        fail3();
       }
     },
     // Only the private sender calls open, after consuming a committed capability.
@@ -276,20 +1971,20 @@ function createSubscriptionProtector({
       let plaintext;
       try {
         check(signal);
-        if (typeof sealed !== "string" || Buffer.byteLength(sealed) > 8192) fail2();
+        if (typeof sealed !== "string" || Buffer.byteLength(sealed) > 8192) fail3();
         const e = JSON.parse(sealed);
-        if (!record(e, ["v", "kid", "hkid", "vapidKeyId", "fingerprint", "bindingFingerprint", "iv", "ciphertext", "tag"]) || JSON.stringify(e) !== sealed || e.v !== 1 || !kid(e.kid) || !kid(e.hkid) || !kid(e.vapidKeyId) || !seals.has(e.kid) || !endpoints.has(e.hkid) || !bindings.has(e.hkid) || !same(e.fingerprint, expected?.fingerprint) || !same(e.bindingFingerprint, expected?.bindingFingerprint)) fail2();
+        if (!record(e, ["v", "kid", "hkid", "vapidKeyId", "fingerprint", "bindingFingerprint", "iv", "ciphertext", "tag"]) || JSON.stringify(e) !== sealed || e.v !== 1 || !kid(e.kid) || !kid(e.hkid) || !kid(e.vapidKeyId) || !seals.has(e.kid) || !endpoints.has(e.hkid) || !bindings.has(e.hkid) || !same(e.fingerprint, expected?.fingerprint) || !same(e.bindingFingerprint, expected?.bindingFingerprint)) fail3();
         const decipher = createDecipheriv("aes-256-gcm", seals.get(e.kid), decode64(e.iv, 12));
         decipher.setAAD(aad(e));
         decipher.setAuthTag(decode64(e.tag, 16));
         plaintext = Buffer.concat([decipher.update(decode64(e.ciphertext)), decipher.final()]);
         const sub = trustedSubscription(JSON.parse(plaintext.toString("utf8")), origins);
         const actual = fingerprints(sub, e.hkid, e.vapidKeyId);
-        if (!same(actual.fingerprint, e.fingerprint) || !same(actual.bindingFingerprint, e.bindingFingerprint)) fail2();
+        if (!same(actual.fingerprint, e.fingerprint) || !same(actual.bindingFingerprint, e.bindingFingerprint)) fail3();
         check(signal);
         return Object.freeze({ subscription: sub, vapidKeyId: e.vapidKeyId });
       } catch {
-        fail2();
+        fail3();
       } finally {
         plaintext?.fill(0);
       }
@@ -362,7 +2057,7 @@ function consumeCommittedPermit(value) {
 }
 
 // drafts/n44-push/audited-sender.mjs
-var fail3 = () => {
+var fail4 = () => {
   throw Error("n44_sender_unavailable");
 };
 var unsafeKeyLogAtImport = process.env.ECE_KEYLOG === "1";
@@ -381,25 +2076,25 @@ function createAuditedSender({
   } });
   const credentials = /* @__PURE__ */ new Map();
   try {
-    if (unsafeDiagnostics()) fail3();
-    if (!origins.length || typeof protector?.open !== "function" || typeof clock !== "function" || typeof resolve !== "function" || typeof httpsRequest !== "function") fail3();
-    if (!(vapidKeys instanceof Map) || vapidKeys.size < 1 || vapidKeys.size > 8) fail3();
+    if (unsafeDiagnostics()) fail4();
+    if (!origins.length || typeof protector?.open !== "function" || typeof clock !== "function" || typeof resolve !== "function" || typeof httpsRequest !== "function") fail4();
+    if (!(vapidKeys instanceof Map) || vapidKeys.size < 1 || vapidKeys.size > 8) fail4();
     for (const [keyId, vapid] of vapidKeys) {
-      if (typeof keyId !== "string" || !/^[A-Za-z0-9_-]{1,40}$/.test(keyId)) fail3();
+      if (typeof keyId !== "string" || !/^[A-Za-z0-9_-]{1,40}$/.test(keyId)) fail4();
       validatePoint(vapid?.publicKey);
       const secret = decode64(vapid?.privateKey, 32), pair = createECDH("prime256v1");
       try {
         pair.setPrivateKey(secret);
-        if (!timingSafeEqual2(pair.getPublicKey(), decode64(vapid.publicKey, 65))) fail3();
+        if (!timingSafeEqual2(pair.getPublicKey(), decode64(vapid.publicKey, 65))) fail4();
       } finally {
         secret.fill(0);
       }
       const subject = new URL(vapid.subject);
-      if (vapid.subject.length > 512 || !["mailto:", "https:"].includes(subject.protocol) || subject.username || subject.password || subject.hash || subject.hostname === "localhost" || subject.protocol === "mailto:" && !/^[^\s?]+@[^\s?]+$/.test(subject.pathname)) fail3();
+      if (vapid.subject.length > 512 || !["mailto:", "https:"].includes(subject.protocol) || subject.username || subject.password || subject.hash || subject.hostname === "localhost" || subject.protocol === "mailto:" && !/^[^\s?]+@[^\s?]+$/.test(subject.pathname)) fail4();
       credentials.set(keyId, Object.freeze({ subject: vapid.subject, publicKey: vapid.publicKey, privateKey: vapid.privateKey }));
     }
   } catch {
-    fail3();
+    fail4();
   }
   const active = /* @__PURE__ */ new Set();
   let closed = false;
@@ -421,33 +2116,33 @@ function createAuditedSender({
         timer = setTimeout(abort, milliseconds);
         signal?.addEventListener("abort", abort, { once: true });
         const check = () => {
-          if (closed || controller.signal.aborted || performance.now() - start >= milliseconds || clock() >= allowedExpiry) fail3();
+          if (closed || controller.signal.aborted || performance.now() - start >= milliseconds || clock() >= allowedExpiry) fail4();
         };
         check();
         const opened = protector.open(permit.sealed, permit, { signal: controller.signal });
         const signing = credentials.get(opened?.vapidKeyId);
-        if (!signing) fail3();
+        if (!signing) fail4();
         const sub = trustedSubscription(opened.subscription, origins);
         const url = new URL(sub.endpoint);
         const cancel = new Promise((_, reject) => controller.signal.addEventListener("abort", () => reject(Error("n44_sender_unavailable")), { once: true }));
         const answers = await Promise.race([Promise.resolve().then(() => resolve(url.hostname, { all: true, verbatim: true })), cancel]);
         check();
-        if (!Array.isArray(answers) || answers.length < 1 || answers.length > 16 || answers.some((a) => !publicAddress(a.address, a.family))) fail3();
+        if (!Array.isArray(answers) || answers.length < 1 || answers.length > 16 || answers.some((a) => !publicAddress(a.address, a.family))) fail4();
         const pinned = Object.freeze({ address: answers[0].address, family: answers[0].family });
         const ttl = Math.floor((allowedExpiry - clock()) / 1e3);
-        if (ttl < 1) fail3();
+        if (ttl < 1) fail4();
         const wire = permit.binding ? normalizePushEnvelope({ v: 1, binding: permit.binding.id, expiresAt: permit.binding.expiresAt, event: payload }, clock()) : payload;
-        if (!wire) fail3();
+        if (!wire) fail4();
         const details = webpush.generateRequestDetails(sub, JSON.stringify(wire), {
           vapidDetails: signing,
           TTL: ttl,
           contentEncoding: "aes128gcm",
           urgency: "normal"
         });
-        if (details.endpoint !== sub.endpoint || details.method !== "POST" || !Buffer.isBuffer(details.body)) fail3();
+        if (details.endpoint !== sub.endpoint || details.method !== "POST" || !Buffer.isBuffer(details.body)) fail4();
         check();
         details.headers.TTL = Math.min(ttl, Math.floor((allowedExpiry - clock()) / 1e3));
-        if (details.headers.TTL < 1) fail3();
+        if (details.headers.TTL < 1) fail4();
         return await new Promise((resolveOutcome) => {
           const finish = (outcome) => {
             if (done) return;
@@ -550,11 +2245,11 @@ var SNAPSHOT_LIMITS = Object.freeze({
   deliveries: LIMITS.jobs,
   budgets: 2 * receipts + 2
 });
-var fail4 = () => {
+var fail5 = () => {
   throw new Error("n44_repository_unavailable");
 };
 var must = (condition) => {
-  if (!condition) fail4();
+  if (!condition) fail5();
 };
 var ownerUUID = (value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value);
 var integer = (value) => {
@@ -815,7 +2510,7 @@ function createPostgresRepository({ acquire, prepare = async () => ({}) }) {
           if (value && typeof value.then === "function") {
             Promise.resolve(value).catch(() => {
             });
-            fail4();
+            fail5();
           }
           value = clone(value);
         } finally {
@@ -865,7 +2560,7 @@ function createPostgresRepository({ acquire, prepare = async () => ({}) }) {
         }
         retry = definitive && rolledBack && attempt === 0;
         broken ||= !definitive;
-        if (!retry) fail4();
+        if (!retry) fail5();
       } finally {
         if (c) {
           try {
@@ -874,9 +2569,9 @@ function createPostgresRepository({ acquire, prepare = async () => ({}) }) {
           }
         }
       }
-      if (!retry) fail4();
+      if (!retry) fail5();
     }
-    fail4();
+    fail5();
   }
   return Object.freeze({
     atomic: (ownerId, work) => run(ownerId, work, false),
@@ -1040,11 +2735,11 @@ function createDeliveryBoundary({ repository, clock, recompute, sender = null, e
 }
 
 // drafts/n44-push/runtime-gateway.mjs
-var fail5 = () => {
+var fail6 = () => {
   throw Error("n44_unavailable");
 };
 function parseBody(text, maxBytes = 12288) {
-  if (typeof text !== "string" || Buffer.byteLength(text) > maxBytes) fail5();
+  if (typeof text !== "string" || Buffer.byteLength(text) > maxBytes) fail6();
   let i = 0;
   const ws = () => {
     while (/[\x20\x09\x0a\x0d]/.test(text[i] ?? "x")) i++;
@@ -1056,10 +2751,10 @@ function parseBody(text, maxBytes = 12288) {
       if (c === "\\") i++;
       else if (c === '"') return JSON.parse(text.slice(start, i));
     }
-    fail5();
+    fail6();
   }
   function value(depth) {
-    if (depth > 12) fail5();
+    if (depth > 12) fail6();
     ws();
     if (text[i] === '"') {
       string();
@@ -1077,12 +2772,12 @@ function parseBody(text, maxBytes = 12288) {
       }
       for (; ; ) {
         if (open === "{") {
-          if (text[i] !== '"') fail5();
+          if (text[i] !== '"') fail6();
           const key = string();
-          if (keys.has(key)) fail5();
+          if (keys.has(key)) fail6();
           keys.add(key);
           ws();
-          if (text[i++] !== ":") fail5();
+          if (text[i++] !== ":") fail6();
         }
         value(depth + 1);
         ws();
@@ -1090,17 +2785,17 @@ function parseBody(text, maxBytes = 12288) {
           i++;
           return;
         }
-        if (text[i++] !== ",") fail5();
+        if (text[i++] !== ",") fail6();
         ws();
       }
     }
     const token = /^(?:true|false|null|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?)/.exec(text.slice(i));
-    if (!token) fail5();
+    if (!token) fail6();
     i += token[0].length;
   }
   value(0);
   ws();
-  if (i !== text.length) fail5();
+  if (i !== text.length) fail6();
   return JSON.parse(text);
 }
 
@@ -1135,22 +2830,22 @@ function createPrivatePushPorts({ enabled = false, providerOrigins = [], ...mate
 }
 
 // drafts/n44-push/web-entry.mjs
-import { Buffer as Buffer5 } from "node:buffer";
+import { Buffer as Buffer6 } from "node:buffer";
 import { timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 
 // drafts/n44-push/backend.mjs
 import { randomUUID, createHmac as createHmac2 } from "node:crypto";
 
 // drafts/n44-push/auth-verifier.mjs
-import { Buffer as Buffer3 } from "node:buffer";
+import { Buffer as Buffer4 } from "node:buffer";
 import { AuthClient } from "@supabase/auth-js";
 var uuid2 = (s) => typeof s === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(s);
-var fail6 = () => {
+var fail7 = () => {
   throw Error("n44_auth_configuration");
 };
 function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch, authDeadlineMs = 2e3, now = Date.now }) {
   const url = new URL(authUrl);
-  if (url.origin !== authUrl || url.protocol !== "https:" || !apiKey || typeof send !== "function" || !Number.isInteger(authDeadlineMs) || authDeadlineMs < 20 || authDeadlineMs > 5e3) fail6();
+  if (url.origin !== authUrl || url.protocol !== "https:" || !apiKey || typeof send !== "function" || !Number.isInteger(authDeadlineMs) || authDeadlineMs < 20 || authDeadlineMs > 5e3) fail7();
   const issuer = authUrl + "/auth/v1";
   return async (authorization, parentSignal, { query, beforeCommit } = {}) => {
     if (typeof query !== "function" || typeof authorization !== "string" || !/^Bearer [A-Za-z0-9._-]{20,8192}$/.test(authorization)) return null;
@@ -1170,7 +2865,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
       const boundedFetch = async (target, init = {}) => {
         fence();
         const u = new URL(target);
-        if (u.origin !== authUrl || ![issuer + "/user", issuer + "/.well-known/jwks.json"].includes(u.href) || init.method && init.method !== "GET") fail6();
+        if (u.origin !== authUrl || ![issuer + "/user", issuer + "/.well-known/jwks.json"].includes(u.href) || init.method && init.method !== "GET") fail7();
         const pending = send(u.href, { ...init, redirect: "error", cache: "no-store", credentials: "omit", signal: abort.signal });
         const response = await Promise.race([pending, new Promise((_, reject) => abort.signal.addEventListener("abort", () => reject(Error("n44_auth_unavailable")), { once: true }))]);
         let n = 0;
@@ -1191,7 +2886,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
           reader.releaseLock();
         }
         fence();
-        return new Response(Buffer3.concat(parts), { status: response.status, headers: response.headers });
+        return new Response(Buffer4.concat(parts), { status: response.status, headers: response.headers });
       };
       const auth = new AuthClient({
         url: issuer,
@@ -1203,10 +2898,10 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
         skipAutoInitialize: true,
         debug: false
       });
-      const verified = await auth.getClaims(token);
+      const verified2 = await auth.getClaims(token);
       fence();
-      if (verified.error || !verified.data?.claims) return null;
-      const c = verified.data.claims, sec = Math.floor(now() / 1e3);
+      if (verified2.error || !verified2.data?.claims) return null;
+      const c = verified2.data.claims, sec = Math.floor(now() / 1e3);
       if (c.iss !== issuer || !(c.aud === "authenticated" || Array.isArray(c.aud) && c.aud.length === 1 && c.aud[0] === "authenticated") || c.role !== "authenticated" || !uuid2(c.sub) || !uuid2(c.session_id) || c.is_anonymous === true || !Number.isSafeInteger(c.exp) || c.exp <= sec || !Number.isSafeInteger(c.iat) || c.iat > sec || c.iat >= c.exp || c.nbf !== void 0 && (!Number.isSafeInteger(c.nbf) || c.nbf > sec)) return null;
       const current2 = await query("select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)", [c.sub, c.session_id]);
       fence();
@@ -1242,7 +2937,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
 }
 
 // drafts/n44-push/canonical-source.mjs
-import { Buffer as Buffer4 } from "node:buffer";
+import { Buffer as Buffer5 } from "node:buffer";
 import { createHash } from "node:crypto";
 
 // src/models.js
@@ -1677,7 +3372,7 @@ async function readSource(query, owner, kind, id2, preferences2) {
   const result2 = await query("select n44_push_draft.read_source($1::uuid,$2::text,$3::text) as source", [owner, kind, id2]);
   const s = result2.rows[0]?.source;
   if (!s) return null;
-  if (Buffer4.byteLength(JSON.stringify(s)) > 262144) throw Error("n44_source_bound");
+  if (Buffer5.byteLength(JSON.stringify(s)) > 262144) throw Error("n44_source_bound");
   const stamp = createHash("sha256").update(JSON.stringify(s)).digest("hex");
   const { year, terms, calendars, days, teaching, section, subject, source } = s;
   if ([year, teaching, section, subject, source].some((r) => !r || r.deleted) || year.status !== "active" || section.status !== "active" || section.yearId !== year.id) return null;
@@ -1735,14 +3430,14 @@ function sourcePayload(event, now) {
 }
 
 // drafts/n44-push/backend.mjs
-var fail7 = () => {
+var fail8 = () => {
   throw Error("n44_unavailable");
 };
 var exact2 = (v, keys) => {
-  if (!record(v, keys)) fail7();
+  if (!record(v, keys)) fail8();
 };
 function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypto: crypto2, rateKey, deliveryEnabled = false, sessionPolicy, serviceSourceSha, now = Date.now }) {
-  if (!supportedSessionPolicy(sessionPolicy, now(), serviceSourceSha)) fail7();
+  if (!supportedSessionPolicy(sessionPolicy, now(), serviceSourceSha)) fail8();
   const policy = Object.freeze(structuredClone(sessionPolicy));
   const verify = createTeacherVerifier({ authUrl, apiKey, fetch, now });
   async function transaction(work, signal) {
@@ -1750,7 +3445,7 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
     let committed = false;
     const until = now() + 12e3, guards = [];
     const fence = () => {
-      if (signal?.aborted || now() >= until || !supportedSessionPolicy(policy, now(), serviceSourceSha)) fail7();
+      if (signal?.aborted || now() >= until || !supportedSessionPolicy(policy, now(), serviceSourceSha)) fail8();
     };
     const query = async (...args) => {
       fence();
@@ -1778,9 +3473,9 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
   }
   async function prepare(c, owner, state, signal) {
     const q = async (...args) => {
-      if (signal?.aborted) fail7();
+      if (signal?.aborted) fail8();
       const r = await c.query(...args);
-      if (signal?.aborted) fail7();
+      if (signal?.aborted) fail8();
       return r;
     }, events = /* @__PURE__ */ new Map();
     for (const ctx of state.contexts.values()) if (ctx.active) {
@@ -1789,7 +3484,7 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
       else if (live2.rows[0].not_after_ms !== null) ctx.sessionExpiresAt = Math.min(ctx.sessionExpiresAt, Number(live2.rows[0].not_after_ms));
     }
     const stored = await q("select * from n44_push_draft.events where owner_id=$1 order by workspace_id,device_id,event_id limit 101", [owner]);
-    if (stored.rows.length > 100) fail7();
+    if (stored.rows.length > 100) fail8();
     const cache = /* @__PURE__ */ new Map();
     for (const e of stored.rows) {
       const ctx = state.contexts.get(JSON.stringify([e.workspace_id, e.device_id]));
@@ -1808,16 +3503,16 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
       },
       async beforeCommit() {
         for (const ctx of state.contexts.values()) if (ctx.active) {
-          if (ctx.sessionExpiresAt <= now()) fail7();
+          if (ctx.sessionExpiresAt <= now()) fail8();
           const live2 = await q("select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)", [owner, ctx.sessionId]);
-          if (live2.rows.length !== 1) fail7();
+          if (live2.rows.length !== 1) fail8();
         }
       }
     };
   }
   const makeDelivery = (signal) => {
     const fence = () => {
-      if (signal?.aborted || !supportedSessionPolicy(policy, now(), serviceSourceSha)) fail7();
+      if (signal?.aborted || !supportedSessionPolicy(policy, now(), serviceSourceSha)) fail8();
     };
     const repository = createPostgresRepository({ acquire, prepare: async (...args) => {
       fence();
@@ -1857,9 +3552,9 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
     },
     async teacher(path, authorization, body, signal) {
       return transaction(async (ports, c) => {
-        const verified = await verify(authorization, signal, ports);
-        if (!verified) return { status: "rejected" };
-        const auth = { ...verified, sessionRevision: policySessionRevision(verified.sessionId, policy) };
+        const verified2 = await verify(authorization, signal, ports);
+        if (!verified2) return { status: "rejected" };
+        const auth = { ...verified2, sessionRevision: policySessionRevision(verified2.sessionId, policy) };
         const allowed = await transaction(({ query }) => take(query, "owner", auth.ownerId, 30), signal);
         if (!allowed) return { status: "limited" };
         const local = createPostgresRepository({ acquire: async () => ({
@@ -1870,13 +3565,13 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
           }
         }) });
         const scope = (b) => {
-          if (!id(b.workspaceId) || !id(b.deviceId)) fail7();
+          if (!id(b.workspaceId) || !id(b.deviceId)) fail8();
         };
         if (path.startsWith("/push/")) {
           if (path === "/push/revoke") {
             exact2(body, ["registrationId", "workspaceId", "deviceId"]);
             scope(body);
-            if (!uuid(body.registrationId)) fail7();
+            if (!uuid(body.registrationId)) fail8();
             const retired = await local.atomic(auth.ownerId, (tx) => {
               const r = tx.get("registrations", body.registrationId);
               return r && r.workspaceId === body.workspaceId && r.deviceId === body.deviceId && r.state !== "active";
@@ -1899,7 +3594,7 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
         if (path === "/context/update") {
           exact2(body, ["workspaceId", "deviceId", "expectedRevision", "preferences", "pushConsent"]);
           scope(body);
-          if (typeof body.pushConsent !== "boolean") fail7();
+          if (typeof body.pushConsent !== "boolean") fail8();
           return local.writeContexts(auth.ownerId, (tx) => {
             const previous = tx.context(body.workspaceId, body.deviceId);
             if ((previous?.consentRevision ?? null) !== body.expectedRevision) return { status: "stale" };
@@ -1930,8 +3625,8 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
           let context;
           await local.atomic(auth.ownerId, (tx) => {
             const ctx = tx.context(body.workspaceId, body.deviceId);
-            if (!ctx?.active || ctx.sessionId !== auth.sessionId || ctx.sessionRevision !== auth.sessionRevision || ctx.sessionExpiresAt <= now() || !ctx.pushConsent || ctx.consentRevision !== body.consentRevision || ctx.preferences[event.kind] !== true || quietNow(ctx.preferences, now()) !== false) fail7();
-            if (!tx.rows("registrations").some((r) => r.registrationId === body.registrationId && r.workspaceId === body.workspaceId && r.deviceId === body.deviceId && r.sessionId === auth.sessionId && r.sessionRevision === auth.sessionRevision && r.consentRevision === ctx.consentRevision && r.state === "active" && r.expiresAt > now())) fail7();
+            if (!ctx?.active || ctx.sessionId !== auth.sessionId || ctx.sessionRevision !== auth.sessionRevision || ctx.sessionExpiresAt <= now() || !ctx.pushConsent || ctx.consentRevision !== body.consentRevision || ctx.preferences[event.kind] !== true || quietNow(ctx.preferences, now()) !== false) fail8();
+            if (!tx.rows("registrations").some((r) => r.registrationId === body.registrationId && r.workspaceId === body.workspaceId && r.deviceId === body.deviceId && r.sessionId === auth.sessionId && r.sessionRevision === auth.sessionRevision && r.consentRevision === ctx.consentRevision && r.state === "active" && r.expiresAt > now())) fail8();
             context = ctx;
           });
           const stored = await ports.query(
@@ -1947,11 +3642,11 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
         if (path === "/events/update") {
           exact2(body, ["workspaceId", "deviceId", "kind", "sourceId", "expectedStamp"]);
           scope(body);
-          if (!["lesson", "due"].includes(body.kind) || !id(body.sourceId) || body.expectedStamp !== null && !/^[a-f0-9]{64}$/.test(body.expectedStamp)) fail7();
+          if (!["lesson", "due"].includes(body.kind) || !id(body.sourceId) || body.expectedStamp !== null && !/^[a-f0-9]{64}$/.test(body.expectedStamp)) fail8();
           let context;
           await local.atomic(auth.ownerId, (tx) => {
             const ctx = tx.context(body.workspaceId, body.deviceId);
-            if (!ctx?.active || ctx.sessionId !== auth.sessionId || ctx.sessionRevision !== auth.sessionRevision || ctx.sessionExpiresAt <= now()) fail7();
+            if (!ctx?.active || ctx.sessionId !== auth.sessionId || ctx.sessionRevision !== auth.sessionRevision || ctx.sessionExpiresAt <= now()) fail8();
             context = ctx;
           });
           const q = ports.query, source = await readSource(q, auth.ownerId, body.kind, body.sourceId, context.preferences);
@@ -1965,7 +3660,7 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
             await q("insert into n44_push_draft.events values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", [auth.ownerId, body.workspaceId, body.deviceId, e.id, body.kind, body.sourceId, source.stamp, dueAt, e.expiresAt, payload]);
           }
           const count = await q("select event_id from n44_push_draft.events where owner_id=$1 limit 101", [auth.ownerId]);
-          if (count.rows.length > 100) fail7();
+          if (count.rows.length > 100) fail8();
           return { status: "updated", sourceStamp: source?.stamp ?? null };
         }
         return { status: "rejected" };
@@ -1974,18 +3669,18 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
     async schedule({ operation, cursor = null, limit = 25 }, signal) {
       if (!deliveryEnabled) return { status: "disabled" };
       const delivery = makeDelivery(signal);
-      if (!["due", "cleanup"].includes(operation) || !Number.isInteger(limit) || limit < 1 || limit > 25) fail7();
+      if (!["due", "cleanup"].includes(operation) || !Number.isInteger(limit) || limit < 1 || limit > 25) fail8();
       if (operation === "cleanup") {
-        if (cursor !== null) fail7();
+        if (cursor !== null) fail8();
         const owners = await transaction(async ({ query }) => {
           const r = await query("select owner_id from n44_push_draft.owner_clock where next_cleanup_ms<=$1 order by next_cleanup_ms,owner_id limit $2 for update skip locked", [now(), limit]);
           for (const r0 of r.rows) await query("update n44_push_draft.owner_clock set next_cleanup_ms=$2 where owner_id=$1", [r0.owner_id, now() + 6e4]);
           return r.rows;
         }, signal);
         for (const r of owners) {
-          if (signal?.aborted) fail7();
+          if (signal?.aborted) fail8();
           const result2 = await delivery.cleanup(r.owner_id);
-          if (result2.status !== "cleaned") fail7();
+          if (result2.status !== "cleaned") fail8();
           await transaction(async ({ query }) => {
             await query("select owner_id from n44_push_draft.owner_clock where owner_id=$1 for update", [r.owner_id]);
             await query("delete from n44_push_draft.events where owner_id=$1 and expires_at_ms<$2", [r.owner_id, now() - 864e5]);
@@ -2003,7 +3698,7 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
         return { status: "completed", count: owners.length, cursor: null };
       }
       const first = [0, "00000000-0000-0000-0000-000000000000", "", "", "", "00000000-0000-0000-0000-000000000000"];
-      if (cursor !== null && (!Array.isArray(cursor) || cursor.length !== 6 || !Number.isSafeInteger(cursor[0]) || cursor.slice(1).some((v) => typeof v !== "string" || v.length > 240))) fail7();
+      if (cursor !== null && (!Array.isArray(cursor) || cursor.length !== 6 || !Number.isSafeInteger(cursor[0]) || cursor.slice(1).some((v) => typeof v !== "string" || v.length > 240))) fail8();
       const rows = await transaction(async ({ query }) => (await query(`select e.*,r.registration_id from n44_push_draft.events e
    join n44_push_draft.registrations r on r.owner_id=e.owner_id and r.workspace_id=e.workspace_id and r.device_id=e.device_id
    left join n44_push_draft.deliveries d on d.owner_id=e.owner_id and d.workspace_id=e.workspace_id and d.device_id=e.device_id and d.event_id=e.event_id
@@ -2013,7 +3708,7 @@ function createBackend({ acquire, authUrl, apiKey, fetch, providerOrigins, crypt
    order by e.due_at_ms,e.owner_id,e.workspace_id,e.device_id,e.event_id,r.registration_id limit $8`, [now(), ...cursor ?? first, limit])).rows, signal);
       const outcomes = [];
       for (const e of rows) {
-        if (signal?.aborted) fail7();
+        if (signal?.aborted) fail8();
         outcomes.push((await delivery.deliver(e.owner_id, e.registration_id, e.payload)).status);
       }
       const last = rows.at(-1);
@@ -2111,7 +3806,7 @@ function createWebEntry(options) {
           authorization = forwarded.get("authorization");
           body = parseBody(new TextDecoder("utf-8", { fatal: true }).decode(raw));
         }
-        if (!timingSafeEqual3(Buffer5.from(expected, "hex"), Buffer5.from(sig, "hex"))) return privateResponse(401);
+        if (!timingSafeEqual3(Buffer6.from(expected, "hex"), Buffer6.from(sig, "hex"))) return privateResponse(401);
         if (!await backend.ingress({ ...e, kind: schedule ? "scheduler" : "teacher" }, abort.signal)) return privateResponse(429);
         const result2 = schedule ? await backend.schedule(envelope, abort.signal) : await backend.teacher(path, authorization, body, abort.signal);
         if (abort.signal.aborted) return privateResponse();
@@ -2135,6 +3830,23 @@ function createWebEntry(options) {
 var recordSchedule = (e) => e && Object.keys(e).sort().join(",") === "cursor,limit,operation";
 
 // drafts/n44-push/existing-host.mjs
+async function assertPrivateDatabaseSession(client) {
+  const result2 = await client.query(`select current_user as role,
+    current_setting('log_error_verbosity') as error_verbosity,
+    current_setting('log_parameter_max_length_on_error') as error_parameters,
+    current_setting('log_statement') as statements,
+    current_setting('log_min_duration_statement') as duration,
+    current_setting('log_min_duration_sample') as duration_sample,
+    current_setting('log_transaction_sample_rate') as transaction_sample,
+    current_setting('pgaudit.log',true) as audit,
+    (select setting from pg_settings where name='auto_explain.log_min_duration') as explain_duration,
+    current_setting('auto_explain.log_nested_statements',true) as explain_nested`);
+  const r = result2.rows?.[0];
+  const explainSafe = r && (r.explain_duration == null || r.explain_duration === "-1" || /^\d+$/.test(r.explain_duration) && Number(r.explain_duration) > 6e3 && r.explain_nested === "off");
+  if (result2.rows?.length !== 1 || !r || r.role !== "n44_backend" || !["terse", "default"].includes(r.error_verbosity) || r.error_parameters !== "0" || !["none", "ddl"].includes(r.statements) || r.duration !== "-1" || r.duration_sample !== "-1" || Number(r.transaction_sample) !== 0 || r.transaction_sample == null || ![null, "none"].includes(r.audit) || !explainSafe)
+    throw Error("n44_database_unavailable");
+  await assertVerifiedBoundary(client);
+}
 function createExistingHost(readEnv) {
   if (readEnv("N44_ENABLED") !== "true") return Object.freeze({ handle: async () => privateResponse(), close: async () => {
   } });
@@ -2152,11 +3864,11 @@ function createExistingHost(readEnv) {
   const sessionPolicy = JSON.parse(required("N44_SESSION_POLICY_JSON")), serviceSourceSha = required("N44_SERVICE_SOURCE_SHA");
   if (!supportedSessionPolicy(sessionPolicy, Date.now(), serviceSourceSha)) throw Error("n44_session_policy_readback_missing");
   const dbUrl = required("N44_DATABASE_URL"), db = new URL(dbUrl), username = decodeURIComponent(db.username);
-  if (!["postgres:", "postgresql:"].includes(db.protocol) || !(username === "n44_backend" || /^n44_backend\.[a-z0-9]{20}$/.test(username)) || !db.password || db.search || db.hash) throw Error("n44_database_configuration");
+  if (!["postgres:", "postgresql:"].includes(db.protocol) || !(username === "n44_service_login" && db.hostname === "db.xlrubcwjqktzzunrvuns.supabase.co" || username === "n44_service_login.xlrubcwjqktzzunrvuns" && db.hostname === "aws-0-ap-south-1.pooler.supabase.com" && ["", "5432"].includes(db.port)) || db.pathname !== "/postgres" || !db.password || db.search || db.hash) throw Error("n44_database_configuration");
   const key = (n) => {
     const v = required(n);
     if (!/^[a-f0-9]{64}$/.test(v)) throw Error("n44_key_configuration");
-    return Buffer6.from(v, "hex");
+    return Buffer7.from(v, "hex");
   };
   const ingressKey = key("N44_INGRESS_KEY"), schedulerKey = key("N44_SCHEDULER_KEY"), rateKey = key("N44_RATE_KEY");
   const raw = JSON.parse(required("N44_CRYPTO_JSON"));
@@ -2164,20 +3876,20 @@ function createExistingHost(readEnv) {
     if (!Array.isArray(x) || x.length < 1 || x.length > 8) throw Error("n44_key_configuration");
     return new Map(x.map(([name, value]) => {
       if (!/^[a-f0-9]{64}$/.test(value)) throw Error("n44_key_configuration");
-      return [name, Buffer6.from(value, "hex")];
+      return [name, Buffer7.from(value, "hex")];
     }));
   };
   const material = { ...raw, sealingKeys: ring(raw.sealingKeys), endpointHmacKeys: ring(raw.endpointHmacKeys), bindingHmacKeys: ring(raw.bindingHmacKeys), vapidKeys: new Map(raw.vapidKeys) };
   const keys = [ingressKey, schedulerKey, rateKey, ...material.sealingKeys.values(), ...material.endpointHmacKeys.values(), ...material.bindingHmacKeys.values()];
   if (new Set(keys.map((v) => v.toString("hex"))).size !== keys.length) throw Error("n44_separate_keys_required");
   for (const v of material.vapidKeys.values()) {
-    if (!p2562.utils.isValidPrivateKey(Buffer6.from(v.privateKey ?? "", "base64url"))) throw Error("n44_private_key_configuration");
+    if (!p2562.utils.isValidPrivateKey(Buffer7.from(v.privateKey ?? "", "base64url"))) throw Error("n44_private_key_configuration");
   }
   const providerOrigins = JSON.parse(required("N44_PROVIDER_ORIGINS_JSON"));
   const crypto2 = createPrivatePushPorts({ ...material, providerOrigins, enabled: true });
   const ca = readEnv("N44_DATABASE_CA_CERT"), pool = new pg.Pool({
     connectionString: dbUrl,
-    ssl: { rejectUnauthorized: true, ...ca ? { ca } : {} },
+    ssl: { rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2", ...ca ? { ca } : {} },
     max: 4,
     connectionTimeoutMillis: 1e3,
     idleTimeoutMillis: 1e4,
@@ -2195,8 +3907,11 @@ function createExistingHost(readEnv) {
     let c;
     try {
       c = await pool.connect();
-      if ((await c.query("select current_user as role")).rows[0]?.role !== "n44_backend") throw Error();
-      return c;
+      const identity = (await c.query("select session_user as login,current_user as role")).rows[0];
+      if (identity?.login !== "n44_service_login" || ![identity.login, "n44_backend"].includes(identity.role)) throw Error();
+      await c.query("set role n44_backend");
+      await assertPrivateDatabaseSession(c);
+      return { query: (sql, values) => privateQuery(c, sql, values), release: (e) => c.release(e) };
     } catch {
       c?.release(Error("n44_database_unavailable"));
       throw Error("n44_database_unavailable");

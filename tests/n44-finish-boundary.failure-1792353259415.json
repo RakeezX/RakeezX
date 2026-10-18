@@ -1,0 +1,38 @@
+{
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "baseSha": "6753b1ede766649c2bb7506b07df63bf421858c5",
+  "startedAt": "2026-10-18T19:54:07.166Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-900eab21-43ab-43bf-86a5-2c9efef9dc02",
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "posture": {
+    "verbosity": "default",
+    "statements": "ddl",
+    "parameters": "-1",
+    "error_parameters": "0"
+  },
+  "failure": {
+    "code": null,
+    "name": "Error",
+    "message": "phase failed; private detail suppressed",
+    "location": "    at fail (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-finish-bounded-service-activation-20261018/drafts/n44-push/activation/private-error-boundary.mjs:7:23)"
+  },
+  "finishedAt": "2026-10-18T19:54:19.414Z"
+}

@@ -1,0 +1,79 @@
+{
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "baseSha": "bb6000ea7843f213f0a9045b81b2df9d1d53973e",
+  "startedAt": "2026-10-18T19:59:57.898Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "typed_private_errors_and_fail_closed_registry",
+      "status": "PASS",
+      "evidence": "Actual SQLSTATE22P02/23503/23514/42501 preserved with fixed message, no original DETAIL/HINT; transaction remains aborted. Unknown SQL and missing/altered catalog rejected before value transmission."
+    },
+    {
+      "name": "native_results_owner_source_and_nonce",
+      "status": "PASS",
+      "evidence": "Native uuid/null/bigint text/timezone results match original queries; original-session foreign-owner denial preserved, missing canonical source returns null; nonce ON CONFLICT idempotency rowCount1/0 preserved."
+    },
+    {
+      "name": "client_scram_exact_noinherit_login_and_ddl_audit",
+      "status": "PASS",
+      "evidence": "Actual new local n44_service_login authenticates with in-memory256-bit password/client SCRAM; inherits no backend privilege before SET ROLE, cannot read Auth after SET, verifier DDL audit retained, original password absent from logs. No hosted secret or login yet."
+    },
+    {
+      "name": "repository_owner_clock_cas_retry_rollback_and_durable_ack",
+      "status": "PASS",
+      "evidence": "Actual repository through typed boundary: owner isolation, stale CAS, callback rollback, high-water clock, one definitive40001 retry and no replay/early result on lost durable COMMIT ACK."
+    },
+    {
+      "name": "actual_server_log_privacy_with_error_and_ddl_audit",
+      "status": "PASS",
+      "evidence": "Actual owned PG17.6 server log retains errors and DDL under default/ddl/error-parameter0; fabricated literal and base64 canary and original constraint DETAIL absent. No hosted logger or privilege change."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-e8d46fab-9e26-448f-ab68-b08aa017f8ca",
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "posture": {
+    "verbosity": "default",
+    "statements": "ddl",
+    "parameters": "-1",
+    "error_parameters": "0"
+  },
+  "errorCases": [
+    {
+      "name": "cast-inside-boundary",
+      "sqlstate": "22P02"
+    },
+    {
+      "name": "foreign-key-detail",
+      "sqlstate": "23503"
+    },
+    {
+      "name": "check-detail",
+      "sqlstate": "23514"
+    },
+    {
+      "name": "permission",
+      "sqlstate": "42501"
+    }
+  ],
+  "routines": 42,
+  "boundaryMigration": {
+    "path": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    "sha256": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83"
+  },
+  "finishedAt": "2026-10-18T20:00:09.805Z",
+  "harnessMetadataCorrection": {
+    "originalCopiedBaseSha": "6753b1ede766649c2bb7506b07df63bf421858c5",
+    "reason": "Copied harness constant; corrected to actual unchanged HEAD observed for this run. No behavior/proof change or test replay."
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "project": {
+    "id": "xlrubcwjqktzzunrvuns",
+    "name": "RakeezX Main",
+    "status": "ACTIVE_HEALTHY"
+  },
+  "nativeIdentity": "user:f028efb8dfc85c090fff8d4b0954b271",
+  "cloudflare": {
+    "accountId": "1c9ae85e766968a4269a7ac505f9a693",
+    "accountRead": 200,
+    "ownedWorkerListRead": 200,
+    "n44WorkersAbsent": true,
+    "sourceBoundPrivacyReadbacksReused": {
+      "candidate": "1ce33228f9aaac1fee1f911662d9fb4549faebb4",
+      "files": [
+        "drafts/n88-student-portal/activation/provider-privacy-readback.json",
+        "drafts/n88-student-portal/activation/logpush-corrected-readback.json"
+      ],
+      "scope": "Same account/zone global privacy/TLS/header settings only; NOT N44 schema/role/source proof"
+    },
+    "custodyReused": {
+      "candidate": "93e76b3f68e8c56f8c7257825417105907305539",
+      "proof": "tests/n88-official-activation-custody-probe.json",
+      "scope": "Provider CSPRNG/WebCrypto RSA3072/OAEP-SHA256 + CurrentUser DPAPI/tamper/cleanup capability; no old secret reused"
+    }
+  },
+  "n44FreshSourcePreflight": {
+    "command": "official CLI2.120.0 db query --linked --project-ref xlrubcwjqktzzunrvuns --file drafts/n44-push/activation/preflight.inactive.sql --output json",
+    "exitCode": 0,
+    "expectedProject": "xlrubcwjqktzzunrvuns",
+    "database": "postgres",
+    "version": "PostgreSQL17.6",
+    "readOnly": true,
+    "personalRowsRead": 0,
+    "scope": "N44 source columns/constraints/triggers/functions/Auth ownership/RLS/existing privilege and absence checks passed; recheck immediately before apply"
+  },
+  "protectedOwnedInputProof": {
+    "newDirectoryCurrentUserOnly": true,
+    "nonEchoingChild": true,
+    "transientRemoved": true,
+    "secretValuesGenerated": false
+  },
+  "localBoundaryAndScram": "tests/n44-finish-boundary.result.json",
+  "initialFailures": [
+    "tests/n44-finish-boundary.failure-1792353259415.json: harness cached empty identities JSON before final write; corrected import order",
+    "tests/n44-finish-boundary.failure-1792353360810.json: test canary inserted in CREATE FUNCTION DDL; audit correctly recorded DDL, corrected test-only retry message"
+  ],
+  "originalSqlSha256": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
+  "rollback": "drafts/n44-push/activation/disable-provider.mjs plus scripts/n44-activation-custody.mjs --disable; exact owned flags/route/login only, no drops/logging change",
+  "liveOperationsYet": 0
+}

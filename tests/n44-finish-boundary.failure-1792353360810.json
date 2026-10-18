@@ -1,0 +1,76 @@
+{
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "8288de34-7362-4946-b319-79a28e864be8",
+  "baseSha": "6753b1ede766649c2bb7506b07df63bf421858c5",
+  "startedAt": "2026-10-18T19:55:47.841Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "typed_private_errors_and_fail_closed_registry",
+      "status": "PASS",
+      "evidence": "Actual SQLSTATE22P02/23503/23514/42501 preserved with fixed message, no original DETAIL/HINT; transaction remains aborted. Unknown SQL and missing/altered catalog rejected before value transmission."
+    },
+    {
+      "name": "native_results_owner_source_and_nonce",
+      "status": "PASS",
+      "evidence": "Native uuid/null/bigint text/timezone results match original queries; original-session foreign-owner denial preserved, missing canonical source returns null; nonce ON CONFLICT idempotency rowCount1/0 preserved."
+    },
+    {
+      "name": "repository_owner_clock_cas_retry_rollback_and_durable_ack",
+      "status": "PASS",
+      "evidence": "Actual repository through typed boundary: owner isolation, stale CAS, callback rollback, high-water clock, one definitive40001 retry and no replay/early result on lost durable COMMIT ACK."
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Assertion failed; inspect local test stack (no private values retained)."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018\\tests\\fixtures\\n44-finish\\owned-f66e0174-f6de-4c19-9cb7-4fee8bb99146",
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "posture": {
+    "verbosity": "default",
+    "statements": "ddl",
+    "parameters": "-1",
+    "error_parameters": "0"
+  },
+  "errorCases": [
+    {
+      "name": "cast-inside-boundary",
+      "sqlstate": "22P02"
+    },
+    {
+      "name": "foreign-key-detail",
+      "sqlstate": "23503"
+    },
+    {
+      "name": "check-detail",
+      "sqlstate": "23514"
+    },
+    {
+      "name": "permission",
+      "sqlstate": "42501"
+    }
+  ],
+  "routines": 42,
+  "boundaryMigration": {
+    "path": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    "sha256": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83"
+  },
+  "failure": {
+    "code": "ERR_ASSERTION",
+    "name": "AssertionError",
+    "message": "The expression evaluated to a falsy value:\n\n  assert.ok(!log.includes('FABRICATED_N44_PRIVATE_CANARY_734916'))\n",
+    "location": "    at journey (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-finish-bounded-service-activation-20261018/tests/fixtures/n44-finish/boundary-cases.mjs:101:9)"
+  },
+  "finishedAt": "2026-10-18T19:56:00.809Z"
+}

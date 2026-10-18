@@ -43,7 +43,7 @@
     "n44_guard": "NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; private read_source owner, column-limited canonical locks under owner RLS",
     "postgres": "existing management role only; lock_current_session owner, no managed Auth ownership/RLS/policy change, no new BYPASSRLS"
   },
-  "unprovenExistingCapability": "postgres REFERENCES(auth.users.id) must be read back before apply; synthetic conditional capability only. Never grant automatically.",
+  "unprovenExistingCapability": "Fresh exact metadata-only original preflight passed in current activation run; recheck immediately before apply. No hosted grant.",
   "serverCustody": {
     "edge": [
       "N44_DATABASE_URL",
@@ -74,7 +74,7 @@
       "N44_ENABLED=false",
       "N44_SCHEDULER_ENABLED=false"
     ],
-    "databaseCredential": "later separately approved LOGIN for n44_backend only, TLS verified; no URL in CLI/history/artifacts; no password provided",
+    "databaseCredential": "n44_service_login NOINHERIT NOBYPASSRLS, exact SET-only n44_backend member; protected client-SCRAM CLI input, DPAPI CurrentUser recovery, strict CA+hostname SESSION pooler5432",
     "cryptoJSONKeys": [
       "sealingKeys",
       "activeKeyId",
@@ -94,5 +94,12 @@
   ],
   "killSwitch": "disable ingress, scheduler and N44_DELIVERY_ENABLED then N44_ENABLED; drain exact old runtime before retiring approval/bindings. Preserve durable receipts; do not drop tables/replay uncertain sends.",
   "hostedStatus": "NOT_RUN",
-  "newHostOrPaidService": false
+  "newHostOrPaidService": false,
+  "privateErrorBoundary": {
+    "migration": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    "path": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    "sha256": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
+    "routines": 42,
+    "security": "SECURITY INVOKER, intended n44_backend EXECUTE only; fixed errors and original SQLSTATE; exact catalog identity checked before private binds"
+  }
 }
