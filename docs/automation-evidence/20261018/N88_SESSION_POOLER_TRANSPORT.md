@@ -1,0 +1,3 @@
+# N88 provider-supported IPv4 transport
+
+The signed-in Supabase Connect / Direct / Session pooler UI supplies aws-0-ap-south-1.pooler.supabase.com:5432 for project xlrubcwjqktzzunrvuns. Direct IPv6 is unreachable from this device. This is read-only nonsecret metadata, not an authentication or readiness PASS. Resume the exact saved boundary candidate/session using SESSION mode, the same restricted role and verified TLS. Reuse unchanged successful source-bound local proof. All hosted activation gates remain mandatory; no provider security/network/logging setting, paid add-on or Auth fixture is authorized.

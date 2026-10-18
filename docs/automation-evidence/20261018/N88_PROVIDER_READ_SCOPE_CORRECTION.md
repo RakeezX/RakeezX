@@ -1,0 +1,3 @@
+# N88 bounded provider metadata read scopes
+
+Logpush account and zone reads are now PASS200/empty in preserved N88 candidatea4af0e9. The next managed-header read was refused once. The exact existing official connection has completed the additional six read scopes recorded in provider-read-scope-correction.json. No configuration write is authorized by this correction. Preserve the actual failures and original saved session/candidate. Reuse completed native/crypto/UI/catalog evidence as applicable; phase-specific fresh baselines and actual service/secret/TLS/privacy/hosted gates remain required. Ops preparation performs no Product provider or data mutation.

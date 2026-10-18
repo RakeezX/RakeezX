@@ -37,3 +37,22 @@ test('tick frees both independent slots without replaying fixture work',async t=
  controller.loadConfig=async()=>{};controller.loadRecords=async()=>{};controller.loadJobs=async()=>{};controller.importCatalog=async()=>{};controller.reapFinishedLeases=async()=>{};controller.syncRecords=async()=>{};controller.snapshot=async()=>{};controller.launch=async task=>{launches.push(task.id);task.status='running';};
  await controller.tick();assert.deepEqual(launches,['independent-1','independent-2']);assert.equal(task.status,'blocked');assert.equal(task.failureClass,'external');
 });
+const missingTransport={state:'BLOCKED',blockerType:'network',blocker:"The local custodian lacks IPv6 connectivity to the project's direct database; the exact existing Session pooler host:port remains unavailable.",nextAction:"Resume only after receiving the project's provider-supplied Session pooler host:port without credentials, or a sanctioned IPv6-capable custodian."};
+test('missing exact provider connection input is external while transient network failures retain retry',()=>{
+ assert.equal(workerBlockerClass(missingTransport),'external');
+ for(const blocker of ['DNS lookup timed out','Temporary TLS handshake failure','IPv6 connection reset; retry when service recovers'])assert.equal(workerBlockerClass({state:'BLOCKED',blockerType:'network',blocker}),'network');
+ assert.equal(workerBlockerClass({...missingTransport,state:'LOCAL_READY'}),'network');
+ assert.equal(workerBlockerClass({...missingTransport,nextAction:'Retry after the outage'}),'network');
+});
+test('a saved completed transport prerequisite is parked without another worker or changed evidence',async t=>{
+ const {task,controller,result}=await fixture(t);
+ Object.assign(task,{failureClass:'network',lastFailure:missingTransport.blocker,infrastructureRetries:3});Object.assign(result,missingTransport);
+ await writeJson(task.attempt.outputPath,result);await controller.save(task);
+ const before=await fs.readFile(task.attempt.outputPath),attempt=structuredClone(task.attempt);
+ assert.equal(await controller.isolateCompletedAuthBlocker(task,[]),true);assert.equal(task.status,'blocked');assert.equal(task.failureClass,'external');assert.equal(task.retryAt,null);assert.equal(task.candidateSha,'a'.repeat(40));assert.deepEqual(task.attempt,attempt);assert.deepEqual(await fs.readFile(task.attempt.outputPath),before);assert.equal(task.failureReclassificationHistory[0].from,'network');assert.equal(task.failureReclassificationHistory[0].originalInfrastructureRetries,3);
+});
+test('a still active transport worker or changed result identity is never reclassified',async t=>{
+ const {task,controller,result}=await fixture(t);Object.assign(task,{failureClass:'network',lastFailure:missingTransport.blocker});Object.assign(result,missingTransport);await writeJson(task.attempt.outputPath,result);
+ assert.equal(await controller.isolateCompletedAuthBlocker(task,[{pid:7000,createdAt:'2026-10-13T01:00:00Z',name:'powershell.exe',commandLine:'',parentPid:1}]),false);
+ result.runId='other';await writeJson(task.attempt.outputPath,result);assert.equal(await controller.isolateCompletedAuthBlocker(task,[]),false);assert.equal(task.status,'retry_wait');
+});

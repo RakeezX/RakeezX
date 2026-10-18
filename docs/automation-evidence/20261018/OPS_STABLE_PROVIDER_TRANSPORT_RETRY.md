@@ -1,0 +1,5 @@
+# Stable provider transport prerequisite
+
+Actual N88 run6085920e and unchanged retriesd5b8519b/e7f1fe6e returned BLOCKED/network while waiting for a provider-supplied Session pooler host:port after unavailable IPv6. The original controller incorrectly applied transient network retry backoff. This correction classifies only this demonstrated completed, identity-bound missing-provider transport condition as external. Generic transient network outages and engine Auth/quota remain unchanged. The existing original controller parks already-completed retry_wait jobs only with matching finished checkpoint/result/session/reason and no exact live owned process; all result/candidate/session/history bytes stay preserved. No Product implementation or provider setting changes.
+
+Validation on2026-10-18:17 targeted tests passed in the isolated ops worktree, including actual stable condition, transient network negatives, result/run mismatch and live-process protection, prior Auth recovery and existing exhausted-fixture safeguards. No Product/UI/crypto suite was repeated. Install via guarded idle maintenance and exact controller reload only.
