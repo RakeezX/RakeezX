@@ -104,3 +104,45 @@ publisher remains responsible for frontend delivery after actual service gates.
 Resume only after material correction of the exact Logpush access/evidence gate.
 The native encrypted handoff is demonstrated capability, not live key installation
 or permission to bypass provider denial. Official trial URL remains unavailable.
+
+## Corrected Logs scope — run3297f7ab, 18 October
+
+Saved candidate93e76b3, all local/browser/crypto proofs and failures are preserved.
+The explicitly corrected Logs Write grant allowed the single new exact account
+and zone Logpush reads: both200, both empty job lists, zero job/configuration
+changes. The prior10000 remains historical FAIL; that blocker is resolved for
+these two reads. Crypto/DPAPI and UI proofs were reused without rerunning them.
+
+Fresh read-only baseline preflight passed on the named PostgreSQL17.6 project.
+Fresh migration history contains none of the six N88 identities. A catalog-only
+snapshot captures all13 consumed source tables, including all score families:
+214 columns,116 constraints,103 triggers. Consumed types, owner PK/immediate FK,
+RLS, exact revision-function identity, managed Auth owner/RLS/zero-policy state
+and existing management lock/REFERENCES privileges passed affected comparisons.
+N88 schema/roles remain absent. No application/Auth personal rows were read.
+The initial snapshot parser failure is retained in the snapshot receipt; only
+the read-only capture was repeated once with a corrected wrapper parser.
+
+Remaining provider gate failed on its first attempt:
+`GET /zones/1aefe7f448c93a8af637a718ac2cd101/managed_headers` returned
+`Cloudflare API error: undefined: request is not authorized`. No retry or
+credential proxy followed; dependent custom-log/header-transform reads were
+not attempted. Actual client-IP/header transformation disposition remains
+unverified. Zone settings readback succeeded: SSL full, minimum TLS1.0,
+Pseudo IPv4 off, IPv6 on. Source TLS rejection/verified upstream TLS safeguards
+remain mandatory; no zone setting was changed.
+
+Official [permission catalog](https://developers.cloudflare.com/fundamentals/api/reference/permissions/)
+lists Managed headers Read separately. This records a missing actual read
+capability, not a guessed OAuth scope or permission to expand the grant.
+No DDL, restricted LOGIN/password, real key provisioning, service/route/readiness
+write or fixture access occurred while the gate is unresolved. No owned hosted
+resource was created or needed disarm; no browser/server was started.
+
+See [current provider receipt](../../../drafts/n88-student-portal/activation/logpush-corrected-readback.json),
+[exact catalog snapshot](../../../drafts/n88-student-portal/activation/official-source-catalog.json)
+and [affected comparison](../../../tests/n88-official-activation-catalog.json).
+Resume this saved session only after a material correction supplies the exact
+authorized transformation metadata readback; refresh phase baselines before DDL.
+Logpush emptiness alone is not full private-logging/ingress readiness. Actual
+service, hosted fixture and original-publisher acceptance gates remain unrun.
