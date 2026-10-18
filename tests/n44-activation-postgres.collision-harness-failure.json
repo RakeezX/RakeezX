@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n44-service-activation-candidate-20261018",
+  "runId": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+  "baseSha": "6753b1ede766649c2bb7506b07df63bf421858c5",
+  "startedAt": "2026-10-18T04:49:26.882Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Assertion failed; inspect local test stack (no private values retained)."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "finishedAt": "2026-10-18T04:49:38.222Z"
+}

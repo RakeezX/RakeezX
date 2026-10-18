@@ -1,0 +1,45 @@
+{
+  "taskId": "continuous-n44-service-activation-candidate-20261018",
+  "runId": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+  "baseSha": "6753b1ede766649c2bb7506b07df63bf421858c5",
+  "startedAt": "2026-10-18T04:49:50.935Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "real_metadata_consumed_parity_and_fail_closed_preapply",
+      "status": "PASS",
+      "evidence": "Consumed types/nullability, composite PK/immediate parent FK topology and FORCE RLS mirrored; type drift, disabled FORCE, deferred FK, role/schema/version collision and missing existing REFERENCES reject atomically before private DDL. REFERENCES then explicitly simulated locally only: its hosted existence is NOT proven. No captured provider definition executed."
+    },
+    {
+      "name": "private_roles_managed_auth_and_negative_privileges",
+      "status": "PASS",
+      "evidence": "Exact migration executed as existing-style postgres NON-superuser/BYPASSRLS; new roles NOLOGIN/NOINHERIT/NOBYPASSRLS. Backend/guard/API roles cannot scan Auth; API roles cannot use private tables/helpers. Managed Auth ownership/RLS/zero policies unchanged; temporary guard SET/CREATE removed."
+    },
+    {
+      "name": "exact_session_helper_denies_wrong_owner_ban_and_expiry",
+      "status": "PASS",
+      "evidence": "Actual private helper returns exact original owner/session/not_after only; wrong owner, ban and expired session yield zero rows under real managed-Auth RLS replica."
+    },
+    {
+      "name": "canonical_actual_schema_parent_calendar_and_read_only_guard",
+      "status": "PASS",
+      "evidence": "Exact SQL helper reads lesson and due through valid parent/child FK dependencies with FORCE RLS and calendar lineage. Owner B hidden, direct backend reads denied, guard UPDATE denied, owner GUC clears on rollback; changed revision and deleted child observed."
+    },
+    {
+      "name": "fresh_only_collision_and_exact_metadata_readback",
+      "status": "PASS",
+      "evidence": "Reapplication rejects before DDL; catalog-only helper body/ACL/role/grant/policy/RLS identities exported from actual owned PG for later authorized readback. No hosted readback claim."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "finishedAt": "2026-10-18T04:50:03.971Z"
+}

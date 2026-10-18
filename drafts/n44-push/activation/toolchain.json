@@ -1,0 +1,37 @@
+{
+  "aiAuthored": true,
+  "tools": {
+    "supabase": {
+      "version": "2.117.0",
+      "sha256": "442c83f7d455edc0462e94e22d60c9f7f05783fc83d39a0f49dadc78a914a1dd"
+    },
+    "esbuild": {
+      "version": "0.28.1",
+      "sha256": "ec02ee9b14ab332416fedd10614dfb80eed5304d94f67745067c011934a8c3c3"
+    },
+    "wrangler": {
+      "version": "4.148.0",
+      "sha256": "780661a508810f3b65786895b1ca9aacbc4f55d329ae6b8c1e49ec8433569f77"
+    },
+    "denoPreviouslyQualified": {
+      "version": "2.2.12",
+      "sha256": "4dd5f70d571e7cb49956b46e91ba9b91a83ea22bcfba496246174d9062b8d410"
+    },
+    "denoTypecheck": {
+      "version": "2.9.6",
+      "sha256": "2ff9493dfa356be2975f477025ea770088e9e9cb2c83d983236d13561b96b7a6"
+    },
+    "postgres": {
+      "version": "17.6",
+      "sha256": "54e7e05939e61f3462e3fd295bc12292623ad3cf010c02ae9cc3295a64b0770f"
+    },
+    "node": {
+      "version": "v24.19.0",
+      "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+    }
+  },
+  "notes": [
+    "Existing installed binaries only; no update/install. Prior N44 Deno 2.2.12 runtime evidence reused by component hashes; actual packaged disabled handler additionally tested here. Deno 2.9.6 cached-only frozen-lockfile check is auxiliary, not hosted runtime proof. Wrangler was not invoked.",
+    "esbuild bundles all local imports offline; npm packages remain exact pinned external dependencies with copied Deno lock integrity. No vendored package source or network service claim."
+  ]
+}

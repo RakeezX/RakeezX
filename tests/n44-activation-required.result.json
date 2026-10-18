@@ -1,0 +1,49 @@
+{
+  "taskId": "continuous-n44-service-activation-candidate-20261018",
+  "runId": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+  "baseSha": "6753b1ede766649c2bb7506b07df63bf421858c5",
+  "checkedAt": "2026-10-18T04:53:57.769Z",
+  "checks": [
+    {
+      "name": "n44_real_metadata_bound_fresh_activation_migration_and_private_role_guards",
+      "status": "PASS",
+      "evidence": "tests/n44-activation-postgres.result.json: actual owned PG17.6 migration as non-superuser postgres, FORCE/managed Auth RLS, owner/session/read-only negatives, type/FK/RLS/schema/role/version collisions; conditional REFERENCES prerequisite explicitly unproven hosted."
+    },
+    {
+      "name": "n44_exact_inactive_deploy_readback_cron_and_client_manifest",
+      "status": "PASS",
+      "evidence": "tests/n44-activation-artifacts.result.json: exact 3 bundled graphs/locks/default-OFF actual handlers, private scheduler, readback tamper checks, unchanged client/component evidence reuse. Final normalized source and exact output hashes rechecked after toolchain note correction."
+    },
+    {
+      "name": "owned_phase_cleanup",
+      "status": "PASS",
+      "evidence": "tests/n44-activation-cleanup.json: all 5 owned checkpoints stopped, no PID file/matching process; integration lease released; no cleanup deletion."
+    },
+    {
+      "name": "hosted_service_policy_provider_private_device_and_production",
+      "status": "NOT_RUN",
+      "evidence": "No live operation authorized/performed; actual REFERENCES, fresh supported Auth policy approval, hosted fixture and real-device proof remain later activation gates. Every activation flag OFF."
+    }
+  ],
+  "sourceSha256": {
+    "scripts/n44-activation-prepare.mjs": "9a57970e5d723bd992be82fe40ad43f22c790a3dd8d41abd562ce69b5b90810c",
+    "scripts/n44-activation-bundle.mjs": "81d8d5e51a81e2c6a30a43e5f59509fc0d681a70cdecabc0f3f7c9acc7296e79",
+    "scripts/n44-activation-readback.mjs": "ea6e9e3851735a07e3a9e6831cb02cdf40258635fda05d73e0d4f1daec23936c",
+    "tests/n44-activation-postgres.mjs": "59fb7a7d656ea8ae86fcae38437cdb353017fa44b0c20011da599606746d4365",
+    "tests/n44-activation-artifacts.mjs": "29ff290de2aa094615b185c9881eba7e38d91c9048dfda4c91dff868fc16bfe9",
+    "tests/n44-activation-edge.mjs": "64a5234d4d4926940a5835e45f9863f8155b79d25363dc1e08e2679c177cda72",
+    "tests/fixtures/n44-activation/guards.mjs": "fd1a73fbe539eae3d6057a9c1e42c7beb1039903369ad4149407194502346cce",
+    "tests/fixtures/n44-activation/canonical.sql": "452e35cd48e500a15c27d57be584b6028183e6976575768294a02f2bacfd1035",
+    "drafts/n44-push/activation/manifest.json": "ec2c2d583f4042db68656818c86e0bcab1bad9c7c4e5ef594c5b285a60adfa49",
+    "drafts/n44-push/activation/expected-identities.json": "83055fde1a2ee1cdd7d6f0e0eaeaa8d75e1a9ec598560072bcd78d71f581386e",
+    "tests/n44-activation-postgres.result.json": "55e47aa8bfe539799d36a304ee5bb748ae7e79be5c8e8395dc72b5bafa448a2b",
+    "tests/n44-activation-artifacts.result.json": "d912f4be5238541fe7d623eae04f89dfe902bcba8f29d46ef2e70f8a8d50c2d0",
+    "tests/n44-activation-cleanup.json": "b8cab7081fd8dc4094fc017198d77f9582d316c30fa0eec88543bb4623b58a60"
+  },
+  "denoAuxiliary": {
+    "version": "2.9.6",
+    "command": "deno check --cached-only --frozen-lockfile --config drafts/n44-push/activation/bundle/edge/deno.json drafts/n44-push/activation/bundle/edge/index.mjs",
+    "exitCode": 0,
+    "scope": "Auxiliary JS entry/dependency check; not hosted proof."
+  }
+}

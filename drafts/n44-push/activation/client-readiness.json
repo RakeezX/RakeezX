@@ -1,0 +1,54 @@
+{
+  "aiAuthored": true,
+  "enabled": false,
+  "browserProtocol": "n44-browser-v2",
+  "serviceRevision": "n44-browser-service-v2",
+  "client": {
+    "path": "src/lib/notification-push-runtime.js",
+    "constant": "PUSH_CONFIGURATION",
+    "enabled": false,
+    "publicKey": null
+  },
+  "serviceWorker": {
+    "path": "sw.js",
+    "constant": "N44_PUSH_ENABLED",
+    "enabled": false
+  },
+  "transport": {
+    "origin": "existing application HTTPS origin only",
+    "route": "/api/n44/*",
+    "credentials": "omit",
+    "sameOriginCSRF": "x-n44-csrf: 1"
+  },
+  "publicValuesOnly": [
+    "enabled",
+    "publicKey (VAPID public P256 only)"
+  ],
+  "privateValuesForbidden": [
+    "N44_DATABASE_URL",
+    "N44_CRYPTO_JSON",
+    "N44_INGRESS_KEY",
+    "N44_SCHEDULER_KEY",
+    "N44_RATE_KEY",
+    "bearer/session/refresh tokens"
+  ],
+  "activationPrerequisites": [
+    "exact hosted migration/readback and private least-privilege custody",
+    "current official Auth verification and original session locks",
+    "fresh actual supported Auth policy metadata bound to NEW approvalId and exact 40-char serviceSourceSha at activation",
+    "ingress and scheduler signatures, provider TLS/IP and safe logs",
+    "new separately approved hosted synthetic fixture with valid parent/child lifecycle",
+    "real device zero-open-client generic receipt; stale binding/logout/expiry denial and fresh private click authorization",
+    "separate explicit browser + SW + service + delivery + ingress + scheduler activation diff"
+  ],
+  "policy": {
+    "timeboxSeconds": null,
+    "inactivityTimeoutSeconds": null,
+    "singleSessionPerUser": false,
+    "freshAtActivationMaximumMs": 86400000,
+    "dailyHumanRenewal": false,
+    "onAuthPolicyChange": "disable ingress/delivery/scheduler, drain, retire approval and old bindings, requalify supported profile with NEW approval ID"
+  },
+  "background": "30-day maximum consent/registration lease clamped to actual original session not_after; each scheduled attempt rechecks ban/session/consent/source; no stored bearer/refresh token",
+  "hostedAndDeviceStatus": "NOT_RUN"
+}

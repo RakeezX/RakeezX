@@ -1,0 +1,5 @@
+{
+  "status": "FAIL",
+  "operation": "node tests/n44-activation-artifacts.mjs",
+  "evidence": "Config assertion expected LF-only observability newline; generated Windows CRLF config contained the correct OFF value. Corrected matcher accepts CRLF/LF without changing activation switches."
+}

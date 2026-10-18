@@ -1,0 +1,3025 @@
+{
+  "aiAuthored": true,
+  "localSyntheticOnly": true,
+  "identities": {
+    "auth": [
+      {
+        "owner": "supabase_auth_admin",
+        "relname": "sessions",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "owner": "supabase_auth_admin",
+        "relname": "users",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    ],
+    "roles": [
+      {
+        "rolname": "n44_backend",
+        "rolsuper": false,
+        "rolinherit": false,
+        "rolcanlogin": false,
+        "rolcreatedb": false,
+        "rolbypassrls": false,
+        "rolcreaterole": false,
+        "rolreplication": false
+      },
+      {
+        "rolname": "n44_guard",
+        "rolsuper": false,
+        "rolinherit": false,
+        "rolcanlogin": false,
+        "rolcreatedb": false,
+        "rolbypassrls": false,
+        "rolcreaterole": false,
+        "rolreplication": false
+      }
+    ],
+    "schema": {
+      "acl": "{postgres=UC/postgres,n44_guard=U/postgres,n44_backend=U/postgres}",
+      "owner": "postgres"
+    },
+    "tables": [
+      {
+        "relname": "budgets",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "contexts",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "deliveries",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "endpoint_claims",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "events",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "ingress_nonces",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "ingress_rates",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "owner_clock",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "registrations",
+        "relrowsecurity": true,
+        "independently_owned": true,
+        "relforcerowsecurity": true
+      }
+    ],
+    "helpers": [
+      {
+        "args": "",
+        "name": "immutable_delivery",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres}",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": false,
+        "definition_md5": "41837045a1b74ba77a253a0a8208d03c"
+      },
+      {
+        "args": "",
+        "name": "immutable_registration",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres}",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": false,
+        "definition_md5": "0464903ad613e7d4199399083b07e3f8"
+      },
+      {
+        "args": "p_user uuid, p_session uuid",
+        "name": "lock_current_session",
+        "owner": "postgres",
+        "proacl": "{postgres=X/postgres,n44_backend=X/postgres}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": true,
+        "definition_md5": "cef322e7251a3673087cad12dbda7843"
+      },
+      {
+        "args": "p_owner uuid, p_kind text, p_id text",
+        "name": "read_source",
+        "owner": "n44_guard",
+        "proacl": "{n44_guard=X/n44_guard,n44_backend=X/n44_guard}",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": true,
+        "definition_md5": "880b8d3011b2f5805b997205d1fced13"
+      }
+    ],
+    "indexes": [
+      {
+        "indexdef": "CREATE UNIQUE INDEX budgets_pkey ON n44_push_draft.budgets USING btree (owner_id, budget_key)",
+        "indexname": "budgets_pkey",
+        "tablename": "budgets"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX contexts_pkey ON n44_push_draft.contexts USING btree (owner_id, workspace_id, device_id)",
+        "indexname": "contexts_pkey",
+        "tablename": "contexts"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX deliveries_pkey ON n44_push_draft.deliveries USING btree (owner_id, workspace_id, device_id, event_id)",
+        "indexname": "deliveries_pkey",
+        "tablename": "deliveries"
+      },
+      {
+        "indexdef": "CREATE INDEX delivery_retention ON n44_push_draft.deliveries USING btree (owner_id, expires_at_ms)",
+        "indexname": "delivery_retention",
+        "tablename": "deliveries"
+      },
+      {
+        "indexdef": "CREATE INDEX retry_due ON n44_push_draft.deliveries USING btree (owner_id, next_at_ms) WHERE (state = 'retry'::text)",
+        "indexname": "retry_due",
+        "tablename": "deliveries"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX endpoint_claims_owner_id_registration_id_key ON n44_push_draft.endpoint_claims USING btree (owner_id, registration_id)",
+        "indexname": "endpoint_claims_owner_id_registration_id_key",
+        "tablename": "endpoint_claims"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX endpoint_claims_pkey ON n44_push_draft.endpoint_claims USING btree (fingerprint)",
+        "indexname": "endpoint_claims_pkey",
+        "tablename": "endpoint_claims"
+      },
+      {
+        "indexdef": "CREATE INDEX endpoint_owner ON n44_push_draft.endpoint_claims USING btree (owner_id)",
+        "indexname": "endpoint_owner",
+        "tablename": "endpoint_claims"
+      },
+      {
+        "indexdef": "CREATE INDEX events_due ON n44_push_draft.events USING btree (due_at_ms, owner_id, workspace_id, device_id, event_id)",
+        "indexname": "events_due",
+        "tablename": "events"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX events_pkey ON n44_push_draft.events USING btree (owner_id, workspace_id, device_id, event_id)",
+        "indexname": "events_pkey",
+        "tablename": "events"
+      },
+      {
+        "indexdef": "CREATE INDEX ingress_expiry ON n44_push_draft.ingress_nonces USING btree (expires_at_ms)",
+        "indexname": "ingress_expiry",
+        "tablename": "ingress_nonces"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX ingress_nonces_pkey ON n44_push_draft.ingress_nonces USING btree (nonce)",
+        "indexname": "ingress_nonces_pkey",
+        "tablename": "ingress_nonces"
+      },
+      {
+        "indexdef": "CREATE INDEX ingress_scope ON n44_push_draft.ingress_nonces USING btree (scope)",
+        "indexname": "ingress_scope",
+        "tablename": "ingress_nonces"
+      },
+      {
+        "indexdef": "CREATE INDEX ingress_kind ON n44_push_draft.ingress_rates USING btree (kind)",
+        "indexname": "ingress_kind",
+        "tablename": "ingress_rates"
+      },
+      {
+        "indexdef": "CREATE INDEX ingress_rate_expiry ON n44_push_draft.ingress_rates USING btree (expires_at_ms)",
+        "indexname": "ingress_rate_expiry",
+        "tablename": "ingress_rates"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX ingress_rates_pkey ON n44_push_draft.ingress_rates USING btree (key)",
+        "indexname": "ingress_rates_pkey",
+        "tablename": "ingress_rates"
+      },
+      {
+        "indexdef": "CREATE INDEX cleanup_due ON n44_push_draft.owner_clock USING btree (next_cleanup_ms, owner_id)",
+        "indexname": "cleanup_due",
+        "tablename": "owner_clock"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX owner_clock_pkey ON n44_push_draft.owner_clock USING btree (owner_id)",
+        "indexname": "owner_clock_pkey",
+        "tablename": "owner_clock"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX one_active_context ON n44_push_draft.registrations USING btree (owner_id, workspace_id, device_id) WHERE (state = 'active'::text)",
+        "indexname": "one_active_context",
+        "tablename": "registrations"
+      },
+      {
+        "indexdef": "CREATE INDEX registration_expiry ON n44_push_draft.registrations USING btree (owner_id, expires_at_ms)",
+        "indexname": "registration_expiry",
+        "tablename": "registrations"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX registrations_pkey ON n44_push_draft.registrations USING btree (owner_id, registration_id)",
+        "indexname": "registrations_pkey",
+        "tablename": "registrations"
+      }
+    ],
+    "policies": [
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "budgets",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "contexts",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "deliveries",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "endpoint_claims",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "events",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "ingress_nonces",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "ingress_rates",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "owner_clock",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "true",
+        "roles": [
+          "n44_backend"
+        ],
+        "tablename": "registrations",
+        "policyname": "private_backend",
+        "schemaname": "n44_push_draft",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "calendar_days",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "calendars",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "items",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "score_subitems",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "sections",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "sessions",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "subjects",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "teachings",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "terms",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((owner_id)::text = current_setting('n44.canonical_owner'::text, true))",
+        "roles": [
+          "n44_guard"
+        ],
+        "tablename": "years",
+        "policyname": "n44_guard_read",
+        "schemaname": "rakeezx",
+        "with_check": "false"
+      }
+    ],
+    "triggers": [
+      {
+        "name": "immutable_delivery",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER immutable_delivery BEFORE UPDATE ON n44_push_draft.deliveries FOR EACH ROW EXECUTE FUNCTION n44_push_draft.immutable_delivery()",
+        "table_name": "n44_push_draft.deliveries"
+      },
+      {
+        "name": "immutable_registration",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER immutable_registration BEFORE UPDATE ON n44_push_draft.registrations FOR EACH ROW EXECUTE FUNCTION n44_push_draft.immutable_registration()",
+        "table_name": "n44_push_draft.registrations"
+      }
+    ],
+    "management": {
+      "role": "postgres",
+      "bypassrls": true,
+      "superuser": false,
+      "auth_create": false,
+      "auth_owner_member": false
+    },
+    "constraints": [
+      {
+        "name": "budgets_bucket_check",
+        "definition": "CHECK ((bucket >= 0))",
+        "table_name": "n44_push_draft.budgets",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "budgets_budget_key_check",
+        "definition": "CHECK (((length(budget_key) >= 1) AND (length(budget_key) <= 200)))",
+        "table_name": "n44_push_draft.budgets",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "budgets_count_check",
+        "definition": "CHECK (((count >= 1) AND (count <= 40)))",
+        "table_name": "n44_push_draft.budgets",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "budgets_owner_id_fkey",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+        "table_name": "n44_push_draft.budgets",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "budgets_pkey",
+        "definition": "PRIMARY KEY (owner_id, budget_key)",
+        "table_name": "n44_push_draft.budgets",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_consent_revision_check",
+        "definition": "CHECK (((length(consent_revision) >= 1) AND (length(consent_revision) <= 180)))",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_device_id_check",
+        "definition": "CHECK (((length(device_id) >= 1) AND (length(device_id) <= 180)))",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_owner_id_fkey",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_pkey",
+        "definition": "PRIMARY KEY (owner_id, workspace_id, device_id)",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_preferences_check",
+        "definition": "CHECK (((jsonb_typeof(preferences) = 'object'::text) AND (octet_length((preferences)::text) <= 2048)))",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_session_id_check",
+        "definition": "CHECK (((length(session_id) >= 1) AND (length(session_id) <= 180)))",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_session_revision_check",
+        "definition": "CHECK (((length(session_revision) >= 1) AND (length(session_revision) <= 180)))",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "contexts_workspace_id_check",
+        "definition": "CHECK (((length(workspace_id) >= 1) AND (length(workspace_id) <= 180)))",
+        "table_name": "n44_push_draft.contexts",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_action_path_check",
+        "definition": "CHECK (((length(action_path) >= 1) AND (length(action_path) <= 800)))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_attempts_check",
+        "definition": "CHECK (((attempts >= 0) AND (attempts <= 3)))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_check",
+        "definition": "CHECK (((attempts > 0) OR (state = 'suppressed'::text)))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_check1",
+        "definition": "CHECK ((started_at_ms < expires_at_ms))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_event_id_check",
+        "definition": "CHECK ((event_id ~ '^[a-zA-Z0-9_:%.-]{1,240}$'::text))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_expires_at_ms_check",
+        "definition": "CHECK ((expires_at_ms >= 0))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_kind_check",
+        "definition": "CHECK ((kind = ANY (ARRAY['lesson'::text, 'due'::text])))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_owner_id_fkey",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_pkey",
+        "definition": "PRIMARY KEY (owner_id, workspace_id, device_id, event_id)",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "deliveries_state_check",
+        "definition": "CHECK ((state = ANY (ARRAY['sending'::text, 'retry'::text, 'sent'::text, 'uncertain'::text, 'suppressed'::text, 'dead'::text])))",
+        "table_name": "n44_push_draft.deliveries",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "endpoint_claims_fingerprint_check",
+        "definition": "CHECK ((fingerprint ~ '^[a-f0-9]{64}$'::text))",
+        "table_name": "n44_push_draft.endpoint_claims",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "endpoint_claims_owner_id_registration_id_fkey",
+        "definition": "FOREIGN KEY (owner_id, registration_id) REFERENCES n44_push_draft.registrations(owner_id, registration_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED",
+        "table_name": "n44_push_draft.endpoint_claims",
+        "condeferred": true,
+        "convalidated": true,
+        "condeferrable": true
+      },
+      {
+        "name": "endpoint_claims_owner_id_registration_id_key",
+        "definition": "UNIQUE (owner_id, registration_id)",
+        "table_name": "n44_push_draft.endpoint_claims",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "endpoint_claims_pkey",
+        "definition": "PRIMARY KEY (fingerprint)",
+        "table_name": "n44_push_draft.endpoint_claims",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "events_check",
+        "definition": "CHECK ((expires_at_ms > due_at_ms))",
+        "table_name": "n44_push_draft.events",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "events_owner_id_fkey",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+        "table_name": "n44_push_draft.events",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "events_owner_id_workspace_id_device_id_fkey",
+        "definition": "FOREIGN KEY (owner_id, workspace_id, device_id) REFERENCES n44_push_draft.contexts(owner_id, workspace_id, device_id)",
+        "table_name": "n44_push_draft.events",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "events_payload_check",
+        "definition": "CHECK ((octet_length((payload)::text) <= 2048))",
+        "table_name": "n44_push_draft.events",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "events_pkey",
+        "definition": "PRIMARY KEY (owner_id, workspace_id, device_id, event_id)",
+        "table_name": "n44_push_draft.events",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "events_source_kind_check",
+        "definition": "CHECK ((source_kind = ANY (ARRAY['lesson'::text, 'due'::text])))",
+        "table_name": "n44_push_draft.events",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "events_source_stamp_check",
+        "definition": "CHECK ((source_stamp ~ '^[a-f0-9]{64}$'::text))",
+        "table_name": "n44_push_draft.events",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "ingress_nonces_pkey",
+        "definition": "PRIMARY KEY (nonce)",
+        "table_name": "n44_push_draft.ingress_nonces",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "ingress_nonces_scope_check",
+        "definition": "CHECK ((scope = ANY (ARRAY['teacher'::text, 'scheduler'::text])))",
+        "table_name": "n44_push_draft.ingress_nonces",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "ingress_rates_pkey",
+        "definition": "PRIMARY KEY (key)",
+        "table_name": "n44_push_draft.ingress_rates",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "owner_clock_high_water_ms_check",
+        "definition": "CHECK ((high_water_ms >= 0))",
+        "table_name": "n44_push_draft.owner_clock",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "owner_clock_owner_id_fkey",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+        "table_name": "n44_push_draft.owner_clock",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "owner_clock_pkey",
+        "definition": "PRIMARY KEY (owner_id)",
+        "table_name": "n44_push_draft.owner_clock",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_binding_fingerprint_check",
+        "definition": "CHECK ((binding_fingerprint ~ '^[a-f0-9]{64}$'::text))",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_check",
+        "definition": "CHECK ((((state = 'active'::text) AND (sealed IS NOT NULL) AND (fingerprint IS NOT NULL) AND (binding_fingerprint IS NOT NULL)) OR ((state <> 'active'::text) AND (sealed IS NULL) AND (fingerprint IS NULL) AND (binding_fingerprint IS NULL))))",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_expires_at_ms_check",
+        "definition": "CHECK ((expires_at_ms >= 0))",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_fingerprint_check",
+        "definition": "CHECK ((fingerprint ~ '^[a-f0-9]{64}$'::text))",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_owner_id_fkey",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_owner_id_workspace_id_device_id_fkey",
+        "definition": "FOREIGN KEY (owner_id, workspace_id, device_id) REFERENCES n44_push_draft.contexts(owner_id, workspace_id, device_id)",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_pkey",
+        "definition": "PRIMARY KEY (owner_id, registration_id)",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_sealed_check",
+        "definition": "CHECK (((octet_length(sealed) >= 1) AND (octet_length(sealed) <= 8192)))",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      },
+      {
+        "name": "registrations_state_check",
+        "definition": "CHECK ((state = ANY (ARRAY['active'::text, 'revoked'::text, 'dead'::text])))",
+        "table_name": "n44_push_draft.registrations",
+        "condeferred": false,
+        "convalidated": true,
+        "condeferrable": false
+      }
+    ],
+    "memberships": [
+      {
+        "role": "n44_backend",
+        "member": "postgres",
+        "set_option": false,
+        "admin_option": true,
+        "inherit_option": false
+      },
+      {
+        "role": "n44_guard",
+        "member": "postgres",
+        "set_option": false,
+        "admin_option": true,
+        "inherit_option": false
+      },
+      {
+        "role": "n44_guard",
+        "member": "postgres",
+        "set_option": false,
+        "admin_option": false,
+        "inherit_option": false
+      }
+    ],
+    "table_grants": [
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "DELETE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      }
+    ],
+    "column_grants": [
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "bucket",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "bucket",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "bucket",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "budget_key",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "budget_key",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "budget_key",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "count",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "count",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "count",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "budgets",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "active",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "active",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "active",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "consent_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "consent_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "consent_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "preferences",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "preferences",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "preferences",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "push_consent",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "push_consent",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "push_consent",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "session_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "contexts",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "action_path",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "action_path",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "action_path",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "attempts",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "attempts",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "attempts",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "event_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "event_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "event_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "next_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "next_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "next_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "started_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "started_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "started_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "state",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "state",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "state",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "deliveries",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "endpoint_claims",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "due_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "due_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "due_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "event_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "event_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "event_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "payload",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "payload",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "payload",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_stamp",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_stamp",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "source_stamp",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "events",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "nonce",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "nonce",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "nonce",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "scope",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "scope",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_nonces",
+        "column_name": "scope",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "bucket",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "bucket",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "bucket",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "count",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "count",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "count",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "key",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "key",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "key",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "ingress_rates",
+        "column_name": "kind",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "high_water_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "high_water_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "high_water_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "next_cleanup_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "next_cleanup_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "next_cleanup_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "owner_clock",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "binding_fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "binding_fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "binding_fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "consent_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "consent_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "consent_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "device_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "expires_at_ms",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "fingerprint",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "owner_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "registration_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "sealed",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "sealed",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "sealed",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "session_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "session_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "session_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "session_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "session_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "session_revision",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "state",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "state",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "state",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "INSERT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_backend",
+        "table_name": "registrations",
+        "column_name": "workspace_id",
+        "table_schema": "n44_push_draft",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "calendar_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "date",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "kind",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendar_days",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "preset_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "source",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "term_date_overrides",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "calendars",
+        "column_name": "year_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "items",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "items",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "items",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "items",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "items",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "items",
+        "column_name": "score_mode",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "items",
+        "column_name": "teaching_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "due_date",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "item_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "score_subitems",
+        "column_name": "start_date",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sections",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sections",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sections",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sections",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sections",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sections",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sections",
+        "column_name": "year_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "date",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "end_time",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "start_time",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "sessions",
+        "column_name": "teaching_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "subjects",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "subjects",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "subjects",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "subjects",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "subjects",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "section_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "subject_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "teachings",
+        "column_name": "term_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "end_date",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "index",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "start_date",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "terms",
+        "column_name": "year_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "calendar_preset_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "deleted_at",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "hijri_end",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "hijri_start",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "id",
+        "table_schema": "rakeezx",
+        "privilege_type": "UPDATE"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "owner_id",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "revision",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      },
+      {
+        "grantee": "n44_guard",
+        "table_name": "years",
+        "column_name": "status",
+        "table_schema": "rakeezx",
+        "privilege_type": "SELECT"
+      }
+    ],
+    "negative_access": {
+      "anon_private": false,
+      "backend_auth": false,
+      "guard_schema_create": false,
+      "backend_guard_member": false,
+      "backend_session_scan": false,
+      "authenticated_private": false,
+      "backend_schema_create": false
+    },
+    "auth_policy_count": 0,
+    "owner_reference_capability": true
+  }
+}

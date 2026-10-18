@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-18T04:53:11.2216392Z",
+  "taskId": "continuous-n44-service-activation-candidate-20261018",
+  "runId": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+  "status": "PASS",
+  "phases": [
+    {
+      "phase": "owned-180ba4e8-025b-4ed9-ab25-574e79b7a2da",
+      "ownerRun": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+      "postmasterPidAbsent": true,
+      "matchingProcessCount": 0,
+      "stoppedCheckpointRetained": true
+    },
+    {
+      "phase": "owned-2caf48d9-59d4-4a80-a8a8-b944c8e07dfe",
+      "ownerRun": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+      "postmasterPidAbsent": true,
+      "matchingProcessCount": 0,
+      "stoppedCheckpointRetained": true
+    },
+    {
+      "phase": "owned-594d523e-e8a0-4dd1-a9e3-6077b04c18d5",
+      "ownerRun": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+      "postmasterPidAbsent": true,
+      "matchingProcessCount": 0,
+      "stoppedCheckpointRetained": true
+    },
+    {
+      "phase": "owned-8e25f060-c401-4bad-82b7-856be635c60d",
+      "ownerRun": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+      "postmasterPidAbsent": true,
+      "matchingProcessCount": 0,
+      "stoppedCheckpointRetained": true
+    },
+    {
+      "phase": "owned-cbea2cd1-c50a-4dc0-8c42-418595bbaa7d",
+      "ownerRun": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+      "postmasterPidAbsent": true,
+      "matchingProcessCount": 0,
+      "stoppedCheckpointRetained": true
+    }
+  ],
+  "scope": "Readonly owned marker/postmaster PID and process command-line check; no deletion or process termination."
+}

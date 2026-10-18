@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n44-service-activation-candidate-20261018",
+  "runId": "db4e0272-e5b1-44da-83b1-c720bc76cb4d",
+  "baseSha": "6753b1ede766649c2bb7506b07df63bf421858c5",
+  "startedAt": "2026-10-18T04:46:19.370Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "real_metadata_consumed_parity_and_fail_closed_preapply",
+      "status": "PASS",
+      "evidence": "Consumed types/nullability, composite PK/immediate parent FK topology and FORCE RLS mirrored; type drift, disabled FORCE, deferred FK and role collision reject atomically before private DDL. No captured provider definition executed."
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "finishedAt": "2026-10-18T04:46:31.222Z"
+}

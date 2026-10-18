@@ -1,0 +1,7 @@
+# AI: inactive merge fragment; relative to existing supabase/config.toml.
+# Never replace the existing config. Separate exact diff approval before enable.
+[functions.n44-notifications]
+enabled = false
+verify_jwt = false
+entrypoint = "../drafts/n44-push/activation/bundle/edge/index.mjs"
+import_map = "../drafts/n44-push/activation/bundle/edge/import_map.json"

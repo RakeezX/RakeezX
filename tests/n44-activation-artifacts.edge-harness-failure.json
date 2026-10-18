@@ -1,0 +1,4 @@
+{
+  "status": "FAIL",
+  "evidence": "Synthetic Deno.env stub rejected dependency import of http_ece ECE_KEYLOG as though it were a service secret. Child environment was sanitized. Corrected harness returns undefined for ordinary dependency diagnostic variables and still throws for every N44 binding except N44_ENABLED=false; no runtime guard changed."
+}
