@@ -34,3 +34,15 @@ Raw final measurements and checks: `tests/n123-review-1400-browser.json`. Initia
 ## Resources and delivery
 
 Canonical `withIsolatedLocalBrowser` verified the active task/run identity, blocked external requests/Service Workers and closed its owned contexts/browser in finally. The ephemeral task-owned server closed in finally. No shared/live browser lease is needed under the approved local synthetic exception. No push, deployment, queue/ledger edit, live mutation or service operation was performed. The independent publisher owns integration and Production evidence; this result is local readiness only.
+
+## Same-session Node harness repair — 19 October
+
+Repair run `a333c666-d6ef-4a40-b128-c5f88c9d0ea3` preserves candidate `d4a7d407c724f09f03fe03de553bd64d3ef798bd` and all historical failures above. The latest N123 Product note, `[OPS-20261019-1445-EXACT-HARNESS-REPAIR]`, requires fixing only the missing Node environment and rerunning only the failed relevant cases, or explicitly establishing the obsolete harness limitation.
+
+Concrete correction: preload `tests/fixtures/n123-review-1400/node-storage.mjs`, providing an empty process-local Storage API (`length`, `key`, get/set/remove/clear) using the existing test-fixture pattern. It does not seed a capability/credential, change a test assertion or alter Product/security code. Storage disappears with the owned Node process.
+
+Command: `node --import ./tests/fixtures/n123-review-1400/node-storage.mjs --test --test-name-pattern='V2 coordinator performs|runtime automatic/manual' tests/sync-v2-runtime.test.mjs`.
+
+Observed result: **2 passed, 0 failed**, exit 0. Both original cases ran: automatic coordinator/manual retry (600.6918ms), and owner rejection/resumption (1152.8425ms). This is a new passing invocation with a corrected environment; the original unprepared invocation remains FAIL, not relabeled. Machine-readable result: `tests/n123-review-1400-node-repair.json`.
+
+Product source remains byte-for-byte unchanged from the preserved candidate. Reuse its required actual-browser timing/ACK/recovery/first-tap deletion proof and four focused engine checks; no browser, server, Preview or performance matrix was repeated. No deployment, queue/status edits or new service operations. The repair adds only the scoped Node preload and evidence; the candidate history is retained.
