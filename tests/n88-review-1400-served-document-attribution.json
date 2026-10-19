@@ -1,0 +1,28 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-actual-private-student-asset-delivery-20261019",
+  "runId": "ec4b44d8-105d-4b02-aece-b93e3e4f954a",
+  "capturedAt": "2026-10-19T11:31:23.142Z",
+  "url": "https://rakeezx.com/student",
+  "httpStatus": 200,
+  "status": "PASS",
+  "rawResponseSha256": "9c10cd3528affc9f6957f60884c5209b4a19a528f3c25897dbc74f8c7b55363b",
+  "qualifiedDocumentSha256": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+  "rawByteIdentical": false,
+  "appDocumentSha256AfterSeparatingProviderAppend": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+  "appDocumentBytesExact": true,
+  "onlyDifference": "One exact observed provider-owned JavaScript Detections script inserted immediately before closing body; only its transient ray/time values vary",
+  "providerAppend": {
+    "bytes": 938,
+    "normalizedSha256": "6d6461bd4913a7ca818f91936d4eac138eba3a8fd68f90a74203f65c7f4b29cf",
+    "observedTemplateSha256": "6d6461bd4913a7ca818f91936d4eac138eba3a8fd68f90a74203f65c7f4b29cf",
+    "exactObservedTemplate": true,
+    "path": "/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+    "executedByCheck": false
+  },
+  "comparison": "No general HTML normalization or arbitrary script removal. All original prefix and suffix bytes must match exactly; the entire inserted script must match the observed provider template after replacing only its two transient fields for comparison.",
+  "primaryDocumentation": "https://developers.cloudflare.com/cloudflare-challenges/challenge-types/javascript-detections/",
+  "securityDisposition": "No security/WAF/CSP/cache-policy change, no alternate request surface, no challenge bypass; native exact Worker source and all8 static asset byte hashes independently match.",
+  "originalRawComparison": "tests/n88-review-1400-served-private-assets.initial.json remains FAIL",
+  "requestsWithCookies": false
+}

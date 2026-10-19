@@ -1,0 +1,177 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-actual-private-student-asset-delivery-20261019",
+  "runId": "ec4b44d8-105d-4b02-aece-b93e3e4f954a",
+  "capturedAt": "2026-10-19T11:29:26.799Z",
+  "origin": "https://rakeezx.com",
+  "status": "FAIL",
+  "qualifiedCandidate": "57694266e519eb41d25e18dbb2ed586ea300182b",
+  "actualServedPrivateAssets": [
+    {
+      "path": "/n88-private/assets/student.mjs",
+      "httpStatus": 200,
+      "bytes": 20224,
+      "sha256": "d72f17c72a47565f7f04987bba7ab92e89c03547182dad1fa6646587ba661a9e",
+      "expectedSha256": "d72f17c72a47565f7f04987bba7ab92e89c03547182dad1fa6646587ba661a9e",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "text/javascript; charset=utf-8",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/n88-private/styles/app.css",
+      "httpStatus": 200,
+      "bytes": 62845,
+      "sha256": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
+      "expectedSha256": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "text/css; charset=utf-8",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/n88-private/styles/student-portal-login.css",
+      "httpStatus": 200,
+      "bytes": 5309,
+      "sha256": "ab77383940f89469846ae76a1f4f4554b4a6a142c4c172025b961920e66559e2",
+      "expectedSha256": "ab77383940f89469846ae76a1f4f4554b4a6a142c4c172025b961920e66559e2",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "text/css; charset=utf-8",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/n88-private/assets/brand/header-light-standard.svg",
+      "httpStatus": 200,
+      "bytes": 8373,
+      "sha256": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+      "expectedSha256": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "image/svg+xml",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/n88-private/assets/brand/header-light-compact.svg",
+      "httpStatus": 200,
+      "bytes": 8134,
+      "sha256": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+      "expectedSha256": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "image/svg+xml",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/n88-private/assets/brand/header-dark-standard.svg",
+      "httpStatus": 200,
+      "bytes": 8414,
+      "sha256": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+      "expectedSha256": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "image/svg+xml",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/n88-private/assets/brand/header-dark-compact.svg",
+      "httpStatus": 200,
+      "bytes": 8175,
+      "sha256": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+      "expectedSha256": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "image/svg+xml",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/n88-private/assets/brand/icon-192.png",
+      "httpStatus": 200,
+      "bytes": 8091,
+      "sha256": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
+      "expectedSha256": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "image/png",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    },
+    {
+      "path": "/student",
+      "httpStatus": 200,
+      "bytes": 1747,
+      "sha256": "5e35f9bc68e434dcec05335324996a7aebfa305f04f9bc1e2b4b0442842e9e0a",
+      "expectedSha256": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+      "sourceMatches": false,
+      "privateHeaders": true,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store, private",
+        "referrer-policy": "no-referrer",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+        "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "x-content-type-options": "nosniff"
+      },
+      "setCookiePresent": false
+    }
+  ],
+  "requests": "Exact private document/asset GET only; no cookies, account, student code or data API calls",
+  "uiEvidence": "Unchanged exact-source tests/n88-review-1400.previous-pass.json reused; no visual/session/owner suite replay",
+  "browserUsed": false,
+  "providerWrites": 0
+}
