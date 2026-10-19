@@ -24,6 +24,10 @@ manifest.privateMembershipCorrection={source:membershipRepair,sha256:await textH
 const hostedOutcomePath=dir+'hosted-activation-outcome.json';
 const hostedOutcome=JSON.parse(await readFile(hostedOutcomePath,'utf8'));
 manifest.hostedActivationOutcome={path:hostedOutcomePath,sha256:await textHash(hostedOutcomePath),state:hostedOutcome.state,appliedHistory:hostedOutcome.history,readiness:false,restrictedSession:hostedOutcome.connection.result,sqlstate:hostedOutcome.connection.sqlstate,loginDisarmed:hostedOutcome.finalDisposition.roles.every(r=>!r.login)};
+manifest.hostedActivationOutcome.historical=true;
+const continuationPath=dir+'continuation-9190735f.json',continuation=JSON.parse(await readFile(continuationPath,'utf8'));
+manifest.hostedContinuation={path:continuationPath,sha256:await textHash(continuationPath),state:continuation.state,protocol:continuation.protocol,direct:continuation.direct,providerVersion:continuation.deployedOriginalFunction.providerVersion,finalDisposition:continuation.finalDisposition,blocker:continuation.blocker};
+manifest.sources[continuationPath]=await textHash(continuationPath);
 manifest.privateMembershipCorrection.hostedApplied=hostedOutcome.history.some(h=>h.sha256===manifest.privateMembershipCorrection.sha256);
 for(const file of [membershipRepair,'tests/n88-official-activation-membership.mjs','tests/n88-official-activation-membership.json'])manifest.sources[file]=await textHash(file);
 manifest.privateErrorBoundary={revision:'typed-private-boundary-v1',migration:boundary.migration,

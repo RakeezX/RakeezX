@@ -390,3 +390,50 @@ student-code issuance, fixture mutation or message occurred. Own original versio
 material remains solely in protected CurrentUser DPAPI recovery; transient SQL files
 were removed. N44 credentials/roles/recovery were untouched. Resume requires a
 materially evidenced resolution and separately authorized proof attempt.
+
+## Own protocol diagnosis and secure original service — run 9190735f
+
+The scoped public challenge first returned XX000 while NOLOGIN. After the exact
+temporary owned LOGIN restore, actual SCRAM server-first announced4096 while the
+own stored count was16384 and salt matched; strict CA/hostname TLS passed. No
+password, client-final proof, nonce/salt or authentication key was exported.
+LOGIN was disarmed in finally. The last card precedence retained the ORIGINAL
+16384 verifier/password/salt: no4096 rewrite, pooler proof or cache reconnect.
+
+The ORIGINAL n88-student-portal Edge backend now supports canonical provider-local
+paths, original direct db.xlrubcwjqktzzunrvuns.supabase.co:5432 transport and a
+domain-separated HMAC readiness branch. Its actual source/handler tests cover
+signatures/replay, provider-local paths, no-Buffer Deno compatibility, full sealed
+configuration construction, false upstreamSSL/owner/missing-boundary rejection
+and normal Product OFF. No private handler is called by readiness.
+
+Actual Edge direct readiness passed correct login/current role, verified client
+TLS, upstreamSSL=true, exact source/routine privacy guard and full actual service
+construction. Provider download version9 matches source SHA256
+809361465b540403d48397fed7ea5e55bc934065be021e7ed31bc7374d98e57d.
+The initial path-wrapper and Deno Buffer configuration failures remain saved.
+No migration or credential rewrite occurred. Historical28P01 evidence is retained.
+
+The actual provider-memory32-byte ingress key was bound only to the exact owned
+Worker and RSA3072-OAEP/SHA256-encrypted to the original custodian recipient.
+Only ciphertext crossed tools; original server keys/recovery stayed local/Edge.
+All exact N88 secret names were installed through protected official CLI env files;
+names-only readback passed. The AES version/key material is unchanged and retained
+with permanent nonce/tombstone contracts. Cloudflare receives only ingress+public
+bindings. Its own Worker is OFF with no routes/workers.dev/previews; explicit
+configuration response disabled observability/log/invocation/trace sampling,
+Logpush and tail consumers. Subsequent GET omits observability, recorded precisely.
+
+Actual designated teacher DOM still displays: مساحة الطالب غير متاحة حاليًا.
+لم تُفعّل الخدمة الخاصة بعد. No publisher-owned HTTPS actual-app test rollout
+was supplied for the required authenticated owner/two-student journey. The
+displayed roster28 MUST NOT receive a bulk issue under maxStudents2. Do not
+extract browser credentials or force UI readiness to route around this gate.
+
+Current result is BLOCKED pending the independent publisher/controller's scoped
+HTTPS actual-app test rollout, then the same saved session completes the original
+bounded fabricated journey. It is not a PM permission request or Product readiness.
+Product/readiness flags were paused, original backend NOLOGIN read back, no public
+API route or student page enabled, no fixture mutation/code/message/field publish.
+Encrypted original recovery and inactive original service are retained. See
+continuation-9190735f.json; reuse successful schema/crypto/transport proof.

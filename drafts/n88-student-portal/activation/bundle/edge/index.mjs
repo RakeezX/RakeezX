@@ -1,5 +1,11 @@
+// drafts/n88-student-portal/activation/node-globals.mjs
+import { Buffer as Buffer2 } from "node:buffer";
+import process from "node:process";
+if (!globalThis.Buffer) globalThis.Buffer = Buffer2;
+if (!globalThis.process) globalThis.process = process;
+
 // drafts/n88-student-portal/existing-host.mjs
-import { Buffer as Buffer12 } from "node:buffer";
+import { Buffer as Buffer13 } from "node:buffer";
 import { createHash as createHash9 } from "node:crypto";
 import pg from "pg";
 
@@ -95,11 +101,11 @@ var deployment_inactive_default = {
 };
 
 // drafts/n88-student-portal/web-entry.mjs
-import { Buffer as Buffer11 } from "node:buffer";
+import { Buffer as Buffer12 } from "node:buffer";
 import { timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 
 // drafts/n88-student-portal/runtime.mjs
-import { Buffer as Buffer10 } from "node:buffer";
+import { Buffer as Buffer11 } from "node:buffer";
 import { isIP } from "node:net";
 
 // drafts/n88-student-portal/task-guidance.mjs
@@ -777,11 +783,11 @@ function guidanceForStudent(input, definition, publication) {
 import { createHash as createHash6, randomUUID as randomUUID4 } from "node:crypto";
 
 // drafts/n88-student-portal/class-credentials.mjs
-import { Buffer as Buffer3 } from "node:buffer";
+import { Buffer as Buffer4 } from "node:buffer";
 import { createHash as createHash4 } from "node:crypto";
 
 // drafts/n88-student-portal/service.mjs
-import { Buffer as Buffer2 } from "node:buffer";
+import { Buffer as Buffer3 } from "node:buffer";
 import { randomBytes, randomUUID, randomInt, createHash as createHash3, createHmac, timingSafeEqual } from "node:crypto";
 var POLICY = Object.freeze({
   sessionMs: 8 * 60 * 6e4,
@@ -937,7 +943,7 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
         if (r.rows.length > maxRows) fail();
         state[name] = r.rows.map(({ payload }) => {
           if (!payload) fail();
-          bytes += Buffer3.byteLength(JSON.stringify(payload));
+          bytes += Buffer4.byteLength(JSON.stringify(payload));
           if (bytes > maxBytes) fail();
           return payload;
         });
@@ -955,7 +961,7 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
           if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [pk2(row)])).rowCount !== 1) fail();
         }
         for (const row of state[name]) {
-          bytes += Buffer3.byteLength(JSON.stringify(row));
+          bytes += Buffer4.byteLength(JSON.stringify(row));
           if (bytes > maxBytes) fail();
           if (before.has(pk2(row)) && JSON.stringify(before.get(pk2(row))) === JSON.stringify(row)) continue;
           if ((await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload`, [pk2(row), JSON.stringify(row)])).rowCount !== 1) fail();
@@ -1002,7 +1008,7 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
         if (r.rows.length > maxRows) fail();
         extra[name] = r.rows.map((r2) => {
           if (!r2.payload) fail();
-          bytes += Buffer3.byteLength(JSON.stringify(r2.payload));
+          bytes += Buffer4.byteLength(JSON.stringify(r2.payload));
           if (bytes > maxBytes) fail();
           return r2.payload;
         });
@@ -1025,7 +1031,7 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
           if ((await ports.query(`delete from n88_private.${table} where row_key=$1`, [key2])).rowCount !== 1) fail();
         }
         for (const [key2, row] of after) {
-          bytes += Buffer3.byteLength(JSON.stringify(row));
+          bytes += Buffer4.byteLength(JSON.stringify(row));
           if (bytes > maxBytes) fail();
           if (before.has(key2) && JSON.stringify(before.get(key2)) === JSON.stringify(row)) continue;
           const ack = before.has(key2) ? await ports.query(`update n88_private.${table} set payload=$2::jsonb where row_key=$1`, [key2, JSON.stringify(row)]) : await ports.query(`insert into n88_private.${table}(row_key,payload) values($1,$2::jsonb)`, [key2, JSON.stringify(row)]);
@@ -1039,7 +1045,7 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
 }
 
 // drafts/n88-student-portal/code-recovery.mjs
-import { Buffer as Buffer4 } from "node:buffer";
+import { Buffer as Buffer5 } from "node:buffer";
 import { randomBytes as randomBytes2, randomUUID as randomUUID2, createCipheriv, createDecipheriv } from "node:crypto";
 var fail2 = () => {
   throw Error("n88_recovery_unavailable");
@@ -1048,25 +1054,25 @@ var ver = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(v);
 var exact3 = (o, ks) => o && Object.keys(o).length === ks.length && ks.every((k) => Object.hasOwn(o, k));
 var fields = ["id", "credentialId", "generation", "envelopeVersion", "algorithm", "keyVersion", "nonce", "ciphertext", "tag"];
 function createCodeRecovery({ keys, activeKeyVersion, otherKeys = [] } = {}) {
-  if (!(keys instanceof Map) || !keys.size || keys.size > 8 || !ver(activeKeyVersion) || !keys.has(activeKeyVersion) || [...keys].some(([v, k]) => !ver(v) || !Buffer4.isBuffer(k) || k.length !== 32) || new Set([...keys.values()].map((k) => k.toString("hex"))).size !== keys.size || [...keys.values()].some((k) => otherKeys.some((o) => Buffer4.isBuffer(o) && k.equals(o)))) fail2();
-  keys = new Map([...keys].map(([v, k]) => [v, Buffer4.from(k)]));
-  const aad = (c, e) => Buffer4.from(JSON.stringify(["n88-code-recovery", e.id, e.envelopeVersion, e.algorithm, e.keyVersion, c.id, c.version, c.ownerId, c.studentId, c.format, e.generation]));
+  if (!(keys instanceof Map) || !keys.size || keys.size > 8 || !ver(activeKeyVersion) || !keys.has(activeKeyVersion) || [...keys].some(([v, k]) => !ver(v) || !Buffer5.isBuffer(k) || k.length !== 32) || new Set([...keys.values()].map((k) => k.toString("hex"))).size !== keys.size || [...keys.values()].some((k) => otherKeys.some((o) => Buffer5.isBuffer(o) && k.equals(o)))) fail2();
+  keys = new Map([...keys].map(([v, k]) => [v, Buffer5.from(k)]));
+  const aad = (c, e) => Buffer5.from(JSON.stringify(["n88-code-recovery", e.id, e.envelopeVersion, e.algorithm, e.keyVersion, c.id, c.version, c.ownerId, c.studentId, c.format, e.generation]));
   function seal(c, code, generation = 1) {
     if (c.revokedAt !== null || c.format !== "six-v1" || !/^1[0-9]{5}$/.test(code) || !Number.isSafeInteger(generation) || generation < 1) fail2();
     const e = { id: randomUUID2(), credentialId: c.id, generation, envelopeVersion: 1, algorithm: "AES-256-GCM", keyVersion: activeKeyVersion, nonce: randomBytes2(12).toString("hex") };
-    const cipher = createCipheriv("aes-256-gcm", keys.get(activeKeyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
+    const cipher = createCipheriv("aes-256-gcm", keys.get(activeKeyVersion), Buffer5.from(e.nonce, "hex"), { authTagLength: 16 });
     cipher.setAAD(aad(c, e));
-    e.ciphertext = Buffer4.concat([cipher.update(code, "ascii"), cipher.final()]).toString("hex");
+    e.ciphertext = Buffer5.concat([cipher.update(code, "ascii"), cipher.final()]).toString("hex");
     e.tag = cipher.getAuthTag().toString("hex");
     return e;
   }
   function open(c, e) {
     try {
       if (c.revokedAt !== null || c.format !== "six-v1" || !exact3(e, fields) || e.credentialId !== c.id || e.envelopeVersion !== 1 || e.algorithm !== "AES-256-GCM" || !keys.has(e.keyVersion) || !Number.isSafeInteger(e.generation) || e.generation < 1 || !/^[a-f0-9]{24}$/.test(e.nonce) || !/^[a-f0-9]{12}$/.test(e.ciphertext) || !/^[a-f0-9]{32}$/.test(e.tag)) fail2();
-      const d = createDecipheriv("aes-256-gcm", keys.get(e.keyVersion), Buffer4.from(e.nonce, "hex"), { authTagLength: 16 });
+      const d = createDecipheriv("aes-256-gcm", keys.get(e.keyVersion), Buffer5.from(e.nonce, "hex"), { authTagLength: 16 });
       d.setAAD(aad(c, e));
-      d.setAuthTag(Buffer4.from(e.tag, "hex"));
-      const code = Buffer4.concat([d.update(Buffer4.from(e.ciphertext, "hex")), d.final()]).toString("ascii");
+      d.setAuthTag(Buffer5.from(e.tag, "hex"));
+      const code = Buffer5.concat([d.update(Buffer5.from(e.ciphertext, "hex")), d.final()]).toString("ascii");
       if (!/^1[0-9]{5}$/.test(code)) fail2();
       return code;
     } catch {
@@ -1456,10 +1462,10 @@ function createIntegratedService(options, adapter, baseRepository) {
 }
 
 // drafts/n88-student-portal/postgres-repository.mjs
-import { Buffer as Buffer6 } from "node:buffer";
+import { Buffer as Buffer7 } from "node:buffer";
 
 // drafts/n88-student-portal/activation/private-error-boundary.mjs
-import { Buffer as Buffer5 } from "node:buffer";
+import { Buffer as Buffer6 } from "node:buffer";
 
 // drafts/n88-student-portal/activation/error-boundary-contract.json
 var error_boundary_contract_default = {
@@ -3852,7 +3858,7 @@ function pgText(value) {
   if (value === null) return null;
   if (typeof value === "string" || typeof value === "bigint" || typeof value === "boolean") return String(value);
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
-  if (Buffer5.isBuffer(value)) return "\\x" + value.toString("hex");
+  if (Buffer6.isBuffer(value)) return "\\x" + value.toString("hex");
   if (value instanceof Date && Number.isFinite(value.getTime())) return value.toISOString();
   if (Array.isArray(value)) return "{" + value.map((v) => v === null ? "NULL" : Array.isArray(v) ? pgText(v) : '"' + pgText(v).replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"').join(",") + "}";
   fail4();
@@ -3877,7 +3883,7 @@ async function privateQuery(client, sql, values = []) {
   if (op.voidResult) return { ...result2, rows: result2.rows.map(() => ({ [op.output[0].name]: "" })) };
   return result2;
 }
-var encodeBoundaryParameter = (value) => value === null ? null : Buffer5.from(pgText(value), "utf8").toString("base64");
+var encodeBoundaryParameter = (value) => value === null ? null : Buffer6.from(pgText(value), "utf8").toString("base64");
 
 // drafts/n88-student-portal/postgres-repository.mjs
 var unavailable = () => new Error("n88_repository_unavailable");
@@ -4030,7 +4036,7 @@ function snapshot(state, limits) {
     must(total <= limits.total);
     maps[name] = /* @__PURE__ */ new Map();
     for (const r of state[name]) {
-      const values = encode(name, r), json = JSON.stringify(r), size = Buffer6.byteLength(json);
+      const values = encode(name, r), json = JSON.stringify(r), size = Buffer7.byteLength(json);
       must(size <= limits.rowBytes);
       bytes += size;
       must(bytes <= limits.bytes);
@@ -4118,12 +4124,12 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         state[name] = result3.rows.map((row) => {
           exact4(row, ["bounded_row"]);
           must(typeof row.bounded_row === "string");
-          transferred += Buffer6.byteLength(row.bounded_row);
+          transferred += Buffer7.byteLength(row.bounded_row);
           must(transferred <= limits.bytes);
           return decode(name, JSON.parse(row.bounded_row));
         });
         count += state[name].length;
-        bytes += Buffer6.byteLength(JSON.stringify(state[name]));
+        bytes += Buffer7.byteLength(JSON.stringify(state[name]));
         must(bytes <= limits.bytes);
       }
       const original = snapshot(state, limits);
@@ -4193,7 +4199,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
 }
 
 // drafts/n88-student-portal/canonical-adapter.mjs
-import { Buffer as Buffer7 } from "node:buffer";
+import { Buffer as Buffer8 } from "node:buffer";
 import { createHash as createHash7 } from "node:crypto";
 var CANONICAL_TABLES = Object.freeze(["years", "terms", "sections", "students", "enrollments", "teachings", "items"]);
 var fail5 = () => {
@@ -4226,7 +4232,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
     let bytes = 0;
     const read = (row) => {
       if (typeof row.payload !== "string") fail5();
-      bytes += Buffer7.byteLength(row.payload);
+      bytes += Buffer8.byteLength(row.payload);
       if (bytes > maxBytes) fail5();
       return JSON.parse(row.payload);
     };
@@ -4311,10 +4317,10 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
 }
 
 // drafts/n88-student-portal/http-adapter.mjs
-import { Buffer as Buffer8 } from "node:buffer";
+import { Buffer as Buffer9 } from "node:buffer";
 
 // drafts/n88-student-portal/auth-verifier.mjs
-import { Buffer as Buffer9 } from "node:buffer";
+import { Buffer as Buffer10 } from "node:buffer";
 import { AuthClient } from "@supabase/auth-js";
 var uuid3 = (s) => typeof s === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(s);
 var fail6 = () => {
@@ -4362,7 +4368,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
           reader.releaseLock();
         }
         fence();
-        return new Response(Buffer9.concat(parts), { status: response2.status, headers: response2.headers });
+        return new Response(Buffer10.concat(parts), { status: response2.status, headers: response2.headers });
       };
       const auth = new AuthClient({
         url: issuer,
@@ -4407,7 +4413,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
 // drafts/n88-student-portal/runtime.mjs
 var REQUIRED_ENV = Object.freeze(["N88_PUBLIC_ORIGIN", "N88_DATABASE_URL", "N88_HMAC_KEY", "N88_AUTH_URL", "N88_AUTH_API_KEY", "N88_INGRESS_KEY"]);
 function deploymentPreflight({ origin, authUrl, apiKey, secretKey, acquire, canonicalReadback, privateIngressReadback, sourceOnly = true }) {
-  if (sourceOnly !== false || typeof acquire !== "function" || canonicalReadback !== true || privateIngressReadback !== true || !Buffer10.isBuffer(secretKey) || secretKey.length < 32 || typeof apiKey !== "string" || !apiKey || ![origin, authUrl].every((u) => {
+  if (sourceOnly !== false || typeof acquire !== "function" || canonicalReadback !== true || privateIngressReadback !== true || !Buffer11.isBuffer(secretKey) || secretKey.length < 32 || typeof apiKey !== "string" || !apiKey || ![origin, authUrl].every((u) => {
     try {
       const x = new URL(u);
       return x.origin === u && x.protocol === "https:" && !x.username && !x.password;
@@ -4490,7 +4496,7 @@ var privateResponse = (status = 503) => new Response('{"error":"unavailable"}', 
 
 // drafts/n88-student-portal/web-entry.mjs
 function createWebEntry(options) {
-  if (!Buffer11.isBuffer(options.ingressKey) || options.ingressKey.length !== 32) throw Error("n88_ingress_configuration");
+  if (!Buffer12.isBuffer(options.ingressKey) || options.ingressKey.length !== 32) throw Error("n88_ingress_configuration");
   const envelopes = /* @__PURE__ */ new WeakMap(), now = options.now || Date.now;
   const verifier = createTeacherVerifier(options);
   const adapter = {
@@ -4527,7 +4533,7 @@ function createWebEntry(options) {
         const bytes = decodeBytes(envelope.body);
         if (bytes.length > 4096) return privateResponse(413);
         const expected = await mac(options.ingressKey, signingText({ origin: options.origin, path, method, headers: h, bodyHash: await sha(bytes), time: time2, nonce, source }));
-        if (!timingSafeEqual3(Buffer11.from(expected, "hex"), Buffer11.from(signature, "hex"))) return privateResponse(401);
+        if (!timingSafeEqual3(Buffer12.from(expected, "hex"), Buffer12.from(signature, "hex"))) return privateResponse(401);
         let body = {};
         if (bytes.length) body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
         if (!body || Array.isArray(body) || typeof body !== "object" || method === "GET" && bytes.length) return privateResponse(400);
@@ -4616,7 +4622,7 @@ function createExistingHost(readEnv) {
   const key2 = (n) => {
     const s = required(n);
     if (!/^[a-f0-9]{64}$/.test(s)) throw Error("n88_key_configuration");
-    return Buffer12.from(s, "hex");
+    return Buffer13.from(s, "hex");
   };
   if (required("N88_SERVICE_REVISION") !== deployment_inactive_default.serviceRevision) throw Error("n88_service_readback_missing");
   const secretKey = key2("N88_HMAC_KEY"), ingressKey = key2("N88_INGRESS_KEY"), numericKey = key2("N88_NUMERIC_KEY"), reservationKey = key2("N88_RESERVATION_KEY");
@@ -4684,7 +4690,7 @@ function createExistingHost(readEnv) {
 
 // drafts/n88-student-portal/activation/readiness-entry.mjs
 import pg2 from "pg";
-import { Buffer as Buffer13 } from "node:buffer";
+import { Buffer as Buffer14 } from "node:buffer";
 import { timingSafeEqual as timingSafeEqual4 } from "node:crypto";
 var busy = 0;
 var nonces = /* @__PURE__ */ new Map();
@@ -4698,7 +4704,14 @@ async function checkReadiness(readEnv) {
     identity2 = await assertRestrictedTransport(client);
     stage = "source_boundary";
     await assertPrivateDatabaseSession(client);
-    return { status: "ready", ...identity2, sourceBoundary: true, source, enabled: readEnv("N88_ENABLED") === "true" };
+    stage = "configuration";
+    let configurationReady = false;
+    if (readEnv("N88_SERVICE_REVISION")) {
+      const runtime2 = createExistingHost((n) => n === "N88_ENABLED" ? "true" : readEnv(n));
+      await runtime2.close();
+      configurationReady = true;
+    }
+    return { status: "ready", ...identity2, sourceBoundary: true, configurationReady, source, enabled: readEnv("N88_ENABLED") === "true" };
   } catch (e) {
     return { status: "unavailable", stage, ...identity2, ...e.safeReadiness ?? {}, code: /^(n88_[a-z_]+|[A-Z0-9]{5})$/.test(e.code ?? e.message) ? e.code ?? e.message : "n88_runtime_unavailable", source, enabled: false };
   } finally {
@@ -4713,8 +4726,8 @@ async function readinessEntry(request, readEnv, check = checkReadiness) {
     if (u.origin !== readEnv("N88_AUTH_URL") || u.pathname !== "/functions/v1/n88-student-portal/readiness" || u.search || request.method !== "POST" || request.headers.get("content-type") !== "application/json" || request.headers.has("content-encoding") || !/^[a-f0-9]{64}$/.test(key2 ?? "") || !/^\d{10}$/.test(time2 ?? "") || Math.abs(Date.now() / 1e3 - Number(time2)) > 15 || !/^[a-f0-9-]{36}$/.test(nonce ?? "") || !/^[a-f0-9]{64}$/.test(sig ?? "")) return privateResponse(401);
     const body = new TextDecoder().decode(await readBytes(request.body, 2, AbortSignal.timeout(2e3)));
     if (body !== "{}") return privateResponse(401);
-    const expected = await mac(Buffer13.from(key2, "hex"), JSON.stringify(["n88-readiness-v1", u.origin, u.pathname, time2, nonce, await sha(new TextEncoder().encode(body))]));
-    if (!timingSafeEqual4(Buffer13.from(expected, "hex"), Buffer13.from(sig, "hex"))) return privateResponse(401);
+    const expected = await mac(Buffer14.from(key2, "hex"), JSON.stringify(["n88-readiness-v1", u.origin, u.pathname, time2, nonce, await sha(new TextEncoder().encode(body))]));
+    if (!timingSafeEqual4(Buffer14.from(expected, "hex"), Buffer14.from(sig, "hex"))) return privateResponse(401);
     for (const [n, t] of nonces) if (t < Date.now() - 15e3) nonces.delete(n);
     if (nonces.has(nonce) || nonces.size >= 100) return privateResponse(401);
     nonces.set(nonce, Date.now());
@@ -4730,9 +4743,28 @@ async function readinessEntry(request, readEnv, check = checkReadiness) {
   }
 }
 
+// drafts/n88-student-portal/activation/edge-request.mjs
+function edgeRequest(request, readEnv) {
+  const u = new URL(request.url), local = "/n88-student-portal", publicPath = "/functions/v1/n88-student-portal";
+  const origin = readEnv("N88_AUTH_URL");
+  if (origin !== "https://xlrubcwjqktzzunrvuns.supabase.co") throw Error("n88_origin");
+  if (u.pathname === local || u.pathname.startsWith(local + "/")) {
+    const canonical = new URL(origin);
+    canonical.pathname = publicPath + u.pathname.slice(local.length);
+    canonical.search = u.search;
+    return new Request(canonical, request);
+  }
+  return request;
+}
+
 // supabase/functions/n88-student-portal/index.ts
 var runtime;
 Deno.serve(async (request) => {
+  try {
+    request = edgeRequest(request, (name) => Deno.env.get(name));
+  } catch {
+    return privateResponse();
+  }
   try {
     if (new URL(request.url).pathname === "/functions/v1/n88-student-portal/readiness") return await readinessEntry(request, (name) => Deno.env.get(name));
     runtime ??= createExistingHost((name) => Deno.env.get(name));

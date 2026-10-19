@@ -1,0 +1,19 @@
+{
+  "runId": "9190735f-6ed0-4513-8ef1-5a3ef24ec6f8",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "httpStatus": 503,
+  "status": "unavailable",
+  "stage": "configuration",
+  "loginExact": true,
+  "roleExact": true,
+  "upstreamSsl": true,
+  "clientTlsAuthorized": true,
+  "code": "n88_configuration",
+  "source": "b74ba19ca5352b7348b935d4e10740c3cb3dec62a32e83e5d145604e2ced768a",
+  "enabled": false,
+  "expectedSource": "b74ba19ca5352b7348b935d4e10740c3cb3dec62a32e83e5d145604e2ced768a",
+  "sourceMatches": true,
+  "transport": "original Supabase Edge IPv6 -> official direct strictTLS",
+  "privateMutations": 0,
+  "loginDisarmed": true
+}

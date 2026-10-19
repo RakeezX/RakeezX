@@ -332,3 +332,25 @@ Encrypted original version material retained in its current-user protected owned
 custody directory; only owner.json/recovery.dpapi remain, no transient SQL/env.
 This is external BLOCKED pending a materially evidenced authentication resolution
 and separately authorized proof attempt; it is not Product readiness or closure.
+
+Run9190735f (2026-10-19) materially resolved the N88 authentication diagnosis:
+actual public server-first4096 vs stored16384, same own salt, strictTLS, no proof
+or password sent. The original verifier/password/salt stayed unchanged per final
+card precedence. Original inactive Edge direct transport actually authenticated
+and passed current-role/fullTLS/upstreamSSL/source-boundary/full-configuration
+readiness. Actual provider source version9/hash809361465b540403d48397fed7ea5e55bc934065be021e7ed31bc7374d98e57d matched.
+
+Provider-local path and Deno missing-Buffer wrapper defects were fixed using the
+actual original entry and targeted tests; initial failures remain. Actual ingress
+custody used provider-memory generation, exact Worker binding, encrypted recipient
+handoff and protected official CLI installation. No plaintext secrets in evidence.
+Exact names-only readback passed; immutable recovery version preserved.
+
+Actual official teacher DOM remains gated OFF, so hosted teacher/student ACK/
+recovery/rotation/fields/guidance acceptance is NOT_RUN. Roster28 was untouched;
+maxStudents2 remains binding. A scoped actual-app HTTPS test rollout through the
+independent publisher is required before this saved session can complete it.
+This is a concrete publication/test-target dependency, not a routine PM approval.
+Readiness flags paused and own role NOLOGIN verified; Worker OFF/no routes/previews.
+No migration replay, real records, fixture mutation, code issuance or sending.
+See activation/continuation-9190735f.json for current exact disposition.

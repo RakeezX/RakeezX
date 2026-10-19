@@ -10,7 +10,7 @@ import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import path from 'node:path';
 import {serverFirst} from './activation/server-first.mjs';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createPublicKey} from 'node:crypto';
 const project='xlrubcwjqktzzunrvuns',run='4ddd5df2-933f-4754-8d04-0d27be47bcff';
 const root=process.cwd(),base=path.resolve('drafts/n88-student-portal/activation'),phase=path.join(base,'owned-custody-'+run+'.tmp');
 const marker={run,project,phase,purpose:'N88 restricted service custody and immutable recovery'};
@@ -71,6 +71,36 @@ async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),phase,protection:'DPAPI CurrentUser + fresh directory current-user ACL',secretValuesReturned:false};
  }
  const state=await load();
+ if(action==='--installed-names'){
+  const result=await official(['secrets','list','--project-ref',project,'--output','json']);
+  const rows=Array.isArray(result)?result:result?.rows;
+  if(!Array.isArray(rows))fail('n88_secret_names_shape');
+  return {names:rows.map(r=>r.name).filter(n=>n.startsWith('N88_')).sort(),valuesReturned:false};
+ }
+ if(action==='--pause-preparation'){
+  if(!state.directVerified||!state.installed)fail('n88_preparation_pause_gate');
+  const file=path.join(phase,'owned-env.tmp');
+  try{await writeFile(file,'N88_ENABLED=false\nN88_READINESS_ENABLED=false\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);}
+  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  await sqlFile("do $$ begin if not exists(select 1 from pg_roles where rolname='n88_backend' and not rolinherit and not rolsuper and not rolbypassrls and not rolcreatedb and not rolcreaterole and not rolreplication and rolconnlimit=-1 and rolvaliduntil is null and rolconfig is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid)) then raise exception 'n88_pause_role_mismatch'; end if; alter role n88_backend nologin; end $$;");
+  state.loginDisarmed=true;state.preparationPaused=true;await save(state);
+  await unlink(path.join(base,'public-provider-config.json'));
+  return {productEnabled:false,signedReadinessEnabled:false,loginDisarmed:true,originalRecoveryRetained:true,temporaryProviderConfigRemoved:true};
+ }
+ if(action==='--recipient-public'){
+  if(!state.directVerified||state.ingress||!state.recipient)fail('n88_ingress_recipient_gate');
+  const der=Buffer.from(state.recipient,'base64');
+  try{return {publicJwk:createPublicKey(createPrivateKey({key:der,format:'der',type:'pkcs8'})).export({format:'jwk'}),project,worker:'rakeez-n88-private-ingress'};}finally{der.fill(0);}
+ }
+ if(action==='--refresh-direct-source'){
+  if(!state.directReadinessInstalled||(!state.loginDisarmed&&!state.directVerified)||state.directAuthRefused)fail('n88_direct_refresh_gate');
+  const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
+  if(source===state.directSource)fail('n88_direct_source_unchanged');
+  const file=path.join(phase,'owned-env.tmp');
+  try{await writeFile(file,'N88_SERVICE_SOURCE_SHA='+source+'\nN88_ENABLED=false\nN88_READINESS_ENABLED=true\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.lastDirectSourceAttempt=state.directSource;state.directSource=source;await save(state);}
+  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {source,enabled:false,credentialChanged:false};
+ }
  if(action==='--install-direct-readiness'){
   const d=state.restoredPublicDiagnostic;
   if(d?.status!=='PASS'||d.announcedIterations!==4096||d.expectedStoredIterations!==16384||!d.saltMatchesOwnStoredPublicChallenge||!d.strictTls||!d.hostnameVerified||d.proofSent||state.directReadinessInstalled)fail('n88_direct_readiness_gate');
@@ -82,24 +112,25 @@ async function execute(action,value){
   return {installed:true,enabled:false,readinessSigned:true,database:'official direct strictTLS',originalIterations:16384,credentialUnchanged:true,names:Object.keys(env),source};
  }
  if(action==='--arm-direct-login'){
-  if(!state.directReadinessInstalled||state.directLoginArmed)fail('n88_direct_login_gate');
+  if(!state.directReadinessInstalled||state.directAuthRefused||(state.directLoginArmed&&(!state.loginDisarmed||(!state.directVerified&&state.lastDirectSourceAttempt===state.directSource))))fail('n88_direct_login_gate');
   await sqlFile("do $$ begin if not exists(select 1 from pg_roles where rolname='n88_backend' and not rolcanlogin and not rolinherit and not rolsuper and not rolbypassrls and not rolcreatedb and not rolcreaterole and not rolreplication and rolconnlimit=-1 and rolvaliduntil is null and rolconfig is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid) and has_database_privilege('n88_backend','postgres','CONNECT')) then raise exception 'n88_direct_login_preimage'; end if; alter role n88_backend login; end $$;");
-  state.directLoginArmed=true;await save(state);return {directLoginArmed:true,verifierOrPasswordChanged:false,membershipChanged:false};
+  state.directLoginArmed=true;state.loginDisarmed=false;await save(state);return {directLoginArmed:true,verifierOrPasswordChanged:false,membershipChanged:false};
  }
  if(action==='--call-direct-readiness'){
-  if(!state.directLoginArmed||state.directReadinessCalled)fail('n88_direct_readiness_consumed');
-  state.directReadinessCalled=true;await save(state);
+  if(!state.directLoginArmed||state.directAuthRefused||state.lastDirectSourceAttempt===state.directSource)fail('n88_direct_readiness_consumed');
+  state.directReadinessCalled=true;state.lastDirectSourceAttempt=state.directSource;await save(state);
   const origin='https://'+project+'.supabase.co',route='/functions/v1/n88-student-portal/readiness',time=String(Math.floor(Date.now()/1000)),nonce=randomUUID(),body='{}';
   const signed=JSON.stringify(['n88-readiness-v1',origin,route,time,nonce,createHash('sha256').update(body).digest('hex')]);
   const signature=createHmac('sha256',Buffer.from(state.hmac,'hex')).update(signed).digest('hex');
   let receipt;
   try{
    const response=await fetch(origin+route,{method:'POST',headers:{'content-type':'application/json','x-n88-time':time,'x-n88-nonce':nonce,'x-n88-signature':signature},body,signal:AbortSignal.timeout(15000)});
-   const data=await response.json();
-   const names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','source','enabled','code'];
-   if(Object.keys(data).some(k=>!names.includes(k)))fail('n88_direct_readiness_shape');
+   let data=await response.json();
+   const names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','configurationReady','source','enabled','code'];
+   if(Object.keys(data).some(k=>!names.includes(k)))data={status:'unavailable',stage:'entry',code:'n88_generic_entry_unavailable',enabled:false};
    receipt={runId:'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,httpStatus:response.status,...data,expectedSource:state.directSource,sourceMatches:data.source===state.directSource,transport:'original Supabase Edge IPv6 -> official direct strictTLS',privateMutations:0};
    state.directVerified=response.status===200&&data.status==='ready'&&data.loginExact===true&&data.roleExact===true&&data.upstreamSsl===true&&data.clientTlsAuthorized===true&&data.sourceBoundary===true&&data.source===state.directSource&&data.enabled===false;
+   if(data.code==='28P01')state.directAuthRefused=true;
    if(!state.directVerified){await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;receipt.loginDisarmed=true;}
    await save(state);await writeFile(path.join(base,'hosted-direct-readiness.json'),JSON.stringify(receipt,null,2)+'\n');return receipt;
   }catch{
@@ -200,10 +231,10 @@ async function execute(action,value){
   }finally{await client.end().catch(()=>{});}
  }
  if(action==='--install-env'){
-  if(!state.loginVerified||!state.ingress||state.installed)fail('n88_install_gate_missing');
+  if(!state.directVerified||!state.ingress||state.installed)fail('n88_install_gate_missing');
   const publicConfig=JSON.parse(await readFile(path.join(base,'public-provider-config.json'),'utf8'));
   if(publicConfig.project!==project||typeof publicConfig.authPublicKey!=='string')fail('n88_public_configuration_missing');
-  const env={N88_ENABLED:'false',N88_PUBLIC_ORIGIN:'https://rakeezx.com',N88_AUTH_URL:'https://'+project+'.supabase.co',N88_AUTH_API_KEY:publicConfig.authPublicKey,N88_SERVICE_REVISION:'n88-integrated-class-v1',N88_DATABASE_URL:`postgresql://n88_backend.${project}:${state.password}@aws-0-ap-south-1.pooler.supabase.com:5432/postgres`,N88_DATABASE_CA_CERT:await readFile(path.join(base,'ca/supabase-prod-ca-2021.crt'),'utf8'),N88_HMAC_KEY:state.hmac,N88_NUMERIC_KEY:state.numeric,N88_RESERVATION_KEY:state.reservation,N88_INGRESS_KEY:state.ingress,N88_RECOVERY_ACTIVE_VERSION:state.recoveryVersion,N88_RECOVERY_VERSIONS:state.recoveryVersion,['N88_RECOVERY_KEY_'+state.recoveryVersion]:state.recovery};
+  const env={N88_ENABLED:'false',N88_READINESS_ENABLED:'true',N88_SERVICE_SOURCE_SHA:state.directSource,N88_PUBLIC_ORIGIN:'https://rakeezx.com',N88_AUTH_URL:'https://'+project+'.supabase.co',N88_AUTH_API_KEY:publicConfig.authPublicKey,N88_SERVICE_REVISION:'n88-integrated-class-v1',N88_DATABASE_URL:`postgresql://n88_backend:${state.password}@db.${project}.supabase.co:5432/postgres`,N88_DATABASE_CA_CERT:await readFile(path.join(base,'ca/supabase-prod-ca-2021.crt'),'utf8'),N88_HMAC_KEY:state.hmac,N88_NUMERIC_KEY:state.numeric,N88_RESERVATION_KEY:state.reservation,N88_INGRESS_KEY:state.ingress,N88_RECOVERY_ACTIVE_VERSION:state.recoveryVersion,N88_RECOVERY_VERSIONS:state.recoveryVersion,['N88_RECOVERY_KEY_'+state.recoveryVersion]:state.recovery};
   const file=path.join(phase,'owned-env.tmp');
   try{await writeFile(file,Object.entries(env).map(([k,v])=>k+'='+JSON.stringify(v)).join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.installed=true;await save(state);}
   finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
