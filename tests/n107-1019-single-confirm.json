@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n107-single-confirm-auto-completion-20261019",
+  "runId": "65c7275e-bcd9-4398-b849-c321f804364b",
+  "checks": [
+    {
+      "name": "n107_one_confirmation_delayed_ack_final_receipt_no_duplicate",
+      "status": "PASS",
+      "evidence": "One actual UI confirmation; creation ACK held beyond former 6s cutoff, genuine maximum and grade ACK gates; same teaching identity, 28 names/31 durable grades, one zero/blank cells and untouched19/0 preserved; five defaults, one grade command/receipt; reload owner/database/receipt verified."
+    },
+    {
+      "name": "offline_cancel_during_creation_wait",
+      "status": "PASS",
+      "evidence": "Actual offline event exposes same-request manual recovery; cancellation stops the foreground wait, later real creation ACK retains one class and owned names without a maximum/grade dispatch or resurrected continuation."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "a00d6c236c97e193c7ff511d5991874a15b069220916a7c64b636ebc88d5bb9f",
+    "src/store.js": "13f4bbf7094882a83b4a63880910ab1750c6139172d5843bdf5bff5c167d4c20",
+    "src/lib/sync.js": "62c792f8444e82156d79da2f1cc7a619036375d544aa4c9218b467a8840aa400",
+    "src/lib/sync-v2.js": "96ebcc1e49528c3e89c716c4e98852dca8ae09f43bbc8ea1f8fad26114fdde3d",
+    "src/lib/grade-transfer.js": "cfea5d2637a5f81e9caf8fe116d93d8fa7713ee212c4863802b1f0a767cb37b3",
+    "src/models.js": "af9e624621e21686a86599b75eead8289af526072906efbe79e58a84d7b4a5fe",
+    "src/styles/components.css": "b175be9dafe966e7f89ffa63b601f73cb71e259e03c1f27a53fd0451f7d3a9d7",
+    "tests/n107-1019-single-confirm.mjs": "663484fba4f1605a1d461cb218bc8b961116772791bd33bdcd796cff3a781fa0"
+  },
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'undefined'\n- 'function'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-single-confirm-auto-completion-20261019/tests/n107-1019-single-confirm.mjs:207:11\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-single-confirm-auto-completion-20261019/tests/n107-1019-single-confirm.mjs:188:2"
+  ]
+}

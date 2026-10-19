@@ -11,6 +11,7 @@ import { CUSTOM_SUBJECT_NAME_MAX } from '../lib/subject-catalog.js';
 
 import { canOpenRoster, classAccessFeedback } from './students.js';
 import * as cloud from '../lib/cloud.js';
+import * as sync from '../lib/sync.js';
 import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { go } from '../router.js';
 import { readGradeFile } from '../lib/grade-transfer-parsers.js';
@@ -319,6 +320,8 @@ function transferPanel(teachingId) {
       ${!review && !draft.review && (!transfer.created || transfer.needsReview && !transfer.plan) ? html`<button class="btn btn--primary" data-act="grade-review" ${transfer.busy || transfer.recovery.length ? 'disabled' : ''}>مراجعة الاستيراد</button>` : ''}
       <button class="btn" data-act="grade-cancel" >إلغاء</button>
     ` : ''}
+    ${transfer.created ? html`<p data-roster-partial role="status">${transfer.created.existing ? 'لم يتأكد حفظ درجات الملف بعد.' : `حُفظ الفصل والمادة و${transfer.created.added} اسمًا.`} ${transfer.stage ?? 'الدرجات لم يتأكد حفظها.'}</p>
+      ${!transfer.busy && !transfer.recovery.length && transfer.plan ? transfer.needsReview ? html`<button class="btn" data-act="roster-changed-review">مراجعة الأثر المتغيّر</button>` : html`<button class="btn btn--primary" data-act="roster-resume">استكمال الاستيراد</button>` : ''}` : ''}
     ${review || draft.review ? html`<div data-grade-review>
       ${compactReview(draft.proposal ?? review, draft.review)}
       ${transfer.importMode==='grades' ? transfer.rows.slice(1).map((row,index) => {
@@ -337,8 +340,6 @@ function transferPanel(teachingId) {
         <button class="btn btn--primary" data-act="${draft.review ? 'class-import-confirm' : 'grade-confirm'}" ${locked() || transfer.recovery.length || review?.rejected?.length || review?.counts?.invalid || review?.counts?.ambiguous ? 'disabled' : ''}>${draft.failed ? 'استكمال الاستيراد' : 'تأكيد الاستيراد'}</button>` : ''}
     </div>` : ''}
     ${transfer.writing && !transfer.created ? html`<p data-roster-progress role="status">${draft.review ? 'حفظ الفصل والطلاب…' : 'حفظ الأسماء والدرجات…'}</p>` : ''}
-    ${transfer.created ? html`<p data-roster-partial role="status">${transfer.created.existing ? 'لم يتأكد حفظ درجات الملف بعد.' : `حُفظ الفصل والمادة و${transfer.created.added} اسمًا.`} ${transfer.stage ?? 'الدرجات لم يتأكد حفظها.'}</p>
-      ${!transfer.busy && !transfer.recovery.length && transfer.plan ? transfer.needsReview ? html`<button class="btn" data-act="roster-changed-review">مراجعة الأثر المتغيّر</button>` : html`<button class="btn btn--primary" data-act="roster-resume">استكمال الاستيراد</button>` : ''}` : ''}
     ${draft.failed && !transfer.created ? html`<p data-roster-partial role="status">لم تكتمل العملية. ${store.classImportReceipt(draft.review)?.sectionId ? 'حُفظ الفصل.' : 'لم يُحفظ الفصل.'} ${store.classImportReceipt(draft.review)?.teachingId ? 'حُفظ إسناد المادة.' : 'لم يُحفظ إسناد المادة.'} الأسماء المحفوظة: ${store.classImportReceipt(draft.review)?.added ?? 0}؛ المتبقية: ${store.classImportReceipt(draft.review)?.pendingNames.length ?? 0}.</p>` : ''}
     ${transfer.message ? html`<p class="grade-transfer__message ${transfer.error ? 'is-error' : ''}" role="${transfer.error ? 'alert' : 'status'}">${transfer.message}</p>` : ''}
     ${transfer.successTeaching && !transfer.error ? html`<a class="btn btn--quiet" href="#/teaching/${transfer.successTeaching}">فتح الفصل</a>` : ''}
@@ -606,17 +607,36 @@ function boundGradeReview(current, plan) {
   return actual;
 }
 function waitForCreation(current,plan) {
-  // Notify-driven, one bounded deadline. No polling, background writes or synthetic Sync acknowledgment.
+  // AI-authored N107: one foreground approval stays alive across normal Sync
+  // passes. The deadline bounds waiting, not a sleep before a second click.
   return new Promise((resolve,reject)=>{
-    let stop=()=>{},timer;
-    const finish=(error,value)=>{stop();clearTimeout(timer);current.stopWait=null;error?reject(error):resolve(value);};
-    const check=()=>{try{finish(null,boundGradeReview(current,plan));}catch(error){
+    const stops=[];let timer,settled=false;
+    const finish=(error,value)=>{
+      if(settled)return;settled=true;
+      stops.forEach(stop=>stop());clearTimeout(timer);current.stopWait=null;
+      error?reject(error):resolve(value);
+    };
+    const check=()=>{if(settled)return;try{
+      assertPlan(current,plan);
+      if(navigator.onLine===false)throw Error('الاتصال غير متاح. الطلب محفوظ؛ استكمل الطلب نفسه بعد عودة الاتصال والمزامنة.');
+      const teaching=store.getTeaching(current.created.teachingId);
+      const stage=!(Number(teaching?.serverRevision)>0) || teaching?.syncCreatePending
+        ? 'انتظار المزامنة: إيصال الفصل وبنود التقييم'
+        : 'انتظار المزامنة: إيصالات الأسماء وربطها بالفصل';
+      if(current.stage!==stage){current.stage=stage;repaint();}
+      finish(null,boundGradeReview(current,plan));
+    }catch(error){
       try{assertPlan(current,plan);}catch(changed){finish(changed);return;}
       if(error.message !== 'GRADE_CONTEXT_INVALID' && error.message !== 'GRADE_ITEM_UNAVAILABLE')finish(error);
     }};
-    stop=store.subscribe(check);current.stopWait=()=>finish(importChanged());
-    timer=setTimeout(()=>finish(Error('انتظار المزامنة لم يكتمل. الأسماء محفوظة والدرجات لم تُحفظ؛ استكمل الطلب نفسه بعد المزامنة.')),6000);
+    stops.push(store.subscribe(check),sync.subscribe(check),cloud.subscribe(check));
+    window.addEventListener('offline',check);stops.push(()=>window.removeEventListener('offline',check));
+    current.stopWait=()=>finish(importChanged());
+    timer=setTimeout(()=>finish(Error('انتهت مهلة انتظار المزامنة. الأسماء محفوظة والدرجات لم تُحفظ؛ تحقّق من الاتصال وحالة المزامنة ثم استكمل الطلب نفسه.')),Math.max(0,Math.min(90000,plan.expires-Date.now())));
     check();
+    // Use the existing coordinator and its owned outbox; concurrent Sync joins
+    // its normal trailing pass. Never retry or dispatch a grade from a timer.
+    if(!settled)void sync.syncAll({full:false}).catch(error=>finish(error));
   });
 }
 // Owner-database device state only: retain the reviewed file while creation ACKs
