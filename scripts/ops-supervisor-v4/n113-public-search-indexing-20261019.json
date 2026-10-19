@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n113-public-search-indexing-20261019",
+      "productId": "N113",
+      "activationId": "po-20261012-continuous",
+      "priority": -1110,
+      "scopeKey": "n113-public-search-indexing",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nHigh priority search indexing/appearance: inspect public origin/index and existing hosting SEO only. Correct genuine crawl/noindex/canonical/meta/structured-data/sitemap inconsistencies with actual public Rakeez pages. Do not list private teacher/student/account/hashUUID routes or real data in sitemap; no route/auth behavior changes, invented reviews/pricing/org facts, new public status page or secret/SearchConsole account extraction. Use already permitted public HTTP/served-source inspection and minimal metadata/crawl validation. Deliver valid public discovery groundwork; no claim Google indexed immediately or Search Console submission unless actually observed. Avoid site redesign or broad marketing audit.",
+      "allowedPaths": [
+        "index.html",
+        "robots.txt",
+        "sitemap.xml",
+        "src/public/**",
+        "assets/brand/**",
+        "docs/SEO.md",
+        "tests/n113-1019*.mjs",
+        "tests/n113-1019*.json",
+        "tests/fixtures/n113-1019/**",
+        "docs/automation-evidence/20261019/N113_PUBLIC_SEARCH_INDEXING.md"
+      ],
+      "verificationPaths": [
+        "index.html",
+        "docs/automation-evidence/20261019/N113_PUBLIC_SEARCH_INDEXING.md"
+      ],
+      "requiredChecks": [
+        "n113_public_metadata_canonical_robots_sitemap_private_routes_excluded"
+      ],
+      "acceptance": [
+        "فهرسة ركيز وظهور صفحاته العامة في البحث — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

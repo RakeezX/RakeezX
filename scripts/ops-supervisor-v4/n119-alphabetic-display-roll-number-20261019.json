@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n119-alphabetic-display-roll-number-20261019",
+      "productId": "N119",
+      "activationId": "po-20261012-continuous",
+      "priority": -540,
+      "scopeKey": "n119-alphabetic-display-roll-number",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority explicit user intent: alphabetical student order should assign current display rollnumber1..N by that same order for old/new active students; selecting sort by roll must not scramble it. Inspect existing N98 accepted contract and distinguish immutable source/external number from computed current Rakeez display roll. Prefer consistent derived display rank across roster/gradebook/reports, preserving student/enrollment IDs, history, source numbers and stored grades; no rewrite of identity/sourceId/import order fields just to sort. Same Arabic collation/tie policy across views. One small mixed old/new fake roster sort/filter example. No full export/import suite.",
+      "allowedPaths": [
+        "src/lib/student-order.js",
+        "src/lib/student-import.js",
+        "src/views/students.js",
+        "src/views/grades.js",
+        "src/views/reports.js",
+        "src/store.js",
+        "tests/n119-1019*.mjs",
+        "tests/n119-1019*.json",
+        "tests/fixtures/n119-1019/**",
+        "docs/automation-evidence/20261019/N119_ALPHABETIC_DISPLAY_ROLL_NUMBER.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-order.js",
+        "docs/automation-evidence/20261019/N119_ALPHABETIC_DISPLAY_ROLL_NUMBER.md"
+      ],
+      "requiredChecks": [
+        "n119_alphabetic_display_roll_matches_old_new_students_stable_identity"
+      ],
+      "acceptance": [
+        "تطابق رقم الكشف مع الترتيب الأبجدي الحالي — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

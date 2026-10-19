@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n116-lesson-generation-on-demand-20261019",
+      "productId": "N116",
+      "activationId": "po-20261012-continuous",
+      "priority": -580,
+      "scopeKey": "n116-lesson-generation-on-demand",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority PO requests honest analysis and best simple mitigation: daily upfront generation causes calendar/Sync conflicts; proposes generate when user enters lesson, optionally shortly before lesson. Inspect actual triggers before deciding. Prefer lazy/on-open creation using existing stable identity/idempotency and current calendar, not creation for every future daily slot. Generate shortly before only if an existing real reminder need requires it; N44 sending stillOFF. Preserve historical attendance/grades/manual lessons/archive/tombstones; no remapping existing recorded sessions or repeated rejected year outbox. Temporary calendar-region switching hold stays until exact underlying Sync case genuinely fixed. Bound scope to proven session generation/calendar interaction, no broader regional roll-out or schedule rewrite. Actual affected generator/store synthetic idempotency and calendar-edit scenario only; record product rationale plainly.",
+      "allowedPaths": [
+        "src/lib/session-auto.js",
+        "src/lib/session-start-ui.js",
+        "src/views/sessions.js",
+        "src/views/schedule.js",
+        "src/views/calendar.js",
+        "src/store.js",
+        "src/app.js",
+        "tests/n116-1019*.mjs",
+        "tests/n116-1019*.json",
+        "tests/fixtures/n116-1019/**",
+        "docs/automation-evidence/20261019/N116_LESSON_GENERATION_ON_DEMAND.md"
+      ],
+      "verificationPaths": [
+        "src/lib/session-auto.js",
+        "docs/automation-evidence/20261019/N116_LESSON_GENERATION_ON_DEMAND.md"
+      ],
+      "requiredChecks": [
+        "n116_on_demand_session_generation_calendar_change_idempotent_history_safe"
+      ],
+      "acceptance": [
+        "تقليل تعارض التقويم بتوليد الحصة عند الحاجة — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

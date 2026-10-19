@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n110-two-tab-runtime-stability-20261019",
+      "productId": "N110",
+      "activationId": "po-20261012-continuous",
+      "priority": -1150,
+      "scopeKey": "n110-two-tab-runtime-stability",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nHigh priority: opening2Rakeez tabs in samebrowser/account causes shaking, instability and hanging. Reproduce with two isolated synthetic same-browser app tabs using actual storage/channel/runtime/Sync lease events. Diagnose source of repeated paint/reload/ownership/leader feedback and fix narrowly; no global reload loop, disabling isolation or multi-tab writes, service worker reset or account purge. One relevant two-tab scenario plus affected owner/leader change recovery, preserve grades/uncommitted outbox and account transitions. No multi-browser exhaustive suite.",
+      "allowedPaths": [
+        "src/app.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync-ownership.js",
+        "src/lib/remote-sync.js",
+        "src/store.js",
+        "src/lib/session-recovery.js",
+        "tests/n110-1019*.mjs",
+        "tests/n110-1019*.json",
+        "tests/fixtures/n110-1019/**",
+        "docs/automation-evidence/20261019/N110_TWO_TAB_RUNTIME_STABILITY.md"
+      ],
+      "verificationPaths": [
+        "src/app.js",
+        "docs/automation-evidence/20261019/N110_TWO_TAB_RUNTIME_STABILITY.md"
+      ],
+      "requiredChecks": [
+        "n110_two_same_browser_tabs_no_refresh_lease_feedback_loop"
+      ],
+      "acceptance": [
+        "استقرار ركيز عند فتح تبويبين للحساب نفسه — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

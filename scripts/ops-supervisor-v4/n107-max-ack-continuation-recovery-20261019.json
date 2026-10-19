@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-max-ack-continuation-recovery-20261019",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -1400,
+      "scopeKey": "n107-max-ack-continuation-recovery",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nNEW ACTUAL PO regression supersedes old synthetic PASS/trial hold. Two fresh accounts: new الثالث الثانوي /3, التفكير الناقد,1448–1449 term1,28students31grades, الواجبات10→20. Names and default items created without duplicates (preserve), grades never save. Confirm yields sync waiting; resume yields exact \"Import maximum reviewed context changed\". Another attempt Cancel yields pending maximum identity retained; one gradebook outbox mutation retries forever and prevents import/cancel/class delete. Do NOT ask user to repeat or replay private CSV. Inspect prior shipped N107 name-match/file-max actual current implementation and its exact normal store/outbox ACK context/review fingerprints. Use small fully fabricated same-shape reproduction with real application store and normal mocked server ACK/rejection, including reload after accepted/pending max. Find actual cause, not timeout extension. Unique normalized-name direct item must retain ID and use EXACT declared file max20 despite previous10. Preserve existing grades, zeros/blanks, absent pupil grades, ambiguity/readonly/auto/lower-max protections. Rebind only the approved canonical max/revision transition after its genuine ACK; arbitrary owner/term/item/business drift still needs new review. Pending/failed max must lead to actionable bounded resume or cancel; cancellation does not silently discard an in-flight command, forge ACK, undo unrelated changes or lose marks. Recover already-persisted stuck continuations safely through existing normal paths, not manual record edits or mass outbox deletion. No global destructive Sync reset or migration. Grade batch only after exact max ACK; final success only durable grade receipt. Explain residual retryable/rejected state clearly and avoid endless automatically paid/runtime retries. New class subject selector additionally offers أخرى with typed subject name through existing canonical subject mechanism, same preview and correct ownership/default resolution, without duplicating importer. Focus affected checks above only; old broad28-case import/browser/N36/SQL suites are not required.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/lib/grade-transfer.js",
+        "src/lib/class-import-file.js",
+        "src/lib/student-import.js",
+        "src/lib/subject-catalog.js",
+        "src/lib/class-subject-default.js",
+        "src/store.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync-ownership.js",
+        "tests/n107-1019*.mjs",
+        "tests/n107-1019*.json",
+        "tests/fixtures/n107-1019/**",
+        "docs/automation-evidence/20261019/N107_MAX_ACK_CONTINUATION_RECOVERY.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js",
+        "docs/automation-evidence/20261019/N107_MAX_ACK_CONTINUATION_RECOVERY.md"
+      ],
+      "requiredChecks": [
+        "n107_reported_max10_to20_ack_then_grade_receipt_retry_reload",
+        "n107_pending_max_recovery_cancel_and_untouched_grade_owner_safety",
+        "n107_new_class_custom_subject_existing_single_preview"
+      ],
+      "acceptance": [
+        "إصلاح تعلّق العظمى واستكمال الدرجات وإلغاء الاستيراد، وإتاحة اسم مادة مخصص — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

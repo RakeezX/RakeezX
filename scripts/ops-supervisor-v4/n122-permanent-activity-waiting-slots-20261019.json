@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n122-permanent-activity-waiting-slots-20261019",
+      "productId": "N122",
+      "activationId": "po-20261012-continuous",
+      "priority": -500,
+      "scopeKey": "n122-permanent-activity-waiting-slots",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority allow teacher to add recurring permanent timetable slot نوع نشاط/انتظار even without a subject they normallyteach, persists until user edits/deletes. Use existing schedule model if capable; preserve existing classes/subjects/slots/session history and no fake academic subject/student roster or synthetic enrollment. Proper existing datetime adapter. One scoped synthetic save/reload/edit/delete timetable flow, only affected persistence/Sync guard. No new live schema/migration; if model truly cannot represent, record exact existing blocker with concrete reviewed minimal proposal rather than silently repurposing IDs.",
+      "allowedPaths": [
+        "src/views/schedule.js",
+        "src/lib/schedule.js",
+        "src/lib/session-auto.js",
+        "src/lib/session-editor-ui.js",
+        "src/store.js",
+        "tests/n122-1019*.mjs",
+        "tests/n122-1019*.json",
+        "tests/fixtures/n122-1019/**",
+        "docs/automation-evidence/20261019/N122_PERMANENT_ACTIVITY_WAITING_SLOTS.md"
+      ],
+      "verificationPaths": [
+        "src/views/schedule.js",
+        "docs/automation-evidence/20261019/N122_PERMANENT_ACTIVITY_WAITING_SLOTS.md"
+      ],
+      "requiredChecks": [
+        "n122_permanent_activity_waiting_slot_save_reload_edit_delete_no_fake_subject"
+      ],
+      "acceptance": [
+        "حصص نشاط وانتظار ثابتة في جدول المعلم — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n111-mobile-delete-single-confirm-20261019",
+      "productId": "N111",
+      "activationId": "po-20261012-continuous",
+      "priority": -1180,
+      "scopeKey": "n111-mobile-delete-single-confirm",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nHigh priority: mobile class deletion final \"تأكيد الحذف\" needs two taps; first tap only darkens red. Inspect actual class deletion dialog/action and focus/touch/pointer/busy timing. First deliberate enabled confirm must execute same existing guarded delete once. Preserve original separate opening/review confirmation, owner validation, archival/history/tombstones and double-click prevention; no deletion semantics/store/schema change or real class deletion. Verify one small actual synthetic mobile interaction of real dialog and idempotent handler; no broad delete/restore suite. Prior accepted N77/N91 remain accepted; this is new regression only.",
+      "allowedPaths": [
+        "src/views/teachings.js",
+        "src/views/groups.js",
+        "src/lib/session-delete-ui.js",
+        "src/lib/dom.js",
+        "src/styles/components.css",
+        "tests/n111-1019*.mjs",
+        "tests/n111-1019*.json",
+        "tests/fixtures/n111-1019/**",
+        "docs/automation-evidence/20261019/N111_MOBILE_DELETE_SINGLE_CONFIRM.md"
+      ],
+      "verificationPaths": [
+        "src/views/teachings.js",
+        "docs/automation-evidence/20261019/N111_MOBILE_DELETE_SINGLE_CONFIRM.md"
+      ],
+      "requiredChecks": [
+        "n111_mobile_delete_confirmation_first_tap_exactly_once"
+      ],
+      "acceptance": [
+        "حذف الفصل من الجوال بضغطة تأكيد واحدة — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

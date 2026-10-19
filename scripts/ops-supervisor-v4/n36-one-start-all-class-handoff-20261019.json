@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-one-start-all-class-handoff-20261019",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -1200,
+      "scopeKey": "n36-one-start-all-class-handoff",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nNEW actual PO trial of extension0.5.11 supersedes previous user-not-saved hold: slow page navigation, per-class incomplete-checkbox/review/transfer, new import tab28names preview expires2min, actual transfer failed. User expressly requests ONE START in extension collecting all available classes/students into their already-open authenticated Rakeez, no per-class confirmations/manual save/redundant new tabs. This is latest direct consent for this user-initiated automatic multi-class names import path, superseding old card no-automatic-save requirement ONLY within that initiated owned batch, not background collection/school writes. Preserve immutable original accepted303/10class evidence, use synthetic counts and actual extension/receiver/store ACK engines; no re-collection of real Madrasati or reroute of refused Chrome actions. Inspect current full batch handoff and boundary/TTL/owner handling, prefer existing batch receiver, correct actual broken transfer and practical navigation waits instead of arbitrary sleeps. One start may clearly state all-class import; bind initiating owner/session, fail closed account switch, preserve IDs/history and skip/retry without duplicate classes/pupils or false completion. Do not silently represent incomplete extraction as complete; give concise truthful summary/action only for actual unresolved classes, not repeated per-class review ceremony. Two minute value is expiry, NEVER mandatory wait; claim and persist promptly into owned batch, preserve progress/retry without expired payload losing collected results, no permanent public student transfer storage. Honor browser foreground/noninterference/denials. Reuse existing packaged extraction tests; one small actual synthetic all-class extension→receiver→normal canonical ACK journey plus essential expiry/duplicate/owner guards, no broad school crawl or previous303-suite rerun. Package genuine changed extension if needed, increment version and current download link coherently; no new stale0.5.11 link. N107 may touch shared import view first, controller serializes overlap; use its delivered implementation. Other unrelated work continues.",
+      "allowedPaths": [
+        "tools/teacher-import-helper/**",
+        "tools/extensions/**",
+        "extensions/**",
+        "assets/extensions/**",
+        "public/assets/extensions/**",
+        "scripts/build-teacher-import-helper.mjs",
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/class-koshoof-bundle.js",
+        "src/lib/teacher-setup-import.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/views/class-import-center.js",
+        "tests/n36-1019*.mjs",
+        "tests/n36-1019*.json",
+        "tests/fixtures/n36-1019/**",
+        "docs/automation-evidence/20261019/N36_ONE_START_ALL_CLASS_HANDOFF.md"
+      ],
+      "verificationPaths": [
+        "tools/teacher-import-helper/**",
+        "docs/automation-evidence/20261019/N36_ONE_START_ALL_CLASS_HANDOFF.md"
+      ],
+      "requiredChecks": [
+        "n36_one_explicit_start_all_available_classes_existing_rakeez_receiver_ack",
+        "n36_handoff_incomplete_ttl_retry_owner_and_package_safety"
+      ],
+      "acceptance": [
+        "نقل مدرستي بضغطة بدء واحدة لكل الفصول إلى ركيز المفتوح — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

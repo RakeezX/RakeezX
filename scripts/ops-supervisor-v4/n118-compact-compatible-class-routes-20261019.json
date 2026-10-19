@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n118-compact-compatible-class-routes-20261019",
+      "productId": "N118",
+      "activationId": "po-20261012-continuous",
+      "priority": -550,
+      "scopeKey": "n118-compact-compatible-class-routes",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority detailed URL /#/teaching/tch:sec:<uuid>|sub:digital-skills|tm:y:1448-1449:1/quicklog. User asks whether normal. Treat IDs as normal internal identity but reduce visible route verbosity only via existing stable owned teaching identity/resolver if safely available. Preserve back/forward, deep links, old aliases, year/term/context and owner guard. No ID renumber/history rewrite, new public identifier registry/schema or misleading hiding security. Choose minimal compatible route change, no whole router replacement. If shortening requires undelegated schema, deliver bounded explanation and simpler existing link display instead of risky rewrite.",
+      "allowedPaths": [
+        "src/router.js",
+        "src/lib/teaching-routing.js",
+        "src/views/teaching-hub.js",
+        "src/views/teachings.js",
+        "tests/n118-1019*.mjs",
+        "tests/n118-1019*.json",
+        "tests/fixtures/n118-1019/**",
+        "docs/automation-evidence/20261019/N118_COMPACT_COMPATIBLE_CLASS_ROUTES.md"
+      ],
+      "verificationPaths": [
+        "src/router.js",
+        "docs/automation-evidence/20261019/N118_COMPACT_COMPATIBLE_CLASS_ROUTES.md"
+      ],
+      "requiredChecks": [
+        "n118_compact_route_same_owner_context_legacy_links_preserved"
+      ],
+      "acceptance": [
+        "روابط صفوف أقصر مع بقاء الروابط القديمة صالحة — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
+        "Preserve owner/identity/history/unmodified grades and existing guards, truthful pending/error/ACK states. Publish genuine source through sole publisher, ready for review; do not fabricate personal PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}
