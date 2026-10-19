@@ -25,7 +25,7 @@
 .n107-success__counts, .n107-review__counts { font-weight: 600; margin-block: .5rem; }
 .n107-context { color: var(--text-3); font-size: .9rem; margin-block: .5rem .75rem; }
 .n107-field-error { color: var(--danger); }
-[data-roster-field][aria-invalid="true"] { border-color: var(--danger); }
+[data-roster-field][aria-invalid="true"], [data-roster-subject][aria-invalid="true"] { border-color: var(--danger); }
 .n107-review [data-grade-max-impact] { padding-inline-start: .75rem; border-inline-start: 3px solid var(--danger-border); }
 @media (max-width: 480px) { .n107-success .btn { width: 100%; } }
 

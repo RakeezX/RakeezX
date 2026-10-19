@@ -3,7 +3,7 @@ import { compareAcademicClasses } from '../lib/class-order.js';
 import { html, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { isDemo } from '../lib/demo.js';
-import { classGroups, detectClassNameColumn } from '../lib/class-import-file.js';
+import { classGroups, detectClassNameColumn, subjectSafe } from '../lib/class-import-file.js';
 import { GRADES, gradeLabel, sectionLabel, defaultItemsFor } from '../models.js';
 import { classKoshoofBundle, downloadKoshoofBundle } from '../lib/class-koshoof-bundle.js';
 import { repaint } from '../repaint.js';
@@ -72,6 +72,12 @@ function rosterLabelError() {
   if (label.length > 8) return 'رمز الفصل: 8 أحرف كحد أقصى';
   return /^[\p{L}\p{N} ._-]+$/u.test(label) ? '' : 'استخدم أحرفًا أو أرقامًا أو مسافة أو . _ -';
 }
+// AI-authored N107: use the import parser's subject constraint before review.
+function rosterSubjectError() {
+  const subject = String(draft.manual?.subject ?? '').trim();
+  if (!subject) return draft.customSubject ? 'أدخل اسم المادة' : 'اختر المادة';
+  return subjectSafe(subject) ? '' : `أدخل اسم مادة صالحًا (حتى ${CUSTOM_SUBJECT_NAME_MAX} حرفًا)`;
+}
 function rosterFilePane(list) {
   const immutable = locked() || !!draft.review || !!transfer.review || !!transfer.created || !!transfer.recovery.length;
   transfer.panel = 'import';
@@ -83,8 +89,8 @@ function rosterFilePane(list) {
     ${hub.kind === 'new' ? html`<div class="class-import-manual" data-roster-create>
       <label class="field"><span>الصف</span><select class="select" data-roster-field="grade" aria-invalid="${draft.gradeError ? 'true' : 'false'}" aria-describedby="roster-grade-error" ${immutable ? 'disabled' : ''}><option value="">اختر الصف</option>${GRADES.map(g=>html`<option value="${g.v}" ${String(draft.manual?.grade) === String(g.v) ? 'selected' : ''}>${g.label}</option>`)}</select><small id="roster-grade-error" class="n107-field-error" ${draft.gradeError ? '' : 'hidden'}>${draft.gradeError ? 'اختر الصف' : ''}</small></label>
       <label class="field"><span>رمز الفصل</span><input class="input" maxlength="8" data-roster-field="label" value="${draft.manual?.label ?? ''}" aria-invalid="${draft.labelError ? 'true' : 'false'}" aria-describedby="roster-label-error" ${immutable ? 'disabled' : ''}><small id="roster-label-error" class="n107-field-error" ${draft.labelError ? '' : 'hidden'}>${draft.labelError ?? ''}</small></label>
-      <label class="field"><span>المادة</span><select class="select" data-roster-subject ${immutable ? 'disabled' : ''}><option value="">اختر المادة</option>${store.subjectOptions().map(o=>html`<option value="${o.name}" ${!draft.customSubject && draft.manual?.subject === o.name ? 'selected' : ''}>${o.name}</option>`)}<option value="custom" ${draft.customSubject ? 'selected' : ''}>أخرى</option></select></label>
-      ${draft.customSubject ? html`<label class="field"><span>اسم المادة</span><input class="input" data-roster-field="subject" maxlength="${CUSTOM_SUBJECT_NAME_MAX}" value="${draft.manual?.subject ?? ''}" ${immutable ? 'disabled' : ''}></label>` : ''}
+      <label class="field"><span>المادة</span><select class="select" data-roster-subject aria-invalid="${!draft.customSubject && draft.subjectError ? 'true' : 'false'}" aria-describedby="roster-subject-error" ${immutable ? 'disabled' : ''}><option value="">اختر المادة</option>${store.subjectOptions().map(o=>html`<option value="${o.name}" ${!draft.customSubject && draft.manual?.subject === o.name ? 'selected' : ''}>${o.name}</option>`)}<option value="custom" ${draft.customSubject ? 'selected' : ''}>أخرى</option></select>${!draft.customSubject ? html`<small id="roster-subject-error" class="n107-field-error" ${draft.subjectError ? '' : 'hidden'}>${draft.subjectError ?? ''}</small>` : ''}</label>
+      ${draft.customSubject ? html`<label class="field"><span>اسم المادة</span><input class="input" data-roster-field="subject" maxlength="${CUSTOM_SUBJECT_NAME_MAX}" value="${draft.manual?.subject ?? ''}" aria-invalid="${draft.subjectError ? 'true' : 'false'}" aria-describedby="roster-subject-error" ${immutable ? 'disabled' : ''}><small id="roster-subject-error" class="n107-field-error" ${draft.subjectError ? '' : 'hidden'}>${draft.subjectError ?? ''}</small></label>` : ''}
     </div>` : html`<label class="field"><span>الفصل والمادة</span><select class="select" data-existing-class aria-label="الفصل الموجود" ${immutable ? 'disabled' : ''}><option value="">اختر الفصل</option>${list.map(row=>html`<option value="${row.id}" ${hub.existing === row.id ? 'selected' : ''}>${shortTeachingLabel(row)}</option>`)}</select></label>`}
     <div class="segmented grade-transfer__modes" role="group" aria-label="محتوى الكشف">${['names','grades'].map(mode=>html`<button class="segmented__btn ${transfer.importMode === mode ? 'is-on' : ''}" data-act="grade-import-mode" data-mode="${mode}" aria-pressed="${transfer.importMode === mode}" ${immutable ? 'disabled' : ''}>${mode === 'names' ? 'أسماء فقط' : 'أسماء ودرجات'}</button>`)}</div></details>
     ${hub.kind === 'new' ? transferPanel(null) : existingPane()}
@@ -524,6 +530,9 @@ const transferActions = {
         if (hub.kind === 'new' && (draft.labelError = rosterLabelError())) {
           draft.focusLabel = true; transfer.message = ''; transfer.error = false; repaint(); return;
         }
+        if (hub.kind === 'new' && (draft.subjectError = rosterSubjectError())) {
+          draft.focusSubject = true; transfer.message = ''; transfer.error = false; repaint(); return;
+        }
         readTransferMappings(el.closest('[data-grade-transfer]')); transfer.mappings=transfer.mappings.map(m=>m.kind==='new'?{...m,confirmed:true}:m); transfer.page=0; if (hub.kind === 'new') { reviewNewRoster(); repaint(); return; } transfer.review = transfer.importMode === 'names' ? store.reviewNamesImport(params.id, transfer) : store.reviewGradeImport(params.id, transfer); transfer.message = ''; transfer.error = false; }
       catch (error) { transfer.review = null; transfer.message = error.message === 'GRADE_NEW_ITEM_CONFIRM_REQUIRED' ? 'أكد إنشاء كل بند جديد باسمه وعظماه، أو اختر تجاهله قبل المراجعة.' : error.message === 'GRADE_CONTEXT_INVALID' ? 'بيانات الفصل لم تتأكد بالمزامنة بعد. أكمل المزامنة ثم أعد المراجعة؛ الملف والأعمدة محفوظة.' : error.message === 'GRADE_DUPLICATE_ITEM' ? 'اختر بندًا مختلفًا لكل عمود درجات؛ لا يمكن ربط عمودين بالبند نفسه.' : 'راجع الأعمدة والبنود والعظمى: ' + error.message; transfer.error = true; }
       repaint();
@@ -846,6 +855,7 @@ export const koshoofCenter = {
     focus(root);
     if (draft.focusGrade) { draft.focusGrade = false; root.querySelector('[data-roster-field="grade"]')?.focus(); }
     if (draft.focusLabel) { draft.focusLabel = false; root.querySelector('[data-roster-field="label"]')?.focus(); }
+    if (draft.focusSubject) { draft.focusSubject = false; root.querySelector(draft.customSubject ? '[data-roster-field="subject"]' : '[data-roster-subject]')?.focus(); }
     if (root.querySelector('[data-class-access-status]')) return;
     if (hub.tab === 'import') void receiveExtension();
     const listen = (selector, handler) => root.querySelectorAll(selector).forEach(el => { if (el.dataset.bound) return; el.dataset.bound = 'true'; el.addEventListener('change', handler); });
@@ -860,8 +870,8 @@ export const koshoofCenter = {
     });
     listen('[data-import-kind]', event => { if (!locked()) { hub.kind = event.target.value; resetDestination(); repaint(); } });
     listen('[data-existing-class]', event => { if (!locked()) { hub.existing = event.target.value; if(!transfer.rows)hub.kind='existing'; resetDestination(); repaint(); } });
-    listen('[data-roster-field]', event => { if (!locked() && !draft.review) { draft.manual ??= {}; draft.manual[event.target.dataset.rosterField] = event.target.value; if(event.target.dataset.rosterField === 'grade' && event.target.value) { draft.gradeError = false; repaint(); } if(event.target.dataset.rosterField === 'label' && draft.labelError) { draft.labelError = rosterLabelError(); repaint(); } } });
-    listen('[data-roster-subject]', event => { if (!locked() && !draft.review) { draft.manual ??= {};draft.customSubject=event.target.value==='custom';draft.manual.subject=draft.customSubject?'':event.target.value;repaint(); } });
+    listen('[data-roster-field]', event => { if (!locked() && !draft.review) { draft.manual ??= {}; draft.manual[event.target.dataset.rosterField] = event.target.value; if(event.target.dataset.rosterField === 'grade' && event.target.value) { draft.gradeError = false; repaint(); } if(event.target.dataset.rosterField === 'label' && draft.labelError) { draft.labelError = rosterLabelError(); repaint(); } if(event.target.dataset.rosterField === 'subject' && draft.subjectError) { draft.subjectError = rosterSubjectError(); repaint(); } } });
+    listen('[data-roster-subject]', event => { if (!locked() && !draft.review) { draft.manual ??= {};draft.customSubject=event.target.value==='custom';draft.manual.subject=draft.customSubject?'':event.target.value;if(draft.subjectError)draft.subjectError=rosterSubjectError();repaint(); } });
     const invalidate = () => { hub.message = ''; };
     listen('[data-koshoof-class]', event => { event.target.checked ? hub.selected.add(event.target.value) : hub.selected.delete(event.target.value); invalidate(); repaint(); });
     listen('[data-koshoof-all]', event => { hub.selected = new Set(event.target.checked ? accessible().map(row => row.id) : []); invalidate(); repaint(); });

@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n107-missing-subject-feedback-20261019",
+  "runId": "d3abf29d-c2fc-4fb2-a426-f53462b2de41",
+  "checks": [
+    {
+      "name": "n107_missing_subject_precise_field_feedback",
+      "status": "PASS",
+      "evidence": "Actual app HTTP in fresh390px context with synthetic account ownership/lease guards and actual CSV/review/change handlers: grade then code precedence; missing select/custom/whitespace field focus and linked direct message; invalid numeric/overlength constraint; correction clears errors, custom subject reaches original review. Source CSS red borders and no overflow PASS. No confirm clicked; records/grades/outbox unchanged."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "2433d19e03508c4e35eca2d63917ab55bff4abb8890084293824dcb9c6f34c94",
+    "src/styles/teacher-setup-import.css": "57d2c771aa00f1c4dedf62841e0ee226422ee5609d2557010f3370179df75a7d"
+  },
+  "scope": "Actual account-bound import view; synthetic CSV, no submit mutation or live service."
+}
