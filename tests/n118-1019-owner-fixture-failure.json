@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n118-compact-compatible-class-routes-20261019",
+  "runId": "7b8859f6-1667-4799-8683-04bb43933be7",
+  "checks": [
+    {
+      "name": "lossless_identity_alias_context",
+      "status": "PASS",
+      "evidence": "90 to 70 path characters; raw/encoded legacy aliases and compact routes preserve full identity, suffix, session/date query; other term/year/subject remain distinct; unknown IDs round-trip."
+    },
+    {
+      "name": "n118_compact_route_same_owner_context_legacy_links_preserved",
+      "status": "PASS",
+      "evidence": "Actual application DOM/handlers/source CSS over task-owned HTTP in fresh isolated mobile context; synthetic account fixture with real store/access guard. Class card → hub → Quicklog, native Back/Forward, app Back, raw/encoded legacy deep links, compact links, class switcher, and go() → Students resolve the original identity. Persisted product stores unchanged (device preferences excluded)."
+    },
+    {
+      "name": "affected_browser_check",
+      "status": "FAIL",
+      "evidence": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-class-access-status=\"ownership\"]') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n118-compact-compatible-class-routes-20261019\\tests\\n118-1019-compact-routes.mjs:90:66\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n118-compact-compatible-class-routes-20261019/tests/n118-1019-compact-routes.mjs:51:3"
+    }
+  ]
+}

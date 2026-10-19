@@ -3,23 +3,23 @@
 import { html, icon, openSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
 import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, SECTION_COLORS, safeColor, normalizeSectionLabel } from '../models.js';
-import { go } from '../router.js';
+import { go, teachingRouteId } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
 import studentsView, { canOpenRoster, classAccessFeedback } from './students.js';
 import teachingsView, { addSubjectToClass } from './teachings.js';
 
 const TOOLS = (id) => [
-  { href: `#/teaching/${id}/student-portal`, icon: 'students', title: 'مساحة الطلاب', sub: 'رموز الدخول والحقول المنشورة' },
-  { href: `#/teaching/${id}/class-rules`, icon: 'book', title: 'هدف وميثاق الصف', sub: 'الهدف الرئيسي والميثاق' },
-  { href: `#/teaching/${id}/quicklog`, icon: 'spark', title: 'الرصد السريع', sub: 'مشاركة وسلوك أثناء الحصة' },
-  { href: `#/teaching/${id}/picker`, icon: 'picker', title: 'القرعة', sub: 'اختيار عادل لا يكرّر أحدًا' },
-  { href: `#/teaching/${id}/groups`, icon: 'groups', title: 'المجموعات', sub: 'تقسيم عشوائي أو متوازن' },
-  { href: `#/teaching/${id}/board`, icon: 'board', title: 'لوحة التميز', sub: 'لعرض التميز على البروجكتر' },
-  { href: `#/teaching/${id}/sessions`, icon: 'session', title: 'الحصص', sub: 'السجل والحصص السابقة' },
-  { href: `#/teaching/${id}/koshoof`, icon: 'upload', title: 'الكشوف', sub: 'استيراد وتصدير الكشوف' },
-  { href: `#/teaching/${id}/reports`, icon: 'reports', title: 'التقارير', sub: 'طباعة وتقارير الفصل' },
-  { href: `#/teaching/${id}/items`, icon: 'note', title: 'توزيع الدرجات', sub: 'البنود والدرجات العظمى' },
+  { href: `#/teaching/${teachingRouteId(id)}/student-portal`, icon: 'students', title: 'مساحة الطلاب', sub: 'رموز الدخول والحقول المنشورة' },
+  { href: `#/teaching/${teachingRouteId(id)}/class-rules`, icon: 'book', title: 'هدف وميثاق الصف', sub: 'الهدف الرئيسي والميثاق' },
+  { href: `#/teaching/${teachingRouteId(id)}/quicklog`, icon: 'spark', title: 'الرصد السريع', sub: 'مشاركة وسلوك أثناء الحصة' },
+  { href: `#/teaching/${teachingRouteId(id)}/picker`, icon: 'picker', title: 'القرعة', sub: 'اختيار عادل لا يكرّر أحدًا' },
+  { href: `#/teaching/${teachingRouteId(id)}/groups`, icon: 'groups', title: 'المجموعات', sub: 'تقسيم عشوائي أو متوازن' },
+  { href: `#/teaching/${teachingRouteId(id)}/board`, icon: 'board', title: 'لوحة التميز', sub: 'لعرض التميز على البروجكتر' },
+  { href: `#/teaching/${teachingRouteId(id)}/sessions`, icon: 'session', title: 'الحصص', sub: 'السجل والحصص السابقة' },
+  { href: `#/teaching/${teachingRouteId(id)}/koshoof`, icon: 'upload', title: 'الكشوف', sub: 'استيراد وتصدير الكشوف' },
+  { href: `#/teaching/${teachingRouteId(id)}/reports`, icon: 'reports', title: 'التقارير', sub: 'طباعة وتقارير الفصل' },
+  { href: `#/teaching/${teachingRouteId(id)}/items`, icon: 'note', title: 'توزيع الدرجات', sub: 'البنود والدرجات العظمى' },
 ];
 function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount }) {
   return html`
@@ -43,7 +43,7 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
         <div class="class-hub-lesson-bar">
           <span class="class-hub-lesson-bar__meta"><strong>الحصة ${targetSession.period}</strong>${targetSession.startTime ? html`${fmtTimeRange(targetSession.startTime, targetSession.endTime)}` : ''}</span>
           <span class="class-hub-lesson-bar__status ${completeness?.state === 'completed' ? 'is-done' : 'is-pending'}">${completeness?.state === 'completed' ? `الحضور ${markedCount}/${rosterCount}` : 'بانتظار الرصد'}</span>
-          <a class="btn btn--sm ${completeness?.state === 'pending' ? 'btn--primary' : 'btn--quiet'}" href="#/teaching/${tch.id}/attendance?session=${targetSession.id}">${completeness?.state === 'completed' ? 'تعديل الحضور' : 'رصد الحضور'}</a>
+          <a class="btn btn--sm ${completeness?.state === 'pending' ? 'btn--primary' : 'btn--quiet'}" href="#/teaching/${teachingRouteId(tch.id)}/attendance?session=${targetSession.id}">${completeness?.state === 'completed' ? 'تعديل الحضور' : 'رصد الحضور'}</a>
         </div>` : ''}
     </div>
   `;
@@ -52,7 +52,7 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
 function activeGoalIndicator(teachingId, activeGoal) {
   if (!activeGoal) return '';
   return html`
-    <a class="class-goal-indicator" href="#/teaching/${teachingId}/class-rules" aria-label="الهدف النشط: ${activeGoal.goal}">
+    <a class="class-goal-indicator" href="#/teaching/${teachingRouteId(teachingId)}/class-rules" aria-label="الهدف النشط: ${activeGoal.goal}">
       <span class="class-goal-indicator__status">${icon('clock')} هدف نشط</span>
       <strong class="class-goal-indicator__title">${activeGoal.goal}</strong>
       <span class="class-goal-indicator__timer tabular" aria-label="الوقت المتبقي ${activeGoal.countdown}">${activeGoal.countdown}</span>
@@ -117,7 +117,7 @@ export default {
               <div class="roster-entry-actions" role="group" aria-label="إضافة أسماء الطلاب">
                 <button class="btn" data-act="paste-names" aria-label="لصق الأسماء">${icon('upload')} لصق الأسماء</button>
                 <button class="btn" data-act="add-student" aria-label="إضافة طالب">${icon('plus')} إضافة طالب</button>
-                <a class="btn btn--primary" data-act="file-import" href="#/teaching/${p.id}/koshoof">${icon('upload')} استيراد الطلاب</a>
+                <a class="btn btn--primary" data-act="file-import" href="#/teaching/${teachingRouteId(p.id)}/koshoof">${icon('upload')} استيراد الطلاب</a>
               </div>
             </div>` : ''}
           </div>
@@ -139,7 +139,7 @@ export default {
       <div class="section">
         <div class="section__head">
           <div class="section__title">حصص اليوم</div>
-          <a class="btn btn--sm btn--quiet" href="#/teaching/${tch.id}/attendance">
+          <a class="btn btn--sm btn--quiet" href="#/teaching/${teachingRouteId(tch.id)}/attendance">
             ${todaySessions.length ? 'افتح' : 'ابدأ'} ${icon('back')}
           </a>
         </div>
@@ -150,7 +150,7 @@ export default {
                   const m = store.sessionStatusPresentation(s);
                   const marked = store.attendanceIn(s.id).length;
                   return html`
-                    <a class="row" href="#/teaching/${tch.id}/attendance?session=${s.id}">
+                    <a class="row" href="#/teaching/${teachingRouteId(tch.id)}/attendance?session=${s.id}">
                       <span class="period">${s.period}</span>
                       <span class="row__main">
                         <span class="row__title">الحصة ${s.period}</span>
@@ -177,7 +177,7 @@ export default {
                     ? html`جدولك يقول <span class="tabular">${weekly}</span> حصص أسبوعيًا لهذا الفصل.`
                     : 'أضف حصص هذا الفصل الأسبوعية من «الجدول».'}
                 </p>
-                <a class="btn btn--sm btn--primary mt-3" href="#/teaching/${tch.id}/attendance">
+                <a class="btn btn--sm btn--primary mt-3" href="#/teaching/${teachingRouteId(tch.id)}/attendance">
                   ${icon('attendance')} افتح حصة اليوم
                 </a>
               </div>
@@ -240,7 +240,7 @@ export default {
           const candidateSection = store.getSection(candidate.sectionId);
           const candidateSubject = store.getSubject(candidate.subjectId);
           const current = candidate.id === params.id;
-          return html`<a class="class-switcher-option ${current ? 'is-current' : ''}" href="#/teaching/${candidate.id}${suffix}" data-sheet-close ${current ? 'aria-current="page"' : ''}><span class="class-switcher-option__dot" style="background:${candidateSection?.color || 'var(--brand)'}"></span><span class="class-switcher-option__main"><span class="class-switcher-option__title">${sectionLabel(candidateSection) || 'الفصل'}</span><span class="class-switcher-option__sub">${candidateSubject?.name || ''}</span></span>${current ? html`<span class="class-switcher-option__current">${icon('check')} الفصل الحالي</span>` : html`<span class="class-switcher-option__chevron">${icon('chev')}</span>`}</a>`;
+          return html`<a class="class-switcher-option ${current ? 'is-current' : ''}" href="#/teaching/${teachingRouteId(candidate.id)}${suffix}" data-sheet-close ${current ? 'aria-current="page"' : ''}><span class="class-switcher-option__dot" style="background:${candidateSection?.color || 'var(--brand)'}"></span><span class="class-switcher-option__main"><span class="class-switcher-option__title">${sectionLabel(candidateSection) || 'الفصل'}</span><span class="class-switcher-option__sub">${candidateSubject?.name || ''}</span></span>${current ? html`<span class="class-switcher-option__current">${icon('check')} الفصل الحالي</span>` : html`<span class="class-switcher-option__chevron">${icon('chev')}</span>`}</a>`;
         })}</div>`,
         foot: html`<a class="btn btn--quiet" href="#/classes" data-sheet-close>كل الفصول</a>`,
       });

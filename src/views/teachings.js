@@ -19,6 +19,7 @@ import {
 } from '../lib/subject-catalog.js';
 import { classSubjectDefault } from '../lib/class-subject-default.js';
 import { repaint } from '../repaint.js';
+import { teachingRouteId } from '../router.js';
 
 function subjectMenu(options, query = '') {
   const normalized = normalizeSubjectName(query);
@@ -310,7 +311,7 @@ function renderClassCard(tch) {
 
   return html`
     <div class="class-card ${demo ? 'is-demo' : ''}" style="--class-color:${safeColor(sec?.color)}">
-      <a class="class-card__main" href="#/teaching/${tch.id}">
+      <a class="class-card__main" href="#/teaching/${teachingRouteId(tch.id)}">
         <div class="class-card__head">
           <div class="class-card__identity">
             <span class="class-card__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
