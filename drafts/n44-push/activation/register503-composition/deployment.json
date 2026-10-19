@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "0bc1d68d-dc66-4230-8172-3f77449f23f6",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T12:46:16.142Z",
+  "acknowledged": true,
+  "source": "2d682b80fdaff7d137430bdfd71948b18ba65efa",
+  "bundleSha256": "0e1a86d8e64fbfdeb294044a9809cd9f33a7ee44ffc2a48b14687716e1141fe7",
+  "service": "n44-notifications",
+  "deliveryEnabled": false,
+  "consumedDiagnosticPreserved": true,
+  "originalFailedDispositionAndApprovalPreserved": true,
+  "registrations": 0,
+  "providerSendAttempts": 0,
+  "ingressChanged": false,
+  "cronEvidenceReused": "drafts/n44-push/activation/device-optin/native-source-readback.json"
+}
