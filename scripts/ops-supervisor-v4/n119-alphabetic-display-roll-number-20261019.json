@@ -15,7 +15,7 @@
       "budgetMinutes": 45,
       "idleMinutes": 12,
       "dependsOn": [],
-      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority explicit user intent: alphabetical student order should assign current display rollnumber1..N by that same order for old/new active students; selecting sort by roll must not scramble it. Inspect existing N98 accepted contract and distinguish immutable source/external number from computed current Rakeez display roll. Prefer consistent derived display rank across roster/gradebook/reports, preserving student/enrollment IDs, history, source numbers and stored grades; no rewrite of identity/sourceId/import order fields just to sort. Same Arabic collation/tie policy across views. One small mixed old/new fake roster sort/filter example. No full export/import suite.",
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority explicit user intent: alphabetical student order should assign current display rollnumber1..N by that same order for old/new active students; selecting sort by roll must not scramble it. Inspect existing N98 accepted contract and distinguish immutable source/external number from computed current Rakeez display roll. Prefer consistent derived display rank across roster/gradebook/reports, preserving student/enrollment IDs, history, source numbers and stored grades; no rewrite of identity/sourceId/import order fields just to sort. Same Arabic collation/tie policy across views. One small mixed old/new fake roster sort/filter example. No full export/import suite.\n\nSYSTEM SOURCE-VERIFICATION METADATA CORRECTION ONLY: Root intake wrongly declared nonexistent src/lib/student-order.js. Actual completed candidate changes src/views/grades.js/reports.js and every required alphabetical-display-roll/identity check PASS. Correct mandatory source to actual changed grades.js; archive original unpushed missing-asset journal, keep attempt counter and same candidate/checks. Sole publisher resumes bounded preparation against current main without any Product worker/test replay.\n",
       "allowedPaths": [
         "src/lib/student-order.js",
         "src/lib/student-import.js",
@@ -29,7 +29,7 @@
         "docs/automation-evidence/20261019/N119_ALPHABETIC_DISPLAY_ROLL_NUMBER.md"
       ],
       "verificationPaths": [
-        "src/lib/student-order.js",
+        "src/views/grades.js",
         "docs/automation-evidence/20261019/N119_ALPHABETIC_DISPLAY_ROLL_NUMBER.md"
       ],
       "requiredChecks": [
@@ -47,7 +47,16 @@
         "AuthRLSChange": false,
         "realSend": false
       },
-      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial.",
+      "completionMode": "repair_source_verification_paths",
+      "verificationPathRepair": {
+        "previousResultSha256": "30f7a8e27414c50129b241c8b793c6b8b057f8803a40b21e1ceb79fa2ce128b4",
+        "previousPathsSha256": "97bb18aa78f944449e6d0769fbb0968b31c4b0fc35997043b48256a02eab78fe",
+        "reviewedFixtureSha256": "75d05cf8ab7569df6195ae06a58d1e763277bc875eeb90bbbdc4f94fc5700509",
+        "previousReceiptSha256": "1124e5831df7a364f6c7fb9db71d0d024784cbbd74f109b959c58f097e9a8dd3",
+        "reason": "Root intake wrongly declared nonexistent src/lib/student-order.js. Actual completed candidate changes src/views/grades.js/reports.js and every required alphabetical-display-roll/identity check PASS. Correct mandatory source to actual changed grades.js; archive original unpushed missing-asset journal, keep attempt counter and same candidate/checks. Sole publisher resumes bounded preparation against current main without any Product worker/test replay.",
+        "blockedJournalSha256": "4e6e530705c33af5465ba34642df86a2ef9e0b8513138fee8b4e8f66e25c8a4c"
+      }
     }
   ]
 }
