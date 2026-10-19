@@ -182,9 +182,14 @@ export function verifiedObservedRepair(task, result, update) {
 
 
 export function verifiedSourcePathRepair(task,result,update) {
- const card=update.card,p=card.verificationPathRepair,old=['drafts/n88-student-portal/runtime-http.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md'],actual=['drafts/n88-student-portal/runtime.mjs','drafts/n88-student-portal/http-adapter.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md'];
+ const card=update.card,p=card.verificationPathRepair;
+ const paths={
+  'continuous-n88-complete-runtime-binding-20261018':{old:['drafts/n88-student-portal/runtime-http.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md'],actual:['drafts/n88-student-portal/runtime.mjs','drafts/n88-student-portal/http-adapter.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md']},
+  'continuous-n115-email-code-autofill-20261019':{old:['src/auth.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md'],actual:['src/app.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md']}
+ }[task.id];
+ if(!paths)return false;const {old,actual}=paths;
  return card.completionMode==='repair_source_verification_paths'
-  && task.id==='continuous-n88-complete-runtime-binding-20261018' && task.status==='blocked'
+  && task.status==='blocked'
   && result.state==='LOCAL_READY' && update.expected.resultState==='LOCAL_READY'
   && task.deliveryReceipt?.errorCode==='VERIFICATION_ASSET_MISSING'
   && !task.liveMutation && !task.liveAuthorizationRef && !card.liveMutation && !card.liveAuthorizationRef
