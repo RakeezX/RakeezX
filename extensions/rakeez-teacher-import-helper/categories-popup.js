@@ -8,6 +8,11 @@ const $=id=>document.getElementById(id);
 let draft=null,staged=[],generation=0,sourceRoster=null,chosenClass='',sourceInfo=null,pendingBatch=null,batchProgress=new Map(),classTotals=new Map();
 window.n36HasSourceRoster=()=>!!sourceRoster;
 const automaticFailures=new Set();
+let lastTransferFailure=null;
+// AI: diagnostic codes are fixed, counts-only; never surface source text or runtime messages.
+const transferCodes=new Set(['SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER']);
+const transferCode=error=>transferCodes.has(error?.message)?error.message:'HANDOFF_UNAVAILABLE';
+const failureHelp=code=>code==='APP_CHANGED'?'ارجع إلى تبويب ركيز الذي بدأ منه التشغيل وصفحة استيراد الكشوف.':code==='BATCH_EXPIRED'||code==='REVIEW_EXPIRED'?'انتهت صلاحية التشغيل؛ استكمل ما وصل إلى ركيز من الحساب نفسه.':code==='SOURCE_CHANGED'?'تغيّرت صفحة المصدر؛ أُوقف النقل لحماية بياناتك.':'تحقق من أن الإضافة وحساب ركيز المفتوح محدّثان، ثم استكمل الفصول غير المحسومة.';
 const sourceBatch=()=>selectedSourceClass(sourceRoster,chosenClass,batchProgress.get(chosenClass)?.offset??0);
 const message=value=>{$('category-status').textContent=value;};
 let sourceView=null,exportRevision=0;
@@ -115,20 +120,33 @@ $('handoff-transfer').addEventListener('click',async()=>{
   if(sourceMode?(revision!==exportRevision||view!==sourceView||!sourceTransferReady()):!$('bundle-review').checked)throw Error('SOURCE_CHANGED');
   const source=window.n36HandoffSource?.();if(!source)throw Error('SOURCE_CHANGED');
   const rows=sourceMode?view.rows:selectedStaged().find(c=>c.category==='students')?.rows;
-  window.n36Diagnostics?.publish({transfer:'sending',receipt:'not-available'});
+  window.n36Diagnostics?.publish({stage:'saving',transfer:'sending',receipt:'not-available',failure:'none'});
   const createdAt=Date.now();
   const envelope=validateHandoff({schema:'rakeez-extension-names',version:window.n36AutomaticBatch?2:1,...source,...(window.n36AutomaticBatch?{batchId:window.n36AutomaticBatch,complete:sourceInfo.complete}:{}),createdAt,expiresAt:createdAt+HANDOFF_TTL,rows});
   if(sourceMode){$('source-class-select').disabled=true;$('partial-approval').disabled=true;}
   const result=await chrome.runtime.sendMessage({type:'n36-create',envelope});
   // Cancellation/expiry already queued transport erasure; a late reply cannot revive its UI.
   if(sourceMode&&(revision!==exportRevision||view!==sourceView||!window.n36HandoffSource?.()))return;
-  if(!result?.ok)throw Error('HANDOFF_UNAVAILABLE');
+  if(!result?.ok)throw Error(transferCodes.has(result?.code)?result.code:'HANDOFF_UNAVAILABLE');
   window.n36Diagnostics?.publish({transfer:'pending',receipt:'pending'});
   window.dispatchEvent(new Event('n36:exported'));
   if(sourceRoster){pendingBatch={actionId:result.actionId,classroom:chosenClass,count:rows.length};invalidateExport();$('source-class-select').disabled=true;$('source-retry').hidden=false;}
   $('direct-handoff').hidden=false;
   $('handoff-status').textContent=window.n36AutomaticBatch?'جار الاستيراد في تبويب ركيز المفتوح؛ ننتظر إيصال الحفظ المحلي، لا مهلة انتظار إلزامية.':'فُتح ركيز في المتصفح نفسه. اختر فصلًا مملوكًا وراجع ثم أكّد؛ لم تُحفظ أسماء تلقائيًا. النقل لمرة واحدة ولمدة دقيقتين.';
- } catch { window.n36Diagnostics?.publish({transfer:'error'});if(sourceMode&&(!sourceRoster||view.roster!==sourceRoster))return;if(sourceMode){$('source-class-select').disabled=false;$('partial-approval').disabled=false;}invalidateExport();$('direct-handoff').hidden=false;$('handoff-status').textContent='تعذّر النقل أو تغيّر المصدر. أعد المراجعة؛ يمكنك استخدام الملفات ضمن الخيارات المتقدمة.'; }
+ } catch (error) {
+  const code=transferCode(error);lastTransferFailure=code;window.n36Diagnostics?.publish({transfer:'error',failure:code});
+  if(sourceMode&&(!sourceRoster||view.roster!==sourceRoster))return;
+  if(sourceMode){$('source-class-select').disabled=false;$('partial-approval').disabled=false;}
+  invalidateExport();$('direct-handoff').hidden=false;
+  $('handoff-status').textContent=`تعذّر إرسال الدفعة (${code}). ${failureHelp(code)} لم يُفترض حفظها.`;
+  if(window.n36AutomaticBatch&&sourceMode){
+   // A transport rejection affects the destination, so stop rather than retry it for every class.
+   for(const group of sourceClasses(sourceRoster))if((batchProgress.get(group.classroom)?.offset??0)<group.count)automaticFailures.add(group.classroom);
+   $('source-retry').hidden=false;
+   // A failed send must not leave an endless importing state or advance its receipt cursor.
+   queueMicrotask(advanceAutomatic);
+  }
+ }
 });
 $('handoff-cancel').addEventListener('click',()=>{chrome.runtime.sendMessage({type:'n36-cancel'});$('bundle-clear').click();$('direct-handoff').hidden=false;$('handoff-status').textContent='مُسحت بيانات الإضافة وأُلغي النقل التالي؛ ما حُفظ محليًا في ركيز يبقى محفوظًا.';});
 $('bundle-download').addEventListener('click',async()=>{
@@ -165,15 +183,17 @@ function renderSourceChoice(){
  if($('partial-approval'))$('partial-approval').disabled=!!pendingBatch;
  sourceView={roster:sourceRoster,classroom:chosenClass,offset:progress.offset,rows};
  for(const row of rows){const li=document.createElement('li');li.textContent=row.name;names.append(li);}
- status.textContent=chosenClass?`${rows.length} اسمًا للمراجعة${count>300?' — من أصل '+count+' في الفصل':''}${totals.added||totals.existing?'؛ أضيف محليًا '+totals.added+'، موجود سابقًا '+totals.existing:''}.`:'اختر الفصل لعرض أسمائه.';
+ status.textContent=window.n36AutomaticBatch?(pendingBatch?'جار حفظ الدفعة في ركيز…':'جار نقل الأسماء المتاحة؛ لا مراجعة فصلية مطلوبة.') : chosenClass?`${rows.length} اسمًا للمراجعة${count>300?' — من أصل '+count+' في الفصل':''}${totals.added||totals.existing?'؛ أضيف محليًا '+totals.added+'، موجود سابقًا '+totals.existing:''}.`:'اختر الفصل لعرض أسمائه.';
  $('bundle-review').disabled=!rows.length||!!pendingBatch;
- $('handoff-transfer').textContent=window.n36AutomaticBatch?'استكمال الدفعة المعلّقة':'راجعت الأسماء — نقل الفصل إلى ركيز';
+ $('handoff-transfer').hidden=!!window.n36AutomaticBatch;
+ $('handoff-status').hidden=!!window.n36AutomaticBatch;
+ $('handoff-transfer').textContent=window.n36AutomaticBatch?'استكمال النقل':'راجعت الأسماء — نقل الفصل إلى ركيز';
  refreshSourceTransfer();
 }
 window.addEventListener('n36:source-roster',({detail})=>{
  const groups=sourceClasses(detail.rows);
  window.n36Diagnostics?.publish({valid:detail.rows.length,staged:detail.rows.length,classes:groups.length,coverage:detail.coverage,hasNext:detail.hasNextReport,processedPages:detail.processedReportPages,excluded:detail.excluded});
- if(!detail.continuing){classTotals.clear();automaticFailures.clear();}
+ if(!detail.continuing){classTotals.clear();automaticFailures.clear();lastTransferFailure=null;}
  for(const group of groups){const prior=classTotals.get(group.classroom)??{collected:0,added:0,existing:0};classTotals.set(group.classroom,{...prior,collected:prior.collected+group.count});}
  clearDraft();staged=[];sourceInfo=detail;sourceRoster=detail.rows;chosenClass='';pendingBatch=null;batchProgress.clear();renderStaged();
  $('source-class-review')?.remove();
@@ -182,14 +202,14 @@ window.addEventListener('n36:source-roster',({detail})=>{
  const select=document.createElement('select');select.id='source-class-select';
  const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='اختر فصلًا ثم راجع أسماء الدفعة';select.append(placeholder);
  for(const group of groups){const option=document.createElement('option');option.value=group.classroom;option.textContent=`${group.classroom}: ${group.count} اسمًا متاحًا في الكشف`;select.append(option);}
- const coverage=document.createElement('p');coverage.id='source-coverage';coverage.textContent=detail.complete?'':coverageMessage(detail);
+ const coverage=document.createElement('p');coverage.id='source-coverage';coverage.textContent=window.n36AutomaticBatch?(detail.complete?'ثبتت نهاية صفحات الكشف.':'التغطية جزئية؛ سيُحفظ المتاح فقط، دون افتراض اكتمال المصدر.'):detail.complete?'':coverageMessage(detail);
  const partial=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.id='partial-approval';partial.append(check,document.createTextNode(' أفهم أن الكشف ناقص أو غير معلوم الاكتمال وأوافق على استيراد المتاح فقط'));partial.hidden=detail.complete;
  check.addEventListener('change',()=>{invalidateExport();refreshSourceTransfer();});
  const status=document.createElement('p');status.id='source-class-status';
  const names=document.createElement('ol');names.id='source-class-names';
  select.addEventListener('change',()=>{chosenClass=select.value;check.checked=false;renderSourceChoice();});
- const retry=document.createElement('button');retry.id='source-retry';retry.type='button';retry.hidden=true;retry.textContent='إعادة مراجعة الدفعة نفسها (لا تجاوز دون إيصال)';
- retry.addEventListener('click',()=>{pendingBatch=null;select.disabled=false;retry.hidden=true;renderSourceChoice();if(window.n36AutomaticBatch){automaticFailures.clear();queueMicrotask(advanceAutomatic);}$('handoff-status').textContent='لم يُفترض نجاح الدفعة السابقة. أعد النقل والمطابقة؛ يفحص ركيز الأسماء الموجودة قبل أي تأكيد جديد.';});
+ const retry=document.createElement('button');retry.id='source-retry';retry.type='button';retry.hidden=true;retry.textContent=window.n36AutomaticBatch?'استكمال الفصول غير المحسومة':'إعادة نقل الدفعة نفسها';
+ retry.addEventListener('click',()=>{pendingBatch=null;select.disabled=false;retry.hidden=true;renderSourceChoice();if(window.n36AutomaticBatch){automaticFailures.clear();queueMicrotask(advanceAutomatic);}$('handoff-status').textContent='جار استكمال غير المحسوم فقط؛ يفحص ركيز الأسماء الموجودة قبل أي إضافة.';});
  const approval=$('bundle-review').closest('label');approval.hidden=true;approval.lastChild.textContent=' راجعت أسماء هذه الدفعة والفصل؛ سأطابقه بفصل مملوك لي وأؤكد داخل ركيز';
  const summary=document.createElement('p');summary.id='source-class-summary';summary.textContent=`جُمعت ${sourceRoster.length} أسماء / ${groups.length} فصول`;label.append(select);section.append(summary,coverage,label,status,names,partial,approval,retry);$('direct-handoff').before(section);$('direct-handoff').hidden=false;
  $('legacy-tools').open=false;renderSourceChoice();if(window.n36AutomaticBatch){section.querySelector('label').hidden=true;partial.hidden=true;names.hidden=true;queueMicrotask(advanceAutomatic);}
@@ -210,7 +230,7 @@ setInterval(async()=>{
    // Retain exact rows/cursor on unknown, failure, restart or expiry.
    if(window.n36AutomaticBatch){automaticFailures.add(pending.classroom);pendingBatch=null;queueMicrotask(advanceAutomatic);}
    $('source-retry').hidden=false;
-   $('handoff-status').textContent='لم يصل إيصال حفظ مؤكد. لا انتقال للدفعة التالية؛ أعد مراجعة الدفعة نفسها أو ابدأ مجددًا بعد انتهاء المهلة.';
+   $('handoff-status').textContent='لم يصل إيصال حفظ مؤكد لهذه الدفعة. تحقق من السبب في تبويب ركيز، ثم استكمل غير المحسوم؛ الأسماء المؤكدة لن تتكرر.';
   }
  }catch{/* No receipt is not success. */}
 },750);
@@ -224,11 +244,13 @@ function advanceAutomatic(){
  const group=sourceClasses(sourceRoster).find(c=>!automaticFailures.has(c.classroom)&&(batchProgress.get(c.classroom)?.offset??0)<c.count);
  if(!group){
   const totals=[...batchProgress.values()];
+  $('source-class-status').textContent='';
+  window.n36Diagnostics?.publish({stage:automaticFailures.size?'unresolved':'saved',transfer:automaticFailures.size?'error':'idle',receipt:automaticFailures.size?'unknown':'saved'});
   $('source-retry').hidden=!automaticFailures.size;
   $('source-retry').textContent='استكمال الفصول غير المحسومة فقط';
-  $('handoff-status').textContent=`${automaticFailures.size?'فصول لم يتأكد استيرادها: '+[...automaticFailures].join('، ')+'. استكملها بعد تصحيح سبب التعذر في ركيز. ':''}حُفظ محليًا ${totals.reduce((n,p)=>n+p.added,0)} اسم جديد؛ موجود سابقًا ${totals.reduce((n,p)=>n+p.existing,0)}. ${sourceInfo.complete&&!automaticFailures.size?'اكتمل استيراد الأسماء المتاحة.':automaticFailures.size?'بقيت فصول غير محسومة.':'الكشف غير مكتمل: راجع الصفحات أو الصفوف غير المحسومة في التشخيص.'} لا إثبات مزامنة خادم.`;
+  $('handoff-status').textContent=`${automaticFailures.size?'فصول لم يتأكد حفظها: '+automaticFailures.size+'. '+(lastTransferFailure?'('+lastTransferFailure+') '+failureHelp(lastTransferFailure):''):''}حُفظ محليًا ${totals.reduce((n,p)=>n+p.added,0)} اسم جديد؛ موجود سابقًا ${totals.reduce((n,p)=>n+p.existing,0)}. ${automaticFailures.size?'بقيت فصول غير محسومة.':'اكتمل استيراد الأسماء المتاحة.'} ${sourceInfo.complete?'':'التغطية جزئية؛ لا إثبات اكتمال المصدر.'} المزامنة لم تتأكد بعد.`;
   $('run-status').textContent=$('handoff-status').textContent;
-  window.dispatchEvent(new CustomEvent('n36:automatic-finished',{detail:{unresolved:automaticFailures.size>0}}));
+  window.dispatchEvent(new CustomEvent('n36:automatic-finished',{detail:{unresolved:automaticFailures.size>0,summary:$('source-class-summary').textContent}}));
   return;
  }
  chosenClass=group.classroom;$('source-class-select').value=chosenClass;renderSourceChoice();

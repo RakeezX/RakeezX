@@ -80,7 +80,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       await chrome.tabs.update(tab.id,{url,...(batch?{}:{active:true})});
     } catch (error) { await erase(nonce); if(!batch)await chrome.tabs.remove(tab.id); throw error; }
     return {ok:true,actionId:nonce};
-  }).then(reply,()=>reply({ok:false,code:'HANDOFF_UNAVAILABLE'}));
+  }).then(reply,error=>reply({ok:false,code:['OPEN_ONE_RAKEEZ_TAB','APP_FINISH_CURRENT_EDIT','APP_UPDATE_REQUIRED','APP_FRAME','APP_DOCUMENT_BINDING','APP_NOT_READY','BATCH_EXPIRED','APP_CHANGED','HANDOFF_SCHEMA','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE'].includes(error.message)?error.message:'HANDOFF_UNAVAILABLE'}));
   return true;
 });
 chrome.runtime.onMessageExternal.addListener((message, sender, reply) => {

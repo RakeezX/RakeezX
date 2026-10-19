@@ -15,7 +15,7 @@ export async function claimHandoff(request) {
     const timer=setTimeout(()=>reject(Error('HANDOFF_TIMEOUT')),5000);
     chrome.runtime.sendMessage(request.extensionId,{type:'n36-claim',nonce:request.nonce},result=>{
       clearTimeout(timer);
-      if(chrome.runtime.lastError || !result?.ok) reject(Error('HANDOFF_UNAVAILABLE')); else resolve(result);
+      if(chrome.runtime.lastError || !result?.ok) reject(Error(['HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER','HANDOFF_EXPIRED_OR_DENIED','HANDOFF_LIMIT_OR_EXPIRED'].includes(result?.code)?result.code:'HANDOFF_UNAVAILABLE')); else resolve(result);
     });
   });
   const envelope=validateHandoff(response.envelope);

@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "303 fabricated names / 10 classes / partial: rejected first sends terminate truthfully, keep cursors, show APP_CHANGED and actionable help, no class review",
+    "Single explicit resume sends exactly the same owned pending rows; only fabricated canonical-shaped ACKs advance cursors, partial remains partial, summary survives erasure"
+  ],
+  "synthetic": true,
+  "accountWrites": "NOT_RUN",
+  "status": "PASS"
+}

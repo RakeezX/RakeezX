@@ -1,0 +1,53 @@
+{
+  "runId": "fe5829e6-1f04-4655-a82a-ca7cedcf3934",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "n36_one_explicit_start_all_available_classes_existing_rakeez_receiver_ack",
+      "status": "PASS",
+      "evidence": "One installed popup Start → slow 9.2s gateway → two real parser report pages/classes → same already-open authenticated app → real guarded canonical names commit/readback, 2 durable receipts; one existing name/ID retained, one new; no class/review/save clicks or extra app tabs. Grades/history unchanged."
+    }
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "lease": "ACQUIRED browser",
+  "browser": "151.0.7922.34",
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "hits": [
+    {
+      "path": "/Dashboards/Schools",
+      "method": "GET"
+    },
+    {
+      "path": "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "method": "GET"
+    },
+    {
+      "path": "/SchoolManagment/Actions/Teacher/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "method": "GET"
+    },
+    {
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET"
+    },
+    {
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "method": "GET"
+    },
+    {
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "method": "GET"
+    },
+    {
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET"
+    }
+  ],
+  "cleanup": "Owned browser/profile/server closed; shared lease released",
+  "preservedFailures": [
+    "Error: Command failed: powershell.exe -NoProfile -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name browser -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-actual-transfer-local-update-copy-20261019.json -OwnerToken fe5829e6-1f04-4655-a82a-ca7cedcf3934 -WaitSeconds 0\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-transfer-local-update-copy-20261019/tests/n36-review-1400-transfer.mjs:11:21)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-transfer-local-update-copy-20261019/tests/n36-review-1400-transfer.mjs:83:54"
+  ]
+}

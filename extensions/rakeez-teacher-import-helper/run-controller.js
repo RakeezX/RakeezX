@@ -33,7 +33,7 @@ function armReview(){
  const tick=()=>{$('review-remaining').textContent=review?`المعاينة: ${Math.max(0,Math.ceil((review.expires-Date.now())/1000))} ثانية متبقية من 5 دقائق.`:'';};
  tick();reviewClock=setInterval(tick,1000);reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }
-function clearPreview(continuing=false){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new CustomEvent('n36:clear',{detail:{continuing}}));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;$('collection-continue').hidden=true;}
+function clearPreview(continuing=false,finished=false){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new CustomEvent('n36:clear',{detail:{continuing,finished}}));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;$('collection-continue').hidden=true;}
 function stop(code='CANCELLED',diagnostic=null,context=null){
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
  cancelReports(job??review);generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);clearTimeout(job.expiryTimer);job.sourceRows.length=0;job.fetches.clear();job.routes.length=0;job.categories.length=0;job=null;}clearPreview();window.n36AutomaticBatch=null;
@@ -359,5 +359,5 @@ window.addEventListener('n36:automatic-finished',({detail})=>{
  window.n36CollectionFinished=true;
  if(detail.unresolved)return; // Explicit retry can still preflight the bounded original source.
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
- clearPreview();window.n36AutomaticBatch=null;$('run-cancel').disabled=true;
+ clearPreview(false,true);window.n36AutomaticBatch=null;$('run-cancel').disabled=true;$('run-counts').textContent=detail.summary??'';
 });
