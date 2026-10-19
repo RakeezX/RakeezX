@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n125-actual-window-return-error-20261019",
+      "productId": "N125",
+      "activationId": "po-20261012-continuous",
+      "priority": -2097,
+      "scopeKey": "n125-actual-1837",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, exact current dated Product row and affected CURRENT origin/main source only. Latest actual PO19October1837 is NEW failed actual evidence after prior releases; no unchanged proof replay. Existing sole controller/serial publisher only; no manual workers/planners/reviewers or queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Minimum necessary affected checks; no fullsuite or wholeappbuild for copy. Preserve owner/session/lease/revisions, IDs/history/grades/durableACK/tombstones/calendar-region hold. No real account/pupil mutation, real messages, new hosted SQL/schema/migrations/Auth/RLS/roles/keys, credential/browser custody bypass or any prior tool-policy refusal retry. Existing client-code user-triggered behavior fixes explicitly authorized. N44 paused, N123/N124/N110/N121/N122 closed; N112/N120 now explicitly CLOSED. Keep those closed; current new defects belong existing open N36/N88/N125/N107/N119. LOCAL_READY not Production.\n\nPO explicitly reports N125 NOT FIXED after prior publication42ed8de. Prior synthetic visibility return test is insufficient. Read previous proof, do not rerun unchanged. Diagnose exact NEW real window switching (window blur/focus without document visibility change), rapid repeated returns, account readiness/lease refresh and already-inflight Sync, plus actual API errors versus harmless same-context events. Reproduce missing real event form using actual current source and tiny fabricated slow readiness; preserve existing genuine session rotation/foreign owner failure. DO NOT mask all transient reds, force green, cache stale session or global timeout/debounce rewrite. Need finite safe error phase/code/timing recorded into existing sync details/copy diagnostics allowlist without IDs/token/pupil payload so next actual recurrence is distinguishable; no new verification button. If current red is actual server failure or no new source cause established, retain exact unknown and safe diagnostics rather than declare fixed from repeat of oldfixture. N123 remains CLOSED. N36 owns store; no store/import edits. Preserve durableACK and authenticated error semantics.",
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/app.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-warning-policy.js",
+        "tests/n125-1837/**",
+        "docs/automation-evidence/20261019/N125_ACTUAL_WINDOW_RETURN_ERROR.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync.js"
+      ],
+      "requiredChecks": [
+        "n125_actual_window_focus_readiness_and_safe_error_phase"
+      ],
+      "acceptance": [
+        "Complete this actual newly reported defect and preserve previously accepted behavior; no synthetic success substituted for actual user outcome.",
+        "Deliver authorized source through sole publisher, verify actual production asset; exact remaining limits explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-current-1837-actual-feedback",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct human requests fixes, independent existing-controller workers and verified delivery; conditional acceptance for N64/N119 after exact correction. No real data/manual operation, service credentials/schema/Auth/RLS or bypass of prior actual denial."
+    }
+  ]
+}

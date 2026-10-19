@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-one-start-complete-madrasati-20261019",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -2095,
+      "scopeKey": "n36-actual-1837",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 40,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n107-missing-subject-feedback-20261019"
+      ],
+      "objective": "Read AGENTS.md, ops contract, exact current dated Product row and affected CURRENT origin/main source only. Latest actual PO19October1837 is NEW failed actual evidence after prior releases; no unchanged proof replay. Existing sole controller/serial publisher only; no manual workers/planners/reviewers or queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Minimum necessary affected checks; no fullsuite or wholeappbuild for copy. Preserve owner/session/lease/revisions, IDs/history/grades/durableACK/tombstones/calendar-region hold. No real account/pupil mutation, real messages, new hosted SQL/schema/migrations/Auth/RLS/roles/keys, credential/browser custody bypass or any prior tool-policy refusal retry. Existing client-code user-triggered behavior fixes explicitly authorized. N44 paused, N123/N124/N110/N121/N122 closed; N112/N120 now explicitly CLOSED. Keep those closed; current new defects belong existing open N36/N88/N125/N107/N119. LOCAL_READY not Production.\n\nNEW actual0.5.15 failed on FRESH account:303valid/staged/observed10classes7pages; unresolved, transfererror, receiptunknown, failureAPP_CHANGED. Old account nowshows subjectless classcards but cannot delete until subject selected. Reimport does not auto fill subject. Latest explicit PO expands/clarifies complete one-start journey: import available classes, subjects, pupils, teachername, principalname, schoolname, timetable and other actually useful supported fields FROM permitted Madrasati session to current Rakeez account. Names-only delivery is NOT full completion.\nFIRST resolve source-proven APP_CHANGED receiver/appdescriptor race/stale pending batch across switched accounts; no loosening owner/account/year/term/lease/document guards. Distinguish harmless same-document hash/app routing or compatible apprevision from genuine owner/source change. Fresh user Start must establish fresh current owner binding; old pending run remains bound to original account and cannot silently resume into another. Keep operation identity within its account and no duplicate sections/subjects/students/slots on retry; do not clear real outbox/records or ask reimport blindly. Use exact new diagnostic; no old SOURCE_CHANGED replay.\nExpose safe delete for subjectless class through existing guarded section-delete lifecycle, normal confirmation/tombstones/history/owner/year/archive protection; no artificial subject/teaching solely to delete and no direct real deletion. Reuse existing N111/Restore proof except new subjectless branch and owner denial.\nImplement coherent existing adapter→one account-bound setup batch→existing guarded store paths for ALL actually available supported fields. Map extracted subject per section/timetable source, reuse canonical subjects/classes/slots, teacher/principal/school into EXISTING profile fields. Missing source fields must stay absent and produce one compact truthful result, never invented placeholders. Existing differing profile/schedule values must not silently overwrite; preserve/reconcile same source identities, succinct unresolved conflict only when genuinely necessary. Region may be captured as school/profile metadata where supported, but NEVER switch held calendar/enable N117. Current on-demand session generation stays; timetable import does not create whole day sessions. Existing manual one-start is explicit teacher authorization for extension READ of authorized source pages and saving these available data through normal Rakeez account flow; no credentials/OTP/nationalIDs/extraneous private fields, source writes, background onload collection or unrelated browsing. Actual automated school control/read/test operations refused14Oct remain refused: do NOT repeat using scripts/another actor/tool/browser. Implement source adapters using actual existing DOM contracts and SMALL fabricated representative markup; clearly retain real school end-to-end as PO trial, not claim synthetic proves every available field. No scraping invented routes/unknown unsupported pages; report precise unsupported required source instead of false complete.\nNo-tab browser test refusal also binding; keep ordinary manual firstparty link and old failclosed preflight, no activation of unqualified automatic opening. One-start happy path must not require perclass review/repeatedresume/destination ceremony once account and actual mappings are known. Compact summary must distinguish local saved/realACK/unresolved fields and counts; no «اكتمل» if no destination receipt. Bundle ONE immutable new extension version with website link, and existing stable-folder updater must advance after verifiedrelease; no new updater/Chrome reload. Whole one-start multi-entity actual app receiver fixture with fake source plus appdescriptor/account change and retry exactly necessary, not repeated pager/full school suites. N107 small field correction delivered before this work to serialize import-center. If full available-field extraction cannot be proved or actual source absent, save exact implemented/remaining fields and blockers, never close N36 as full success.",
+      "allowedPaths": [
+        "extensions/**",
+        "tools/teacher-import-helper/**",
+        "assets/extensions/**",
+        "public/assets/extensions/**",
+        "scripts/build-teacher-import-helper.mjs",
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/class-koshoof-bundle.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/views/class-import-center.js",
+        "src/views/teachings.js",
+        "src/views/classes.js",
+        "src/views/students.js",
+        "src/store.js",
+        "src/lib/class-delete.js",
+        "src/lib/class-deletion.js",
+        "tests/n36-1837/**",
+        "docs/automation-evidence/20261019/N36_ONE_START_COMPLETE_MADRASATI.md"
+      ],
+      "verificationPaths": [
+        "extensions/**"
+      ],
+      "requiredChecks": [
+        "n36_app_changed_safe_one_start_available_setup_and_subjectless_delete"
+      ],
+      "acceptance": [
+        "Complete this actual newly reported defect and preserve previously accepted behavior; no synthetic success substituted for actual user outcome.",
+        "Deliver authorized source through sole publisher, verify actual production asset; exact remaining limits explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-current-1837-actual-feedback",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct human requests fixes, independent existing-controller workers and verified delivery; conditional acceptance for N64/N119 after exact correction. No real data/manual operation, service credentials/schema/Auth/RLS or bypass of prior actual denial."
+    }
+  ]
+}

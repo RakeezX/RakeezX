@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-missing-subject-feedback-20261019",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -2099,
+      "scopeKey": "n107-actual-1837",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 15,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, exact current dated Product row and affected CURRENT origin/main source only. Latest actual PO19October1837 is NEW failed actual evidence after prior releases; no unchanged proof replay. Existing sole controller/serial publisher only; no manual workers/planners/reviewers or queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Minimum necessary affected checks; no fullsuite or wholeappbuild for copy. Preserve owner/session/lease/revisions, IDs/history/grades/durableACK/tombstones/calendar-region hold. No real account/pupil mutation, real messages, new hosted SQL/schema/migrations/Auth/RLS/roles/keys, credential/browser custody bypass or any prior tool-policy refusal retry. Existing client-code user-triggered behavior fixes explicitly authorized. N44 paused, N123/N124/N110/N121/N122 closed; N112/N120 now explicitly CLOSED. Keep those closed; current new defects belong existing open N36/N88/N125/N107/N119. LOCAL_READY not Production.\n\nNEW actual PO: missing subject gives «راجع الأعمدة والبنود والعظمى: اختر اسم مادة صالحًا (حتى60حرفًا)». Apply the SAME already accepted grade/classcode field pattern to missing subject: concise «أدخل اسم المادة» or «اختر المادة» according to actual field, aria-invalid/linked field message/focus, no generic columns/max prefix. Invalid supplied subject gets short constraint. Preserve custom subject support, missinggrade/code precedence and original submit validation; no backend/Sync/grades engine change. Actual newclass28/31 confirmation still18seconds; no new claim faster. Inspect only actual confirm handler to identify explicit redundant wait if present, reuse prior finding event-driven90sdeadline not fixed sleep. DO NOT repeat old data/performance fixture without new source cause; record18seconds as unsolved measurement if nothing concrete. One390px actual missing subject field path and existing correction, no import confirmation writes. This SMALL task precedes N36 because same import-center/styles.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/styles/teacher-setup-import.css",
+        "tests/n107-1837/**",
+        "docs/automation-evidence/20261019/N107_MISSING_SUBJECT_FEEDBACK.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n107_missing_subject_precise_field_feedback"
+      ],
+      "acceptance": [
+        "Complete this actual newly reported defect and preserve previously accepted behavior; no synthetic success substituted for actual user outcome.",
+        "Deliver authorized source through sole publisher, verify actual production asset; exact remaining limits explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-current-1837-actual-feedback",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct human requests fixes, independent existing-controller workers and verified delivery; conditional acceptance for N64/N119 after exact correction. No real data/manual operation, service credentials/schema/Auth/RLS or bypass of prior actual denial."
+    }
+  ]
+}

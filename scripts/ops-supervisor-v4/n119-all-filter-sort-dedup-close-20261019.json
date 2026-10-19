@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n119-all-filter-sort-dedup-close-20261019",
+      "productId": "N119",
+      "activationId": "po-20261012-continuous",
+      "priority": -2096,
+      "scopeKey": "n119-actual-1837",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 20,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, exact current dated Product row and affected CURRENT origin/main source only. Latest actual PO19October1837 is NEW failed actual evidence after prior releases; no unchanged proof replay. Existing sole controller/serial publisher only; no manual workers/planners/reviewers or queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Minimum necessary affected checks; no fullsuite or wholeappbuild for copy. Preserve owner/session/lease/revisions, IDs/history/grades/durableACK/tombstones/calendar-region hold. No real account/pupil mutation, real messages, new hosted SQL/schema/migrations/Auth/RLS/roles/keys, credential/browser custody bypass or any prior tool-policy refusal retry. Existing client-code user-triggered behavior fixes explicitly authorized. N44 paused, N123/N124/N110/N121/N122 closed; N112/N120 now explicitly CLOSED. Keep those closed; current new defects belong existing open N36/N88/N125/N107/N119. LOCAL_READY not Production.\n\nPO still sees default and byroll simultaneously and explicitly approves CLOSE AFTER removing duplication across ALL filters. Earlier N120 dedup covered only reports.js live roster/grades. Inventory only current sort-option definitions in actual class roster/grades/attendance/reports/globalstudents/crossclass/execution; remove semantically duplicate DEFAULT/ROLL/name choices where same underlying displayRoster numeric order; preserve actual different support urgency, grade-desc, historical saved-roll order. Clarify default label where meaningful rather than asserting every default equals grade-desc. Keep old stored handler/query value aliases compatible; no renumbering/identity/history/grade data changes. N120 layout is accepted+CLOSED: no CSS/layout redesign or reopening, only option list semantics. Exact few changed option definitions and small source/actual DOM option assertion enough; no all-screen geometry screenshots/matrix again. Prepare clear list of touched filters for parent to close by conditional PO approval once full exact scope genuinely verified and published.",
+      "allowedPaths": [
+        "src/views/grades.js",
+        "src/views/students.js",
+        "src/views/attendance.js",
+        "src/views/reports.js",
+        "src/views/cross-class-reports.js",
+        "src/views/execution-report.js",
+        "src/views/teaching-hub.js",
+        "src/views/former-students.js",
+        "src/lib/report-filters.js",
+        "src/lib/student-search-ui.js",
+        "tests/n119-1837/**",
+        "docs/automation-evidence/20261019/N119_ALL_FILTER_SORT_DEDUP.md"
+      ],
+      "verificationPaths": [
+        "src/views/grades.js"
+      ],
+      "requiredChecks": [
+        "n119_all_duplicated_sort_options_removed_meaningful_orders_preserved"
+      ],
+      "acceptance": [
+        "Complete this actual newly reported defect and preserve previously accepted behavior; no synthetic success substituted for actual user outcome.",
+        "Deliver authorized source through sole publisher, verify actual production asset; exact remaining limits explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-current-1837-actual-feedback",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct human requests fixes, independent existing-controller workers and verified delivery; conditional acceptance for N64/N119 after exact correction. No real data/manual operation, service credentials/schema/Auth/RLS or bypass of prior actual denial."
+    }
+  ]
+}

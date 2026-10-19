@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n64-plain-email-instructions-close-20261019",
+      "productId": "N64",
+      "activationId": "po-20261012-continuous",
+      "priority": -2100,
+      "scopeKey": "n64-actual-1837",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 10,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, exact current dated Product row and affected CURRENT origin/main source only. Latest actual PO19October1837 is NEW failed actual evidence after prior releases; no unchanged proof replay. Existing sole controller/serial publisher only; no manual workers/planners/reviewers or queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Minimum necessary affected checks; no fullsuite or wholeappbuild for copy. Preserve owner/session/lease/revisions, IDs/history/grades/durableACK/tombstones/calendar-region hold. No real account/pupil mutation, real messages, new hosted SQL/schema/migrations/Auth/RLS/roles/keys, credential/browser custody bypass or any prior tool-policy refusal retry. Existing client-code user-triggered behavior fixes explicitly authorized. N44 paused, N123/N124/N110/N121/N122 closed; N112/N120 now explicitly CLOSED. Keep those closed; current new defects belong existing open N36/N88/N125/N107/N119. LOCAL_READY not Production.\n\nPO confirms actual email change succeeded and original page showed «تم اعتماد البريد الإلكتروني الجديد»; explicitly APPROVES CLOSE after only copy cleanup. Do NOT demand new-email login proof again or restart/change email/resend/cancel/Auth redirect/templates. Existing settings dialog says «حتى يؤكد الخادم» and verbose repeated instructions. Replace with concise user language, e.g. «أُرسل طلب تغيير البريد. يبقى بريدك الحالي مستخدمًا حتى اكتمال التأكيد.» and «أكّد الطلب من الرسالتين في بريدك الحالي والجديد. إن لم تجدهما، تحقّق من الرسائل غير المرغوب فيها. تتحدّث الحالة تلقائيًا عند العودة إلى الإعدادات.» Only claim actual implemented auto-refresh behavior. Keep true two-email provider flow, no technical server/internal text/new status page/button. One affected visible dialog/source inspection, no Auth/network fixture/suite. Return delivered copy candidate; parent closes automatically after verified publication per latest conditional PO approval.",
+      "allowedPaths": [
+        "src/views/settings.js",
+        "tests/n64-1837/**",
+        "docs/automation-evidence/20261019/N64_PLAIN_EMAIL_INSTRUCTIONS.md"
+      ],
+      "verificationPaths": [
+        "src/views/settings.js"
+      ],
+      "requiredChecks": [
+        "n64_plain_user_email_instructions"
+      ],
+      "acceptance": [
+        "Complete this actual newly reported defect and preserve previously accepted behavior; no synthetic success substituted for actual user outcome.",
+        "Deliver authorized source through sole publisher, verify actual production asset; exact remaining limits explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-current-1837-actual-feedback",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct human requests fixes, independent existing-controller workers and verified delivery; conditional acceptance for N64/N119 after exact correction. No real data/manual operation, service credentials/schema/Auth/RLS or bypass of prior actual denial."
+    }
+  ]
+}

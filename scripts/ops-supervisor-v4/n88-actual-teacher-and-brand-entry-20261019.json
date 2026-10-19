@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-actual-teacher-and-brand-entry-20261019",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -2098,
+      "scopeKey": "n88-actual-1837",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, exact current dated Product row and affected CURRENT origin/main source only. Latest actual PO19October1837 is NEW failed actual evidence after prior releases; no unchanged proof replay. Existing sole controller/serial publisher only; no manual workers/planners/reviewers or queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Minimum necessary affected checks; no fullsuite or wholeappbuild for copy. Preserve owner/session/lease/revisions, IDs/history/grades/durableACK/tombstones/calendar-region hold. No real account/pupil mutation, real messages, new hosted SQL/schema/migrations/Auth/RLS/roles/keys, credential/browser custody bypass or any prior tool-policy refusal retry. Existing client-code user-triggered behavior fixes explicitly authorized. N44 paused, N123/N124/N110/N121/N122 closed; N112/N120 now explicitly CLOSED. Keep those closed; current new defects belong existing open N36/N88/N125/N107/N119. LOCAL_READY not Production.\n\nNEW actual PO: teacher class space still blank-heading/loading then connectionerror AFTER prior UI+backend readiness; public student brand still rejected, and random code navigates to a whole «جارٍ الاتصال…يرجىالانتظار» screen then returns. Need successful normal access, not more spinner copy. Keep entry form mounted while checking a code; syntactically invalid input gets immediate inline field error/no request, wellformed unknown/expired/revoked code gets same safe unavailable feedback without whole-page navigation; busy state stays on same form, no pupil/teacher existence leak, no guessing-rate or code/session guard weakening. Existing valid session resume may have its own bounded state. Reuse actual Rakeez AUTH/entry design tokens/components/logo/typeface/light appearance, not a custom almost-similar theme; read current source login/auth UI as visual reference. Formal concise wording «أدخل رمز الدخول الذي زوّدك به معلّمك.» Public portal must be accessible via an explicit existing teacher student-space link to /student, no implementation text or clutter.\nTeacher root cause: old signed direct readiness PASS1851ms is SAVED and CONSUMED, no replay. Original supported custodian channel RESTORED in prior original worktree action; do not report undefined globals/missing handle again. Existing teacher-browser ownership refusal remains: do NOT attach another tab/actor, use original proper owner only if provider offers legitimate release; no bypass/new profile. Trace source actual classBinding/key/lease/source/publiccontext and ingress HTTP contract as a complete composition. Necessary new evidence can come from existing ordinary read-only provider operational logs in actual15:00–15:37UTC window, no private headers/PII; do not replay prior14:00window. Account for current auth/focus/lease churn and real natural teaching/section IDs, not only handcrafted fixtures. If actual authenticated trace remains unavailable, add minimal safe phase/status/timing/source-version capture to EXISTING support diagnostics (NO IDs/tokens/roster/name/payload, no extra verify-account workflow), so normal next user error yields actionable evidence; do not just shorten timers or label service fixed from readiness. Identify and fix proven actual source mismatch; existing-service correction only by original N88 custodian with one changed-source deploy/readback if needed. No new keys/SQL/Auth/RLS/fixtures, zero actual code/pupil mutations. Actual successful class request proof mandatory before whole N88 closure. Minimal changed entry invalid/unknown-code UI case + first-teacher failure path/owner guard; reuse prior crypto/SQL/role/transport/UI proofs.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal-login.css",
+        "drafts/n88-student-portal/**",
+        "supabase/functions/n88-student-portal/**",
+        "tests/n88-1837/**",
+        "docs/automation-evidence/20261019/N88_ACTUAL_TEACHER_BRAND_ENTRY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_real_entry_contract_and_same_form_invalid_code_brand"
+      ],
+      "acceptance": [
+        "Complete this actual newly reported defect and preserve previously accepted behavior; no synthetic success substituted for actual user outcome.",
+        "Deliver authorized source through sole publisher, verify actual production asset; exact remaining limits explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "existing-N88-service-correction-original-custodian",
+        "publication": true,
+        "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "newMigrations": 0,
+        "newFixtures": 0,
+        "newAuthUsers": 0,
+        "realPupilMutations": 0,
+        "realSend": false,
+        "existingHostedServiceCorrection": true
+      },
+      "releaseAuthority": "Latest direct human requests fixes, independent existing-controller workers and verified delivery; conditional acceptance for N64/N119 after exact correction. No real data/manual operation, service credentials/schema/Auth/RLS or bypass of prior actual denial.",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "liveAuthorizationRef": "PO-CURRENT-1837-N88-ACTUAL-FAILURE"
+    }
+  ]
+}
