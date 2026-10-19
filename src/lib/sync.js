@@ -64,6 +64,21 @@ let startupPreparing = false;
 // AI N125: a foreground lifecycle owns its prerequisite, before receiver/capture.
 let resumePreparing = null;
 let resumeAwake = false;
+// AI-authored N125: bounded, context-local diagnostics; never retain raw errors.
+let lastSafeFailure = null;
+let resumeEvent = 'automatic';
+function recordSafeFailure(error, phase, startedAt, event = resumeEvent) {
+  const known = ['AUTH_REQUIRED', 'AUTH_TIMEOUT', 'AUTH_CONTEXT_CHANGED', 'AUTH_OWNER_MISMATCH',
+    'SYNC_OWNERSHIP_BLOCKED', 'OFFLINE_LEASE_LIMITED', 'LEASE_VERIFY_TIMEOUT'];
+  const status = Number(error?.status);
+  const code = error?.reason === 'sync-context-changed' ? 'CONTEXT_CHANGED'
+    : known.includes(error?.code) ? error.code
+    : [400, 401, 403, 404, 409, 429, 500, 502, 503, 504].includes(status) ? `HTTP_${status}`
+    : error?.name === 'TypeError' && ['Failed to fetch', 'Load failed', 'NetworkError when attempting to fetch resource.'].includes(error.message)
+      ? 'FETCH_FAILED' : 'UNKNOWN';
+  lastSafeFailure = Object.freeze({ phase, code, event,
+    at: new Date().toISOString(), elapsedMs: Math.min(120000, Math.max(0, Math.round(performance.now() - startedAt))) });
+}
 let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
@@ -80,6 +95,7 @@ function bindPresentationContext() {
   const token = presentationSeverity.bind(cloud.session && cloud.user && workspace
     ? JSON.stringify([cloud.user.id, workspace.databaseName, workspace.authUserId]) : null);
   if (token !== presentationContextToken) {
+    lastSafeFailure = null;
     liveStudentLifecycle = null;
     liveClassDeletion = null;
     presentationContextToken = token;
@@ -152,6 +168,7 @@ const remoteSync = createRemoteSync({
 export const getRemoteSyncDiagnostics = () => remoteSync.diagnostics();
 
 function stopOwnershipBlockedScheduling(access) {
+  recordSafeFailure({ code: 'SYNC_OWNERSHIP_BLOCKED', reason: access.reason }, 'ownership', performance.now());
   remoteSync.stop();
   fullRequested = false;
   remoteRequested = false;
@@ -274,6 +291,7 @@ function cacheOperationalSummary(durable, expectedToken = null) {
     studentLifecycleInFlight: studentLifecycleInFlight(),
     classDeletionInFlight: classDeletionInFlight(),
     presentationSeverity: Object.freeze(presentationSeverity.snapshot()),
+    lastSafeFailure,
   });
   return projectSyncStatusSeverity(operationalSummaryCache);
 }
@@ -374,11 +392,12 @@ function scheduleRetry() {
   // Keep the failed result visible while waiting; a timer is not an active run.
 }
 
-async function scheduleResumeSync(prepareResume, { force = false } = {}) {
+async function scheduleResumeSync(prepareResume, { force = false, event = 'focus' } = {}) {
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
   if (resumePreparing) { resumeAwake = true; return; }
   if (resumeAwake && !force) return;
   resumeAwake = true;
+  resumeEvent = event;
   // Startup already owns its readiness and initial full pass (N123).
   if (startupPreparing) return;
   presentationSeverity.verifying(bindPresentationContext());
@@ -391,6 +410,7 @@ async function scheduleResumeSync(prepareResume, { force = false } = {}) {
     return;
   }
   const context = { workspace: store.getActiveWorkspace(), owner: cloud.user.id };
+  const startedAt = performance.now();
   const isCurrent = () => store.getActiveWorkspace() === context.workspace && cloud.user?.id === context.owner && !!cloud.session;
   resumePreparing = context;
   if (autoTimer) clearTimeout(autoTimer);
@@ -402,8 +422,12 @@ async function scheduleResumeSync(prepareResume, { force = false } = {}) {
     if (autoRunning) await new Promise(resolve => syncSettledWaiters.add(resolve));
     presentationSeverity.verifying(bindPresentationContext());
     remoteSync.stop();
-    if (isCurrent()) await prepareResume?.();
-  } catch {
+    if (isCurrent()) {
+      const result = await prepareResume?.();
+      if (result?.error) recordSafeFailure(result.error, 'resume_readiness', startedAt, event);
+    }
+  } catch (error) {
+    if (isCurrent()) recordSafeFailure(error, 'resume_readiness', startedAt, event);
     // Readiness failure is not success. The following real attempt retains all
     // owner/lease/Auth guards and reports the actual failure, as at startup.
   } finally {
@@ -585,6 +609,8 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
   autoRunning = true;
+  const startedAt = performance.now();
+  let phase = 'marker';
   const presentationToken = bindPresentationContext();
   const acknowledgedContext = { workspace: store.getActiveWorkspace(), session: cloud.session };
   let presentationErrors = null;
@@ -602,10 +628,12 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     // provide exactly the same coverage as a remote wake. Writes, absent marker
     // evidence and partial passes still require their canonical post-pull.
     const idleReceiver = full && remoteCapture && snapshot.length === 0;
+    phase = 'capability';
     const scoreDomainAvailable = await scoreDomainAvailableForSync();
     const unifiedCapability = await cloud.getUnifiedRestoreCapability();
     unifiedRestoreOwner = unifiedCapability?.protocol === 'N71_V1' ? cloud.user.id : null;
     const stores = v2StoresFor(snapshot, full, scoreDomainAvailable);
+    phase = 'pull';
     const pull = await v2Engine.pullAll({ stores, scoreDomainSnapshot: scoreDomainAvailable,
       // AI-authored N123: overlap bounded snapshot reads on every entry path.
       // The engine still reconciles in dependency order before dispatching.
@@ -617,6 +645,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     const pullError = firstPullError(pull);
     if (pullError) presentationErrors = pull.failures.map((failure) => failure.error);
     if (pullError) throw pullError;
+    phase = 'dispatch';
     const pushed = await v2Engine.dispatchPending();
     madeProgress = pushed.acknowledged > 0;
     // AI-authored N107: publish durable ACK revisions before unrelated trailing
@@ -635,6 +664,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     // cover self-echo safely, including other-device commits already observed.
     const writerCapture = pushed.acknowledged > 0 ? await remoteSync.beforeFullSync({ writer: true }) : null;
     if (writerCapture) remoteCapture = writerCapture;
+    phase = 'post_pull';
     const postPull = skipPostPull ? null : await v2Engine.pullAll({
       stores: v2PostPullStores(snapshot, full || !!writerCapture, scoreDomainAvailable),
       scoreDomainSnapshot: scoreDomainAvailable,
@@ -650,6 +680,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     // Never acknowledge the later marker: it may represent a write after an
     // earlier store was read. It requests trailing work, even if Broadcast was
     // missed. A failed validation cannot certify the single-pull fast path.
+    phase = 'revision_validation';
     if (remoteCapture && !await remoteSync.check() && skipPostPull) {
       throw new Error('Remote Sync revision validation unavailable');
     }
@@ -657,6 +688,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
         acknowledgedContext.session !== cloud.session || !cloudOwnershipAccess('pull').allowed)) {
       throw ownershipBlockedError({ reason: 'sync-context-changed' });
     }
+    phase = 'local_refresh';
     await store.refreshSyncedState();
     const v2Status = await v2Engine.status();
     const lastSyncedAt = Date.now();
@@ -684,6 +716,9 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     console.warn('[rakeezx sync] Automatic sync failed:', err);
     const needsAuth = cloud.isAuthRequiredError?.(err) || cloud.authStatus?.().state === 'auth_required';
     bindPresentationContext();
+    // firstPullError adds a store label and drops HTTP metadata. Diagnose the
+    // original transport failure, while preserving existing error semantics.
+    if (presentationToken === presentationContextToken) recordSafeFailure(presentationErrors?.[0] ?? err, phase, startedAt);
     presentationSeverity.failed(presentationToken, needsAuth ? [] : presentationErrors ?? [err]);
     setState({ status: needsAuth ? 'auth_required' : (isOnline() ? 'error' : 'offline'), lastError: err.message });
     return false;
@@ -972,7 +1007,7 @@ export function init({ readiness = null, prepareResume = null } = {}) {
   else if (cloud.authStatus?.().state === 'auth_required') setState({ status: 'auth_required' });
   if (typeof addEventListener === 'function') {
     addEventListener('online', () => {
-      void scheduleResumeSync(prepareResume, { force: true });
+      void scheduleResumeSync(prepareResume, { force: true, event: 'online' });
     });
     addEventListener('offline', () => {
       remoteSync.stop();
@@ -981,15 +1016,15 @@ export function init({ readiness = null, prepareResume = null } = {}) {
       void getSyncOperationalSummary().catch(() => {});
     });
     const leave = () => { resumeAwake = false; remoteSync.stop(); };
-    const resume = () => { void scheduleResumeSync(prepareResume); };
+    const resume = event => { void scheduleResumeSync(prepareResume, { event: event?.type === 'pageshow' ? 'pageshow' : event?.type === 'visibilitychange' ? 'visible' : 'focus' }); };
     // A visible window losing focus does not invalidate an active read capture.
     addEventListener('blur', () => { resumeAwake = false; });
     addEventListener('pagehide', leave);
     addEventListener('pageshow', resume);
     addEventListener('focus', resume);
     if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') resume();
+      document.addEventListener('visibilitychange', event => {
+        if (document.visibilityState === 'visible') resume(event);
         else leave();
       });
     }
