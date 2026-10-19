@@ -23,9 +23,12 @@ const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف 
 const safeName = (value) => visibleLatinDigits(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
 // AI N120: offer only orderings that the selected document can apply.
-const sortOptions = () => [
-  ['default', tab === 'support' ? 'الأكثر حاجة للدعم' : 'الترتيب الافتراضي (السجل)'],
-  ['name', 'أبجديًا (اسم الطالب)'], ['roll', 'حسب رقم الكشف'],
+// Live roster/grade reports already receive displayRoster's ascending numbers.
+// Archived and attendance rosters can carry saved numbers, so retain their option.
+const sortOptions = (historical = false) => [
+  ['default', tab === 'support' ? 'الأكثر حاجة للدعم' : !historical && ['roster', 'grades'].includes(tab) ? 'حسب رقم الكشف (الافتراضي)' : 'الترتيب الافتراضي (السجل)'],
+  ['name', 'أبجديًا (اسم الطالب)'],
+  ...(historical || !['roster', 'grades'].includes(tab) ? [['roll', 'حسب رقم الكشف']] : []),
   ...(['grades', 'support'].includes(tab) ? [['score_desc', 'الأعلى درجة'], ['score_asc', 'الأقل درجة']] : []),
   ...(['attendance', 'support'].includes(tab) ? [['absent_desc', 'الأكثر غيابًا']] : []),
 ];
@@ -203,13 +206,13 @@ export default {
           <button class="segmented__btn ${tab === 'support' ? 'is-on' : ''}" data-act="tab" data-tab="support">من يحتاج دعمًا</button>
         </div>
 
-        <div class="grades-toolbar report-toolbar report-filter-bar report-filter-bar--context noprint" role="group" tabindex="0" aria-label="عوامل تصفية تقرير الفصل، مرّر أفقيًا لعرض كل الخيارات">
+        <div class="grades-toolbar report-toolbar report-filter-bar report-filter-bar--context noprint" role="group" tabindex="0" aria-label="عوامل تصفية تقرير الفصل">
           <label class="field report-toolbar__field">
             <span class="field__label fs-xs">
               ${icon('filter', 'compact')} ترتيب الكشف
             </span>
             <select class="select" data-change="sort" aria-label="ترتيب التقرير">
-              ${sortOptions().map(([value, label]) => html`<option value="${value}" ${sortKey === value ? 'selected' : ''}>${label}</option>`)}
+              ${sortOptions(!!historical).map(([value, label]) => html`<option value="${value}" ${sortKey === value ? 'selected' : ''}>${label}</option>`)}
             </select>
           </label>
           ${tab === 'attendance'
@@ -263,7 +266,12 @@ export default {
 
   actions: {
     tab(el) { tab = el.dataset.tab; sortKey = 'default'; repaint(); },
-    sort(el) { sortKey = sortOptions().some(([value]) => value === el.value) ? el.value : 'default'; repaint(); },
+    sort(el, ev, params) {
+      // A legacy live-roster "roll" request aliases its identical default;
+      // saved-number reports still accept and apply the explicit value.
+      sortKey = sortOptions(!!store.closedTeachingReport(params.id)).some(([value]) => value === el.value) ? el.value : 'default';
+      repaint();
+    },
     'reset-filters'() { sortKey = 'default'; if (tab === 'attendance') { filterStartDate = ''; filterEndDate = ''; attMode = 'brief'; } repaint(); },
     'att-mode'(el) { attMode = el.dataset.mode; repaint(); },
     'toggle-a4'() { a4Preview = !a4Preview; repaint(); },

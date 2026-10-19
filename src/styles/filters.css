@@ -95,3 +95,29 @@
   outline: 3px solid var(--action-focus-ring);
   outline-offset: 2px;
 }
+
+/* AI N120 / PO 19 October: small screens expose every control without a drag.
+   Fixed equal columns keep geometry stable across option/text/result changes.
+   The accepted desktop row above stays unchanged. */
+@media (max-width: 1100px) {
+  .report-filter-bar.report-filter-bar--context {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    padding: 10px;
+  }
+  .report-filter-bar.report-filter-bar--context .field {
+    min-inline-size: 0;
+  }
+  .report-filter-bar.report-filter-bar--context > :is(.btn, .segmented) {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+  .report-filter-bar.report-filter-bar--context .report-toolbar__field,
+  .report-filter-bar.report-filter-bar--context .report-toolbar__mode {
+    grid-column: 1 / -1;
+  }
+  .report-filter-bar--context .field__label {
+    white-space: normal;
+  }
+}
