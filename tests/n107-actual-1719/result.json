@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n107-missing-class-code-field-20261019",
+  "runId": "b3a4f494-7079-4175-a6cd-29a95321b1d3",
+  "checks": [
+    {
+      "name": "n107_missing_class_code_precise_field_feedback",
+      "status": "PASS",
+      "evidence": "Actual app at loopback HTTP, fresh390px context, real synthetic account ownership/lease guards and CSV/review/change handlers: grade precedence; empty/whitespace code focused with direct error; invalid character/overlength precise error; valid code clears feedback and reaches existing review/confirm without writes. CSS red border and no overflow verified; database/outbox snapshot unchanged."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "b999f4bab9bb341a2794e5a210c90994bdfecc4367780ee733e4227e85572824",
+    "src/styles/teacher-setup-import.css": "768cb3772e3c54c08251e4966a2e37fa2feaa3cc0bcae708f22f6397eef979d7"
+  },
+  "scope": "Actual account-bound import view; synthetic CSV, no submit mutation or live service."
+}
