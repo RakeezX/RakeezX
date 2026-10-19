@@ -58,6 +58,29 @@ const compile = (path) => {
 
 const COMPILED = ROUTES.map((r) => ({ ...r, ...compile(r.path) }));
 
+// A lossless URL spelling of the existing natural teaching key, not a new ID.
+// Keep every component (including year/term); unknown/legacy identities stay intact.
+// Inline here so the already-cached router needs no new offline-shell dependency.
+const TEACHING_KEY = /^tch:sec:([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})\|sub:([a-z0-9-]+)\|tm:y:([0-9]{4}-[0-9]{4}):([1-9][0-9]*)$/;
+const COMPACT_TEACHING_KEY = /^~([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})\.([a-z0-9-]+)\.([0-9]{4}-[0-9]{4})\.([1-9][0-9]*)$/;
+
+export function teachingRouteId(id) {
+  const key = TEACHING_KEY.exec(String(id));
+  return key ? `~${key.slice(1, 6).join('')}.${key[6]}.${key[7]}.${key[8]}` : encodeURIComponent(id).replaceAll('%3A', ':').replaceAll('%7C', '|');
+}
+
+function teachingIdentity(id) {
+  const key = COMPACT_TEACHING_KEY.exec(id);
+  return key ? `tch:sec:${key.slice(1, 6).join('-')}|sub:${key[6]}|tm:y:${key[7]}:${key[8]}` : id;
+}
+
+function compactTeachingPath(path) {
+  return path.replace(/^(\/teaching\/)([^/?]+)/, (whole, prefix, id) => {
+    try { return prefix + teachingRouteId(teachingIdentity(decodeURIComponent(id))); }
+    catch { return whole; }
+  });
+}
+
 const NAVIGATION_STATE_KEY = '__rakeezNavigation';
 let activeNavigation = null;
 let pendingReplacement = null;
@@ -75,6 +98,7 @@ export function match(path = currentPath()) {
     if (!m) continue;
     const params = {};
     route.keys.forEach((k, i) => (params[k] = decodeURIComponent(m[i + 1])));
+    if (route.path.startsWith('/teaching/')) params.id = teachingIdentity(params.id);
     if (queryStr) {
       for (const [k, v] of new URLSearchParams(queryStr)) params[k] = v;
     }
@@ -126,6 +150,7 @@ export function syncNavigationContext() {
 }
 
 export const go = (path, { replace = false } = {}) => {
+  path = compactTeachingPath(path);
   const target = '#' + path;
   if (location.hash === target) return;
   if (replace) {
