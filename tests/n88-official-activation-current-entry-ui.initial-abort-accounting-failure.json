@@ -1,0 +1,15 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "status": "FAIL",
+  "checks": [],
+  "hostedProof": false,
+  "cleanup": {
+    "ownedBrowserAndHttpClosed": true,
+    "lease": "RELEASED browser"
+  },
+  "failure": {
+    "message": "Expected values to be strictly equal:\n\n2 !== 1\n",
+    "stack": ""
+  }
+}

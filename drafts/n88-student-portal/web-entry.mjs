@@ -52,7 +52,7 @@ export function createWebEntry(options) {
     };
     try {
       const pending=work().finally(()=>{running--;});
-      return await Promise.race([pending,new Promise(resolve=>{timer=setTimeout(()=>{abort.abort();resolve(privateResponse());},11000);})]);
+      return await Promise.race([pending,new Promise(resolve=>{timer=setTimeout(()=>{abort.abort();resolve(privateResponse());},18000);})]);
     }finally{clearTimeout(timer);abort.abort();}
   };
 }

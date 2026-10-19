@@ -1,0 +1,33 @@
+{
+  "runId": "75c77bea-eec3-4a4e-9749-42ab3982de7e",
+  "at": "2026-10-19T07:33:21.469Z",
+  "rows": [
+    {
+      "path": "/api/n88/teacher/class/list",
+      "status": 401,
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "cspPresent": false
+    },
+    {
+      "path": "/api/n88/student/read",
+      "status": 401,
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "cspPresent": false
+    },
+    {
+      "path": "/student",
+      "status": 200,
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "cspPresent": true
+    }
+  ],
+  "anonymousPrivateAccessDenied": true,
+  "credentialsOrIdentitiesSent": false,
+  "privateBodiesRecorded": false
+}

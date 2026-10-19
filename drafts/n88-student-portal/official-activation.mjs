@@ -3,6 +3,7 @@
  * CLI args/output never carry a password, verifier or secret value.
  */
 import assert from 'node:assert/strict';
+import {pilotCorrectionRestoreReady} from './activation/pilot-ui-correction-gate.mjs';
 import {randomBytes,generateKeyPairSync,privateDecrypt,createPrivateKey,constants,pbkdf2Sync,createHmac,createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
@@ -113,6 +114,34 @@ async function execute(action,value){
   finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   return {sameBindingInstalled:true,serializationCorrected:true,credentialOrVerifierChanged:false,identifiersReturned:false};
  }
+ if(action==='--restore-pilot-ui-correction'){
+  const activeRun='75c77bea-eec3-4a4e-9749-42ab3982de7e';
+  if(process.env.N88_ACTIVATION_RUN_ID!==activeRun||!state.pilotConfigured||!state.installed||state.loginDisarmed||state.directAuthRefused||!state.pilotBinding||state.pilotBinding.studentIds?.length!==2)fail('n88_pilot_correction_custody_gate');
+  const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
+  const readiness=JSON.parse(await readFile(path.join(base,'hosted-pilot-readiness.json'),'utf8'));
+  if(state.directVerified!==true||readiness.runId!==activeRun)fail('n88_pilot_correction_fresh_readiness_required');
+  const history=(await readFile(path.join(base,'continuation-b324b7b5.json'),'utf8')).replaceAll('\r\n','\n');
+  const card=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-official-student-portal-activation-20261018.json','utf8'));
+  const listed=await official(['secrets','list','--project-ref',project,'--output','json']);
+  const rows=Array.isArray(listed)?listed:listed?.rows;
+  const matches=(name,value)=>Array.isArray(rows)&&rows.filter(r=>r.name===name).length===1&&rows.find(r=>r.name===name).value?.toLowerCase()===createHash('sha256').update(value).digest('hex');
+  const guard={source,readiness,alreadyRestored:!!state.pilotUiCorrectionRestored,enabledOff:!state.pilotEnabled&&matches('N88_ENABLED','false'),modePilot:matches('N88_ROLLOUT_MODE','pilot'),bindingMatches:matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding)),sourceMatches:source===state.directSource&&matches('N88_SERVICE_SOURCE_SHA',source),localUiPass:JSON.parse(await readFile('tests/n88-official-activation-current-entry-ui.json','utf8')).status==='PASS',localPackagePass:JSON.parse(await readFile('tests/n88-official-activation-current-package.json','utf8')).status==='PASS',historicalFailureMatches:createHash('sha256').update(history).digest('hex')==='28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83',stageAuthorized:card.stagedActivation?.phase==='pilot'&&card.requiredChecks?.length===7&&card.stagedActivation?.finalRequiredChecks?.length===9&&card.objective?.includes('LATEST ONCE-ONLY VERIFIED PILOT UI CORRECTION STAGE')};
+  if(!pilotCorrectionRestoreReady(guard))fail('n88_pilot_correction_preimage_mismatch');
+  const file=path.join(phase,'owned-env.tmp');
+  try{
+   await writeFile(file,'N88_ENABLED=true\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);
+   state.pilotEnabled=true;state.pilotUiCorrectionRestored={runId:activeRun,source};state.pilotLiveReadinessCalled=false;await save(state);
+  }finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {runId:activeRun,enabled:true,rolloutMode:'pilot',publicEnabled:false,existingOwnerBindingUnchanged:true,students:2,credentialRoleSqlOrFixtureChanged:false,source,historicalFinalFailuresPreserved:true};
+ }
+ if(action==='--read-pilot-ui-correction-config'){
+  if(!state.pilotUiCorrectionRestored||!state.pilotEnabled)fail('n88_pilot_correction_readback_gate');
+  const listed=await official(['secrets','list','--project-ref',project,'--output','json']),rows=Array.isArray(listed)?listed:listed?.rows;
+  const matches=(name,value)=>Array.isArray(rows)&&rows.filter(r=>r.name===name).length===1&&rows.find(r=>r.name===name).value?.toLowerCase()===createHash('sha256').update(value).digest('hex');
+  const result={runId:state.pilotUiCorrectionRestored.runId,enabled:matches('N88_ENABLED','true'),pilotMode:matches('N88_ROLLOUT_MODE','pilot'),sameProtectedBinding:matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding)),sameSource:matches('N88_SERVICE_SOURCE_SHA',state.directSource),publicEnabled:false,students:2,source:state.directSource,identifiersOrValuesReturned:false};
+  if(!result.enabled||!result.pilotMode||!result.sameProtectedBinding||!result.sameSource)fail('n88_pilot_correction_config_readback_failed');
+  await writeFile(path.join(base,'pilot-ui-correction-config-75c77bea.json'),JSON.stringify(result,null,2)+'\n');return result;
+ }
  if(action==='--enable-pilot'){
   const r=JSON.parse(await readFile(path.join(base,'hosted-pilot-readiness.json'),'utf8'));
   if(!state.pilotConfigured||!state.directVerified||state.loginDisarmed||r.source!==state.directSource||r.rolloutMode!=='pilot'||!r.rolloutConfigured||!r.configurationReady||!r.sourceMatches)fail('n88_pilot_enable_gate');
@@ -125,6 +154,28 @@ async function execute(action,value){
   const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];if(source===state.directSource)fail('n88_pilot_source_unchanged');
   const file=path.join(phase,'owned-env.tmp');try{await writeFile(file,'N88_ENABLED=false\nN88_SERVICE_SOURCE_SHA='+source+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.directSource=source;state.pilotEnabled=false;state.pilotLiveReadinessCalled=false;state.pilotSerializedReadinessCalled=false;await save(state);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   return {source,enabled:false,originalBindingAndCredentialUnchanged:true};
+ }
+ if(action==='--pause-owned-pilot'){
+  const receipt=JSON.parse(await readFile(path.join(base,'hosted-journey-b324b7b5.json'),'utf8'));
+  const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
+  if(!state.pilotConfigured||!state.pilotEnabled||!state.directVerified||source!==state.directSource||receipt.runId!=='b324b7b5-5bfa-4ddb-8a92-adde7e26fe04'||receipt.publicEnabled!==false)fail('n88_owned_pilot_pause_gate');
+  const file=path.join(phase,'owned-env.tmp');
+  try{await writeFile(file,'N88_ENABLED=false\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.pilotEnabled=false;state.pilotPausedForFrontendSource=source;await save(state);}
+  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  const result=await official(['secrets','list','--project-ref',project,'--output','json']);
+  const rows=Array.isArray(result)?result:result?.rows;
+  const confirmed=Array.isArray(rows)&&rows.filter(r=>r.name==='N88_ENABLED').length===1&&rows.find(r=>r.name==='N88_ENABLED').value?.toLowerCase()===createHash('sha256').update('false').digest('hex');
+  const disposition={runId:receipt.runId,enabled:false,enabledFalseProviderDigestMatches:confirmed,rolloutMode:'pilot',publicEnabled:false,credentialOrRoleOrFixtureChanged:false,protectedTemporaryInputRemoved:true,source};
+  await writeFile(path.join(base,'owned-pilot-pause-b324b7b5.json'),JSON.stringify(disposition,null,2)+'\n');
+  if(!confirmed)fail('n88_owned_pilot_pause_readback_unconfirmed');return disposition;
+ }
+ if(action==='--read-owned-pilot-flag'){
+  if(state.pilotEnabled||!state.pilotPausedForFrontendSource)fail('n88_owned_pause_readback_gate');
+  const result=await official(['secrets','list','--project-ref',project,'--output','json']);const rows=Array.isArray(result)?result:result?.rows;
+  const flag=rows?.find(r=>r.name==='N88_ENABLED');
+  const matches=typeof flag?.value==='string'&&flag.value.toLowerCase()===createHash('sha256').update('false').digest('hex');
+  const r={runId:'b324b7b5-5bfa-4ddb-8a92-adde7e26fe04',enabled:false,enabledFalseProviderDigestMatches:matches,providerDigestField:'value',rolloutMode:'pilot',publicEnabled:false,credentialOrRoleOrFixtureChanged:false,protectedTemporaryInputRemoved:true,source:state.directSource,initialPausedSource:state.pilotPausedForFrontendSource};
+  if(!matches)fail('n88_owned_pause_digest_mismatch');await writeFile(path.join(base,'owned-pilot-pause-readback-b324b7b5.json'),JSON.stringify(r,null,2)+'\n');return r;
  }
  if(action==='--installed-names'){
   const result=await official(['secrets','list','--project-ref',project,'--output','json']);
@@ -186,7 +237,7 @@ async function execute(action,value){
    let data=await response.json();
    const names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','configurationReady','rolloutMode','rolloutConfigured','source','enabled','code'];
    if(Object.keys(data).some(k=>!names.includes(k)))data={status:'unavailable',stage:'entry',code:'n88_generic_entry_unavailable',enabled:false};
-   receipt={runId:state.pilotConfigured?'3576957c-1cf3-455d-8d62-150b1934b728':'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,httpStatus:response.status,...data,expectedSource:state.directSource,sourceMatches:data.source===state.directSource,transport:'original Supabase Edge IPv6 -> official direct strictTLS',privateMutations:0};
+   receipt={runId:process.env.N88_ACTIVATION_RUN_ID??(state.pilotConfigured?'3576957c-1cf3-455d-8d62-150b1934b728':'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8'),projectId:project,httpStatus:response.status,...data,expectedSource:state.directSource,sourceMatches:data.source===state.directSource,transport:'original Supabase Edge IPv6 -> official direct strictTLS',privateMutations:0};
    state.directVerified=response.status===200&&data.status==='ready'&&data.loginExact===true&&data.roleExact===true&&data.upstreamSsl===true&&data.clientTlsAuthorized===true&&data.sourceBoundary===true&&data.source===state.directSource&&data.enabled===live;
    if(data.code==='28P01')state.directAuthRefused=true;
    if(!state.directVerified){await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;receipt.loginDisarmed=true;}

@@ -99,12 +99,12 @@ export function createIntegratedService(options,adapter,baseRepository) {
     const ops=createClassCredentialOperations({rollout,repository,...credentials,...recovering,origin:options.origin,verifyIngress:adapter.verifyIngress,verifyTeacher,resolveClass});
     // Operations preserve their transaction/commit ACK. UI adaptation never exposes a precommit secret.
     if(action==='visibility' || action==='list' || action.startsWith('guidance-')) {
-      try{return await repository.transaction(async(db,ports)=>{
+      let stage='repository';try{return await repository.transaction(async(db,ports)=>{
         const h=request.headers||{};
         if(!await adapter.verifyIngress(request,ports) || h.origin!==options.origin||h['x-n88-csrf']!=='1'||h['content-type']!=='application/json'||h['sec-fetch-site']&&h['sec-fetch-site']!=='same-origin')return deny();
-        const auth=await verifyTeacher(request,ports);if(!auth?.current||!rollout.allowsOwner(auth.ownerId))return deny();
-        const s=await resolveClass(db,ports,auth,body.teachingId,body);if(!s)return deny();
-        await ports.synchronizeOwner(auth.ownerId);
+        stage='teacher';const auth=await verifyTeacher(request,ports);if(!auth?.current||!rollout.allowsOwner(auth.ownerId))return deny();
+        stage='source';const s=await resolveClass(db,ports,auth,body.teachingId,body);if(!s)return deny();
+        stage='synchronize';await ports.synchronizeOwner(auth.ownerId);stage='projection';
         const members=db.memberships.filter(m=>m.ownerId===auth.ownerId&&m.classId===s.classId&&m.status==='active'&&!m.endDate&&m.studentActive&&m.classActive&&rollout.admitsStudent(m));
         if(members.length>2000||new Set(members.map(m=>m.studentId)).size!==members.length||members.some(m=>db.memberships.filter(x=>x.ownerId===m.ownerId&&x.studentId===m.studentId&&x.status==='active'&&!x.endDate&&x.studentActive&&x.classActive).length!==1))return deny();
         const rosterRevision=hash([s.teachingId,s.revision,members.sort((a,b)=>a.studentId.localeCompare(b.studentId)).map(m=>[m.studentId,m.enrollmentId,m.revision,m.canonicalStamp])]);
@@ -125,7 +125,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
           data={updated:true,policyRevision:p.revision,fields:p.fields};
         }else data={classId:s.classId,rosterRevision,policyRevision:p.revision,visibility:p.fields,students:await Promise.all(members.map(async m=>{const cs=db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId);const c=ownedCredential(db,m),r=c?await recovery.read(ports,c):{status:'inactive',credential:null};return {recoveryStatus:r.status,credential:r.credential,studentId:m.studentId,enrollmentId:m.enrollmentId,revision:m.revision,label:m.label,hasActiveCode:cs.some(c=>c.revokedAt===null),credentialVersion:Math.max(0,...cs.map(c=>c.version))};}))};
         return {status:200,body:{ack:true,binding,requestId:body.requestId??null,data,rollout:rollout.mode},headers:PRIVATE_HEADERS};
-      });}catch{return {...deny(),status:503};}
+      });}catch(e){const phase=['acquire','begin','snapshot'].includes(e.safeStage)?e.safeStage:stage;return {...deny(),status:503,body:{error:'unavailable',stage:phase}};}
     }
     const current=ops.forRequest(request);
     const result=action==='issue-missing'?await current.issueMissingClassCodes(body.teachingId,body):await current[action](body);

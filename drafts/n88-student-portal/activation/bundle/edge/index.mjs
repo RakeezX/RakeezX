@@ -61,8 +61,8 @@ var deployment_inactive_default = {
     rowBytes: 4096
   },
   timing: {
-    acquireMs: 1e3,
-    transactionMs: 8e3,
+    acquireMs: 6e3,
+    transactionMs: 16e3,
     cleanupMs: 400,
     statementMs: 3e3,
     lockMs: 1e3
@@ -73,7 +73,7 @@ var deployment_inactive_default = {
   },
   pool: {
     max: 2,
-    connectionTimeoutMillis: 1e3,
+    connectionTimeoutMillis: 5e3,
     boundedAdmission: true
   },
   privateLogs: {
@@ -1467,15 +1467,20 @@ function createIntegratedService(options, adapter, baseRepository) {
     });
     const ops = createClassCredentialOperations({ rollout, repository, ...credentials, ...recovering, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });
     if (action === "visibility" || action === "list" || action.startsWith("guidance-")) {
+      let stage = "repository";
       try {
         return await repository.transaction(async (db, ports) => {
           const h = request.headers || {};
           if (!await adapter.verifyIngress(request, ports) || h.origin !== options.origin || h["x-n88-csrf"] !== "1" || h["content-type"] !== "application/json" || h["sec-fetch-site"] && h["sec-fetch-site"] !== "same-origin") return deny2();
+          stage = "teacher";
           const auth = await verifyTeacher(request, ports);
           if (!auth?.current || !rollout.allowsOwner(auth.ownerId)) return deny2();
+          stage = "source";
           const s = await resolveClass(db, ports, auth, body.teachingId, body);
           if (!s) return deny2();
+          stage = "synchronize";
           await ports.synchronizeOwner(auth.ownerId);
+          stage = "projection";
           const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === s.classId && m.status === "active" && !m.endDate && m.studentActive && m.classActive && rollout.admitsStudent(m));
           if (members.length > 2e3 || new Set(members.map((m) => m.studentId)).size !== members.length || members.some((m) => db.memberships.filter((x) => x.ownerId === m.ownerId && x.studentId === m.studentId && x.status === "active" && !x.endDate && x.studentActive && x.classActive).length !== 1)) return deny2();
           const rosterRevision = hash4([s.teachingId, s.revision, members.sort((a, b) => a.studentId.localeCompare(b.studentId)).map((m) => [m.studentId, m.enrollmentId, m.revision, m.canonicalStamp])]);
@@ -1503,8 +1508,9 @@ function createIntegratedService(options, adapter, baseRepository) {
           })) };
           return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2, rollout: rollout.mode }, headers: PRIVATE_HEADERS };
         });
-      } catch {
-        return { ...deny2(), status: 503 };
+      } catch (e) {
+        const phase = ["acquire", "begin", "snapshot"].includes(e.safeStage) ? e.safeStage : stage;
+        return { ...deny2(), status: 503, body: { error: "unavailable", stage: phase } };
       }
     }
     const current = ops.forRequest(request);
@@ -4139,7 +4145,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
   timing = { ...timing };
   return Object.freeze({ async transaction(action) {
     must(typeof action === "function");
-    let c, live2 = true, begun = false, committed = false, destroyed = false;
+    let c, live2 = true, begun = false, committed = false, destroyed = false, stage = "acquire";
     const deadline = Date.now() + timing.transactionMs;
     const fence = () => must(live2 && Date.now() < deadline);
     const release = (broken) => {
@@ -4169,6 +4175,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       must(c && typeof c.query === "function" && typeof c.release === "function");
       await assertVerifiedBoundary(c);
       fence();
+      stage = "begin";
       await query("begin isolation level read committed");
       begun = true;
       await query(
@@ -4176,6 +4183,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         [String(timing.statementMs), String(timing.lockMs), String(timing.transactionMs)]
       );
       await query(LOCK);
+      stage = "snapshot";
       const state = {};
       let count = 0, bytes = 0, transferred = 0;
       for (const name of names) {
@@ -4194,6 +4202,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         must(bytes <= limits.bytes);
       }
       const original = snapshot(state, limits);
+      stage = "operation";
       const owners = /* @__PURE__ */ new Set(), commitGuards = [];
       const beforeCommit = (check) => {
         fence();
@@ -4249,7 +4258,9 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
           clearTimeout(cleanupTimer);
         }
       }
-      throw unavailable();
+      const error = unavailable();
+      error.safeStage = stage;
+      throw error;
     } finally {
       live2 = false;
       clearTimeout(timer);
@@ -4621,7 +4632,7 @@ function createWebEntry(options) {
         timer = setTimeout(() => {
           abort.abort();
           resolve(privateResponse());
-        }, 11e3);
+        }, 18e3);
       })]);
     } finally {
       clearTimeout(timer);
@@ -4701,17 +4712,7 @@ function createExistingHost(readEnv) {
   const recoveryKeys = new Map(versions.map((v) => [v, key2("N88_RECOVERY_KEY_" + v)]));
   const ca = required("N88_DATABASE_CA_CERT").replaceAll("\r\n", "\n");
   if (createHash9("sha256").update(ca).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n88_database_ca_configuration");
-  const pool = new pg.Pool({
-    connectionString: dbUrl,
-    ssl: { rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2", ca },
-    max: 2,
-    connectionTimeoutMillis: 1e3,
-    idleTimeoutMillis: 1e4,
-    statement_timeout: 3e3,
-    query_timeout: 4e3,
-    application_name: "n88-private-server",
-    allowExitOnIdle: true
-  });
+  const pool = new pg.Pool(databaseConfig(readEnv));
   pool.on("error", () => {
   });
   let waiting = 0;

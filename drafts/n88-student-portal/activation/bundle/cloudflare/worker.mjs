@@ -73,7 +73,7 @@ function createCloudflareEntry({ fetch: send = globalThis.fetch, now = Date.now 
         "Content-Security-Policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
       } });
     }
-    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 12e3);
+    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 19e3);
     let stage = "configuration";
     const unavailable = () => new Response('{"error":"unavailable"}', { status: 503, headers: { ...PRIVATE_WEB_HEADERS, "x-n88-transport-stage": stage } });
     try {
@@ -129,6 +129,7 @@ function createCloudflareEntry({ fetch: send = globalThis.fetch, now = Date.now 
       }
       const out = new Headers(PRIVATE_WEB_HEADERS);
       if (reply.cookie) out.set("set-cookie", reply.cookie);
+      if (reply.status === 503 && ["acquire", "begin", "snapshot", "repository", "teacher", "source", "synchronize", "projection"].includes(reply.body?.stage)) out.set("x-n88-service-stage", reply.body.stage);
       return new Response(JSON.stringify(reply.body), { status: reply.status, headers: out });
     } catch {
       return unavailable();

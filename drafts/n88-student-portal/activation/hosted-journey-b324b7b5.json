@@ -1,0 +1,92 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "pilotPublication": {
+    "candidate": "35e2cbb6131129ee5997e818e59e0ea6fd3d76a4",
+    "published": "01ed8edd78a672a4b01c8d6ab8b4cf692279ced0",
+    "verifiedAt": "2026-10-19T05:51:14.579Z"
+  },
+  "failures": [
+    {
+      "phase": "initial normal teacher list",
+      "status": 503,
+      "privateMutation": false
+    },
+    {
+      "phase": "acquire",
+      "status": 503,
+      "repair": "normal pool aligned to already-proven strict databaseConfig; connect5000/acquire6000ms"
+    },
+    {
+      "phase": "projection",
+      "status": 503,
+      "elapsedMs": 9383,
+      "repair": "bounded transaction16000/Web18000/ingress19000ms; statement3000/lock1000ms unchanged"
+    },
+    {
+      "phase": "begin",
+      "status": 503,
+      "repair": "bounded same-instance signed request queue before private acquisition; original global DB lock retained"
+    },
+    {
+      "phase": "local diagnostic fixture",
+      "status": "FAIL",
+      "reason": "missing synthetic verifyIngress seam corrected; original failure preserved here"
+    },
+    {
+      "phase": "CDP response-body lookup",
+      "status": "NOT_AVAILABLE",
+      "reason": "No data found for resource with given identifier; no repeated body lookup or alternate fetch"
+    },
+    {
+      "phase": "safe pause readback harness",
+      "status": "FAIL",
+      "reason": "CLI list exposes SHA256 metadata under value, not digest; exact flag-only readback corrected and PASS; initial receipt preserved"
+    }
+  ],
+  "observedHosted": {
+    "teacherRosterCount": 2,
+    "createdCodes": 2,
+    "codeFormatValid": true,
+    "codesDistinct": true,
+    "persistedSameCodesAfterReload": true,
+    "studentSessionOpened": true,
+    "initialAllFieldsHidden": true,
+    "visibilitySaved": true,
+    "chosenFields": [
+      "name",
+      "class",
+      "required"
+    ],
+    "studentChosenFieldsVisible": true,
+    "studentUnchosenFieldsOmitted": true,
+    "guidanceSavedAck": true,
+    "guidanceStudentRead": "NOT_RUN",
+    "rotation": "NOT_RUN",
+    "revocation": "NOT_RUN",
+    "oldCodeAndSessionDenial": "NOT_RUN"
+  },
+  "rawCodesOrIdentitiesRecorded": false,
+  "publicEnabled": false,
+  "status": "FAIL",
+  "currentBackendEnabled": false,
+  "remainingGate": "Corrected normal authenticated teacher runtime must be served by the sole publisher before remaining hosted acceptance; current source is prepared and actual local DOM/store/owner/renewal/serialization checks PASS.",
+  "fixtureDisposition": {
+    "existingTeacher": 1,
+    "existingFabricatedPupils": 2,
+    "newPeople": 0,
+    "issuedCredentials": 2,
+    "credentialsRetainedDormant": true,
+    "visibilityFieldsRetained": [
+      "name",
+      "class",
+      "required"
+    ],
+    "privateGuidanceSaved": true,
+    "canonicalOrGradeChanges": 0,
+    "realDataChanges": 0,
+    "messages": 0,
+    "tombstonesAndNonceHistoryPreserved": true,
+    "unapprovedCleanup": false
+  }
+}

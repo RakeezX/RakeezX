@@ -1,0 +1,48 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "edge": {
+    "version": 35,
+    "sourceMatches": true,
+    "verifyJwt": false,
+    "eszip": "d15fc5eefd077aa7141a89ce2d2c64f791191a2c6c73b7a5a6828ff3f33fde13",
+    "sourceSha256": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+    "enabled": false,
+    "flagReadback": "owned-pilot-pause-readback-b324b7b5.json"
+  },
+  "cloudflare": {
+    "name": "rakeez-n88-private-ingress",
+    "sourceSha256": "4c962e99b6e9cf634f57bc94cda8bcb6a1caa62bc7eb47d397867d8d6d707b60",
+    "sourceMatches": true,
+    "etag": "014f9e5fe4569533c504573b0aaa7dc041f8f482286c431bd3cf0d1f0cc05975",
+    "deploymentId": "19589b22f664494eb2a62352eb203394",
+    "logpush": false,
+    "tailConsumers": [],
+    "observability": {
+      "enabled": false,
+      "logs": false,
+      "invocationLogs": false,
+      "traces": false,
+      "sampling": 0
+    },
+    "secretBindingsPreserved": true,
+    "routesUnchanged": true
+  },
+  "publicEnabled": false,
+  "credentialVerifierOrMigrationChanges": 0,
+  "readinessReuse": {
+    "source": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+    "actualEarlierThisRun": true,
+    "loginExact": true,
+    "roleExact": true,
+    "clientTlsAuthorized": true,
+    "upstreamSsl": true,
+    "sourceBoundary": true,
+    "configurationReady": true,
+    "rolloutMode": "pilot",
+    "currentEnabled": false,
+    "note": "Exact source previously passed own signed direct readiness in this run before safe feature pause; current inactive provider bytes match. No fresh auth/routine replay for unchanged source."
+  },
+  "originalProofs": "pilot-provider-readback-3576957c.json and hosted-activation-outcome.json retained; account/zone/source/RLS8/76/custody history reused unchanged",
+  "finalFrontendPublished": false
+}

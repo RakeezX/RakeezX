@@ -1,0 +1,13 @@
+{
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "status": "PASS",
+  "checks": [
+    "three signed requests execute serially before private acquisition",
+    "original signed ingress rejection preserved; invalid request never enters queue",
+    "service remains denial; no private DB or data fixture"
+  ],
+  "hostedProof": false,
+  "historicalOnly": true,
+  "currentImplementation": false,
+  "disposition": "Same-instance queue did not resolve cross-worker hosted contention and was removed. Current correction serializes authenticated browser dispatch before it reaches provider workers."
+}

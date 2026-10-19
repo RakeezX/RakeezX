@@ -1,0 +1,65 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "75c77bea-eec3-4a4e-9749-42ab3982de7e",
+  "state": "LOCAL_READY",
+  "scope": "Once-only owner-restricted pilot UI correction publication only",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "preservedCorrectionCandidate": "26b819f187e7222937763b29c9023e33d1fd6e66",
+  "checks": [
+    {
+      "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+      "status": "PASS",
+      "evidence": "Immutable eight-migration/role/custody history reused. Current protected config digest confirms unchanged source and original one-owner/two-pupil binding; no SQL, role or credential writes."
+    },
+    {
+      "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "status": "PASS",
+      "evidence": "pilot-ui-correction-provider-75c77bea.json: exact Edge36/Worker source and current settings. Unchanged explicit privacy/logging proof reused; anonymous private APIs401 and /student private headers pass."
+    },
+    {
+      "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "Unchanged actual PostgreSQL log cases and76-routine typed source/ACL coverage reused. Current signed direct readiness confirms sourceBoundary with strictTLS before and after pilot restore."
+    },
+    {
+      "name": "n88_exact_private_guard_membership_inherit_correction",
+      "status": "PASS",
+      "evidence": "Original exact applied guard-membership correction/readback retained unchanged; no membership, privilege or migration operation."
+    },
+    {
+      "name": "n88_actual_scram_iteration_compatibility",
+      "status": "PASS",
+      "evidence": "Original own public-challenge proof reused;16384 password/verifier/salt unchanged. Current restricted direct identity/clientTLS/upstreamSSL pass; no pooler proof retry."
+    },
+    {
+      "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+      "status": "PASS",
+      "evidence": "Same protected owner/two-pupil binding read back. Restoration guard rejects missing/wrong source/binding/mode/TLS/history/replay. Existing actual DOM/store/owner/renewal/serialization proof reused by unchanged runtime identity."
+    },
+    {
+      "name": "n88_pilot_original_service_and_frontend_publisher_package",
+      "status": "PASS",
+      "evidence": "Existing genuine sequence/context correction remains in candidate for sole publisher. Exact active restricted pilot source/config/readiness passes; current package pins verified. Full acceptance/public source remain separate."
+    }
+  ],
+  "backendEnabled": true,
+  "rolloutMode": "pilot",
+  "publicEnabled": false,
+  "fullHostedAcceptance": false,
+  "wholeProductClosed": false,
+  "finalFrontendPublished": false,
+  "historicalFinalFailures": {
+    "path": "continuation-b324b7b5.json",
+    "lfSha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83",
+    "names": [
+      "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "n88_official_publisher_readiness_route_and_served_behavior"
+    ],
+    "status": "FAIL",
+    "unchanged": true
+  },
+  "finalRequiredChecksSource": "canonical card stagedActivation.finalRequiredChecks (all nine preserved)",
+  "nextStage": "Only after verified sole-publisher correction receipt, resume original same task/session; restore all nine full checks and test remaining/affected real UI journey before any public mode.",
+  "fixtureDisposition": "Same existing teacher/two existing fabricated pupils, class, codes, chosen fields and private guidance preserved; no new people/Auth/source imports, real data or sends.",
+  "resources": "No browser/server phase rerun; live-mutation phase released; no owned temporary private input retained; prior denied resources untouched."
+}

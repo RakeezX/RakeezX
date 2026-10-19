@@ -436,3 +436,43 @@ execution (CreateProcess rejected: blocked by policy). It remains with its owner
 marker, prepared bundle/config and CLI metadata filenames; no alternate deletion
 was attempted. Original protected recovery is retained, temporary SQL/env/source
 inputs are absent, and the inherited previously rejected PG directory is untouched.
+# Actual acceptance continuation b324b7b5 — BLOCKED
+
+The verified pilot frontend receipt remains35e2cbb ->01ed8edd (05:51:14.579Z).
+Actual normal UI proved two-code creation/recovery, student login, default field
+omission, selected fields and teacher guidance commit ACK. Full journey is incomplete:
+the published class runtime dispatches parallel list/guidance calls into the existing
+short lock and does not restore admission after binding renewal. No rotation/revoke,
+old-session or student-guidance PASS is claimed.
+
+The scoped runtime correction passes actual DOM/CSS/store/owner and renewed-session
+checks in tests/n88-official-activation-current-entry-ui.json. Original affected
+native PG owner/source/CAS/rollback/ACK checks pass in hosted-entry-repair.json.
+Current provider source/config and safe OFF disposition are recorded under
+drafts/n88-student-portal/activation/current-provider-readback-b324b7b5.json and
+owned-pilot-pause-readback-b324b7b5.json. Original8 SQL/76-routine/16384 credential
+and private logging/custody history remain unchanged. Initial failures are retained.
+
+N88_ENABLED=false is provider-digest verified; private APIs return503 with no-store.
+Two fabricated credentials/selected fields/private guidance are retained dormant;
+no real data, sends, canonical grade/roster writes or blind cleanup. Public mode
+was never enabled. Sole-publisher receipt for the corrected pilot runtime is the
+changed-input condition before same-session hosted continuation. No PO re-approval
+or Product closure is asserted. Prior evidence below remains historical.
+# Once-only pilot correction75c77bea — publication package
+
+The current seven pilot gates pass; the prior full hosted/publisher FAILs remain
+immutable in continuation-b324b7b5.json (LF SHA25628c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83).
+Original final9 and acceptance remain required after the verified publisher receipt.
+
+Existing strict direct service/source/config readbacks pass after restoration of
+the original protected one-owner/two-pupil pilot only. Edge36/source4353be6a and
+ingress4c962e99 are exact. No public mode, key/role/SQL/Auth/fixture reset or send.
+Actual local DOM/store/owner/session-renewal and serial-dispatch proof is reused
+for unchanged teacher correction26b819f; the new restoration gate has focused
+fail-closed checks. Current provider/HTTP evidence is in pilot-ui-correction-provider-75c77bea.json.
+
+Sole publisher owns integration and served-source verification. This is a genuine
+pilot UI correction package, not whole-Product acceptance. Same-session continuation
+after that receipt restores all9 and tests the remaining/affected real UI journey.
+Historical failure/disposition records below remain unchanged evidence.
