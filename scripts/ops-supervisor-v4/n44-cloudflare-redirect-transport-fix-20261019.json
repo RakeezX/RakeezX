@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -660,
+      "scopeKey": "n44-existing-ingress-transport-compatibility",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261019-N44-CF-TRANSPORT-REPAIR",
+      "resourceClass": "live-mutation",
+      "budgetMinutes": 30,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "releaseAuthority": "Latest direct PO18Oct16:28 N44 finish it authorizes exact needed operational notification implementation and these bounded nonsending service prerequisites on the verified existing project/zone. Actual tool denial and absent secure channel cannot be bypassed. No real push/test message, admin audience, paid service or Auth settings change is authorized. No user/device proof is inferred; sole publisher performs frontend Product delivery. Necessary code-level private error sanitization and one exact additional private service migration are included in this existing nonsending completion authority, subject to actual affected proof/preflight. The original SQL/history and all managed Auth/RLS/security/logging/real-data/send boundaries are preserved. Necessary bounded diagnosis/configuration correction for the same task-created restricted login is included in original service completion; a retry requires concrete locally proved changed input and uses the same existing credential/endpoint only. No rotation, extra role/access/security weakening or unchanged authentication retry is authorized. Standard public-challenge SCRAM equality inside the original sealed custodian and boolean server-side compare is a necessary same-role diagnostic. If and only if it proves an own provisioning mismatch, exact restoration of the same originally intended credential is included; no guessed rotation/new salt/new role/access or unchanged authentication attempt. PO20261019 exact live Supavisor server-first public challenge diagnosis and, only if own16384 vs announced4096 with same salt is proved, guarded same-role/password/salt verifier compatibility repair to standard4096 plus one corrected authentication. Original deployment gates and no-sending scope remain. Actual own Supavisor validation-cache update on2026-10-19T03:44:48.038Z authorizes one post-refresh reconnect, same repaired credential and original permissions, no further credential changes; then original official non-sending deployment gates. Successful auth28P01 repair is proved. Necessary exact restricted-session boolean diagnostics and routine helper repair are authorized. Only if actual pooler upstream TLS is false, original inactive production Edge function may use official direct strictTLS same-role/password transport, with failclosed guard before readiness and no alternate diagnostic proxy/global security changes.",
+      "objective": "Latest PO19Oct requests solve28P01 and finish N44/N88 officially. Actual N88 native production investigation discovered Cloudflare Workers rejects fetch redirect:error (503); replacing with redirect:manual and explicit redirect rejection fixes it. N44 existing ingress has the SAME unsupported option at drafts/n44-push/cloudflare-entry.mjs. Its previous GET wrong-method401 never reached forwarding. This is NEW evidence requiring ONE narrow corrective task, not replay of service activation. Original N44 service publication0c31266030c58b5fbe28d143d9bc273556780c0a and runtime source236f68e0131ca4d2b27fc3014cb33421f90b40c1 remain valid evidence for unchanged Edge/roles/strictTLS/migrations. Read current N44 row and affected ingress/build/contracts only.\n\nUse existing official Cloudflare connection rakeez_cloudflare through currently sanctioned native API. Update ONLY existing n44-notifications-ingress script using official keep_bindings and preserve every existing secret/config binding in provider custody. No original DPAPI/recovery/password/token/key read, decrypt, export, reset, copying or original-custodian proxy. Do not touch Supabase function, roles, SQL/migrations/Auth/session policy, scheduler, route ownership, logging, source records, frontend/SW/browser flags, cron/device/send or other Worker. No real account, student rows, Auth fixtures or actual JWT. Optional DNS10000 refusal is preserved, not retried. If provider offers no exact secret-preserving upload, stop with concrete evidence rather than re-provision credentials.\n\nBefore mutation capture ONE safe actual POST https://rakeezx.com/api/n44/status with correct Origin and syntactically valid but fake unauthorized Bearer/body according to existing protocol, no personal data; preserve status503 if observed. Add minimal affected local ingress tests proving forwarding is attempted with redirect:manual and upstream3xx is explicitly rejected without redirect-follow; retain origin/IP/HMAC/body/private response bounds unchanged. Fix unsupported option, rebuild ONLY affected ingress artifact using existing certified pipeline. Upload exact script to existing Worker with keep_bindings; preserve all bindings and current metadata/privacy. Read back exact script bytes, version/deployment, existing failclosed route and existing logs-off metadata. Scheduler readback/source is reusable unchanged; do not upload it. Repeat the same proper POST once: expected401 from actual upstream denial. A wrong-method GET401 alone cannot pass. No arbitrary logs/private payloads, headers containing credentials or original signing keys in artifacts. No new error logs/diagnostic proxy.\n\nArchive original final/current readbacks before updating current service report/manifest; immutable historical candidate/receipt stays intact. Reuse original unchanged Edge/directTLS/config16/migration evidence with its real timestamp, never relabel as newly run. Refresh current cloudflare-off-readback source entry for ingress only, retain scheduler evidence and label reuse. Current tests/n44-finish-activation-final.json taskId must this corrective task; preserve original serviceSourceSha, Edge identity, fullTLS readiness and all OFF/zero-send/no-data facts. Add transportCompatibility object: version1, platform cloudflare-workers, redirectMode manual, rejectsRedirects true, localForwardAttempted true, beforeHttpStatus503, afterHttpStatus401, probeMethod POST, upstreamSourceUnchanged true, originalCustodyUntouched true, bindingsPreserved true, nativeSourceExact true. Only assert these from actual proofs, do not fabricate before503 if different. Store actual denied request metadata sans Bearer/body/sensitive values. The manifest bundle cloudflare/worker.mjs hash must change from known bad438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40. Edge and scheduler bundle hashes unchanged. Existing service proof builder supports this exact corrective task only with that additional transport proof.\n\nReturn truthful LOCAL_READY with these required checks PASS and exact candidate/base; sole publisher integrates manifests/source and verifies official/immutable served bytes. Final backend-only declaration may be reconciled by guarded maintainer from exact immutable candidate and actual publication receipt, never a fake frontend change. No umbrella CLOSED/OS delivery/PO acceptance claim. Release owned phase lease; leave any tool-denied cleanup untouched and preserve refusal. No old database/credential/TLS/local-suite/build replay unless affected by new evidence.",
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "tests/n44-finish*.mjs",
+        "tests/n44-finish*.json",
+        "docs/automation-evidence/20261019/N44_TRANSPORT_CORRECTION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/activation/manifest.json",
+        "docs/automation-evidence/20261019/N44_TRANSPORT_CORRECTION.md"
+      ],
+      "requiredChecks": [
+        "n44_actual_cloudflare_proper_post_before_and_after",
+        "n44_manual_redirect_and_explicit_redirect_rejection",
+        "n44_native_exact_ingress_source_and_binding_preservation",
+        "n44_unchanged_restricted_tls_and_nonsending_scope"
+      ],
+      "acceptance": [
+        "Actual proper POST forwarding returns upstream unauthorized401 after supported manual transport; preserved initial503 and unchanged TLS/identity/private scope evidence.",
+        "Only named existing ingress script is corrected with bindings kept in provider custody; no Supabase/data/Auth/device/send or frontend mutation; source-native readback and sole-publisher manifest proof."
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N44",
+        "liveAuthorizationRef": "PO-20261019-N44-CF-TRANSPORT-REPAIR",
+        "authoritySource": "Direct PO19Oct full mandate to finish N44; new actual shared runtime incompatibility. Narrow existing ingress code repair only, no new access/data/credential authority.",
+        "publication": true,
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "function": {
+            "name": "n44-notifications",
+            "enableDelivery": false,
+            "write": false
+          },
+          "newAuthIds": 0,
+          "personalRowsRead": 0,
+          "realStudentMutations": 0,
+          "realSend": 0,
+          "AuthConfigurationChanges": 0,
+          "readOnlyExistingEvidence": true
+        },
+        "providers": {
+          "ingress": "n44-notifications-ingress",
+          "scheduler": "n44-notifications-scheduler",
+          "deliveryEnabled": false,
+          "allowedMutation": "existing-ingress-script-only",
+          "keepBindingsRequired": true,
+          "secretReadOrWrite": false,
+          "loggingChanges": false,
+          "routeChanges": false,
+          "schedulerChanges": false
+        }
+      }
+    }
+  ]
+}

@@ -7,9 +7,8 @@ const digest=b=>createHash('sha256').update(b).digest('hex');
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const names=['n44-notifications-ingress','n44-notifications-scheduler'];
 const route=r=>r?.pattern==='rakeezx.com/api/n44/*'&&r.script===names[0]&&r.request_limit_fail_open===false&&/^[a-f0-9]{32}$/.test(r.id??'');
-const fixedScope=t=>t?.id==='continuous-n44-finish-bounded-service-activation-20261018'&&t.productId==='N44'
- &&t.scopeKey==='n44-exact-nonsending-service-activation'&&t.executionMode==='local'&&t.liveMutation===true
- &&t.liveAuthorizationRef==='PO-20261018-1628-FINISH-N44-EXACT-NONSENDING-ACTIVATION'
+const correction=t=>t?.id==='continuous-n44-cloudflare-redirect-transport-fix-20261019'&&t.scopeKey==='n44-existing-ingress-transport-compatibility'&&t.liveAuthorizationRef==='PO-20261019-N44-CF-TRANSPORT-REPAIR';
+const fixedScope=t=>(correction(t)||t?.id==='continuous-n44-finish-bounded-service-activation-20261018'&&t.scopeKey==='n44-exact-nonsending-service-activation'&&t.liveAuthorizationRef==='PO-20261018-1628-FINISH-N44-EXACT-NONSENDING-ACTIVATION')&&t.productId==='N44'&&t.executionMode==='local'&&t.liveMutation===true
  &&t.preparationAuthority?.publication===true&&t.preparationAuthority.supabase?.projectId==='xlrubcwjqktzzunrvuns'
  &&t.preparationAuthority.supabase.function?.name==='n44-notifications'&&t.preparationAuthority.supabase.function.enableDelivery===false
  &&t.preparationAuthority.providers?.ingress===names[0]&&t.preparationAuthority.providers.scheduler===names[1]
@@ -68,6 +67,13 @@ export function verifiedLiveServicePublication(task,receipt,report=()=>{}){
    ||c.configuration?.length!==2||!names.every((n,i)=>c.configuration.some(s=>s.name===n&&s.readback===true&&s.logpush===false&&s.tailConsumers?.length===0&&s.enabled===(i===0?'true':'false')&&s.schedulerEnabled==='false'&&s.cron?.length===0))
    ||c.privacy?.length!==2||!names.every(n=>c.privacy.some(s=>s.name===n&&s.status===200&&s.success===true&&s.logpush===false&&s.tailConsumers?.length===0&&s.configurationResponse?.enabled===false&&s.configurationResponse.logs?.enabled===false&&s.configurationResponse.logs.invocation_logs===false&&s.configurationResponse.traces?.enabled===false))
    ||p.versions?.length!==2||!names.every(n=>p.versions.some(s=>s.name===n&&s.status===200&&UUID.test(s.deploymentId??'')&&s.versions?.length===1&&s.versions[0].percentage===100&&UUID.test(s.versions[0].version_id??''))))return fail('workers');
+  if(correction(task)){
+   const x=f.transportCompatibility;
+   if(x?.version!==1||x.platform!=='cloudflare-workers'||x.redirectMode!=='manual'||x.probeMethod!=='POST'||x.beforeHttpStatus!==503||x.afterHttpStatus!==401
+    ||!['rejectsRedirects','localForwardAttempted','upstreamSourceUnchanged','originalCustodyUntouched','bindingsPreserved','nativeSourceExact'].every(k=>x[k]===true)
+    ||p.bundleHashes['cloudflare/worker.mjs']==='438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40'
+    ||task.preparationAuthority.providers.keepBindingsRequired!==true||task.preparationAuthority.providers.secretReadOrWrite!==false||task.preparationAuthority.supabase.function.write!==false)return fail('transport-compatibility');
+  }
   return true;
  }catch{return false;}
 }
