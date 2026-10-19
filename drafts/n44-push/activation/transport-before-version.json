@@ -1,0 +1,82 @@
+{
+  "recordedAt": "2026-10-19T05:58:51.796Z",
+  "version": {
+    "result": {
+      "id": "64700bdd-201b-4bdf-9fe3-332bc7f034f0",
+      "number": 5,
+      "metadata": {
+        "created_on": "2026-10-19T04:12:40.97017Z",
+        "source": "api",
+        "author_id": "f028efb8dfc85c090fff8d4b0954b271",
+        "author_email": "rakeezxteam@gmail.com",
+        "has_preview": true
+      },
+      "annotations": {
+        "workers/triggered_by": "upload"
+      },
+      "resources": {
+        "script": {
+          "etag": "72a94e68ffc9e0355f659384f39a242e8115bf4c71bef54bdcbc133d78f05e93",
+          "handlers": [
+            "fetch"
+          ],
+          "named_handlers": [
+            {
+              "name": "createCloudflareEntry",
+              "handlers": [
+                "class"
+              ]
+            }
+          ],
+          "last_deployed_from": "api"
+        },
+        "script_runtime": {
+          "compatibility_date": "2026-10-13",
+          "usage_model": "standard"
+        },
+        "bindings": [
+          {
+            "name": "N44_EDGE_URL",
+            "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications",
+            "type": "plain_text"
+          },
+          {
+            "name": "N44_ENABLED",
+            "text": "true",
+            "type": "plain_text"
+          },
+          {
+            "name": "N44_INGRESS_KEY",
+            "type": "secret_text"
+          },
+          {
+            "name": "N44_PUBLIC_ORIGIN",
+            "text": "https://rakeezx.com",
+            "type": "plain_text"
+          },
+          {
+            "name": "N44_SCHEDULER_ENABLED",
+            "text": "false",
+            "type": "plain_text"
+          }
+        ]
+      }
+    },
+    "success": true,
+    "errors": [],
+    "messages": [],
+    "status": 200
+  },
+  "route": {
+    "result": {
+      "id": "05c0088cf73e4223abaccd1c859e4539",
+      "pattern": "rakeezx.com/api/n44/*",
+      "script": "n44-notifications-ingress",
+      "request_limit_fail_open": false
+    },
+    "success": true,
+    "errors": [],
+    "messages": [],
+    "status": 200
+  }
+}

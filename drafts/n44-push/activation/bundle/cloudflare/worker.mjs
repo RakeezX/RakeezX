@@ -88,9 +88,14 @@ function createCloudflareEntry({ fetch: send = globalThis.fetch, now = Date.now 
         headers: wire,
         body: payload,
         signal: abort.signal,
-        redirect: "error",
+        redirect: "manual",
         cache: "no-store"
       });
+      if (result.status >= 300 && result.status < 400) {
+        void result.body?.cancel().catch(() => {
+        });
+        return privateResponse();
+      }
       const responseBytes = await readBytes(result.body, 2 * 1024 * 1024, abort.signal);
       if (!result.ok) return privateResponse(result.status === 429 ? 429 : result.status >= 500 ? 503 : 401);
       const reply = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(responseBytes));

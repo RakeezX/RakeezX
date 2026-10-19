@@ -70,7 +70,7 @@
     "drafts/n44-push/readiness-entry.mjs": "51534b2f4d2ceb6a95376f5a37fb4fd0cf47d2a56f48de72f99c772b97d29516",
     "drafts/n44-push/edge-request.mjs": "24ad294c8bf63e5d675a3e6f4488e3d5ff207c18ae6d3d3d20683a8fb8d1aacf",
     "supabase/functions/n44-notifications/index.ts": "9a9d8c94419e683fc36cc8c53167aac0f02824ee751dcef2e8fa6336a794792a",
-    "drafts/n44-push/cloudflare-entry.mjs": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
+    "drafts/n44-push/cloudflare-entry.mjs": "4bf6a01064a460cc696ee8eeeed01c0415abaa7a8e330f2ab16c4012fc0fc0ca",
     "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
     "supabase/functions/n44-notifications/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
     "supabase/functions/n44-notifications/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
@@ -102,7 +102,7 @@
   },
   "outputs": {
     "edge/index.mjs": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
-    "cloudflare/worker.mjs": "438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40",
+    "cloudflare/worker.mjs": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
     "scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433",
     "edge/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
     "edge/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
@@ -340,5 +340,14 @@
     "browserEnabled": false,
     "serviceWorkerEnabled": false
   },
-  "sourceDefaultsRemainOff": true
+  "sourceDefaultsRemainOff": true,
+  "pendingIngressTransport": {
+    "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+    "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
+    "state": "BLOCKED",
+    "providerMutationPerformed": false,
+    "nativeSourceExact": false,
+    "receipt": "tests/n44-finish-transport.result.json",
+    "localBundleSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7"
+  }
 }

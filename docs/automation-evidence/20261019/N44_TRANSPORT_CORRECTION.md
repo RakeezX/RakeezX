@@ -1,0 +1,25 @@
+# N44 ingress transport correction — blocked live proof
+
+AI-authored. Task `continuous-n44-cloudflare-redirect-transport-fix-20261019`, run `9485ed5a-6fed-4e65-a831-343a6bd11186`, base `73c681da8633c2cc1ff1e269349322a7cb0e5e05`.
+
+The actual ingress source and its offline bundle now use `redirect: 'manual'` and explicitly reject every upstream 300–399 response before reading its body. Body cancellation cannot delay the private rejection response. The fixed dispatch URL, HMAC envelope, provider IP/TLS checks, route allowlist, request/response limits and private response headers remain unchanged. The certified esbuild 0.28.1 pipeline options were reused for ingress alone. New ingress bundle SHA256: `cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7`.
+
+`node tests/n44-finish-transport.mjs` passed six focused source/bundle checks. These invoke both actual handlers, verify one manual forward with the original body-only bearer and HMAC, reject eight representative redirect statuses without following or exposing their location/body, and retain the affected failclosed guards and size bounds. No UI/browser acceptance is claimed.
+
+## Actual blocker
+
+The single authorized **POST https://rakeezx.com/api/n44/status** with correct Origin, CSRF/same-origin protocol headers, a fabricated unauthorized Bearer and empty JSON body returned **401 at 2026-10-19T05:59:53.753Z**, before mutation. Response keys were only `error`, private values were absent and Cache-Control was `no-store, private`. The request Bearer/body were not persisted.
+
+Both the native provider source and local source/bundle confirm that `/api/n44/status` is outside the existing `ROUTE` allowlist. Its401 is an ingress path rejection and cannot prove forwarding or upstream authorization denial. The card's expected before503 has therefore **not** been observed. No after request, ingress upload, alternate live endpoint, route change or fabricated transport PASS was performed. The corrected local code remains ready for the exact service phase once the probe mismatch is resolved.
+
+Retry condition: correct the activated card's probe to an explicitly approved existing read path, such as `/api/n44/context/read`, with the same synthetic unauthorized protocol and a bounded before/after pair; resume this saved candidate/session. Do not repeat `/status` as transport proof. The pending user clarification does not grant that correction. A guarded card correction is an operating scope repair; the worker does not edit the queue. The existing proof builder also requires actual503/401 and must remain unsatisfied by the current401-only result.
+
+## Preserved provider state and evidence
+
+Native read-only source bytes matched the known-bad original bundle `438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40`. Current deployment `31128d40-8dd1-46f9-8d83-1f5421bcf607` uses version `64700bdd-201b-4bdf-9fe3-332bc7f034f0`. The existing route `05c0088cf73e4223abaccd1c859e4539` remains failclosed. Five original binding metadata entries remain in provider custody; only the ingress secret's name/type was returned, with no value. Native settings reported Logpush false, no tail consumers, and observability null. Those exact native values are retained; null is not relabeled as a fresh explicit observability false readback. No logging configuration was changed.
+
+Original final/manifest/current Cloudflare readbacks are archived byte-for-byte under `drafts/n44-push/activation/transport-baseline/`, with source commit and hashes in `tests/n44-finish-transport.result.json`. Original candidate/publication receipts remain untouched. Current `tests/n44-finish-activation-final.json` identifies this corrective task and records BLOCKED, actual before401, after null, corrected upload false and corrected native-source proof false. The current manifest explicitly marks pending ingress transport.
+
+Unchanged evidence is reused with original timestamps: restricted identity/full TLS at `2026-10-19T04:07:25.540Z`, runtime source `236f68e0131ca4d2b27fc3014cb33421f90b40c1`, and Edge metadata at `2026-10-19T04:14:18.138Z`. Edge bundle `75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181` and scheduler bundle `85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433` are unchanged. Every prior manifest source except ingress was hash-checked without replaying its suites. The original16-config/migration/TLS evidence, scheduler readbacks and OFF/zero-send/no-data facts are retained as historical evidence. Optional DNS10000 refusal was not retried.
+
+No provider mutation, Supabase operation, credential/recovery access, personal-data read, Auth fixture, device/cron/send/frontend/SW change, temporary-function deployment or cleanup occurred in this task. Historical cleanup/disarm evidence is reused with its original identity; no fresh cleanup claim is inferred. The exact owned live-mutation lease was acquired for the bounded probe/readback phase and released. No browser or server process was created. This is not Product publication, closure, OS delivery or PO acceptance.

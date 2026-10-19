@@ -1,0 +1,249 @@
+{
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "accountId": "1c9ae85e766968a4269a7ac505f9a693",
+  "identity": "user:f028efb8dfc85c090fff8d4b0954b271",
+  "uploaded": [
+    {
+      "worker": "n44-notifications-ingress",
+      "status": 200,
+      "etag": "72a94e68ffc9e0355f659384f39a242e8115bf4c71bef54bdcbc133d78f05e93",
+      "workersDev": false,
+      "preview": false,
+      "enabled": false,
+      "cron": []
+    },
+    {
+      "worker": "n44-notifications-scheduler",
+      "status": 200,
+      "etag": "27b3a582d9e9908467993540fdd20d10c21fdd5b7031fcb50d4be7f448300564",
+      "workersDev": false,
+      "preview": false,
+      "enabled": false,
+      "cron": []
+    }
+  ],
+  "sources": [
+    {
+      "name": "n44-notifications-ingress",
+      "downloadedSourceExact": true,
+      "version": "eff1dd2e-43bb-4990-8030-27df3004ba5c",
+      "versionResourceKeys": [
+        "script",
+        "script_runtime",
+        "bindings"
+      ],
+      "scriptMetadata": {
+        "etag": "72a94e68ffc9e0355f659384f39a242e8115bf4c71bef54bdcbc133d78f05e93",
+        "handlers": [
+          "fetch"
+        ],
+        "named_handlers": [
+          {
+            "name": "createCloudflareEntry",
+            "handlers": [
+              "class"
+            ]
+          }
+        ],
+        "last_deployed_from": "api"
+      },
+      "scriptRuntime": {
+        "compatibility_date": "2026-10-13",
+        "usage_model": "standard"
+      },
+      "schedules": {
+        "schedules": []
+      }
+    },
+    {
+      "name": "n44-notifications-scheduler",
+      "downloadedSourceExact": true,
+      "version": "137a326f-292c-47ba-ba93-2a7643196113",
+      "versionResourceKeys": [
+        "script",
+        "script_runtime",
+        "bindings"
+      ],
+      "scriptMetadata": {
+        "etag": "27b3a582d9e9908467993540fdd20d10c21fdd5b7031fcb50d4be7f448300564",
+        "handlers": [
+          "scheduled",
+          "fetch"
+        ],
+        "named_handlers": [
+          {
+            "name": "runScheduled",
+            "handlers": [
+              "class"
+            ]
+          },
+          {
+            "name": "signedScheduleRequest",
+            "handlers": [
+              "class"
+            ]
+          }
+        ],
+        "last_deployed_from": "api"
+      },
+      "scriptRuntime": {
+        "compatibility_date": "2026-10-13",
+        "usage_model": "standard"
+      },
+      "schedules": {
+        "schedules": []
+      }
+    }
+  ],
+  "config": [
+    {
+      "name": "n44-notifications-ingress",
+      "success": true,
+      "status": 200,
+      "keys": [
+        "placement",
+        "compatibility_date",
+        "compatibility_flags",
+        "usage_model",
+        "tags",
+        "tail_consumers",
+        "logpush",
+        "annotations",
+        "bindings"
+      ],
+      "observabilityPresent": false,
+      "observability": null,
+      "logpush": false,
+      "tailConsumers": [],
+      "bindings": [
+        {
+          "name": "N44_EDGE_URL",
+          "type": "plain_text",
+          "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications"
+        },
+        {
+          "name": "N44_ENABLED",
+          "type": "plain_text",
+          "text": "false"
+        },
+        {
+          "name": "N44_INGRESS_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "N44_PUBLIC_ORIGIN",
+          "type": "plain_text",
+          "text": "https://rakeezx.com"
+        },
+        {
+          "name": "N44_SCHEDULER_ENABLED",
+          "type": "plain_text",
+          "text": "false"
+        }
+      ]
+    },
+    {
+      "name": "n44-notifications-scheduler",
+      "success": true,
+      "status": 200,
+      "keys": [
+        "placement",
+        "compatibility_date",
+        "compatibility_flags",
+        "usage_model",
+        "tags",
+        "tail_consumers",
+        "logpush",
+        "annotations",
+        "bindings"
+      ],
+      "observabilityPresent": false,
+      "observability": null,
+      "logpush": false,
+      "tailConsumers": [],
+      "bindings": [
+        {
+          "name": "N44_EDGE_URL",
+          "type": "plain_text",
+          "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications"
+        },
+        {
+          "name": "N44_ENABLED",
+          "type": "plain_text",
+          "text": "false"
+        },
+        {
+          "name": "N44_PUBLIC_ORIGIN",
+          "type": "plain_text",
+          "text": "https://rakeezx.com"
+        },
+        {
+          "name": "N44_SCHEDULER_ENABLED",
+          "type": "plain_text",
+          "text": "false"
+        },
+        {
+          "name": "N44_SCHEDULER_KEY",
+          "type": "secret_text"
+        }
+      ]
+    }
+  ],
+  "privacy": [
+    {
+      "name": "n44-notifications-ingress",
+      "status": 200,
+      "success": true,
+      "observability": {
+        "enabled": false,
+        "head_sampling_rate": null,
+        "logs": {
+          "enabled": false,
+          "destinations": [],
+          "head_sampling_rate": null,
+          "persist": false,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "destinations": [],
+          "persist": false,
+          "head_sampling_rate": null
+        }
+      },
+      "logpush": false,
+      "tailConsumers": []
+    },
+    {
+      "name": "n44-notifications-scheduler",
+      "status": 200,
+      "success": true,
+      "observability": {
+        "enabled": false,
+        "head_sampling_rate": null,
+        "logs": {
+          "enabled": false,
+          "destinations": [],
+          "head_sampling_rate": null,
+          "persist": false,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "destinations": [],
+          "persist": false,
+          "head_sampling_rate": null
+        }
+      },
+      "logpush": false,
+      "tailConsumers": []
+    }
+  ],
+  "initialReadFailure": {
+    "operation": "GET /workers/scripts/{name}/content",
+    "status": 405,
+    "correction": "Used documented GET /workers/scripts/{name}; no authorization denial or scope change."
+  },
+  "routesBeforeActivation": [],
+  "sourceAndPrivacyReadback": "PASS"
+}
