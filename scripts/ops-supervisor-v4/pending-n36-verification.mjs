@@ -10,3 +10,15 @@ export function verifyPristineN36Verification(task, update, actualSha256) {
   insist(Object.entries(card).every(([key,value])=>key==='verificationPaths'||same(value,task[key])),'Other source field changed');
   return true;
 }
+
+// The exact source-selector maintenance preceded the first session. Preserve
+// that binding when the now-started card later needs an ordinary scope repair.
+export function n36PristineSelectorSourceChain(task,event,latest) {
+  return task.id==='continuous-n36-one-start-complete-madrasati-20261019' && task.productId==='N36'
+    && latest.commit==='3c0c80d3e8d4e44237d2467b243d28ed45b54827'
+    && latest.sourceSha256==='958f8b46196f6f9d9dbe64c91b802fb13ca2b3e5e68fa1825ee32a6194dff894'
+    && event.commit===latest.commit && event.sessionId===null && event.previousRunId===null
+    && event.preservedCandidateSha===null && event.previousQueuedCandidateSha===null
+    && event.previousQueuedBaseSha===null && event.preservedResultBaseSha===null
+    && JSON.stringify(task.verificationPaths)===JSON.stringify(['src/views/class-import-center.js','src/views/teachings.js']);
+}

@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import {verifiedN44SourceStageSplit,n44QualifiedTask} from './n44-qualified-source-evidence.mjs';
 import {verifyPristineN123DependencyCorrection} from './pending-n123-dependency.mjs';
-import {verifyPristineN36Verification} from './pending-n36-verification.mjs';
+import {verifyPristineN36Verification,n36PristineSelectorSourceChain} from './pending-n36-verification.mjs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -368,7 +368,7 @@ export function catalogSourceBinding(catalogTasks, task, update, sourceCardFile,
     insist(latest && latest.sourceSha256 === expectedSourceSha256 && GIT_SHA.test(latest.commit ?? '')
       && win(latest.sourceFile ?? '').replaceAll('/', '\\').endsWith(wanted)
       && task.recoveryHistory?.some(event => event.kind === 'reviewed-material-maintenance'
-        && event.commit === latest.commit && event.sessionId === task.sessionId),
+        && event.commit === latest.commit && (event.sessionId === task.sessionId || n36PristineSelectorSourceChain(task,event,latest))),
       'Approved-note source is not the latest reviewed owned maintenance chain');
   }
   return { kind: 'approved-note', index: -1, baseline: task, approvedNoteSha256: task.approvedNote.sha256 };
