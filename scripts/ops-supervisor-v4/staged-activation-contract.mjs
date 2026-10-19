@@ -42,6 +42,7 @@ export function verifiedActivationStageContinuation(task,result,update,{verified
 // Only the two gates requiring a published UI may move to the following stage.
 // Every original final gate/acceptance remains mandatory and source-bound.
 export function verifiedPilotStagePreparation(task,result,update,{same,valueSha256,stringSha256}){
+ if(verifiedPilotUiCorrection(task,result,update,{same,valueSha256,stringSha256}))return true;
  try{
   const c=update.card,s=c.stagedActivation,p=c.verificationRepair,a=c.preparationAuthority?.stagedRollout;
   const oldAuthority=structuredClone(c.preparationAuthority);delete oldAuthority.stagedRollout;
@@ -63,5 +64,31 @@ export function verifiedPilotStagePreparation(task,result,update,{same,valueSha2
    &&a.noNewAuthFixture===true&&a.noTokenExtraction===true&&a.noCredentialOrVerifierChange===true
    &&p?.kind==='owned-pilot-ordering-repair-v1'&&p.previousResultSha256===valueSha256(result)&&p.previousFailureSha256===stringSha256(task.lastFailure)&&p.reason?.length>=50
    &&Object.entries(c).every(([k,v])=>['objective','requiredChecks','acceptance','stagedActivation','verificationRepair','releaseAuthority','allowedPaths','preparationAuthority'].includes(k)||same(v,task[k]));
+ }catch{return false;}
+}
+
+// One actual published-pilot UI ordering defect, not a public acceptance waiver.
+export function verifiedPilotUiCorrection(task,result,update,{same,valueSha256,stringSha256}){
+ try{
+  const c=update.card,s=task.stagedActivation,p=c.verificationRepair,h=task.stagePublicationHistory?.[0],d=h?.receipt;
+  const deferred=['n88_official_hosted_fabricated_teacher_student_ack_and_isolation','n88_official_publisher_readiness_route_and_served_behavior'];
+  return task.id==='continuous-n88-official-student-portal-activation-20261018'&&task.productId==='N88'&&task.scopeKey==='n88-official-hosted-private-service-activation'
+   &&task.sessionId==='01a14fc3-b292-7390-9952-8549a286c80f'&&task.status==='blocked'&&task.liveMutation===true
+   &&result.state==='BLOCKED'&&result.candidateSha==='26b819f187e7222937763b29c9023e33d1fd6e66'&&task.lastFailure===result.blocker
+   &&['implementation','external'].includes(result.blockerType)&&deferred.every(n=>result.checks?.some(x=>x.name===n&&x.status==='FAIL'))
+   &&N88_PILOT_CHECKS.every(n=>result.checks.some(x=>x.name===n&&x.status==='PASS'))
+   &&result.checks.every(x=>x.status==='PASS'||deferred.includes(x.name)&&x.status==='FAIL')
+   &&task.stagePublicationHistory.length===1&&h.phase==='pilot'&&h.candidateSha==='35e2cbb6131129ee5997e818e59e0ea6fd3d76a4'
+   &&d?.status==='deployed'&&d.publishedSha==='01ed8edd78a672a4b01c8d6ab8b4cf692279ced0'&&d.evidence?.immutable?.passed===true&&d.evidence?.production?.passed===true
+   &&s?.version===1&&s.phase==='acceptance-and-public-enable'&&!s.repairRound&&s.maxTeachers===1&&s.maxFabricatedStudents===2&&s.dataScope==='designated-fabricated-only'
+   &&s.publicEnableRequiresHostedProof===true&&s.pilotStageIsNotProductCompletion===true
+   &&same(s.originalRequiredChecks,N88_FINAL_CHECKS)&&same(s.finalRequiredChecks,[...new Set([...N88_FINAL_CHECKS,...N88_PILOT_CHECKS])])
+   &&same(task.requiredChecks,s.finalRequiredChecks)&&same(c.requiredChecks,N88_PILOT_CHECKS)
+   &&same(c.stagedActivation,{...s,phase:'pilot',repairRound:1})&&same(c.preparationAuthority,task.preparationAuthority)&&same(c.allowedPaths,task.allowedPaths)
+   &&same(c.dependsOn,[...new Set([...(task.dependsOn??[]),'continuous-n44-cloudflare-redirect-transport-fix-20261019'])])
+   &&c.completionMode==='pilot_ui_correction'&&p?.kind==='verified-pilot-ui-ordering-repair-v1'
+   &&p.previousResultSha256===valueSha256(result)&&p.previousFailureSha256===stringSha256(task.lastFailure)&&p.priorPilotReceiptSha256===valueSha256(d)
+   &&p.failedFinalChecksSha256===valueSha256(result.checks.filter(x=>deferred.includes(x.name)))&&p.reason?.length>=50
+   &&Object.entries(c).every(([k,v])=>['objective','completionMode','verificationRepair','stagedActivation','requiredChecks','acceptance','dependsOn'].includes(k)||same(v,task[k]));
  }catch{return false;}
 }

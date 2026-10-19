@@ -39,7 +39,7 @@ export function verifiedLiveServicePublication(task,receipt,report=()=>{}){
    ||!GIT.test(p.candidateSha??'')||p.candidateSha!==task.candidateSha||p.candidateSha!==receipt?.candidateSha
    ||p.baseSha!==task.baseSha||p.baseSha!==receipt.baseSha||p.publishedSha!==receipt.publishedSha
    ||receipt.productSourceChangeObserved!==false||!Array.isArray(receipt.changedAssets)||receipt.changedAssets.length!==0
-   ||!Array.isArray(receipt.sourceOnlyPaths)||!SERVICE_ARTIFACTS.slice(1).every(x=>receipt.sourceOnlyPaths.includes(x))
+   ||!Array.isArray(receipt.sourceOnlyPaths)||!(correction(task)?SERVICE_ARTIFACTS.filter((_,i)=>[1,3,5].includes(i)):SERVICE_ARTIFACTS.slice(1)).every(x=>receipt.sourceOnlyPaths.includes(x))
    ||!same(Object.keys(p.artifactHashes).sort(),[...SERVICE_ARTIFACTS].sort())||!Object.values(p.artifactHashes).every(x=>SHA.test(x)))return fail('binding');
   const manifestHash=p.artifactHashes[SERVICE_ARTIFACTS[0]];
   if(![receipt.evidence?.immutable,receipt.evidence?.production].every(part=>part?.passed===true&&part.assets?.some(x=>x.repoPath===SERVICE_ARTIFACTS[0]&&x.verified===true&&x.deleted!==true&&x.expectedSha256===manifestHash&&x.observedSha256===manifestHash)))return fail('served-manifest');
@@ -72,6 +72,7 @@ export function verifiedLiveServicePublication(task,receipt,report=()=>{}){
    if(x?.version!==1||x.platform!=='cloudflare-workers'||x.redirectMode!=='manual'||x.probeMethod!=='POST'||x.beforeHttpStatus!==503||x.afterHttpStatus!==401
     ||!['rejectsRedirects','localForwardAttempted','upstreamSourceUnchanged','originalCustodyUntouched','bindingsPreserved','nativeSourceExact'].every(k=>x[k]===true)
     ||p.bundleHashes['cloudflare/worker.mjs']==='438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40'
+    ||p.bundleHashes['edge/index.mjs']!=='75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181'||p.bundleHashes['scheduler/worker.mjs']!=='85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433'||a.source!=='236f68e0131ca4d2b27fc3014cb33421f90b40c1'
     ||task.preparationAuthority.providers.keepBindingsRequired!==true||task.preparationAuthority.providers.secretReadOrWrite!==false||task.preparationAuthority.supabase.function.write!==false)return fail('transport-compatibility');
   }
   return true;

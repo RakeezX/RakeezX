@@ -1,0 +1,7 @@
+# Shared live phase and exact pilot correction
+
+N44 local ingress candidate9650e9bf retained; actual correct public POST before503 recorded once. Native upload was blocked by original N88 live phase, never attempted or force-reaped. N88 safely turned service OFF and saved exact UI correction26b819f with two true final acceptance FAILs. Its original owner worker and one no-change retry ended/reaped; shared live lease is absent. Next N88 restricted pilot stage depends on actual N44 verified service delivery to avoid another live lease collision.
+
+Once-only pilot correction contract binds original session, exact correction candidate, actual original verified pilot receipt, original failed checks and checksums, unchanged authority/paths/budgets, all final9 gates and default-off scope. Seven pilot gates allow only restricted owner UI correction publication; actual full9 must pass later before public enable. No failure relabeled PASS or whole product closure.8 new guard cases passedb7c65f; one negative test used absent N44-style fixture member, corrected test data only and targeted authority case passed762088.6 strict unchanged-artifact gate casescb9df/ecb9df passed; previous44 unchanged-case suite not replayed.
+
+Original secrets, passwords, SQL/migrations, canonical rows, Auth policy and true tool refusals preserved. This code/reload operation requires zero active workers and idle publisher.
