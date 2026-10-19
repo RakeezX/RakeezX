@@ -28,3 +28,13 @@ Initial check found the nested gradebook search input below the 44px minimum: co
 `node --check` on the three changed views and scoped browser harness — PASS. `git diff --check` — PASS. No full build or unrelated suite; independent publisher owns build/integration/Production verification. Browser contexts and owned Vite server closed in `finally`; isolated phase requires no global live-browser lease.
 
 Local source readiness is separate from Production and PO acceptance.
+
+## Resumed validation repair — run cb3fe9f9-3278-4458-a30d-e1377661c58f
+
+The previous candidate `3e4391fb8fcb825ae1b329d11fe6e58a391cec4e` was rejected by candidate validation because its recorded legacy N70 fixture check failed. That original failure remains recorded above; its result is not relabeled.
+
+Added `tests/n120-1019-report-owner.test.mjs`, a scoped copy of the original N70 test preserving all original assertions. Its fixture now explicitly supplies a synthetic year and term and seeds only fake IndexedDB via the existing `db.putAcross` API before reloading the actual store. An initial attempt to seed with `store.save` correctly encountered `OFFLINE_LEASE_LIMITED`: fresh unverified account writes are prohibited. The corrected read-only fixture does not pretend to perform an authorized Product write or renew Auth evidence. An added negative assertion verifies that actual `store.save` still rejects with `OFFLINE_LEASE_LIMITED`, leaving subjects/outbox empty, before fixture seeding.
+
+`node --test tests/n120-1019-report-owner.test.mjs` — PASS (1 test, 0 failures): original report routes/hierarchy/filter/export assertions and account owner-switch isolation all execute, plus the negative unverified-account write check. Neither the original N70 test nor any Product source/guard changed in this repair.
+
+Reuse the prior N120 actual-app DOM/handlers/CSS check and six screenshots: the three views, shared CSS, fixtures and their dependencies are unchanged. No browser/server phase was opened in this resumed run. Syntax and staged whitespace checks pass for the new fixture test/document changes. The new commit preserves the previous candidate as its parent; publisher delivery and Production evidence remain separate.
