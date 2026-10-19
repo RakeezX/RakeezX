@@ -1,0 +1,214 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+  "baseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+  "savedCandidateSha": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+  "recordedAt": "2026-10-19T07:11:27.760Z",
+  "state": "BLOCKED",
+  "checks": [
+    {
+      "name": "n44_actual_cloudflare_proper_post_before_and_after",
+      "status": "FAIL",
+      "evidence": "Original before503 and prior failed requests retained. New shape-correct POST at 2026-10-19T07:08:04.909Z returned503/identity, not400; exact predicate receipt tests/n44-finish-runtime.predicate1.json."
+    },
+    {
+      "name": "n44_manual_redirect_and_explicit_redirect_rejection",
+      "status": "PASS",
+      "evidence": "Existing six tests and exact Cloudflare bundle cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7 reused unchanged; no ingress upload or suite replay. Reused unchanged in current run."
+    },
+    {
+      "name": "n44_native_exact_ingress_source_and_binding_preservation",
+      "status": "PASS",
+      "evidence": "Prior byte-exact native ingress/version/privacy/binding proof retained; ingress and scheduler bytes unchanged. No Cloudflare action this run. Reused unchanged in current run."
+    },
+    {
+      "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
+      "status": "PASS",
+      "evidence": "All four original identity/TLS assertions, pinned CA/hostname and private42-routine guards retained. New3 predicate/redaction tests PASS; unchanged rollback/retry/ACK/deadline proof reused. Historical TLS timestamp 2026-10-19T04:07:25.540Z retained, not asserted fresh. No secret/config/SQL/Auth/data/send/device/cron/logging change."
+    },
+    {
+      "name": "n44_service_request_runtime_phase_diagnosis_and_fix",
+      "status": "FAIL",
+      "evidence": "Version31 exact-source diagnostic completed query and one-row read: login/role/clientTLS true, upstreamSsl false, configured target direct. Fine diagnosis observed; compliant fix not established. Conditional session-target normalization not applied; no timeout change or unchanged retry."
+    },
+    {
+      "name": "n44_actual_typed_rejected_session_contract400",
+      "status": "FAIL",
+      "evidence": "Actual typed400 remains absent: changed-code diagnostic503/identity, upstreamSsl predicate false. Final normal proof NOT_RUN; local negative400 does not replace hosted acceptance."
+    },
+    {
+      "name": "n44_existing_edge_native_source_and_unchanged_private_guards",
+      "status": "PASS",
+      "evidence": "Existing function ID and verify_jwt=false unchanged; version31 native bytes/import map match Edge SHA256 8c30b7c09e76c76c66433fc32c76c4cee242a3dd47a74e45b9377b956c759f3b. New predicate/redaction/guard-negative tests3/3 PASS; security assertions unchanged. Private/session/source checks remain failclosed and were not reached live."
+    }
+  ],
+  "blocker": "Actual changed-code diagnostic returned503/identity: query completed with one row; loginExact=true, roleExact=true, clientTlsAuthorized=true, upstreamSsl=false; validated configured targetKind=direct. The conditional session-to-direct remedy does not apply. No query timeout was observed. A compliant correction for this direct-target upstream SSL predicate has not been established within the allowed wrapper/public-constant scope; credentials, guard weakening and provider transport/role changes remain forbidden. Typed400 remains unproved.",
+  "transportCompatibility": {
+    "version": 1,
+    "platform": "cloudflare-workers",
+    "redirectMode": "manual",
+    "rejectsRedirects": true,
+    "localForwardAttempted": true,
+    "beforeHttpStatus": 503,
+    "afterHttpStatus": 503,
+    "probeMethod": "POST",
+    "probePath": "/api/n44/context/read",
+    "upstreamSourceUnchanged": false,
+    "originalCustodyUntouched": true,
+    "bindingsPreserved": true,
+    "nativeSourceExact": true,
+    "correctedIngressUploaded": true,
+    "beforeRecordedAt": "2026-10-19T06:01:21.375Z",
+    "afterRecordedAt": "2026-10-19T07:08:04.909Z",
+    "unauthorizedAcceptancePassed": false,
+    "expectedAfterHttpStatus": 400,
+    "typedRejectedSession": false,
+    "completeSyntheticShapeValidatedOffline": true,
+    "runtimeGuardExecuted": false,
+    "observedRuntimePhase": "identity",
+    "normalFinalProof": "NOT_RUN",
+    "observedIdentity": {
+      "loginExact": true,
+      "roleExact": true,
+      "upstreamSsl": false,
+      "clientTlsAuthorized": true,
+      "queryCompleted": true,
+      "returnedOneRow": true,
+      "targetKind": "direct"
+    }
+  },
+  "currentRequestRuntime": {
+    "version": 1,
+    "phase": "identity",
+    "diagnosisObserved": true,
+    "configurationCompleted": true,
+    "connectionAcquired": true,
+    "identityGuardCompleted": false,
+    "identityBooleanValues": {
+      "loginExact": true,
+      "roleExact": true,
+      "upstreamSsl": false,
+      "clientTlsAuthorized": true,
+      "queryCompleted": true,
+      "returnedOneRow": true,
+      "targetKind": "direct"
+    },
+    "rolePrivateSourceReached": false,
+    "fixApplied": false,
+    "sanitizerRetryMetadataCorrected": true,
+    "diagnosticRequestConsumed": true,
+    "finalNormalProof": "NOT_RUN",
+    "diagnosticSourceSha256": "8c30b7c09e76c76c66433fc32c76c4cee242a3dd47a74e45b9377b956c759f3b",
+    "observedProviderVersion": 31,
+    "currentSourceSha256": "8c30b7c09e76c76c66433fc32c76c4cee242a3dd47a74e45b9377b956c759f3b",
+    "providerVersion": 31,
+    "probe": "tests/n44-finish-runtime.predicate1.json",
+    "local": "tests/n44-finish-runtime.local.json",
+    "deadline": "tests/n44-finish-runtime.deadline.json",
+    "privateBindingsChanged": false,
+    "nonsecretConfigurationChanged": false,
+    "guardPathsUnchanged": [
+      "drafts/n44-push/readiness-entry.mjs",
+      "drafts/n44-push/backend.mjs",
+      "drafts/n44-push/auth-verifier.mjs",
+      "drafts/n44-push/activation/private-error-boundary.mjs",
+      "drafts/n44-push/activation/error-boundary-contract.json",
+      "drafts/n44-push/activation/error-boundary-identities.json"
+    ],
+    "identityQueryCompleted": true,
+    "identityReturnedOneRow": true,
+    "configuredTargetKind": "direct",
+    "observedFailedPredicate": "upstreamSsl",
+    "queryFailureClassification": null,
+    "conditionalSessionTargetRemedyApplied": false,
+    "predicateLocal": "tests/n44-finish-runtime.identity-local.json",
+    "newPhasesConsumed": 1,
+    "maxMaterialPhasesAuthorizedThisRun": 4,
+    "transportGuardScope": "Only optional safe query observer added; all original transport/identity predicates retained. Configured target enum is not an independent socket/route attestation."
+  },
+  "archived": [
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-activation-final.json",
+      "sha256": "769aefaebe779f7c4b629b41400e6e6ecf530475a9dc910f770f721b0fce71a9",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-transport.result.json",
+      "sha256": "fbbeb7af2491d4291d7ec2f57b28194444d7f6304c6430ffc0c74276dd854e7f",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/manifest.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/manifest.json",
+      "sha256": "4943197a138166e40d948194629625e4eda31d80ddd9433e24eced95c550706f",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-final-metadata.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-final-metadata.json",
+      "sha256": "28c78fa091aa44d4024d320c466076eeab15089902cfc9c4d0000cad55611f0c",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-source-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-source-readback.json",
+      "sha256": "e7a72593caab48a04c63bf05816f54761e08700ab4bb4f4de8fd2ed2f36e0557",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-activation-final.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "eac84d52166b3810790571bae55c40835311aaadcb60242e45262ed751bd1acc"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-transport.result.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "1261878455d74a930ab22d27b2073b132de106f84559407fefad8e9164cb72e1"
+    },
+    {
+      "source": "drafts/n44-push/activation/manifest.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/manifest.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "93f88b0c9a9331b671cf3a0d73d2de54305020f2dc91faf5ef9f94e7e44df8f2"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-final-metadata.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-final-metadata.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "7445ca7c12f111e11e944c0cabbe0c235d7c2b8600e11b94e466856fe635d554"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-source-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-source-readback.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "274b3e99547894b70b08dde839e708946858b8c921cfd62547bc0a4dc653ac4d"
+    },
+    {
+      "source": "drafts/n44-push/activation/runtime-final-native.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-native.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "b1331b34ea6ad7e05df89f82a316f7b76921c874a1e0fddff35b8b7a689e8643"
+    },
+    {
+      "source": "drafts/n44-push/activation/runtime-final-deploy.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-deploy.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "4c3cc664d62769496a85909462d019b76068d8c90122b7134edc1bfcbf7ccc34"
+    }
+  ],
+  "onlyMutatedService": "supabase/n44-notifications existing wrapper",
+  "providerWrites": 1,
+  "publicDiagnosticRequests": 1,
+  "publicFinalRequests": 0,
+  "cloudflareWrites": 0,
+  "secretOrConfigurationWrites": 0,
+  "sqlOrAuthOperations": 0,
+  "realSends": 0,
+  "liveMutationLeaseReleased": true,
+  "originalFailuresPreserved": true
+}

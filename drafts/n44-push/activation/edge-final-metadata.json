@@ -2,15 +2,15 @@
   "projectId": "xlrubcwjqktzzunrvuns",
   "name": "n44-notifications",
   "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
-  "version": 31,
+  "version": 32,
   "status": "ACTIVE",
   "verifyJwt": false,
-  "providerBundleSha256": "391b40b6d3bd249ed6549a0410f3f39b56f67114bfe90e6fb96220482db3fc0c",
-  "sourceSha256": "8c30b7c09e76c76c66433fc32c76c4cee242a3dd47a74e45b9377b956c759f3b",
-  "recordedAt": "2026-10-19T07:11:27.760Z",
-  "providerUpdatedAt": "2026-10-19T07:07:36.488Z",
-  "nativeReadbackAt": "2026-10-19T07:07:59.163Z",
-  "nativeReadbackSource": "drafts/n44-push/activation/runtime-predicate-native.json",
+  "providerBundleSha256": "1c5aee48143a50a73f3a40d3a0c398e46e74b0927922a237a272750f6e16a512",
+  "sourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+  "recordedAt": "2026-10-19T07:15:29.980Z",
+  "providerUpdatedAt": "2026-10-19T07:13:58.116Z",
+  "nativeReadbackAt": "2026-10-19T07:14:09.809Z",
+  "nativeReadbackSource": "drafts/n44-push/activation/runtime-pool-role-native.json",
   "originalActivationEvidenceReused": true,
-  "requestRuntimeAcceptance": "BLOCKED_UPSTREAM_SSL_PREDICATE"
+  "requestRuntimeAcceptance": "PASS_TYPED_REJECTED400"
 }

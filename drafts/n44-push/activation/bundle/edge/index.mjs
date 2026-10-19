@@ -3892,6 +3892,31 @@ async function assertRestrictedIdentity(client, observe = () => {
   return flags;
 }
 
+// drafts/n44-push/request-session.mjs
+async function prepareRequestSession(client, targetKind, assertPrivate) {
+  let phase = "set_role", identity = { targetKind, queryCompleted: false, returnedOneRow: false };
+  try {
+    await client.query("reset role");
+    phase = "identity";
+    try {
+      await assertRestrictedIdentity(client, (v) => {
+        identity = { ...identity, ...v };
+      });
+    } catch (e) {
+      if (!identity.queryCompleted) identity.queryFailure = identityQueryFailure(e);
+      throw e;
+    }
+    phase = "set_role";
+    await client.query("set role n44_backend");
+    phase = "private_session";
+    await assertPrivate(client, () => {
+      phase = "source";
+    });
+  } catch (e) {
+    throw runtimeFailure(phase, e, identity);
+  }
+}
+
 // drafts/n44-push/existing-host.mjs
 async function assertPrivateDatabaseSession(client, onSource = () => {
 }) {
@@ -3967,24 +3992,10 @@ function createExistingHost(readEnv) {
       if (waiting >= 4) throw Error("n44_pool_capacity");
       waiting++;
       let c;
-      let phase = "connect", identity = { targetKind: transport.ssl.servername === "db.xlrubcwjqktzzunrvuns.supabase.co" ? "direct" : "session", queryCompleted: false, returnedOneRow: false };
+      let phase = "connect";
       try {
         c = await pool.connect();
-        phase = "identity";
-        try {
-          await assertRestrictedIdentity(c, (flags) => {
-            identity = { ...identity, ...flags };
-          });
-        } catch (e) {
-          if (!identity.queryCompleted) identity.queryFailure = identityQueryFailure(e);
-          throw e;
-        }
-        phase = "set_role";
-        await c.query("set role n44_backend");
-        phase = "private_session";
-        await assertPrivateDatabaseSession(c, () => {
-          phase = "source";
-        });
+        await prepareRequestSession(c, transport.ssl.servername === "db.xlrubcwjqktzzunrvuns.supabase.co" ? "direct" : "session", assertPrivateDatabaseSession);
         return { query: async (sql, values) => {
           try {
             return await privateQuery(c, sql, values);
@@ -3994,7 +4005,7 @@ function createExistingHost(readEnv) {
         }, release: (e) => c.release(e) };
       } catch (e) {
         c?.release(Error("n44_database_unavailable"));
-        throw runtimeFailure(phase, e, identity);
+        throw runtimeFailure(phase, e);
       } finally {
         waiting--;
       }
