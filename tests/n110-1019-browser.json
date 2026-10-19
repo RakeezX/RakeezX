@@ -1,0 +1,132 @@
+{
+  "taskId": "continuous-n110-two-tab-runtime-stability-20261019",
+  "runId": "6463f4ca-f30b-41b2-8301-4ad7197a784e",
+  "base": "81b892cc81a6622c05fcc291e9d7cfa00611245b",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "real_workspace_broadcast",
+      "status": "PASS",
+      "evidence": "Device preference propagated through the actual store/channel/absorb path."
+    },
+    {
+      "name": "single_receiver_leader_recovery",
+      "status": "PASS",
+      "evidence": "Real browserRemoteLeadership/Web Locks allowed one receiver, then transferred leadership after the owner released it."
+    },
+    {
+      "name": "owner_grade_history_pending_preserved",
+      "status": "PASS",
+      "evidence": {
+        "owner": "a1100000-0000-4000-8000-000000000001",
+        "database": "rakeezx-user-9fd3b6e55f01fae8ace76b9dc515e4ad",
+        "receiptOwner": "a1100000-0000-4000-8000-000000000001",
+        "protectedRowCounts": [
+          1,
+          1,
+          1,
+          1,
+          10
+        ],
+        "beforeAndAfterSHA256": "e0eb1f9f02b90cd110f728d75de0b41a2014551df18826e790bfc12bd76d0bb5",
+        "wrongOwnerRejected": true,
+        "leaseEditable": true,
+        "syncState": "error",
+        "pendingCount": 10,
+        "lastSuccessfulSyncAt": null,
+        "cloudSyncHealthy": false
+      }
+    },
+    {
+      "name": "peer_account_transition",
+      "status": "PASS",
+      "evidence": "Peer sign-out removed the private account UI and reloaded exactly once into login."
+    },
+    {
+      "name": "n110_two_same_browser_tabs_no_refresh_lease_feedback_loop",
+      "status": "PASS",
+      "evidence": {
+        "start": [
+          {
+            "paints": 3,
+            "storage": 20,
+            "clocks": 18,
+            "messages": 0
+          },
+          {
+            "paints": 2,
+            "storage": 3,
+            "clocks": 2,
+            "messages": 0
+          }
+        ],
+        "end": [
+          {
+            "paints": 3,
+            "storage": 20,
+            "clocks": 18,
+            "messages": 0
+          },
+          {
+            "paints": 2,
+            "storage": 3,
+            "clocks": 2,
+            "messages": 0
+          }
+        ],
+        "deltas": [
+          {
+            "paints": 0,
+            "clocks": 0
+          },
+          {
+            "paints": 0,
+            "clocks": 0
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "serviceWrites": 11,
+  "idle": {
+    "start": [
+      {
+        "paints": 3,
+        "storage": 20,
+        "clocks": 18,
+        "messages": 0
+      },
+      {
+        "paints": 2,
+        "storage": 3,
+        "clocks": 2,
+        "messages": 0
+      }
+    ],
+    "end": [
+      {
+        "paints": 3,
+        "storage": 20,
+        "clocks": 18,
+        "messages": 0
+      },
+      {
+        "paints": 2,
+        "storage": 3,
+        "clocks": 2,
+        "messages": 0
+      }
+    ],
+    "deltas": [
+      {
+        "paints": 0,
+        "clocks": 0
+      },
+      {
+        "paints": 0,
+        "clocks": 0
+      }
+    ]
+  }
+}

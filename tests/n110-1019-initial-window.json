@@ -1,0 +1,50 @@
+{
+  "taskId": "continuous-n110-two-tab-runtime-stability-20261019",
+  "runId": "6463f4ca-f30b-41b2-8301-4ad7197a784e",
+  "base": "81b892cc81a6622c05fcc291e9d7cfa00611245b",
+  "baseline": true,
+  "checks": [],
+  "errors": [],
+  "serviceWrites": 8,
+  "idle": {
+    "start": [
+      {
+        "paints": 155,
+        "storage": 283,
+        "clocks": 158,
+        "messages": 0
+      },
+      {
+        "paints": 147,
+        "storage": 238,
+        "clocks": 153,
+        "messages": 0
+      }
+    ],
+    "end": [
+      {
+        "paints": 155,
+        "storage": 283,
+        "clocks": 158,
+        "messages": 0
+      },
+      {
+        "paints": 147,
+        "storage": 238,
+        "clocks": 153,
+        "messages": 0
+      }
+    ],
+    "deltas": [
+      {
+        "paints": 0,
+        "clocks": 0
+      },
+      {
+        "paints": 0,
+        "clocks": 0
+      }
+    ]
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: Original app must reproduce sustained cross-tab paint/clock feedback\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n110-two-tab-runtime-stability-20261019/tests/n110-1019-two-tab.mjs:80:11\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n110-two-tab-runtime-stability-20261019/tests/n110-1019-two-tab.mjs:50:2"
+}

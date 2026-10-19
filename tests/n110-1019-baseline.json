@@ -1,0 +1,94 @@
+{
+  "taskId": "continuous-n110-two-tab-runtime-stability-20261019",
+  "runId": "6463f4ca-f30b-41b2-8301-4ad7197a784e",
+  "base": "81b892cc81a6622c05fcc291e9d7cfa00611245b",
+  "baseline": true,
+  "checks": [
+    {
+      "name": "baseline_reproduced",
+      "status": "PASS",
+      "evidence": {
+        "start": [
+          {
+            "paints": 319,
+            "storage": 605,
+            "clocks": 327,
+            "messages": 0
+          },
+          {
+            "paints": 317,
+            "storage": 523,
+            "clocks": 318,
+            "messages": 0
+          }
+        ],
+        "end": [
+          {
+            "paints": 625,
+            "storage": 1168,
+            "clocks": 633,
+            "messages": 0
+          },
+          {
+            "paints": 622,
+            "storage": 994,
+            "clocks": 623,
+            "messages": 0
+          }
+        ],
+        "deltas": [
+          {
+            "paints": 306,
+            "clocks": 306
+          },
+          {
+            "paints": 305,
+            "clocks": 305
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "serviceWrites": 8,
+  "idle": {
+    "start": [
+      {
+        "paints": 319,
+        "storage": 605,
+        "clocks": 327,
+        "messages": 0
+      },
+      {
+        "paints": 317,
+        "storage": 523,
+        "clocks": 318,
+        "messages": 0
+      }
+    ],
+    "end": [
+      {
+        "paints": 625,
+        "storage": 1168,
+        "clocks": 633,
+        "messages": 0
+      },
+      {
+        "paints": 622,
+        "storage": 994,
+        "clocks": 623,
+        "messages": 0
+      }
+    ],
+    "deltas": [
+      {
+        "paints": 306,
+        "clocks": 306
+      },
+      {
+        "paints": 305,
+        "clocks": 305
+      }
+    ]
+  }
+}

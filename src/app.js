@@ -60,7 +60,10 @@ store.subscribe(() => { void notificationPush.refresh(); });
 subscribeAcknowledged(checkpoint => notificationPush.afterSyncAck(checkpoint));
 window.addEventListener('storage', event => {
   if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) notificationPush.invalidate();
-  if (event.key?.startsWith('rakeezx-n44-') || event.key?.startsWith(NOTIFICATION_CATEGORY_PREFIX) || event.key?.startsWith(LEASE_STORAGE_PREFIX)) void notificationPush.refresh();
+  // AI N110: observing a lease writes a per-tab clock witness. Never feed
+  // those observations back into another lease observation through Push.
+  if (event.key?.startsWith('rakeezx-n44-') || event.key?.startsWith(NOTIFICATION_CATEGORY_PREFIX) ||
+      event.key?.startsWith(LEASE_STORAGE_PREFIX) && !event.key.includes(':clock:')) void notificationPush.refresh();
 });
 window.addEventListener('pageshow', () => { void notificationPush.refresh(); });
 let notificationContext = null;
@@ -130,6 +133,14 @@ function actOnNotification(el, type) {
 store.onWorkspaceDeactivation(clearNotificationUI);
 cloud.subscribe(() => { if (!currentNotificationContext(store, cloud)) clearNotificationUI(); });
 window.addEventListener('storage', event => {
+  // AI N110: only notification/account changes affect this presentation.
+  // Rendering observes the offline lease and writes a clock witness; repainting
+  // for that witness (or a Sync coordination key) creates a two-tab feedback loop.
+  // Lease receipt changes retain their dedicated guarded listener below.
+  if (event.key !== null && event.key !== cloud.AUTH_STORAGE_KEY &&
+      !event.key?.startsWith('rakeezx-n44-') &&
+      !event.key?.startsWith(NOTIFICATION_STORAGE_PREFIX) &&
+      !event.key?.startsWith(NOTIFICATION_CATEGORY_PREFIX)) return;
   // Clock-only writes must not cause tabs to repaint/write clocks back at each
   // other. Ordinary preference changes still recompute the actual settings/UI.
   if (event.key?.startsWith(NOTIFICATION_CATEGORY_PREFIX)) {
