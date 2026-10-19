@@ -1,0 +1,133 @@
+{
+  "taskId": "continuous-n124-compact-attendance-action-20261019",
+  "runId": "b2f31236-ac91-45fc-9d63-152b8dc0e3f4",
+  "geometry": [
+    {
+      "width": 390,
+      "selector": ".home-session-row[data-session-id=\"se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10\"]",
+      "label": "رصد الحضور",
+      "decoration": "none",
+      "whiteSpace": "nowrap",
+      "lines": 1,
+      "action": {
+        "x": 29,
+        "y": 478.484375,
+        "width": 63.046875,
+        "height": 44
+      },
+      "main": {
+        "y": 472.640625,
+        "height": 55.6875
+      },
+      "row": {
+        "x": 15,
+        "y": 461.640625,
+        "width": 360,
+        "height": 76.6875
+      }
+    },
+    {
+      "width": 390,
+      "selector": ".home-attention__row[data-session-id=\"se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10\"]",
+      "label": "رصد الحضور",
+      "decoration": "none",
+      "whiteSpace": "nowrap",
+      "lines": 1,
+      "action": {
+        "x": 26,
+        "y": 34.75,
+        "width": 63.046875,
+        "height": 44
+      },
+      "main": {
+        "y": 33.453125,
+        "height": 46.59375
+      },
+      "row": {
+        "x": 15,
+        "y": 21.453125,
+        "width": 360,
+        "height": 70.59375
+      }
+    },
+    {
+      "width": 1440,
+      "selector": ".home-session-row[data-session-id=\"se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10\"]",
+      "label": "رصد الحضور",
+      "decoration": "none",
+      "whiteSpace": "nowrap",
+      "lines": 1,
+      "action": {
+        "x": 428.6875,
+        "y": 853.640625,
+        "width": 68.046875,
+        "height": 44
+      },
+      "main": {
+        "y": 856.234375,
+        "height": 38.796875
+      },
+      "row": {
+        "x": 414.6875,
+        "y": 839.140625,
+        "width": 728.3125,
+        "height": 72
+      }
+    },
+    {
+      "width": 1440,
+      "selector": ".home-attention__row[data-session-id=\"se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10\"]",
+      "label": "رصد الحضور",
+      "decoration": "none",
+      "whiteSpace": "nowrap",
+      "lines": 1,
+      "action": {
+        "x": 426.6875,
+        "y": 420.25,
+        "width": 68.046875,
+        "height": 44
+      },
+      "main": {
+        "y": 418.953125,
+        "height": 46.59375
+      },
+      "row": {
+        "x": 414.6875,
+        "y": 406.953125,
+        "width": 728.3125,
+        "height": 70.59375
+      }
+    }
+  ],
+  "routes": [
+    {
+      "selector": ".today-focus__action",
+      "session": "se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:11",
+      "keyboard": false
+    },
+    {
+      "selector": ".home-session-row[data-session-id=\"se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10\"] .home-session-state",
+      "session": "se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10",
+      "keyboard": true
+    },
+    {
+      "selector": ".home-attention__row[data-session-id=\"se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10\"] .home-session-state",
+      "session": "se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10",
+      "keyboard": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "n124_compact_no_underline_mobile_and_exact_session_route",
+      "status": "PASS",
+      "evidence": "Actual app/source CSS over task-owned loopback HTTP; 390/1440 geometry: single-line contextual actions in main row, no underline/overflow; keyboard focus visible; current and past links select exact session, card title opens class; no attendance writes, navigation preserves pupils/attendance/scores. Contextual partial/completed labels checked without data writes. Prior broader N121 proof reused."
+    }
+  ],
+  "origin": "http://127.0.0.1:55786/",
+  "fixture": {
+    "teaching": "tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72",
+    "past": "se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:10",
+    "current": "se:tch:a7d22242-3b42-4fa9-b879-5bc7f6392d72:2026-10-19:11"
+  },
+  "status": "PASS"
+}

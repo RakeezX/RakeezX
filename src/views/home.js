@@ -272,14 +272,20 @@ function lessonClassLink(session) {
     style="position:absolute;inset:0;z-index:1;border-radius:inherit"></a>`;
 }
 
+export function attendanceActionLabel(completeness) {
+  if (completeness.state === 'completed') return 'مراجعة الحضور';
+  return completeness.recorded ? 'استكمال الحضور' : 'رصد الحضور';
+}
+
 function renderTodayFocus(focus) {
   if (!focus) return '';
   const { session, kind } = focus;
   const teaching = store.getTeaching(session.teachingId);
+  const completeness = store.attendanceCompleteness(session);
   const content = {
     current: { eyebrow: 'الآن', title: 'حصتك الحالية', detail: 'الحصة جارية الآن', tone: 'is-current' },
     upcoming: { eyebrow: 'بعد قليل', title: 'الحصة التالية', detail: session.startTime ? html`تبدأ ${fmtTimeRange(session.startTime, session.endTime)}` : 'موعد الحصة التالي', tone: 'is-upcoming' },
-    'past-pending': { eyebrow: 'يتطلب انتباهك', title: 'رصد حضور معلّق', detail: 'انتهت الحصة ولم يُرصد الحضور بعد.', tone: 'is-pending' },
+    'past-pending': { eyebrow: 'يتطلب انتباهك', title: 'رصد حضور معلّق', detail: 'انتهت الحصة.', tone: 'is-pending' },
   }[kind];
   return html`
     <section class="today-focus ${content.tone}" aria-label="تركيز اليوم" data-session-id="${session.id}" style="position:relative;isolation:isolate">
@@ -289,12 +295,10 @@ function renderTodayFocus(focus) {
         <div class="today-focus__title">${content.title}</div>
         <div class="today-focus__class">${visibleLatinDigits(store.teachingLabel(teaching))}</div>
         <div class="today-focus__detail">الحصة ${session.period}${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</div>
-        <div class="today-focus__state">${store.attendanceCompleteness(session).completed
-          ? html`<a href="#/teaching/${session.teachingId}/attendance?session=${session.id}" style="position:relative;z-index:2;color:inherit">تم رصد الحضور</a>`
-          : content.detail}</div>
+        ${completeness.completed ? '' : html`<div class="today-focus__state">${content.detail}</div>`}
       </div>
       <a class="btn btn--primary today-focus__action" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" data-session-id="${session.id}" style="position:relative;z-index:2">
-        ${icon('attendance')} ${store.attendanceCompleteness(session).completed ? 'مراجعة الحضور' : 'رصد الحضور'}
+        ${icon('attendance')} ${attendanceActionLabel(completeness)}
       </a>
     </section>
   `;
@@ -312,9 +316,9 @@ function renderNeedsAttention(sessions) {
             <span class="period">${session.period}</span>
             <span class="row__main">
               <span class="row__title">${visibleLatinDigits(store.teachingLabel(store.getTeaching(session.teachingId)))}</span>
-              <span class="row__sub">انتهت الحصة ولم يكتمل رصد الحضور${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</span>
+              <span class="row__sub">انتهت الحصة${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</span>
             </span>
-            <span class="row__end"><a class="home-session-state" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" style="position:relative;z-index:2;color:inherit">متابعة الرصد</a>${icon('chev')}</span>
+            <span class="row__end"><a class="home-session-state" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" style="position:relative;z-index:2">${attendanceActionLabel(store.attendanceCompleteness(session))}</a></span>
           </div>
         `)}
       </div>
@@ -442,7 +446,7 @@ export default {
                   const tch = store.getTeaching(s.teachingId);
                   const completeness = store.attendanceCompleteness(s);
                   const presentation = todaySessionPresentation(s, completeness);
-                  const attendanceLabel = presentation.label;
+                  const attendanceLabel = completeness.state === 'excluded' ? presentation.label : attendanceActionLabel(completeness);
                   const marked = completeness.recorded;
                   const roster = completeness.expected;
                   return html`
@@ -460,8 +464,7 @@ export default {
                         </span>
                       </span>
                       <span class="row__end">
-                        <a class="home-session-state" href="#/teaching/${s.teachingId}/attendance?session=${s.id}" style="position:relative;z-index:2;color:inherit">${attendanceLabel}</a>
-                        ${icon('chev')}
+                        <a class="home-session-state" href="#/teaching/${s.teachingId}/attendance?session=${s.id}" style="position:relative;z-index:2">${attendanceLabel}</a>
                       </span>
                     </div>
                   `;
