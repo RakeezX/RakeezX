@@ -210,7 +210,6 @@ const scrollMemory = new Map();
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => scheduleRender());
 
 const isDemoWorkspace = () => store.getActiveWorkspace()?.type === 'demo';
-const canMaterializeTodaySessions = () => store.getOfflineLeaseStatus().editable && (isDemoWorkspace() || Boolean(cloud.session && cloud.user));
 const supportAccountKey = () => `${cloud.user?.id ?? 'signed-out'}|${store.getActiveWorkspace()?.databaseName ?? 'unresolved'}`;
 let lastSupportAccountKey = supportAccountKey();
 
@@ -889,7 +888,6 @@ async function resolve() {
     return;
   }
 
-  if (canMaterializeTodaySessions()) await store.ensureSessionsForDate();
   if (!isCurrent()) return;
 
   let mod;
@@ -991,7 +989,6 @@ async function boot() {
       else
       console.error('[rakeezx] Sync module failed to load:', err);
     }
-    if (canMaterializeTodaySessions()) await store.ensureSessionsForDate();
     if (isDemoWorkspace()) markDemoReady();
   } catch (err) {
     console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
@@ -1117,10 +1114,10 @@ async function boot() {
   onNavigate(resolve);
   cleanupSessionAutoTriggers();
   stopSessionAutoTriggers = installSessionAutoTriggers({
-    materialize: (date, signal) => !signal.aborted && canMaterializeTodaySessions()
-      ? store.ensureSessionsForDate(date, { signal }) : null,
+    // Boundaries refresh presentation only; opening a lesson owns creation.
+    materialize: () => null,
     repaint: scheduleRender,
-    getSessions: (date) => store.sessionsOn(date),
+    getSessions: (date) => store.operationalSessionsOn(date),
     getCalendarDay: (date) => store.calendarDayFor(date),
     subscribe: (refresh) => store.subscribe(refresh),
     onError: (err) => console.warn('[rakeezx sessions] automatic materialization failed:', err),

@@ -332,7 +332,7 @@ export default {
     const cal = store.calendarDayFor(today);
     // Calendar controls today's operational view; persisted sessions remain historical evidence.
     const nonTeachingToday = !!cal && !isTeachingDay(cal.kind);
-    const daySessions = nonTeachingToday ? [] : store.sessionsOn(today);
+    const daySessions = nonTeachingToday ? [] : store.operationalSessionsOn(today);
     const onboarding = homeOnboardingState(list, {
       studentsFor: (teachingId) => store.students(teachingId),
       slotsFor: (teachingId) => store.slotsOf(teachingId),

@@ -1,0 +1,8 @@
+{
+  "taskId": "continuous-n116-lesson-generation-on-demand-20261019",
+  "runId": "9d9ad329-0029-4e7c-8e41-1f817958af6d",
+  "baseSha": "644e6896c24e02e00d46c558a0f87c563f644870",
+  "kind": "baseline-diagnostic-only",
+  "result": "Reproduced 3 unopened persisted sessions across 2 teachings; repeat is idempotent; later holiday retains original rows without attendance. This does not prove a hosted Sync failure or an implemented fix.",
+  "onDemandAcceptance": "NOT_RUN"
+}

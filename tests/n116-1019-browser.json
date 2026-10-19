@@ -1,0 +1,46 @@
+{
+  "taskId": "continuous-n116-lesson-generation-on-demand-20261019",
+  "runId": "df7d23e0-8d02-4090-af18-92974aac704f",
+  "checks": [
+    {
+      "name": "read_only_cards_and_wake",
+      "status": "PASS",
+      "evidence": "Actual Home DOM/CSS shows unopened lessons; Home entry and wake persist no sessions."
+    },
+    {
+      "name": "exact_card_entry",
+      "status": "PASS",
+      "evidence": "Class card opens class without creation; exact period-2 attendance link creates only period 2 with one owner-bound pending command, no fake ACK."
+    },
+    {
+      "name": "session_and_date_handlers",
+      "status": "PASS",
+      "evidence": "Actual period switch creates only selected period; history date and return retain identities without backfill."
+    },
+    {
+      "name": "holiday_entry_and_failure",
+      "status": "PASS",
+      "evidence": "Actual attendance mount rejects stale holiday link; injected IndexedDB transaction failure is shown in toast and creates neither memory/durable session nor command."
+    },
+    {
+      "name": "calendar_and_idempotency",
+      "status": "PASS",
+      "evidence": "Holiday-before-open creates none; reopening study day uses current timing; concurrent/repeated requests retain one durable session command and old timing."
+    },
+    {
+      "name": "guards_tombstones_history",
+      "status": "PASS",
+      "evidence": "Real account/store guards reject foreign parent, unresolved owner and foreign Auth; pre-abort writes none; durable unseen tombstone is retained; attendance/grades/history unchanged; calendar switch hold active."
+    },
+    {
+      "name": "n116_on_demand_session_generation_calendar_change_idempotent_history_safe",
+      "status": "PASS",
+      "evidence": "PASS: affected actual app HTTP DOM/handlers/CSS and owner-bound store scenarios; synthetic only, no hosted Sync certification."
+    }
+  ],
+  "errors": [],
+  "previousFailures": [
+    "page.evaluate: Error: يلزم التحقق من الحساب لاستئناف التعديل. يمكنك العرض والتصدير وتنزيل نسخة احتياطية.\n    at leaseWriteError (http://127.0.0.1:49807/src/lib/offline-lease.js:32:52)\n    at Object.assertWritable (http://127.0.0.1:49807/src/lib/offline-lease.js:115:36)\n    at assertLeaseWritable (http://127.0.0.1:49807/src/store.js:192:25)\n    at assertCloudRestoreWritable (http://127.0.0.1:49807/src/store.js:104:14)\n    at assertClassImportAccess (http://127.0.0.1:49807/src/store.js:334:5)\n    at Module.assertClassOperationsAccess (http://127.0.0.1:49807/src/store.js:290:3)\n    at eval (eval at evaluate (:311:30), <anonymous>:9:9)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n116-lesson-generation-on-demand-20261019\\tests\\n116-1019-browser.mjs:57:16\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n116-lesson-generation-on-demand-20261019/tests/n116-1019-browser.mjs:50:3",
+    "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('�� ���� ��� ������ ���� �����', { exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n116-lesson-generation-on-demand-20261019\\tests\\n116-1019-browser.mjs:110:76\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n116-lesson-generation-on-demand-20261019/tests/n116-1019-browser.mjs:51:3"
+  ]
+}
