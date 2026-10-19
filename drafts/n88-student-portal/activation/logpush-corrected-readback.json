@@ -1,0 +1,81 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3297f7ab-daae-4b90-be12-e7dcfb676c0f",
+  "preservedCandidate": "93e76b3f68e8c56f8c7257825417105907305539",
+  "at": "2026-10-18T17:43:23.881Z",
+  "correctionEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/cloudflare-logpush-scope-correction.json",
+  "logpush": {
+    "account": {
+      "id": "1c9ae85e766968a4269a7ac505f9a693",
+      "status": 200,
+      "success": true,
+      "jobs": []
+    },
+    "zone": {
+      "id": "1aefe7f448c93a8af637a718ac2cd101",
+      "status": 200,
+      "success": true,
+      "jobs": []
+    },
+    "oneNewReadPerLevel": true,
+    "prior10000FailurePreserved": true,
+    "configurationWrites": 0
+  },
+  "ingressSettings": {
+    "ssl": "full",
+    "min_tls_version": "1.0",
+    "pseudo_ipv4": "off",
+    "ipv6": "on",
+    "allReadsStatus": 200,
+    "meaning": "Source entry independently rejects unsupported TLS; upstream verified TLS remains mandatory. No zone settings changed."
+  },
+  "actualBlocker": {
+    "method": "GET",
+    "path": "/zones/1aefe7f448c93a8af637a718ac2cd101/managed_headers",
+    "tool": "mcp__rakeez_cloudflare__execute",
+    "error": "Cloudflare API error: undefined: request is not authorized",
+    "attempts": 1,
+    "dependentReadsNotAttempted": [
+      "http_log_custom_fields entrypoint",
+      "http_request_late_transform entrypoint"
+    ],
+    "meaning": "Cannot certify actual client-IP/header transformation disposition. Logpush empty alone does not prove ingress or full private-logging readiness. No retry, proxy, alternate credential or permission change.",
+    "officialPermissionReference": "https://developers.cloudflare.com/fundamentals/api/reference/permissions/",
+    "permissionReferenceFact": "Official permission catalog separately lists Managed headers Read. No OAuth scope name or authorization cause guessed from this error."
+  },
+  "baselinePreflight": {
+    "path": "drafts/n88-student-portal/activation/preflight.inactive.sql",
+    "result": "PASS",
+    "readOnly": true,
+    "personalRowsRead": 0,
+    "sourceCatalog": "official-source-catalog.json",
+    "fullConsumedSourceComparison": "tests/n88-official-activation-catalog.json"
+  },
+  "migrationHistory": {
+    "requiredSixAbsent": true,
+    "latestListed": "20261015082719_n90_unified_student_grade_import",
+    "applied": []
+  },
+  "reused": {
+    "custodyProof": "tests/n88-official-activation-custody-probe.json",
+    "nativeIdentity": "native-channel-readback.json",
+    "renderedPrivateUi": "tests/n88-official-activation-private-assets.json",
+    "rerun": false
+  },
+  "disposition": {
+    "hostedWrites": 0,
+    "secretsGeneratedOrInstalled": 0,
+    "loginChanges": 0,
+    "functionsOrWorkersDeployed": 0,
+    "routesOrReadinessChanged": 0,
+    "existingFabricatedTeacherAccessed": false,
+    "hostedFixtureConsumed": false,
+    "realRowsReadOrMutated": 0,
+    "messagesSent": 0,
+    "browserOrServerStarted": false,
+    "temporaryFunctionCleanup": "No temporary function or hosted fixture created in this run; prior absence evidence retained, no new function list claimed. Nothing owned to disarm; unrelated resources untouched.",
+    "officialTrialUrl": null
+  },
+  "retryCondition": "Material correction must make exact managed-header/IP transformation metadata readback available through the approved connection. Preserve this new refusal; no unchanged retry or broader automatic OAuth. Complete still-unread transformation/private-logging and actual custody gates before DDL; refresh catalog baselines then. Existing six immutable SQL identities and prior evidence remain unchanged."
+}

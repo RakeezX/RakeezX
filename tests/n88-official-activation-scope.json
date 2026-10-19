@@ -1,0 +1,106 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "9190735f-6ed0-4513-8ef1-5a3ef24ec6f8",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "at": "2026-10-19T04:42:59.087Z",
+  "checks": [
+    {
+      "name": "exact_inert_graph_and_preserved_migrations",
+      "status": "PASS",
+      "evidence": "All source/output/binary hashes verified; original six migrations unchanged from base; exact boundary and membership repair sources pinned before their hosted applies. Only Edge graph changed; provider/config/private UI outputs unchanged; activation OFF."
+    },
+    {
+      "name": "exact_card_migration_bytes",
+      "status": "PASS",
+      "evidence": "All six byte identities match corrected current card."
+    },
+    {
+      "name": "unchanged_evidence_reuse",
+      "status": "PASS",
+      "evidence": "Six service/crypto/budget/recovery/guidance/teacher reports unchanged from base. Four-case browser evidence reused with identical UI/document/styles/logo bytes."
+    }
+  ],
+  "boundaryMigration": {
+    "path": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
+    "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+  },
+  "priorPinFailurePreserved": "tests/n88-official-activation-scope.json in candidate76a58 and Git history; old CRLF pin superseded by exact LF metadata correction",
+  "migrationHashes": [
+    {
+      "path": "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+      "authorizedSha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c",
+      "actualSha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c",
+      "lfSha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c",
+      "crlfSha256": "4fea91b6b74a0d6c70497ebe170bddb65db8f5a58dc5117ad34412264043eeb4",
+      "exact": true
+    },
+    {
+      "path": "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
+      "authorizedSha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c",
+      "actualSha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c",
+      "lfSha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c",
+      "crlfSha256": "6c19a6dd0443770628724faf0fe0c0a583c140b03797ecd1add7f80a909dfcd5",
+      "exact": true
+    },
+    {
+      "path": "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
+      "authorizedSha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
+      "actualSha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
+      "lfSha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
+      "crlfSha256": "5ed7afae15c8e048e54259b9f7de56ad36921c44130e2ceebafa69d095e5e1bd",
+      "exact": true
+    },
+    {
+      "path": "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
+      "authorizedSha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd",
+      "actualSha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd",
+      "lfSha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd",
+      "crlfSha256": "2f138ac64a5c31eb8bddb7a06dcf25636c3a849560b7f5c4353622a3d196f915",
+      "exact": true
+    },
+    {
+      "path": "supabase/migrations/20261018115648_n88_code_recovery_staged.sql",
+      "authorizedSha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5",
+      "actualSha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5",
+      "lfSha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5",
+      "crlfSha256": "28af63cc8cfee0ddd2e59b251feeb9151d85c9c3ea5ea409e3d2416442babbe6",
+      "exact": true
+    },
+    {
+      "path": "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
+      "authorizedSha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
+      "actualSha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
+      "lfSha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
+      "crlfSha256": "f48be5c930c4567632caa94b59f28a1e19a31a82c208f03aa5cfbbe184252ae1",
+      "exact": true
+    }
+  ],
+  "reused": [
+    {
+      "path": "tests/n88-integrated-class-final-service.json",
+      "sha256": "463627ce78bb65c7c4db76a2bf16cb840331c1eb3030b6f1af021f38701ecbbf"
+    },
+    {
+      "path": "tests/n88-six-digit-security.json",
+      "sha256": "27289091e104a6a49816c2166a4c355d44bd78dee2661cc46cca41000da18122"
+    },
+    {
+      "path": "tests/n88-six-digit-shared-network.json",
+      "sha256": "64f12a375cb5d0960ab73133605f6146749033be63b3c0c74869fba38b341a99"
+    },
+    {
+      "path": "tests/n88-six-digit-recovery.json",
+      "sha256": "9fd5fddb9a2a7961dc0b93d0f173adb734b939233435d268bc0ac51d8d2d7407"
+    },
+    {
+      "path": "tests/n88-task-guidance.json",
+      "sha256": "32d78ff146e33defb3ad1a7e027989d3002d2d00b53dee389f20b559375dae51"
+    },
+    {
+      "path": "tests/n88-teacher-presentation.json",
+      "sha256": "ce01a037686be16401b7758f0afcc72c221a33ee7ec5e0c0aef2160544513cd9"
+    }
+  ],
+  "hostedProof": false
+}

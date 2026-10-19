@@ -2,6 +2,7 @@
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import { PRIVATE_HEADERS } from './service.mjs';
+import {createRolloutGuard} from './rollout-guard.mjs';
 const fail=()=>{throw Error('n88_class_unavailable');};
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const active=m=>m.status==='active' && m.endDate===null && m.studentActive===true && m.classActive===true;
@@ -20,7 +21,7 @@ const summary=rows=>Object.fromEntries(['created','skipped','failed','uncertain'
  * send responses, log secrets or call the old four-digit HTTP /teacher/issue route.
  * Bind request via forRequest(request) in existing authenticated/CSRF ingress handler.
  */
-export function createClassCredentialOperations({repository,verifyTeacher,verifyIngress,origin,resolveClass,issueMember,rotateMember,revokeMember}) {
+export function createClassCredentialOperations({repository,verifyTeacher,verifyIngress,origin,resolveClass,issueMember,rotateMember,revokeMember,rollout=createRolloutGuard()}) {
   if(!repository?.transaction || [verifyTeacher,verifyIngress,resolveClass,issueMember,rotateMember,revokeMember].some(f=>typeof f!=='function') ||
      new URL(origin).origin!==origin || !origin.startsWith('https://')) fail();
   return Object.freeze({forRequest(request) {
@@ -31,12 +32,13 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
           action==='list' && request.method!=='GET' || action!=='list' && (request.method!=='POST' || headers.origin!==origin ||
           headers['x-n88-csrf']!=='1' || headers['content-type']!=='application/json')) return denied();
         const auth=await verifyTeacher(request,ports);
-        if(!auth?.ownerId || !auth.sessionId || auth.current!==true || typeof ports?.synchronizeOwner!=='function') return denied();
-        await ports.synchronizeOwner(auth.ownerId);
+        if(!auth?.ownerId || !auth.sessionId || auth.current!==true || !rollout.allowsOwner(auth.ownerId) || typeof ports?.synchronizeOwner!=='function') return denied();
         const scope=await resolveClass(db,ports,auth,teachingId,input);
         if(!scope || scope.ownerId!==auth.ownerId || scope.current!==true || !id(scope.teachingId) || !id(scope.classId) || !id(scope.revision)) return denied();
         if(teachingId!==null && scope.teachingId!==teachingId) return denied();
-        const members=db.memberships.filter(m=>m.ownerId===auth.ownerId && m.classId===scope.classId && active(m));
+        if(!rollout.admitsTeacher(auth,scope))return denied();
+        await ports.synchronizeOwner(auth.ownerId);
+        const members=db.memberships.filter(m=>m.ownerId===auth.ownerId && m.classId===scope.classId && active(m) && rollout.admitsStudent(m));
         if(members.length>2000 || new Set(members.map(m=>m.studentId)).size!==members.length) return denied();
         // Ambiguous current enrollment anywhere under this owner cannot issue a code.
         if(members.some(m=>db.memberships.filter(x=>x.ownerId===m.ownerId && x.studentId===m.studentId && active(x)).length!==1)) return denied();
@@ -48,6 +50,7 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
         const binding=hash([action,scope.teachingId,input.expectedRosterRevision??null,input.studentId??null,input.enrollmentId??null,input.revision??null,input.credentialVersion??null]);
         const prior=db.classReceipts.find(r=>r.ownerId===auth.ownerId && r.requestId===input.requestId);
         if(prior) {
+          if(!prior.results.every(r=>members.some(m=>m.studentId===r.studentId&&m.enrollmentId===r.enrollmentId)))return denied();
           if(prior.binding!==binding) return result(409,{error:'stale_request'});
           const rows=replay(prior);return result(200,{requestId:input.requestId,replayed:true,results:rows,counts:summary(rows)});
         }
@@ -106,6 +109,9 @@ export function createPgClassResolver({teachingId:boundTeachingId}={}) {
   return async(db,ports,auth,teachingId,input)=>{
     const requested=teachingId ?? boundTeachingId;
     if(!id(requested) || typeof ports?.query!=='function') return null;
+    // Establish the existing transaction-local owner/RLS fence before source reads.
+    // Synchronization writes occur only AFTER this resolver and rollout admission.
+    await ports.query('select n88_private.lock_canonical_sources($1::uuid,$2::integer)',[auth.ownerId,2000]);
     const r=await ports.query(`select t.id,t.section_id,t.revision::text as teaching_revision,
       term.revision::text as term_revision from rakeezx.teachings t
       join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id

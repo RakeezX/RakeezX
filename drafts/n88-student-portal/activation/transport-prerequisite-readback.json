@@ -1,0 +1,67 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "6085920e-db53-474e-9ba9-d2e1efa73012",
+  "recordedAt": "2026-10-18T19:14:57.271Z",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "providerProject": {
+    "status": "ACTIVE_HEALTHY",
+    "host": "db.xlrubcwjqktzzunrvuns.supabase.co",
+    "version": "17.6.1.166"
+  },
+  "transport": {
+    "authAttempted": false,
+    "secretGenerated": false,
+    "defaultResolution": "ENOTFOUND",
+    "aRecord": "ENODATA",
+    "aaaaRecord": "2406:da1a:314:7102:b56b:ec54:38ab:5060",
+    "observedAaaaTcp5432": "ENETUNREACH",
+    "tlsHandshakeReached": false,
+    "scope": "Existing local custodian direct connection only; this does not prove Edge/provider network availability or outage."
+  },
+  "freshAbsence": {
+    "requiredVersions": [
+      {
+        "version": "20261018034356",
+        "applied": false
+      },
+      {
+        "version": "20261018102843",
+        "applied": false
+      },
+      {
+        "version": "20261018110713",
+        "applied": false
+      },
+      {
+        "version": "20261018114113",
+        "applied": false
+      },
+      {
+        "version": "20261018115648",
+        "applied": false
+      },
+      {
+        "version": "20261018125611",
+        "applied": false
+      },
+      {
+        "version": "20261018185300",
+        "applied": false
+      }
+    ],
+    "n88Functions": []
+  },
+  "disposition": {
+    "hostedWrites": 0,
+    "roleOrPasswordChanges": 0,
+    "serviceSecrets": 0,
+    "hostedFixtureConsumed": false,
+    "browserUsed": false,
+    "newDeployments": [],
+    "ownedHostedCleanup": "No N88 function appears in current provider list; no owned hosted resource was created or disarmed. Unrelated historical functions untouched.",
+    "readiness": "OFF"
+  },
+  "retryCondition": "Obtain this existing project's provider-supplied Session pooler host:port (no credentials), or a sanctioned IPv6-capable custodian runtime. Verify TLS and exact restricted-role identity using existing protected custody; refresh only imminent phase baselines. Do not guess pooler host, purchase IPv4, repeat OAuth or replay migrations.",
+  "reference": "https://supabase.com/docs/guides/database/connecting-to-postgres"
+}

@@ -1,0 +1,115 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "state": "LOCAL_READY",
+  "scope": "Publisher-ready owner-restricted pilot only",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "savedCandidatePreserved": "aff7a76542b64500aa9794dd9c34c7372e19c9af",
+  "implementationCandidates": [
+    "b5143a3d88c67aa3495f6af04dd43084c96c9f2b"
+  ],
+  "checks": [
+    {
+      "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+      "status": "PASS",
+      "evidence": "Reused source-bound hosted-activation-outcome.json: all eight exact migrations already applied/read back. No SQL replay or credential change. Current protected pilot binding installed through original custodian; hosted-pilot-live-readiness.json confirms restricted identity/configuration."
+    },
+    {
+      "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "status": "PASS",
+      "evidence": "pilot-provider-readback-3576957c.json and hosted-pilot-http.json: exact provider source/config/routes, private document/assets/headers/MIME and anonymous API401. Current owned logging/Logpush/tails disabled; unchanged account/zone evidence retained."
+    },
+    {
+      "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "Original five actual PostgreSQL canary/log cases and typed76-routine source/ACL evidence reused unchanged. Final own Edge direct readiness verifies exact deployed boundary; no hosted canary or logging changes."
+    },
+    {
+      "name": "n88_exact_private_guard_membership_inherit_correction",
+      "status": "PASS",
+      "evidence": "Original exact applied correction and hosted readback retained in hosted-activation-outcome.json. No role membership, grant or migration change this run; only intended existing LOGIN restored for authorized pilot."
+    },
+    {
+      "name": "n88_actual_scram_iteration_compatibility",
+      "status": "PASS",
+      "evidence": "Reused own hosted-scram-restored-challenge.json: same-salt16384 stored/4096 announced, no final proof. Original credential unchanged; actual direct strictTLS/upstreamSSL and identity pass in hosted-pilot-live-readiness.json."
+    },
+    {
+      "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+      "status": "PASS",
+      "evidence": "tests/n88-official-activation-pilot-service.json and pilot-ui.json: actual Auth/session/source/RLS, one-owner/two-member admission, excluded receipt/member/publication preservation, rollback/ACK/recovery and actual store/dispatch/DOM/CSS negative paths. Protected actual pilot configuration readback passes."
+    },
+    {
+      "name": "n88_pilot_original_service_and_frontend_publisher_package",
+      "status": "PASS",
+      "evidence": "Final exact Edge20/source cb0371e... and Worker/source5e1e74... read back; signed live pilot readiness and anonymous ingress denial pass. Actual normal teacher pilot frontend is prepared for sole publisher. Anonymous official student DOM/CSS passed; no full hosted journey claimed."
+    },
+    {
+      "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "status": "NOT_RUN",
+      "evidence": "Explicit pilot-stage deferral until verified frontend publication. Original stagedActivation requirements retained; no code issuance, real data/send or extra fixture budget."
+    },
+    {
+      "name": "n88_official_publisher_readiness_route_and_served_behavior",
+      "status": "NOT_RUN",
+      "evidence": "Full public rollout remains gated. This worker did not integrate/publish main or certify the publisher's served teacher frontend."
+    },
+    {
+      "name": "phase_resource_disposition",
+      "status": "PASS",
+      "evidence": "Owned native PG/HTTP/browser processes closed; integration/browser/live-mutation leases released. Owned staging deletion was rejected before execution: CreateProcess rejected: blocked by policy. Directory retained with owner marker; no alternate cleanup, tool-policy change or touch of inherited rejected resources."
+    }
+  ],
+  "officialTrialUrl": "https://rakeezx.com/student",
+  "fullProductCompletion": false,
+  "publicMode": false,
+  "originalFinalAcceptance": "Canonical stagedActivation retained unchanged; same-session continuation after verified pilot receipt",
+  "fixtureDisposition": {
+    "existingTeacher": 1,
+    "existingFabricatedStudentsBound": 2,
+    "newAuthUsers": 0,
+    "newCanonicalStudents": 0,
+    "canonicalOrGradeMutations": 0,
+    "studentCodesIssued": 0,
+    "messages": 0,
+    "fieldsPublished": 0,
+    "ownerBinding": "encrypted original custodian and provider configuration only"
+  },
+  "retainedResource": {
+    "path": "drafts/n88-student-portal/activation/owned-pilot-deploy-3576957c.tmp",
+    "cleanup": "NOT_EXECUTED_POLICY_DENIED",
+    "denial": "CreateProcess rejected: blocked by policy",
+    "ownedMarkerRunId": "3576957c-1cf3-455d-8d62-150b1934b728",
+    "observedFilenames": [
+      "owner.json",
+      "config.toml",
+      "cli-latest",
+      "linked-project.json",
+      "deno.json",
+      "deno.lock",
+      "import_map.json",
+      "index.mjs"
+    ],
+    "noAlternateDeletion": true,
+    "activeOwnedProcesses": 0
+  },
+  "temporaryInputs": {
+    "sqlEnvAndPilotSourceRemoved": true,
+    "encryptedRecoveryRetained": true,
+    "inheritedRejectedPgDirectoryUntouched": true
+  },
+  "historicalFailures": {
+    "initialFixture": "tests/n88-official-activation-pilot-service.initial-failure.json",
+    "preimageFixture": "tests/n88-official-activation-pilot-service.preimage-fixture-failure.json",
+    "uiFixture": "tests/n88-official-activation-pilot-ui.initial-failure.json",
+    "additionalObservedHarnessFailures": [
+      "RLS source resolution initially ran before the existing transaction-local canonical lock; repaired the original resolver ordering without relaxing RLS",
+      "Changed-binding test initially retained its sorted first pupil; corrected the actual excluded-pupil fixture"
+    ],
+    "provider": [
+      "hosted-pilot-readiness.initial-config-failure.json",
+      "hosted-pilot-http.initial-api-failure.json",
+      "hosted-pilot-http.initial-mime-failure.json"
+    ]
+  }
+}

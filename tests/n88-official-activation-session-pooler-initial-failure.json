@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "1b9971f9-e3ae-4e07-9d05-52923064dd91",
+  "at": "2026-10-18T19:28:01.451Z",
+  "host": "aws-0-ap-south-1.pooler.supabase.com",
+  "port": 5432,
+  "mode": "session",
+  "modeEvidence": "supabase-session-pooler-readonly.json; provider Connect UI, not inferred from region",
+  "authenticationAttempted": false,
+  "hostedWrites": 0,
+  "ipv4": [
+    "65.0.195.55",
+    "3.111.105.85"
+  ],
+  "result": {
+    "status": "FAIL",
+    "stage": "verified-tls-no-auth",
+    "code": "SELF_SIGNED_CERT_IN_CHAIN"
+  },
+  "socketsClosed": true
+}

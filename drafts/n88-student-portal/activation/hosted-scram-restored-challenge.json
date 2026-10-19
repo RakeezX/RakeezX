@@ -1,0 +1,15 @@
+{
+  "runId": "9190735f-6ed0-4513-8ef1-5a3ef24ec6f8",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "status": "PASS",
+  "announcedIterations": 4096,
+  "expectedStoredIterations": 16384,
+  "saltMatchesOwnStoredPublicChallenge": true,
+  "strictTls": true,
+  "hostnameVerified": true,
+  "proofSent": false,
+  "passwordSent": false,
+  "privateQueryExecuted": false,
+  "verifierWritten": false,
+  "temporaryLoginOnly": true
+}

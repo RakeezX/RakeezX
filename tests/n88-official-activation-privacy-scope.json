@@ -1,0 +1,37 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "4c5a66bc-5348-4e74-86a2-2ce6b2b5eec9",
+  "preservedCandidate": "a4af0e926b5120dabc762ec94881247d130c09bd",
+  "at": "2026-10-18T18:51:02.430Z",
+  "checks": [
+    {
+      "name": "affected_package_and_saved_proofs",
+      "status": "PASS",
+      "evidence": "All source/output/binary hashes match; only existing-host and Edge bundle changed. Client/Cloudflare/teacher/startup/SW graphs unchanged, all gates OFF, six immutable SQL pins match. Existing UI/custody/catalog/Logpush evidence preserved without rerun."
+    }
+  ],
+  "reused": [
+    {
+      "path": "tests/n88-official-activation-custody-probe.json",
+      "sha256": "cd09734c2470dca3934813f4bc9354a38ad13a5a8b3fc5fd4eecc706046c09e3"
+    },
+    {
+      "path": "tests/n88-official-activation-custody-initial-failure.json",
+      "sha256": "bc888e0ea3decd3a960e77370f5e755374c05f309bb0e9920c5d57e0e52aa033"
+    },
+    {
+      "path": "tests/n88-official-activation-private-assets.json",
+      "sha256": "3edefd85293c7a75d53cc3559da8e43fbb5624eeab684e8ee926f5984b0a179f"
+    },
+    {
+      "path": "tests/n88-official-activation-catalog.json",
+      "sha256": "fe231856c53da4df5377d04ff3a27fe830b888b80624a8a077658af585299ce2"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/logpush-corrected-readback.json",
+      "sha256": "af17d122bc9e1a416776ee6feb30a1337eb346bfef21a65bce867ec77668d7f5"
+    }
+  ],
+  "serviceReadiness": false
+}

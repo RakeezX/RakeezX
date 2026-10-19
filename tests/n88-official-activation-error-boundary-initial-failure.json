@@ -1,0 +1,6 @@
+{
+  "status": "FAIL",
+  "phase": "local compiler harness cleanup",
+  "evidence": "76 routines compiled and native fixture cleanup completed; pending pg custom Describe query timeout callbacks then raised TypeError: queryCallback is not a function, exit1.",
+  "correction": "Custom Describe query now completes through pg's wrapped callback, clearing its query timer. No hosted operation occurred."
+}

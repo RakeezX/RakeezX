@@ -1,0 +1,192 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "9190735f-6ed0-4513-8ef1-5a3ef24ec6f8",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "preservedCandidate": "d148634b0756b48e3563c71358454f4d6cbcc5ce",
+  "state": "BLOCKED",
+  "protocol": {
+    "diagnostic": "hosted-scram-restored-challenge.json",
+    "disabledDiagnostic": "hosted-scram-public-challenge.json",
+    "announcedIterations": 4096,
+    "ownStoredIterations": 16384,
+    "ownSaltMatched": true,
+    "proofSent": false,
+    "passwordSent": false,
+    "verifierChanged": false,
+    "passwordChanged": false,
+    "saltChanged": false,
+    "primaryEvidence": "https://github.com/supabase/supavisor/commit/356029200cbe4a9be190b6e6ec13149b08cbc4c7",
+    "interpretation": "Own server-first challenge confirms the exact iteration mismatch hypothesis. Final card precedence followed: retain original16384 verifier and use secure original Edge direct transport; no4096 repair or pooler final proof/cache retry."
+  },
+  "direct": {
+    "receipt": "hosted-direct-readiness.json",
+    "status": "PASS",
+    "httpStatus": 200,
+    "loginExact": true,
+    "roleExact": true,
+    "upstreamSsl": true,
+    "clientTlsAuthorized": true,
+    "sourceBoundary": true,
+    "configurationReady": true,
+    "source": "809361465b540403d48397fed7ea5e55bc934065be021e7ed31bc7374d98e57d",
+    "originalFunctionOnly": true,
+    "privateOperationsExecuted": 0,
+    "wrapperFailuresPreserved": [
+      "hosted-direct-readiness-initial-failure.json",
+      "hosted-direct-configuration-initial-failure.json"
+    ],
+    "targetedWrapperProof": "tests/n88-official-activation-direct-readiness.json"
+  },
+  "deployedOriginalFunction": {
+    "id": "9da39c86-ed1a-4bbe-91a1-e0d291b07c04",
+    "name": "n88-student-portal",
+    "providerVersion": 9,
+    "ezbr_sha256": "e452c6d38895864139e47e68786d8721fcd5de93a099ff1b0c5ba88aa5e6478c",
+    "verify_jwt": false,
+    "actualDownloadedSourceMatchesCandidate": true,
+    "sourceSha256": "809361465b540403d48397fed7ea5e55bc934065be021e7ed31bc7374d98e57d",
+    "productEnabled": false,
+    "signedReadinessEnabledAfterPause": false
+  },
+  "cloudflare": {
+    "worker": "rakeez-n88-private-ingress",
+    "accountId": "1c9ae85e766968a4269a7ac505f9a693",
+    "zoneId": "1aefe7f448c93a8af637a718ac2cd101",
+    "providerMemorySecretGeneration": true,
+    "encryptedRsa3072OaepSha256Handoff": true,
+    "originalLocalRecipient": true,
+    "secretValuesReturned": false,
+    "ingressReceivedAndProtected": true,
+    "onlyIngressSecretOnCloudflare": true,
+    "scriptEtag": "c6e6ce4e0bec668dab4881114f57203116ec72762a81cb051f19376c2f1e89af",
+    "explicitOwnedObservabilityConfigurationResponse": {
+      "observability": {
+        "enabled": false,
+        "head_sampling_rate": 0,
+        "logs": {
+          "enabled": false,
+          "head_sampling_rate": 0,
+          "persist": null,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": null,
+          "head_sampling_rate": 0
+        }
+      },
+      "logpush": false,
+      "tail_consumers": [],
+      "bindings": [
+        {
+          "name": "N88_EDGE_URL",
+          "type": "plain_text"
+        },
+        {
+          "name": "N88_ENABLED",
+          "type": "plain_text"
+        },
+        {
+          "name": "N88_INGRESS_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "N88_PUBLIC_ORIGIN",
+          "type": "plain_text"
+        }
+      ]
+    },
+    "currentMetadata": {
+      "settings": {
+        "success": true,
+        "status": 200,
+        "logpush": false,
+        "tail_consumers": [],
+        "bindings": [
+          {
+            "name": "N88_EDGE_URL",
+            "type": "plain_text",
+            "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n88-student-portal"
+          },
+          {
+            "name": "N88_ENABLED",
+            "type": "plain_text",
+            "text": "false"
+          },
+          {
+            "name": "N88_INGRESS_KEY",
+            "type": "secret_text"
+          },
+          {
+            "name": "N88_PUBLIC_ORIGIN",
+            "type": "plain_text",
+            "text": "https://rakeezx.com"
+          }
+        ]
+      },
+      "subdomain": {
+        "enabled": false,
+        "previews_enabled": false
+      },
+      "ownRoutes": [],
+      "routeReadSuccess": true
+    },
+    "observabilityReadbackNote": "Explicit PATCH response records disabled logs/invocation/traces and sampling0. Subsequent GET settings omits observability; do not relabel that omission as an explicit false field. Account/zone/headers/Logpush successful prior evidence reused unchanged."
+  },
+  "installedSecretNames": [
+    "N88_AUTH_API_KEY",
+    "N88_AUTH_URL",
+    "N88_DATABASE_CA_CERT",
+    "N88_DATABASE_URL",
+    "N88_ENABLED",
+    "N88_HMAC_KEY",
+    "N88_INGRESS_KEY",
+    "N88_NUMERIC_KEY",
+    "N88_PUBLIC_ORIGIN",
+    "N88_READINESS_ENABLED",
+    "N88_RECOVERY_ACTIVE_VERSION",
+    "N88_RECOVERY_KEY_n88_1792356057764",
+    "N88_RECOVERY_VERSIONS",
+    "N88_RESERVATION_KEY",
+    "N88_SERVICE_REVISION",
+    "N88_SERVICE_SOURCE_SHA"
+  ],
+  "recoveryVersion": "n88_1792356057764",
+  "migrationHistory": "All8 exact prior sources/readbacks reused; no migration applied or rewritten this run.",
+  "ui": {
+    "tabId": "2005438157",
+    "origin": "https://rakeezx.com",
+    "teachingId": "tch:sec:8d78704e-fd86-4b95-aa92-83957740daf6|sub:digital-skills|tm:y:1448-1449:1",
+    "actualDomHeading": "مساحة طلاب الفصل",
+    "actualDomMessage": "مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة الخاصة بعد.",
+    "route": "/student-portal",
+    "renderedAcceptance": "NOT_RUN: actual served readiness gate is OFF",
+    "bound": "Displayed roster28; never issue a class batch against it under maxStudents2. Use only the authorized bounded fabricated fixture.",
+    "tabReturnedToClasses": true,
+    "syncAtEnd": "متزامن",
+    "credentialsOrTokensRead": false
+  },
+  "finalDisposition": {
+    "backendNoLoginReadback": true,
+    "backendNoInherit": true,
+    "backendMemberships": 0,
+    "privilegedFlags": false,
+    "edgeProductEnabled": false,
+    "edgeReadinessEnabled": false,
+    "edgeReadinessAfterDisarmHttp": 503,
+    "cloudflareEnabled": false,
+    "cloudflareOwnRoutes": 0,
+    "workersDev": false,
+    "previews": false,
+    "fixtureMutations": 0,
+    "codesIssued": 0,
+    "messages": 0,
+    "publicFieldsPublished": 0,
+    "encryptedOriginalRecoveryRetained": true,
+    "temporarySqlEnvAndPublicConfigurationRemoved": true,
+    "priorRejectedResourceTouched": false,
+    "n44CredentialsRolesObjectsTouched": false
+  },
+  "blocker": "Actual official teacher portal is still gated OFF. No publisher-owned HTTPS actual-application test target with the designated owner is available to execute the required teacher/student hosted journey before official readiness.",
+  "retryCondition": "The independent publisher/controller provides the scoped actual-application HTTPS test rollout for this exact service candidate and bounded fabricated owner/two-student fixture, then resumes this same session. Reuse successful direct/crypto/schema proof; do not repeat the pooler failure or issue the displayed28-student batch."
+}

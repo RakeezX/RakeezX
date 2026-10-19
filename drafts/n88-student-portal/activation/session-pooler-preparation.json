@@ -1,0 +1,14 @@
+{
+  "taskId":"continuous-n88-official-student-portal-activation-20261018",
+  "runId":"1b9971f9-e3ae-4e07-9d05-52923064dd91",
+  "projectId":"xlrubcwjqktzzunrvuns",
+  "transport":"Provider-observed IPv4 SESSION pooler5432; TLSv1.3/CA/hostname verification PASS before Auth; original IPv6 and default-trust failures retained.",
+  "custodyChannel":"Official CLI2.120.0 db query --linked --project-ref --file returned postgres, SCRAM-SHA-256, error-parameter0 and no N88 role/schema. Initial missing --linked invocation preserved as harness failure; no debug/credential read.",
+  "freshDirectoryProtection":"PASS with standard .NET Directory.SetAccessControl/GetAccessControl on this run's fresh directory; exactly one current-user FullControl rule, inheritance protected. Initial PowerShell.Security module-load failure preserved; no actual ACL denial or policy bypass.",
+  "localScram":"tests/n88-official-activation-scram.json; actual restricted login PASS, original high-entropy password absent from SQL/logs, verifier DDL audit retained. DPAPI/RSA proof reused unchanged.",
+  "fixtureGrounding":{"tabId":"2005438157","normalUiTestTeacherLabelVerified":true,"sync":"synchronized","teachingId":"tch:sec:8d78704e-fd86-4b95-aa92-83957740daf6|sub:digital-skills|tm:y:1448-1449:1","sectionId":"sec:8d78704e-fd86-4b95-aa92-83957740daf6","ownerId":"fb521d8a-9ebb-44bc-96bc-f194d7030528","sourceMetadataOnly":true,"credentialsRead":false,"mutations":0,"maxStudentsForLaterTrial":2,"bulkIssueExistingClassForbidden":true},
+  "freshCatalog":"session-pooler-preapply-catalog.json: full original N88 source catalog unchanged; no personal rows",
+  "liveSecretsGenerated":false,
+  "teacherReadiness":false,
+  "browserPhase":"RELEASED browser; designated tab left open, read panel closed"
+}

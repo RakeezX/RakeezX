@@ -1,0 +1,8 @@
+{
+  "source": "a9996f0fa30f6182518a142b11a175931470d5811acff3fc946380d5830c2a64",
+  "httpStatus": 200,
+  "serviceStatus": 401,
+  "genericDenial": true,
+  "noTeacherBindingOrTokenSent": true,
+  "privateQueries": 0
+}

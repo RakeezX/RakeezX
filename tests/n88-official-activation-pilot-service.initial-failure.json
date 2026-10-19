@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "status": "FAIL",
+  "checks": [],
+  "hostedProof": false,
+  "renderedUiProof": false,
+  "cleanup": {
+    "ownedNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "failure": {
+    "name": "AssertionError",
+    "message": "assertion failed",
+    "stack": "    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018/tests/n88-official-activation-pilot-service.mjs:37:138"
+  }
+}

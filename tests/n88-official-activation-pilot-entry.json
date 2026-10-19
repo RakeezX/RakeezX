@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "checks": [
+    "actual Edge entry does not cache early OFF host",
+    "enabled configured pilot reaches signed-transport rejection",
+    "OFF/unknown/malformed closes cached service",
+    "unsigned requests never acquire private DB"
+  ],
+  "hostedProof": false
+}

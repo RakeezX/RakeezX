@@ -1,0 +1,173 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "4ddd5df2-933f-4754-8d04-0d27be47bcff",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "state": "BLOCKED",
+  "membershipRepair": {
+    "sourceCandidate": "599f6374133ae9991da77a4e4500fe3616d319d6",
+    "source": "supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql",
+    "sourceSha256": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de",
+    "providerVersion": "20261018203630",
+    "onlyExistingPostgresGrantedInheritChanged": true,
+    "originalExpectedIdentityMatched": true,
+    "allOtherIdentitiesUnchanged": true,
+    "localProof": "tests/n88-official-activation-membership.json",
+    "originalFailurePreserved": "hosted-phase1-membership-mismatch.json"
+  },
+  "history": [
+    {
+      "version": "20261018194329",
+      "name": "n88_exact_activation_staged_20261018034356",
+      "sha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c"
+    },
+    {
+      "version": "20261018203630",
+      "name": "n88_guard_membership_inherit_staged_20261018195100",
+      "sha256": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de"
+    },
+    {
+      "version": "20261018203704",
+      "name": "n88_integrated_class_staged_20261018102843",
+      "sha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c"
+    },
+    {
+      "version": "20261018203805",
+      "name": "n88_six_digit_staged_20261018110713",
+      "sha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff"
+    },
+    {
+      "version": "20261018203837",
+      "name": "n88_shared_network_budget_staged_20261018114113",
+      "sha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd"
+    },
+    {
+      "version": "20261018203858",
+      "name": "n88_code_recovery_staged_20261018115648",
+      "sha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5"
+    },
+    {
+      "version": "20261018203919",
+      "name": "n88_task_guidance_staged_20261018125611",
+      "sha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060"
+    },
+    {
+      "version": "20261018203939",
+      "name": "n88_private_error_boundary_staged_20261018185300",
+      "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+    }
+  ],
+  "historyIdentity": "Eight actual provider-assigned versions; immutable source hashes. M1 skipped, repair placed before M2. No replay.",
+  "schemaReadback": {
+    "m2": "hosted-m2-identities.json",
+    "m3": "hosted-m3-identities.json",
+    "m4": "hosted-m4-identities-comparison.json",
+    "m5": "hosted-m5-identities-comparison.json",
+    "m6": "hosted-m6-identities-comparison.json",
+    "boundary": "hosted-boundary-identities-comparison.json",
+    "preservedIdentity": "hosted-m7-preserved-identities-comparison.json",
+    "allMatched": true
+  },
+  "credentialEquality": {
+    "storedKeyMatchesOriginalCredential": true,
+    "serverKeyMatchesOriginalCredential": true,
+    "loginDisabledDuringEquality": true,
+    "methodReference": "d8aaa9a4ccc0230bee1ea280b152dd7c57bbb250:scripts/n44-activation-equality.mjs; adapted fixed N88 role only via protected official CLI files",
+    "otherRoleCredentialsRead": false,
+    "secretValuesReturned": false
+  },
+  "preAuthenticationReadback": {
+    "rolcanlogin": true,
+    "rolinherit": false,
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "rolreplication": false,
+    "rolconnlimit": -1,
+    "rolvaliduntil": null,
+    "rolconfig": null,
+    "database_connect": true,
+    "memberships": 0
+  },
+  "connection": {
+    "host": "aws-0-ap-south-1.pooler.supabase.com",
+    "port": 5432,
+    "mode": "session",
+    "username": "n88_backend.xlrubcwjqktzzunrvuns",
+    "database": "postgres",
+    "pinnedCaAndHostnameVerification": true,
+    "attempts": 1,
+    "result": "FAIL",
+    "sqlstate": "28P01",
+    "cause": "Unexplained SESSION pooler authentication rejection despite own credential equality and nonsecret preconditions; no cache/global cause inferred.",
+    "runtimeCaptureBoundaryGuard": "NOT_RUN: authentication failed first",
+    "privateQueriesExecuted": false,
+    "retryForbidden": true
+  },
+  "finalDisposition": {
+    "roles": [
+      {
+        "name": "n88_backend",
+        "login": false,
+        "inherit": false,
+        "createdb": false,
+        "bypassrls": false,
+        "no_expiry": true,
+        "superuser": false,
+        "createrole": false,
+        "replication": false,
+        "connection_limit": -1
+      },
+      {
+        "name": "n88_guard",
+        "login": false,
+        "inherit": false,
+        "createdb": false,
+        "bypassrls": false,
+        "no_expiry": true,
+        "superuser": false,
+        "createrole": false,
+        "replication": false,
+        "connection_limit": -1
+      }
+    ],
+    "backend_connect": true,
+    "membership_options": [
+      {
+        "set": false,
+        "role": "n88_backend",
+        "admin": true,
+        "member": "postgres",
+        "grantor": "supabase_admin",
+        "inherit": false
+      },
+      {
+        "set": false,
+        "role": "n88_guard",
+        "admin": false,
+        "member": "postgres",
+        "grantor": "postgres",
+        "inherit": false
+      },
+      {
+        "set": false,
+        "role": "n88_guard",
+        "admin": true,
+        "member": "postgres",
+        "grantor": "supabase_admin",
+        "inherit": false
+      }
+    ],
+    "backend_memberships": 0
+  },
+  "readiness": false,
+  "secretsInstalled": false,
+  "cloudflareWrites": 0,
+  "edgeDeployments": 0,
+  "fixtureMutations": 0,
+  "messages": 0,
+  "n44ObjectsOrRecoveryTouched": false,
+  "custodyDisposition": "Owned current-user-only directory retains original versioned material solely as DPAPI CurrentUser encrypted recovery. Transient protected SQL inputs removed in finally. No provider ingress secret generated or bound.",
+  "blockerType": "external",
+  "retryCondition": "A materially evidenced resolution of this exact restricted SESSION authentication rejection and separately authorized proof attempt. Do not retry, rotate, create another role, use another endpoint/proxy or replay migrations."
+}

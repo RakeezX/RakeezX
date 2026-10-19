@@ -1,0 +1,15 @@
+{
+  "initialHarnessFailure": "pg custom Describe timer raised TypeError: queryCallback is not a function after compilation; corrected wrapped callback completion.",
+  "secondHarnessFailure": "A failing assertion reached fixture pool.end while the borrowed client was unreleased; corrected finally to release the owned client before closing the pool.",
+  "toolDenial": "Combined verified Stop-Process/pg_ctl/Remove-Item cleanup command rejected: blocked by policy. No retry of process termination or recursive deletion was made.",
+  "saferDisposition": "Direct pg_ctl -D exact owned data directory -m fast -w -t20 stop exited0: server stopped. The test process then exited1 on connection termination. Residual stopped fixture directory retained; no live owned PostgreSQL server from that attempt.",
+  "retainedDirectory": "tests/fixtures/n88-integrated-class/owned-092b1fd8-7b19-4b11-81e1-41c4f096f362",
+  "finalResourceReadback": {"originalNode17636Absent":true,"originalPostgres2892Absent":true,"laterOwnedNativeFixturesClosed":true,"integrationLease":"RELEASED integration","residualDirectoryExcludedFromCandidate":true},
+  "correctedFixtureAssertion": "The initial FK canary targeted contexts.owner_id, which has no FK by the immutable schema. It correctly succeeded. The corrected test uses the actual credentials(namespace,owner_id) FK; no constraint was added or weakened.",
+  "additionalHarnessCorrections": [
+    "Permission test initially selected the first generic snapshot query rather than contexts; corrected to exact contexts read after its local-only SELECT revoke.",
+    "Foreign-owner projection read correctly changed the existing canonical-owner RLS fence and denied a later owner write (42501); corrected fixture restores the actual owner helper fence before writing. No guard or policy changed.",
+    "After changing routine identity hashes from MD5 to SHA256, static repository import cached prior JSON before compilation. Corrected harness imports the actual repository and boundary only after writing the exact compiled identities. Missing/wrong identity rejection retained."
+  ],
+  "hostedMutations": 0
+}

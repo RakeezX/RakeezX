@@ -1,0 +1,102 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "1b9971f9-e3ae-4e07-9d05-52923064dd91",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "sourceCandidate": "d4f445b49d7784028840f07c682eed14c04ee572",
+  "state": "BLOCKED",
+  "phase": "first migration identity readback",
+  "appliedSource": "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+  "appliedAtMostOnce": true,
+  "sourceSha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c",
+  "providerReadback": {
+    "roles": [
+      {
+        "name": "n88_backend",
+        "login": false,
+        "inherit": false,
+        "createdb": false,
+        "bypassrls": false,
+        "superuser": false,
+        "createrole": false,
+        "replication": false
+      },
+      {
+        "name": "n88_guard",
+        "login": false,
+        "inherit": false,
+        "createdb": false,
+        "bypassrls": false,
+        "superuser": false,
+        "createrole": false,
+        "replication": false
+      }
+    ],
+    "history": [
+      {
+        "name": "n88_exact_activation_staged_20261018034356",
+        "version": "20261018194329",
+        "statement_count": 1,
+        "recorded_sql_sha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c"
+      }
+    ],
+    "memberships": [
+      {
+        "role": "n88_backend",
+        "member": "postgres",
+        "grantor": "supabase_admin",
+        "set_option": false,
+        "admin_option": true,
+        "inherit_option": false
+      },
+      {
+        "role": "n88_guard",
+        "member": "postgres",
+        "grantor": "postgres",
+        "set_option": false,
+        "admin_option": false,
+        "inherit_option": true
+      },
+      {
+        "role": "n88_guard",
+        "member": "postgres",
+        "grantor": "supabase_admin",
+        "set_option": false,
+        "admin_option": true,
+        "inherit_option": false
+      }
+    ]
+  },
+  "identityComparison": {
+    "expected": "activation/expected-identities.json",
+    "differences": [
+      {
+        "path": "identities.memberships[2].inherit_option",
+        "actual": true,
+        "expected": false
+      }
+    ],
+    "grantorReadback": "The discrepant n88_guard -> postgres edge is granted by postgres; the separate supabase_admin admin edge has inherit_option=false."
+  },
+  "remainingMigrationsApplied": 0,
+  "privateQueriesAllowed": false,
+  "loginProvisioned": false,
+  "secretsGenerated": false,
+  "secretsInstalled": false,
+  "edgeFunctionDeployed": false,
+  "cloudflareWorkerDeployed": false,
+  "publicRoutesActivated": false,
+  "teacherReadiness": false,
+  "hostedFixtureMutations": 0,
+  "messagesSent": 0,
+  "cleanup": {
+    "ownedEmptyCustodyPreparationRemoved": true,
+    "recursiveDelete": false,
+    "priorRejectedResourceTouched": false,
+    "browserLease": "RELEASED",
+    "liveMutationLease": "RELEASED",
+    "integrationLease": "RELEASED",
+    "ownedDeployedResourcesToDisarm": 0
+  },
+  "blocker": "Exact post-migration membership identity differs: n88_guard granted by postgres to postgres has inherit_option=true; the approved expected identity requires false. Stopped before migration 2; no automatic grant/revoke or baseline rewrite.",
+  "retryCondition": "A separately scoped approved correction or security-preserving contract resolution for this exact membership mismatch. On resume, reconcile provider version 20261018194329 against its exact source hash and skip the already-applied first migration; do not replay or replenish migration allowance."
+}

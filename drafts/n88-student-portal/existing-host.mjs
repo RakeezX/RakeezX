@@ -2,17 +2,53 @@
  * No service-role key, new account, SDK Auth flow, migrations or runtime fixtures.
  */
 import {Buffer} from 'node:buffer';
+import {createHash} from 'node:crypto';
 import pg from 'pg';
 import manifest from './deployment.inactive.json' with {type:'json'};
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
+import {assertVerifiedBoundary} from './activation/private-error-boundary.mjs';
+import {assertRestrictedTransport} from './activation/database-transport.mjs';
+import {createRolloutGuard} from './rollout-guard.mjs';
+// Source-side error redaction cannot prevent the database server logging DETAIL.
+// Read only effective session settings before granting the repository this client.
+export async function assertPrivateDatabaseSession(client) {
+  const result=await client.query(`select current_user as role,
+    current_setting('log_error_verbosity') as error_verbosity,
+    current_setting('log_parameter_max_length_on_error') as error_parameters,
+    current_setting('log_statement') as statements,
+    current_setting('log_min_duration_statement') as duration,
+    current_setting('log_min_duration_sample') as duration_sample,
+    current_setting('log_transaction_sample_rate') as transaction_sample,
+    current_setting('pgaudit.log',true) as audit,
+    (select setting from pg_settings where name='auto_explain.log_min_duration') as explain_duration,
+    current_setting('auto_explain.log_nested_statements',true) as explain_nested`);
+  const r=result.rows?.[0];
+  // Statements have a hard3s timeout. An explain threshold above that cannot
+  // capture a completed private statement; missing extension settings are inert.
+  const explainSafe=r && (r.explain_duration==null || r.explain_duration==='-1' ||
+    /^\d+$/.test(r.explain_duration) && Number(r.explain_duration)>3000 && r.explain_nested==='off');
+  if(result.rows?.length!==1 || !r || r.role!=='n88_backend' || !['terse','default'].includes(r.error_verbosity) ||
+    r.error_parameters!=='0' || !['none','ddl'].includes(r.statements) ||
+    r.duration!=='-1' || r.duration_sample!=='-1' || Number(r.transaction_sample)!==0 ||
+    r.transaction_sample==null || ![null,'none'].includes(r.audit) || !explainSafe)
+    throw Error('n88_database_unavailable');
+  // Even terse cannot make an arbitrary private query safe. Verify the exact
+  // typed routines, source identities, owner, invoker mode and narrow ACL first.
+  await assertVerifiedBoundary(client);
+}
 export function createExistingHost(readEnv) {
   if(readEnv('N88_ENABLED')!=='true')return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});
+  const rollout=createRolloutGuard(readEnv);
+  if(!rollout.configured)return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});
   const required=n=>{const v=readEnv(n);if(typeof v!=='string' || !v)throw Error('n88_configuration');return v;};
   const origin=required('N88_PUBLIC_ORIGIN'),authUrl=required('N88_AUTH_URL'),dbUrl=required('N88_DATABASE_URL');
   const db=new URL(dbUrl);
   const username=decodeURIComponent(db.username);
-  if(!['postgres:','postgresql:'].includes(db.protocol) || !(username==='n88_backend' || /^n88_backend\.[a-z0-9]{20}$/.test(username)) || !db.password || db.search || db.hash)throw Error('n88_database_configuration');
+  const direct=db.hostname==='db.xlrubcwjqktzzunrvuns.supabase.co'&&username==='n88_backend';
+  const session=db.hostname==='aws-0-ap-south-1.pooler.supabase.com'&&username==='n88_backend.xlrubcwjqktzzunrvuns';
+  if(!['postgres:','postgresql:'].includes(db.protocol) || !(direct||session) || !['','5432'].includes(db.port) ||
+    db.pathname!=='/postgres' || !db.password || db.search || db.hash)throw Error('n88_database_configuration');
   const key=n=>{const s=required(n);if(!/^[a-f0-9]{64}$/.test(s))throw Error('n88_key_configuration');return Buffer.from(s,'hex');};
   // Physical deployment gate; readback/authorization evidence still required.
   if(required('N88_SERVICE_REVISION')!==manifest.serviceRevision)throw Error('n88_service_readback_missing');
@@ -24,8 +60,11 @@ export function createExistingHost(readEnv) {
   const versions=required('N88_RECOVERY_VERSIONS').split(',');
   if(versions.length>8||new Set(versions).size!==versions.length||versions.some(v=>!/^[A-Za-z0-9_-]{1,40}$/.test(v)))throw Error('n88_configuration');
   const recoveryKeys=new Map(versions.map(v=>[v,key('N88_RECOVERY_KEY_'+v)]));
-  const ca=readEnv('N88_DATABASE_CA_CERT');
-  const pool=new pg.Pool({connectionString:dbUrl,ssl:{rejectUnauthorized:true,...(ca?{ca}:{})},max:2,
+  // Provider's published Root2021 CA, scoped to this client only. No OS trust or
+  // verification downgrade. Session-mode5432 preserves session/transaction fences.
+  const ca=required('N88_DATABASE_CA_CERT').replaceAll('\r\n','\n');
+  if(createHash('sha256').update(ca).digest('hex')!=='700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7')throw Error('n88_database_ca_configuration');
+  const pool=new pg.Pool({connectionString:dbUrl,ssl:{rejectUnauthorized:true,servername:db.hostname,minVersion:'TLSv1.2',ca},max:2,
     connectionTimeoutMillis:1000,idleTimeoutMillis:10000,statement_timeout:3000,query_timeout:4000,
     application_name:'n88-private-server',allowExitOnIdle:true});
   // No raw pg errors/SQL/parameters in platform logs.
@@ -35,13 +74,14 @@ export function createExistingHost(readEnv) {
     let client;
     try {
       client=await pool.connect();
-      if((await client.query('select current_user as role')).rows[0]?.role!=='n88_backend')throw Error('n88_database_role');
+      await assertRestrictedTransport(client);
+      await assertPrivateDatabaseSession(client);
       return client;
     }catch{client?.release(Error('n88_database_unavailable'));throw Error('n88_database_unavailable');}
     finally{waiting--;}
   };
   try {
-    const handle=createWebEntry({...manifest,origin,authUrl,apiKey:required('N88_AUTH_API_KEY'),secretKey,ingressKey,numericKey,reservationKey,recoveryKeys,recoveryActiveKeyVersion,acquire,
+    const handle=createWebEntry({...manifest,rollout,canonicalBounds:{rollout},origin,authUrl,apiKey:required('N88_AUTH_API_KEY'),secretKey,ingressKey,numericKey,reservationKey,recoveryKeys,recoveryActiveKeyVersion,acquire,
       sourceOnly:false,canonicalReadback:true,privateIngressReadback:true});
     return Object.freeze({handle,close:()=>pool.end()});
   }catch{void pool.end();throw Error('n88_configuration');}

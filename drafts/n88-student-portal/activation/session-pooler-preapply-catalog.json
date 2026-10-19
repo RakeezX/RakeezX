@@ -1,0 +1,3215 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "1b9971f9-e3ae-4e07-9d05-52923064dd91",
+  "mode": "catalog-only",
+  "personalRowsRead": 0,
+  "priorCatalogUnchanged": true,
+  "catalog": {
+    "n88": {
+      "guardExists": false,
+      "schemaExists": false,
+      "backendExists": false
+    },
+    "tables": [
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "attendance",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "enrollments",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "items",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "logs",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "score_subitem_completions",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "score_subitems",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "scores",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "sections",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "sessions",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "students",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "teachings",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "terms",
+        "forceRls": true
+      },
+      {
+        "rls": true,
+        "owner": "postgres",
+        "table": "years",
+        "forceRls": true
+      }
+    ],
+    "columns": [
+      {
+        "udt": "text",
+        "table": "attendance",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "attendance",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "attendance",
+        "column": "student_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "attendance",
+        "column": "session_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "attendance",
+        "column": "teaching_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "date",
+        "table": "attendance",
+        "column": "date",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "attendance",
+        "column": "status",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "attendance",
+        "column": "note",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "attendance",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "attendance",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "attendance",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "attendance",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "attendance",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "attendance",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "attendance",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "enrollments",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "enrollments",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "enrollments",
+        "column": "student_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "enrollments",
+        "column": "section_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "enrollments",
+        "column": "roll_no",
+        "nullable": "YES"
+      },
+      {
+        "udt": "date",
+        "table": "enrollments",
+        "column": "start_date",
+        "nullable": "YES"
+      },
+      {
+        "udt": "date",
+        "table": "enrollments",
+        "column": "end_date",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "enrollments",
+        "column": "status",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "enrollments",
+        "column": "transfer_note",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "enrollments",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "enrollments",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "enrollments",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "enrollments",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "enrollments",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "enrollments",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "enrollments",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "items",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "teaching_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "name",
+        "nullable": "NO"
+      },
+      {
+        "udt": "numeric",
+        "table": "items",
+        "column": "max",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "items",
+        "column": "order",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "auto",
+        "nullable": "YES"
+      },
+      {
+        "udt": "numeric",
+        "table": "items",
+        "column": "per_point",
+        "nullable": "NO"
+      },
+      {
+        "udt": "numeric",
+        "table": "items",
+        "column": "penalty",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "unit_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "lesson_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "items",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "items",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "items",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "items",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "items",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "items",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "score_mode",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "distribution_mode",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "items",
+        "column": "distribution_version",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "distribution_origin_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "items",
+        "column": "portability_group_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "logs",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "student_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "teaching_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "session_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "date",
+        "table": "logs",
+        "column": "date",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "kind",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "logs",
+        "column": "delta",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "tag",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "note",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "logs",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "logs",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "logs",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "logs",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "logs",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "logs",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "logs",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitem_completions",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "score_subitem_completions",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitem_completions",
+        "column": "student_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitem_completions",
+        "column": "subitem_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "bool",
+        "table": "score_subitem_completions",
+        "column": "checked",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "score_subitem_completions",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "score_subitem_completions",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "score_subitem_completions",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitem_completions",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "score_subitem_completions",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "score_subitem_completions",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "score_subitem_completions",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitem_completions",
+        "column": "completion_state",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitems",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "score_subitems",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitems",
+        "column": "item_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitems",
+        "column": "name",
+        "nullable": "NO"
+      },
+      {
+        "udt": "numeric",
+        "table": "score_subitems",
+        "column": "value",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "score_subitems",
+        "column": "order",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "score_subitems",
+        "column": "distribution_version",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "score_subitems",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "score_subitems",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "score_subitems",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitems",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "score_subitems",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "score_subitems",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "score_subitems",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "score_subitems",
+        "column": "distribution_origin_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "date",
+        "table": "score_subitems",
+        "column": "start_date",
+        "nullable": "YES"
+      },
+      {
+        "udt": "date",
+        "table": "score_subitems",
+        "column": "due_date",
+        "nullable": "YES"
+      },
+      {
+        "udt": "numeric",
+        "table": "score_subitems",
+        "column": "late_points",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "scores",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "scores",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "scores",
+        "column": "student_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "scores",
+        "column": "item_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "numeric",
+        "table": "scores",
+        "column": "value",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "scores",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "scores",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "scores",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "scores",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "scores",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "scores",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "scores",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "numeric",
+        "table": "scores",
+        "column": "manual_value",
+        "nullable": "YES"
+      },
+      {
+        "udt": "numeric",
+        "table": "scores",
+        "column": "derived_value",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sections",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "sections",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sections",
+        "column": "year_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "sections",
+        "column": "grade",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sections",
+        "column": "label",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sections",
+        "column": "name",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sections",
+        "column": "color",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "sections",
+        "column": "order",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sections",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sections",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "sections",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sections",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sections",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "sections",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "sections",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sections",
+        "column": "status",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sections",
+        "column": "archived_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "date",
+        "table": "sections",
+        "column": "archive_date",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "sessions",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "teaching_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "date",
+        "table": "sessions",
+        "column": "date",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "sessions",
+        "column": "period",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "slot_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "time",
+        "table": "sessions",
+        "column": "start_time",
+        "nullable": "YES"
+      },
+      {
+        "udt": "time",
+        "table": "sessions",
+        "column": "end_time",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "time_profile_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "status",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "reason",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "makeup_for_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "lesson_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "note",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "homework",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "covered",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sessions",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sessions",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "sessions",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "sessions",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sessions",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "sessions",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "sessions",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "sessions",
+        "column": "calendar_context",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "students",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "students",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "students",
+        "column": "name",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "students",
+        "column": "note",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "students",
+        "column": "status",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "students",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "students",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "students",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "students",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "students",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "students",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "students",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "teachings",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "teachings",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "teachings",
+        "column": "section_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "teachings",
+        "column": "subject_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "teachings",
+        "column": "term_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "teachings",
+        "column": "order",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "teachings",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "teachings",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "teachings",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "teachings",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "teachings",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "teachings",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "teachings",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "terms",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "terms",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "terms",
+        "column": "year_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "terms",
+        "column": "name",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "terms",
+        "column": "index",
+        "nullable": "NO"
+      },
+      {
+        "udt": "date",
+        "table": "terms",
+        "column": "start_date",
+        "nullable": "YES"
+      },
+      {
+        "udt": "date",
+        "table": "terms",
+        "column": "end_date",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "terms",
+        "column": "status",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "terms",
+        "column": "calendar_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "terms",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "terms",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "terms",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "terms",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "terms",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "terms",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "terms",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "years",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "uuid",
+        "table": "years",
+        "column": "owner_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "years",
+        "column": "label",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "years",
+        "column": "hijri_start",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "years",
+        "column": "hijri_end",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int4",
+        "table": "years",
+        "column": "order",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "years",
+        "column": "status",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "years",
+        "column": "created_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "years",
+        "column": "updated_at",
+        "nullable": "NO"
+      },
+      {
+        "udt": "int8",
+        "table": "years",
+        "column": "client_updated_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "text",
+        "table": "years",
+        "column": "device_id",
+        "nullable": "YES"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "years",
+        "column": "deleted_at",
+        "nullable": "YES"
+      },
+      {
+        "udt": "int8",
+        "table": "years",
+        "column": "revision",
+        "nullable": "NO"
+      },
+      {
+        "udt": "jsonb",
+        "table": "years",
+        "column": "field_revisions",
+        "nullable": "NO"
+      },
+      {
+        "udt": "text",
+        "table": "years",
+        "column": "calendar_preset_id",
+        "nullable": "YES"
+      }
+    ],
+    "triggers": [
+      {
+        "name": "00_student_lifecycle_safety",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.guard_live_student_parent()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_safety\" BEFORE INSERT OR UPDATE ON rakeezx.attendance FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_live_student_parent()",
+        "functionMd5": "086a8458865f73ec824a72ded136bcae",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.attendance FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "attendance_owner",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER attendance_owner BEFORE INSERT ON rakeezx.attendance FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "attendance_sync_v2_revision",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER attendance_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.attendance FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "attendance_touch",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER attendance_touch BEFORE INSERT OR UPDATE ON rakeezx.attendance FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.guard_archived_section_write()",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.attendance FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()",
+        "functionMd5": "ee019fa75cd27bceb3516ee8c463860b",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.attendance FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "attendance",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.attendance FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_safety",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.guard_live_student_parent()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_safety\" BEFORE INSERT OR UPDATE ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_live_student_parent()",
+        "functionMd5": "086a8458865f73ec824a72ded136bcae",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.enrollments FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "enrollments_owner",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER enrollments_owner BEFORE INSERT ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "enrollments_prune_group_arrangements",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.prune_group_arrangements_for_enrollment()",
+        "definition": "CREATE TRIGGER enrollments_prune_group_arrangements AFTER INSERT OR DELETE OR UPDATE OF student_id, section_id, status, deleted_at ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.prune_group_arrangements_for_enrollment()",
+        "functionMd5": "89eb69152e42d8d9763d1c0c77251568",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "enrollments_sync_v2_revision",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER enrollments_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "enrollments_touch",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER enrollments_touch BEFORE INSERT OR UPDATE ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.guard_archived_section_write()",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()",
+        "functionMd5": "ee019fa75cd27bceb3516ee8c463860b",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "enrollments",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.enrollments FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.items FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.guard_archived_section_write()",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.items FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()",
+        "functionMd5": "ee019fa75cd27bceb3516ee8c463860b",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "items_owner",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER items_owner BEFORE INSERT ON rakeezx.items FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "items_subitem_definition_guard",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.guard_subitem_definition_write()",
+        "definition": "CREATE TRIGGER items_subitem_definition_guard BEFORE INSERT OR UPDATE ON rakeezx.items FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_subitem_definition_write()",
+        "functionMd5": "502dbc275a6c52797c8bf4b138804200",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "items_sync_v2_revision",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER items_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.items FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "items_touch",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER items_touch BEFORE INSERT OR UPDATE ON rakeezx.items FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.items FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "items",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.items FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_safety",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.guard_live_student_parent()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_safety\" BEFORE INSERT OR UPDATE ON rakeezx.logs FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_live_student_parent()",
+        "functionMd5": "086a8458865f73ec824a72ded136bcae",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.logs FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.guard_archived_section_write()",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.logs FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()",
+        "functionMd5": "ee019fa75cd27bceb3516ee8c463860b",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "logs_owner",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER logs_owner BEFORE INSERT ON rakeezx.logs FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "logs_sync_v2_revision",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER logs_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.logs FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "logs_touch",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER logs_touch BEFORE INSERT OR UPDATE ON rakeezx.logs FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.logs FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "logs",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.logs FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "score_subitem_completions",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.score_subitem_completions FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "score_subitem_completions",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.score_subitem_completions FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitem_completions_definition_guard",
+        "table": "score_subitem_completions",
+        "enabled": "O",
+        "function": "rakeezx.guard_subitem_definition_write()",
+        "definition": "CREATE TRIGGER score_subitem_completions_definition_guard BEFORE INSERT OR UPDATE ON rakeezx.score_subitem_completions FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_subitem_definition_write()",
+        "functionMd5": "502dbc275a6c52797c8bf4b138804200",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitem_completions_owner",
+        "table": "score_subitem_completions",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER score_subitem_completions_owner BEFORE INSERT ON rakeezx.score_subitem_completions FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitem_completions_sync_v2_revision",
+        "table": "score_subitem_completions",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER score_subitem_completions_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.score_subitem_completions FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitem_completions_touch",
+        "table": "score_subitem_completions",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER score_subitem_completions_touch BEFORE INSERT OR UPDATE ON rakeezx.score_subitem_completions FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "score_subitems",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.score_subitems FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "score_subitems",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.score_subitems FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitems_definition_guard",
+        "table": "score_subitems",
+        "enabled": "O",
+        "function": "rakeezx.guard_subitem_definition_write()",
+        "definition": "CREATE TRIGGER score_subitems_definition_guard BEFORE INSERT OR UPDATE ON rakeezx.score_subitems FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_subitem_definition_write()",
+        "functionMd5": "502dbc275a6c52797c8bf4b138804200",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitems_owner",
+        "table": "score_subitems",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER score_subitems_owner BEFORE INSERT ON rakeezx.score_subitems FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitems_sync_v2_revision",
+        "table": "score_subitems",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER score_subitems_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.score_subitems FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "score_subitems_touch",
+        "table": "score_subitems",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER score_subitems_touch BEFORE INSERT OR UPDATE ON rakeezx.score_subitems FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_safety",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.guard_live_student_parent()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_safety\" BEFORE INSERT OR UPDATE ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_live_student_parent()",
+        "functionMd5": "086a8458865f73ec824a72ded136bcae",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.scores FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.guard_archived_section_write()",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()",
+        "functionMd5": "ee019fa75cd27bceb3516ee8c463860b",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "scores_owner",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER scores_owner BEFORE INSERT ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "scores_subitem_write_guard",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.guard_subitem_score_write()",
+        "definition": "CREATE TRIGGER scores_subitem_write_guard BEFORE INSERT OR UPDATE ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_subitem_score_write()",
+        "functionMd5": "728140421ac5d93118398d574002fa30",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "scores_sync_v2_revision",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER scores_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "scores_touch",
+        "table": "scores",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER scores_touch BEFORE INSERT OR UPDATE ON rakeezx.scores FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "01_n58_calendar_contract",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.n58_guard_calendar_contract()",
+        "definition": "CREATE TRIGGER \"01_n58_calendar_contract\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_guard_calendar_contract()",
+        "functionMd5": "be864602a38e49731f67d4ec79bd1f60",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_section_lifecycle_fields",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.guard_section_lifecycle_fields()",
+        "definition": "CREATE TRIGGER guard_section_lifecycle_fields BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_section_lifecycle_fields()",
+        "functionMd5": "aa96c334432867391726b2f2146e3760",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sections_cancel_class_goals",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.cancel_goals_when_section_archived()",
+        "definition": "CREATE TRIGGER sections_cancel_class_goals AFTER UPDATE OF status ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.cancel_goals_when_section_archived()",
+        "functionMd5": "c8b227b535cc13878f71ed0304d30f8a",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sections_owner",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER sections_owner BEFORE INSERT ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sections_sync_v2_revision",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER sections_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sections_touch",
+        "table": "sections",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER sections_touch BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sessions FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "01_n58_calendar_contract",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.n58_guard_calendar_contract()",
+        "definition": "CREATE TRIGGER \"01_n58_calendar_contract\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sessions FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_guard_calendar_contract()",
+        "functionMd5": "be864602a38e49731f67d4ec79bd1f60",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.guard_archived_section_write()",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.sessions FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()",
+        "functionMd5": "ee019fa75cd27bceb3516ee8c463860b",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.sessions FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.sessions FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sessions_guard_safe_delete",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.guard_safe_session_delete()",
+        "definition": "CREATE TRIGGER sessions_guard_safe_delete BEFORE UPDATE OF deleted_at ON rakeezx.sessions FOR EACH ROW WHEN (((old.deleted_at IS NULL) AND (new.deleted_at IS NOT NULL))) EXECUTE FUNCTION rakeezx.guard_safe_session_delete()",
+        "functionMd5": "72d047d635a7b004e5732781feb1fcf5",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sessions_owner",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER sessions_owner BEFORE INSERT ON rakeezx.sessions FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sessions_sync_v2_revision",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER sessions_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.sessions FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "sessions_touch",
+        "table": "sessions",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER sessions_touch BEFORE INSERT OR UPDATE ON rakeezx.sessions FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_safety",
+        "table": "students",
+        "enabled": "O",
+        "function": "rakeezx.guard_live_student_parent()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_safety\" BEFORE INSERT OR UPDATE ON rakeezx.students FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_live_student_parent()",
+        "functionMd5": "086a8458865f73ec824a72ded136bcae",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "students",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.students FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "students",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.students FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "students_owner",
+        "table": "students",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER students_owner BEFORE INSERT ON rakeezx.students FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "students_sync_v2_revision",
+        "table": "students",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER students_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.students FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "students_touch",
+        "table": "students",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER students_touch BEFORE INSERT OR UPDATE ON rakeezx.students FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.teachings FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "01_n58_calendar_contract",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.n58_guard_calendar_contract()",
+        "definition": "CREATE TRIGGER \"01_n58_calendar_contract\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_guard_calendar_contract()",
+        "functionMd5": "be864602a38e49731f67d4ec79bd1f60",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.guard_archived_section_write()",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()",
+        "functionMd5": "ee019fa75cd27bceb3516ee8c463860b",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.n77_guard_live_parent()",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()",
+        "functionMd5": "a544241092c65c0a5d777025e8596385",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "teachings_owner",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER teachings_owner BEFORE INSERT ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "teachings_sync_v2_revision",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER teachings_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "teachings_tombstone_class_goal_data",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.tombstone_class_goal_data_for_teaching()",
+        "definition": "CREATE TRIGGER teachings_tombstone_class_goal_data AFTER UPDATE OF deleted_at ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.tombstone_class_goal_data_for_teaching()",
+        "functionMd5": "284c1c2c2d7bdfebaae495e1a294e7be",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "teachings_tombstone_class_rules",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.tombstone_class_rules_for_teaching()",
+        "definition": "CREATE TRIGGER teachings_tombstone_class_rules AFTER UPDATE OF deleted_at ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.tombstone_class_rules_for_teaching()",
+        "functionMd5": "1bf4e03fc3adb4015406c9638a89c37a",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "teachings_tombstone_group_arrangement",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.tombstone_group_arrangement_for_teaching()",
+        "definition": "CREATE TRIGGER teachings_tombstone_group_arrangement AFTER UPDATE OF deleted_at ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.tombstone_group_arrangement_for_teaching()",
+        "functionMd5": "dc4ba712f3d5380a36a0ac1fa9e3f112",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "teachings_touch",
+        "table": "teachings",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER teachings_touch BEFORE INSERT OR UPDATE ON rakeezx.teachings FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.terms FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "01_n58_calendar_contract",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.n58_guard_calendar_contract()",
+        "definition": "CREATE TRIGGER \"01_n58_calendar_contract\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.terms FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_guard_calendar_contract()",
+        "functionMd5": "be864602a38e49731f67d4ec79bd1f60",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "99_n58_revalidate_term",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.n58_revalidate_effective_scope_change()",
+        "definition": "CREATE TRIGGER \"99_n58_revalidate_term\" AFTER INSERT OR DELETE OR UPDATE ON rakeezx.terms FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_revalidate_effective_scope_change()",
+        "functionMd5": "d61f47a4da8919612be3cfcb06dde6ba",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "guard_closed_term_lifecycle",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.guard_closed_term_lifecycle()",
+        "definition": "CREATE TRIGGER guard_closed_term_lifecycle BEFORE UPDATE ON rakeezx.terms FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_closed_term_lifecycle()",
+        "functionMd5": "0bfb438864f3ca244e8367cc3846da62",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.terms FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "terms_owner",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER terms_owner BEFORE INSERT ON rakeezx.terms FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "terms_sync_v2_revision",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER terms_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.terms FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "terms_touch",
+        "table": "terms",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER terms_touch BEFORE INSERT OR UPDATE ON rakeezx.terms FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "years",
+        "enabled": "O",
+        "function": "rakeezx.lock_student_lifecycle_statement()",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.years FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()",
+        "functionMd5": "91709dc328b2de2f7b4c0c606d977754",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "01_n58_calendar_contract",
+        "table": "years",
+        "enabled": "O",
+        "function": "rakeezx.n58_guard_calendar_contract()",
+        "definition": "CREATE TRIGGER \"01_n58_calendar_contract\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.years FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_guard_calendar_contract()",
+        "functionMd5": "be864602a38e49731f67d4ec79bd1f60",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "99_n58_revalidate_year",
+        "table": "years",
+        "enabled": "O",
+        "function": "rakeezx.n58_revalidate_effective_scope_change()",
+        "definition": "CREATE TRIGGER \"99_n58_revalidate_year\" AFTER INSERT OR UPDATE ON rakeezx.years FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_revalidate_effective_scope_change()",
+        "functionMd5": "d61f47a4da8919612be3cfcb06dde6ba",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "years",
+        "enabled": "O",
+        "function": "rakeezx.record_owner_sync_change()",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.years FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()",
+        "functionMd5": "2f716071e31a882d7f2b857f7d804801",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "years_owner",
+        "table": "years",
+        "enabled": "O",
+        "function": "rakeezx.force_owner()",
+        "definition": "CREATE TRIGGER years_owner BEFORE INSERT ON rakeezx.years FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()",
+        "functionMd5": "0bda469faac69150c19bae71adef18c0",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "years_sync_v2_revision",
+        "table": "years",
+        "enabled": "O",
+        "function": "rakeezx.sync_v2_stamp_revision()",
+        "definition": "CREATE TRIGGER years_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.years FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()",
+        "functionMd5": "41a3c7f6bc9c218f8640b21fbf891ac8",
+        "functionOwner": "postgres"
+      },
+      {
+        "name": "years_touch",
+        "table": "years",
+        "enabled": "O",
+        "function": "rakeezx.touch_updated_at()",
+        "definition": "CREATE TRIGGER years_touch BEFORE INSERT OR UPDATE ON rakeezx.years FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()",
+        "functionMd5": "cb93f1593e1d1109e16677f2ecc4a3ca",
+        "functionOwner": "postgres"
+      }
+    ],
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "authTables": [
+      {
+        "rls": true,
+        "owner": "supabase_auth_admin",
+        "table": "sessions",
+        "forceRls": false,
+        "policyCount": 0
+      },
+      {
+        "rls": true,
+        "owner": "supabase_auth_admin",
+        "table": "users",
+        "forceRls": false,
+        "policyCount": 0
+      }
+    ],
+    "capturedAt": "2026-10-18T19:38:47.289912+00:00",
+    "management": {
+      "bypassRls": true,
+      "superuser": false,
+      "currentUser": "postgres",
+      "sessionUser": "postgres",
+      "authReferences": true,
+      "authOwnerMember": false,
+      "authSchemaUsage": true,
+      "authSchemaCreate": false
+    },
+    "constraints": [
+      {
+        "name": "attendance_field_revisions_check",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "attendance_natural_uniq",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "UNIQUE (owner_id, student_id, session_id)"
+      },
+      {
+        "name": "attendance_owner_id_fkey",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "attendance_owner_id_session_id_fkey",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, session_id) REFERENCES rakeezx.sessions(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "attendance_owner_id_student_id_fkey",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, student_id) REFERENCES rakeezx.students(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "attendance_owner_id_teaching_id_fkey",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "attendance_pkey",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "attendance_revision_check",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "attendance_status_check",
+        "table": "attendance",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((status = ANY (ARRAY['present'::text, 'late'::text, 'excused'::text, 'absent'::text])))"
+      },
+      {
+        "name": "enrollments_dates_ck",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((start_date IS NULL) OR (end_date IS NULL) OR (start_date <= end_date)))"
+      },
+      {
+        "name": "enrollments_field_revisions_check",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "enrollments_natural_uniq",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "UNIQUE (owner_id, student_id, section_id)"
+      },
+      {
+        "name": "enrollments_owner_id_fkey",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "enrollments_owner_id_section_id_fkey",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, section_id) REFERENCES rakeezx.sections(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "enrollments_owner_id_student_id_fkey",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, student_id) REFERENCES rakeezx.students(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "enrollments_pkey",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "enrollments_revision_check",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "enrollments_roll_no_check",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((roll_no >= 1) AND (roll_no <= 999)))"
+      },
+      {
+        "name": "enrollments_status_check",
+        "table": "enrollments",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'transferred'::text, 'withdrawn'::text, 'completed'::text])))"
+      },
+      {
+        "name": "items_auto_check",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((auto = ANY (ARRAY['participation'::text, 'attendance'::text])))"
+      },
+      {
+        "name": "items_distribution_mode_check",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((distribution_mode = ANY (ARRAY['auto'::text, 'manual'::text])))"
+      },
+      {
+        "name": "items_distribution_version_check",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((distribution_version >= 1))"
+      },
+      {
+        "name": "items_field_revisions_check",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "items_max_check",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((max > (0)::numeric))"
+      },
+      {
+        "name": "items_owner_id_fkey",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "items_owner_id_lesson_id_fkey",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, lesson_id) REFERENCES rakeezx.lessons(owner_id, id) ON DELETE SET NULL (lesson_id)"
+      },
+      {
+        "name": "items_owner_id_teaching_id_fkey",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "items_owner_id_unit_id_fkey",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, unit_id) REFERENCES rakeezx.units(owner_id, id) ON DELETE SET NULL (unit_id)"
+      },
+      {
+        "name": "items_pkey",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "items_revision_check",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "items_score_mode_check",
+        "table": "items",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((score_mode = ANY (ARRAY['direct'::text, 'subitems'::text])))"
+      },
+      {
+        "name": "logs_delta_check",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((delta >= '-10'::integer) AND (delta <= 10)))"
+      },
+      {
+        "name": "logs_field_revisions_check",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "logs_kind_check",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((kind = ANY (ARRAY['participation'::text, 'behavior'::text])))"
+      },
+      {
+        "name": "logs_owner_id_fkey",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "logs_owner_id_session_id_fkey",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, session_id) REFERENCES rakeezx.sessions(owner_id, id) ON DELETE SET NULL (session_id)"
+      },
+      {
+        "name": "logs_owner_id_student_id_fkey",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, student_id) REFERENCES rakeezx.students(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "logs_owner_id_teaching_id_fkey",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "logs_pkey",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "logs_revision_check",
+        "table": "logs",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "n94_completion_state",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((completion_state IS NULL) OR (checked AND (completion_state = ANY (ARRAY['regular'::text, 'late'::text])))))"
+      },
+      {
+        "name": "score_subitem_completions_field_revisions_check",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "score_subitem_completions_owner_id_fkey",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "score_subitem_completions_owner_id_student_id_fkey",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, student_id) REFERENCES rakeezx.students(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "score_subitem_completions_owner_id_student_id_subitem_id_key",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "UNIQUE (owner_id, student_id, subitem_id)"
+      },
+      {
+        "name": "score_subitem_completions_owner_id_subitem_id_fkey",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, subitem_id) REFERENCES rakeezx.score_subitems(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "score_subitem_completions_pkey",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "score_subitem_completions_revision_check",
+        "table": "score_subitem_completions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "n94_late_points",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((late_points IS NULL) OR ((late_points >= (0)::numeric) AND (late_points <= value) AND (late_points = round(late_points, 2)))))"
+      },
+      {
+        "name": "n94_subitem_dates",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((start_date IS NULL) OR (due_date IS NULL) OR (due_date >= start_date)))"
+      },
+      {
+        "name": "score_subitems_distribution_version_check",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((distribution_version >= 1))"
+      },
+      {
+        "name": "score_subitems_field_revisions_check",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "score_subitems_owner_id_fkey",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "score_subitems_owner_id_item_id_fkey",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, item_id) REFERENCES rakeezx.items(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "score_subitems_pkey",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "score_subitems_revision_check",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "score_subitems_value_check",
+        "table": "score_subitems",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((value >= (0)::numeric))"
+      },
+      {
+        "name": "scores_derived_value_check",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((derived_value >= (0)::numeric))"
+      },
+      {
+        "name": "scores_field_revisions_check",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "scores_manual_value_check",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((manual_value >= (0)::numeric))"
+      },
+      {
+        "name": "scores_natural_uniq",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "UNIQUE (owner_id, student_id, item_id)"
+      },
+      {
+        "name": "scores_owner_id_fkey",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "scores_owner_id_item_id_fkey",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, item_id) REFERENCES rakeezx.items(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "scores_owner_id_student_id_fkey",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, student_id) REFERENCES rakeezx.students(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "scores_pkey",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "scores_revision_check",
+        "table": "scores",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "sections_archive_state_ck",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((((status = 'active'::text) AND (archived_at IS NULL) AND (archive_date IS NULL)) OR ((status = 'archived'::text) AND (archived_at IS NOT NULL) AND (archive_date IS NOT NULL))))"
+      },
+      {
+        "name": "sections_color_ck",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((color ~ '^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$'::text))"
+      },
+      {
+        "name": "sections_field_revisions_check",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "sections_grade_check",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((grade >= 1) AND (grade <= 12)))"
+      },
+      {
+        "name": "sections_owner_id_fkey",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "sections_owner_id_year_id_fkey",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, year_id) REFERENCES rakeezx.years(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "sections_pkey",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "sections_revision_check",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "sections_status_ck",
+        "table": "sections",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))"
+      },
+      {
+        "name": "sessions_field_revisions_check",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "sessions_natural_uniq",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "UNIQUE (owner_id, teaching_id, date, period)"
+      },
+      {
+        "name": "sessions_owner_id_fkey",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "sessions_owner_id_lesson_id_fkey",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, lesson_id) REFERENCES rakeezx.lessons(owner_id, id) ON DELETE SET NULL (lesson_id)"
+      },
+      {
+        "name": "sessions_owner_id_makeup_for_id_fkey",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, makeup_for_id) REFERENCES rakeezx.sessions(owner_id, id) ON DELETE SET NULL (makeup_for_id)"
+      },
+      {
+        "name": "sessions_owner_id_slot_id_fkey",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, slot_id) REFERENCES rakeezx.slots(owner_id, id) ON DELETE SET NULL (slot_id)"
+      },
+      {
+        "name": "sessions_owner_id_teaching_id_fkey",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "sessions_owner_id_time_profile_id_fkey",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, time_profile_id) REFERENCES rakeezx.time_profiles(owner_id, id) ON DELETE SET NULL (time_profile_id)"
+      },
+      {
+        "name": "sessions_period_check",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((period >= 1) AND (period <= 12)))"
+      },
+      {
+        "name": "sessions_pkey",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "sessions_revision_check",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "sessions_status_check",
+        "table": "sessions",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((status = ANY (ARRAY['scheduled'::text, 'held'::text, 'missed'::text, 'postponed'::text, 'cancelled'::text, 'cancelled_holiday'::text, 'makeup'::text])))"
+      },
+      {
+        "name": "students_field_revisions_check",
+        "table": "students",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "students_name_check",
+        "table": "students",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((length(btrim(name)) >= 2) AND (length(name) <= 80)))"
+      },
+      {
+        "name": "students_owner_id_fkey",
+        "table": "students",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "students_pkey",
+        "table": "students",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "students_revision_check",
+        "table": "students",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "students_status_check",
+        "table": "students",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'withdrawn'::text])))"
+      },
+      {
+        "name": "teachings_field_revisions_check",
+        "table": "teachings",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "teachings_owner_id_fkey",
+        "table": "teachings",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "teachings_owner_id_section_id_fkey",
+        "table": "teachings",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, section_id) REFERENCES rakeezx.sections(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "teachings_owner_id_subject_id_fkey",
+        "table": "teachings",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, subject_id) REFERENCES rakeezx.subjects(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "teachings_owner_id_term_id_fkey",
+        "table": "teachings",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, term_id) REFERENCES rakeezx.terms(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "teachings_pkey",
+        "table": "teachings",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "teachings_revision_check",
+        "table": "teachings",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "terms_calendar_fk",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, calendar_id) REFERENCES rakeezx.calendars(owner_id, id) ON DELETE SET NULL (calendar_id)"
+      },
+      {
+        "name": "terms_dates_ck",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((start_date IS NULL) OR (end_date IS NULL) OR (start_date <= end_date)))"
+      },
+      {
+        "name": "terms_field_revisions_check",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "terms_index_check",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK (((index >= 1) AND (index <= 6)))"
+      },
+      {
+        "name": "terms_index_uniq",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "UNIQUE (owner_id, year_id, index)"
+      },
+      {
+        "name": "terms_owner_id_fkey",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "terms_owner_id_year_id_fkey",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id, year_id) REFERENCES rakeezx.years(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "terms_pkey",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "terms_revision_check",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "terms_status_check",
+        "table": "terms",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((status = ANY (ARRAY['upcoming'::text, 'active'::text, 'closed'::text])))"
+      },
+      {
+        "name": "years_field_revisions_check",
+        "table": "years",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((jsonb_typeof(field_revisions) = 'object'::text))"
+      },
+      {
+        "name": "years_hijri_uniq",
+        "table": "years",
+        "validated": true,
+        "deferrable": false,
+        "definition": "UNIQUE (owner_id, hijri_start)"
+      },
+      {
+        "name": "years_owner_id_fkey",
+        "table": "years",
+        "validated": true,
+        "deferrable": false,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "years_pkey",
+        "table": "years",
+        "validated": true,
+        "deferrable": false,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "years_revision_check",
+        "table": "years",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "name": "years_status_check",
+        "table": "years",
+        "validated": true,
+        "deferrable": false,
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))"
+      }
+    ],
+    "authStatusColumns": [
+      {
+        "udt": "uuid",
+        "table": "sessions",
+        "column": "id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "sessions",
+        "column": "not_after",
+        "nullable": "YES"
+      },
+      {
+        "udt": "uuid",
+        "table": "sessions",
+        "column": "user_id",
+        "nullable": "NO"
+      },
+      {
+        "udt": "timestamptz",
+        "table": "users",
+        "column": "banned_until",
+        "nullable": "YES"
+      },
+      {
+        "udt": "uuid",
+        "table": "users",
+        "column": "id",
+        "nullable": "NO"
+      }
+    ],
+    "statusLockPrivileges": [
+      {
+        "table": "users",
+        "column": "id",
+        "select": true,
+        "update": true
+      },
+      {
+        "table": "users",
+        "column": "banned_until",
+        "select": true,
+        "update": true
+      },
+      {
+        "table": "sessions",
+        "column": "id",
+        "select": true,
+        "update": true
+      },
+      {
+        "table": "sessions",
+        "column": "user_id",
+        "select": true,
+        "update": true
+      },
+      {
+        "table": "sessions",
+        "column": "not_after",
+        "select": true,
+        "update": true
+      }
+    ]
+  }
+}

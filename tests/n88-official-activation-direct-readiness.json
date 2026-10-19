@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "scope": "Actual Edge entry and signed readiness handler with synthetic PG metadata only",
+  "checks": [
+    "unsigned rejected before DB",
+    "signed metadata/fullTLS/source boundary ready",
+    "replay rejected",
+    "false upstreamSSL rejected with precise flags",
+    "wrong identity rejected",
+    "missing boundary rejected",
+    "normal Product entry remains OFF"
+  ],
+  "privateQueries": 0,
+  "hostedProof": false
+}

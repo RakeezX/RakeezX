@@ -290,3 +290,175 @@ and delivery method. Do not put codes in URLs/logs/screenshots. No live credenti
 Stop via the launcher `-Stop -Receipt <returned receiptPath>`; otherwise its existing TTL
 closes owned HTTP/PostgreSQL resources. The launcher uses this checkout's source, never
 the canonical working tree's Product files.
+
+## Typed private error boundary — PO18October18:56 correction
+
+The six original staged migrations remain byte-identical. The only additional
+migration is `20261018185300_n88_private_error_boundary_staged.sql` (append-only,
+76 SECURITY INVOKER routines; EXECUTE only postgres owner and n88_backend).
+`activation/error-boundary-contract.json` records the finite source SQL mapping,
+inferred native parameter/result types and exact migration SHA256. No routine
+accepts SQL text. Bound ASCII parameters are decoded/cast inside the exception
+block; private failures rethrow a fixed message with their original SQLSTATE.
+There is no new JSON result codec, parameter/logger grant, managed Auth change,
+source write or logging reduction.
+
+Every repository private operation now uses that mapping. Unknown SQL is denied
+before PostgreSQL. The connection checks effective capture posture and the exact
+routine SHA256 definitions/signatures/owner/invoker/search_path/ACL before access.
+Observed default/ddl posture is admitted only with that verified boundary and
+error-parameter suppression. Missing, changed or unreadable metadata fails closed.
+
+The focused native PG17 proof uses default verbosity, ddl logging and error
+parameter0, inspects actual server logs, and covers unique/FK/check/cast/permission
+failures, owner/source/session locks, guidance CAS, rollback, lost durable COMMIT
+ACK and native type roundtrips. See `tests/n88-official-activation-error-boundary.json`.
+Earlier compiler/fixture failures and the cleanup tool denial remain recorded;
+the stopped residual synthetic fixture is not a candidate artifact.
+
+No hosted migration, LOGIN/password/secret, fixture, function/Worker, route or
+readiness operation has been performed. Fresh provider lists show all seven
+versions absent and no N88 Edge function. The current local custodian cannot
+reach the observed IPv6-only direct database (ENETUNREACH before TLS/Auth).
+`activation/transport-prerequisite-readback.json` records this narrower network
+limit, not a provider outage or missing OAuth. Obtain the existing project's
+provider-supplied session-pooler host/port or a sanctioned IPv6-capable runtime;
+never guess the host, purchase IPv4, export credentials or repeat unchanged proofs.
+Fresh phase baselines and actual restricted TLS/source/ACL readbacks still gate
+hosted apply and validation. Official teacher/student publication stays with the
+sole publisher after service gates pass; no current official trial URL is claimed.
+
+## Verified IPv4 Session pooler transport — run1b9971f9
+
+The provider Connect UI supplied `aws-0-ap-south-1.pooler.supabase.com:5432`,
+database postgres, restricted username `n88_backend.xlrubcwjqktzzunrvuns`.
+The direct IPv6 failure is preserved and was not retried. DNS and TLSv1.3 with
+hostname verification now PASS using the Root2021 CA from the exact download
+template in Supabase's first-party Studio source. Initial system-trust failure
+SELF_SIGNED_CERT_IN_CHAIN and the unrelated public-download404 remain historical.
+No OS trust, certificate bypass, provider SSL setting or paid option changed.
+
+The service accepts only the named direct endpoint or this session endpoint,
+the same project/restricted role, postgres database and port5432. Transaction
+pooling6543, foreign project/host, URL SSL overrides and wrong CA are rejected.
+The required CA is pinned to its public source SHA256 in the service and manifest.
+Actual authenticated session identity, stable backend transaction semantics,
+upstream SSL, boundary source/ACL and capture guard remain prerequisites before
+private operations. A successful unauthenticated TLS handshake is not that proof.
+
+`official-activation.mjs` is an explicit custodian, inert at import. It uses fresh
+current-user protected resources, CurrentUser DPAPI recovery custody, public-key
+only provider ingress handoff, and protected official CLI files. Only a derived
+SCRAM verifier enters role DDL; raw password/keys never enter tool arguments or
+SQL. CLI diagnostics are suppressed and temporary SQL/env inputs removed in
+finally. An attempted LOGIN change is consumed even on ambiguous failure; no
+automatic password reset/replay. Seven source/ACL readbacks must pass first.
+
+## Actual hosted continuation — 2026-10-18, run 4ddd5df2
+
+The expressly authorized eighth source is the membership repair
+20261018195100_n88_guard_membership_inherit_staged.sql. Its placement is AFTER
+already-applied M1 and BEFORE M2, regardless of filename order. Local actual PG17
+proof reproduced both grantors and changed only the postgres-granted guard
+INHERIT true to false; missing/altered/unexpected baselines fail atomically.
+The original expected identity and all six original SQL sources remain unchanged.
+Original local fixture failures and hosted membership mismatch remain historical.
+
+All eight source-bound hosted migrations now exist exactly once. Provider history
+versions differ from filename timestamps; compare exact names and stored SQL
+SHA256, never forge versions or replay. Read hosted-activation-outcome.json and
+hosted-boundary-readback.json: every staged identity comparison passed, including
+76 boundary routines' source/ACL/signature/invoker/owner identities and preservation
+of previous helpers/grants/roles/Auth/RLS metadata.
+
+The own N88 credential was installed as a client-derived verifier through the
+protected official CLI file while NOLOGIN. Public salt/iteration challenge and
+protected client-derived comparison returned both stored/server equality booleans
+true; no raw verifier/password/key left custody. Actual pre-auth metadata confirmed
+LOGIN, NOINHERIT, restricted flags, no membership/expiry/cap and existing CONNECT.
+No CONNECT/TEMP/CREATE/global grants were changed.
+
+The single authorized n88_backend.PROJECT SESSION5432 attempt with pinned CA and
+hostname verification returned 28P01. Its cause is unknown. The helper immediately
+disarmed only n88_backend LOGIN; fresh provider metadata confirms NOLOGIN and all
+other flags/options unchanged. Authentication is consumed; no alternate role,
+endpoint/proxy, rotation, unchanged retry or inferred provider-cache diagnosis.
+No restricted private query or actual runtime capture guard could run.
+
+Readiness remains OFF. No Edge/Worker/route deployment, provider secret installation,
+student-code issuance, fixture mutation or message occurred. Own original versioned
+material remains solely in protected CurrentUser DPAPI recovery; transient SQL files
+were removed. N44 credentials/roles/recovery were untouched. Resume requires a
+materially evidenced resolution and separately authorized proof attempt.
+
+## Own protocol diagnosis and secure original service — run 9190735f
+
+The scoped public challenge first returned XX000 while NOLOGIN. After the exact
+temporary owned LOGIN restore, actual SCRAM server-first announced4096 while the
+own stored count was16384 and salt matched; strict CA/hostname TLS passed. No
+password, client-final proof, nonce/salt or authentication key was exported.
+LOGIN was disarmed in finally. The last card precedence retained the ORIGINAL
+16384 verifier/password/salt: no4096 rewrite, pooler proof or cache reconnect.
+
+The ORIGINAL n88-student-portal Edge backend now supports canonical provider-local
+paths, original direct db.xlrubcwjqktzzunrvuns.supabase.co:5432 transport and a
+domain-separated HMAC readiness branch. Its actual source/handler tests cover
+signatures/replay, provider-local paths, no-Buffer Deno compatibility, full sealed
+configuration construction, false upstreamSSL/owner/missing-boundary rejection
+and normal Product OFF. No private handler is called by readiness.
+
+Actual Edge direct readiness passed correct login/current role, verified client
+TLS, upstreamSSL=true, exact source/routine privacy guard and full actual service
+construction. Provider download version9 matches source SHA256
+809361465b540403d48397fed7ea5e55bc934065be021e7ed31bc7374d98e57d.
+The initial path-wrapper and Deno Buffer configuration failures remain saved.
+No migration or credential rewrite occurred. Historical28P01 evidence is retained.
+
+The actual provider-memory32-byte ingress key was bound only to the exact owned
+Worker and RSA3072-OAEP/SHA256-encrypted to the original custodian recipient.
+Only ciphertext crossed tools; original server keys/recovery stayed local/Edge.
+All exact N88 secret names were installed through protected official CLI env files;
+names-only readback passed. The AES version/key material is unchanged and retained
+with permanent nonce/tombstone contracts. Cloudflare receives only ingress+public
+bindings. Its own Worker is OFF with no routes/workers.dev/previews; explicit
+configuration response disabled observability/log/invocation/trace sampling,
+Logpush and tail consumers. Subsequent GET omits observability, recorded precisely.
+
+Actual designated teacher DOM still displays: مساحة الطالب غير متاحة حاليًا.
+لم تُفعّل الخدمة الخاصة بعد. No publisher-owned HTTPS actual-app test rollout
+was supplied for the required authenticated owner/two-student journey. The
+displayed roster28 MUST NOT receive a bulk issue under maxStudents2. Do not
+extract browser credentials or force UI readiness to route around this gate.
+
+Current result is BLOCKED pending the independent publisher/controller's scoped
+HTTPS actual-app test rollout, then the same saved session completes the original
+bounded fabricated journey. It is not a PM permission request or Product readiness.
+Product/readiness flags were paused, original backend NOLOGIN read back, no public
+API route or student page enabled, no fixture mutation/code/message/field publish.
+Encrypted original recovery and inactive original service are retained. See
+continuation-9190735f.json; reuse successful schema/crypto/transport proof.
+
+## Current bounded pilot — 2026-10-19, run3576957c
+
+The earlier frontend ordering/scope blockers are resolved for the authorized
+one-owner/two-existing-fabricated-pupil pilot only. Default/malformed rollout is
+OFF. Actual backend pilot admission and source/private configuration are in the
+original service; identities are not shipped in frontend code or diagnostics.
+Original16384 credential, eight applied immutable migrations,76 routines and
+all Auth/source/owner/RLS/grade/Sync/custody boundaries remain intact.
+
+Current evidence: pilot-provider-readback-3576957c.json, hosted-pilot-readiness.json,
+hosted-pilot-live-readiness.json, hosted-pilot-http.json and pilot-delivery-3576957c.json.
+Original Edge direct strictTLS/source guard passes; original private ingress
+serves exact /student/private assets with private headers, no fallback or SW.
+Existing provider privacy proof is reused; current owned logging/routes/source
+readbacks are explicit. No additional diagnostic function or privileged proxy.
+
+Teacher pilot source is ready for the sole publisher through normal authenticated
+UI. Other teachers receive unavailable; no control is mounted before actual
+server admission. Official student trial URL: https://rakeezx.com/student.
+The blank document is rendered proof only; it is not a teacher/student journey.
+Full hosted acceptance and public activation remain NOT_RUN until the same saved
+session resumes after verified pilot publication. No full N88 completion/CLOSED.
+Owned staging cleanup was policy-denied and retained without a bypass; all owned
+processes and phase leases are released. See the exact retained-resource receipt.

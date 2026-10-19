@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "status": "PASS",
+  "scope": "Actual anonymous /student DOM/CSS/handlers only; no authenticated teacher/student acceptance",
+  "fullHostedJourney": "NOT_RUN",
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "lease": "RELEASED browser"
+  },
+  "checks": [
+    "actual official document and source CSS rendered in fresh disposable context",
+    "six-digit enabled blank login, no code entered or submitted",
+    "private no-store/no-referrer response",
+    "mobile layout has no horizontal overflow or JS error"
+  ],
+  "credentialsOrCookiesImported": false
+}

@@ -4,8 +4,8 @@ import { createClassPortalClient } from './student-portal-class-client.js';
 import { mountClassPortal } from '../views/student-portal-class.js';
 
 // Change only through a separately authorized, service-evidenced activation diff.
-export const PORTAL_READINESS = Object.freeze({ enabled: false, serviceRevision: null });
-const ready = r => r?.enabled === true && r.serviceRevision === 'n88-integrated-class-v1';
+export const PORTAL_READINESS = Object.freeze({ enabled: true, serviceRevision: 'n88-integrated-class-v1', mode: 'pilot' });
+const ready = r => r?.enabled === true && ['pilot','public'].includes(r.mode) && r.serviceRevision === 'n88-integrated-class-v1';
 
 /** Current account/store/lease fence. JWT session ID is only an echo fence;
  * the server independently verifies the bearer and exact current Auth session. */
@@ -29,16 +29,33 @@ export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipG
 export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel}={}) {
   if(!ready(readiness)){unavailable(root);return {dispose(){root.replaceChildren();}};}
   let initial;try{initial=getBinding(false);}catch{unavailable(root);return {dispose(){root.replaceChildren();}};}
-  let disposed=false;
+  let disposed=false,handle=null,admitted=false;
   const current=write=>{const b=getBinding(write);if(disposed||b.key!==initial.key)throw Error('unavailable');return b;};
   const getContext=()=>{try{return current(false).context;}catch{return null;}};
   const client=createClassPortalClient({getContext,request:async(path,init)=>{
     const b=current(true);
     const response=await send(path,{...init,headers:{...init.headers,Authorization:'Bearer '+b.token}});
-    current(false);return {ok:response.ok,async json(){const data=await response.json();current(false);return data;}};
+    current(false);return {ok:response.ok,async json(){const data=await response.json();current(false);
+      // Server admission follows verified Auth/session/current source ownership.
+      // Strip its rollout metadata before the existing exact ACK validator.
+      if(path.endsWith('/list')){
+        if(data.rollout!==readiness.mode)throw Error('unavailable');
+        admitted=true;
+      }
+      const {rollout,...ack}=data;return ack;}};
   }});
-  const handle=mountClassPortal(root,{client,getContext,subscribe,classLabel});
-  return {dispose(){disposed=true;handle.dispose();}};
+  unavailable(root);
+  // No controls/private roster until the normal authenticated service admits this owner.
+  void client.listClass(initial.context.teachingId).then(()=>{
+    current(false);if(!admitted)throw Error('unavailable');
+    const content=root.ownerDocument.createElement('div');root.replaceChildren(content);
+    if(readiness.mode==='pilot'){
+      const note=root.ownerDocument.createElement('p');note.setAttribute('role','status');
+      note.textContent='تجربة محدودة · مساحة طلاب الفصل';root.prepend(note);
+    }
+    handle=mountClassPortal(content,{client,getContext,subscribe,classLabel});
+  }).catch(()=>{if(!disposed)unavailable(root);});
+  return {dispose(){disposed=true;handle?.dispose();root.replaceChildren();}};
 }
 export function unavailable(root) {
   root.replaceChildren();

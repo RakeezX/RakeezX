@@ -1,0 +1,15 @@
+{
+  "runId":"4ddd5df2-933f-4754-8d04-0d27be47bcff",
+  "status":"PASS",
+  "integrationLease":"RELEASED integration",
+  "liveMutationLease":"RELEASED live-mutation",
+  "browserPhase":"NOT_STARTED this run",
+  "localPostgres":"All fresh membership-proof fixtures closed through their ownership-verified helper finally",
+  "providerDisarm":"Actual provider metadata confirms n88_backend NOLOGIN after its one failed SESSION28P01 attempt",
+  "ownedFunctionWorkerOrRouteCreated":false,
+  "providerSecretInstallation":false,
+  "temporarySqlOrEnvInputsRemaining":false,
+  "encryptedRecoveryRetained":"owned-custody-4ddd5df2-933f-4754-8d04-0d27be47bcff.tmp: owner.json and CurrentUser DPAPI recovery.dpapi only; ignored, protected, original version material retained",
+  "priorRejectedResourceTouched":false,
+  "unrelatedProcessesOrN44ResourcesTouched":false
+}

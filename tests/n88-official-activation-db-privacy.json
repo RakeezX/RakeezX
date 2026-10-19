@@ -1,0 +1,20 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "1b9971f9-e3ae-4e07-9d05-52923064dd91",
+  "at": "2026-10-18T19:40:05.707Z",
+  "checks": [
+    {
+      "name": "actual_source_private_session_guard",
+      "status": "PASS",
+      "evidence": "Actual source guard exercised in 22 metadata cases. Observed default/ddl/error-parameter0 is accepted only with all exact boundary identities/ACL verified. Missing/modified boundary, unknown capture posture, owner/admin, unsafe parameter/statement/duration/audit/explain settings rejected. Read-only metadata only; no logging change."
+    },
+    {
+      "name": "actual_bound_service_acquire_failure",
+      "status": "PASS",
+      "evidence": "Actual signed gateway -> Web/service/repository -> bound Pool acquisition returns generic401 and destroys client when observed default posture has no matching boundary. Exactly two metadata queries, zero private/canonical operations. Only DB/Auth transport packages fabricated; no live credentials/network."
+    }
+  ],
+  "hostedWrites": 0,
+  "fullHostedServicePass": false
+}

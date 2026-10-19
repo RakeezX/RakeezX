@@ -7,6 +7,7 @@ import {createNumericCredentialOperations} from './numeric-credentials.mjs';
 import {projectStudentPortal,studentPortalPublicationBindings,CANONICAL_PROJECTION_REQUIREMENTS} from './student-projection.mjs';
 import {VISIBILITY_FIELDS} from './visibility-policy.mjs';
 import {PRIVATE_HEADERS} from './service.mjs';
+import {createRolloutGuard} from './rollout-guard.mjs';
 const deny=()=>({status:401,body:{error:'unavailable'},headers:PRIVATE_HEADERS});
 const hash=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex');
 const camel=s=>s.replace(/_([a-z])/g,(_,c)=>c.toUpperCase());
@@ -43,8 +44,9 @@ export async function readCanonical(ports,ownerId) {
 const fieldsOff=()=>Object.fromEntries(VISIBILITY_FIELDS.map(f=>[f,false]));
 const bindingKeys=['ownerId','sessionId','leaseId','teachingId','classId','termId','contextRevision'];
 export function createIntegratedService(options,adapter,baseRepository) {
+  const rollout=options.rollout??createRolloutGuard();
   const repository=withCredentialRepository(baseRepository);
-  const credentials=createNumericCredentialOperations({keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey});
+  const credentials=createNumericCredentialOperations({rollout,keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey});
   const recovery=createCodeRecovery({keys:options.recoveryKeys,activeKeyVersion:options.recoveryActiveKeyVersion,otherKeys:[options.numericKey,options.reservationKey,options.ingressKey,options.secretKey]});
   const ownedCredential=(db,m)=>{
     const cs=db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId&&c.revokedAt===null);
@@ -87,17 +89,23 @@ export function createIntegratedService(options,adapter,baseRepository) {
       const auth=await adapter.verifyTeacher(r,ports);
       return auth?.ownerId===binding.ownerId&&auth.sessionId===binding.sessionId?auth:null;
     };
-    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input).then(s=>s&&s.classId===binding.classId&&s.termId===binding.termId?s:null);
-    const ops=createClassCredentialOperations({repository,...credentials,...recovering,origin:options.origin,verifyIngress:adapter.verifyIngress,verifyTeacher,resolveClass});
+    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input).then(s=>{
+      if(!s||s.classId!==binding.classId||s.termId!==binding.termId||!rollout.admitsTeacher(auth,s))return null;
+      // First deliberate admitted pilot access may create its own private context.
+      // An existing inactive context is never reactivated; no canonical/Auth write.
+      if(rollout.mode==='pilot'&&!db.contexts.some(c=>c.ownerId===auth.ownerId))db.contexts.push({namespace:'n88_pilot_'+randomUUID(),ownerId:auth.ownerId,active:true});
+      return s;
+    });
+    const ops=createClassCredentialOperations({rollout,repository,...credentials,...recovering,origin:options.origin,verifyIngress:adapter.verifyIngress,verifyTeacher,resolveClass});
     // Operations preserve their transaction/commit ACK. UI adaptation never exposes a precommit secret.
     if(action==='visibility' || action==='list' || action.startsWith('guidance-')) {
       try{return await repository.transaction(async(db,ports)=>{
         const h=request.headers||{};
         if(!await adapter.verifyIngress(request,ports) || h.origin!==options.origin||h['x-n88-csrf']!=='1'||h['content-type']!=='application/json'||h['sec-fetch-site']&&h['sec-fetch-site']!=='same-origin')return deny();
-        const auth=await verifyTeacher(request,ports);if(!auth?.current)return deny();
-        await ports.synchronizeOwner(auth.ownerId);
+        const auth=await verifyTeacher(request,ports);if(!auth?.current||!rollout.allowsOwner(auth.ownerId))return deny();
         const s=await resolveClass(db,ports,auth,body.teachingId,body);if(!s)return deny();
-        const members=db.memberships.filter(m=>m.ownerId===auth.ownerId&&m.classId===s.classId&&m.status==='active'&&!m.endDate&&m.studentActive&&m.classActive);
+        await ports.synchronizeOwner(auth.ownerId);
+        const members=db.memberships.filter(m=>m.ownerId===auth.ownerId&&m.classId===s.classId&&m.status==='active'&&!m.endDate&&m.studentActive&&m.classActive&&rollout.admitsStudent(m));
         if(members.length>2000||new Set(members.map(m=>m.studentId)).size!==members.length||members.some(m=>db.memberships.filter(x=>x.ownerId===m.ownerId&&x.studentId===m.studentId&&x.status==='active'&&!x.endDate&&x.studentActive&&x.classActive).length!==1))return deny();
         const rosterRevision=hash([s.teachingId,s.revision,members.sort((a,b)=>a.studentId.localeCompare(b.studentId)).map(m=>[m.studentId,m.enrollmentId,m.revision,m.canonicalStamp])]);
         let p=await policies(ports,s.ownerId,s.classId,s.termId),data;
@@ -111,11 +119,12 @@ export function createIntegratedService(options,adapter,baseRepository) {
         }else if(action==='visibility') {
           if(p.revision!==body.policyRevision||body.expectedRosterRevision!==rosterRevision||!body.fields||Object.keys(body.fields).length!==6||!VISIBILITY_FIELDS.every(f=>typeof body.fields[f]==='boolean'))return deny();
           const membersPolicy=members.map(m=>{const input=inputFor(s,m),b=studentPortalPublicationBindings(input);return {version:'n88-visibility-v1',ownerId:s.ownerId,studentId:m.studentId,enrollmentId:m.enrollmentId,classId:s.classId,termId:s.termId,scopeStamp:b.scopeStamp,fields:body.fields,sources:b.sources.map(src=>({...src,publicationId:randomUUID()}))};});
-          p={revision:p.revision+1,fields:body.fields,members:membersPolicy};
+          // Preserve unrelated historical member policies during the bounded pilot.
+          p={revision:p.revision+1,fields:body.fields,members:[...p.members.filter(m=>!rollout.allowsMember(m)),...membersPolicy]};
           await ports.query('insert into n88_private.class_visibility(owner_id,class_id,term_id,payload) values($1::uuid,$2,$3,$4::jsonb) on conflict(owner_id,class_id,term_id) do update set payload=excluded.payload',[s.ownerId,s.classId,s.termId,JSON.stringify(p)]);
           data={updated:true,policyRevision:p.revision,fields:p.fields};
         }else data={classId:s.classId,rosterRevision,policyRevision:p.revision,visibility:p.fields,students:await Promise.all(members.map(async m=>{const cs=db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId);const c=ownedCredential(db,m),r=c?await recovery.read(ports,c):{status:'inactive',credential:null};return {recoveryStatus:r.status,credential:r.credential,studentId:m.studentId,enrollmentId:m.enrollmentId,revision:m.revision,label:m.label,hasActiveCode:cs.some(c=>c.revokedAt===null),credentialVersion:Math.max(0,...cs.map(c=>c.version))};}))};
-        return {status:200,body:{ack:true,binding,requestId:body.requestId??null,data},headers:PRIVATE_HEADERS};
+        return {status:200,body:{ack:true,binding,requestId:body.requestId??null,data,rollout:rollout.mode},headers:PRIVATE_HEADERS};
       });}catch{return {...deny(),status:503};}
     }
     const current=ops.forRequest(request);

@@ -1,0 +1,40 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "bb64e011-c3c1-417b-9e99-af05ee0f8f09",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "at": "2026-10-18T16:10:10.011Z",
+  "checks": [
+    {
+      "name": "current_graph_and_unchanged_service",
+      "status": "PASS",
+      "evidence": "All LF source hashes, exact-byte brand/output hashes match; Edge/Cloudflare output bytes unchanged from base; six migrations retained; all live gates OFF."
+    },
+    {
+      "name": "actual_private_document_390_light",
+      "status": "PASS",
+      "evidence": "Fresh shared-lease Chromium context, loopback HTTP, actual compiled student entry/DOM/brand/CSS; both logos decode, dynamic stylesheet loaded, no failed assets/JS errors/overflow, live entry disabled; actual pagehide handler resets entry. No credentials or fixture identities."
+    },
+    {
+      "name": "actual_private_document_390_dark",
+      "status": "PASS",
+      "evidence": "Fresh shared-lease Chromium context, loopback HTTP, actual compiled student entry/DOM/brand/CSS; both logos decode, dynamic stylesheet loaded, no failed assets/JS errors/overflow, live entry disabled; actual pagehide handler resets entry. No credentials or fixture identities."
+    },
+    {
+      "name": "actual_private_document_1280_light",
+      "status": "PASS",
+      "evidence": "Fresh shared-lease Chromium context, loopback HTTP, actual compiled student entry/DOM/brand/CSS; both logos decode, dynamic stylesheet loaded, no failed assets/JS errors/overflow, live entry disabled; actual pagehide handler resets entry. No credentials or fixture identities."
+    },
+    {
+      "name": "actual_private_document_1280_dark",
+      "status": "PASS",
+      "evidence": "Fresh shared-lease Chromium context, loopback HTTP, actual compiled student entry/DOM/brand/CSS; both logos decode, dynamic stylesheet loaded, no failed assets/JS errors/overflow, live entry disabled; actual pagehide handler resets entry. No credentials or fixture identities."
+    }
+  ],
+  "cleanup": {
+    "browserClosed": true,
+    "serverClosed": true,
+    "browserLease": "RELEASED browser"
+  },
+  "hostedProof": false
+}

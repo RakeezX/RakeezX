@@ -9,9 +9,15 @@ if not exists(select 1 from pg_constraint where conrelid='n88_private.numeric_cr
 then raise exception 'N88 prior integrated constraint mismatch';end if;
 if to_regprocedure('n88_private.numeric_six_capacity_guard()') is not null then raise exception 'N88 amendment collision';end if;
 if to_regclass('supabase_migrations.schema_migrations') is not null then
-  if not exists(select 1 from supabase_migrations.schema_migrations where version='20261018034356') or
-     not exists(select 1 from supabase_migrations.schema_migrations where version='20261018102843') or
-     exists(select 1 from supabase_migrations.schema_migrations where version='20261018110713') then
+  -- Provider-assigned history versions are not source-file timestamps. Bind exact
+  -- names and immutable stored SQL instead; preserve the original collision gate.
+  if (select count(*) from supabase_migrations.schema_migrations where
+      name='n88_exact_activation_staged_20261018034356' and
+      encode(extensions.digest(array_to_string(statements,''),'sha256'),'hex')='e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c')<>1 or
+     (select count(*) from supabase_migrations.schema_migrations where
+      name='n88_integrated_class_staged_20261018102843' and
+      encode(extensions.digest(array_to_string(statements,''),'sha256'),'hex')='49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c')<>1 or
+     exists(select 1 from supabase_migrations.schema_migrations where version='20261018110713' or name like 'n88_six_digit%') then
     raise exception 'N88 exact migration history mismatch';
   end if;
 end if;

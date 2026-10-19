@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "4c5a66bc-5348-4e74-86a2-2ce6b2b5eec9",
+  "failure": "n88_configuration during synthetic host composition",
+  "cause": "Fixture active recovery version probe-v1 did not match its probe_v1 environment property. No live material involved.",
+  "correction": "Aligned only synthetic fixture version/property; kept real configuration guard unchanged. Corrected actual bound gateway/service/acquire scenario must pass before any future hosted work.",
+  "secondFixtureFailure": "Actual Web entry returned401 because synthetic request omitted its required x-n88-csrf header. Added only the normal synthetic same-origin/CSRF headers; retained real ingress checks.",
+  "statusExpectationCorrection": "After request correction, expected503 was not the integrated service contract: repository unavailability maps to generic unavailable401. Corrected assertion still requires actual Pool reached, client destroyed and zero private queries; no source error status changed.",
+  "hostedWrites": 0
+}

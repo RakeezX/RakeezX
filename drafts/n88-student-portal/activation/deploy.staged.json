@@ -2,7 +2,7 @@
   "aiAuthored": true,
   "enabled": false,
   "projectId": "xlrubcwjqktzzunrvuns",
-  "migration": "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
+  "migration": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
   "function": {
     "name": "n88-student-portal",
     "entry": "bundle/edge/index.mjs",
@@ -31,7 +31,12 @@
     "assetAllowlist": [
       "assets/student.mjs",
       "styles/app.css",
-      "styles/student-portal-login.css"
+      "styles/student-portal-login.css",
+      "assets/brand/header-light-standard.svg",
+      "assets/brand/header-light-compact.svg",
+      "assets/brand/header-dark-standard.svg",
+      "assets/brand/header-dark-compact.svg",
+      "assets/brand/icon-192.png"
     ],
     "fallbackToAccountApp": false,
     "headers": {
@@ -70,27 +75,32 @@
     ],
     "valuesIncluded": false,
     "databaseRole": "n88_backend",
-    "provisionLoginOnlyAfterSeparateApproval": true,
-    "recoveryVersionCustody": "Immutable version->dedicated random32byte material, never alias/rebind/reuse versions or material; retain supported old decrypt keys or CAS rewrap all owned active envelopes with fresh nonce before retiring. Never export keys/values; never reset codes for missing keys."
+    "provisionLoginOnlyAfterSeparateApproval": false,
+    "recoveryVersionCustody": "Immutable version->dedicated random32byte material, never alias/rebind/reuse versions or material; retain supported old decrypt keys or CAS rewrap all owned active envelopes with fresh nonce before retiring. Never export keys/values; never reset codes for missing keys.",
+    "provisionLoginAuthority": "PO-20261018-1628-N88-official-if-ready; conditional phases and protected SCRAM only"
   },
   "cron": [],
   "n44Changes": false,
   "migrations": [
     "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+    "supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql",
     "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
     "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
     "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
     "supabase/migrations/20261018115648_n88_code_recovery_staged.sql",
-    "supabase/migrations/20261018125611_n88_task_guidance_staged.sql"
+    "supabase/migrations/20261018125611_n88_task_guidance_staged.sql",
+    "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql"
   ],
   "requiredPreflight": [
+    "Exact existing postgres-granted n88_guard membership correction after source-bound M1 and before M2; original expected baseline unchanged. Actual eight-version readback: hosted-activation-outcome.json. Never replay.",
     "prior-20261018-preflight.inactive.sql (before fresh baseline only)",
     "integrated-preflight.inactive.sql (after baseline, before extension)",
     "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families",
     "six-digit-preflight.inactive.sql (after integrated extension, before six-v1 amendment)",
     "shared-network-preflight.inactive.sql (after six-v1, before attempt/epoch amendment; compare prior-shared-budget-expected-identities.json first)",
     "recovery-preflight.inactive.sql (after shared budget, compare full prior-recovery-integrated-expected-identities.json; no repeat apply)",
-    "task-guidance-preflight.inactive.sql (after all five prior versions; compare prior-task-guidance-integrated-expected-identities.json; no repeat apply)"
+    "task-guidance-preflight.inactive.sql (after all five prior versions; compare prior-task-guidance-integrated-expected-identities.json; no repeat apply)",
+    "exact private-boundary source/signature/owner/invoker/ACL catalog readback plus restricted current_user/TLS/effective-capture session before private access"
   ],
   "qualification": {
     "state": "LOCAL_READY",
@@ -189,5 +199,32 @@
     "unknownCommit": "retain draft; reread committed state; explicit source/CAS revalidation before retry",
     "sourceChange": "omit until deliberate revalidation and republication",
     "hostedApplied": false
+  },
+  "privateErrorBoundary": {
+    "revision": "typed-private-boundary-v1",
+    "migration": {
+      "path": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
+      "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+    },
+    "routines": 76,
+    "contract": "error-boundary-contract.json",
+    "identities": "error-boundary-identities.json",
+    "sourceDefinitionHash": "SHA256(pg_get_functiondef UTF8)",
+    "security": "INVOKER",
+    "executeGrantee": "n88_backend",
+    "hostedApplied": false,
+    "loggingChanges": false,
+    "parameterGrants": false,
+    "originalSixImmutable": true
+  },
+  "stagedRollout": {
+    "phase": "pilot",
+    "defaultMode": "off",
+    "publicEnabled": false,
+    "maxOwners": 1,
+    "maxStudents": 2,
+    "privateBinding": "protected CLI env-file only",
+    "fullHostedAcceptance": "NOT_RUN",
+    "fullPublicRollout": "NOT_RUN"
   }
 }

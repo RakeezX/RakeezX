@@ -13,7 +13,9 @@
     "N88_INGRESS_KEY",
     "N88_SERVICE_REVISION",
     "N88_NUMERIC_KEY",
-    "N88_RESERVATION_KEY"
+    "N88_RESERVATION_KEY",
+    "N88_ROLLOUT_MODE",
+    "N88_PILOT_BINDING"
   ],
   "requiredTrustedPorts": [],
   "requiredReadbacks": [
@@ -85,5 +87,15 @@
     "format": "six-v1",
     "pattern": "^1[0-9]{5}$",
     "capacity": 100000
+  },
+  "stagedRollout": {
+    "phase": "pilot",
+    "defaultMode": "off",
+    "publicEnabled": false,
+    "maxOwners": 1,
+    "maxStudents": 2,
+    "privateBinding": "protected CLI env-file only",
+    "fullHostedAcceptance": "NOT_RUN",
+    "fullPublicRollout": "NOT_RUN"
   }
 }

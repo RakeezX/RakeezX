@@ -1,0 +1,131 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "4c5a66bc-5348-4e74-86a2-2ce6b2b5eec9",
+  "preservedCandidate": "a4af0e926b5120dabc762ec94881247d130c09bd",
+  "at": "2026-10-18T18:48:12.947Z",
+  "cloudflare": {
+    "correctionEvidence": "provider-read-scope-correction.json",
+    "managedHeaders": {
+      "name": "managedHeaders",
+      "status": 200,
+      "success": true,
+      "result": {
+        "managed_request_headers": [
+          {
+            "enabled": false,
+            "has_conflict": false,
+            "id": "add_client_certificate_headers"
+          },
+          {
+            "enabled": false,
+            "has_conflict": false,
+            "id": "add_visitor_location_headers"
+          },
+          {
+            "enabled": false,
+            "has_conflict": false,
+            "id": "remove_visitor_ip_headers"
+          },
+          {
+            "enabled": false,
+            "has_conflict": false,
+            "id": "add_waf_credential_check_status_header"
+          }
+        ],
+        "managed_response_headers": [
+          {
+            "enabled": false,
+            "has_conflict": false,
+            "id": "remove_x-powered-by_header"
+          },
+          {
+            "enabled": false,
+            "has_conflict": false,
+            "id": "add_security_headers"
+          }
+        ]
+      },
+      "errors": []
+    },
+    "privateLoggingFields": {
+      "name": "privateLoggingFields",
+      "error": "Cloudflare API error: 10003: could not find entrypoint ruleset in the http_log_custom_fields phase"
+    },
+    "transforms": [
+      {
+        "name": "requestHeaderTransforms",
+        "error": "Cloudflare API error: 10003: could not find entrypoint ruleset in the http_request_late_transform phase",
+        "absentEntrypoint": true
+      },
+      {
+        "name": "requestUrlTransforms",
+        "error": "Cloudflare API error: 10003: could not find entrypoint ruleset in the http_request_transform phase",
+        "absentEntrypoint": true
+      }
+    ],
+    "absenceInterpretation": "10003 'could not find entrypoint ruleset' means no entrypoint configured in that exact phase, not authorization refusal. The loop stopped after first absence due wording classification; the two untouched remaining phases were then read once. No endpoint repeated.",
+    "logpushEvidenceReused": "logpush-corrected-readback.json: both account/zone200 and empty, no reread",
+    "configurationWrites": 0
+  },
+  "database": {
+    "settings": {
+      "ssl": "on",
+      "pgaudit.log": "none",
+      "log_duration": "off",
+      "log_statement": "ddl",
+      "log_error_verbosity": "default",
+      "password_encryption": "scram-sha-256",
+      "pgaudit.log_parameter": "off",
+      "pgaudit.log_statement": "on",
+      "log_min_duration_sample": "-1",
+      "log_min_error_statement": "error",
+      "log_parameter_max_length": "-1",
+      "ssl_min_protocol_version": "TLSv1.2",
+      "log_min_duration_statement": "-1",
+      "log_transaction_sample_rate": "0",
+      "auto_explain.log_min_duration": "10000",
+      "log_parameter_max_length_on_error": "0",
+      "auto_explain.log_nested_statements": "off"
+    },
+    "n88BackendExists": false,
+    "postgresRoleOverrides": [
+      "search_path=\"\\$user\", public, extensions"
+    ]
+  },
+  "privacyGate": {
+    "state": "BLOCKED",
+    "observed": "log_error_verbosity=default; log_statement=ddl; log_parameter_max_length_on_error=0",
+    "meaning": "Bind-value-on-error suppression does not suppress server DETAIL/HINT/CONTEXT fields or redact credential/verifier literals in logged DDL. Current runtime previously checked only current_user; application catch does not control server logging. The uncreated n88_backend has no established protected effective-session configuration.",
+    "implemented": "Actual bound connection checks effective metadata before any private query and fails closed unless error DETAIL and private statement/bind capture are excluded. It does not SET/ALTER logging, grant privileges or disable provider logs.",
+    "notAssumed": "No actual credential, verifier or private-row leak was induced or observed. No synthetic secret was sent to hosted SQL. Unsafe capture follows documented effective settings; the tested guard rejects those settings.",
+    "scopeBoundary": "No environment/logging downgrade, new parameter SET grant, global logging change, managed Auth change or immutable migration rewrite performed. A supported authorized per-service privacy/redaction disposition is required before provisioning and activation.",
+    "references": [
+      "https://www.postgresql.org/docs/17/runtime-config-logging.html",
+      "https://supabase.com/docs/guides/database/postgres/postgres-log-config"
+    ]
+  },
+  "reuse": {
+    "nativeAccountIdentity": "native-channel-readback.json",
+    "custody": "tests/n88-official-activation-custody-probe.json",
+    "catalog": "official-source-catalog.json",
+    "ui": "tests/n88-official-activation-private-assets.json",
+    "oldFailuresPreserved": true,
+    "unchangedSuitesRerun": false
+  },
+  "disposition": {
+    "hostedWrites": 0,
+    "appliedMigrations": [],
+    "actualServiceSecretsGeneratedOrInstalled": 0,
+    "restrictedLoginChanges": 0,
+    "functionsOrWorkersDeployed": [],
+    "routesOrReadinessChanges": 0,
+    "fixtureAccessedOrConsumed": false,
+    "realPersonalRowsRead": 0,
+    "messagesSent": 0,
+    "browserOrLocalServerStarted": false,
+    "temporaryFunctionCleanup": "No N88 temporary function or hosted fixture created; no owned hosted resource to disarm. Unrelated historical resources untouched; no new absence list claimed.",
+    "officialTrialUrl": null
+  },
+  "retryCondition": "Provide a supported explicitly authorized per-service no-private-DETAIL/no-secret-DDL-capture disposition without violating the logging-change boundary. Keep the runtime guard; validate actual restricted session metadata, then fresh phase baselines immediately before any absent migration apply. Do not run another OAuth/read-scope loop or unchanged local suite."
+}

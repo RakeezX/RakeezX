@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "actualPath": "drafts/n88-student-portal/activation/hosted-m5-identities.json",
+  "expectedPath": "drafts/n88-student-portal/activation/prior-task-guidance-integrated-expected-identities.json",
+  "differences": []
+}

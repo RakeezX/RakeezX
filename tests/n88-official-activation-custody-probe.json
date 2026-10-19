@@ -1,0 +1,24 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "8698a850-ff9c-488d-8516-328eed2c356d",
+  "at": "2026-10-18T17:07:45.866Z",
+  "algorithm": "RSA-OAEP",
+  "hash": "SHA-256",
+  "modulusBits": 3072,
+  "providerWrites": 0,
+  "actualServiceSecretsProvisioned": 0,
+  "plaintextOrPrivateKeyPersisted": false,
+  "checks": [
+    {
+      "name": "actual_provider_webcrypto_to_local_dpapi_recipient",
+      "status": "PASS",
+      "evidence": "Actual native Cloudflare sandbox CSPRNG32-byte throwaway encrypted to3072-bit RSA-OAEP/SHA-256 recipient. Only public JWK and ciphertext crossed tool boundary. CurrentUser DPAPI protected private recipient; local decrypt validated envelope and rejected tampering. No provider writes or actual service secret provisioning."
+    }
+  ],
+  "cleanup": {
+    "ownedEncryptedRecipientRemoved": true,
+    "ownedDirectoryRemoved": true,
+    "privateMaterialLifetime": "local process memory plus temporary DPAPI ciphertext only"
+  }
+}

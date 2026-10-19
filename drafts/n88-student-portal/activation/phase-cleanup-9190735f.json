@@ -1,0 +1,19 @@
+{
+  "runId":"9190735f-6ed0-4513-8ef1-5a3ef24ec6f8",
+  "status":"PASS",
+  "browserLease":"RELEASED browser",
+  "liveMutationLease":"RELEASED live-mutation",
+  "integrationLease":"RELEASED integration",
+  "browser":"Original designated teacher tab returned to classes, synchronized, left open; no other tab or profile touched",
+  "localServersOrPostgresStarted":false,
+  "backendLogin":"NOLOGIN read back, zero memberships and restricted flags",
+  "edgeFlags":"Product and signed readiness OFF; actual readiness503/no-store/no-referrer/noindex",
+  "cloudflare":"Owned Worker retained OFF, zero routes, workers.dev and previews disabled",
+  "originalProductionFunction":"Retained inactive original n88-student-portal; not a temporary proxy or SQL executor",
+  "temporaryInputs":"Protected SQL/env, downloaded source scratch and public-provider-config removed",
+  "custody":"Original protected owner.json and CurrentUser DPAPI recovery.dpapi retained; original version material preserved",
+  "priorRejectedResourceTouched":false,
+  "unrelatedProcessLockOrN44ResourceTouched":false,
+  "fixtureMutations":0,
+  "messages":0
+}
