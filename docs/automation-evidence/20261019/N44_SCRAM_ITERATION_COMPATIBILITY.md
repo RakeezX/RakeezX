@@ -1,0 +1,3 @@
+# N44 Supavisor iteration diagnosis
+
+New first-party source: https://github.com/supabase/supavisor/commit/356029200cbe4a9be190b6e6ec13149b08cbc4c7 explicitly fixes hardcoded4096 in server-first challenge with nondefault stored iteration counts. Existing own provisioning uses16384. Actual hosted behavior is not yet observed; it must be confirmed with a strictTLS own-role public server-first challenge and private same-salt comparison, no final proof. Only a proved16384/4096 mismatch permits guarded repair of the SAME role/password/salt to provider standard4096 and one corrected auth. All original immutable migrations, custody/data/isolation/send gates remain. No repeated completed suites.
