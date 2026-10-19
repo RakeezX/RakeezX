@@ -156,5 +156,29 @@ manifest.stagedActivation.restoreFullAcceptanceAfterVerifiedCorrectionReceipt=tr
 for(const file of ['tests/n88-official-activation-current-entry-ui.mjs','tests/n88-official-activation-current-entry-ui.json','tests/n88-official-activation-hosted-entry-repair.mjs','tests/n88-official-activation-hosted-entry-repair.json','tests/n88-official-activation-request-phase.mjs','tests/n88-official-activation-request-phase.json',dir+'continuation-b324b7b5.json',dir+'current-provider-readback-b324b7b5.json',dir+'hosted-journey-b324b7b5.json',dir+'owned-pilot-pause-readback-b324b7b5.json'])manifest.sources[file]=await textHash(file);
 for(const file of ['drafts/n88-student-portal/official-activation.mjs',dir+'pilot-ui-correction-stage-contract-75c77bea.json',dir+'pilot-ui-correction-delivery-75c77bea.json',dir+'pilot-ui-correction-provider-75c77bea.json',dir+'pilot-ui-correction-config-75c77bea.json',dir+'pilot-ui-correction-http-75c77bea.json',dir+'pilot-ui-correction-gate.mjs','tests/n88-official-activation-pilot-correction-gate.mjs','tests/n88-official-activation-pilot-correction-gate.json'])manifest.sources[file]=await textHash(file);
 for(const file of [dir+'hosted-pilot-readiness.json',dir+'hosted-pilot-live-readiness.json'])manifest.sources[file]=await textHash(file);
+// Exact authorized wake-repair publication stage. Preserve the failed full
+// continuation verbatim; all nine return only after its publisher receipt.
+const replacement=JSON.parse(await readFile(dir+'replacement-delivery-35395ae1.json','utf8'));
+const wake=JSON.parse(await readFile(dir+'wake-pilot-delivery-f8356a7b.json','utf8'));
+manifest.stagedActivation.phase='pilot';
+manifest.stagedActivation.purpose='exact-wake-repair-publication';
+manifest.stagedActivation.deferredChecks=replacement.checks.filter(c=>c.status==='FAIL').map(c=>c.name);
+manifest.stagedActivation.currentEvidence=dir+'wake-pilot-delivery-f8356a7b.json';
+manifest.stagedActivation.currentProviderReadback=dir+'wake-pilot-config-f8356a7b.json';
+manifest.stagedActivation.requiredCheckResults=wake.checks;
+manifest.stagedActivation.currentRequiredChecks=wake.checks.map(c=>c.name);
+manifest.stagedActivation.currentBackendEnabled=wake.currentBackendEnabled;
+manifest.stagedActivation.publicEnabled=false;
+manifest.stagedActivation.fullHostedAcceptance=false;
+manifest.stagedActivation.restoreFullAcceptanceAfterVerifiedCorrectionReceipt=true;
+manifest.stagedActivation.fullAcceptanceRestored=false;
+manifest.stagedActivation.finalRequiredChecks=wake.finalRequiredChecks;
+manifest.stagedActivation.finalAcceptance=wake.finalAcceptance;
+manifest.stagedActivation.preservedFullStage=wake.preservedFullStage;
+manifest.stagedActivation.wakeCorrectionPublicationRequired=true;
+manifest.stagedActivation.replacementFixture={activeOwners:1,activePupils:2,priorFixturePreserved:true};
+manifest.stagedActivation.lastVerifiedCorrectionPublication={candidate:'fbfebd29f10b841849c33639a993a973b4da2ca5',published:'9858b9003da11d7904556adaba663bd432b0ea6e',verifiedAt:'2026-10-19T07:40:18.803Z'};
+for(const file of [dir+'replacement-delivery-35395ae1.json',dir+'replacement-journey-35395ae1.json',dir+'replacement-config-35395ae1.json',dir+'replacement-readiness-35395ae1.json',dir+'replacement-live-readiness-35395ae1.json','tests/n88-official-activation-wake-entry-ui.mjs','tests/n88-official-activation-wake-entry-ui.json','tests/n88-official-activation-wake-entry-ui.baseline.json'])manifest.sources[file]=await textHash(file);
+for(const file of [dir+'wake-pilot-delivery-f8356a7b.json',dir+'wake-pilot-config-f8356a7b.json'])manifest.sources[file]=await textHash(file);
 await writeFile(dir+'manifest.json',JSON.stringify(manifest,null,2)+'\n');
 console.log('N88 exact pilot graphs packaged; public activation remains OFF; provider state is recorded separately.');

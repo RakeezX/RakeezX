@@ -1,0 +1,128 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "35395ae1-0dc1-4fd1-b598-5441b50a3f09",
+  "capturedAt": "2026-10-19T08:27:10.384Z",
+  "authority": "PO-20261019-NEW-TEST-ACCOUNT-CREATE-CLASS-PUPILS",
+  "fixture": {
+    "newClasses": 1,
+    "newFabricatedPupils": 2,
+    "syntheticNames": [
+      "طالب تجريبي أ",
+      "طالب تجريبي ب"
+    ],
+    "normalUiCreation": true,
+    "sameDocumentReloadAndSyncAck": true,
+    "oldFixtureUntouched": true,
+    "noAuthAccountCreated": true,
+    "canonicalWrites": "Only the authorized normal UI class/two-pupil creation"
+  },
+  "custody": {
+    "source": "replacement-config-35395ae1.json",
+    "priorBindingRetainedEncrypted": true,
+    "activePilotOwners": 1,
+    "activePilotPupils": 2,
+    "newRoleCredentialSqlOrKeys": false
+  },
+  "readiness": [
+    "replacement-readiness-35395ae1.json",
+    "replacement-live-readiness-35395ae1.json"
+  ],
+  "initialFailure": {
+    "path": "/api/n88/teacher/class/list",
+    "status": 503,
+    "stage": "begin",
+    "retained": true
+  },
+  "normalStableEntry": {
+    "listStatus": 200,
+    "rosterCount": 2,
+    "pilotAdmitted": true
+  },
+  "hostedFlow": {
+    "batch": "PASS: actual ACK created2/existing0/failed0; two distinct six-digit codes beginning1; creation disabled once none missing",
+    "recovery": "PASS: same two codes recovered in reloaded document after normal stable class entry",
+    "studentLogin": "PASS: first current code opened actual official study page",
+    "visibility": "PASS: teacher durable save ACK; student read shows name/class/required and omits grades/completed/scheduled",
+    "guidance": "PASS: official student expanded the synthetic task; execution and delivery instructions both visible",
+    "rotation": "PASS: durable rotation ACK, only first code changed, second code unchanged",
+    "revoke": "PASS: durable selective revoke ACK; first code hidden, second remains visible",
+    "oldCodeSessionDenial": "PASS: actual normal UI tested both rotated and revoked previous code/session paths",
+    "visibilityDefault": "PASS: no name/class/grade/work sections with all fields unpublished",
+    "emptyState": "PASS: no published tasks initially; teacher guidance and student required section state empty honestly",
+    "sourcePublication": "PASS: newly created canonical task remained absent from portal guidance until teacher explicitly re-saved the already chosen visibility fields; then exactly one synthetic task became available",
+    "guidanceTeacherAck": "PASS: حُفظت التعليمات وأُقرّ نشرها.",
+    "guideSending": "No delivery/send action; fabricated instructions only",
+    "oldSessionAfterRotation": "PASS: existing official student session denied; login form and generic expired-session message shown",
+    "oldCodeAfterRotation": "PASS: original code returns generic unavailable-session message and login form; no study page. Initial result was cleared by lifecycle; one current-document read-only recheck recorded.",
+    "replacementCode": "PASS: rotated current code opens actual study page and synthetic task",
+    "oldSessionAfterRevoke": "PASS: prior current session denied and official login form shown",
+    "revokedCode": "PASS: revoked code produces generic unavailable-session message and no study page",
+    "completedAndScheduled": "NOT_RUN: these fields remain deliberately unpublished; initial required-empty state observed honestly",
+    "contextRenewal": "FAIL on published source: stale context after tab activity. New exact wake regression passes locally, published baseline fails; no actual hosted correction receipt yet.",
+    "unaffectedSecondPupil": "PASS: original second code opens its own study page, selected fields and task after first pupil rotation/revoke; no grades/completed/scheduled data leaked"
+  },
+  "publicEnabled": false,
+  "identitiesCodesSecretsRecorded": false,
+  "transientContention": {
+    "teacherReloadDuringStudentClaim": "Teacher unavailable; student claim/read succeeded",
+    "noAutomaticWriteRetry": true,
+    "preserved": true
+  },
+  "taskFixture": {
+    "created": 1,
+    "title": "مهمة تجريبية N88",
+    "normalUi": true,
+    "originalParentMaximumUnchanged": true,
+    "previewAffectedGrades": 0,
+    "studentScoresWritten": 0
+  },
+  "remainingWakeDefect": {
+    "actualPublishedUi": "After student-tab activity, teacher controls became unavailable under a stale context until normal class re-entry",
+    "sourceFix": "src/lib/student-portal-runtime.js: outer lifecycle reconciliation and request lane spanning binding replacement",
+    "localActualDomPass": "tests/n88-official-activation-wake-entry-ui.json",
+    "publishedBaselineFailure": "tests/n88-official-activation-wake-entry-ui.baseline.json",
+    "freshPublicationRequired": true
+  },
+  "localWakeRegression": {
+    "baselineStatus": "FAIL",
+    "baselineImmutableSource": "815c72aca60e5c7078e53695567c26d2061f5330",
+    "failure": "No fresh server admission after silent same-owner renewal on focus",
+    "correctedStatus": "PASS",
+    "actualDomCssStoreAndGuard": true,
+    "maximumRequestsInFlight": 1,
+    "wrongOwnerRejected": true,
+    "hostedProof": false
+  },
+  "serviceProvider": {
+    "function": "n88-student-portal",
+    "version": 38,
+    "verifyJwt": false,
+    "sameEszip": true,
+    "sourceSha256": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa"
+  },
+  "fixtureDisposition": {
+    "oldFixtureUntouched": true,
+    "newSyntheticClass": 1,
+    "newSyntheticPupils": 2,
+    "newTask": 1,
+    "firstCredentialRevoked": true,
+    "secondCredentialActive": true,
+    "nonceAndCredentialHistoryRetained": true,
+    "studentSessionEnd": "PASS: supported UI showed انتهت الجلسة.",
+    "noExternalMessages": true,
+    "noRawCodesOrIdentitiesInArtifacts": true
+  },
+  "resources": {
+    "ownedStudentTabClosed": true,
+    "studentSessionEnded": true,
+    "teacherObserverDisabled": true,
+    "transientCodesCleared": true,
+    "userTeacherTabPreserved": true,
+    "localBrowsersAndHttpClosed": true,
+    "browserLeaseReleased": true,
+    "liveMutationLeaseReleased": true,
+    "priorDeniedResourcesUntouched": true
+  },
+  "fullHostedAcceptance": false
+}

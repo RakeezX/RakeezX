@@ -1,0 +1,17 @@
+{
+  "aiAuthored": true,
+  "runId": "35395ae1-0dc1-4fd1-b598-5441b50a3f09",
+  "status": "PASS",
+  "checks": [
+    "all9 required checks retained; two full gates still FAIL, no deferred downgrade",
+    "original historical failure checksum unchanged",
+    "exact provider/student bundle bytes unchanged; no service redeploy needed",
+    "current wake/runtime/custodian source graph pinned",
+    "real DOM/store/owner wake regression PASS and published baseline FAIL retained",
+    "no new startup dependency; existing offline shell already includes runtime",
+    "no SQL migration diff and no owned temporary private inputs"
+  ],
+  "publicEnabled": false,
+  "fullHostedAcceptance": false,
+  "finalFrontendPublished": false
+}
