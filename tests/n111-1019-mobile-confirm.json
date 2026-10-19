@@ -1,0 +1,32 @@
+{
+  "taskId": "continuous-n111-mobile-delete-single-confirm-20261019",
+  "runId": "ab7de6cb-b95c-4d31-8559-5c47004f2b87",
+  "baseSha": "80d7a264596cb38c1856796c0c30c23dbbb6b49f",
+  "checks": [
+    {
+      "name": "baseline_missing_compatibility_click_reproduction",
+      "status": "PASS",
+      "evidence": "Immutable base actual application over HTTP: suppressing only first touch compatibility click leaves dialog/data unchanged; second tap deletes. This is a controlled event-loss reproduction, not a claim of native Chromium failure."
+    },
+    {
+      "name": "n111_mobile_delete_confirmation_first_tap_exactly_once",
+      "status": "PASS",
+      "evidence": "390x844 touch context, real account UI/store/owner guard and source CSS: one tap executes exactly one guarded commit despite suppressed compatibility click. While receipt held, duplicate clicks ignored, dialog retained, no Product rows changed. ACK tombstones only selected class/item/score; other grades, students, history and outbox unchanged. Back/cancel, touchcancel and drag remain read-only."
+    },
+    {
+      "name": "owner_rejection_no_mutation",
+      "status": "PASS",
+      "evidence": "Actual account confirm with foreign current Auth identity rejects before commit; all stores unchanged; confirmation remains retryable and no success claimed."
+    },
+    {
+      "name": "failure_and_keyboard_retry",
+      "status": "PASS",
+      "evidence": "A native mobile tap with unavailable receipt leaves all Product stores unchanged, keeps durable intent, warns and re-enables confirm without duplicate commit. Enter retries the same mutationId and closes only after valid ACK."
+    },
+    {
+      "name": "owned_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Canonical isolated helper closed fresh owned contexts/browser; task-owned ephemeral loopback server closed in finally. No shared/live browser lease required by synthetic exception."
+    }
+  ]
+}

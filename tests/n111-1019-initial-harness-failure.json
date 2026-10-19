@@ -1,0 +1,27 @@
+{
+  "taskId": "continuous-n111-mobile-delete-single-confirm-20261019",
+  "runId": "ab7de6cb-b95c-4d31-8559-5c47004f2b87",
+  "baseSha": "80d7a264596cb38c1856796c0c30c23dbbb6b49f",
+  "checks": [
+    {
+      "name": "baseline_missing_compatibility_click_reproduction",
+      "status": "PASS",
+      "evidence": "Immutable base actual application over HTTP: suppressing only first touch compatibility click leaves dialog/data unchanged; second tap deletes. This is a controlled event-loss reproduction, not a claim of native Chromium failure."
+    },
+    {
+      "name": "n111_mobile_delete_confirmation_first_tap_exactly_once",
+      "status": "PASS",
+      "evidence": "390x844 touch context, real account UI/store/owner guard and source CSS: one tap executes exactly one guarded commit despite suppressed compatibility click. While receipt held, duplicate clicks ignored, dialog retained, no Product rows changed. ACK tombstones only selected class/item/score; other grades, students, history and outbox unchanged. Back/cancel, touchcancel and drag remain read-only."
+    },
+    {
+      "name": "scenario_failure",
+      "status": "FAIL",
+      "evidence": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  {\n    assignments: [],\n    attendance: [],\n    calendarDays: [],\n    calendars: [],\n...\n        lastSyncAt: null,\n+       n77DeleteIntent: {\n+         deviceId: 'n73-synthetic-device',\n+         mutationId: '3e65c0f7-97db-40f1-8321-bbe5407941f9',\n+         ownerId: 'a7300000-0000-4000-8000-000000000001',\n+         plan: {\n+           fingerprint: 'n111-synthetic-plan',\n+           ownerId: 'a7300000-0000-4000-8000-000000000001',\n+           scope: 'section',\n+           sectionId: 'n73-target-section',\n+           selectedTeachingId: 'n73-target',\n+           teachingIds: [\n+             'n73-target'\n+           ]\n+         },\n+         selectedTeachingId: 'n73-target'\n+       },\n-       n77DeleteIntent: null,\n        n77DeleteReceipt: {\n          committedAt: 1792396018569,\n          fingerprint: 'n111-synthetic-plan',\n          mutationId: 'e4cfcf7e-5f15-4ea5-a0f0-858bd9a17445',\n          ownerId: 'a7300000-0000-4000-8000-000000000001',\n...\n        theme: 'light',\n+       updatedAt: 1792396019223\n-       updatedAt: 1792396018569\n      }\n    ],\n    enrollments: [],\n    groupArrangements: [],\n    items: [\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n111-mobile-delete-single-confirm-20261019/tests/n111-1019-mobile-confirm.mjs:130:12\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n111-mobile-delete-single-confirm-20261019/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n111-mobile-delete-single-confirm-20261019/tests/n111-1019-mobile-confirm.mjs:45:3"
+    },
+    {
+      "name": "owned_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Canonical isolated helper closed fresh owned contexts/browser; task-owned ephemeral loopback server closed in finally. No shared/live browser lease required by synthetic exception."
+    }
+  ]
+}

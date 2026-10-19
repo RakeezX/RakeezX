@@ -572,6 +572,35 @@ const teachings = {
 
             const confirmBtn = foot.querySelector('#class-delete-confirm-btn');
             if (confirmBtn) {
+              // A completed touch must not depend on the browser synthesizing a
+              // click after its hover/focus pass. Keep keyboard/mouse activation
+              // and every deletion guard in the single click handler below.
+              let confirmTouch;
+              confirmBtn.addEventListener('touchstart', (event) => {
+                const touch = event.touches[0];
+                confirmTouch = !confirmBtn.disabled && event.touches.length === 1
+                  ? { id: touch.identifier, x: touch.clientX, y: touch.clientY, at: event.timeStamp }
+                  : null;
+              }, { passive: true });
+              confirmBtn.addEventListener('touchmove', (event) => {
+                const touch = [...event.touches].find(touch => touch.identifier === confirmTouch?.id);
+                if (!touch || event.touches.length !== 1 ||
+                    Math.hypot(touch.clientX - confirmTouch.x, touch.clientY - confirmTouch.y) > 10) confirmTouch = null;
+              }, { passive: true });
+              confirmBtn.addEventListener('touchcancel', () => { confirmTouch = null; }, { passive: true });
+              confirmBtn.addEventListener('touchend', (event) => {
+                const started = confirmTouch;
+                confirmTouch = null;
+                const touch = [...event.changedTouches].find(touch => touch.identifier === started?.id);
+                if (!started || !touch || !event.cancelable || event.touches.length || confirmBtn.disabled ||
+                    event.timeStamp - started.at > 700 ||
+                    Math.hypot(touch.clientX - started.x, touch.clientY - started.y) > 10 ||
+                    !confirmBtn.contains(document.elementFromPoint(touch.clientX, touch.clientY))) return;
+                // Cancel the compatibility click so a failed request cannot be
+                // retried by a second event from this same deliberate tap.
+                event.preventDefault();
+                confirmBtn.click();
+              }, { passive: false });
               confirmBtn.addEventListener('click', async () => {
                 if (confirmBtn.disabled) return;
                 confirmBtn.disabled = true;
