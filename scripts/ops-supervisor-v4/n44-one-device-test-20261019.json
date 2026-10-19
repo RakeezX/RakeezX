@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -1400,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261019-ONE-DEVICE-TEST-NOTIFICATION",
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "allowedPaths": [
+        "src/app.js",
+        "src/lib/notification-push-*.js",
+        "src/views/notification-settings.js",
+        "src/styles/notifications.css",
+        "sw.js",
+        "drafts/n44-push/**",
+        "supabase/functions/n44-notifications/**",
+        "tests/n44-device-1019*.mjs",
+        "tests/n44-device-1019*.json",
+        "tests/fixtures/n44-device-1019/**",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md"
+      ],
+      "preparationAuthority": {
+        "kind": "explicit-one-user-device-notification-test",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "origin": "https://rakeezx.com",
+        "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261019-followups/po-n44-one-device-test.json",
+        "authorityEvidenceSha256": "ab762a65e8b8f0c36a07335584a9423fb956a9a388fa6709916e0893e006d6bd",
+        "publication": true,
+        "maxActualDeviceRegistrations": 1,
+        "maxProviderSendAttemptsTotalAcrossBothCards": 1,
+        "periodicCron": false,
+        "globalAutonomousDelivery": false,
+        "newAuthUsers": 0,
+        "newRoles": 0,
+        "newMigrations": 0,
+        "managedAuthChange": false,
+        "RlsChange": false,
+        "realStudentMutations": 0,
+        "newPaidService": false,
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "existingSyntheticTeacherNormalUiOnly": true,
+        "maxAdditionalSyntheticOperationalSources": 1
+      },
+      "releaseAuthority": "Direct human19October explicitly permits ONE actual notification to the current device through the existing user-opened fabricated account, with browser consent and pages closed. Existing operational N44 feature implementation/release delegation applies. This bounds one provider-send ATTEMPT total, one device, no other recipients/periodic sends/cron/newAuth/roles/schema/RLS/Auth changes. Original owning N44 CLI session alone may use its existing protected service configuration. Preserve every actual refusal and prior service/SQL/TLS/source proof; no alternate actor/credential/tool bypass.",
+      "id": "continuous-n44-single-device-optin-ready-20261019",
+      "dependsOn": [
+        "continuous-n44-finish-bounded-service-activation-20261018",
+        "continuous-n44-cloudflare-redirect-transport-fix-20261019"
+      ],
+      "objective": "Read canonical AGENTS.md, ops contract and current N44 row only. This is a NEW explicitly approved single-device test continuation, not replay of the completed nonsending activation. Controller resumes SAME original N44 custodian CLI session 01a14fcd-032c-7ec0-8b0c-0e0395862c61 in its new isolated current-main worktree for each serial card; original completed task/receipts remain immutable. Return NEW supplied taskId/runId. Private custody stays in this same original session and existing protected channel; do not export/copy/decrypt private material to root/model/logs or extract browser tokens/profile credentials. Source reused: verified service foundation0c312660 and actual transport/public runtime fix0f5ad310 candidate6f68b6e8, Edge v32 SHA705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f. Same strict direct TLS, same restricted role/password/verifier, RESET ROLE before strict identity/TLS guard, manual redirect+3xx rejection. NEVER reattempt28P01/SQL/OAuth/DNS10000 or replay applied two migrations/42routines/crypto/nativePG/UI suites. Use existing actual evidence by unchanged relevant hashes; fresh source/flags/current-context checks only. Current managed Auth policy proof18Oct16:07:28.711Z supports null/null/false until its existing freshness deadline; do not change managed Auth or read secrets to refresh it. A necessary expired metadata-only refresh uses sanctioned supported channel only.\n\nPO test budget is ONE provider-send ATTEMPT TOTAL across both cards, not one successful delivery plus retries. Persist private owner/device/event/run-bound attempt disposition BEFORE network send; timeout/unknown outcome consumes it, never retry/resend automatically. No real email/WhatsApp/admin/campaign/other device. Do not enable global/periodic production delivery or cron; existing scheduler triggers remain empty. Use the existing audited committed-permit sender/private capability, with a bounded single-target guard if needed, not a generic public send endpoint. Other users/registrations/events cannot enter this test. No schema, roles/grants, applied source/Auth/RLS/security/logging alteration. The public VAPID key alone may appear in frontend after actual matching readiness, no privileged key/service_role/browser bearer export. Reuse original protected provider configuration paths; no new integration or provider OAuth.\n\nUse only existing user-designated SYNTHETIC teacher account opened in Chrome, with N88 one fake class/two fake students. Discover current tab via normal allowed Chrome UI and recognizable fabricated roster, not private Auth rows/token/sessionStorage/cookies/injected fetch. Preserve all N88 codes/fields/fixtures. Do not create accounts/pupils. Prefer an already eligible synthetic operational source; if indispensable, create at most ONE clearly fabricated lesson/due item through normal teacher UI/canonical ACK in that existing fake class. No real pupil/grade/history mutation, retired fixture or direct canonical SQL. Browser test phase uses existing shared browser/live phase lease only while actually operating, releases while awaiting human permission/receipt. Browser notification permission is the actual visible browser prompt: ask user to press Allow only when shown, not for another general authorization. Native computer/browser rules and personal noninterference remain. Preserve unrelated tabs and real-account work; close only owned designated test page(s) for the agreed closed-page test, ask user to close other Rakeez tabs if needed rather than disrupting them.\n\nNo actual OS observation can be inferred from provider201/accepted or HTTP200. Record source/SW callback/provider acceptance separately from observed OS reception; user may confirm the single arrival after send, no extra send to prove it. After the one attempt, restore sending OFF and cron empty, revoke own test registration/consent/subscription through ordinary owner-safe path; preserve minimal deidentified immutable receipt. If cleanup cannot be acknowledged keep it explicit, never claim all OFF. No ongoing notification subscription/recipient/schedule is authorized by one test. Teacher UI remains concise and consistent with Rakeez; no new setup wall/page or implementation details. Full Product CLOSED/personal PO acceptance is not inferred.\n\nPHASE1: make the actual existing opt-in frontend/SW and exact service binding ready on official HTTPS via sole publisher, WITHOUT requesting permission, registering a device or sending. Inspect current implementation rather than inventing new ports. PUSH_CONFIGURATION.enabled=false/publicKey=null currently keeps button hidden; expose deliberate ordinary opt-in only after matching supported service/key/source readiness. Missing backend runtime binding or a bounded one-target send guard is necessary implementation within this card; scope is existing N44 service/client, with delivery globally OFF. Qualify only changed readiness/explicit gesture/SW owner-consent mapping, one-attempt budget and negative wrong-target/second-attempt controls using existing audited adapters. Include existing offline shell check only if app/SW startup actually changed. Do not run old owner/crypto/PG suites. Save public config/source readback, local affected proof and no-send disposition, then LOCAL_READY for publisher. This is only device readiness, not actual closed-page push success. The dependent phase starts automatically after verified publication; do not wait for another human chat approval.",
+      "requiredChecks": [
+        "n44_device_test_service_readiness_and_single_target_budget_guard",
+        "n44_device_test_client_explicit_optin_sw_binding_and_failclosed",
+        "n44_device_test_no_cron_no_real_send_before_device_consent"
+      ],
+      "acceptance": [
+        "Official existing Rakeez opt-in is ready after supported service/SW binding; no test send or registration in phase1.",
+        "One existing original custodian, no SQL/Auth/new roles/credentials or unnecessary proof replay; dependent actual test remains mandatory."
+      ]
+    },
+    {
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -1399,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261019-ONE-DEVICE-TEST-NOTIFICATION",
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "allowedPaths": [
+        "src/app.js",
+        "src/lib/notification-push-*.js",
+        "src/views/notification-settings.js",
+        "src/styles/notifications.css",
+        "sw.js",
+        "drafts/n44-push/**",
+        "supabase/functions/n44-notifications/**",
+        "tests/n44-device-1019*.mjs",
+        "tests/n44-device-1019*.json",
+        "tests/fixtures/n44-device-1019/**",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md"
+      ],
+      "preparationAuthority": {
+        "kind": "explicit-one-user-device-notification-test",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "origin": "https://rakeezx.com",
+        "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261019-followups/po-n44-one-device-test.json",
+        "authorityEvidenceSha256": "ab762a65e8b8f0c36a07335584a9423fb956a9a388fa6709916e0893e006d6bd",
+        "publication": true,
+        "maxActualDeviceRegistrations": 1,
+        "maxProviderSendAttemptsTotalAcrossBothCards": 1,
+        "periodicCron": false,
+        "globalAutonomousDelivery": false,
+        "newAuthUsers": 0,
+        "newRoles": 0,
+        "newMigrations": 0,
+        "managedAuthChange": false,
+        "RlsChange": false,
+        "realStudentMutations": 0,
+        "newPaidService": false,
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "existingSyntheticTeacherNormalUiOnly": true,
+        "maxAdditionalSyntheticOperationalSources": 1
+      },
+      "releaseAuthority": "Direct human19October explicitly permits ONE actual notification to the current device through the existing user-opened fabricated account, with browser consent and pages closed. Existing operational N44 feature implementation/release delegation applies. This bounds one provider-send ATTEMPT total, one device, no other recipients/periodic sends/cron/newAuth/roles/schema/RLS/Auth changes. Original owning N44 CLI session alone may use its existing protected service configuration. Preserve every actual refusal and prior service/SQL/TLS/source proof; no alternate actor/credential/tool bypass.",
+      "id": "continuous-n44-one-approved-closed-page-push-20261019",
+      "dependsOn": [
+        "continuous-n44-single-device-optin-ready-20261019"
+      ],
+      "objective": "Read canonical AGENTS.md, ops contract and current N44 row only. This is a NEW explicitly approved single-device test continuation, not replay of the completed nonsending activation. Controller resumes SAME original N44 custodian CLI session 01a14fcd-032c-7ec0-8b0c-0e0395862c61 in its new isolated current-main worktree for each serial card; original completed task/receipts remain immutable. Return NEW supplied taskId/runId. Private custody stays in this same original session and existing protected channel; do not export/copy/decrypt private material to root/model/logs or extract browser tokens/profile credentials. Source reused: verified service foundation0c312660 and actual transport/public runtime fix0f5ad310 candidate6f68b6e8, Edge v32 SHA705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f. Same strict direct TLS, same restricted role/password/verifier, RESET ROLE before strict identity/TLS guard, manual redirect+3xx rejection. NEVER reattempt28P01/SQL/OAuth/DNS10000 or replay applied two migrations/42routines/crypto/nativePG/UI suites. Use existing actual evidence by unchanged relevant hashes; fresh source/flags/current-context checks only. Current managed Auth policy proof18Oct16:07:28.711Z supports null/null/false until its existing freshness deadline; do not change managed Auth or read secrets to refresh it. A necessary expired metadata-only refresh uses sanctioned supported channel only.\n\nPO test budget is ONE provider-send ATTEMPT TOTAL across both cards, not one successful delivery plus retries. Persist private owner/device/event/run-bound attempt disposition BEFORE network send; timeout/unknown outcome consumes it, never retry/resend automatically. No real email/WhatsApp/admin/campaign/other device. Do not enable global/periodic production delivery or cron; existing scheduler triggers remain empty. Use the existing audited committed-permit sender/private capability, with a bounded single-target guard if needed, not a generic public send endpoint. Other users/registrations/events cannot enter this test. No schema, roles/grants, applied source/Auth/RLS/security/logging alteration. The public VAPID key alone may appear in frontend after actual matching readiness, no privileged key/service_role/browser bearer export. Reuse original protected provider configuration paths; no new integration or provider OAuth.\n\nUse only existing user-designated SYNTHETIC teacher account opened in Chrome, with N88 one fake class/two fake students. Discover current tab via normal allowed Chrome UI and recognizable fabricated roster, not private Auth rows/token/sessionStorage/cookies/injected fetch. Preserve all N88 codes/fields/fixtures. Do not create accounts/pupils. Prefer an already eligible synthetic operational source; if indispensable, create at most ONE clearly fabricated lesson/due item through normal teacher UI/canonical ACK in that existing fake class. No real pupil/grade/history mutation, retired fixture or direct canonical SQL. Browser test phase uses existing shared browser/live phase lease only while actually operating, releases while awaiting human permission/receipt. Browser notification permission is the actual visible browser prompt: ask user to press Allow only when shown, not for another general authorization. Native computer/browser rules and personal noninterference remain. Preserve unrelated tabs and real-account work; close only owned designated test page(s) for the agreed closed-page test, ask user to close other Rakeez tabs if needed rather than disrupting them.\n\nNo actual OS observation can be inferred from provider201/accepted or HTTP200. Record source/SW callback/provider acceptance separately from observed OS reception; user may confirm the single arrival after send, no extra send to prove it. After the one attempt, restore sending OFF and cron empty, revoke own test registration/consent/subscription through ordinary owner-safe path; preserve minimal deidentified immutable receipt. If cleanup cannot be acknowledged keep it explicit, never claim all OFF. No ongoing notification subscription/recipient/schedule is authorized by one test. Teacher UI remains concise and consistent with Rakeez; no new setup wall/page or implementation details. Full Product CLOSED/personal PO acceptance is not inferred.\n\nPHASE2: first verify predecessor actual published identity/current hosted binding, then through ordinary teacher settings click the existing explicit device opt-in in designated fake account. If browser asks, present the actual Allow prompt and wait for user interaction; no permission bypass. Verify normal server registration/consent ACK and only the one intended subscription. Prepare one valid synthetic existing operational event under current source/preferences through normal paths. Ensure no Rakeez page remains open for this Chrome SW/client scope, preserving unrelated tabs; then perform exactly ONE original private committed-permit provider delivery attempt, with per-target durable consumed budget. Keep source revalidation/consent/Auth/owner/expiry/encryption/rate guards; no generic notification without canonical eligible source. Capture provider outcome and any actually observed SW/OS result deidentified. If OS cannot be observed with enabled tools, ask user once whether the notification arrived after this actual attempt and wait/release lease; do not request another send. Unknown provider outcome never resends. Execute exact owned test cleanup and sending OFF/readback/cron-empty disposition. Reuse all successful predecessor/local evidence, no repeat build/native/crypto/UI matrices. Return LOCAL_READY only with truthful actual required checks; if actual prompt/human observation prevents completion save BLOCKED external with exact condition rather than restarting. Sole publisher records any final source/evidence release; do not claim Product CLOSED from provider acceptance.",
+      "requiredChecks": [
+        "n44_one_authorized_device_registration_single_push_with_pages_closed",
+        "n44_device_test_final_disposition_and_no_extra_delivery"
+      ],
+      "acceptance": [
+        "Exactly one approved current-device actual push attempt, after pages closed, with explicit browser consent and truthful OS result.",
+        "Sending disabled/cron empty and own test registration/subscription disposition verified; no extra recipient/send or fabricated receipt."
+      ]
+    }
+  ]
+}
