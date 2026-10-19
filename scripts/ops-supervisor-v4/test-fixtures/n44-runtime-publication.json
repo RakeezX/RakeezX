@@ -1,0 +1,1318 @@
+{
+  "task": {
+    "id": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+    "productId": "N44",
+    "scopeKey": "n44-existing-ingress-transport-compatibility",
+    "executionMode": "local",
+    "liveMutation": true,
+    "liveAuthorizationRef": "PO-20261019-N44-CF-TRANSPORT-REPAIR",
+    "preparationAuthority": {
+      "kind": "scoped_preview_and_fixture_ops",
+      "version": 1,
+      "productId": "N44",
+      "liveAuthorizationRef": "PO-20261019-N44-CF-TRANSPORT-REPAIR",
+      "authoritySource": "Direct PO19Oct full mandate to finish N44; new actual shared runtime incompatibility. Narrow existing ingress code repair only, no new access/data/credential authority.",
+      "publication": true,
+      "supabase": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "function": {
+          "name": "n44-notifications",
+          "enableDelivery": false,
+          "write": true,
+          "operation": "redeploy-existing-request-wrapper-only"
+        },
+        "newAuthIds": 0,
+        "personalRowsRead": 0,
+        "realStudentMutations": 0,
+        "realSend": 0,
+        "AuthConfigurationChanges": 0,
+        "readOnlyExistingEvidence": true,
+        "runtimeRepair": {
+          "version": 1,
+          "kind": "existing-service-request-runtime-only",
+          "newEvidenceSha256": "4df688ddad95abbe60b41e61ab95b4f3c4c30087bf2229c3d2c1f927bd0d25f2",
+          "function": "n44-notifications",
+          "noSqlSchemaAuthRoleOrCredentialOperation": true,
+          "noSecretReadOrWrite": true,
+          "noNewRoutes": true,
+          "noRealAccountOrStudentData": true,
+          "strictTlsRoleAndPrivateBoundaryUnchanged": true,
+          "expectedTypedUnauthorizedStatus": 400,
+          "nonsecretConfigurationCorrectionOnlyIfActualMismatch": [
+            "N44_ENABLED",
+            "N44_SERVICE_REVISION",
+            "N44_SERVICE_SOURCE_SHA",
+            "N44_PUBLIC_ORIGIN",
+            "N44_AUTH_URL",
+            "N44_SESSION_POLICY_JSON",
+            "N44_PROVIDER_ORIGINS_JSON"
+          ]
+        }
+      },
+      "providers": {
+        "ingress": "n44-notifications-ingress",
+        "scheduler": "n44-notifications-scheduler",
+        "deliveryEnabled": false,
+        "allowedMutation": "existing-ingress-script-only",
+        "keepBindingsRequired": true,
+        "secretReadOrWrite": false,
+        "loggingChanges": false,
+        "routeChanges": false,
+        "schedulerChanges": false
+      }
+    },
+    "requiredChecks": [
+      "n44_actual_cloudflare_proper_post_before_and_after",
+      "n44_manual_redirect_and_explicit_redirect_rejection",
+      "n44_native_exact_ingress_source_and_binding_preservation",
+      "n44_unchanged_restricted_tls_and_nonsending_scope",
+      "n44_service_request_runtime_phase_diagnosis_and_fix",
+      "n44_actual_typed_rejected_session_contract400",
+      "n44_existing_edge_native_source_and_unchanged_private_guards"
+    ],
+    "candidateSha": "6f68b6e8cd148773e51007d990fd9e2c7b54f213",
+    "baseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+    "attempt": {
+      "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430"
+    },
+    "servicePublicationEvidence": {
+      "runtime": {
+        "codeHashes": {
+          "drafts/n44-push/database-transport.mjs": "9b4e38cd806b87061f5b739a37ed18d6888e1a80050443de700c6e5bdc892a33",
+          "drafts/n44-push/request-session.mjs": "d7b27021a55cea209a88fe8c117afd919d8cf0746f777ee99bfb2af7e046f513",
+          "drafts/n44-push/runtime-failure.mjs": "90dee199e4b179828f13ff96bbde5a5218f2763463ccb952d5236d0e10a47e99",
+          "drafts/n44-push/existing-host.mjs": "453b5a5146807b4aca802c0cfde3f5df5a4fe46af08c84bdf3be7724191568f4",
+          "drafts/n44-push/web-entry.mjs": "7fc2ee383c8318c09838081ba58d757fc3ed84d9d1c4b72d1c790d858f0afd5c",
+          "drafts/n44-push/readiness-entry.mjs": "51534b2f4d2ceb6a95376f5a37fb4fd0cf47d2a56f48de72f99c772b97d29516",
+          "drafts/n44-push/backend.mjs": "eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2",
+          "drafts/n44-push/auth-verifier.mjs": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+          "drafts/n44-push/activation/private-error-boundary.mjs": "1611f96425963ffde1f8b3d645c3e88303510bd2ecbc0ccf4685b96fd68021c3",
+          "drafts/n44-push/activation/error-boundary-contract.json": "8eeea87b7a77de0759a6d4c1a106c012073556b0d5ee35b7ab31dc81c7064356",
+          "drafts/n44-push/activation/error-boundary-identities.json": "44f315fe1b150f787b7d1d01d98282d53e24f1290023a6f7c405253cc28d671c"
+        },
+        "probe": {
+          "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+          "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+          "recordedAt": "2026-10-19T07:14:16.517Z",
+          "phase": "fix1",
+          "url": "https://rakeezx.com/api/n44/context/read",
+          "method": "POST",
+          "httpStatus": 400,
+          "elapsedMs": 6197,
+          "expectedContractStatus": 400,
+          "bodyKeys": [
+            "status"
+          ],
+          "identity": {},
+          "failurePhase": null,
+          "typedRejectedSession": true,
+          "cacheControl": "no-store, private",
+          "completeSyntheticShapeValidatedOffline": true,
+          "noRealCredentialOrAccount": true,
+          "bodyOrBearerRecorded": false
+        },
+        "probeSha256": "fc8f37ba0ca5f3121b985ba104c48dd18a875c8a6fea5cdaa3ee644ed334389a",
+        "poolRole": {
+          "aiAuthored": true,
+          "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+          "recordedAt": "2026-10-19T07:13:43.080Z",
+          "status": "PASS",
+          "evidence": "Actual shared request-session helper restores original login before each identity/TLS query, then re-enters private backend role. Reproduced retained-role SSL metadata-null denial; two sequential acquisitions pass all original guards. Each false guard and RESET ROLE failure still rejects before private work.",
+          "scope": "Injected ports; not an actual SQL visibility or hosted readiness proof",
+          "networkCalls": 0
+        },
+        "poolRoleSha256": "e8515b58b6dad88fa813f39b723691c84d93a61c28eed5643db982a1545fb0f8",
+        "ingressSource": {
+          "name": "n44-notifications-ingress",
+          "downloadedSourceExact": true,
+          "version": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
+          "versionResourceKeys": [
+            "script",
+            "script_runtime",
+            "bindings"
+          ],
+          "scriptMetadata": {
+            "etag": "60425be16bd83d415a6e5294ec5b37562c2833659daea7e7faf72d64c3062f60",
+            "handlers": [
+              "fetch"
+            ],
+            "named_handlers": [
+              {
+                "name": "createCloudflareEntry",
+                "handlers": [
+                  "class"
+                ]
+              }
+            ],
+            "last_deployed_from": "api"
+          },
+          "scriptRuntime": {
+            "compatibility_date": "2026-10-13",
+            "usage_model": "standard"
+          },
+          "schedules": {
+            "schedules": []
+          },
+          "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+          "downloadedSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+          "recordedAt": "2026-10-19T06:35:52.750Z",
+          "transportCorrectionRunId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+          "schedulesEvidenceReused": true
+        }
+      },
+      "version": 1,
+      "kind": "n44-nonsending-live-service",
+      "candidateSha": "6f68b6e8cd148773e51007d990fd9e2c7b54f213",
+      "baseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+      "publishedSha": "0f5ad310486e80f5d52ff2dbdd53b08b1c1db61c",
+      "artifactHashes": {
+        "drafts/n44-push/activation/manifest.json": "04a262937b1228b6549aee621029d7a09e3bba89e475949997fd97d73f09ff04",
+        "tests/n44-finish-activation-final.json": "b345a388dd0c4818fd96991df0713425d93042f0d95bd6089d3558c06f03159a",
+        "drafts/n44-push/activation/edge-source-readback.json": "0b893feb4e9e54ac36e28d6a929f8a1213656bbb282090a4f81f89512a231c56",
+        "drafts/n44-push/activation/cloudflare-off-readback.json": "377c98cd67c3e44f5a7dc900f022d40a6b1f6572e6d741d3dbc28e81444824a0",
+        "drafts/n44-push/activation/cloudflare-final-readback.json": "ed6e53d258faf4c5b66f26c1850a623010b6b67349b3f83a7ae597388ca83943",
+        "drafts/n44-push/activation/cloudflare-final-versions.json": "7960ed19865f5852d39ba1d771157989d70c029f845680b472fa4333f66461cf"
+      },
+      "bundleHashes": {
+        "edge/index.mjs": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+        "cloudflare/worker.mjs": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+        "scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433"
+      },
+      "manifest": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "outputs": {
+          "edge/index.mjs": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+          "cloudflare/worker.mjs": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+          "scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433",
+          "edge/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
+          "edge/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+          "edge/import_map.json": "50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421"
+        },
+        "actualServiceReadback": {
+          "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+          "receipt": "tests/n44-finish-activation-final.json",
+          "serviceEnabled": true,
+          "ingressEnabled": true,
+          "deliveryEnabled": false,
+          "schedulerEnabled": false,
+          "cron": [],
+          "browserEnabled": false,
+          "serviceWorkerEnabled": false,
+          "ingressTransport": {
+            "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+            "version": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
+            "deploymentId": "9c299159-27e3-462d-834b-953da989a106",
+            "recordedAt": "2026-10-19T06:35:52.750Z",
+            "bindingsPreserved": true,
+            "acceptance": "BLOCKED_AFTER503"
+          },
+          "edgeRequestRuntime": {
+            "version": 32,
+            "sourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+            "recordedAt": "2026-10-19T07:15:29.980Z",
+            "acceptance": "PASS_TYPED_REJECTED400",
+            "serviceMetadataSourceUnchanged": "236f68e0131ca4d2b27fc3014cb33421f90b40c1"
+          }
+        }
+      },
+      "final": {
+        "aiAuthored": true,
+        "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+        "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+        "recordedAt": "2026-10-19T07:15:29.980Z",
+        "state": "LOCAL_READY",
+        "scope": "Existing ingress supported transport plus pooled request-session role restoration; actual guarded typed400 rejected. No full Product/OS acceptance.",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "serviceSourceSha": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+        "edgeFunction": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "name": "n44-notifications",
+          "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
+          "version": 32,
+          "status": "ACTIVE",
+          "verifyJwt": false,
+          "providerBundleSha256": "1c5aee48143a50a73f3a40d3a0c398e46e74b0927922a237a272750f6e16a512",
+          "sourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+          "recordedAt": "2026-10-19T07:15:29.980Z",
+          "providerUpdatedAt": "2026-10-19T07:13:58.116Z",
+          "nativeReadbackAt": "2026-10-19T07:14:09.809Z",
+          "nativeReadbackSource": "drafts/n44-push/activation/runtime-pool-role-native.json",
+          "originalActivationEvidenceReused": true,
+          "requestRuntimeAcceptance": "PASS_TYPED_REJECTED400"
+        },
+        "edgeSourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+        "restrictedIdentityAndFullTls": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+          "recordedAt": "2026-10-19T04:07:25.540Z",
+          "httpStatus": 200,
+          "status": "ready",
+          "loginExact": true,
+          "roleExact": true,
+          "upstreamSsl": true,
+          "clientTlsAuthorized": true,
+          "sourceBoundary": true,
+          "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+          "enabled": true,
+          "deliveryEnabled": false
+        },
+        "providerSecretNamesAndDigestsMatched": [
+          "N44_AUTH_API_KEY",
+          "N44_AUTH_URL",
+          "N44_CRYPTO_JSON",
+          "N44_DATABASE_CA_CERT",
+          "N44_DATABASE_URL",
+          "N44_DELIVERY_ENABLED",
+          "N44_ENABLED",
+          "N44_INGRESS_KEY",
+          "N44_PROVIDER_ORIGINS_JSON",
+          "N44_PUBLIC_ORIGIN",
+          "N44_RATE_KEY",
+          "N44_READINESS_ENABLED",
+          "N44_SCHEDULER_KEY",
+          "N44_SERVICE_REVISION",
+          "N44_SERVICE_SOURCE_SHA",
+          "N44_SESSION_POLICY_JSON"
+        ],
+        "ingressEnabled": true,
+        "route": {
+          "id": "05c0088cf73e4223abaccd1c859e4539",
+          "pattern": "rakeezx.com/api/n44/*",
+          "script": "n44-notifications-ingress",
+          "request_limit_fail_open": false
+        },
+        "schedulerEnabled": false,
+        "cron": [],
+        "deliveryEnabled": false,
+        "browserEnabled": false,
+        "serviceWorkerEnabled": false,
+        "actualUnauthorizedHttp": [
+          {
+            "name": "mountedIngressWrongMethod",
+            "url": "https://rakeezx.com/api/n44/status",
+            "method": "GET",
+            "httpStatus": 401,
+            "denied": true,
+            "bodyKeys": [
+              "error"
+            ],
+            "privateValuesReturned": false,
+            "cacheControl": "no-store, private"
+          },
+          {
+            "name": "edgeWrongAuthDispatch",
+            "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/dispatch",
+            "method": "POST",
+            "httpStatus": 401,
+            "denied": true,
+            "bodyKeys": [
+              "error"
+            ],
+            "privateValuesReturned": false,
+            "cacheControl": "no-store, private"
+          },
+          {
+            "name": "edgeWrongAuthReadiness",
+            "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/readiness",
+            "method": "POST",
+            "httpStatus": 401,
+            "denied": true,
+            "bodyKeys": [
+              "error"
+            ],
+            "privateValuesReturned": false,
+            "cacheControl": "no-store, private"
+          }
+        ],
+        "immutableMigrationsReplayed": false,
+        "personalRowsRead": 0,
+        "authFixtureCreated": false,
+        "realSend": false,
+        "devicePermissionOrRegistration": false,
+        "closedClientOsDelivery": "NOT_RUN",
+        "originalFailuresPreserved": true,
+        "optionalDnsRead": {
+          "status": "FAIL",
+          "code": 10000,
+          "message": "Authentication error",
+          "retried": false,
+          "dnsChanged": false,
+          "requiredMountIndependentlyProved": true
+        },
+        "cleanup": {
+          "liveMutationLeaseReleased": true,
+          "plaintextTransientInputsAbsent": true,
+          "ownedBrowserServerProcessesCreated": false,
+          "encryptedRecoveryRetained": true,
+          "originalCustodyAccessed": false,
+          "providerMutationPerformed": true,
+          "liveMutationLeaseAcquired": true,
+          "priorOwnedLeaseReleaseReused": true,
+          "leaseDisposition": "RELEASED_EXACT_CURRENT_OWNER"
+        },
+        "noFrontendPublication": true,
+        "productClosed": false,
+        "originalActivationEvidence": {
+          "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+          "originalRecordedAt": "2026-10-19T04:16:29.540Z",
+          "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.json",
+          "reused": true
+        },
+        "transportCompatibility": {
+          "version": 1,
+          "platform": "cloudflare-workers",
+          "redirectMode": "manual",
+          "rejectsRedirects": true,
+          "localForwardAttempted": true,
+          "beforeHttpStatus": 503,
+          "afterHttpStatus": 400,
+          "probeMethod": "POST",
+          "probePath": "/api/n44/context/read",
+          "upstreamSourceUnchanged": false,
+          "originalCustodyUntouched": true,
+          "bindingsPreserved": true,
+          "nativeSourceExact": true,
+          "correctedIngressUploaded": true,
+          "beforeRecordedAt": "2026-10-19T06:01:21.375Z",
+          "afterRecordedAt": "2026-10-19T07:14:16.517Z",
+          "unauthorizedAcceptancePassed": true,
+          "expectedAfterHttpStatus": 400,
+          "typedRejectedSession": true,
+          "completeSyntheticShapeValidatedOffline": true,
+          "runtimeGuardExecuted": true,
+          "observedRuntimePhase": "complete",
+          "normalFinalProof": "PASS",
+          "historicalIdentityDiagnostic": {
+            "loginExact": true,
+            "roleExact": true,
+            "upstreamSsl": false,
+            "clientTlsAuthorized": true,
+            "queryCompleted": true,
+            "returnedOneRow": true,
+            "targetKind": "direct"
+          }
+        },
+        "actualTransportUnauthorizedHttp": [
+          {
+            "at": "2026-10-19T06:01:21.375Z",
+            "kind": "single-public-fabricated-unauthorized-forwarding-probe",
+            "method": "POST",
+            "url": "https://rakeezx.com/api/n44/context/read",
+            "httpStatus": 503,
+            "cacheControl": "no-store, private",
+            "bodyRecorded": false,
+            "credentialUsed": false,
+            "accountOrDataMutation": false,
+            "protocolRoute": "existing-context-read",
+            "oldStatusRoute": "pre-forward-denial-only",
+            "reused": true,
+            "evidenceSource": "artifacts/ops-supervisor-v4/intake-evidence/po-20261019-supabase28p01/n44-correct-forward-route-before.json",
+            "admittedByCardRepairAt": "2026-10-19T06:05:50.121Z"
+          },
+          {
+            "aiAuthored": true,
+            "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+            "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+            "recordedAt": "2026-10-19T06:36:03.373Z",
+            "phase": "after",
+            "url": "https://rakeezx.com/api/n44/context/read",
+            "method": "POST",
+            "httpStatus": 503,
+            "denied": true,
+            "bodyKeys": [
+              "error"
+            ],
+            "privateValuesReturned": false,
+            "cacheControl": "no-store, private",
+            "requestOrigin": "https://rakeezx.com",
+            "csrfAndSameOriginProtocol": true,
+            "fakeUnauthorizedBearer": true,
+            "personalData": false,
+            "credentialsPersisted": false,
+            "requestBodyPersisted": false,
+            "probePathAllowed": true
+          },
+          {
+            "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+            "runId": "b7a2a2e4-c4bc-4cce-ac9d-e02740bc494f",
+            "recordedAt": "2026-10-19T06:51:46.679Z",
+            "phase": "diagnostic",
+            "url": "https://rakeezx.com/api/n44/context/read",
+            "method": "POST",
+            "httpStatus": 503,
+            "elapsedMs": 5213,
+            "expectedContractStatus": 400,
+            "bodyKeys": [
+              "error",
+              "phase"
+            ],
+            "failurePhase": "identity",
+            "typedRejectedSession": false,
+            "cacheControl": "no-store, private",
+            "completeSyntheticShapeValidatedOffline": true,
+            "noRealCredentialOrAccount": true,
+            "bodyOrBearerRecorded": false
+          },
+          {
+            "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+            "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+            "recordedAt": "2026-10-19T07:08:04.909Z",
+            "phase": "predicate1",
+            "url": "https://rakeezx.com/api/n44/context/read",
+            "method": "POST",
+            "httpStatus": 503,
+            "elapsedMs": 5071,
+            "expectedContractStatus": 400,
+            "bodyKeys": [
+              "error",
+              "identity",
+              "phase"
+            ],
+            "identity": {
+              "loginExact": true,
+              "roleExact": true,
+              "upstreamSsl": false,
+              "clientTlsAuthorized": true,
+              "queryCompleted": true,
+              "returnedOneRow": true,
+              "targetKind": "direct"
+            },
+            "failurePhase": "identity",
+            "typedRejectedSession": false,
+            "cacheControl": "no-store, private",
+            "completeSyntheticShapeValidatedOffline": true,
+            "noRealCredentialOrAccount": true,
+            "bodyOrBearerRecorded": false
+          },
+          {
+            "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+            "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+            "recordedAt": "2026-10-19T07:14:16.517Z",
+            "phase": "fix1",
+            "url": "https://rakeezx.com/api/n44/context/read",
+            "method": "POST",
+            "httpStatus": 400,
+            "elapsedMs": 6197,
+            "expectedContractStatus": 400,
+            "bodyKeys": [
+              "status"
+            ],
+            "identity": {},
+            "failurePhase": null,
+            "typedRejectedSession": true,
+            "cacheControl": "no-store, private",
+            "completeSyntheticShapeValidatedOffline": true,
+            "noRealCredentialOrAccount": true,
+            "bodyOrBearerRecorded": false
+          }
+        ],
+        "checks": [
+          {
+            "name": "n44_actual_cloudflare_proper_post_before_and_after",
+            "status": "PASS",
+            "evidence": "Original correct-path before503 at2026-10-19T06:01:21.375Z reused. Exact shape-correct fake-session POST at 2026-10-19T07:14:16.517Z returned400 with only status:rejected, no-store/private. All intermediate503 and obsolete401 expectations retained historically."
+          },
+          {
+            "name": "n44_manual_redirect_and_explicit_redirect_rejection",
+            "status": "PASS",
+            "evidence": "Reused six source/bundle handler tests and unchanged native ingress SHA256 cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7. Manual forward and explicit3xx rejection remain; no repeated suite/upload."
+          },
+          {
+            "name": "n44_native_exact_ingress_source_and_binding_preservation",
+            "status": "PASS",
+            "evidence": "Existing keep_bindings native source/deployment/route/privacy proof reused unchanged; scheduler untouched. Current Edge source read back exactly at version32 without secret/config operations."
+          },
+          {
+            "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
+            "status": "PASS",
+            "evidence": "All four original identity/TLS assertions, strict CA/hostname and private42-routine guards retained. RESET ROLE restores original session authority before verification, then existing SET ROLE narrows to backend before private work. Original TLS/config/schema proof retains its real timestamps; no account/student/Auth/secret/config/schema/role-grant/send/device/cron/logging changes."
+          },
+          {
+            "name": "n44_service_request_runtime_phase_diagnosis_and_fix",
+            "status": "PASS",
+            "evidence": "Version31 diagnostic proved completed one-row query with upstreamSsl=false and other predicates true. Source showed pooled SET ROLE survives release and restricts login-owned stats visibility. New shared session preparation resets original role before every identity query, re-enters backend before private/source checks; targeted reused-session negatives PASS and exact version32 normal POST400 confirms correction."
+          },
+          {
+            "name": "n44_actual_typed_rejected_session_contract400",
+            "status": "PASS",
+            "evidence": "tests/n44-finish-runtime.fix1.json: actual POST400 at 2026-10-19T07:14:16.517Z, status-only rejected body, complete synthetic nonJWT/two-id protocol shape, no real Auth/owner/account rows. Same changed-source corrective request supplies normal final gate; no unchanged extra probe."
+          },
+          {
+            "name": "n44_existing_edge_native_source_and_unchanged_private_guards",
+            "status": "PASS",
+            "evidence": "Native existing function version32, verify_jwt=false, exact source/import map; Edge SHA256 705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f. Targeted predicate/redaction3 cases plus two-acquisition role-restoration/false-guard/reset-failure proof PASS. Prior request/rollback40001-40P01/lost-COMMIT/deadline evidence reused unchanged."
+          }
+        ],
+        "blocker": null,
+        "unchangedEvidenceReused": {
+          "restrictedTlsRecordedAt": "2026-10-19T04:07:25.540Z",
+          "edgeRecordedAt": "2026-10-19T04:14:18.138Z",
+          "secretConfig16": "Original historical providerSecretNamesAndDigestsMatched retained, no fresh secret read",
+          "scheduler": "Original cloudflare readbacks/versions retained unchanged; no scheduler request or upload",
+          "historicalCleanup": "tests/n44-finish-cleanup.json reused; no new temporary function deployed/disarmed/cleaned in this task",
+          "optionalDns": "Original10000 refusal retained and not retried"
+        },
+        "priorBlockedEvidence": [
+          {
+            "source": "tests/n44-finish-activation-final.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-9485ed5a.json",
+            "sha256": "2a42a0680ca7f0febcfb0ee8a23cbd47efaafb8201d0c6a759485fa251a4006e",
+            "candidateSha": "f9a1e579a3d5344f6622849b3e638f10b4d11d71"
+          },
+          {
+            "source": "tests/n44-finish-transport.result.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-9485ed5a.json",
+            "sha256": "91b6afba9a67400eb149703fb9b092f5d1c7aeffd35afd01cebcb90e5c876fb9",
+            "candidateSha": "f9a1e579a3d5344f6622849b3e638f10b4d11d71"
+          },
+          {
+            "source": "tests/n44-finish-activation-final.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-65b5a648.json",
+            "sha256": "c0ffbef9458bbbcfcc6a670a10abda2beef8e3b226167479723eb4b659e2ce41",
+            "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+          },
+          {
+            "source": "tests/n44-finish-transport.result.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-65b5a648.json",
+            "sha256": "9920a7042926dba1716553fa6d1201cf971815add6f3675116f845d0ec855169",
+            "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+          }
+        ],
+        "correctedProbeAuthority": {
+          "cardRepairAt": "2026-10-19T06:05:50.121Z",
+          "path": "/api/n44/context/read",
+          "productionAllowlistChanged": false
+        },
+        "probeInputConformance": {
+          "completeSyntheticShapeValidatedOffline": true,
+          "noRealJwtOrAccount": true,
+          "diagnosticRequestConsumed": true,
+          "finalNormalRequestPerformed": true,
+          "finalNormalRequestReceipt": "tests/n44-finish-runtime.fix1.json"
+        },
+        "nativeIngressEvidence": {
+          "upload": "drafts/n44-push/activation/transport-upload-receipt.json",
+          "readback": "drafts/n44-push/activation/transport-after-native.json",
+          "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+          "deploymentId": "9c299159-27e3-462d-834b-953da989a106",
+          "version": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
+          "recordedAt": "2026-10-19T06:35:52.750Z"
+        },
+        "historicalPrivacyEvidenceReused": true,
+        "currentRequestRuntime": {
+          "version": 1,
+          "phase": "complete",
+          "diagnosisObserved": true,
+          "configurationCompleted": true,
+          "connectionAcquired": true,
+          "identityGuardCompleted": true,
+          "identityBooleanValues": null,
+          "rolePrivateSourceReached": true,
+          "fixApplied": true,
+          "sanitizerRetryMetadataCorrected": true,
+          "diagnosticRequestConsumed": true,
+          "finalNormalProof": "PASS",
+          "diagnosticSourceSha256": "8c30b7c09e76c76c66433fc32c76c4cee242a3dd47a74e45b9377b956c759f3b",
+          "observedProviderVersion": 32,
+          "currentSourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+          "providerVersion": 32,
+          "probe": "tests/n44-finish-runtime.fix1.json",
+          "local": "tests/n44-finish-runtime.local.json",
+          "deadline": "tests/n44-finish-runtime.deadline.json",
+          "privateBindingsChanged": false,
+          "nonsecretConfigurationChanged": false,
+          "guardPathsUnchanged": [
+            "drafts/n44-push/readiness-entry.mjs",
+            "drafts/n44-push/backend.mjs",
+            "drafts/n44-push/auth-verifier.mjs",
+            "drafts/n44-push/activation/private-error-boundary.mjs",
+            "drafts/n44-push/activation/error-boundary-contract.json",
+            "drafts/n44-push/activation/error-boundary-identities.json"
+          ],
+          "identityQueryCompleted": true,
+          "identityReturnedOneRow": null,
+          "configuredTargetKind": "direct",
+          "observedFailedPredicate": null,
+          "queryFailureClassification": null,
+          "conditionalSessionTargetRemedyApplied": false,
+          "predicateLocal": "tests/n44-finish-runtime.identity-local.json",
+          "newPhasesConsumed": 2,
+          "maxMaterialPhasesAuthorizedThisRun": 4,
+          "transportGuardScope": "Only optional safe query observer added; all original transport/identity predicates retained. Configured target enum is not an independent socket/route attestation.",
+          "fix": "restore-original-role-before-pooled-identity-check",
+          "historicalDiagnosticIdentity": {
+            "loginExact": true,
+            "roleExact": true,
+            "upstreamSsl": false,
+            "clientTlsAuthorized": true,
+            "queryCompleted": true,
+            "returnedOneRow": true,
+            "targetKind": "direct"
+          },
+          "historicalDiagnosticProbe": "tests/n44-finish-runtime.predicate1.json",
+          "poolRoleLocal": "tests/n44-finish-runtime.pool-role.json",
+          "guardExecutionEvidence": "Exact native source reaches typed400 only after restricted identity/TLS, backend-role private session/source boundary and durable ingress/teacher transaction checks. Current booleans not directly echoed; no fresh positive readiness endpoint or config16 readback claimed."
+        },
+        "historicalProbeInputConformance": {
+          "consumedRequestConformsToFullServiceInput": false,
+          "bearerBelowServiceMinimum": true,
+          "contextBodyMissingRequiredKeys": true,
+          "actual503CauseProved": false,
+          "correctedHarnessPreparedOffline": true,
+          "correctedHarnessSent": false,
+          "authorizedAfterRequestConsumed": true,
+          "automaticRetryAllowed": false
+        },
+        "runtimeArchive": [
+          {
+            "source": "tests/n44-finish-activation-final.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-activation-final.json",
+            "sha256": "769aefaebe779f7c4b629b41400e6e6ecf530475a9dc910f770f721b0fce71a9",
+            "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+          },
+          {
+            "source": "tests/n44-finish-transport.result.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-transport.result.json",
+            "sha256": "fbbeb7af2491d4291d7ec2f57b28194444d7f6304c6430ffc0c74276dd854e7f",
+            "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+          },
+          {
+            "source": "drafts/n44-push/activation/manifest.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/manifest.json",
+            "sha256": "4943197a138166e40d948194629625e4eda31d80ddd9433e24eced95c550706f",
+            "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+          },
+          {
+            "source": "drafts/n44-push/activation/edge-final-metadata.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-final-metadata.json",
+            "sha256": "28c78fa091aa44d4024d320c466076eeab15089902cfc9c4d0000cad55611f0c",
+            "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+          },
+          {
+            "source": "drafts/n44-push/activation/edge-source-readback.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-source-readback.json",
+            "sha256": "e7a72593caab48a04c63bf05816f54761e08700ab4bb4f4de8fd2ed2f36e0557",
+            "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+          },
+          {
+            "source": "tests/n44-finish-activation-final.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-activation-final.json",
+            "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+            "sha256": "eac84d52166b3810790571bae55c40835311aaadcb60242e45262ed751bd1acc"
+          },
+          {
+            "source": "tests/n44-finish-transport.result.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-transport.result.json",
+            "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+            "sha256": "1261878455d74a930ab22d27b2073b132de106f84559407fefad8e9164cb72e1"
+          },
+          {
+            "source": "drafts/n44-push/activation/manifest.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/manifest.json",
+            "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+            "sha256": "93f88b0c9a9331b671cf3a0d73d2de54305020f2dc91faf5ef9f94e7e44df8f2"
+          },
+          {
+            "source": "drafts/n44-push/activation/edge-final-metadata.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-final-metadata.json",
+            "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+            "sha256": "7445ca7c12f111e11e944c0cabbe0c235d7c2b8600e11b94e466856fe635d554"
+          },
+          {
+            "source": "drafts/n44-push/activation/edge-source-readback.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-source-readback.json",
+            "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+            "sha256": "274b3e99547894b70b08dde839e708946858b8c921cfd62547bc0a4dc653ac4d"
+          },
+          {
+            "source": "drafts/n44-push/activation/runtime-final-native.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-native.json",
+            "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+            "sha256": "b1331b34ea6ad7e05df89f82a316f7b76921c874a1e0fddff35b8b7a689e8643"
+          },
+          {
+            "source": "drafts/n44-push/activation/runtime-final-deploy.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-deploy.json",
+            "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+            "sha256": "4c3cc664d62769496a85909462d019b76068d8c90122b7134edc1bfcbf7ccc34"
+          },
+          {
+            "source": "tests/n44-finish-activation-final.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-activation-final.json",
+            "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+            "sha256": "6f42a2a83377f46f4b92d87459b095b32cc525793184f33442a30c0c6c6e0a1e"
+          },
+          {
+            "source": "tests/n44-finish-transport.result.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-transport.result.json",
+            "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+            "sha256": "e9b5faf8ac960822872ca2bfd4e241197413352c683fb62bbf0e245479cab4a5"
+          },
+          {
+            "source": "drafts/n44-push/activation/manifest.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/manifest.json",
+            "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+            "sha256": "23b7756b3f454bc5a03a5a63d4ec18d317a5a46af063e5420fc7bb8b1beb3838"
+          },
+          {
+            "source": "drafts/n44-push/activation/edge-final-metadata.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-final-metadata.json",
+            "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+            "sha256": "8749c9f663d34f4b323bff6a8f496b7e0c3391415d8aad36bbe59c83f3abbb8d"
+          },
+          {
+            "source": "drafts/n44-push/activation/edge-source-readback.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-source-readback.json",
+            "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+            "sha256": "4f22c52c27cbf40eb6d7c59f5a520b3239563759a50a371fdca6d42fc0b6e154"
+          },
+          {
+            "source": "drafts/n44-push/activation/runtime-final-native.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-native.json",
+            "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+            "sha256": "ae10aecab0908c996f01552eee6de2950292b3a1d0bd09402334f912f0047f6c"
+          },
+          {
+            "source": "drafts/n44-push/activation/runtime-final-deploy.json",
+            "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-deploy.json",
+            "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+            "sha256": "3b65e09192dc8a26b2e233f69d29aba0925bf68ac9e321e4ae5abad60f83238c"
+          }
+        ],
+        "readinessEvidenceScope": "Original positive role/TLS/config/schema readbacks reused with original timestamps. Current normal request proves guarded typed denial and durable ingress/teacher path; no fresh full positive readiness or Product/OS delivery inferred."
+      },
+      "edgeSource": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "function": "n44-notifications",
+        "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+        "sourceProvenance": "Original typed SQL/session-policy service metadata pin; distinct from changed diagnostic Edge bundle hash",
+        "sourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+        "downloadedSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+        "exactBytes": true,
+        "importMapExact": true,
+        "recordedAt": "2026-10-19T07:15:29.980Z",
+        "finalProviderVersion": 32,
+        "finalSourceBytesUnchanged": true,
+        "finalSourceBytesScope": "Current corrected pooled-session bytes exactly match native source; changed from original activation and prior diagnostic",
+        "originalSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+        "originalActivationProviderVersion": 4,
+        "priorNativeProviderVersion": 31,
+        "upstreamSourceUnchanged": false,
+        "nativeReadbackAt": "2026-10-19T07:14:09.809Z"
+      },
+      "workerSources": [
+        {
+          "name": "n44-notifications-ingress",
+          "exact": true,
+          "version": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
+          "cron": []
+        },
+        {
+          "name": "n44-notifications-scheduler",
+          "exact": true,
+          "version": "137a326f-292c-47ba-ba93-2a7643196113",
+          "cron": []
+        }
+      ],
+      "workerSourceReadback": "PASS",
+      "cloudflare": {
+        "activation": {
+          "status": "PASS",
+          "ingressEnabled": true,
+          "route": {
+            "id": "05c0088cf73e4223abaccd1c859e4539",
+            "pattern": "rakeezx.com/api/n44/*",
+            "script": "n44-notifications-ingress",
+            "request_limit_fail_open": false
+          },
+          "schedulerEnabled": false,
+          "cron": []
+        },
+        "configuration": [
+          {
+            "name": "n44-notifications-ingress",
+            "readback": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "enabled": "true",
+            "schedulerEnabled": "false",
+            "cron": []
+          },
+          {
+            "name": "n44-notifications-scheduler",
+            "readback": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "enabled": "false",
+            "schedulerEnabled": "false",
+            "cron": []
+          }
+        ],
+        "privacy": [
+          {
+            "name": "n44-notifications-ingress",
+            "status": 200,
+            "success": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "configurationResponse": {
+              "enabled": false,
+              "head_sampling_rate": null,
+              "logs": {
+                "enabled": false,
+                "destinations": [],
+                "head_sampling_rate": null,
+                "persist": false,
+                "invocation_logs": false
+              },
+              "traces": {
+                "enabled": false,
+                "destinations": [],
+                "persist": false,
+                "head_sampling_rate": null
+              }
+            }
+          },
+          {
+            "name": "n44-notifications-scheduler",
+            "status": 200,
+            "success": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "configurationResponse": {
+              "enabled": false,
+              "head_sampling_rate": null,
+              "logs": {
+                "enabled": false,
+                "destinations": [],
+                "head_sampling_rate": null,
+                "persist": false,
+                "invocation_logs": false
+              },
+              "traces": {
+                "enabled": false,
+                "destinations": [],
+                "persist": false,
+                "head_sampling_rate": null
+              }
+            }
+          }
+        ]
+      },
+      "versions": [
+        {
+          "name": "n44-notifications-ingress",
+          "status": 200,
+          "deploymentId": "9c299159-27e3-462d-834b-953da989a106",
+          "versions": [
+            {
+              "version_id": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
+              "percentage": 100
+            }
+          ]
+        },
+        {
+          "name": "n44-notifications-scheduler",
+          "status": 200,
+          "deploymentId": "c8f1aaaa-6bf3-476a-9f16-b414ac70aefc",
+          "versions": [
+            {
+              "version_id": "971e8e93-1bc1-4e40-ab6e-301143f8443d",
+              "percentage": 100
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "receipt": {
+    "version": 1,
+    "ticketId": "N44",
+    "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+    "candidateSha": "6f68b6e8cd148773e51007d990fd9e2c7b54f213",
+    "baseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+    "publishedSha": "0f5ad310486e80f5d52ff2dbdd53b08b1c1db61c",
+    "productionUrl": "https://rakeezx.com",
+    "at": "2026-10-19T07:18:39.311Z",
+    "status": "deployed",
+    "retryable": false,
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-19T07:18:39.311Z",
+    "repository": "RakeezX/RakeezX",
+    "targetBranch": "main",
+    "deploymentId": "02fa9f1a-13e8-42af-bfbe-9d7b73198745",
+    "previewUrl": "https://02fa9f1a.rakeezx.pages.dev",
+    "providerStatus": "SUCCESS",
+    "provider": {
+      "checkRunId": "117937100630",
+      "headSha": "0f5ad310486e80f5d52ff2dbdd53b08b1c1db61c",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-19T07:18:24Z",
+      "completedAt": "2026-10-19T07:18:24Z",
+      "headBranch": null,
+      "deploymentId": "02fa9f1a-13e8-42af-bfbe-9d7b73198745",
+      "previewUrl": "https://02fa9f1a.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/02fa9f1a-13e8-42af-bfbe-9d7b73198745"
+    },
+    "currentMainSha": "0f5ad310486e80f5d52ff2dbdd53b08b1c1db61c",
+    "binding": {
+      "candidateSha": "6f68b6e8cd148773e51007d990fd9e2c7b54f213",
+      "declaredBaseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+      "mainAtPreparation": "a3fb892df7e774c76bb8f1d827e1203c07e1d49b",
+      "integrationSha": "486e6537330afb9d3579dc1232956773a3405453",
+      "publishedSha": "0f5ad310486e80f5d52ff2dbdd53b08b1c1db61c",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "merge"
+    },
+    "build": {
+      "status": "passed",
+      "startedAt": "2026-10-19T07:17:45.482Z",
+      "completedAt": "2026-10-19T07:17:49.866Z",
+      "integrationSha": "486e6537330afb9d3579dc1232956773a3405453",
+      "publishedSha": "0f5ad310486e80f5d52ff2dbdd53b08b1c1db61c",
+      "kind": "standard-build",
+      "validationTier": "STANDARD",
+      "reusedVerifiedBuildSha": null,
+      "generatedPathsChanged": [
+        "src/generated/build-meta.generated.js"
+      ],
+      "commands": [
+        {
+          "command": "node.exe",
+          "args": [
+            "scripts/generate-build-meta.mjs"
+          ]
+        },
+        {
+          "command": "node.exe",
+          "args": [
+            "node_modules/vite/bin/vite.js",
+            "build"
+          ]
+        }
+      ]
+    },
+    "changedPaths": [
+      "docs/automation-evidence/20261019/N44_TRANSPORT_CORRECTION.md",
+      "drafts/n44-push/activation/build-ingress-transport.mjs",
+      "drafts/n44-push/activation/build-request-runtime.mjs",
+      "drafts/n44-push/activation/bundle/cloudflare/worker.mjs",
+      "drafts/n44-push/activation/bundle/edge/index.mjs",
+      "drafts/n44-push/activation/cloudflare-final-readback.json",
+      "drafts/n44-push/activation/cloudflare-final-versions.json",
+      "drafts/n44-push/activation/cloudflare-off-readback.json",
+      "drafts/n44-push/activation/edge-final-metadata.json",
+      "drafts/n44-push/activation/edge-source-readback.json",
+      "drafts/n44-push/activation/manifest.json",
+      "drafts/n44-push/activation/runtime-diagnostic-deploy.json",
+      "drafts/n44-push/activation/runtime-diagnostic-native.json",
+      "drafts/n44-push/activation/runtime-edge-before-metadata.json",
+      "drafts/n44-push/activation/runtime-final-deploy.json",
+      "drafts/n44-push/activation/runtime-final-native.json",
+      "drafts/n44-push/activation/runtime-native-read-input-failure.json",
+      "drafts/n44-push/activation/runtime-pool-role-deploy.json",
+      "drafts/n44-push/activation/runtime-pool-role-native.json",
+      "drafts/n44-push/activation/runtime-predicate-deploy.json",
+      "drafts/n44-push/activation/runtime-predicate-native.json",
+      "drafts/n44-push/activation/transport-after-native.json",
+      "drafts/n44-push/activation/transport-baseline/cloudflare-final-readback.json",
+      "drafts/n44-push/activation/transport-baseline/cloudflare-final-versions.json",
+      "drafts/n44-push/activation/transport-baseline/cloudflare-off-readback.json",
+      "drafts/n44-push/activation/transport-baseline/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-65b5a648.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-9485ed5a.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-65b5a648.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-9485ed5a.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-final-metadata.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-source-readback.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-transport.result.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-deploy.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-native.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-final-metadata.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-source-readback.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-transport.result.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-deploy.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-native.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-final-metadata.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-source-readback.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-transport.result.json",
+      "drafts/n44-push/activation/transport-before-native.json",
+      "drafts/n44-push/activation/transport-before-version.json",
+      "drafts/n44-push/activation/transport-preupload-native.json",
+      "drafts/n44-push/activation/transport-upload-receipt.json",
+      "drafts/n44-push/cloudflare-entry.mjs",
+      "drafts/n44-push/database-transport.mjs",
+      "drafts/n44-push/existing-host.mjs",
+      "drafts/n44-push/request-session.mjs",
+      "drafts/n44-push/runtime-failure.mjs",
+      "drafts/n44-push/web-entry.mjs",
+      "supabase/functions/n44-notifications/index.ts",
+      "tests/n44-finish-activation-final.json",
+      "tests/n44-finish-runtime-deadline.mjs",
+      "tests/n44-finish-runtime-evidence.mjs",
+      "tests/n44-finish-runtime-identity-evidence.mjs",
+      "tests/n44-finish-runtime-identity.mjs",
+      "tests/n44-finish-runtime-local.mjs",
+      "tests/n44-finish-runtime-pool-role-evidence.mjs",
+      "tests/n44-finish-runtime-pool-role.mjs",
+      "tests/n44-finish-runtime-probe.mjs",
+      "tests/n44-finish-runtime.deadline.json",
+      "tests/n44-finish-runtime.diagnostic.json",
+      "tests/n44-finish-runtime.fix1.json",
+      "tests/n44-finish-runtime.identity-local.json",
+      "tests/n44-finish-runtime.local.json",
+      "tests/n44-finish-runtime.pool-role.json",
+      "tests/n44-finish-runtime.predicate1.json",
+      "tests/n44-finish-transport-evidence.mjs",
+      "tests/n44-finish-transport-finalize.mjs",
+      "tests/n44-finish-transport-probe.mjs",
+      "tests/n44-finish-transport-resume.mjs",
+      "tests/n44-finish-transport.context-read.after.json",
+      "tests/n44-finish-transport.context-read.before.json",
+      "tests/n44-finish-transport.local.json",
+      "tests/n44-finish-transport.mjs",
+      "tests/n44-finish-transport.result.json",
+      "tests/n44-finish-transport.status.before.json"
+    ],
+    "sourceOnlyPaths": [
+      "drafts/n44-push/activation/build-ingress-transport.mjs",
+      "drafts/n44-push/activation/build-request-runtime.mjs",
+      "drafts/n44-push/activation/bundle/cloudflare/worker.mjs",
+      "drafts/n44-push/activation/bundle/edge/index.mjs",
+      "drafts/n44-push/activation/cloudflare-final-readback.json",
+      "drafts/n44-push/activation/cloudflare-final-versions.json",
+      "drafts/n44-push/activation/cloudflare-off-readback.json",
+      "drafts/n44-push/activation/edge-final-metadata.json",
+      "drafts/n44-push/activation/edge-source-readback.json",
+      "drafts/n44-push/activation/runtime-diagnostic-deploy.json",
+      "drafts/n44-push/activation/runtime-diagnostic-native.json",
+      "drafts/n44-push/activation/runtime-edge-before-metadata.json",
+      "drafts/n44-push/activation/runtime-final-deploy.json",
+      "drafts/n44-push/activation/runtime-final-native.json",
+      "drafts/n44-push/activation/runtime-native-read-input-failure.json",
+      "drafts/n44-push/activation/runtime-pool-role-deploy.json",
+      "drafts/n44-push/activation/runtime-pool-role-native.json",
+      "drafts/n44-push/activation/runtime-predicate-deploy.json",
+      "drafts/n44-push/activation/runtime-predicate-native.json",
+      "drafts/n44-push/activation/transport-after-native.json",
+      "drafts/n44-push/activation/transport-baseline/cloudflare-final-readback.json",
+      "drafts/n44-push/activation/transport-baseline/cloudflare-final-versions.json",
+      "drafts/n44-push/activation/transport-baseline/cloudflare-off-readback.json",
+      "drafts/n44-push/activation/transport-baseline/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-65b5a648.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-9485ed5a.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-65b5a648.json",
+      "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-9485ed5a.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-final-metadata.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-source-readback.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-transport.result.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-deploy.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-native.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-final-metadata.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-source-readback.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-transport.result.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-deploy.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-native.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-final-metadata.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-source-readback.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/manifest.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-activation-final.json",
+      "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-transport.result.json",
+      "drafts/n44-push/activation/transport-before-native.json",
+      "drafts/n44-push/activation/transport-before-version.json",
+      "drafts/n44-push/activation/transport-preupload-native.json",
+      "drafts/n44-push/activation/transport-upload-receipt.json",
+      "drafts/n44-push/cloudflare-entry.mjs",
+      "drafts/n44-push/database-transport.mjs",
+      "drafts/n44-push/existing-host.mjs",
+      "drafts/n44-push/request-session.mjs",
+      "drafts/n44-push/runtime-failure.mjs",
+      "drafts/n44-push/web-entry.mjs",
+      "supabase/functions/n44-notifications/index.ts",
+      "tests/n44-finish-activation-final.json",
+      "tests/n44-finish-runtime-deadline.mjs",
+      "tests/n44-finish-runtime-evidence.mjs",
+      "tests/n44-finish-runtime-identity-evidence.mjs",
+      "tests/n44-finish-runtime-identity.mjs",
+      "tests/n44-finish-runtime-local.mjs",
+      "tests/n44-finish-runtime-pool-role-evidence.mjs",
+      "tests/n44-finish-runtime-pool-role.mjs",
+      "tests/n44-finish-runtime-probe.mjs",
+      "tests/n44-finish-runtime.deadline.json",
+      "tests/n44-finish-runtime.diagnostic.json",
+      "tests/n44-finish-runtime.fix1.json",
+      "tests/n44-finish-runtime.identity-local.json",
+      "tests/n44-finish-runtime.local.json",
+      "tests/n44-finish-runtime.pool-role.json",
+      "tests/n44-finish-runtime.predicate1.json",
+      "tests/n44-finish-transport-evidence.mjs",
+      "tests/n44-finish-transport-finalize.mjs",
+      "tests/n44-finish-transport-probe.mjs",
+      "tests/n44-finish-transport-resume.mjs",
+      "tests/n44-finish-transport.context-read.after.json",
+      "tests/n44-finish-transport.context-read.before.json",
+      "tests/n44-finish-transport.local.json",
+      "tests/n44-finish-transport.mjs",
+      "tests/n44-finish-transport.result.json",
+      "tests/n44-finish-transport.status.before.json"
+    ],
+    "changedAssets": [],
+    "productSourceChangeObserved": false,
+    "evidence": {
+      "immutable": {
+        "origin": "https://02fa9f1a.rakeezx.pages.dev",
+        "checkedAt": "2026-10-19T07:18:34.494Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "bytes": 3952,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "observedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "bytes": 21721,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "de80c2f174c7fc367a85035775caa4ebe04b3825a5f74a5b6ecf14bc14df7ff2",
+            "observedSha256": "de80c2f174c7fc367a85035775caa4ebe04b3825a5f74a5b6ecf14bc14df7ff2",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/activation/manifest.json",
+            "urlPath": "drafts/n44-push/activation/manifest.json",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "04a262937b1228b6549aee621029d7a09e3bba89e475949997fd97d73f09ff04",
+            "observedSha256": "04a262937b1228b6549aee621029d7a09e3bba89e475949997fd97d73f09ff04",
+            "bytes": 19547,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261019/N44_TRANSPORT_CORRECTION.md",
+            "urlPath": "docs/automation-evidence/20261019/N44_TRANSPORT_CORRECTION.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "59c9367c3fee02dba3d98a4587b0abd94400b3d8dd55a0c8b08059b5edb5ec34",
+            "observedSha256": "59c9367c3fee02dba3d98a4587b0abd94400b3d8dd55a0c8b08059b5edb5ec34",
+            "bytes": 25740,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-19T07:18:35.045Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8b8456bb958430d9e22a6f305032932aae99e8543604c672c915141389cacd3f",
+            "bytes": 5257,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "normalizedBytes": 3952,
+            "removedProviderBytes": 1305,
+            "removedSha256": "9772c28fa771adf9cc4d826a2e776256b78e3afd1f89f8cb6a8af0e6b2ab8bbc",
+            "providerTransforms": [
+              "cloudflare-analytics-20261017",
+              "cloudflare-jsd-v1"
+            ]
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "observedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "bytes": 21721,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "de80c2f174c7fc367a85035775caa4ebe04b3825a5f74a5b6ecf14bc14df7ff2",
+            "observedSha256": "de80c2f174c7fc367a85035775caa4ebe04b3825a5f74a5b6ecf14bc14df7ff2",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/activation/manifest.json",
+            "urlPath": "drafts/n44-push/activation/manifest.json",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "04a262937b1228b6549aee621029d7a09e3bba89e475949997fd97d73f09ff04",
+            "observedSha256": "04a262937b1228b6549aee621029d7a09e3bba89e475949997fd97d73f09ff04",
+            "bytes": 19547,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261019/N44_TRANSPORT_CORRECTION.md",
+            "urlPath": "docs/automation-evidence/20261019/N44_TRANSPORT_CORRECTION.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "59c9367c3fee02dba3d98a4587b0abd94400b3d8dd55a0c8b08059b5edb5ec34",
+            "observedSha256": "59c9367c3fee02dba3d98a4587b0abd94400b3d8dd55a0c8b08059b5edb5ec34",
+            "bytes": 25740,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      }
+    },
+    "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n44-cloudflare-redirect-transport-fix-20261019\\integration-6f68b6e8cd14-1-432bb768",
+    "pushRecovered": false,
+    "poPersonallyTested": false,
+    "closed": false
+  }
+}

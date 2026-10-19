@@ -8,6 +8,11 @@ const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const names=['n44-notifications-ingress','n44-notifications-scheduler'];
 const route=r=>r?.pattern==='rakeezx.com/api/n44/*'&&r.script===names[0]&&r.request_limit_fail_open===false&&/^[a-f0-9]{32}$/.test(r.id??'');
 const correction=t=>t?.id==='continuous-n44-cloudflare-redirect-transport-fix-20261019'&&t.scopeKey==='n44-existing-ingress-transport-compatibility'&&t.liveAuthorizationRef==='PO-20261019-N44-CF-TRANSPORT-REPAIR';
+const runtimeRepair=t=>correction(t)&&t.preparationAuthority?.supabase?.function?.write===true&&t.preparationAuthority.supabase.function.operation==='redeploy-existing-request-wrapper-only'
+ &&t.preparationAuthority.supabase.runtimeRepair?.version===1&&t.preparationAuthority.supabase.runtimeRepair.kind==='existing-service-request-runtime-only'
+ &&t.preparationAuthority.supabase.runtimeRepair.function==='n44-notifications'&&t.preparationAuthority.supabase.runtimeRepair.expectedTypedUnauthorizedStatus===400
+ &&['noSqlSchemaAuthRoleOrCredentialOperation','noSecretReadOrWrite','noNewRoutes','noRealAccountOrStudentData','strictTlsRoleAndPrivateBoundaryUnchanged'].every(k=>t.preparationAuthority.supabase.runtimeRepair[k]===true);
+const RUNTIME_CODE_HASHES={"drafts/n44-push/database-transport.mjs":"9b4e38cd806b87061f5b739a37ed18d6888e1a80050443de700c6e5bdc892a33","drafts/n44-push/request-session.mjs":"d7b27021a55cea209a88fe8c117afd919d8cf0746f777ee99bfb2af7e046f513","drafts/n44-push/runtime-failure.mjs":"90dee199e4b179828f13ff96bbde5a5218f2763463ccb952d5236d0e10a47e99","drafts/n44-push/existing-host.mjs":"453b5a5146807b4aca802c0cfde3f5df5a4fe46af08c84bdf3be7724191568f4","drafts/n44-push/web-entry.mjs":"7fc2ee383c8318c09838081ba58d757fc3ed84d9d1c4b72d1c790d858f0afd5c","drafts/n44-push/readiness-entry.mjs":"51534b2f4d2ceb6a95376f5a37fb4fd0cf47d2a56f48de72f99c772b97d29516","drafts/n44-push/backend.mjs":"eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2","drafts/n44-push/auth-verifier.mjs":"929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b","drafts/n44-push/activation/private-error-boundary.mjs":"1611f96425963ffde1f8b3d645c3e88303510bd2ecbc0ccf4685b96fd68021c3","drafts/n44-push/activation/error-boundary-contract.json":"8eeea87b7a77de0759a6d4c1a106c012073556b0d5ee35b7ab31dc81c7064356","drafts/n44-push/activation/error-boundary-identities.json":"44f315fe1b150f787b7d1d01d98282d53e24f1290023a6f7c405253cc28d671c"};
 const fixedScope=t=>(correction(t)||t?.id==='continuous-n44-finish-bounded-service-activation-20261018'&&t.scopeKey==='n44-exact-nonsending-service-activation'&&t.liveAuthorizationRef==='PO-20261018-1628-FINISH-N44-EXACT-NONSENDING-ACTIVATION')&&t.productId==='N44'&&t.executionMode==='local'&&t.liveMutation===true
  &&t.preparationAuthority?.publication===true&&t.preparationAuthority.supabase?.projectId==='xlrubcwjqktzzunrvuns'
  &&t.preparationAuthority.supabase.function?.name==='n44-notifications'&&t.preparationAuthority.supabase.function.enableDelivery===false
@@ -20,7 +25,8 @@ export function buildLiveServiceEvidence(task,receipt,readCandidateFile){
  const raw=Object.fromEntries(SERVICE_ARTIFACTS.map(p=>[p,Buffer.from(readCandidateFile(p))]));
  const [m,f,e,o,c,v]=SERVICE_ARTIFACTS.map(p=>JSON.parse(raw[p].toString('utf8')));
  const bundleHashes=Object.fromEntries(['edge/index.mjs','cloudflare/worker.mjs','scheduler/worker.mjs'].map(p=>[p,digest(Buffer.from(readCandidateFile(ROOT+'bundle/'+p)))]));
- return {version:1,kind:'n44-nonsending-live-service',candidateSha:task.candidateSha,baseSha:task.baseSha,publishedSha:receipt.publishedSha,
+ const runtime=runtimeRepair(task)?{codeHashes:Object.fromEntries(Object.keys(RUNTIME_CODE_HASHES).map(p=>[p,digest(Buffer.from(readCandidateFile(p)))])),probe:JSON.parse(Buffer.from(readCandidateFile('tests/n44-finish-runtime.fix1.json')).toString('utf8')),probeSha256:digest(Buffer.from(readCandidateFile('tests/n44-finish-runtime.fix1.json'))),poolRole:JSON.parse(Buffer.from(readCandidateFile('tests/n44-finish-runtime.pool-role.json')).toString('utf8')),poolRoleSha256:digest(Buffer.from(readCandidateFile('tests/n44-finish-runtime.pool-role.json'))),ingressSource:o.sources?.find(s=>s.name==='n44-notifications-ingress')}:null;
+ return {...(runtime?{runtime}:{}),version:1,kind:'n44-nonsending-live-service',candidateSha:task.candidateSha,baseSha:task.baseSha,publishedSha:receipt.publishedSha,
   artifactHashes:Object.fromEntries(SERVICE_ARTIFACTS.map(p=>[p,digest(raw[p])])),bundleHashes,
   manifest:{projectId:m.projectId,outputs:m.outputs,actualServiceReadback:m.actualServiceReadback},
   final:f,edgeSource:e,
@@ -69,11 +75,32 @@ export function verifiedLiveServicePublication(task,receipt,report=()=>{}){
    ||p.versions?.length!==2||!names.every(n=>p.versions.some(s=>s.name===n&&s.status===200&&UUID.test(s.deploymentId??'')&&s.versions?.length===1&&s.versions[0].percentage===100&&UUID.test(s.versions[0].version_id??''))))return fail('workers');
   if(correction(task)){
    const x=f.transportCompatibility;
-   if(x?.version!==1||x.platform!=='cloudflare-workers'||x.redirectMode!=='manual'||x.probeMethod!=='POST'||x.beforeHttpStatus!==503||x.afterHttpStatus!==401
-    ||!['rejectsRedirects','localForwardAttempted','upstreamSourceUnchanged','originalCustodyUntouched','bindingsPreserved','nativeSourceExact'].every(k=>x[k]===true)
+   if(x?.version!==1||x.platform!=='cloudflare-workers'||x.redirectMode!=='manual'||x.probeMethod!=='POST'||x.beforeHttpStatus!==503
+    ||!['rejectsRedirects','localForwardAttempted','originalCustodyUntouched','bindingsPreserved','nativeSourceExact'].every(k=>x[k]===true)
     ||p.bundleHashes['cloudflare/worker.mjs']==='438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40'
-    ||p.bundleHashes['edge/index.mjs']!=='75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181'||p.bundleHashes['scheduler/worker.mjs']!=='85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433'||a.source!=='236f68e0131ca4d2b27fc3014cb33421f90b40c1'
-    ||task.preparationAuthority.providers.keepBindingsRequired!==true||task.preparationAuthority.providers.secretReadOrWrite!==false||task.preparationAuthority.supabase.function.write!==false)return fail('transport-compatibility');
+    ||p.bundleHashes['scheduler/worker.mjs']!=='85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433'||a.source!=='236f68e0131ca4d2b27fc3014cb33421f90b40c1'
+    ||task.preparationAuthority.providers.keepBindingsRequired!==true||task.preparationAuthority.providers.secretReadOrWrite!==false)return fail('transport-compatibility');
+   if(runtimeRepair(task)){
+    const z=p.runtime,h=f.currentRequestRuntime,b=z?.probe;
+    if(p.candidateSha!=='6f68b6e8cd148773e51007d990fd9e2c7b54f213'||p.bundleHashes['edge/index.mjs']!=='705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f'
+     ||p.bundleHashes['cloudflare/worker.mjs']!=='cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7'
+     ||f.edgeFunction.version!==32||f.edgeFunction.verifyJwt!==false||x.afterHttpStatus!==400||x.expectedAfterHttpStatus!==400||x.upstreamSourceUnchanged!==false
+     ||x.probePath!=='/api/n44/context/read'||!['typedRejectedSession','completeSyntheticShapeValidatedOffline','runtimeGuardExecuted','correctedIngressUploaded','unauthorizedAcceptancePassed'].every(k=>x[k]===true)
+     ||x.observedRuntimePhase!=='complete'||x.normalFinalProof!=='PASS'||!same(z?.codeHashes,RUNTIME_CODE_HASHES)
+     ||z?.probeSha256!=='fc8f37ba0ca5f3121b985ba104c48dd18a875c8a6fea5cdaa3ee644ed334389a'||z.poolRoleSha256!=='e8515b58b6dad88fa813f39b723691c84d93a61c28eed5643db982a1545fb0f8'
+     ||!receipt.sourceOnlyPaths.includes('tests/n44-finish-runtime.fix1.json')||!receipt.sourceOnlyPaths.includes('tests/n44-finish-runtime.pool-role.json')
+     ||b?.taskId!==task.id||b.runId!==task.attempt?.runId||b.runId!==f.runId||b.phase!=='fix1'||b.method!=='POST'||b.url!=='https://rakeezx.com/api/n44/context/read'
+     ||b.httpStatus!==400||b.expectedContractStatus!==400||b.typedRejectedSession!==true||b.completeSyntheticShapeValidatedOffline!==true||b.noRealCredentialOrAccount!==true||b.bodyOrBearerRecorded!==false
+     ||b.cacheControl!=='no-store, private'||!same(b.bodyKeys,['status'])||!same(b.identity,{})||b.failurePhase!==null||b.recordedAt!==x.afterRecordedAt
+     ||!Number.isFinite(Date.parse(b.recordedAt))||Date.parse(b.recordedAt)>Date.parse(f.recordedAt)||Date.parse(b.recordedAt)<Date.parse(f.edgeFunction.nativeReadbackAt)
+     ||z.poolRole.status!=='PASS'||z.poolRole.networkCalls!==0||z.poolRole.runId!==b.runId
+     ||z.ingressSource?.sourceSha256!==p.bundleHashes['cloudflare/worker.mjs']||z.ingressSource.downloadedSha256!==p.bundleHashes['cloudflare/worker.mjs']||z.ingressSource.downloadedSourceExact!==true
+     ||h?.version!==1||h.phase!=='complete'||h.fix!=='restore-original-role-before-pooled-identity-check'||h.finalNormalProof!=='PASS'||h.identityBooleanValues!==null
+     ||!['diagnosisObserved','configurationCompleted','connectionAcquired','identityGuardCompleted','rolePrivateSourceReached','fixApplied','sanitizerRetryMetadataCorrected','identityQueryCompleted'].every(k=>h[k]===true)
+     ||h.privateBindingsChanged!==false||h.nonsecretConfigurationChanged!==false||h.conditionalSessionTargetRemedyApplied!==false||h.currentSourceSha256!==p.bundleHashes['edge/index.mjs']||h.providerVersion!==32||h.probe!=='tests/n44-finish-runtime.fix1.json'
+     ||!f.actualTransportUnauthorizedHttp?.some(v=>v.httpStatus===503&&v.failurePhase==='identity')||!f.actualTransportUnauthorizedHttp.some(v=>same(v,b))
+     ||!same(h.guardPathsUnchanged,['drafts/n44-push/readiness-entry.mjs','drafts/n44-push/backend.mjs','drafts/n44-push/auth-verifier.mjs','drafts/n44-push/activation/private-error-boundary.mjs','drafts/n44-push/activation/error-boundary-contract.json','drafts/n44-push/activation/error-boundary-identities.json']))return fail('reviewed-runtime-repair');
+   }else if(x.afterHttpStatus!==401||x.upstreamSourceUnchanged!==true||p.bundleHashes['edge/index.mjs']!=='75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181'||task.preparationAuthority.supabase.function.write!==false)return fail('transport-compatibility');
   }
   return true;
  }catch{return false;}
