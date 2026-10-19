@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n112-logged-out-login-banner-20261019",
+  "runId": "f6c1b1a8-5116-4eb6-9aee-8443038ea4db",
+  "baseline": true,
+  "checks": [
+    {
+      "name": "baseline_reproduced",
+      "status": "PASS",
+      "evidence": "Expired Auth identity leaves the top banner asking for account verification."
+    }
+  ],
+  "errors": []
+}

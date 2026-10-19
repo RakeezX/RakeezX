@@ -844,6 +844,13 @@ function paint() {
 function renderOfflineLease() {
   const lease = store.getOfflineLeaseStatus();
   if (!['REMINDER', 'LIMITED'].includes(lease.state)) return '';
+  // AI: an absent/rejected identity needs the existing login flow, not lease renewal.
+  if (!cloud.session || !cloud.user || cloud.authStatus().state === 'auth_required') {
+    return html`<aside class="offline-lease-notice noprint" dir="rtl" role="status" data-offline-lease="${lease.state}">
+      <div><strong>يلزم تسجيل الدخول</strong><p>سجّل الدخول لاستئناف العمل بحسابك. بياناتك المحلية محفوظة.</p></div>
+      <button class="btn btn--ghost" data-act="mini-hub-login">تسجيل الدخول</button>
+    </aside>`;
+  }
   return html`<aside class="offline-lease-notice noprint" dir="rtl" role="status" data-offline-lease="${lease.state}">
     <div><strong>${lease.state === 'LIMITED' ? 'وضع القراءة فقط' : 'تذكير بالاتصال'}</strong>
       <p>${lease.state === 'LIMITED' ? 'يمكنك العرض والتصدير وتنزيل نسخة احتياطية. لاستئناف التعديل، اتصل بالإنترنت واضغط «التحقق من الحساب».' : 'يمكنك متابعة العمل. اتصل بالإنترنت قريبًا واضغط «التحقق من الحساب» لتستمر في التعديل.'}</p></div>
@@ -1031,8 +1038,14 @@ async function boot() {
     !!cloud.session, cloud.authStatus().state, store.getActiveWorkspace(),
     store.getOfflineLeaseStatus().state, store.getOfflineLeaseStatus().reason]);
   let lastAccountPresentationKey = accountPresentationKey();
+  const authenticatedOwner = () => cloud.authStatus().state === 'authenticated' &&
+    cloud.session?.user?.id === cloud.user?.id ? cloud.user?.id ?? null : null;
+  let lastAuthenticatedOwner = authenticatedOwner();
   cloud.subscribe(() => {
     const workspace = store.getActiveWorkspace();
+    const nextAuthenticatedOwner = authenticatedOwner();
+    const signedIn = nextAuthenticatedOwner && nextAuthenticatedOwner !== lastAuthenticatedOwner;
+    lastAuthenticatedOwner = nextAuthenticatedOwner;
     if (workspace?.type === 'account' && workspace.authUserId !== cloud.user?.id) cleanupSessionAutoTriggers();
     if (workspace?.type === 'account' && cloud.user?.id && workspace.authUserId !== cloud.user.id) {
       store.deactivateWorkspace('authenticated-account-workspace-mismatch');
@@ -1053,6 +1066,11 @@ async function boot() {
       lastAccountPresentationKey = nextPresentationKey;
       scheduleRender();
       refreshTeacherMiniHubSheet();
+    }
+    // Renew through the real identity/workspace guards after login. A failed
+    // verification keeps the lease warning; token refreshes do not repeat this.
+    if (signedIn && workspace?.type === 'account' && workspace.authUserId === nextAuthenticatedOwner) {
+      void renewLeaseInBackground();
     }
   });
   if (syncModule) {
