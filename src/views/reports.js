@@ -152,6 +152,7 @@ export default {
     const reportContent = html`${header}${reportWithClosing(reportBody, { profile: identity(cls).profile })}`;
 
     return html`
+      <link rel="stylesheet" href="${new URL('../styles/filters.css', import.meta.url).href}">
       <article class="print-report print-report--${tab} ${widePrint ? 'print-report--wide' : ''} report-workspace" dir="rtl">
         ${reportPageSetup({ wide: widePrint })}
         <header class="report-workspace__head noprint">
@@ -171,7 +172,7 @@ export default {
           <button class="segmented__btn ${tab === 'support' ? 'is-on' : ''}" data-act="tab" data-tab="support">من يحتاج دعمًا</button>
         </div>
 
-        <div class="grades-toolbar report-toolbar noprint">
+        <div class="grades-toolbar report-toolbar report-filter-bar noprint" role="group" aria-label="عوامل تصفية تقرير الفصل">
           <label class="field report-toolbar__field">
             <span class="field__label fs-xs">
               ${icon('filter', 'compact')} ترتيب الكشف

@@ -1,0 +1,63 @@
+/* AI-authored N120: shared, view-scoped layout; filter handlers stay unchanged. */
+.report-filter-bar.report-filter-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: flex-start;
+  gap: 8px;
+  min-inline-size: 0;
+  padding: 10px;
+  margin-block: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  box-shadow: none;
+}
+.report-filter-bar.report-filter-bar > .field {
+  flex: 1 1 140px;
+  min-inline-size: 0;
+  margin: 0;
+}
+.report-filter-bar .field__label {
+  margin-block-end: 4px;
+  font-size: var(--fs-xs);
+}
+.report-filter-bar.report-filter-bar :is(.input, .select) {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  font-size: var(--fs-sm);
+}
+.report-filter-bar.report-filter-bar > .report-toolbar__field { flex-basis: 220px; }
+.report-filter-bar.report-filter-bar > .n70-search { flex-basis: 160px; }
+.report-filter-bar.report-filter-bar > :is(.btn, .segmented) {
+  flex: 0 1 auto;
+  inline-size: auto;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  margin: 0;
+  align-self: end;
+}
+.report-filter-bar .segmented__btn { min-block-size: 44px; }
+.report-filter-bar .btn { white-space: normal; }
+.report-filter-bar.report-filter-bar > .grades-01c__search {
+  flex: 1 1 220px;
+  min-inline-size: 0;
+  max-inline-size: none;
+}
+.report-filter-bar .grades-01c__filters { display: contents; }
+.report-filter-bar .grades-01c__search input { min-block-size: 44px; }
+.report-filter-bar .grades-01c__sort { flex: 1 1 190px; }
+.report-filter-bar .grades-01c__missing-filter { flex: 0 0 auto; }
+.report-filter-bar :is(button, select, input):focus-visible {
+  outline: 3px solid var(--action-focus-ring);
+  outline-offset: 2px;
+}
+@media (max-width: 540px) {
+  .report-filter-bar.report-filter-bar > .field { flex-basis: 140px; }
+  .report-filter-bar.report-filter-bar > .report-toolbar__field { flex-basis: 100%; }
+  .report-filter-bar.report-filter-bar > .grades-01c__search { flex-basis: 100%; }
+  .report-filter-bar .grades-01c__sort { flex-basis: 100%; }
+  .report-filter-bar.report-filter-bar > .report-toolbar__mode { display: flex; }
+}

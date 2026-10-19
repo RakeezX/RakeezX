@@ -153,6 +153,7 @@ const gradesView = {
     }
 
     return html`
+      <link rel="stylesheet" href="${new URL('../styles/filters.css', import.meta.url).href}">
       <style>
 /* N84 isolated Work UI. N82 selector remains frozen. */
 .n84-inline { display:inline-flex; align-items:center; gap:2px; vertical-align:middle; }
@@ -196,7 +197,7 @@ const gradesView = {
       </section>
 
       <!-- شريط الإنتاجية: الفلترة والترتيب -->
-      <div class="grades-toolbar grades-01c__toolbar noprint">
+      <div class="grades-toolbar grades-01c__toolbar report-filter-bar noprint" role="group" aria-label="عوامل تصفية كشف الدرجات">
         <label class="grades-01c__search">${icon('search')}<input type="search" data-input="search" data-fk="grades-search"
           value="${query}" placeholder="ابحث عن طالب" aria-label="بحث في كشف الدرجات"></label>
         <div class="grades-01c__filters">
