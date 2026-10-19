@@ -476,3 +476,29 @@ Sole publisher owns integration and served-source verification. This is a genuin
 pilot UI correction package, not whole-Product acceptance. Same-session continuation
 after that receipt restores all9 and tests the remaining/affected real UI journey.
 Historical failure/disposition records below remain unchanged evidence.
+
+# Hosted continuation3d76cd50 — original account context unavailable
+
+The correction publication dependency is resolved: candidatefbfebd29 was verified
+as9858b900 at2026-10-19T07:40:18.803Z. The official runtime bytes match the
+unchanged candidate, including serialized requests and context reconciliation.
+The actual browser also received that correction through its Service Worker.
+
+The designated teacher tab no longer exists. A fresh owned tab on the exact
+original class route, followed by its normal class navigation, reports
+«تعذّر مطابقة الفصل مع الحساب النشط». No N88 API response or code field was
+observed. No identity, credential, token or private store was inspected; no
+account was switched and no hosted write was attempted. This is a new account
+context prerequisite, not the resolved publisher dependency.
+
+All nine checks remain required. Seven unchanged prerequisite proofs are reused;
+the two full hosted/public checks remain FAIL and their unperformed substeps
+remain NOT_RUN. Original failure checksum is unchanged. Public mode was not
+enabled; the last verified owner-restricted pilot configuration and existing
+two-pupil fixture remain untouched. Actual evidence and retry condition are in
+activation/hosted-continuation-3d76cd50.json. Resume only when the same designated
+test teacher can open its original class through normal authenticated UI.
+
+The owned replacement tab and observer were closed; the browser lease was
+released. No other tab, denied resource, queue state or provider configuration
+was modified. No Product closure or final frontend publication is claimed.
