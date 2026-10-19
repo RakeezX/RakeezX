@@ -1,5 +1,6 @@
 // AI: real nonsending backend proof, separate from visible frontend asset changes.
 import { createHash } from 'node:crypto';
+import {n88AssetTask,buildN88AssetEvidence,verifiedN88AssetPublication} from './n88-live-asset-evidence.mjs';
 const SHA=/^[a-f0-9]{64}$/, GIT=/^[a-f0-9]{40}$/, UUID=/^[a-f0-9-]{36}$/;
 const ROOT='drafts/n44-push/activation/';
 export const SERVICE_ARTIFACTS=[ROOT+'manifest.json','tests/n44-finish-activation-final.json',ROOT+'edge-source-readback.json',ROOT+'cloudflare-off-readback.json',ROOT+'cloudflare-final-readback.json',ROOT+'cloudflare-final-versions.json'];
@@ -22,6 +23,7 @@ const fixedScope=t=>(correction(t)||t?.id==='continuous-n44-finish-bounded-servi
 // Only the guarded maintainer calls this with immutable git-show bytes at the saved candidate.
 // Runtime/credentials/provider writes are deliberately absent from this module.
 export function buildLiveServiceEvidence(task,receipt,readCandidateFile){
+ if(n88AssetTask(task))return buildN88AssetEvidence(task,receipt,readCandidateFile);
  const raw=Object.fromEntries(SERVICE_ARTIFACTS.map(p=>[p,Buffer.from(readCandidateFile(p))]));
  const [m,f,e,o,c,v]=SERVICE_ARTIFACTS.map(p=>JSON.parse(raw[p].toString('utf8')));
  const bundleHashes=Object.fromEntries(['edge/index.mjs','cloudflare/worker.mjs','scheduler/worker.mjs'].map(p=>[p,digest(Buffer.from(readCandidateFile(ROOT+'bundle/'+p)))]));
@@ -38,6 +40,7 @@ export function buildLiveServiceEvidence(task,receipt,readCandidateFile){
 }
 
 export function verifiedLiveServicePublication(task,receipt,report=()=>{}){
+ if(n88AssetTask(task))return verifiedN88AssetPublication(task,receipt);
  const fail=reason=>{report(reason);return false;};
  try{
   const p=task?.servicePublicationEvidence,f=p?.final,m=p?.manifest,a=m?.actualServiceReadback,e=p?.edgeSource,r=f?.restrictedIdentityAndFullTls;
