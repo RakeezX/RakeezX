@@ -30,11 +30,14 @@
     "target": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\private-tools\\n36-current\\runtime",
     "updated": false
   },
-  "updaterBlocker": {
-    "path": "C:/Users/Abody/Projects/RakeezX/artifacts/private-tools/n36-current/update-stable.mjs",
-    "actualError": "N36_STABLE_UPDATE: permissions/CSP changed",
-    "reason": "0.5.12 app-only host_permissions conflicts with fixed no-host-permissions predicate; exact existing helper is outside activated allowedPaths",
+  "updaterCorrection": {
+    "status": "RECONCILED",
+    "opsCommit": "e759a56d722a82733a9178311d204bca98305c3f",
+    "activeHelper": "C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/n36-update-stable.mjs",
+    "activeFilesMatchRecordedCorrection": true,
+    "legacyFailurePreserved": "N36_STABLE_UPDATE: permissions/CSP changed",
     "officialPublication": "NOT_RUN",
-    "localCurrentCandidateMatch": "NOT_RUN"
+    "localCurrentCandidateMatch": "NOT_RUN",
+    "reason": "0.5.13 must first be published and verified by the independent publisher; existing minute updater then reconciles the official package"
   }
 }

@@ -40,8 +40,18 @@ const stable=JSON.parse(await fs.readFile(stableRoot+'/STABLE_CURRENT.json','utf
 for(const f of stable.files){const b=await fs.readFile(stableRoot+'/runtime/'+f.file);assert.equal(hash(b),f.sha256,f.file);assert.equal(b.length,f.bytes);}
 const published=JSON.parse(await fs.readFile(assets+'rakeez-teacher-import-helper-'+stable.version+'.manifest.json','utf8'));
 assert.deepEqual(stable.files,published.files);assert.equal(stable.archiveSha256,published.archive.sha256);
-const updater=await fs.readFile(stableRoot+'/update-stable.mjs','utf8');
-assert.ok(updater.includes('!extensionManifest.host_permissions'));
 evidence.stableFolder={version:stable.version,files:stable.files.length,allBytesMatchOwnedReceipt:true,allBytesMatchOfficialPublishedPackage:true,target:stable.target,updated:false};
-evidence.updaterBlocker={path:stableRoot+'/update-stable.mjs',actualError:'N36_STABLE_UPDATE: permissions/CSP changed',reason:'0.5.12 app-only host_permissions conflicts with fixed no-host-permissions predicate; exact existing helper is outside activated allowedPaths',officialPublication:'NOT_RUN',localCurrentCandidateMatch:'NOT_RUN'};
+// AI: reconcile the ACTIVE canonical caller, not the obsolete private helper or
+// this isolated checkout's older ops wrapper. Reuse the recorded ops repair;
+// neither rerun its policy suite nor install an unpublished Product candidate.
+const canonicalRoot='C:/Users/Abody/Projects/RakeezX',opsCommit='e759a56d722a82733a9178311d204bca98305c3f';
+const opsFiles=['scripts/ops-supervisor-v4/n36-stable-sync.mjs','scripts/ops-supervisor-v4/n36-update-stable.mjs','scripts/ops-supervisor-v4/n36-extension-package-policy.mjs'];
+for(const file of opsFiles){
+ const actual=(await fs.readFile(canonicalRoot+'/'+file,'utf8')).replace(/\r\n/g,'\n');
+ const recorded=execFileSync('git',['-C',canonicalRoot,'show',opsCommit+':'+file],{encoding:'utf8'}).replace(/\r\n/g,'\n');
+ assert.equal(actual,recorded,'Active updater differs from recorded operating correction: '+file);
+}
+const caller=await fs.readFile(canonicalRoot+'/'+opsFiles[0],'utf8');
+assert.ok(caller.includes("root+'/scripts/ops-supervisor-v4/n36-update-stable.mjs'"));
+evidence.updaterCorrection={status:'RECONCILED',opsCommit,activeHelper:canonicalRoot+'/'+opsFiles[1],activeFilesMatchRecordedCorrection:true,legacyFailurePreserved:'N36_STABLE_UPDATE: permissions/CSP changed',officialPublication:'NOT_RUN',localCurrentCandidateMatch:'NOT_RUN',reason:'0.5.13 must first be published and verified by the independent publisher; existing minute updater then reconciles the official package'};
 await fs.writeFile('tests/n36-review-1400-package.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

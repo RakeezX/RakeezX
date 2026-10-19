@@ -1,8 +1,18 @@
-# N36 actual-transfer follow-up — scoped candidate, blocked updater
+# N36 actual-transfer follow-up — scoped candidate, updater reconciled
 
 Task: `continuous-n36-actual-transfer-local-update-copy-20261019`
 Run: `fe5829e6-1f04-4655-a82a-ca7cedcf3934`
 Base / observed origin/main: `df8e49362e79b488bcf56fbdca5c94e361bead7a`
+
+## Saved-session reconciliation — run eb672568-1c11-4c04-9521-45ae330ed37d
+
+The previous Product candidate `890ac80a0537f1a2a6c0eb19a47e9bca4b9d8e42` is preserved. The prior blocker incorrectly treated the legacy private helper and this isolated checkout's old ops wrapper as the active minute-update path. The latest N36 ledger row identifies the already-completed operating repair `e759a56d722a82733a9178311d204bca98305c3f`; the active canonical wrapper now calls `scripts/ops-supervisor-v4/n36-update-stable.mjs`, which uses the approved first-party package policy. The obsolete private helper's genuine failure below remains historical evidence, not a current scope blocker.
+
+Fresh read-only reconciliation matched all three active canonical updater files to that exact ops commit and verified its caller path. The stable folder's 25 files still match the official immutable 0.5.12 package and its receipt. No updater/policy suite or install was repeated, and no ops/private/queue files were changed. `node tests/n36-review-1400-package.mjs` PASS now records the active correction instead of asserting the obsolete helper remains a blocker.
+
+The Product files and 0.5.13 ZIP are unchanged, so the actual installed-extension/receiver/store proof, 303-name failure/resume DOM proof, screenshots and negative guard evidence below are reused without another browser phase. Current observed origin/main is `beeedfae36d0ecdd7e80003511648e09c5643c42`; its affected Product files have no changes relative to the assigned base. The follow-up commit changes only this reconciliation and the package-evidence script/JSON.
+
+Local candidate preparation is ready for the independent publisher. Official 0.5.13 publication and subsequent minute-updater/stable-folder 0.5.13 readback are NOT_RUN and remain with the authorized delivery path. No unpublished candidate was installed. The PO's original real 0.5.12 failure remains unclassified and is not converted to a successful real-account trial; the bounded synthetic failure handling and one-start receipt path passed. Product acceptance is not claimed.
 
 ## Original evidence retained
 
@@ -25,7 +35,9 @@ The PO's actual official 0.5.12 result remains: 303 valid/staged/observed names,
 
 The new synthetic proofs establish the bounded failure-handling/copy result and a working partial handoff, not the previously unclassified real failure's cause, actual personal-account success, Production delivery or Product acceptance.
 
-## Concrete updater blocker and saved continuation
+## Historical updater failure and superseded blocker
+
+The following records the previous assessment. Its active-caller conclusion and missing-scope retry condition are superseded by the saved-session reconciliation above; the original failure and install receipt remain unchanged.
 
 The existing scheduled task `RAKEEZ-N36-Verified-Local-Update` is Ready, cadence PT1M. Its observed action is Windows wscript → `scripts/ops-supervisor-v4/n36-stable-sync-hidden.vbs` → `scripts/ops-supervisor-v4/n36-stable-sync.mjs --once` → `artifacts/private-tools/n36-current/update-stable.mjs`.
 
