@@ -214,8 +214,8 @@ cloud.subscribe(() => {
 function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
-    <p>ثبّت الإضافة لمتصفح كروم، وسجّل دخولك إلى منصة مدرستي، ثم شغّل الإضافة لجلب أسماء الطلاب وبيانات فصولهم المتاحة. ابدأ مرة واحدة لجمع واستيراد أسماء جميع الفصول المتاحة إلى هذا الحساب المفتوح؛ تُعرض الحالات غير المحسومة فقط.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.12.zip" download>تنزيل إضافة ركيز 0.5.12</a>
+    <p>افتح حساب ركيز في تبويب واحد، ثم ابدأ من إضافة مدرستي لجمع وحفظ أسماء جميع الفصول المتاحة. لا تأكيد لكل فصل؛ تُعرض الحالات غير المحسومة فقط. التغطية الجزئية تبقى جزئية بعد الحفظ.</p>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.13.zip" download>تنزيل إضافة ركيز 0.5.13</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
@@ -242,7 +242,7 @@ async function receiveExtension() {
     }
     extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
     extensionTimer=setTimeout(()=>{clearExtensionPreview();extensionMessage='انتهت المعاينة. أعد النقل من الإضافة ثم أعد المحاولة.';repaint();},Math.max(0,result.envelope.expiresAt-Date.now()));
-  } catch { extensionMessage='تعذّر النقل: الإضافة غير متاحة أو انتهت الصلاحية أو تغيّر الحساب. أعد النقل ثم أعد المحاولة.'; }
+  } catch (error) { const code=['HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER','HANDOFF_EXPIRED_OR_DENIED','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_TIMEOUT','OWNER_CHANGED'].includes(error.message)?error.message:'HANDOFF_UNAVAILABLE';extensionMessage='تعذّر النقل ('+code+'). ارجع إلى حساب ركيز الذي بدأ منه التشغيل واستكمل الفصول غير المحسومة من الإضافة. لم يُفترض حفظ هذه الدفعة.'; }
   finally { extensionBusy=false;if(location.hash===route)history.replaceState(null,'','#/classes/koshoof?import=1');repaint(); }
 }
 function setupBinding(teachingId) {

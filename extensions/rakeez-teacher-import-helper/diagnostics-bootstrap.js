@@ -6,13 +6,14 @@
  const assets = new Set(['popup.js','categories-popup.js','run-controller.js','handoff-protocol.js','handoff-worker.js','diagnostics-bootstrap.js','route-diagnostics.js','source-roster.js','source-adapter.js','selection.js','core.js','categories.js','navigation.js','class-order.js','rakeez-datetime.js','rakeez-datetime-values.js']);
  const modules = {'popup.js':'not-available','categories-popup.js':'not-available','run-controller.js':'not-available'};
  const enums = {
-  stage:['idle','collecting','review','partial','paused','cancelled','expired','error'],
+  stage:['idle','collecting','review','partial','paused','cancelled','expired','error','saving','saved','unresolved'],
   coverage:['complete','partial','paused','unknown'], terminal:['unproven','explicit-next','observed-anchor'],
   endpoint:['none','ambiguous','anchor','span'], transfer:['idle','sending','pending','error','unknown'],
+  failure:['none','SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER'],
   receipt:['not-available','pending','saved','existing','unknown','expired']
  };
  const numbers = ['valid','staged','observed','excluded','classes','processedPages','currentPage'];
- const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available'});
+ const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none'});
  let state=fresh(), errors=[], background='not-available';
  const ownValue=(o,k)=>Object.getOwnPropertyDescriptor(o,k)?.value;
  function publish(input) {
@@ -36,7 +37,7 @@
   record(message==='Extension context invalidated.'?'EXTENSION_CONTEXT_INVALIDATED':'MODULE_OR_RUNTIME_REJECTION');
  });
  const reset=()=>{state=fresh();errors=[];const field=document.getElementById('safe-report');if(field){field.value='';field.hidden=true;}};
- addEventListener('n36:clear',reset);addEventListener('n36:discard',reset);addEventListener('pagehide',reset);
+ addEventListener('n36:clear',event=>{if(!event.detail?.finished)reset();});addEventListener('n36:discard',reset);addEventListener('pagehide',reset);
  Object.defineProperty(globalThis,'n36Diagnostics',{value:Object.freeze({
   publish, reset, moduleReady(asset){if(Object.hasOwn(modules,asset))modules[asset]='ready';}
  })});
