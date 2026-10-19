@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "recordedAt": "2026-10-19T03:55:25.367Z",
+  "cacheEventId": "390bbf31-fab1-42ae-afb0-1b212fc61889",
+  "privateValuesReturned": false,
+  "status": "FAIL",
+  "failure": "n44_tls_role_mismatch",
+  "leaseReleased": true
+}

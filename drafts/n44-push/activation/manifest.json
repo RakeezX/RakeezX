@@ -65,8 +65,10 @@
     "drafts/n44-push/backend.mjs": "eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2",
     "drafts/n44-push/web-protocol.mjs": "96c7c55dcf941db0880c650b0ebec2d107edff57f6eabdb6719c46ebaeb6941f",
     "drafts/n44-push/web-entry.mjs": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
-    "drafts/n44-push/existing-host.mjs": "065dd5741d612f1a02c8b7c6a9c49dfc5a3c319ffd9c6674646d4ac352e9bf38",
-    "supabase/functions/n44-notifications/index.ts": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+    "drafts/n44-push/database-transport.mjs": "2f5a4f6dd4d2d5864756d0cab111fc1771b4356b2aed7b551e10529ac89bf88d",
+    "drafts/n44-push/existing-host.mjs": "773f5798f8e1acab2bc9ded39a6dbaa28353cf67101f07948020662ebd0c92df",
+    "drafts/n44-push/readiness-entry.mjs": "51534b2f4d2ceb6a95376f5a37fb4fd0cf47d2a56f48de72f99c772b97d29516",
+    "supabase/functions/n44-notifications/index.ts": "353935003b8736128ebf26a75af214548ecb3ee8df76b571c3b5c3ea7b56f6bb",
     "drafts/n44-push/cloudflare-entry.mjs": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
     "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
     "supabase/functions/n44-notifications/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
@@ -76,7 +78,7 @@
     "scripts/n44-activation-readback.mjs": "ea6e9e3851735a07e3a9e6831cb02cdf40258635fda05d73e0d4f1daec23936c",
     "supabase/migrations/20261018044448_n44_exact_activation_staged.sql": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
     "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
-    "scripts/n44-activation-custody.mjs": "0ee2e69a14e02921d2d18207fbdfe82d88de0d358f06c862475442cb069dba57",
+    "scripts/n44-activation-custody.mjs": "aef33442c5766ddc22f957cd70e88825bc7b68841dc32a4db7326001957aa209",
     "drafts/n44-push/activation/build-error-boundary.mjs": "86cf5cd24c60cb75b821863f1ecd2de6944a34abb69e60442bb633d991e4a5d8",
     "drafts/n44-push/activation/metadata-contract.json": "a8d893d890e243dee110746ef80f937c2525fc4415f3293672c47e29d1146963",
     "drafts/n44-push/activation/preflight.inactive.sql": "5e4f5cdd5cac95899d6aa9f9c22ed5501f5b46bbce5c0a355b313181cd8cbaa7",
@@ -94,14 +96,10 @@
     "drafts/n44-push/existing-host.inactive.sql": "f5b534520db93b0a09e58ab22099652b3c4dcd351015394553c0753917290c2e",
     "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
     "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
-    "drafts/n44-push/deployment.inactive.json": "89866dd757f3ff5f79abc5c250de649049348194997a28a339c8a4aa25c2737c",
-    "scripts/n44-activation-equality.mjs": "0c640c96c0f121f147223b562452b038c2bb9b82c9210ba440d9cf9ff8c77e4d",
-    "scripts/n44-activation-server-first.mjs": "2bd75099d4ce27c495ca3d2187baa54d8fddd4276ee1fa3b5c670b4d32331416",
-    "scripts/n44-activation-iteration.mjs": "5e1dd07620c5dc2da52f878e06f089ff2833de5cc7bd79587036b1a73281534f",
-    "scripts/n44-activation-post-cache.mjs": "3e27af6f874e4f5811ccb87c4f59b4a4f3e27851bb143574a0df158d7f310527"
+    "drafts/n44-push/deployment.inactive.json": "89866dd757f3ff5f79abc5c250de649049348194997a28a339c8a4aa25c2737c"
   },
   "outputs": {
-    "edge/index.mjs": "c4f26b1790499df77a4021ecedcaadf377bbe5098aff9eba84e9a217db621819",
+    "edge/index.mjs": "b6c018044ebca2e4da951500a4554bd9db68651fd4d956da110197cc067bfd27",
     "cloudflare/worker.mjs": "438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40",
     "scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433",
     "edge/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
@@ -119,12 +117,14 @@
         "drafts/n44-push/backend.mjs",
         "drafts/n44-push/canonical-source.mjs",
         "drafts/n44-push/committed-permit.mjs",
+        "drafts/n44-push/database-transport.mjs",
         "drafts/n44-push/delivery.mjs",
         "drafts/n44-push/existing-host.mjs",
         "drafts/n44-push/node-globals.mjs",
         "drafts/n44-push/postgres-repository.mjs",
         "drafts/n44-push/private-runtime.mjs",
         "drafts/n44-push/provider-policy.mjs",
+        "drafts/n44-push/readiness-entry.mjs",
         "drafts/n44-push/registration.mjs",
         "drafts/n44-push/runtime-gateway.mjs",
         "drafts/n44-push/session-policy.mjs",
@@ -266,6 +266,31 @@
           "path": "node:crypto",
           "kind": "import-statement",
           "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "pg",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
         }
       ]
     },
@@ -300,20 +325,5 @@
     "serviceWorkerEnabled": false,
     "routes": [],
     "cron": []
-  },
-  "scramCompatibility": {
-    "providerOperationSource": "0bd7d8f8cc14d886e074fbb44b9dd4c346c49353",
-    "currentStoredIterations": 4096,
-    "originalHistoricalIterations": 16384,
-    "authenticationReady": false,
-    "evidence": "tests/n44-finish-iteration.hosted.json",
-    "previousManifest": "prior-20261019-iteration-manifest.json"
-  },
-  "postCacheReadiness": {
-    "authenticationSucceeded": true,
-    "identityAndUpstreamTls": false,
-    "sourceCandidateDuringConnection": "b96a5da2d02e7b10ebfdbd66948313ceace83e0c",
-    "evidence": "tests/n44-finish-post-cache-session.json",
-    "previousManifest": "prior-20261019-post-cache-manifest.json"
   }
 }

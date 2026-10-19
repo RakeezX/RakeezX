@@ -1,6 +1,6 @@
 /** AI: exact N44 custodian. No operation at import; no private values in CLI args/output. */
 import assert from 'node:assert/strict';
-import {randomBytes,generateKeyPairSync,privateDecrypt,createPrivateKey,constants,pbkdf2Sync,createHmac,createHash,createECDH} from 'node:crypto';
+import {randomBytes,generateKeyPairSync,privateDecrypt,createPrivateKey,createPublicKey,constants,pbkdf2Sync,createHmac,createHash,createECDH} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
 import {createRequire} from 'node:module';
@@ -84,6 +84,39 @@ export async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),source,secretValuesReturned:false,protection:'DPAPI CurrentUser + own restricted directory'};
  }
  const state=await load();
+ if(action==='--prepare-direct'){
+  const actual=JSON.parse(await readFile(base+'/hosted-session-precise-identity.json','utf8'));
+  if(!actual.loginExact||!actual.roleExact||!actual.clientTlsAuthorized||actual.upstreamSsl!==false||!state.disarmed||state.installed||!state.preciseIdentityAttempted||state.databaseTransport)fail('n44_direct_precondition');
+  if(!/^[a-f0-9]{40}$/.test(value??''))fail('n44_direct_source_missing');
+  const profile=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/n44-session-policy-dashboard-readonly.json','utf8'));
+  const observedAt=Date.parse(profile.observations.observedAt),now=Date.now();
+  if(now<observedAt||now-observedAt>86400000||profile.normalized.singleSessionPerUser!==false||profile.normalized.timeboxSeconds!==null||profile.normalized.inactivityTimeoutSeconds!==null)fail('n44_direct_policy_admission');
+  state.source=value;state.policy={...state.policy,serviceSourceSha:value,observedAt,activatedAt:now};state.databaseTransport='direct';state.directPreparation=true;await save(state);
+  return {directPreparation:true,source:value,profileAdmissionFresh:true,deliveryEnabled:false};
+ }
+ if(action==='--public-recipient'){
+  if(!state.directPreparation||!state.recipient)fail('n44_direct_recipient_gate');
+  const b=Buffer.from(state.recipient,'base64');try{const jwk=createPublicKey(createPrivateKey({key:b,format:'der',type:'pkcs8'})).export({format:'jwk'});if(Object.keys(jwk).sort().join(',')!=='e,kty,n')fail('n44_public_recipient_shape');return {publicJwk:jwk};}finally{b.fill(0);}
+ }
+ if(action==='--restore-direct-login'){
+  if(!state.directPreparation||!state.disarmed||state.installed)fail('n44_direct_restore_gate');
+  const disabled="rolname='n44_service_login' and not rolcanlogin and not rolinherit and not rolsuper and not rolcreatedb and not rolcreaterole and not rolreplication and not rolbypassrls and rolconnlimit=-1 and rolvaliduntil is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid)";
+  await sqlFile(`begin;do $n44$ begin if (select count(*) from pg_roles where ${disabled})<>1 then raise exception 'n44_owned_state_changed';end if;alter role n44_service_login login;grant n44_backend to n44_service_login with inherit false,set true,admin false;end $n44$;commit;select true as restored;`);
+  state.disarmed=false;await save(state);return {directLoginRestored:true,verified:false};
+ }
+ if(action==='--readiness'){
+  if(!state.installed||!state.directPreparation||!state.ingress)fail('n44_readiness_gate');
+  const {mac,sha}=await import('../drafts/n44-push/web-protocol.mjs');
+  const u=new URL('https://'+project+'.supabase.co/functions/v1/n44-notifications/readiness'),time=String(Math.floor(Date.now()/1000)),nonce=crypto.randomUUID(),body='{}';
+  const signature=await mac(Buffer.from(state.ingress,'hex'),JSON.stringify(['n44-readiness-v1',u.origin,u.pathname,time,nonce,await sha(new TextEncoder().encode(body))]));
+  const response=await fetch(u,{method:'POST',headers:{'content-type':'application/json','x-n44-time':time,'x-n44-nonce':nonce,'x-n44-signature':signature},body,signal:AbortSignal.timeout(15000),redirect:'error'});
+  const actual=await response.json();const allowed=['status','stage','code','source','enabled','deliveryEnabled','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'];
+  if(Object.keys(actual).some(k=>!allowed.includes(k)))fail('n44_readiness_reply_shape');
+  const receipt={projectId:project,runId:operationRun,recordedAt:new Date().toISOString(),httpStatus:response.status,...actual};
+  await writeFile(base+'/hosted-direct-readiness.json',JSON.stringify(receipt,null,2)+'\n');
+  if(response.status!==200||actual.status!=='ready'||actual.source!==state.source||!actual.loginExact||!actual.roleExact||!actual.upstreamSsl||!actual.clientTlsAuthorized||!actual.sourceBoundary||actual.deliveryEnabled)fail('n44_direct_readiness_unproven');
+  state.loginVerified=true;await save(state);return receipt;
+ }
  if(action==='--post-cache-session'||action==='--precise-session'){
   const precise=action==='--precise-session';
   const evidence=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261019-supabase28p01/n44-provider-cache-refreshed.json','utf8'));
@@ -138,10 +171,10 @@ export async function execute(action,value){
   }catch(e){const safeCode=/^[A-Z0-9_]{3,60}$/.test(e.code??'')?e.code:'UNCLASSIFIED';await writeFile(base+'/hosted-session-precise-diagnostic.json',JSON.stringify({projectId:project,runId:operationRun,status:'FAIL',stage:sessionStage,code:safeCode,authenticationSucceeded:sessionStage!=='connect',privateDiagnosticsSuppressed:true},null,2)+'\n');if(/^n44_/.test(e.message))throw e;fail('n44_session_'+sessionStage+'_'+safeCode);}finally{await client.end().catch(()=>{});}
  }
  if(action==='--install-env'){
-  if(!state.loginVerified||!state.ingress||!state.scheduler||state.installed)fail('n44_install_gate_missing');
+  if((!state.loginVerified&&!state.directPreparation)||!state.ingress||!state.scheduler||state.installed)fail('n44_install_gate_missing');
   const pub=JSON.parse(await readFile(base+'/public-provider-config.json','utf8'));if(pub.project!==project||!pub.authPublicKey)fail('n44_public_config_missing');
   const crypto={activeKeyId:'v1',fingerprintKeyId:'v1',activeVapidKeyId:'v1',sealingKeys:[['v1',state.sealing]],endpointHmacKeys:[['v1',state.endpoint]],bindingHmacKeys:[['v1',state.binding]],vapidKeys:[['v1',{publicKey:state.vapidPublic,privateKey:state.vapidPrivate,subject:'https://rakeezx.com'}]]};
-  const env={N44_ENABLED:'false',N44_DELIVERY_ENABLED:'false',N44_PUBLIC_ORIGIN:'https://rakeezx.com',N44_AUTH_URL:'https://'+project+'.supabase.co',N44_AUTH_API_KEY:pub.authPublicKey,N44_SERVICE_REVISION:'n44-browser-service-v2',N44_SERVICE_SOURCE_SHA:state.source,N44_SESSION_POLICY_JSON:JSON.stringify(state.policy),N44_DATABASE_URL:`postgresql://n44_service_login.${project}:${state.password}@aws-0-ap-south-1.pooler.supabase.com:5432/postgres`,N44_DATABASE_CA_CERT:await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/supabase-prod-ca-2021.crt','utf8'),N44_INGRESS_KEY:state.ingress,N44_SCHEDULER_KEY:state.scheduler,N44_RATE_KEY:state.rate,N44_CRYPTO_JSON:JSON.stringify(crypto),N44_PROVIDER_ORIGINS_JSON:JSON.stringify(['https://fcm.googleapis.com'])};
+  const env={N44_ENABLED:'false',N44_DELIVERY_ENABLED:'false',N44_READINESS_ENABLED:'true',N44_PUBLIC_ORIGIN:'https://rakeezx.com',N44_AUTH_URL:'https://'+project+'.supabase.co',N44_AUTH_API_KEY:pub.authPublicKey,N44_SERVICE_REVISION:'n44-browser-service-v2',N44_SERVICE_SOURCE_SHA:state.source,N44_SESSION_POLICY_JSON:JSON.stringify(state.policy),N44_DATABASE_URL:state.databaseTransport==='direct'?`postgresql://n44_service_login:${state.password}@db.${project}.supabase.co:5432/postgres`:`postgresql://n44_service_login.${project}:${state.password}@aws-0-ap-south-1.pooler.supabase.com:5432/postgres`,N44_DATABASE_CA_CERT:await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/supabase-prod-ca-2021.crt','utf8'),N44_INGRESS_KEY:state.ingress,N44_SCHEDULER_KEY:state.scheduler,N44_RATE_KEY:state.rate,N44_CRYPTO_JSON:JSON.stringify(crypto),N44_PROVIDER_ORIGINS_JSON:JSON.stringify(['https://fcm.googleapis.com'])};
   const f=path.join(phase,'owned-env.tmp');try{await writeFile(f,Object.entries(env).map(([k,v])=>k+'='+JSON.stringify(v)).join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',f]);state.installed=true;await save(state);}finally{await unlink(f).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   state.envDigests=Object.fromEntries(Object.entries(env).map(([k,v])=>[k,createHash('sha256').update(v).digest('hex')]));await save(state);
   return {installed:true,enabled:false,names:Object.keys(env),publicVapidKey:state.vapidPublic,policyApprovalId:state.policy.approvalId,source:state.source};

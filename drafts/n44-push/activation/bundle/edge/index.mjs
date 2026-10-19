@@ -1707,7 +1707,7 @@ function supportedSessionPolicy(profile, now = Date.now(), sourceSha) {
 var policySessionRevision = (sessionId, profile) => sessionId + ":" + profile.approvalId;
 
 // drafts/n44-push/existing-host.mjs
-import { Buffer as Buffer7 } from "node:buffer";
+import { Buffer as Buffer8 } from "node:buffer";
 import pg from "pg";
 import { p256 as p2562 } from "@noble/curves/nist.js";
 
@@ -3829,6 +3829,28 @@ function createWebEntry(options) {
 }
 var recordSchedule = (e) => e && Object.keys(e).sort().join(",") === "cursor,limit,operation";
 
+// drafts/n44-push/database-transport.mjs
+import { Buffer as Buffer7 } from "node:buffer";
+import { createHash as createHash2 } from "node:crypto";
+function databaseConfig(readEnv) {
+  const url = readEnv("N44_DATABASE_URL"), db = new URL(url), user = decodeURIComponent(db.username);
+  const direct = user === "n44_service_login" && db.hostname === "db.xlrubcwjqktzzunrvuns.supabase.co";
+  const session = user === "n44_service_login.xlrubcwjqktzzunrvuns" && db.hostname === "aws-0-ap-south-1.pooler.supabase.com";
+  const ca = readEnv("N44_DATABASE_CA_CERT");
+  if (!["postgres:", "postgresql:"].includes(db.protocol) || !(direct || session) || !["", "5432"].includes(db.port) || db.pathname !== "/postgres" || !db.password || db.search || db.hash || typeof ca !== "string" || createHash2("sha256").update(ca).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n44_database_configuration");
+  return { connectionString: url, ssl: { ca, rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2" }, max: 4, connectionTimeoutMillis: 5e3, idleTimeoutMillis: 1e4, statement_timeout: 3e3, query_timeout: 4e3, application_name: "n44-private-server", allowExitOnIdle: true };
+}
+async function assertRestrictedIdentity(client) {
+  const row = (await client.query("select session_user as login,current_user as role,(select ssl from pg_stat_ssl where pid=pg_backend_pid()) as ssl")).rows[0];
+  const flags = { loginExact: row?.login === "n44_service_login", roleExact: row?.role === "n44_service_login" || row?.role === "n44_backend", upstreamSsl: row?.ssl === true, clientTlsAuthorized: client.connection?.stream?.authorized === true };
+  if (Object.values(flags).some((v) => v !== true)) {
+    const e = Error("n44_transport_invariants");
+    e.safeReadiness = flags;
+    throw e;
+  }
+  return flags;
+}
+
 // drafts/n44-push/existing-host.mjs
 async function assertPrivateDatabaseSession(client) {
   const result2 = await client.query(`select current_user as role,
@@ -3863,12 +3885,11 @@ function createExistingHost(readEnv) {
   if (required("N44_SERVICE_REVISION") !== "n44-browser-service-v2") throw Error("n44_readback_missing");
   const sessionPolicy = JSON.parse(required("N44_SESSION_POLICY_JSON")), serviceSourceSha = required("N44_SERVICE_SOURCE_SHA");
   if (!supportedSessionPolicy(sessionPolicy, Date.now(), serviceSourceSha)) throw Error("n44_session_policy_readback_missing");
-  const dbUrl = required("N44_DATABASE_URL"), db = new URL(dbUrl), username = decodeURIComponent(db.username);
-  if (!["postgres:", "postgresql:"].includes(db.protocol) || !(username === "n44_service_login" && db.hostname === "db.xlrubcwjqktzzunrvuns.supabase.co" || username === "n44_service_login.xlrubcwjqktzzunrvuns" && db.hostname === "aws-0-ap-south-1.pooler.supabase.com" && ["", "5432"].includes(db.port)) || db.pathname !== "/postgres" || !db.password || db.search || db.hash) throw Error("n44_database_configuration");
+  const transport = databaseConfig(readEnv);
   const key = (n) => {
     const v = required(n);
     if (!/^[a-f0-9]{64}$/.test(v)) throw Error("n44_key_configuration");
-    return Buffer7.from(v, "hex");
+    return Buffer8.from(v, "hex");
   };
   const ingressKey = key("N44_INGRESS_KEY"), schedulerKey = key("N44_SCHEDULER_KEY"), rateKey = key("N44_RATE_KEY");
   const raw = JSON.parse(required("N44_CRYPTO_JSON"));
@@ -3876,28 +3897,18 @@ function createExistingHost(readEnv) {
     if (!Array.isArray(x) || x.length < 1 || x.length > 8) throw Error("n44_key_configuration");
     return new Map(x.map(([name, value]) => {
       if (!/^[a-f0-9]{64}$/.test(value)) throw Error("n44_key_configuration");
-      return [name, Buffer7.from(value, "hex")];
+      return [name, Buffer8.from(value, "hex")];
     }));
   };
   const material = { ...raw, sealingKeys: ring(raw.sealingKeys), endpointHmacKeys: ring(raw.endpointHmacKeys), bindingHmacKeys: ring(raw.bindingHmacKeys), vapidKeys: new Map(raw.vapidKeys) };
   const keys = [ingressKey, schedulerKey, rateKey, ...material.sealingKeys.values(), ...material.endpointHmacKeys.values(), ...material.bindingHmacKeys.values()];
   if (new Set(keys.map((v) => v.toString("hex"))).size !== keys.length) throw Error("n44_separate_keys_required");
   for (const v of material.vapidKeys.values()) {
-    if (!p2562.utils.isValidPrivateKey(Buffer7.from(v.privateKey ?? "", "base64url"))) throw Error("n44_private_key_configuration");
+    if (!p2562.utils.isValidPrivateKey(Buffer8.from(v.privateKey ?? "", "base64url"))) throw Error("n44_private_key_configuration");
   }
   const providerOrigins = JSON.parse(required("N44_PROVIDER_ORIGINS_JSON"));
   const crypto2 = createPrivatePushPorts({ ...material, providerOrigins, enabled: true });
-  const ca = readEnv("N44_DATABASE_CA_CERT"), pool = new pg.Pool({
-    connectionString: dbUrl,
-    ssl: { rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2", ...ca ? { ca } : {} },
-    max: 4,
-    connectionTimeoutMillis: 1e3,
-    idleTimeoutMillis: 1e4,
-    statement_timeout: 3e3,
-    query_timeout: 4e3,
-    application_name: "n44-private-server",
-    allowExitOnIdle: true
-  });
+  const pool = new pg.Pool(transport);
   pool.on("error", () => {
   });
   let waiting = 0;
@@ -3907,8 +3918,7 @@ function createExistingHost(readEnv) {
     let c;
     try {
       c = await pool.connect();
-      const identity = (await c.query("select session_user as login,current_user as role")).rows[0];
-      if (identity?.login !== "n44_service_login" || ![identity.login, "n44_backend"].includes(identity.role)) throw Error();
+      await assertRestrictedIdentity(c);
       await c.query("set role n44_backend");
       await assertPrivateDatabaseSession(c);
       return { query: (sql, values) => privateQuery(c, sql, values), release: (e) => c.release(e) };
@@ -3932,9 +3942,61 @@ function createExistingHost(readEnv) {
   }
 }
 
+// drafts/n44-push/readiness-entry.mjs
+import pg2 from "pg";
+import { Buffer as Buffer9 } from "node:buffer";
+import { timingSafeEqual as timingSafeEqual4 } from "node:crypto";
+var busy = 0;
+var nonces = /* @__PURE__ */ new Map();
+async function checkReadiness(readEnv) {
+  const source = readEnv("N44_SERVICE_SOURCE_SHA"), profile = JSON.parse(readEnv("N44_SESSION_POLICY_JSON") ?? "null");
+  if (!supportedSessionPolicy(profile, Date.now(), source)) throw Error("n44_session_policy_readback_missing");
+  const client = new pg2.Client(databaseConfig(readEnv));
+  let stage = "connect";
+  try {
+    await client.connect();
+    stage = "identity";
+    const identity = await assertRestrictedIdentity(client);
+    stage = "set_role";
+    await client.query("set role n44_backend");
+    stage = "source_boundary";
+    await assertPrivateDatabaseSession(client);
+    return { status: "ready", ...identity, sourceBoundary: true, source, enabled: readEnv("N44_ENABLED") === "true", deliveryEnabled: readEnv("N44_DELIVERY_ENABLED") === "true" };
+  } catch (e) {
+    return { status: "unavailable", stage, ...e.safeReadiness ?? {}, code: /^(n44_[a-z_]+|[A-Z][A-Z0-9_]{2,40})$/.test(e.code ?? e.message) ? e.code ?? e.message : "n44_runtime_unavailable", source, enabled: false, deliveryEnabled: false };
+  } finally {
+    await client.end().catch(() => {
+    });
+  }
+}
+async function readinessEntry(request2, readEnv, check = checkReadiness) {
+  if (readEnv("N44_READINESS_ENABLED") !== "true" || busy >= 2) return privateResponse();
+  try {
+    const u = new URL(request2.url), time = request2.headers.get("x-n44-time"), nonce = request2.headers.get("x-n44-nonce"), signature = request2.headers.get("x-n44-signature"), key = readEnv("N44_INGRESS_KEY");
+    if (u.origin !== readEnv("N44_AUTH_URL") || u.pathname !== "/functions/v1/n44-notifications/readiness" || u.search || request2.method !== "POST" || request2.headers.get("content-type") !== "application/json" || request2.headers.has("content-encoding") || !/^[a-f0-9]{64}$/.test(key ?? "") || !/^\d{10}$/.test(time ?? "") || Math.abs(Date.now() / 1e3 - Number(time)) > 15 || !/^[a-f0-9-]{36}$/.test(nonce ?? "") || !/^[a-f0-9]{64}$/.test(signature ?? "")) return privateResponse(401);
+    const body = new TextDecoder().decode(await readBytes(request2.body, 2, AbortSignal.timeout(2e3)));
+    if (body !== "{}") return privateResponse(401);
+    const expected = await mac(Buffer9.from(key, "hex"), JSON.stringify(["n44-readiness-v1", u.origin, u.pathname, time, nonce, await sha(new TextEncoder().encode(body))]));
+    if (!timingSafeEqual4(Buffer9.from(expected, "hex"), Buffer9.from(signature, "hex"))) return privateResponse(401);
+    for (const [n, t] of nonces) if (t < Date.now() - 15e3) nonces.delete(n);
+    if (nonces.has(nonce) || nonces.size >= 100) return privateResponse(401);
+    nonces.set(nonce, Date.now());
+    busy++;
+    try {
+      const result2 = await check(readEnv);
+      return Response.json(result2, { status: result2.status === "ready" ? 200 : 503, headers: PRIVATE_WEB_HEADERS });
+    } finally {
+      busy--;
+    }
+  } catch {
+    return privateResponse();
+  }
+}
+
 // supabase/functions/n44-notifications/index.ts
 var runtime;
 Deno.serve(async (request2) => {
+  if (new URL(request2.url).pathname === "/functions/v1/n44-notifications/readiness") return readinessEntry(request2, (name) => Deno.env.get(name));
   try {
     runtime ??= createExistingHost((name) => Deno.env.get(name));
     return await runtime.handle(request2);

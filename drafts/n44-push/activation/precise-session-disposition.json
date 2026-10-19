@@ -1,0 +1,24 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "recordedAt": "2026-10-19T03:55:43.533Z",
+  "preciseIdentityAttempts": 1,
+  "verifierWrites": 0,
+  "disarm": {
+    "ownedLoginDisabled": true,
+    "backendMembershipRevoked": true,
+    "restrictedFlagReadback": {
+      "backend_member": false,
+      "rolbypassrls": false,
+      "rolcanlogin": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false,
+      "rolreplication": false,
+      "rolsuper": false
+    },
+    "encryptedRecoveryRetained": true,
+    "providerRuntimeEverEnabled": false
+  },
+  "providerRuntimeEnabled": false,
+  "privateValuesReturned": false
+}
