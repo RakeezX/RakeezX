@@ -1,5 +1,8 @@
 /** AI: same-origin private transport. Captured bearer exists only in memory. */
 export const N44_PROTOCOL = 'n44-browser-v2';
+// The ingress has a bounded12s deadline. Allow its committed response to reach
+// this client before aborting;10s could lose a successful consent CAS ACK.
+export const N44_RESPONSE_DEADLINE_MS = 15000;
 export function createPushGateway({ fetch: send = globalThis.fetch, authorization, context, preferences,
   storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => authorization, bindConsent = async () => false, clearConsent = async () => true }) {
   const scope = { workspaceId: context.workspaceId, deviceId: context.deviceId };
@@ -9,7 +12,7 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
   try { cleanupIdentity = JSON.parse(storage.getItem(key) || 'null'); } catch { cleanupIdentity = 'invalid'; }
   const request = async (path, body, cleanup = false) => {
     if (!cleanup && !valid()) throw Error('stale');
-    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 10000);
+    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), N44_RESPONSE_DEADLINE_MS);
     try {
       const response = await send('/api/n44/' + path, { method: 'POST', credentials: 'omit', redirect: 'error', cache: 'no-store',
         headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });

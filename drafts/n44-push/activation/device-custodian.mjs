@@ -1,10 +1,11 @@
 /** AI: same original N44 CurrentUser custodian; no SQL, credentials or private output. */
 import assert from 'node:assert/strict';
-import {readFile,writeFile,mkdir,unlink,readdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,unlink,readdir,open} from 'node:fs/promises';
 import {spawnSync,execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {protectedEnvText} from '../../../scripts/n44-activation-custody.mjs';
+import {writeEncryptedAttemptJournal} from './device-attempt-journal.mjs';
 const project='xlrubcwjqktzzunrvuns',taskId='continuous-n44-single-device-optin-ready-20261019',runId='05fd1236-442a-4fbf-add3-e9b9c20bb8e1';
 const originalRun='8288de34-7362-4946-b319-79a28e864be8';
 const phase='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/n44-live/owned-'+originalRun+'.tmp';
@@ -85,3 +86,47 @@ export async function execute(action,value){
  fail('n44_unknown_scoped_action');
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===path.resolve(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/,'$1'))){try{console.log(JSON.stringify(await execute(process.argv[2],process.argv[3])));}catch(e){console.error(JSON.stringify({status:'FAIL',code:/^n44_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n44_private_diagnostics_suppressed'}));process.exitCode=1;}}
+
+// Phase2 uses the SAME owning process/channel and original approval. None of the
+// completed phase1 commands is reachable from this narrowly scoped entry.
+export async function executeClosedPage(action,input,currentRun) {
+ const currentTask='continuous-n44-one-approved-closed-page-push-20261019';
+ if(!/^[a-f0-9-]{36}$/.test(currentRun??''))fail('n44_current_run_required');
+ const l=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/live-mutation.json','utf8'));
+ if(l.taskId!==currentTask||l.owner?.token!==currentRun||l.resource!=='live-mutation')fail('n44_current_live_lease_required');
+ const s=await load(),d=s.device1019;
+ const {deviceApproval}=await import('../one-device-test.mjs');
+ if(!s.installed||!s.directPreparation||!d||d.pending&&action!=='disarm'||!d.edgeDeployAcknowledged||s.source!==d.source)fail('n44_original_device_custody_required');
+ const folder='drafts/n44-push/activation/device-closed-page/';await mkdir(folder,{recursive:true});
+ const output=async(name,data)=>{const r={taskId:currentTask,runId:currentRun,recordedAt:new Date().toISOString(),...data};await writeFile(folder+name+'.json',JSON.stringify(r,null,2)+'\n');return r;};
+ const journal=path.join(phase,'one-device-20261019-attempt.dpapi');
+ const persist=async()=>{const b=Buffer.from(JSON.stringify(s));let encrypted;try{encrypted=dpapi(b,true);const f=await open(path.join(phase,'recovery.dpapi'),'r+');try{await f.writeFile(encrypted);await f.truncate(encrypted.length);await f.sync();}finally{await f.close();}}finally{b.fill(0);encrypted?.fill(0);}};
+ const verifyConfig=async values=>{await envFile(values);const rows=await list();if(!Object.entries(values).every(([name,v])=>rows.find(r=>r.name===name)?.value===hash(v)))fail('n44_changed_config_readback_mismatch');for(const [name,v]of Object.entries(values))s.envDigests[name]=hash(v);};
+ if(action==='state')return output('state',{originalOwnerVerified:true,source:s.source,scopeDigest:d.scopeDigest,approvalValid:!!deviceApproval(d.approval,Date.now()),targetBound:!!d.approval.target,capabilityInvocations:d.providerSendAttempts??0,disabled:d.disabled===true,immutableAttemptJournalPresent:(await readdir(phase)).includes(path.basename(journal)),privateValuesReturned:false});
+ if(action==='arm') {
+  if(!input||Object.keys(input).sort().join(',')!=='eventId,registrationId,scopeDigest'||input.scopeDigest!==d.scopeDigest||d.disabled||d.providerSendAttempts!==0||(await readdir(phase)).includes(path.basename(journal)))fail('n44_target_or_attempt_disposition');
+  const target={registrationId:input.registrationId,eventId:input.eventId},a=deviceApproval({...d.approval,target},Date.now());
+  if(!a||d.approval.target!==null)fail('n44_existing_approval_target_required');
+  const rows=await list();if(!Object.entries(s.envDigests).every(([name,v])=>rows.find(r=>r.name===name)?.value===v))fail('n44_configuration_drift');
+  d.approval=a;d.actualRegistrations=1;d.pending=true;await persist();
+  await verifyConfig({N44_ONE_DEVICE_TEST_JSON:JSON.stringify(a),N44_DELIVERY_ENABLED:'false'});d.pending=false;await persist();
+  return output('target-bound',{source:s.source,scopeDigest:d.scopeDigest,targetBound:true,targetDigest:hash(JSON.stringify(target)),approvalExpiryUnchanged:true,approvalRunUnchanged:true,deliveryEnabled:false,capabilityInvocations:0});
+ }
+ if(action==='attempt') {
+  const a=deviceApproval(d.approval,Date.now());
+  if(!a?.target||d.disabled||d.providerSendAttempts!==0||!input||Object.keys(input).sort().join(',')!=='chromeScopeClientCount,pagesClosedAt'||input.chromeScopeClientCount!==0||!Number.isSafeInteger(input.pagesClosedAt)||input.pagesClosedAt>Date.now()||Date.now()-input.pagesClosedAt>60000)fail('n44_closed_page_proof_required');
+  // Fixed, exclusively-created encrypted journal is NEVER removed or reset.
+  // fsync must ACK before the network invocation; crashes/timeouts consume it.
+  const j=Buffer.from(JSON.stringify({testId:a.testId,approvalRun:a.runId,executionRun:currentRun,ownerId:a.ownerId,workspaceId:a.workspaceId,deviceId:a.deviceId,target:a.target,...input,consumed:true}));let encrypted;
+  try{encrypted=dpapi(j,true);await writeEncryptedAttemptJournal(journal,encrypted);}finally{j.fill(0);encrypted?.fill(0);}
+  d.providerSendAttempts=1;d.attemptExecutionRun=currentRun;d.attemptDisposition='unknown';await persist();
+  const {signedScheduleRequest}=await import('../scheduler-entry.mjs');let httpStatus=null,status='unknown';
+  try{const request=await signedScheduleRequest('https://'+project+'.supabase.co/functions/v1/n44-notifications/schedule',Buffer.from(s.scheduler,'hex'),{operation:'one-device-test',cursor:a.runId,limit:1});const r=await fetch(request,{signal:AbortSignal.timeout(20000),redirect:'error'});httpStatus=r.status;const body=await r.json();if(Object.keys(body).join(',')==='status'&&['sent','dead','uncertain','suppressed','rejected','expired','disabled','duplicate','limited','backoff','exhausted','conflict','unavailable'].includes(body.status))status=body.status;}catch{/* unknown consumes the same fixed budget; never resend */}
+  d.attemptDisposition=status;await persist();return output('one-attempt',{httpStatus,status,capabilityInvocations:1,budgetConsumed:true,encryptedJournalRetained:true,pagesClosedBeforeInvocation:true,providerAcceptance:status==='sent'?'accepted':'not_proven',osReception:'NOT_RUN',deliveryEnabled:false});
+ }
+ if(action==='disarm') {
+  await verifyConfig({N44_ONE_DEVICE_TEST_JSON:'null',N44_DELIVERY_ENABLED:'false'});d.disabled=true;await persist();
+  return output('disabled',{testApprovalDisabled:true,deliveryEnabled:false,capabilityInvocations:d.providerSendAttempts??0,encryptedRecoveryRetained:true,encryptedAttemptJournalRetained:(await readdir(phase)).includes(path.basename(journal)),plaintextTransientInputsAbsent:!(await readdir(phase)).some(f=>f.startsWith('owned-device-env-')),registrationCleanup:'Separate ordinary owner-safe UI acknowledgement required'});
+ }
+ fail('n44_unknown_closed_page_action');
+}
