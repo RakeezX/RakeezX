@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "fifth_labels_empty_targets",
+      "status": "PASS",
+      "evidence": "Actual installed runner completed snapshot (four fabricated pupils / خامس 1–4), original source page1 → page2 while active tab is runner; real worker encrypted claim + current app owner guard + four canonical section/roster writes + durable ACK. No extractor/pagination suite replay."
+    },
+    {
+      "name": "retry_same_ids_one_new",
+      "status": "PASS",
+      "evidence": "Second real extension→receiver/store journey: SAME four section IDs, SAME existing pupil/enrollment IDs and rows; exactly one new pupil/enrollment, zero duplicate classes, grades unchanged."
+    },
+    {
+      "name": "lost_ack_resume",
+      "status": "PASS",
+      "evidence": "Drop one actual consumed worker receipt at the runner boundary: UI stays unresolved; explicit retry uses the same completed source and durable canonical receipt, with no roster/outbox changes."
+    },
+    {
+      "name": "ambiguous_label_no_guess",
+      "status": "PASS",
+      "evidence": "Bare ثاني 1 lacks academic stage: actual receiver keeps pending owner-bound rows and explains CLASS_MAPPING_REQUIRED, zero class/student writes."
+    },
+    {
+      "name": "normal_page_movement_wrong_source_denial",
+      "status": "PASS",
+      "evidence": "Actual onUpdated and pre-export guard allow same authorized source pagination, reject replaced report/school. Source remains bound to captured tab rather than active runner; expiry/role/school policies retained."
+    },
+    {
+      "name": "wrong_owner_denial",
+      "status": "PASS",
+      "evidence": "Actual window.rakeezBeginNamesBatch / ownership guard denies mismatched session owner; complete DB checkpoint unchanged."
+    },
+    {
+      "name": "n36_reported_source_changed_and_fifth_class_upsert_retry_no_duplicate",
+      "status": "PASS",
+      "evidence": "All six bounded installed-extension/actual-app checks pass; baseline SOURCE_CHANGED reproduction retained separately. Synthetic only."
+    }
+  ],
+  "synthetic": true,
+  "provenance": {
+    "command": "node tests/n36-feedback-1532/journeys.mjs",
+    "completedExecSessionId": 12481,
+    "observedExitCode": 0,
+    "recordedFrom": "Actual successful browser invocation and its seven PASS stdout records, before the optional expiry follow-up. This records observations; it does not relabel the later acquisition failure.",
+    "laterAttempt": "journeys.json retains actual FAIL on lease checkpoint read before any browser starts; optional extra expiry phase withdrawn, no further browser retry."
+  },
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "screenshots": [
+    "runner.png",
+    "receiver.png"
+  ],
+  "productHashes": {
+    "src/views/class-import-center.js": "2651255ca6c4006eac8783918b36ba36e3f33163d2e9e98bfff18bfd01897b27",
+    "extensions/rakeez-teacher-import-helper/run-controller.js": "c9373895878c85c97241d671001db3ecdefcfe20f8aa80df1e56e321b654718e",
+    "extensions/rakeez-teacher-import-helper/popup.html": "fa0108e0b515a717962cf85b25cd20014249c79462c653065cfb294fdb624b23",
+    "extensions/rakeez-teacher-import-helper/manifest.json": "f7fbd382ffe6f6921b699973cfa2ada5b7395836c117281913f97b71e2906568"
+  }
+}

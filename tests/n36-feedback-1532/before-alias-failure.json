@@ -1,0 +1,12 @@
+{
+  "checks": [],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [],
+  "lease": "ACQUIRED browser",
+  "status": "FAIL",
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#run-status').filter({ hasText: 'اكتمل استيراد الأسماء المتاحة' }) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-source-change-class-upsert-20261019\\tests\\n36-feedback-1532\\journeys.mjs:53:88",
+  "release": "RELEASED browser",
+  "cleanup": "Owned disposable extension context/profile and loopback server closed; owned lease released if acquired"
+}

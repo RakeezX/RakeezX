@@ -1,0 +1,83 @@
+{
+  "checks": [
+    {
+      "name": "baseline_source_changed_reproduced",
+      "status": "PASS",
+      "evidence": "Original base run-controller guards and actual categories handler: normal same-source page1→page2 during preflight invalidates completed review, raises SOURCE_CHANGED before any save. Only completed-checkpoint setup is instrumented; no extractor executed."
+    }
+  ],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [],
+  "lease": "ACQUIRED browser",
+  "originalDiagnostic": {
+    "schema": "rakeez-safe-diagnostics",
+    "reportVersion": 1,
+    "extensionVersion": "0.5.14",
+    "context": "run-tab",
+    "browser": {
+      "family": "chromium",
+      "major": 151,
+      "platform": "Windows"
+    },
+    "layout": {
+      "innerWidth": 1280,
+      "innerHeight": 900,
+      "devicePixelRatio": 1,
+      "visualScale": 1,
+      "root": {
+        "clientWidth": 1280,
+        "clientHeight": 900,
+        "scrollWidth": 1280,
+        "scrollHeight": 900,
+        "computedWidth": 1280
+      },
+      "body": {
+        "clientWidth": 840,
+        "clientHeight": 318,
+        "scrollWidth": 840,
+        "scrollHeight": 318,
+        "computedWidth": 840
+      },
+      "main": {
+        "clientWidth": 840,
+        "clientHeight": 318,
+        "scrollWidth": 840,
+        "scrollHeight": 318,
+        "computedWidth": 840
+      }
+    },
+    "health": {
+      "bootstrap": "ready",
+      "modules": {
+        "popup.js": "ready",
+        "categories-popup.js": "ready",
+        "run-controller.js": "ready"
+      },
+      "background": "ready"
+    },
+    "collection": {
+      "valid": null,
+      "staged": null,
+      "observed": null,
+      "excluded": null,
+      "classes": null,
+      "processedPages": null,
+      "currentPage": null,
+      "stage": "error",
+      "coverage": "unknown",
+      "terminal": "unproven",
+      "endpoint": "none",
+      "hasNext": null,
+      "disabledNext": null,
+      "transfer": "error",
+      "receipt": "not-available",
+      "failure": "SOURCE_CHANGED"
+    },
+    "errors": []
+  },
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "cleanup": "Owned disposable extension context/profile and loopback server closed; owned lease released if acquired"
+}

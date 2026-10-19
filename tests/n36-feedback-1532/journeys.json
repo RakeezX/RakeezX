@@ -1,0 +1,10 @@
+{
+  "checks": [],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [],
+  "status": "FAIL",
+  "failure": "Error: Command failed: powershell.exe -NoProfile -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name browser -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-source-change-class-upsert-20261019.json -OwnerToken 538f9cb0-3d79-40a8-8c5c-37748229abd3 -WaitSeconds 0\nC:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\resource-lease.ps1 : Exception calling \"ReadAllText\" with \r\n\"2\" argument(s): \"The process cannot access the file 'C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attem\r\npts\\continuous-n36-source-change-class-upsert-20261019\\538f9cb0-3d79-40a8-8c5c-37748229abd3\\checkpoint.json' because \r\nit is being used by another process.\"\r\n    + CategoryInfo          : NotSpecified: (:) [resource-lease.ps1], MethodInvocationException\r\n    + FullyQualifiedErrorId : IOException,resource-lease.ps1\r\n \r\n\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-change-class-upsert-20261019/tests/n36-feedback-1532/journeys.mjs:11:21)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-change-class-upsert-20261019/tests/n36-feedback-1532/journeys.mjs:18:15\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)",
+  "cleanup": "Owned disposable extension context/profile and loopback server closed; owned lease released if acquired"
+}
