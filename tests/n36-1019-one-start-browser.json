@@ -1,0 +1,104 @@
+{
+  "runId": "b8ed9286-da2f-4ad3-b71c-24d7a9fb3614",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "n36_one_explicit_start_all_available_classes_existing_rakeez_receiver_ack",
+      "status": "PASS",
+      "evidence": "One installed popup Start → slow 9.2s gateway → two real parser report pages/classes → same already-open authenticated app → real guarded canonical names commit/readback, 2 durable receipts; one existing name/ID retained, one new; no class/review/save clicks or extra app tabs. Grades/history unchanged."
+    },
+    {
+      "name": "duplicate_replay",
+      "status": "PASS",
+      "evidence": "Explicit fresh batch retries identical names through the same canonical receiver; IDs/roster/outbox unchanged, counts-only new local receipt."
+    },
+    {
+      "name": "incomplete_retry",
+      "status": "PASS",
+      "evidence": "Unresolved class yields unknown outcome and durable owner-local pending rows; no false completion or student writes."
+    },
+    {
+      "name": "new_class_names_only",
+      "status": "PASS",
+      "evidence": "Unambiguous grade/section creates one guarded section and canonical roster, retaining IDs/grades and inventing no subject. Earlier unresolved class remains durable."
+    },
+    {
+      "name": "actual_pending_resume_after_transport_TTL",
+      "status": "PASS",
+      "evidence": "Actual unresolved-class mapping + single resume handler commits the saved owned batch after 120001ms; no recollection, grades untouched and pending cleared only after canonical receipt."
+    },
+    {
+      "name": "expired_unclaimed",
+      "status": "PASS",
+      "evidence": "Actual extension alarm erases unclaimed payload; exact tab cannot claim expired transfer. Claimed pending rows remain in owner DB beyond transport expiry."
+    },
+    {
+      "name": "owner_session_switch",
+      "status": "PASS",
+      "evidence": "Start-bound owner/session guard rejects later automatic writes after account switch; no mutation or fake receipt."
+    }
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "lease": "ACQUIRED browser",
+  "browser": "151.0.7922.34",
+  "reusedProof": {
+    "checks": [
+      "n36_one_explicit_start_all_available_classes_existing_rakeez_receiver_ack",
+      "duplicate_replay",
+      "incomplete_retry",
+      "new_class_names_only",
+      "actual_pending_resume_after_transport_TTL"
+    ],
+    "reason": "The prior actual installed-browser run passed the one-start journey, duplicate, unknown/new class and actual pending resume. No Product files changed afterward; only this harness now restores the page clock before the remaining worker-clock expiry phase."
+  },
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "hits": [],
+  "cleanup": "Owned browser/profile/server closed; shared lease released",
+  "preservedFailures": [
+    "Error: Command failed: powershell.exe -NoProfile -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name browser -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-one-start-all-class-handoff-20261019.json -OwnerToken b8ed9286-da2f-4ad3-b71c-24d7a9fb3614 -WaitSeconds 0\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-all-class-handoff-20261019/tests/n36-1019-one-start-browser.mjs:11:21)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-all-class-handoff-20261019/tests/n36-1019-one-start-browser.mjs:83:54",
+    "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#run-status').filter({ hasText: 'اكتمل استيراد الأسماء المتاحة' }) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-one-start-all-class-handoff-20261019\\tests\\n36-1019-one-start-browser.mjs:109:88",
+    "Error: Command failed: powershell.exe -NoProfile -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name browser -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-one-start-all-class-handoff-20261019.json -OwnerToken b8ed9286-da2f-4ad3-b71c-24d7a9fb3614 -WaitSeconds 0\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-all-class-handoff-20261019/tests/n36-1019-one-start-browser.mjs:11:21)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-all-class-handoff-20261019/tests/n36-1019-one-start-browser.mjs:83:54",
+    "page.waitForFunction: Timeout 60000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-one-start-all-class-handoff-20261019\\tests\\n36-1019-one-start-browser.mjs:109:15",
+    "Error: ACTUAL_HANDOFF_FAILED\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-all-class-handoff-20261019/tests/n36-1019-one-start-browser.mjs:111:319\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-all-class-handoff-20261019/tests/n36-1019-one-start-browser.mjs:111:2",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-all-class-handoff-20261019/tests/n36-1019-one-start-browser.mjs:153:77"
+  ],
+  "taskId": "continuous-n36-one-start-all-class-handoff-20261019",
+  "finalSourceBinding": {
+    "recordedAt": "2026-10-19T08:34:15.703Z",
+    "reason": "Post-pass aggregation: no Product source edits after the actual passing browser phases; final genuine package binds these same source bytes.",
+    "sha256": {
+      "src/views/class-import-center.js": "40b33c7925cfdfd5eefc6d1c6954c47a1691fd75e36ced97d93d7c03084b9fe0",
+      "src/lib/n36-extension-protocol.js": "f8e6afec57e00b01f5a8a865864aa1b4d96af742d86b667c6c6409a099729341",
+      "src/lib/n36-extension-handoff.js": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+      "extensions/rakeez-teacher-import-helper/categories-popup.js": "bb1aebc2edfe70099e6c61b90f8e9e4a5a511a579d27b2cd6597f10463d47ebc",
+      "extensions/rakeez-teacher-import-helper/categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+      "extensions/rakeez-teacher-import-helper/class-order.js": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87",
+      "extensions/rakeez-teacher-import-helper/core.js": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+      "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js": "cea03033d54728a79cf21926e9f02fc415d4a07c3ceb681f4773f800b43b6b60",
+      "extensions/rakeez-teacher-import-helper/handoff-protocol.js": "f8e6afec57e00b01f5a8a865864aa1b4d96af742d86b667c6c6409a099729341",
+      "extensions/rakeez-teacher-import-helper/handoff-worker.js": "e88a40b242d6c6478b28dd04869163b8bdb76d139944247269f66c391a07605f",
+      "extensions/rakeez-teacher-import-helper/lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "extensions/rakeez-teacher-import-helper/lib/rakeez-datetime.js": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+      "extensions/rakeez-teacher-import-helper/manifest.json": "addf43c036e85156a78f8f4d50c021c5744bb683b4043f6b796faa717b49f535",
+      "extensions/rakeez-teacher-import-helper/navigation.js": "6a766d1590fdc7713b090e6bb1ec15468de1d4426e7dd6da2847ee6f57dcafb4",
+      "extensions/rakeez-teacher-import-helper/popup.html": "476a1ce89922656db087bf45052a9e446f6a97af3236ff6bd695ccf985b745ec",
+      "extensions/rakeez-teacher-import-helper/popup.js": "0e1a555d42fac03776026d457632cf7979e3a751259685dc82e942317cf75bdc",
+      "extensions/rakeez-teacher-import-helper/route-diagnostics.js": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a",
+      "extensions/rakeez-teacher-import-helper/run-controller.js": "b9be267290daa43891c58b3eaaa61a3f89db4f365630b991a3884407f5051e1a",
+      "extensions/rakeez-teacher-import-helper/selection.js": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+      "extensions/rakeez-teacher-import-helper/source-adapter.js": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c",
+      "extensions/rakeez-teacher-import-helper/source-roster.js": "2bc76e92e5996ca3ad6579bd064cc33dbd0feca797929bd88fc05e02c998a067",
+      "extensions/rakeez-teacher-import-helper/vendor/flatpickr/ar.js": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b",
+      "extensions/rakeez-teacher-import-helper/vendor/flatpickr/flatpickr.min.js": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1"
+    },
+    "archive": {
+      "file": "rakeez-teacher-import-helper-0.5.12.zip",
+      "sha256": "7dcb2245a51e8aa8f1c97cf741153e4b15ea5faae2b9ba2cb05c954a8f591fac",
+      "bytes": 109057
+    }
+  }
+}

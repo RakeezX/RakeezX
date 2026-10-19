@@ -94,6 +94,117 @@ function extensionOwnerBinding() {
   store.assertLeaseWritable();
   return JSON.stringify([w.authUserId,w.id,w.databaseName,w.leaseGeneration]);
 }
+// AI: explicit extension Start grants one document/session-bound names batch.
+let automaticBatch=null, automaticWriting=false;
+export function prepareExtensionBatch(){
+ const binding=extensionOwnerBinding();
+ if(automaticWriting||store.state.device?.n36NamesBatch?.pending)throw Error('BATCH_PENDING');
+ const id=[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
+ automaticBatch={id,binding,session:cloud.session,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
+ return id;
+}
+// Stable bridge survives the publisher's bundled asset names; no source-URL injection.
+window.rakeezBeginNamesBatch=prepareExtensionBatch;
+window.rakeezCancelNamesBatch=id=>{if(automaticBatch?.id===id)automaticBatch=null;};
+function automaticGuard(batch){
+ if(automaticBatch!==batch||Date.now()>=batch.expires||extensionOwnerBinding()!==batch.binding||cloud.session!==batch.session||
+ store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||batch.route&&location.hash!==batch.route)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
+}
+function automaticPersistedGuard(batch,current){
+ automaticGuard(batch);
+ const device=current.device?.find(d=>d.id==='device');
+ if(device&&(device.activeYearId!==batch.year||device.activeTermId!==batch.term))throw Error('BATCH_PERSISTED_TERM_CHANGED');
+ if(current.years&&JSON.stringify(current.years.find(y=>y.id===batch.year))!==batch.yearState||
+ current.terms&&JSON.stringify(current.terms.find(t=>t.id===batch.term))!==batch.termState)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');
+}
+async function batchCheckpoint(batch,change){
+ automaticGuard(batch);
+ const db=await import('../lib/db.js');
+ const committed=await db.applyBatch({device:{}},{prepare(current){
+  automaticPersistedGuard(batch,current);
+  const device=current.device.find(d=>d.id==='device');if(!device)throw Error('BATCH_DEVICE');
+  const prior=device.n36NamesBatch;
+  if(prior?.pending&&prior.batchId!==batch.id)throw Error('BATCH_PENDING');
+  if(prior&&prior.ownerId!==store.getActiveWorkspace().authUserId)throw Error('BATCH_OWNER');
+  return {device:{put:[{...device,n36NamesBatch:change(prior?.batchId===batch.id?prior:{batchId:batch.id,ownerId:store.getActiveWorkspace().authUserId,receipts:{}})}]}};
+ }});
+ automaticGuard(batch);store.state.device={...store.state.device,n36NamesBatch:committed.device.put[0].n36NamesBatch};
+}
+function sourceSection(classroom){
+ const saved=store.state.device?.n36NamesBatch?.classMappings?.[classroom];
+ if(saved){const section=store.getSection(saved);if(!section||section.yearId!==store.activeYear().id||section.status==='archived')throw Error('CLASS_MAPPING_CHANGED');return {section};}
+
+ const key=v=>String(v).normalize('NFC').replace(/[إأآٱ]/g,'ا').replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/\s+/g,' ').trim();
+ const name=key(classroom).replace(/^الصف /,'');
+ const exact=store.state.sections.filter(s=>!s.deleted&&s.yearId===store.activeYear().id&&key(s.name)===name);
+ if(exact.length===1)return {section:exact[0]};if(exact.length>1)throw Error('CLASS_AMBIGUOUS');
+ let grade,label;
+ for(const g of GRADES){const prefix=key(g.label);if(name.startsWith(prefix+' ')||name.startsWith(prefix+'/')){grade=g.v;label=name.slice(prefix.length).replace(/^[ /(-]+|[ )]+$/g,'').trim();break;}}
+ const numeric=name.match(/^(1[0-2]|[1-9])\s*[/(-]\s*([\p{L}\p{N} ._-]{1,8})\)?$/u);
+ if(numeric){grade=Number(numeric[1]);label=numeric[2].trim();}
+ if(!grade||!label||label.length>8||!/^[\p{L}\p{N} ._-]+$/u.test(label))throw Error('CLASS_MAPPING_REQUIRED');
+ const matches=store.state.sections.filter(s=>s.yearId===store.activeYear().id&&Number(s.grade)===grade&&key(s.label)===key(label));
+ if(matches.length>1||matches.some(s=>s.deleted||s.status==='archived'))throw Error('CLASS_ARCHIVED_OR_AMBIGUOUS');
+ return {section:matches[0],grade,label};
+}
+async function saveAutomaticNames(result){
+ const batch=automaticBatch;
+ if(!batch||result.envelope.batchId!==batch.id)throw Error('BATCH_NOT_INITIATED');
+ automaticGuard(batch);if(automaticWriting)throw Error('BATCH_BUSY');automaticWriting=true;batch.route=location.hash;
+ const envelope=result.envelope,rows=envelope.rows;
+ const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(rows))))].map(n=>n.toString(16).padStart(2,'0')).join('');
+ try{
+  const prior=store.state.device?.n36NamesBatch;
+  if(prior?.batchId===batch.id&&prior.receipts?.[digest])return prior.receipts[digest];
+  await batchCheckpoint(batch,p=>{
+   return {...p,batchId:batch.id,pending:{...p.pending,[digest]:{rows,complete:envelope.complete}},yearId:batch.year,termId:batch.term};
+  });
+  const {previewStudentRows}=await import('../lib/student-import.js');
+  let added=0,existing=0;
+  for(const classroom of new Set(rows.map(r=>r.classroom))){
+   automaticGuard(batch);
+   const names=rows.filter(r=>r.classroom===classroom).map(r=>[r.name]);
+   let {section,grade,label}=sourceSection(classroom);
+   if(!section){
+    section=await store.createSection({yearId:batch.year,grade,label,name:classroom},{verifyCurrent(current){
+     automaticPersistedGuard(batch,current);
+     if(current.sections.some(s=>s.yearId===batch.year&&Number(s.grade)===grade&&gradeNameKey(s.label)===gradeNameKey(label)))throw Error('CLASS_CHANGED');
+    }});
+    section=store.getSection(section.id);
+   }
+   if(section.deleted||section.status==='archived'||section.ownerId&&section.ownerId!==store.getActiveWorkspace().authUserId)throw Error('CLASS_OWNER_OR_ARCHIVED');
+   const teachings=store.state.teachings.filter(t=>!t.deleted&&t.status!=='archived'&&t.sectionId===section.id&&t.termId===batch.term);
+   const roster=store.sectionRoster(section.id),owner=store.getActiveWorkspace().authUserId;
+   if(roster.some(r=>r.ownerId!=null&&r.ownerId!==owner)||store.state.enrollments.some(e=>!e.deleted&&e.sectionId===section.id&&e.ownerId!=null&&e.ownerId!==owner))throw Error('NAMES_OWNER');
+   const preview=previewStudentRows(names,0,false,roster);
+   if(preview.entries.length!==names.length||preview.counts.invalid||preview.counts.ambiguous)throw Error('NAMES_AMBIGUOUS');
+   existing+=preview.counts.existing;
+   if(teachings.length){
+    const review=store.reviewNamesImport(teachings[0].id,{rows:names,nameColumn:0});
+    store.assertClassOperationsAccess(teachings[0].id);
+    if(preview.counts.new){const saved=await store.confirmNamesImport(review,true,{verifyCurrent:()=>automaticGuard(batch)});added+=saved.added;}
+   }else if(preview.counts.new){
+    // A names-only source supplies no subject. Keep a section roster without inventing one.
+    const saved=await store.importStudents(section.id,preview.names,{verifyCurrent(current){
+     automaticPersistedGuard(batch,current);
+     const target=current.sections.find(s=>s.id===section.id);
+     if(JSON.stringify(target)!==JSON.stringify(section))throw Error('CLASS_CHANGED');
+     const ids=new Set(current.enrollments.filter(e=>!e.deleted&&e.status==='active'&&e.sectionId===section.id).map(e=>e.studentId));
+     const roster=current.students.filter(s=>!s.deleted&&ids.has(s.id));
+     if(roster.some(s=>s.ownerId!=null&&s.ownerId!==owner)||current.enrollments.some(e=>e.sectionId===section.id&&!e.deleted&&e.ownerId!=null&&e.ownerId!==owner))throw Error('NAMES_OWNER');
+     if(JSON.stringify(previewStudentRows(names,0,false,roster).entries)!==JSON.stringify(preview.entries))throw Error('NAMES_CHANGED');
+    }});added+=saved.added;
+   }
+   automaticGuard(batch);
+   const after=previewStudentRows(names,0,false,store.sectionRoster(section.id));
+   if(after.counts.existing!==names.length||after.counts.ambiguous)throw Error('NAMES_RECEIPT_UNKNOWN');
+  }
+  const outcome={status:added?'saved':'existing',added,existing,remaining:0,total:rows.length};
+  await batchCheckpoint(batch,p=>{const pending={...p.pending};delete pending[digest];return {...p,pending:Object.keys(pending).length?pending:null,receipts:{...p.receipts,[digest]:outcome}};});
+  extensionMessage=`حُفظت الدفعة محليًا: ${added} جديد، ${existing} موجود سابقًا. ${envelope.complete?'':'الكشف غير مكتمل؛ لم تُفترض أسماء الصفحات غير المحسومة.'} المزامنة لم تتأكد بعد.`;
+  return outcome;
+ }finally{automaticWriting=false;batch.route=null;}
+}
 function clearExtensionPreview() { extensionPreview = extensionOwner = null; clearTimeout(extensionTimer); }
 store.onWorkspaceDeactivation(clearExtensionPreview);
 cloud.subscribe(() => {
@@ -103,14 +214,15 @@ cloud.subscribe(() => {
 function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
-    <p>ثبّت الإضافة لمتصفح كروم، وسجّل دخولك إلى منصة مدرستي، ثم شغّل الإضافة لجلب أسماء الطلاب وبيانات فصولهم المتاحة. راجع البيانات وأكّد حفظها في ركيز.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.11.zip" download>تنزيل إضافة ركيز 0.5.11</a>
+    <p>ثبّت الإضافة لمتصفح كروم، وسجّل دخولك إلى منصة مدرستي، ثم شغّل الإضافة لجلب أسماء الطلاب وبيانات فصولهم المتاحة. ابدأ مرة واحدة لجمع واستيراد أسماء جميع الفصول المتاحة إلى هذا الحساب المفتوح؛ تُعرض الحالات غير المحسومة فقط.</p>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.12.zip" download>تنزيل إضافة ركيز 0.5.12</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
       <li>عند تحديث ملفات الإضافة في المجلد نفسه، اضغط «إعادة تحميل» في صفحة الإضافات.</li>
     </ol></details>
     ${extensionPreview ? html`<p role="status">${extensionPreview.envelope.source === 'noor' ? 'نور — عمود ظاهر مختار؛ صفحات وأعمدة أخرى غير مجمّعة' : 'مدرستي — الأسماء التي راجعتها في الإضافة فقط'} · ${extensionPreview.envelope.rows.length} اسمًا. اختر الفصل والمادة أدناه.</p><button class="btn btn--primary" data-act="n36-extension-review" ${!hub.existing || hub.kind === 'new' ? 'disabled' : ''}>مراجعة أسماء الإضافة</button><button class="btn btn--quiet" data-act="n36-extension-cancel">إلغاء ومسح النقل</button>` : ''}
+    ${store.state.device?.n36NamesBatch?.pending ? html`<details open><summary>الفصول غير المحسومة فقط</summary>${[...new Set(Object.values(store.state.device.n36NamesBatch.pending).flatMap(p=>p.rows.map(r=>r.classroom)))].map(classroom=>html`<label class="field"><span>${classroom} — حدّد فصلًا موجودًا إذا لم تُحسم المطابقة</span><select class="select" data-n36-batch-map data-classroom="${classroom}"><option value="">المطابقة من اسم المصدر</option>${store.sections().filter(s=>s.status!=='archived'&&(!s.ownerId||s.ownerId===store.getActiveWorkspace().authUserId)).map(s=>html`<option value="${s.id}" ${store.state.device.n36NamesBatch.classMappings?.[classroom]===s.id?'selected':''}>${sectionLabel(s)}</option>`)}</select></label>`)}</details><button class="btn" data-act="n36-batch-resume">استكمال دفعة الأسماء المحفوظة لهذا الحساب</button>` : ''}
     <p role="status" data-n36-handoff-status>${extensionBusy ? 'جار استلام المعاينة المؤقتة…' : extensionMessage}</p>
   </section>`;
 }
@@ -123,6 +235,11 @@ async function receiveExtension() {
   try {
     const result=await claimHandoff(request);
     if(location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
+    if(result.envelope.version===2){
+      try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);}
+      catch(error){extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+'). التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.';await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length});}
+      return;
+    }
     extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
     extensionTimer=setTimeout(()=>{clearExtensionPreview();extensionMessage='انتهت المعاينة. أعد النقل من الإضافة ثم أعد المحاولة.';repaint();},Math.max(0,result.envelope.expiresAt-Date.now()));
   } catch { extensionMessage='تعذّر النقل: الإضافة غير متاحة أو انتهت الصلاحية أو تغيّر الحساب. أعد النقل ثم أعد المحاولة.'; }
@@ -686,6 +803,15 @@ export const koshoofCenter = {
     if (root.querySelector('[data-class-access-status]')) return;
     if (hub.tab === 'import') void receiveExtension();
     const listen = (selector, handler) => root.querySelectorAll(selector).forEach(el => { if (el.dataset.bound) return; el.dataset.bound = 'true'; el.addEventListener('change', handler); });
+    listen('[data-n36-batch-map]',async event=>{
+      if(automaticWriting)return;
+      const p=store.state.device?.n36NamesBatch;if(!p?.pending||p.ownerId!==store.getActiveWorkspace()?.authUserId)return;
+      try{
+       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
+       await batchCheckpoint(automaticBatch,current=>({...current,classMappings:{...current.classMappings,[event.target.dataset.classroom]:event.target.value}}));
+       extensionMessage='حُفظت مطابقة الفصل لهذه الدفعة فقط. اضغط الاستكمال للتحقق والحفظ.';
+      }catch(error){extensionMessage='تعذّر اعتماد المطابقة: '+error.message;}repaint();
+    });
     listen('[data-import-kind]', event => { if (!locked()) { hub.kind = event.target.value; resetDestination(); repaint(); } });
     listen('[data-existing-class]', event => { if (!locked()) { hub.existing = event.target.value; if(!transfer.rows)hub.kind='existing'; resetDestination(); repaint(); } });
     listen('[data-roster-field]', event => { if (!locked() && !draft.review) { draft.manual ??= {}; draft.manual[event.target.dataset.rosterField] = event.target.value; } });
@@ -697,6 +823,15 @@ export const koshoofCenter = {
   },
   actions: {
     ...classImport.actions,
+    async 'n36-batch-resume'(){
+      if(automaticWriting)return;
+      const p=store.state.device?.n36NamesBatch;if(!p?.pending||p.ownerId!==store.getActiveWorkspace()?.authUserId)return;
+      try{
+       // Fresh explicit resume, never automatic continuation into a switched account/session.
+       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
+       for(const pending of Object.values(p.pending))await saveAutomaticNames({envelope:{version:2,batchId:p.batchId,...pending}});
+      }catch(error){extensionMessage='الدفعة محفوظة ولم يتأكد اكتمالها: '+error.message;}repaint();
+    },
     'roster-page'(el){transfer.page=Number(el.dataset.page);repaint();},
     ...Object.fromEntries(Object.entries(transferActions).map(([name, action]) => [name, (el, ev) => {
       const id = hub.tab === 'export' ? [...hub.selected][0] : hub.existing;

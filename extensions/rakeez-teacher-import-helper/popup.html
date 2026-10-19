@@ -2,12 +2,12 @@
 <html lang="ar" dir="rtl">
 <head><meta charset="utf-8"><script src="diagnostics-bootstrap.js"></script><meta name="viewport" content="width=device-width, initial-scale=1"><title>مساعد إعداد المعلم</title><link rel="stylesheet" href="lib/rakeez-datetime.css"><link rel="stylesheet" href="popup.css"></head>
 <body><main>
-<header class="popup-header"><h1>مساعد إعداد المعلم</h1><button id="copy-safe-report" type="button">نسخ معلومات التشخيص</button></header><p id="safe-report-status" role="status" aria-live="polite"></p><textarea id="safe-report" readonly hidden dir="ltr" rows="8" aria-label="معلومات التشخيص الآمنة للنسخ اليدوي"></textarea><p class="notice">راجع أسماء الفصل ثم انقلها إلى ركيز؛ الحفظ بتأكيدك داخل ركيز.</p>
+<header class="popup-header"><h1>مساعد إعداد المعلم</h1><button id="copy-safe-report" type="button">نسخ معلومات التشخيص</button></header><p id="safe-report-status" role="status" aria-live="polite"></p><textarea id="safe-report" readonly hidden dir="ltr" rows="8" aria-label="معلومات التشخيص الآمنة للنسخ اليدوي"></textarea><p class="notice">مدرستي: بدء واحد يستورد أسماء كل الفصول المتاحة إلى حساب ركيز المفتوح. نور: مراجعة العمود المختار.</p>
 <section id="one-start-controls">
-<p>افتح صفحة مدرستي المصرّح لك بها واضغط البدء، ثم اختر الفصل وراجع أسماءه.</p>
-<button id="one-start" type="button" disabled>ابدأ الاستيراد من مدرستي</button>
+<p>افتح حساب ركيز في تبويب واحد بهذا المتصفح، ثم ابدأ من صفحة مدرستي المصرّح لك بها. تُستورد الأسماء المتاحة فقط؛ لا درجات ولا تعديل في مدرستي.</p>
+<button id="one-start" type="button" disabled>ابدأ جمع واستيراد جميع الفصول إلى ركيز</button>
 <button id="run-cancel" type="button" disabled>إلغاء ومسح المعاينة</button>
-<p id="run-status" role="status" aria-live="polite">لن تبدأ قراءة بمجرد فتح المتصفح أو الإضافة. لا إضافة تلقائية إلى ركيز.</p>
+<p id="run-status" role="status" aria-live="polite">لن تبدأ قراءة بمجرد فتح المتصفح أو الإضافة. الاستيراد التلقائي يخص هذا البدء الصريح فقط.</p>
 <div id="school-choices" hidden aria-label="اختر مدرسة واحدة"></div>
 
 <p id="review-remaining" role="timer" aria-label="الوقت المتبقي للمعاينة"></p>

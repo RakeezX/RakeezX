@@ -9,8 +9,10 @@ export function validateHandoff(value, now = Date.now()) {
   const keys = (o, expected) => {
     if (!o || Object.getPrototypeOf(o) !== Object.prototype || Object.keys(o).sort().join() !== [...expected].sort().join()) throw Error('HANDOFF_SCHEMA');
   };
-  keys(value, ['schema','version','source','scope','createdAt','expiresAt','rows']);
-  if (value.schema !== 'rakeez-extension-names' || value.version !== 1 ||
+  const automatic = value?.version === 2;
+  keys(value, ['schema','version','source','scope','createdAt','expiresAt','rows',...(automatic ? ['batchId','complete'] : [])]);
+  if (automatic && (!/^[a-f0-9]{64}$/.test(value.batchId) || typeof value.complete !== 'boolean' || value.source !== 'madrasati')) throw Error('HANDOFF_BATCH');
+  if (value.schema !== 'rakeez-extension-names' || ![1,2].includes(value.version) ||
       !['madrasati','noor'].includes(value.source) ||
       value.scope !== (value.source === 'noor' ? 'selected-visible-partial' : 'reviewed-run') ||
       !Number.isSafeInteger(value.createdAt) || !Number.isSafeInteger(value.expiresAt) ||
