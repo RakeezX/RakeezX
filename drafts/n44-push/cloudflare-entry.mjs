@@ -32,7 +32,10 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       const payload=JSON.stringify({path:url.pathname,method:request.method,headers:FORWARDED.map(n=>headers.get(n)||''),body:encodeBytes(bytes)});
       if(new TextEncoder().encode(payload).length>32768)return privateResponse(413);
       const result=await send(upstream.href+'/dispatch',{method:'POST',headers:wire,body:payload,
-        signal:abort.signal,redirect:'error',cache:'no-store'});
+        signal:abort.signal,redirect:'manual',cache:'no-store'});
+      // Workers supports manual redirects. Never follow an upstream redirect or
+      // expose its location/body through the private application response.
+      if(result.status>=300 && result.status<400){void result.body?.cancel().catch(()=>{});return privateResponse();}
       const responseBytes=await readBytes(result.body,2*1024*1024,abort.signal);
       if(!result.ok)return privateResponse(result.status===429?429:result.status>=500?503:401);
       const reply=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(responseBytes));

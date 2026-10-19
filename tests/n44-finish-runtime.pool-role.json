@@ -1,0 +1,9 @@
+{
+  "aiAuthored": true,
+  "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+  "recordedAt": "2026-10-19T07:13:43.080Z",
+  "status": "PASS",
+  "evidence": "Actual shared request-session helper restores original login before each identity/TLS query, then re-enters private backend role. Reproduced retained-role SSL metadata-null denial; two sequential acquisitions pass all original guards. Each false guard and RESET ROLE failure still rejects before private work.",
+  "scope": "Injected ports; not an actual SQL visibility or hosted readiness proof",
+  "networkCalls": 0
+}

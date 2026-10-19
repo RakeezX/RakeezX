@@ -1,0 +1,208 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
+  "recordedAt": "2026-10-19T06:01:59.973Z",
+  "state": "BLOCKED",
+  "scope": "Ingress-only transport code locally corrected; provider mutation withheld because named pre-mutation probe cannot exercise forwarding.",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "serviceSourceSha": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+  "edgeFunction": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "name": "n44-notifications",
+    "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
+    "version": 4,
+    "status": "ACTIVE",
+    "verifyJwt": false,
+    "providerBundleSha256": "8c46bff41a14277bd72f3905a51dc034abf902a1b5da189aa717a752e13d42f7",
+    "recordedAt": "2026-10-19T04:14:18.138Z"
+  },
+  "edgeSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "restrictedIdentityAndFullTls": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+    "recordedAt": "2026-10-19T04:07:25.540Z",
+    "httpStatus": 200,
+    "status": "ready",
+    "loginExact": true,
+    "roleExact": true,
+    "upstreamSsl": true,
+    "clientTlsAuthorized": true,
+    "sourceBoundary": true,
+    "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+    "enabled": true,
+    "deliveryEnabled": false
+  },
+  "providerSecretNamesAndDigestsMatched": [
+    "N44_AUTH_API_KEY",
+    "N44_AUTH_URL",
+    "N44_CRYPTO_JSON",
+    "N44_DATABASE_CA_CERT",
+    "N44_DATABASE_URL",
+    "N44_DELIVERY_ENABLED",
+    "N44_ENABLED",
+    "N44_INGRESS_KEY",
+    "N44_PROVIDER_ORIGINS_JSON",
+    "N44_PUBLIC_ORIGIN",
+    "N44_RATE_KEY",
+    "N44_READINESS_ENABLED",
+    "N44_SCHEDULER_KEY",
+    "N44_SERVICE_REVISION",
+    "N44_SERVICE_SOURCE_SHA",
+    "N44_SESSION_POLICY_JSON"
+  ],
+  "ingressEnabled": true,
+  "route": {
+    "id": "05c0088cf73e4223abaccd1c859e4539",
+    "pattern": "rakeezx.com/api/n44/*",
+    "script": "n44-notifications-ingress",
+    "request_limit_fail_open": false
+  },
+  "schedulerEnabled": false,
+  "cron": [],
+  "deliveryEnabled": false,
+  "browserEnabled": false,
+  "serviceWorkerEnabled": false,
+  "actualUnauthorizedHttp": [
+    {
+      "name": "mountedIngressWrongMethod",
+      "url": "https://rakeezx.com/api/n44/status",
+      "method": "GET",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    },
+    {
+      "name": "edgeWrongAuthDispatch",
+      "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/dispatch",
+      "method": "POST",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    },
+    {
+      "name": "edgeWrongAuthReadiness",
+      "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/readiness",
+      "method": "POST",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    }
+  ],
+  "immutableMigrationsReplayed": false,
+  "personalRowsRead": 0,
+  "authFixtureCreated": false,
+  "realSend": false,
+  "devicePermissionOrRegistration": false,
+  "closedClientOsDelivery": "NOT_RUN",
+  "originalFailuresPreserved": true,
+  "optionalDnsRead": {
+    "status": "FAIL",
+    "code": 10000,
+    "message": "Authentication error",
+    "retried": false,
+    "dnsChanged": false,
+    "requiredMountIndependentlyProved": true
+  },
+  "cleanup": {
+    "liveMutationLeaseReleased": true,
+    "plaintextTransientInputsAbsent": true,
+    "ownedBrowserServerProcessesCreated": false,
+    "encryptedRecoveryRetained": true,
+    "originalCustodyAccessed": false,
+    "providerMutationPerformed": false
+  },
+  "noFrontendPublication": true,
+  "productClosed": false,
+  "originalActivationEvidence": {
+    "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+    "originalRecordedAt": "2026-10-19T04:16:29.540Z",
+    "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.json",
+    "reused": true
+  },
+  "transportCompatibility": {
+    "version": 1,
+    "platform": "cloudflare-workers",
+    "redirectMode": "manual",
+    "rejectsRedirects": true,
+    "localForwardAttempted": true,
+    "beforeHttpStatus": 401,
+    "afterHttpStatus": null,
+    "probeMethod": "POST",
+    "probePath": "/api/n44/status",
+    "upstreamSourceUnchanged": true,
+    "originalCustodyUntouched": true,
+    "bindingsPreserved": true,
+    "nativeSourceExact": false,
+    "correctedIngressUploaded": false,
+    "statusPathForwards": false
+  },
+  "actualTransportUnauthorizedHttp": [
+    {
+      "aiAuthored": true,
+      "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+      "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
+      "recordedAt": "2026-10-19T05:59:53.753Z",
+      "phase": "before",
+      "url": "https://rakeezx.com/api/n44/status",
+      "method": "POST",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private",
+      "requestOrigin": "https://rakeezx.com",
+      "csrfAndSameOriginProtocol": true,
+      "fakeUnauthorizedBearer": true,
+      "personalData": false,
+      "credentialsPersisted": false,
+      "requestBodyPersisted": false,
+      "statusPathForwards": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "n44_actual_cloudflare_proper_post_before_and_after",
+      "status": "FAIL",
+      "evidence": "Required POST /api/n44/status before repair returned401 at 2026-10-19T05:59:53.753Z. Native source and actual local source/bundle handlers reject this path before forwarding. Before503 and after-upstream401 are not proved; after request/upload NOT_RUN pending exact probe correction."
+    },
+    {
+      "name": "n44_manual_redirect_and_explicit_redirect_rejection",
+      "status": "PASS",
+      "evidence": "tests/n44-finish-transport.local.json: six affected checks across actual source and bundle; dispatch invoked once using manual mode and original HMAC/body envelope; eight3xx statuses rejected without reading/following/exposing; original guards/body limits/private mapping retained."
+    },
+    {
+      "name": "n44_native_exact_ingress_source_and_binding_preservation",
+      "status": "NOT_RUN",
+      "evidence": "Read-only native baseline matched known-bad438bc572... source, existing five bindings (secret name only), deployed version64700bdd-201b-4bdf-9fe3-332bc7f034f0 and failclosed route. No upload or bindings change performed; corrected native exact-source/keep_bindings readback remains pending."
+    },
+    {
+      "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
+      "status": "PASS",
+      "evidence": "Reused original strictTLS/identity proof at 2026-10-19T04:07:25.540Z with source236f68e0131ca4d2b27fc3014cb33421f90b40c1; unchanged Edge/scheduler bundles and every prior manifest source except ingress verified by hashes. No database/Auth/secret/device/send/scheduler/frontend mutation; DNS10000 not retried."
+    }
+  ],
+  "blocker": "The activated /api/n44/status probe is outside the immutable existing ROUTE allowlist and returns401 before forwarding. Exact supported read-path probe correction is required before the one transport before/after pair and ingress upload. No fake503 or frontend/route change.",
+  "unchangedEvidenceReused": {
+    "restrictedTlsRecordedAt": "2026-10-19T04:07:25.540Z",
+    "edgeRecordedAt": "2026-10-19T04:14:18.138Z",
+    "secretConfig16": "Original historical providerSecretNamesAndDigestsMatched retained, no fresh secret read",
+    "scheduler": "Original cloudflare readbacks/versions retained unchanged; no scheduler request or upload",
+    "historicalCleanup": "tests/n44-finish-cleanup.json reused; no new temporary function deployed/disarmed/cleaned in this task",
+    "optionalDns": "Original10000 refusal retained and not retried"
+  }
+}

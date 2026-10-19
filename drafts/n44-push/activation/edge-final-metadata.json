@@ -2,9 +2,15 @@
   "projectId": "xlrubcwjqktzzunrvuns",
   "name": "n44-notifications",
   "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
-  "version": 4,
+  "version": 32,
   "status": "ACTIVE",
   "verifyJwt": false,
-  "providerBundleSha256": "8c46bff41a14277bd72f3905a51dc034abf902a1b5da189aa717a752e13d42f7",
-  "recordedAt": "2026-10-19T04:14:18.138Z"
+  "providerBundleSha256": "1c5aee48143a50a73f3a40d3a0c398e46e74b0927922a237a272750f6e16a512",
+  "sourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+  "recordedAt": "2026-10-19T07:15:29.980Z",
+  "providerUpdatedAt": "2026-10-19T07:13:58.116Z",
+  "nativeReadbackAt": "2026-10-19T07:14:09.809Z",
+  "nativeReadbackSource": "drafts/n44-push/activation/runtime-pool-role-native.json",
+  "originalActivationEvidenceReused": true,
+  "requestRuntimeAcceptance": "PASS_TYPED_REJECTED400"
 }

@@ -2,12 +2,18 @@
   "projectId": "xlrubcwjqktzzunrvuns",
   "function": "n44-notifications",
   "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
-  "sourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
-  "downloadedSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "sourceProvenance": "Original typed SQL/session-policy service metadata pin; distinct from changed diagnostic Edge bundle hash",
+  "sourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+  "downloadedSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
   "exactBytes": true,
   "importMapExact": true,
-  "recordedAt": "2026-10-19T04:05:25.202Z",
-  "finalProviderVersion": 4,
+  "recordedAt": "2026-10-19T07:15:29.980Z",
+  "finalProviderVersion": 32,
   "finalSourceBytesUnchanged": true,
-  "finalReadbackAt": "2026-10-19T04:15:23.880Z"
+  "finalSourceBytesScope": "Current corrected pooled-session bytes exactly match native source; changed from original activation and prior diagnostic",
+  "originalSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "originalActivationProviderVersion": 4,
+  "priorNativeProviderVersion": 31,
+  "upstreamSourceUnchanged": false,
+  "nativeReadbackAt": "2026-10-19T07:14:09.809Z"
 }

@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-19T06:01:21.375Z",
+  "kind": "single-public-fabricated-unauthorized-forwarding-probe",
+  "method": "POST",
+  "url": "https://rakeezx.com/api/n44/context/read",
+  "httpStatus": 503,
+  "cacheControl": "no-store, private",
+  "bodyRecorded": false,
+  "credentialUsed": false,
+  "accountOrDataMutation": false,
+  "protocolRoute": "existing-context-read",
+  "oldStatusRoute": "pre-forward-denial-only",
+  "reused": true,
+  "evidenceSource": "artifacts/ops-supervisor-v4/intake-evidence/po-20261019-supabase28p01/n44-correct-forward-route-before.json",
+  "admittedByCardRepairAt": "2026-10-19T06:05:50.121Z"
+}

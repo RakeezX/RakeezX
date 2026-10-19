@@ -1,0 +1,44 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
+  "recordedAt": "2026-10-19T06:01:59.476Z",
+  "checks": [
+    {
+      "name": "source_manual_forward_and_hmac",
+      "status": "PASS",
+      "evidence": "Actual handler invoked fixed dispatch once with manual redirect, original body-only bearer and valid source/body HMAC; upstream401 sanitized."
+    },
+    {
+      "name": "source_explicit_redirect_rejection",
+      "status": "PASS",
+      "evidence": "300/301/302/303/304/307/308/399 rejected503 without following, reading or exposing redirect body/location. Stalled body cancellation cannot delay rejection."
+    },
+    {
+      "name": "source_existing_guards_private_body_bounds",
+      "status": "PASS",
+      "evidence": "Unchanged disabled/method/route/query/provider TLS/worker-IP/upstream HTTPS/body guards reject before fetch; oversized upstream body fails closed."
+    },
+    {
+      "name": "bundle_manual_forward_and_hmac",
+      "status": "PASS",
+      "evidence": "Actual handler invoked fixed dispatch once with manual redirect, original body-only bearer and valid source/body HMAC; upstream401 sanitized."
+    },
+    {
+      "name": "bundle_explicit_redirect_rejection",
+      "status": "PASS",
+      "evidence": "300/301/302/303/304/307/308/399 rejected503 without following, reading or exposing redirect body/location. Stalled body cancellation cannot delay rejection."
+    },
+    {
+      "name": "bundle_existing_guards_private_body_bounds",
+      "status": "PASS",
+      "evidence": "Unchanged disabled/method/route/query/provider TLS/worker-IP/upstream HTTPS/body guards reject before fetch; oversized upstream body fails closed."
+    }
+  ],
+  "sourceSha256": "4bf6a01064a460cc696ee8eeeed01c0415abaa7a8e330f2ab16c4012fc0fc0ca",
+  "bundleSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+  "localForwardAttempted": true,
+  "rejectsRedirects": true,
+  "statusPathForwards": false,
+  "networkCalls": 0
+}

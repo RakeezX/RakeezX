@@ -1,0 +1,166 @@
+{
+  "recordedAt": "2026-10-19T05:58:26.349Z",
+  "settings": {
+    "result": {
+      "placement": {},
+      "compatibility_date": "2026-10-13",
+      "compatibility_flags": [],
+      "usage_model": "standard",
+      "tags": [],
+      "tail_consumers": [],
+      "logpush": false,
+      "annotations": {
+        "workers/triggered_by": "upload"
+      },
+      "bindings": [
+        {
+          "name": "N44_EDGE_URL",
+          "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications",
+          "type": "plain_text"
+        },
+        {
+          "name": "N44_ENABLED",
+          "text": "true",
+          "type": "plain_text"
+        },
+        {
+          "name": "N44_INGRESS_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "N44_PUBLIC_ORIGIN",
+          "text": "https://rakeezx.com",
+          "type": "plain_text"
+        },
+        {
+          "name": "N44_SCHEDULER_ENABLED",
+          "text": "false",
+          "type": "plain_text"
+        }
+      ]
+    },
+    "success": true,
+    "errors": [],
+    "messages": [],
+    "status": 200
+  },
+  "privacy": {
+    "result": {
+      "logpush": false,
+      "tags": null,
+      "tail_consumers": null,
+      "observability": null
+    },
+    "success": true,
+    "errors": [],
+    "messages": [],
+    "status": 200
+  },
+  "deployments": {
+    "result": {
+      "deployments": [
+        {
+          "id": "31128d40-8dd1-46f9-8d83-1f5421bcf607",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "64700bdd-201b-4bdf-9fe3-332bc7f034f0",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T04:12:40.97017Z"
+        },
+        {
+          "id": "08cdb68c-efeb-4b8f-b27d-a513ec203602",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "0f070371-5866-4f7b-9f5f-68bf6134ee6a",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T04:10:48.957484Z"
+        },
+        {
+          "id": "a522d399-f734-40b2-a714-bd135920ba97",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "94280ce2-5a76-41f1-91f0-feac5248b9d2",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T04:08:34.436891Z"
+        },
+        {
+          "id": "8f3430bb-82b7-4cbc-9215-098d01b6abfb",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "c01cf33a-c679-4077-97c8-9deebb526aea",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T04:06:47.25791Z"
+        },
+        {
+          "id": "e66ccd8f-02da-4c9f-b10c-c25951220d85",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "eff1dd2e-43bb-4990-8030-27df3004ba5c",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T03:59:53.722596Z"
+        }
+      ]
+    },
+    "success": true,
+    "errors": [],
+    "messages": [],
+    "result_info": {
+      "page": 1,
+      "per_page": 10,
+      "count": 5,
+      "total_count": 5,
+      "total_pages": 1
+    },
+    "status": 200
+  },
+  "source": {
+    "success": true,
+    "status": 200,
+    "result": "--834eebc51fd13dbfba2cf05e5a4f07b73431b832f44cae232272999a0ebe\r\nContent-Disposition: form-data; name=\"worker.mjs\"\r\n\r\n// drafts/n44-push/web-protocol.mjs\nvar ROUTE = /^\\/api\\/n44\\/(?:context\\/(?:read|update)|events\\/(?:update|authorize)|push\\/(?:register|revoke))$/;\nvar FORWARDED = Object.freeze([\"authorization\", \"origin\", \"content-type\", \"x-n44-csrf\", \"sec-fetch-site\"]);\nvar encodeBytes = (bytes) => btoa(String.fromCharCode(...bytes));\nvar hex = (bytes) => Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, \"0\")).join(\"\");\nasync function sha(bytes) {\n  return hex(await crypto.subtle.digest(\"SHA-256\", bytes));\n}\nasync function mac(key, value) {\n  const k = await crypto.subtle.importKey(\"raw\", key, { name: \"HMAC\", hash: \"SHA-256\" }, false, [\"sign\"]);\n  return hex(await crypto.subtle.sign(\"HMAC\", k, new TextEncoder().encode(value)));\n}\nfunction signingText({ origin, path, method, headers, bodyHash, time, nonce, source }) {\n  return JSON.stringify([\"n44-ingress-v1\", origin, path, method, FORWARDED.map((n) => headers.get(n) || \"\"), bodyHash, time, nonce, source]);\n}\nasync function readBytes(stream, max = 12288, signal) {\n  if (!stream) return new Uint8Array();\n  const reader = stream.getReader();\n  let total = 0;\n  const parts = [];\n  const cancel = () => {\n    void reader.cancel().catch(() => {\n    });\n  };\n  signal?.addEventListener(\"abort\", cancel, { once: true });\n  try {\n    for (; ; ) {\n      if (signal?.aborted) throw Error(\"n44_deadline\");\n      const { done, value } = await reader.read();\n      if (done) break;\n      total += value.length;\n      if (total > max) throw Error(\"n44_body_limit\");\n      parts.push(value);\n    }\n    const bytes = new Uint8Array(total);\n    let at = 0;\n    for (const p of parts) {\n      bytes.set(p, at);\n      at += p.length;\n    }\n    return bytes;\n  } finally {\n    signal?.removeEventListener(\"abort\", cancel);\n    void reader.cancel().catch(() => {\n    });\n    reader.releaseLock();\n  }\n}\nvar PRIVATE_WEB_HEADERS = Object.freeze({\n  \"cache-control\": \"no-store, private\",\n  \"referrer-policy\": \"no-referrer\",\n  \"x-robots-tag\": \"noindex, nofollow, noarchive\",\n  \"x-content-type-options\": \"nosniff\",\n  vary: \"Origin\",\n  \"content-type\": \"application/json; charset=utf-8\"\n});\nvar privateResponse = (status = 503) => new Response('{\"error\":\"unavailable\"}', { status, headers: PRIVATE_WEB_HEADERS });\n\n// drafts/n44-push/cloudflare-entry.mjs\nfunction createCloudflareEntry({ fetch: send = globalThis.fetch, now = Date.now } = {}) {\n  return async (request, env) => {\n    if (env?.N44_ENABLED !== \"true\") return privateResponse();\n    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 12e3);\n    try {\n      const url = new URL(request.url), origin = env.N44_PUBLIC_ORIGIN, upstream = new URL(env.N44_EDGE_URL);\n      if (url.origin !== origin || url.protocol !== \"https:\" || url.search || !ROUTE.test(url.pathname) || request.method !== \"POST\" || !request.cf || ![\"TLSv1.2\", \"TLSv1.3\"].includes(request.cf.tlsVersion) || request.headers.has(\"cf-worker\") || upstream.protocol !== \"https:\" || upstream.username || upstream.password || upstream.search || upstream.hash || !/^\\/functions\\/v1\\/n44-notifications$/.test(upstream.pathname)) return privateResponse(401);\n      let ip = request.headers.get(\"cf-connecting-ip\");\n      if (!ip || ip.length > 45 || !/^[a-fA-F0-9:.]+$/.test(ip)) return privateResponse(401);\n      if (ip.includes(\":\")) ip = new URL(\"http://[\" + ip + \"]/\").hostname.toLowerCase();\n      else if (!/^(?:\\d{1,3}\\.){3}\\d{1,3}$/.test(ip) || ip.split(\".\").some((p) => Number(p) > 255 || String(Number(p)) !== p)) return privateResponse(401);\n      const keyText = env.N44_INGRESS_KEY;\n      if (!/^[a-f0-9]{64}$/.test(keyText || \"\")) return privateResponse();\n      const key = Uint8Array.from(keyText.match(/../g), (x) => parseInt(x, 16));\n      const headers = new Headers();\n      for (const n of FORWARDED) {\n        const v = request.headers.get(n);\n        if (v !== null) headers.set(n, v);\n      }\n      const bytes = await readBytes(request.body, 12288, abort.signal);\n      const time = String(Math.floor(now() / 1e3)), nonce = crypto.randomUUID(), source = await mac(key, JSON.stringify([\"source-v1\", ip]));\n      const signature = await mac(key, signingText({ origin, path: url.pathname, method: request.method, headers, bodyHash: await sha(bytes), time, nonce, source }));\n      const wire = new Headers({ \"content-type\": \"application/json\" });\n      for (const [n, v] of Object.entries({ \"x-n44-time\": time, \"x-n44-nonce\": nonce, \"x-n44-source\": source, \"x-n44-signature\": signature })) wire.set(n, v);\n      const payload = JSON.stringify({ path: url.pathname, method: request.method, headers: FORWARDED.map((n) => headers.get(n) || \"\"), body: encodeBytes(bytes) });\n      if (new TextEncoder().encode(payload).length > 32768) return privateResponse(413);\n      const result = await send(upstream.href + \"/dispatch\", {\n        method: \"POST\",\n        headers: wire,\n        body: payload,\n        signal: abort.signal,\n        redirect: \"error\",\n        cache: \"no-store\"\n      });\n      const responseBytes = await readBytes(result.body, 2 * 1024 * 1024, abort.signal);\n      if (!result.ok) return privateResponse(result.status === 429 ? 429 : result.status >= 500 ? 503 : 401);\n      const reply = JSON.parse(new TextDecoder(\"utf-8\", { fatal: true }).decode(responseBytes));\n      if (!reply || Object.keys(reply).sort().join(\",\") !== \"body,status\" || ![200, 400, 401, 413, 429, 503].includes(reply.status)) return privateResponse();\n      const out = new Headers(PRIVATE_WEB_HEADERS);\n      return new Response(JSON.stringify(reply.body), { status: reply.status, headers: out });\n    } catch {\n      return privateResponse();\n    } finally {\n      clearTimeout(timer);\n      abort.abort();\n    }\n  };\n}\nvar cloudflare_entry_default = { fetch: createCloudflareEntry() };\nexport {\n  createCloudflareEntry,\n  cloudflare_entry_default as default\n};\n\r\n--834eebc51fd13dbfba2cf05e5a4f07b73431b832f44cae232272999a0ebe--\r\n"
+  }
+}

@@ -3,14 +3,15 @@
     {
       "name": "n44-notifications-ingress",
       "status": 200,
-      "deploymentId": "31128d40-8dd1-46f9-8d83-1f5421bcf607",
+      "deploymentId": "9c299159-27e3-462d-834b-953da989a106",
       "versions": [
         {
-          "version_id": "64700bdd-201b-4bdf-9fe3-332bc7f034f0",
+          "version_id": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
           "percentage": 100
         }
       ],
-      "createdOn": "2026-10-19T04:12:40.97017Z"
+      "createdOn": "2026-10-19T06:35:27.860065Z",
+      "recordedAt": "2026-10-19T06:35:52.750Z"
     },
     {
       "name": "n44-notifications-scheduler",
@@ -32,5 +33,10 @@
       "script": "n44-notifications-ingress",
       "request_limit_fail_open": false
     }
-  ]
+  ],
+  "transportCorrection": {
+    "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+    "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+    "schedulerVersionReused": true
+  }
 }

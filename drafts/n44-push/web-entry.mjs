@@ -4,12 +4,13 @@ import {timingSafeEqual} from 'node:crypto';
 import {createBackend} from './backend.mjs';
 import {parseBody} from './runtime-gateway.mjs';
 import {ROUTE,FORWARDED,readBytes,decodeBytes,sha,mac,signingText,privateResponse,PRIVATE_WEB_HEADERS} from './web-protocol.mjs';
+import {requestFailure} from './runtime-failure.mjs';
 export function createWebEntry(options) {
  const backend=createBackend(options),now=options.now??Date.now;let running=0;
  return async request=>{
   if(running>=4)return privateResponse();running++;
   const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),15000);
-  const work=async()=>{
+  let authenticated=false;const work=async()=>{
    try {
     const u=new URL(request.url),h=request.headers,schedule=u.pathname==='/functions/v1/n44-notifications/schedule';
     if(u.origin!==options.authUrl||u.search||request.method!=='POST'||h.get('content-type')!=='application/json'||h.has('content-encoding')||
@@ -32,14 +33,15 @@ export function createWebEntry(options) {
      path=envelope.path.slice('/api/n44'.length);authorization=forwarded.get('authorization');body=parseBody(new TextDecoder('utf-8',{fatal:true}).decode(raw));
     }
     if(!timingSafeEqual(Buffer.from(expected,'hex'),Buffer.from(sig,'hex')))return privateResponse(401);
+    authenticated=true;
     if(!await backend.ingress({...e,kind:schedule?'scheduler':'teacher'},abort.signal))return privateResponse(429);
     const result=schedule?await backend.schedule(envelope,abort.signal):await backend.teacher(path,authorization,body,abort.signal);
     if(abort.signal.aborted)return privateResponse();
     const status=result.status==='unavailable'?503:result.status==='limited'?429:['rejected','stale'].includes(result.status)?400:200;
     return schedule?Response.json(result,{status,headers:PRIVATE_WEB_HEADERS}):Response.json({status,body:result},{headers:PRIVATE_WEB_HEADERS});
-   }catch{return privateResponse();}
+   }catch(e){return authenticated?requestFailure(e,'ingress'):privateResponse();}
   };
-  try{const pending=work().finally(()=>{running--;});return await Promise.race([pending,new Promise(resolve=>abort.signal.addEventListener('abort',()=>resolve(privateResponse()),{once:true}))]);}
+  try{const pending=work().finally(()=>{running--;});return await Promise.race([pending,new Promise(resolve=>abort.signal.addEventListener('abort',()=>resolve(authenticated?requestFailure(null,'deadline'):privateResponse()),{once:true}))]);}
   finally{clearTimeout(timer);abort.abort();}
  };
 }

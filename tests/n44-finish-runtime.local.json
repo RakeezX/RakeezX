@@ -1,0 +1,29 @@
+{
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "b7a2a2e4-c4bc-4cce-ac9d-e02740bc494f",
+  "recordedAt": "2026-10-19T06:58:23.026Z",
+  "checks": [
+    {
+      "name": "static_phase_redaction_actual_signed_entry",
+      "status": "PASS",
+      "evidence": "Finite phases only, no error message/property inspection; actual ingress/HMAC/WebRequest/backend acquire failures return public503 with sanitized enum. Unknown input maps fixed configuration."
+    },
+    {
+      "name": "typed400_full_synthetic_entry_and_durable_ack",
+      "status": "PASS",
+      "evidence": "Actual ingress/WebRequest/backend + official AuthClient rejects shape-correct nonJWT; both ingress/teacher transactions commit before public typed400; no Auth/owner/canonical query or provider request."
+    },
+    {
+      "name": "rollback_and_untrusted_deny_unchanged",
+      "status": "PASS",
+      "evidence": "Actual query failure rolls back with no commit; unsigned preflight remains401 without diagnostic stage. Existing size/HMAC/private/saturation guards retained."
+    },
+    {
+      "name": "definitive_abort_retry_and_uncertain_ack_no_replay",
+      "status": "PASS",
+      "evidence": "Actual repository through sanitized query errors retries40001/40P01 only once after rollback; lost COMMIT ACK is not retried or returned. Error getters/arbitrary codes are not copied; public responses remain enum-only."
+    }
+  ],
+  "scope": "Injected ports only; no hosted readiness or actual private SQL proof",
+  "networkCalls": 0
+}

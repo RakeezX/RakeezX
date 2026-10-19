@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+  "recordedAt": "2026-10-19T07:14:16.517Z",
+  "phase": "fix1",
+  "url": "https://rakeezx.com/api/n44/context/read",
+  "method": "POST",
+  "httpStatus": 400,
+  "elapsedMs": 6197,
+  "expectedContractStatus": 400,
+  "bodyKeys": [
+    "status"
+  ],
+  "identity": {},
+  "failurePhase": null,
+  "typedRejectedSession": true,
+  "cacheControl": "no-store, private",
+  "completeSyntheticShapeValidatedOffline": true,
+  "noRealCredentialOrAccount": true,
+  "bodyOrBearerRecorded": false
+}

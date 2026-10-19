@@ -1,23 +1,29 @@
 {
   "aiAuthored": true,
-  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
-  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
-  "recordedAt": "2026-10-19T04:16:29.540Z",
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+  "recordedAt": "2026-10-19T07:15:29.980Z",
   "state": "LOCAL_READY",
-  "scope": "Actual original nonsending service activation only; frontend publisher/PO/device acceptance separate",
+  "scope": "Existing ingress supported transport plus pooled request-session role restoration; actual guarded typed400 rejected. No full Product/OS acceptance.",
   "projectId": "xlrubcwjqktzzunrvuns",
   "serviceSourceSha": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
   "edgeFunction": {
     "projectId": "xlrubcwjqktzzunrvuns",
     "name": "n44-notifications",
     "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
-    "version": 4,
+    "version": 32,
     "status": "ACTIVE",
     "verifyJwt": false,
-    "providerBundleSha256": "8c46bff41a14277bd72f3905a51dc034abf902a1b5da189aa717a752e13d42f7",
-    "recordedAt": "2026-10-19T04:14:18.138Z"
+    "providerBundleSha256": "1c5aee48143a50a73f3a40d3a0c398e46e74b0927922a237a272750f6e16a512",
+    "sourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+    "recordedAt": "2026-10-19T07:15:29.980Z",
+    "providerUpdatedAt": "2026-10-19T07:13:58.116Z",
+    "nativeReadbackAt": "2026-10-19T07:14:09.809Z",
+    "nativeReadbackSource": "drafts/n44-push/activation/runtime-pool-role-native.json",
+    "originalActivationEvidenceReused": true,
+    "requestRuntimeAcceptance": "PASS_TYPED_REJECTED400"
   },
-  "edgeSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "edgeSourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
   "restrictedIdentityAndFullTls": {
     "projectId": "xlrubcwjqktzzunrvuns",
     "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
@@ -120,8 +126,441 @@
     "liveMutationLeaseReleased": true,
     "plaintextTransientInputsAbsent": true,
     "ownedBrowserServerProcessesCreated": false,
-    "encryptedRecoveryRetained": true
+    "encryptedRecoveryRetained": true,
+    "originalCustodyAccessed": false,
+    "providerMutationPerformed": true,
+    "liveMutationLeaseAcquired": true,
+    "priorOwnedLeaseReleaseReused": true,
+    "leaseDisposition": "RELEASED_EXACT_CURRENT_OWNER"
   },
   "noFrontendPublication": true,
-  "productClosed": false
+  "productClosed": false,
+  "originalActivationEvidence": {
+    "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+    "originalRecordedAt": "2026-10-19T04:16:29.540Z",
+    "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.json",
+    "reused": true
+  },
+  "transportCompatibility": {
+    "version": 1,
+    "platform": "cloudflare-workers",
+    "redirectMode": "manual",
+    "rejectsRedirects": true,
+    "localForwardAttempted": true,
+    "beforeHttpStatus": 503,
+    "afterHttpStatus": 400,
+    "probeMethod": "POST",
+    "probePath": "/api/n44/context/read",
+    "upstreamSourceUnchanged": false,
+    "originalCustodyUntouched": true,
+    "bindingsPreserved": true,
+    "nativeSourceExact": true,
+    "correctedIngressUploaded": true,
+    "beforeRecordedAt": "2026-10-19T06:01:21.375Z",
+    "afterRecordedAt": "2026-10-19T07:14:16.517Z",
+    "unauthorizedAcceptancePassed": true,
+    "expectedAfterHttpStatus": 400,
+    "typedRejectedSession": true,
+    "completeSyntheticShapeValidatedOffline": true,
+    "runtimeGuardExecuted": true,
+    "observedRuntimePhase": "complete",
+    "normalFinalProof": "PASS",
+    "historicalIdentityDiagnostic": {
+      "loginExact": true,
+      "roleExact": true,
+      "upstreamSsl": false,
+      "clientTlsAuthorized": true,
+      "queryCompleted": true,
+      "returnedOneRow": true,
+      "targetKind": "direct"
+    }
+  },
+  "actualTransportUnauthorizedHttp": [
+    {
+      "at": "2026-10-19T06:01:21.375Z",
+      "kind": "single-public-fabricated-unauthorized-forwarding-probe",
+      "method": "POST",
+      "url": "https://rakeezx.com/api/n44/context/read",
+      "httpStatus": 503,
+      "cacheControl": "no-store, private",
+      "bodyRecorded": false,
+      "credentialUsed": false,
+      "accountOrDataMutation": false,
+      "protocolRoute": "existing-context-read",
+      "oldStatusRoute": "pre-forward-denial-only",
+      "reused": true,
+      "evidenceSource": "artifacts/ops-supervisor-v4/intake-evidence/po-20261019-supabase28p01/n44-correct-forward-route-before.json",
+      "admittedByCardRepairAt": "2026-10-19T06:05:50.121Z"
+    },
+    {
+      "aiAuthored": true,
+      "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+      "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+      "recordedAt": "2026-10-19T06:36:03.373Z",
+      "phase": "after",
+      "url": "https://rakeezx.com/api/n44/context/read",
+      "method": "POST",
+      "httpStatus": 503,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private",
+      "requestOrigin": "https://rakeezx.com",
+      "csrfAndSameOriginProtocol": true,
+      "fakeUnauthorizedBearer": true,
+      "personalData": false,
+      "credentialsPersisted": false,
+      "requestBodyPersisted": false,
+      "probePathAllowed": true
+    },
+    {
+      "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+      "runId": "b7a2a2e4-c4bc-4cce-ac9d-e02740bc494f",
+      "recordedAt": "2026-10-19T06:51:46.679Z",
+      "phase": "diagnostic",
+      "url": "https://rakeezx.com/api/n44/context/read",
+      "method": "POST",
+      "httpStatus": 503,
+      "elapsedMs": 5213,
+      "expectedContractStatus": 400,
+      "bodyKeys": [
+        "error",
+        "phase"
+      ],
+      "failurePhase": "identity",
+      "typedRejectedSession": false,
+      "cacheControl": "no-store, private",
+      "completeSyntheticShapeValidatedOffline": true,
+      "noRealCredentialOrAccount": true,
+      "bodyOrBearerRecorded": false
+    },
+    {
+      "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+      "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+      "recordedAt": "2026-10-19T07:08:04.909Z",
+      "phase": "predicate1",
+      "url": "https://rakeezx.com/api/n44/context/read",
+      "method": "POST",
+      "httpStatus": 503,
+      "elapsedMs": 5071,
+      "expectedContractStatus": 400,
+      "bodyKeys": [
+        "error",
+        "identity",
+        "phase"
+      ],
+      "identity": {
+        "loginExact": true,
+        "roleExact": true,
+        "upstreamSsl": false,
+        "clientTlsAuthorized": true,
+        "queryCompleted": true,
+        "returnedOneRow": true,
+        "targetKind": "direct"
+      },
+      "failurePhase": "identity",
+      "typedRejectedSession": false,
+      "cacheControl": "no-store, private",
+      "completeSyntheticShapeValidatedOffline": true,
+      "noRealCredentialOrAccount": true,
+      "bodyOrBearerRecorded": false
+    },
+    {
+      "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+      "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+      "recordedAt": "2026-10-19T07:14:16.517Z",
+      "phase": "fix1",
+      "url": "https://rakeezx.com/api/n44/context/read",
+      "method": "POST",
+      "httpStatus": 400,
+      "elapsedMs": 6197,
+      "expectedContractStatus": 400,
+      "bodyKeys": [
+        "status"
+      ],
+      "identity": {},
+      "failurePhase": null,
+      "typedRejectedSession": true,
+      "cacheControl": "no-store, private",
+      "completeSyntheticShapeValidatedOffline": true,
+      "noRealCredentialOrAccount": true,
+      "bodyOrBearerRecorded": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "n44_actual_cloudflare_proper_post_before_and_after",
+      "status": "PASS",
+      "evidence": "Original correct-path before503 at2026-10-19T06:01:21.375Z reused. Exact shape-correct fake-session POST at 2026-10-19T07:14:16.517Z returned400 with only status:rejected, no-store/private. All intermediate503 and obsolete401 expectations retained historically."
+    },
+    {
+      "name": "n44_manual_redirect_and_explicit_redirect_rejection",
+      "status": "PASS",
+      "evidence": "Reused six source/bundle handler tests and unchanged native ingress SHA256 cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7. Manual forward and explicit3xx rejection remain; no repeated suite/upload."
+    },
+    {
+      "name": "n44_native_exact_ingress_source_and_binding_preservation",
+      "status": "PASS",
+      "evidence": "Existing keep_bindings native source/deployment/route/privacy proof reused unchanged; scheduler untouched. Current Edge source read back exactly at version32 without secret/config operations."
+    },
+    {
+      "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
+      "status": "PASS",
+      "evidence": "All four original identity/TLS assertions, strict CA/hostname and private42-routine guards retained. RESET ROLE restores original session authority before verification, then existing SET ROLE narrows to backend before private work. Original TLS/config/schema proof retains its real timestamps; no account/student/Auth/secret/config/schema/role-grant/send/device/cron/logging changes."
+    },
+    {
+      "name": "n44_service_request_runtime_phase_diagnosis_and_fix",
+      "status": "PASS",
+      "evidence": "Version31 diagnostic proved completed one-row query with upstreamSsl=false and other predicates true. Source showed pooled SET ROLE survives release and restricts login-owned stats visibility. New shared session preparation resets original role before every identity query, re-enters backend before private/source checks; targeted reused-session negatives PASS and exact version32 normal POST400 confirms correction."
+    },
+    {
+      "name": "n44_actual_typed_rejected_session_contract400",
+      "status": "PASS",
+      "evidence": "tests/n44-finish-runtime.fix1.json: actual POST400 at 2026-10-19T07:14:16.517Z, status-only rejected body, complete synthetic nonJWT/two-id protocol shape, no real Auth/owner/account rows. Same changed-source corrective request supplies normal final gate; no unchanged extra probe."
+    },
+    {
+      "name": "n44_existing_edge_native_source_and_unchanged_private_guards",
+      "status": "PASS",
+      "evidence": "Native existing function version32, verify_jwt=false, exact source/import map; Edge SHA256 705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f. Targeted predicate/redaction3 cases plus two-acquisition role-restoration/false-guard/reset-failure proof PASS. Prior request/rollback40001-40P01/lost-COMMIT/deadline evidence reused unchanged."
+    }
+  ],
+  "blocker": null,
+  "unchangedEvidenceReused": {
+    "restrictedTlsRecordedAt": "2026-10-19T04:07:25.540Z",
+    "edgeRecordedAt": "2026-10-19T04:14:18.138Z",
+    "secretConfig16": "Original historical providerSecretNamesAndDigestsMatched retained, no fresh secret read",
+    "scheduler": "Original cloudflare readbacks/versions retained unchanged; no scheduler request or upload",
+    "historicalCleanup": "tests/n44-finish-cleanup.json reused; no new temporary function deployed/disarmed/cleaned in this task",
+    "optionalDns": "Original10000 refusal retained and not retried"
+  },
+  "priorBlockedEvidence": [
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-9485ed5a.json",
+      "sha256": "2a42a0680ca7f0febcfb0ee8a23cbd47efaafb8201d0c6a759485fa251a4006e",
+      "candidateSha": "f9a1e579a3d5344f6622849b3e638f10b4d11d71"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-9485ed5a.json",
+      "sha256": "91b6afba9a67400eb149703fb9b092f5d1c7aeffd35afd01cebcb90e5c876fb9",
+      "candidateSha": "f9a1e579a3d5344f6622849b3e638f10b4d11d71"
+    },
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-65b5a648.json",
+      "sha256": "c0ffbef9458bbbcfcc6a670a10abda2beef8e3b226167479723eb4b659e2ce41",
+      "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-65b5a648.json",
+      "sha256": "9920a7042926dba1716553fa6d1201cf971815add6f3675116f845d0ec855169",
+      "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+    }
+  ],
+  "correctedProbeAuthority": {
+    "cardRepairAt": "2026-10-19T06:05:50.121Z",
+    "path": "/api/n44/context/read",
+    "productionAllowlistChanged": false
+  },
+  "probeInputConformance": {
+    "completeSyntheticShapeValidatedOffline": true,
+    "noRealJwtOrAccount": true,
+    "diagnosticRequestConsumed": true,
+    "finalNormalRequestPerformed": true,
+    "finalNormalRequestReceipt": "tests/n44-finish-runtime.fix1.json"
+  },
+  "nativeIngressEvidence": {
+    "upload": "drafts/n44-push/activation/transport-upload-receipt.json",
+    "readback": "drafts/n44-push/activation/transport-after-native.json",
+    "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+    "deploymentId": "9c299159-27e3-462d-834b-953da989a106",
+    "version": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
+    "recordedAt": "2026-10-19T06:35:52.750Z"
+  },
+  "historicalPrivacyEvidenceReused": true,
+  "currentRequestRuntime": {
+    "version": 1,
+    "phase": "complete",
+    "diagnosisObserved": true,
+    "configurationCompleted": true,
+    "connectionAcquired": true,
+    "identityGuardCompleted": true,
+    "identityBooleanValues": null,
+    "rolePrivateSourceReached": true,
+    "fixApplied": true,
+    "sanitizerRetryMetadataCorrected": true,
+    "diagnosticRequestConsumed": true,
+    "finalNormalProof": "PASS",
+    "diagnosticSourceSha256": "8c30b7c09e76c76c66433fc32c76c4cee242a3dd47a74e45b9377b956c759f3b",
+    "observedProviderVersion": 32,
+    "currentSourceSha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f",
+    "providerVersion": 32,
+    "probe": "tests/n44-finish-runtime.fix1.json",
+    "local": "tests/n44-finish-runtime.local.json",
+    "deadline": "tests/n44-finish-runtime.deadline.json",
+    "privateBindingsChanged": false,
+    "nonsecretConfigurationChanged": false,
+    "guardPathsUnchanged": [
+      "drafts/n44-push/readiness-entry.mjs",
+      "drafts/n44-push/backend.mjs",
+      "drafts/n44-push/auth-verifier.mjs",
+      "drafts/n44-push/activation/private-error-boundary.mjs",
+      "drafts/n44-push/activation/error-boundary-contract.json",
+      "drafts/n44-push/activation/error-boundary-identities.json"
+    ],
+    "identityQueryCompleted": true,
+    "identityReturnedOneRow": null,
+    "configuredTargetKind": "direct",
+    "observedFailedPredicate": null,
+    "queryFailureClassification": null,
+    "conditionalSessionTargetRemedyApplied": false,
+    "predicateLocal": "tests/n44-finish-runtime.identity-local.json",
+    "newPhasesConsumed": 2,
+    "maxMaterialPhasesAuthorizedThisRun": 4,
+    "transportGuardScope": "Only optional safe query observer added; all original transport/identity predicates retained. Configured target enum is not an independent socket/route attestation.",
+    "fix": "restore-original-role-before-pooled-identity-check",
+    "historicalDiagnosticIdentity": {
+      "loginExact": true,
+      "roleExact": true,
+      "upstreamSsl": false,
+      "clientTlsAuthorized": true,
+      "queryCompleted": true,
+      "returnedOneRow": true,
+      "targetKind": "direct"
+    },
+    "historicalDiagnosticProbe": "tests/n44-finish-runtime.predicate1.json",
+    "poolRoleLocal": "tests/n44-finish-runtime.pool-role.json",
+    "guardExecutionEvidence": "Exact native source reaches typed400 only after restricted identity/TLS, backend-role private session/source boundary and durable ingress/teacher transaction checks. Current booleans not directly echoed; no fresh positive readiness endpoint or config16 readback claimed."
+  },
+  "historicalProbeInputConformance": {
+    "consumedRequestConformsToFullServiceInput": false,
+    "bearerBelowServiceMinimum": true,
+    "contextBodyMissingRequiredKeys": true,
+    "actual503CauseProved": false,
+    "correctedHarnessPreparedOffline": true,
+    "correctedHarnessSent": false,
+    "authorizedAfterRequestConsumed": true,
+    "automaticRetryAllowed": false
+  },
+  "runtimeArchive": [
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-activation-final.json",
+      "sha256": "769aefaebe779f7c4b629b41400e6e6ecf530475a9dc910f770f721b0fce71a9",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-transport.result.json",
+      "sha256": "fbbeb7af2491d4291d7ec2f57b28194444d7f6304c6430ffc0c74276dd854e7f",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/manifest.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/manifest.json",
+      "sha256": "4943197a138166e40d948194629625e4eda31d80ddd9433e24eced95c550706f",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-final-metadata.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-final-metadata.json",
+      "sha256": "28c78fa091aa44d4024d320c466076eeab15089902cfc9c4d0000cad55611f0c",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-source-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-source-readback.json",
+      "sha256": "e7a72593caab48a04c63bf05816f54761e08700ab4bb4f4de8fd2ed2f36e0557",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-activation-final.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "eac84d52166b3810790571bae55c40835311aaadcb60242e45262ed751bd1acc"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/n44-finish-transport.result.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "1261878455d74a930ab22d27b2073b132de106f84559407fefad8e9164cb72e1"
+    },
+    {
+      "source": "drafts/n44-push/activation/manifest.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/manifest.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "93f88b0c9a9331b671cf3a0d73d2de54305020f2dc91faf5ef9f94e7e44df8f2"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-final-metadata.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-final-metadata.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "7445ca7c12f111e11e944c0cabbe0c235d7c2b8600e11b94e466856fe635d554"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-source-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/edge-source-readback.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "274b3e99547894b70b08dde839e708946858b8c921cfd62547bc0a4dc653ac4d"
+    },
+    {
+      "source": "drafts/n44-push/activation/runtime-final-native.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-native.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "b1331b34ea6ad7e05df89f82a316f7b76921c874a1e0fddff35b8b7a689e8643"
+    },
+    {
+      "source": "drafts/n44-push/activation/runtime-final-deploy.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-6cb/runtime-final-deploy.json",
+      "sourceCommit": "6cb6149b8509566d5b25acbbdedfdd074edfe66d",
+      "sha256": "4c3cc664d62769496a85909462d019b76068d8c90122b7134edc1bfcbf7ccc34"
+    },
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-activation-final.json",
+      "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+      "sha256": "6f42a2a83377f46f4b92d87459b095b32cc525793184f33442a30c0c6c6e0a1e"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/n44-finish-transport.result.json",
+      "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+      "sha256": "e9b5faf8ac960822872ca2bfd4e241197413352c683fb62bbf0e245479cab4a5"
+    },
+    {
+      "source": "drafts/n44-push/activation/manifest.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/manifest.json",
+      "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+      "sha256": "23b7756b3f454bc5a03a5a63d4ec18d317a5a46af063e5420fc7bb8b1beb3838"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-final-metadata.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-final-metadata.json",
+      "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+      "sha256": "8749c9f663d34f4b323bff6a8f496b7e0c3391415d8aad36bbe59c83f3abbb8d"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-source-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/edge-source-readback.json",
+      "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+      "sha256": "4f22c52c27cbf40eb6d7c59f5a520b3239563759a50a371fdca6d42fc0b6e154"
+    },
+    {
+      "source": "drafts/n44-push/activation/runtime-final-native.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-native.json",
+      "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+      "sha256": "ae10aecab0908c996f01552eee6de2950292b3a1d0bd09402334f912f0047f6c"
+    },
+    {
+      "source": "drafts/n44-push/activation/runtime-final-deploy.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-85b/runtime-final-deploy.json",
+      "sourceCommit": "85b7ae312d3c23ee56a55df1c36ef935c1d8f21a",
+      "sha256": "3b65e09192dc8a26b2e233f69d29aba0925bf68ac9e321e4ae5abad60f83238c"
+    }
+  ],
+  "readinessEvidenceScope": "Original positive role/TLS/config/schema readbacks reused with original timestamps. Current normal request proves guarded typed denial and durable ingress/teacher path; no fresh full positive readiness or Product/OS delivery inferred."
 }
