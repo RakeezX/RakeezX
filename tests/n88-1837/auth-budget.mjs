@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';import {readFile,writeFile} from 'node:fs/promises';import {execFileSync} from 'node:child_process';import {createRequire} from 'node:module';import {pathToFileURL} from 'node:url';import {A,B,SESSION,authUrl,providerFixture} from '../fixtures/n88-existing-host/provider.mjs';
+const sdk=createRequire('C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018/drafts/n88-student-portal/package.json').resolve('@supabase/auth-js'),load=async s=>import('data:text/javascript;base64,'+Buffer.from(s.replace("'@supabase/auth-js'",JSON.stringify(pathToFileURL(sdk).href))).toString('base64'));
+const old=await load(execFileSync('git',['show','a0490e3e54b11498406bad71c70ab5485920f26e:drafts/n88-student-portal/auth-verifier.mjs'],{encoding:'utf8'})),next=await load(await readFile('drafts/n88-student-portal/auth-verifier.mjs','utf8'));
+const delay=ms=>new Promise(ok=>setTimeout(ok,ms)),rows={rows:[{user_id:A,session_id:SESSION}]},report={status:'FAIL',scope:'Real pinned official SDK with existing synthetic provider; only changed SQL-wait/Auth-budget seam, no real SQL/provider request'};
+try{
+ const p=providerFixture(),options={authUrl,apiKey:'FABRICATED_PUBLIC_API_KEY',fetch:p.fetch},token=p.token(),ports={query:async()=>{await delay(2200);return rows;}};
+ assert.equal(await old.createTeacherVerifier(options)('Bearer '+token,undefined,ports),null);report.baseline='Valid synthetic bearer incorrectly denied after a2200ms separately bounded SQL wait';
+ const guards=[];assert.deepEqual(await next.createTeacherVerifier(options)('Bearer '+token,undefined,{...ports,beforeCommit:f=>guards.push(f)}),{ownerId:A,sessionId:SESSION,current:true});assert.equal(guards.length,1);await guards[0]();
+ assert.equal(await next.createTeacherVerifier(options)('Bearer '+token,undefined,{query:async()=>({rows:[{user_id:B,session_id:SESSION}]})}),null);
+ const ac=new AbortController();const work=next.createTeacherVerifier(options)('Bearer '+token,ac.signal,{query:async()=>{ac.abort();return rows;}});assert.equal(await work,null);
+ p.delay=true;const t=performance.now();assert.equal(await next.createTeacherVerifier({...options,authDeadlineMs:40})('Bearer '+token,undefined,{query:async()=>rows}),null);assert(performance.now()-t<1000);
+ report.status='PASS';report.checks=['SQL wait no longer spends provider2s budget','fresh exact getUser and beforeCommit session fence retained','wrong user/session and parent cancellation failclosed','provider network deadline remains bounded; no retries'];report.realTeacherCause='Source defect reproduced; hosted user causality not claimed';
+}catch(e){report.failure={name:e.name,message:e.message};process.exitCode=1;}
+await writeFile('tests/n88-1837/auth-budget.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

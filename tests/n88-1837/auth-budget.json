@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "scope": "Real pinned official SDK with existing synthetic provider; only changed SQL-wait/Auth-budget seam, no real SQL/provider request",
+  "baseline": "Valid synthetic bearer incorrectly denied after a2200ms separately bounded SQL wait",
+  "checks": [
+    "SQL wait no longer spends provider2s budget",
+    "fresh exact getUser and beforeCommit session fence retained",
+    "wrong user/session and parent cancellation failclosed",
+    "provider network deadline remains bounded; no retries"
+  ],
+  "realTeacherCause": "Source defect reproduced; hosted user causality not claimed"
+}

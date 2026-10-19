@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n88-actual-teacher-and-brand-entry-20261019",
+  "runId": "0f958d3a-36e2-4a23-9c15-80f691f15ddc",
+  "status": "FAIL",
+  "checks": [],
+  "timings": [],
+  "hostedOwnerProof": false,
+  "privateBrowserRefusalPreserved": true,
+  "failure": {
+    "name": "Error",
+    "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name browser -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-actual-teacher-and-brand-entry-20261019.json -WaitSeconds 0 -OwnerToken 0f958d3a-36e2-4a23-9c15-80f691f15ddc"
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "not acquired"
+  }
+}

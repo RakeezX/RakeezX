@@ -14,7 +14,12 @@ export function createTeacherVerifier({authUrl,apiKey,fetch:send=globalThis.fetc
     const cancel=()=>abort.abort(); parentSignal?.addEventListener('abort',cancel,{once:true});
     if(parentSignal?.aborted) abort.abort();
     let expired=false;
-    const timer=setTimeout(()=>{expired=true;abort.abort();},authDeadlineMs);
+    // Provider/SDK work shares the same finite budget. The separately bounded
+    // private SQL lock must not spend that provider budget while no Auth I/O runs.
+    let remaining=authDeadlineMs,started=performance.now(),timer;
+    const arm=()=>{started=performance.now();timer=setTimeout(()=>{expired=true;abort.abort();},remaining);};
+    const pause=()=>{clearTimeout(timer);remaining-=performance.now()-started;if(remaining<=0){expired=true;abort.abort();}};
+    arm();
     const fence=()=>{if(expired || abort.signal.aborted) throw Error('n88_auth_unavailable');};
     try {
       // Only these two read-only provider paths. Bounded bytes/time, no redirects,
@@ -41,7 +46,9 @@ export function createTeacherVerifier({authUrl,apiKey,fetch:send=globalThis.fetc
         c.nbf!==undefined && (!Number.isSafeInteger(c.nbf) || c.nbf>sec)) return null;
       // Lock exact user/session before fresh getUser, so a concurrent ban/logout
       // cannot commit between that provider checkpoint and our portal commit.
-      const current=await query('select user_id,session_id from n88_private.lock_current_session($1::uuid,$2::uuid)',[c.sub,c.session_id]); fence();
+      pause();fence();
+      const current=await query('select user_id,session_id from n88_private.lock_current_session($1::uuid,$2::uuid)',[c.sub,c.session_id]);
+      fence();arm();
       const matches=result=>result.rows.length===1 && result.rows[0].user_id===c.sub && result.rows[0].session_id===c.session_id;
       if(!matches(current))return null;
       // Always a fresh server user lookup for the EXACT same bearer, even with JWKS.

@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "capturedAt": "2026-10-19T15:53:04.348Z",
+  "sourceSha256": "54a72c0161fe301e241d082b381611b67c05d8bba510da9b3e8e95f099fe7e50",
+  "transportUnchanged": true,
+  "bindingsUnchanged": true,
+  "routesUnchanged": true,
+  "subdomainUnchanged": true,
+  "secretValuesRead": false,
+  "workerUploads": 1,
+  "sourceChanges": "Embedded student JS/CSS only",
+  "deployment": {
+    "id": "be177f1a-6b49-4960-bc0d-089b315d2fc5",
+    "created_on": "2026-10-19T15:52:58.054788Z",
+    "versions": [
+      {
+        "version_id": "8342e1ac-6f07-42dc-89bb-357f6fbcdc9f",
+        "percentage": 100
+      }
+    ]
+  },
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 0,
+    "logs": {
+      "enabled": false,
+      "head_sampling_rate": 0,
+      "persist": null,
+      "invocation_logs": false
+    },
+    "traces": {
+      "enabled": false,
+      "persist": null,
+      "head_sampling_rate": 0
+    }
+  },
+  "logpush": false,
+  "tail_consumers": []
+}

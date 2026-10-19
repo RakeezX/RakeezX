@@ -1,0 +1,70 @@
+{
+  "taskId": "continuous-n88-actual-teacher-and-brand-entry-20261019",
+  "runId": "0f958d3a-36e2-4a23-9c15-80f691f15ddc",
+  "baseSha": "a0490e3e54b11498406bad71c70ab5485920f26e",
+  "requiredCheck": {
+    "name": "n88_real_entry_contract_and_same_form_invalid_code_brand",
+    "status": "FAIL"
+  },
+  "state": "BLOCKED",
+  "components": {
+    "authBudget": {
+      "status": "PASS",
+      "evidence": "tests/n88-1837/auth-budget.json",
+      "actualUserCausality": false
+    },
+    "actualDom": {
+      "status": "PASS",
+      "evidence": "tests/n88-1837/ui.previous-pass.json",
+      "scope": "Earlier completed current-run same-form invalid/unknown401,390/1440 light brand, natural model IDs, teacher503/retry/owner invalidation"
+    },
+    "laterOptional410Case": {
+      "status": "NOT_RUN",
+      "evidence": "tests/n88-1837/ui.lease-blocked.json",
+      "reason": "Shared browser lease unavailable; no retry or other-owner resource touched"
+    },
+    "latestUiAttempt": {
+      "status": "FAIL",
+      "evidence": "tests/n88-1837/ui.json",
+      "priorPassPreserved": true
+    },
+    "service": {
+      "status": "PASS",
+      "evidence": "drafts/n88-student-portal/activation/service-final-1837.json",
+      "version": 49,
+      "codeDeploys": 1,
+      "readinessReplayed": false
+    },
+    "ingress": {
+      "status": "PASS",
+      "evidence": "drafts/n88-student-portal/activation/worker-1837.json",
+      "uploads": 1
+    },
+    "staticAssets": {
+      "status": "PASS",
+      "evidence": "tests/n88-1837/served.json",
+      "teacherAcceptance": false
+    },
+    "supportHook": {
+      "status": "NOT_RUN",
+      "missingAllowedPath": "src/lib/support.js",
+      "preparedPatch": "tests/n88-1837/support-diagnostics.patch",
+      "patchApplicability": "PASS; not applied",
+      "reason": "Existing support sanitizer and submission do not yet collect the new safe transient runtime checkpoint"
+    },
+    "actualAuthenticatedClassSuccess": {
+      "status": "NOT_RUN",
+      "reason": "Existing teacher-browser session ownership refusal remains binding; no alternative tab/actor used"
+    }
+  },
+  "blocker": "src/lib/support.js is absent from allowedPaths. The existing Support sanitizer/submission needs the prepared bounded hook before a normal next user error can carry phase/status/timing/source-version evidence. Actual authenticated teacher success and hosted timeout causality remain unverified.",
+  "retryCondition": "Approved inactive-card maintenance adds only src/lib/support.js; controller resumes this exact saved candidate/session, applies and checks the prepared strict support hook. Do not replay consumed readiness or redeploy unchanged services/assets.",
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLeaseReleasedAfterCompletedPass": true,
+    "laterLeaseNotAcquired": true,
+    "liveMutationLeaseReleased": true,
+    "protectedTemporaryEnvRemoved": true
+  },
+  "wholeN88Closure": false
+}

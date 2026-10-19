@@ -1,0 +1,53 @@
+{
+  "taskId": "continuous-n88-actual-teacher-and-brand-entry-20261019",
+  "runId": "0f958d3a-36e2-4a23-9c15-80f691f15ddc",
+  "status": "PASS",
+  "checks": [
+    {
+      "teacher": "Real model-generated natural section/teaching IDs, actual store/owner guard,503 and re-admission, explicit student link",
+      "diagnostic": {
+        "phase": "http",
+        "httpStatus": 503,
+        "elapsedMs": 0,
+        "sourceVersion": "n88-class-entry-1837-v1"
+      }
+    },
+    {
+      "width": 390,
+      "layout": {
+        "background": "rgb(244, 247, 245)",
+        "scheme": "light",
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "gap": 20,
+        "logo": true,
+        "overflow": false,
+        "heading": "مساحة الطالب"
+      }
+    },
+    {
+      "width": 1440,
+      "layout": {
+        "background": "rgb(244, 247, 245)",
+        "scheme": "light",
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "gap": 20,
+        "logo": true,
+        "overflow": false,
+        "heading": "مساحة الطالب"
+      }
+    }
+  ],
+  "timings": [
+    {
+      "path": "/api/n88/teacher/class/list",
+      "phase": "allow",
+      "elapsedMs": 0
+    }
+  ],
+  "hostedOwnerProof": false,
+  "privateBrowserRefusalPreserved": true,
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

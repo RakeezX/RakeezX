@@ -1,0 +1,64 @@
+{
+  "taskId": "continuous-n88-actual-teacher-and-brand-entry-20261019",
+  "runId": "2ae8ed4f-f05f-487a-a9e3-5420314db9d3",
+  "state": "LOCAL_READY",
+  "baseSha": "a0490e3e54b11498406bad71c70ab5485920f26e",
+  "previousCandidate": "95bed2c86b53e075abc53baf38df86e5f613809a",
+  "qualification": "Bounded source-contract/UI/service/support delivery only. Actual authenticated teacher access NOT_PROVEN; whole N88 OPEN.",
+  "requiredChecks": [
+    {
+      "name": "n88_real_entry_contract_and_same_form_invalid_code_brand",
+      "status": "PASS",
+      "scope": "Source contract qualification, not actual authenticated user acceptance",
+      "evidence": [
+        "tests/n88-1837/ui.previous-pass.json",
+        "tests/n88-1837/auth-budget.json",
+        "tests/n88-1837/support-hook.json"
+      ]
+    },
+    {
+      "name": "n88_bounded_entry_service_support_delivery",
+      "status": "PASS",
+      "evidence": [
+        "tests/n88-1837/support-hook.json",
+        "drafts/n88-student-portal/activation/service-final-1837.json",
+        "drafts/n88-student-portal/activation/worker-1837.json",
+        "tests/n88-1837/served.json"
+      ],
+      "scope": "Unchanged native49 source/pin and ingress static evidence reused; missing Support hook now genuinely applied"
+    }
+  ],
+  "currentMain": {
+    "sha": "278b86e5870f80f918437915b535a915dab9fc8e",
+    "remoteReadback": "git ls-remote origin refs/heads/main matched origin/main",
+    "affectedCandidatePathsUnchangedSinceBase": true
+  },
+  "newProof": {
+    "supportHook": "2aabb1fa7f8e7a15ebd2e098242e7bba3fd2acfbf7f41802132d7d636baf8ffe",
+    "test": "tests/n88-1837/support-hook.json",
+    "syntax": "PASS node --check src/lib/support.js",
+    "diffCheck": "PASS"
+  },
+  "preservedHistory": {
+    "originalComposite": "tests/n88-1837/conclusion.json",
+    "originalCompositeStatus": "FAIL",
+    "latestUiAttempt": "tests/n88-1837/ui.json",
+    "latestUiStatus": "FAIL",
+    "optional410": "NOT_RUN",
+    "filesByteIdenticalToPreviousGitCandidate": true
+  },
+  "actualTeacherSuccess": "NOT_PROVEN",
+  "browserOwnershipRefusalPreserved": true,
+  "oldReadinessConsumedAndNotRepeated": true,
+  "operations": {
+    "realSupportSends": 0,
+    "serviceUploads": 0,
+    "readinessCalls": 0,
+    "providerLogCalls": 0,
+    "browserReservations": 0,
+    "sqlAuthRoleKeyFixtureMutations": 0
+  },
+  "publisherOwnsFinalFrontendDelivery": true,
+  "wholeN88Closed": false,
+  "cleanup": "No browser/server/live phase opened; direct test restores owned globals in finally"
+}

@@ -45,6 +45,25 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(action==='--1837-pin-qualified-source'){
+  const incidentRun='0f958d3a-36e2-4a23-9c15-80f691f15ddc',taskId='continuous-n88-actual-teacher-and-brand-entry-20261019';
+  if(path.resolve(root)!==path.resolve('C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018')||process.env.N88_1837_RUN_ID!==incidentRun)fail('n88_1837_original_context_required');
+  const card=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+taskId+'.json','utf8'));
+  if(card.id!==taskId||card.sessionId!=='01a14fc3-b292-7390-9952-8549a286c80f'||card.liveAuthorizationRef!=='PO-CURRENT-1837-N88-ACTUAL-FAILURE')fail('n88_1837_authority_mismatch');
+  const receipt=JSON.parse(await readFile(new URL('./activation/service-native-1837.json',import.meta.url),'utf8'));
+  const source='420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253',prior='0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c';
+  if(receipt.projectId!==project||receipt.functionName!=='n88-student-portal'||receipt.sourceSha256!==source||receipt.sourceExact!==true||receipt.version<=47)fail('n88_1837_native_source_missing');
+  const state=await load();if(state.directSource!==prior||state.loginDisarmed||state.directAuthRefused||!state.directVerified)fail('n88_1837_owned_preimage_mismatch');
+  const rows=await official(['secrets','list','--project-ref',project,'--output','json']),entries=Array.isArray(rows)?rows:rows?.rows;
+  if(!Array.isArray(entries)||entries.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA').length!==1||entries.find(r=>r.name==='N88_SERVICE_SOURCE_SHA').value?.toLowerCase()!==createHash('sha256').update(prior).digest('hex'))fail('n88_1837_provider_preimage_mismatch');
+  await writeFile(path.join(phase,'incident-1837-source-pin-once.json'),JSON.stringify({taskId,runId:incidentRun,prior,source,nativeVersion:receipt.version})+'\n',{flag:'wx'});
+  const file=path.join(phase,'owned-env.tmp');
+  try{await writeFile(file,'N88_SERVICE_SOURCE_SHA='+source+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  const after=await official(['secrets','list','--project-ref',project,'--output','json']),list=Array.isArray(after)?after:after?.rows;
+  if(!Array.isArray(list)||list.find(r=>r.name==='N88_SERVICE_SOURCE_SHA').value?.toLowerCase()!==createHash('sha256').update(source).digest('hex'))fail('n88_1837_pin_readback_mismatch');
+  state.sourceCorrections=[...(state.sourceCorrections||[]),{runId:incidentRun,prior,source,nativeVersion:receipt.version}];state.directSource=source;await save(state);
+  return {status:'PASS',source,nativeVersion:receipt.version,sourcePinReadback:true,readinessReplayed:false,keysRolesSqlAuthFixturesUnchanged:true};
+ }
  if(action==='--discard-empty-preparation'){
   // Only the exact fresh directory created by this run's failed module load;
   // no secrets/marker existed, and no recursive or process cleanup is used.

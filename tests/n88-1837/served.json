@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "capturedAt": "2026-10-19T15:54:07.778Z",
+  "scope": "Changed public private-route static bytes only, no cookies/account/student requests",
+  "assets": [
+    {
+      "path": "/n88-private/assets/student.mjs",
+      "status": 200,
+      "elapsedMs": 468,
+      "sha256": "28e9d68a0c6231e2b2629e4e0682f2d0ee2336a1fab9733416818a06014d765e",
+      "expectedSha256": "28e9d68a0c6231e2b2629e4e0682f2d0ee2336a1fab9733416818a06014d765e",
+      "match": true,
+      "privateHeaders": true,
+      "headers": {
+        "cacheControl": "no-store, private",
+        "referrerPolicy": "no-referrer",
+        "robots": "noindex, nofollow, noarchive",
+        "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "path": "/n88-private/styles/student-portal-login.css",
+      "status": 200,
+      "elapsedMs": 129,
+      "sha256": "3b99e8903436b2faa4e7fcad60ac3513fde322cdd849773a81be387e2de1533f",
+      "expectedSha256": "3b99e8903436b2faa4e7fcad60ac3513fde322cdd849773a81be387e2de1533f",
+      "match": true,
+      "privateHeaders": true,
+      "headers": {
+        "cacheControl": "no-store, private",
+        "referrerPolicy": "no-referrer",
+        "robots": "noindex, nofollow, noarchive",
+        "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+      }
+    }
+  ]
+}

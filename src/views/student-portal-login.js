@@ -19,7 +19,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   };
   function entry(message = '') {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي أعطاك معلمك</p><form data-claim><label for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
+    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي زوّدك به معلّمك.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="btn btn--ghost n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -39,10 +39,22 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     }
     paint(content + '</div>');
   }
-  async function run(action, ending = false) {
+  function inlineEntry(message='',invalid=false) {
+    const form=root.querySelector('[data-claim]');if(!form)return;
+    const cooling=Date.now()<cooldownUntil,field=form.querySelector('input');
+    form.setAttribute('aria-busy',String(busy));field.disabled=!enabled||busy||cooling;
+    field.setAttribute('aria-invalid',String(invalid));
+    form.querySelector('[type=submit]').disabled=!enabled||busy||cooling;
+    form.querySelector('[type=submit]').textContent=busy?'جارٍ التحقق…':'دخول الطالب';
+    root.querySelector('[data-resume]').disabled=busy||cooling;
+    form.querySelector('[role=status]').textContent=cooling?'يرجى الانتظار قليلًا قبل المحاولة مجددًا.':message;
+    clearTimeout(timer);if(cooling)timer=setTimeout(()=>inlineEntry('يمكنك المحاولة مجددًا.'),Math.max(1,cooldownUntil-Date.now()));
+  }
+  async function run(action, ending = false, sameForm = false) {
     if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
     busy = true; const checkpoint = ++generation;
-    paint('<h1 tabindex="-1">جارٍ الاتصال…</h1><p role="status">يرجى الانتظار</p>');
+    if(sameForm)inlineEntry('جارٍ التحقق من الرمز…');
+    else paint('<h1 tabindex="-1">جارٍ الاتصال…</h1><p role="status">يرجى الانتظار</p>');
     try {
       const data = await action();
       if (disposed || checkpoint !== generation) return;
@@ -50,15 +62,16 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === 'rate') cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1000;
-      entry(error?.kind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.' : 'تعذّر فتح المساحة. تحقق من الرمز أو حاول لاحقًا.');
-    } finally { if (checkpoint === generation) busy = false; }
+      if(sameForm)inlineEntry('تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.',true);
+      else entry(error?.kind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.' : 'تعذّر فتح المساحة. تحقق من الرمز أو حاول لاحقًا.');
+    } finally { if (checkpoint === generation) {busy = false;if(sameForm&&root.querySelector('[data-claim]')){const m=root.querySelector('#n88-message').textContent;inlineEntry(m,root.querySelector('input').getAttribute('aria-invalid')==='true');}} }
   }
   const submit = event => {
     if (!event.target.matches('[data-claim]')) return;
     event.preventDefault(); if (busy || !enabled) return;
     const input = root.querySelector('input'); let code = normalizeStudentCode(input.value); input.value = '';
-    if (!validStudentCode(code)) { code = ''; entry('استخدم 6 أرقام يبدأ بالرقم 1.'); root.querySelector('input')?.setAttribute('aria-invalid', 'true'); return; }
-    void run(() => { const pending = client.claim(code); code = ''; return pending; });
+    if (!validStudentCode(code)) { code = ''; inlineEntry('أدخل 6 أرقام تبدأ بالرقم 1.',true); input.focus(); return; }
+    void run(() => { const pending = client.claim(code); code = ''; return pending; },false,true);
   };
   const input = event => { if (event.target.matches('[data-claim] input')) {
     event.target.setCustomValidity(''); event.target.removeAttribute('aria-invalid');
@@ -73,7 +86,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     const proposed = field.value.slice(0, field.selectionStart ?? field.value.length) + added + field.value.slice(field.selectionEnd ?? field.value.length);
     if (normalizeStudentCode(proposed).length > 6) {
       event.preventDefault(); field.value = '';
-      field.setCustomValidity('استخدم رمزًا من 6 أرقام دون اختصار.'); field.setAttribute('aria-invalid', 'true');
+      inlineEntry('أدخل 6 أرقام تبدأ بالرقم 1.',true);
     } else if (pasted) {
       event.preventDefault(); field.value = normalizeStudentCode(proposed); input({target:field});
     }

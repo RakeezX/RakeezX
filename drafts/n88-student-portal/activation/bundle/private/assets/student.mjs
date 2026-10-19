@@ -177,7 +177,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   };
   function entry(message = "") {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p class="n88-unified-welcome">\u0623\u062F\u062E\u0644 \u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644 \u0627\u0644\u0630\u064A \u0623\u0639\u0637\u0627\u0643 \u0645\u0639\u0644\u0645\u0643</p><form data-claim><label for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><p id="n88-code-help">6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u06401</p><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form>${enabled ? '<button type="button" class="n88-unified-resume" data-resume>\u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629</button>' : ""}</section>`);
+    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p class="n88-unified-welcome">\u0623\u062F\u062E\u0644 \u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644 \u0627\u0644\u0630\u064A \u0632\u0648\u0651\u062F\u0643 \u0628\u0647 \u0645\u0639\u0644\u0651\u0645\u0643.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><p id="n88-code-help">6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u06401</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form>${enabled ? '<button type="button" class="btn btn--ghost n88-unified-resume" data-resume>\u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629</button>' : ""}</section>`);
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -197,11 +197,26 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     }
     paint(content + "</div>");
   }
-  async function run(action, ending = false) {
+  function inlineEntry(message = "", invalid = false) {
+    const form = root.querySelector("[data-claim]");
+    if (!form) return;
+    const cooling = Date.now() < cooldownUntil, field = form.querySelector("input");
+    form.setAttribute("aria-busy", String(busy));
+    field.disabled = !enabled || busy || cooling;
+    field.setAttribute("aria-invalid", String(invalid));
+    form.querySelector("[type=submit]").disabled = !enabled || busy || cooling;
+    form.querySelector("[type=submit]").textContent = busy ? "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642\u2026" : "\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628";
+    root.querySelector("[data-resume]").disabled = busy || cooling;
+    form.querySelector("[role=status]").textContent = cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message;
+    clearTimeout(timer);
+    if (cooling) timer = setTimeout(() => inlineEntry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
+  }
+  async function run(action, ending = false, sameForm = false) {
     if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
     busy = true;
     const checkpoint = ++generation;
-    paint('<h1 tabindex="-1">\u062C\u0627\u0631\u064D \u0627\u0644\u0627\u062A\u0635\u0627\u0644\u2026</h1><p role="status">\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631</p>');
+    if (sameForm) inlineEntry("\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632\u2026");
+    else paint('<h1 tabindex="-1">\u062C\u0627\u0631\u064D \u0627\u0644\u0627\u062A\u0635\u0627\u0644\u2026</h1><p role="status">\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631</p>');
     try {
       const data = await action();
       if (disposed || checkpoint !== generation) return;
@@ -210,9 +225,16 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === "rate") cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1e3;
-      entry(error?.kind === "session" ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0641\u062A\u062D \u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632 \u0623\u0648 \u062D\u0627\u0648\u0644 \u0644\u0627\u062D\u0642\u064B\u0627.");
+      if (sameForm) inlineEntry("\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0645\u0632. \u062A\u062D\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0651\u0645\u0643.", true);
+      else entry(error?.kind === "session" ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0641\u062A\u062D \u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632 \u0623\u0648 \u062D\u0627\u0648\u0644 \u0644\u0627\u062D\u0642\u064B\u0627.");
     } finally {
-      if (checkpoint === generation) busy = false;
+      if (checkpoint === generation) {
+        busy = false;
+        if (sameForm && root.querySelector("[data-claim]")) {
+          const m = root.querySelector("#n88-message").textContent;
+          inlineEntry(m, root.querySelector("input").getAttribute("aria-invalid") === "true");
+        }
+      }
     }
   }
   const submit = (event) => {
@@ -224,15 +246,15 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     input2.value = "";
     if (!validStudentCode(code)) {
       code = "";
-      entry("\u0627\u0633\u062A\u062E\u062F\u0645 6 \u0623\u0631\u0642\u0627\u0645 \u064A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1.");
-      root.querySelector("input")?.setAttribute("aria-invalid", "true");
+      inlineEntry("\u0623\u062F\u062E\u0644 6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1.", true);
+      input2.focus();
       return;
     }
     void run(() => {
       const pending = client.claim(code);
       code = "";
       return pending;
-    });
+    }, false, true);
   };
   const input = (event) => {
     if (event.target.matches("[data-claim] input")) {
@@ -250,8 +272,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     if (normalizeStudentCode(proposed).length > 6) {
       event.preventDefault();
       field.value = "";
-      field.setCustomValidity("\u0627\u0633\u062A\u062E\u062F\u0645 \u0631\u0645\u0632\u064B\u0627 \u0645\u0646 6 \u0623\u0631\u0642\u0627\u0645 \u062F\u0648\u0646 \u0627\u062E\u062A\u0635\u0627\u0631.");
-      field.setAttribute("aria-invalid", "true");
+      inlineEntry("\u0623\u062F\u062E\u0644 6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1.", true);
     } else if (pasted) {
       event.preventDefault();
       field.value = normalizeStudentCode(proposed);

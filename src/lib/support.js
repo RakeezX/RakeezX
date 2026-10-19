@@ -97,6 +97,11 @@ function safeViewport(value) {
 /** Returns a new JSON-safe object containing only V1-approved diagnostic fields. */
 export function sanitizeSupportDiagnostics(input = {}) {
   const diagnostics = {};
+  const p=input.n88Portal;
+  if(p&&['binding','queue','dispatch','http','response','admitted','failure'].includes(p.phase)&&
+     p.sourceVersion==='n88-class-entry-1837-v1'&&Number.isInteger(p.httpStatus)&&
+     (p.httpStatus===0||p.httpStatus>=100&&p.httpStatus<=599)&&Number.isInteger(p.elapsedMs)&&p.elapsedMs>=0&&p.elapsedMs<=30000)
+    diagnostics.n88Portal={phase:p.phase,httpStatus:p.httpStatus,elapsedMs:Math.round(p.elapsedMs/100)*100,sourceVersion:p.sourceVersion};
   const appVersion = inputString(input.appVersion, 40);
   const buildSha = inputString(input.buildSha, 64)?.toLowerCase();
   const buildTimestamp = safeTimestamp(input.buildTimestamp);
@@ -238,11 +243,13 @@ export async function submitSupportRequest({ type, message, diagnostics = {} } =
   if (!TYPES.has(cleanType)) throw supportError('INVALID_TYPE', 'نوع الطلب غير صالح.');
   if (!cleanMessage || cleanMessage.length > 4000) throw supportError('INVALID_MESSAGE', 'اكتب رسالة بين 1 و4000 حرف.');
 
+  let portal=null;
+  try{portal=(await import('./student-portal-runtime.js')).studentPortalDiagnostic();}catch{}
   const payload = {
     id: requestId(),
     type: cleanType,
     message: cleanMessage,
-    diagnostics: sanitizeSupportDiagnostics({ ...diagnostics, timestamp: diagnostics.timestamp ?? new Date().toISOString() }),
+    diagnostics: sanitizeSupportDiagnostics({ ...diagnostics, n88Portal:portal, timestamp: diagnostics.timestamp ?? new Date().toISOString() }),
   };
   await cloud.request('/support_requests', {
     method: 'POST',
