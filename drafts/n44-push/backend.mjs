@@ -8,11 +8,13 @@ import {createDeliveryBoundary,quietNow} from './delivery.mjs';
 import {normalizePushPayload} from '../../src/lib/notification-push-core.js';
 import {readSource,sourcePayload} from './canonical-source.mjs';
 import {id,record,uuid,LIMITS} from './shared.mjs';
+import {deviceApproval,publicDeviceConfiguration,oneDeviceGuard} from './one-device-test.mjs';
 const fail=()=>{throw Error('n44_unavailable');};
 const exact=(v,keys)=>{if(!record(v,keys))fail();};
-export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,crypto,rateKey,deliveryEnabled=false,sessionPolicy,serviceSourceSha,now=Date.now}) {
+export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,crypto,rateKey,deliveryEnabled=false,deviceTest=null,publicVapidKey=null,sessionPolicy,serviceSourceSha,now=Date.now}) {
  if(!supportedSessionPolicy(sessionPolicy,now(),serviceSourceSha))fail();
  const policy=Object.freeze(structuredClone(sessionPolicy));
+ const testApproval=deviceTest&&structuredClone(deviceTest);
  const verify=createTeacherVerifier({authUrl,apiKey,fetch,now});
  async function transaction(work,signal) {
   const c=await acquire();let committed=false;
@@ -47,10 +49,10 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
     const live=await q('select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[owner,ctx.sessionId]);if(live.rows.length!==1)fail();
    }}};
  }
- const makeDelivery=signal=>{
+ const makeDelivery=(signal,oneDevice=false)=>{
   const fence=()=>{if(signal?.aborted||!supportedSessionPolicy(policy,now(),serviceSourceSha))fail();};
   const repository=createPostgresRepository({acquire,prepare:async(...args)=>{fence();const extension=await prepare(...args,signal);fence();return {...extension,async beforeCommit(){await extension.beforeCommit?.();fence();}};}});
-  return createDeliveryBoundary({repository,clock:now,envelope:true,recompute:(tx,r,event,time)=>tx.sourceEvent(r,event,time),sender:{send(permit){if(signal?.aborted)return 'uncertain';return crypto.sender.send(permit,{signal});}}});
+  return createDeliveryBoundary({repository,clock:now,envelope:true,...(oneDevice?{beforePermit:oneDeviceGuard(testApproval),maxAttempts:1,bindingExpiresAt:testApproval.expiresAt}:{}),recompute:(tx,r,event,time)=>tx.sourceEvent(r,event,time),sender:{send(permit){if(signal?.aborted||oneDevice&&!deviceApproval(testApproval,now()))return 'uncertain';return crypto.sender.send(permit,{signal});}}});
  };
  // Both roles use a shared durable atomic upsert; raw IP/owner never used as rate keys.
  async function take(query,kind,key,limit) {
@@ -86,7 +88,18 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
     query(text,values){return text.startsWith('begin')?ports.query('savepoint n44_owner'):text==='commit'?ports.query('release savepoint n44_owner'):text==='rollback'?ports.query('rollback to savepoint n44_owner'):ports.query(text,values);},release(){}
    })});
    const scope=b=>{if(!id(b.workspaceId)||!id(b.deviceId))fail();};
+   if(path==='/push/config') {
+    exact(body,['workspaceId','deviceId']);scope(body);
+    if(deliveryEnabled)return {status:'disabled'};
+    return publicDeviceConfiguration(testApproval,auth.ownerId,body,publicVapidKey,serviceSourceSha,now());
+   }
    if(path.startsWith('/push/')) {
+    if(path==='/push/register'&&testApproval) {
+     const a=deviceApproval(testApproval,now());
+     if(!a||auth.ownerId!==a.ownerId||body.workspaceId!==a.workspaceId||body.deviceId!==a.deviceId)return {status:'disabled'};
+     const previous=await local.atomic(auth.ownerId,tx=>tx.rows('registrations').some(r=>r.workspaceId===a.workspaceId&&r.deviceId===a.deviceId&&r.registrationId!==body.registrationId));
+     if(previous)return {status:'disabled'};
+    }
     if(path==='/push/revoke') {
      exact(body,['registrationId','workspaceId','deviceId']);scope(body);if(!uuid(body.registrationId))fail();
      // A fresh session may acknowledge an already retired ORIGINAL identity,
@@ -157,6 +170,15 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
   },signal);
  },
  async schedule({operation,cursor=null,limit=25},signal) {
+  if(operation==='one-device-test') {
+   const a=deviceApproval(testApproval,now());
+   if(deliveryEnabled||!a?.target||cursor!==a.runId||limit!==1)return {status:'disabled'};
+   const rows=await transaction(({query})=>query('select * from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and event_id=$4',
+    [a.ownerId,a.workspaceId,a.deviceId,a.target.eventId]),signal);
+   const payload=normalizePushPayload(rows.rows?.[0]?.payload,now());
+   if(!payload||payload.id!==a.target.eventId)return {status:'rejected'};
+   return makeDelivery(signal,true).deliver(a.ownerId,a.target.registrationId,payload);
+  }
   if(!deliveryEnabled)return {status:'disabled'};
   const delivery=makeDelivery(signal);
   if(!['due','cleanup'].includes(operation)||!Number.isInteger(limit)||limit<1||limit>25)fail();

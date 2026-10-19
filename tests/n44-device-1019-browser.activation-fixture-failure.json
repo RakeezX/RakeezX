@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "a4b73532-2bc6-4327-98e7-89c5edb7bcee",
+  "checks": [],
+  "actualDeviceRegistrations": 0,
+  "actualPermissionPrompts": 0,
+  "actualProviderSendAttempts": 0,
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true,
+    "browserLease": "RELEASED browser"
+  },
+  "browserLease": "ACQUIRED browser",
+  "origin": "http://127.0.0.1:56795",
+  "prepared": {
+    "snapshot": {
+      "available": true,
+      "status": "unsubscribed"
+    },
+    "editable": true,
+    "contextPresent": true
+  },
+  "requests": [
+    "/api/n44/push/config",
+    "/api/n44/push/config",
+    "/api/n44/context/read"
+  ],
+  "status": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'denied'\n- 'gesture_required'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-single-device-optin-ready-20261019/tests/n44-device-1019-browser.mjs:66:9"
+}

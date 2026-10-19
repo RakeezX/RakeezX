@@ -7,7 +7,16 @@ import { readNotificationCategories, readNotificationTiming } from './notificati
 import { LEASE_STORAGE_PREFIX } from './offline-lease.js';
 import { normalizePushPayload, normalizePushEnvelope } from './notification-push-core.js';
 
-export const PUSH_CONFIGURATION = Object.freeze({ enabled: false, publicKey: null });
+// Public-key discovery is authenticated and same-origin. This enables discovery,
+// never permission, subscription, a scheduler or delivery on application load.
+export const PUSH_CONFIGURATION = Object.freeze({ enabled: true, publicKey: null });
+export function supportedPushConfiguration(value, now = Date.now()) {
+  return value && Object.keys(value).sort().join(',') === 'capability,deliveryEnabled,expiresAt,protocol,publicKey,schedulerEnabled,serviceRevision,serviceSourceSha,status' &&
+    value.status === 'ready' && value.protocol === 'n44-browser-v2' && value.capability === 'n44-single-device-20261019-v1' &&
+    value.serviceRevision === 'n44-browser-service-v2' && /^[a-f0-9]{40}$/.test(value.serviceSourceSha) &&
+    /^B[A-Za-z0-9_-]{86}$/.test(value.publicKey) && Number.isSafeInteger(value.expiresAt) &&
+    value.expiresAt > now && value.expiresAt <= now + 86400000 && value.deliveryEnabled === false && value.schedulerEnabled === false;
+}
 export function createPushRuntime({ store, cloud, navigate, window: win = globalThis.window,
   configuration = PUSH_CONFIGURATION, fetch, storage = win?.localStorage, changed = () => {} }) {
   let generation = 0, binding = null, client = null, gateway = null, ready = false, status = 'disabled', preparing = false;
@@ -17,12 +26,12 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     for (const old of retired) { await old.settled(); if ((await old.revoke()).status === 'revoked') retired.delete(old); }
     return { status: retired.size ? 'cleanup_pending' : 'revoked' };
   };
-  const browser = createPushBrowser({ window: win, publicKey: configuration.publicKey, navigate });
+  let browser = createPushBrowser({ window: win, publicKey: configuration.publicKey, navigate });
   const current = () => store.getOfflineLeaseStatus().editable ? currentNotificationContext(store, cloud, storage) : null;
   const leaseRevision = () => { try { return JSON.parse(storage.getItem(LEASE_STORAGE_PREFIX + store.getActiveWorkspace()?.id) || 'null')?.renewalId; } catch { return null; } };
   const revisionKey = c => 'rakeezx-n44-consent:' + JSON.stringify([c.ownerId, c.workspaceId, c.deviceId]);
   const consentRevision = c => { try { return storage.getItem(revisionKey(c)); } catch { return undefined; } };
-  const matches = b => b && current()?.ownerId === b.context.ownerId && current()?.workspaceId === b.context.workspaceId &&
+  const matches = b => b && (b.serviceExpiresAt ?? Infinity) > Date.now() && current()?.ownerId === b.context.ownerId && current()?.workspaceId === b.context.workspaceId &&
     current()?.deviceId === b.context.deviceId && cloud.session === b.session && store.getActiveWorkspace() === b.workspace && leaseRevision() === b.leaseRevision && consentRevision(b.context) === b.consentRevision;
   const preferences = () => {
     const c = current(), timing = readNotificationTiming(c, storage);
@@ -46,7 +55,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   }
   async function refresh() {
     if (binding && (!matches(binding) || status === 'subscribed' && browser.permission() !== 'granted')) invalidate();
-    if (!configuration.enabled || !browser.supported() || !current() || preparing || binding) return;
+    if (!configuration.enabled || !current() || preparing || binding) return;
     preparing = true; const token = generation;
     const b = { context: current(), session: cloud.session, workspace: store.getActiveWorkspace(), leaseRevision: leaseRevision() };
     try { b.consentRevision = consentRevision(b.context); } catch { preparing = false; return; }
@@ -62,6 +71,11 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
         storage.setItem(revisionKey(b.context), revision); b.consentRevision = revision;
       } });
     try {
+      const publicConfiguration = await g.configuration();
+      if (!supportedPushConfiguration(publicConfiguration) || !valid()) throw Error('unavailable');
+      b.serviceExpiresAt = publicConfiguration.expiresAt;
+      browser = createPushBrowser({ window: win, publicKey: publicConfiguration.publicKey, navigate });
+      if (!browser.supported() || !valid()) throw Error('unavailable');
       const r = await g.read();
       // Same owner/device, new Auth session: retire the old context via its
       // observed CAS revision before acknowledging original registration cleanup.
@@ -117,7 +131,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   };
   win?.navigator.serviceWorker?.addEventListener('message', onMessage);
   let permissionState = null, disposed = false;
-  if (configuration.enabled && browser.supported()) {
+  if (configuration.enabled) {
     win.addEventListener?.('focus', refresh);
     void win.navigator.permissions?.query({ name: 'notifications' }).then(value => {
       if (disposed) return;

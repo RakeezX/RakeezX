@@ -1,0 +1,40 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "a4b73532-2bc6-4327-98e7-89c5edb7bcee",
+  "checks": [
+    {
+      "name": "actual_ui_explicit_gesture_and_denied_consent",
+      "status": "PASS",
+      "evidence": "Actual authenticated synthetic store/ownership guard, mounted notification-settings DOM, delegated click and source CSS over loopback HTTP. Missing service hides button; matching synthetic readiness shows ordinary opt-in; programmatic call cannot prompt; actual click invokes only fake denied permission, zero subscriptions/registrations."
+    },
+    {
+      "name": "actual_entry_wrong_source_and_owner_failclosed",
+      "status": "PASS",
+      "evidence": "Malformed service source hides the actual mounted control; changing the real runtime ownership guard invalidates readiness and hides opt-in without any permission or subscription. Native browser facilities are injected synthetic ports, not live permission/OS proof."
+    }
+  ],
+  "actualDeviceRegistrations": 0,
+  "actualPermissionPrompts": 0,
+  "actualProviderSendAttempts": 0,
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true,
+    "browserLease": "RELEASED browser"
+  },
+  "browserLease": "ACQUIRED browser",
+  "origin": "http://127.0.0.1:57824",
+  "prepared": {
+    "snapshot": {
+      "available": true,
+      "status": "unsubscribed"
+    },
+    "editable": true,
+    "contextPresent": true
+  },
+  "requests": [
+    "/api/n44/push/config",
+    "/api/n44/push/config",
+    "/api/n44/context/read"
+  ],
+  "status": "PASS"
+}

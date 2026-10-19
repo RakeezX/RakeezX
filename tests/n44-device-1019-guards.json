@@ -1,0 +1,24 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "a4b73532-2bc6-4327-98e7-89c5edb7bcee",
+  "checks": [
+    {
+      "name": "single_target_durable_total_attempt_budget",
+      "status": "PASS",
+      "evidence": "Actual delivery boundary with existing serializable synthetic repository: wrong owner/registration/event deny; two concurrent calls send once; fixed authority and run/target hash persisted before sender; accepted/429/unknown outcomes and new run cannot retry."
+    },
+    {
+      "name": "owner_consent_expiry_and_commit_ack_failclosed",
+      "status": "PASS",
+      "evidence": "Missing consent, wrong owner/key, approval expiry and failed durable commit prevent test transmission. No actual provider request."
+    },
+    {
+      "name": "actual_sw_binding_dedupe_clear_and_offline_shell",
+      "status": "PASS",
+      "evidence": "Actual sw.js in disposable VM: no consent/no display, foreign-client bind denied, wrong binding denied, one generic callback, duplicate suppressed, clear blocks later callback; startup assets remain shell-listed/offline-served and config/private consent routes bypass cache. No OS notification or browser registration."
+    }
+  ],
+  "actualProviderSendAttempts": 0,
+  "actualRegistrations": 0,
+  "hostedStatus": "NOT_RUN"
+}

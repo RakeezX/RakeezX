@@ -1,0 +1,10 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "a4b73532-2bc6-4327-98e7-89c5edb7bcee",
+  "status": "FAIL",
+  "phase": "local_test_module_import",
+  "code": "ERR_MODULE_NOT_FOUND",
+  "package": "@supabase/auth-js",
+  "liveOperations": 0,
+  "correction": "Restore unchanged lockfile dependencies offline with scripts disabled inside owned drafts/n44-push workspace."
+}

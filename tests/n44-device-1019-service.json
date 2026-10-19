@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "a4b73532-2bc6-4327-98e7-89c5edb7bcee",
+  "checks": [
+    {
+      "name": "actual_signed_config_route_and_auth_gate",
+      "status": "PASS",
+      "evidence": "Changed route traverses actual Cloudflare HMAC/WebRequest/official AuthClient/backend with fabricated signed JWT and metadata query ports; exact approved scope returns public key/source only after Auth locks/commit; wrong device, absent approval and global delivery ON deny."
+    },
+    {
+      "name": "private_test_requires_bound_target_and_cron_off",
+      "status": "PASS",
+      "evidence": "Actual signed private schedule request with absent target stays disabled; no generic public send route, disabled scheduler performs zero fetches; sender never invoked."
+    }
+  ],
+  "scope": "Injected fabricated provider/DB ports; no hosted source/config/readiness claim",
+  "providerSendAttempts": 0,
+  "liveAuthOrSqlOperations": 0
+}
