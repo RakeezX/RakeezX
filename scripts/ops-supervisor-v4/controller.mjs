@@ -170,6 +170,8 @@ export function missingProviderTransport(result) {
     && /host:port|provider.supplied|ipv6.capable custodian/i.test(next);
 }
 export function workerBlockerClass(result) {
+  // A worker cannot repair omitted card files; do not pay for an unchanged retry.
+  if(result?.state==='BLOCKED' && /^(?:Card scope omits|allowedPaths(?: still)? excludes)\s+src\//i.test(result.blocker??''))return 'external';
   // A preserved real failure remains blocked; a new worker cannot replenish a retired one-pair phase.
   if (exhaustedLiveFixture(result) || missingProviderTransport(result)) return 'external';
   return result?.blockerType === 'auth' ? 'external' : result?.blockerType;

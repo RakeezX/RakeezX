@@ -107,7 +107,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     insist(card && expected && ID.test(card.id ?? '') && card.activationId === payload.activationId, 'Invalid activated source card');
     insist(!taskIds.has(card.id) && !allowed.includes(card.id), 'Duplicate or active card update'); taskIds.add(card.id);
     insist(Object.keys(card).every(key => !RUNTIME_KEYS.has(key)), 'Source card contains runtime state: ' + card.id);
-    const exactAttempt = (expected.status === 'blocked' || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS' || expected.status === 'awaiting_po' && card.completionMode === STAGED_ACTIVATION_MODE && card.productId === 'N88' && card.stagedActivation?.phase === 'acceptance-and-public-enable') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? '');
+    const exactAttempt = (['blocked','retry_wait'].includes(expected.status) || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS' || expected.status === 'awaiting_po' && card.completionMode === STAGED_ACTIVATION_MODE && card.productId === 'N88' && card.stagedActivation?.phase === 'acceptance-and-public-enable') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? '');
     const pristinePendingSupersession = expected.status === 'pending' && card.completionMode === 'superseded_by_verified_delivery' && ID.test(card.supersededBy ?? '') && GIT_SHA.test(card.supersedingPublishedSha ?? '') && expected.sessionId === null && expected.lastRunId === null && expected.candidateSha === null && Array.isArray(expected.dependsOn);
     insist(expected.id === card.id && (exactAttempt || pristinePendingSupersession), 'Expected exact inactive attempt or pristine pending supersession: ' + card.id);
     insist(typeof card.productId === 'string' && typeof card.scopeKey === 'string' && Array.isArray(card.allowedPaths) && Array.isArray(card.requiredChecks) && card.requiredChecks.every(x => typeof x === 'string' && x.length), 'Incomplete source card: ' + card.id);
@@ -185,19 +185,21 @@ export function verifiedSourcePathRepair(task,result,update) {
  const card=update.card,p=card.verificationPathRepair;
  const paths={
   'continuous-n88-complete-runtime-binding-20261018':{old:['drafts/n88-student-portal/runtime-http.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md'],actual:['drafts/n88-student-portal/runtime.mjs','drafts/n88-student-portal/http-adapter.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md']},
-  'continuous-n115-email-code-autofill-20261019':{old:['src/auth.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md'],actual:['src/app.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md']}
+  'continuous-n115-email-code-autofill-20261019':{old:['src/auth.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md'],actual:['src/app.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md']},
+  'continuous-n36-one-start-all-class-handoff-20261019':{old:['tools/teacher-import-helper/**','docs/automation-evidence/20261019/N36_ONE_START_ALL_CLASS_HANDOFF.md'],actual:['src/lib/n36-extension-protocol.js','docs/automation-evidence/20261019/N36_ONE_START_ALL_CLASS_HANDOFF.md']},
+  'continuous-n119-alphabetic-display-roll-number-20261019':{old:['src/lib/student-order.js','docs/automation-evidence/20261019/N119_ALPHABETIC_DISPLAY_ROLL_NUMBER.md'],actual:['src/views/grades.js','docs/automation-evidence/20261019/N119_ALPHABETIC_DISPLAY_ROLL_NUMBER.md']}
  }[task.id];
  if(!paths)return false;const {old,actual}=paths;
  return card.completionMode==='repair_source_verification_paths'
   && task.status==='blocked'
   && result.state==='LOCAL_READY' && update.expected.resultState==='LOCAL_READY'
-  && task.deliveryReceipt?.errorCode==='VERIFICATION_ASSET_MISSING'
+  && (task.deliveryReceipt?.errorCode==='VERIFICATION_ASSET_MISSING' || task.id==='continuous-n36-one-start-all-class-handoff-20261019' && task.deliveryReceipt?.errorCode==='SOURCE_PARITY_PENDING' && sha256(bytes(task.deliveryReceipt))===p?.previousReceiptSha256 && ['immutable','production'].every(origin=>{const a=task.deliveryReceipt?.evidence?.[origin]?.assets;return a?.length>1&&a.filter(x=>!x.verified).length===1&&a.every(x=>x.verified||x.repoPath==='tools/teacher-import-helper/**'&&x.statusCode===404);}))
   && !task.liveMutation && !task.liveAuthorizationRef && !card.liveMutation && !card.liveAuthorizationRef
   && (same(task.verificationPaths,old) || task.id==='continuous-n115-email-code-autofill-20261019' && same(task.verificationPaths,actual) && task.sourceParityHistory?.some(h=>h.receipt?.errorCode==='VERIFICATION_ASSET_MISSING')) && same(card.verificationPaths,actual)
   && actual.every(path=>result.changedPaths?.includes(path) && task.allowedPaths.some(a=>a===path||a.endsWith('/**')&&path.startsWith(a.slice(0,-2))))
   && same(card.requiredChecks,task.requiredChecks) && same(card.allowedPaths,task.allowedPaths)
   && task.requiredChecks.every(name=>result.checks?.some(c=>c.name===name&&c.status==='PASS'))
-  && result.checks.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&c.name==='hosted_service_auth_tls_and_student_activation')
+  && result.checks.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&(c.name==='hosted_service_auth_tls_and_student_activation'||task.id==='continuous-n36-one-start-all-class-handoff-20261019'&&c.name==='publisher_production'))
   && result.blockerType==='none' && !result.blocker
   && sha256(bytes(result))===p?.previousResultSha256 && sha256(bytes(task.verificationPaths))===p?.previousPathsSha256
   && SHA256.test(p?.reviewedFixtureSha256??'') && p?.reason?.length>=50
@@ -253,7 +255,7 @@ export function verifiedLiveServiceDeclarationRepair(task,result,update){
 export function verifyInactiveIdentity(task, result, update, activationId, historicalContext = null) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
-  insist(task.status === e.status && (task.status === 'blocked' || task.status === 'delivery' && update.card.completionMode === 'deferred_by_po' || task.status === 'awaiting_po' && verifiedStageContinuation(task,result,update)) && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
+  insist(task.status === e.status && (['blocked','retry_wait'].includes(task.status) || task.status === 'delivery' && update.card.completionMode === 'deferred_by_po' || task.status === 'awaiting_po' && verifiedStageContinuation(task,result,update)) && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
   insist(task.lastWorkerReap?.exactAbsence === true && task.lastWorkerReap.activationId === activationId && task.lastWorkerReap.runId === e.lastRunId && Array.isArray(task.lastWorkerReap.owners) && task.lastWorkerReap.owners.length > 0, 'No exact owned-process absence proof: ' + e.id);
   const evidenceOnly = update.card.completionMode === 'record_published_evidence' && e.resultState === 'LOCAL_READY' && result.state === 'LOCAL_READY' && !update.card.liveMutation && !update.card.liveAuthorizationRef && update.card.evidenceOnly?.acceptanceAuthority && result.changedPaths?.length && result.changedPaths.every(p => /^docs\/automation-evidence\/\d{8}\/[a-zA-Z0-9_-]+\.(md|json)$/.test(p) && update.card.allowedPaths.includes(p)) && update.card.requiredChecks?.length && update.card.requiredChecks.every(name => result.checks?.some(c => c.name === name && c.status === 'PASS')) && result.checks.every(c => c.status === 'PASS') && result.blockerType === 'none' && !result.blocker;
   const poDeferred = update.card.completionMode === 'deferred_by_po' && update.card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS' && update.card.productId === 'N58' && update.card.id === 'continuous-n58-empty-account-reviewed-recovery-20261014' && update.card.deferralReason?.length >= 20 && ['LOCAL_READY','BLOCKED'].includes(result.state);
@@ -377,6 +379,14 @@ export function reviewedSourcePreimageMatches(remoteBytes, opsBytes, canonicalBy
 export function prepareVerificationJournalRepair(task,update,raw){
  const p=update.card.verificationPathRepair,j=parse(raw);
  insist(verifiedSourcePathRepair(task,json(task.resultPath),update),'Journal repair lacks exact accepted source-path correction');
+ if(p.publishedJournalSha256){
+  insist(task.id==='continuous-n36-one-start-all-class-handoff-20261019'&&sha256(raw)===p.publishedJournalSha256,'Published source-selector journal changed');
+  insist(j.stage==='pushed'&&j.pushConfirmedAt&&j.candidateSha===update.expected.candidateSha&&j.baseSha===update.expected.baseSha&&j.ticketId===task.productId&&j.publishedSha===task.deliveryReceipt.publishedSha,'Wrong published journal identity/phase');
+  const invalid='tools/teacher-import-helper/**',actual='src/lib/n36-extension-protocol.js';
+  insist(j.assets?.filter(a=>a.repoPath===invalid).length===1&&j.assets.some(a=>a.repoPath===actual&&!a.deleted)&&update.card.verificationPaths.includes(actual),'Exact corrected real source is missing');
+  return {...j,assets:j.assets.filter(a=>a.repoPath!==invalid),verificationRepairHistory:[...(j.verificationRepairHistory??[]),{at:new Date().toISOString(),oldJournalSha256:sha256(raw),removedInvalidSelector:invalid,mandatoryActualSource:actual,reason:p.reason}]};
+ }
+
  insist(SHA256.test(p?.blockedJournalSha256??'')&&sha256(raw)===p.blockedJournalSha256,'Blocked publisher journal changed since review');
  insist(j.stage==='blocked'&&j.errorCode==='VERIFICATION_ASSET_MISSING'&&j.candidateSha===update.expected.candidateSha&&j.baseSha===update.expected.baseSha&&j.ticketId===task.productId,'Journal is not the exact missing-asset attempt');
  insist(j.prepareAttempt>=1&&j.prepareAttempt<3&&!j.pushedAt&&!j.receipt,'Only an unpushed bounded preparation may resume');
@@ -574,7 +584,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         readPublishedBlob: (publishedSha, repoPath) => git(['rev-parse', publishedSha + ':' + repoPath], task.worktreePath) };
     }
     verifyInactiveIdentity(task, result, update, payload.activationId, historicalContext);
-    if(update.card.verificationPathRepair?.blockedJournalSha256){const jf=path.join(rt,'delivery',task.id,update.expected.candidateSha+'.journal.json');noLinks(jf);prepareVerificationJournalRepair(task,update,fs.readFileSync(jf));}
+    if(update.card.verificationPathRepair?.blockedJournalSha256||update.card.verificationPathRepair?.publishedJournalSha256){const jf=path.join(rt,'delivery',task.id,update.expected.candidateSha+'.journal.json');noLinks(jf);prepareVerificationJournalRepair(task,update,fs.readFileSync(jf));}
     insist(equalPath(task.worktreePath, path.join(root, '.worktrees', task.id)), 'Task worktree is outside its owned path');
     noLinks(task.worktreePath);
     insist(git(['rev-parse', 'HEAD'], task.worktreePath) === update.expected.candidateSha, 'Worktree HEAD differs from preserved candidate: ' + task.id);
@@ -739,7 +749,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         const state = update.card.completionMode === HISTORICAL_RUNTIME_MODE ? exactInactive(update) : previous;
         insist(sha256(state.raw) === sha256(previous.raw), 'Queue changed during historical classification');
         const revised = revisedTask(state.task, update, commit, at, state.historicalContext);
-        if(update.card.verificationPathRepair?.blockedJournalSha256){const jf=path.join(rt,'delivery',state.task.id,update.expected.candidateSha+'.journal.json');noLinks(jf);const raw=fs.readFileSync(jf),next=prepareVerificationJournalRepair(state.task,update,raw);fs.writeFileSync(path.join(evidenceRoot,state.task.id+'.publisher-journal-before.json'),raw,{flag:'wx'});replaceGuarded(jf,bytes(next),sha256(raw));receipt.publisherJournalRepairs=[...(receipt.publisherJournalRepairs??[]),{taskId:state.task.id,candidateSha:update.expected.candidateSha,oldSha256:sha256(raw),newSha256:sha256(bytes(next)),stage:'reprepare',originalFailurePreserved:true,providerOperation:false}];record('PUBLISHER_JOURNAL_REPAIRED');}
+        if(update.card.verificationPathRepair?.blockedJournalSha256||update.card.verificationPathRepair?.publishedJournalSha256){const jf=path.join(rt,'delivery',state.task.id,update.expected.candidateSha+'.journal.json');noLinks(jf);const raw=fs.readFileSync(jf),next=prepareVerificationJournalRepair(state.task,update,raw);fs.writeFileSync(path.join(evidenceRoot,state.task.id+'.publisher-journal-before.json'),raw,{flag:'wx'});replaceGuarded(jf,bytes(next),sha256(raw));receipt.publisherJournalRepairs=[...(receipt.publisherJournalRepairs??[]),{taskId:state.task.id,candidateSha:update.expected.candidateSha,oldSha256:sha256(raw),newSha256:sha256(bytes(next)),stage:'reprepare',originalFailurePreserved:true,providerOperation:false}];record('PUBLISHER_JOURNAL_REPAIRED');}
         replaceGuarded(state.file, bytes(revised), sha256(state.raw));
         receipt.activatedTasks.push({ id: revised.id, status: revised.status, sessionId: revised.sessionId ?? null, runId: revised.attempt?.runId ?? null, candidateSha: revised.candidateSha ?? null, reason: update.materialReason }); record('CARD_ACTIVATED');
       }

@@ -93,8 +93,29 @@ try {
   $promptBytes = $utf8.GetBytes([System.IO.File]::ReadAllText($spec.promptPath, [System.Text.Encoding]::UTF8))
   $inputPipe = $child.StandardInput.BaseStream
   $inputPipe.Write($promptBytes, 0, $promptBytes.Length); $inputPipe.Flush(); $inputPipe.Close()
-  while (!$child.WaitForExit(2000)) { $outStream.Flush(); $errStream.Flush(); Capture-Session; Save-Checkpoint }
+  $terminalCleanupLastAttempt = $null
+  $monitorTerminal = {
+    # A saved final turn can outlive its CLI teardown. This does not stop active work.
+    if ([System.IO.File]::Exists($spec.outputPath) -and [System.IO.File]::Exists($spec.jsonlPath)) {
+      $now = [DateTime]::UtcNow
+      $quietSince = [System.IO.File]::GetLastWriteTimeUtc($spec.outputPath)
+      $logWritten = [System.IO.File]::GetLastWriteTimeUtc($spec.jsonlPath)
+      if ($logWritten -gt $quietSince) { $quietSince = $logWritten }
+      if (($now - $quietSince).TotalSeconds -ge 120 -and (!$terminalCleanupLastAttempt -or ($now - $terminalCleanupLastAttempt).TotalSeconds -ge 60)) {
+        $terminalCleanupLastAttempt = $now
+        try {
+          $cleanupNode = (Get-Command node.exe -CommandType Application -ErrorAction Stop).Source
+          $cleanupText = & $cleanupNode (Join-Path $PSScriptRoot 'terminal-worker-cleanup.mjs') $TaskFile $AttemptFile
+          if ($LASTEXITCODE -eq 0 -and $cleanupText) { $checkpoint['terminalCleanup'] = ($cleanupText | ConvertFrom-Json) }
+          else { $checkpoint['terminalCleanupError'] = 'Terminal cleanup declined; saved result and ordinary lifecycle preserved' }
+        } catch { $checkpoint['terminalCleanupError'] = 'Terminal cleanup unavailable; saved result and ordinary lifecycle preserved' }
+        Save-Checkpoint
+      }
+    }
+  }
+  while (!$child.WaitForExit(2000)) { $outStream.Flush(); $errStream.Flush(); Capture-Session; Save-Checkpoint; . $monitorTerminal }
   $checkpoint.codexExitedAt = [DateTime]::UtcNow.ToString('o'); Save-Checkpoint
+  while (!$copyOut.IsCompleted -or !$copyErr.IsCompleted) { . $monitorTerminal; Start-Sleep -Milliseconds 2000 }
   $copyOut.GetAwaiter().GetResult(); $copyErr.GetAwaiter().GetResult()
   $outStream.Flush(); $errStream.Flush(); Capture-Session
   $checkpoint.exitCode = $child.ExitCode; $checkpoint.status = 'exited'; $checkpoint.finishedAt = [DateTime]::UtcNow.ToString('o')
