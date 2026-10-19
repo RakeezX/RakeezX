@@ -83,7 +83,7 @@ revoke all on function rakeezx.guard_active_slot_collision() from public,anon,au
 -- The existing section lifecycle command follows below, with only its conflict
 -- lookup widened to independent slots in the restored teaching's term.
 
-create or replace function rakeezx.apply_sync_v2_section_lifecycle_command(
+create or replace function rakeezx.apply_sync_v2_section_lifecycle_command_before_student_0029(
   p_mutation_id text,p_device_id text,p_command text,p_section_id text,p_archive_date date default null,
   p_client_updated_at bigint default null
 ) returns jsonb language plpgsql security definer set search_path = '' as $$

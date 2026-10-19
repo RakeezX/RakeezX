@@ -1,0 +1,1425 @@
+{
+  "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+  "runId": "e1ddb345-79ab-41f5-9d11-f9d786dd517b",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "observedAt": "2026-10-19 10:00:46 UTC",
+  "baseSha": "c929cfbcae012c2074e75e63e51f1c70c076916e",
+  "startingCandidate": "86fa24617980a1e583e898f59659cec3f3c0ee97",
+  "status": "PASS",
+  "authority": "PO-20261019-N122-permanent-independent-slots-qualified-schema",
+  "migration": {
+    "path": "supabase/migrations/20261019091500_n122_non_teaching_slots.sql",
+    "priorUnappliedSha256Lf": "ddc1a199003e8b8ba1162d84b6261ce624bd4704953c74d781b8ad3b6c6e9d9f",
+    "sha256Lf": "f023d560fbbc1124afd322c4dfa61ea61f6d6422f1fd3d136db117f38e119306",
+    "literalReplacements": 1,
+    "providerVersion": "20261019095922",
+    "providerName": "n122_non_teaching_slots",
+    "historyStatementCount": 1,
+    "historyExactSourceMatch": true,
+    "managementResult": {
+      "success": true
+    }
+  },
+  "operations": {
+    "applyMigrationCalls": 1,
+    "metadataQueriesThisPhase": 2,
+    "realCanonicalMutations": 0,
+    "teacherStudentRowReads": 0,
+    "hostedFixtures": 0,
+    "newAuthUsers": 0,
+    "newRoles": 0,
+    "newGrants": 0,
+    "rlsPolicyChanges": 0,
+    "productPushOrDeployment": false
+  },
+  "preimage": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "default": null,
+        "notNull": true
+      },
+      {
+        "name": "owner_id",
+        "type": "uuid",
+        "default": "auth.uid()",
+        "notNull": true
+      },
+      {
+        "name": "teaching_id",
+        "type": "text",
+        "default": null,
+        "notNull": true
+      },
+      {
+        "name": "weekday",
+        "type": "integer",
+        "default": null,
+        "notNull": true
+      },
+      {
+        "name": "period",
+        "type": "integer",
+        "default": null,
+        "notNull": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "notNull": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "notNull": true
+      },
+      {
+        "name": "client_updated_at",
+        "type": "bigint",
+        "default": null,
+        "notNull": false
+      },
+      {
+        "name": "device_id",
+        "type": "text",
+        "default": null,
+        "notNull": false
+      },
+      {
+        "name": "deleted_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notNull": false
+      },
+      {
+        "name": "revision",
+        "type": "bigint",
+        "default": "1",
+        "notNull": true
+      },
+      {
+        "name": "field_revisions",
+        "type": "jsonb",
+        "default": "'{}'::jsonb",
+        "notNull": true
+      }
+    ],
+    "history": [],
+    "indexes": [
+      {
+        "name": "slots_pkey",
+        "definition": "CREATE UNIQUE INDEX slots_pkey ON rakeezx.slots USING btree (owner_id, id)"
+      },
+      {
+        "name": "slots_sync_idx",
+        "definition": "CREATE INDEX slots_sync_idx ON rakeezx.slots USING btree (owner_id, updated_at)"
+      },
+      {
+        "name": "slots_teaching_idx",
+        "definition": "CREATE INDEX slots_teaching_idx ON rakeezx.slots USING btree (owner_id, teaching_id)"
+      }
+    ],
+    "policies": [
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "slots",
+        "permissive": "PERMISSIVE",
+        "policyname": "slots_insert",
+        "schemaname": "rakeezx",
+        "with_check": "(owner_id = ( SELECT auth.uid() AS uid))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(owner_id = ( SELECT auth.uid() AS uid))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "slots",
+        "permissive": "PERMISSIVE",
+        "policyname": "slots_select",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(owner_id = ( SELECT auth.uid() AS uid))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "slots",
+        "permissive": "PERMISSIVE",
+        "policyname": "slots_update",
+        "schemaname": "rakeezx",
+        "with_check": "(owner_id = ( SELECT auth.uid() AS uid))"
+      }
+    ],
+    "relation": {
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arw/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "forceRls": true
+    },
+    "triggers": [
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "name": "01_n58_calendar_contract",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER \"01_n58_calendar_contract\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_guard_calendar_contract()"
+      },
+      {
+        "name": "guard_section_lifecycle_fields",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER guard_section_lifecycle_fields BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_section_lifecycle_fields()"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()"
+      },
+      {
+        "name": "sections_cancel_class_goals",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_cancel_class_goals AFTER UPDATE OF status ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.cancel_goals_when_section_archived()"
+      },
+      {
+        "name": "sections_owner",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_owner BEFORE INSERT ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()"
+      },
+      {
+        "name": "sections_sync_v2_revision",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()"
+      },
+      {
+        "name": "sections_touch",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_touch BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.slots FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "name": "guard_active_slot_collision",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER guard_active_slot_collision BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_active_slot_collision()"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()"
+      },
+      {
+        "name": "slots_owner",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER slots_owner BEFORE INSERT ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()"
+      },
+      {
+        "name": "slots_sync_v2_revision",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER slots_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()"
+      },
+      {
+        "name": "slots_touch",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER slots_touch BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()"
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "a6284ed21c86f1cafcac2d4d84a5fadc",
+        "signature": "rakeezx.apply_sync_v2_mutation(text,text,text,text,bigint,jsonb,text,bigint)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "98c190e60237f952122355c6bfab2eee",
+        "signature": "rakeezx.apply_sync_v2_section_lifecycle_command_before_student_0029(text,text,text,text,date,bigint)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c97cc4db769bd3c590cf161172b136e6",
+        "signature": "rakeezx.apply_sync_v2_section_lifecycle_command(text,text,text,text,date,bigint)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "392a181e1dacf4629322fbfa440479c8",
+        "signature": "rakeezx.cancel_goals_when_section_archived()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "74a3e785528671f0a1ea8f62e7d89574",
+        "signature": "rakeezx.finalize_n71_restore(text,text,text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c7fd7d1d4712ccb97b5266f5c41c311a",
+        "signature": "rakeezx.force_owner()",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "cd916728dbf3838274fa5f8abd363156",
+        "signature": "rakeezx.guard_active_slot_collision()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "35a4350874cd39c36f12397cdbf8ddb4",
+        "signature": "rakeezx.guard_archived_section_write()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "5311a6a1b727924f8bc4d6c3e44b2818",
+        "signature": "rakeezx.guard_section_lifecycle_fields()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "bb108b92f9f16304cede93ffbd8ee566",
+        "signature": "rakeezx.lock_student_lifecycle_statement()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "6fc9fcdf35f78d0ae295fe61a833f70d",
+        "signature": "rakeezx.n58_guard_calendar_contract()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "b327d697c3d3aa866f981416f6011dba",
+        "signature": "rakeezx.n71_restore_canonical(uuid)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "47d7d5f8f97146ff11da2b72a24a9139",
+        "signature": "rakeezx.n77_guard_live_parent()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "f10457561b00d7a1fa878bcff29754a6",
+        "signature": "rakeezx.record_owner_sync_change()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "953407030275378ef8452840366b01d0",
+        "signature": "rakeezx.stage_n71_restore(text,text,integer,jsonb,jsonb,uuid)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "ab4f5c36f7d4c1ccfec9d80e36f7b1d7",
+        "signature": "rakeezx.sync_v2_field_map_before_class_goal_0024(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "8387b711ca1c56429244f545891a291f",
+        "signature": "rakeezx.sync_v2_field_map_before_curriculum_0031(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "217df888aef6b0ae5ef93c15bbe234a8",
+        "signature": "rakeezx.sync_v2_field_map_before_group_arrangements_0025(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "45951e1ee33015aa4e9cb4668f380558",
+        "signature": "rakeezx.sync_v2_field_map_before_n03(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "9635442ab51ad54069b78a276a866eda",
+        "signature": "rakeezx.sync_v2_field_map_before_n58(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "8848a8f75e994063cc5e25432792dd3e",
+        "signature": "rakeezx.sync_v2_field_map_before_n71(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "6489910b8a5a469f3340b8f04b696aad",
+        "signature": "rakeezx.sync_v2_field_map_before_n73(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "48cea883c9a8e12edc5793e0afa40259",
+        "signature": "rakeezx.sync_v2_field_map_before_profile_access_0032(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "7c599c05d27dea5298a3d68b34d4c0bc",
+        "signature": "rakeezx.sync_v2_field_map_before_scores_0033(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "67509db798e886d0ebd545aebc5abf56",
+        "signature": "rakeezx.sync_v2_field_map_before_section_archive_0021(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "77428869bad88a9d80e8366e7d99f11f",
+        "signature": "rakeezx.sync_v2_field_map(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "29b31b631a0156edb3954857d47d0788",
+        "signature": "rakeezx.sync_v2_natural_key_before_group_arrangements_0025(text,jsonb)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c4368222d9005d860ab2fb1477f95f29",
+        "signature": "rakeezx.sync_v2_natural_key_before_n58(text,jsonb)",
+        "securityDefiner": true
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "3ab0353ac9cf6a40a99dd09fa687e8d5",
+        "signature": "rakeezx.sync_v2_natural_key_reusable_after_delete(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "47d56ee07ceb90d3c81a6c1c2dabdfb5",
+        "signature": "rakeezx.sync_v2_natural_key(text,jsonb)",
+        "securityDefiner": true
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c7d255759e950fea8c38efd44367422b",
+        "signature": "rakeezx.sync_v2_stamp_revision()",
+        "securityDefiner": false
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "7e3d5e0e65812e8a1ebffe6b7655f85e",
+        "signature": "rakeezx.touch_updated_at()",
+        "securityDefiner": false
+      }
+    ],
+    "roleFlags": [
+      {
+        "name": "anon",
+        "login": false,
+        "bypassRls": false,
+        "superuser": false
+      },
+      {
+        "name": "authenticated",
+        "login": false,
+        "bypassRls": false,
+        "superuser": false
+      },
+      {
+        "name": "service_role",
+        "login": false,
+        "bypassRls": true,
+        "superuser": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "slots_field_revisions_check",
+        "validated": true,
+        "definition": "CHECK (jsonb_typeof(field_revisions) = 'object'::text)"
+      },
+      {
+        "name": "slots_owner_id_fkey",
+        "validated": true,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "slots_owner_id_teaching_id_fkey",
+        "validated": true,
+        "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "slots_period_check",
+        "validated": true,
+        "definition": "CHECK (period >= 1 AND period <= 12)"
+      },
+      {
+        "name": "slots_pkey",
+        "validated": true,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "slots_revision_check",
+        "validated": true,
+        "definition": "CHECK (revision >= 1)"
+      },
+      {
+        "name": "slots_weekday_check",
+        "validated": true,
+        "definition": "CHECK (weekday >= 0 AND weekday <= 6)"
+      }
+    ]
+  },
+  "readback": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "default": null,
+        "notNull": true
+      },
+      {
+        "name": "owner_id",
+        "type": "uuid",
+        "default": "auth.uid()",
+        "notNull": true
+      },
+      {
+        "name": "teaching_id",
+        "type": "text",
+        "default": null,
+        "notNull": false
+      },
+      {
+        "name": "weekday",
+        "type": "integer",
+        "default": null,
+        "notNull": true
+      },
+      {
+        "name": "period",
+        "type": "integer",
+        "default": null,
+        "notNull": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "notNull": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "notNull": true
+      },
+      {
+        "name": "client_updated_at",
+        "type": "bigint",
+        "default": null,
+        "notNull": false
+      },
+      {
+        "name": "device_id",
+        "type": "text",
+        "default": null,
+        "notNull": false
+      },
+      {
+        "name": "deleted_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notNull": false
+      },
+      {
+        "name": "revision",
+        "type": "bigint",
+        "default": "1",
+        "notNull": true
+      },
+      {
+        "name": "field_revisions",
+        "type": "jsonb",
+        "default": "'{}'::jsonb",
+        "notNull": true
+      },
+      {
+        "name": "kind",
+        "type": "text",
+        "default": "'teaching'::text",
+        "notNull": true
+      },
+      {
+        "name": "term_id",
+        "type": "text",
+        "default": null,
+        "notNull": false
+      }
+    ],
+    "history": [
+      {
+        "version": "20261019095922",
+        "name": "n122_non_teaching_slots",
+        "statementCount": 1
+      }
+    ],
+    "indexes": [
+      {
+        "name": "slots_n122_term_idx",
+        "definition": "CREATE INDEX slots_n122_term_idx ON rakeezx.slots USING btree (owner_id, term_id) WHERE (term_id IS NOT NULL)"
+      },
+      {
+        "name": "slots_pkey",
+        "definition": "CREATE UNIQUE INDEX slots_pkey ON rakeezx.slots USING btree (owner_id, id)"
+      },
+      {
+        "name": "slots_sync_idx",
+        "definition": "CREATE INDEX slots_sync_idx ON rakeezx.slots USING btree (owner_id, updated_at)"
+      },
+      {
+        "name": "slots_teaching_idx",
+        "definition": "CREATE INDEX slots_teaching_idx ON rakeezx.slots USING btree (owner_id, teaching_id)"
+      }
+    ],
+    "policies": [
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "slots",
+        "permissive": "PERMISSIVE",
+        "policyname": "slots_insert",
+        "schemaname": "rakeezx",
+        "with_check": "(owner_id = ( SELECT auth.uid() AS uid))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(owner_id = ( SELECT auth.uid() AS uid))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "slots",
+        "permissive": "PERMISSIVE",
+        "policyname": "slots_select",
+        "schemaname": "rakeezx",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(owner_id = ( SELECT auth.uid() AS uid))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "slots",
+        "permissive": "PERMISSIVE",
+        "policyname": "slots_update",
+        "schemaname": "rakeezx",
+        "with_check": "(owner_id = ( SELECT auth.uid() AS uid))"
+      }
+    ],
+    "relation": {
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arw/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "forceRls": true
+    },
+    "triggers": [
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "name": "01_n58_calendar_contract",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER \"01_n58_calendar_contract\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.n58_guard_calendar_contract()"
+      },
+      {
+        "name": "guard_section_lifecycle_fields",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER guard_section_lifecycle_fields BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_section_lifecycle_fields()"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()"
+      },
+      {
+        "name": "sections_cancel_class_goals",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_cancel_class_goals AFTER UPDATE OF status ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.cancel_goals_when_section_archived()"
+      },
+      {
+        "name": "sections_owner",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_owner BEFORE INSERT ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()"
+      },
+      {
+        "name": "sections_sync_v2_revision",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()"
+      },
+      {
+        "name": "sections_touch",
+        "table": "sections",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER sections_touch BEFORE INSERT OR UPDATE ON rakeezx.sections FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()"
+      },
+      {
+        "name": "00_student_lifecycle_statement_lock",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.slots FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "name": "guard_active_slot_collision",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER guard_active_slot_collision BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_active_slot_collision()"
+      },
+      {
+        "name": "guard_archived_section_write",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER guard_archived_section_write BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.guard_archived_section_write()"
+      },
+      {
+        "name": "n122_guard_slot_term",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER n122_guard_slot_term BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.n122_guard_slot_term()"
+      },
+      {
+        "name": "n77_guard_live_parent",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER n77_guard_live_parent BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.n77_guard_live_parent()"
+      },
+      {
+        "name": "owner_sync_change",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER owner_sync_change AFTER INSERT OR DELETE OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.record_owner_sync_change()"
+      },
+      {
+        "name": "slots_owner",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER slots_owner BEFORE INSERT ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.force_owner()"
+      },
+      {
+        "name": "slots_sync_v2_revision",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER slots_sync_v2_revision BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.sync_v2_stamp_revision()"
+      },
+      {
+        "name": "slots_touch",
+        "table": "slots",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER slots_touch BEFORE INSERT OR UPDATE ON rakeezx.slots FOR EACH ROW EXECUTE FUNCTION rakeezx.touch_updated_at()"
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "a6284ed21c86f1cafcac2d4d84a5fadc",
+        "signature": "rakeezx.apply_sync_v2_mutation(text,text,text,text,bigint,jsonb,text,bigint)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "e26395086d9f4f7bb6e0fffadd4258a0",
+        "signature": "rakeezx.apply_sync_v2_section_lifecycle_command_before_student_0029(text,text,text,text,date,bigint)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c97cc4db769bd3c590cf161172b136e6",
+        "signature": "rakeezx.apply_sync_v2_section_lifecycle_command(text,text,text,text,date,bigint)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "392a181e1dacf4629322fbfa440479c8",
+        "signature": "rakeezx.cancel_goals_when_section_archived()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "74a3e785528671f0a1ea8f62e7d89574",
+        "signature": "rakeezx.finalize_n71_restore(text,text,text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c7fd7d1d4712ccb97b5266f5c41c311a",
+        "signature": "rakeezx.force_owner()",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "e135716673914077600d22bb007499a3",
+        "signature": "rakeezx.guard_active_slot_collision()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "35a4350874cd39c36f12397cdbf8ddb4",
+        "signature": "rakeezx.guard_archived_section_write()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "5311a6a1b727924f8bc4d6c3e44b2818",
+        "signature": "rakeezx.guard_section_lifecycle_fields()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "bb108b92f9f16304cede93ffbd8ee566",
+        "signature": "rakeezx.lock_student_lifecycle_statement()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "f9118a60f5faaa9c55f09da15ae90230",
+        "signature": "rakeezx.n122_guard_slot_term()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "6fc9fcdf35f78d0ae295fe61a833f70d",
+        "signature": "rakeezx.n58_guard_calendar_contract()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "b327d697c3d3aa866f981416f6011dba",
+        "signature": "rakeezx.n71_restore_canonical(uuid)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "47d7d5f8f97146ff11da2b72a24a9139",
+        "signature": "rakeezx.n77_guard_live_parent()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "f10457561b00d7a1fa878bcff29754a6",
+        "signature": "rakeezx.record_owner_sync_change()",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "953407030275378ef8452840366b01d0",
+        "signature": "rakeezx.stage_n71_restore(text,text,integer,jsonb,jsonb,uuid)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "ab4f5c36f7d4c1ccfec9d80e36f7b1d7",
+        "signature": "rakeezx.sync_v2_field_map_before_class_goal_0024(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "8387b711ca1c56429244f545891a291f",
+        "signature": "rakeezx.sync_v2_field_map_before_curriculum_0031(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "217df888aef6b0ae5ef93c15bbe234a8",
+        "signature": "rakeezx.sync_v2_field_map_before_group_arrangements_0025(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "45951e1ee33015aa4e9cb4668f380558",
+        "signature": "rakeezx.sync_v2_field_map_before_n03(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "77428869bad88a9d80e8366e7d99f11f",
+        "signature": "rakeezx.sync_v2_field_map_before_n122(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "9635442ab51ad54069b78a276a866eda",
+        "signature": "rakeezx.sync_v2_field_map_before_n58(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "8848a8f75e994063cc5e25432792dd3e",
+        "signature": "rakeezx.sync_v2_field_map_before_n71(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "6489910b8a5a469f3340b8f04b696aad",
+        "signature": "rakeezx.sync_v2_field_map_before_n73(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "48cea883c9a8e12edc5793e0afa40259",
+        "signature": "rakeezx.sync_v2_field_map_before_profile_access_0032(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "7c599c05d27dea5298a3d68b34d4c0bc",
+        "signature": "rakeezx.sync_v2_field_map_before_scores_0033(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "67509db798e886d0ebd545aebc5abf56",
+        "signature": "rakeezx.sync_v2_field_map_before_section_archive_0021(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "e8f19db62abd9ade83e014e6e0ebf15e",
+        "signature": "rakeezx.sync_v2_field_map(text)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "29b31b631a0156edb3954857d47d0788",
+        "signature": "rakeezx.sync_v2_natural_key_before_group_arrangements_0025(text,jsonb)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "47d56ee07ceb90d3c81a6c1c2dabdfb5",
+        "signature": "rakeezx.sync_v2_natural_key_before_n122(text,jsonb)",
+        "securityDefiner": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c4368222d9005d860ab2fb1477f95f29",
+        "signature": "rakeezx.sync_v2_natural_key_before_n58(text,jsonb)",
+        "securityDefiner": true
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "3ab0353ac9cf6a40a99dd09fa687e8d5",
+        "signature": "rakeezx.sync_v2_natural_key_reusable_after_delete(text)",
+        "securityDefiner": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "bbe0f5e0e95bc9ee6b9d0c6a3a03202c",
+        "signature": "rakeezx.sync_v2_natural_key(text,jsonb)",
+        "securityDefiner": true
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "c7d255759e950fea8c38efd44367422b",
+        "signature": "rakeezx.sync_v2_stamp_revision()",
+        "securityDefiner": false
+      },
+      {
+        "acl": null,
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "bodyMd5Lf": "7e3d5e0e65812e8a1ebffe6b7655f85e",
+        "signature": "rakeezx.touch_updated_at()",
+        "securityDefiner": false
+      }
+    ],
+    "roleFlags": [
+      {
+        "name": "anon",
+        "login": false,
+        "bypassRls": false,
+        "superuser": false
+      },
+      {
+        "name": "authenticated",
+        "login": false,
+        "bypassRls": false,
+        "superuser": false
+      },
+      {
+        "name": "service_role",
+        "login": false,
+        "bypassRls": true,
+        "superuser": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "slots_field_revisions_check",
+        "validated": true,
+        "definition": "CHECK (jsonb_typeof(field_revisions) = 'object'::text)"
+      },
+      {
+        "name": "slots_n122_kind_parent_ck",
+        "validated": true,
+        "definition": "CHECK (kind = 'teaching'::text AND teaching_id IS NOT NULL AND term_id IS NULL OR (kind = ANY (ARRAY['activity'::text, 'waiting'::text])) AND teaching_id IS NULL AND term_id IS NOT NULL)"
+      },
+      {
+        "name": "slots_n122_owner_term_fk",
+        "validated": true,
+        "definition": "FOREIGN KEY (owner_id, term_id) REFERENCES rakeezx.terms(owner_id, id)"
+      },
+      {
+        "name": "slots_owner_id_fkey",
+        "validated": true,
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "slots_owner_id_teaching_id_fkey",
+        "validated": true,
+        "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+      },
+      {
+        "name": "slots_period_check",
+        "validated": true,
+        "definition": "CHECK (period >= 1 AND period <= 12)"
+      },
+      {
+        "name": "slots_pkey",
+        "validated": true,
+        "definition": "PRIMARY KEY (owner_id, id)"
+      },
+      {
+        "name": "slots_revision_check",
+        "validated": true,
+        "definition": "CHECK (revision >= 1)"
+      },
+      {
+        "name": "slots_weekday_check",
+        "validated": true,
+        "definition": "CHECK (weekday >= 0 AND weekday <= 6)"
+      }
+    ]
+  },
+  "publicWrapperBefore": {
+    "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+    "owner": "postgres",
+    "config": [
+      "search_path=\"\""
+    ],
+    "bodyMd5Lf": "c97cc4db769bd3c590cf161172b136e6",
+    "signature": "rakeezx.apply_sync_v2_section_lifecycle_command(text,text,text,text,date,bigint)",
+    "definition": "CREATE OR REPLACE FUNCTION rakeezx.apply_sync_v2_section_lifecycle_command(p_mutation_id text, p_device_id text, p_command text, p_section_id text, p_archive_date date DEFAULT NULL::date, p_client_updated_at bigint DEFAULT NULL::bigint)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$ begin\r\n      if auth.uid() is null then raise exception using errcode='42501',message='Authentication required'; end if;\r\n      perform rakeezx.lock_student_lifecycle(auth.uid());\r\n      return rakeezx.apply_sync_v2_section_lifecycle_command_before_student_0029(p_mutation_id,p_device_id,p_command,p_section_id,p_archive_date,p_client_updated_at); end; $function$\n",
+    "securityDefiner": true
+  },
+  "publicWrapperAfter": {
+    "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+    "owner": "postgres",
+    "config": [
+      "search_path=\"\""
+    ],
+    "bodyMd5Lf": "c97cc4db769bd3c590cf161172b136e6",
+    "signature": "rakeezx.apply_sync_v2_section_lifecycle_command(text,text,text,text,date,bigint)",
+    "definition": "CREATE OR REPLACE FUNCTION rakeezx.apply_sync_v2_section_lifecycle_command(p_mutation_id text, p_device_id text, p_command text, p_section_id text, p_archive_date date DEFAULT NULL::date, p_client_updated_at bigint DEFAULT NULL::bigint)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$ begin\r\n      if auth.uid() is null then raise exception using errcode='42501',message='Authentication required'; end if;\r\n      perform rakeezx.lock_student_lifecycle(auth.uid());\r\n      return rakeezx.apply_sync_v2_section_lifecycle_command_before_student_0029(p_mutation_id,p_device_id,p_command,p_section_id,p_archive_date,p_client_updated_at); end; $function$\n",
+    "securityDefiner": true
+  },
+  "expectedSourceFunctionBodyMd5Lf": [
+    {
+      "name": "sync_v2_field_map",
+      "bodyMd5Lf": "e8f19db62abd9ade83e014e6e0ebf15e"
+    },
+    {
+      "name": "sync_v2_natural_key",
+      "bodyMd5Lf": "bbe0f5e0e95bc9ee6b9d0c6a3a03202c"
+    },
+    {
+      "name": "n122_guard_slot_term",
+      "bodyMd5Lf": "f9118a60f5faaa9c55f09da15ae90230"
+    },
+    {
+      "name": "guard_active_slot_collision",
+      "bodyMd5Lf": "e135716673914077600d22bb007499a3"
+    },
+    {
+      "name": "apply_sync_v2_section_lifecycle_command_before_student_0029",
+      "bodyMd5Lf": "e26395086d9f4f7bb6e0fffadd4258a0"
+    }
+  ],
+  "checks": [
+    {
+      "name": "provider_history_exact_corrected_source",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged_relation",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged_policies",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged_roleFlags",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_columns_and_existing_academic_fk",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_index_and_trigger_with_existing_guards_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "source_function_bodies_owners_and_internal_acl",
+      "status": "PASS"
+    },
+    {
+      "name": "public_entry_wrapper_and_unrelated_delegate_guards_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "n122_preserved_lifecycle_entry_guard_before_exact_hosted_apply",
+      "status": "PASS",
+      "evidence": "tests/n122-1019-entry-guard.json: native public RPC, exact wrapper/owner/ACL equality, second-connection mutex unavailable before transaction commit and available after; academic and both independent conflict controls passed."
+    },
+    {
+      "name": "n122_exact_hosted_schema_service_readback_before_product_release",
+      "status": "PASS",
+      "evidence": "Actual apply_migration success plus exact provider history source equality and matching installed field/constraint/index/trigger/function body/owner/ACL readback. Prior RLS, wrapper/delegate guards and role flags preserved."
+    }
+  ],
+  "cleanup": {
+    "native": "Owned PG fixture stopped/removed; integration lease RELEASED (tests/n122-1019-entry-guard.json)",
+    "hostedMutationLease": "RELEASED live-mutation",
+    "browserPhase": "NOT_RUN; unchanged successful prior UI evidence reused"
+  },
+  "priorFailure": {
+    "evidence": "tests/n122-1019-hosted-preimage.json",
+    "status": "FAIL",
+    "disposition": "Retained unchanged. Old unapplied source corrected only by explicitly authorized single signature replacement; native guard proof and hosted installation now resolve the defect."
+  }
+}

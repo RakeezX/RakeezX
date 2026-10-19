@@ -8,22 +8,7 @@ export async function qualify({a,b,sql,report,root}) {
   const q=(s,v=[])=>a.query(s,v);
   const check=async(name,fn)=>{const e={name,status:'FAIL'};report.checks.push(e);await fn();e.status='PASS';};
   const fail=async(s,v,code)=>{let actual;try{await q(s,v);}catch(e){actual=e.code;}assert.equal(actual,code);report.negativeSqlstates.push({expected:code,actual});};
-  // Unchanged standard synthetic bootstrap identities only. No Product roles or
-  // LOGINs are added by N122, and no shared cluster/hosted role is modified.
-  await q(`create schema auth; create schema realtime;
-    create role authenticated nologin; create role anon nologin; create role service_role nologin;
-    create table auth.users(id uuid primary key,email text);
-    create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
-    grant usage on schema auth to authenticated,anon;
-    create table realtime.messages(extension text,topic text); alter table realtime.messages enable row level security;
-    create function realtime.topic() returns text language sql stable as $$select current_setting('realtime.topic',true)$$;
-    create function realtime.send(jsonb,text,text,boolean) returns void language sql as $$select$$;`);
-  // Only public-domain prerequisite schema, no staged N44/N88 private schemas.
-  const dir=path.join(root,'supabase/migrations');
-  const n58=['20261004070000_n58_calendar_persistence.sql','20261004070001_n58_extra_term_compatibility.sql','20261004070002_n58_effective_scope_revalidation.sql'];
-  const names=[...await readdir(dir),...n58].filter(n=>n.endsWith('.sql')&&n<'20261018000000').sort();
-  for(const n of names) {try{await q((n58.includes(n)?execFileSync('C:/Program Files/Git/cmd/git.exe',['show','4fa6fb8b98415a42dd0a835bfdd7038ab65b8979:supabase/migrations/'+n],{encoding:'utf8',maxBuffer:20000000}):await readFile(path.join(dir,n),'utf8')).replace(/^\uFEFF/,'').replaceAll('\r\n','\n'));}catch(e){throw Error(`Public bootstrap ${n}: ${e.code} ${e.message}`);}}
-  report.bootstrap=names;
+  await bootstrapPublicSchema({a,report,root});
   await q(`insert into auth.users(id) values('${A}'),('${B}'); select set_config('request.jwt.claim.sub','${A}',false);`);
   await q(`insert into rakeezx.years(id,label,hijri_start,hijri_end) values('n122-y','synthetic',1500,1501);
     insert into rakeezx.terms(id,year_id,name,"index",status) values('n122-t','n122-y','synthetic',1,'active');
@@ -94,4 +79,24 @@ export async function qualify({a,b,sql,report,root}) {
     const r=(await b.query("select rakeezx.apply_sync_v2_mutation('slots','n122-a','n122-foreign','n122-device',1,'{\"period\":5}'::jsonb,'patch',3000) r")).rows[0].r;
     assert.equal(r.outcome,'not_found');
   });
+}
+
+export async function bootstrapPublicSchema({a,report,root}) {
+  const q=(s,v=[])=>a.query(s,v);
+  // Unchanged standard synthetic bootstrap identities only. No Product roles or
+  // LOGINs are added by N122, and no shared cluster/hosted role is modified.
+  await q(`create schema auth; create schema realtime;
+    create role authenticated nologin; create role anon nologin; create role service_role nologin;
+    create table auth.users(id uuid primary key,email text);
+    create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+    grant usage on schema auth to authenticated,anon;
+    create table realtime.messages(extension text,topic text); alter table realtime.messages enable row level security;
+    create function realtime.topic() returns text language sql stable as $$select current_setting('realtime.topic',true)$$;
+    create function realtime.send(jsonb,text,text,boolean) returns void language sql as $$select$$;`);
+  // Only public-domain prerequisite schema, no staged N44/N88 private schemas.
+  const dir=path.join(root,'supabase/migrations');
+  const n58=['20261004070000_n58_calendar_persistence.sql','20261004070001_n58_extra_term_compatibility.sql','20261004070002_n58_effective_scope_revalidation.sql'];
+  const names=[...await readdir(dir),...n58].filter(n=>n.endsWith('.sql')&&n<'20261018000000').sort();
+  for(const n of names) {try{await q((n58.includes(n)?execFileSync('C:/Program Files/Git/cmd/git.exe',['show','4fa6fb8b98415a42dd0a835bfdd7038ab65b8979:supabase/migrations/'+n],{encoding:'utf8',maxBuffer:20000000}):await readFile(path.join(dir,n),'utf8')).replace(/^\uFEFF/,'').replaceAll('\r\n','\n'));}catch(e){throw Error(`Public bootstrap ${n}: ${e.code} ${e.message}`);}}
+  report.bootstrap=names;
 }
