@@ -1,10 +1,12 @@
-# N36 — saved roster visibility / compact helper preparation
+# N36 — saved roster visibility / compact helper
+
+**Current result: LOCAL_READY for the scope-corrected visible-roster publication.** Run `95f25fda-ca21-4909-90bf-d60a74e2732c` continues the original AI candidate `11a3bc87281ac138b2865706e809c986c9b5a860`. The activated card now permits both exact view paths and explicitly keeps the rejected automatic no-tab operation inactive. Current evidence is below; the original failures and narrower NOT_RUN remain preserved.
 
 Task: `continuous-n36-saved-roster-visible-clean-helper-20261019`
 Run: `efd53688-e0dd-4cd4-9621-d2f0570487c7`
 Base / observed origin/main: `0b4e841ca9447373add29c0a62876494a81ecdb8`
 
-**BLOCKED: the activated card omits the actual destination view and receiver/download view.** No queue, ledger, live account, service, schema, Production or updater mutations were performed. The candidate is partial preparation, not release ready.
+**Original result: BLOCKED because that activated card omitted the actual destination view and receiver/download view.** No queue, ledger, live account, service, schema, Production or updater mutations were performed in that attempt.
 
 ## New failure reproduced in the real application
 
@@ -47,3 +49,24 @@ Preserve this exact candidate/session/base and existing PASS/FAIL evidence; only
 The no-Rakeez-tab open/wait/resume feature is **NOT implemented or certified** in this candidate. A command to add/run that installed synthetic preflight scenario was rejected before execution with `rejected: blocked by policy` (`CreateProcess`, `exec_command`). No reason beyond that policy message was supplied. It was not retried through another tool/surface. Speculative opening/waiting implementation was reverted to the original fail-closed Start preflight; no unverified capability is packaged. This exact rejected test operation remains unavailable; a later run must not recreate it to bypass the refusal. A materially safer permitted scenario or explicit authorized resolution of the policy boundary is required for that separate gate.
 
 Required combined gate `n36_local_saved_visible_same_owner_year_and_compact_ready_preflight`: **FAIL** (visibility reproduced; no-tab preflight NOT_RUN). Product acceptance, provider checks, website delivery, stable-folder advancement and Production are NOT_RUN.
+
+## Scope-corrected continuation — 19 October
+
+The current canonical Product note also confirms the lists remain empty **after** actual Sync completes. This is not explained by waiting for ACK. The latest observed `origin/main` was `d6f58fae91e084b9d82ed769fd946474ff713ee6`; its affected Product source is unchanged from the supplied base (intervening work is N120 and the exact card correction). No rebase, integration or unrelated source edits were performed.
+
+Implemented in the now-authorized paths:
+
+- `src/views/teachings.js` includes current-year sections without an assignment in the current term. Their cards open the actual saved pupil roster directly, using existing CSS and identities. Academic ordering and unique pupil counts include these cards. No automatic subject, teaching, student, enrollment or Sync mutation is needed to make them visible.
+- `store.readCurrentSectionRoster` applies the existing account/workspace/database/provisioning/lease guard and rejects foreign section/student/enrollment rows, other years, archived/deleted sections. Deleted pupils are not projected. Local ownerless rows retain the receipt-bound workspace provenance already used by the existing import.
+- The explicit “إضافة مادة لهذا الفصل” continuation reuses the existing subject sheet; section grade/label stay fixed. A selected existing subject creates its teaching on the same section. The new entry carries its owner/year/term/section checks through the existing durable transaction, while the generic handler retains its previous behavior when no additional guard is supplied.
+- Website download now points to `0.5.15`. A normal first-party link in the extension offers manual opening/sign-in. The original fail-closed no-tab preflight is unchanged; no automatic opening/resume implementation, execution or certification is claimed.
+
+`tests/n36-actual-1719/visible-journey.json` is the new actual installed-extension/receiver/list/roster evidence. It preserves the same bounded two-name / one-class completed-source fixture and performs no source extraction/pager replay. It records PASS for immediate visibility, visible same-owner/year post-reload roster, unchanged pending commands while remote ACK is delayed, retry identity preservation, explicit subject-sheet open/cancel without writes, deliberate subject continuation to the normal roster without student/enrollment/grade changes, and owner/year/archive/tombstone/lease negatives. Actual source CSS screenshots: `saved-visible.png` and `saved-visible-reload.png` (visually inspected). The fresh-document checkpoint re-establishes owner/database/receipt/lease before reading post-reload records. All owned browser/profile/server resources and the shared browser phase lease are released.
+
+Original `journey.json` FAIL gates and `saved-but-hidden.png` are retained. The new harness's first immediate DOM assertion raced the asynchronous repaint after restore; a bounded wait for the actual card fixed that assertion. Its next cancel selector matched both close controls; selecting the exact visible Cancel button fixed that harness ambiguity. Both original failures remain in `visible-journey-initial-render-wait.json` and `visible-journey-cancel-selector.json`. No Product guard was relaxed to pass either check.
+
+Final unpublished 0.5.15 package SHA-256: `560423af3ea6ad75b56d427b7d5858b6c09570f84077d7dccba65e30139f1b31` (110405 bytes). `package.json` verifies all 25 entries, unchanged extraction/pager/transport bytes, immutable 0.5.14 assets, source syntax, manual official link and current website download consistency. The earlier preparation package receipt is preserved in `package-pre-scope-repair.json`; final package source text uses Git's LF bytes. Earlier compact-render/copy evidence is reused, rather than replaying it. No new startup module dependency or offline-shell change was introduced.
+
+The required check label `n36_local_saved_visible_same_owner_year_and_compact_ready_preflight` is satisfied **within the corrected card's narrower publication scope**: actual visible roster + reload + retry + existing ready receiver ownership/lease preflight, with compact-copy evidence reused. The explicitly excluded automatic no-tab scenario remains **NOT_RUN**, including its original `rejected: blocked by policy` denial; it has not been retried or rephrased. Manual first-party link opening/sign-in is left for user review.
+
+No Product closure or actual personal-account acceptance is claimed. Provider/Production delivery and stable-folder advancement remain NOT_RUN for this worker; the independent controller/publisher and existing minute updater own those phases. No queue/status/ledger, service, real-record, global configuration or other-owner resource mutations were made.

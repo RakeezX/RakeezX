@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "name": "actual_extension_local_save",
+      "status": "PASS",
+      "evidence": "Two fabricated names / one class: actual encrypted extension transport, receiver ownership guard and store transaction; five pending commands, zero remote ACKs, local receipt arithmetic 2 new + 0 existing."
+    },
+    {
+      "name": "saved_roster_immediately_visible",
+      "status": "PASS",
+      "evidence": "Actual classes route displays one subjectless section card with both actual saved pupil IDs/names, metrics 1/2, zero extra writes and no invented teaching."
+    }
+  ],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [
+    "https://xlrubcwjqktzzunrvuns.supabase.co/auth/v1/user"
+  ],
+  "lease": "ACQUIRED browser",
+  "status": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-saved-roster-visible-clean-helper-20261019/tests/n36-actual-1719/visible-journey.mjs:77:9",
+  "release": "RELEASED browser",
+  "cleanup": "Owned synthetic browser/profile/server closed; owned shared browser lease released"
+}

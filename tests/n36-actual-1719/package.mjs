@@ -31,10 +31,11 @@ const reusedHashes={};for(const f of ['source-adapter.js','source-roster.js','se
  const source=await fs.readFile(dir+f);assert.deepEqual(source,execFileSync('git',['show',base+':'+dir+f]));reusedHashes[f]=hash(source);
 }
 assert.deepEqual(await fs.readFile(dir+'handoff-protocol.js'),await fs.readFile('src/lib/n36-extension-protocol.js'));
-const app=await fs.readFile('src/views/class-import-center.js','utf8');assert.match(app,/helper-0\.5\.14\.zip/); // Expected blocker: website path is outside allowedPaths.
+const popup=await fs.readFile(dir+'popup.html','utf8');assert.ok(popup.includes('href="https://rakeezx.com/" target="_blank" rel="noopener noreferrer"'));
+const app=await fs.readFile('src/views/class-import-center.js','utf8');assert.match(app,/helper-0\.5\.15\.zip/);
 for(const f of ['src/views/class-import-center.js',...manifest.files.filter(f=>f.file.endsWith('.js')).map(f=>dir+f.file)])execFileSync(process.execPath,['--check',f]);
 const canonical='C:/Users/Abody/Projects/RakeezX';
 const updater=await fs.readFile(canonical+'/scripts/ops-supervisor-v4/n36-stable-sync.mjs','utf8');assert.ok(updater.includes("root+'/scripts/ops-supervisor-v4/n36-update-stable.mjs'"));
 const stable=JSON.parse(await fs.readFile(canonical+'/artifacts/private-tools/n36-current/STABLE_CURRENT.json','utf8'));
-const evidence={status:'PASS',version,archive:manifest.archive,files:manifest.files.length,reusedHashes,checks:['Exact ZIP/source/manifest hashes; immutable 0.5.14','Unchanged source extraction/pagination/transport guards: reuse recorded evidence','Scoped JS syntax and protocol parity','Website remains 0.5.14: BLOCKED missing src/views/class-import-center.js scope'],stableFolder:{observedVersion:stable.version,updatedByWorker:false,existingMinuteUpdater:true,advanceToCandidate:'NOT_RUN: requires independent publisher verified release'},provider:'NOT_RUN',production:'NOT_RUN'};
+const evidence={status:'PASS',version,archive:manifest.archive,files:manifest.files.length,reusedHashes,checks:['Exact ZIP/source/manifest hashes; immutable 0.5.14','Unchanged source extraction/pagination/transport guards: reuse recorded evidence','Scoped JS syntax and protocol parity','Actual website download points to verified local 0.5.15 package'],stableFolder:{observedVersion:stable.version,updatedByWorker:false,existingMinuteUpdater:true,advanceToCandidate:'NOT_RUN: requires independent publisher verified release'},provider:'NOT_RUN',production:'NOT_RUN'};
 await fs.writeFile('tests/n36-actual-1719/package.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

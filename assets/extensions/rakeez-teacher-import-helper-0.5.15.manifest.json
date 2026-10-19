@@ -61,8 +61,8 @@
     },
     {
       "file": "manifest.json",
-      "sha256": "9d1ddc7529f071ecec7d611ebad96a3e7a2174ee6a310faf1365942c32d4c57e",
-      "bytes": 854
+      "sha256": "26d00d3dedb0480c22f975961c93ba596e4d0f624ac6cd4bd05a064c7008afe0",
+      "bytes": 842
     },
     {
       "file": "navigation.js",
@@ -76,8 +76,8 @@
     },
     {
       "file": "popup.html",
-      "sha256": "0d71277dddb978e7940d09ba1bc836f0237715c3e9ee717c823e0a183481fed8",
-      "bytes": 8862
+      "sha256": "2c9ce1dbd6f7e1e53e7b624d903865e74fd53890b17203f297e587b1608ea41e",
+      "bytes": 8961
     },
     {
       "file": "popup.js",
@@ -91,8 +91,8 @@
     },
     {
       "file": "run-controller.js",
-      "sha256": "1ac1412274f5dedf270c6f6b2378d9736d563c9ff2b696bdb3bff5be809d1159",
-      "bytes": 41276
+      "sha256": "16754f5602c10023379480ca3133facde3d1bad54e0d13b4f1870f754346771c",
+      "bytes": 40893
     },
     {
       "file": "selection.js",
@@ -132,7 +132,7 @@
   ],
   "archive": {
     "file": "rakeez-teacher-import-helper-0.5.15.zip",
-    "sha256": "c65a7c92deb60c7b01113733f3045ccc83d8dd46e1420961eb39abe6ea4de817",
-    "bytes": 110397
+    "sha256": "560423af3ea6ad75b56d427b7d5858b6c09570f84077d7dccba65e30139f1b31",
+    "bytes": 110405
   }
 }

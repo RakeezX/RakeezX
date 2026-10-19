@@ -1485,6 +1485,23 @@ export function sectionRoster(secId) {
   return sortStudents(rows);
 }
 
+// AI: names-only imports need no invented teaching to read their saved roster.
+// Local ownerless rows retain the mounted account DB's receipt-bound provenance.
+export function readCurrentSectionRoster(secId) {
+  const workspace = assertClassImportAccess();
+  const section = getSection(secId);
+  if (!section || section.yearId !== activeYear().id || isSectionArchived(section)) {
+    throw new Error('الفصل غير متاح في السنة الحالية.');
+  }
+  const enrollments = enrollmentsIn(secId).filter(row => row.status === 'active');
+  const students = sectionRoster(secId);
+  if (workspace.type === 'account' && [section, ...enrollments, ...students].some(row =>
+    row.ownerId != null && row.ownerId !== workspace.authUserId)) {
+    throw new Error('تعذّرت مطابقة كشف الفصل مع الحساب الحالي.');
+  }
+  return { section, students };
+}
+
 /** كشف الإسناد = كشف شعبته. */
 export const students = (tchId) => {
   const tch = getTeaching(tchId);

@@ -1,0 +1,59 @@
+{
+  "checks": [
+    {
+      "name": "actual_extension_local_save",
+      "status": "PASS",
+      "evidence": "Two fabricated names / one class: actual encrypted extension transport, receiver ownership guard and store transaction; five pending commands, zero remote ACKs, local receipt arithmetic 2 new + 0 existing."
+    },
+    {
+      "name": "saved_roster_immediately_visible",
+      "status": "PASS",
+      "evidence": "Actual classes route displays one subjectless section card with both actual saved pupil IDs/names, metrics 1/2, zero extra writes and no invented teaching."
+    },
+    {
+      "name": "reload_same_owner_durable_roster_pending_ack",
+      "status": "PASS",
+      "evidence": "Fresh document re-established actual ownership/provisioning/lease guards; same IDs and five unchanged outbox commands survive reload, still no server ACK."
+    },
+    {
+      "name": "saved_roster_visible_after_reload",
+      "status": "PASS",
+      "evidence": "Same actual section card and owned pupils visible after fresh-document owner/year/receipt/DB readback, while remote ACK remains delayed."
+    },
+    {
+      "name": "retry_preserves_ids",
+      "status": "PASS",
+      "evidence": "Retry completed source uses existing same-owner/year names: zero duplicate records/commands, unchanged IDs."
+    },
+    {
+      "name": "add_subject_is_explicit",
+      "status": "PASS",
+      "evidence": "Actual add-subject action opens existing sheet with correct saved section; opening/cancelling creates no records or outbox commands."
+    },
+    {
+      "name": "new_projection_negative_ownership_year_tombstones",
+      "status": "PASS",
+      "evidence": "New actual view/read guard rejects wrong session owner, foreign section/student/enrollment, other year, archived/deleted sections; deleted students absent. Complete durable DB unchanged."
+    },
+    {
+      "name": "explicit_subject_continuation_preserves_roster",
+      "status": "PASS",
+      "evidence": "Actual sheet submit selects an existing subject and creates exactly one teaching on SAME section; both pupils/memberships/grades unchanged and visible on normal teaching roster. No duplicate subjectless card."
+    },
+    {
+      "name": "lease_guard_preserved",
+      "status": "PASS",
+      "evidence": "New section read rejects invalid synthetic offline lease; durable DB remains unchanged."
+    }
+  ],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [
+    "https://xlrubcwjqktzzunrvuns.supabase.co/auth/v1/user"
+  ],
+  "lease": "ACQUIRED browser",
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "cleanup": "Owned synthetic browser/profile/server closed; owned shared browser lease released"
+}

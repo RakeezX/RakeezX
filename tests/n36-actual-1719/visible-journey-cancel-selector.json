@@ -1,0 +1,40 @@
+{
+  "checks": [
+    {
+      "name": "actual_extension_local_save",
+      "status": "PASS",
+      "evidence": "Two fabricated names / one class: actual encrypted extension transport, receiver ownership guard and store transaction; five pending commands, zero remote ACKs, local receipt arithmetic 2 new + 0 existing."
+    },
+    {
+      "name": "saved_roster_immediately_visible",
+      "status": "PASS",
+      "evidence": "Actual classes route displays one subjectless section card with both actual saved pupil IDs/names, metrics 1/2, zero extra writes and no invented teaching."
+    },
+    {
+      "name": "reload_same_owner_durable_roster_pending_ack",
+      "status": "PASS",
+      "evidence": "Fresh document re-established actual ownership/provisioning/lease guards; same IDs and five unchanged outbox commands survive reload, still no server ACK."
+    },
+    {
+      "name": "saved_roster_visible_after_reload",
+      "status": "PASS",
+      "evidence": "Same actual section card and owned pupils visible after fresh-document owner/year/receipt/DB readback, while remote ACK remains delayed."
+    },
+    {
+      "name": "retry_preserves_ids",
+      "status": "PASS",
+      "evidence": "Retry completed source uses existing same-owner/year names: zero duplicate records/commands, unchanged IDs."
+    }
+  ],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [
+    "https://xlrubcwjqktzzunrvuns.supabase.co/auth/v1/user"
+  ],
+  "lease": "ACQUIRED browser",
+  "status": "FAIL",
+  "failure": "locator.click: Error: strict mode violation: locator('[data-sheet-close]') resolved to 2 elements:\n    1) <button class=\"iconbtn\" aria-label=\"إغلاق\" data-sheet-close=\"\">…</button> aka getByRole('button', { name: 'إغلاق' })\n    2) <button data-sheet-close=\"\" class=\"btn btn--ghost\">إلغاء</button> aka getByRole('button', { name: 'إلغاء' })\n\nCall log:\n\u001b[2m  - waiting for locator('[data-sheet-close]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-saved-roster-visible-clean-helper-20261019\\tests\\n36-actual-1719\\visible-journey.mjs:99:43",
+  "release": "RELEASED browser",
+  "cleanup": "Owned synthetic browser/profile/server closed; owned shared browser lease released"
+}

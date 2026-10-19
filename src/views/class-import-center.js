@@ -216,7 +216,7 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>افتح حساب ركيز في تبويب واحد، ثم ابدأ من إضافة مدرستي لجمع وحفظ أسماء جميع الفصول المتاحة. لا تأكيد لكل فصل؛ تُعرض الحالات غير المحسومة فقط. التغطية الجزئية تبقى جزئية بعد الحفظ.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.14.zip" download>تنزيل إضافة ركيز 0.5.14</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.15.zip" download>تنزيل إضافة ركيز 0.5.15</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
