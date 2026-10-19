@@ -14,8 +14,10 @@
       "liveMutation": false,
       "budgetMinutes": 45,
       "idleMinutes": 12,
-      "dependsOn": [],
-      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority allow teacher to add recurring permanent timetable slot نوع نشاط/انتظار even without a subject they normallyteach, persists until user edits/deletes. Use existing schedule model if capable; preserve existing classes/subjects/slots/session history and no fake academic subject/student roster or synthetic enrollment. Proper existing datetime adapter. One scoped synthetic save/reload/edit/delete timetable flow, only affected persistence/Sync guard. No new live schema/migration; if model truly cannot represent, record exact existing blocker with concrete reviewed minimal proposal rather than silently repurposing IDs.",
+      "dependsOn": [
+        "continuous-n116-lesson-generation-on-demand-20261019"
+      ],
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md and latest N122 Product row. Direct PO19October requests permanent weekly activity/waiting slots without academic subjects. Original system card prevented any necessary model/service preparation and resulted in a concrete useful diagnosis. This MATERIAL scope correction authorizes completing all necessary LOCAL implementation and one exact append-only LOCAL migration source/native PostgreSQL qualification first, rather than repeating that diagnosis or asking user a technical permission question before concrete preparation. Original blocked candidate/proposal remains history. Resume the SAME saved session/worktree and reconcile current origin/main, including delivered N119 rank and N116 on-demand generation after its dependency is met. No new worker/planner/orchestrator, paid service or old whole-suite replay.\n\nProduct: activity/waiting are independent recurring slots in the CURRENT teacher timetable/term, remain until teacher edits/deletes them, and occupy their weekday/period. They do not require a class/subject/pupils and never generate academic attendance, rosters or grades. Use existing timetable layout/tokens/dialog and existing timing profiles. No fake teaching/subject IDs, hidden local-only values, settings side-channel or suppressed Sync errors. Keep old teaching slots, IDs, grade/history/tombstones and calendar-region hold unchanged. Read-only Home projections/on-demand N116 must not create lessons for these nonacademic slots.\n\nUse the existing slots domain with explicit kind teaching/activity/waiting and owner-bound term affiliation for nonacademic rows. Academic defaults/backward compatibility keep old records valid without real-data rewrite/backfill. Null teaching is legal ONLY for the two nonacademic types with a valid SAME-owner term; old teaching parent guards remain. Scope includes exact model/store/schedule/Sync codecs plus affected timetable export and backup/restore field preservation. Extend normal mutation/ACK/revision/tombstone validation narrowly, not another schedule engine. Restoring a class must treat a retained activity/waiting slot as occupied and preserve it on conflict. Old clients/legacy rows default to academic semantics; no loss of new kind/term on canonical readback or restore.\n\nPrepare at most ONE new append-only migration source at supabase/migrations/20261019091500_n122_non_teaching_slots.sql. Prior applied SQL/migrations are immutable read-only references. Qualify exact new owner/term/kind/check/RLS and normal Sync protocol changes on an owned synthetic LOCAL PostgreSQL fixture using existing harness/runtime. No new LOGIN/roles, global grants/security changes, managed Auth settings, N44/N88 private schema/keys/logging alteration or mutation of real records. Reuse existing local bootstrap/dependency evidence where unchanged; actual affected native PG tests must prove new type roundtrip, owner/foreign-term rejection, academic control, revision/ACK failure and tombstone/restore preservation. One actual-app synthetic save/reload/edit/delete for both kinds with no teachings plus academic coexistence/conflict control and labels in export/backup is enough; no old comprehensive calendar/grades/Auth/76-routine replay.\n\nTHIS PHASE DOES NOT AUTHORIZE HOSTED SQL/APPLY_MIGRATION OR PRODUCT PUBLICATION. Prepare full reviewable code/migration hash/local qualification and exact provider preimage/readback/apply steps needed, then return BLOCKED with blockerType external for the one specifically missing hosted prerequisite; keep its final required check NOT_RUN. Do not relaunch unchanged diagnosis or fabricate LOCAL_READY/Production. Parent will review the concrete scoped source and bind the exact service operation within current PO feature delegation before same-session continuation. No new user permission question now and no alternative tool/actor to bypass an actual denial. Normal controller owns resumption, sole publisher releases only after actual hosted prerequisite and all final checks. Save only deidentified evidence in the existing dated N122 doc and scoped fixtures.",
       "allowedPaths": [
         "src/views/schedule.js",
         "src/lib/schedule.js",
@@ -25,14 +27,23 @@
         "tests/n122-1019*.mjs",
         "tests/n122-1019*.json",
         "tests/fixtures/n122-1019/**",
-        "docs/automation-evidence/20261019/N122_PERMANENT_ACTIVITY_WAITING_SLOTS.md"
+        "docs/automation-evidence/20261019/N122_PERMANENT_ACTIVITY_WAITING_SLOTS.md",
+        "src/models.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/lib/schedule-export.js",
+        "src/views/backup.js",
+        "src/lib/backup*.js",
+        "supabase/migrations/20261019091500_n122_non_teaching_slots.sql"
       ],
       "verificationPaths": [
         "src/views/schedule.js",
         "docs/automation-evidence/20261019/N122_PERMANENT_ACTIVITY_WAITING_SLOTS.md"
       ],
       "requiredChecks": [
-        "n122_permanent_activity_waiting_slot_save_reload_edit_delete_no_fake_subject"
+        "n122_permanent_activity_waiting_slot_save_reload_edit_delete_no_fake_subject",
+        "n122_local_native_postgres_owner_term_legacy_sync_and_tombstone_qualification",
+        "n122_exact_hosted_schema_service_readback_before_product_release"
       ],
       "acceptance": [
         "حصص نشاط وانتظار ثابتة في جدول المعلم — actual changed behavior verified using the affected existing application path and small synthetic reproduction; no unrelated full suite.",
@@ -40,13 +51,19 @@
       ],
       "preparationAuthority": {
         "kind": "PO-20261019-continue-and-number-followups",
-        "publication": true,
+        "publication": false,
         "manualRealStudentMutations": false,
         "hostedSchemaChange": false,
         "AuthRLSChange": false,
-        "realSend": false
+        "realSend": false,
+        "localSchemaSourcePreparation": true,
+        "maxNewLocalMigrationSources": 1,
+        "migrationPath": "supabase/migrations/20261019091500_n122_non_teaching_slots.sql",
+        "liveMigrationApply": false,
+        "manualRealCanonicalMutations": false,
+        "publicReleaseRequiresQualifiedExactHostedPrerequisite": true
       },
-      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+      "releaseAuthority": "Direct PO19October explicitly requests permanent activity/waiting timetable entries. This source correction authorizes necessary LOCAL code, one exact append-only migration source and native synthetic qualification for that behavior, preserving all owner/term/history/Sync/scoring contracts. No live SQL/Auth/RLS application, real canonical mutations, new expense or Product publication in this preparation phase. Exact hosted operation will be concretely bound after local code/source qualification by parent under the existing feature mandate; do not ask for permission before authorized preparation is complete."
     }
   ]
 }

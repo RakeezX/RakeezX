@@ -1,0 +1,120 @@
+{
+  "aiAuthored": true,
+  "runId": "3d76cd50-4f65-4434-8f91-0eba2d239b60",
+  "capturedAt": "2026-10-19T07:48:35.129Z",
+  "state": "BLOCKED",
+  "preservedCandidate": "fbfebd29f10b841849c33639a993a973b4da2ca5",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "resolvedPriorDependency": {
+    "candidate": "fbfebd29f10b841849c33639a993a973b4da2ca5",
+    "published": "9858b9003da11d7904556adaba663bd432b0ea6e",
+    "verifiedAt": "2026-10-19T07:40:18.803Z",
+    "source": "canonical card stagePublicationHistory"
+  },
+  "publicSource": {
+    "url": "https://rakeezx.com/src/lib/student-portal-runtime.js",
+    "status": 200,
+    "lfSha256": "f9c7a5277bfac0ee959acdf96d3954cefc815a26bbbd60d5805f628708b231f0",
+    "matchesCandidate": true,
+    "serializedDispatch": true,
+    "contextReconciliation": true,
+    "mode": "pilot",
+    "renderedUiAcceptance": false
+  },
+  "actualNormalUi": {
+    "designatedTabAvailable": false,
+    "exactMissingTabError": "Tab not found in browser 1.",
+    "ownedReplacementOpenedOnOriginalClassRoute": true,
+    "sourceReceivedThroughServiceWorker": true,
+    "receivedSourceContainsCorrection": true,
+    "cloudStatus": "بياناتك الحالية متزامنة مع السحابة.",
+    "portalStatus": "مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة الخاصة بعد.",
+    "normalClassHeading": "تعذّر مطابقة الفصل مع الحساب النشط",
+    "normalClassExplanation": "عد إلى الفصول واختر فصلًا تابعًا للحساب الحالي. إذا استمرت المشكلة بعد الاستعادة، تحقق من الحساب في الإعدادات.",
+    "n88ApiResponsesObserved": 0,
+    "codeFields": 0,
+    "ownerIdentitiesCollected": false,
+    "accountSwitchAttempted": false,
+    "studentCodeRead": false
+  },
+  "checks": [
+    {
+      "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+      "status": "PASS",
+      "evidence": "Reused unchanged proof from pilot-ui-correction-delivery-75c77bea.json (not rerun this continuation): Immutable eight-migration/role/custody history reused. Current protected config digest confirms unchanged source and original one-owner/two-pupil binding; no SQL, role or credential writes."
+    },
+    {
+      "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "status": "PASS",
+      "evidence": "Reused unchanged proof from pilot-ui-correction-delivery-75c77bea.json (not rerun this continuation): pilot-ui-correction-provider-75c77bea.json: exact Edge36/Worker source and current settings. Unchanged explicit privacy/logging proof reused; anonymous private APIs401 and /student private headers pass."
+    },
+    {
+      "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "status": "FAIL",
+      "evidence": "Current normal UI cannot match the original fabricated class to the active account; remaining rotation/revoke/session/guidance acceptance NOT_RUN."
+    },
+    {
+      "name": "n88_official_publisher_readiness_route_and_served_behavior",
+      "status": "FAIL",
+      "evidence": "Corrected pilot publication receipt verified, but final hosted acceptance and public enable remain incomplete. Final public frontend publication not attempted."
+    },
+    {
+      "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "Reused unchanged proof from pilot-ui-correction-delivery-75c77bea.json (not rerun this continuation): Unchanged actual PostgreSQL log cases and76-routine typed source/ACL coverage reused. Current signed direct readiness confirms sourceBoundary with strictTLS before and after pilot restore."
+    },
+    {
+      "name": "n88_exact_private_guard_membership_inherit_correction",
+      "status": "PASS",
+      "evidence": "Reused unchanged proof from pilot-ui-correction-delivery-75c77bea.json (not rerun this continuation): Original exact applied guard-membership correction/readback retained unchanged; no membership, privilege or migration operation."
+    },
+    {
+      "name": "n88_actual_scram_iteration_compatibility",
+      "status": "PASS",
+      "evidence": "Reused unchanged proof from pilot-ui-correction-delivery-75c77bea.json (not rerun this continuation): Original own public-challenge proof reused;16384 password/verifier/salt unchanged. Current restricted direct identity/clientTLS/upstreamSSL pass; no pooler proof retry."
+    },
+    {
+      "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+      "status": "PASS",
+      "evidence": "Reused unchanged proof from pilot-ui-correction-delivery-75c77bea.json (not rerun this continuation): Same protected owner/two-pupil binding read back. Restoration guard rejects missing/wrong source/binding/mode/TLS/history/replay. Existing actual DOM/store/owner/renewal/serialization proof reused by unchanged runtime identity."
+    },
+    {
+      "name": "n88_pilot_original_service_and_frontend_publisher_package",
+      "status": "PASS",
+      "evidence": "Reused unchanged proof from pilot-ui-correction-delivery-75c77bea.json (not rerun this continuation): Existing genuine sequence/context correction remains in candidate for sole publisher. Exact active restricted pilot source/config/readiness passes; current package pins verified. Full acceptance/public source remain separate."
+    }
+  ],
+  "historicalFinalFailures": {
+    "path": "continuation-b324b7b5.json",
+    "lfSha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83",
+    "unchanged": true
+  },
+  "remainingHostedSteps": {
+    "rotation": "NOT_RUN",
+    "revocation": "NOT_RUN",
+    "oldCodeAndSessionDenial": "NOT_RUN",
+    "studentGuidanceRead": "NOT_RUN",
+    "unaffectedSecondPupil": "NOT_RUN"
+  },
+  "disposition": {
+    "serviceWrites": 0,
+    "sqlRoleCredentialFixtureChanges": 0,
+    "publicEnableAttempted": false,
+    "lastVerifiedMode": "pilot",
+    "lastVerifiedConfigSource": "pilot-ui-correction-config-75c77bea.json",
+    "freshPrivateConfigRead": false,
+    "existingFixtureRetained": true,
+    "protectedCustodyUntouched": true,
+    "priorDeniedResourcesUntouched": true
+  },
+  "resources": {
+    "observerDisabled": true,
+    "ownedReplacementTabClosed": true,
+    "browserLeaseReleased": true,
+    "userTabsChanged": false,
+    "liveMutationLeaseNotAcquired": true
+  },
+  "blockerType": "external",
+  "blocker": "The designated fabricated-teacher tab is absent. Opening the original class through normal Rakeez UI reports that the class cannot be matched to the active account, before any N88 API request. The remaining authorized hosted flow cannot be exercised in that context.",
+  "retryCondition": "The same originally designated fabricated teacher is again available in normal authenticated Chrome UI and its original class resolves under the real owner guard. Resume this same session and existing two-pupil fixture; no new account, credential, role, import or permission."
+}

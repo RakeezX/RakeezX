@@ -1,0 +1,119 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "35395ae1-0dc1-4fd1-b598-5441b50a3f09",
+  "state": "BLOCKED",
+  "checks": [
+    {
+      "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+      "status": "PASS",
+      "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes."
+    },
+    {
+      "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "status": "PASS",
+      "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes."
+    },
+    {
+      "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "status": "FAIL",
+      "evidence": "New-owner core journey progressed, but actual published teacher loses current context on tab return; corrected wake entry is locally proven and not yet published."
+    },
+    {
+      "name": "n88_official_publisher_readiness_route_and_served_behavior",
+      "status": "FAIL",
+      "evidence": "Published pilot receipt9858b900 retained; final public readiness requires the wake correction receipt and remaining actual acceptance. Public mode not enabled."
+    },
+    {
+      "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true."
+    },
+    {
+      "name": "n88_exact_private_guard_membership_inherit_correction",
+      "status": "PASS",
+      "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes."
+    },
+    {
+      "name": "n88_actual_scram_iteration_compatibility",
+      "status": "PASS",
+      "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true."
+    },
+    {
+      "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+      "status": "PASS",
+      "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake."
+    },
+    {
+      "name": "n88_pilot_original_service_and_frontend_publisher_package",
+      "status": "PASS",
+      "evidence": "Original service source/config is unchanged and ready in restricted pilot. Exact new frontend wake/shared-lane package is locally verified; it remains unserved and does not imply full acceptance/public availability."
+    }
+  ],
+  "currentBackendEnabled": true,
+  "rolloutMode": "pilot",
+  "publicEnabled": false,
+  "fullHostedAcceptance": false,
+  "finalFrontendPublished": false,
+  "currentJourney": "replacement-journey-35395ae1.json",
+  "freshProvider": {
+    "function": "n88-student-portal",
+    "version": 38,
+    "verifyJwt": false,
+    "eszip": "d15fc5eefd077aa7141a89ce2d2c64f791191a2c6c73b7a5a6828ff3f33fde13",
+    "eszipUnchanged": true,
+    "edgeSourceSha256": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+    "workerSourceUnchanged": true,
+    "workerPrivacyEvidenceReused": "pilot-ui-correction-provider-75c77bea.json"
+  },
+  "fixture": {
+    "additionalClasses": 1,
+    "additionalPupils": 2,
+    "additionalTasks": 1,
+    "activeOwners": 1,
+    "activePupils": 2,
+    "priorFixtureAndEncryptedBindingRetained": true
+  },
+  "historicalFinalFailures": {
+    "path": "continuation-b324b7b5.json",
+    "lfSha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83",
+    "names": [
+      "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "n88_official_publisher_readiness_route_and_served_behavior"
+    ],
+    "status": "FAIL",
+    "unchanged": true
+  },
+  "localWakeFix": {
+    "proof": "tests/n88-official-activation-wake-entry-ui.json",
+    "baseline": "tests/n88-official-activation-wake-entry-ui.baseline.json",
+    "published": false
+  },
+  "observedRemoteMain": "81b892cc81a6622c05fcc291e9d7cfa00611245b",
+  "blockerType": "external",
+  "blocker": "The new fabricated-owner journey exposed a silent-context/wake failure in the published teacher entry. The exact new lifecycle/shared-lane correction passes the actual DOM/store/ownership regression while the published baseline fails. Its sole-publisher receipt is required before the remaining current hosted context acceptance and public rollout.",
+  "retryCondition": "Sole publisher serves this exact bounded pilot wake correction through the guarded delivery stage, then resumes the same session and retained replacement fixture. Preserve all nine checks; no new Auth, people, credentials, SQL, keys or permission.",
+  "resources": {
+    "ownedStudentTabClosed": true,
+    "studentSessionEnded": true,
+    "teacherObserverDisabled": true,
+    "transientCodesCleared": true,
+    "userTeacherTabPreserved": true,
+    "localBrowsersAndHttpClosed": true,
+    "browserLeaseReleased": true,
+    "liveMutationLeaseReleased": true,
+    "priorDeniedResourcesUntouched": true
+  },
+  "fixtureDisposition": {
+    "oldFixtureUntouched": true,
+    "newSyntheticClass": 1,
+    "newSyntheticPupils": 2,
+    "newTask": 1,
+    "firstCredentialRevoked": true,
+    "secondCredentialActive": true,
+    "nonceAndCredentialHistoryRetained": true,
+    "studentSessionEnd": "PASS: supported UI showed انتهت الجلسة.",
+    "noExternalMessages": true,
+    "noRawCodesOrIdentitiesInArtifacts": true
+  }
+}

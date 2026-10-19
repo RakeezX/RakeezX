@@ -1,0 +1,164 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "f8356a7b-0f5d-4804-b1b7-10ff0a8c4043",
+  "state": "LOCAL_READY",
+  "scope": "Exact existing replacement-pilot wake repair publication only",
+  "preservedCandidate": "d1d6bde9c046c83756b3fb854a630128e42331c4",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "checks": [
+    {
+      "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+      "status": "PASS",
+      "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+    },
+    {
+      "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "status": "PASS",
+      "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+    },
+    {
+      "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+    },
+    {
+      "name": "n88_exact_private_guard_membership_inherit_correction",
+      "status": "PASS",
+      "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+    },
+    {
+      "name": "n88_actual_scram_iteration_compatibility",
+      "status": "PASS",
+      "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+    },
+    {
+      "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+      "status": "PASS",
+      "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+    },
+    {
+      "name": "n88_pilot_original_service_and_frontend_publisher_package",
+      "status": "PASS",
+      "evidence": "Exact d1d6bde9 wake/shared-lane runtime and actual DOM/store/CSS proof reused; immutable published baseline FAIL retained. Current seven-check pilot publication package is coherent; full acceptance/public source remain pending."
+    }
+  ],
+  "currentBackendEnabled": true,
+  "rolloutMode": "pilot",
+  "publicEnabled": false,
+  "fullHostedAcceptance": false,
+  "finalFrontendPublished": false,
+  "currentConfig": "wake-pilot-config-f8356a7b.json",
+  "source": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+  "serviceAndWorkerBundlesUnchanged": true,
+  "wakeRuntimeLfSha256": "40cacdfc17a7e0323f6c26be52169ab0f79d69f977f8e25f04ff7d3918ed73c5",
+  "reusedEvidence": [
+    "tests/n88-official-activation-wake-entry-ui.json",
+    "tests/n88-official-activation-wake-entry-ui.baseline.json",
+    "replacement-readiness-35395ae1.json",
+    "replacement-live-readiness-35395ae1.json",
+    "replacement-journey-35395ae1.json",
+    "pilot-ui-correction-provider-75c77bea.json"
+  ],
+  "sourceBoundReadinessReuse": {
+    "readbackRunId": "35395ae1-0dc1-4fd1-b598-5441b50a3f09",
+    "freshRuntimeReadinessCalled": false,
+    "originalRecordsAndTimestampsUnchanged": true
+  },
+  "preservedFullStage": {
+    "path": "replacement-delivery-35395ae1.json",
+    "lfSha256": "1d17214ff55c72d28fbf0b994b3f53c139e55746890c03180007ddc724a43523",
+    "checks": [
+      {
+        "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+        "status": "PASS",
+        "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes."
+      },
+      {
+        "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+        "status": "PASS",
+        "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes."
+      },
+      {
+        "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+        "status": "FAIL",
+        "evidence": "New-owner core journey progressed, but actual published teacher loses current context on tab return; corrected wake entry is locally proven and not yet published."
+      },
+      {
+        "name": "n88_official_publisher_readiness_route_and_served_behavior",
+        "status": "FAIL",
+        "evidence": "Published pilot receipt9858b900 retained; final public readiness requires the wake correction receipt and remaining actual acceptance. Public mode not enabled."
+      },
+      {
+        "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+        "status": "PASS",
+        "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true."
+      },
+      {
+        "name": "n88_exact_private_guard_membership_inherit_correction",
+        "status": "PASS",
+        "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes."
+      },
+      {
+        "name": "n88_actual_scram_iteration_compatibility",
+        "status": "PASS",
+        "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true."
+      },
+      {
+        "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+        "status": "PASS",
+        "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake."
+      },
+      {
+        "name": "n88_pilot_original_service_and_frontend_publisher_package",
+        "status": "PASS",
+        "evidence": "Original service source/config is unchanged and ready in restricted pilot. Exact new frontend wake/shared-lane package is locally verified; it remains unserved and does not imply full acceptance/public availability."
+      }
+    ],
+    "originalFailure": {
+      "path": "continuation-b324b7b5.json",
+      "lfSha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83"
+    }
+  },
+  "finalRequiredChecks": [
+    "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+    "n88_official_exact_provider_ingress_private_document_and_no_logging",
+    "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+    "n88_official_publisher_readiness_route_and_served_behavior",
+    "n88_private_database_error_boundary_under_actual_provider_logging",
+    "n88_exact_private_guard_membership_inherit_correction",
+    "n88_actual_scram_iteration_compatibility",
+    "n88_pilot_owner_admission_and_failclosed_rollout",
+    "n88_pilot_original_service_and_frontend_publisher_package"
+  ],
+  "finalAcceptance": [
+    "Exact existing migration identities are freshly compared, applied at most once only where absent; unchanged proofs/history retained and no managed Auth policy/global privilege or real source mutation.",
+    "Actual restricted DB, provider custody/version names, exact service code/config, private logging/TLS/route/document readbacks pass; no secret/browser/service-role leak.",
+    "One bounded hosted fabricated-only teacher/student flow proves current code recovery/rotation/revoke/visibility/guidance and authoritative owner/source/session/ACK handling; fixture disposition recorded.",
+    "Only after prerequisites pass, original publisher enables verified official class page and universal /student; unavailable channels produce exact BLOCKED evidence and preserved prepared candidate, never false live readiness.",
+    "Actual observed PostgreSQL logging remains unchanged. A typed private server-side error boundary prevents private values/details from entering server errors, preserves DB types/owner/locks/transactions/ACK, and is locally proven with actual logs then source/ACL/readback verified before hosted activation. One exact append-only private migration maximum; original six immutable.",
+    "After source-bound applied M1 is skipped, exactly the existing postgres-granted n88_guard->postgres INHERIT option is reduced to false, with all other edges/flags/owners/grants/Auth/RLS/data unchanged and original strict expected identity restored. One named append-only correction source, actual local negative/preimage proof and hosted readback; no baseline relaxation or original migration replay."
+  ],
+  "fixtureDisposition": {
+    "oldFixtureUntouched": true,
+    "newSyntheticClass": 1,
+    "newSyntheticPupils": 2,
+    "newTask": 1,
+    "firstCredentialRevoked": true,
+    "secondCredentialActive": true,
+    "nonceAndCredentialHistoryRetained": true,
+    "studentSessionEnd": "PASS: supported UI showed انتهت الجلسة.",
+    "noExternalMessages": true,
+    "noRawCodesOrIdentitiesInArtifacts": true
+  },
+  "resources": {
+    "browserOrServerPhaseStarted": false,
+    "providerWrites": 0,
+    "privateQueries": 0,
+    "noOwnedProcessesStarted": true,
+    "priorDeniedResourcesUntouched": true,
+    "protectedTransientInputsAbsent": true
+  },
+  "nextStage": "After sole-publisher wake correction receipt, restore all9 and original acceptance in the same session; test only newly served wake/focus/current admission and necessary public source/config guards. No new fixture or replay of passed core hosted journey.",
+  "observedRemoteMain": "af329b88ee47533e0d2b110af3488897833a6a83"
+}

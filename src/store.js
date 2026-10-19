@@ -2192,7 +2192,8 @@ export function calendarPresetForYear(yearId = activeYear()?.id) {
 // N58 bounded release: selection patches the existing year; official dates are
 // projections. Actual UI/local protocol roundtrips certify this path separately
 // from the outstanding PO fresh-account acceptance.
-export const CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD = false;
+// N116 does not certify the underlying calendar/year Sync repair.
+export const CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD = true;
 export const CALENDAR_PRESET_SWITCH_HOLD_MESSAGE = 'تغيير التقويم متوقف مؤقتًا لمعالجة المزامنة. يمكنك متابعة العمل بالتقويم الحالي.';
 
 /** Applies a built-in template without replacing existing user calendar data. */
@@ -4803,57 +4804,94 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
   return getSession(ses.id);
 }
 
-/** يولّد أغلفة حصص اليوم فقط من الجدول الحالي، من دون لمس الموجود أو tombstone. */
-export async function ensureSessionsForDate(date = todayISO(), { signal } = {}) {
-  if (signal?.aborted) return { created: 0, existing: 0, skipped: 0 };
-  if (date !== todayISO() || !isSessionEligibleDate(date)) return { created: 0, existing: 0, skipped: 0 };
-  const term = activeTerm();
-  const year = activeYear();
-  const profile = activeTimeProfile();
-  const pending = [];
-  let existing = 0;
-  let skipped = 0;
-  for (const teaching of teachings(term?.id)) {
-    const section = getSection(teaching.sectionId);
-    const calendarDay = selectedCalendarDay(year, date) ?? calendarDayForYear(year?.id, date);
-    const resolved = resolveProfile(profile, date, calendarDay);
-    for (const slot of slotsOf(teaching.id).filter((candidate) => candidate.weekday === weekday(date))) {
-      const sameIdentity = state.sessions.find((session) =>
-        session.teachingId === teaching.id && session.date === date && Number(session.period) === Number(slot.period));
-      if (sameIdentity) {
-        if (sameIdentity.deleted) skipped++;
-        else existing++;
-        continue;
+/** Explicit entry creates one current occurrence, never an entire day. */
+const openingSessions = new Map();
+export async function ensureSessionsForDate(date = todayISO(), { signal, teachingId, period } = {}) {
+  if (!teachingId || !Number.isInteger(Number(period)) || signal?.aborted) return { created: 0, existing: 0, skipped: 0 };
+  const workspace = activeWorkspace;
+  const key = `${workspace?.databaseName}|${teachingId}|${date}|${period}`;
+  if (openingSessions.has(key)) return openingSessions.get(key);
+  const pending = Promise.resolve().then(async () => {
+    const guard = () => {
+      if (workspace !== activeWorkspace || signal?.aborted) throw new Error('تغيّر سياق الحصة. أعد فتحها.');
+      assertClassOperationsAccess(teachingId);
+    };
+    guard();
+    const existing = state.sessions.find(row => row.teachingId === teachingId && row.date === date && Number(row.period) === Number(period));
+    if (existing) return { created: 0, existing: existing.deleted ? 0 : 1, skipped: existing.deleted ? 1 : 0 };
+    const projected = projectedSessionsForDate(date).find(row => row.teachingId === teachingId && Number(row.period) === Number(period));
+    if (date !== todayISO() || !projected) return { created: 0, existing: 0, skipped: 1 };
+    const expectedTerm = activeTerm()?.id, expectedYear = activeYear()?.id;
+    const teaching = getTeaching(teachingId);
+    const contextNames = ['years', 'terms', 'teachings', 'sections', 'subjects', 'slots', 'timeProfiles', 'calendars', 'calendarDays'];
+    const contextToken = source => JSON.stringify(contextNames.map(name => (source[name] ?? [])
+      .filter(row => name === 'years' ? row.id === expectedYear : name === 'terms' ? row.id === expectedTerm :
+        name === 'teachings' ? row.id === teachingId : name === 'sections' ? row.id === teaching.sectionId :
+        name === 'subjects' ? row.id === teaching.subjectId : name === 'slots' ? row.id === projected.slotId : name === 'calendars' ? row.yearId === expectedYear :
+        name === 'calendarDays' ? row.date === date : true)
+      .map(row => Object.fromEntries(['id', 'deleted', 'ownerId', ...Object.keys(SYNC_V2_SCHEMAS[name]?.fields ?? {})]
+        .sort().map(field => [field, row[field] ?? null])))
+      .sort((a, b) => a.id.localeCompare(b.id))));
+    const expectedContext = contextToken(state);
+    const { projected: ignored, ...session } = projected;
+    const calendarContext = newSessionCalendarContext(session);
+    const record = syncV2Record('sessions', { ...session, ...(calendarContext ? { calendarContext } : {}) }, { pendingCreate: true });
+    assertOperationalWritesAllowed({ sessions: [record] });
+    let result, adoptedId = record.id;
+    // The durable identity check serializes other tabs as well as repeated clicks.
+    await db.applyBatch(Object.fromEntries(['sessions', 'outbox', ...contextNames].map(name => [name, {}])), { signal, prepare(current) {
+      guard();
+      if (activeTerm()?.id !== expectedTerm || activeYear()?.id !== expectedYear || contextToken(current) !== expectedContext || contextToken(state) !== expectedContext) {
+        throw new Error('تغيّر الجدول أو التقويم. أعد فتح الحصة.');
       }
-      const timing = periodTime(resolved, weekday(date), slot.period, section?.grade);
-      if (!timing) { skipped++; continue; }
-      pending.push(makeSession({
-        teachingId: teaching.id, date, period: slot.period, slotId: slot.id,
-        startTime: timing.start, endTime: timing.end,
-        timeProfileId: resolved?.id ?? profile?.id ?? null, status: 'scheduled',
-      }));
-    }
-  }
-  if (signal?.aborted) return { created: 0, existing, skipped };
-  if (pending.length && !await save({ sessions: pending }, { signal }) && !signal?.aborted) throw new Error('تعذّر حفظ الحصص التلقائية.');
-  if (signal?.aborted) return { created: 0, existing, skipped };
-  return { created: pending.length, existing, skipped };
+      const prior = current.sessions.find(row => row.id === record.id ||
+        row.teachingId === teachingId && row.date === date && Number(row.period) === Number(period));
+      if (prior) {
+        adoptedId = prior.id;
+        result = { created: 0, existing: prior.deleted ? 0 : 1, skipped: prior.deleted ? 1 : 0 };
+        return {};
+      }
+      const latest = projectedSessionsForDate(date).find(row => row.id === record.id);
+      if (date !== todayISO() || !latest || ['startTime', 'endTime', 'timeProfileId', 'slotId'].some(field => latest[field] !== record[field])) {
+        throw new Error('تغيّر يوم التقويم أو التوقيت. أعد فتح الحصة.');
+      }
+      const entry = outboxEntry('sessions', record, null, 'put', null);
+      result = { created: 1, existing: 0, skipped: 0 };
+      return { sessions: { put: [record] }, outbox: { put: entry ? [entry] : [] } };
+    } });
+    guard();
+    const changes = [{ store: 'sessions', id: adoptedId }];
+    await absorb(changes);
+    broadcast(changes);
+    return result;
+  });
+  openingSessions.set(key, pending);
+  try { return await pending; } finally { if (openingSessions.get(key) === pending) openingSessions.delete(key); }
 }
 
-/** إسقاط قراءة فقط للحصص المقبلة؛ لا يكتب صفوف sessions. */
+/** Operational cards only. Stored history getters continue returning persisted rows. */
+export function operationalSessionsOn(date) {
+  return [...sessionsOn(date), ...projectedSessionsForDate(date)].sort((a, b) => a.period - b.period);
+}
+
+/** إسقاط قراءة فقط للحصص غير المفتوحة من اليوم فصاعدًا؛ لا يكتب صفوف sessions. */
 export function projectedSessionsForDate(date, { term = activeTerm() } = {}) {
-  if (!date || date <= todayISO() || !isSessionEligibleDate(date, { term })) return [];
+  if (!date || date < todayISO() || !isSessionEligibleDate(date, { term })) return [];
   const profile = activeTimeProfile();
   const year = activeYear();
-  const calendarDay = calendarDayForYear(year?.id, date);
+  const calendarDay = selectedCalendarDay(year, date) ?? calendarDayForYear(year?.id, date);
   const resolved = resolveProfile(profile, date, calendarDay);
   return teachings(term?.id).flatMap((teaching) => {
     const section = getSection(teaching.sectionId);
     return slotsOf(teaching.id).filter((slot) => slot.weekday === weekday(date)).map((slot) => {
+      if (state.sessions.some(row => row.teachingId === teaching.id && row.date === date && Number(row.period) === Number(slot.period))) return null;
       const timing = periodTime(resolved, weekday(date), slot.period, section?.grade);
-      return timing && makeSession({ teachingId: teaching.id, date, period: slot.period, slotId: slot.id,
+      if (!timing) return null;
+      const session = makeSession({ teachingId: teaching.id, date, period: slot.period, slotId: slot.id,
         startTime: timing.start, endTime: timing.end, timeProfileId: resolved?.id ?? profile?.id ?? null,
         status: 'scheduled', projected: true });
+      const calendarContext = newSessionCalendarContext(session);
+      return calendarContext ? { ...session, calendarContext } : session;
     }).filter(Boolean);
   }).sort((a, b) => a.period - b.period);
 }
@@ -5117,7 +5155,6 @@ export async function addSlot(tchId, weekday, period, times = {}) {
   const slot = makeSlot({ teachingId: tchId, weekday, period, ...times });
   if (live(state.slots).some((s) => s.id === slot.id)) return null;
   await save({ slots: [slot] });
-  await ensureSessionsForDate();
   return slot;
 }
 
@@ -5141,7 +5178,6 @@ export async function editSlot(slotId, data) {
     start: updated.start,
     end: updated.end
   });
-  await ensureSessionsForDate();
   return updated;
 }
 

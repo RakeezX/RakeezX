@@ -42,6 +42,7 @@ export function verifiedActivationStageContinuation(task,result,update,{verified
 // Only the two gates requiring a published UI may move to the following stage.
 // Every original final gate/acceptance remains mandatory and source-bound.
 export function verifiedPilotStagePreparation(task,result,update,{same,valueSha256,stringSha256}){
+ if(verifiedSecondPilotWakeCorrection(task,result,update,{same,valueSha256,stringSha256}))return true;
  if(verifiedPilotUiCorrection(task,result,update,{same,valueSha256,stringSha256}))return true;
  try{
   const c=update.card,s=c.stagedActivation,p=c.verificationRepair,a=c.preparationAuthority?.stagedRollout;
@@ -90,5 +91,20 @@ export function verifiedPilotUiCorrection(task,result,update,{same,valueSha256,s
    &&p.previousResultSha256===valueSha256(result)&&p.previousFailureSha256===stringSha256(task.lastFailure)&&p.priorPilotReceiptSha256===valueSha256(d)
    &&p.failedFinalChecksSha256===valueSha256(result.checks.filter(x=>deferred.includes(x.name)))&&p.reason?.length>=50
    &&Object.entries(c).every(([k,v])=>['objective','completionMode','verificationRepair','stagedActivation','requiredChecks','acceptance','dependsOn'].includes(k)||same(v,task[k]));
+ }catch{return false;}
+}
+
+// Actual second distinct UI defect: same owned pilot, all final gates retained.
+export function verifiedSecondPilotWakeCorrection(task,result,update,{same,valueSha256,stringSha256}){
+ try{const c=update.card,s=task.stagedActivation,p=c.verificationRepair,h=task.stagePublicationHistory?.at(-1),d=h?.receipt;const failed=['n88_official_hosted_fabricated_teacher_student_ack_and_isolation','n88_official_publisher_readiness_route_and_served_behavior'];
+ return task.id==='continuous-n88-official-student-portal-activation-20261018'&&task.sessionId==='01a14fc3-b292-7390-9952-8549a286c80f'&&task.status==='blocked'&&task.liveMutation===true
+ &&result.state==='BLOCKED'&&result.candidateSha==='d1d6bde9c046c83756b3fb854a630128e42331c4'&&task.lastFailure===result.blocker&&result.changedPaths.includes('src/lib/student-portal-runtime.js')
+ &&N88_PILOT_CHECKS.every(n=>result.checks.some(x=>x.name===n&&x.status==='PASS'))&&failed.every(n=>result.checks.some(x=>x.name===n&&x.status==='FAIL'))&&result.checks.every(x=>x.status==='PASS'||failed.includes(x.name)&&x.status==='FAIL')
+ &&task.stagePublicationHistory.length===2&&h.phase==='pilot'&&h.candidateSha==='fbfebd29f10b841849c33639a993a973b4da2ca5'&&d.status==='deployed'&&d.publishedSha==='9858b9003da11d7904556adaba663bd432b0ea6e'&&d.evidence.immutable.passed===true&&d.evidence.production.passed===true
+ &&s.phase==='acceptance-and-public-enable'&&s.repairRound===1&&s.maxTeachers===1&&s.maxFabricatedStudents===2&&s.publicEnableRequiresHostedProof===true&&s.pilotStageIsNotProductCompletion===true
+ &&same(s.originalRequiredChecks,N88_FINAL_CHECKS)&&same(s.finalRequiredChecks,[...new Set([...N88_FINAL_CHECKS,...N88_PILOT_CHECKS])])&&same(task.requiredChecks,s.finalRequiredChecks)&&same(c.requiredChecks,N88_PILOT_CHECKS)&&same(c.stagedActivation,{...s,phase:'pilot',repairRound:2})
+ &&same(c.preparationAuthority,task.preparationAuthority)&&same(c.allowedPaths,task.allowedPaths)&&c.completionMode==='pilot_ui_correction'&&p.kind==='reviewed-second-pilot-wake-correction'
+ &&p.previousResultSha256===valueSha256(result)&&p.previousFailureSha256===stringSha256(task.lastFailure)&&p.priorPilotReceiptSha256===valueSha256(d)&&p.failedFinalChecksSha256===valueSha256(result.checks.filter(x=>failed.includes(x.name)))&&p.localUiProofCandidateSha===result.candidateSha
+ &&Object.entries(c).every(([k,v])=>['objective','completionMode','verificationRepair','stagedActivation','requiredChecks','acceptance'].includes(k)||same(v,task[k]));
  }catch{return false;}
 }

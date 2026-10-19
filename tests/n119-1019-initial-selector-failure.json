@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n119-alphabetic-display-roll-number-20261019",
+  "runId": "1542972d-8046-4d62-a1ae-91bdf3b1b193",
+  "baseSha": "644e6896c24e02e00d46c558a0f87c563f644870",
+  "mode": "original-source-reproduction",
+  "checks": [],
+  "errors": [],
+  "originalRollOrder": [
+    "خالد",
+    "بندر",
+    "أَحْمَد",
+    "أحمد",
+    "حاتم"
+  ],
+  "failure": {
+    "message": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    '1',\n    '2',\n    '3',\n    '4',\n    '5',\n+   '\\n    \\n      معلم المادة\\n      \\n    \\n  \\n    \\n      رَكيز المعلم\\n    \\n  '\n  ]\n",
+    "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    '1',\n    '2',\n    '3',\n    '4',\n    '5',\n+   '\\n    \\n      معلم المادة\\n      \\n    \\n  \\n    \\n      رَكيز المعلم\\n    \\n  '\n  ]\n\n    at rows (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n119-alphabetic-display-roll-number-20261019/tests/n119-1019-display-roll.mjs:45:9)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n119-alphabetic-display-roll-number-20261019/tests/n119-1019-display-roll.mjs:85:3\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n119-alphabetic-display-roll-number-20261019/tests/n119-1019-display-roll.mjs:50:2"
+  }
+}

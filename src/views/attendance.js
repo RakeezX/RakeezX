@@ -21,16 +21,28 @@ let date = todayISO();
 let activeSessionId = null;
 let query = '';
 
-/** يختار حصة اليوم المناسبة: المطلوبة في الرابط، أو الأولى، أو ينشئ واحدة. */
+// Abort stale mounts/date selections before they can adopt another occurrence.
+let opening = null;
+const dayOptions = (tchId, day) => store.operationalSessionsOn(day).filter(s => s.teachingId === tchId);
 async function ensureActive(tchId) {
-  await store.ensureSessionsForDate(date);
-  const list = store.sessionsOnFor(tchId, date);
-  if (activeSessionId && list.some((s) => s.id === activeSessionId)) return;
-  if (list.length) {
-    activeSessionId = list[0].id;
-    return;
-  }
+  opening?.abort();
+  const controller = opening = new AbortController();
+  const selectedDate = date;
+  const options = dayOptions(tchId, selectedDate);
+  const selected = activeSessionId ? options.find(s => s.id === activeSessionId) : options[0];
   activeSessionId = null;
+  if (!selected) return;
+  try {
+    if (selected.projected) await store.ensureSessionsForDate(selectedDate, {
+      teachingId: tchId, period: selected.period, signal: controller.signal,
+    });
+    if (!controller.signal.aborted && date === selectedDate) {
+      const saved = store.getSession(selected.id);
+      if (saved?.teachingId === tchId && saved.date === selectedDate) activeSessionId = saved.id;
+    }
+  } catch (error) {
+    if (!controller.signal.aborted) toast(error.message || 'تعذّر فتح الحصة', 'danger');
+  }
 }
 
 function renderDateNavigation() {
@@ -106,19 +118,21 @@ export default {
     activeSessionId = p.session ?? null;
     if (p.session) {
       const ses = store.getSession(p.session);
-      if (ses) date = ses.date;
+      if (ses?.teachingId === p.id) date = ses.date;
     }
     if (!store.isTeachingArchived(p.id)) await ensureActive(p.id);
     repaint();
   },
+
+  onUnmount() { opening?.abort(); activeSessionId = null; },
 
   render(p) {
     const tch = store.getTeaching(p.id);
     if (!tch) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(tch)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">سجل الحضور محفوظ للعرض التاريخي، ولا يمكن إضافة رصد جديد.</div></div>`;
 
-    const daySessions = store.sessionsOnFor(tch.id, date);
-    const ses = activeSessionId ? store.getSession(activeSessionId) : daySessions[0] ?? null;
+    const daySessions = dayOptions(tch.id, date);
+    const ses = activeSessionId ? store.getSession(activeSessionId) : null;
     if (!ses) return html`
       <div class="attendance-01c">
       ${renderSessionContext(tch, null, daySessions, SESSION_STATUS.scheduled)}
@@ -353,16 +367,18 @@ export default {
       repaint();
     },
 
-    'pick-session'(el) {
+    async 'pick-session'(el, ev, params) {
       activeSessionId = el.dataset.id;
+      await ensureActive(params.id);
       repaint();
     },
 
     /** حصة إضافية في نفس اليوم — الحالة التي كان النموذج القديم يفقدها. */
     async 'add-period'(el, ev, params) {
-      const existing = store.sessionsOnFor(params.id, date);
+      const existing = dayOptions(params.id, date);
       const nextPeriod = Math.max(0, ...existing.map((s) => s.period)) + 1;
       const ses = await store.ensureSession(params.id, date, nextPeriod);
+      if (!ses) return;
       activeSessionId = ses.id;
       toast(`أُضيفت الحصة ${nextPeriod} في هذا اليوم`);
       repaint();

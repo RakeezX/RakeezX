@@ -476,3 +476,86 @@ Sole publisher owns integration and served-source verification. This is a genuin
 pilot UI correction package, not whole-Product acceptance. Same-session continuation
 after that receipt restores all9 and tests the remaining/affected real UI journey.
 Historical failure/disposition records below remain unchanged evidence.
+
+# Hosted continuation3d76cd50 — original account context unavailable
+
+The correction publication dependency is resolved: candidatefbfebd29 was verified
+as9858b900 at2026-10-19T07:40:18.803Z. The official runtime bytes match the
+unchanged candidate, including serialized requests and context reconciliation.
+The actual browser also received that correction through its Service Worker.
+
+The designated teacher tab no longer exists. A fresh owned tab on the exact
+original class route, followed by its normal class navigation, reports
+«تعذّر مطابقة الفصل مع الحساب النشط». No N88 API response or code field was
+observed. No identity, credential, token or private store was inspected; no
+account was switched and no hosted write was attempted. This is a new account
+context prerequisite, not the resolved publisher dependency.
+
+All nine checks remain required. Seven unchanged prerequisite proofs are reused;
+the two full hosted/public checks remain FAIL and their unperformed substeps
+remain NOT_RUN. Original failure checksum is unchanged. Public mode was not
+enabled; the last verified owner-restricted pilot configuration and existing
+two-pupil fixture remain untouched. Actual evidence and retry condition are in
+activation/hosted-continuation-3d76cd50.json. Resume only when the same designated
+test teacher can open its original class through normal authenticated UI.
+
+The owned replacement tab and observer were closed; the browser lease was
+released. No other tab, denied resource, queue state or provider configuration
+was modified. No Product closure or final frontend publication is claimed.
+
+# Replacement fixture and wake correction35395ae1
+
+The explicit new-test-account authority was exercised through normal Rakeez UI:
+one labelled synthetic class, exactly two synthetic pupils and one minimal task
+under the unchanged homework maximum. UI restore and Sync ACK were observed;
+no Auth user, import, real-person mutation or student score was created. The
+original custodian narrowly resolved that exact source, retained the old binding
+encrypted and installed only the replacement one-owner/two-pupil pilot binding.
+Original credentials/16384 verifier/salt/CA/keys/eight migrations/76 routines and
+all unrelated objects remain unchanged. Own strict direct readiness passed before
+and after activation. Native original function38 has the identical prior eszip.
+
+Actual official UI proved two-code creation/recovery, default privacy, selective
+name/class/required publication, explicit publication of the new task, teacher
+guidance ACK and visible student instructions, selective rotate/revoke ACKs,
+old-code and old-session denial and unaffected second-pupil access. No share or
+message was sent. Completed/scheduled fields stayed unpublished; no populated
+completed/scheduled proof is claimed. Detailed safe evidence is in
+activation/replacement-journey-35395ae1.json.
+
+The actual published entry still lost current context after tab activity. The
+new bounded correction reconciles on focus/pageshow/visibility and retains one
+request lane across retiring/replacement entries. Every fresh request keeps the
+original Auth/store/owner/lease guard; controls require new server admission.
+The original published source815c72a fails the focused silent-renewal/focus
+regression, while the corrected real component/DOM/CSS/store entry passes, with
+wrong-owner/server rejection and maximum one in-flight request retained. This
+is local correction evidence, not a hosted acceptance PASS.
+
+All nine checks remain active; the two full hosted/public checks remain FAIL.
+Original failure/source/receipt history is unchanged. Public mode is OFF; the
+replacement fabricated fixture remains in restricted pilot. Sole-publisher
+served-source receipt for this exact wake correction is required before the
+remaining hosted wake/context acceptance and authorized final public transition.
+No Product closure, new PO gate or final frontend publication is claimed.
+
+# Exact wake-repair pilot publication f8356a7b
+
+Current authority admits only the existing d1d6bde9 wake/shared-lane correction
+to the replacement pilot. Seven current pilot checks PASS using unchanged
+evidence; all original final9 and acceptance remain mandatory after the actual
+sole-publisher receipt. The two genuine full-stage FAILs remain unchanged in
+replacement-delivery-35395ae1.json and in the new source-bound stage manifest.
+
+The original sealed custodian performed only a metadata digest read: enabled
+pilot, same replacement one-owner/two-pupil binding, readiness flag and exact
+service source all match. No provider write, private query, browser phase, new
+fixture, role, key, credential or SQL operation occurred. Original source/TLS/
+privacy/core journey/wake DOM proofs retain their original records/timestamps.
+Student1 stays revoked; student2 stays active with its prior test session ended.
+See activation/wake-pilot-config-f8356a7b.json and wake-pilot-delivery-f8356a7b.json.
+
+This is LOCAL_READY for the exact restricted wake repair publication only. No
+public-mode enable, final frontend receipt, whole-product acceptance or closure
+is claimed. Resume the same session after the publisher receipt for only the
+newly served wake/current-admission checks and required public-stage guards.

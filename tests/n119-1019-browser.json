@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n119-alphabetic-display-roll-number-20261019",
+  "runId": "1542972d-8046-4d62-a1ae-91bdf3b1b193",
+  "baseSha": "644e6896c24e02e00d46c558a0f87c563f644870",
+  "mode": "candidate",
+  "checks": [
+    {
+      "name": "n119_alphabetic_display_roll_matches_old_new_students_stable_identity",
+      "status": "PASS",
+      "evidence": "Actual HTTP app roster, grade item/table and report DOM: mixed old/new active students, tied Arabic names, default/name/roll sorts agree on display 1..5; name/number filters retain full-roster rank. All persisted non-device stores (including owner, source IDs, enrollment IDs/numbers, history, grades and outbox) unchanged; zero synthetic service commits or page errors. Fresh isolated context and source CSS; owned browser and server closed in finally."
+    }
+  ],
+  "errors": []
+}

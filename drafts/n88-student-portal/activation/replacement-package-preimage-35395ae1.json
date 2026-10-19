@@ -1,0 +1,20 @@
+{
+  "aiAuthored": true,
+  "outputs": {
+    "edge/index.mjs": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+    "private/assets/student.mjs": "80913524d030d80f4df7799086b0c5b59b25383e19d637fba0ae50973d894c61",
+    "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
+    "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
+    "private/styles/app.css": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
+    "private/styles/student-portal-login.css": "d8da8a3226b9efe47e564eb92e54bdd2ef9c617888df2a72db222a67ce364bfd",
+    "edge/import_map.json": "7f6d1a3f45a0dd142f3f6d2e8327bb4f2f138f360fb3e050e4b20af06343b1f6",
+    "private/assets/brand/header-light-standard.svg": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+    "private/assets/brand/header-light-compact.svg": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+    "private/assets/brand/header-dark-standard.svg": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+    "private/assets/brand/header-dark-compact.svg": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+    "private/assets/brand/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
+    "private/student.html": "e684f3de945ef8a48add40a0d85bbd05e7d82da6833760c6d35184daff625174",
+    "cloudflare/worker.mjs": "4c962e99b6e9cf634f57bc94cda8bcb6a1caa62bc7eb47d397867d8d6d707b60"
+  },
+  "purpose": "Unchanged provider bundle outputs before teacher-only wake/custodian metadata refresh"
+}

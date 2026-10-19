@@ -1,0 +1,28 @@
+{
+  "taskId": "continuous-n119-alphabetic-display-roll-number-20261019",
+  "runId": "1542972d-8046-4d62-a1ae-91bdf3b1b193",
+  "baseSha": "644e6896c24e02e00d46c558a0f87c563f644870",
+  "mode": "original-source-reproduction",
+  "checks": [
+    {
+      "name": "original_roll_sort_mismatch_reproduced",
+      "status": "PASS",
+      "evidence": "Original real grades/reports sort handlers reorder displayed 1..5 by saved source numbers."
+    }
+  ],
+  "errors": [],
+  "originalRollOrder": [
+    "خالد",
+    "بندر",
+    "أَحْمَد",
+    "أحمد",
+    "حاتم"
+  ],
+  "originalReportRollOrder": [
+    "خالد",
+    "بندر",
+    "أَحْمَد",
+    "أحمد",
+    "حاتم"
+  ]
+}

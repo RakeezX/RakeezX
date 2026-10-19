@@ -7,7 +7,7 @@
 import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
 import { canOpenRoster } from './students.js';
-import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster } from '../models.js';
+import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster, sortStudents } from '../models.js';
 import { repaint } from '../repaint.js';
 import * as db from '../lib/db.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
@@ -136,9 +136,9 @@ const gradesView = {
 
     // الترتيب
     if (sortKey === 'name') {
-      processedRoster.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+      processedRoster = sortStudents(processedRoster);
     } else if (sortKey === 'roll') {
-      processedRoster.sort((a, b) => (a.rollNo ?? 9999) - (b.rollNo ?? 9999));
+      processedRoster.sort((a, b) => (a.displayNo ?? 9999) - (b.displayNo ?? 9999));
     } else if (sortKey === 'score_desc') {
       processedRoster.sort((a, b) => {
         const scA = mode === 'item' ? (itemScore(currentItem, ctx[a.id]) ?? -1) : (studentTotal(items, ctx[a.id]).pct ?? -1);
