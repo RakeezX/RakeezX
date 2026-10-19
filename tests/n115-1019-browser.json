@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n115-email-code-autofill-20261019",
+  "runId": "0c73cf2b-ab73-454a-a837-e8b9636d203d",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "n115_email_otp_autocomplete_paste_and_supported_browser_contract",
+      "status": "PASS",
+      "evidence": "Actual app + source CSS on fresh isolated Chromium: one-time-code/numeric/text/pattern/maxlength preserved; formatted Arabic/Persian paste and selection replacement, leading zeros, typing, input/change autofill events; no auto-submit; incomplete code blocked; rejected synthetic verification preserves error and signed-out state. OS/email suggestion availability is not certified."
+    }
+  ],
+  "errors": []
+}

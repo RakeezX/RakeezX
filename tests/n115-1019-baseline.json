@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n115-email-code-autofill-20261019",
+  "runId": "0c73cf2b-ab73-454a-a837-e8b9636d203d",
+  "baseline": true,
+  "checks": [
+    {
+      "name": "baseline_formatted_paste_truncation",
+      "status": "PASS",
+      "evidence": "Actual app lost sixth digit when maxlength truncated formatted clipboard text before input normalization."
+    }
+  ],
+  "errors": []
+}
