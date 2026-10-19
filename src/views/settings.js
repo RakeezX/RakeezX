@@ -87,8 +87,8 @@ function emailChangeSheet(currentEmail, submit) {
         <div class="field__error" role="alert" data-email-change-error hidden></div>
         <div class="field__hint" role="status" data-email-change-sending hidden>جارٍ إرسال طلب تغيير البريد… يمكنك إغلاق النافذة ومتابعة استخدام الإعدادات.</div>
         <div class="settings-email-feedback" role="status" data-email-change-accepted hidden>
-          <p>أُرسل طلب التغيير. سيبقى بريدك الحالي معتمدًا حتى يؤكد الخادم التغيير.</p>
-          <p>أكمل التأكيد من الرسالتين في بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. بعد التأكيد، ارجع إلى الإعدادات لتحديث الحالة تلقائيًا، أو حدّث الصفحة.</p>
+          <p>أُرسل طلب تغيير البريد. يبقى بريدك الحالي مستخدمًا حتى اكتمال التأكيد.</p>
+          <p>أكّد الطلب من الرسالتين في بريدك الحالي والجديد. إن لم تجدهما، تحقّق من الرسائل غير المرغوب فيها. تتحدّث الحالة تلقائيًا عند العودة إلى الإعدادات.</p>
         </div>
       </form>
     `,
@@ -404,10 +404,10 @@ const settings = {
                 </div>
                 ${emailView.verificationError ? html`<p class="field__hint" role="status">${emailView.verificationError} <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification" aria-busy=${emailView.verifying ? 'true' : 'false'} ${emailView.verifying ? 'disabled' : ''}>${emailView.verifying ? 'جارٍ التحقق…' : 'إعادة المحاولة'}</button></p>` : ''}
                 ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
-                  ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بعد تأكيد الرسالتين، تُحدَّث الحالة تلقائيًا عند العودة إلى الإعدادات. إذا لم تظهر الحالة الجديدة، حدّث الصفحة.</span>${emailView.verifying ? html` <span data-email-change-checking>جارٍ التحقق من حالة البريد…</span>` : ''}</div>
+                  ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. تتحدّث الحالة تلقائيًا عند العودة إلى الإعدادات.</span>${emailView.verifying ? html` <span data-email-change-checking>جارٍ التحقق من حالة البريد…</span>` : ''}</div>
                     <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
                       <summary>كيف أكمل تأكيد البريد؟</summary>
-                      <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. ثم ارجع إلى الإعدادات لتحديث الحالة تلقائيًا، أو حدّث الصفحة. لا يُعتمد التغيير هنا حتى يؤكده الخادم.</p>
+                      <p class="field__hint">أكّد الطلب من الرسالتين في بريدك الحالي والجديد. إن لم تجدهما، تحقّق من الرسائل غير المرغوب فيها.</p>
                     </details>`
                     : emailFeedback.completed ? html`<p class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span></p>` : ''}
                 ${emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
