@@ -437,3 +437,28 @@ Product/readiness flags were paused, original backend NOLOGIN read back, no publ
 API route or student page enabled, no fixture mutation/code/message/field publish.
 Encrypted original recovery and inactive original service are retained. See
 continuation-9190735f.json; reuse successful schema/crypto/transport proof.
+
+## Current bounded pilot — 2026-10-19, run3576957c
+
+The earlier frontend ordering/scope blockers are resolved for the authorized
+one-owner/two-existing-fabricated-pupil pilot only. Default/malformed rollout is
+OFF. Actual backend pilot admission and source/private configuration are in the
+original service; identities are not shipped in frontend code or diagnostics.
+Original16384 credential, eight applied immutable migrations,76 routines and
+all Auth/source/owner/RLS/grade/Sync/custody boundaries remain intact.
+
+Current evidence: pilot-provider-readback-3576957c.json, hosted-pilot-readiness.json,
+hosted-pilot-live-readiness.json, hosted-pilot-http.json and pilot-delivery-3576957c.json.
+Original Edge direct strictTLS/source guard passes; original private ingress
+serves exact /student/private assets with private headers, no fallback or SW.
+Existing provider privacy proof is reused; current owned logging/routes/source
+readbacks are explicit. No additional diagnostic function or privileged proxy.
+
+Teacher pilot source is ready for the sole publisher through normal authenticated
+UI. Other teachers receive unavailable; no control is mounted before actual
+server admission. Official student trial URL: https://rakeezx.com/student.
+The blank document is rendered proof only; it is not a teacher/student journey.
+Full hosted acceptance and public activation remain NOT_RUN until the same saved
+session resumes after verified pilot publication. No full N88 completion/CLOSED.
+Owned staging cleanup was policy-denied and retained without a bypass; all owned
+processes and phase leases are released. See the exact retained-resource receipt.

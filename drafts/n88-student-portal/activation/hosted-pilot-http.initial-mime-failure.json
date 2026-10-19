@@ -1,0 +1,13 @@
+{
+  "observed": [
+    {
+      "path": "/student",
+      "contentType": "application/json; charset=utf-8, text/html; charset=utf-8"
+    },
+    {
+      "path": "/n88-private/assets/student.mjs",
+      "contentType": "application/json; charset=utf-8, text/javascript; charset=utf-8"
+    }
+  ],
+  "cause": "Mixed-case header keys combined the old JSON default with the asset MIME; preserve real response, fix only exact static Content-Type override."
+}

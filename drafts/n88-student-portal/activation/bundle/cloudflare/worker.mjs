@@ -69,7 +69,7 @@ function createCloudflareEntry({ fetch: send = globalThis.fetch, now = Date.now 
       const bytes = Uint8Array.from(atob(asset.base64), (c) => c.charCodeAt(0));
       return new Response(request.method === "HEAD" ? null : bytes, { headers: {
         ...PRIVATE_WEB_HEADERS,
-        "Content-Type": asset.type,
+        "content-type": asset.type,
         "Content-Security-Policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
       } });
     }

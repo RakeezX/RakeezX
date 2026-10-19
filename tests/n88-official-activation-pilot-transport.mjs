@@ -10,6 +10,12 @@ for(const status of [200,302]){
  assert.equal((await handle(request(),env)).status,401);
 }
 assert.equal(calls,2);
+for(const [url,type]of [['/student','text/html; charset=utf-8'],['/n88-private/assets/student.mjs','text/javascript; charset=utf-8']]){
+ const r=new Request('https://rakeezx.com'+url);r.cf={tlsVersion:'TLSv1.3'};
+ const response=await createCloudflareEntry({fetch:()=>{throw Error('static must not fetch');}})(r,env);
+ assert.equal(response.status,200);assert.equal(response.headers.get('content-type'),type);
+ assert.equal(response.headers.get('x-content-type-options'),'nosniff');
+}
 const failed=await createCloudflareEntry({fetch:async()=>{throw Error('PRIVATE_CANARY');}})(request(),env);
 assert.equal(failed.status,503);assert.equal(failed.headers.get('x-n88-transport-stage'),'upstream');assert.equal(await failed.text(),'{"error":"unavailable"}');
-const result={status:'PASS',checks:['Workers supported manual redirect mode','3xx rejected without following Location or forwarding envelope','upstream generic denial preserved','only fixed transport-stage diagnostic, no private error'],primaryDocumentation:'https://developers.cloudflare.com/workers/runtime-apis/request/',hostedProof:false};await writeFile('tests/n88-official-activation-pilot-transport.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
+const result={status:'PASS',checks:['Workers supported manual redirect mode','3xx rejected without following Location or forwarding envelope','upstream generic denial preserved','only fixed transport-stage diagnostic, no private error','exact single HTML/JS MIME with nosniff and no static subrequest'],primaryDocumentation:'https://developers.cloudflare.com/workers/runtime-apis/request/',hostedProof:false};await writeFile('tests/n88-official-activation-pilot-transport.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

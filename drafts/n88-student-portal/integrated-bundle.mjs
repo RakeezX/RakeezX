@@ -27,6 +27,7 @@ manifest.hostedActivationOutcome={path:hostedOutcomePath,sha256:await textHash(h
 manifest.hostedActivationOutcome.historical=true;
 const continuationPath=dir+'continuation-9190735f.json',continuation=JSON.parse(await readFile(continuationPath,'utf8'));
 manifest.hostedContinuation={path:continuationPath,sha256:await textHash(continuationPath),state:continuation.state,protocol:continuation.protocol,direct:continuation.direct,providerVersion:continuation.deployedOriginalFunction.providerVersion,finalDisposition:continuation.finalDisposition,blocker:continuation.blocker};
+manifest.hostedContinuation.historical=true;
 manifest.sources[continuationPath]=await textHash(continuationPath);
 manifest.privateMembershipCorrection.hostedApplied=hostedOutcome.history.some(h=>h.sha256===manifest.privateMembershipCorrection.sha256);
 for(const file of [membershipRepair,'tests/n88-official-activation-membership.mjs','tests/n88-official-activation-membership.json'])manifest.sources[file]=await textHash(file);
@@ -122,6 +123,9 @@ for(const name of ['pilot-service','pilot-ui','pilot-entry','pilot-transport','p
 }
 const shell=await readFile('sw.js','utf8');assert.ok(shell.includes("'./src/lib/student-portal-runtime.js'"));
 manifest.stagedActivation.offlineShell='existing runtime precached; private student/API routes retain bypass; no new browser startup dependency';
+const pilotReceiptPath=dir+'pilot-provider-readback-3576957c.json';
+const pilotReceipt=JSON.parse(await readFile(pilotReceiptPath,'utf8'));
+manifest.stagedActivation.providerReadback={path:pilotReceiptPath,sha256:await textHash(pilotReceiptPath),edgeSourceMatches:pilotReceipt.edge.sourceSha256===manifest.outputs['edge/index.mjs'],workerSourceMatches:pilotReceipt.cloudflare.sourceSha256===manifest.outputs['cloudflare/worker.mjs']};
 // Runtime stylesheet and brand URLs are pinned by privateAssets above.
 const worker=await readFile(out+'cloudflare/worker.mjs','utf8');assert.ok(!worker.includes('node:'));
 const browser=await readFile(out+'private/assets/student.mjs','utf8');

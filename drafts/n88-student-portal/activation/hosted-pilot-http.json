@@ -1,0 +1,124 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "at": "2026-10-19T05:29:05.692Z",
+  "rows": [
+    {
+      "path": "/student",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "e684f3de945ef8a48add40a0d85bbd05e7d82da6833760c6d35184daff625174",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "contentType": "text/html; charset=utf-8",
+      "mimeMatches": true
+    },
+    {
+      "path": "/n88-private/assets/student.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "80913524d030d80f4df7799086b0c5b59b25383e19d637fba0ae50973d894c61",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "contentType": "text/javascript; charset=utf-8",
+      "mimeMatches": true
+    },
+    {
+      "path": "/n88-private/styles/app.css",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    {
+      "path": "/n88-private/styles/student-portal-login.css",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "d8da8a3226b9efe47e564eb92e54bdd2ef9c617888df2a72db222a67ce364bfd",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    {
+      "path": "/n88-private/assets/brand/header-light-standard.svg",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    {
+      "path": "/n88-private/assets/brand/header-light-compact.svg",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    {
+      "path": "/n88-private/assets/brand/header-dark-standard.svg",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    {
+      "path": "/n88-private/assets/brand/header-dark-compact.svg",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    {
+      "path": "/n88-private/assets/brand/icon-192.png",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true,
+      "csp": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    {
+      "path": "/api/n88/student/read",
+      "status": 401,
+      "noStore": true,
+      "stage": null
+    },
+    {
+      "path": "/api/n88/teacher/class/list",
+      "status": 401,
+      "noStore": true,
+      "stage": null
+    },
+    {
+      "path": "/n88-private/unknown",
+      "status": 401,
+      "noStore": true
+    }
+  ],
+  "privateIdentityOrCodeSent": false,
+  "hostedTeacherStudentJourney": "NOT_RUN",
+  "apiCheckAfterSourceRepair": "cb0371e7815cb2204f6da12ba3d389102a684c1ddf458333493cd1200add4c39",
+  "staticProofReusedUnchanged": true,
+  "status": "PASS",
+  "workerFetchRepair": "manual redirect with explicit 3xx rejection; original throw at upstream stage preserved"
+}

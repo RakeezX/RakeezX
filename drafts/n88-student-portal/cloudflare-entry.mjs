@@ -13,7 +13,7 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
        !documentUrl.search&&['GET','HEAD'].includes(request.method)&&Object.hasOwn(privateAssets,documentUrl.pathname)){
       const asset=privateAssets[documentUrl.pathname];
       const bytes=Uint8Array.from(atob(asset.base64),c=>c.charCodeAt(0));
-      return new Response(request.method==='HEAD'?null:bytes,{headers:{...PRIVATE_WEB_HEADERS,'Content-Type':asset.type,
+      return new Response(request.method==='HEAD'?null:bytes,{headers:{...PRIVATE_WEB_HEADERS,'content-type':asset.type,
         'Content-Security-Policy':"default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"}});
     }
     const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),12000);

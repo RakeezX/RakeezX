@@ -380,3 +380,59 @@ read, role/config/migration change, fixture mutation, publication or resource
 lease occurred. Prior successful proofs and original stagedActivation full
 acceptance remain unchanged. Operational pilot and full hosted/public groups
 remain NOT_RUN until the exact source scope is repaired and session resumed.
+
+### 2026-10-19 — bounded pilot continuation 3576957c
+
+The four original service seams are now wired to the default-OFF rollout policy.
+Pilot admission follows verified Auth/session and locked canonical ownership;
+only the privately configured existing fabricated owner/two pupils are admitted.
+Unknown owner/source/member, malformed configuration and excluded historical
+idempotency receipts deny. Synchronization preserves excluded memberships and
+other-teaching publications. An inactive existing context is never reactivated.
+First deliberate admitted pilot access may create only its own private context.
+Original eight SQL sources, credential16384/password/salt and76 typed routines
+are unchanged. Native-PG proof covers original Auth/RLS, source revision, rollback,
+COMMIT ACK, current-code recovery, admission and out-of-pilot preservation.
+
+Actual original Edge version20 is source-bound to
+cb0371e7815cb2204f6da12ba3d389102a684c1ddf458333493cd1200add4c39.
+Own restricted identity, strict client CA/hostname TLS, upstreamSSL, exact private
+boundary and configured pilot readiness passed before and after bounded enable.
+Existing exact source/two pupils were checked through normal designated UI;
+only the single owner UUID was projected inside the original sealed custodian.
+Binding values remain private/DPAPI/config only. No new Auth user, canonical or
+grade mutation, actual code issuance, publication of fields or message occurred.
+
+The original private ingress now serves the exact compiled /student document and
+eight allowlisted actual app/brand assets; there is no broad mount, account-app
+fallback or static upstream fetch. Downloaded Worker source matches
+5e1e74cd5ae17aa52d42a936fb05835d2ac7bc11fd82467fa54bf5cfa863d948.
+Source/config/routes, no-store/no-referrer/noindex/CSP/nosniff, correct HTML/JS MIME,
+anonymous API401 and actual blank mobile document DOM/CSS passed. Owned Worker
+logs/invocation/traces/Logpush/tails stay disabled; existing account/zone evidence
+is reused. Workers.dev/previews remain disabled; unrelated N44 route is preserved.
+
+Real failures remain saved. Fixed dotenv JSON serialization, early OFF host
+memoization, Workers unsupported redirect:error (manual plus explicit3xx rejection,
+never forwarding to Location), and mixed-case Content-Type duplication. Original
+service-only signed empty-binding probe proved401 without a teacher token or DB
+query. Local fixture failures were corrected against existing typed-boundary,
+RLS-lock ordering and active-projection contracts, without relaxing safeguards.
+See tests/n88-official-activation-pilot-*.json, hosted-pilot-*.json and
+activation/pilot-provider-readback-3576957c.json. Documentation:
+https://developers.cloudflare.com/workers/runtime-apis/request/.
+
+The normal teacher frontend genuinely models pilot versus public and waits for
+normal authenticated server list admission before mounting controls. Its actual
+store/owner-bound dispatch entry, DOM, handlers and source CSS passed locally.
+The sole publisher still owns integration/publication of that frontend candidate.
+This is pilot LOCAL_READY only. Full hosted teacher/two-pupil acceptance and full
+public rollout remain explicitly NOT_RUN; canonical stagedActivation acceptance
+is retained for the same-session continuation after verified publisher receipt.
+
+All owned browsers/native PG/HTTP servers closed and phase leases released.
+Policy rejected recursive cleanup of owned-pilot-deploy-3576957c.tmp before
+execution (CreateProcess rejected: blocked by policy). It remains with its owner
+marker, prepared bundle/config and CLI metadata filenames; no alternate deletion
+was attempted. Original protected recovery is retained, temporary SQL/env/source
+inputs are absent, and the inherited previously rejected PG directory is untouched.

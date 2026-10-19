@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "scope": "Affected current source/package only; unchanged historical evidence retained",
+  "sourceInputsVerified": 16,
+  "outputsVerified": 3,
+  "allowedPaths": true,
+  "noMigrationChange": true,
+  "providerSourceMatches": true,
+  "temporarySqlEnvSourceInputsAbsent": true,
+  "ownedStagingRetainedAfterPolicyDenial": true
+}

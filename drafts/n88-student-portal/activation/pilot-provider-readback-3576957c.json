@@ -1,0 +1,160 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "phase": "owner-restricted-pilot",
+  "edge": {
+    "name": "n88-student-portal",
+    "version": 20,
+    "verifyJwt": false,
+    "ezbrSha256": "ee8e9db68a893b07f2200757f39c28db4ea209db3545655e23fd595f12498619",
+    "sourceSha256": "cb0371e7815cb2204f6da12ba3d389102a684c1ddf458333493cd1200add4c39",
+    "sourceMatches": true
+  },
+  "edgeHistory": [
+    {
+      "name": "n88-student-portal",
+      "version": 11,
+      "verifyJwt": false,
+      "ezbrSha256": "d58aa80954f4f4d803453fa5bfa4f2d6ab19c09c37408985e770a29a9edd900c",
+      "sourceSha256": "211e3ebeec2a9934a2c86858ccff59a53582cdc3a6e684bdbd52c73f5527a1bf",
+      "sourceMatches": true
+    },
+    {
+      "name": "n88-student-portal",
+      "version": 17,
+      "verifyJwt": false,
+      "ezbrSha256": "7d2aa4e5842923654fb55429fc22682000742e1fb2f0870ccc802822e86dae47",
+      "sourceSha256": "a9996f0fa30f6182518a142b11a175931470d5811acff3fc946380d5830c2a64",
+      "sourceMatches": true
+    }
+  ],
+  "cloudflare": {
+    "sourceMatches": true,
+    "sourceSha256": "5e1e74cd5ae17aa52d42a936fb05835d2ac7bc11fd82467fa54bf5cfa863d948",
+    "settings": {
+      "success": true,
+      "status": 200,
+      "logpush": false,
+      "tail_consumers": [],
+      "bindings": [
+        {
+          "name": "N88_EDGE_URL",
+          "type": "plain_text",
+          "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n88-student-portal"
+        },
+        {
+          "name": "N88_ENABLED",
+          "type": "plain_text",
+          "text": "true"
+        },
+        {
+          "name": "N88_INGRESS_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "N88_PUBLIC_ORIGIN",
+          "type": "plain_text",
+          "text": "https://rakeezx.com"
+        }
+      ]
+    },
+    "subdomain": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "routes": {
+      "success": true,
+      "status": 200,
+      "owned": [
+        {
+          "id": "346d924c9746479a89e6e211a41bba14",
+          "pattern": "rakeezx.com/student",
+          "script": "rakeez-n88-private-ingress",
+          "request_limit_fail_open": false
+        },
+        {
+          "id": "1bcc93cfb56b42469bdad21724b63a1d",
+          "pattern": "rakeezx.com/n88-private/*",
+          "script": "rakeez-n88-private-ingress",
+          "request_limit_fail_open": false
+        },
+        {
+          "id": "c27599645c3c492f9b25eca0107e3dc9",
+          "pattern": "rakeezx.com/api/n88/*",
+          "script": "rakeez-n88-private-ingress",
+          "request_limit_fail_open": false
+        }
+      ],
+      "unrelatedN44Preserved": true
+    },
+    "sourceHistory": [
+      {
+        "sha256": "ed234b33857b5b08bab71f8bd6ed7d899d4d2e47411baafbc95833fe38df2f37",
+        "sourceMatches": true
+      }
+    ]
+  },
+  "ownedWorkerUpload": {
+    "success": true,
+    "status": 200,
+    "errors": [],
+    "result": {
+      "id": "rakeez-n88-private-ingress",
+      "etag": "668addabed47d5d02e09221e5c11288d7d7f4817961ac8b0d921271783da04c5",
+      "deployment_id": "0f6cd70711df4c8185c18ded7b1960af",
+      "logpush": false,
+      "tail_consumers": [],
+      "observability": {
+        "enabled": false,
+        "head_sampling_rate": 0,
+        "logs": {
+          "enabled": false,
+          "head_sampling_rate": 0,
+          "persist": null,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": null,
+          "head_sampling_rate": 0
+        }
+      }
+    }
+  },
+  "privacyEvidence": {
+    "priorAccountZoneLogpushHeaderTransformTlsProof": "continuation-9190735f.json and prior source-bound native readbacks; unchanged configuration reused",
+    "currentOwnedWorkerObservability": "explicit upload response: logs/invocation/traces disabled, sampling0; subsequent settings GET omits observability"
+  },
+  "privateBinding": {
+    "normalUiValidatedExistingFabricatedClass": true,
+    "existingPupilsSelected": 2,
+    "exactOwnerProjectionMatches": 1,
+    "ownerUuidOrBindingReturned": false,
+    "encryptedOriginalCustodian": true,
+    "newAuthUsers": 0,
+    "canonicalWrites": 0,
+    "studentCodesIssued": 0
+  },
+  "preserved": {
+    "original16384Credential": true,
+    "eightAppliedMigrationsUnchanged": true,
+    "typedBoundaryRoutines": 76,
+    "noN44RoleOrRecoveryAccess": true
+  },
+  "frontend": {
+    "teacherPilotSourcePrepared": true,
+    "publishedByThisWorker": false,
+    "solePublisherRequired": true,
+    "fullHostedJourney": "NOT_RUN",
+    "fullPublicRollout": "NOT_RUN"
+  },
+  "failuresPreserved": [
+    "hosted-pilot-readiness.initial-config-failure.json",
+    "hosted-pilot-http.initial-api-failure.json",
+    "tests/n88-official-activation-pilot-service.initial-failure.json",
+    "tests/n88-official-activation-pilot-service.preimage-fixture-failure.json",
+    "tests/n88-official-activation-pilot-ui.initial-failure.json",
+    "hosted-pilot-http.initial-mime-failure.json"
+  ],
+  "temporaryFunctionDisposition": "No temporary/diagnostic function created this run. Original function only; earlier safe disarm history retained."
+}

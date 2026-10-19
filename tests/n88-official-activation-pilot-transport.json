@@ -4,7 +4,8 @@
     "Workers supported manual redirect mode",
     "3xx rejected without following Location or forwarding envelope",
     "upstream generic denial preserved",
-    "only fixed transport-stage diagnostic, no private error"
+    "only fixed transport-stage diagnostic, no private error",
+    "exact single HTML/JS MIME with nosniff and no static subrequest"
   ],
   "primaryDocumentation": "https://developers.cloudflare.com/workers/runtime-apis/request/",
   "hostedProof": false
