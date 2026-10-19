@@ -93,6 +93,7 @@ export function createCanonicalAdapter({ maxRows = 2000, maxBytes = 2*1024*1024,
     }
     // Removing a source deletes ONLY its editorial portal projection. No score or
     // source writes. Restored sources must be explicitly published again.
-    db.publications=db.publications.filter(p=>p.ownerId!==ownerId || !rollout.allowsMember(p) || current.has(p.id));
+    db.publications=db.publications.filter(p=>p.ownerId!==ownerId || !rollout.allowsMember(p) ||
+      !rollout.admitsTeacher({ownerId,current:true},{current:true,ownerId:p.ownerId,classId:p.classId,teachingId:p.source.teachingId}) || current.has(p.id));
   };
 }

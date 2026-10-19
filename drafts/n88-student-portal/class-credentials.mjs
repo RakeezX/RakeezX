@@ -50,6 +50,7 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
         const binding=hash([action,scope.teachingId,input.expectedRosterRevision??null,input.studentId??null,input.enrollmentId??null,input.revision??null,input.credentialVersion??null]);
         const prior=db.classReceipts.find(r=>r.ownerId===auth.ownerId && r.requestId===input.requestId);
         if(prior) {
+          if(!prior.results.every(r=>members.some(m=>m.studentId===r.studentId&&m.enrollmentId===r.enrollmentId)))return denied();
           if(prior.binding!==binding) return result(409,{error:'stale_request'});
           const rows=replay(prior);return result(200,{requestId:input.requestId,replayed:true,results:rows,counts:summary(rows)});
         }

@@ -72,6 +72,14 @@ async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),phase,protection:'DPAPI CurrentUser + fresh directory current-user ACL',secretValuesReturned:false};
  }
  const state=await load();
+ if(action==='--probe-original-pilot-dispatch'){
+  if(!state.pilotEnabled||!state.directVerified||state.directAuthRefused||state.pilotDispatchProbeSource===state.directSource)fail('n88_pilot_dispatch_probe_gate');
+  state.pilotDispatchProbeSource=state.directSource;await save(state);
+  const time=String(Math.floor(Date.now()/1000)),nonce=randomUUID(),source='a'.repeat(64),body=Buffer.from('{}'),headers=['','','https://rakeezx.com','application/json','1','same-origin'],route='/api/n88/teacher/class/list';
+  const signature=createHmac('sha256',Buffer.from(state.ingress,'hex')).update(JSON.stringify(['n88-ingress-v1','https://rakeezx.com',route,'POST',headers,createHash('sha256').update(body).digest('hex'),time,nonce,source])).digest('hex');
+  const response=await fetch('https://'+project+'.supabase.co/functions/v1/n88-student-portal/dispatch',{method:'POST',headers:{'content-type':'application/json','x-n88-time':time,'x-n88-nonce':nonce,'x-n88-source':source,'x-n88-signature':signature},body:JSON.stringify({path:route,method:'POST',headers,body:body.toString('base64')}),signal:AbortSignal.timeout(15000)});
+  const reply=await response.json();const result={source:state.directSource,httpStatus:response.status,serviceStatus:reply.status??null,genericDenial:reply.body?.error==='unavailable',noTeacherBindingOrTokenSent:true,privateQueries:0};await writeFile(path.join(base,'hosted-pilot-dispatch-probe.json'),JSON.stringify(result,null,2)+'\n');return result;
+ }
  if(action==='--prepare-pilot-binding'){
   if(!state.directVerified||!state.installed||!state.preparationPaused||state.pilotBinding)fail('n88_pilot_binding_preimage');
   for(const name of ['service','ui'])if(JSON.parse(await readFile('tests/n88-official-activation-pilot-'+name+'.json','utf8')).status!=='PASS')fail('n88_pilot_local_gate');

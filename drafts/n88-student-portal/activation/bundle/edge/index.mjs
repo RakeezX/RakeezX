@@ -902,6 +902,7 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
           const binding = hash3([action, scope.teachingId, input.expectedRosterRevision ?? null, input.studentId ?? null, input.enrollmentId ?? null, input.revision ?? null, input.credentialVersion ?? null]);
           const prior = db.classReceipts.find((r) => r.ownerId === auth.ownerId && r.requestId === input.requestId);
           if (prior) {
+            if (!prior.results.every((r) => members.some((m) => m.studentId === r.studentId && m.enrollmentId === r.enrollmentId))) return denied();
             if (prior.binding !== binding) return result(409, { error: "stale_request" });
             const rows2 = replay(prior);
             return result(200, { requestId: input.requestId, replayed: true, results: rows2, counts: summary(rows2) });
@@ -4375,7 +4376,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024, rol
         if (db.publications.length > maxRows) fail5();
       }
     }
-    db.publications = db.publications.filter((p) => p.ownerId !== ownerId || !rollout.allowsMember(p) || current.has(p.id));
+    db.publications = db.publications.filter((p) => p.ownerId !== ownerId || !rollout.allowsMember(p) || !rollout.admitsTeacher({ ownerId, current: true }, { current: true, ownerId: p.ownerId, classId: p.classId, teachingId: p.source.teachingId }) || current.has(p.id));
   };
 }
 

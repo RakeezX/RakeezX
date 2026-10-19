@@ -115,6 +115,13 @@ manifest.outputs['cloudflare/worker.mjs']=sha(workerBuild.outputFiles[0].content
 manifest.graphs['cloudflare/worker.mjs']={inputs:Object.keys(workerBuild.metafile.inputs).sort(),imports:Object.values(workerBuild.metafile.outputs).flatMap(o=>o.imports)};
 for(const file of manifest.graphs['cloudflare/worker.mjs'].inputs)manifest.sources[file]=await textHash(file);
 manifest.stagedActivation={phase:'owner-restricted-pilot',defaultMode:'off',publicEnabled:false,protectedBindings:['N88_ROLLOUT_MODE','N88_PILOT_BINDING'],maxOwners:1,maxStudents:2,teacherFrontend:'normal authenticated list admission before controls',privateDocumentDelivery:'original private ingress exact embedded assets',deferredChecks:['n88_official_hosted_fabricated_teacher_student_ack_and_isolation','n88_official_publisher_readiness_route_and_served_behavior'],originalAcceptance:'canonical card stagedActivation retained; no full Product readiness'};
+manifest.activationSemantics={enabled:'legacy public activation flag remains false',gates:'legacy full-public gates remain false; bounded pilot has separate source/provider receipts'};
+manifest.stagedActivation.localChecks={};
+for(const name of ['pilot-service','pilot-ui','pilot-entry','pilot-transport','pilot-hosted-browser'])for(const suffix of ['mjs','json']){
+ const file='tests/n88-official-activation-'+name+'.'+suffix;manifest.stagedActivation.localChecks[file]=await textHash(file);
+}
+const shell=await readFile('sw.js','utf8');assert.ok(shell.includes("'./src/lib/student-portal-runtime.js'"));
+manifest.stagedActivation.offlineShell='existing runtime precached; private student/API routes retain bypass; no new browser startup dependency';
 // Runtime stylesheet and brand URLs are pinned by privateAssets above.
 const worker=await readFile(out+'cloudflare/worker.mjs','utf8');assert.ok(!worker.includes('node:'));
 const browser=await readFile(out+'private/assets/student.mjs','utf8');
@@ -126,4 +133,4 @@ for(const file of ['drafts/n88-student-portal/task-guidance.mjs','drafts/n88-stu
   dir+'metadata-contract.json',dir+'supabase.staged.toml',...['schema-proposal.sql','postgres-repository-schema.sql','canonical-state-schema.inactive.sql','canonical-lock.inactive.sql','auth-session.inactive.sql','ingress.inactive.sql','roles.inactive.sql'].map(f=>'drafts/n88-student-portal/'+f),
   'supabase/functions/n88-student-portal/config.inactive.toml','drafts/n88-student-portal/package-lock.json'])manifest.sources[file]=await textHash(file);
 await writeFile(dir+'manifest.json',JSON.stringify(manifest,null,2)+'\n');
-console.log('N88 offline Edge/Cloudflare/private actual-app document graphs bundled; all activation switches OFF.');
+console.log('N88 exact pilot graphs packaged; public activation remains OFF; provider state is recorded separately.');

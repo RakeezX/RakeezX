@@ -7,6 +7,8 @@
     "missing/invalid mode denies before synchronization",
     "wrong owner/source denies without private synchronization",
     "same-owner excluded pupil omitted from synchronization and batch",
+    "existing excluded membership and other-teaching publication byte-for-field preserved",
+    "old excluded-pupil idempotency receipt cannot bypass pilot admission",
     "only two credentials with durable ACK and recoverable current codes",
     "precommit failure discloses no credential and rolls back",
     "student claim/read pilot admission and changed-binding rejection",
@@ -21,6 +23,7 @@
   "lastAuthAccepted": true,
   "providerPaths": [
     "/auth/v1/.well-known/jwks.json",
+    "/auth/v1/user",
     "/auth/v1/user",
     "/auth/v1/user",
     "/auth/v1/user",

@@ -1,0 +1,26 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "status": "FAIL",
+  "checks": [],
+  "hostedProof": false,
+  "renderedUiProof": false,
+  "cleanup": {
+    "ownedNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "lastAuthAccepted": true,
+  "providerPaths": [
+    "/auth/v1/.well-known/jwks.json",
+    "/auth/v1/user",
+    "/auth/v1/user",
+    "/auth/v1/user",
+    "/auth/v1/user",
+    "/auth/v1/user"
+  ],
+  "failure": {
+    "name": "error",
+    "message": "new row for relation \"memberships\" violates check constraint \"n88_membership_active_projection\"",
+    "stack": "    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018/tests/n88-official-activation-pilot-service.mjs:44:2"
+  }
+}
