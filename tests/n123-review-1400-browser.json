@@ -1,0 +1,74 @@
+{
+  "taskId": "continuous-n123-sync-latency-measured-20261019",
+  "runId": "02cae405-94c0-43f3-ae42-abbd0c4c7c74",
+  "baseSha": "210cce3813b4cf1b45269f671d87fb5221076ab2",
+  "measurements": [
+    {
+      "version": "baseline",
+      "scenario": "full_open_refresh",
+      "ms": 4629.699999988079,
+      "ok": true,
+      "requests": 48,
+      "maximum": 1,
+      "readDelayMs": 80
+    },
+    {
+      "version": "baseline",
+      "scenario": "single_store_edit_including_ACK_hold",
+      "ms": 257.60000002384186
+    },
+    {
+      "version": "baseline",
+      "scenario": "pageshow_return",
+      "ms": 4570.5,
+      "requests": 48
+    },
+    {
+      "version": "baseline",
+      "scenario": "active_sync_to_delete_commit",
+      "ms": 4591.099999964237
+    },
+    {
+      "version": "candidate",
+      "scenario": "full_open_refresh",
+      "ms": 1244.6000000238419,
+      "ok": true,
+      "requests": 48,
+      "maximum": 3,
+      "readDelayMs": 80
+    },
+    {
+      "version": "candidate",
+      "scenario": "single_store_edit_including_ACK_hold",
+      "ms": 245.79999995231628
+    },
+    {
+      "version": "candidate",
+      "scenario": "pageshow_return",
+      "ms": 1235.7000000476837,
+      "requests": 48
+    },
+    {
+      "version": "candidate",
+      "scenario": "active_sync_to_delete_commit",
+      "ms": 1384.300000011921
+    }
+  ],
+  "checks": [
+    {
+      "name": "n123_measured_sync_latency_and_true_ack_recovery_preserved",
+      "status": "PASS",
+      "evidence": "Actual source app/CSS on loopback HTTP, fresh mobile synthetic account contexts and real ownership guard. Identical 80ms HTTP read delays; same reads and two pulls, read concurrency capped at four (observed HTTP overlap in measurements). Held edit ACK remains queued/unhealthy. One-tap class delete drains active sync, waits for receipt, tombstones selected class/grade and preserves unrelated grade. See measurements."
+    },
+    {
+      "name": "wrong_ack_idempotent_recovery_and_owner_rejection",
+      "status": "PASS",
+      "evidence": "Actual account store/coordinator: mismatched receipt leaves durable outbox and reports false; retry sends same mutationId, canonical receipt clears it. Foreign owner sends zero reads/writes and reports false."
+    },
+    {
+      "name": "owned_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Canonical isolated helper closed fresh contexts/browser; owned ephemeral loopback server closed in finally. No shared/live browser phase."
+    }
+  ]
+}

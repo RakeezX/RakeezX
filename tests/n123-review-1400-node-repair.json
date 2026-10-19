@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n123-sync-latency-measured-20261019",
+  "runId": "a333c666-d6ef-4a40-b128-c5f88c9d0ea3",
+  "baseSha": "210cce3813b4cf1b45269f671d87fb5221076ab2",
+  "preservedProductCandidateSha": "d4a7d407c724f09f03fe03de553bd64d3ef798bd",
+  "originalFailure": "Prior unprepared Node invocation failed two coordinator tests with ReferenceError: localStorage is not defined; immutable-base reproduction and original FAIL remain documented in N123_SYNC_LATENCY_MEASURED.md and prior candidate history.",
+  "correction": "Preload process-local in-memory Storage API. No original test assertions, Product source, ownership guard, lease or receipt handling changed.",
+  "command": "node --import ./tests/fixtures/n123-review-1400/node-storage.mjs --test --test-name-pattern='V2 coordinator performs|runtime automatic/manual' tests/sync-v2-runtime.test.mjs",
+  "exitCode": 0,
+  "tests": 2,
+  "passed": 2,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "legacy_node_runtime_harness_with_storage",
+      "status": "PASS",
+      "evidence": "V2 coordinator performs quiet automatic sync and manual retry without V1 dispatch: PASS (600.6918ms). Runtime automatic/manual Sync share the owner guard and resume only as the workspace owner: PASS (1152.8425ms). Total: 2 passed, 0 failed."
+    },
+    {
+      "name": "unchanged_product_browser_evidence_reused",
+      "status": "PASS",
+      "evidence": "Product src/lib/sync.js is unchanged from d4a7d407c724f09f03fe03de553bd64d3ef798bd. Reuse tests/n123-review-1400-browser.json from run 02cae405-94c0-43f3-ae42-abbd0c4c7c74, including required timing/ACK proof and actual account owner rejection. No browser/server was opened in this repair run."
+    }
+  ]
+}

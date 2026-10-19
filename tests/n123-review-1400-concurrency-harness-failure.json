@@ -1,0 +1,53 @@
+{
+  "taskId": "continuous-n123-sync-latency-measured-20261019",
+  "runId": "02cae405-94c0-43f3-ae42-abbd0c4c7c74",
+  "baseSha": "210cce3813b4cf1b45269f671d87fb5221076ab2",
+  "measurements": [
+    {
+      "version": "baseline",
+      "scenario": "full_open_refresh",
+      "ms": 4582.5,
+      "ok": true,
+      "requests": 48,
+      "maximum": 1,
+      "readDelayMs": 80
+    },
+    {
+      "version": "baseline",
+      "scenario": "single_store_edit_including_ACK_hold",
+      "ms": 254.10000002384186
+    },
+    {
+      "version": "baseline",
+      "scenario": "pageshow_return",
+      "ms": 4578.200000047684,
+      "requests": 48
+    },
+    {
+      "version": "baseline",
+      "scenario": "active_sync_to_delete_commit",
+      "ms": 4603.399999976158
+    },
+    {
+      "version": "candidate",
+      "scenario": "full_open_refresh",
+      "ms": 1269.199999988079,
+      "ok": true,
+      "requests": 48,
+      "maximum": 3,
+      "readDelayMs": 80
+    }
+  ],
+  "checks": [
+    {
+      "name": "scenario_failure",
+      "status": "FAIL",
+      "evidence": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n3 !== 4\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n123-sync-latency-measured-20261019/tests/n123-review-1400-browser.mjs:76:14\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n123-sync-latency-measured-20261019/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n123-sync-latency-measured-20261019/tests/n123-review-1400-browser.mjs:70:3"
+    },
+    {
+      "name": "owned_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Canonical isolated helper closed fresh contexts/browser; owned ephemeral loopback server closed in finally. No shared/live browser phase."
+    }
+  ]
+}
