@@ -47,6 +47,17 @@ export default {
   subtitle: () => 'جميع الفصول',
   back: () => '#/reports',
   wide: true,
+  // AI N120: retain the sheet across whole-view repaints (filters and quick scores).
+  beforeRender() {
+    if (!document.getElementById('report-filter-style')) {
+      const style = document.createElement('link');
+      style.id = 'report-filter-style';
+      style.rel = 'stylesheet';
+      style.href = new URL('../styles/filters.css', import.meta.url).href;
+      document.head.append(style);
+    }
+  },
+
   onMount() { termId = store.activeTerm()?.id; grade = 'all'; teachingId = 'all'; filter = 'all'; query = ''; repaint(); },
   render() {
     const rows = reportRows();
@@ -54,7 +65,7 @@ export default {
     const grades = [...new Set(allTeachings.map(t => Number(store.getSection(t.sectionId)?.grade)))].sort((a,b) => a-b);
     const selectedTerm = store.state.terms.find(t => t.id === term());
     const context = [grade === 'all' ? 'جميع الصفوف' : gradeLabel(Number(grade)), teachingId === 'all' ? 'جميع الفصول' : sectionLabel(store.getSection(store.getTeaching(teachingId)?.sectionId)), query && `بحث: ${query}`].filter(Boolean).join(' · ');
-    return html`<link rel="stylesheet" href="${new URL('../styles/filters.css', import.meta.url).href}"><article class="print-report report-workspace n70-report-page" dir="rtl" data-report-kind="${followup() ? 'followup' : 'grades'}">
+    return html`<article class="print-report report-workspace n70-report-page" dir="rtl" data-report-kind="${followup() ? 'followup' : 'grades'}">
       ${reportPageSetup()}
       ${reportHeader({ title: reportTitle(), profile: store.state.profile, year: store.activeYear()?.label, term: selectedTerm?.name, period: context })}
       <header class="report-workspace__head noprint"><div><span class="report-workspace__eyebrow">جميع الفصول</span><h2>${reportTitle()}</h2><p>${followup() ? 'الطالب وفصله وسبب المتابعة من السجلات الحالية.' : 'راجع الدرجات المرصودة عبر الفصول دون تغيير حسابها.'}</p>${demoOutputMarker({screenOnly:true})}</div><div class="n70-head-actions"><button type="button" class="btn btn--primary" data-act="n70-print">${icon('print')} طباعة التقرير</button><button type="button" class="btn btn--ghost" data-act="n70-csv">${icon('download')} تصدير CSV</button></div></header>

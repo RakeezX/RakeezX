@@ -38,3 +38,27 @@ Added `tests/n120-1019-report-owner.test.mjs`, a scoped copy of the original N70
 `node --test tests/n120-1019-report-owner.test.mjs` — PASS (1 test, 0 failures): original report routes/hierarchy/filter/export assertions and account owner-switch isolation all execute, plus the negative unverified-account write check. Neither the original N70 test nor any Product source/guard changed in this repair.
 
 Reuse the prior N120 actual-app DOM/handlers/CSS check and six screenshots: the three views, shared CSS, fixtures and their dependencies are unchanged. No browser/server phase was opened in this resumed run. Syntax and staged whitespace checks pass for the new fixture test/document changes. The new commit preserves the previous candidate as its parent; publisher delivery and Production evidence remain separate.
+
+## Stable filter geometry — task continuous-n120-stable-filter-geometry-20261019
+
+- Run: `26d59d19-139f-4f90-864f-0d3ed85407fc`.
+- Base: `df8e49362e79b488bcf56fbdca5c94e361bead7a` (assigned HEAD and observed origin/main).
+- Scope: PO19October N120 filter shaking plus N114's visual +/- follow-up. Local synthetic application only; independent controller/publisher owns delivery. No queue/ledger edits or live mutations.
+
+### Diagnosis and change
+
+Whole-view `innerHTML` replacement removed the filter stylesheet link on every filter/score repaint. Actual frame sampling reproduced missing CSS and temporary bar geometry changes, including 52px on narrow gradebook and up to 114.80px on aggregate reports. Preview text also changed sibling control widths by 18.95px. These are transient rendered failures that settled-state screenshots alone missed.
+
+The three views now install one persistent filter stylesheet in `head` through the existing `beforeRender` hook. No new JS dependency or offline shell dependency was added. Scoped CSS reserves the scrollbar gutter while a filter view is present, gives action groups a consistent 148px flex basis, and reserves automatic score badge space so digits cannot push +/- controls. Existing responsive wrapping, 44px targets, native controls, focus outlines and approved date adapter remain. No handlers, calculations, owner checks, persistence, Sync, identity, history or date policy changed.
+
+### Affected verification
+
+`node tests/n120-1019-stability.mjs --baseline` diagnoses the actual immutable base application sources served over loopback, not a reconstructed template. Final baseline: 40 cases, 114.796875px maximum bar-frame change, 18.953125px maximum control change, 15 sampled frames without the filter stylesheet. `tests/n120-1019-stability-baseline.json` preserves those failures as diagnostic measurements, not a Product PASS. The first narrower 36-case reproduction had 21 missing-CSS frames; exact frame counts depend on request/frame timing, while the same defect reproduced in the immutable replay.
+
+`node tests/n120-1019-stability.mjs` exercises real application DOM, handlers and source CSS at 1440px and 390px using the canonical isolated-local-browser helper and existing served Demo readiness helper. It covers sort, missing-only, search/no-results, reset, count changes, focus, attendance detail, A4 preview text and repaint. Synthetic +/- interactions cross 9→10→9 and exercise a separate 24-student class while genuinely scrolled beyond 1100px. Score records remain unchanged; synthetic participation logs use the existing command. The affected controls remain visible and at least 44px high, all three wide bars occupy one row, and neither width has horizontal page overflow.
+
+Machine measurements: `tests/n120-1019-stability.json`. Six viewport captures: `tests/fixtures/n120-1019/stable-{grade,aggregate,attendance}-{1440,390}.png`; inspected the affected wide and narrow layouts. Existing unrelated report/owner/scoring acceptance evidence above and in the prior N114 receipt is reused; no new backend/grade/security suite is warranted for stylesheet lifetime and layout changes. Demo fixtures and browser emulation do not certify live accounts, physical devices, offline cache or Production.
+
+The owned loopback server on port 5127 and all fresh disposable browser contexts/browser close in `finally`. Service Workers and external requests remain blocked; expected SW-block warnings are not a failure or an offline certification. No shared live-browser lease is needed for this eligible isolated phase. Syntax checks of the three affected views and harness, plus `git diff --check`, are the other affected checks. No full Vite build, push or deployment by this worker.
+
+Final candidate result: **PASS**, 40 affected interaction cases; maximum bar-frame change **0px**, maximum control change **0px**, missing-CSS frames **0**, and scrolled +/- maximum scroll change **0px** at both widths. Syntax and whitespace checks PASS. Source readiness only; publisher delivery remains outstanding.
