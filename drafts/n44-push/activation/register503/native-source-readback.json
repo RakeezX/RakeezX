@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "f6beb7aa-5700-4ef2-b759-129b88b7ac11",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "functionId": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
+  "function": "n44-notifications",
+  "version": 42,
+  "status": "ACTIVE",
+  "verifyJwt": false,
+  "providerBundleSha256": "8024177dbc3b7ad96802cb6f9d06b6174e69d40f10b629ee506524309fdbfa08",
+  "sourceExact": true,
+  "sourceSha256": "0bc9e6f37bd37dc00f2d2237bd0215034b6751b2facfa58f4b8ce734f545d77c",
+  "importMapExact": true,
+  "recordedAt": "2026-10-19T12:07:48.849Z",
+  "source": "fcf1126acdeee82b3458040d412294853be109f2",
+  "ingressChanged": false,
+  "deliveryEnabled": false,
+  "registrations": 0,
+  "providerSendAttempts": 0
+}
