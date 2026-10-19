@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-actual-transfer-local-update-copy-20261019",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -1499,
+      "scopeKey": "n36-review-1400",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, exact latest Product row and affected current origin/main files only. Latest direct human19October requires continue existing work, minimal NECESSARY checks, independent scopes through this controller and sole publisher, no planner/reviewer or manual worker. Preserve existing candidates/receipts and reuse unchanged proofs. Work in assigned isolated checkout. No queue/source/ledger edits by worker. Return exact supplied taskId/runId/base/candidate/check schema; LOCAL_READY is not Production. No real pupil/account data mutation, new Auth/RLS/schema/migrations/roles/credentials, real messages, denied school/browser operation or alternate actor/tool bypass. Preserve IDs/history/grades/owner/Sync/true ACK/tombstones/calendar switch hold. Never fake completion or relax security for speed. Necessary ordinary implementation and official publication are delegated.\n\nNEW actual user downloaded official0.5.12: 303valid/staged/observed names,10classes,7processed pages,current7,excluded0,coveragepartial,terminalunproven,endpointnone,hasNextfalse,disabledNextfalse,transfererror,receiptnotavailable,errors[]. Preserve this actual evidence; NO recollect school or repeat blocked browser scripts. Transfer still fails: after one-start says importing all classes, stale UI says28review,2minute validity/manualconfirmation/continuependingbatch/sourcechanged. Inspect actual extension→receiver contract/owner/context/first batch ACK and failure; reproduce minimal fabricated same-shaped multi-class handoff through actual engines, no real names. Preserve durable receipt/idempotency/owner+expiry guards. One start automatically saves all available owned batches, no per-class/review ceremony; partial source remains truthful,2min expiry is not a mandatory wait. Remove conflicting old stage/help/count/review text in popup/run-page/website extension landing, concise stage-specific summary and actionable failure instead of mystery error. Ensure official package/version/download and ALREADY approved stable LOCAL extension folder updater also advance together; user reports recurring local folder stale. Inspect exact existing minute-updater/config/stable path (no personal Chrome profile access); reconcile official published package into known local unpacked folder after source verified, backup/preserve owned state, no browser reload/extension reinstall or school action. If local updater repair needs narrow ops path report exact necessary path, do not broaden to new scheduler. Reuse old extraction proofs; only actual failed handoff/partialresume/current local-manifest match plus affected copy check.",
+      "allowedPaths": [
+        "tools/teacher-import-helper/**",
+        "tools/extensions/**",
+        "extensions/**",
+        "assets/extensions/**",
+        "public/assets/extensions/**",
+        "scripts/build-teacher-import-helper.mjs",
+        "scripts/*teacher*helper*",
+        "scripts/*extension*",
+        "src/lib/n36-extension*.js",
+        "src/lib/class-koshoof-bundle.js",
+        "src/lib/teacher-setup-import.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/views/class-import-center.js",
+        "tests/n36-review-1400*.mjs",
+        "tests/n36-review-1400*.json",
+        "tests/fixtures/n36-review-1400/**",
+        "docs/automation-evidence/20261019/N36_ACTUAL_TRANSFER_LOCAL_COPY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/n36-extension-protocol.js"
+      ],
+      "requiredChecks": [
+        "n36_actual_0512_transfer_failure_fixed_one_start_receipt",
+        "n36_package_local_folder_match_and_stage_copy"
+      ],
+      "acceptance": [
+        "Resolve this exact new PO feedback through the existing actual application path, preserving unchanged prior acceptance evidence.",
+        "Actual official publication/readback through sole publisher, truthful residual limitations, minimum affected checks only."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding."
+    }
+  ]
+}

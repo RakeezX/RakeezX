@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-availability-fast-light-entry-20261019",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -1500,
+      "scopeKey": "n88-review-1400",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, exact latest Product row and affected current origin/main files only. Latest direct human19October requires continue existing work, minimal NECESSARY checks, independent scopes through this controller and sole publisher, no planner/reviewer or manual worker. Preserve existing candidates/receipts and reuse unchanged proofs. Work in assigned isolated checkout. No queue/source/ledger edits by worker. Return exact supplied taskId/runId/base/candidate/check schema; LOCAL_READY is not Production. No real pupil/account data mutation, new Auth/RLS/schema/migrations/roles/credentials, real messages, denied school/browser operation or alternate actor/tool bypass. Preserve IDs/history/grades/owner/Sync/true ACK/tombstones/calendar switch hold. Never fake completion or relax security for speed. Necessary ordinary implementation and official publication are delegated.\n\nNEW ACTUAL PO regression after public verified ea7ab626: teacher still sees exact «مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة الخاصة بعد.». Student login waits too long on «جارٍ الاتصال… يرجى الانتظار». Diagnose actual readiness/binding/current owner/lease/request/source path; do not assume unpublished service or simply replace error text. Runtime currently paints unavailable BEFORE list response and uses same generic error for every local guard/server cause. Distinguish loading, legitimate unavailable/error and retry without logging PII or bypassing guards. Initial student entry currently eagerly client.read() even without usable session: inspect/fix unnecessary blocking roundtrip, keep actual session expiry/revocation failclosed. Public student portal must be consistently LIGHT independent of teacher/system theme; compact clear label «رمز الدخول», single help «6 أرقام تبدأ بـ1», visible gap field/button. Preserve teacher branding/compactness. SAME ORIGINAL private custodian session only may inspect existing hosted N88 exact service/ingress/source if necessary and deploy a bounded existing-service correction with actual source readback before LOCAL_READY; original8 migrations immutable, no SQL/role/Auth/key/policy/28P01 replay, no new fixture/account/code rotation/revocation. Reuse previous actual synthetic journey, only reported failure and changed no-session/loading/error + mobile/desktop light appearance checks. Do not use N44 session/config or compete for browser lease. Prefer no shared app/sw edits; if actually necessary report exact dependency and preserve single publisher integration.",
+      "allowedPaths": [
+        "src/lib/student-portal*.js",
+        "src/views/student-portal*.js",
+        "src/styles/student-portal*.css",
+        "drafts/n88-student-portal/**",
+        "supabase/functions/n88-student-portal/**",
+        "tests/n88-review-1400*.mjs",
+        "tests/n88-review-1400*.json",
+        "tests/fixtures/n88-review-1400/**",
+        "docs/automation-evidence/20261019/N88_AVAILABILITY_FAST_LIGHT_ENTRY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/views/student-portal-login.js"
+      ],
+      "requiredChecks": [
+        "n88_reported_teacher_availability_actual_cause_and_safe_recovery",
+        "n88_student_initial_entry_fast_light_compact_and_session_safety"
+      ],
+      "acceptance": [
+        "Resolve this exact new PO feedback through the existing actual application path, preserving unchanged prior acceptance evidence.",
+        "Actual official publication/readback through sole publisher, truthful residual limitations, minimum affected checks only."
+      ],
+      "preparationAuthority": {
+        "kind": "existing-N88-service-correction-same-original-custodian",
+        "publication": true,
+        "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "newMigrations": 0,
+        "newFixtures": 0,
+        "newAuthUsers": 0,
+        "realPupilMutations": 0,
+        "realSend": false,
+        "existingHostedServiceCorrection": true
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding.",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "liveAuthorizationRef": "PO-20261019-N88-REPORTED-AVAILABILITY"
+    }
+  ]
+}

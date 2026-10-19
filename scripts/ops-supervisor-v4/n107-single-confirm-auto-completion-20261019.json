@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-single-confirm-auto-completion-20261019",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -1497,
+      "scopeKey": "n107-review-1400",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-actual-transfer-local-update-copy-20261019"
+      ],
+      "objective": "Read AGENTS.md, ops contract, exact latest Product row and affected current origin/main files only. Latest direct human19October requires continue existing work, minimal NECESSARY checks, independent scopes through this controller and sole publisher, no planner/reviewer or manual worker. Preserve existing candidates/receipts and reuse unchanged proofs. Work in assigned isolated checkout. No queue/source/ledger edits by worker. Return exact supplied taskId/runId/base/candidate/check schema; LOCAL_READY is not Production. No real pupil/account data mutation, new Auth/RLS/schema/migrations/roles/credentials, real messages, denied school/browser operation or alternate actor/tool bypass. Preserve IDs/history/grades/owner/Sync/true ACK/tombstones/calendar switch hold. Never fake completion or relax security for speed. Necessary ordinary implementation and official publication are delegated.\n\nNEW user actual success: confirm preserved28names then sync wait; secondmanualContinue completed exactly31grades. Do not replay old max mismatch fix or claim grades still broken. Improve existing continuation orchestrator so ONE confirm carries owned names/default/max/grade ACK phases automatically to final durable receipt when Sync succeeds; no forced second click for normal pending ACK. Use event/receipt-driven bounded waiting/resume rather than arbitrary long sleeps/poll storms, show compact real phase progress, actionable manual retry only on true timeout/offline/rejection. Preserve same operation identity across refresh/retry/cancel, no duplicate classes/items/grades, accurate31 receipt, owner/term/review drift guard, existing zero/blanks. Tiny fabricated delayed ACK actual import path sufficient; reuse existing unchanged owner/max proofs. Serialize after N36 shared hub delivery.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/lib/grade-transfer.js",
+        "src/lib/class-import-file.js",
+        "src/lib/student-import.js",
+        "src/lib/subject-catalog.js",
+        "src/lib/class-subject-default.js",
+        "src/store.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync-ownership.js",
+        "tests/n107-1019*.mjs",
+        "tests/n107-1019*.json",
+        "tests/fixtures/n107-1019/**",
+        "docs/automation-evidence/20261019/N107_MAX_ACK_CONTINUATION_RECOVERY.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js",
+        "docs/automation-evidence/20261019/N107_MAX_ACK_CONTINUATION_RECOVERY.md"
+      ],
+      "requiredChecks": [
+        "n107_one_confirmation_delayed_ack_final_receipt_no_duplicate"
+      ],
+      "acceptance": [
+        "Resolve this exact new PO feedback through the existing actual application path, preserving unchanged prior acceptance evidence.",
+        "Actual official publication/readback through sole publisher, truthful residual limitations, minimum affected checks only."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding."
+    }
+  ]
+}
