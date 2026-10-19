@@ -93,15 +93,30 @@ async function execute(action,value){
   const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
   const env={N88_ENABLED:'false',N88_READINESS_ENABLED:'true',N88_ROLLOUT_MODE:'pilot',N88_PILOT_BINDING:JSON.stringify(state.pilotBinding),N88_SERVICE_SOURCE_SHA:source};
   const file=path.join(phase,'owned-env.tmp');
-  try{await writeFile(file,Object.entries(env).map(([k,v])=>k+'='+JSON.stringify(v)).join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.directSource=source;state.pilotConfigured=true;await save(state);}
+  try{await writeFile(file,Object.entries(env).map(([k,v])=>k+'='+(k==='N88_PILOT_BINDING'?"'"+v+"'":JSON.stringify(v))).join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.directSource=source;state.pilotConfigured=true;state.pilotConfigSerialization=2;await save(state);}
   finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   return {installed:true,enabled:false,rolloutMode:'pilot',source,protectedOwnerBinding:true,names:Object.keys(env),identifiersReturned:false};
+ }
+ if(action==='--repair-pilot-config-serialization'){
+  const r=JSON.parse(await readFile(path.join(base,'hosted-pilot-readiness.initial-config-failure.json'),'utf8'));
+  if(!state.pilotConfigured||state.pilotConfigSerialization||!state.pilotBinding||r.source!==state.directSource||r.rolloutMode!=='off'||r.rolloutConfigured!==false||r.enabled!==false||!r.sourceMatches)fail('n88_pilot_serialization_preimage');
+  const file=path.join(phase,'owned-env.tmp');
+  try{await writeFile(file,"N88_ENABLED=false\nN88_ROLLOUT_MODE=pilot\nN88_PILOT_BINDING='"+JSON.stringify(state.pilotBinding)+"'\n",{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.pilotConfigSerialization=2;await save(state);}
+  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {sameBindingInstalled:true,serializationCorrected:true,credentialOrVerifierChanged:false,identifiersReturned:false};
  }
  if(action==='--enable-pilot'){
   const r=JSON.parse(await readFile(path.join(base,'hosted-pilot-readiness.json'),'utf8'));
   if(!state.pilotConfigured||!state.directVerified||state.loginDisarmed||r.source!==state.directSource||r.rolloutMode!=='pilot'||!r.rolloutConfigured||!r.configurationReady||!r.sourceMatches)fail('n88_pilot_enable_gate');
   const file=path.join(phase,'owned-env.tmp');try{await writeFile(file,'N88_ENABLED=true\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.pilotEnabled=true;await save(state);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   return {enabled:true,rolloutMode:'pilot',publicMode:false,credentialChanged:false};
+ }
+ if(action==='--stage-pilot-source'){
+  if(!state.pilotConfigured||!state.directVerified||state.directAuthRefused)fail('n88_pilot_source_gate');
+  if(JSON.parse(await readFile('tests/n88-official-activation-pilot-entry.json','utf8')).status!=='PASS')fail('n88_pilot_entry_gate');
+  const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];if(source===state.directSource)fail('n88_pilot_source_unchanged');
+  const file=path.join(phase,'owned-env.tmp');try{await writeFile(file,'N88_ENABLED=false\nN88_SERVICE_SOURCE_SHA='+source+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.directSource=source;state.pilotEnabled=false;state.pilotLiveReadinessCalled=false;state.pilotSerializedReadinessCalled=false;await save(state);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {source,enabled:false,originalBindingAndCredentialUnchanged:true};
  }
  if(action==='--installed-names'){
   const result=await official(['secrets','list','--project-ref',project,'--output','json']);
@@ -148,8 +163,11 @@ async function execute(action,value){
   await sqlFile("do $$ begin if not exists(select 1 from pg_roles where rolname='n88_backend' and not rolcanlogin and not rolinherit and not rolsuper and not rolbypassrls and not rolcreatedb and not rolcreaterole and not rolreplication and rolconnlimit=-1 and rolvaliduntil is null and rolconfig is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid) and has_database_privilege('n88_backend','postgres','CONNECT')) then raise exception 'n88_direct_login_preimage'; end if; alter role n88_backend login; end $$;");
   state.directLoginArmed=true;state.loginDisarmed=false;await save(state);return {directLoginArmed:true,verifierOrPasswordChanged:false,membershipChanged:false};
  }
- if(action==='--call-direct-readiness'){
-  if(!state.directLoginArmed||state.directAuthRefused||state.lastDirectSourceAttempt===state.directSource)fail('n88_direct_readiness_consumed');
+ if(action==='--call-direct-readiness'||action==='--call-pilot-live-readiness'){
+  const live=action==='--call-pilot-live-readiness';
+  if(live?(!state.pilotEnabled||state.pilotLiveReadinessCalled||state.directAuthRefused):(!state.directLoginArmed||state.directAuthRefused||(state.lastDirectSourceAttempt===state.directSource&&!(state.pilotConfigSerialization===2&&!state.pilotSerializedReadinessCalled))))fail('n88_direct_readiness_consumed');
+  if(live)state.pilotLiveReadinessCalled=true;
+  if(state.pilotConfigSerialization===2)state.pilotSerializedReadinessCalled=true;
   state.directReadinessCalled=true;state.lastDirectSourceAttempt=state.directSource;await save(state);
   const origin='https://'+project+'.supabase.co',route='/functions/v1/n88-student-portal/readiness',time=String(Math.floor(Date.now()/1000)),nonce=randomUUID(),body='{}';
   const signed=JSON.stringify(['n88-readiness-v1',origin,route,time,nonce,createHash('sha256').update(body).digest('hex')]);
@@ -161,10 +179,10 @@ async function execute(action,value){
    const names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','configurationReady','rolloutMode','rolloutConfigured','source','enabled','code'];
    if(Object.keys(data).some(k=>!names.includes(k)))data={status:'unavailable',stage:'entry',code:'n88_generic_entry_unavailable',enabled:false};
    receipt={runId:state.pilotConfigured?'3576957c-1cf3-455d-8d62-150b1934b728':'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,httpStatus:response.status,...data,expectedSource:state.directSource,sourceMatches:data.source===state.directSource,transport:'original Supabase Edge IPv6 -> official direct strictTLS',privateMutations:0};
-   state.directVerified=response.status===200&&data.status==='ready'&&data.loginExact===true&&data.roleExact===true&&data.upstreamSsl===true&&data.clientTlsAuthorized===true&&data.sourceBoundary===true&&data.source===state.directSource&&data.enabled===false;
+   state.directVerified=response.status===200&&data.status==='ready'&&data.loginExact===true&&data.roleExact===true&&data.upstreamSsl===true&&data.clientTlsAuthorized===true&&data.sourceBoundary===true&&data.source===state.directSource&&data.enabled===live;
    if(data.code==='28P01')state.directAuthRefused=true;
    if(!state.directVerified){await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;receipt.loginDisarmed=true;}
-   await save(state);await writeFile(path.join(base,state.pilotConfigured?'hosted-pilot-readiness.json':'hosted-direct-readiness.json'),JSON.stringify(receipt,null,2)+'\n');return receipt;
+   await save(state);await writeFile(path.join(base,live?'hosted-pilot-live-readiness.json':state.pilotConfigured?'hosted-pilot-readiness.json':'hosted-direct-readiness.json'),JSON.stringify(receipt,null,2)+'\n');return receipt;
   }catch{
    await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;await save(state);fail('n88_direct_readiness_failed_disarmed');
   }

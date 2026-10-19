@@ -118,7 +118,7 @@
     "drafts/n88-student-portal/activation/hosted-scram-restored-challenge.json": "42af614bcb6afde23c51b80f2e33ef1d3abf4d5678beb9fc155731958cb23edb",
     "tests/n88-official-activation-direct-readiness.mjs": "19011fee87d13cc87f3c9299e86d91eee3546cf378293ef6cad470bab4b2e9b7",
     "tests/n88-official-activation-direct-readiness.json": "640543b7a8ee5c6b3ddf8db99d090c8c17aadff5cb1b70af5c31c07ab9a6e084",
-    "drafts/n88-student-portal/official-activation.mjs": "ab7d90670d0ffd29dc4d6dd2d570db9d720b4434cec15511799a9ff43f52a8a5",
+    "drafts/n88-student-portal/official-activation.mjs": "9d6e72b5aa8fe6df98218e88cd1f35ea2a4b8047e4f18066a6269230d921384d",
     "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
     "drafts/n88-student-portal/activation/ca/provenance.json": "82cbea55c25279317503a264d455ccb33d5be54952b072e088ba5e6cd6f582d4",
     "tests/n88-official-activation-session-pooler.mjs": "9f38a6b6a81efddcd68f7aa6a96c09be9b3a372c9626e54159e387070499b26c",
@@ -149,7 +149,7 @@
     "drafts/n88-student-portal/web-entry.mjs": "fe079ed58f6b066d3b23048a51f5c96e0ea318ca7eca0caa9e825cd4a071bef5",
     "drafts/n88-student-portal/existing-host.mjs": "880d4211259649e9c0bfa080405a93b285a14f43703363d2f835ae184dc6886e",
     "drafts/n88-student-portal/activation/edge-request.mjs": "acf653ee96cdd3705fcae5b6dea376130200d14ada27a1016ff4a02fcb361330",
-    "supabase/functions/n88-student-portal/index.ts": "b5203de6fb4252cf870bf032648a9aa7ee1c06d2549c7cf7ebbaaed6a5a8dc7d",
+    "supabase/functions/n88-student-portal/index.ts": "0582560364c98186ad94347d90fe4d14cbbeff6b00fc3220ef30a6564dd16aff",
     "src/lib/student-portal-unified-client.js": "f9db53a368d670784e1cb5122b7dac057b2e3da4a4900eb034ed33ae2c54188b",
     "src/lib/visible-numerals.js": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575",
     "src/lib/visible-viewport.js": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
@@ -275,7 +275,7 @@
     "drafts/n88-student-portal/package-lock.json": "014b58d8a27a30c8e9d13cf0211f0ef12d90007c41e295cfa330d95d0459d88a"
   },
   "outputs": {
-    "edge/index.mjs": "211e3ebeec2a9934a2c86858ccff59a53582cdc3a6e684bdbd52c73f5527a1bf",
+    "edge/index.mjs": "a9996f0fa30f6182518a142b11a175931470d5811acff3fc946380d5830c2a64",
     "private/assets/student.mjs": "80913524d030d80f4df7799086b0c5b59b25383e19d637fba0ae50973d894c61",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
