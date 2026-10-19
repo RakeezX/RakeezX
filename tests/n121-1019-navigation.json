@@ -1,0 +1,90 @@
+{
+  "taskId": "continuous-n121-lesson-card-target-actions-20261019",
+  "runId": "32d00c6d-c3c6-4b76-ab26-0396607ab078",
+  "checks": [
+    {
+      "name": "n121_lesson_card_class_target_attendance_same_session_target",
+      "status": "PASS",
+      "evidence": "Actual served app, source CSS and router at 390/1280: current/today card bodies open teaching by pointer and Enter; review/completed/pending attendance links select exact clicked session among two sessions of the same teaching. No horizontal overflow or page errors; navigation leaves attendance/students/scores unchanged."
+    }
+  ],
+  "targets": [
+    {
+      "title": "الخامس الابتدائي / N121 · المهارات الرقمية",
+      "hit": "home-lesson-class-link"
+    },
+    {
+      "title": "الخامس الابتدائي / N121 · المهارات الرقمية",
+      "hit": "home-lesson-class-link"
+    },
+    {
+      "title": "الخامس الابتدائي / N121 · المهارات الرقمية",
+      "hit": "home-lesson-class-link"
+    },
+    {
+      "selector": ".today-focus__action",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:11",
+      "keyboard": true
+    },
+    {
+      "selector": ".today-focus__state a",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:11",
+      "keyboard": false
+    },
+    {
+      "selector": ".home-session-row[data-session-id=\"se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10\"] .home-session-state",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10",
+      "keyboard": true
+    },
+    {
+      "selector": ".home-attention__row[data-session-id=\"se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10\"] .home-session-state",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10",
+      "keyboard": false
+    },
+    {
+      "title": "الخامس الابتدائي / N121 · المهارات الرقمية",
+      "hit": "home-lesson-class-link"
+    },
+    {
+      "title": "الخامس الابتدائي / N121 · المهارات الرقمية",
+      "hit": "home-lesson-class-link"
+    },
+    {
+      "title": "الخامس الابتدائي / N121 · المهارات الرقمية",
+      "hit": "home-lesson-class-link"
+    },
+    {
+      "selector": ".today-focus__action",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:11",
+      "keyboard": true
+    },
+    {
+      "selector": ".today-focus__state a",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:11",
+      "keyboard": false
+    },
+    {
+      "selector": ".home-session-row[data-session-id=\"se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10\"] .home-session-state",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10",
+      "keyboard": true
+    },
+    {
+      "selector": ".home-attention__row[data-session-id=\"se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10\"] .home-session-state",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10",
+      "keyboard": false
+    },
+    {
+      "selector": ".home-session-row[data-session-id=\"se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10\"] .home-session-state",
+      "session": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10",
+      "keyboard": false
+    }
+  ],
+  "origin": "http://127.0.0.1:64487/",
+  "fixture": {
+    "teaching": "tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0",
+    "student": "d371e432-9b56-4fcb-8862-0731bcc80aa2",
+    "past": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:10",
+    "current": "se:tch:95e61806-3c4d-4aa0-8d07-eef8be6128c0:2026-10-19:11"
+  },
+  "status": "PASS"
+}
