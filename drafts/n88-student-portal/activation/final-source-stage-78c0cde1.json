@@ -1,0 +1,9 @@
+{
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "source": "87043cad23cb75545a990a2ac7d90bde01d44ee060a1fd71e8f64af9b60ad4e3",
+  "enabled": false,
+  "mode": "pilot",
+  "sameProtectedBinding": true,
+  "keysRoleCredentialSqlOrFixtureChanged": false,
+  "hostedHash": "9654b060bf2af1569dae612d6b3a7f08062c6df6e788fd2b3bf4be9609105164"
+}

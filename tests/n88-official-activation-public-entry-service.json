@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "status": "PASS",
+  "checks": [
+    "actual typed PG repository/Auth/session/source entry",
+    "missing public proof and wrong owner/source deny before private context creation",
+    "first admitted public teacher list creates one private context with durable ACK",
+    "legacy and public UI list response protocols return same authorized roster",
+    "repeat list never duplicates context",
+    "unknown protocol denied without context mutation",
+    "existing inactive context never reactivated",
+    "no codes issued and no fields published"
+  ],
+  "hostedProof": false,
+  "renderedUiProof": false,
+  "cleanup": {
+    "ownedNativePgClosed": true,
+    "lease": "RELEASED integration"
+  },
+  "lastAuthAccepted": true,
+  "providerPaths": [
+    "/auth/v1/.well-known/jwks.json",
+    "/auth/v1/user",
+    "/auth/v1/user",
+    "/auth/v1/user",
+    "/auth/v1/user",
+    "/auth/v1/user"
+  ]
+}

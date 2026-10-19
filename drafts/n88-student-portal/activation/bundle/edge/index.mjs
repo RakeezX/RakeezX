@@ -1464,7 +1464,7 @@ function createIntegratedService(options, adapter, baseRepository) {
     };
     const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input).then((s) => {
       if (!s || s.classId !== binding.classId || s.termId !== binding.termId || !rollout.admitsTeacher(auth, s)) return null;
-      if (rollout.mode === "pilot" && !db.contexts.some((c) => c.ownerId === auth.ownerId)) db.contexts.push({ namespace: "n88_pilot_" + randomUUID4(), ownerId: auth.ownerId, active: true });
+      if (["pilot", "public"].includes(rollout.mode) && !db.contexts.some((c) => c.ownerId === auth.ownerId)) db.contexts.push({ namespace: (rollout.mode === "pilot" ? "n88_pilot_" : "n88_owner_") + randomUUID4(), ownerId: auth.ownerId, active: true });
       return s;
     });
     const ops = createClassCredentialOperations({ rollout, repository, ...credentials, ...recovering, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });

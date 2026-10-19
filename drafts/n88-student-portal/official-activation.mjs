@@ -73,20 +73,23 @@ async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),phase,protection:'DPAPI CurrentUser + fresh directory current-user ACL',secretValuesReturned:false};
  }
  const state=await load();
- if(['--stage-final-source','--final-readiness','--enable-final-public','--read-final-config'].includes(action)){
+ if(['--stage-final-source','--restage-final-source','--final-readiness','--enable-final-public','--read-final-config'].includes(action)){
   const activeRun='78c0cde1-994b-441a-9ab5-3ffb68508b66';
   const card=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-official-student-portal-activation-20261018.json','utf8'));
   const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
   const hostedBytes=(await readFile(path.join(base,'served-hosted-78c0cde1.json'),'utf8')).replaceAll('\r\n','\n'),hosted=JSON.parse(hostedBytes),hostedHash=createHash('sha256').update(hostedBytes).digest('hex');
   const ui=JSON.parse(await readFile('tests/n88-official-activation-public-entry-ui.json','utf8')),protocol=JSON.parse(await readFile('tests/n88-official-activation-public-protocol.json','utf8'));
+  if(JSON.parse(await readFile('tests/n88-official-activation-public-entry-service.json','utf8')).status!=='PASS')fail('n88_final_first_access_proof');
   if(process.env.N88_ACTIVATION_RUN_ID!==activeRun||card.requiredChecks?.length!==9||!JSON.stringify(card.stagePublicationHistory).includes('4adda44802b336997c6276693fc0791637bcfb42')||hosted.status!=='PASS'||!hosted.actualUi.sameValueVisibilitySubmit||hosted.actualUi.newFixtureOrCodeOperations!==0||ui.status!=='PASS'||protocol.status!=='PASS'||!state.replacementFixture?.configured||state.loginDisarmed||state.directAuthRefused||!state.directVerified)fail('n88_final_authority_or_proof_gate');
   const rows=await official(['secrets','list','--project-ref',project,'--output','json']);
   const entries=Array.isArray(rows)?rows:rows?.rows;
   const matches=(name,v)=>Array.isArray(entries)&&entries.filter(r=>r.name===name).length===1&&entries.find(r=>r.name===name).value?.toLowerCase()===createHash('sha256').update(v).digest('hex');
   const install=async env=>{const file=path.join(phase,'owned-env.tmp');try{await writeFile(file,env,{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}};
-  if(action==='--stage-final-source'){
-   if(state.finalRelease||source===state.directSource||!matches('N88_ENABLED','true')||!matches('N88_ROLLOUT_MODE','pilot')||!matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding))||!matches('N88_SERVICE_SOURCE_SHA',state.directSource))fail('n88_final_source_preimage');
-   state.finalRelease={runId:activeRun,priorSource:state.directSource,source,hostedHash,stageAttempted:true};await save(state);
+  if(action==='--stage-final-source'||action==='--restage-final-source'){
+   const restage=action==='--restage-final-source',previous=state.finalRelease;
+   if(restage?(!previous?.inactiveReady||previous.enableAttempted||previous.priorStage||previous.source!=='87043cad23cb75545a990a2ac7d90bde01d44ee060a1fd71e8f64af9b60ad4e3'):!!previous)fail('n88_final_source_already_staged');
+   if(source===state.directSource||!matches('N88_ENABLED',String(!restage))||!matches('N88_ROLLOUT_MODE','pilot')||!matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding))||!matches('N88_SERVICE_SOURCE_SHA',state.directSource))fail('n88_final_source_preimage');
+   state.finalRelease={runId:activeRun,priorSource:state.directSource,source,hostedHash,stageAttempted:true,...(restage?{priorStage:previous,repair:'First admitted public teacher private context; prior successful inactive readiness retained'}:{})};await save(state);
    await install('N88_ENABLED=false\nN88_SERVICE_SOURCE_SHA='+source+'\n');
    state.directSource=source;state.pilotEnabled=false;state.finalRelease.staged=true;await save(state);
    const result={runId:activeRun,source,enabled:false,mode:'pilot',sameProtectedBinding:true,keysRoleCredentialSqlOrFixtureChanged:false,hostedHash};await writeFile(path.join(base,'final-source-stage-78c0cde1.json'),JSON.stringify(result,null,2)+'\n');return result;
