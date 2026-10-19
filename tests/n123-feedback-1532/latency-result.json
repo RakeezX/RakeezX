@@ -1,0 +1,46 @@
+{
+  "taskId": "continuous-n123-mobile-reload-real-wait-20261019",
+  "runId": "3bea38e5-a1ac-4c39-b9ae-8fa2f0392f9c",
+  "baseSha": "98885befd4f13c02210661309a4add21e04c72ca",
+  "measurements": [
+    {
+      "version": "baseline",
+      "phase": "actual_account_boot",
+      "ms": 30418.30000001192,
+      "reads": 48,
+      "readDelayMs": 2500
+    },
+    {
+      "version": "baseline",
+      "phase": "actual_reload",
+      "reads": 48,
+      "ms": 627.6999999880791
+    },
+    {
+      "version": "candidate",
+      "phase": "actual_account_boot",
+      "ms": 15329.899999976158,
+      "reads": 24,
+      "readDelayMs": 2500
+    },
+    {
+      "version": "candidate",
+      "phase": "actual_reload",
+      "reads": 24,
+      "ms": 481.60000002384186
+    }
+  ],
+  "checks": [
+    {
+      "name": "changed_path_guards",
+      "status": "PASS",
+      "evidence": "{\"readFailure\":{\"ok\":false,\"reads\":24,\"healthy\":false},\"missingMarker\":{\"ok\":true,\"reads\":48,\"healthy\":true},\"held\":{\"queued\":1,\"healthy\":false},\"edited\":{\"reads\":48,\"outbox\":[]},\"wrong\":{\"ok\":false,\"reads\":24,\"healthy\":false},\"retained\":1,\"recovered\":{\"ok\":true,\"reads\":48,\"healthy\":true},\"calls\":[\"6eb99a1c-d3bd-4525-b540-179ac710cbf3\",\"443ba322-690f-434a-a681-85f3494147bd\",\"443ba322-690f-434a-a681-85f3494147bd\"],\"foreign\":{\"ok\":false,\"reads\":0,\"healthy\":false}}"
+    },
+    {
+      "name": "n123_actual_thirty_second_path_measured_and_true_ack_guards",
+      "status": "PASS",
+      "evidence": "Actual source app boot and reload, synthetic owner/lease/registry and 2500ms table-read delay; duplicate full pull removed only with valid revision evidence and no local dispatch. See measurements; no real mobile/network outcome claimed."
+    }
+  ],
+  "cleanup": "Owned browser/contexts and loopback server closed in finally"
+}

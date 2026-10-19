@@ -1,0 +1,28 @@
+{
+  "taskId": "continuous-n123-mobile-reload-real-wait-20261019",
+  "runId": "3bea38e5-a1ac-4c39-b9ae-8fa2f0392f9c",
+  "baseSha": "98885befd4f13c02210661309a4add21e04c72ca",
+  "measurements": [
+    {
+      "version": "candidate",
+      "phase": "actual_account_boot",
+      "ms": 386.30000001192093,
+      "reads": 24,
+      "readDelayMs": 10
+    },
+    {
+      "version": "candidate",
+      "phase": "actual_reload",
+      "reads": 24,
+      "ms": 418
+    }
+  ],
+  "checks": [
+    {
+      "name": "actual_mobile_manual_handler_and_pageshow",
+      "status": "PASS",
+      "evidence": "{\"manual\":{\"reads\":24,\"green\":true},\"wake\":{\"owner\":\"a7300000-0000-4000-8000-000000000001\",\"reads\":24,\"healthy\":true}}"
+    }
+  ],
+  "cleanup": "Owned browser/contexts and loopback server closed in finally"
+}
