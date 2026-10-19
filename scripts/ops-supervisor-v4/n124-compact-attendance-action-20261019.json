@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n124-compact-attendance-action-20261019",
+      "productId": "N124",
+      "activationId": "po-20261012-continuous",
+      "priority": -1799,
+      "scopeKey": "n124-priority-1621",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract and exact dated Product row, then only affected current origin/main source. Sole existing controller and serial publisher own work; no manual worker/queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Latest human19October wants minimal necessary affected checks only, no full suite/reviewer chain. Preserve IDs/history/grades/owner/session/lease/revision/true ACK, tombstones and accepted CLOSED tickets. No actual account/pupil/browser mutations, real send, schema/SQL/Auth/RLS/credentials or bypass of prior tool denials. Existing code delivery authorized, LOCAL_READY is not production. N44 explicitly temporarily held by latest human; do not work on it.\n\nNEW visual followup, do not reopen CLOSED N121. PO reports underline under «متابعة الرصد» and «بانتظار رصد الحضور» and extra line on mobile. Remove underline on these contextual attendance actions only, retain visible keyboard focus. Intelligently consolidate redundant action/status into concise contextual attendance action (e.g. رصد الحضور/استكمال الحضور/مراجعة الحضور as accurate), avoid duplicate verbose text. Compact mobile action without unwanted wrapped second line; use existing Rakeez tokens/responsive flex/grid, no framework/new visual system. Preserve exact accepted N121 contract: card body opens that class, attendance action opens EXACT clicked session, never generic current session. One390px/1440px geometry inspection plus tiny two-session route/assertion; reuse prior routing proof, no attendance data writes/whole suite. Do not change session generation, store, reports, or grades.",
+      "allowedPaths": [
+        "src/views/home.js",
+        "src/styles/components.css",
+        "src/styles/app.css",
+        "src/lib/home-today.js",
+        "src/lib/session-card.js",
+        "tests/n124-priority-1621/**",
+        "docs/automation-evidence/20261019/N124_COMPACT_ATTENDANCE_ACTION.md"
+      ],
+      "verificationPaths": [
+        "src/views/home.js"
+      ],
+      "requiredChecks": [
+        "n124_compact_no_underline_mobile_and_exact_session_route"
+      ],
+      "acceptance": [
+        "Resolve exactly this new reported behavior with minimum affected-path evidence and preserve true error/ACK and accepted routing.",
+        "Deliver through existing publisher and verify official asset; retain real PO review as pending."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

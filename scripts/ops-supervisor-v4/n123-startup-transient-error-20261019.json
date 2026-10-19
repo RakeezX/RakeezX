@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n123-startup-transient-error-20261019",
+      "productId": "N123",
+      "activationId": "po-20261012-continuous",
+      "priority": -1800,
+      "scopeKey": "n123-priority-1621",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract and exact dated Product row, then only affected current origin/main source. Sole existing controller and serial publisher own work; no manual worker/queue/source/ledger edits. Return exact supplied task/run/base/candidate/check schema. Latest human19October wants minimal necessary affected checks only, no full suite/reviewer chain. Preserve IDs/history/grades/owner/session/lease/revision/true ACK, tombstones and accepted CLOSED tickets. No actual account/pupil/browser mutations, real send, schema/SQL/Auth/RLS/credentials or bypass of prior tool denials. Existing code delivery authorized, LOCAL_READY is not production. N44 explicitly temporarily held by latest human; do not work on it.\n\nNEW actual PO: immediately after refreshing, sync badge flashes red «تعذر إكمال المزامنة», then shortly turns green without intervention. Diagnose concrete startup/auth readiness/owner lease/hydration/persisted error transition from current source, not generic cosmetic suppression. Transient startup waiting must show truthful neutral connecting/pending state until prerequisites available; genuine completed attempt failure must remain visible with actionable error. Never force green before durable ACK, hide actual persistent failure or weaken owner/auth guard. Reuse delivered latency proof; one tiny actual-app delayed-start scenario and genuine persistent error/owner guard only. No unrelated latency tuning/global debounce/timeout changes.",
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-warning-policy.js",
+        "src/lib/cloud.js",
+        "src/app.js",
+        "tests/n123-priority-1621/**",
+        "docs/automation-evidence/20261019/N123_STARTUP_TRANSIENT_ERROR.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync.js"
+      ],
+      "requiredChecks": [
+        "n123_startup_transient_wait_and_genuine_failure_truthful"
+      ],
+      "acceptance": [
+        "Resolve exactly this new reported behavior with minimum affected-path evidence and preserve true error/ACK and accepted routing.",
+        "Deliver through existing publisher and verify official asset; retain real PO review as pending."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding."
+    }
+  ]
+}
