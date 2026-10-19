@@ -1,0 +1,129 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-actual-private-student-asset-delivery-20261019",
+  "runId": "ec4b44d8-105d-4b02-aece-b93e3e4f954a",
+  "baseSha": "53134dd13b49788543554dc94741162125ad8793",
+  "qualifiedCandidate": "57694266e519eb41d25e18dbb2ed586ea300182b",
+  "preparedAt": "2026-10-19T11:27:53.793Z",
+  "source": {
+    "previousWorkerSha256": "4c962e99b6e9cf634f57bc94cda8bcb6a1caa62bc7eb47d397867d8d6d707b60",
+    "candidateWorkerSha256": "ca5ad2fcf735007234cb2f0c39b14ae8481f3709aae1265270fbba6fa48a29b0",
+    "transportWithoutEmbeddedAssetsSha256": "893e595af394eacb5fb19c3a47e9e484efdb94bc2b75194e3c6aa4c6552827d7",
+    "changedPrivatePaths": [
+      "/n88-private/assets/student.mjs",
+      "/n88-private/styles/student-portal-login.css",
+      "/student"
+    ],
+    "allowlistUnchanged": true,
+    "totalPrivatePaths": 9,
+    "qualifiedBundleByteIdentical": true,
+    "edgeUnchanged": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c"
+  },
+  "reusedEvidence": [
+    "tests/n88-review-1400.previous-pass.json",
+    "tests/n88-review-1400-reuse.json",
+    "tests/n88-review-1400-package.json"
+  ],
+  "providerOperation": "PASS",
+  "provider": {
+    "status": "PASS",
+    "capturedAt": "2026-10-19T11:28:52.162Z",
+    "accountId": "1c9ae85e766968a4269a7ac505f9a693",
+    "worker": "rakeez-n88-private-ingress",
+    "previousSourceSha256": "4c962e99b6e9cf634f57bc94cda8bcb6a1caa62bc7eb47d397867d8d6d707b60",
+    "sourceSha256": "ca5ad2fcf735007234cb2f0c39b14ae8481f3709aae1265270fbba6fa48a29b0",
+    "targetSha256": "ca5ad2fcf735007234cb2f0c39b14ae8481f3709aae1265270fbba6fa48a29b0",
+    "transportUnchanged": true,
+    "upload": {
+      "httpStatus": 200,
+      "etag": "a03b4c68f7c933d27e116bf0fd7daaf8dde6433868b54f120d23a6e61201fcf6",
+      "deployment_id": "0987194e6f8f4d09bbfb5241da94ff27",
+      "observability": {
+        "enabled": false,
+        "head_sampling_rate": 0,
+        "logs": {
+          "enabled": false,
+          "head_sampling_rate": 0,
+          "persist": null,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": null,
+          "head_sampling_rate": 0
+        }
+      },
+      "logpush": false,
+      "tail_consumers": []
+    },
+    "bindingsUnchanged": true,
+    "secretValuesReadOrReturned": false,
+    "secretTypesRetained": [
+      "secret_text"
+    ],
+    "settings": {
+      "httpStatus": 200,
+      "compatibility_date": "2026-10-01",
+      "compatibility_flags": [],
+      "usage_model": "standard",
+      "logpush": false,
+      "tail_consumers": [],
+      "observabilityPresent": false
+    },
+    "routesUnchanged": true,
+    "subdomainsUnchanged": true,
+    "subdomains": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "latestDeployment": {
+      "id": "2aa7df1a-2353-4957-9083-63346a691ce2",
+      "versions": [
+        {
+          "version_id": "0987194e-6f8f-4d09-bbfb-5241da94ff27",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-19T11:28:45.624425Z"
+    },
+    "providerWrites": 1,
+    "backendOrCredentialOperations": 0
+  },
+  "browserUsed": false,
+  "newFixturesOrCredentials": 0,
+  "requiredCheck": {
+    "name": "n88_existing_ingress_private_asset_source_and_actual_served_delivery",
+    "status": "PASS",
+    "basis": "Native exact deployed Worker source; eight static assets byte-exact; complete qualified application HTML bytes exact with one strictly attributed Cloudflare security append; private response headers unchanged."
+  },
+  "served": {
+    "rawComparison": "tests/n88-review-1400-served-private-assets.json",
+    "rawComparisonStatus": "FAIL",
+    "preservedInitialComparison": "tests/n88-review-1400-served-private-assets.initial.json",
+    "attribution": "tests/n88-review-1400-served-document-attribution.json",
+    "attributionStatus": "PASS",
+    "staticAssetsByteExact": 8,
+    "qualifiedDocumentSha256": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+    "applicationDocumentBytesExact": true,
+    "rawHtmlByteIdentical": false,
+    "providerSecurityAppend": "One exact observed provider-owned JavaScript Detections script inserted immediately before closing body; only its transient ray/time values vary",
+    "privateHeadersUnchanged": true,
+    "noSetCookie": true
+  },
+  "scope": {
+    "providerWrites": 1,
+    "backendChanges": 0,
+    "credentialChanges": 0,
+    "routeOrBindingChanges": 0,
+    "securityPolicyChanges": 0,
+    "fixtureMutations": 0,
+    "priorSuitesReplayed": false,
+    "pagesPublicationPerformed": false
+  },
+  "cleanup": {
+    "liveMutationLease": "RELEASED live-mutation",
+    "ownerToken": "ec4b44d8-105d-4b02-aece-b93e3e4f954a",
+    "browserOrServerStarted": false
+  },
+  "status": "PASS"
+}

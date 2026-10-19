@@ -1031,5 +1031,21 @@
     "evidence": "tests/n88-review-1400.previous-pass.json",
     "laterUnrunAttempt": "tests/n88-review-1400.json",
     "reuseProof": "tests/n88-review-1400-reuse.json"
+  },
+  "privateAssetDelivery": {
+    "taskId": "continuous-n88-actual-private-student-asset-delivery-20261019",
+    "runId": "ec4b44d8-105d-4b02-aece-b93e3e4f954a",
+    "receipt": "drafts/n88-student-portal/activation/private-asset-delivery-ec4b44d8.json",
+    "qualifiedCandidate": "57694266e519eb41d25e18dbb2ed586ea300182b",
+    "sourceSha256": "ca5ad2fcf735007234cb2f0c39b14ae8481f3709aae1265270fbba6fa48a29b0",
+    "version": "0987194e-6f8f-4d09-bbfb-5241da94ff27",
+    "deployment": "2aa7df1a-2353-4957-9083-63346a691ce2",
+    "capturedAt": "2026-10-19T11:28:52.162Z",
+    "workerSourceMatches": true,
+    "staticAssetHashesMatch": true,
+    "applicationDocumentBytesExact": true,
+    "rawHtmlByteIdentical": false,
+    "providerSecurityAppendDocumented": true,
+    "priorPendingPublicationMetadataPreserved": true
   }
 }
