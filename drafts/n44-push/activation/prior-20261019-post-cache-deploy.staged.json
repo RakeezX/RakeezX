@@ -1,0 +1,117 @@
+{
+  "aiAuthored": true,
+  "sourceOnly": true,
+  "enabled": false,
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "migration": "supabase/migrations/20261018044448_n44_exact_activation_staged.sql",
+  "migrationVersion": "20261018044448",
+  "function": {
+    "name": "n44-notifications",
+    "enabled": false,
+    "entry": "bundle/edge/index.mjs",
+    "config": "supabase.staged.toml",
+    "importMap": "bundle/edge/import_map.json",
+    "lock": "bundle/edge/deno.lock",
+    "verify_jwt": false,
+    "authorization": "private signed ingress + official AuthClient verified claims/fresh user + original current-session DB lock; no unaudited parser"
+  },
+  "cloudflare": {
+    "name": "n44-notifications-ingress",
+    "enabled": false,
+    "config": "wrangler.staged.toml",
+    "proposedExistingZoneRoute": "/api/n44/*",
+    "routes": [],
+    "workersDev": false,
+    "preview": false
+  },
+  "scheduler": {
+    "name": "n44-notifications-scheduler",
+    "enabled": false,
+    "config": "scheduler.staged.toml",
+    "publicRoutes": [],
+    "cron": [],
+    "proposedCadence": "once per minute only after explicit activation",
+    "invocation": "private signed POST /functions/v1/n44-notifications/schedule",
+    "bounds": "at most 4 pages x 25 due rows then 25-row cleanup per invocation"
+  },
+  "cron": [],
+  "deliveryEnabled": false,
+  "browserEnabled": false,
+  "serviceWorkerEnabled": false,
+  "roles": {
+    "n44_backend": "NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; private DML only, no Auth/canonical reads",
+    "n44_guard": "NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; private read_source owner, column-limited canonical locks under owner RLS",
+    "postgres": "existing management role only; lock_current_session owner, no managed Auth ownership/RLS/policy change, no new BYPASSRLS"
+  },
+  "unprovenExistingCapability": "Fresh exact metadata-only original preflight passed in current activation run; recheck immediately before apply. No hosted grant.",
+  "serverCustody": {
+    "edge": [
+      "N44_DATABASE_URL",
+      "N44_DATABASE_CA_CERT (optional custom trusted CA)",
+      "N44_AUTH_URL",
+      "N44_AUTH_API_KEY (publishable/anon key only; reject service_role by custody)",
+      "N44_PUBLIC_ORIGIN",
+      "N44_SERVICE_REVISION",
+      "N44_SERVICE_SOURCE_SHA",
+      "N44_SESSION_POLICY_JSON",
+      "N44_INGRESS_KEY",
+      "N44_SCHEDULER_KEY",
+      "N44_RATE_KEY",
+      "N44_CRYPTO_JSON",
+      "N44_PROVIDER_ORIGINS_JSON",
+      "N44_ENABLED=false",
+      "N44_DELIVERY_ENABLED=false"
+    ],
+    "ingress": [
+      "N44_PUBLIC_ORIGIN",
+      "N44_EDGE_URL",
+      "N44_INGRESS_KEY",
+      "N44_ENABLED=false"
+    ],
+    "scheduler": [
+      "N44_EDGE_URL",
+      "N44_SCHEDULER_KEY",
+      "N44_ENABLED=false",
+      "N44_SCHEDULER_ENABLED=false"
+    ],
+    "databaseCredential": "n44_service_login NOINHERIT NOBYPASSRLS; current standard SCRAM4096 same-password/salt compatibility repair; restricted LOGIN currently DISABLED with membership revoked after corrected SESSION28P01. Protected CLI/DPAPI/strict CA+hostname custody unchanged.",
+    "cryptoJSONKeys": [
+      "sealingKeys",
+      "activeKeyId",
+      "endpointHmacKeys",
+      "bindingHmacKeys",
+      "fingerprintKeyId",
+      "vapidKeys",
+      "activeVapidKeyId"
+    ],
+    "keySeparation": "all 32-byte ingress/scheduler/rate/sealing/endpoint-HMAC/binding-HMAC keys distinct, server only; P256 VAPID private key server only"
+  },
+  "postapply": [
+    "metadata-only identities.inactive.sql vs expected-identities.json; exact roles/helpers/ACL/grants/RLS/indexes/constraints/triggers",
+    "fresh Auth policy readback and original session semantics",
+    "provider function/route/config source hashes, disabled flags, NO active cron",
+    "separately approved hosted fixture/device proof before explicit enable"
+  ],
+  "killSwitch": "disable ingress, scheduler and N44_DELIVERY_ENABLED then N44_ENABLED; drain exact old runtime before retiring approval/bindings. Preserve durable receipts; do not drop tables/replay uncertain sends.",
+  "hostedStatus": "NOT_RUN",
+  "newHostOrPaidService": false,
+  "privateErrorBoundary": {
+    "migration": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    "path": "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+    "sha256": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
+    "routines": 42,
+    "security": "SECURITY INVOKER, intended n44_backend EXECUTE only; fixed errors and original SQLSTATE; exact catalog identity checked before private binds"
+  },
+  "scramCompatibility": {
+    "recordedAt": "2026-10-19T03:46:35.660Z",
+    "actualServerAnnouncedIterations": 4096,
+    "originalStoredIterations": 16384,
+    "saltMatched": true,
+    "samePasswordSaltRepairIterations": 4096,
+    "correctedAuthentication": "FAIL28P01",
+    "ownedLoginEnabled": false,
+    "backendMembership": false,
+    "deliveryEnabled": false,
+    "evidence": "tests/n44-finish-iteration.hosted.json"
+  }
+}

@@ -76,14 +76,14 @@
     "scripts/n44-activation-readback.mjs": "ea6e9e3851735a07e3a9e6831cb02cdf40258635fda05d73e0d4f1daec23936c",
     "supabase/migrations/20261018044448_n44_exact_activation_staged.sql": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
     "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
-    "scripts/n44-activation-custody.mjs": "6de85f50c0312405ef3d347d49d245c19156f84a514179c4eb9811f3a6f28054",
+    "scripts/n44-activation-custody.mjs": "0ee2e69a14e02921d2d18207fbdfe82d88de0d358f06c862475442cb069dba57",
     "drafts/n44-push/activation/build-error-boundary.mjs": "86cf5cd24c60cb75b821863f1ecd2de6944a34abb69e60442bb633d991e4a5d8",
     "drafts/n44-push/activation/metadata-contract.json": "a8d893d890e243dee110746ef80f937c2525fc4415f3293672c47e29d1146963",
     "drafts/n44-push/activation/preflight.inactive.sql": "5e4f5cdd5cac95899d6aa9f9c22ed5501f5b46bbce5c0a355b313181cd8cbaa7",
     "drafts/n44-push/activation/readback.inactive.sql": "52777fc1065b843cf3ab1400478dfe2896b7c7d577ade4766a8b4c060cc08029",
     "drafts/n44-push/activation/identities.inactive.sql": "06e3c252d7d8550f157b04e3434dabfb1b0e40c53a627645b3c4d6d053c1c01d",
     "drafts/n44-push/activation/expected-identities.json": "83055fde1a2ee1cdd7d6f0e0eaeaa8d75e1a9ec598560072bcd78d71f581386e",
-    "drafts/n44-push/activation/deploy.staged.json": "2bfee7cbc1eb4cb0eac24e0ba3e2e5807fd1a17b41f3e51184d4bf78be967ce4",
+    "drafts/n44-push/activation/deploy.staged.json": "18dd86d5ec57618ea4a760246969033130e5eaf0b4dd8d91f36cd99f14e87152",
     "drafts/n44-push/activation/supabase.staged.toml": "66941ff754c3a375617ddd9a0e364da4fc4dac2c4fe56a03bfee9ce9550d4ff9",
     "drafts/n44-push/activation/wrangler.staged.toml": "4c9fc344e569b35e40a125c936c6917c0f403def266b39991003ab00ed975efd",
     "drafts/n44-push/activation/scheduler.staged.toml": "39f8c3d3545c06abbe88eba92c0bd596acacd1d7d7c25b6a895d33c596e4d331",
@@ -97,7 +97,8 @@
     "drafts/n44-push/deployment.inactive.json": "89866dd757f3ff5f79abc5c250de649049348194997a28a339c8a4aa25c2737c",
     "scripts/n44-activation-equality.mjs": "0c640c96c0f121f147223b562452b038c2bb9b82c9210ba440d9cf9ff8c77e4d",
     "scripts/n44-activation-server-first.mjs": "2bd75099d4ce27c495ca3d2187baa54d8fddd4276ee1fa3b5c670b4d32331416",
-    "scripts/n44-activation-iteration.mjs": "5e1dd07620c5dc2da52f878e06f089ff2833de5cc7bd79587036b1a73281534f"
+    "scripts/n44-activation-iteration.mjs": "5e1dd07620c5dc2da52f878e06f089ff2833de5cc7bd79587036b1a73281534f",
+    "scripts/n44-activation-post-cache.mjs": "3e27af6f874e4f5811ccb87c4f59b4a4f3e27851bb143574a0df158d7f310527"
   },
   "outputs": {
     "edge/index.mjs": "c4f26b1790499df77a4021ecedcaadf377bbe5098aff9eba84e9a217db621819",
@@ -307,5 +308,12 @@
     "authenticationReady": false,
     "evidence": "tests/n44-finish-iteration.hosted.json",
     "previousManifest": "prior-20261019-iteration-manifest.json"
+  },
+  "postCacheReadiness": {
+    "authenticationSucceeded": true,
+    "identityAndUpstreamTls": false,
+    "sourceCandidateDuringConnection": "b96a5da2d02e7b10ebfdbd66948313ceace83e0c",
+    "evidence": "tests/n44-finish-post-cache-session.json",
+    "previousManifest": "prior-20261019-post-cache-manifest.json"
   }
 }

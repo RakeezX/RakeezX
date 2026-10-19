@@ -74,7 +74,7 @@
       "N44_ENABLED=false",
       "N44_SCHEDULER_ENABLED=false"
     ],
-    "databaseCredential": "n44_service_login NOINHERIT NOBYPASSRLS; current standard SCRAM4096 same-password/salt compatibility repair; restricted LOGIN currently DISABLED with membership revoked after corrected SESSION28P01. Protected CLI/DPAPI/strict CA+hostname custody unchanged.",
+    "databaseCredential": "Same n44_service_login SCRAM4096 password/salt. Post-observed-cache authentication succeeded, mandatory identity/upstream-TLS guard failed; current NOLOGIN and no backend membership. No runtime deployed.",
     "cryptoJSONKeys": [
       "sealingKeys",
       "activeKeyId",
@@ -113,5 +113,14 @@
     "backendMembership": false,
     "deliveryEnabled": false,
     "evidence": "tests/n44-finish-iteration.hosted.json"
+  },
+  "postObservedCacheRefresh": {
+    "authenticationSucceeded": true,
+    "restrictedSessionReadiness": false,
+    "failure": "n44_tls_role_mismatch",
+    "ownedLoginEnabled": false,
+    "backendMembership": false,
+    "evidence": "tests/n44-finish-post-cache-session.json",
+    "furtherConnectionAllowance": 0
   }
 }

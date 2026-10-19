@@ -1,0 +1,33 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "071a93c7-00b3-4cdd-b5a1-42d47796b1eb",
+  "recordedAt": "2026-10-19T03:52:00.038Z",
+  "sourceCandidateDuringConnection": "b96a5da2d02e7b10ebfdbd66948313ceace83e0c",
+  "cacheRefreshEventId": "390bbf31-fab1-42ae-afb0-1b212fc61889",
+  "postRefreshConnectionAttempts": 1,
+  "authenticationSucceeded": true,
+  "failedGate": "n44_tls_role_mismatch",
+  "stage": "identity",
+  "exactFailedIdentityOrTlsSubpredicate": "NOT_RETAINED by original helper; no additional connection authorized/performed",
+  "safeDisarm": {
+    "ownedLoginDisabled": true,
+    "backendMembershipRevoked": true,
+    "restrictedFlagsReadBack": true,
+    "evidence": "--post-cache-session awaited --disarm-login before rethrowing original n44_tls_role_mismatch; disarm verifies false privileged flags and backend_member. A disarm failure would have replaced the observed error."
+  },
+  "verifierWrites": 0,
+  "sameRepaired4096Credential": true,
+  "leaseReleased": true,
+  "protectedTransientSqlRemoved": true,
+  "encryptedRecoveryRetained": true,
+  "edgeWorkerKeyRouteServiceActivation": false,
+  "deviceRegistrationPermissionSendCron": false,
+  "migrationReplay": false,
+  "diagnosticCheckpointRepair": {
+    "implemented": true,
+    "syntaxOnly": true,
+    "hostedExecution": "NOT_RUN; original connection allowance consumed"
+  },
+  "priorFailuresPreserved": true
+}
