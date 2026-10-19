@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "f6beb7aa-5700-4ef2-b759-129b88b7ac11",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T12:06:40.502Z",
+  "acknowledged": true,
+  "source": "fcf1126acdeee82b3458040d412294853be109f2",
+  "bundleSha256": "0bc9e6f37bd37dc00f2d2237bd0215034b6751b2facfa58f4b8ce734f545d77c",
+  "service": "n44-notifications",
+  "purpose": "Finite registration failure observability; original503 cause remains unproven",
+  "deliveryEnabled": false,
+  "cronEvidenceReused": "drafts/n44-push/activation/device-optin/native-source-readback.json",
+  "registrations": 0,
+  "providerSendAttempts": 0,
+  "approvalAndFailedRegistrationDispositionPreserved": true
+}

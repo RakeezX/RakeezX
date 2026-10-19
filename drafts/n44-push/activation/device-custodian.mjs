@@ -130,3 +130,108 @@ export async function executeClosedPage(action,input,currentRun) {
  }
  fail('n44_unknown_closed_page_action');
 }
+
+// AI: current repair uses the original sealed custody. No registration, SQL,
+// scheduler/send capability, approval renewal or credential change is reachable.
+export async function executeRegister503(action){
+ const task='continuous-n44-register503-existing-service-repair-20261019',run='f6beb7aa-5700-4ef2-b759-129b88b7ac11',folder='drafts/n44-push/activation/register503/';
+ const l=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/live-mutation.json','utf8'));
+ if(l.taskId!==task||l.owner?.token!==run||l.resource!=='live-mutation')fail('n44_current_repair_lease_required');
+ const emit=async(name,data)=>{const r={taskId:task,runId:run,projectId:project,recordedAt:new Date().toISOString(),...data};await writeFile(folder+name+'.json',JSON.stringify(r,null,2)+'\n');return r;};
+ const s=await load(),d=s.device1019;
+ if(!s.installed||!s.directPreparation||!s.serviceEnabled||!d||d.pending||d.disabled||d.approval?.target!==null||(d.providerSendAttempts??0)!==0||d.registrationDisposition?.status!=='failed_unacknowledged_revoked'||!d.registrationDisposition?.consentDisabled)fail('n44_original_cleaned_disposition_required');
+ const rows=await list();if(Object.entries(s.envDigests).some(([n,h])=>rows.find(r=>r.name===n)?.value!==h)||rows.find(r=>r.name==='N44_DELIVERY_ENABLED')?.value!==hash('false'))fail('n44_existing_configuration_drift');
+ if(action==='deploy'){
+  if(s.register503?.deploymentAcknowledged||s.register503?.pending)fail('n44_repair_attempt_already_recorded');
+  if(Date.now()-s.policy.observedAt>86400000)fail('n44_profile_metadata_expired');
+  const m=JSON.parse(await readFile(folder+'manifest.json','utf8'));
+  for(const [f,h]of Object.entries(m.sources))if(hash((await readFile(f,'utf8')).replaceAll('\r\n','\n'))!==h)fail('n44_repair_source_changed');
+  const bytes=await readFile(folder+'edge.mjs');if(hash(bytes)!==m.outputs['edge.mjs'])fail('n44_repair_bundle_changed');
+  const source=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),policy={...s.policy,serviceSourceSha:source};
+  // Preserve approval/session revision and original policy metadata/activation;
+  // only bind the exact changed service bytes, not a new Auth approval.
+  const values={N44_SERVICE_SOURCE_SHA:source,N44_SESSION_POLICY_JSON:JSON.stringify(policy)};
+  s.register503={source,priorSource:s.source,pending:true,registrations:0,sends:0};await save(s);
+  await envFile(values);const after=await list();if(Object.entries(values).some(([n,v])=>after.find(r=>r.name===n)?.value!==hash(v)))fail('n44_repair_config_readback');
+  for(const [n,v]of Object.entries(values))s.envDigests[n]=hash(v);s.source=source;s.policy=policy;d.source=source;await save(s);
+  const work=path.resolve('drafts/n44-push/activation/provider-deploy/register503-'+run),dir=path.join(work,'supabase/functions/n44-notifications');await mkdir(dir,{recursive:true});
+  await writeFile(path.join(work,'supabase/config.toml'),'project_id = "'+project+'"\n[functions.n44-notifications]\nverify_jwt = false\nentrypoint = "./functions/n44-notifications/index.mjs"\nimport_map = "./functions/n44-notifications/import_map.json"\n');
+  await writeFile(path.join(dir,'index.mjs'),bytes);await writeFile(path.join(dir,'import_map.json'),await readFile('drafts/n44-push/activation/bundle/edge/import_map.json'));
+  official(['functions','deploy','n44-notifications','--project-ref',project,'--use-api','--no-verify-jwt','--workdir',work],work,60000);
+  s.register503.pending=false;s.register503.deploymentAcknowledged=true;await save(s);
+  return emit('deployment',{acknowledged:true,source,bundleSha256:m.outputs['edge.mjs'],service:'n44-notifications',purpose:m.purpose,deliveryEnabled:false,cronEvidenceReused:'drafts/n44-push/activation/device-optin/native-source-readback.json',registrations:0,providerSendAttempts:0,approvalAndFailedRegistrationDispositionPreserved:true});
+ }
+ if(action==='readiness'){
+  if(!s.register503?.deploymentAcknowledged||s.register503.pending)fail('n44_repair_deployment_not_acknowledged');
+  const {mac,sha}=await import('../web-protocol.mjs');const u=new URL('https://'+project+'.supabase.co/functions/v1/n44-notifications/readiness'),time=String(Math.floor(Date.now()/1000)),nonce=crypto.randomUUID(),body='{}';
+  const signature=await mac(Buffer.from(s.ingress,'hex'),JSON.stringify(['n44-readiness-v1',u.origin,u.pathname,time,nonce,await sha(new TextEncoder().encode(body))]));
+  const response=await fetch(u,{method:'POST',headers:{'content-type':'application/json','x-n44-time':time,'x-n44-nonce':nonce,'x-n44-signature':signature},body,signal:AbortSignal.timeout(15000),redirect:'error'}),r=await response.json();
+  const accepted=response.status===200&&r.status==='ready'&&r.source===s.source&&r.enabled===true&&r.deliveryEnabled===false&&['loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'].every(k=>r[k]===true)&&r.optIn?.deliveryEnabled===false&&r.optIn?.schedulerEnabled===false&&r.optIn?.targetBound===false;
+  const safe={};for(const k of ['status','stage','code','source','enabled','deliveryEnabled','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'])if(Object.hasOwn(r,k))safe[k]=r[k];
+  const receipt=await emit('readiness',{httpStatus:response.status,...safe,accepted,registrationFailureRootCause:'NOT_PROVEN',registrations:0,providerSendAttempts:0,approvalAndPrivateDispositionPreserved:true,plaintextTransientInputsAbsent:!(await readdir(phase)).some(f=>f.startsWith('owned-device-env-'))});
+  if(!accepted)fail('n44_repair_readiness_failed');return receipt;
+ }
+ fail('n44_unknown_repair_action');
+}
+
+// AI: latest explicit one-probe allowance. Immutable marker precedes normal UI;
+// this entry has no HTTP registration, service config, SQL or sender operation.
+export async function consumeRegister503Diagnostic(){
+ const task='continuous-n44-register503-existing-service-repair-20261019',run='3934ca4d-4107-470d-b214-070916b3d526';
+ const l=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/live-mutation.json','utf8'));
+ if(l.taskId!==task||l.owner?.token!==run||l.resource!=='live-mutation')fail('n44_current_diagnostic_lease_required');
+ const authorityPath='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261019-review-1400/n44-one-diagnostic-registration-authority.json';
+ if(hash(await readFile(authorityPath))!=='438c0dba62d129ba8fab8e53f624c8a9700b99fc46406c505a6ce7501115d53c')fail('n44_diagnostic_authority_changed');
+ const {DIAGNOSTIC_SOURCE,assertDiagnosticAttempt}=await import('./register503-diagnostic-guard.mjs');
+ const s=await load(),d=s.device1019,m=JSON.parse(await readFile('drafts/n44-push/activation/register503/manifest.json','utf8'));
+ if(!s.register503?.deploymentAcknowledged||s.register503.pending||s.source!=='fcf1126acdeee82b3458040d412294853be109f2'||d.source!==s.source||!d.approval||d.disabled||d.pending||d.approval.expiresAt<=Date.now())fail('n44_original_diagnostic_state_required');
+ const journal=path.join(phase,'register503-source-'+DIAGNOSTIC_SOURCE+'-diagnostic-attempt.dpapi'),files=await readdir(phase);
+ assertDiagnosticAttempt({source:m.outputs['edge.mjs'],consumed:files.includes(path.basename(journal)),cleaned:d.registrationDisposition?.status==='failed_unacknowledged_revoked'&&d.registrationDisposition?.consentDisabled===true,targetBound:d.approval.target!==null,sends:d.providerSendAttempts??0});
+ const bytes=Buffer.from(JSON.stringify({task,run,source:DIAGNOSTIC_SOURCE,ownerId:d.approval.ownerId,workspaceId:d.approval.workspaceId,deviceId:d.approval.deviceId,priorRegistrationDisposition:d.registrationDisposition,consumed:true,consumedAt:Date.now(),purpose:'ONE normal UI changed-source diagnostic; no send'}));let encrypted;
+ try{encrypted=dpapi(bytes,true);await writeEncryptedAttemptJournal(journal,encrypted);}finally{bytes.fill(0);encrypted?.fill(0);}
+ const receipt={taskId:task,runId:run,recordedAt:new Date().toISOString(),sourceSha256:DIAGNOSTIC_SOURCE,scopeDigest:d.scopeDigest,consumed:true,immutableEncryptedMarkerAcknowledged:true,originalFailedIdentityPreserved:true,originalApprovalPreserved:true,providerSendAttempts:0,sendJournalPresent:files.includes('one-device-20261019-attempt.dpapi'),privateValuesReturned:false};
+ await writeFile('drafts/n44-push/activation/register503/diagnostic-consumed.json',JSON.stringify(receipt,null,2)+'\n');return receipt;
+}
+
+// AI: qualified composition correction only. No diagnostic/registration/sender,
+// SQL or credential operation; old receipts and consumed journals remain intact.
+export async function executeRegister503Composition(action){
+ const task='continuous-n44-register503-existing-service-repair-20261019',run='0bc1d68d-dc66-4230-8172-3f77449f23f6',folder='drafts/n44-push/activation/register503-composition/';
+ const l=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/live-mutation.json','utf8'));
+ if(l.taskId!==task||l.owner?.token!==run||l.resource!=='live-mutation')fail('n44_current_composition_lease_required');
+ const emit=async(name,data)=>{const r={taskId:task,runId:run,projectId:project,recordedAt:new Date().toISOString(),...data};await writeFile(folder+name+'.json',JSON.stringify(r,null,2)+'\n');return r;};
+ const s=await load(),d=s.device1019,files=await readdir(phase);
+ const consumed='register503-source-0bc9e6f37bd37dc00f2d2237bd0215034b6751b2facfa58f4b8ce734f545d77c-diagnostic-attempt.dpapi';
+ if(!s.installed||!s.directPreparation||!s.serviceEnabled||!d||d.pending||d.disabled||d.approval?.target!==null||(d.providerSendAttempts??0)!==0||!s.register503?.deploymentAcknowledged||!files.includes(consumed)||files.includes('one-device-20261019-attempt.dpapi'))fail('n44_consumed_diagnostic_and_nonsending_state_required');
+ const rows=await list();if(Object.entries(s.envDigests).some(([n,h])=>rows.find(r=>r.name===n)?.value!==h)||rows.find(r=>r.name==='N44_DELIVERY_ENABLED')?.value!==hash('false'))fail('n44_existing_configuration_drift');
+ if(action==='deploy'){
+  if(s.register503Composition||s.source!=='fcf1126acdeee82b3458040d412294853be109f2')fail('n44_composition_preimage_or_attempt_changed');
+  if(Date.now()-s.policy.observedAt>86400000)fail('n44_profile_metadata_expired');
+  const proof=JSON.parse(await readFile('tests/n44-register503-1019-composition-corrected.json','utf8'));
+  if(proof.status!=='PASS'||proof.mode!=='corrected'||proof.runId!==run)fail('n44_composition_qualification_required');
+  const m=JSON.parse(await readFile(folder+'manifest.json','utf8'));
+  for(const [f,h]of Object.entries(m.sources))if(hash((await readFile(f,'utf8')).replaceAll('\r\n','\n'))!==h)fail('n44_composition_source_changed');
+  const bytes=await readFile(folder+'edge.mjs');if(hash(bytes)!==m.outputs['edge.mjs'])fail('n44_composition_bundle_changed');
+  const source=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),policy={...s.policy,serviceSourceSha:source};
+  const values={N44_SERVICE_SOURCE_SHA:source,N44_SESSION_POLICY_JSON:JSON.stringify(policy)};
+  s.register503Composition={source,priorSource:s.source,pending:true,registrations:0,sends:0};await save(s);
+  await envFile(values);const after=await list();if(Object.entries(values).some(([n,v])=>after.find(r=>r.name===n)?.value!==hash(v)))fail('n44_composition_config_readback');
+  for(const [n,v]of Object.entries(values))s.envDigests[n]=hash(v);s.source=source;s.policy=policy;d.source=source;await save(s);
+  const work=path.resolve('drafts/n44-push/activation/provider-deploy/register503-composition-'+run),dir=path.join(work,'supabase/functions/n44-notifications');await mkdir(dir,{recursive:true});
+  await writeFile(path.join(work,'supabase/config.toml'),'project_id = "'+project+'"\n[functions.n44-notifications]\nverify_jwt = false\nentrypoint = "./functions/n44-notifications/index.mjs"\nimport_map = "./functions/n44-notifications/import_map.json"\n');
+  await writeFile(path.join(dir,'index.mjs'),bytes);await writeFile(path.join(dir,'import_map.json'),await readFile('drafts/n44-push/activation/bundle/edge/import_map.json'));
+  official(['functions','deploy','n44-notifications','--project-ref',project,'--use-api','--no-verify-jwt','--workdir',work],work,60000);
+  s.register503Composition.pending=false;s.register503Composition.deploymentAcknowledged=true;await save(s);
+  return emit('deployment',{acknowledged:true,source,bundleSha256:m.outputs['edge.mjs'],service:'n44-notifications',deliveryEnabled:false,consumedDiagnosticPreserved:true,originalFailedDispositionAndApprovalPreserved:true,registrations:0,providerSendAttempts:0,ingressChanged:false,cronEvidenceReused:'drafts/n44-push/activation/device-optin/native-source-readback.json'});
+ }
+ if(action==='readiness'){
+  if(!s.register503Composition?.deploymentAcknowledged||s.register503Composition.pending)fail('n44_composition_deployment_not_acknowledged');
+  const {mac,sha}=await import('../web-protocol.mjs');const u=new URL('https://'+project+'.supabase.co/functions/v1/n44-notifications/readiness'),time=String(Math.floor(Date.now()/1000)),nonce=crypto.randomUUID(),body='{}';
+  const signature=await mac(Buffer.from(s.ingress,'hex'),JSON.stringify(['n44-readiness-v1',u.origin,u.pathname,time,nonce,await sha(new TextEncoder().encode(body))]));
+  const response=await fetch(u,{method:'POST',headers:{'content-type':'application/json','x-n44-time':time,'x-n44-nonce':nonce,'x-n44-signature':signature},body,signal:AbortSignal.timeout(15000),redirect:'error'}),r=await response.json();
+  const accepted=response.status===200&&r.status==='ready'&&r.source===s.source&&r.enabled===true&&r.deliveryEnabled===false&&['loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'].every(k=>r[k]===true)&&r.optIn?.deliveryEnabled===false&&r.optIn?.schedulerEnabled===false&&r.optIn?.targetBound===false;
+  const safe={};for(const k of ['status','stage','code','source','enabled','deliveryEnabled','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'])if(Object.hasOwn(r,k))safe[k]=r[k];
+  const result=await emit('readiness',{httpStatus:response.status,...safe,accepted,originalHosted503Phase:'NOT_PROVEN',consumedDiagnosticPreserved:true,registrations:0,providerSendAttempts:0,plaintextTransientInputsAbsent:!(await readdir(phase)).some(f=>f.startsWith('owned-device-env-'))});if(!accepted)fail('n44_composition_readiness_failed');return result;
+ }
+ fail('n44_unknown_composition_action');
+}

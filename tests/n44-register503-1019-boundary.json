@@ -1,0 +1,27 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "f6beb7aa-5700-4ef2-b759-129b88b7ac11",
+  "runtime": {
+    "deno": "2.2.12",
+    "v8": "13.5.212.10-rusty",
+    "typescript": "5.7.3"
+  },
+  "checks": [
+    {
+      "name": "real_registration_guard_and_Deno_protector_synthetic_commit_ack",
+      "status": "PASS"
+    },
+    {
+      "name": "missing_principal_and_current_consent_fail_closed",
+      "status": "PASS"
+    },
+    {
+      "name": "finite_phase_envelope_no_messages_getters_keys_or_rows_and_prior_guard_preserved",
+      "status": "PASS"
+    }
+  ],
+  "scope": "Actual registration and protector; trusted fabricated synchronous repository capability. Not hosted DB/owner acceptance or reproduction of the original503.",
+  "liveRegistrations": 0,
+  "providerSendAttempts": 0
+}

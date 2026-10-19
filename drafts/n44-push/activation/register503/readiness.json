@@ -1,0 +1,22 @@
+{
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "f6beb7aa-5700-4ef2-b759-129b88b7ac11",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T12:06:51.848Z",
+  "httpStatus": 200,
+  "status": "ready",
+  "source": "fcf1126acdeee82b3458040d412294853be109f2",
+  "enabled": true,
+  "deliveryEnabled": false,
+  "loginExact": true,
+  "roleExact": true,
+  "upstreamSsl": true,
+  "clientTlsAuthorized": true,
+  "sourceBoundary": true,
+  "accepted": true,
+  "registrationFailureRootCause": "NOT_PROVEN",
+  "registrations": 0,
+  "providerSendAttempts": 0,
+  "approvalAndPrivateDispositionPreserved": true,
+  "plaintextTransientInputsAbsent": true
+}

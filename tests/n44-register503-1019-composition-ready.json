@@ -1,0 +1,33 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "0bc1d68d-dc66-4230-8172-3f77449f23f6",
+  "scope": "Qualified source-composition correction and actual nonsending service prerequisites; no hosted registration/OS acceptance",
+  "state": "LOCAL_READY",
+  "serviceSourceSha": "2d682b80fdaff7d137430bdfd71948b18ba65efa",
+  "serviceVersion": 44,
+  "bundleSha256": "0e1a86d8e64fbfdeb294044a9809cd9f33a7ee44ffc2a48b14687716e1141fe7",
+  "checks": [
+    {"name":"n44_registration_duplicate_snapshot_causal_source_reproduction","status":"PASS","evidence":"Actual backend/AuthClient/repository:50 calls/2snapshots; fixed250ms capability crosses12s fence without outer commit. Context/update control33calls succeeds. tests/n44-register503-1019-composition-baseline.json"},
+    {"name":"n44_registration_single_snapshot_and_affected_safeguards","status":"PASS","evidence":"Corrected35calls/1snapshot/8750ms; retired other identity and false consent denied; unknown outer commit neverACKs or retries. tests/n44-register503-1019-composition-corrected.json"},
+    {"name":"n44_corrected_service_exact_native_source_and_readiness","status":"PASS","evidence":"Original function44 exact bytes/import map; signed readiness200/ready, source and strict guards true, deliveryfalse. drafts/n44-push/activation/register503-composition/native-source-readback.json and readiness.json"},
+    {"name":"n44_register503_actual_cause_and_qualified_existing_service_correction","status":"NOT_RUN","evidence":"Source defect/fix is causally qualified and deployed. The original hosted503 response phase remains unavailable; this combined original acceptance gate is preserved, not relabeled or inferred from virtual timing."}
+  ],
+  "historicalObservations": {
+    "originalRegistration503": "FAIL preserved",
+    "consumedDiagnosticRegistration503AndMissingBody": "FAIL preserved; allowance not renewed",
+    "sourceDirectoryDeletionPolicyRefusal": "Preserved; no retry or alternate deletion"
+  },
+  "liveRegistrationsThisRun": 0,
+  "providerSendAttemptsThisRun": 0,
+  "consumedDiagnosticPreserved": true,
+  "originalSendBudgetUnconsumed": true,
+  "globalDelivery": false,
+  "cron": [],
+  "ingressChanged": false,
+  "browserUsed": false,
+  "liveMutationLeaseReleased": true,
+  "plaintextEnvInputAbsent": true,
+  "productClosed": false,
+  "next": "Sole publisher integrates candidate; final device test remains its separate existing bounded task. No extra diagnostic or send allowance inferred."
+}

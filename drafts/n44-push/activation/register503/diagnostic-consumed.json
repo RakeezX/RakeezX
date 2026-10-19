@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "3934ca4d-4107-470d-b214-070916b3d526",
+  "recordedAt": "2026-10-19T12:16:39.346Z",
+  "sourceSha256": "0bc9e6f37bd37dc00f2d2237bd0215034b6751b2facfa58f4b8ce734f545d77c",
+  "scopeDigest": "feb87890d4966dcf23b415cb0512855647f628e539b65c90e829882453e955e4",
+  "consumed": true,
+  "immutableEncryptedMarkerAcknowledged": true,
+  "originalFailedIdentityPreserved": true,
+  "originalApprovalPreserved": true,
+  "providerSendAttempts": 0,
+  "sendJournalPresent": false,
+  "privateValuesReturned": false
+}
