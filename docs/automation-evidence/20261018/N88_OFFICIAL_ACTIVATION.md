@@ -502,3 +502,39 @@ test teacher can open its original class through normal authenticated UI.
 The owned replacement tab and observer were closed; the browser lease was
 released. No other tab, denied resource, queue state or provider configuration
 was modified. No Product closure or final frontend publication is claimed.
+
+# Replacement fixture and wake correction35395ae1
+
+The explicit new-test-account authority was exercised through normal Rakeez UI:
+one labelled synthetic class, exactly two synthetic pupils and one minimal task
+under the unchanged homework maximum. UI restore and Sync ACK were observed;
+no Auth user, import, real-person mutation or student score was created. The
+original custodian narrowly resolved that exact source, retained the old binding
+encrypted and installed only the replacement one-owner/two-pupil pilot binding.
+Original credentials/16384 verifier/salt/CA/keys/eight migrations/76 routines and
+all unrelated objects remain unchanged. Own strict direct readiness passed before
+and after activation. Native original function38 has the identical prior eszip.
+
+Actual official UI proved two-code creation/recovery, default privacy, selective
+name/class/required publication, explicit publication of the new task, teacher
+guidance ACK and visible student instructions, selective rotate/revoke ACKs,
+old-code and old-session denial and unaffected second-pupil access. No share or
+message was sent. Completed/scheduled fields stayed unpublished; no populated
+completed/scheduled proof is claimed. Detailed safe evidence is in
+activation/replacement-journey-35395ae1.json.
+
+The actual published entry still lost current context after tab activity. The
+new bounded correction reconciles on focus/pageshow/visibility and retains one
+request lane across retiring/replacement entries. Every fresh request keeps the
+original Auth/store/owner/lease guard; controls require new server admission.
+The original published source815c72a fails the focused silent-renewal/focus
+regression, while the corrected real component/DOM/CSS/store entry passes, with
+wrong-owner/server rejection and maximum one in-flight request retained. This
+is local correction evidence, not a hosted acceptance PASS.
+
+All nine checks remain active; the two full hosted/public checks remain FAIL.
+Original failure/source/receipt history is unchanged. Public mode is OFF; the
+replacement fabricated fixture remains in restricted pilot. Sole-publisher
+served-source receipt for this exact wake correction is required before the
+remaining hosted wake/context acceptance and authorized final public transition.
+No Product closure, new PO gate or final frontend publication is claimed.

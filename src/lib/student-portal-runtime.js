@@ -28,24 +28,32 @@ export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipG
 }
 export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel}={}) {
   let active, key, disposed=false;
+  // The lane survives a binding renewal. Retired reads must finish before the
+  // replacement entry acquires the same authoritative server transaction lock.
+  let requestTail=Promise.resolve();
+  const enqueue=operation=>{const pending=requestTail.then(operation);requestTail=pending.then(()=>{},()=>{});return pending;};
   const reconcile=()=>{if(disposed)return;let next;try{next=getBinding(false).key;}catch{next=null;}
     if(active&&next===key)return;active?.dispose();key=next;
-    active=mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel});
+    active=mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel,enqueue});
   };
+  // Visibility/focus can reveal a renewed session or lease before a store event.
+  // Re-admit through the original real guard, never reuse the old bound context.
+  const doc=root.ownerDocument,win=doc.defaultView;
+  const wake=()=>{if(doc.visibilityState==='visible')reconcile();};
+  win.addEventListener('focus',wake);win.addEventListener('pageshow',wake);doc.addEventListener('visibilitychange',wake);
   reconcile();const unsubscribe=subscribe(reconcile);
-  return {dispose(){disposed=true;unsubscribe?.();active?.dispose();root.replaceChildren();}};
+  return {dispose(){disposed=true;unsubscribe?.();win.removeEventListener('focus',wake);win.removeEventListener('pageshow',wake);doc.removeEventListener('visibilitychange',wake);active?.dispose();root.replaceChildren();}};
 }
-function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel}) {
+function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel,enqueue}) {
   if(!ready(readiness)){unavailable(root);return {dispose(){root.replaceChildren();}};}
   let initial;try{initial=getBinding(false);}catch{unavailable(root);return {dispose(){root.replaceChildren();}};}
   let disposed=false,handle=null,admitted=false;
   const current=write=>{const b=getBinding(write);if(disposed||b.key!==initial.key)throw Error('unavailable');return b;};
   const getContext=()=>{try{return current(false).context;}catch{return null;}};
-  let requestTail=Promise.resolve();
   const client=createClassPortalClient({getContext,request:(path,init)=>{
     // List/guidance share the same authoritative short DB lock. Serialize this
     // owner's browser requests before dispatch, retaining all binding/lease checks.
-    const pending=requestTail.then(async()=>{
+    return enqueue(async()=>{
     const b=current(true);
     const response=await send(path,{...init,headers:{...init.headers,Authorization:'Bearer '+b.token}});
     current(false);return {ok:response.ok,async json(){const data=await response.json();current(false);
@@ -56,7 +64,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
         admitted=true;
       }
       const {rollout,...ack}=data;return ack;}};
-    });requestTail=pending.then(()=>{},()=>{});return pending;
+    });
   }});
   unavailable(root);
   // No controls/private roster until the normal authenticated service admits this owner.

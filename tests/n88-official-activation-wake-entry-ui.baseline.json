@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "35395ae1-0dc1-4fd1-b598-5441b50a3f09",
+  "baseline": true,
+  "status": "FAIL",
+  "checks": [],
+  "hostedProof": false,
+  "cleanup": {
+    "ownedBrowserAndHttpClosed": true,
+    "lease": "RELEASED browser"
+  },
+  "failure": {
+    "message": "page.waitForResponse: Timeout 12000ms exceeded while waiting for event \"response\"",
+    "stack": ""
+  }
+}
