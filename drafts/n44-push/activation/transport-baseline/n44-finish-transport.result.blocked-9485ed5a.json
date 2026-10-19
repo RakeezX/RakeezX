@@ -1,0 +1,67 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
+  "baseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+  "recordedAt": "2026-10-19T06:01:59.973Z",
+  "state": "BLOCKED",
+  "checks": [
+    {
+      "name": "n44_actual_cloudflare_proper_post_before_and_after",
+      "status": "FAIL",
+      "evidence": "Required POST /api/n44/status before repair returned401 at 2026-10-19T05:59:53.753Z. Native source and actual local source/bundle handlers reject this path before forwarding. Before503 and after-upstream401 are not proved; after request/upload NOT_RUN pending exact probe correction."
+    },
+    {
+      "name": "n44_manual_redirect_and_explicit_redirect_rejection",
+      "status": "PASS",
+      "evidence": "tests/n44-finish-transport.local.json: six affected checks across actual source and bundle; dispatch invoked once using manual mode and original HMAC/body envelope; eight3xx statuses rejected without reading/following/exposing; original guards/body limits/private mapping retained."
+    },
+    {
+      "name": "n44_native_exact_ingress_source_and_binding_preservation",
+      "status": "NOT_RUN",
+      "evidence": "Read-only native baseline matched known-bad438bc572... source, existing five bindings (secret name only), deployed version64700bdd-201b-4bdf-9fe3-332bc7f034f0 and failclosed route. No upload or bindings change performed; corrected native exact-source/keep_bindings readback remains pending."
+    },
+    {
+      "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
+      "status": "PASS",
+      "evidence": "Reused original strictTLS/identity proof at 2026-10-19T04:07:25.540Z with source236f68e0131ca4d2b27fc3014cb33421f90b40c1; unchanged Edge/scheduler bundles and every prior manifest source except ingress verified by hashes. No database/Auth/secret/device/send/scheduler/frontend mutation; DNS10000 not retried."
+    }
+  ],
+  "archived": [
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.json",
+      "sha256": "e73a671b5d98549a58977bf85f7f9297583d130c7a1feb6cf246f1e6c9982776",
+      "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05"
+    },
+    {
+      "source": "drafts/n44-push/activation/cloudflare-off-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/cloudflare-off-readback.json",
+      "sha256": "4d0a02cd929eea90e4712b2bda287aef20605701128ab6df9f077def93e88214",
+      "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05"
+    },
+    {
+      "source": "drafts/n44-push/activation/cloudflare-final-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/cloudflare-final-readback.json",
+      "sha256": "577f087b525da4910c0862b775d6b536b4946ddafcb713e5d389708cf4cee4b5",
+      "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05"
+    },
+    {
+      "source": "drafts/n44-push/activation/cloudflare-final-versions.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/cloudflare-final-versions.json",
+      "sha256": "df351aeae5b0b601c05d449993ef5e15b3ff19bdbe82e576881807107d679319",
+      "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05"
+    },
+    {
+      "source": "drafts/n44-push/activation/manifest.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/manifest.json",
+      "sha256": "64fdb2e1ecdd14f988839ecc4c11172b0a744aa3a2a01b06e4a0b11e62eb2c5c",
+      "sourceCommit": "73c681da8633c2cc1ff1e269349322a7cb0e5e05"
+    }
+  ],
+  "localBundleSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+  "nativeBeforeSourceSha256": "438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40",
+  "nativeBeforeExact": true,
+  "providerMutationPerformed": false,
+  "liveMutationLeaseReleased": true
+}

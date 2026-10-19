@@ -343,11 +343,14 @@
   "sourceDefaultsRemainOff": true,
   "pendingIngressTransport": {
     "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
-    "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
+    "runId": "65b5a648-5daf-4334-90d6-948812ca669d",
     "state": "BLOCKED",
     "providerMutationPerformed": false,
     "nativeSourceExact": false,
     "receipt": "tests/n44-finish-transport.result.json",
-    "localBundleSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7"
+    "localBundleSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+    "reason": "shared-live-mutation-lease-owned-by-active-N88",
+    "beforeHttpStatus": 503,
+    "beforeEvidence": "tests/n44-finish-transport.context-read.before.json"
   }
 }

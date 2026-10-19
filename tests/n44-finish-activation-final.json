@@ -1,10 +1,10 @@
 {
   "aiAuthored": true,
   "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
-  "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
-  "recordedAt": "2026-10-19T06:01:59.973Z",
+  "runId": "65b5a648-5daf-4334-90d6-948812ca669d",
+  "recordedAt": "2026-10-19T06:25:43.625Z",
   "state": "BLOCKED",
-  "scope": "Ingress-only transport code locally corrected; provider mutation withheld because named pre-mutation probe cannot exercise forwarding.",
+  "scope": "Corrected existing-route before503 and saved ingress implementation ready; native upload blocked by active N88 live-mutation lease.",
   "projectId": "xlrubcwjqktzzunrvuns",
   "serviceSourceSha": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
   "edgeFunction": {
@@ -117,12 +117,15 @@
     "requiredMountIndependentlyProved": true
   },
   "cleanup": {
-    "liveMutationLeaseReleased": true,
+    "liveMutationLeaseReleased": false,
     "plaintextTransientInputsAbsent": true,
     "ownedBrowserServerProcessesCreated": false,
     "encryptedRecoveryRetained": true,
     "originalCustodyAccessed": false,
-    "providerMutationPerformed": false
+    "providerMutationPerformed": false,
+    "liveMutationLeaseAcquired": false,
+    "priorOwnedLeaseReleaseReused": true,
+    "leaseDisposition": "NOT_ACQUIRED_OTHER_OWNER"
   },
   "noFrontendPublication": true,
   "productClosed": false,
@@ -138,65 +141,56 @@
     "redirectMode": "manual",
     "rejectsRedirects": true,
     "localForwardAttempted": true,
-    "beforeHttpStatus": 401,
+    "beforeHttpStatus": 503,
     "afterHttpStatus": null,
     "probeMethod": "POST",
-    "probePath": "/api/n44/status",
+    "probePath": "/api/n44/context/read",
     "upstreamSourceUnchanged": true,
     "originalCustodyUntouched": true,
     "bindingsPreserved": true,
     "nativeSourceExact": false,
     "correctedIngressUploaded": false,
-    "statusPathForwards": false
+    "beforeEvidenceSource": "artifacts/ops-supervisor-v4/intake-evidence/po-20261019-supabase28p01/n44-correct-forward-route-before.json",
+    "beforeRecordedAt": "2026-10-19T06:01:21.375Z"
   },
   "actualTransportUnauthorizedHttp": [
     {
-      "aiAuthored": true,
-      "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
-      "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
-      "recordedAt": "2026-10-19T05:59:53.753Z",
-      "phase": "before",
-      "url": "https://rakeezx.com/api/n44/status",
+      "at": "2026-10-19T06:01:21.375Z",
+      "kind": "single-public-fabricated-unauthorized-forwarding-probe",
       "method": "POST",
-      "httpStatus": 401,
-      "denied": true,
-      "bodyKeys": [
-        "error"
-      ],
-      "privateValuesReturned": false,
+      "url": "https://rakeezx.com/api/n44/context/read",
+      "httpStatus": 503,
       "cacheControl": "no-store, private",
-      "requestOrigin": "https://rakeezx.com",
-      "csrfAndSameOriginProtocol": true,
-      "fakeUnauthorizedBearer": true,
-      "personalData": false,
-      "credentialsPersisted": false,
-      "requestBodyPersisted": false,
-      "statusPathForwards": false
+      "bodyRecorded": false,
+      "credentialUsed": false,
+      "accountOrDataMutation": false,
+      "protocolRoute": "existing-context-read",
+      "oldStatusRoute": "pre-forward-denial-only"
     }
   ],
   "checks": [
     {
       "name": "n44_actual_cloudflare_proper_post_before_and_after",
-      "status": "FAIL",
-      "evidence": "Required POST /api/n44/status before repair returned401 at 2026-10-19T05:59:53.753Z. Native source and actual local source/bundle handlers reject this path before forwarding. Before503 and after-upstream401 are not proved; after request/upload NOT_RUN pending exact probe correction."
+      "status": "NOT_RUN",
+      "evidence": "Corrected beforePOST503 reused from 2026-10-19T06:01:21.375Z; original /status401 retained. AfterPOST401 awaits the shared live-mutation lease and exact ingress upload; no before request repeated."
     },
     {
       "name": "n44_manual_redirect_and_explicit_redirect_rejection",
       "status": "PASS",
-      "evidence": "tests/n44-finish-transport.local.json: six affected checks across actual source and bundle; dispatch invoked once using manual mode and original HMAC/body envelope; eight3xx statuses rejected without reading/following/exposing; original guards/body limits/private mapping retained."
+      "evidence": "Six unchanged actual source/bundle checks reused from run 9485ed5a-6fed-4e65-a831-343a6bd11186 at 2026-10-19T06:01:59.476Z. Current source and bundle hashes match; no suite/build replay."
     },
     {
       "name": "n44_native_exact_ingress_source_and_binding_preservation",
       "status": "NOT_RUN",
-      "evidence": "Read-only native baseline matched known-bad438bc572... source, existing five bindings (secret name only), deployed version64700bdd-201b-4bdf-9fe3-332bc7f034f0 and failclosed route. No upload or bindings change performed; corrected native exact-source/keep_bindings readback remains pending."
+      "evidence": "Fresh read-only preupload snapshot retains existing five bindings, original deployment, failclosed route, Logpush false and observability null. keep_bindings upload and corrected source readback blocked by another owner lease; no secret values accessed."
     },
     {
       "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
       "status": "PASS",
-      "evidence": "Reused original strictTLS/identity proof at 2026-10-19T04:07:25.540Z with source236f68e0131ca4d2b27fc3014cb33421f90b40c1; unchanged Edge/scheduler bundles and every prior manifest source except ingress verified by hashes. No database/Auth/secret/device/send/scheduler/frontend mutation; DNS10000 not retried."
+      "evidence": "Original TLS/identity at 2026-10-19T04:07:25.540Z and service source 236f68e0131ca4d2b27fc3014cb33421f90b40c1 reused. Edge/scheduler bundle hashes match. No Supabase/Auth/data/send/device/cron/frontend/secret mutation."
     }
   ],
-  "blocker": "The activated /api/n44/status probe is outside the immutable existing ROUTE allowlist and returns401 before forwarding. Exact supported read-path probe correction is required before the one transport before/after pair and ingress upload. No fake503 or frontend/route change.",
+  "blocker": "Shared live-mutation lease is owned by active N88 worker continuous-n88-official-student-portal-activation-20261018 (run b324b7b5-5bfa-4ddb-8a92-adde7e26fe04, PID 37208, birth 2026-10-19T05:55:57.8496720Z). Both bounded acquisition attempts returned BUSY; no ingress upload or afterPOST performed.",
   "unchangedEvidenceReused": {
     "restrictedTlsRecordedAt": "2026-10-19T04:07:25.540Z",
     "edgeRecordedAt": "2026-10-19T04:14:18.138Z",
@@ -204,5 +198,24 @@
     "scheduler": "Original cloudflare readbacks/versions retained unchanged; no scheduler request or upload",
     "historicalCleanup": "tests/n44-finish-cleanup.json reused; no new temporary function deployed/disarmed/cleaned in this task",
     "optionalDns": "Original10000 refusal retained and not retried"
+  },
+  "priorBlockedEvidence": [
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-9485ed5a.json",
+      "sha256": "2a42a0680ca7f0febcfb0ee8a23cbd47efaafb8201d0c6a759485fa251a4006e",
+      "candidateSha": "f9a1e579a3d5344f6622849b3e638f10b4d11d71"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-9485ed5a.json",
+      "sha256": "91b6afba9a67400eb149703fb9b092f5d1c7aeffd35afd01cebcb90e5c876fb9",
+      "candidateSha": "f9a1e579a3d5344f6622849b3e638f10b4d11d71"
+    }
+  ],
+  "correctedProbeAuthority": {
+    "cardRepairAt": "2026-10-19T06:05:50.121Z",
+    "path": "/api/n44/context/read",
+    "productionAllowlistChanged": false
   }
 }
