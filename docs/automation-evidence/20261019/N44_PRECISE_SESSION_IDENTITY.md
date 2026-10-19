@@ -1,0 +1,3 @@
+# N44 post-auth identity gate
+
+Actual post-cache connection authenticated successfully. Remaining grouped identity/upstreamTLS check failed without subpredicate evidence. Run exact safe booleans before unchanged guard, resolve a real helper defect if proved. Never ignore false upstreamTLS. If and only if actual upstreamSSL is false with own identity/clientTLS correct, original inactive Edge production backend may use the same restricted role/password on official direct strictTLS from IPv6-capable provider runtime, retaining all privacy/source/readiness gates. No new proxy, privilege/global config, migration/password change or real send. Unexplained28P01 would stop; normal successful service sessions are not artificially limited to one.
