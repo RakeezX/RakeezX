@@ -1,0 +1,28 @@
+{
+  "taskId": "continuous-n123-mobile-reload-real-wait-20261019",
+  "runId": "3bea38e5-a1ac-4c39-b9ae-8fa2f0392f9c",
+  "baseSha": "98885befd4f13c02210661309a4add21e04c72ca",
+  "measurements": [
+    {
+      "version": "candidate",
+      "phase": "actual_account_boot",
+      "ms": 383,
+      "reads": 24,
+      "readDelayMs": 10
+    },
+    {
+      "version": "candidate",
+      "phase": "actual_reload",
+      "reads": 24,
+      "ms": 405.5999999642372
+    }
+  ],
+  "checks": [
+    {
+      "name": "scenario",
+      "status": "FAIL",
+      "evidence": "locator.tap: Error: strict mode violation: locator('[data-act=\"open-teacher-mini-hub\"]') resolved to 2 elements:\n    1) <button class=\"teacher-mini-hub-trigger\" data-act=\"open-teacher-mini-hub\" title=\"مركز المعلم: المعلم — متزامن\" aria-label=\"مركز المعلم: المعلم، متزامن\" data-sync-account-label=\"مركز المعلم: المعلم\">…</button> aka getByText('م المعلم')\n    2) <button data-act=\"open-teacher-mini-hub\" title=\"مركز المعلم: المعلم — متزامن\" aria-label=\"مركز المعلم: المعلم، متزامن\" class=\"topbar__teacher-btn compact-identity\" data-sync-account-label=\"مركز المعلم: المعلم\">…</button> aka getByRole('button', { name: 'مركز المعلم: المعلم، متزامن' })\n\nCall log:\n\u001b[2m  - waiting for locator('[data-act=\"open-teacher-mini-hub\"]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n123-mobile-reload-real-wait-20261019\\tests\\n123-feedback-1532\\reload.mjs:86:66\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n123-mobile-reload-real-wait-20261019/tests/n123-feedback-1532/reload.mjs:66:3"
+    }
+  ],
+  "cleanup": "Owned browser/contexts and loopback server closed in finally"
+}

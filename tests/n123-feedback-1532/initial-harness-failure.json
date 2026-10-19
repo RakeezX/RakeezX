@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n123-mobile-reload-real-wait-20261019",
+  "runId": "3bea38e5-a1ac-4c39-b9ae-8fa2f0392f9c",
+  "baseSha": "98885befd4f13c02210661309a4add21e04c72ca",
+  "measurements": [],
+  "checks": [
+    {
+      "name": "scenario",
+      "status": "FAIL",
+      "evidence": "page.evaluate: TypeError: window.checkpoint is not a function\n    at eval (eval at evaluate (:311:30), <anonymous>:1:33)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at settled (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n123-mobile-reload-real-wait-20261019\\tests\\n123-feedback-1532\\reload.mjs:52:15)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n123-mobile-reload-real-wait-20261019/tests/n123-feedback-1532/reload.mjs:64:22\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n123-mobile-reload-real-wait-20261019/tests/n123-feedback-1532/reload.mjs:57:3"
+    }
+  ],
+  "cleanup": "Owned browser/contexts and loopback server closed in finally"
+}

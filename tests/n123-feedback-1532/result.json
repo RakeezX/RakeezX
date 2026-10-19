@@ -1,0 +1,33 @@
+{
+  "taskId": "continuous-n123-mobile-reload-real-wait-20261019",
+  "runId": "3bea38e5-a1ac-4c39-b9ae-8fa2f0392f9c",
+  "baseSha": "98885befd4f13c02210661309a4add21e04c72ca",
+  "measurements": [
+    {
+      "version": "candidate",
+      "phase": "actual_account_boot",
+      "ms": 368.60000002384186,
+      "reads": 24,
+      "readDelayMs": 10
+    },
+    {
+      "version": "candidate",
+      "phase": "actual_reload",
+      "reads": 24,
+      "ms": 404.2999999523163
+    }
+  ],
+  "checks": [
+    {
+      "name": "single_pull_final_marker_context_and_new_revision",
+      "status": "PASS",
+      "evidence": "{\"fail-validation\":{\"ok\":false,\"reads\":24,\"healthy\":false},\"switch-validation\":{\"ok\":false,\"reads\":24,\"healthy\":false},\"new-revision\":{\"ok\":true,\"reads\":24,\"healthy\":false}}"
+    },
+    {
+      "name": "changed_path_guards",
+      "status": "PASS",
+      "evidence": "{\"readFailure\":{\"ok\":false,\"reads\":24,\"healthy\":false},\"missingMarker\":{\"ok\":true,\"reads\":48,\"healthy\":true},\"held\":{\"queued\":1,\"healthy\":false},\"edited\":{\"reads\":48,\"outbox\":[]},\"wrong\":{\"ok\":false,\"reads\":24,\"healthy\":false},\"retained\":1,\"recovered\":{\"ok\":true,\"reads\":48,\"healthy\":true},\"calls\":[\"dfa74e31-17e8-411c-b13e-72993fef6ee3\",\"a4640e9a-976c-46a2-9124-796dd7190bd0\",\"a4640e9a-976c-46a2-9124-796dd7190bd0\"],\"foreign\":{\"ok\":false,\"reads\":0,\"healthy\":false}}"
+    }
+  ],
+  "cleanup": "Owned browser/contexts and loopback server closed in finally"
+}

@@ -547,9 +547,11 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
   try {
     if (full) remoteCapture = await remoteSync.beforeFullSync();
     const snapshot = await pendingOutbox();
-    // Only a revision-proven remote wake with no local lifecycle/outbox work
-    // may use one pull. Manual/open/retry and mixed local work keep two pulls.
-    const idleReceiver = remote && full && remoteCapture && snapshot.length === 0;
+    // AI-authored N123: open/return also need only one complete read when no
+    // local work existed. The pre-read owner revision and final marker check
+    // provide exactly the same coverage as a remote wake. Writes, absent marker
+    // evidence and partial passes still require their canonical post-pull.
+    const idleReceiver = full && remoteCapture && snapshot.length === 0;
     const scoreDomainAvailable = await scoreDomainAvailableForSync();
     const unifiedCapability = await cloud.getUnifiedRestoreCapability();
     unifiedRestoreOwner = unifiedCapability?.protocol === 'N71_V1' ? cloud.user.id : null;
@@ -600,6 +602,10 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     // missed. A failed validation cannot certify the single-pull fast path.
     if (remoteCapture && !await remoteSync.check() && skipPostPull) {
       throw new Error('Remote Sync revision validation unavailable');
+    }
+    if (skipPostPull && (acknowledgedContext.workspace !== store.getActiveWorkspace() ||
+        acknowledgedContext.session !== cloud.session || !cloudOwnershipAccess('pull').allowed)) {
+      throw ownershipBlockedError({ reason: 'sync-context-changed' });
     }
     await store.refreshSyncedState();
     const v2Status = await v2Engine.status();
