@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n112-logged-out-login-banner-20261019",
+  "runId": "f6c1b1a8-5116-4eb6-9aee-8443038ea4db",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "rejected_login_preserves_warning",
+      "status": "PASS",
+      "evidence": "An invalid synthetic OTP leaves the login banner and pending local data intact."
+    },
+    {
+      "name": "n112_logged_out_login_route_and_automatic_banner_clear",
+      "status": "PASS",
+      "evidence": "Real expired-identity notification → existing login sheet → rejected OTP retained warning → successful OTP and guarded /user verification cleared banner without refresh or extra action; owner/receipt/DB and pending/grade/history rows unchanged."
+    },
+    {
+      "name": "offline_verified_distinction",
+      "status": "PASS",
+      "evidence": "Offline /user network failure retains authenticated owner, editable REMINDER and account-verification action; no login prompt and no Product data changes."
+    }
+  ],
+  "errors": []
+}
