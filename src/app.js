@@ -1411,7 +1411,18 @@ function mountEmailOtpController(root, done, { reloadOnSuccess = false, inline =
   };
 
   emailInput?.addEventListener('input', () => { updateCooldown(); showFeedback(); });
-  tokenInput?.addEventListener('input', () => { tokenInput.value = normalizeEmailOtp(tokenInput.value); showFeedback(); });
+  const normalizeTokenInput = () => { tokenInput.value = normalizeEmailOtp(tokenInput.value); showFeedback(); };
+  tokenInput?.addEventListener('input', normalizeTokenInput);
+  tokenInput?.addEventListener('change', normalizeTokenInput);
+  tokenInput?.addEventListener('paste', (event) => {
+    // Normalize before the browser applies maxlength to a formatted code.
+    const digits = normalizeEmailOtp(event.clipboardData?.getData('text'));
+    if (!digits) return;
+    event.preventDefault();
+    tokenInput.setRangeText(digits, tokenInput.selectionStart, tokenInput.selectionEnd, 'end');
+    tokenInput.value = normalizeEmailOtp(tokenInput.value);
+    tokenInput.dispatchEvent(new Event('input', { bubbles: true }));
+  });
   root.querySelector('[data-email-otp-change]')?.addEventListener('click', () => {
     codeStep.hidden = true;
     emailStep.hidden = false;
