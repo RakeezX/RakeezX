@@ -72,3 +72,26 @@
   .report-filter-bar .grades-01c__sort { flex-basis: 100%; }
   .report-filter-bar.report-filter-bar > .report-toolbar__mode { display: flex; }
 }
+
+/* AI N120: report-only single row. Keep accepted gradebook geometry intact. */
+.report-filter-bar.report-filter-bar--context {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: 12px;
+  padding: 10px 12px 14px;
+}
+.report-filter-bar--context > :is(.field-row, .report-filter-grid) { display: contents; }
+.report-filter-bar.report-filter-bar--context .field {
+  flex: 1 0 140px;
+  min-inline-size: 140px;
+  margin: 0;
+}
+.report-filter-bar.report-filter-bar--context .report-toolbar__field { flex-basis: 210px; }
+.report-filter-bar.report-filter-bar--context .report-toolbar__mode { display: flex; }
+.report-filter-bar--context :is(input, select, button) { scroll-margin-inline: 12px; }
+.report-filter-bar--context:focus-visible {
+  outline: 3px solid var(--action-focus-ring);
+  outline-offset: 2px;
+}
