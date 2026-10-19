@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';import path from 'node:path';
 const project='xlrubcwjqktzzunrvuns',run='8288de34-7362-4946-b319-79a28e864be8';
 // Current authorized continuation owns the phase lease; recovery remains bound to its original owner.
-const operationRun='3edbd211-f3f1-4698-b39c-eaf346722eb5';
+const operationRun='071a93c7-00b3-4cdd-b5a1-42d47796b1eb';
 const taskId='continuous-n44-finish-bounded-service-activation-20261018';
 const root=process.cwd(),base=path.resolve('drafts/n44-push/activation');
 const phase='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/n44-live/owned-'+run+'.tmp';
@@ -84,6 +84,21 @@ export async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),source,secretValuesReturned:false,protection:'DPAPI CurrentUser + own restricted directory'};
  }
  const state=await load();
+ if(action==='--post-cache-session'){
+  const evidence=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261019-supabase28p01/n44-provider-cache-refreshed.json','utf8'));
+  if(evidence.project!==project||evidence.role!=='n44_service_login'||evidence.eventId!=='390bbf31-fab1-42ae-afb0-1b212fc61889'||evidence.ownRoleFilteredCounts?.validation_cache_updated_events!==1)fail('n44_cache_evidence_missing');
+  if(!state.disarmed||state.installed||state.loginVerified||!state.iterationCompatibilityRepaired||state.scramIterations!==4096||!state.iterationCorrectedAttempt||state.postCacheAttempted)fail('n44_post_cache_state_mismatch');
+  const disabled="rolname='n44_service_login' and not rolcanlogin and not rolinherit and not rolsuper and not rolcreatedb and not rolcreaterole and not rolreplication and not rolbypassrls and rolconnlimit=-1 and rolvaliduntil is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid)";
+  const pre=await sqlFile(`select count(*)=1 as owned_disabled from pg_roles where ${disabled};`);
+  if(pre.rows?.[0]?.owned_disabled!==true)fail('n44_post_cache_disarm_drift');
+  state.postCacheAttempted=true;await save(state);
+  try{
+   await sqlFile(`begin;do $n44$ begin if (select count(*) from pg_roles where ${disabled})<>1 then raise exception 'n44_owned_state_changed';end if;alter role n44_service_login login;grant n44_backend to n44_service_login with inherit false,set true,admin false;end $n44$;commit;select true as restored;`);
+   state.disarmed=false;await save(state);
+   const proof=await execute('--check-session');
+   return {...proof,postObservedCacheRefresh:true,attempts:1,verifierWrites:0};
+  }catch(e){await execute('--disarm-login');throw e;}
+ }
  if(['--ingress','--scheduler'].includes(action)){
   const name=action.slice(2),worker='n44-notifications-'+name;if(state[name])fail('n44_key_already_bound');
   const der=Buffer.from(state.recipient,'base64');let plain;
@@ -113,7 +128,7 @@ export async function execute(action,value){
    const bundle=await esbuild.build({stdin:{contents:"export {assertPrivateDatabaseSession} from './drafts/n44-push/existing-host.mjs';",resolveDir:root},bundle:true,format:'esm',platform:'node',write:false,plugins:[unused],logLevel:'silent'});
    const {assertPrivateDatabaseSession}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].contents).toString('base64'));sessionStage='source_guard';await assertPrivateDatabaseSession(client);
    state.loginVerified=true;await save(state);return {restrictedLoginAndSetRole:true,sessionMode:true,tls:client.connection.stream.getProtocol(),hostnameVerified:true,upstreamSsl:true,actualSourcePrivacyBoundary:true};
-  }catch(e){const safeCode=/^[A-Z0-9_]{3,60}$/.test(e.code??'')?e.code:'UNCLASSIFIED';await writeFile(base+'/hosted-session-iteration-diagnostic.json',JSON.stringify({projectId:project,runId:operationRun,status:'FAIL',stage:sessionStage,code:safeCode,privateDiagnosticsSuppressed:true},null,2)+'\n');if(/^n44_/.test(e.message))throw e;fail('n44_session_'+sessionStage+'_'+safeCode);}finally{await client.end().catch(()=>{});}
+  }catch(e){const safeCode=/^[A-Z0-9_]{3,60}$/.test(e.code??'')?e.code:'UNCLASSIFIED';await writeFile(base+'/hosted-session-post-cache-diagnostic.json',JSON.stringify({projectId:project,runId:operationRun,status:'FAIL',stage:sessionStage,code:safeCode,authenticationSucceeded:sessionStage!=='connect',privateDiagnosticsSuppressed:true},null,2)+'\n');if(/^n44_/.test(e.message))throw e;fail('n44_session_'+sessionStage+'_'+safeCode);}finally{await client.end().catch(()=>{});}
  }
  if(action==='--install-env'){
   if(!state.loginVerified||!state.ingress||!state.scheduler||state.installed)fail('n44_install_gate_missing');
