@@ -1,7 +1,7 @@
 # N88 actual teacher / branded same-form entry — 19 October 2026
 
-Task: continuous-n88-actual-teacher-and-brand-entry-20261019  
-Run: 0f958d3a-36e2-4a23-9c15-80f691f15ddc  
+Task: continuous-n88-actual-teacher-and-brand-entry-20261019
+Run: 0f958d3a-36e2-4a23-9c15-80f691f15ddc
 Base: a0490e3e54b11498406bad71c70ab5485920f26e
 
 The changed student entry and a concrete Auth-budget defect are implemented. The overall check remains FAIL/BLOCKED: actual authenticated teacher success is unverified, and the necessary existing Support submission hook is outside this card's allowed paths. This is not N88 closure or a Pages publication receipt.
