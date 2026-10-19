@@ -130,3 +130,46 @@ export async function executeClosedPage(action,input,currentRun) {
  }
  fail('n44_unknown_closed_page_action');
 }
+
+// AI: current repair uses the original sealed custody. No registration, SQL,
+// scheduler/send capability, approval renewal or credential change is reachable.
+export async function executeRegister503(action){
+ const task='continuous-n44-register503-existing-service-repair-20261019',run='f6beb7aa-5700-4ef2-b759-129b88b7ac11',folder='drafts/n44-push/activation/register503/';
+ const l=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/live-mutation.json','utf8'));
+ if(l.taskId!==task||l.owner?.token!==run||l.resource!=='live-mutation')fail('n44_current_repair_lease_required');
+ const emit=async(name,data)=>{const r={taskId:task,runId:run,projectId:project,recordedAt:new Date().toISOString(),...data};await writeFile(folder+name+'.json',JSON.stringify(r,null,2)+'\n');return r;};
+ const s=await load(),d=s.device1019;
+ if(!s.installed||!s.directPreparation||!s.serviceEnabled||!d||d.pending||d.disabled||d.approval?.target!==null||(d.providerSendAttempts??0)!==0||d.registrationDisposition?.status!=='failed_unacknowledged_revoked'||!d.registrationDisposition?.consentDisabled)fail('n44_original_cleaned_disposition_required');
+ const rows=await list();if(Object.entries(s.envDigests).some(([n,h])=>rows.find(r=>r.name===n)?.value!==h)||rows.find(r=>r.name==='N44_DELIVERY_ENABLED')?.value!==hash('false'))fail('n44_existing_configuration_drift');
+ if(action==='deploy'){
+  if(s.register503?.deploymentAcknowledged||s.register503?.pending)fail('n44_repair_attempt_already_recorded');
+  if(Date.now()-s.policy.observedAt>86400000)fail('n44_profile_metadata_expired');
+  const m=JSON.parse(await readFile(folder+'manifest.json','utf8'));
+  for(const [f,h]of Object.entries(m.sources))if(hash((await readFile(f,'utf8')).replaceAll('\r\n','\n'))!==h)fail('n44_repair_source_changed');
+  const bytes=await readFile(folder+'edge.mjs');if(hash(bytes)!==m.outputs['edge.mjs'])fail('n44_repair_bundle_changed');
+  const source=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),policy={...s.policy,serviceSourceSha:source};
+  // Preserve approval/session revision and original policy metadata/activation;
+  // only bind the exact changed service bytes, not a new Auth approval.
+  const values={N44_SERVICE_SOURCE_SHA:source,N44_SESSION_POLICY_JSON:JSON.stringify(policy)};
+  s.register503={source,priorSource:s.source,pending:true,registrations:0,sends:0};await save(s);
+  await envFile(values);const after=await list();if(Object.entries(values).some(([n,v])=>after.find(r=>r.name===n)?.value!==hash(v)))fail('n44_repair_config_readback');
+  for(const [n,v]of Object.entries(values))s.envDigests[n]=hash(v);s.source=source;s.policy=policy;d.source=source;await save(s);
+  const work=path.resolve('drafts/n44-push/activation/provider-deploy/register503-'+run),dir=path.join(work,'supabase/functions/n44-notifications');await mkdir(dir,{recursive:true});
+  await writeFile(path.join(work,'supabase/config.toml'),'project_id = "'+project+'"\n[functions.n44-notifications]\nverify_jwt = false\nentrypoint = "./functions/n44-notifications/index.mjs"\nimport_map = "./functions/n44-notifications/import_map.json"\n');
+  await writeFile(path.join(dir,'index.mjs'),bytes);await writeFile(path.join(dir,'import_map.json'),await readFile('drafts/n44-push/activation/bundle/edge/import_map.json'));
+  official(['functions','deploy','n44-notifications','--project-ref',project,'--use-api','--no-verify-jwt','--workdir',work],work,60000);
+  s.register503.pending=false;s.register503.deploymentAcknowledged=true;await save(s);
+  return emit('deployment',{acknowledged:true,source,bundleSha256:m.outputs['edge.mjs'],service:'n44-notifications',purpose:m.purpose,deliveryEnabled:false,cronEvidenceReused:'drafts/n44-push/activation/device-optin/native-source-readback.json',registrations:0,providerSendAttempts:0,approvalAndFailedRegistrationDispositionPreserved:true});
+ }
+ if(action==='readiness'){
+  if(!s.register503?.deploymentAcknowledged||s.register503.pending)fail('n44_repair_deployment_not_acknowledged');
+  const {mac,sha}=await import('../web-protocol.mjs');const u=new URL('https://'+project+'.supabase.co/functions/v1/n44-notifications/readiness'),time=String(Math.floor(Date.now()/1000)),nonce=crypto.randomUUID(),body='{}';
+  const signature=await mac(Buffer.from(s.ingress,'hex'),JSON.stringify(['n44-readiness-v1',u.origin,u.pathname,time,nonce,await sha(new TextEncoder().encode(body))]));
+  const response=await fetch(u,{method:'POST',headers:{'content-type':'application/json','x-n44-time':time,'x-n44-nonce':nonce,'x-n44-signature':signature},body,signal:AbortSignal.timeout(15000),redirect:'error'}),r=await response.json();
+  const accepted=response.status===200&&r.status==='ready'&&r.source===s.source&&r.enabled===true&&r.deliveryEnabled===false&&['loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'].every(k=>r[k]===true)&&r.optIn?.deliveryEnabled===false&&r.optIn?.schedulerEnabled===false&&r.optIn?.targetBound===false;
+  const safe={};for(const k of ['status','stage','code','source','enabled','deliveryEnabled','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'])if(Object.hasOwn(r,k))safe[k]=r[k];
+  const receipt=await emit('readiness',{httpStatus:response.status,...safe,accepted,registrationFailureRootCause:'NOT_PROVEN',registrations:0,providerSendAttempts:0,approvalAndPrivateDispositionPreserved:true,plaintextTransientInputsAbsent:!(await readdir(phase)).some(f=>f.startsWith('owned-device-env-'))});
+  if(!accepted)fail('n44_repair_readiness_failed');return receipt;
+ }
+ fail('n44_unknown_repair_action');
+}

@@ -108,7 +108,7 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
       return r && r.workspaceId===body.workspaceId&&r.deviceId===body.deviceId&&r.state!=='active';});
      if(retired)return {status:'revoked'};
     }
-    const registration=createRegistrationBoundary({verifySession:async()=>auth,repository:local,protect:crypto.protect,clock:now,approvedOrigins:providerOrigins,receipt:true});
+    const registration=createRegistrationBoundary({verifySession:async()=>auth,repository:local,protect:crypto.protect,clock:now,approvedOrigins:providerOrigins,receipt:true,failureProjection:true});
     return registration[path.endsWith('/register')?'register':'revoke'](null,body);
    }
    if(path==='/context/read'){

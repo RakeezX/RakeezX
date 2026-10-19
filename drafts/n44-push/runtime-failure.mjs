@@ -1,6 +1,6 @@
 /** AI: fixed finite request phases only; never retain or inspect private errors. */
 import {PRIVATE_WEB_HEADERS} from './web-protocol.mjs';
-const phases=new Set(['configuration','configuration_origin','configuration_revision','configuration_policy','configuration_transport','configuration_crypto','configuration_provider','connect','identity','set_role','private_session','source','ingress','query','deadline']);
+const phases=new Set(['configuration','configuration_origin','configuration_revision','configuration_policy','configuration_transport','configuration_crypto','configuration_provider','connect','identity','set_role','private_session','source','ingress','query','deadline','registration_input','registration_auth','registration_protect','registration_repository']);
 const tags=new WeakMap();
 const own=(value,name)=>value&&(typeof value==='object'||typeof value==='function')?Object.getOwnPropertyDescriptor(value,name)?.value:undefined;
 export function identityProjection(value){

@@ -1,4 +1,5 @@
 import { LIMITS, result, id, uuid, record, principal, current, rate } from './shared.mjs';
+import { runtimeFailure } from './runtime-failure.mjs';
 
 // No provider origins are supplied by this package. Configuration is a later gate.
 export function validateSubscription(raw, approvedOrigins = []) {
@@ -24,10 +25,11 @@ export function validateSubscription(raw, approvedOrigins = []) {
  * protect validates curve material, seals secrets and HMACs endpoint server-side.
  * repository.atomic commits before resolving; no memory fallback is supplied. */
 export function createRegistrationBoundary({ verifySession, repository, protect, clock,
-  approvedOrigins = [], receipt = false }) {
+  approvedOrigins = [], receipt = false, failureProjection = false }) {
   const origins = Object.freeze([...approvedOrigins]);
   return Object.freeze({
     async register(transport, body) {
+      let phase = 'registration_input';
       try {
         if (!record(body, ['registrationId', 'workspaceId', 'deviceId', 'sessionRevision', 'consent', 'subscription']) ||
             !uuid(body.registrationId) || ![body.workspaceId, body.deviceId, body.sessionRevision].every(id) ||
@@ -36,11 +38,14 @@ export function createRegistrationBoundary({ verifySession, repository, protect,
         if (!sub) return result('rejected');
         // Snapshot before asynchronous work: a caller cannot swap validated fields.
         body = structuredClone(body);
+        phase = 'registration_auth';
         const auth = await verifySession(transport);
         if (!principal(auth, clock()) || auth.sessionRevision !== body.sessionRevision) return result('rejected');
+        phase = 'registration_protect';
         const secret = await protect(sub);
         if (!secret || typeof secret.sealed !== 'string' || secret.sealed.length < 1 || secret.sealed.length > 8192 ||
             !/^[a-f0-9]{64}$/.test(secret.fingerprint) || !/^[a-f0-9]{64}$/.test(secret.bindingFingerprint)) return result('rejected');
+        phase = 'registration_repository';
         return await repository.atomic(auth.ownerId, tx => {
           const now = tx.time(clock());
           const ctx = tx.context(body.workspaceId, body.deviceId);
@@ -65,7 +70,12 @@ export function createRegistrationBoundary({ verifySession, repository, protect,
             fingerprint: secret.fingerprint, bindingFingerprint: secret.bindingFingerprint, sealed: secret.sealed });
           return acknowledged(tx.get('registrations', body.registrationId));
         });
-      } catch { return result('unavailable'); }
+      } catch (error) {
+        // Only the trusted HTTP composition opts in. Fixed phases traverse its
+        // existing private response envelope; never copy/log the caught error.
+        if (failureProjection === true) throw runtimeFailure(phase, error);
+        return result('unavailable');
+      }
     },
     async revoke(transport, body) {
       try {
