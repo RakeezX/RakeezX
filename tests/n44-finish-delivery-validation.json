@@ -1,0 +1,29 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "6524432d-95a8-4b18-83e8-62ea9fd04bfe",
+  "scope": "Delivery reporting correction only; reuse unchanged bounded nonsending service evidence",
+  "previousValidationFailure": "An affected check must pass and no recorded check may fail",
+  "correction": "Current acceptance gates reference completed required service checks; the optional historical DNS refusal remains FAIL in the original receipt and is not relabeled as a passed gate.",
+  "checks": [
+    {
+      "name": "unchanged_service_evidence_and_reporting_scope",
+      "status": "PASS",
+      "evidence": "Exact prior receipt, current Edge bundle, full TLS/identity, 16 secret acknowledgements, nonsending flags, mounted unauthorized denials and owned cleanup assertions passed locally."
+    }
+  ],
+  "reusedEvidence": {
+    "path": "tests/n44-finish-activation-final.json",
+    "sha256": "e73a671b5d98549a58977bf85f7f9297583d130c7a1feb6cf246f1e6c9982776",
+    "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+    "serviceSourceSha": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+    "edgeSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181"
+  },
+  "historicalOptionalDnsFailurePreserved": true,
+  "providerOperationsThisRun": 0,
+  "authenticationAttemptsThisRun": 0,
+  "liveStateOrRuntimeSourceChangedThisRun": false,
+  "noFrontendPublication": true,
+  "productClosed": false,
+  "closedClientOsDelivery": "NOT_RUN"
+}
