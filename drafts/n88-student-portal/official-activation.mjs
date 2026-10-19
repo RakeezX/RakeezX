@@ -9,6 +9,8 @@ import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import path from 'node:path';
+import {serverFirst} from './activation/server-first.mjs';
+import {randomUUID} from 'node:crypto';
 const project='xlrubcwjqktzzunrvuns',run='4ddd5df2-933f-4754-8d04-0d27be47bcff';
 const root=process.cwd(),base=path.resolve('drafts/n88-student-portal/activation'),phase=path.join(base,'owned-custody-'+run+'.tmp');
 const marker={run,project,phase,purpose:'N88 restricted service custody and immutable recovery'};
@@ -69,6 +71,68 @@ async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),phase,protection:'DPAPI CurrentUser + fresh directory current-user ACL',secretValuesReturned:false};
  }
  const state=await load();
+ if(action==='--install-direct-readiness'){
+  const d=state.restoredPublicDiagnostic;
+  if(d?.status!=='PASS'||d.announcedIterations!==4096||d.expectedStoredIterations!==16384||!d.saltMatchesOwnStoredPublicChallenge||!d.strictTls||!d.hostnameVerified||d.proofSent||state.directReadinessInstalled)fail('n88_direct_readiness_gate');
+  const m=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')),source=m.outputs['edge/index.mjs'];
+  const env={N88_ENABLED:'false',N88_READINESS_ENABLED:'true',N88_AUTH_URL:'https://'+project+'.supabase.co',N88_SERVICE_SOURCE_SHA:source,N88_HMAC_KEY:state.hmac,N88_DATABASE_URL:`postgresql://n88_backend:${state.password}@db.${project}.supabase.co:5432/postgres`,N88_DATABASE_CA_CERT:await readFile(path.join(base,'ca/supabase-prod-ca-2021.crt'),'utf8')};
+  const file=path.join(phase,'owned-env.tmp');
+  try{await writeFile(file,Object.entries(env).map(([k,v])=>k+'='+JSON.stringify(v)).join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.directReadinessInstalled=true;state.directSource=source;await save(state);}
+  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {installed:true,enabled:false,readinessSigned:true,database:'official direct strictTLS',originalIterations:16384,credentialUnchanged:true,names:Object.keys(env),source};
+ }
+ if(action==='--arm-direct-login'){
+  if(!state.directReadinessInstalled||state.directLoginArmed)fail('n88_direct_login_gate');
+  await sqlFile("do $$ begin if not exists(select 1 from pg_roles where rolname='n88_backend' and not rolcanlogin and not rolinherit and not rolsuper and not rolbypassrls and not rolcreatedb and not rolcreaterole and not rolreplication and rolconnlimit=-1 and rolvaliduntil is null and rolconfig is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid) and has_database_privilege('n88_backend','postgres','CONNECT')) then raise exception 'n88_direct_login_preimage'; end if; alter role n88_backend login; end $$;");
+  state.directLoginArmed=true;await save(state);return {directLoginArmed:true,verifierOrPasswordChanged:false,membershipChanged:false};
+ }
+ if(action==='--call-direct-readiness'){
+  if(!state.directLoginArmed||state.directReadinessCalled)fail('n88_direct_readiness_consumed');
+  state.directReadinessCalled=true;await save(state);
+  const origin='https://'+project+'.supabase.co',route='/functions/v1/n88-student-portal/readiness',time=String(Math.floor(Date.now()/1000)),nonce=randomUUID(),body='{}';
+  const signed=JSON.stringify(['n88-readiness-v1',origin,route,time,nonce,createHash('sha256').update(body).digest('hex')]);
+  const signature=createHmac('sha256',Buffer.from(state.hmac,'hex')).update(signed).digest('hex');
+  let receipt;
+  try{
+   const response=await fetch(origin+route,{method:'POST',headers:{'content-type':'application/json','x-n88-time':time,'x-n88-nonce':nonce,'x-n88-signature':signature},body,signal:AbortSignal.timeout(15000)});
+   const data=await response.json();
+   const names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','source','enabled','code'];
+   if(Object.keys(data).some(k=>!names.includes(k)))fail('n88_direct_readiness_shape');
+   receipt={runId:'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,httpStatus:response.status,...data,expectedSource:state.directSource,sourceMatches:data.source===state.directSource,transport:'original Supabase Edge IPv6 -> official direct strictTLS',privateMutations:0};
+   state.directVerified=response.status===200&&data.status==='ready'&&data.loginExact===true&&data.roleExact===true&&data.upstreamSsl===true&&data.clientTlsAuthorized===true&&data.sourceBoundary===true&&data.source===state.directSource&&data.enabled===false;
+   if(!state.directVerified){await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;receipt.loginDisarmed=true;}
+   await save(state);await writeFile(path.join(base,'hosted-direct-readiness.json'),JSON.stringify(receipt,null,2)+'\n');return receipt;
+  }catch{
+   await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;await save(state);fail('n88_direct_readiness_failed_disarmed');
+  }
+ }
+ if(action==='--server-first-restored'){
+  if(state.restoredPublicChallengeConsumed||state.publicChallengeDiagnostic?.status!=='UNAVAILABLE'||state.publicChallengeDiagnostic?.code!=='XX000')fail('n88_restored_public_challenge_gate');
+  const before=await sqlFile("select not rolcanlogin and not rolinherit and not rolsuper and not rolcreatedb and not rolcreaterole and not rolreplication and not rolbypassrls and rolconnlimit=-1 and rolvaliduntil is null and rolconfig is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid) as disabled_exact from pg_roles where rolname='n88_backend';");
+  if(before?.rows?.length!==1||before.rows[0].disabled_exact!==true)fail('n88_restored_public_challenge_preimage');
+  const result=await sqlFile("select split_part(split_part(rolpassword,'$',2),':',2) as salt,split_part(split_part(rolpassword,'$',2),':',1) as iterations from pg_authid where rolname='n88_backend' and not rolcanlogin and split_part(rolpassword,'$',1)='SCRAM-SHA-256';");
+  const challenge=result?.rows?.[0];if(result?.rows?.length!==1||challenge.iterations!=='16384'||!/^[A-Za-z0-9+/]{22}==$/.test(challenge.salt))fail('n88_restored_public_challenge_shape');
+  state.restoredPublicChallengeConsumed=true;await save(state);
+  try{
+   await sqlFile("do $$ begin if not exists(select 1 from pg_roles where rolname='n88_backend' and not rolcanlogin and not rolinherit and not rolsuper and not rolbypassrls and not rolcreatedb and not rolcreaterole and not rolreplication and rolconnlimit=-1 and rolvaliduntil is null and rolconfig is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid)) then raise exception 'n88_restore_preimage'; end if; alter role n88_backend login; end $$;");
+   const diagnostic=await serverFirst({...challenge,ca:await readFile(path.join(base,'ca/supabase-prod-ca-2021.crt'),'utf8')});
+   state.restoredPublicDiagnostic={runId:'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,...diagnostic,verifierWritten:false,temporaryLoginOnly:true};await save(state);
+   await writeFile(path.join(base,'hosted-scram-restored-challenge.json'),JSON.stringify(state.restoredPublicDiagnostic,null,2)+'\n');
+   return state.restoredPublicDiagnostic;
+  }finally{await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;await save(state);}
+ }
+ if(action==='--server-first'){
+  if(state.publicChallengeConsumed)fail('n88_public_challenge_already_consumed');
+  const q="select split_part(split_part(rolpassword,'$',2),':',2) as salt,split_part(split_part(rolpassword,'$',2),':',1) as iterations from pg_authid where rolname='n88_backend' and not rolcanlogin and not rolinherit and not rolsuper and not rolcreatedb and not rolcreaterole and not rolreplication and not rolbypassrls and rolconnlimit=-1 and rolvaliduntil is null and not exists(select 1 from pg_auth_members where member=pg_authid.oid) and split_part(rolpassword,'$',1)='SCRAM-SHA-256';";
+  const result=await sqlFile(q),challenge=result?.rows?.[0];
+  if(result?.rows?.length!==1||challenge.iterations!=='16384'||!/^[A-Za-z0-9+/]{22}==$/.test(challenge.salt))fail('n88_own_public_challenge_state_mismatch');
+  state.publicChallengeConsumed=true;await save(state);
+  const diagnostic=await serverFirst({...challenge,ca:await readFile(path.join(base,'ca/supabase-prod-ca-2021.crt'),'utf8')});
+  const receipt={runId:'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,...diagnostic,verifierWritten:false,loginRestored:false};
+  state.publicChallengeDiagnostic=receipt;await save(state);
+  await writeFile(path.join(base,'hosted-scram-public-challenge.json'),JSON.stringify(receipt,null,2)+'\n');
+  return receipt;
+ }
  if(action==='--ingress'){
   if(state.ingress)fail('n88_ingress_already_bound');
   const der=Buffer.from(state.recipient,'base64');let plain;

@@ -8,6 +8,7 @@ import manifest from './deployment.inactive.json' with {type:'json'};
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
 import {assertVerifiedBoundary} from './activation/private-error-boundary.mjs';
+import {assertRestrictedTransport} from './activation/database-transport.mjs';
 // Source-side error redaction cannot prevent the database server logging DETAIL.
 // Read only effective session settings before granting the repository this client.
 export async function assertPrivateDatabaseSession(client) {
@@ -70,6 +71,7 @@ export function createExistingHost(readEnv) {
     let client;
     try {
       client=await pool.connect();
+      await assertRestrictedTransport(client);
       await assertPrivateDatabaseSession(client);
       return client;
     }catch{client?.release(Error('n88_database_unavailable'));throw Error('n88_database_unavailable');}

@@ -1,6 +1,6 @@
 // drafts/n88-student-portal/existing-host.mjs
 import { Buffer as Buffer12 } from "node:buffer";
-import { createHash as createHash8 } from "node:crypto";
+import { createHash as createHash9 } from "node:crypto";
 import pg from "pg";
 
 // drafts/n88-student-portal/deployment.inactive.json
@@ -4560,6 +4560,27 @@ function createWebEntry(options) {
   };
 }
 
+// drafts/n88-student-portal/activation/database-transport.mjs
+import { createHash as createHash8 } from "node:crypto";
+function databaseConfig(readEnv) {
+  const url = readEnv("N88_DATABASE_URL"), db = new URL(url), user = decodeURIComponent(db.username);
+  const direct = user === "n88_backend" && db.hostname === "db.xlrubcwjqktzzunrvuns.supabase.co";
+  const session = user === "n88_backend.xlrubcwjqktzzunrvuns" && db.hostname === "aws-0-ap-south-1.pooler.supabase.com";
+  const ca = readEnv("N88_DATABASE_CA_CERT");
+  if (!["postgres:", "postgresql:"].includes(db.protocol) || !(direct || session) || !["", "5432"].includes(db.port) || db.pathname !== "/postgres" || !db.password || db.search || db.hash || typeof ca !== "string" || createHash8("sha256").update(ca.replaceAll("\r\n", "\n")).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n88_database_configuration");
+  return { connectionString: url, ssl: { ca, rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2" }, max: 2, connectionTimeoutMillis: 5e3, idleTimeoutMillis: 1e4, statement_timeout: 3e3, query_timeout: 4e3, application_name: "n88-private-server", allowExitOnIdle: true };
+}
+async function assertRestrictedTransport(client) {
+  const r = (await client.query("select session_user as login,current_user as role,(select ssl from pg_stat_ssl where pid=pg_backend_pid()) as ssl")).rows[0];
+  const flags = { loginExact: r?.login === "n88_backend", roleExact: r?.role === "n88_backend", upstreamSsl: r?.ssl === true, clientTlsAuthorized: client.connection?.stream?.authorized === true };
+  if (Object.values(flags).some((v) => v !== true)) {
+    const e = Error("n88_transport_invariants");
+    e.safeReadiness = flags;
+    throw e;
+  }
+  return flags;
+}
+
 // drafts/n88-student-portal/existing-host.mjs
 async function assertPrivateDatabaseSession(client) {
   const result2 = await client.query(`select current_user as role,
@@ -4606,7 +4627,7 @@ function createExistingHost(readEnv) {
   if (versions.length > 8 || new Set(versions).size !== versions.length || versions.some((v) => !/^[A-Za-z0-9_-]{1,40}$/.test(v))) throw Error("n88_configuration");
   const recoveryKeys = new Map(versions.map((v) => [v, key2("N88_RECOVERY_KEY_" + v)]));
   const ca = required("N88_DATABASE_CA_CERT").replaceAll("\r\n", "\n");
-  if (createHash8("sha256").update(ca).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n88_database_ca_configuration");
+  if (createHash9("sha256").update(ca).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n88_database_ca_configuration");
   const pool = new pg.Pool({
     connectionString: dbUrl,
     ssl: { rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2", ca },
@@ -4627,6 +4648,7 @@ function createExistingHost(readEnv) {
     let client;
     try {
       client = await pool.connect();
+      await assertRestrictedTransport(client);
       await assertPrivateDatabaseSession(client);
       return client;
     } catch {
@@ -4660,10 +4682,59 @@ function createExistingHost(readEnv) {
   }
 }
 
+// drafts/n88-student-portal/activation/readiness-entry.mjs
+import pg2 from "pg";
+import { Buffer as Buffer13 } from "node:buffer";
+import { timingSafeEqual as timingSafeEqual4 } from "node:crypto";
+var busy = 0;
+var nonces = /* @__PURE__ */ new Map();
+async function checkReadiness(readEnv) {
+  const source = readEnv("N88_SERVICE_SOURCE_SHA");
+  const client = new pg2.Client(databaseConfig(readEnv));
+  let stage = "connect", identity2 = {};
+  try {
+    await client.connect();
+    stage = "identity";
+    identity2 = await assertRestrictedTransport(client);
+    stage = "source_boundary";
+    await assertPrivateDatabaseSession(client);
+    return { status: "ready", ...identity2, sourceBoundary: true, source, enabled: readEnv("N88_ENABLED") === "true" };
+  } catch (e) {
+    return { status: "unavailable", stage, ...identity2, ...e.safeReadiness ?? {}, code: /^(n88_[a-z_]+|[A-Z0-9]{5})$/.test(e.code ?? e.message) ? e.code ?? e.message : "n88_runtime_unavailable", source, enabled: false };
+  } finally {
+    await client.end().catch(() => {
+    });
+  }
+}
+async function readinessEntry(request, readEnv, check = checkReadiness) {
+  if (readEnv("N88_READINESS_ENABLED") !== "true" || busy >= 2) return privateResponse();
+  try {
+    const u = new URL(request.url), time2 = request.headers.get("x-n88-time"), nonce = request.headers.get("x-n88-nonce"), sig = request.headers.get("x-n88-signature"), key2 = readEnv("N88_HMAC_KEY");
+    if (u.origin !== readEnv("N88_AUTH_URL") || u.pathname !== "/functions/v1/n88-student-portal/readiness" || u.search || request.method !== "POST" || request.headers.get("content-type") !== "application/json" || request.headers.has("content-encoding") || !/^[a-f0-9]{64}$/.test(key2 ?? "") || !/^\d{10}$/.test(time2 ?? "") || Math.abs(Date.now() / 1e3 - Number(time2)) > 15 || !/^[a-f0-9-]{36}$/.test(nonce ?? "") || !/^[a-f0-9]{64}$/.test(sig ?? "")) return privateResponse(401);
+    const body = new TextDecoder().decode(await readBytes(request.body, 2, AbortSignal.timeout(2e3)));
+    if (body !== "{}") return privateResponse(401);
+    const expected = await mac(Buffer13.from(key2, "hex"), JSON.stringify(["n88-readiness-v1", u.origin, u.pathname, time2, nonce, await sha(new TextEncoder().encode(body))]));
+    if (!timingSafeEqual4(Buffer13.from(expected, "hex"), Buffer13.from(sig, "hex"))) return privateResponse(401);
+    for (const [n, t] of nonces) if (t < Date.now() - 15e3) nonces.delete(n);
+    if (nonces.has(nonce) || nonces.size >= 100) return privateResponse(401);
+    nonces.set(nonce, Date.now());
+    busy++;
+    try {
+      const result2 = await check(readEnv);
+      return Response.json(result2, { status: result2.status === "ready" ? 200 : 503, headers: PRIVATE_WEB_HEADERS });
+    } finally {
+      busy--;
+    }
+  } catch {
+    return privateResponse();
+  }
+}
+
 // supabase/functions/n88-student-portal/index.ts
 var runtime;
 Deno.serve(async (request) => {
   try {
+    if (new URL(request.url).pathname === "/functions/v1/n88-student-portal/readiness") return await readinessEntry(request, (name) => Deno.env.get(name));
     runtime ??= createExistingHost((name) => Deno.env.get(name));
     return await runtime.handle(request);
   } catch {

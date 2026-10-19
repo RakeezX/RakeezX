@@ -110,7 +110,14 @@
     "drafts/n88-student-portal/activation/private-error-boundary.mjs": "c17ed676799033cda3b4bd2d39ee185d298c256d62c8878fb595b8a69cf96f99",
     "tests/n88-official-activation-error-boundary.mjs": "0b84f13aae427302e8bb2712ed60a9c84fc433c0dfec8f00764488fa02fef1ed",
     "tests/n88-official-activation-error-boundary.json": "96a1e5e792b0ebf42bb3281130f5c84b7a7cba78a6b851be1672720301587510",
-    "drafts/n88-student-portal/official-activation.mjs": "c0987451e18fc9f89edd926bf1190d28e71aac815795cbbcad37bbe5c1412e3a",
+    "drafts/n88-student-portal/activation/server-first.mjs": "43c6ba7514a3fc286e3d9d6637fe6f924ae0b9ad475473faddea84dc31df0617",
+    "drafts/n88-student-portal/activation/database-transport.mjs": "b8dee65bdc57e04da34c9c4ef8cfc5506a38d1140db893675509abe1e2d98326",
+    "drafts/n88-student-portal/activation/readiness-entry.mjs": "e55f4c5a13d96cd08bcc76ba657ccf10f3cd5af5296d7676f03549be4eff71a1",
+    "drafts/n88-student-portal/activation/hosted-scram-public-challenge.json": "4b370fc1b3531cc98fe404550545e1f699c9f4d01895ddb550f41fb0d15cff8a",
+    "drafts/n88-student-portal/activation/hosted-scram-restored-challenge.json": "42af614bcb6afde23c51b80f2e33ef1d3abf4d5678beb9fc155731958cb23edb",
+    "tests/n88-official-activation-direct-readiness.mjs": "24540b748700d925774a55ecc9b7f1d1314243e43e49fa89b7413691f2a8d9ab",
+    "tests/n88-official-activation-direct-readiness.json": "640543b7a8ee5c6b3ddf8db99d090c8c17aadff5cb1b70af5c31c07ab9a6e084",
+    "drafts/n88-student-portal/official-activation.mjs": "d1410ce4ba47965b10ae044d6e4302993f7197f9cb989066938a3664e1e90bdb",
     "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
     "drafts/n88-student-portal/activation/ca/provenance.json": "82cbea55c25279317503a264d455ccb33d5be54952b072e088ba5e6cd6f582d4",
     "tests/n88-official-activation-session-pooler.mjs": "9f38a6b6a81efddcd68f7aa6a96c09be9b3a372c9626e54159e387070499b26c",
@@ -137,8 +144,8 @@
     "drafts/n88-student-portal/runtime.mjs": "0c2abe8d798b302656c4a13d46c2ada6035b1e1afa2401c7c1a1c5a553e8b2c2",
     "drafts/n88-student-portal/web-protocol.mjs": "22b77196c6b514c6911785373b907b78b23275c57d7042351e85613a2b4c774c",
     "drafts/n88-student-portal/web-entry.mjs": "fe079ed58f6b066d3b23048a51f5c96e0ea318ca7eca0caa9e825cd4a071bef5",
-    "drafts/n88-student-portal/existing-host.mjs": "956ab0258389d6f42ceba552e48ba97d1c5bd04ac3d649a587f0b10da552e1ff",
-    "supabase/functions/n88-student-portal/index.ts": "591d1fae83050d391db2300cb6026eca7f41e61787cce677bee499c0bbacf7b6",
+    "drafts/n88-student-portal/existing-host.mjs": "1218d6183a912ffe6c3a341d3bc0f17e9d87d6dee69b626e455d1c3bcd350b4a",
+    "supabase/functions/n88-student-portal/index.ts": "4944d8f77866ce5722e05d7c1986481a619f03b7e065dc141c92d381b9b9f405",
     "drafts/n88-student-portal/cloudflare-entry.mjs": "0783901aaa1b793587aef871055574e3a49fefc46d075db345c9390efbe42c80",
     "src/lib/student-portal-unified-client.js": "f9db53a368d670784e1cb5122b7dac057b2e3da4a4900eb034ed33ae2c54188b",
     "src/lib/visible-numerals.js": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575",
@@ -217,7 +224,7 @@
     "drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql": "fe271ff549148e777511327963637c391b52ea13eddc2d7c3bf01615f79e5715",
     "tests/n88-six-digit-redaction.mjs": "7e31c4634798898cf157a06f51c84585efce246da6b559fdf0343bfda294bbbe",
     "tests/n88-six-digit-security.mjs": "27b802cd8fd7d47cdcc34f514d8849361dc07d81f9c72479c09e1b94542c45e1",
-    "drafts/n88-student-portal/integrated-bundle.mjs": "9b33ed2265bbd840aba40d52a7a54ff3f7450c05874d8fa12ede1b066e14640c",
+    "drafts/n88-student-portal/integrated-bundle.mjs": "dd89953e4d27d5e12eed3dd0e87db7836f25d9d489a08718b5629a8592f24807",
     "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
     "index.html": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
     "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
@@ -263,7 +270,7 @@
     "drafts/n88-student-portal/package-lock.json": "014b58d8a27a30c8e9d13cf0211f0ef12d90007c41e295cfa330d95d0459d88a"
   },
   "outputs": {
-    "edge/index.mjs": "a5834682f9904df63a2ec539176e6f00a95eb45c25d5d941ec9b381af10842a8",
+    "edge/index.mjs": "89f51e9211dba06508e19ab43885a6b840a3d64d478cead49faffbc81e84fd5a",
     "cloudflare/worker.mjs": "d3867a9f96278c2c4ae4e270df3284789c4b1a2704e07fcee6789e0f0daec32d",
     "private/assets/student.mjs": "f88d908955ca2039816a6e8233b4a47de0ac8f450095449c7ce892a4ab37f0dc",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
@@ -281,9 +288,11 @@
   "graphs": {
     "edge/index.mjs": {
       "inputs": [
+        "drafts/n88-student-portal/activation/database-transport.mjs",
         "drafts/n88-student-portal/activation/error-boundary-contract.json",
         "drafts/n88-student-portal/activation/error-boundary-identities.json",
         "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/readiness-entry.mjs",
         "drafts/n88-student-portal/auth-verifier.mjs",
         "drafts/n88-student-portal/canonical-adapter.mjs",
         "drafts/n88-student-portal/canonical-grade-context.mjs",
@@ -425,6 +434,26 @@
         },
         {
           "path": "@supabase/auth-js",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "pg",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
           "kind": "import-statement",
           "external": true
         }
@@ -591,9 +620,9 @@
   },
   "privateDatabaseTransport": {
     "projectId": "xlrubcwjqktzzunrvuns",
-    "host": "aws-0-ap-south-1.pooler.supabase.com",
+    "host": "db.xlrubcwjqktzzunrvuns.supabase.co",
     "port": 5432,
-    "mode": "session",
+    "mode": "direct-original-Edge-IPv6",
     "role": "n88_backend",
     "tls": {
       "verifyHostname": true,
@@ -610,8 +639,16 @@
         "sha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7"
       }
     },
-    "preAuthenticationEvidence": "tests/n88-official-activation-session-pooler.json",
+    "publicChallengeEvidence": "drafts/n88-student-portal/activation/hosted-scram-restored-challenge.json",
+    "original16384CredentialUnchanged": true,
     "restrictedSessionReadbackRequired": true
+  },
+  "signedReadiness": {
+    "path": "/functions/v1/n88-student-portal/readiness",
+    "metadataOnly": true,
+    "key": "N88_HMAC_KEY",
+    "domain": "n88-readiness-v1",
+    "productEnabled": false
   },
   "binarySources": {
     "assets/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951"
