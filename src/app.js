@@ -871,7 +871,10 @@ function renderOfflineLease() {
 async function renewLeaseInBackground() {
   if (store.getActiveWorkspace()?.type !== 'account') return;
   try { await store.renewOfflineLease(); scheduleRender(); }
-  catch { /* Network failures leave the durable receipt and Product rows intact. */ }
+  catch (error) {
+    // Internal coordinator result only; no raw error enters presentation diagnostics.
+    return { error };
+  }
 }
 
 /* ---------- تبديل الشاشة ---------- */

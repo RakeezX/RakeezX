@@ -17,6 +17,17 @@ const CATEGORIES = Object.freeze({ account: 'الحساب', academic: 'السن�
 const COUNTS = [['pendingCount', 'بانتظار المزامنة'], ['failedCount', 'تعذّر إرسالها'], ['blockedCount', 'تنتظر بيانات مرتبطة'], ['rejectedCount', 'لم تُعتمد في السحابة']];
 const isPreparing = summary => ['startup_preparing', 'resume_preparing'].includes(summary.reasonCategory);
 
+// Finite copyable diagnostic allowlist in the existing details, without raw errors.
+function safeFailureText(failure) {
+  if (!failure || !['ownership', 'resume_readiness', 'marker', 'capability', 'pull', 'dispatch', 'post_pull', 'revision_validation', 'local_refresh'].includes(failure.phase) ||
+      !['automatic', 'focus', 'visible', 'pageshow', 'online'].includes(failure.event) ||
+      !['CONTEXT_CHANGED', 'AUTH_REQUIRED', 'AUTH_TIMEOUT', 'AUTH_CONTEXT_CHANGED', 'AUTH_OWNER_MISMATCH', 'SYNC_OWNERSHIP_BLOCKED', 'OFFLINE_LEASE_LIMITED', 'LEASE_VERIFY_TIMEOUT', 'FETCH_FAILED', 'UNKNOWN',
+        ...[400, 401, 403, 404, 409, 429, 500, 502, 503, 504].map(status => `HTTP_${status}`)].includes(failure.code) ||
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(failure.at) ||
+      !Number.isInteger(failure.elapsedMs) || failure.elapsedMs < 0 || failure.elapsedMs > 120000) return '';
+  return `${failure.phase} / ${failure.code} / ${failure.event} / ${failure.elapsedMs}ms / ${failure.at}`;
+}
+
 function savedChanges(count) {
   if (count === 1) return 'تغيير واحد محفوظ';
   if (count === 2) return 'تغييران محفوظان';
@@ -84,6 +95,7 @@ export function renderSyncOperationalSection(summary, { compact = false } = {}) 
         ${needsExplanation && summary.localWorkSaved ? html`<p>بياناتك محفوظة على هذا الجهاز.</p>` : ''}
         ${COUNTS.filter(([key]) => summary[key] > 0).map(([key, label]) => html`<p>${label}: <bdi>${summary[key]}</bdi></p>`)}
         <p>آخر مزامنة ناجحة: <bdi>${lastText}</bdi></p>
+        ${safeFailureText(summary.lastSafeFailure) ? html`<p data-sync-safe-failure>آخر تعذّر مسجل (قد تتعافى المزامنة بعده): <bdi dir="ltr">${safeFailureText(summary.lastSafeFailure)}</bdi></p>` : ''}
         ${needsExplanation && summary.automaticRetryActive ? html`<p>سنحاول المزامنة مرة أخرى تلقائيًا.</p>` : ''}
         ${needsExplanation && summary.safeToContinueUnrelatedWork ? html`<p>يمكنك متابعة العمل غير المرتبط بهذه التغييرات.</p>` : ''}
         ${categories.length ? html`<div><p>الأقسام المعنية:</p><div class="mini-hub-sync__categories" aria-label="الأقسام المعنية">${categories.map((label) => html`<span>${label}</span>`)}</div></div>` : ''}

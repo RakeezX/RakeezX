@@ -1,0 +1,399 @@
+{
+  "taskId": "continuous-n125-actual-window-return-error-20261019",
+  "runId": "0ecd9e4b-29fe-4656-bba1-f4b223a9c942",
+  "baseSha": "a0490e3e54b11498406bad71c70ab5485920f26e",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "n125_actual_window_focus_readiness_and_safe_error_phase",
+      "status": "PASS",
+      "evidence": "Actual HTTP app/CSS: two pure visible-window delayed return renewals plus rapid blur/focus stay pending with zero premature reads, one verification/pass per return, green only after completed guarded sync; HTTP503 read failure remains red with finite safe diagnostics across return, foreign-owner manual UI makes zero reads, grade 18 and empty outbox preserved."
+    }
+  ],
+  "returns": [
+    {
+      "cycle": 1,
+      "beforeReads": 24,
+      "afterReads": 48,
+      "authReads": 1,
+      "red": false,
+      "states": [
+        {
+          "state": "pending",
+          "reason": "resume_preparing",
+          "reads": 24,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--pending",
+            "sync-dot sync-dot--pending topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 28,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--pending",
+            "sync-dot sync-dot--pending topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 28,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 32,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 36,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 40,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 44,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 48,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "synced",
+          "reason": "none",
+          "reads": 48,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--synced",
+            "sync-dot topbar__teacher-sync sync-dot--synced"
+          ]
+        }
+      ]
+    },
+    {
+      "cycle": 2,
+      "beforeReads": 48,
+      "afterReads": 72,
+      "authReads": 1,
+      "red": false,
+      "states": [
+        {
+          "state": "pending",
+          "reason": "resume_preparing",
+          "reads": 48,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--pending",
+            "sync-dot sync-dot--pending topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 52,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 56,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 60,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 64,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 68,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 72,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "synced",
+          "reason": "none",
+          "reads": 72,
+          "authReads": 4,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--synced",
+            "sync-dot topbar__teacher-sync sync-dot--synced"
+          ]
+        }
+      ]
+    }
+  ],
+  "activeFocus": {
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792424892182,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "outbox": [],
+    "score": {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "canonicalId": "n73-valid",
+      "deleted": false,
+      "serverCanonical": {
+        "id": "n73-valid",
+        "studentId": "n73-student2",
+        "itemId": "n73-target-exam",
+        "value": 18,
+        "canonicalId": "n73-valid",
+        "serverRevision": 1,
+        "deleted": false
+      }
+    },
+    "summary": {
+      "state": "syncing",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": false,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "sync_in_progress",
+      "reasonLabel": "المزامنة تعمل الآن.",
+      "lastSuccessfulSyncAt": 1792424962691,
+      "automaticRetryActive": false,
+      "automaticSyncActive": true,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": false,
+        "authRequired": false,
+        "awaitingVerification": true,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": null
+    },
+    "error": null,
+    "reads": 84,
+    "authReads": 4,
+    "dots": [
+      "sync-dot sync-dot--syncing",
+      "sync-dot topbar__teacher-sync sync-dot--syncing"
+    ]
+  },
+  "activeReturn": {
+    "authReads": 1,
+    "noFailure": true,
+    "checkpoint": {
+      "owner": "a7300000-0000-4000-8000-000000000001",
+      "workspace": {
+        "id": "account:b51e1b326ee7406912c80050ef41b865",
+        "type": "account",
+        "authUserId": "a7300000-0000-4000-8000-000000000001",
+        "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+        "ownershipState": "claimed",
+        "syncEligible": true,
+        "leaseGeneration": "[1792424892182,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+        "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+        "workspaceKind": "account-provisioned"
+      },
+      "outbox": [],
+      "score": {
+        "id": "n73-valid",
+        "itemId": "n73-target-exam",
+        "studentId": "n73-student2",
+        "value": 18,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 1,
+        "canonicalId": "n73-valid",
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n73-valid",
+          "studentId": "n73-student2",
+          "itemId": "n73-target-exam",
+          "value": 18,
+          "canonicalId": "n73-valid",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      },
+      "summary": {
+        "state": "synced",
+        "queuedCount": 0,
+        "pendingCount": 0,
+        "failedCount": 0,
+        "blockedCount": 0,
+        "rejectedCount": 0,
+        "historicalConflictCount": 0,
+        "actionableSyncIssue": false,
+        "affectedCategories": [],
+        "historicalConflictCategories": [],
+        "reasonCategory": "none",
+        "reasonLabel": "لا توجد تغييرات حالية تحتاج إجراءً.",
+        "lastSuccessfulSyncAt": 1792424966409,
+        "automaticRetryActive": false,
+        "automaticSyncActive": false,
+        "teacherActionRequired": false,
+        "localWorkSaved": true,
+        "cloudSyncHealthy": true,
+        "safeToContinueUnrelatedWork": true,
+        "studentLifecycleInFlight": false,
+        "classDeletionInFlight": false,
+        "presentationSeverity": {
+          "transient": false,
+          "hardFailure": false,
+          "authRequired": false,
+          "awaitingVerification": false,
+          "failureSince": null,
+          "failedAttempts": 0
+        },
+        "lastSafeFailure": null
+      },
+      "error": null,
+      "reads": 120,
+      "authReads": 5,
+      "dots": [
+        "sync-dot sync-dot--synced",
+        "sync-dot topbar__teacher-sync sync-dot--synced"
+      ]
+    }
+  },
+  "realContextChange": {
+    "state": "error",
+    "error": "Sync ownership blocked: sync-context-changed",
+    "diagnostic": {
+      "phase": "revision_validation",
+      "code": "CONTEXT_CHANGED",
+      "event": "focus",
+      "at": "2026-10-19T15:48:26.029Z",
+      "elapsedMs": 961
+    }
+  },
+  "serverFailure": {
+    "diagnostic": {
+      "phase": "pull",
+      "code": "HTTP_503",
+      "event": "focus",
+      "at": "2026-10-19T15:48:28.542Z",
+      "elapsedMs": 990
+    },
+    "rendered": "آخر تعذّر مسجل (قد تتعافى المزامنة بعده): pull / HTTP_503 / focus / 990ms / 2026-10-19T15:48:28.542Z"
+  },
+  "readinessFailure": {
+    "phase": "resume_readiness",
+    "code": "HTTP_503",
+    "event": "focus",
+    "at": "2026-10-19T15:48:32.627Z",
+    "elapsedMs": 614
+  },
+  "cleanup": "Owned isolated contexts/browser and loopback server closed in finally; external requests and Service Workers blocked."
+}
