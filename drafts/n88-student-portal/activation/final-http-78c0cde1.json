@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-10-19T09:35:30.689Z",
+  "origin": "https://rakeezx.com",
+  "privateValuesReturned": false,
+  "student": {
+    "status": 200,
+    "headers": {
+      "cache-control": "no-store, private",
+      "referrer-policy": "no-referrer",
+      "x-robots-tag": "noindex, nofollow, noarchive",
+      "content-security-policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "x-content-type-options": "nosniff"
+    },
+    "actualPrivateDocument": true,
+    "accountFallback": false
+  },
+  "anonymousTeacherDenial": {
+    "status": 401,
+    "genericOnly": true,
+    "noStore": true
+  },
+  "scope": "Affected current public-route guards only; unchanged static assets and provider logging proof reused. HTTP status alone is not rendered UI acceptance."
+}

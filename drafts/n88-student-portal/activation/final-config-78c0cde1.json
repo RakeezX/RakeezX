@@ -1,0 +1,14 @@
+{
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "source": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c",
+  "enabled": true,
+  "mode": "public",
+  "sourceMatches": true,
+  "temporaryProviderBindingCleared": true,
+  "readinessEnabled": true,
+  "hostedHash": "9654b060bf2af1569dae612d6b3a7f08062c6df6e788fd2b3bf4be9609105164",
+  "originalKeysRoleAndFixturePreserved": true,
+  "privateQueries": 0,
+  "providerWrites": 0,
+  "identifiersOrSecretsReturned": false
+}

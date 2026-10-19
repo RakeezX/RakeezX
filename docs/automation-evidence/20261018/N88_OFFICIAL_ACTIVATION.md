@@ -559,3 +559,44 @@ This is LOCAL_READY for the exact restricted wake repair publication only. No
 public-mode enable, final frontend receipt, whole-product acceptance or closure
 is claimed. Resume the same session after the publisher receipt for only the
 newly served wake/current-admission checks and required public-stage guards.
+
+# Affected-only final public source candidate — 78c0cde1
+
+AI-authored. The sole publisher verified wake candidate cd1b0e9b as
+4adda44802b336997c6276693fc0791637bcfb42 at 2026-10-19T08:57:27.689Z.
+Normal designated teacher navigation/reload loaded that actual focus/shared-lane
+code. Returning from the official student tab retained the guarded roster; one
+same-value visibility save received its authoritative ACK, followed by successful
+list/guidance reads. No class, pupil, task, code rotation or revoke was repeated.
+The immutable previous journey supplies unchanged batch/recovery/field/guidance/
+rotation/revoke/old-code/session components; its original FAIL reports remain intact.
+
+After this actual hosted composite PASS, the original protected custodian enabled
+public mode and cleared only the temporary provider pilot binding. Original keys,
+16384 credential, restricted role, eight migrations, typed routines, logging and
+direct strict CA/hostname TLS remain unchanged. Native original Edge43 source is
+0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c.
+Its signed current readiness proves exact identity, upstream SSL, source boundary,
+configuration and public mode. The unchanged private ingress was not redeployed.
+
+Final teacher source removes the temporary pilot title and uses an explicit public
+list response protocol. Legacy published pilot list clients remain compatible
+during integration; response versioning grants no admission. The bounded first
+public teacher entry now creates its private context only after actual Auth/source
+admission; an existing inactive context cannot be revived. Focused actual native PG
+entry and real application DOM/CSS/store/owner-guard checks PASS. No code or field
+is automatically issued/published. Existing offline dependencies are unchanged.
+
+Actual public-mode normal teacher reentry and the existing second fabricated
+pupil's login/read PASS. Only name/class/required fields appeared; other fields
+stayed omitted. Its test session ended by normal ACK. Pupil1 stays revoked and
+pupil2's existing credential stays active. Owned tabs, native PG, HTTP server and
+phase leases were released; protected transient env files were removed. The old
+tool-denied unrelated owned-resource remnant was untouched.
+
+All nine current composite checks PASS in activation/final-delivery-78c0cde1.json.
+See served-hosted, final-provider/config/public-readiness/http/served receipts with
+the same run suffix. Official student trial URL: https://rakeezx.com/student.
+This is a LOCAL_READY final frontend candidate. Its integration and final served
+source receipt belong to the sole publisher and have not run here. No Product
+CLOSED or PO acceptance is claimed.

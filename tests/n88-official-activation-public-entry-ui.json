@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "baseline": false,
+  "status": "PASS",
+  "checks": [
+    "actual class runtime/component/handlers and source CSS rendered over loopback HTTP",
+    "actual account store and owner-bound dispatch guard admitted synthetic current owner",
+    "public teacher availability has no temporary pilot label; two-member roster rendered with explicit public list protocol",
+    "field draft handler exercised without publishing",
+    "renewed same-owner synthetic session requires fresh server admission and restores controls",
+    "owner deactivation removes private roster/delivery",
+    "server admission rejection keeps controls unavailable",
+    "delayed actual list/guidance requests serialized; maximum one in flight",
+    "silent same-owner renewal on actual focus re-admits before controls return",
+    "request serialization survives retiring/replacement entry overlap"
+  ],
+  "hostedProof": false,
+  "cleanup": {
+    "ownedBrowserAndHttpClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

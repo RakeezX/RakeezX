@@ -218,13 +218,24 @@
     "originalSixImmutable": true
   },
   "stagedRollout": {
-    "phase": "pilot",
+    "phase": "public-backend-final-frontend-candidate",
     "defaultMode": "off",
-    "publicEnabled": false,
-    "maxOwners": 1,
-    "maxStudents": 2,
-    "privateBinding": "protected CLI env-file only",
-    "fullHostedAcceptance": "NOT_RUN",
-    "fullPublicRollout": "NOT_RUN"
-  }
+    "publicEnabled": true,
+    "privateBinding": "original protected custodian/CLI env-file; temporary pilot binding cleared",
+    "publicProofNames": [
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256",
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED"
+    ],
+    "fullHostedAcceptance": "PASS: served-hosted-78c0cde1.json + unchanged actual component proofs",
+    "fullPublicRollout": "Backend/config/readiness PASS; final frontend integration/served-source receipt owned by sole publisher",
+    "configurationReceipt": "final-config-78c0cde1.json",
+    "providerReceipt": "final-provider-78c0cde1.json",
+    "fixtureBudget": {
+      "cumulativeTeachers": 2,
+      "cumulativePupils": 4,
+      "currentTestOwners": 1,
+      "currentTestPupils": 2
+    }
+  },
+  "artifactSemantics": "Inert deploy inputs remain disabled; observed current provider state is in named receipts, never inferred from these flags."
 }

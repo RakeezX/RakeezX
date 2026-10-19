@@ -1,0 +1,59 @@
+{
+  "aiAuthored": true,
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "capturedAt": "2026-10-19T09:38:45.515Z",
+  "status": "PASS",
+  "actualProviderMode": "public",
+  "actualServiceSource": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c",
+  "teacher": {
+    "normalNavigationReentry": true,
+    "publishedPilotListCompatible": true,
+    "roster": 2,
+    "activeCodes": 1,
+    "firstPupilRevoked": true,
+    "secondPupilActive": true,
+    "guardedListHttp200": true,
+    "pendingSettled": true
+  },
+  "student": {
+    "normalOfficialPage": true,
+    "existingSecondPupilCodeOnly": true,
+    "actualPublicModeLoginAndRead": true,
+    "chosenNameClassRequiredOnly": true,
+    "gradesCompletedScheduledOmitted": true,
+    "sessionEndedAck": "انتهت الجلسة.",
+    "ownedTabClosed": true,
+    "codeVariableCleared": true
+  },
+  "sourceReadiness": {
+    "newPublicFrontendRenderedLocal": "tests/n88-official-activation-public-entry-ui.json",
+    "newPublicFirstAccessGuard": "tests/n88-official-activation-public-entry-service.json",
+    "finalCandidateServedSource": "NOT_RUN: sole publisher owns final frontend publication and served-source receipt",
+    "publishedPilotSourceReceipt": {
+      "candidate": "cd1b0e9b5651f308f113a0af464a4912d653f0f0",
+      "published": "4adda44802b336997c6276693fc0791637bcfb42",
+      "verifiedAt": "2026-10-19T08:57:27.689Z",
+      "receiptPresent": true
+    }
+  },
+  "fixtureDisposition": {
+    "newAccountsClassesPupilsTasks": 0,
+    "rotationsOrRevokesRepeated": 0,
+    "currentFirstPupil": "revoked",
+    "currentSecondPupil": "active credential; test session ended",
+    "priorFixturePreserved": true,
+    "cumulativeAuthorizedTeachers": 2,
+    "cumulativeAuthorizedPupils": 4
+  },
+  "cleanup": {
+    "ownedStudentClosed": true,
+    "userTeacherPreserved": true,
+    "browserLease": "RELEASED",
+    "liveMutationLease": "RELEASED",
+    "ownedNativePgAndLocalHttpClosed": true,
+    "ownedTemporaryEnvAbsent": true,
+    "priorDeniedResourceUntouched": true
+  },
+  "historicalFailuresUnchanged": true,
+  "privateIdentifiersCodesTokensOrSecretsRecorded": false
+}

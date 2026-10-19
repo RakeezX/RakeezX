@@ -4,7 +4,7 @@ import { createClassPortalClient } from './student-portal-class-client.js';
 import { mountClassPortal } from '../views/student-portal-class.js';
 
 // Change only through a separately authorized, service-evidenced activation diff.
-export const PORTAL_READINESS = Object.freeze({ enabled: true, serviceRevision: 'n88-integrated-class-v1', mode: 'pilot' });
+export const PORTAL_READINESS = Object.freeze({ enabled: true, serviceRevision: 'n88-integrated-class-v1', mode: 'public' });
 const ready = r => r?.enabled === true && ['pilot','public'].includes(r.mode) && r.serviceRevision === 'n88-integrated-class-v1';
 
 /** Current account/store/lease fence. JWT session ID is only an echo fence;
@@ -55,7 +55,10 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     // owner's browser requests before dispatch, retaining all binding/lease checks.
     return enqueue(async()=>{
     const b=current(true);
-    const response=await send(path,{...init,headers:{...init.headers,Authorization:'Bearer '+b.token}});
+    // Version only the list response contract; this marker grants no admission.
+    // Older published pilot clients keep working during the public source rollout.
+    const body=path.endsWith('/list')&&readiness.mode==='public'?JSON.stringify({...JSON.parse(init.body),uiProtocol:'n88-public-ui-v1'}):init.body;
+    const response=await send(path,{...init,body,headers:{...init.headers,Authorization:'Bearer '+b.token}});
     current(false);return {ok:response.ok,async json(){const data=await response.json();current(false);
       // Server admission follows verified Auth/session/current source ownership.
       // Strip its rollout metadata before the existing exact ACK validator.

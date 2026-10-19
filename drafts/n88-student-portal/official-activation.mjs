@@ -73,16 +73,70 @@ async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),phase,protection:'DPAPI CurrentUser + fresh directory current-user ACL',secretValuesReturned:false};
  }
  const state=await load();
- if(action==='--read-wake-pilot-config'){
-  const activeRun='f8356a7b-0f5d-4804-b1b7-10ff0a8c4043';
+ if(['--stage-final-source','--restage-final-source','--final-readiness','--enable-final-public','--read-final-config'].includes(action)){
+  const activeRun='78c0cde1-994b-441a-9ab5-3ffb68508b66';
   const card=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-official-student-portal-activation-20261018.json','utf8'));
   const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
-  if(process.env.N88_ACTIVATION_RUN_ID!==activeRun||card.stagedActivation?.phase!=='pilot'||card.requiredChecks?.length!==7||card.stagedActivation?.finalRequiredChecks?.length!==9||!state.replacementFixture?.configured||!state.replacementFixture.priorBinding||!state.pilotBinding||state.pilotBinding.studentIds?.length!==2||JSON.stringify(state.replacementFixture.newBinding)!==JSON.stringify(state.pilotBinding)||state.directAuthRefused||state.loginDisarmed||!state.directVerified||source!==state.directSource)fail('n88_wake_readback_preimage');
+  const hostedBytes=(await readFile(path.join(base,'served-hosted-78c0cde1.json'),'utf8')).replaceAll('\r\n','\n'),hosted=JSON.parse(hostedBytes),hostedHash=createHash('sha256').update(hostedBytes).digest('hex');
+  const ui=JSON.parse(await readFile('tests/n88-official-activation-public-entry-ui.json','utf8')),protocol=JSON.parse(await readFile('tests/n88-official-activation-public-protocol.json','utf8'));
+  if(JSON.parse(await readFile('tests/n88-official-activation-public-entry-service.json','utf8')).status!=='PASS')fail('n88_final_first_access_proof');
+  if(process.env.N88_ACTIVATION_RUN_ID!==activeRun||card.requiredChecks?.length!==9||!JSON.stringify(card.stagePublicationHistory).includes('4adda44802b336997c6276693fc0791637bcfb42')||hosted.status!=='PASS'||!hosted.actualUi.sameValueVisibilitySubmit||hosted.actualUi.newFixtureOrCodeOperations!==0||ui.status!=='PASS'||protocol.status!=='PASS'||!state.replacementFixture?.configured||state.loginDisarmed||state.directAuthRefused||!state.directVerified)fail('n88_final_authority_or_proof_gate');
+  const rows=await official(['secrets','list','--project-ref',project,'--output','json']);
+  const entries=Array.isArray(rows)?rows:rows?.rows;
+  const matches=(name,v)=>Array.isArray(entries)&&entries.filter(r=>r.name===name).length===1&&entries.find(r=>r.name===name).value?.toLowerCase()===createHash('sha256').update(v).digest('hex');
+  const install=async env=>{const file=path.join(phase,'owned-env.tmp');try{await writeFile(file,env,{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}};
+  if(action==='--stage-final-source'||action==='--restage-final-source'){
+   const restage=action==='--restage-final-source',previous=state.finalRelease;
+   if(restage?(!previous?.inactiveReady||previous.enableAttempted||previous.priorStage||previous.source!=='87043cad23cb75545a990a2ac7d90bde01d44ee060a1fd71e8f64af9b60ad4e3'):!!previous)fail('n88_final_source_already_staged');
+   if(source===state.directSource||!matches('N88_ENABLED',String(!restage))||!matches('N88_ROLLOUT_MODE','pilot')||!matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding))||!matches('N88_SERVICE_SOURCE_SHA',state.directSource))fail('n88_final_source_preimage');
+   state.finalRelease={runId:activeRun,priorSource:state.directSource,source,hostedHash,stageAttempted:true,...(restage?{priorStage:previous,repair:'First admitted public teacher private context; prior successful inactive readiness retained'}:{})};await save(state);
+   await install('N88_ENABLED=false\nN88_SERVICE_SOURCE_SHA='+source+'\n');
+   state.directSource=source;state.pilotEnabled=false;state.finalRelease.staged=true;await save(state);
+   const result={runId:activeRun,source,enabled:false,mode:'pilot',sameProtectedBinding:true,keysRoleCredentialSqlOrFixtureChanged:false,hostedHash};await writeFile(path.join(base,'final-source-stage-78c0cde1.json'),JSON.stringify(result,null,2)+'\n');return result;
+  }
+  const f=state.finalRelease;
+  if(!f?.staged||f.source!==source||state.directSource!==source||f.hostedHash!==hostedHash||!matches('N88_SERVICE_SOURCE_SHA',source))fail('n88_final_source_identity');
+  if(action==='--enable-final-public'){
+   if(f.enableAttempted||!f.inactiveReady||!matches('N88_ENABLED','false')||!matches('N88_ROLLOUT_MODE','pilot')||!matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding)))fail('n88_final_public_preimage');
+   const env={N88_ENABLED:'true',N88_ROLLOUT_MODE:'public',N88_PILOT_BINDING:'',N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256:hostedHash,N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED:'true'};
+   if(!createRolloutGuard(n=>env[n]).configured)fail('n88_final_public_schema');
+   f.enableAttempted=true;await save(state);
+   await install(Object.entries(env).map(([k,v])=>k+'='+v).join('\n')+'\n');
+   f.publicEnabled=true;state.pilotEnabled=false;await save(state);
+   return {runId:activeRun,source,mode:'public',enabled:true,temporaryProviderBindingCleared:true,priorBindingsRetainedEncrypted:true,hostedHash,keysRoleCredentialSqlOrFixtureChanged:false};
+  }
+  const live=f.publicEnabled===true;
+  if(!matches('N88_ENABLED',String(live))||!matches('N88_ROLLOUT_MODE',live?'public':'pilot')||!matches('N88_PILOT_BINDING',live?'':JSON.stringify(state.pilotBinding))||!matches('N88_READINESS_ENABLED','true')||live&&(!matches('N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256',hostedHash)||!matches('N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED','true')))fail('n88_final_config_mismatch');
+  if(action==='--read-final-config'){
+   const result={runId:activeRun,source,enabled:live,mode:live?'public':'pilot',sourceMatches:true,temporaryProviderBindingCleared:live,readinessEnabled:true,hostedHash,originalKeysRoleAndFixturePreserved:true,privateQueries:0,providerWrites:0,identifiersOrSecretsReturned:false};await writeFile(path.join(base,'final-config-78c0cde1.json'),JSON.stringify(result,null,2)+'\n');return result;
+  }
+  const checkpoint=live?'public':'inactive';if(f[checkpoint+'ReadinessAttempted'])fail('n88_final_readiness_consumed');f[checkpoint+'ReadinessAttempted']=true;await save(state);
+  const origin='https://'+project+'.supabase.co',route='/functions/v1/n88-student-portal/readiness',time=String(Math.floor(Date.now()/1000)),nonce=randomUUID(),body='{}';
+  const signature=createHmac('sha256',Buffer.from(state.hmac,'hex')).update(JSON.stringify(['n88-readiness-v1',origin,route,time,nonce,createHash('sha256').update(body).digest('hex')])).digest('hex');
+  let result;
+  try{
+   const response=await fetch(origin+route,{method:'POST',headers:{'content-type':'application/json','x-n88-time':time,'x-n88-nonce':nonce,'x-n88-signature':signature},body,signal:AbortSignal.timeout(15000)});
+   const data=await response.json(),names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','configurationReady','rolloutMode','rolloutConfigured','source','enabled','code'];
+   if(Object.keys(data).some(k=>!names.includes(k)))fail('n88_final_unexpected_readiness_shape');
+   result={runId:activeRun,projectId:project,httpStatus:response.status,...data,expectedSource:source,sourceMatches:data.source===source,privateMutations:0};
+   const passed=response.status===200&&data.status==='ready'&&data.loginExact===true&&data.roleExact===true&&data.upstreamSsl===true&&data.clientTlsAuthorized===true&&data.sourceBoundary===true&&data.configurationReady===true&&data.rolloutConfigured===true&&data.rolloutMode===(live?'public':'pilot')&&data.source===source&&data.enabled===live;
+   result.status=passed?'PASS':'FAIL';f[checkpoint+'Ready']=passed;
+   if(!passed){await install('N88_ENABLED=false\n');f.publicEnabled=false;if(data.code==='28P01'){await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;state.directAuthRefused=true;}}
+  }catch(e){await install('N88_ENABLED=false\n');f.publicEnabled=false;result={runId:activeRun,status:'FAIL',code:'n88_final_readiness_unavailable',source,enabled:false,ownedFeatureDisabled:true};}
+  await save(state);await writeFile(path.join(base,'final-'+checkpoint+'-readiness-78c0cde1.json'),JSON.stringify(result,null,2)+'\n');return result;
+ }
+ if(action==='--read-wake-pilot-config'||action==='--read-served-pilot-config'){
+  const served=action==='--read-served-pilot-config';
+  const activeRun=served?'78c0cde1-994b-441a-9ab5-3ffb68508b66':'f8356a7b-0f5d-4804-b1b7-10ff0a8c4043';
+  const card=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-official-student-portal-activation-20261018.json','utf8'));
+  const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
+  const stage=served?card.requiredChecks?.length===9&&JSON.stringify(card.stagePublicationHistory).includes('4adda44802b336997c6276693fc0791637bcfb42'):card.stagedActivation?.phase==='pilot'&&card.requiredChecks?.length===7&&card.stagedActivation?.finalRequiredChecks?.length===9;
+  if(process.env.N88_ACTIVATION_RUN_ID!==activeRun||!stage||!state.replacementFixture?.configured||!state.replacementFixture.priorBinding||!state.pilotBinding||state.pilotBinding.studentIds?.length!==2||JSON.stringify(state.replacementFixture.newBinding)!==JSON.stringify(state.pilotBinding)||state.directAuthRefused||state.loginDisarmed||!state.directVerified||source!==state.directSource)fail('n88_wake_readback_preimage');
   const listed=await official(['secrets','list','--project-ref',project,'--output','json']),rows=Array.isArray(listed)?listed:listed?.rows;
   const matches=(name,v)=>Array.isArray(rows)&&rows.filter(r=>r.name===name).length===1&&rows.find(r=>r.name===name).value?.toLowerCase()===createHash('sha256').update(v).digest('hex');
   const result={runId:activeRun,readOnly:true,enabled:matches('N88_ENABLED','true'),pilotMode:matches('N88_ROLLOUT_MODE','pilot'),sameReplacementBinding:matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding)),sameSource:matches('N88_SERVICE_SOURCE_SHA',source),readinessEnabled:matches('N88_READINESS_ENABLED','true'),source,activeOwners:1,activePupils:2,priorBindingRetainedEncrypted:true,providerWrites:0,privateQueries:0,identifiersOrValuesReturned:false};
   if(!result.enabled||!result.pilotMode||!result.sameReplacementBinding||!result.sameSource||!result.readinessEnabled)fail('n88_wake_pilot_config_mismatch');
-  await writeFile(path.join(base,'wake-pilot-config-f8356a7b.json'),JSON.stringify(result,null,2)+'\n');return result;
+  await writeFile(path.join(base,served?'served-pilot-config-78c0cde1.json':'wake-pilot-config-f8356a7b.json'),JSON.stringify(result,null,2)+'\n');return result;
  }
  if(action==='--rebind-replacement-pilot'){
   const activeRun='35395ae1-0dc1-4fd1-b598-5441b50a3f09';

@@ -1,0 +1,85 @@
+{
+  "aiAuthored": true,
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "capturedAt": "2026-10-19T09:29:26.987Z",
+  "status": "PASS",
+  "scope": "Affected-only actual served teacher return/focus and same-value field ACK; unchanged hosted components reused",
+  "publication": {
+    "candidate": "cd1b0e9b5651f308f113a0af464a4912d653f0f0",
+    "published": "4adda44802b336997c6276693fc0791637bcfb42",
+    "verifiedAt": "2026-10-19T08:57:27.689Z",
+    "receiptPresent": true
+  },
+  "actualUi": {
+    "origin": "https://rakeezx.com",
+    "normalDesignatedTeacher": true,
+    "normalSyntheticClassNavigation": true,
+    "oneDeliberateReload": true,
+    "loadedRuntimeHttp200": true,
+    "observedLoadedFocusHandler": true,
+    "observedLoadedSharedRequestLane": true,
+    "actualReturnFromOwnedOfficialStudentTab": true,
+    "actualPageFocus": true,
+    "privateRosterRecovered": 2,
+    "activeCodeCount": 1,
+    "firstPupilRevoked": true,
+    "secondPupilActive": true,
+    "sameValueVisibilitySubmit": true,
+    "visibilityHttp200": true,
+    "ackText": "حُفظت الحقول المختارة.",
+    "subsequentListHttp200": true,
+    "subsequentGuidanceHttp200": true,
+    "finalPending": false,
+    "selectedFields": [
+      "name",
+      "class",
+      "required"
+    ],
+    "unpublishedFields": [
+      "grades",
+      "completed",
+      "scheduled"
+    ],
+    "newFixtureOrCodeOperations": 0,
+    "studentLoginRepeated": false,
+    "authTokensOrStorageRead": false,
+    "ownerIdentifiersOrCodesRecorded": false
+  },
+  "silentRenewal": {
+    "actualTokenInspection": false,
+    "explicitChangedBindingProof": "tests/n88-official-activation-wake-entry-ui.json",
+    "kind": "Reused unchanged actual app/store/owner-guard synthetic delayed request + silent renewal/focus regression; live normal return and successful guarded ACK observed separately"
+  },
+  "unchangedComponentProofs": [
+    "batch/retry/reload current code recovery",
+    "student chosen fields and task guidance",
+    "single selective rotation and revoke",
+    "old code and old session denials",
+    "second pupil active code login and session end ACK",
+    "original owner/source/session/commit guards"
+  ],
+  "preserved": {
+    "replacement-journey-35395ae1.json": {
+      "sha256": "c2c358f23c3e91679b45cb85dcc500588e860ae85818623205ab5c0178e224aa"
+    },
+    "replacement-delivery-35395ae1.json": {
+      "sha256": "1d17214ff55c72d28fbf0b994b3f53c139e55746890c03180007ddc724a43523"
+    },
+    "replacement-live-readiness-35395ae1.json": {
+      "sha256": "9f04e5ae4eff30fbb291451850e27157e24acd0b35d47924a369041d8e675c3e"
+    },
+    "continuation-b324b7b5.json": {
+      "sha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83"
+    },
+    "served-pilot-config-78c0cde1.json": {
+      "sha256": "89081404bc2adfa0df8f0d221c17be1cfe5c0e050f996a6e1ad59c48b4438609"
+    }
+  },
+  "history": "Original full-stage FAILs remain unchanged; this composite adds served dependency evidence rather than editing them.",
+  "cleanup": {
+    "ownedStudentTabClosed": true,
+    "userTeacherTabPreserved": true,
+    "browserLeaseReleased": true
+  },
+  "publicEnabled": false
+}

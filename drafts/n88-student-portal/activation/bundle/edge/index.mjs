@@ -1413,6 +1413,7 @@ async function readCanonical(ports, ownerId) {
 }
 var fieldsOff = () => Object.fromEntries(VISIBILITY_FIELDS.map((f) => [f, false]));
 var bindingKeys = ["ownerId", "sessionId", "leaseId", "teachingId", "classId", "termId", "contextRevision"];
+var classListResponseMode = (mode, protocol) => mode === "public" && protocol === void 0 ? "pilot" : mode;
 function createIntegratedService(options, adapter, baseRepository) {
   const rollout = options.rollout ?? createRolloutGuard();
   const repository = withCredentialRepository(baseRepository);
@@ -1455,6 +1456,7 @@ function createIntegratedService(options, adapter, baseRepository) {
     const match = /^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)$/.exec(request.path);
     if (!match || request.method !== "POST") return deny2();
     const action = match[1], body = request.body || {}, binding = body.binding;
+    if (action === "list" && body.uiProtocol !== void 0 && body.uiProtocol !== "n88-public-ui-v1") return deny2();
     if (!binding || Object.keys(binding).length !== bindingKeys.length || !bindingKeys.every((k) => typeof binding[k] === "string" && binding[k].length > 0 && binding[k].length <= 200) || binding.teachingId !== body.teachingId) return deny2();
     const verifyTeacher = async (r2, ports) => {
       const auth = await adapter.verifyTeacher(r2, ports);
@@ -1462,7 +1464,7 @@ function createIntegratedService(options, adapter, baseRepository) {
     };
     const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input).then((s) => {
       if (!s || s.classId !== binding.classId || s.termId !== binding.termId || !rollout.admitsTeacher(auth, s)) return null;
-      if (rollout.mode === "pilot" && !db.contexts.some((c) => c.ownerId === auth.ownerId)) db.contexts.push({ namespace: "n88_pilot_" + randomUUID4(), ownerId: auth.ownerId, active: true });
+      if (["pilot", "public"].includes(rollout.mode) && !db.contexts.some((c) => c.ownerId === auth.ownerId)) db.contexts.push({ namespace: (rollout.mode === "pilot" ? "n88_pilot_" : "n88_owner_") + randomUUID4(), ownerId: auth.ownerId, active: true });
       return s;
     });
     const ops = createClassCredentialOperations({ rollout, repository, ...credentials, ...recovering, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });
@@ -1506,7 +1508,8 @@ function createIntegratedService(options, adapter, baseRepository) {
             const c = ownedCredential(db, m), r2 = c ? await recovery.read(ports, c) : { status: "inactive", credential: null };
             return { recoveryStatus: r2.status, credential: r2.credential, studentId: m.studentId, enrollmentId: m.enrollmentId, revision: m.revision, label: m.label, hasActiveCode: cs.some((c2) => c2.revokedAt === null), credentialVersion: Math.max(0, ...cs.map((c2) => c2.version)) };
           })) };
-          return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2, rollout: rollout.mode }, headers: PRIVATE_HEADERS };
+          const responseMode = action === "list" ? classListResponseMode(rollout.mode, body.uiProtocol) : rollout.mode;
+          return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2, rollout: responseMode }, headers: PRIVATE_HEADERS };
         });
       } catch (e) {
         const phase = ["acquire", "begin", "snapshot"].includes(e.safeStage) ? e.safeStage : stage;
