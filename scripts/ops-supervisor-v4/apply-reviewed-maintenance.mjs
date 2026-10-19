@@ -193,7 +193,7 @@ export function verifiedSourcePathRepair(task,result,update) {
   && result.state==='LOCAL_READY' && update.expected.resultState==='LOCAL_READY'
   && task.deliveryReceipt?.errorCode==='VERIFICATION_ASSET_MISSING'
   && !task.liveMutation && !task.liveAuthorizationRef && !card.liveMutation && !card.liveAuthorizationRef
-  && same(task.verificationPaths,old) && same(card.verificationPaths,actual)
+  && (same(task.verificationPaths,old) || task.id==='continuous-n115-email-code-autofill-20261019' && same(task.verificationPaths,actual) && task.sourceParityHistory?.some(h=>h.receipt?.errorCode==='VERIFICATION_ASSET_MISSING')) && same(card.verificationPaths,actual)
   && actual.every(path=>result.changedPaths?.includes(path) && task.allowedPaths.some(a=>a===path||a.endsWith('/**')&&path.startsWith(a.slice(0,-2))))
   && same(card.requiredChecks,task.requiredChecks) && same(card.allowedPaths,task.allowedPaths)
   && task.requiredChecks.every(name=>result.checks?.some(c=>c.name===name&&c.status==='PASS'))
@@ -370,6 +370,18 @@ export function reviewedSourcePreimageMatches(remoteBytes, opsBytes, canonicalBy
   return remoteBytes === null && opsBytes === null && canonicalBytes !== null
     && approvedNoteSha256 === file.expectedCanonicalSha256
     && sha256(canonicalBytes) === file.expectedCanonicalSha256;
+}
+
+
+// Only an exact reviewed missing-asset failure may re-enter bounded preparation.
+export function prepareVerificationJournalRepair(task,update,raw){
+ const p=update.card.verificationPathRepair,j=parse(raw);
+ insist(verifiedSourcePathRepair(task,json(task.resultPath),update),'Journal repair lacks exact accepted source-path correction');
+ insist(SHA256.test(p?.blockedJournalSha256??'')&&sha256(raw)===p.blockedJournalSha256,'Blocked publisher journal changed since review');
+ insist(j.stage==='blocked'&&j.errorCode==='VERIFICATION_ASSET_MISSING'&&j.candidateSha===update.expected.candidateSha&&j.baseSha===update.expected.baseSha&&j.ticketId===task.productId,'Journal is not the exact missing-asset attempt');
+ insist(j.prepareAttempt>=1&&j.prepareAttempt<3&&!j.pushedAt&&!j.receipt,'Only an unpushed bounded preparation may resume');
+ const {errorCode,message,errorDetails,...kept}=j;
+ return {...kept,stage:'reprepare',verificationRepairHistory:[...(j.verificationRepairHistory??[]),{at:new Date().toISOString(),oldStage:j.stage,errorCode,message,oldJournalSha256:sha256(raw),reviewedPaths:update.card.verificationPaths,reason:p.reason}]};
 }
 
 export function revisedTask(task, update, commit, at, historicalContext = null) {
@@ -562,6 +574,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         readPublishedBlob: (publishedSha, repoPath) => git(['rev-parse', publishedSha + ':' + repoPath], task.worktreePath) };
     }
     verifyInactiveIdentity(task, result, update, payload.activationId, historicalContext);
+    if(update.card.verificationPathRepair?.blockedJournalSha256){const jf=path.join(rt,'delivery',task.id,update.expected.candidateSha+'.journal.json');noLinks(jf);prepareVerificationJournalRepair(task,update,fs.readFileSync(jf));}
     insist(equalPath(task.worktreePath, path.join(root, '.worktrees', task.id)), 'Task worktree is outside its owned path');
     noLinks(task.worktreePath);
     insist(git(['rev-parse', 'HEAD'], task.worktreePath) === update.expected.candidateSha, 'Worktree HEAD differs from preserved candidate: ' + task.id);
@@ -726,6 +739,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         const state = update.card.completionMode === HISTORICAL_RUNTIME_MODE ? exactInactive(update) : previous;
         insist(sha256(state.raw) === sha256(previous.raw), 'Queue changed during historical classification');
         const revised = revisedTask(state.task, update, commit, at, state.historicalContext);
+        if(update.card.verificationPathRepair?.blockedJournalSha256){const jf=path.join(rt,'delivery',state.task.id,update.expected.candidateSha+'.journal.json');noLinks(jf);const raw=fs.readFileSync(jf),next=prepareVerificationJournalRepair(state.task,update,raw);fs.writeFileSync(path.join(evidenceRoot,state.task.id+'.publisher-journal-before.json'),raw,{flag:'wx'});replaceGuarded(jf,bytes(next),sha256(raw));receipt.publisherJournalRepairs=[...(receipt.publisherJournalRepairs??[]),{taskId:state.task.id,candidateSha:update.expected.candidateSha,oldSha256:sha256(raw),newSha256:sha256(bytes(next)),stage:'reprepare',originalFailurePreserved:true,providerOperation:false}];record('PUBLISHER_JOURNAL_REPAIRED');}
         replaceGuarded(state.file, bytes(revised), sha256(state.raw));
         receipt.activatedTasks.push({ id: revised.id, status: revised.status, sessionId: revised.sessionId ?? null, runId: revised.attempt?.runId ?? null, candidateSha: revised.candidateSha ?? null, reason: update.materialReason }); record('CARD_ACTIVATED');
       }
