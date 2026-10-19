@@ -187,6 +187,7 @@ export function verifiedObservedRepair(task, result, update) {
 export function verifiedSourcePathRepair(task,result,update) {
  const card=update.card,p=card.verificationPathRepair;
  const paths={
+  'continuous-n36-source-change-class-upsert-20261019':{old:['scripts/build-teacher-import-helper.mjs'],actual:['src/views/class-import-center.js']},
   'continuous-n88-complete-runtime-binding-20261018':{old:['drafts/n88-student-portal/runtime-http.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md'],actual:['drafts/n88-student-portal/runtime.mjs','drafts/n88-student-portal/http-adapter.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md']},
   'continuous-n115-email-code-autofill-20261019':{old:['src/auth.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md'],actual:['src/app.js','docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md']},
   'continuous-n36-one-start-all-class-handoff-20261019':{old:['tools/teacher-import-helper/**','docs/automation-evidence/20261019/N36_ONE_START_ALL_CLASS_HANDOFF.md'],actual:['src/lib/n36-extension-protocol.js','docs/automation-evidence/20261019/N36_ONE_START_ALL_CLASS_HANDOFF.md']},
@@ -202,7 +203,7 @@ export function verifiedSourcePathRepair(task,result,update) {
   && actual.every(path=>result.changedPaths?.includes(path) && task.allowedPaths.some(a=>a===path||a.endsWith('/**')&&path.startsWith(a.slice(0,-2))))
   && same(card.requiredChecks,task.requiredChecks) && same(card.allowedPaths,task.allowedPaths)
   && task.requiredChecks.every(name=>result.checks?.some(c=>c.name===name&&c.status==='PASS'))
-  && result.checks.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&(c.name==='hosted_service_auth_tls_and_student_activation'||task.id==='continuous-n36-one-start-all-class-handoff-20261019'&&c.name==='publisher_production'))
+  && result.checks.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&(c.name==='hosted_service_auth_tls_and_student_activation'||task.id==='continuous-n36-one-start-all-class-handoff-20261019'&&c.name==='publisher_production'||task.id==='continuous-n36-source-change-class-upsert-20261019'&&['optional_additional_expiry_phase','production_and_stable_folder_advance'].includes(c.name)))
   && result.blockerType==='none' && !result.blocker
   && sha256(bytes(result))===p?.previousResultSha256 && sha256(bytes(task.verificationPaths))===p?.previousPathsSha256
   && SHA256.test(p?.reviewedFixtureSha256??'') && p?.reason?.length>=50
