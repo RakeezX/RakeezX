@@ -502,7 +502,7 @@ function replaceGuarded(file, content, expectedHash) {
     try { fs.renameSync(temp, file); }
     catch (error) {
       if (process.platform !== 'win32' || !['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || expectedHash === null || !fs.existsSync(file)) throw error;
-      ps('$target=' + literal(file) + '\nif ((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant() -ne ' + literal(expectedHash) + ') { throw "Concurrent file change" }\n[IO.File]::Replace(' + literal(temp) + ',$target,[NullString]::Value)');
+      ps(nativeGuardedReplacementScript(file,temp,expectedHash));
     }
     insist(sha256(read(file)) === sha256(content), 'Installed bytes differ: ' + file);
   } finally { if (fs.existsSync(temp)) fs.unlinkSync(temp); }
@@ -644,10 +644,15 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     for (const update of payload.cardUpdates) {
       const state = exactInactive(update); queueBefore.set(update.card.id, state);
       const sourceSpec = payload.files.find(file => file.repoPath === payload.sourceCardFile);
-      let bindingHash=sourceSpec.expectedCanonicalSha256;
+      let bindingHash=sourceSpec.expectedCanonicalSha256,bindingFollowups=catalog.followupSources??[];
       // A committed/installed source may precede catalog activation when an exact guarded reload refuses.
       // Rebind only this original N88 pilot and the immutable owned partial receipt/payload.
-      if(sourceSpec.partialInstallationRecovery){
+      if(sourceSpec.partialInstallationRecovery?.receiptPath){
+        const rec=sourceSpec.partialInstallationRecovery,rp=path.resolve(rec.receiptPath),pp=path.resolve(rec.payloadPath);
+        insist(win(rp).startsWith(win(path.join(rt,'maintenance'))+'\\')&&win(pp).startsWith(win(path.join(rt,'intake-evidence'))+'\\'),'Partial evidence outside owned runtime');noLinks(rp);noLinks(pp);
+        const rb=fs.readFileSync(rp),pb=fs.readFileSync(pp),pr=parse(rb);insist(equalPath(rp,path.join(rt,'maintenance',pr.taskId,pr.token,'receipt.json')),'Partial receipt identity/path changed');
+        const recovery=reviewedOwnedPartialQueueRecovery(state.task,update,sourceSpec,rb,pb,bindingFollowups);git(['merge-base','--is-ancestor',recovery.partialCommit,'origin/main'],ops);bindingHash=recovery.bindingHash;bindingFollowups=recovery.followups;
+      }else if(sourceSpec.partialInstallationRecovery){
         const rec=sourceSpec.partialInstallationRecovery;
         insist(state.task.id==='continuous-n88-official-student-portal-activation-20261018'&&state.task.sessionId==='01a14fc3-b292-7390-9952-8549a286c80f'&&state.task.status==='awaiting_po'&&state.task.stagedActivation?.phase==='pilot','Partial recovery task changed');
         const priorReceiptPath=path.join(rt,'maintenance','po-20261019-final-activation-and-ingress-transport','fd2d0f13-cd63-4440-8703-c650e0856c1f','receipt.json');
@@ -659,7 +664,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         insist(pr.installedPaths?.includes(payload.sourceCardFile)&&pf&&pf.sha256===sourceSpec.expectedCanonicalSha256&&sha256(Buffer.from(pf.content))===pf.sha256&&pp.cardUpdates?.length===1&&same(pp.cardUpdates[0].expected,update.expected)&&same(pp.cardUpdates[0].card,update.card),'Partial source/card identity differs');
         git(['merge-base','--is-ancestor',pr.commit,'origin/main'],ops);bindingHash=pf.expectedCanonicalSha256;
       }
-      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, bindingHash, catalog.followupSources ?? []);
+      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, bindingHash, bindingFollowups);
       sourceBindings.set(update.card.id, binding);
       const baselineChecks = binding.baseline.requiredChecks ?? [];
       const preservesChecks = baselineChecks.every(check => update.card.requiredChecks.includes(check));
@@ -793,4 +798,19 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
     if (mode === '--check') console.log(JSON.stringify({ status: 'LOCAL_PAYLOAD_CHECK_PASS', payloadSha256: sha256(raw), ...validatePayload(payload), liveStateChecked: false, mutationPerformed: false }));
     else { const result = await applyReviewedMaintenance(payload, sha256(raw)); console.log(JSON.stringify(result)); if (result.status !== 'INSTALLED_AND_ACTIVATED') process.exitCode = 1; }
   } catch (error) { console.error(JSON.stringify({ status: 'FAILED_BEFORE_APPLY_OR_LOCK', error: safeError(error) })); process.exitCode = 1; }
+}
+
+export function nativeGuardedReplacementScript(file,temp,expectedHash){
+ return '$target='+literal(file)+'\n$h=[Security.Cryptography.SHA256]::Create();$s=[IO.File]::Open($target,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite);try{$actual=([BitConverter]::ToString($h.ComputeHash($s))).Replace("-","").ToLowerInvariant()}finally{$s.Dispose();$h.Dispose()}\nif($actual -ne '+literal(expectedHash)+'){throw "Concurrent file change"}\n[IO.File]::Replace('+literal(temp)+',$target,[NullString]::Value)';
+}
+
+export function reviewedOwnedPartialQueueRecovery(task,update,spec,receiptRaw,payloadRaw,followups){
+ const rec=spec.partialInstallationRecovery,pr=parse(receiptRaw),pp=parse(payloadRaw),pf=pp.files?.find(f=>f.repoPath===spec.repoPath);
+ insist(task.id==='continuous-n88-official-student-portal-activation-20261018'&&task.sessionId==='01a14fc3-b292-7390-9952-8549a286c80f'&&task.status==='awaiting_po'&&task.stagedActivation?.phase==='pilot','Partial stage identity changed');
+ insist(rec.receiptSha256===sha256(receiptRaw)&&rec.payloadSha256===sha256(payloadRaw)&&pr.payloadSha256===sha256(payloadRaw)&&pr.owner==='apply-reviewed-maintenance'&&pr.status==='PARTIAL_FAILURE'&&pr.taskId===pp.taskId&&pr.activationId===task.activationId,'Owned partial bytes/authority changed');
+ insist(pr.committed===true&&pr.pushed===true&&pr.catalogUpdated===true&&GIT_SHA.test(pr.commit)&&pr.activatedTasks?.length===0&&pr.touchedWorkerProcesses?.length===0&&pr.cleanupErrors?.length===0&&pr.ownedPauseRemoved===true&&pr.ownedLockRemoved===true&&pr.error?.stderr?.includes('Get-FileHash')&&pr.error.stderr.includes('CommandNotFoundException'),'Partial queue failure disposition changed');
+ insist(pr.installedPaths?.includes(spec.repoPath)&&pf&&pf.sha256===spec.expectedCanonicalSha256&&sha256(Buffer.from(pf.content))===pf.sha256&&spec.content===pf.content&&pp.cardUpdates?.length===1&&same(pp.cardUpdates[0].expected,update.expected)&&same(pp.cardUpdates[0].card,update.card),'Installed partial card/source changed');
+ const chain=followups.filter(x=>x.updatedTaskIds?.includes(task.id)),latest=chain.at(-1);
+ insist(latest?.commit===pr.commit&&latest.sourceSha256===pf.sha256&&latest.maintenanceToken===pr.token&&!task.recoveryHistory?.some(e=>e.commit===pr.commit),'Catalog/queue partial boundary changed');
+ return {bindingHash:pf.expectedCanonicalSha256,followups:followups.filter(x=>x!==latest),partialCommit:pr.commit};
 }
