@@ -73,7 +73,7 @@ function popupHarness() {
   const chrome = { tabs: { query: async () => { calls.push('query'); return [{ id: 7, url: 'https://madrasati.moe.gov.sa/' }]; } }, scripting: { executeScript: async options => { calls.push(options); return [{ result: { ok: true, values: ['أحمد محمد'], hiddenRows: 0 } }]; } } };
   const URLMock = { createObjectURL: blob => { calls.push(blob); return 'blob:local'; }, revokeObjectURL: url => calls.push(url) };
   const source = readFileSync(new URL('../popup.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, '');
-  vm.runInNewContext(source, { document, chrome, URL: URLMock, Blob, setTimeout: fn => pendingTimers.push(fn), isOfficialUrl, parsePastedTable, reviewNames, namesCsv, readSelectedNameColumn });
+  vm.runInNewContext(source, { window:{}, document, chrome, URL: URLMock, Blob, setTimeout: fn => pendingTimers.push(fn), isOfficialUrl, parsePastedTable, reviewNames, namesCsv, readSelectedNameColumn });
   return { element, calls, outputs, pendingTimers };
 }
 test('no startup page read; click-only injection, manual review, one local download, cancellation', async () => {
@@ -104,11 +104,14 @@ test('MV3 source policy: explicit action, narrow receiver, session-only private 
   const dir = new URL('../', import.meta.url);
   const manifest = JSON.parse(readFileSync(new URL('manifest.json', dir), 'utf8'));
   assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage', 'alarms']);
-  for (const key of ['content_scripts', 'host_permissions']) assert.equal(manifest[key], undefined);
+  assert.equal(manifest.content_scripts, undefined);
+  assert.deepEqual(manifest.host_permissions,['https://rakeezx.com/*']); // Exact app tab binding, no school host grant.
   assert.deepEqual(manifest.externally_connectable,{matches:['https://rakeezx.com/*']});
   assert.match(manifest.content_security_policy.extension_pages, /connect-src 'none'/);
   for (const file of readdirSync(dir).filter(name => /\.js$/.test(name))) {
     const source = readFileSync(new URL(file, dir), 'utf8');
-    assert.doesNotMatch(source, /\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|chrome\.cookies|storage\.(local|sync)|localStorage|indexedDB/);
+    assert.doesNotMatch(source, /XMLHttpRequest|WebSocket|sendBeacon|chrome\.cookies|storage\.(local|sync)|localStorage|indexedDB/);
+    if(file!=='source-adapter.js')assert.doesNotMatch(source,/\bfetch\s*\(/);
+    else {assert.equal((source.match(/\bfetch\s*\(/g)??[]).length,1);assert.match(source,/fetch\(u.href,\{method:'GET',credentials:'same-origin',redirect:'error',cache:'no-store',signal:controller.signal\}\)/);}
   }
 });

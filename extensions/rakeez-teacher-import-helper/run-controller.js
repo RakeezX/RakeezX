@@ -36,12 +36,13 @@ function armReview(){
 function clearPreview(continuing=false){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new CustomEvent('n36:clear',{detail:{continuing}}));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;$('collection-continue').hidden=true;}
 function stop(code='CANCELLED',diagnostic=null,context=null){
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
- cancelReports(job??review);generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);clearTimeout(job.expiryTimer);job.sourceRows.length=0;job.fetches.clear();job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
+ cancelReports(job??review);generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);clearTimeout(job.expiryTimer);job.sourceRows.length=0;job.fetches.clear();job.routes.length=0;job.categories.length=0;job=null;}clearPreview();window.n36AutomaticBatch=null;
  window.n36Diagnostics?.publish({stage:code==='CANCELLED'?'cancelled':code==='REVIEW_EXPIRED'?'expired':'error'});
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
- if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة معاينة البيانات ومسحت لحمايتك؛ لا توجد أسماء محفوظة. لبدء معاينة جديدة افتح تبويب المصدر ثم اضغط زر الإضافة طوعًا.');return;}
+ if(code==='OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB'){announce('افتح حساب ركيز المسجّل دخوله في تبويب واحد في هذه النافذة وحدّث التطبيق، ثم ابدأ من مدرستي. لم تبدأ قراءة الأسماء.');return;}
+ if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة التشغيل ومُسحت الأسماء المؤقتة في الإضافة. ما حُفظ محليًا في ركيز يبقى محفوظًا، والدفعات المعلّقة فيه يمكن استكمالها من الحساب نفسه. لبدء جمع جديد افتح المصدر ثم ابدأ طوعًا.');return;}
  showDiagnostic(diagnostic??{stage:context?.stage??'run',reason:code,category:context?.kind??'students'});
- announce(code==='CANCELLED'?'أُلغيت المعاينة ومُسحت الأسماء.':code==='SOURCE_CHANGED'||/CONTEXT|ORIGIN|LOGIN|CLOSED/.test(code)?'تغيّرت صفحة المصدر؛ مُسحت المعاينة. ابدأ مجددًا من الصفحة المصرّح بها.':'تعذّرت القراءة؛ مُسحت المعاينة. التفاصيل في التشخيص الاختياري.');
+ announce(code==='CANCELLED'?'أُوقف التشغيل ومُسحت الأسماء المؤقتة في الإضافة. ما حُفظ محليًا في ركيز يبقى محفوظًا.':code==='SOURCE_CHANGED'||/CONTEXT|ORIGIN|LOGIN|CLOSED/.test(code)?'تغيّرت صفحة المصدر؛ مُسحت المعاينة. ابدأ مجددًا من الصفحة المصرّح بها.':'تعذّرت القراءة؛ مُسحت المعاينة. التفاصيل في التشخيص الاختياري.');
 }
 // AI: cancel only this run's source-context requests; never navigate to recover a fetch.
 function cancelReports(active){
@@ -72,13 +73,13 @@ async function readReport(next,ticket,alive){
  return value;
 }
 function current(ticket){if(ticket!==generation||!job)throw Error('CANCELLED');if(job.expires&&Date.now()>=job.expires)throw Error('REVIEW_EXPIRED');}
-async function inspect(tabId,origin,mode,alive=()=>true,school=null,entryDeadline=job?.gatewaySettleUntil??Date.now()+6000){
+async function inspect(tabId,origin,mode,alive=()=>true,school=null,entryDeadline=job?.gatewaySettleUntil??Date.now()+20000){
  const tab=await chrome.tabs.get(tabId);if(!tab.url||new URL(tab.url).origin!==origin)throw Error('ORIGIN_CHANGED');
  if(!alive())throw Error('CANCELLED');
  if(/(?:login|signin|signout|logout|oauth)/i.test(new URL(tab.url).pathname))throw Error('LOGIN_OR_LOGOUT');
  try{const u=new URL(tab.url);safeRoute(origin,u.pathname+u.search,(job??review)?.context);}catch(e){throw routeError(e,'navigation-redirect',mode==='home'?'role':mode,new URL(tab.url).pathname+new URL(tab.url).search);}
  if(['students','timetable'].includes(mode)){
-  const until=Date.now()+6000;
+  const until=Date.now()+20000;
   while(true){
    await inspect(tabId,origin,'guard',alive);if(!alive())throw Error('CANCELLED');
    const values=await chrome.scripting.executeScript({target:{tabId,frameIds:[0]},world:'ISOLATED',func:readSourceReportPage,args:[mode,{...((job??review)?.context??{}),rowOffset:job?.readOffset??0}]});
@@ -111,7 +112,7 @@ async function inspect(tabId,origin,mode,alive=()=>true,school=null,entryDeadlin
  if(result.length!==1||!result[0].result?.ok){const e=Error(result[0]?.result?.code??'PAGE_UNAVAILABLE');e.diagnostic=result[0]?.result?.diagnostic;throw e;}return result[0].result;
 }
 async function ready(tabId,origin,ticket){
- const until=Date.now()+10000;
+ const until=Date.now()+30000;
  while(Date.now()<until){current(ticket);const tab=await chrome.tabs.get(tabId);if(!tab.url||new URL(tab.url).origin!==origin)throw Error('ORIGIN_CHANGED');if(tab.status==='complete'&&!/^\/Dashboards\/Schools\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(tab.url).pathname))return;await new Promise(r=>setTimeout(r,100));}
  current(ticket);throw Error('PAGE_TIMEOUT');
 }
@@ -130,6 +131,7 @@ async function start(tabId){
  let stage='start-path',kind='start',path='';
  try{
   const tab=await chrome.tabs.get(tabId),origin=startOrigin(tab.url??'');
+  const beginResult=await chrome.runtime.sendMessage({type:'n36-begin'});if(!beginResult?.ok)throw Error('OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB');window.n36AutomaticBatch=beginResult.batchId;window.n36CollectionFinished=false;
   path=new URL(tab.url).pathname+new URL(tab.url).search;
   safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
   job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),fetches:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0,excluded:0,windowPages:0,sourceBytes:0,expires:null,expiryTimer:null};
@@ -157,7 +159,7 @@ async function start(tabId){
     job.readOffset=next.rowOffset??0;
     try{
      if(next.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(target).pathname))next.page=await readReport(next,ticket,alive);
-     else {await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+8000;next.page=await inspect(tabId,origin,next.kind,alive);}current(ticket);
+     else {await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+30000;next.page=await inspect(tabId,origin,next.kind,alive);}current(ticket);
     }
     catch(e){if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT')throw e;current(ticket);
      const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname);
@@ -241,6 +243,7 @@ async function start(tabId){
 // AI: resource-only read continuation, independent of all class receipts.
 async function pauseCollection(ticket){
  const active=job;
+ if(window.n36AutomaticBatch){await Promise.all(active.fetches.values());current(ticket);await inspect(active.tabId,active.origin,'guard',()=>job===active);active.windowPages=0;active.deadline=Date.now()+RUN_LIMITS.milliseconds;return;}
  window.n36Diagnostics?.publish({stage:'paused'});
  await Promise.all(active.fetches.values());current(ticket);
  review={tabId:active.tabId,origin:active.origin,context:active.context,expires:active.expires??Date.now()+RUN_LIMITS.reviewMilliseconds};
@@ -269,7 +272,7 @@ async function finishCollection(ticket){
  window.n36Diagnostics?.publish({excluded:active.excluded});
  cancelReports(active);job=null;
  window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,...coverage,excluded:active.excluded,hasNext:false}}));
- announce('انتهت قراءة الصفحات المتاحة. اختر الفصل أدناه.');armReview();
+ announce('انتهت قراءة الصفحات المتاحة؛ جار استيراد جميع الفصول إلى ركيز المفتوح.');if(!window.n36AutomaticBatch)armReview();else {review.expires=Date.now()+1800000;reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),1800000);}
 }
 async function noorRead(tabId) {
  const tab=await chrome.tabs.get(tabId),u=new URL(tab.url??'');
@@ -327,7 +330,7 @@ if(runToken){
 $('run-reopen').addEventListener('click',()=>{announce('افتح بنفسك تبويب مدرستي المصرّح ثم اضغط زر الإضافة وابدأ؛ لا قراءة قبل اختيارك.');$('run-reopen').hidden=true;});
 $('run-cancel').addEventListener('click',()=>stop());
 window.addEventListener('n36:discard',()=>{if(runToken)stop();});
-window.addEventListener('n36:exported',()=>{if(!runToken)return;if(review?.source!=='noor'&&window.n36HasSourceRoster?.()){announce('نُقل الفصل المختار للمراجعة فقط. يمكنك اختيار فصل آخر خلال المهلة الأصلية؛ لم تُضف أسماء تلقائيًا.');return;}generation++;clearPreview();$('run-cancel').disabled=true;announce('اكتمل التصدير الصريح ومُسحت المعاينة المؤقتة. لم تُضف بيانات إلى ركيز.');});
+window.addEventListener('n36:exported',()=>{if(!runToken||window.n36AutomaticBatch)return;if(review?.source!=='noor'&&window.n36HasSourceRoster?.()){announce('نُقل الفصل المختار للمراجعة فقط. يمكنك اختيار فصل آخر خلال المهلة الأصلية؛ لم تُضف أسماء تلقائيًا.');return;}generation++;clearPreview();$('run-cancel').disabled=true;announce('اكتمل التصدير الصريح ومُسحت المعاينة المؤقتة. لم تُضف بيانات إلى ركيز.');});
 window.n36BeforeExport=async()=>{
  if(!runToken)return;const snapshot=review;if(!snapshot||Date.now()>=snapshot.expires){stop('REVIEW_EXPIRED');throw Error('REVIEW_EXPIRED');}
  try{if(snapshot.source==='noor'){const fresh=await noorRead(snapshot.tabId);if(fresh.url!==snapshot.url||JSON.stringify(fresh.names)!==snapshot.names)throw Error('SOURCE_CHANGED');}else await inspect(snapshot.tabId,snapshot.origin,'guard',()=>review===snapshot);if(review!==snapshot)throw Error('SOURCE_CHANGED');}catch(e){stop('SOURCE_CHANGED');throw e;}
@@ -342,7 +345,7 @@ chrome.tabs.onUpdated.addListener((id,change)=>{
  if(new URL(change.url).origin!==target.origin||/(?:login|signin|signout|logout|oauth)/i.test(new URL(change.url).pathname))stop('ORIGIN_OR_LOGIN_CHANGED');
 });
 setInterval(async()=>{
- if(!review||guardBusy)return;if(Date.now()>=review.expires){stop('REVIEW_EXPIRED');return;}guardBusy=true;
+ if(!review||guardBusy||window.n36CollectionFinished)return;if(Date.now()>=review.expires){stop('REVIEW_EXPIRED');return;}guardBusy=true;
  const snapshot=review;try{if(snapshot.source==='noor'){const fresh=await noorRead(snapshot.tabId);if(fresh.url!==snapshot.url||JSON.stringify(fresh.names)!==snapshot.names)throw Error('SOURCE_CHANGED');}else await inspect(snapshot.tabId,snapshot.origin,'guard',()=>review===snapshot);}catch{if(review===snapshot)stop('ORIGIN_OR_LOGIN_CHANGED');}finally{guardBusy=false;}
 },3000);
 if(!runToken)$('one-start').disabled=false;
@@ -350,3 +353,11 @@ $('copy-route-diagnostic').addEventListener('click',async()=>{try{await navigato
 
 // AI: reached only after the actual ESM graph and entry handlers initialized.
 window.n36Diagnostics?.moduleReady("run-controller.js");
+
+// AI: successful completion stops source inspection and erases run-local names.
+window.addEventListener('n36:automatic-finished',({detail})=>{
+ window.n36CollectionFinished=true;
+ if(detail.unresolved)return; // Explicit retry can still preflight the bounded original source.
+ chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
+ clearPreview();window.n36AutomaticBatch=null;$('run-cancel').disabled=true;
+});
