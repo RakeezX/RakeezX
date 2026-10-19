@@ -177,7 +177,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   };
   function entry(message = "") {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p id="n88-code-help">\u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0627\u0644\u0634\u062E\u0635\u064A: 6 \u0623\u0631\u0642\u0627\u0645 \u064A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1. \u0627\u0633\u062A\u062E\u062F\u0645 \u0627\u0644\u0623\u0631\u0642\u0627\u0645 0\u20139.</p><form data-claim><label for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form></section>`);
+    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p id="n88-code-help">6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u06401</p><form data-claim><label for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form>${enabled ? '<button type="button" class="n88-unified-resume" data-resume>\u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629</button>' : ""}</section>`);
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -261,6 +261,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   const beforeInput = (event) => rejectOverflow(event);
   const paste = (event) => rejectOverflow(event, true);
   const click = (event) => {
+    if (event.target.closest("[data-resume]")) void run(() => client.read());
     if (event.target.closest("[data-read]")) void run(() => client.read());
     if (event.target.closest("[data-end]")) void run(() => client.end(), true);
   };
@@ -276,10 +277,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     if (doc.visibilityState === "hidden") clear();
   };
   const pageshow = (event) => {
-    if (event.persisted) {
-      clear();
-      if (enabled) void run(() => client.read());
-    }
+    if (event.persisted) clear();
   };
   root.addEventListener("beforeinput", beforeInput);
   root.addEventListener("paste", paste);
@@ -290,7 +288,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   win.addEventListener("pageshow", pageshow);
   doc.addEventListener("visibilitychange", visible);
   entry();
-  const ready = enabled ? run(() => client.read()) : Promise.resolve();
+  const ready = Promise.resolve();
   return { ready, clear, refresh: () => run(() => client.read()), dispose() {
     if (disposed) return;
     clear();

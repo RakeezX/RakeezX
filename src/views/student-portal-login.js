@@ -19,7 +19,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   };
   function entry(message = '') {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">دخول الطالب</h1><p id="n88-code-help">أدخل رمزك الشخصي: 6 أرقام يبدأ بالرقم 1. استخدم الأرقام 0–9.</p><form data-claim><label for="n88-unified-code">رمز الدخول</label><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form></section>`);
+    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">دخول الطالب</h1><p id="n88-code-help">6 أرقام تبدأ بـ1</p><form data-claim><label for="n88-unified-code">رمز الدخول</label><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -81,17 +81,20 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const beforeInput = event => rejectOverflow(event);
   const paste = event => rejectOverflow(event, true);
   const click = event => {
+    if (event.target.closest('[data-resume]')) void run(() => client.read());
     if (event.target.closest('[data-read]')) void run(() => client.read());
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
   };
   function clear() { generation++; busy = false; clearTimeout(timer); client?.invalidate?.(); entry(); }
   const hide = () => clear();
   const visible = () => { if (doc.visibilityState === 'hidden') clear(); };
-  const pageshow = event => { if (event.persisted) { clear(); if (enabled) void run(() => client.read()); } };
+  const pageshow = event => { if (event.persisted) clear(); };
   root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
   win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
   entry();
-  const ready = enabled ? run(() => client.read()) : Promise.resolve();
+  // HttpOnly session cookies cannot be safely inspected here. Initial entry is
+  // immediate; explicit resume still requires an authoritative server read.
+  const ready = Promise.resolve();
   return { ready, clear, refresh: () => run(() => client.read()), dispose() {
     if (disposed) return;
     clear(); disposed = true; clearTimeout(timer); client?.dispose?.(); root.replaceChildren(); style.remove();

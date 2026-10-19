@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n88-availability-fast-light-entry-20261019",
+  "runId": "fa7a7f6d-ad79-43d1-8bc0-e18312534dc2",
+  "status": "PASS",
+  "baseline": {
+    "teacherFalseUnavailableBeforeResponse": true,
+    "studentInitialBlockingRead": true
+  },
+  "checks": [
+    "baseline false disabled state and blocking session read reproduced from immutable base",
+    "real teacher account/store/owner-bound guard: loading, delayed503 and same-key retry recovery",
+    "one admitted list instead of duplicate initial list",
+    "server401/bad-ACK and real owner/expired lease keep private controls hidden; retry never bypasses guards",
+    "mobile: actual document light under dark OS/ancestor, visible gap, no overflow, zero initial request and explicit expired-session denial",
+    "desktop-dark-ancestor: actual document light under dark OS/ancestor, visible gap, no overflow, zero initial request and explicit expired-session denial",
+    "claim/read expiry remains failclosed; late session response and BFCache return cannot restore cleared private data"
+  ],
+  "hostedAccountProof": false,
+  "cleanup": {
+    "ownedBrowserAndHttpClosed": true,
+    "lease": "parent-owned browser retained"
+  }
+}

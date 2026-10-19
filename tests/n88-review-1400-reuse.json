@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "priorSuccessfulReportSha256": "86ca972471039b36618a907eb700cc5103d9fd30aac5ea7830d6efbde21b3b91",
+  "priorSuccessfulHarnessSha256": "bc7c48f9a0bd532696e5b0488e5aa9d9e691b58e2ca79dea517c2a9d2e7366bb",
+  "matchingSourcePins": {
+    "src/lib/student-portal-runtime.js": "ae7d902b870da58ef01ad2b60c0635e2a8ce9ce2fab7f6aa4a22869a9590f814",
+    "src/views/student-portal-login.js": "530f0c396ded8a8ecff4e1726dba6c30ad80c9e07e1dabeeebd2815495563063",
+    "src/styles/student-portal-login.css": "ab77383940f89469846ae76a1f4f4554b4a6a142c4c172025b961920e66559e2",
+    "drafts/n88-student-portal/client/student.html": "5fbc18a2058be0b1bf8a1c1100f9204179970bb067e9cadc03ca4a5be0bc33fb"
+  },
+  "laterAttempt": "tests/n88-review-1400.json remains FAIL: lease acquisition failed before any browser/server started",
+  "laterHarnessChange": "bounded five-second synthetic request-start deadline only; Product source and functional assertions unchanged",
+  "leaseStatus": "browser held by continuous-n44-one-approved-closed-page-push-20261019 at2026-10-19T11:16:04.1348157Z",
+  "noRetryOrOtherOwnerCleanup": true
+}
