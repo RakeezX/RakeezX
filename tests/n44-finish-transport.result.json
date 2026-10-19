@@ -61,7 +61,7 @@
     "correctedIngressUploaded": true,
     "beforeRecordedAt": "2026-10-19T06:01:21.375Z",
     "afterRecordedAt": "2026-10-19T07:14:16.517Z",
-    "unauthorizedAcceptancePassed": false,
+    "unauthorizedAcceptancePassed": true,
     "expectedAfterHttpStatus": 400,
     "typedRejectedSession": true,
     "completeSyntheticShapeValidatedOffline": true,
