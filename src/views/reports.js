@@ -22,13 +22,15 @@ let a4Preview = false;
 const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف الحضور', grades: 'كشف الدرجات', support: 'تقرير من يحتاج دعمًا' }[tab] ?? 'تقرير الفصل');
 const safeName = (value) => visibleLatinDigits(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
-// AI N120: offer only orderings that the selected document can apply.
-// Live roster/grade reports already receive displayRoster's ascending numbers.
-// Archived and attendance rosters can carry saved numbers, so retain their option.
-const sortOptions = (historical = false) => [
-  ['default', tab === 'support' ? 'الأكثر حاجة للدعم' : !historical && ['roster', 'grades'].includes(tab) ? 'حسب رقم الكشف (الافتراضي)' : 'الترتيب الافتراضي (السجل)'],
-  ['name', 'أبجديًا (اسم الطالب)'],
-  ...(historical || !['roster', 'grades'].includes(tab) ? [['roll', 'حسب رقم الكشف']] : []),
+// AI N119: current display numbers follow names; saved historical numbers may differ.
+// Attendance can also include former students carrying their saved roll numbers.
+const hasDistinctRollOrder = (students) => [...students]
+  .sort((a, b) => (a.displayNo ?? a.rollNo ?? 9999) - (b.displayNo ?? b.rollNo ?? 9999))
+  .some((student, index) => student.id !== students[index].id);
+const sortOptions = (historical = false, distinctAttendanceRoll = false) => [
+  ['default', tab === 'support' ? 'الأكثر حاجة للدعم' : historical ? 'الترتيب الافتراضي (السجل)' : distinctAttendanceRoll ? 'أبجديًا (الافتراضي)' : 'أبجديًا حسب رقم الكشف (الافتراضي)'],
+  ...(historical || tab === 'support' ? [['name', historical ? 'أبجديًا (اسم الطالب)' : 'أبجديًا حسب رقم الكشف']] : []),
+  ...(historical || distinctAttendanceRoll ? [['roll', 'حسب رقم الكشف']] : []),
   ...(['grades', 'support'].includes(tab) ? [['score_desc', 'الأعلى درجة'], ['score_asc', 'الأقل درجة']] : []),
   ...(['attendance', 'support'].includes(tab) ? [['absent_desc', 'الأكثر غيابًا']] : []),
 ];
@@ -212,7 +214,7 @@ export default {
               ${icon('filter', 'compact')} ترتيب الكشف
             </span>
             <select class="select" data-change="sort" aria-label="ترتيب التقرير">
-              ${sortOptions(!!historical).map(([value, label]) => html`<option value="${value}" ${sortKey === value ? 'selected' : ''}>${label}</option>`)}
+              ${sortOptions(!!historical, !!attendance && hasDistinctRollOrder(attendance.students)).map(([value, label]) => html`<option value="${value}" ${sortKey === value ? 'selected' : ''}>${label}</option>`)}
             </select>
           </label>
           ${tab === 'attendance'
@@ -267,9 +269,11 @@ export default {
   actions: {
     tab(el) { tab = el.dataset.tab; sortKey = 'default'; repaint(); },
     sort(el, ev, params) {
-      // A legacy live-roster "roll" request aliases its identical default;
-      // saved-number reports still accept and apply the explicit value.
-      sortKey = sortOptions(!!store.closedTeachingReport(params.id)).some(([value]) => value === el.value) ? el.value : 'default';
+      const historical = !!store.closedTeachingReport(params.id);
+      const distinctRoll = tab === 'attendance' && hasDistinctRollOrder(reportAttendance(params.id).students);
+      // Preserve old handler values without offering identical menu choices.
+      const value = !historical && el.value === 'roll' && tab === 'support' ? 'name' : el.value;
+      sortKey = sortOptions(historical, distinctRoll).some(([key]) => key === value) ? value : 'default';
       repaint();
     },
     'reset-filters'() { sortKey = 'default'; if (tab === 'attendance') { filterStartDate = ''; filterEndDate = ''; attMode = 'brief'; } repaint(); },

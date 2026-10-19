@@ -1,0 +1,129 @@
+{
+  "check": "n119_all_duplicated_sort_options_removed_meaningful_orders_preserved",
+  "taskId": "continuous-n119-all-filter-sort-dedup-close-20261019",
+  "runId": "483179a4-5613-4143-b281-f8009d070277",
+  "options": [
+    {
+      "name": "gradebook",
+      "actual": [
+        {
+          "value": "default",
+          "label": "أبجديًا حسب رقم الكشف (الافتراضي)"
+        },
+        {
+          "value": "score_desc",
+          "label": "الأعلى درجة"
+        },
+        {
+          "value": "score_asc",
+          "label": "الأقل درجة"
+        }
+      ]
+    },
+    {
+      "name": "live-roster",
+      "actual": [
+        {
+          "value": "default",
+          "label": "أبجديًا حسب رقم الكشف (الافتراضي)"
+        }
+      ]
+    },
+    {
+      "name": "live-grades",
+      "actual": [
+        {
+          "value": "default",
+          "label": "أبجديًا حسب رقم الكشف (الافتراضي)"
+        },
+        {
+          "value": "score_desc",
+          "label": "الأعلى درجة"
+        },
+        {
+          "value": "score_asc",
+          "label": "الأقل درجة"
+        }
+      ]
+    },
+    {
+      "name": "live-attendance",
+      "actual": [
+        {
+          "value": "default",
+          "label": "أبجديًا حسب رقم الكشف (الافتراضي)"
+        },
+        {
+          "value": "absent_desc",
+          "label": "الأكثر غيابًا"
+        }
+      ]
+    },
+    {
+      "name": "live-support",
+      "actual": [
+        {
+          "value": "default",
+          "label": "الأكثر حاجة للدعم"
+        },
+        {
+          "value": "name",
+          "label": "أبجديًا حسب رقم الكشف"
+        },
+        {
+          "value": "score_desc",
+          "label": "الأعلى درجة"
+        },
+        {
+          "value": "score_asc",
+          "label": "الأقل درجة"
+        },
+        {
+          "value": "absent_desc",
+          "label": "الأكثر غيابًا"
+        }
+      ]
+    },
+    {
+      "name": "historical-roster",
+      "actual": [
+        {
+          "value": "default",
+          "label": "الترتيب الافتراضي (السجل)"
+        },
+        {
+          "value": "name",
+          "label": "أبجديًا (اسم الطالب)"
+        },
+        {
+          "value": "roll",
+          "label": "حسب رقم الكشف"
+        }
+      ]
+    },
+    {
+      "name": "live-attendance-with-former-saved-number",
+      "actual": [
+        {
+          "value": "default",
+          "label": "أبجديًا (الافتراضي)"
+        },
+        {
+          "value": "roll",
+          "label": "حسب رقم الكشف"
+        },
+        {
+          "value": "absent_desc",
+          "label": "الأكثر غيابًا"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    "Actual gradebook and support handlers: default/name/legacy roll and grade orders; student/enrollment/grade/attendance records unchanged.",
+    "Frozen historical roll remains different from alphabetical and both handlers work.",
+    "Attendance retains explicit saved-roll order only when it differs from the default."
+  ],
+  "inventory": "Only grades.js and reports.js define student sort menus in the scoped entry points; shared student search has none.",
+  "status": "PASS"
+}
