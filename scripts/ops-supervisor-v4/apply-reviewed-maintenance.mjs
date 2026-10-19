@@ -10,6 +10,7 @@ import { buildLiveServiceEvidence, verifiedLiveServicePublication } from './live
 import { STAGED_ACTIVATION_MODE, verifiedActivationStageContinuation, verifiedPilotStagePreparation } from './staged-activation-contract.mjs';
 import { validateControllerReload, buildControllerReloadScript } from './reviewed-controller-reload.mjs';
 import { HISTORICAL_RUNTIME_MODE, verifyHistoricalRuntimeSupersession } from './historical-runtime-supersession.mjs';
+import { sourceWrapperCompanions, verifyPendingCompanion } from './source-wrapper-companions.mjs';
 
 const SELF = 'scripts/ops-supervisor-v4/apply-reviewed-maintenance.mjs';
 const WIN_PS = 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
@@ -118,7 +119,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     const file = payload.files.find(x => x.repoPath === payload.sourceCardFile);
     insist(file && file.repoPath.startsWith('scripts/ops-supervisor-v4/') && file.repoPath.endsWith('.json'), 'Reviewed source card wrapper is missing');
     const wrapper = JSON.parse(file.content);
-    insist(wrapper.activationId === payload.activationId && Array.isArray(wrapper.tasks) && wrapper.tasks.length === taskIds.size, 'Source wrapper activation or task count mismatch');
+    insist(wrapper.activationId === payload.activationId && Array.isArray(wrapper.tasks) && wrapper.tasks.length === taskIds.size + sourceWrapperCompanions(payload).length, 'Source wrapper activation or task count mismatch');
     for (const update of payload.cardUpdates) insist(wrapper.tasks.filter(c => c.id === update.card.id).length === 1 && same(wrapper.tasks.find(c => c.id === update.card.id), update.card), 'Source wrapper differs from card payload: ' + update.card.id);
   }
   return { taskId: payload.taskId, files: payload.files.map(f => f.repoPath), taskIds: [...taskIds], allowActiveTaskIds: allowed, requireNoActiveWorkers, runtimeConfigUpdate, controllerReload };
@@ -640,6 +641,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     receipt.activeBefore = active.active; record('PAUSED_PUBLISHER_IDLE', { activeTaskIds: active.active.map(t => t.id) });
     const catalogPath = path.join(rt, 'intake-catalog.json'); noLinks(catalogPath);
     beforeCatalog = fs.readFileSync(catalogPath); const catalog = parse(beforeCatalog);
+    const pendingCompanions = sourceWrapperCompanions(payload).map(card => { const file=path.join(rt,'queue',card.id+'.json'); noLinks(file); const raw=fs.readFileSync(file), task=parse(raw); verifyPendingCompanion(card,task); insist(!catalog.tasks.some(t=>t.id===card.id),'Companion catalog identity already exists'); return {card,file,raw}; });
     insist(catalog.currentActivationId === payload.activationId && Array.isArray(catalog.tasks), 'Catalog activation changed');
     for (const update of payload.cardUpdates) {
       const state = exactInactive(update); queueBefore.set(update.card.id, state);
@@ -738,6 +740,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     insist(pausedIdle(), 'Pause lost before card activation');
     insist(sha256(read(catalogPath)) === sha256(beforeCatalog), 'Catalog changed before activation');
     for (const update of payload.cardUpdates) { const fresh = exactInactive(update); insist(sha256(fresh.raw) === sha256(queueBefore.get(update.card.id).raw), 'Queue changed before activation: ' + update.card.id); }
+    for(const p of pendingCompanions){insist(sha256(read(p.file))===sha256(p.raw),'Pending companion runtime changed');verifyPendingCompanion(p.card,json(p.file));}
     const at = new Date().toISOString();
     for (const update of payload.cardUpdates) {
       const binding = sourceBindings.get(update.card.id), index = catalog.tasks.findIndex(t => t.id === update.card.id);
@@ -745,6 +748,8 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       else insist(index === -1, 'Approved-note task unexpectedly appeared in catalog');
     }
     if (payload.cardUpdates.length) {
+      for(const p of pendingCompanions){catalog.tasks.push(Object.fromEntries(Object.entries(p.card).filter(([k])=>!RUNTIME_KEYS.has(k))));fs.writeFileSync(path.join(evidenceRoot,p.card.id+'.preserved-pending.json'),p.raw,{flag:'wx'});}
+      receipt.preservedPendingCompanions=pendingCompanions.map(p=>({id:p.card.id,queueSha256:sha256(p.raw),queueChanged:false,sourceCardChanged:false}));
       catalog.updatedAt = at;
       catalog.followupSources = [...(catalog.followupSources ?? []), { commit, sourceFile: path.join(root, payload.sourceCardFile), sourceSha256: payload.files.find(f => f.repoPath === payload.sourceCardFile).sha256, updatedTaskIds: plan.taskIds, at, maintenanceToken: token }];
       replaceGuarded(catalogPath, bytes(catalog), sha256(beforeCatalog)); receipt.catalogUpdated = true; record('CATALOG_UPDATED');
