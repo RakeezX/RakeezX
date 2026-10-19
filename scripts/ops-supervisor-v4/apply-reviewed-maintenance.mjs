@@ -616,7 +616,22 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     for (const update of payload.cardUpdates) {
       const state = exactInactive(update); queueBefore.set(update.card.id, state);
       const sourceSpec = payload.files.find(file => file.repoPath === payload.sourceCardFile);
-      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, sourceSpec.expectedCanonicalSha256, catalog.followupSources ?? []);
+      let bindingHash=sourceSpec.expectedCanonicalSha256;
+      // A committed/installed source may precede catalog activation when an exact guarded reload refuses.
+      // Rebind only this original N88 pilot and the immutable owned partial receipt/payload.
+      if(sourceSpec.partialInstallationRecovery){
+        const rec=sourceSpec.partialInstallationRecovery;
+        insist(state.task.id==='continuous-n88-official-student-portal-activation-20261018'&&state.task.sessionId==='01a14fc3-b292-7390-9952-8549a286c80f'&&state.task.status==='awaiting_po'&&state.task.stagedActivation?.phase==='pilot','Partial recovery task changed');
+        const priorReceiptPath=path.join(rt,'maintenance','po-20261019-final-activation-and-ingress-transport','fd2d0f13-cd63-4440-8703-c650e0856c1f','receipt.json');
+        const priorPayloadPath=path.join(rt,'intake-evidence','po-20261019-supabase28p01','transport-and-final-stage-maintenance.payload.json');
+        noLinks(priorReceiptPath);noLinks(priorPayloadPath);
+        const rb=fs.readFileSync(priorReceiptPath),pb=fs.readFileSync(priorPayloadPath),pr=parse(rb),pp=parse(pb),pf=pp.files?.find(f=>f.repoPath===payload.sourceCardFile);
+        insist(rec.receiptSha256===sha256(rb)&&rec.payloadSha256===sha256(pb)&&pr.payloadSha256===sha256(pb)&&pr.status==='PARTIAL_FAILURE'&&pr.owner==='apply-reviewed-maintenance'&&pr.taskId===pp.taskId&&pr.activationId===payload.activationId,'Owned partial receipt binding changed');
+        insist(pr.committed===true&&pr.pushed===true&&pr.commit==='a935127ef7c2c25e873355322c96c33189b924a9'&&pr.catalogUpdated===false&&pr.activatedTasks?.length===0&&pr.touchedWorkerProcesses?.length===0&&pr.cleanupErrors?.length===0&&pr.ownedPauseRemoved===true&&pr.ownedLockRemoved===true&&pr.error?.stderr?.includes('Controller command identity mismatch'),'Owned partial operation changed');
+        insist(pr.installedPaths?.includes(payload.sourceCardFile)&&pf&&pf.sha256===sourceSpec.expectedCanonicalSha256&&sha256(Buffer.from(pf.content))===pf.sha256&&pp.cardUpdates?.length===1&&same(pp.cardUpdates[0].expected,update.expected)&&same(pp.cardUpdates[0].card,update.card),'Partial source/card identity differs');
+        git(['merge-base','--is-ancestor',pr.commit,'origin/main'],ops);bindingHash=pf.expectedCanonicalSha256;
+      }
+      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, bindingHash, catalog.followupSources ?? []);
       sourceBindings.set(update.card.id, binding);
       const baselineChecks = binding.baseline.requiredChecks ?? [];
       const preservesChecks = baselineChecks.every(check => update.card.requiredChecks.includes(check));
