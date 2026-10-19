@@ -94,11 +94,13 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
     return publicDeviceConfiguration(testApproval,auth.ownerId,body,publicVapidKey,serviceSourceSha,now());
    }
    if(path.startsWith('/push/')) {
+    let admitRegistration;
     if(path==='/push/register'&&testApproval) {
      const a=deviceApproval(testApproval,now());
      if(!a||auth.ownerId!==a.ownerId||body.workspaceId!==a.workspaceId||body.deviceId!==a.deviceId)return {status:'disabled'};
-     const previous=await local.atomic(auth.ownerId,tx=>tx.rows('registrations').some(r=>r.workspaceId===a.workspaceId&&r.deviceId===a.deviceId&&r.registrationId!==body.registrationId));
-     if(previous)return {status:'disabled'};
+     // Preserve all identities, including tombstones, under the same owner lock
+     // as registration. A separate full snapshot wastes15 serial roundtrips.
+     admitRegistration=(tx,_auth,request)=>!tx.rows('registrations').some(r=>r.workspaceId===a.workspaceId&&r.deviceId===a.deviceId&&r.registrationId!==request.registrationId);
     }
     if(path==='/push/revoke') {
      exact(body,['registrationId','workspaceId','deviceId']);scope(body);if(!uuid(body.registrationId))fail();
@@ -108,7 +110,7 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
       return r && r.workspaceId===body.workspaceId&&r.deviceId===body.deviceId&&r.state!=='active';});
      if(retired)return {status:'revoked'};
     }
-    const registration=createRegistrationBoundary({verifySession:async()=>auth,repository:local,protect:crypto.protect,clock:now,approvedOrigins:providerOrigins,receipt:true,failureProjection:true});
+    const registration=createRegistrationBoundary({verifySession:async()=>auth,repository:local,protect:crypto.protect,clock:now,approvedOrigins:providerOrigins,receipt:true,failureProjection:true,admitRegistration});
     return registration[path.endsWith('/register')?'register':'revoke'](null,body);
    }
    if(path==='/context/read'){

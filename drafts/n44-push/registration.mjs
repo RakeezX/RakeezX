@@ -25,7 +25,8 @@ export function validateSubscription(raw, approvedOrigins = []) {
  * protect validates curve material, seals secrets and HMACs endpoint server-side.
  * repository.atomic commits before resolving; no memory fallback is supplied. */
 export function createRegistrationBoundary({ verifySession, repository, protect, clock,
-  approvedOrigins = [], receipt = false, failureProjection = false }) {
+  approvedOrigins = [], receipt = false, failureProjection = false,
+  admitRegistration = () => true }) {
   const origins = Object.freeze([...approvedOrigins]);
   return Object.freeze({
     async register(transport, body) {
@@ -51,6 +52,9 @@ export function createRegistrationBoundary({ verifySession, repository, protect,
           const ctx = tx.context(body.workspaceId, body.deviceId);
           if (!principal(auth, now) || !current(ctx, auth, now) || ctx.consentRevision !== body.consent.revision ||
               ctx.pushConsent !== true) return result('rejected');
+          // Trusted host scope check shares THIS locked owner snapshot. Only a
+          // synchronous true admits; no second read or pre-commit ACK is needed.
+          if (admitRegistration(tx, auth, body) !== true) return result('disabled');
           const previous = tx.get('registrations', body.registrationId);
           const acknowledged = r => receipt ? Object.freeze({status:'registered',registrationId:r.registrationId,expiresAt:r.expiresAt}) : result('registered');
           if (previous) return previous.state === 'active' && previous.expiresAt > now &&
