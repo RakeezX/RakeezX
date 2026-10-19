@@ -1,5 +1,5 @@
 /* AI: compact student presentation; shared RAKEEZ identity/tokens, no teacher navigation. */
-.n88-unified{font-family:var(--font,system-ui,sans-serif);background:var(--bg,#f4f7f5);color:var(--text,#15253d);line-height:1.8;min-height:100dvh;padding:24px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.n88-unified{color-scheme:light;--bg:#f4f7f5;--bg-elev:#fff;--text:#15253d;--text-2:#52645b;--border:#d4dce5;--border-strong:#758596;--action-primary:#165c50;--action-primary-ink:#fff;--brand-text:#165c50;font-family:var(--font,system-ui,sans-serif);background:var(--bg,#f4f7f5);color:var(--text,#15253d);line-height:1.8;min-height:100dvh;padding:24px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .n88-unified,.n88-unified *{box-sizing:border-box}
 .n88-unified header,.n88-unified main{max-width:1040px;margin:auto;min-width:0}
 .n88-unified header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--border,#d4dce5)}
@@ -47,3 +47,13 @@
 
 /* AI: escaped multiline task guidance. */
 .n88-guidance-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Standalone student scope stays light without changing teacher theme/preferences. */
+html[data-n88-student-document]{color-scheme:light;background:#f4f7f5}
+.n88-unified .brand-lockup .brand-lockup__image--light{display:block}
+.n88-unified .brand-lockup .brand-lockup__image--dark{display:none}
+.n88-unified-entry form{display:grid;gap:8px}
+.n88-unified-entry button[type=submit]{margin-block-start:12px}
+.n88-unified-entry #n88-message{margin:0}
+.n88-unified-entry #n88-message:empty{display:none}
+.n88-unified .n88-unified-resume{margin-block-start:12px;font-size:13px;width:100%}

@@ -1,0 +1,17 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-availability-fast-light-entry-20261019",
+  "runId": "fa7a7f6d-ad79-43d1-8bc0-e18312534dc2",
+  "status": "PASS",
+  "checks": [
+    "exact Worker-embedded actual document/JS/CSS match candidate hashes and retain private headers",
+    "unchanged backend/Supabase/SW/transport/custodian/unified session client",
+    "no new teacher startup import",
+    "current source pins coherent; historical hosted proof not relabeled",
+    "private asset publication and actual live account verification explicitly pending controller"
+  ],
+  "providerWrites": 0,
+  "fullBuildRun": false,
+  "renderedUiEvidence": "tests/n88-review-1400.previous-pass.json",
+  "reuseProof": "tests/n88-review-1400-reuse.json"
+}

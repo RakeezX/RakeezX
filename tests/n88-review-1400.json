@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n88-availability-fast-light-entry-20261019",
+  "runId": "fa7a7f6d-ad79-43d1-8bc0-e18312534dc2",
+  "status": "FAIL",
+  "baseline": {},
+  "checks": [],
+  "hostedAccountProof": false,
+  "cleanup": {
+    "ownedBrowserAndHttpClosed": true,
+    "lease": "parent-owned browser retained"
+  },
+  "failure": {
+    "name": "Error",
+    "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name browser -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-availability-fast-light-entry-20261019.json -WaitSeconds 0 -OwnerToken fa7a7f6d-ad79-43d"
+  }
+}

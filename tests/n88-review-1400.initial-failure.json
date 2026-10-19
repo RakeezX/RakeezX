@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n88-availability-fast-light-entry-20261019",
+  "runId": "fa7a7f6d-ad79-43d1-8bc0-e18312534dc2",
+  "status": "FAIL",
+  "baseline": {
+    "teacherFalseUnavailableBeforeResponse": true,
+    "studentInitialBlockingRead": true
+  },
+  "checks": [],
+  "hostedAccountProof": false,
+  "cleanup": {
+    "ownedBrowserAndHttpClosed": true,
+    "lease": "parent-owned browser retained"
+  },
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-entry-state=lease]') to be visible\u001b[22m\n"
+  }
+}
