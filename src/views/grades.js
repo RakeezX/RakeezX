@@ -214,9 +214,7 @@ const gradesView = {
         <div class="grades-01c__filters">
           <label class="grades-01c__sort">
           <select class="select" data-change="sort" aria-label="ترتيب الطلاب">
-            <option value="default" ${sortKey === 'default' ? 'selected' : ''}>الترتيب الافتراضي</option>
-            <option value="name" ${sortKey === 'name' ? 'selected' : ''}>أبجديًا (اسم الطالب)</option>
-            <option value="roll" ${sortKey === 'roll' ? 'selected' : ''}>حسب رقم الكشف</option>
+            <option value="default" ${['default', 'name', 'roll'].includes(sortKey) ? 'selected' : ''}>أبجديًا حسب رقم الكشف (الافتراضي)</option>
             <option value="score_desc" ${sortKey === 'score_desc' ? 'selected' : ''}>الأعلى درجة</option>
             <option value="score_asc" ${sortKey === 'score_asc' ? 'selected' : ''}>الأقل درجة</option>
           </select>
@@ -250,7 +248,8 @@ const gradesView = {
     },
 
     sort(el) {
-      sortKey = el.value;
+      // AI N119: keep legacy values compatible with the single alphabetic order.
+      sortKey = ['name', 'roll'].includes(el.value) ? 'default' : el.value;
       repaint();
     },
 
