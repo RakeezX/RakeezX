@@ -114,6 +114,17 @@ export default {
   back: (p) => `#/teaching/${p.id}`,
   wide: true,
 
+  // AI N120: retain the sheet across whole-view repaints (filters and quick scores).
+  beforeRender() {
+    if (!document.getElementById('report-filter-style')) {
+      const style = document.createElement('link');
+      style.id = 'report-filter-style';
+      style.rel = 'stylesheet';
+      style.href = new URL('../styles/filters.css', import.meta.url).href;
+      document.head.append(style);
+    }
+  },
+
   onMount() {
     tab = 'grades';
     sortKey = 'default';
@@ -152,7 +163,6 @@ export default {
     const reportContent = html`${header}${reportWithClosing(reportBody, { profile: identity(cls).profile })}`;
 
     return html`
-      <link rel="stylesheet" href="${new URL('../styles/filters.css', import.meta.url).href}">
       <article class="print-report print-report--${tab} ${widePrint ? 'print-report--wide' : ''} report-workspace" dir="rtl">
         ${reportPageSetup({ wide: widePrint })}
         <header class="report-workspace__head noprint">

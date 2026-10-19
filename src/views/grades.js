@@ -53,6 +53,17 @@ const gradesView = {
   back: (p) => `#/teaching/${p.id}`,
   wide: true,
 
+  // AI N120: retain the sheet across whole-view repaints (filters and quick scores).
+  beforeRender() {
+    if (!document.getElementById('report-filter-style')) {
+      const style = document.createElement('link');
+      style.id = 'report-filter-style';
+      style.rel = 'stylesheet';
+      style.href = new URL('../styles/filters.css', import.meta.url).href;
+      document.head.append(style);
+    }
+  },
+
   onMount() {
     if (!document.getElementById('n94-grades-style')) {
       const style = document.createElement('link');
@@ -154,7 +165,6 @@ const gradesView = {
     }
 
     return html`
-      <link rel="stylesheet" href="${new URL('../styles/filters.css', import.meta.url).href}">
       <style>
 /* N84 isolated Work UI. N82 selector remains frozen. */
 .n84-inline { display:inline-flex; align-items:center; gap:2px; vertical-align:middle; }

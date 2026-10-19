@@ -1,4 +1,9 @@
 /* AI-authored N120: shared, view-scoped layout; filter handlers stay unchanged. */
+/* Keep the available width constant as filtered results gain/lose a scrollbar. */
+:root:has(.report-filter-bar) { scrollbar-gutter: stable; }
+@supports not (scrollbar-gutter: stable) {
+  :root:has(.report-filter-bar) { overflow-y: scroll; }
+}
 .report-filter-bar.report-filter-bar {
   display: flex;
   flex-direction: row;
@@ -40,7 +45,13 @@
   align-self: end;
 }
 .report-filter-bar .segmented__btn { min-block-size: 44px; }
-.report-filter-bar .btn { white-space: normal; }
+.report-filter-bar .btn { white-space: nowrap; }
+/* Action text/state must not change the wrapping threshold of sibling fields. */
+.report-filter-bar.report-filter-bar > :is(.btn, .segmented) {
+  flex: 0 0 148px;
+  max-inline-size: 100%;
+}
+.report-filter-bar .field__label { white-space: nowrap; }
 .report-filter-bar.report-filter-bar > .grades-01c__search {
   flex: 1 1 220px;
   min-inline-size: 0;

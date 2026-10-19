@@ -1,4 +1,12 @@
 /* Compact N94 cells retain the established state palette and focus treatment. */
+/* AI N120: automatic score digits cannot move the adjacent +/- controls. */
+.graderow__auto:has(.n84-inline) > .badge {
+  min-inline-size: 8ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.graderow__auto .n84-inline { flex: none; }
 .target-review > summary { cursor: pointer; font-weight: 700; }
 .target-review > summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
 .target-review__subitem { display: block; margin-inline-start: 12px; color: var(--text-2); }
