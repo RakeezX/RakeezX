@@ -1,48 +1,49 @@
 {
   "aiAuthored": true,
   "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
-  "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+  "runId": "b7a2a2e4-c4bc-4cce-ac9d-e02740bc494f",
   "baseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
-  "savedCandidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9",
-  "recordedAt": "2026-10-19T06:38:49.886Z",
+  "savedCandidateSha": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add",
+  "recordedAt": "2026-10-19T06:59:54.099Z",
   "state": "BLOCKED",
   "checks": [
     {
       "name": "n44_actual_cloudflare_proper_post_before_and_after",
       "status": "FAIL",
-      "evidence": "Corrected-route before503 reused at 2026-10-19T06:01:21.375Z; sole afterPOST returned503 at 2026-10-19T06:36:03.373Z, expected401. Private error-only response retained. No retry. Original harness bearer/body failed complete application input shape; cause of503 remains unproved."
+      "evidence": "Original before503 retained; new source-native shape-correct diagnostic POST returned503 at 2026-10-19T06:51:46.679Z with phase identity, expected typed400. Old401 expectation superseded explicitly by card; no old failure relabeled."
     },
     {
       "name": "n44_manual_redirect_and_explicit_redirect_rejection",
       "status": "PASS",
-      "evidence": "Six unchanged source/bundle checks reused from 2026-10-19T06:01:59.476Z; exact deployed bundle matches cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7. No suite/build replay."
+      "evidence": "Existing six tests and exact Cloudflare bundle cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7 reused unchanged; no ingress upload or suite replay."
     },
     {
       "name": "n44_native_exact_ingress_source_and_binding_preservation",
       "status": "PASS",
-      "evidence": "One official keep_bindings upload; byte-exact native source, five binding metadata entries and all runtime/privacy fields match; secret values stayed in provider custody. Deployment 9c299159-27e3-462d-834b-953da989a106 / version f13f8bdb-bf77-4cc7-a40f-159fe543ee63 at100%; failclosed route unchanged."
+      "evidence": "Prior byte-exact native ingress/version/privacy/binding proof retained; ingress and scheduler bytes unchanged. No Cloudflare action this run."
     },
     {
       "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
       "status": "PASS",
-      "evidence": "Original TLS/identity at 2026-10-19T04:07:25.540Z and service source 236f68e0131ca4d2b27fc3014cb33421f90b40c1 reused with timestamps. Edge/scheduler hashes unchanged; no Supabase/Auth/data/secret/device/send/cron/frontend mutation. Scheduler evidence explicitly reused."
-    }
-  ],
-  "blocker": "After the exact authorized ingress upload, the single corrected-path POST returned503 instead of required401. The source/config/bindings readback passes. Full forwarding/unauthorized acceptance remains failed;503 cause is unproved. Consumed after request used an inherited incomplete synthetic input shape. No automatic request retry, credential/service diagnosis or Supabase mutation is authorized by this ingress-only phase.",
-  "archived": [
-    {
-      "source": "tests/n44-finish-activation-final.json",
-      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-65b5a648.json",
-      "sha256": "c0ffbef9458bbbcfcc6a670a10abda2beef8e3b226167479723eb4b659e2ce41",
-      "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+      "evidence": "Transport/identity/readiness/private42-routine/SQL/Auth verifier sources match prior candidate hashes; original TLS proof retains 2026-10-19T04:07:25.540Z. No security assertion, secret/config, SQL/role/Auth/RLS/data/device/send/cron/frontend change. Current identity guard does not complete, so no fresh live fullTLS/readiness claim."
     },
     {
-      "source": "tests/n44-finish-transport.result.json",
-      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-65b5a648.json",
-      "sha256": "9920a7042926dba1716553fa6d1201cf971815add6f3675116f845d0ec855169",
-      "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+      "name": "n44_service_request_runtime_phase_diagnosis_and_fix",
+      "status": "FAIL",
+      "evidence": "Bounded enum diagnostic version29 actually observed identity after pool.connect returned. Query failure versus a failing identity/TLS boolean is not distinguished; no guessed timeout/constant/security change. Current version30 only corrects sanitized definitive-abort retry metadata; identity defect not fixed, final normal proof NOT_RUN."
+    },
+    {
+      "name": "n44_actual_typed_rejected_session_contract400",
+      "status": "FAIL",
+      "evidence": "Actual shape-correct nonJWT request returned503/identity, not400/rejected. Local actual ingress/WebRequest/backend/official AuthClient injected-port negative path passed400 with two durable commits and no owner/Auth lookup; this is not hosted readiness."
+    },
+    {
+      "name": "n44_existing_edge_native_source_and_unchanged_private_guards",
+      "status": "PASS",
+      "evidence": "Existing function 91b66efd-70c8-4d7d-bb50-e19f9bf4dced verify_jwt=false preserved; native version30 exact source f96d57935bdb2fe369a8772046d966985dfdd9d2bd28d71af5b61eb65b5f291a and import map matched. Four focused redaction/rollback/typed-contract/retry-ACK cases and actual15s deadline PASS; strict transport/identity/private source conditions unchanged. No private error/property values or logs exposed."
     }
   ],
+  "blocker": "Actual diagnostic POST503 reports static phase identity in existing Edge version29. Connection acquisition returned, but identity query/guard failed before SET ROLE/private-session/42-routine source checks. Current version30 preserves this unchanged identity path and fixes only sanitizer retry metadata. Query failure versus login/role/upstreamSSL/clientTLS predicates remains unknown. No cause/fix inferred; one diagnostic request consumed, final typed400 proof unrun.",
   "transportCompatibility": {
     "version": 1,
     "platform": "cloudflare-workers",
@@ -53,33 +54,93 @@
     "afterHttpStatus": 503,
     "probeMethod": "POST",
     "probePath": "/api/n44/context/read",
-    "upstreamSourceUnchanged": true,
+    "upstreamSourceUnchanged": false,
     "originalCustodyUntouched": true,
     "bindingsPreserved": true,
     "nativeSourceExact": true,
     "correctedIngressUploaded": true,
     "beforeRecordedAt": "2026-10-19T06:01:21.375Z",
-    "afterRecordedAt": "2026-10-19T06:36:03.373Z",
-    "unauthorizedAcceptancePassed": false
+    "afterRecordedAt": "2026-10-19T06:51:46.679Z",
+    "unauthorizedAcceptancePassed": false,
+    "expectedAfterHttpStatus": 400,
+    "typedRejectedSession": false,
+    "completeSyntheticShapeValidatedOffline": true,
+    "runtimeGuardExecuted": false,
+    "observedRuntimePhase": "identity",
+    "normalFinalProof": "NOT_RUN"
   },
-  "probeInputConformance": {
-    "consumedRequestConformsToFullServiceInput": false,
-    "bearerBelowServiceMinimum": true,
-    "contextBodyMissingRequiredKeys": true,
-    "actual503CauseProved": false,
-    "correctedHarnessPreparedOffline": true,
-    "correctedHarnessSent": false,
-    "authorizedAfterRequestConsumed": true,
-    "automaticRetryAllowed": false
+  "currentRequestRuntime": {
+    "version": 1,
+    "phase": "identity",
+    "diagnosisObserved": true,
+    "configurationCompleted": true,
+    "connectionAcquired": true,
+    "identityGuardCompleted": false,
+    "identityBooleanValues": null,
+    "rolePrivateSourceReached": false,
+    "fixApplied": false,
+    "sanitizerRetryMetadataCorrected": true,
+    "diagnosticRequestConsumed": true,
+    "finalNormalProof": "NOT_RUN",
+    "diagnosticSourceSha256": "adcb3e0368c3199b9b0c5748671b892da27863be6c7a9c1eef240de25cf3b1e0",
+    "observedProviderVersion": 29,
+    "currentSourceSha256": "f96d57935bdb2fe369a8772046d966985dfdd9d2bd28d71af5b61eb65b5f291a",
+    "providerVersion": 30,
+    "probe": "tests/n44-finish-runtime.diagnostic.json",
+    "local": "tests/n44-finish-runtime.local.json",
+    "deadline": "tests/n44-finish-runtime.deadline.json",
+    "privateBindingsChanged": false,
+    "nonsecretConfigurationChanged": false,
+    "guardPathsUnchanged": [
+      "drafts/n44-push/database-transport.mjs",
+      "drafts/n44-push/readiness-entry.mjs",
+      "drafts/n44-push/backend.mjs",
+      "drafts/n44-push/auth-verifier.mjs",
+      "drafts/n44-push/activation/private-error-boundary.mjs",
+      "drafts/n44-push/activation/error-boundary-contract.json",
+      "drafts/n44-push/activation/error-boundary-identities.json"
+    ]
   },
-  "providerMutationPerformed": true,
-  "onlyMutatedWorker": "n44-notifications-ingress",
+  "archived": [
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-activation-final.json",
+      "sha256": "769aefaebe779f7c4b629b41400e6e6ecf530475a9dc910f770f721b0fce71a9",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/n44-finish-transport.result.json",
+      "sha256": "fbbeb7af2491d4291d7ec2f57b28194444d7f6304c6430ffc0c74276dd854e7f",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/manifest.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/manifest.json",
+      "sha256": "4943197a138166e40d948194629625e4eda31d80ddd9433e24eced95c550706f",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-final-metadata.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-final-metadata.json",
+      "sha256": "28c78fa091aa44d4024d320c466076eeab15089902cfc9c4d0000cad55611f0c",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    },
+    {
+      "source": "drafts/n44-push/activation/edge-source-readback.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/runtime-before-c17/edge-source-readback.json",
+      "sha256": "e7a72593caab48a04c63bf05816f54761e08700ab4bb4f4de8fd2ed2f36e0557",
+      "sourceCommit": "c17db3c1f04b8bfe154510a60e1c8dc7bd451add"
+    }
+  ],
+  "onlyMutatedService": "supabase/n44-notifications existing wrapper",
+  "providerWrites": 2,
+  "publicDiagnosticRequests": 1,
+  "publicFinalRequests": 0,
+  "cloudflareWrites": 0,
+  "secretOrConfigurationWrites": 0,
+  "sqlOrAuthOperations": 0,
+  "realSends": 0,
   "liveMutationLeaseReleased": true,
-  "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
-  "schedulerProviderReadOrWrite": false,
-  "localEvidenceReused": {
-    "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
-    "recordedAt": "2026-10-19T06:01:59.476Z"
-  },
   "originalFailuresPreserved": true
 }

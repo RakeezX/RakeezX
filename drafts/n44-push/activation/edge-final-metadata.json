@@ -2,9 +2,15 @@
   "projectId": "xlrubcwjqktzzunrvuns",
   "name": "n44-notifications",
   "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
-  "version": 4,
+  "version": 30,
   "status": "ACTIVE",
   "verifyJwt": false,
-  "providerBundleSha256": "8c46bff41a14277bd72f3905a51dc034abf902a1b5da189aa717a752e13d42f7",
-  "recordedAt": "2026-10-19T04:14:18.138Z"
+  "providerBundleSha256": "e8c42a95710dc75a712f61c2e2b914fc4b95c27dc17b2c6fb66e8dc028498789",
+  "sourceSha256": "f96d57935bdb2fe369a8772046d966985dfdd9d2bd28d71af5b61eb65b5f291a",
+  "recordedAt": "2026-10-19T06:59:54.099Z",
+  "providerUpdatedAt": "2026-10-19T06:58:42.319Z",
+  "nativeReadbackAt": null,
+  "nativeReadbackSource": "drafts/n44-push/activation/runtime-final-native.json",
+  "originalActivationEvidenceReused": true,
+  "requestRuntimeAcceptance": "BLOCKED_IDENTITY"
 }

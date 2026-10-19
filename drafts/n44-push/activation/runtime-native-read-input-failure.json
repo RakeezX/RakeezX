@@ -1,0 +1,1 @@
+{"operation":"get_edge_function readback","error_code":"INVALID_ARGUMENT","reason":"Mistyped project ref had19 characters; tool input validation requires20. No service read occurred. Corrected to the activated exact project, without permission or policy changes."}

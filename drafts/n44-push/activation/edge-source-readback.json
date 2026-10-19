@@ -2,12 +2,17 @@
   "projectId": "xlrubcwjqktzzunrvuns",
   "function": "n44-notifications",
   "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
-  "sourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
-  "downloadedSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "sourceProvenance": "Original typed SQL/session-policy service metadata pin; distinct from changed diagnostic Edge bundle hash",
+  "sourceSha256": "f96d57935bdb2fe369a8772046d966985dfdd9d2bd28d71af5b61eb65b5f291a",
+  "downloadedSha256": "f96d57935bdb2fe369a8772046d966985dfdd9d2bd28d71af5b61eb65b5f291a",
   "exactBytes": true,
   "importMapExact": true,
-  "recordedAt": "2026-10-19T04:05:25.202Z",
-  "finalProviderVersion": 4,
+  "recordedAt": "2026-10-19T06:59:54.099Z",
+  "finalProviderVersion": 30,
   "finalSourceBytesUnchanged": true,
-  "finalReadbackAt": "2026-10-19T04:15:23.880Z"
+  "finalSourceBytesScope": "Candidate diagnostic bytes equal native readback; original activation bundle changed",
+  "originalSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "originalActivationProviderVersion": 4,
+  "priorNativeProviderVersion": 28,
+  "upstreamSourceUnchanged": false
 }

@@ -1,0 +1,85 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+  "baseSha": "73c681da8633c2cc1ff1e269349322a7cb0e5e05",
+  "savedCandidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9",
+  "recordedAt": "2026-10-19T06:38:49.886Z",
+  "state": "BLOCKED",
+  "checks": [
+    {
+      "name": "n44_actual_cloudflare_proper_post_before_and_after",
+      "status": "FAIL",
+      "evidence": "Corrected-route before503 reused at 2026-10-19T06:01:21.375Z; sole afterPOST returned503 at 2026-10-19T06:36:03.373Z, expected401. Private error-only response retained. No retry. Original harness bearer/body failed complete application input shape; cause of503 remains unproved."
+    },
+    {
+      "name": "n44_manual_redirect_and_explicit_redirect_rejection",
+      "status": "PASS",
+      "evidence": "Six unchanged source/bundle checks reused from 2026-10-19T06:01:59.476Z; exact deployed bundle matches cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7. No suite/build replay."
+    },
+    {
+      "name": "n44_native_exact_ingress_source_and_binding_preservation",
+      "status": "PASS",
+      "evidence": "One official keep_bindings upload; byte-exact native source, five binding metadata entries and all runtime/privacy fields match; secret values stayed in provider custody. Deployment 9c299159-27e3-462d-834b-953da989a106 / version f13f8bdb-bf77-4cc7-a40f-159fe543ee63 at100%; failclosed route unchanged."
+    },
+    {
+      "name": "n44_unchanged_restricted_tls_and_nonsending_scope",
+      "status": "PASS",
+      "evidence": "Original TLS/identity at 2026-10-19T04:07:25.540Z and service source 236f68e0131ca4d2b27fc3014cb33421f90b40c1 reused with timestamps. Edge/scheduler hashes unchanged; no Supabase/Auth/data/secret/device/send/cron/frontend mutation. Scheduler evidence explicitly reused."
+    }
+  ],
+  "blocker": "After the exact authorized ingress upload, the single corrected-path POST returned503 instead of required401. The source/config/bindings readback passes. Full forwarding/unauthorized acceptance remains failed;503 cause is unproved. Consumed after request used an inherited incomplete synthetic input shape. No automatic request retry, credential/service diagnosis or Supabase mutation is authorized by this ingress-only phase.",
+  "archived": [
+    {
+      "source": "tests/n44-finish-activation-final.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-activation-final.blocked-65b5a648.json",
+      "sha256": "c0ffbef9458bbbcfcc6a670a10abda2beef8e3b226167479723eb4b659e2ce41",
+      "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+    },
+    {
+      "source": "tests/n44-finish-transport.result.json",
+      "archive": "drafts/n44-push/activation/transport-baseline/n44-finish-transport.result.blocked-65b5a648.json",
+      "sha256": "9920a7042926dba1716553fa6d1201cf971815add6f3675116f845d0ec855169",
+      "candidateSha": "9650e9bfcdfb956bc91a6d455a544628e17673f9"
+    }
+  ],
+  "transportCompatibility": {
+    "version": 1,
+    "platform": "cloudflare-workers",
+    "redirectMode": "manual",
+    "rejectsRedirects": true,
+    "localForwardAttempted": true,
+    "beforeHttpStatus": 503,
+    "afterHttpStatus": 503,
+    "probeMethod": "POST",
+    "probePath": "/api/n44/context/read",
+    "upstreamSourceUnchanged": true,
+    "originalCustodyUntouched": true,
+    "bindingsPreserved": true,
+    "nativeSourceExact": true,
+    "correctedIngressUploaded": true,
+    "beforeRecordedAt": "2026-10-19T06:01:21.375Z",
+    "afterRecordedAt": "2026-10-19T06:36:03.373Z",
+    "unauthorizedAcceptancePassed": false
+  },
+  "probeInputConformance": {
+    "consumedRequestConformsToFullServiceInput": false,
+    "bearerBelowServiceMinimum": true,
+    "contextBodyMissingRequiredKeys": true,
+    "actual503CauseProved": false,
+    "correctedHarnessPreparedOffline": true,
+    "correctedHarnessSent": false,
+    "authorizedAfterRequestConsumed": true,
+    "automaticRetryAllowed": false
+  },
+  "providerMutationPerformed": true,
+  "onlyMutatedWorker": "n44-notifications-ingress",
+  "liveMutationLeaseReleased": true,
+  "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+  "schedulerProviderReadOrWrite": false,
+  "localEvidenceReused": {
+    "runId": "9485ed5a-6fed-4e65-a831-343a6bd11186",
+    "recordedAt": "2026-10-19T06:01:59.476Z"
+  },
+  "originalFailuresPreserved": true
+}

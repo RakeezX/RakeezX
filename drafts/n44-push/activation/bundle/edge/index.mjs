@@ -3778,6 +3778,26 @@ var PRIVATE_WEB_HEADERS = Object.freeze({
 });
 var privateResponse = (status = 503) => new Response('{"error":"unavailable"}', { status, headers: PRIVATE_WEB_HEADERS });
 
+// drafts/n44-push/runtime-failure.mjs
+var phases = /* @__PURE__ */ new Set(["configuration", "configuration_origin", "configuration_revision", "configuration_policy", "configuration_transport", "configuration_crypto", "configuration_provider", "connect", "identity", "set_role", "private_session", "source", "ingress", "query", "deadline"]);
+var tags = /* @__PURE__ */ new WeakMap();
+function runtimeFailure(phase, cause) {
+  const safe = tags.get(cause) ?? (phases.has(phase) ? phase : "configuration");
+  const error = new Error("n44_request_unavailable");
+  const own = (name) => cause && (typeof cause === "object" || typeof cause === "function") ? Object.getOwnPropertyDescriptor(cause, name)?.value : void 0;
+  const code = own("code");
+  if (["40001", "40P01"].includes(code) && own("severity") === "ERROR") {
+    error.code = code;
+    error.severity = "ERROR";
+  }
+  tags.set(error, safe);
+  return error;
+}
+function requestFailure(error, fallback = "configuration") {
+  const phase = tags.get(error) ?? (phases.has(fallback) ? fallback : "configuration");
+  return Response.json({ status: 503, body: { error: "unavailable", phase } }, { headers: PRIVATE_WEB_HEADERS });
+}
+
 // drafts/n44-push/web-entry.mjs
 function createWebEntry(options) {
   const backend = createBackend(options), now = options.now ?? Date.now;
@@ -3786,6 +3806,7 @@ function createWebEntry(options) {
     if (running >= 4) return privateResponse();
     running++;
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 15e3);
+    let authenticated = false;
     const work = async () => {
       try {
         const u = new URL(request2.url), h = request2.headers, schedule = u.pathname === "/functions/v1/n44-notifications/schedule";
@@ -3807,20 +3828,21 @@ function createWebEntry(options) {
           body = parseBody(new TextDecoder("utf-8", { fatal: true }).decode(raw));
         }
         if (!timingSafeEqual3(Buffer6.from(expected, "hex"), Buffer6.from(sig, "hex"))) return privateResponse(401);
+        authenticated = true;
         if (!await backend.ingress({ ...e, kind: schedule ? "scheduler" : "teacher" }, abort.signal)) return privateResponse(429);
         const result2 = schedule ? await backend.schedule(envelope, abort.signal) : await backend.teacher(path, authorization, body, abort.signal);
         if (abort.signal.aborted) return privateResponse();
         const status = result2.status === "unavailable" ? 503 : result2.status === "limited" ? 429 : ["rejected", "stale"].includes(result2.status) ? 400 : 200;
         return schedule ? Response.json(result2, { status, headers: PRIVATE_WEB_HEADERS }) : Response.json({ status, body: result2 }, { headers: PRIVATE_WEB_HEADERS });
-      } catch {
-        return privateResponse();
+      } catch (e) {
+        return authenticated ? requestFailure(e, "ingress") : privateResponse();
       }
     };
     try {
       const pending = work().finally(() => {
         running--;
       });
-      return await Promise.race([pending, new Promise((resolve) => abort.signal.addEventListener("abort", () => resolve(privateResponse()), { once: true }))]);
+      return await Promise.race([pending, new Promise((resolve) => abort.signal.addEventListener("abort", () => resolve(authenticated ? requestFailure(null, "deadline") : privateResponse()), { once: true }))]);
     } finally {
       clearTimeout(timer);
       abort.abort();
@@ -3852,7 +3874,8 @@ async function assertRestrictedIdentity(client) {
 }
 
 // drafts/n44-push/existing-host.mjs
-async function assertPrivateDatabaseSession(client) {
+async function assertPrivateDatabaseSession(client, onSource = () => {
+}) {
   const result2 = await client.query(`select current_user as role,
     current_setting('log_error_verbosity') as error_verbosity,
     current_setting('log_parameter_max_length_on_error') as error_parameters,
@@ -3867,78 +3890,102 @@ async function assertPrivateDatabaseSession(client) {
   const explainSafe = r && (r.explain_duration == null || r.explain_duration === "-1" || /^\d+$/.test(r.explain_duration) && Number(r.explain_duration) > 6e3 && r.explain_nested === "off");
   if (result2.rows?.length !== 1 || !r || r.role !== "n44_backend" || !["terse", "default"].includes(r.error_verbosity) || r.error_parameters !== "0" || !["none", "ddl"].includes(r.statements) || r.duration !== "-1" || r.duration_sample !== "-1" || Number(r.transaction_sample) !== 0 || r.transaction_sample == null || ![null, "none"].includes(r.audit) || !explainSafe)
     throw Error("n44_database_unavailable");
+  onSource();
   await assertVerifiedBoundary(client);
 }
 function createExistingHost(readEnv) {
-  if (readEnv("N44_ENABLED") !== "true") return Object.freeze({ handle: async () => privateResponse(), close: async () => {
-  } });
-  const required = (n) => {
-    const v = readEnv(n);
-    if (typeof v !== "string" || !v) throw Error("n44_configuration");
-    return v;
-  };
-  const authUrl = required("N44_AUTH_URL"), origin = required("N44_PUBLIC_ORIGIN");
-  for (const v of [authUrl, origin]) {
-    const u = new URL(v);
-    if (u.origin !== v || u.protocol !== "https:") throw Error("n44_origin");
-  }
-  if (required("N44_SERVICE_REVISION") !== "n44-browser-service-v2") throw Error("n44_readback_missing");
-  const sessionPolicy = JSON.parse(required("N44_SESSION_POLICY_JSON")), serviceSourceSha = required("N44_SERVICE_SOURCE_SHA");
-  if (!supportedSessionPolicy(sessionPolicy, Date.now(), serviceSourceSha)) throw Error("n44_session_policy_readback_missing");
-  const transport = databaseConfig(readEnv);
-  const key = (n) => {
-    const v = required(n);
-    if (!/^[a-f0-9]{64}$/.test(v)) throw Error("n44_key_configuration");
-    return Buffer8.from(v, "hex");
-  };
-  const ingressKey = key("N44_INGRESS_KEY"), schedulerKey = key("N44_SCHEDULER_KEY"), rateKey = key("N44_RATE_KEY");
-  const raw = JSON.parse(required("N44_CRYPTO_JSON"));
-  const ring = (x) => {
-    if (!Array.isArray(x) || x.length < 1 || x.length > 8) throw Error("n44_key_configuration");
-    return new Map(x.map(([name, value]) => {
-      if (!/^[a-f0-9]{64}$/.test(value)) throw Error("n44_key_configuration");
-      return [name, Buffer8.from(value, "hex")];
-    }));
-  };
-  const material = { ...raw, sealingKeys: ring(raw.sealingKeys), endpointHmacKeys: ring(raw.endpointHmacKeys), bindingHmacKeys: ring(raw.bindingHmacKeys), vapidKeys: new Map(raw.vapidKeys) };
-  const keys = [ingressKey, schedulerKey, rateKey, ...material.sealingKeys.values(), ...material.endpointHmacKeys.values(), ...material.bindingHmacKeys.values()];
-  if (new Set(keys.map((v) => v.toString("hex"))).size !== keys.length) throw Error("n44_separate_keys_required");
-  for (const v of material.vapidKeys.values()) {
-    if (!p2562.utils.isValidPrivateKey(Buffer8.from(v.privateKey ?? "", "base64url"))) throw Error("n44_private_key_configuration");
-  }
-  const providerOrigins = JSON.parse(required("N44_PROVIDER_ORIGINS_JSON"));
-  const crypto2 = createPrivatePushPorts({ ...material, providerOrigins, enabled: true });
-  const pool = new pg.Pool(transport);
-  pool.on("error", () => {
-  });
-  let waiting = 0;
-  const acquire = async () => {
-    if (waiting >= 4) throw Error("n44_pool_capacity");
-    waiting++;
-    let c;
-    try {
-      c = await pool.connect();
-      await assertRestrictedIdentity(c);
-      await c.query("set role n44_backend");
-      await assertPrivateDatabaseSession(c);
-      return { query: (sql, values) => privateQuery(c, sql, values), release: (e) => c.release(e) };
-    } catch {
-      c?.release(Error("n44_database_unavailable"));
-      throw Error("n44_database_unavailable");
-    } finally {
-      waiting--;
-    }
-  };
+  let configurationPhase = "configuration";
   try {
-    const handle = createWebEntry({ sessionPolicy, serviceSourceSha, acquire, authUrl, origin, apiKey: required("N44_AUTH_API_KEY"), providerOrigins, crypto: crypto2, ingressKey, schedulerKey, rateKey, deliveryEnabled: readEnv("N44_DELIVERY_ENABLED") === "true" });
-    return Object.freeze({ handle, async close() {
-      crypto2.close();
-      await pool.end();
+    if (readEnv("N44_ENABLED") !== "true") return Object.freeze({ handle: async () => privateResponse(), close: async () => {
     } });
-  } catch {
-    crypto2.close();
-    void pool.end();
-    throw Error("n44_configuration");
+    const required = (n) => {
+      const v = readEnv(n);
+      if (typeof v !== "string" || !v) throw Error("n44_configuration");
+      return v;
+    };
+    configurationPhase = "configuration_origin";
+    const authUrl = required("N44_AUTH_URL"), origin = required("N44_PUBLIC_ORIGIN");
+    for (const v of [authUrl, origin]) {
+      const u = new URL(v);
+      if (u.origin !== v || u.protocol !== "https:") throw Error("n44_origin");
+    }
+    configurationPhase = "configuration_revision";
+    if (required("N44_SERVICE_REVISION") !== "n44-browser-service-v2") throw Error("n44_readback_missing");
+    configurationPhase = "configuration_policy";
+    const sessionPolicy = JSON.parse(required("N44_SESSION_POLICY_JSON")), serviceSourceSha = required("N44_SERVICE_SOURCE_SHA");
+    if (!supportedSessionPolicy(sessionPolicy, Date.now(), serviceSourceSha)) throw Error("n44_session_policy_readback_missing");
+    configurationPhase = "configuration_transport";
+    const transport = databaseConfig(readEnv);
+    configurationPhase = "configuration_crypto";
+    const key = (n) => {
+      const v = required(n);
+      if (!/^[a-f0-9]{64}$/.test(v)) throw Error("n44_key_configuration");
+      return Buffer8.from(v, "hex");
+    };
+    const ingressKey = key("N44_INGRESS_KEY"), schedulerKey = key("N44_SCHEDULER_KEY"), rateKey = key("N44_RATE_KEY");
+    const raw = JSON.parse(required("N44_CRYPTO_JSON"));
+    const ring = (x) => {
+      if (!Array.isArray(x) || x.length < 1 || x.length > 8) throw Error("n44_key_configuration");
+      return new Map(x.map(([name, value]) => {
+        if (!/^[a-f0-9]{64}$/.test(value)) throw Error("n44_key_configuration");
+        return [name, Buffer8.from(value, "hex")];
+      }));
+    };
+    const material = { ...raw, sealingKeys: ring(raw.sealingKeys), endpointHmacKeys: ring(raw.endpointHmacKeys), bindingHmacKeys: ring(raw.bindingHmacKeys), vapidKeys: new Map(raw.vapidKeys) };
+    const keys = [ingressKey, schedulerKey, rateKey, ...material.sealingKeys.values(), ...material.endpointHmacKeys.values(), ...material.bindingHmacKeys.values()];
+    if (new Set(keys.map((v) => v.toString("hex"))).size !== keys.length) throw Error("n44_separate_keys_required");
+    for (const v of material.vapidKeys.values()) {
+      if (!p2562.utils.isValidPrivateKey(Buffer8.from(v.privateKey ?? "", "base64url"))) throw Error("n44_private_key_configuration");
+    }
+    configurationPhase = "configuration_provider";
+    const providerOrigins = JSON.parse(required("N44_PROVIDER_ORIGINS_JSON"));
+    const crypto2 = createPrivatePushPorts({ ...material, providerOrigins, enabled: true });
+    const pool = new pg.Pool(transport);
+    pool.on("error", () => {
+    });
+    let waiting = 0;
+    const acquire = async () => {
+      if (waiting >= 4) throw Error("n44_pool_capacity");
+      waiting++;
+      let c;
+      let phase = "connect";
+      try {
+        c = await pool.connect();
+        phase = "identity";
+        await assertRestrictedIdentity(c);
+        phase = "set_role";
+        await c.query("set role n44_backend");
+        phase = "private_session";
+        await assertPrivateDatabaseSession(c, () => {
+          phase = "source";
+        });
+        return { query: async (sql, values) => {
+          try {
+            return await privateQuery(c, sql, values);
+          } catch (e) {
+            throw runtimeFailure("query", e);
+          }
+        }, release: (e) => c.release(e) };
+      } catch (e) {
+        c?.release(Error("n44_database_unavailable"));
+        throw runtimeFailure(phase, e);
+      } finally {
+        waiting--;
+      }
+    };
+    try {
+      const handle = createWebEntry({ sessionPolicy, serviceSourceSha, acquire, authUrl, origin, apiKey: required("N44_AUTH_API_KEY"), providerOrigins, crypto: crypto2, ingressKey, schedulerKey, rateKey, deliveryEnabled: readEnv("N44_DELIVERY_ENABLED") === "true" });
+      return Object.freeze({ handle, async close() {
+        crypto2.close();
+        await pool.end();
+      } });
+    } catch (e) {
+      crypto2.close();
+      void pool.end();
+      throw runtimeFailure("configuration", e);
+    }
+  } catch (e) {
+    throw runtimeFailure(configurationPhase, e);
   }
 }
 
@@ -4019,8 +4066,8 @@ Deno.serve(async (request2) => {
   try {
     runtime ??= createExistingHost((name) => Deno.env.get(name));
     return await runtime.handle(request2);
-  } catch {
-    return privateResponse();
+  } catch (e) {
+    return requestFailure(e);
   }
 });
 addEventListener("beforeunload", () => {

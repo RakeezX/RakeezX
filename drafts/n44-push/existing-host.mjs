@@ -9,7 +9,8 @@ import {createPrivatePushPorts} from './private-runtime.mjs';
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
 import {databaseConfig,assertRestrictedIdentity} from './database-transport.mjs';
-export async function assertPrivateDatabaseSession(client) {
+import {runtimeFailure} from './runtime-failure.mjs';
+export async function assertPrivateDatabaseSession(client,onSource=()=>{}) {
   const result=await client.query(`select current_user as role,
     current_setting('log_error_verbosity') as error_verbosity,
     current_setting('log_parameter_max_length_on_error') as error_parameters,
@@ -32,17 +33,20 @@ export async function assertPrivateDatabaseSession(client) {
     throw Error('n44_database_unavailable');
   // Even terse cannot make an arbitrary private query safe. Verify the exact
   // typed routines, source identities, owner, invoker mode and narrow ACL first.
-  await assertVerifiedBoundary(client);
+  onSource();await assertVerifiedBoundary(client);
 }
 export function createExistingHost(readEnv) {
+ let configurationPhase='configuration';try{
  if(readEnv('N44_ENABLED')!=='true')return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});
  const required=n=>{const v=readEnv(n);if(typeof v!=='string'||!v)throw Error('n44_configuration');return v;};
- const authUrl=required('N44_AUTH_URL'),origin=required('N44_PUBLIC_ORIGIN');
+ configurationPhase='configuration_origin';const authUrl=required('N44_AUTH_URL'),origin=required('N44_PUBLIC_ORIGIN');
  for(const v of [authUrl,origin]){const u=new URL(v);if(u.origin!==v||u.protocol!=='https:')throw Error('n44_origin');}
- if(required('N44_SERVICE_REVISION')!=='n44-browser-service-v2')throw Error('n44_readback_missing');
+ configurationPhase='configuration_revision';if(required('N44_SERVICE_REVISION')!=='n44-browser-service-v2')throw Error('n44_readback_missing');
+ configurationPhase='configuration_policy';
  const sessionPolicy=JSON.parse(required('N44_SESSION_POLICY_JSON')),serviceSourceSha=required('N44_SERVICE_SOURCE_SHA');
  if(!supportedSessionPolicy(sessionPolicy,Date.now(),serviceSourceSha))throw Error('n44_session_policy_readback_missing');
- const transport=databaseConfig(readEnv);
+ configurationPhase='configuration_transport';const transport=databaseConfig(readEnv);
+ configurationPhase='configuration_crypto';
  const key=n=>{const v=required(n);if(!/^[a-f0-9]{64}$/.test(v))throw Error('n44_key_configuration');return Buffer.from(v,'hex');};
  const ingressKey=key('N44_INGRESS_KEY'),schedulerKey=key('N44_SCHEDULER_KEY'),rateKey=key('N44_RATE_KEY');
  const raw=JSON.parse(required('N44_CRYPTO_JSON'));
@@ -51,18 +55,19 @@ export function createExistingHost(readEnv) {
  const keys=[ingressKey,schedulerKey,rateKey,...material.sealingKeys.values(),...material.endpointHmacKeys.values(),...material.bindingHmacKeys.values()];
  if(new Set(keys.map(v=>v.toString('hex'))).size!==keys.length)throw Error('n44_separate_keys_required');
  for(const v of material.vapidKeys.values()){if(!p256.utils.isValidPrivateKey(Buffer.from(v.privateKey??'','base64url')))throw Error('n44_private_key_configuration');}
- const providerOrigins=JSON.parse(required('N44_PROVIDER_ORIGINS_JSON'));
+ configurationPhase='configuration_provider';const providerOrigins=JSON.parse(required('N44_PROVIDER_ORIGINS_JSON'));
  const crypto=createPrivatePushPorts({...material,providerOrigins,enabled:true});
  const pool=new pg.Pool(transport);
  pool.on('error',()=>{});let waiting=0;
  const acquire=async()=>{if(waiting>=4)throw Error('n44_pool_capacity');waiting++;let c;
-  try{c=await pool.connect();
-   await assertRestrictedIdentity(c);
-   await c.query('set role n44_backend');await assertPrivateDatabaseSession(c);
-   return {query:(sql,values)=>privateQuery(c,sql,values),release:e=>c.release(e)};}
-  catch{c?.release(Error('n44_database_unavailable'));throw Error('n44_database_unavailable');}finally{waiting--;}};
+  let phase='connect';try{c=await pool.connect();
+   phase='identity';await assertRestrictedIdentity(c);
+   phase='set_role';await c.query('set role n44_backend');phase='private_session';await assertPrivateDatabaseSession(c,()=>{phase='source';});
+   return {query:async(sql,values)=>{try{return await privateQuery(c,sql,values);}catch(e){throw runtimeFailure('query',e);}},release:e=>c.release(e)};}
+  catch(e){c?.release(Error('n44_database_unavailable'));throw runtimeFailure(phase,e);}finally{waiting--;}};
  try {
   const handle=createWebEntry({sessionPolicy,serviceSourceSha,acquire,authUrl,origin,apiKey:required('N44_AUTH_API_KEY'),providerOrigins,crypto,ingressKey,schedulerKey,rateKey,deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true'});
   return Object.freeze({handle,async close(){crypto.close();await pool.end();}});
- }catch{crypto.close();void pool.end();throw Error('n44_configuration');}
+ }catch(e){crypto.close();void pool.end();throw runtimeFailure('configuration',e);}
+ }catch(e){throw runtimeFailure(configurationPhase,e);}
 }

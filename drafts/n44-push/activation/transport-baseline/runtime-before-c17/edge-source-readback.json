@@ -1,0 +1,13 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "function": "n44-notifications",
+  "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+  "sourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "downloadedSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "exactBytes": true,
+  "importMapExact": true,
+  "recordedAt": "2026-10-19T04:05:25.202Z",
+  "finalProviderVersion": 4,
+  "finalSourceBytesUnchanged": true,
+  "finalReadbackAt": "2026-10-19T04:15:23.880Z"
+}

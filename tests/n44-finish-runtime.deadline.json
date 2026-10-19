@@ -1,0 +1,7 @@
+{
+  "runId": "b7a2a2e4-c4bc-4cce-ac9d-e02740bc494f",
+  "recordedAt": "2026-10-19T06:54:59.335Z",
+  "status": "PASS",
+  "elapsedMs": 15010,
+  "evidence": "Actual signed WebRequest hung acquisition is bounded by original15s deadline; sanitized503 wire status, private headers, no SQL/Auth/network."
+}
