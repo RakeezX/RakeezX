@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n118-general-route-review-20261019",
+      "productId": "N118",
+      "activationId": "po-20261012-continuous",
+      "priority": -1900,
+      "scopeKey": "n118-remaining-open-20261019",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract and exact dated Product row; only current origin/main affected source and precise missing acceptance evidence. Latest direct human asks two independent useful workers on remaining OPEN work, minimum necessary checks only. Existing controller and serial publisher exclusively own dispatch/queue/delivery. No extra agent/planner/reviewer, no queue/source/ledger edits. Preserve real PO acceptance and old proof: N123/N124 now CLOSED, N110/N121/N122 CLOSED, N44 explicitly temporarily paused and NOT resumed. No repeated tests of completed features, generic audit or filler. No real records/browser operations/messages/secrets/new hosted SQL/schema/Auth/RLS/roles; all prior tool denials binding and not assigned to another actor. Preserve owner/session/identity/grades/history/tombstones/true ACK and calendar-region hold. Routine narrow source delivery authorized; exact final task/run/base/candidate/check schema required. LOCAL_READY is not Production.\n\nUnfinished actual PO clarification: asks about Rakeez URLs generally, not only class IDs. Existing compact class-route delivery is complete and its proofs must NOT repeat. Perform bounded static review of current route definitions/builders to identify avoidable duplicate path segments, leaking composite class context in newly generated links or inconsistent query encoding in other actual app navigation. IDs, # routing and query params alone are NORMAL; do not promise shortest URLs or security from hiding them. Make only concrete small compatible fixes found, retain old aliases/deep links/back-forward/current term/exact session/owner checks, no router replacement or ID migration. If current routes are already appropriate, return concise source-grounded explanation and exact examples in evidence, NO_CHANGE honestly; do not manufacture code/testing to occupy capacity. Check only changed builder/resolver mappings; no whole-app crawl/live browser/old class route suite.",
+      "allowedPaths": [
+        "src/router.js",
+        "src/lib/teaching-routing.js",
+        "src/views/teaching-hub.js",
+        "src/views/teachings.js",
+        "tests/n118-open-finish/**",
+        "docs/automation-evidence/20261019/N118_GENERAL_ROUTE_REVIEW.md"
+      ],
+      "verificationPaths": [
+        "src/router.js"
+      ],
+      "requiredChecks": [
+        "n118_general_routes_review_precise_compatibility"
+      ],
+      "acceptance": [
+        "Complete this still-unresolved portion only, or retain a precise factual blocker; no duplicate execution of accepted work.",
+        "Preserve old links/owner/data/ACK and calendar hold; actual official delivery only via publisher, not a local PASS claim."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

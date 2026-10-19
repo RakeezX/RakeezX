@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n116-calendar-year-conflict-cause-20261019",
+      "productId": "N116",
+      "activationId": "po-20261012-continuous",
+      "priority": -1899,
+      "scopeKey": "n116-remaining-open-20261019",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract and exact dated Product row; only current origin/main affected source and precise missing acceptance evidence. Latest direct human asks two independent useful workers on remaining OPEN work, minimum necessary checks only. Existing controller and serial publisher exclusively own dispatch/queue/delivery. No extra agent/planner/reviewer, no queue/source/ledger edits. Preserve real PO acceptance and old proof: N123/N124 now CLOSED, N110/N121/N122 CLOSED, N44 explicitly temporarily paused and NOT resumed. No repeated tests of completed features, generic audit or filler. No real records/browser operations/messages/secrets/new hosted SQL/schema/Auth/RLS/roles; all prior tool denials binding and not assigned to another actor. Preserve owner/session/identity/grades/history/tombstones/true ACK and calendar-region hold. Routine narrow source delivery authorized; exact final task/run/base/candidate/check schema required. LOCAL_READY is not Production.\n\nUnfinished underlying calendar/Sync conflict is explicitly NOT fixed by already-delivered lazy session creation. DO NOT rerun/reimplement lazy generation or activate N117. Existing real incident14October: newly created account, Mecca→general calendar change produced ONE rejected academic-year mutation and63 blocked dependants. Existing year/calendar switching UI hold remains. Read only exact incident evidence docs/automation-evidence/20261014/CALENDAR_HOLD_AND_REPAIR_UI_1754.md plus current year/calendar mutation producer, codec and applicable existing schema contract. Establish actual source mismatch/dependency cause with one small fabricated year mutation fixture and one necessary owner/history/ACK guard; do not repeat whole Sync/performance/calendar matrix or inspect actual private outbox. Fix a proven narrow client producer/codec/dependency defect if any, retain original rejection history and no outbox reset/manual migration. If backend/schema/auth change is actually necessary, stop with exact source-bound cause and missing operation, no new or applied SQL/Auth/role/schema changes. Never unlock region/calendar switch without independent genuine acceptance; task aims root cause and safe source correction, not claiming old hosted incident repaired from synthetic proof. No N44 work/notifications.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/lib/sync-v2.js",
+        "src/lib/cloud.js",
+        "src/lib/calendar-presets.js",
+        "src/views/calendar.js",
+        "tests/n116-open-finish/**",
+        "docs/automation-evidence/20261019/N116_CALENDAR_YEAR_CONFLICT_CAUSE.md"
+      ],
+      "verificationPaths": [
+        "src/store.js"
+      ],
+      "requiredChecks": [
+        "n116_calendar_year_rejection_source_cause_hold_preserved"
+      ],
+      "acceptance": [
+        "Complete this still-unresolved portion only, or retain a precise factual blocker; no duplicate execution of accepted work.",
+        "Preserve old links/owner/data/ACK and calendar hold; actual official delivery only via publisher, not a local PASS claim."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}
