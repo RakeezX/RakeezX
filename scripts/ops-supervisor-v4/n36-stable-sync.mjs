@@ -43,7 +43,7 @@ export async function syncOnce({root=ROOT,now=Date.now,execute=execFileSync}={})
  const failurePath=base+'/AUTO_SYNC_FAILURE.json';let failure;try{failure=read(failurePath)}catch{}
  if(failure?.taskId===decision.taskId&&failure.version===decision.version&&now()<failure.retryAfter)return {status:'RETRY_LATER',version:decision.version};
  try {
-  const output=execute(process.execPath,[base+'/update-stable.mjs','--version',decision.version,'--task',decision.taskId,'--apply'],{encoding:'utf8',windowsHide:true,timeout:110000,maxBuffer:200000});
+  const output=execute(process.execPath,[root+'/scripts/ops-supervisor-v4/n36-update-stable.mjs','--version',decision.version,'--task',decision.taskId,'--apply'],{encoding:'utf8',windowsHide:true,timeout:110000,maxBuffer:200000});
   const after=read(base+'/STABLE_CURRENT.json');
   if(after.version!==decision.version||after.sourceTaskId!==decision.taskId||after.publishedSha!==decision.publishedSha)throw Error('Receipt mismatch');
   const result={status:'UPDATED',version:after.version,taskId:decision.taskId,publishedSha:decision.publishedSha,at:new Date(now()).toISOString(),chromeReloaded:false};
