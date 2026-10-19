@@ -7,7 +7,8 @@ import { withIsolatedLocalBrowser } from '../scripts/ops-supervisor-v4/isolated-
 import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 import { syntheticService } from './n73-account-flow-fixture.mjs';
 const taskId='continuous-n111-mobile-delete-single-confirm-20261019';
-const runId='ab7de6cb-b95c-4d31-8559-5c47004f2b87';
+const runId=process.env.N111_RUN_ID;
+if(!runId)throw Error('Set N111_RUN_ID to the activated attempt identity before opening browser resources');
 const baseSha='80d7a264596cb38c1856796c0c30c23dbbb6b49f';
 const root=resolve('.'), checks=[];
 const service=syntheticService();
