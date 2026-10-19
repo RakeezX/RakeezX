@@ -1,0 +1,13 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "functionName": "n88-student-portal",
+  "version": 49,
+  "archiveSha256": "1a89619c380a318de1a86a4c8963ebe3d0861d9e383b414fcfd6ddc6c4e36b3b",
+  "verify_jwt": false,
+  "sourceSha256": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
+  "sourceExact": true,
+  "codeDeploys": 1,
+  "sourcePinUpdate": "Original protected custodian; tests/n88-1837/source-pin.json",
+  "readinessReplayed": false,
+  "actualTeacherRequest": "NOT_RUN"
+}

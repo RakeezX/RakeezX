@@ -1,0 +1,12 @@
+{
+  "capturedAt": "2026-10-19T15:52:02.029Z",
+  "exitCode": 0,
+  "result": {
+    "status": "PASS",
+    "source": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
+    "nativeVersion": 48,
+    "sourcePinReadback": true,
+    "readinessReplayed": false,
+    "keysRolesSqlAuthFixturesUnchanged": true
+  }
+}

@@ -1,5 +1,5 @@
 /* AI: compact student presentation; shared RAKEEZ identity/tokens, no teacher navigation. */
-.n88-unified{color-scheme:light;--bg:#f4f7f5;--bg-elev:#fff;--text:#15253d;--text-2:#52645b;--border:#d4dce5;--border-strong:#758596;--action-primary:#165c50;--action-primary-ink:#fff;--brand-text:#165c50;font-family:var(--font,system-ui,sans-serif);background:var(--bg,#f4f7f5);color:var(--text,#15253d);line-height:1.8;min-height:100dvh;padding:24px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.n88-unified{color-scheme:light;--bg:#f4f7f5;--bg-elev:#fff;--text:#15253d;--text-2:#334155;--text-3:#64748b;--border:#dce7e1;--border-strong:#bfd2c8;--brand:#18a878;--brand-hover:#25b98a;--brand-active:#13936a;--brand-text:#0f7655;--brand-soft:#e8f6f1;--action-primary:var(--brand);--action-primary-hover:var(--brand-hover);--action-primary-active:var(--brand-active);--action-primary-ink:#06231f;--action-focus-ring:color-mix(in srgb,var(--brand) 34%,transparent);font-family:var(--font,system-ui,sans-serif);background:var(--bg,#f4f7f5);color:var(--text,#15253d);line-height:1.8;min-height:100dvh;padding:24px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .n88-unified,.n88-unified *{box-sizing:border-box}
 .n88-unified header,.n88-unified main{max-width:1040px;margin:auto;min-width:0}
 .n88-unified header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--border,#d4dce5)}
@@ -69,3 +69,9 @@ html[data-n88-student-document]{color-scheme:light;background:#f4f7f5}
 .n88-unified h1[tabindex="-1"]:focus{outline:none}
 
 .n88-unified h1[tabindex="-1"]:focus{box-shadow:none}
+
+.n88-unified-entry.first-run-auth form{gap:var(--sp-2)}
+.n88-unified-entry .input{border-color:var(--border-strong);background:var(--bg-elev)}
+.n88-unified-entry .input:focus{border-color:var(--brand-text);box-shadow:0 0 0 3px var(--action-focus-ring)}
+.n88-unified-entry .btn--primary{background:var(--action-primary);color:var(--action-primary-ink)}
+.n88-unified-entry [aria-invalid=true]{border-color:var(--danger,#dc2626)}

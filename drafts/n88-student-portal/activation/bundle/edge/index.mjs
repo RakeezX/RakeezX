@@ -4415,10 +4415,23 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
     parentSignal?.addEventListener("abort", cancel, { once: true });
     if (parentSignal?.aborted) abort.abort();
     let expired = false;
-    const timer = setTimeout(() => {
-      expired = true;
-      abort.abort();
-    }, authDeadlineMs);
+    let remaining = authDeadlineMs, started = performance.now(), timer;
+    const arm = () => {
+      started = performance.now();
+      timer = setTimeout(() => {
+        expired = true;
+        abort.abort();
+      }, remaining);
+    };
+    const pause = () => {
+      clearTimeout(timer);
+      remaining -= performance.now() - started;
+      if (remaining <= 0) {
+        expired = true;
+        abort.abort();
+      }
+    };
+    arm();
     const fence = () => {
       if (expired || abort.signal.aborted) throw Error("n88_auth_unavailable");
     };
@@ -4463,8 +4476,11 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
       if (verified2.error || !verified2.data?.claims) return null;
       const c = verified2.data.claims, sec = Math.floor(now() / 1e3);
       if (c.iss !== issuer || !(c.aud === "authenticated" || Array.isArray(c.aud) && c.aud.length === 1 && c.aud[0] === "authenticated") || c.role !== "authenticated" || !uuid4(c.sub) || !uuid4(c.session_id) || c.is_anonymous === true || !Number.isSafeInteger(c.exp) || c.exp <= sec || !Number.isSafeInteger(c.iat) || c.iat > sec || c.iat >= c.exp || c.nbf !== void 0 && (!Number.isSafeInteger(c.nbf) || c.nbf > sec)) return null;
+      pause();
+      fence();
       const current = await query("select user_id,session_id from n88_private.lock_current_session($1::uuid,$2::uuid)", [c.sub, c.session_id]);
       fence();
+      arm();
       const matches = (result2) => result2.rows.length === 1 && result2.rows[0].user_id === c.sub && result2.rows[0].session_id === c.session_id;
       if (!matches(current)) return null;
       const fresh = await auth.getUser(token);

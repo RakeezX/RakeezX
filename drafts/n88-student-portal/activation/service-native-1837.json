@@ -1,0 +1,12 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "functionName": "n88-student-portal",
+  "version": 48,
+  "verify_jwt": false,
+  "archiveSha256": "1a89619c380a318de1a86a4c8963ebe3d0861d9e383b414fcfd6ddc6c4e36b3b",
+  "sourceSha256": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
+  "sourceExact": true,
+  "sourceReadbackSerialization": "exact",
+  "providerDeploys": 1,
+  "oldReadinessReplayed": false
+}
