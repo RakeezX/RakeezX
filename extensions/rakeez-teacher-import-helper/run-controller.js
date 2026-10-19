@@ -134,7 +134,7 @@ async function start(tabId){
   const beginResult=await chrome.runtime.sendMessage({type:'n36-begin'});if(!beginResult?.ok)throw Error('OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB');window.n36AutomaticBatch=beginResult.batchId;window.n36CollectionFinished=false;
   path=new URL(tab.url).pathname+new URL(tab.url).search;
   safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
-  job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),fetches:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0,excluded:0,windowPages:0,sourceBytes:0,expires:null,expiryTimer:null};
+  job={tabId,origin,batchExpires:Date.now()+1800000,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),fetches:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0,excluded:0,windowPages:0,sourceBytes:0,expires:null,expiryTimer:null};
   job.timer=setTimeout(()=>{if(job?.sourceRows.length===0&&ticket===generation)stop('TIME_LIMIT');},RUN_LIMITS.milliseconds); // No names held indefinitely during entry/choice.
   const alive=()=>ticket===generation&&!!job;
   stage='role-selection';kind='role';await ready(tabId,origin,ticket);let page=await inspect(tabId,origin,'home',alive);current(ticket);
@@ -240,6 +240,17 @@ async function start(tabId){
   }
  }catch(e){if(ticket===generation){routeError(e,stage,kind,path);stop(/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',e.diagnostic,{stage,kind});}}
 }
+// AI: completed rows belong to the run's original source, never the active run tab.
+function completedSourceReview(active,url){
+ return {tabId:active.tabId,origin:active.origin,context:active.context,expires:active.expires,sourceRoute:sourceReviewRoute(url,active.origin,active.context)};
+}
+function sourceReviewRoute(url,origin,context){
+ const u=new URL(url);if(u.origin!==origin)throw Error('ORIGIN_CHANGED');
+ safeRoute(origin,u.pathname+u.search,context);
+ // Only pagination within the SAME authorized page is normal movement.
+ for(const key of [...u.searchParams.keys()])if(['page','pagenumber'].includes(key.toLowerCase()))u.searchParams.delete(key);
+ return u.pathname+'?'+JSON.stringify([...u.searchParams].sort());
+}
 // AI: resource-only read continuation, independent of all class receipts.
 async function pauseCollection(ticket){
  const active=job;
@@ -263,7 +274,7 @@ async function pauseCollection(ticket){
 async function finishCollection(ticket){
  const active=job;clearTimeout(active.timer);await Promise.all(active.fetches.values());current(ticket);
  const coverage=sourceCoverage({series:active.series,warnings:active.warnings,pendingReportPages:active.remainingReportPages??0}),{complete}=coverage;
- review={tabId:active.tabId,origin:active.origin,context:active.context,expires:active.expires};
+ const source=await chrome.tabs.get(active.tabId);current(ticket);
  clearTimeout(active.expiryTimer);
  const warnings=[...new Set(active.warnings.filter(w=>w.category==='students'&&!(w.optional&&complete)).map(w=>w.code))];
  showDiagnostic({run:{...coverage,staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
@@ -271,8 +282,16 @@ async function finishCollection(ticket){
  $('run-missing').textContent='';$('run-skipped').textContent=warnings.length||active.excluded?`تعذّر جمع بعض الصفوف أو الصفحات؛ استُبعد ${active.excluded} صفًا. التفاصيل في التشخيص الاختياري.`:'';
  window.n36Diagnostics?.publish({excluded:active.excluded});
  cancelReports(active);job=null;
- window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,...coverage,excluded:active.excluded,hasNext:false}}));
- announce('انتهت قراءة الصفحات المتاحة؛ جار استيراد جميع الفصول إلى ركيز المفتوح.');if(!window.n36AutomaticBatch)armReview();else {review.expires=Date.now()+1800000;reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),1800000);}
+ presentCollectedSource({...active,sourceURL:source.url},coverage);
+}
+export function presentCollectedSource(active,coverage){
+ // Install the complete review before publishing rows/starting asynchronous transfers.
+ review=completedSourceReview(active,active.sourceURL);
+ review.expires=window.n36AutomaticBatch?Math.min(active.batchExpires??Date.now()+1800000,Date.now()+1800000):active.expires;
+ const rows=active.sourceRows.map(row=>Object.freeze({...row}));
+ window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,...coverage,excluded:active.excluded,hasNext:false}}));
+ announce('انتهت قراءة الصفحات المتاحة؛ جار استيراد جميع الفصول إلى ركيز المفتوح.');
+ if(!window.n36AutomaticBatch)armReview();else reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }
 async function noorRead(tabId) {
  const tab=await chrome.tabs.get(tabId),u=new URL(tab.url??'');
@@ -333,7 +352,7 @@ window.addEventListener('n36:discard',()=>{if(runToken)stop();});
 window.addEventListener('n36:exported',()=>{if(!runToken||window.n36AutomaticBatch)return;if(review?.source!=='noor'&&window.n36HasSourceRoster?.()){announce('نُقل الفصل المختار للمراجعة فقط. يمكنك اختيار فصل آخر خلال المهلة الأصلية؛ لم تُضف أسماء تلقائيًا.');return;}generation++;clearPreview();$('run-cancel').disabled=true;announce('اكتمل التصدير الصريح ومُسحت المعاينة المؤقتة. لم تُضف بيانات إلى ركيز.');});
 window.n36BeforeExport=async()=>{
  if(!runToken)return;const snapshot=review;if(!snapshot||Date.now()>=snapshot.expires){stop('REVIEW_EXPIRED');throw Error('REVIEW_EXPIRED');}
- try{if(snapshot.source==='noor'){const fresh=await noorRead(snapshot.tabId);if(fresh.url!==snapshot.url||JSON.stringify(fresh.names)!==snapshot.names)throw Error('SOURCE_CHANGED');}else await inspect(snapshot.tabId,snapshot.origin,'guard',()=>review===snapshot);if(review!==snapshot)throw Error('SOURCE_CHANGED');}catch(e){stop('SOURCE_CHANGED');throw e;}
+ try{if(snapshot.source==='noor'){const fresh=await noorRead(snapshot.tabId);if(fresh.url!==snapshot.url||JSON.stringify(fresh.names)!==snapshot.names)throw Error('SOURCE_CHANGED');}else {const tab=await chrome.tabs.get(snapshot.tabId);if(snapshot.sourceRoute&&sourceReviewRoute(tab.url,snapshot.origin,snapshot.context)!==snapshot.sourceRoute)throw Error('SOURCE_CHANGED');await inspect(snapshot.tabId,snapshot.origin,'guard',()=>review===snapshot);}if(review!==snapshot)throw Error('SOURCE_CHANGED');}catch(e){stop('SOURCE_CHANGED');throw e;}
 };
 window.n36HandoffSource=()=>!job&&review&&Date.now()<review.expires?{source:review.source==='noor'?'noor':'madrasati',scope:review.source==='noor'?'selected-visible-partial':'reviewed-run'}:null;
 window.addEventListener('pagehide',()=>{cancelReports(job??review);clearTimeout(reviewTimer);clearInterval(reviewClock);if(job){clearTimeout(job.timer);clearTimeout(job.expiryTimer);job.sourceRows.length=0;job.routes.length=0;job.categories.length=0;}clearPreview();channel.close();});
@@ -341,6 +360,7 @@ window.addEventListener('pagehide',()=>{cancelReports(job??review);clearTimeout(
 chrome.tabs.onRemoved.addListener(id=>{if(id===job?.tabId||id===review?.tabId)stop('SOURCE_CLOSED');});
 chrome.tabs.onUpdated.addListener((id,change)=>{
  const target=job??review;if(id!==target?.tabId||!change.url)return;
+ if(review?.sourceRoute){try{if(sourceReviewRoute(change.url,target.origin,target.context)!==review.sourceRoute)throw Error('SOURCE_CHANGED');}catch{stop('SOURCE_CONTEXT_CHANGED');}return;}
  if((review||target.fetches?.size)&&!target.expectedNavigation){stop('SOURCE_CONTEXT_CHANGED');return;}
  if(new URL(change.url).origin!==target.origin||/(?:login|signin|signout|logout|oauth)/i.test(new URL(change.url).pathname))stop('ORIGIN_OR_LOGIN_CHANGED');
 });

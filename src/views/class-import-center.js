@@ -137,10 +137,10 @@ function sourceSection(classroom){
 
  const key=v=>String(v).normalize('NFC').replace(/[إأآٱ]/g,'ا').replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/\s+/g,' ').trim();
  const name=key(classroom).replace(/^الصف /,'');
- const exact=store.state.sections.filter(s=>!s.deleted&&s.yearId===store.activeYear().id&&key(s.name)===name);
- if(exact.length===1)return {section:exact[0]};if(exact.length>1)throw Error('CLASS_AMBIGUOUS');
  let grade,label;
- for(const g of GRADES){const prefix=key(g.label);if(name.startsWith(prefix+' ')||name.startsWith(prefix+'/')){grade=g.v;label=name.slice(prefix.length).replace(/^[ /(-]+|[ )]+$/g,'').trim();break;}}
+ // AI: first/second/third without an academic stage remain ambiguous.
+ const aliases={4:['رابع','الرابع'],5:['خامس','الخامس'],6:['سادس','السادس']};
+ for(const g of GRADES){for(const prefix of [key(g.label),...(aliases[g.v]??[])]){if(name.startsWith(prefix+' ')||name.startsWith(prefix+'/')||name.startsWith(prefix+'(')){grade=g.v;label=name.slice(prefix.length).replace(/^[ /(-]+|[ )]+$/g,'').trim();break;}}if(grade)break;}
  const numeric=name.match(/^(1[0-2]|[1-9])\s*[/(-]\s*([\p{L}\p{N} ._-]{1,8})\)?$/u);
  if(numeric){grade=Number(numeric[1]);label=numeric[2].trim();}
  if(!grade||!label||label.length>8||!/^[\p{L}\p{N} ._-]+$/u.test(label))throw Error('CLASS_MAPPING_REQUIRED');
@@ -216,7 +216,7 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>افتح حساب ركيز في تبويب واحد، ثم ابدأ من إضافة مدرستي لجمع وحفظ أسماء جميع الفصول المتاحة. لا تأكيد لكل فصل؛ تُعرض الحالات غير المحسومة فقط. التغطية الجزئية تبقى جزئية بعد الحفظ.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.13.zip" download>تنزيل إضافة ركيز 0.5.13</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.14.zip" download>تنزيل إضافة ركيز 0.5.14</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
@@ -238,7 +238,7 @@ async function receiveExtension() {
     if(location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
     if(result.envelope.version===2){
       try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);}
-      catch(error){extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+'). التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.';await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length});}
+      catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+').'+reason+' التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.';await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length});}
       return;
     }
     extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
