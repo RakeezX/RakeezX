@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { verifiedDeployment, verifiedSourceOnlyPublication } from './controller.mjs';
 import { buildLiveServiceEvidence, verifiedLiveServicePublication } from './live-service-publication.mjs';
+import { STAGED_ACTIVATION_MODE, verifiedActivationStageContinuation, verifiedPilotStagePreparation } from './staged-activation-contract.mjs';
 import { validateControllerReload, buildControllerReloadScript } from './reviewed-controller-reload.mjs';
 import { HISTORICAL_RUNTIME_MODE, verifyHistoricalRuntimeSupersession } from './historical-runtime-supersession.mjs';
 
@@ -16,7 +17,7 @@ const WIN_GIT = 'C:/Program Files/Git/cmd/git.exe';
 const SHA256 = /^[a-f0-9]{64}$/;
 const GIT_SHA = /^[a-f0-9]{40}$/;
 const ID = /^[a-z0-9][a-z0-9._-]{0,159}$/;
-const RUNTIME_KEYS = new Set(('status sessionId attempt attempts runId lastRunId candidateSha baseSha worktreePath cwd resultPath runnerPid runnerCreatedAt brokerPid brokerCreatedAt ownedProcesses lastWorkerReap deliveryReceipt deliveryOwner implementationFailures infrastructureRetries failureClass lastFailure retryAt nextDeliveryAt lastModelError probingClass productRecordKey createdAt updatedAt workflowVersion __file recoveryHistory maintenanceHistory').split(' '));
+const RUNTIME_KEYS = new Set(('status sessionId attempt attempts runId lastRunId candidateSha baseSha worktreePath cwd resultPath runnerPid runnerCreatedAt brokerPid brokerCreatedAt ownedProcesses lastWorkerReap deliveryReceipt deliveryOwner implementationFailures infrastructureRetries failureClass lastFailure retryAt nextDeliveryAt lastModelError probingClass productRecordKey createdAt updatedAt workflowVersion __file recoveryHistory maintenanceHistory stagePublicationHistory').split(' '));
 const read = file => { try { return fs.readFileSync(file); } catch (e) { if (e.code === 'ENOENT') return null; throw e; } };
 export const sha256 = bytes => bytes === null ? null : createHash('sha256').update(bytes).digest('hex');
 const parse = bytes => JSON.parse(bytes.toString('utf8').replace(/^\uFEFF/, ''));
@@ -106,7 +107,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     insist(card && expected && ID.test(card.id ?? '') && card.activationId === payload.activationId, 'Invalid activated source card');
     insist(!taskIds.has(card.id) && !allowed.includes(card.id), 'Duplicate or active card update'); taskIds.add(card.id);
     insist(Object.keys(card).every(key => !RUNTIME_KEYS.has(key)), 'Source card contains runtime state: ' + card.id);
-    const exactAttempt = (expected.status === 'blocked' || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? '');
+    const exactAttempt = (expected.status === 'blocked' || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS' || expected.status === 'awaiting_po' && card.completionMode === STAGED_ACTIVATION_MODE && card.productId === 'N88' && card.stagedActivation?.phase === 'acceptance-and-public-enable') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? '');
     const pristinePendingSupersession = expected.status === 'pending' && card.completionMode === 'superseded_by_verified_delivery' && ID.test(card.supersededBy ?? '') && GIT_SHA.test(card.supersedingPublishedSha ?? '') && expected.sessionId === null && expected.lastRunId === null && expected.candidateSha === null && Array.isArray(expected.dependsOn);
     insist(expected.id === card.id && (exactAttempt || pristinePendingSupersession), 'Expected exact inactive attempt or pristine pending supersession: ' + card.id);
     insist(typeof card.productId === 'string' && typeof card.scopeKey === 'string' && Array.isArray(card.allowedPaths) && Array.isArray(card.requiredChecks) && card.requiredChecks.every(x => typeof x === 'string' && x.length), 'Incomplete source card: ' + card.id);
@@ -221,6 +222,13 @@ export function verifiedSourceOnlyDeclarationRepair(task, result, update) {
     && SHA256.test(proof.reviewedFixtureSha256??'') && proof.reason?.length>=50;
 }
 
+export function verifiedStageContinuation(task,result,update){
+  return verifiedActivationStageContinuation(task,result,update,{verifiedDeployment,receiptSha256:d=>sha256(bytes(d)),same});
+}
+export function verifiedPilotPreparation(task,result,update){
+  return verifiedPilotStagePreparation(task,result,update,{same,valueSha256:v=>sha256(bytes(v)),stringSha256:s=>sha256(Buffer.from(s,'utf8'))});
+}
+
 export function verifiedLiveServiceDeclarationRepair(task,result,update){
   const card=update.card,p=card.verificationRepair,d=task.deliveryReceipt;
   const declared={...task,servicePublicationEvidence:card.servicePublicationEvidence};
@@ -240,7 +248,7 @@ export function verifiedLiveServiceDeclarationRepair(task,result,update){
 export function verifyInactiveIdentity(task, result, update, activationId, historicalContext = null) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
-  insist(task.status === e.status && (task.status === 'blocked' || task.status === 'delivery' && update.card.completionMode === 'deferred_by_po') && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
+  insist(task.status === e.status && (task.status === 'blocked' || task.status === 'delivery' && update.card.completionMode === 'deferred_by_po' || task.status === 'awaiting_po' && verifiedStageContinuation(task,result,update)) && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
   insist(task.lastWorkerReap?.exactAbsence === true && task.lastWorkerReap.activationId === activationId && task.lastWorkerReap.runId === e.lastRunId && Array.isArray(task.lastWorkerReap.owners) && task.lastWorkerReap.owners.length > 0, 'No exact owned-process absence proof: ' + e.id);
   const evidenceOnly = update.card.completionMode === 'record_published_evidence' && e.resultState === 'LOCAL_READY' && result.state === 'LOCAL_READY' && !update.card.liveMutation && !update.card.liveAuthorizationRef && update.card.evidenceOnly?.acceptanceAuthority && result.changedPaths?.length && result.changedPaths.every(p => /^docs\/automation-evidence\/\d{8}\/[a-zA-Z0-9_-]+\.(md|json)$/.test(p) && update.card.allowedPaths.includes(p)) && update.card.requiredChecks?.length && update.card.requiredChecks.every(name => result.checks?.some(c => c.name === name && c.status === 'PASS')) && result.checks.every(c => c.status === 'PASS') && result.blockerType === 'none' && !result.blocker;
   const poDeferred = update.card.completionMode === 'deferred_by_po' && update.card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS' && update.card.productId === 'N58' && update.card.id === 'continuous-n58-empty-account-reviewed-recovery-20261014' && update.card.deferralReason?.length >= 20 && ['LOCAL_READY','BLOCKED'].includes(result.state);
@@ -294,7 +302,7 @@ export function verifyInactiveIdentity(task, result, update, activationId, histo
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
   const historicalSupersession = update.card.completionMode === HISTORICAL_RUNTIME_MODE && verifyHistoricalRuntimeSupersession(task, result, update, historicalContext);
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedStageContinuation(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -380,6 +388,11 @@ export function revisedTask(task, update, commit, at, historicalContext = null) 
   const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt?.runId ?? null, sessionId: task.sessionId ?? null, preservedCandidateSha: update.expected.candidateSha ?? null, previousQueuedCandidateSha: task.candidateSha ?? null, previousQueuedBaseSha: task.baseSha ?? null, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha ?? null, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
 
   Object.assign(saved, structuredClone(update.card), { status: 'pending', candidateSha: update.expected.candidateSha, baseSha: update.expected.baseSha ?? task.baseSha, implementationFailures: 0, infrastructureRetries: 0, failureClass: null, lastFailure: null, retryAt: null, nextDeliveryAt: null, probingClass: null, lastModelError: null, productRecordKey: null, updatedAt: at, recoveryHistory: [...(task.recoveryHistory ?? []), event] });
+  if(update.card.completionMode===STAGED_ACTIVATION_MODE){
+    insist(verifiedStageContinuation(task,json(task.resultPath),update),'Verified pilot stage no longer qualifies');
+    saved.stagePublicationHistory=[...(task.stagePublicationHistory??[]),{at,phase:'pilot',runId:task.attempt.runId,candidateSha:task.candidateSha,receipt:structuredClone(task.deliveryReceipt)}];
+    saved.deliveryReceipt=null;saved.deliveryOwner=null;
+  }
   if (update.card.completionMode === 'repair_source_verification_paths') {
     insist(verifiedSourcePathRepair(task, json(task.resultPath), update), 'Source verification-path repair no longer qualifies');
     saved.status='delivery'; saved.nextDeliveryAt=at; saved.deliveryOwner=null;
@@ -617,7 +630,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         && typeof update.card.objective === 'string' && update.card.objective.includes('VALIDATION CONTRACT REPAIR — 2026-10-17')
         && update.card.acceptance?.some(item => typeof item === 'string' && item.includes('Cloudflare provider/immutable/served Production parity'))
         && update.card.preparationAuthority?.publication === true;
-      insist(preservesChecks || n36PublisherGateSplit, 'This helper cannot remove required checks');
+      insist(preservesChecks || n36PublisherGateSplit || verifiedPilotPreparation(state.task,json(state.task.resultPath),update), 'This helper cannot remove required checks');
     }
     insist(!dirtyPaths().length, 'Ops checkout must be clean before maintenance');
     const common = cwd => path.resolve(cwd, git(['rev-parse', '--git-common-dir'], cwd));
