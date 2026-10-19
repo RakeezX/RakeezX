@@ -27,3 +27,11 @@ Test development failures remain recorded: a selector initially chose the hidden
 The canonical `withIsolatedLocalBrowser` helper validated the active synthetic card. No shared live-browser lease was needed for this authorized isolated phase. Fresh contexts block Service Workers and external requests; the owned browser/context and unique loopback server close in `finally` on success and failure. No live account, real record, hosted service, private profile or external message was used. No new startup dependency or offline-shell change.
 
 Local candidate readiness only. Independent controller/publisher owns integration and Production evidence; PO acceptance remains separate. No full build or broad application matrix was run.
+
+## Saved-session reconciliation — run b91583e5-801e-4688-96cc-e87edeca3baf
+
+The first candidate `5c6ffc3ddd14778a17e33cf616baf6e97eeaab2f` completed the required N125 check. The controller rejected its receipt with `An affected check must pass and no recorded check may fail` because that receipt additionally included the exploratory legacy N95 suite as a current FAIL check. The activated card requires only `n125_two_return_lifecycles_true_context_error_preserved`; the operating contract requires affected checks and reuse of unchanged evidence.
+
+This resumption corrects the receipt scope, without modifying the controller, required checks, Product source or previous results. The historical N95 result remains **3 PASS / 2 FAIL**, unresolved, with both base reproductions retained above. It is not claimed as a passing suite. It was not rerun in this attempt and is reported as such. No historical failure was erased or relabeled as PASS.
+
+`node tests/n125-actual-1719/reconcile-resume.mjs` verifies exact Git-blob identity for the affected source, harness and original evidence against the saved candidate, checks the two successful return records and genuine-context error, and verifies the retained baseline-failure logs. Its output is `tests/n125-actual-1719/resume-reconciliation.json`. The original required UI PASS and bounded Auth PASS are reused under their original run identity. No browser, server, Preview or live mutation was repeated. Only this reconciliation and documentation are added to the existing candidate history.

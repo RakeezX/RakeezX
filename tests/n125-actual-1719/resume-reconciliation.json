@@ -1,0 +1,37 @@
+{
+  "taskId": "continuous-n125-return-focus-transient-sync-20261019",
+  "runId": "b91583e5-801e-4688-96cc-e87edeca3baf",
+  "reusedFromRunId": "a4cffdb4-a229-4390-a948-7d6d37317a88",
+  "priorCandidate": "5c6ffc3ddd14778a17e33cf616baf6e97eeaab2f",
+  "hashes": {
+    "src/app.js": "dfab6200b9ff96c02911698b827125939389110a63fbff194afd5e08bd741080",
+    "src/lib/cloud.js": "1040b6cf78a2d1b99acace81c6a8c5cc52691125439f4b08755fa9bf205f652c",
+    "src/lib/sync.js": "65a68b32edf408d8495d8f3ae4d29886409f87d7f86e12266e29fb1bbb5c2199",
+    "src/lib/sync-operational-ui.js": "00f382e70763b8e9813e2e9bf5694276dd3efda595bd1c72c48d6719e9621c8a",
+    "tests/n125-actual-1719/returns.mjs": "1801ceb3acf09814fdb5f4eb9fb8e8c9ca653a4f93ff13b687ed65757a40bb04",
+    "tests/n125-actual-1719/bootstrap.mjs": "746b5acc98ad4e797d3d69461273b1c2dbb9c488d54dfc60e836036ee5724f26",
+    "tests/n125-actual-1719/result.json": "e3961cd48b962a2167fa51d6bec55c5f988197a9951a1a16b0d87af5bb8eb6b6",
+    "tests/n125-actual-1719/auth-context.test.mjs": "8cefce015372292da13b55348816b125d195328366c80c81130fc0558e7e14e9",
+    "tests/n125-actual-1719/auth-checks.txt": "bffd41b5e39c8edae315628868c8bded04e382ef5bb71b1e8548e27d2c53fc24",
+    "tests/n125-actual-1719/baseline.json": "d15ad74093d824f1eafa1c2589272eb448f8fe317fc9a62c5f182439e575a6ce",
+    "tests/n125-actual-1719/n95-base-failure.txt": "d1fb108971af4a3baa1b5b37e330f5102f438f801f69a26af1b32fdfc0892cfa",
+    "tests/n125-actual-1719/n95-base-source-pin-failure.txt": "523a57593fda7a57d1352c82481f02428a3abb4d125fe8f64c8597f0b1bd496b"
+  },
+  "requiredCheck": {
+    "name": "n125_two_return_lifecycles_true_context_error_preserved",
+    "status": "PASS",
+    "evidence": "Actual HTTP app/CSS: two delayed return renewals stay pending with zero premature reads, one verification/pass per return, green only after completed guarded sync; persistent read failure remains red across return, foreign-owner manual UI makes zero reads, grade 18 and empty outbox preserved."
+  },
+  "currentCheck": {
+    "name": "n125_saved_evidence_reconciliation",
+    "status": "PASS",
+    "evidence": "Affected source, UI harness and evidence blobs exactly match saved candidate; required UI PASS and original N95 failures retained unchanged. No UI or service operation repeated."
+  },
+  "historicalN95": {
+    "rerun": false,
+    "priorPassed": 3,
+    "priorFailed": 2,
+    "disposition": "Unresolved historical exploratory failures; not converted to PASS. Full suite is not an activated N125 required check."
+  },
+  "resourcesCreated": []
+}
