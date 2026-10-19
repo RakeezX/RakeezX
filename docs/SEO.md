@@ -29,6 +29,28 @@ Run the affected source check with:
 node --test tests/n113-1019-public-search.mjs
 ```
 
-This is discovery groundwork only. Neither a successful deployment nor this check
-establishes search-engine indexing or Search Console submission. Those require
-separate observed evidence; no Search Console access is needed for this change.
+PO evidence supplied on 19 October 2026 confirms that Search Console URL inspection
+reports the homepage indexed, available on Google and served over HTTPS. This
+confirmation applies only to `https://rakeezx.com/`; it is not evidence for other
+routes or a particular query position. Preserve that accepted result rather than
+repeating an indexing diagnosis.
+
+The homepage title and matching descriptions now explicitly identify teacher
+class/student management, attendance, grades, lesson timetable and reports. These
+are existing capabilities already described in the visible public landing page.
+The full product name, canonical domain and WebApplication identity distinguish
+this product without competitor claims or extra keyword lists. The existing
+landing layout and private routing are unchanged.
+
+Indexing means the homepage is in Google's index; ranking is its position for a
+particular search. This copy improvement does not establish or guarantee a ranking,
+a search snippet, or when Google will reflect the updated content. Deployment
+verification remains with the serial publisher; this local check is not proof of
+delivery or a new Search Console observation.
+
+The affected actual-app HTTP check (fresh local synthetic browser, no credentials,
+external requests or Service Workers) is:
+
+```sh
+node tests/n113-feedback-1532/public-relevance.mjs
+```
