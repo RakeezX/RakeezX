@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-publish-qualified-entry-ui-20261019",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -1999,
+      "scopeKey": "n88-qualified-ui-only-1719",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "budgetMinutes": 12,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "objective": "Latest direct PO asks fix first-entry blank wait and student login appearance. This is ONLY DELIVERY of already qualified UI from saved candidate1d205d13997b626fbe0b30ec49c02e715d61a117, base0b4e841ca9447373add29c0a62876494a81ecdb8 in .worktrees/continuous-n88-real-teacher-timeout-light-login-20261019. Original task remains BLOCKED with composite FAIL; actual authenticated timeout cause is UNKNOWN and signed readiness NOT_RUN. Do NOT erase/relabel that FAIL, revive private custody, retry refused browser, create another service checker or claim actual service fixed. N44 stays paused. Existing sole controller/publisher owns delivery.\nRead original exact saved result and evidence. Reuse/cherry-pick the existing candidate into this isolated current-main worktree; retain ALL historical FAIL/NOT_RUN artifacts and existing native asset delivery proof byte-identical. Do not reimplement or rerun UI/provider/browser tests: actual current UI check PASS, existing ingress native readback+served JS/CSS hashes PASS, source syntax/scope/cleanup PASS already executed. New main changes N120filters/N125sync do not alter these exact N88 UI files; check actual diff scope rather than blanket build. Prior student asset carrier was already deployed version9ea7a7ec-6e9f-4542-bdc4-3c489b08390a/native SHA4ee37d7cdd0084588615ab6f242c54a312b43484e942877ae6847e00bee369f5; its binding/routes/privacy/edge bytes unchanged. NO additional service upload/readiness probe/secret/SQL/Auth/RLS/account/code/pupil mutations. Generic publisher delivers frontend teacher shell and matches saved source only. Add concise stage delivery note clearly distinguishing current static student assets delivered, teacher UI qualified, actual teacher service diagnosis still BLOCKED in original task. Return exact task/run/base/candidate/check schema with genuinely reused applicable threePASS proofs, not old compositeFAIL transformed intoPASS; source failure artifact stays untouched. LOCAL_READY not Production, no Productclosure.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal-login.css",
+        "drafts/n88-student-portal/**",
+        "tests/n88-actual-1719/**",
+        "docs/automation-evidence/20261019/N88_REAL_TEACHER_TIMEOUT_LIGHT_LOGIN.md",
+        "docs/automation-evidence/20261019/N88_QUALIFIED_ENTRY_UI_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/views/student-portal-login.js"
+      ],
+      "requiredChecks": [
+        "n88_qualified_ui_only_saved_source_and_scope",
+        "n88_prior_native_asset_delivery_retained_no_redeploy"
+      ],
+      "acceptance": [
+        "Deliver already qualified UI only through sole publisher and verify exact source; original actual teacher failure remains blocked without retry.",
+        "No Product closure, no service-ready claim from static assets or UI; preserve old FAIL and missing actual authenticated trace."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-current-1719-publish-qualified-UI-only",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "serviceOperation": false
+      },
+      "releaseAuthority": "Current human N88 visual/first-entry request plus existing source delivery mandate; no service/data action. Separate qualified UI delivery does not satisfy or remove original failed runtime requirement."
+    }
+  ]
+}
