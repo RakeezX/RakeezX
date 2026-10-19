@@ -1,0 +1,32 @@
+{
+  "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+  "runId": "57e985f1-2297-4d68-9855-061744258c65",
+  "checks": [
+    {
+      "name": "no_teachings_save_pending_owner_bound",
+      "status": "PASS",
+      "evidence": "Actual schedule dialogs save both independent kinds with no fake subjects/classes/pupils; real owner-bound outbox remains pending."
+    },
+    {
+      "name": "same_document_reload_checkpoint",
+      "status": "PASS",
+      "evidence": "Both kinds/IDs/term survive actual reload in the expected owner/database checkpoint; no slot fixture is reseeded."
+    },
+    {
+      "name": "coexistence_projection_export_backup",
+      "status": "PASS",
+      "evidence": "Academic slot coexists; occupied time rejects collision; read-only projections and unscoped N116 entry create no independent lessons; actual export preview and backup retain both labels/fields."
+    },
+    {
+      "name": "edit_delete_guards_history",
+      "status": "PASS",
+      "evidence": "Both kinds edited through real dialogs and soft-deleted with tombstones; history unchanged; owner/Auth/lease negatives rejected; local commands never claim ACK."
+    },
+    {
+      "name": "n122_permanent_activity_waiting_slot_save_reload_edit_delete_no_fake_subject",
+      "status": "PASS",
+      "evidence": "PASS: actual app DOM/handlers/source CSS over owned loopback HTTP, synthetic account guard path."
+    }
+  ],
+  "errors": []
+}

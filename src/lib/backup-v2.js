@@ -54,8 +54,14 @@ const equal = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 function comparable(storeName, record) {
   if (!record) return null;
   const fields = Object.keys(SYNC_V2_SCHEMAS[storeName].fields);
-  return Object.fromEntries(['deleted', ...fields].map((field) => [field,
-    field === 'deleted' ? record.deleted === true : clone(record[field]) ]));
+  return Object.fromEntries(['deleted', ...fields].map((field) => {
+    let value = clone(record[field]);
+    if (field === 'deleted') value = record.deleted === true;
+    // Old backup baselines predate the additive slot fields; defaults are not edits.
+    if (storeName === 'slots' && field === 'kind') value ??= 'teaching';
+    if (storeName === 'slots' && field === 'termId') value ??= null;
+    return [field, value];
+  }));
 }
 
 function baselineMap(payload, storeName) {

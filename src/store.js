@@ -52,7 +52,7 @@ import {
   now, uid, todayISO, scoreId, scoreSubitemCompletionId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
   calendarRangeIdentity, calendarRangeDayId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment, makeItem, makeScoreSubitem, makeScoreSubitemCompletion,
-  makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule, makeGroupArrangement,
+  makeSession, makeSlot, slotKind, isNonTeachingSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule, makeGroupArrangement,
   defaultItemsFor, DEFAULT_ITEMS, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend, CALENDAR_KIND, sessionCalendarPresentation,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
@@ -1963,14 +1963,14 @@ export function sessionDates(tchId) {
 }
 
 export const slotsOf = (tchId) =>
-  live(state.slots).filter((s) => s.teachingId === tchId)
+  live(state.slots).filter((s) => slotKind(s) === 'teaching' && s.teachingId === tchId)
     .sort((a, b) => a.weekday - b.weekday || a.period - b.period);
 
 export const getSlot = (id) => live(state.slots).find((s) => s.id === id);
 
 export const allSlots = (tmId = activeTerm()?.id) => {
   const ids = new Set(teachings(tmId).map((t) => t.id));
-  return live(state.slots).filter((s) => ids.has(s.teachingId))
+  return live(state.slots).filter((s) => isNonTeachingSlot(s) ? s.termId === tmId : ids.has(s.teachingId))
     .sort((a, b) => a.weekday - b.weekday || a.period - b.period);
 };
 
@@ -3060,9 +3060,10 @@ export function validateSectionReopen(secId) {
   const archivedTeachingIds = new Set(live(state.teachings).filter((teaching) => teaching.sectionId === secId).map((teaching) => teaching.id));
   const activeTeachingIds = new Set(live(state.teachings).filter((teaching) =>
     teaching.sectionId !== secId && !isSectionArchived(teaching.sectionId)).map((teaching) => teaching.id));
-  const activeSlots = live(state.slots).filter((slot) => activeTeachingIds.has(slot.teachingId));
+  const activeSlots = live(state.slots).filter((slot) => isNonTeachingSlot(slot) || activeTeachingIds.has(slot.teachingId));
   const conflict = live(state.slots).find((slot) => archivedTeachingIds.has(slot.teachingId) &&
-    activeSlots.some((other) => slot.weekday === other.weekday && slot.period === other.period));
+    activeSlots.some((other) => slot.weekday === other.weekday && slot.period === other.period &&
+      (!isNonTeachingSlot(other) || other.termId === getTeaching(slot.teachingId)?.termId)));
   return conflict ? { ok: false, reason: 'slot-conflict', slotId: conflict.id } : { ok: true };
 }
 
@@ -5145,14 +5146,31 @@ export async function fillAttendance(sesId, status = 'present') {
 
 /* ---------- عمليات: الجدول والتقويم ---------- */
 
+function validatedSlot(data) {
+  const slot = makeSlot(data);
+  if (!['teaching', 'activity', 'waiting'].includes(slotKind(slot))) throw new Error('نوع الحصة غير صالح.');
+  if (!Number.isInteger(slot.weekday) || slot.weekday < 0 || slot.weekday > 6 ||
+      !Number.isInteger(slot.period) || slot.period < 1 || slot.period > 12) throw new Error('اليوم أو رقم الحصة غير صالح.');
+  if (isNonTeachingSlot(slot)) {
+    if (slot.teachingId || !slot.termId || !getTerm(slot.termId) || getTerm(slot.termId).status === 'closed') throw new Error('اختر فصلًا دراسيًا متاحًا للحصة المستقلة.');
+    slot.teachingId = null;
+  } else {
+    if (!getTeaching(slot.teachingId) || slot.termId) throw new Error('اختر الفصل والمادة للحصة التدريسية.');
+    if (isTeachingArchived(slot.teachingId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
+    slot.termId = null;
+  }
+  return slot;
+}
+
 export async function addSlot(tchId, weekday, period, times = {}) {
   if (isTeachingArchived(tchId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
-  const existing = allSlots().find(s => s.weekday === weekday && s.period === period);
+  const slot = validatedSlot({ ...times, teachingId: tchId, weekday: Number(weekday), period: Number(period) });
+  const termId = isNonTeachingSlot(slot) ? slot.termId : getTeaching(tchId)?.termId;
+  const existing = allSlots(termId).find(s => s.weekday === slot.weekday && s.period === slot.period);
   if (existing) {
     throw new Error('لديك حصة مسجلة بالفعل في هذا الوقت.');
   }
   
-  const slot = makeSlot({ teachingId: tchId, weekday, period, ...times });
   if (live(state.slots).some((s) => s.id === slot.id)) return null;
   await save({ slots: [slot] });
   return slot;
@@ -5163,18 +5181,19 @@ export async function editSlot(slotId, data) {
   if (!existingSlot) throw new Error('الحصة غير موجودة');
   if (isTeachingArchived(existingSlot.teachingId) || isTeachingArchived(data.teachingId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
 
-  // Check for conflicts
-  const conflict = allSlots().find(s => s.id !== slotId && s.weekday === Number(data.weekday) && s.period === Number(data.period));
+  const updated = validatedSlot({ ...existingSlot, ...data, id: slotId });
+  const termId = isNonTeachingSlot(updated) ? updated.termId : getTeaching(updated.teachingId)?.termId;
+  const conflict = allSlots(termId).find(s => s.id !== slotId && s.weekday === updated.weekday && s.period === updated.period);
   if (conflict) {
     throw new Error('لديك حصة مسجلة بالفعل في هذا الوقت.');
   }
 
-  const { makeSlot } = await import('./models.js');
-  const updated = makeSlot({ ...existingSlot, ...data, id: slotId });
   await patch('slots', slotId, { 
     weekday: updated.weekday, 
     period: updated.period, 
     teachingId: updated.teachingId,
+    kind: updated.kind,
+    termId: updated.termId,
     start: updated.start,
     end: updated.end
   });

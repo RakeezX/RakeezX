@@ -766,6 +766,9 @@ export const makeScoreSubitemCompletion = (o = {}) => ({
 });
 
 /** الخانة في الجدول الأسبوعي — بلا أوقات، فالوقت يأتي من ملف التوقيت. */
+export const slotKind = (slot) => slot?.kind ?? 'teaching';
+export const isNonTeachingSlot = (slot) => ['activity', 'waiting'].includes(slotKind(slot));
+export const slotKindLabel = (slot) => ({ activity: 'نشاط', waiting: 'انتظار', teaching: 'تدريس' })[slotKind(slot)] ?? '';
 export const makeSlot = (o = {}) => ({
   ...base(),
   id: o.id ?? slotId(),
@@ -773,6 +776,8 @@ export const makeSlot = (o = {}) => ({
   weekday: Number(o.weekday ?? 0),
   period: Number(o.period ?? 1),
   ...o,
+  kind: o.kind ?? 'teaching',
+  termId: o.termId ?? null,
 });
 
 /**

@@ -1,0 +1,360 @@
+{
+  "runId": "57e985f1-2297-4d68-9855-061744258c65",
+  "history": [
+    {
+      "phase": "native_harness_path_assertion",
+      "failure": "Initial copied helper asserted artifacts/ path after phase was moved under tests/fixtures/n122-1019; failed before mkdir/start. Corrected the ownership-prefix assertion."
+    },
+    {
+      "originalFile": "n122-1019-browser-initial-field-display.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at add (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/n122-1019-browser.mjs:77:14)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/n122-1019-browser.mjs:82:5\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/n122-1019-browser.mjs:62:3",
+        "checks": [],
+        "errors": []
+      }
+    },
+    {
+      "originalFile": "n122-1019-browser-lease-context-failure.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'unresolved-owner',\n    'foreign-auth',\n-   'limited-lease'\n  ]\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/n122-1019-browser.mjs:147:15\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/n122-1019-browser.mjs:62:3",
+        "checks": [
+          {
+            "name": "no_teachings_save_pending_owner_bound",
+            "status": "PASS",
+            "evidence": "Actual schedule dialogs save both independent kinds with no fake subjects/classes/pupils; real owner-bound outbox remains pending."
+          },
+          {
+            "name": "same_document_reload_checkpoint",
+            "status": "PASS",
+            "evidence": "Both kinds/IDs/term survive actual reload in the expected owner/database checkpoint; no slot fixture is reseeded."
+          },
+          {
+            "name": "coexistence_projection_export_backup",
+            "status": "PASS",
+            "evidence": "Academic slot coexists; occupied time rejects collision; read-only projections and unscoped N116 entry create no independent lessons; actual export preview and backup retain both labels/fields."
+          }
+        ],
+        "errors": []
+      }
+    },
+    {
+      "originalFile": "n122-1019-native-bootstrap-failure.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "startedAt": "2026-10-19T09:34:26.592Z",
+        "finishedAt": "2026-10-19T09:34:41.029Z",
+        "status": "FAIL",
+        "failure": {
+          "name": "Error",
+          "code": null,
+          "message": "Public bootstrap 20261014203000_n58_atomic_empty_foundation_repair.sql: 42883 function \"rakeezx.n58_guard_calendar_contract()\" does not exist",
+          "location": "at qualify (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/fixtures/n122-1019/native-cases.mjs:23:119)"
+        },
+        "checks": [],
+        "negativeSqlstates": [],
+        "cleanup": {
+          "stopped": true,
+          "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+          "exactPidAbsent": true,
+          "exactPortReboundAndReleased": true,
+          "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n122-permanent-activity-waiting-slots-20261019\\tests\\fixtures\\n122-1019\\n122-native-pg-57e985f1-2297-4d68-9855-061744258c65-4964c400-2808-4793-802c-0ef36f17ac2d",
+          "ownedDirectoryRemoved": true,
+          "lease": "RELEASED integration"
+        }
+      }
+    },
+    {
+      "originalFile": "n122-1019-native-delete-outcome-failure.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "startedAt": "2026-10-19T09:39:06.969Z",
+        "finishedAt": "2026-10-19T09:39:21.182Z",
+        "status": "FAIL",
+        "failure": {
+          "name": "AssertionError",
+          "code": "ERR_ASSERTION",
+          "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'deleted'\n- 'applied'\n",
+          "location": "at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/fixtures/n122-1019/native-cases.mjs:80:84"
+        },
+        "checks": [
+          {
+            "name": "exact_append_only_migration_and_legacy_no_rewrite",
+            "status": "PASS"
+          },
+          {
+            "name": "owner_term_kind_checks_and_rls",
+            "status": "PASS"
+          },
+          {
+            "name": "actual_protocol_roundtrip_revision_idempotent_receipt_and_conflict",
+            "status": "PASS"
+          },
+          {
+            "name": "class_reopen_preserves_independent_occupancy",
+            "status": "PASS"
+          },
+          {
+            "name": "tombstone_stale_patch_and_restore_canonical_preserve_kind_term",
+            "status": "FAIL"
+          }
+        ],
+        "negativeSqlstates": [
+          {
+            "expected": "42501",
+            "actual": "42501"
+          },
+          {
+            "expected": "23503",
+            "actual": "23503"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23503",
+            "actual": "23503"
+          },
+          {
+            "expected": "22023",
+            "actual": "22023"
+          },
+          {
+            "expected": "23505",
+            "actual": "23505"
+          }
+        ],
+        "cleanup": {
+          "stopped": true,
+          "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+          "exactPidAbsent": true,
+          "exactPortReboundAndReleased": true,
+          "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n122-permanent-activity-waiting-slots-20261019\\tests\\fixtures\\n122-1019\\n122-native-pg-57e985f1-2297-4d68-9855-061744258c65-d2670290-b8df-4e71-a3e9-c33dc8e92e9d",
+          "ownedDirectoryRemoved": true,
+          "lease": "RELEASED integration"
+        }
+      }
+    },
+    {
+      "originalFile": "n122-1019-native-direct-dml-guard.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "startedAt": "2026-10-19T09:35:35.540Z",
+        "finishedAt": "2026-10-19T09:35:50.684Z",
+        "status": "FAIL",
+        "failure": {
+          "name": "AssertionError",
+          "code": "ERR_ASSERTION",
+          "message": "Expected values to be strictly equal:\n\n'42501' !== '23503'\n",
+          "location": "at fail (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/fixtures/n122-1019/native-cases.mjs:10:92)"
+        },
+        "checks": [
+          {
+            "name": "exact_append_only_migration_and_legacy_no_rewrite",
+            "status": "PASS"
+          },
+          {
+            "name": "owner_term_kind_checks_and_rls",
+            "status": "FAIL"
+          }
+        ],
+        "negativeSqlstates": [],
+        "cleanup": {
+          "stopped": true,
+          "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+          "exactPidAbsent": true,
+          "exactPortReboundAndReleased": true,
+          "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n122-permanent-activity-waiting-slots-20261019\\tests\\fixtures\\n122-1019\\n122-native-pg-57e985f1-2297-4d68-9855-061744258c65-38528ccd-f85a-4641-b665-a77825779df5",
+          "ownedDirectoryRemoved": true,
+          "lease": "RELEASED integration"
+        }
+      }
+    },
+    {
+      "originalFile": "n122-1019-native-initial-harness-failure.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "startedAt": "2026-10-19T09:34:09.854Z",
+        "finishedAt": "2026-10-19T09:34:10.220Z",
+        "status": "FAIL",
+        "failure": {
+          "name": "Error",
+          "code": null,
+          "message": "Command failed: C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n122-permanent-activity-waiting-slots-20261019.json -OwnerToken 57e985f1-2297-4d68-9855-061744258c65 -WaitSeconds 0\nFile C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\resource-lease.ps1 cannot be loaded because running \r\nscripts is disabled on this system. For more information, see ",
+          "location": "at command (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/n122-1019-native.mjs:22:50)"
+        },
+        "checks": [],
+        "negativeSqlstates": [],
+        "cleanup": {
+          "stopped": false
+        }
+      }
+    },
+    {
+      "originalFile": "n122-1019-native-lifecycle-envelope-failure.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "startedAt": "2026-10-19T09:38:18.635Z",
+        "finishedAt": "2026-10-19T09:38:33.427Z",
+        "status": "FAIL",
+        "failure": {
+          "name": "error",
+          "code": "22023",
+          "message": "SQL operation failed; see named check and SQLSTATE",
+          "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/fixtures/n122-1019/native-cases.mjs:73:5"
+        },
+        "checks": [
+          {
+            "name": "exact_append_only_migration_and_legacy_no_rewrite",
+            "status": "PASS"
+          },
+          {
+            "name": "owner_term_kind_checks_and_rls",
+            "status": "PASS"
+          },
+          {
+            "name": "actual_protocol_roundtrip_revision_idempotent_receipt_and_conflict",
+            "status": "PASS"
+          },
+          {
+            "name": "class_reopen_preserves_independent_occupancy",
+            "status": "FAIL"
+          }
+        ],
+        "negativeSqlstates": [
+          {
+            "expected": "42501",
+            "actual": "42501"
+          },
+          {
+            "expected": "23503",
+            "actual": "23503"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23503",
+            "actual": "23503"
+          },
+          {
+            "expected": "22023",
+            "actual": "22023"
+          },
+          {
+            "expected": "23505",
+            "actual": "23505"
+          }
+        ],
+        "cleanup": {
+          "stopped": true,
+          "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+          "exactPidAbsent": true,
+          "exactPortReboundAndReleased": true,
+          "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n122-permanent-activity-waiting-slots-20261019\\tests\\fixtures\\n122-1019\\n122-native-pg-57e985f1-2297-4d68-9855-061744258c65-636acc4c-c6a8-4d1d-a194-f5c4e96395cb",
+          "ownedDirectoryRemoved": true,
+          "lease": "RELEASED integration"
+        }
+      }
+    },
+    {
+      "originalFile": "n122-1019-native-replay-envelope-failure.json",
+      "evidence": {
+        "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+        "runId": "57e985f1-2297-4d68-9855-061744258c65",
+        "startedAt": "2026-10-19T09:37:18.752Z",
+        "finishedAt": "2026-10-19T09:37:33.999Z",
+        "status": "FAIL",
+        "failure": {
+          "name": "error",
+          "code": "22023",
+          "message": "SQL operation failed; see named check and SQLSTATE",
+          "location": "at async mutate (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n122-permanent-activity-waiting-slots-20261019/tests/fixtures/n122-1019/native-cases.mjs:47:78)"
+        },
+        "checks": [
+          {
+            "name": "exact_append_only_migration_and_legacy_no_rewrite",
+            "status": "PASS"
+          },
+          {
+            "name": "owner_term_kind_checks_and_rls",
+            "status": "PASS"
+          },
+          {
+            "name": "actual_protocol_roundtrip_revision_idempotent_receipt_and_conflict",
+            "status": "FAIL"
+          }
+        ],
+        "negativeSqlstates": [
+          {
+            "expected": "42501",
+            "actual": "42501"
+          },
+          {
+            "expected": "23503",
+            "actual": "23503"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23514",
+            "actual": "23514"
+          },
+          {
+            "expected": "23503",
+            "actual": "23503"
+          }
+        ],
+        "cleanup": {
+          "stopped": true,
+          "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+          "exactPidAbsent": true,
+          "exactPortReboundAndReleased": true,
+          "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n122-permanent-activity-waiting-slots-20261019\\tests\\fixtures\\n122-1019\\n122-native-pg-57e985f1-2297-4d68-9855-061744258c65-854a1475-3004-4372-9498-25a05f27ad6b",
+          "ownedDirectoryRemoved": true,
+          "lease": "RELEASED integration"
+        }
+      }
+    },
+    {
+      "phase": "client_codec_harness",
+      "failures": [
+        "Authoritative parent already at revision 1 legitimately produced no pending-parent dependency; corrected fixture to start revision 0 and proved blocked-before-parent-ACK.",
+        "Restore tombstones are KEEP_SERVER/server-tombstone under existing suppression contract, not TOMBSTONED_SERVER; corrected expectation and preserved no-resurrection assertion.",
+        "Transport adapter incorrectly exposed applySyncV2Mutation rather than engine applyMutation; corrected adapter, then proved exact wrong-ACK mismatch and unchanged durable mutation identity."
+      ]
+    }
+  ]
+}

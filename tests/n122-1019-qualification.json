@@ -1,0 +1,54 @@
+{
+  "taskId": "continuous-n122-permanent-activity-waiting-slots-20261019",
+  "runId": "e1ddb345-79ab-41f5-9d11-f9d786dd517b",
+  "declaredOriginalBase": "63502a351413f4b3ba2a9196ecb3b7ddca7dab7d",
+  "reconciledOriginMain": "c929cfbcae012c2074e75e63e51f1c70c076916e",
+  "priorDiagnosisCandidate": "70973d46feadb1d5de00bf308368a957f106d57a",
+  "hashFormat": "SHA256 of UTF8 LF-normalized source",
+  "sourceHashes": {
+    "src/models.js": "af9e624621e21686a86599b75eead8289af526072906efbe79e58a84d7b4a5fe",
+    "src/store.js": "13f4bbf7094882a83b4a63880910ab1750c6139172d5843bdf5bff5c167d4c20",
+    "src/views/schedule.js": "e1c498670d13ab3ca300cbeccefd40d0f4ab9cd99eba701cc4f6a77936222f4a",
+    "src/lib/sync.js": "62c792f8444e82156d79da2f1cc7a619036375d544aa4c9218b467a8840aa400",
+    "src/lib/sync-v2.js": "96ebcc1e49528c3e89c716c4e98852dca8ae09f43bbc8ea1f8fad26114fdde3d",
+    "src/lib/schedule-export.js": "c3717e41f8ec5ab0e512618373200a6d91d006e9e2dfc63518e761ef890ca9a6",
+    "src/lib/backup-v2.js": "21ff7093b9de772ab87af6ac5213c96ff9ff22518d96275b33ce5c255cfc9416",
+    "supabase/migrations/20261019091500_n122_non_teaching_slots.sql": "f023d560fbbc1124afd322c4dfa61ea61f6d6422f1fd3d136db117f38e119306"
+  },
+  "checks": [
+    {
+      "name": "n122_permanent_activity_waiting_slot_save_reload_edit_delete_no_fake_subject",
+      "status": "PASS",
+      "evidence": "tests/n122-1019-browser.json; reused unchanged scope"
+    },
+    {
+      "name": "n122_local_native_postgres_owner_term_legacy_sync_and_tombstone_qualification",
+      "status": "PASS",
+      "evidence": "tests/n122-1019-native.json; PostgreSQL 17.6, 6 affected gates; reused unchanged scope"
+    },
+    {
+      "name": "codec_ack_restore_and_reopen",
+      "status": "PASS",
+      "evidence": "node --test tests/n122-1019-model-blocker.mjs tests/n122-1019-sync.mjs: 5 passed; reused unchanged scope"
+    },
+    {
+      "name": "n122_exact_hosted_schema_service_readback_before_product_release",
+      "status": "PASS",
+      "evidence": "tests/n122-1019-hosted-final.json: one exact apply; provider version 20261019095922, history bytes and actual schema/guard/ACL/RLS readback match"
+    },
+    {
+      "name": "n122_preserved_lifecycle_entry_guard_before_exact_hosted_apply",
+      "status": "PASS",
+      "evidence": "tests/n122-1019-entry-guard.json: actual public RPC and two-connection transaction mutex proof; existing wrapper/owner/ACL unchanged"
+    }
+  ],
+  "priorLocalQualificationRunId": "57e985f1-2297-4d68-9855-061744258c65",
+  "observedCurrentOriginMain": "192da4716cd4afbe4dac2a870d9adfb054307b93",
+  "schemaCorrection": {
+    "priorUnappliedSha256Lf": "ddc1a199003e8b8ba1162d84b6261ce624bd4704953c74d781b8ad3b6c6e9d9f",
+    "correctedSha256Lf": "f023d560fbbc1124afd322c4dfa61ea61f6d6422f1fd3d136db117f38e119306",
+    "literalReplacements": 1,
+    "nativeGuardEvidence": "tests/n122-1019-entry-guard.json",
+    "priorFailureEvidence": "tests/n122-1019-hosted-preimage.json"
+  }
+}
