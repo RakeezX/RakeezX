@@ -1,0 +1,13 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-one-approved-closed-page-push-20261019",
+  "runId": "a5bafe17-2400-4454-8f07-c0076fd18e0a",
+  "status": "PASS",
+  "checks": [
+    "Concurrent reserve has one winner and one EEXIST",
+    "Acknowledged marker bytes precede sender",
+    "Unknown outcome and different run cannot replace/replenish marker"
+  ],
+  "scope": "Fabricated local bytes only; no DPAPI/credentials, provider operation or real delivery proof",
+  "cleanup": "Exact owned marker/directory removed in finally"
+}

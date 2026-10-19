@@ -1,0 +1,24 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-one-approved-closed-page-push-20261019",
+  "runId": "a5bafe17-2400-4454-8f07-c0076fd18e0a",
+  "checks": [
+    {
+      "name": "actual_ui_delayed_consent_ack",
+      "status": "PASS",
+      "evidence": "Actual authenticated synthetic store/ownership guard, settings DOM and delegated click.11s consent ACK survives the former10s cutoff and completes exactly one synthetic registration/SW bind. Fresh browser/loopback only; no real permission, account, device or send."
+    },
+    {
+      "name": "late_response_keeps_owner_fence",
+      "status": "PASS",
+      "evidence": "A response after ownership validity changes remains rejected; the deadline correction does not relax the request/response ownership fence or retry an operation."
+    }
+  ],
+  "actualProviderSendAttempts": 0,
+  "actualDeviceRegistrations": 0,
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true
+  },
+  "status": "PASS"
+}
