@@ -15,7 +15,7 @@
       "budgetMinutes": 45,
       "idleMinutes": 12,
       "dependsOn": [],
-      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority PO asks email OTP autofill like phone-code Google permission. Read actual existing email OTP input and primary browser docs only if necessary. Apply supported autocomplete=\"one-time-code\", numeric input semantics when matching existing OTP, paste/autofill handling without breaking normal entry. Do not promise SMS WebOTP API can read email, request mailbox permissions, add SMS/vendor/password/OTP capture, send real email or change auth policy. Explain actual support limits in concise evidence, no new user-facing technical clutter. One affected input verification.",
+      "objective": "Read AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, your exact Product row and only affected current origin/main files. Latest direct PO19October asks continue/finish current work, independent workers via existing controller and MINIMUM affected checks, no blanket reruns or paid reviewer chain. Work in your isolated current-main checkout, preserve user work. Reuse unchanged prior proofs; reproduce only the reported failure with small fabricated fixtures. Do not change queue, source cards or ledger, launch workers or another dispatcher. Existing controller/sole publisher owns delivery. No real school/browser denied operations, real student/account mutations, secrets, new Auth/RLS/schema/SQL, messages or paid service. Keep owner/identity/history/grades/Sync/tombstones and true ACK; never fake completion or suppress legitimate failures. Return exact task/run/base/candidate/check schema. Continue to actual authorized publication; LOCAL_READY is not Production. If routine scope/fixture/harness needs a precise correction, document affected file and reason rather than running repeated unchanged attempts.\n\nLow priority PO asks email OTP autofill like phone-code Google permission. Read actual existing email OTP input and primary browser docs only if necessary. Apply supported autocomplete=\"one-time-code\", numeric input semantics when matching existing OTP, paste/autofill handling without breaking normal entry. Do not promise SMS WebOTP API can read email, request mailbox permissions, add SMS/vendor/password/OTP capture, send real email or change auth policy. Explain actual support limits in concise evidence, no new user-facing technical clutter. One affected input verification.\n\nSYSTEM CARD VERIFICATION-PATH CORRECTION ONLY: src/auth.js never existed. The already completed exact candidate694d2b61c4680d0c20d24d199f29c1c9583f6db5 actually changed existing src/app.js and all required OTP checks passed. Original missing-source receipt remains failed. Correct declared served path to src/app.js and let same sole publisher complete actual publication/source readback without another Product worker, test replay, artificial byte or Auth operation.\n",
       "allowedPaths": [
         "src/auth.js",
         "src/app.js",
@@ -27,7 +27,7 @@
         "docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md"
       ],
       "verificationPaths": [
-        "src/auth.js",
+        "src/app.js",
         "docs/automation-evidence/20261019/N115_EMAIL_CODE_AUTOFILL.md"
       ],
       "requiredChecks": [
@@ -45,7 +45,14 @@
         "AuthRLSChange": false,
         "realSend": false
       },
-      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial.",
+      "completionMode": "repair_source_verification_paths",
+      "verificationPathRepair": {
+        "previousResultSha256": "8c980df974bd5230c6b5987c2160eb7db78a4ba708268cec7e7eb80c9f216a7c",
+        "previousPathsSha256": "a2cfa16773591fd7d1b016f4478d10692754105f571b3b13763529a52d99aea6",
+        "reviewedFixtureSha256": "4a3b04ba5813eb3cf539668d4bf1056412933e94f630f281a37439f08205fe9f",
+        "reason": "Root intake wrongly declared src/auth.js as served verification asset; actual existing Auth form is in src/app.js. Candidate694d Product tests allPASS and exact actual changed src/app.js/doc are allowed. Original missing-asset receipt remains failed; correct declared paths only and resume sole publisher, not Product worker/tests/provider side effects."
+      }
     }
   ]
 }
