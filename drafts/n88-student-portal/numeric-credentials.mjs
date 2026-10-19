@@ -1,6 +1,7 @@
 /** AI-authored, INACTIVE server-only extension. No environment/network at import. */
 import { randomInt, randomBytes, randomUUID, createHmac, createHash, timingSafeEqual } from 'node:crypto';
 import { PRIVATE_HEADERS } from './service.mjs';
+import {createRolloutGuard} from './rollout-guard.mjs';
 
 export const CREDENTIAL_FORMAT = 'six-v1';
 export const CREDENTIAL_CAPACITY = 100_000;
@@ -27,7 +28,7 @@ const response = r => ({...r, headers:{...PRIVATE_HEADERS,...(r.cookie ? {'Set-C
  * keys is a Map(version -> >=32-byte Buffer); activeKeyVersion selects new verifiers.
  */
 export function createNumericCredentialOperations({ keys, activeKeyVersion, reservationKey,
-  now = Date.now, generate = generateNumericCredential }) {
+  now = Date.now, generate = generateNumericCredential, rollout=createRolloutGuard() }) {
   if (!(keys instanceof Map) || !keys.size || !/^[A-Za-z0-9_-]{1,40}$/.test(activeKeyVersion || '') ||
       !keys.has(activeKeyVersion) || !Buffer.isBuffer(reservationKey) || reservationKey.length<32 ||
       [...keys].some(([v,k]) => !/^[A-Za-z0-9_-]{1,40}$/.test(v) || !Buffer.isBuffer(k) || k.length<32)) fail();
@@ -46,6 +47,7 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
   }
   function version(db,m) { return Math.max(0,...db.numericCredentials.filter(c=>identity(c,m)).map(c=>c.version)); }
   function check(db,m,expectedVersion) {
+    if(!rollout.admitsStudent(m))fail();
     const canonical=current(db,m);
     if(!canonical || canonical.enrollmentId!==m.enrollmentId || canonical.revision!==m.revision ||
        canonical.canonicalStamp!==m.canonicalStamp || version(db,m)!==expectedVersion) fail();
@@ -145,11 +147,12 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
           if(!c || c.revokedAt!==null || !keys.has(c.keyVersion) || !/^[a-f0-9]{64}$/.test(c.verifier) ||
              !timingSafeEqual(Buffer.from(c.verifier,'hex'),Buffer.from(verifier(code,c),'hex'))) return denied();
           if(typeof ports?.synchronizeOwner!=='function') fail();
+          if(!rollout.allowsOwner(c.ownerId)||!db.memberships.some(m=>identity(m,c)&&rollout.allowsMember(m)))return denied();
           await ports.synchronizeOwner(c.ownerId);
-          const m=current(db,c); if(!m) return denied();
-          if(token) for(const s of db.numericSessions) if(s.tokenHash===tokenHash(token)) s.revokedAt=time;
+          const m=current(db,c); if(!m||!rollout.admitsStudent(m)) return denied();
+          if(token) for(const s of db.numericSessions) if(s.tokenHash===tokenHash(token)&&rollout.allowsMember(s)) s.revokedAt=time;
           const fresh=randomBytes(32).toString('base64url');
-          db.numericSessions=db.numericSessions.filter(s=>s.expiresAt>time && s.revokedAt===null);
+          db.numericSessions=db.numericSessions.filter(s=>!rollout.allowsMember(s)||s.expiresAt>time && s.revokedAt===null);
           if(db.numericSessions.length>=10000) fail();
           db.numericSessions.push({id:randomUUID(),credentialId:c.id,ownerId:c.ownerId,studentId:c.studentId,
             classId:m.classId,enrollmentId:m.enrollmentId,membershipRevision:m.revision,canonicalStamp:m.canonicalStamp,
@@ -157,6 +160,7 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
           return {status:200,body:{claimed:true},cookie:cookie(fresh,NUMERIC_POLICY.sessionMs/1000)};
         }
         const s=token && db.numericSessions.find(s=>s.tokenHash===tokenHash(token));
+        if(s&&!rollout.allowsMember(s))return denied();
         if(path==='/api/n88/student/end' && method==='POST') {
           if(s) s.revokedAt=time;
           return {status:200,body:{ended:true},cookie:cookie('',0)};
@@ -167,6 +171,7 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
         if(typeof ports?.synchronizeOwner!=='function') fail();
         await ports.synchronizeOwner(c.ownerId);
         const m=current(db,c);
+        if(!rollout.admitsStudent(m))return denied();
         if(!m || m.enrollmentId!==s.enrollmentId || m.classId!==s.classId || m.revision!==s.membershipRevision || m.canonicalStamp!==s.canonicalStamp) {
           s.revokedAt=time; return denied();
         }

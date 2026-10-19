@@ -314,5 +314,5 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
 }
 
 // drafts/n88-student-portal/client/student-entry.js
-var readiness = Object.freeze({ enabled: false });
+var readiness = Object.freeze({ enabled: true, mode: "pilot" });
 mountUnifiedStudentPortal(document.getElementById("student-portal"), { client: createUnifiedStudentPortalClient(), readiness });

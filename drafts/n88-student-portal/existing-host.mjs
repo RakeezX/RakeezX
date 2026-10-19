@@ -9,6 +9,7 @@ import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
 import {assertVerifiedBoundary} from './activation/private-error-boundary.mjs';
 import {assertRestrictedTransport} from './activation/database-transport.mjs';
+import {createRolloutGuard} from './rollout-guard.mjs';
 // Source-side error redaction cannot prevent the database server logging DETAIL.
 // Read only effective session settings before granting the repository this client.
 export async function assertPrivateDatabaseSession(client) {
@@ -38,6 +39,8 @@ export async function assertPrivateDatabaseSession(client) {
 }
 export function createExistingHost(readEnv) {
   if(readEnv('N88_ENABLED')!=='true')return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});
+  const rollout=createRolloutGuard(readEnv);
+  if(!rollout.configured)return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});
   const required=n=>{const v=readEnv(n);if(typeof v!=='string' || !v)throw Error('n88_configuration');return v;};
   const origin=required('N88_PUBLIC_ORIGIN'),authUrl=required('N88_AUTH_URL'),dbUrl=required('N88_DATABASE_URL');
   const db=new URL(dbUrl);
@@ -78,7 +81,7 @@ export function createExistingHost(readEnv) {
     finally{waiting--;}
   };
   try {
-    const handle=createWebEntry({...manifest,origin,authUrl,apiKey:required('N88_AUTH_API_KEY'),secretKey,ingressKey,numericKey,reservationKey,recoveryKeys,recoveryActiveKeyVersion,acquire,
+    const handle=createWebEntry({...manifest,rollout,canonicalBounds:{rollout},origin,authUrl,apiKey:required('N88_AUTH_API_KEY'),secretKey,ingressKey,numericKey,reservationKey,recoveryKeys,recoveryActiveKeyVersion,acquire,
       sourceOnly:false,canonicalReadback:true,privateIngressReadback:true});
     return Object.freeze({handle,close:()=>pool.end()});
   }catch{void pool.end();throw Error('n88_configuration');}

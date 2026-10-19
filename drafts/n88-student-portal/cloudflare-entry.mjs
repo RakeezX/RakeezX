@@ -4,9 +4,18 @@
  * subrequests (CF-Worker header) are denied, including same-zone IP overrides.
  */
 import {ROUTE,FORWARDED,readBytes,sha,mac,signingText,encodeBytes,privateResponse,PRIVATE_WEB_HEADERS} from './web-protocol.mjs';
+import {privateAssets} from './activation/private-document.mjs';
 export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}={}) {
   return async (request,env) => {
     if(env?.N88_ENABLED!=='true')return privateResponse();
+    const documentUrl=new URL(request.url);
+    if(documentUrl.origin===env.N88_PUBLIC_ORIGIN&&request.cf&&['TLSv1.2','TLSv1.3'].includes(request.cf.tlsVersion)&&!request.headers.has('cf-worker')&&
+       !documentUrl.search&&['GET','HEAD'].includes(request.method)&&Object.hasOwn(privateAssets,documentUrl.pathname)){
+      const asset=privateAssets[documentUrl.pathname];
+      const bytes=Uint8Array.from(atob(asset.base64),c=>c.charCodeAt(0));
+      return new Response(request.method==='HEAD'?null:bytes,{headers:{...PRIVATE_WEB_HEADERS,'Content-Type':asset.type,
+        'Content-Security-Policy':"default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"}});
+    }
     const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),12000);
     try {
       const url=new URL(request.url),origin=env.N88_PUBLIC_ORIGIN,upstream=new URL(env.N88_EDGE_URL);

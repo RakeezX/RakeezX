@@ -5,6 +5,7 @@ import {timingSafeEqual} from 'node:crypto';
 import {databaseConfig,assertRestrictedTransport} from './database-transport.mjs';
 import {assertPrivateDatabaseSession,createExistingHost} from '../existing-host.mjs';
 import {mac,sha,readBytes,privateResponse,PRIVATE_WEB_HEADERS} from '../web-protocol.mjs';
+import {createRolloutGuard} from '../rollout-guard.mjs';
 let busy=0;const nonces=new Map();
 export async function checkReadiness(readEnv){
  const source=readEnv('N88_SERVICE_SOURCE_SHA');const client=new pg.Client(databaseConfig(readEnv));let stage='connect',identity={};
@@ -12,13 +13,14 @@ export async function checkReadiness(readEnv){
   await client.connect();stage='identity';identity=await assertRestrictedTransport(client);
   stage='source_boundary';await assertPrivateDatabaseSession(client);
   stage='configuration';let configurationReady=false;
-  if(readEnv('N88_SERVICE_REVISION')){
+  const rollout=createRolloutGuard(readEnv);
+  if(readEnv('N88_SERVICE_REVISION')&&rollout.configured){
    // Construct the actual service with the sealed configuration, without calling
    // its handler or acquiring a private-operation connection. Public gate stays OFF.
    const runtime=createExistingHost(n=>n==='N88_ENABLED'?'true':readEnv(n));
    await runtime.close();configurationReady=true;
   }
-  return {status:'ready',...identity,sourceBoundary:true,configurationReady,source,enabled:readEnv('N88_ENABLED')==='true'};
+  return {status:'ready',...identity,sourceBoundary:true,configurationReady,rolloutMode:rollout.mode,rolloutConfigured:rollout.configured,source,enabled:readEnv('N88_ENABLED')==='true'};
  }catch(e){return {status:'unavailable',stage,...identity,...(e.safeReadiness??{}),code:/^(n88_[a-z_]+|[A-Z0-9]{5})$/.test(e.code??e.message)?(e.code??e.message):'n88_runtime_unavailable',source,enabled:false};}
  finally{await client.end().catch(()=>{});}
 }

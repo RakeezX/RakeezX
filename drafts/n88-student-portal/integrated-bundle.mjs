@@ -55,7 +55,6 @@ const privateAssets={name:'private-document-asset-urls',setup(build){
 }};
 for(const [name,entry,options]of [
   ['edge/index.mjs','supabase/functions/n88-student-portal/index.ts',{platform:'neutral',external:['node:*','pg','@supabase/auth-js']}],
-  ['cloudflare/worker.mjs','drafts/n88-student-portal/cloudflare-entry.mjs',{platform:'browser'}],
   ['private/assets/student.mjs','drafts/n88-student-portal/client/student-entry.js',{platform:'browser',plugins:[absolute,privateAssets]}]
 ]) {
   const result=await esbuild.build({entryPoints:[entry],bundle:true,format:'esm',target:'es2022',write:false,metafile:true,logLevel:'silent',...options});
@@ -101,10 +100,25 @@ let html=(await readFile('drafts/n88-student-portal/client/student.html','utf8')
   .replace('/drafts/n88-student-portal/client/student-entry.js','/n88-private/assets/student.mjs');
 await writeFile(out+'private/student.html',html);manifest.outputs['private/student.html']=sha(html);
 manifest.sources['drafts/n88-student-portal/client/student.html']=await textHash('drafts/n88-student-portal/client/student.html');
+// Original ingress serves only this exact compiled app document/asset allowlist.
+// No Pages build hook, broad directory mount, account-app fallback or subrequest.
+const documents={'/student':{type:'text/html; charset=utf-8',base64:Buffer.from(html).toString('base64')}};
+for(const asset of JSON.parse(await readFile(dir+'deploy.staged.json','utf8')).privateDocument.assetAllowlist){
+  const type=asset.endsWith('.mjs')?'text/javascript; charset=utf-8':asset.endsWith('.css')?'text/css; charset=utf-8':asset.endsWith('.svg')?'image/svg+xml':'image/png';
+  documents['/n88-private/'+asset]={type,base64:(await readFile(out+'private/'+asset)).toString('base64')};
+}
+const documentModule=dir+'private-document.mjs';
+await writeFile(documentModule,'// AI: generated exact compiled application assets; no private config.\nexport const privateAssets=Object.freeze('+JSON.stringify(documents)+');\n');
+const workerBuild=await esbuild.build({entryPoints:['drafts/n88-student-portal/cloudflare-entry.mjs'],bundle:true,platform:'browser',format:'esm',target:'es2022',write:false,metafile:true,logLevel:'silent'});
+await mkdir(out+'cloudflare/',{recursive:true});await writeFile(out+'cloudflare/worker.mjs',workerBuild.outputFiles[0].contents);
+manifest.outputs['cloudflare/worker.mjs']=sha(workerBuild.outputFiles[0].contents);
+manifest.graphs['cloudflare/worker.mjs']={inputs:Object.keys(workerBuild.metafile.inputs).sort(),imports:Object.values(workerBuild.metafile.outputs).flatMap(o=>o.imports)};
+for(const file of manifest.graphs['cloudflare/worker.mjs'].inputs)manifest.sources[file]=await textHash(file);
+manifest.stagedActivation={phase:'owner-restricted-pilot',defaultMode:'off',publicEnabled:false,protectedBindings:['N88_ROLLOUT_MODE','N88_PILOT_BINDING'],maxOwners:1,maxStudents:2,teacherFrontend:'normal authenticated list admission before controls',privateDocumentDelivery:'original private ingress exact embedded assets',deferredChecks:['n88_official_hosted_fabricated_teacher_student_ack_and_isolation','n88_official_publisher_readiness_route_and_served_behavior'],originalAcceptance:'canonical card stagedActivation retained; no full Product readiness'};
 // Runtime stylesheet and brand URLs are pinned by privateAssets above.
 const worker=await readFile(out+'cloudflare/worker.mjs','utf8');assert.ok(!worker.includes('node:'));
 const browser=await readFile(out+'private/assets/student.mjs','utf8');
-assert.match(browser,/enabled: false/);assert.ok(!/serviceWorker\.register|registerSW\(/.test(browser));
+assert.match(browser,/mode: "pilot"/);assert.ok(!/serviceWorker\.register|registerSW\(/.test(browser));
 const wrangler=`# AI: generated inactive config; existing zone only, no route or preview.\nname = "rakeez-n88-private-ingress"\nmain = "bundle/cloudflare/worker.mjs"\ncompatibility_date = "2026-10-01"\nworkers_dev = false\npreview_urls = false\nroutes = []\n[vars]\nN88_ENABLED = "false"\n[observability]\nenabled = false\n`;
 await writeFile(dir+'wrangler.staged.toml',wrangler);
 for(const file of ['drafts/n88-student-portal/task-guidance.mjs','drafts/n88-student-portal/task-guidance.inactive.sql','supabase/migrations/20261018125611_n88_task_guidance_staged.sql',dir+'task-guidance-preflight.inactive.sql','drafts/n88-student-portal/task-guidance-review.mjs','drafts/n88-student-portal/deployment.inactive.json','tests/n88-task-guidance.mjs','tests/n88-task-guidance-review.mjs','tests/n88-task-guidance-artifacts.mjs','drafts/n88-student-portal/code-recovery.mjs','drafts/n88-student-portal/code-recovery.inactive.sql','supabase/migrations/20261018115648_n88_code_recovery_staged.sql',dir+'recovery-preflight.inactive.sql','tests/n88-six-digit-recovery.mjs','tests/n88-six-digit-recovery-context.mjs','tests/n88-six-digit-recovery-launcher.mjs','tests/n88-six-digit-recovery-artifacts.mjs','drafts/n88-student-portal/shared-network-budget.inactive.sql','supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql',dir+'shared-network-preflight.inactive.sql','tests/n88-six-digit-shared-network.mjs','tests/n88-six-digit-shared-launcher.mjs','tests/n88-six-digit-shared-artifacts.mjs','tests/n88-six-digit-shared-flood-window.mjs','drafts/n88-student-portal/ACTIVATION.md','drafts/n88-student-portal/six-digit-schema.inactive.sql','supabase/migrations/20261018110713_n88_six_digit_staged.sql',dir+'six-digit-preflight.inactive.sql','tests/n88-six-digit-redaction.mjs','tests/n88-six-digit-security.mjs','drafts/n88-student-portal/integrated-bundle.mjs','drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/integrated-schema.inactive.sql','index.html','src/app.js','src/lib/app-update.js','drafts/n88-student-portal/current-review.mjs','drafts/n88-student-portal/current-review-launch.ps1','drafts/n88-student-portal/integrated-review.mjs','tests/fixtures/n88-integrated-class/bootstrap.js','tests/fixtures/n88-integrated-class/canonical-extension.sql','tests/fixtures/n88-integrated-class/seed.sql','tests/fixtures/n88-integrated-class/native-pg.mjs','src/router.js','src/lib/student-portal-runtime.js','src/views/student-portal-class.js','src/lib/student-portal-class-client.js','src/styles/student-portal-class.css','src/views/teaching-hub.js','src/views/students.js','sw.js','supabase/migrations/20261018102843_n88_integrated_class_staged.sql',dir+'integrated-preflight.inactive.sql',dir+'integrated-metadata-contract.json',dir+'integrated-identities.inactive.sql',dir+'integrated-expected-identities.json','drafts/n88-student-portal/integrated-readback.mjs','src/views/student-portal-teacher.js',

@@ -10,6 +10,7 @@ import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import path from 'node:path';
 import {serverFirst} from './activation/server-first.mjs';
+import {createRolloutGuard} from './rollout-guard.mjs';
 import {randomUUID,createPublicKey} from 'node:crypto';
 const project='xlrubcwjqktzzunrvuns',run='4ddd5df2-933f-4754-8d04-0d27be47bcff';
 const root=process.cwd(),base=path.resolve('drafts/n88-student-portal/activation'),phase=path.join(base,'owned-custody-'+run+'.tmp');
@@ -71,6 +72,37 @@ async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),phase,protection:'DPAPI CurrentUser + fresh directory current-user ACL',secretValuesReturned:false};
  }
  const state=await load();
+ if(action==='--prepare-pilot-binding'){
+  if(!state.directVerified||!state.installed||!state.preparationPaused||state.pilotBinding)fail('n88_pilot_binding_preimage');
+  for(const name of ['service','ui'])if(JSON.parse(await readFile('tests/n88-official-activation-pilot-'+name+'.json','utf8')).status!=='PASS')fail('n88_pilot_local_gate');
+  const file=path.join(phase,'owned-pilot-source.json');
+  try{
+   const input=JSON.parse(await readFile(file,'utf8'));
+   if(Object.keys(input).sort().join(',')!=='classId,studentIds,teachingId'||!/^sec:[a-f0-9-]{36}$/.test(input.classId)||input.teachingId!=='tch:'+input.classId+'|sub:digital-skills|tm:y:1448-1449:1'||input.classId!=='sec:8d78704e-fd86-4b95-aa92-83957740daf6'||!Array.isArray(input.studentIds)||input.studentIds.length!==2||new Set(input.studentIds).size!==2||input.studentIds.some(s=>!/^[a-f0-9-]{36}$/.test(s)))fail('n88_pilot_source_shape');
+   // Only owner UUID of this exact normal-UI observed source and these two
+   // existing fabricated pupils. No Auth/profile/token/canonical payload projection.
+   const out=await sqlFile(`select t.owner_id::text as owner_id from rakeezx.teachings t join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id join rakeezx.terms tm on tm.owner_id=t.owner_id and tm.id=t.term_id join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id where t.id='${input.teachingId}' and t.section_id='${input.classId}' and t.deleted_at is null and c.deleted_at is null and c.status='active' and tm.deleted_at is null and tm.status='active' and tm.year_id=c.year_id and y.deleted_at is null and y.status='active' and (select count(*) from rakeezx.enrollments e join rakeezx.students s on s.owner_id=e.owner_id and s.id=e.student_id where e.owner_id=t.owner_id and e.section_id=c.id and e.student_id in ('${input.studentIds[0]}','${input.studentIds[1]}') and e.deleted_at is null and e.status='active' and e.end_date is null and s.deleted_at is null and s.status='active')=2 and not exists(select 1 from rakeezx.enrollments e where e.owner_id=t.owner_id and e.student_id in ('${input.studentIds[0]}','${input.studentIds[1]}') and e.section_id<>c.id and e.deleted_at is null and e.status='active' and e.end_date is null);`);
+   if(out?.rows?.length!==1||!/^[a-f0-9-]{36}$/.test(out.rows[0].owner_id))fail('n88_pilot_exact_single_owner_missing');
+   state.pilotBinding={...input,ownerId:out.rows[0].owner_id};
+   if(!createRolloutGuard(n=>({N88_ROLLOUT_MODE:'pilot',N88_PILOT_BINDING:JSON.stringify(state.pilotBinding)})[n]).configured)fail('n88_pilot_binding_invalid');
+   await save(state);return {bindingProtected:true,exactSourceOwnerMatches:1,students:2,newAuthUsers:0,canonicalWrites:0,identifiersReturned:false};
+  }finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+ }
+ if(action==='--install-pilot-config'){
+  if(!state.pilotBinding||!state.directVerified||!state.installed||state.pilotConfigured)fail('n88_pilot_configuration_gate');
+  const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
+  const env={N88_ENABLED:'false',N88_READINESS_ENABLED:'true',N88_ROLLOUT_MODE:'pilot',N88_PILOT_BINDING:JSON.stringify(state.pilotBinding),N88_SERVICE_SOURCE_SHA:source};
+  const file=path.join(phase,'owned-env.tmp');
+  try{await writeFile(file,Object.entries(env).map(([k,v])=>k+'='+JSON.stringify(v)).join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.directSource=source;state.pilotConfigured=true;await save(state);}
+  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {installed:true,enabled:false,rolloutMode:'pilot',source,protectedOwnerBinding:true,names:Object.keys(env),identifiersReturned:false};
+ }
+ if(action==='--enable-pilot'){
+  const r=JSON.parse(await readFile(path.join(base,'hosted-pilot-readiness.json'),'utf8'));
+  if(!state.pilotConfigured||!state.directVerified||state.loginDisarmed||r.source!==state.directSource||r.rolloutMode!=='pilot'||!r.rolloutConfigured||!r.configurationReady||!r.sourceMatches)fail('n88_pilot_enable_gate');
+  const file=path.join(phase,'owned-env.tmp');try{await writeFile(file,'N88_ENABLED=true\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);state.pilotEnabled=true;await save(state);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {enabled:true,rolloutMode:'pilot',publicMode:false,credentialChanged:false};
+ }
  if(action==='--installed-names'){
   const result=await official(['secrets','list','--project-ref',project,'--output','json']);
   const rows=Array.isArray(result)?result:result?.rows;
@@ -126,13 +158,13 @@ async function execute(action,value){
   try{
    const response=await fetch(origin+route,{method:'POST',headers:{'content-type':'application/json','x-n88-time':time,'x-n88-nonce':nonce,'x-n88-signature':signature},body,signal:AbortSignal.timeout(15000)});
    let data=await response.json();
-   const names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','configurationReady','source','enabled','code'];
+   const names=['status','stage','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary','configurationReady','rolloutMode','rolloutConfigured','source','enabled','code'];
    if(Object.keys(data).some(k=>!names.includes(k)))data={status:'unavailable',stage:'entry',code:'n88_generic_entry_unavailable',enabled:false};
-   receipt={runId:'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,httpStatus:response.status,...data,expectedSource:state.directSource,sourceMatches:data.source===state.directSource,transport:'original Supabase Edge IPv6 -> official direct strictTLS',privateMutations:0};
+   receipt={runId:state.pilotConfigured?'3576957c-1cf3-455d-8d62-150b1934b728':'9190735f-6ed0-4513-8ef1-5a3ef24ec6f8',projectId:project,httpStatus:response.status,...data,expectedSource:state.directSource,sourceMatches:data.source===state.directSource,transport:'original Supabase Edge IPv6 -> official direct strictTLS',privateMutations:0};
    state.directVerified=response.status===200&&data.status==='ready'&&data.loginExact===true&&data.roleExact===true&&data.upstreamSsl===true&&data.clientTlsAuthorized===true&&data.sourceBoundary===true&&data.source===state.directSource&&data.enabled===false;
    if(data.code==='28P01')state.directAuthRefused=true;
    if(!state.directVerified){await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;receipt.loginDisarmed=true;}
-   await save(state);await writeFile(path.join(base,'hosted-direct-readiness.json'),JSON.stringify(receipt,null,2)+'\n');return receipt;
+   await save(state);await writeFile(path.join(base,state.pilotConfigured?'hosted-pilot-readiness.json':'hosted-direct-readiness.json'),JSON.stringify(receipt,null,2)+'\n');return receipt;
   }catch{
    await sqlFile('alter role n88_backend nologin;');state.loginDisarmed=true;await save(state);fail('n88_direct_readiness_failed_disarmed');
   }

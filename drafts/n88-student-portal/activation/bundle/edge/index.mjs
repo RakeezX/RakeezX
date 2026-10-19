@@ -25,7 +25,9 @@ var deployment_inactive_default = {
     "N88_INGRESS_KEY",
     "N88_SERVICE_REVISION",
     "N88_NUMERIC_KEY",
-    "N88_RESERVATION_KEY"
+    "N88_RESERVATION_KEY",
+    "N88_ROLLOUT_MODE",
+    "N88_PILOT_BINDING"
   ],
   requiredTrustedPorts: [],
   requiredReadbacks: [
@@ -97,6 +99,16 @@ var deployment_inactive_default = {
     format: "six-v1",
     pattern: "^1[0-9]{5}$",
     capacity: 1e5
+  },
+  stagedRollout: {
+    phase: "pilot",
+    defaultMode: "off",
+    publicEnabled: false,
+    maxOwners: 1,
+    maxStudents: 2,
+    privateBinding: "protected CLI env-file only",
+    fullHostedAcceptance: "NOT_RUN",
+    fullPublicRollout: "NOT_RUN"
   }
 };
 
@@ -437,13 +449,13 @@ function indexScores(scores) {
 // drafts/n88-student-portal/canonical-grade-context.mjs
 function canonicalGradeContext(state, studentId, teachingId) {
   const live2 = (rows) => rows.filter((r) => !r.deleted);
-  const getTeaching = (id3) => live2(state.teachings).find((r) => r.id === id3) ?? null;
-  const getSection = (id3) => live2(state.sections).find((r) => r.id === id3) ?? null;
-  const items = (id3) => sortByOrder(live2(state.items).filter((r) => r.teachingId === id3));
-  const scoresOf = (id3) => live2(state.scores).filter((r) => r.studentId === id3);
-  const enrollmentsOf = (id3) => live2(state.enrollments).filter((r) => r.studentId === id3);
-  const logsOf = (id3) => live2(state.logs).filter((r) => r.studentId === id3);
-  const attendanceOf = (id3) => live2(state.attendance).filter((r) => r.studentId === id3);
+  const getTeaching = (id4) => live2(state.teachings).find((r) => r.id === id4) ?? null;
+  const getSection = (id4) => live2(state.sections).find((r) => r.id === id4) ?? null;
+  const items = (id4) => sortByOrder(live2(state.items).filter((r) => r.teachingId === id4));
+  const scoresOf = (id4) => live2(state.scores).filter((r) => r.studentId === id4);
+  const enrollmentsOf = (id4) => live2(state.enrollments).filter((r) => r.studentId === id4);
+  const logsOf = (id4) => live2(state.logs).filter((r) => r.studentId === id4);
+  const attendanceOf = (id4) => live2(state.attendance).filter((r) => r.studentId === id4);
   function portableGroup(item) {
     return item && !item.deleted && item.scoreMode !== "subitems" && typeof item.portabilityGroupId === "string" && item.portabilityGroupId.trim() ? item.portabilityGroupId : null;
   }
@@ -626,7 +638,7 @@ function readScope(input) {
       revision(row);
     }
   }
-  const one = (table, id3) => rows[table].find((row) => row.id === id3);
+  const one = (table, id4) => rows[table].find((row) => row.id === id4);
   const student = one("students", studentId), section = one("sections", classId), term = one("terms", termId);
   const year = one("years", section?.yearId), enrollment = one("enrollments", enrollmentId);
   if (![student, section, term, year, enrollment].every(active) || [student, section, term, year, enrollment].some((row) => row.status !== "active") || term.yearId !== section.yearId || enrollment.studentId !== studentId || enrollment.sectionId !== classId || enrollment.endDate != null || date(enrollment.startDate) && enrollment.startDate > today || date(term.startDate) && term.startDate > today || date(term.endDate) && term.endDate < today) deny();
@@ -808,13 +820,49 @@ var PRIVATE_HEADERS = Object.freeze({
   Vary: "Cookie"
 });
 
+// drafts/n88-student-portal/rollout-guard.mjs
+var uuid2 = (v) => typeof v === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(v);
+var id = (v) => typeof v === "string" && v.length > 0 && v.length <= 240 && !v.includes("\0");
+var exact3 = (v, keys) => v && typeof v === "object" && !Array.isArray(v) && Object.keys(v).length === keys.length && keys.every((k) => Object.hasOwn(v, k));
+var off = () => Object.freeze({ mode: "off", configured: false, allowsOwner: () => false, allowsMember: () => false, admitsTeacher: () => false, admitsStudent: () => false });
+function createRolloutGuard(readEnv) {
+  if (typeof readEnv !== "function") return off();
+  let mode, binding, proof;
+  try {
+    mode = readEnv("N88_ROLLOUT_MODE");
+    if (mode === "off" || mode == null) return off();
+    if (mode === "public") {
+      proof = readEnv("N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256");
+      if (typeof proof !== "string" || !/^[a-f0-9]{64}$/.test(proof) || readEnv("N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED") !== "true") return off();
+    } else if (mode === "pilot") {
+      const text2 = readEnv("N88_PILOT_BINDING");
+      if (typeof text2 !== "string" || text2.length > 2048) return off();
+      binding = JSON.parse(text2);
+      if (!exact3(binding, ["ownerId", "classId", "teachingId", "studentIds"]) || !uuid2(binding.ownerId) || !id(binding.classId) || !id(binding.teachingId) || !Array.isArray(binding.studentIds) || binding.studentIds.length !== 2 || binding.studentIds.some((v) => !id(v)) || new Set(binding.studentIds).size !== 2) return off();
+      binding = { ...binding, studentIds: new Set(binding.studentIds) };
+    } else return off();
+  } catch {
+    return off();
+  }
+  const allowsOwner = (ownerId) => uuid2(ownerId) && (mode === "public" || ownerId === binding.ownerId);
+  const allowsMember = (m) => !!m && allowsOwner(m.ownerId) && id(m.studentId) && id(m.classId) && (mode === "public" || m.classId === binding.classId && binding.studentIds.has(m.studentId));
+  return Object.freeze({
+    mode,
+    configured: true,
+    allowsOwner,
+    allowsMember,
+    admitsTeacher: (auth, scope) => !!auth && auth.current === true && allowsOwner(auth.ownerId) && !!scope && scope.current === true && scope.ownerId === auth.ownerId && id(scope.classId) && id(scope.teachingId) && (mode === "public" || scope.classId === binding.classId && scope.teachingId === binding.teachingId),
+    admitsStudent: (member) => allowsMember(member) && member.status === "active" && member.endDate === null && member.studentActive === true && member.classActive === true
+  });
+}
+
 // drafts/n88-student-portal/class-credentials.mjs
 var fail = () => {
   throw Error("n88_class_unavailable");
 };
 var hash3 = (value) => createHash4("sha256").update(JSON.stringify(value)).digest("hex");
 var active2 = (m) => m.status === "active" && m.endDate === null && m.studentActive === true && m.classActive === true;
-var id = (value) => typeof value === "string" && value.length > 0 && value.length <= 240 && !value.includes("\0");
+var id2 = (value) => typeof value === "string" && value.length > 0 && value.length <= 240 && !value.includes("\0");
 var requestId = (value) => typeof value === "string" && /^[A-Za-z0-9_-]{16,100}$/.test(value);
 var version = (db, m) => Math.max(0, ...db.numericCredentials.filter((c) => c.ownerId === m.ownerId && c.studentId === m.studentId).map((c) => c.version));
 var live = (db, m) => db.numericCredentials.some((c) => c.ownerId === m.ownerId && c.studentId === m.studentId && c.revokedAt === null);
@@ -822,7 +870,7 @@ var result = (status, body) => ({ status, body, headers: { ...PRIVATE_HEADERS } 
 var denied = () => result(401, { error: "unavailable" });
 var replay = (receipt) => receipt.results.map((r) => r.status === "created" ? { ...r, status: "uncertain", recovery: "refresh_current_roster" } : { ...r });
 var summary = (rows) => Object.fromEntries(["created", "skipped", "failed", "uncertain"].map((s) => [s, rows.filter((r) => r.status === s).length]));
-function createClassCredentialOperations({ repository, verifyTeacher, verifyIngress, origin, resolveClass, issueMember, rotateMember, revokeMember }) {
+function createClassCredentialOperations({ repository, verifyTeacher, verifyIngress, origin, resolveClass, issueMember, rotateMember, revokeMember, rollout = createRolloutGuard() }) {
   if (!repository?.transaction || [verifyTeacher, verifyIngress, resolveClass, issueMember, rotateMember, revokeMember].some((f) => typeof f !== "function") || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail();
   return Object.freeze({ forRequest(request) {
     async function run(action, teachingId, input = {}) {
@@ -831,12 +879,13 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
           const ingress = await verifyIngress(request, ports), headers = request.headers || {};
           if (!ingress?.clientKey || headers["sec-fetch-site"] && headers["sec-fetch-site"] !== "same-origin" || action === "list" && request.method !== "GET" || action !== "list" && (request.method !== "POST" || headers.origin !== origin || headers["x-n88-csrf"] !== "1" || headers["content-type"] !== "application/json")) return denied();
           const auth = await verifyTeacher(request, ports);
-          if (!auth?.ownerId || !auth.sessionId || auth.current !== true || typeof ports?.synchronizeOwner !== "function") return denied();
-          await ports.synchronizeOwner(auth.ownerId);
+          if (!auth?.ownerId || !auth.sessionId || auth.current !== true || !rollout.allowsOwner(auth.ownerId) || typeof ports?.synchronizeOwner !== "function") return denied();
           const scope = await resolveClass(db, ports, auth, teachingId, input);
-          if (!scope || scope.ownerId !== auth.ownerId || scope.current !== true || !id(scope.teachingId) || !id(scope.classId) || !id(scope.revision)) return denied();
+          if (!scope || scope.ownerId !== auth.ownerId || scope.current !== true || !id2(scope.teachingId) || !id2(scope.classId) || !id2(scope.revision)) return denied();
           if (teachingId !== null && scope.teachingId !== teachingId) return denied();
-          const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === scope.classId && active2(m));
+          if (!rollout.admitsTeacher(auth, scope)) return denied();
+          await ports.synchronizeOwner(auth.ownerId);
+          const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === scope.classId && active2(m) && rollout.admitsStudent(m));
           if (members.length > 2e3 || new Set(members.map((m) => m.studentId)).size !== members.length) return denied();
           if (members.some((m) => db.memberships.filter((x) => x.ownerId === m.ownerId && x.studentId === m.studentId && active2(x)).length !== 1)) return denied();
           members.sort((a, b) => a.studentId.localeCompare(b.studentId));
@@ -914,7 +963,8 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
 function createPgClassResolver({ teachingId: boundTeachingId } = {}) {
   return async (db, ports, auth, teachingId, input) => {
     const requested = teachingId ?? boundTeachingId;
-    if (!id(requested) || typeof ports?.query !== "function") return null;
+    if (!id2(requested) || typeof ports?.query !== "function") return null;
+    await ports.query("select n88_private.lock_canonical_sources($1::uuid,$2::integer)", [auth.ownerId, 2e3]);
     const r = await ports.query(`select t.id,t.section_id,t.revision::text as teaching_revision,
       term.revision::text as term_revision from rakeezx.teachings t
       join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id
@@ -969,9 +1019,9 @@ function withCredentialRepository(repository, { maxRows = 1e4, maxBytes = 4 * 10
       }
       return allowed;
     }),
-    commitAttemptSession: async (id3, action) => {
+    commitAttemptSession: async (id4, action) => {
       const committed = await api.transaction(async (db, ports) => {
-        const a = db.numericAttempts.find((a2) => a2.id === id3);
+        const a = db.numericAttempts.find((a2) => a2.id === id4);
         if (!a || a.sessionId !== null || a.settled) fail();
         const before = new Set(db.numericSessions.map((s) => s.id));
         const value = await action(db, ports);
@@ -1051,7 +1101,7 @@ var fail2 = () => {
   throw Error("n88_recovery_unavailable");
 };
 var ver = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(v);
-var exact3 = (o, ks) => o && Object.keys(o).length === ks.length && ks.every((k) => Object.hasOwn(o, k));
+var exact4 = (o, ks) => o && Object.keys(o).length === ks.length && ks.every((k) => Object.hasOwn(o, k));
 var fields = ["id", "credentialId", "generation", "envelopeVersion", "algorithm", "keyVersion", "nonce", "ciphertext", "tag"];
 function createCodeRecovery({ keys, activeKeyVersion, otherKeys = [] } = {}) {
   if (!(keys instanceof Map) || !keys.size || keys.size > 8 || !ver(activeKeyVersion) || !keys.has(activeKeyVersion) || [...keys].some(([v, k]) => !ver(v) || !Buffer5.isBuffer(k) || k.length !== 32) || new Set([...keys.values()].map((k) => k.toString("hex"))).size !== keys.size || [...keys.values()].some((k) => otherKeys.some((o) => Buffer5.isBuffer(o) && k.equals(o)))) fail2();
@@ -1068,7 +1118,7 @@ function createCodeRecovery({ keys, activeKeyVersion, otherKeys = [] } = {}) {
   }
   function open(c, e) {
     try {
-      if (c.revokedAt !== null || c.format !== "six-v1" || !exact3(e, fields) || e.credentialId !== c.id || e.envelopeVersion !== 1 || e.algorithm !== "AES-256-GCM" || !keys.has(e.keyVersion) || !Number.isSafeInteger(e.generation) || e.generation < 1 || !/^[a-f0-9]{24}$/.test(e.nonce) || !/^[a-f0-9]{12}$/.test(e.ciphertext) || !/^[a-f0-9]{32}$/.test(e.tag)) fail2();
+      if (c.revokedAt !== null || c.format !== "six-v1" || !exact4(e, fields) || e.credentialId !== c.id || e.envelopeVersion !== 1 || e.algorithm !== "AES-256-GCM" || !keys.has(e.keyVersion) || !Number.isSafeInteger(e.generation) || e.generation < 1 || !/^[a-f0-9]{24}$/.test(e.nonce) || !/^[a-f0-9]{12}$/.test(e.ciphertext) || !/^[a-f0-9]{32}$/.test(e.tag)) fail2();
       const d = createDecipheriv("aes-256-gcm", keys.get(e.keyVersion), Buffer5.from(e.nonce, "hex"), { authTagLength: 16 });
       d.setAAD(aad(c, e));
       d.setAuthTag(Buffer5.from(e.tag, "hex"));
@@ -1134,7 +1184,8 @@ function createNumericCredentialOperations({
   activeKeyVersion,
   reservationKey,
   now = Date.now,
-  generate = generateNumericCredential
+  generate = generateNumericCredential,
+  rollout = createRolloutGuard()
 }) {
   if (!(keys instanceof Map) || !keys.size || !/^[A-Za-z0-9_-]{1,40}$/.test(activeKeyVersion || "") || !keys.has(activeKeyVersion) || !Buffer.isBuffer(reservationKey) || reservationKey.length < 32 || [...keys].some(([v, k]) => !/^[A-Za-z0-9_-]{1,40}$/.test(v) || !Buffer.isBuffer(k) || k.length < 32)) fail3();
   keys = new Map([...keys].map(([v, k]) => [v, Buffer.from(k)]));
@@ -1155,6 +1206,7 @@ function createNumericCredentialOperations({
     return Math.max(0, ...db.numericCredentials.filter((c) => identity(c, m)).map((c) => c.version));
   }
   function check(db, m, expectedVersion) {
+    if (!rollout.admitsStudent(m)) fail3();
     const canonical = current(db, m);
     if (!canonical || canonical.enrollmentId !== m.enrollmentId || canonical.revision !== m.revision || canonical.canonicalStamp !== m.canonicalStamp || version2(db, m) !== expectedVersion) fail3();
   }
@@ -1257,14 +1309,15 @@ function createNumericCredentialOperations({
             const c2 = db.numericCredentials.find((c3) => c3.reservation === reservation(code));
             if (!c2 || c2.revokedAt !== null || !keys.has(c2.keyVersion) || !/^[a-f0-9]{64}$/.test(c2.verifier) || !timingSafeEqual2(Buffer.from(c2.verifier, "hex"), Buffer.from(verifier(code, c2), "hex"))) return denied2();
             if (typeof ports?.synchronizeOwner !== "function") fail3();
+            if (!rollout.allowsOwner(c2.ownerId) || !db.memberships.some((m3) => identity(m3, c2) && rollout.allowsMember(m3))) return denied2();
             await ports.synchronizeOwner(c2.ownerId);
             const m2 = current(db, c2);
-            if (!m2) return denied2();
+            if (!m2 || !rollout.admitsStudent(m2)) return denied2();
             if (token) {
-              for (const s2 of db.numericSessions) if (s2.tokenHash === tokenHash(token)) s2.revokedAt = time2;
+              for (const s2 of db.numericSessions) if (s2.tokenHash === tokenHash(token) && rollout.allowsMember(s2)) s2.revokedAt = time2;
             }
             const fresh = randomBytes3(32).toString("base64url");
-            db.numericSessions = db.numericSessions.filter((s2) => s2.expiresAt > time2 && s2.revokedAt === null);
+            db.numericSessions = db.numericSessions.filter((s2) => !rollout.allowsMember(s2) || s2.expiresAt > time2 && s2.revokedAt === null);
             if (db.numericSessions.length >= 1e4) fail3();
             db.numericSessions.push({
               id: randomUUID3(),
@@ -1283,6 +1336,7 @@ function createNumericCredentialOperations({
             return { status: 200, body: { claimed: true }, cookie: cookie(fresh, NUMERIC_POLICY.sessionMs / 1e3) };
           }
           const s = token && db.numericSessions.find((s2) => s2.tokenHash === tokenHash(token));
+          if (s && !rollout.allowsMember(s)) return denied2();
           if (path === "/api/n88/student/end" && method === "POST") {
             if (s) s.revokedAt = time2;
             return { status: 200, body: { ended: true }, cookie: cookie("", 0) };
@@ -1293,6 +1347,7 @@ function createNumericCredentialOperations({
           if (typeof ports?.synchronizeOwner !== "function") fail3();
           await ports.synchronizeOwner(c.ownerId);
           const m = current(db, c);
+          if (!rollout.admitsStudent(m)) return denied2();
           if (!m || m.enrollmentId !== s.enrollmentId || m.classId !== s.classId || m.revision !== s.membershipRevision || m.canonicalStamp !== s.canonicalStamp) {
             s.revokedAt = time2;
             return denied2();
@@ -1358,8 +1413,9 @@ async function readCanonical(ports, ownerId) {
 var fieldsOff = () => Object.fromEntries(VISIBILITY_FIELDS.map((f) => [f, false]));
 var bindingKeys = ["ownerId", "sessionId", "leaseId", "teachingId", "classId", "termId", "contextRevision"];
 function createIntegratedService(options, adapter, baseRepository) {
+  const rollout = options.rollout ?? createRolloutGuard();
   const repository = withCredentialRepository(baseRepository);
-  const credentials = createNumericCredentialOperations({ keys: /* @__PURE__ */ new Map([["v1", options.numericKey]]), activeKeyVersion: "v1", reservationKey: options.reservationKey });
+  const credentials = createNumericCredentialOperations({ rollout, keys: /* @__PURE__ */ new Map([["v1", options.numericKey]]), activeKeyVersion: "v1", reservationKey: options.reservationKey });
   const recovery = createCodeRecovery({ keys: options.recoveryKeys, activeKeyVersion: options.recoveryActiveKeyVersion, otherKeys: [options.numericKey, options.reservationKey, options.ingressKey, options.secretKey] });
   const ownedCredential = (db, m) => {
     const cs = db.numericCredentials.filter((c) => c.ownerId === m.ownerId && c.studentId === m.studentId && c.revokedAt === null);
@@ -1403,19 +1459,23 @@ function createIntegratedService(options, adapter, baseRepository) {
       const auth = await adapter.verifyTeacher(r2, ports);
       return auth?.ownerId === binding.ownerId && auth.sessionId === binding.sessionId ? auth : null;
     };
-    const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input).then((s) => s && s.classId === binding.classId && s.termId === binding.termId ? s : null);
-    const ops = createClassCredentialOperations({ repository, ...credentials, ...recovering, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });
+    const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input).then((s) => {
+      if (!s || s.classId !== binding.classId || s.termId !== binding.termId || !rollout.admitsTeacher(auth, s)) return null;
+      if (rollout.mode === "pilot" && !db.contexts.some((c) => c.ownerId === auth.ownerId)) db.contexts.push({ namespace: "n88_pilot_" + randomUUID4(), ownerId: auth.ownerId, active: true });
+      return s;
+    });
+    const ops = createClassCredentialOperations({ rollout, repository, ...credentials, ...recovering, origin: options.origin, verifyIngress: adapter.verifyIngress, verifyTeacher, resolveClass });
     if (action === "visibility" || action === "list" || action.startsWith("guidance-")) {
       try {
         return await repository.transaction(async (db, ports) => {
           const h = request.headers || {};
           if (!await adapter.verifyIngress(request, ports) || h.origin !== options.origin || h["x-n88-csrf"] !== "1" || h["content-type"] !== "application/json" || h["sec-fetch-site"] && h["sec-fetch-site"] !== "same-origin") return deny2();
           const auth = await verifyTeacher(request, ports);
-          if (!auth?.current) return deny2();
-          await ports.synchronizeOwner(auth.ownerId);
+          if (!auth?.current || !rollout.allowsOwner(auth.ownerId)) return deny2();
           const s = await resolveClass(db, ports, auth, body.teachingId, body);
           if (!s) return deny2();
-          const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === s.classId && m.status === "active" && !m.endDate && m.studentActive && m.classActive);
+          await ports.synchronizeOwner(auth.ownerId);
+          const members = db.memberships.filter((m) => m.ownerId === auth.ownerId && m.classId === s.classId && m.status === "active" && !m.endDate && m.studentActive && m.classActive && rollout.admitsStudent(m));
           if (members.length > 2e3 || new Set(members.map((m) => m.studentId)).size !== members.length || members.some((m) => db.memberships.filter((x) => x.ownerId === m.ownerId && x.studentId === m.studentId && x.status === "active" && !x.endDate && x.studentActive && x.classActive).length !== 1)) return deny2();
           const rosterRevision = hash4([s.teachingId, s.revision, members.sort((a, b) => a.studentId.localeCompare(b.studentId)).map((m) => [m.studentId, m.enrollmentId, m.revision, m.canonicalStamp])]);
           let p = await policies(ports, s.ownerId, s.classId, s.termId), data2;
@@ -1432,7 +1492,7 @@ function createIntegratedService(options, adapter, baseRepository) {
               const input = inputFor(s, m), b = studentPortalPublicationBindings(input);
               return { version: "n88-visibility-v1", ownerId: s.ownerId, studentId: m.studentId, enrollmentId: m.enrollmentId, classId: s.classId, termId: s.termId, scopeStamp: b.scopeStamp, fields: body.fields, sources: b.sources.map((src) => ({ ...src, publicationId: randomUUID4() })) };
             });
-            p = { revision: p.revision + 1, fields: body.fields, members: membersPolicy };
+            p = { revision: p.revision + 1, fields: body.fields, members: [...p.members.filter((m) => !rollout.allowsMember(m)), ...membersPolicy] };
             await ports.query("insert into n88_private.class_visibility(owner_id,class_id,term_id,payload) values($1::uuid,$2,$3,$4::jsonb) on conflict(owner_id,class_id,term_id) do update set payload=excluded.payload", [s.ownerId, s.classId, s.termId, JSON.stringify(p)]);
             data2 = { updated: true, policyRevision: p.revision, fields: p.fields };
           } else data2 = { classId: s.classId, rosterRevision, policyRevision: p.revision, visibility: p.fields, students: await Promise.all(members.map(async (m) => {
@@ -1440,7 +1500,7 @@ function createIntegratedService(options, adapter, baseRepository) {
             const c = ownedCredential(db, m), r2 = c ? await recovery.read(ports, c) : { status: "inactive", credential: null };
             return { recoveryStatus: r2.status, credential: r2.credential, studentId: m.studentId, enrollmentId: m.enrollmentId, revision: m.revision, label: m.label, hasActiveCode: cs.some((c2) => c2.revokedAt === null), credentialVersion: Math.max(0, ...cs.map((c2) => c2.version)) };
           })) };
-          return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2 }, headers: PRIVATE_HEADERS };
+          return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2, rollout: rollout.mode }, headers: PRIVATE_HEADERS };
         });
       } catch {
         return { ...deny2(), status: 503 };
@@ -3925,9 +3985,9 @@ var tables = {
   rates: { sql: "guess_budgets", pk: ["key"], fields: ["key", "count", "until"], cols: ["key", "count", "until_at"] }
 };
 var names = Object.keys(tables);
-var exact4 = (o, keys) => must(o && Object.getPrototypeOf(o) === Object.prototype && Object.keys(o).length === keys.length && keys.every((k) => Object.hasOwn(o, k)));
+var exact5 = (o, keys) => must(o && Object.getPrototypeOf(o) === Object.prototype && Object.keys(o).length === keys.length && keys.every((k) => Object.hasOwn(o, k)));
 var str = (s, max, min = 1) => must(typeof s === "string" && s.length >= min && s.length <= max && !s.includes("\0"));
-var uuid2 = (s) => must(typeof s === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(s));
+var uuid3 = (s) => must(typeof s === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(s));
 var hex = (s) => must(typeof s === "string" && /^[a-f0-9]{64}$/.test(s));
 var bool = (b) => must(typeof b === "boolean");
 var safe = (n, min = 0, max = Number.MAX_SAFE_INTEGER) => {
@@ -3946,8 +4006,8 @@ var date2 = (s) => {
 var namespace = (s) => must(typeof s === "string" && /^[A-Za-z0-9_-]{24,64}$/.test(s));
 var active4 = (r) => r.status === "active" && r.endDate === null && r.studentActive && r.classActive;
 function validate(name, r) {
-  exact4(r, tables[name].fields);
-  for (const k of ["ownerId", "id", "credentialId"]) if (Object.hasOwn(r, k)) uuid2(r[k]);
+  exact5(r, tables[name].fields);
+  for (const k of ["ownerId", "id", "credentialId"]) if (Object.hasOwn(r, k)) uuid3(r[k]);
   for (const k of ["classId", "studentId", "enrollmentId"]) if (Object.hasOwn(r, k)) str(r[k], 240);
   if (Object.hasOwn(r, "namespace")) namespace(r.namespace);
   for (const k of ["version", "revision", "membershipRevision"]) if (Object.hasOwn(r, k)) safe(r[k], 1);
@@ -3964,7 +4024,7 @@ function validate(name, r) {
   }
   if (name === "sessions") time(r.expiresAt);
   if (name === "publications") {
-    exact4(r.source, ["teachingId", "itemId"]);
+    exact5(r.source, ["teachingId", "itemId"]);
     str(r.source.teachingId, 240);
     str(r.source.itemId, 240);
     str(r.title, 160);
@@ -3988,7 +4048,7 @@ function encode(name, r) {
 }
 function decode(name, row) {
   const t = tables[name];
-  exact4(row, t.cols);
+  exact5(row, t.cols);
   let r;
   if (name === "publications") r = {
     id: row.id,
@@ -4027,7 +4087,7 @@ var queries = Object.fromEntries(names.map((name) => {
 }));
 var pk = (name, values) => tables[name].pk.map((k) => values[tables[name].cols.indexOf(k)]);
 function snapshot(state, limits) {
-  exact4(state, names);
+  exact5(state, names);
   let total = 0, bytes = 0;
   const maps = {};
   for (const name of names) {
@@ -4066,12 +4126,12 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
 } }) {
   must(typeof synchronize === "function");
   must(typeof acquire === "function");
-  exact4(limits, [...names, "total", "bytes", "rowBytes"]);
+  exact5(limits, [...names, "total", "bytes", "rowBytes"]);
   for (const k of names) safe(limits[k], 1, 1e4);
   safe(limits.total, 1, 5e4);
   safe(limits.bytes, 1024, 64 * 1024 * 1024);
   safe(limits.rowBytes, 128, 32768);
-  exact4(timing, ["acquireMs", "transactionMs", "cleanupMs", "statementMs", "lockMs"]);
+  exact5(timing, ["acquireMs", "transactionMs", "cleanupMs", "statementMs", "lockMs"]);
   for (const k of Object.keys(timing)) safe(timing[k], 1, 6e4);
   must(timing.acquireMs <= timing.transactionMs && timing.statementMs <= timing.transactionMs && timing.lockMs <= timing.statementMs);
   limits = { ...limits };
@@ -4122,7 +4182,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         const result3 = await query(queries[name].read, [bound + 1, limits.rowBytes, limits.bytes - transferred]);
         must(result3.rows.length <= bound);
         state[name] = result3.rows.map((row) => {
-          exact4(row, ["bounded_row"]);
+          exact5(row, ["bounded_row"]);
           must(typeof row.bounded_row === "string");
           transferred += Buffer7.byteLength(row.bounded_row);
           must(transferred <= limits.bytes);
@@ -4141,7 +4201,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       };
       const synchronizeOwner = async (ownerId) => {
         fence();
-        uuid2(ownerId);
+        uuid3(ownerId);
         if (owners.has(ownerId)) return;
         await synchronize(state, { query }, ownerId);
         fence();
@@ -4206,13 +4266,14 @@ var fail5 = () => {
   throw Error("n88_canonical_unavailable");
 };
 var key = (m) => JSON.stringify([m.ownerId, m.classId, m.studentId, m.enrollmentId]);
-var id2 = (parts) => {
+var id3 = (parts) => {
   const h = createHash7("sha256").update(JSON.stringify(["n88-publication-v1", ...parts])).digest("hex");
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20, 32)}`;
 };
-function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = {}) {
+function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024, rollout = createRolloutGuard() } = {}) {
   if (!Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail5();
   return async (db, { query }, ownerId) => {
+    if (!rollout.allowsOwner(ownerId)) fail5();
     if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(ownerId) || !db.contexts.some((c) => c.ownerId === ownerId && c.active)) fail5();
     await query("select n88_private.lock_canonical_sources($1::uuid,$2::integer)", [ownerId, maxRows]);
     const owners = [ownerId];
@@ -4237,13 +4298,14 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
       return JSON.parse(row.payload);
     };
     const previous = new Map(db.memberships.map((m) => [key(m), m]));
-    for (const m of db.memberships.filter((m2) => m2.ownerId === ownerId)) {
+    for (const m of db.memberships.filter((m2) => m2.ownerId === ownerId && rollout.allowsMember(m2))) {
       m.status = "inactive";
       m.studentActive = false;
       m.classActive = false;
     }
     for (const row of result2.rows) {
       const r = read(row), revision2 = Number(r.revision);
+      if (!rollout.allowsMember({ ownerId: r.owner_id, classId: r.section_id, studentId: r.student_id })) continue;
       if (!/^[1-9][0-9]*$/.test(r.revision) || !Number.isSafeInteger(revision2)) fail5();
       const revisions = [r.revision, r.student_revision, r.section_revision, r.year_revision];
       if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail5();
@@ -4269,7 +4331,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
         previous.set(key(m), m);
       }
     }
-    for (const s of db.sessions.filter((s2) => s2.ownerId === ownerId && s2.revokedAt == null)) {
+    for (const s of db.sessions.filter((s2) => s2.ownerId === ownerId && s2.revokedAt == null && rollout.allowsMember(s2))) {
       const m = db.memberships.find((m2) => key(m2) === key(s));
       if (!m || m.status !== "active" || m.endDate || !m.studentActive || !m.classActive || m.revision !== s.membershipRevision || m.canonicalStamp !== s.canonicalStamp) s.revokedAt = Date.now();
     }
@@ -4288,10 +4350,11 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
     const current = /* @__PURE__ */ new Set();
     for (const row of source.rows) {
       const r = read(row);
+      if (!rollout.admitsTeacher({ ownerId, current: true }, { ownerId: r.owner_id, current: true, classId: r.section_id, teachingId: r.teaching_id })) continue;
       const revisions = [r.item_revision, r.teaching_revision, r.term_revision];
       if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail5();
-      for (const m of db.memberships.filter((m2) => m2.ownerId === r.owner_id && m2.classId === r.section_id && m2.status === "active" && !m2.endDate && m2.studentActive && m2.classActive)) {
-        const publicationId = id2([m.ownerId, m.enrollmentId, m.canonicalStamp, r.teaching_id, r.item_id, ...revisions]);
+      for (const m of db.memberships.filter((m2) => m2.ownerId === r.owner_id && m2.classId === r.section_id && m2.status === "active" && !m2.endDate && m2.studentActive && m2.classActive && rollout.admitsStudent(m2))) {
+        const publicationId = id3([m.ownerId, m.enrollmentId, m.canonicalStamp, r.teaching_id, r.item_id, ...revisions]);
         current.add(publicationId);
         const existing = db.publications.find((p) => p.id === publicationId);
         if (existing && (key(existing) !== key(m) || existing.source.teachingId !== r.teaching_id || existing.source.itemId !== r.item_id)) fail5();
@@ -4312,7 +4375,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024 } = 
         if (db.publications.length > maxRows) fail5();
       }
     }
-    db.publications = db.publications.filter((p) => p.ownerId !== ownerId || current.has(p.id));
+    db.publications = db.publications.filter((p) => p.ownerId !== ownerId || !rollout.allowsMember(p) || current.has(p.id));
   };
 }
 
@@ -4322,7 +4385,7 @@ import { Buffer as Buffer9 } from "node:buffer";
 // drafts/n88-student-portal/auth-verifier.mjs
 import { Buffer as Buffer10 } from "node:buffer";
 import { AuthClient } from "@supabase/auth-js";
-var uuid3 = (s) => typeof s === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(s);
+var uuid4 = (s) => typeof s === "string" && /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(s);
 var fail6 = () => {
   throw Error("n88_auth_configuration");
 };
@@ -4384,7 +4447,7 @@ function createTeacherVerifier({ authUrl, apiKey, fetch: send = globalThis.fetch
       fence();
       if (verified2.error || !verified2.data?.claims) return null;
       const c = verified2.data.claims, sec = Math.floor(now() / 1e3);
-      if (c.iss !== issuer || !(c.aud === "authenticated" || Array.isArray(c.aud) && c.aud.length === 1 && c.aud[0] === "authenticated") || c.role !== "authenticated" || !uuid3(c.sub) || !uuid3(c.session_id) || c.is_anonymous === true || !Number.isSafeInteger(c.exp) || c.exp <= sec || !Number.isSafeInteger(c.iat) || c.iat > sec || c.iat >= c.exp || c.nbf !== void 0 && (!Number.isSafeInteger(c.nbf) || c.nbf > sec)) return null;
+      if (c.iss !== issuer || !(c.aud === "authenticated" || Array.isArray(c.aud) && c.aud.length === 1 && c.aud[0] === "authenticated") || c.role !== "authenticated" || !uuid4(c.sub) || !uuid4(c.session_id) || c.is_anonymous === true || !Number.isSafeInteger(c.exp) || c.exp <= sec || !Number.isSafeInteger(c.iat) || c.iat > sec || c.iat >= c.exp || c.nbf !== void 0 && (!Number.isSafeInteger(c.nbf) || c.nbf > sec)) return null;
       const current = await query("select user_id,session_id from n88_private.lock_current_session($1::uuid,$2::uuid)", [c.sub, c.session_id]);
       fence();
       const matches = (result2) => result2.rows.length === 1 && result2.rows[0].user_id === c.sub && result2.rows[0].session_id === c.session_id;
@@ -4608,6 +4671,9 @@ async function assertPrivateDatabaseSession(client) {
 function createExistingHost(readEnv) {
   if (readEnv("N88_ENABLED") !== "true") return Object.freeze({ handle: async () => privateResponse(), close: async () => {
   } });
+  const rollout = createRolloutGuard(readEnv);
+  if (!rollout.configured) return Object.freeze({ handle: async () => privateResponse(), close: async () => {
+  } });
   const required = (n) => {
     const v = readEnv(n);
     if (typeof v !== "string" || !v) throw Error("n88_configuration");
@@ -4667,6 +4733,8 @@ function createExistingHost(readEnv) {
   try {
     const handle = createWebEntry({
       ...deployment_inactive_default,
+      rollout,
+      canonicalBounds: { rollout },
       origin,
       authUrl,
       apiKey: required("N88_AUTH_API_KEY"),
@@ -4706,12 +4774,13 @@ async function checkReadiness(readEnv) {
     await assertPrivateDatabaseSession(client);
     stage = "configuration";
     let configurationReady = false;
-    if (readEnv("N88_SERVICE_REVISION")) {
+    const rollout = createRolloutGuard(readEnv);
+    if (readEnv("N88_SERVICE_REVISION") && rollout.configured) {
       const runtime2 = createExistingHost((n) => n === "N88_ENABLED" ? "true" : readEnv(n));
       await runtime2.close();
       configurationReady = true;
     }
-    return { status: "ready", ...identity2, sourceBoundary: true, configurationReady, source, enabled: readEnv("N88_ENABLED") === "true" };
+    return { status: "ready", ...identity2, sourceBoundary: true, configurationReady, rolloutMode: rollout.mode, rolloutConfigured: rollout.configured, source, enabled: readEnv("N88_ENABLED") === "true" };
   } catch (e) {
     return { status: "unavailable", stage, ...identity2, ...e.safeReadiness ?? {}, code: /^(n88_[a-z_]+|[A-Z0-9]{5})$/.test(e.code ?? e.message) ? e.code ?? e.message : "n88_runtime_unavailable", source, enabled: false };
   } finally {

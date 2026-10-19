@@ -216,5 +216,15 @@
     "loggingChanges": false,
     "parameterGrants": false,
     "originalSixImmutable": true
+  },
+  "stagedRollout": {
+    "phase": "pilot",
+    "defaultMode": "off",
+    "publicEnabled": false,
+    "maxOwners": 1,
+    "maxStudents": 2,
+    "privateBinding": "protected CLI env-file only",
+    "fullHostedAcceptance": "NOT_RUN",
+    "fullPublicRollout": "NOT_RUN"
   }
 }

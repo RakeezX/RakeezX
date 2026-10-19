@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "status": "PASS",
+  "checks": [
+    "actual class runtime/component/handlers and source CSS rendered over loopback HTTP",
+    "actual account store and owner-bound dispatch guard admitted synthetic current owner",
+    "pilot state and two-member roster rendered",
+    "field draft handler exercised without publishing",
+    "owner deactivation removes private roster/delivery",
+    "server admission rejection keeps controls unavailable"
+  ],
+  "hostedProof": false,
+  "cleanup": {
+    "ownedBrowserAndHttpClosed": true,
+    "lease": "RELEASED browser"
+  }
+}
