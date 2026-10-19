@@ -26,7 +26,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   const selection=focus?.tagName==='TEXTAREA'?[focus.selectionStart,focus.selectionEnd]:null;
   const focusKey=focus&&(focus.name||[...focus.attributes].find(a=>a.name.startsWith('data-guidance-'))?.name);
   const {task,draft,stale}=state();
-  root.innerHTML=`<details class="n88-task-guidance" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body"><p role="status" aria-live="polite">${esc(message||(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy?'جارٍ قراءة المهام…':''))}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&!busy&&!readError?'<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>':''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="2">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="2">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><label data-clear hidden><input type="checkbox" name="confirmClear"> أؤكد نشر المهمة دون تعليمات</label><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
+  root.innerHTML=`<details class="n88-task-guidance" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body"><p role="status" aria-live="polite">${esc(message||(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy&&!tasks.length?'جارٍ قراءة المهام…':''))}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&!busy&&!readError?'<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>':''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="2">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="2">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><label data-clear hidden><input type="checkbox" name="confirmClear"> أؤكد نشر المهمة دون تعليمات</label><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
   updateControls();
   if(focusKey){const next=[...root.querySelectorAll('button,select,textarea,input')].find(e=>e.name===focusKey||e.hasAttribute(focusKey));next?.focus({preventScroll:true});if(next&&selection)next.setSelectionRange(...selection);}
  }
@@ -59,7 +59,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   catch{if(k===current()&&g===sequence){uncertain.add(task.subitemId);message='تعذّر تأكيد النشر. راجع الحالة قبل المحاولة.';}}
   finally{saving=false;busy=false;if(!disposed){if(k!==current())reset();queued=false;draw();await refresh();}}
  };
- const changed=()=>{if(bound!==current()){reset();draw();}scheduleRead();};
+ const changed=()=>{if(bound===current())return;reset();draw();scheduleRead();};
  const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);reset();tasks=[];draw();},wake=()=>{if(root.ownerDocument.visibilityState==='visible'){suspended=false;scheduleRead();}};
  root.addEventListener('input',input);root.addEventListener('change',change);root.addEventListener('click',click);root.addEventListener('submit',submit);
  win.addEventListener('pagehide',hide);win.addEventListener('pageshow',wake);win.addEventListener('focus',wake);root.ownerDocument.addEventListener('visibilitychange',wake);
@@ -85,7 +85,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     root.setAttribute('aria-busy', String(busy));
     panel.innerHTML = `<section aria-label="مساحة طلاب الفصل">
       <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'رموز الدخول · '+esc(roster.students.length) : 'رموز دخول الطلاب'}</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0) ? 'disabled' : ''}>إنشاء الرموز الناقصة</button>` : ''}</div>
-      <div class="n88-class-status"><p role="status" aria-live="polite">${esc(message || (ready ? (busy ? 'جارٍ قراءة القائمة…' : '') : 'مساحة الطلاب غير مفعّلة حاليًا.'))}</p>${retry && ready ? `<button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>مراجعة القائمة</button>` : ''}</div>
+      <div class="n88-class-status"><p role="status" aria-live="polite">${esc(message || (ready ? (busy && !roster ? 'جارٍ قراءة القائمة…' : '') : 'مساحة الطلاب غير مفعّلة حاليًا.'))}</p>${retry && ready ? `<button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>مراجعة القائمة</button>` : ''}</div>
       ${roster ? `<ul class="n88-class-roster" aria-label="طلاب ${esc(classLabel())}">${!roster.students.length?'<li class="n88-roster-empty">لا يوجد طلاب في هذا الفصل.</li>':''}${roster.students.map((s, index) => `<li><div class="n88-class-student"><strong>${esc(s.label)}</strong>${s.credential ? `<div data-code><input readonly autocomplete="off" dir="ltr" aria-label="رمز ${esc(s.label)}" value="${esc(s.credential)}"></div>` : `<span>${s.recoveryStatus==='legacy' ? 'رمز قديم غير مسترجع' : s.hasActiveCode ? 'الرمز مخفي؛ راجع القائمة لإظهاره' : 'بلا رمز فعّال'}</span>`}</div><div class="n88-class-actions">${s.credential ? `<button class="btn" data-action="copy-student" data-index="${index}" aria-label="نسخ رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>نسخ</button><button class="btn" data-action="share-student" data-index="${index}" aria-label="مشاركة رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>مشاركة</button>` : ''}<details class="n88-student-more"><summary aria-label="إجراءات ${esc(s.label)}" data-index="${index}">المزيد</summary><div class="n88-student-more-panel"><button class="btn" data-action="review-rotate" data-index="${index}" aria-label="تغيير رمز ${esc(s.label)}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" aria-label="إلغاء وصول ${esc(s.label)}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></details></div></li>`).join('')}</ul>
       <details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${PORTAL_FIELDS.filter(f=>roster.visibility[f]).length} من ${PORTAL_FIELDS.length}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر الحقول ثم احفظها</legend><div class="n88-class-fields">${PORTAL_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${(draft ?? roster.visibility)[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}
       ${selected && writable ? `<section class="card" data-confirm aria-label="تأكيد العملية"><h3>${esc(selected.student.label)}</h3><p>${selected.action === 'rotate' ? 'تغيير الرمز يُبطل الرمز السابق وجميع جلساته. سلّم البديل لهذا الطالب وحده بعد التحقق من هويته.' : 'إلغاء الوصول يُبطل الرمز الحالي وجميع جلساته، ولن يستطيع الطالب الدخول به.'}</p><div class="n88-class-actions"><button class="btn" data-action="confirm">${selected.action === 'rotate' ? 'تأكيد تغيير الرمز' : 'تأكيد إلغاء الوصول'}</button><button class="btn" data-action="cancel">تراجع</button></div></section>` : ''}
@@ -112,8 +112,11 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     if (mutating) { queued = true; return Promise.resolve(); }
     if (readWork) { if (key() !== readWork.key || generation !== readWork.generation) queued = true; return readWork.promise; }
     clearTimeout(wakeTimer);
-    const k = key(); invalidate(k); const g = generation;
-    busy = true; message = ''; draw();
+    const k = key();
+    if(k!==boundKey)invalidate(k);
+    const g = ++generation;
+    busy = true; retry = false; selected = null; outcomes = []; message = ''; draw();
+    clearTimeout(expiryTimer);
     if (k) expiryTimer = setTimeout(() => { changed(); if (key()) scheduleRead(); }, Math.min(2147483647, Math.max(1, context().validUntil - Date.now())));
     if (!client || !k) { busy = false; draw(); return Promise.resolve(); }
     const work = { key:k, generation:g };
@@ -126,7 +129,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
           if (draft && draftRevision !== result.policyRevision) { draft = null; draftRevision = null; message = 'تغيّرت إعدادات الحقول؛ راجع اختيارك من جديد.'; }
           else message = '';
         }
-      } catch { if (valid(g, k)) { retry = true; message = 'تعذّرت قراءة القائمة. راجعها للمتابعة.'; } }
+      } catch { if (valid(g, k)) { clearSecrets(); roster = null; retry = true; message = 'تعذّرت قراءة القائمة. راجعها للمتابعة.'; } }
       finally {
         if (readWork === work) readWork = null;
         busy = mutating;
@@ -211,9 +214,8 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     draftRevision = roster.policyRevision;
   };
   const changed = () => {
-    if (key() !== boundKey) { invalidate(); message = ''; draw(); }
-    // Roster/policy updates can retain the same class key. Read once per burst,
-    // ignoring same-context notifications from an already active read.
+    if (key() === boundKey) return;
+    invalidate(); message = ''; draw();
     if (key()) scheduleRead();
   };
   const wake = () => { if (root.ownerDocument.visibilityState === 'visible') { suspended = false; scheduleRead(); } };

@@ -26,7 +26,14 @@ export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipG
   if(typeof payload.session_id!=='string'||!Number.isFinite(validUntil)||validUntil<=Date.now())throw bindingError('session');
   const context={enabled:true,ownerId,sessionId:payload.session_id,leaseId:w.id,
     teachingId,classId:teaching.sectionId,termId:term.id,contextRevision:JSON.stringify([teaching.revision??1,term.revision??1]),validUntil};
-  return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,session.access_token,context])};
+  // Only this class's canonical dependencies participate; cloud progress/profile
+  // notifications must not retire an otherwise identical admitted entry. Kept
+  // transiently in memory, never persisted or sent as authorization metadata.
+  const state=store.state||{}, enrolled=(state.enrollments||[]).filter(r=>r.sectionId===teaching.sectionId),
+    studentIds=new Set(enrolled.map(r=>r.studentId)), items=(state.items||[]).filter(r=>r.teachingId===teachingId),itemIds=new Set(items.map(r=>r.id));
+  const source=[(state.years||[]).filter(r=>r.id===term.yearId),(state.sections||[]).filter(r=>r.id===teaching.sectionId),
+    enrolled,(state.students||[]).filter(r=>studentIds.has(r.id)),items,(state.scoreSubitems||[]).filter(r=>itemIds.has(r.itemId))];
+  return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,session.access_token,context,source])};
 }
 export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel}={}) {
   let active, key, disposed=false;

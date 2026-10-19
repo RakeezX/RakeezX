@@ -1,0 +1,29 @@
+{
+  "taskId": "continuous-n88-stable-teacher-real-entry-20261019",
+  "runId": "9f6bf669-aa39-4bc2-b65d-b7a446a3a628",
+  "scope": "Source-level actual lifecycle modules with a minimal element sink; not a rendered DOM/browser test",
+  "status": "PASS",
+  "checks": [
+    "Immutable base reproduces repeated identical list/guidance reads and repaints; corrected same-key notifications cause zero reads or paints.",
+    "Actual classBinding/ownership guard/composition/transport ACK validation; expired session denied: unrelated device notification stable; canonical student revision re-admits; delayed same-context refresh retains roster; owner/source/lease changes clear immediately; late response denied.",
+    "Existing actual ingress module serves exact qualified student HTML without any backend call or private key; no service source change required."
+  ],
+  "baseline": {
+    "lists": 5,
+    "guidance": 5,
+    "extraPaints": 16
+  },
+  "corrected": {
+    "lists": 1,
+    "guidance": 1,
+    "extraPaints": 0
+  },
+  "sourceHashSerialization": "Git LF UTF-8",
+  "sourceSha256": {
+    "src/lib/student-portal-runtime.js": "842212ab7cc18000bd651e318325d63b638f2e20ea2cf1fe2be0d05ab940f804",
+    "src/views/student-portal-class.js": "f2a48735857ffcc4000a8c010663c3ce99537f85648194fa25b722ec9482f95b",
+    "drafts/n88-student-portal/cloudflare-entry.mjs": "4243cd22440bd3097fb8298b73a4736f97d59f418e6c8239c1162c566e9849bc",
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs": "ca5ad2fcf735007234cb2f0c39b14ae8481f3709aae1265270fbba6fa48a29b0"
+  },
+  "residual": "Browser ownership refusal retained; this is not a real-owner browser journey, layout rendering proof, or diagnosis of the reported client host timeout."
+}

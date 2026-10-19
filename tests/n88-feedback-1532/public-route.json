@@ -1,0 +1,17 @@
+{
+  "capturedAt": "2026-10-19T12:37:24.912Z",
+  "scope": "Unauthenticated exact public document; no cookies, credentials or student code",
+  "requests": [
+    {
+      "path": "/student",
+      "status": 200,
+      "elapsedMs": 408,
+      "bytes": 1747,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "no-store, private",
+      "referrerPolicy": "no-referrer",
+      "robots": "noindex, nofollow, noarchive",
+      "setCookie": false
+    }
+  ]
+}
