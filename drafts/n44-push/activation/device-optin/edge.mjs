@@ -4098,8 +4098,25 @@ function createExistingHost(readEnv) {
 import pg2 from "pg";
 import { Buffer as Buffer9 } from "node:buffer";
 import { timingSafeEqual as timingSafeEqual4 } from "node:crypto";
+import { p256 as p2563 } from "@noble/curves/nist.js";
 var busy = 0;
 var nonces = /* @__PURE__ */ new Map();
+function deviceReadinessConfiguration(readEnv) {
+  if (readEnv("N44_DELIVERY_ENABLED") !== "false") return { status: "disabled" };
+  try {
+    const a = JSON.parse(readEnv("N44_ONE_DEVICE_TEST_JSON") ?? "null"), c = JSON.parse(readEnv("N44_CRYPTO_JSON") ?? "null");
+    const v = c?.vapidKeys?.find(([id2]) => id2 === c.activeVapidKeyId)?.[1];
+    const secret = Buffer9.from(v?.privateKey ?? "", "base64url");
+    try {
+      if (secret.length !== 32 || !p2563.utils.isValidPrivateKey(secret) || Buffer9.from(p2563.getPublicKey(secret, false)).toString("base64url") !== v.publicKey) return { status: "disabled" };
+    } finally {
+      secret.fill(0);
+    }
+    return { ...publicDeviceConfiguration(a, a?.ownerId, a ?? {}, v.publicKey, readEnv("N44_SERVICE_SOURCE_SHA"), Date.now()), targetBound: a?.target !== null };
+  } catch {
+    return { status: "disabled" };
+  }
+}
 async function checkReadiness(readEnv) {
   const source = readEnv("N44_SERVICE_SOURCE_SHA"), profile = JSON.parse(readEnv("N44_SESSION_POLICY_JSON") ?? "null");
   if (!supportedSessionPolicy(profile, Date.now(), source)) throw Error("n44_session_policy_readback_missing");
@@ -4107,13 +4124,15 @@ async function checkReadiness(readEnv) {
   let stage = "connect";
   try {
     await client.connect();
+    stage = "reset_role";
+    await client.query("reset role");
     stage = "identity";
     const identity = await assertRestrictedIdentity(client);
     stage = "set_role";
     await client.query("set role n44_backend");
     stage = "source_boundary";
     await assertPrivateDatabaseSession(client);
-    return { status: "ready", ...identity, sourceBoundary: true, source, enabled: readEnv("N44_ENABLED") === "true", deliveryEnabled: readEnv("N44_DELIVERY_ENABLED") === "true" };
+    return { status: "ready", ...identity, sourceBoundary: true, source, enabled: readEnv("N44_ENABLED") === "true", deliveryEnabled: readEnv("N44_DELIVERY_ENABLED") === "true", optIn: deviceReadinessConfiguration(readEnv) };
   } catch (e) {
     return { status: "unavailable", stage, ...e.safeReadiness ?? {}, code: /^(n44_[a-z_]+|[A-Z][A-Z0-9_]{2,40})$/.test(e.code ?? e.message) ? e.code ?? e.message : "n44_runtime_unavailable", source, enabled: false, deliveryEnabled: false };
   } finally {

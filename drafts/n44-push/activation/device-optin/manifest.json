@@ -24,7 +24,7 @@
     "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
     "drafts/n44-push/private-runtime.mjs": "c7d0739284cbf5c6af9dff93d2b0517df66c2de4578a102df47bea28e840ffe9",
     "drafts/n44-push/provider-policy.mjs": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
-    "drafts/n44-push/readiness-entry.mjs": "51534b2f4d2ceb6a95376f5a37fb4fd0cf47d2a56f48de72f99c772b97d29516",
+    "drafts/n44-push/readiness-entry.mjs": "c1f1cfe43167361818f081dd38dac6cc81d78614efab29c2f2f5508a4d588b9d",
     "drafts/n44-push/registration.mjs": "464f60c2419d31560ed781c4dcb406fc60611879b7514361faf77a928a64c2ad",
     "drafts/n44-push/request-session.mjs": "d7b27021a55cea209a88fe8c117afd919d8cf0746f777ee99bfb2af7e046f513",
     "drafts/n44-push/runtime-failure.mjs": "90dee199e4b179828f13ff96bbde5a5218f2763463ccb952d5236d0e10a47e99",
@@ -48,7 +48,7 @@
     "sw.js": "54280bf490e92e0840fc0a06c0b90edcf2e3bf93332dfd84bbed4cc6fe68f318"
   },
   "outputs": {
-    "edge.mjs": "5ce0dff5397f3690ded3fc567e684e63dd111f57afe82953ef77b5e4e659903f",
+    "edge.mjs": "df1d97a8b6f9d1cfdebd1c5277abab025827fefb689167c46be8155b09cafef9",
     "ingress.mjs": "76f6baaa05b57b599314f0b6b58e7e2794dabcff761c7e4506463a1c271be254"
   },
   "graphs": {

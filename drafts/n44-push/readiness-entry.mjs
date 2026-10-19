@@ -5,16 +5,29 @@ import {timingSafeEqual} from 'node:crypto';
 import {databaseConfig,assertRestrictedIdentity} from './database-transport.mjs';
 import {assertPrivateDatabaseSession} from './existing-host.mjs';
 import {supportedSessionPolicy} from './session-policy.mjs';
+import {p256} from '@noble/curves/nist.js';
+import {publicDeviceConfiguration} from './one-device-test.mjs';
 import {mac,sha,readBytes,privateResponse,PRIVATE_WEB_HEADERS} from './web-protocol.mjs';
 let busy=0;const nonces=new Map();
+export function deviceReadinessConfiguration(readEnv) {
+ if(readEnv('N44_DELIVERY_ENABLED')!=='false')return {status:'disabled'};
+ try {
+  const a=JSON.parse(readEnv('N44_ONE_DEVICE_TEST_JSON')??'null'),c=JSON.parse(readEnv('N44_CRYPTO_JSON')??'null');
+  const v=c?.vapidKeys?.find(([id])=>id===c.activeVapidKeyId)?.[1];
+  const secret=Buffer.from(v?.privateKey??'','base64url');
+  try {if(secret.length!==32||!p256.utils.isValidPrivateKey(secret)||Buffer.from(p256.getPublicKey(secret,false)).toString('base64url')!==v.publicKey)return {status:'disabled'};}
+  finally {secret.fill(0);}
+  return {...publicDeviceConfiguration(a,a?.ownerId,a??{},v.publicKey,readEnv('N44_SERVICE_SOURCE_SHA'),Date.now()),targetBound:a?.target!==null};
+ }catch{return {status:'disabled'};}
+}
 export async function checkReadiness(readEnv){
  const source=readEnv('N44_SERVICE_SOURCE_SHA'),profile=JSON.parse(readEnv('N44_SESSION_POLICY_JSON')??'null');
  if(!supportedSessionPolicy(profile,Date.now(),source))throw Error('n44_session_policy_readback_missing');
  const client=new pg.Client(databaseConfig(readEnv));
  let stage='connect';try{
-  await client.connect();stage='identity';const identity=await assertRestrictedIdentity(client);
+  await client.connect();stage='reset_role';await client.query('reset role');stage='identity';const identity=await assertRestrictedIdentity(client);
   stage='set_role';await client.query('set role n44_backend');stage='source_boundary';await assertPrivateDatabaseSession(client);
-  return {status:'ready',...identity,sourceBoundary:true,source,enabled:readEnv('N44_ENABLED')==='true',deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true'};
+  return {status:'ready',...identity,sourceBoundary:true,source,enabled:readEnv('N44_ENABLED')==='true',deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true',optIn:deviceReadinessConfiguration(readEnv)};
  }catch(e){return {status:'unavailable',stage,...(e.safeReadiness??{}),code:/^(n44_[a-z_]+|[A-Z][A-Z0-9_]{2,40})$/.test(e.code??e.message)?(e.code??e.message):'n44_runtime_unavailable',source,enabled:false,deliveryEnabled:false};}
  finally{await client.end().catch(()=>{});}
 }
