@@ -1037,9 +1037,12 @@ export function createSyncV2Engine({
   async function markAttempt(mutation, expectedWorkspace = null) {
     let locked = mutation;
     const contextualCreate = mutation.store === 'sessions' && mutation.op === 'create' && mutation.patch?.calendar_context;
-    await database.applyBatch(mutation.importMaximum === true ? {outbox:{},device:{},items:{},scores:{},teachings:{},terms:{},sections:{}} : mutation.sessionRepairOf ? Object.fromEntries(REPAIR_STORES.map(name => [name, {}])) : contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
+    await database.applyBatch(mutation.importMaximum === true ? {outbox:{},device:{},items:{},scores:{},teachings:{},terms:{},years:{},sections:{}} : mutation.sessionRepairOf ? Object.fromEntries(REPAIR_STORES.map(name => [name, {}])) : contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
+        if (mutation.importMaximum===true && (!existing || ['rejected','superseded'].includes(existing.state))) {
+          locked=null;return {outbox:operationBatch()};
+        }
         if (!existing) return { outbox: operationBatch() };
         if (pendingFoundationGroup(current.outbox, existing)) throw Object.assign(Error('Atomic calendar repair owns this request'), { code: 'N58_REPAIR_PENDING' });
         if (existing.importMaximum === true) {
@@ -1048,11 +1051,17 @@ export function createSyncV2Engine({
           const device=current.device.find(r=>r.id==='device'), item=current.items.find(r=>r.id===existing.recordId);
           const teaching=current.teachings.find(r=>r.id===review?.teachingId), term=current.terms.find(r=>r.id===review?.termId);
           const section=current.sections.find(r=>r.id===teaching?.sectionId), workspace=ownershipGuard.getWorkspace();
+          // Match the application's read selectors, including a fresh device's
+          // missing/deleted selection. A valid explicit different selection wins.
+          const selectedYear=current.years.find(r=>r.id===device.activeYearId && !r.deleted) ?? current.years.find(r=>!r.deleted);
+          const selectedTerm=current.terms.find(r=>r.id===device.activeTermId && !r.deleted) ??
+            current.terms.filter(r=>r.yearId===selectedYear?.id && !r.deleted).sort((a,b)=>(a.index??0)-(b.index??0))[0];
           const access=ownershipGuard.cloudAccess({operation:'dispatch',authenticatedUserId:currentAuthenticatedUserId(),command:existing});
           if (!stage || !item || !access.allowed || workspace!==expectedWorkspace || saved.ownerId!==existing.ownerId ||
-              saved.databaseName!==workspace?.databaseName || device.activeTermId!==review.termId || device.activeYearId!==term?.yearId ||
+              saved.databaseName!==workspace?.databaseName || selectedTerm?.id!==review.termId || selectedYear?.id!==term?.yearId ||
               !teaching || teaching.deleted || teaching.serverRevision!==review.teachingRevision || !term || term.deleted || term.status!=='active' ||
-              !section || section.deleted || section.status==='archived' || item.deleted || item.auto || (item.scoreMode??'direct')!=='direct' ||
+              !section || section.deleted || section.status==='archived' || item.deleted || item.auto || item.readOnly || item.locked || item.parentId || (item.scoreMode??'direct')!=='direct' ||
+              [item,teaching,term,section,selectedYear].some(row=>row?.ownerId!=null && row.ownerId!==existing.ownerId) ||
               Number(item.max)!==stage.max || !existing.envelopeLocked && (existing.baseRevision!==stage.revision || item.serverRevision!==stage.revision))
             throw Error('Import maximum reviewed context changed');
           const before=JSON.parse(stage.item);
@@ -2100,10 +2109,11 @@ export function createSyncV2Engine({
       try { mutation = await markAttempt(live, repairWorkspace); }
       catch (error) {
         if (error.code === 'N58_REPAIR_PENDING') { result.blocked++; continue; }
-        if (!live.sessionRepairOf) throw error;
+        if (!live.sessionRepairOf && live.importMaximum !== true) throw error;
         if (repairContextCurrent()) await markDependencyBlock(live, error.message);
         result.blocked++; continue;
       }
+      if (!mutation) continue; // Cancellation won the atomic send/retire race.
       result.attempted++;
       try {
         const receipt = await transport.applyMutation(mutationEnvelope(mutation));
@@ -2290,13 +2300,18 @@ export function createSyncV2Engine({
         const result = {};
         for (const [store] of entries) {
           const remoteIds = new Set(canonical[store].map((row) => row.id));
-          const locallyPending = (row) => store === 'scores' && current.outbox.some((mutation) =>
+          const maximums = (row) => store === 'items' ? pendingForRecord(current.outbox,store,[row.id])
+            .filter(mutation=>mutation.importMaximum===true && mutation.state!=='rejected') : [];
+          const locallyPending = (row) => maximums(row).length > 0 || store === 'scores' && current.outbox.some((mutation) =>
             mutation.protocol === 'v2' && mutation.state !== 'superseded' &&
             mutation.store === 'scores' && mutation.recordId === row.id);
           result[store] = {
-            put: canonical[store].filter((row) => !locallyPending(row)).map((row) => {
+            put: canonical[store].filter((row) => store==='items' || !locallyPending(row)).map((row) => {
               const local = current[store].find((candidate) => candidate.id === row.id);
-              return { ...(local ?? {}), ...row, serverCanonical: canonicalSnapshot(row) };
+              // A snapshot is canonical readback, not an ACK of a reviewed
+              // maximum. Keep its pending max overlay and original envelope;
+              // expose other canonical changes to the preservation/CAS guards.
+              return overlayMutations({ ...(local ?? {}), ...row, serverCanonical: canonicalSnapshot(row) },maximums(row),row.deleted===true);
             }),
             remove: current[store].filter((row) => covered[store](row) && !remoteIds.has(row.id) && !locallyPending(row))
               .map((row) => row.id),
@@ -2383,6 +2398,9 @@ export function createSyncV2Engine({
       failed: summary.failedCount,
       blocked: summary.blockedCount,
       rejected: summary.rejectedCount,
+      // Foreground import stages stay visible as pending/error, but cannot
+      // make the background scheduler repeatedly request work it cannot send.
+      backgroundPending: outbox.filter(row=>row.state==='pending' && row.importMaximum!==true).length,
     };
   }
 

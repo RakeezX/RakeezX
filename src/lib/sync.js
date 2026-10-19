@@ -640,7 +640,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
       if (failed && cloud.authStatus?.().state !== 'auth_required') {
         rerunRequested = false;
         scheduleRetry();
-      } else if (rerunRequested || v2Status.pending || (v2Status.blocked && madeProgress)) {
+      } else if (rerunRequested || v2Status.backgroundPending || (v2Status.blocked && madeProgress)) {
         rerunRequested = false;
         scheduleAutomaticSync({ full: fullRequested, remote: remoteRequested });
       } else {

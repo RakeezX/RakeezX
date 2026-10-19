@@ -1,0 +1,73 @@
+{
+  "taskId": "continuous-n107-max-ack-continuation-recovery-20261019",
+  "runId": "fbb7555d-ba95-4224-80ab-8272f89e693b",
+  "checks": [
+    {
+      "name": "fallback-selection",
+      "status": "PASS",
+      "evidence": "Actual fresh-device fallback selection matches app selectors; exact homework10→20 ACK then grades17/9/0, five defaults, no duplicates or changed unrelated grades."
+    },
+    {
+      "name": "custom-subject",
+      "status": "PASS",
+      "evidence": "Other typed subject uses existing canonical resolver, one preview/consent, owned subject/defaults and max ACK before grade receipt."
+    },
+    {
+      "name": "custom-builtin-alias",
+      "status": "PASS",
+      "evidence": "Other typed subject uses existing canonical resolver, one preview/consent, owned subject/defaults and max ACK before grade receipt."
+    },
+    {
+      "name": "lost-max-reload",
+      "status": "PASS",
+      "evidence": "Lost max receipt survives reload/pull, identical request replays once, genuine max revision rebind then durable grades17/9/0; blank and untouched19/0 preserved."
+    },
+    {
+      "name": "accepted-max-grade-receipt-reload",
+      "status": "PASS",
+      "evidence": "Accepted max and pending grade receipt survive reload; explicit same grade mutation recovers durable receipt, no duplicate marks or max mutation."
+    },
+    {
+      "name": "rejected-cancel",
+      "status": "PASS",
+      "evidence": "Terminal rejected max cancelled through normal store; rejection/identity retained as superseded audit, only own unaccepted max overlay restored; names/grades retained."
+    },
+    {
+      "name": "uncertain-cancel",
+      "status": "PASS",
+      "evidence": "One bounded cancel recovery per explicit click; uncertain original retained with actionable status, later same-envelope genuine max ACK allows cancellation without grade dispatch or rollback of accepted max."
+    },
+    {
+      "name": "owner-term-guard",
+      "status": "PASS",
+      "evidence": "Valid different term and foreign owner retain original guards; no max or grade transport."
+    },
+    {
+      "name": "item-drift",
+      "status": "PASS",
+      "evidence": "Genuine max ACK does not excuse later business-field drift during asynchronous grade preflight."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "712478dee41deea2dd98c8e4b963421af6e32d904dae791cce000eeba95a5b79",
+    "src/store.js": "b037ad7697a91d5693dda3ca6731aae9bb33d71369a1c58c730780222251b58c",
+    "src/lib/sync.js": "d8033a80a98a4b530e22f2caf2559df964c8494b3eb2379be88d7629ca1a8fc0",
+    "src/lib/sync-v2.js": "332df2ce7a4548c4aeb983368920c32130c742c639a12fc017e3ee16cf54a6a6",
+    "src/lib/grade-transfer.js": "cfea5d2637a5f81e9caf8fe116d93d8fa7713ee212c4863802b1f0a767cb37b3",
+    "src/models.js": "c3799c0dbd8089d1faf39c68cacb0f49495a8afd91cc28f9e3b5a6ba8eef0d2b",
+    "src/styles/components.css": "b175be9dafe966e7f89ffa63b601f73cb71e259e03c1f27a53fd0451f7d3a9d7",
+    "tests/n107-1019-browser.mjs": "b50ac03a6fc1f9f26fc30f5d25a13f9751d9cb2dee962d1b46b9ada60ccaf305"
+  },
+  "previousFailures": [
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:155:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:168:13\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:158:2",
+    "locator.selectOption: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-roster-field=\"subject\"]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:164:54\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:158:2",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at fillNew (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:164:9)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:202:2\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:184:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:156:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:244:64\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:184:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at complete (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:156:27)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:244:68\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:184:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at closed (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:169:25)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:229:29\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:184:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at closed (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:169:25)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:235:42\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:184:2",
+    "page.waitForFunction: Timeout 12000ms exceeded.\n    at closed (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:169:25)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:237:29\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:184:2",
+    "locator.click: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-act=\"grade-confirm\"]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-max-ack-continuation-recovery-20261019\\tests\\n107-1019-browser.mjs:190:52\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-max-ack-continuation-recovery-20261019/tests/n107-1019-browser.mjs:184:2"
+  ]
+}

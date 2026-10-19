@@ -2711,7 +2711,12 @@ export function reviewClassImport(group) {
   const matches = state.sections.filter(row => !row.deleted && row.yearId === activeYear().id &&
     Number(row.grade) === canonical.grade && normalizeSectionLabel(row.label) === normalizeSectionLabel(canonical.label));
   if (matches.length) throw Error('الفصل موجود مسبقًا أو مؤرشف. راجعه من الفصول والكشوف؛ لن يُدمج طلابه تلقائيًا.');
-  const review = { grade: canonical.grade, label: canonical.label, subject: canonical.subject,
+  const validatedSubject=validateCustomSubjectName(canonical.subject);
+  if(!validatedSubject.ok)throw Error(validatedSubject.error);
+  const definition=matchBuiltinSubject(validatedSubject.name);
+  const subjectName=definition ? findPersistedBuiltin(live(state.subjects),definition)?.name ?? definition.name :
+    live(state.subjects).find(row=>normalizeSubjectName(row.name)===validatedSubject.normalized)?.name ?? validatedSubject.name;
+  const review = { grade: canonical.grade, label: canonical.label, subject: subjectName,
     names: Object.freeze([...canonical.preview.names]), yearId: activeYear().id, termId: activeTerm().id };
   classImportReviews.set(review, { workspace, session: cloud.session, source: JSON.stringify(review),
     year: classImportFingerprint('years',activeYear()), term: classImportFingerprint('terms',activeTerm()), section: null, teaching: null,
@@ -2782,6 +2787,53 @@ export async function saveClassFileImportContinuation(value, { expectedTeachingI
   if(activeWorkspace===workspace && cloud.session===session){
     state.device=committed.device.put[0];broadcast([{store:'device',id:'device'}]);
   }
+}
+// AI-authored N107: cancellation settles only this continuation's commands.
+// An uncertain envelope must recover its genuine receipt before being released.
+export async function cancelClassFileImportContinuation(expectedTeachingId) {
+  const workspace=assertClassImportAccess(), session=cloud.session;
+  const guard=()=>{assertLeaseWritable();if(assertClassImportAccess()!==workspace || cloud.session!==session)throw Error('CLASS_FILE_CONTINUATION_CONTEXT');};
+  guard();
+  let saved=(await db.get('device','device'))?.classFileImportContinuation;
+  if(!saved)return;
+  if(saved.ownerId!==workspace.authUserId || saved.databaseName!==workspace.databaseName || saved.created?.teachingId!==expectedTeachingId)throw Error('CLASS_FILE_CONTINUATION_CHANGED');
+  const pending=await db.getAll('outbox');
+  if(pending.some(row=>row.command==='score:grade_import' && row.state!=='superseded' && row.patch?.batch?.teachingId===expectedTeachingId))
+    throw Error('دفعة الدرجات محفوظة بهويتها؛ استعد إيصال الطلب نفسه، أو عالج رفضه من حالة الطلب، قبل إغلاق المراجعة.');
+  if(saved.maxProgress?.some(stage=>pending.some(row=>row.mutationId===stage.mutationId && row.envelopeLocked && !['rejected','superseded'].includes(row.state)))) {
+    try {await confirmImportMaximums(saved.maximumReview,{verifyCurrent:guard});}
+    catch(error) {
+      // A terminal rejection can be released below; uncertainty cannot.
+      const rows=await db.getAll('outbox');
+      if(saved.maxProgress.some(stage=>rows.some(row=>row.mutationId===stage.mutationId && row.envelopeLocked && !['rejected','superseded'].includes(row.state))))
+        throw Error('لم يتأكد إلغاء الطلب: تعذّر استعادة إيصال العظمى. هويته محفوظة؛ أعد الإلغاء أو الاستكمال عند توفر المزامنة. '+error.message);
+    }
+  }
+  await db.applyBatch({device:{},outbox:{},items:{},scores:{}},{prepare(current){
+    guard();
+    const device=current.device.find(row=>row.id==='device'), prior=device?.classFileImportContinuation;
+    if(JSON.stringify(prior)!==JSON.stringify(saved))throw Error('CLASS_FILE_CONTINUATION_CHANGED');
+    if(current.outbox.some(row=>row.command==='score:grade_import' && row.state!=='superseded' && row.patch?.batch?.teachingId===expectedTeachingId))
+      throw Error('دفعة الدرجات ما زالت محفوظة بهويتها؛ استعد إيصالها قبل إغلاق المراجعة.');
+    const items=[],outbox=[];
+    for(const stage of prior.maxProgress??[]) {
+      const row=current.outbox.find(row=>row.mutationId===stage.mutationId && row.state!=='superseded');
+      if(!row)continue; // Already acknowledged: keep the accepted maximum.
+      if(row.ownerId!==workspace.authUserId || row.importMaximum!==true || row.recordId!==stage.itemId || row.envelopeLocked && row.state!=='rejected')throw Error('CLASS_FILE_CONTINUATION_CHANGED');
+      const item=current.items.find(item=>item.id===stage.itemId),before=JSON.parse(stage.item);
+      // Undo only our still-unaccepted max overlay, never another edit/grade.
+      if(!item || !isTransferItem(item) || item.ownerId!=null && item.ownerId!==workspace.authUserId || !(Number(item.max)===stage.max || (row.state==='rejected' || !row.envelopeLocked) && Number(item.max)===stage.oldMax) || item.serverRevision!==stage.revision ||
+         Object.keys(SYNC_V2_SCHEMAS.items.fields).filter(k=>k!=='max').some(k=>JSON.stringify(item[k]??null)!==JSON.stringify(before[k]??null)) ||
+         importScoreBinding(current.scores.filter(r=>r.itemId===stage.itemId))!==stage.scores ||
+         current.outbox.some(other=>other.id!==row.id && other.state!=='superseded' && other.store==='items' && other.recordId===stage.itemId))
+        throw Error('تغيّر البند أو درجاته؛ الطلب محفوظ. عالج التعارض قبل الإلغاء.');
+      items.push({...item,max:stage.oldMax,updatedAt:now()});
+      outbox.push({...row,state:'superseded',recoveryReason:'import-review-cancelled',supersededAt:now()});
+    }
+    return {items:{put:items},scores:{},outbox:{put:outbox},device:{put:[{...device,classFileImportContinuation:null,updatedAt:now()}]}};
+  }});
+  guard();await absorb([{store:'device',id:'device'},...(saved.maxProgress??[]).map(stage=>({store:'items',id:stage.itemId}))]);
+  broadcast([{store:'device',id:'device'}]);
 }
 export function classImportReceipt(review) {
   const receipt = classImportReviews.get(review);
@@ -4478,7 +4530,25 @@ export async function confirmImportMaximums(review, { verifyCurrent = () => {} }
     if(!saved || saved.created?.teachingId!==review.teachingId || saved.ownerId!==review.ownerId ||
        saved.databaseName!==review.databaseName)throw Error('IMPORT_CHANGED');
     if(JSON.stringify(saved.maximumReview)!==JSON.stringify(review))throw Error('IMPORT_CHANGED');
-    if(saved.maxProgress)return {device:{},items:{},scores:{},outbox:{}};
+    if(saved.maxProgress){
+      // Recover the old snapshot bug through this same reviewed transaction.
+      // Only a still-identical canonical preimage may regain its own overlay;
+      // this is neither a new request nor an acknowledgement.
+      const repairs=[];
+      for(const stage of saved.maxProgress){
+        const row=current.outbox.find(r=>r.mutationId===stage.mutationId && !['rejected','superseded'].includes(r.state));
+        const item=current.items.find(i=>i.id===stage.itemId),before=JSON.parse(stage.item);
+        if(!row || Number(item?.max)!==stage.oldMax)continue;
+        if(row.importMaximum!==true || row.ownerId!==review.ownerId || row.recordId!==stage.itemId ||
+           row.patch?.max!==stage.max || row.localPatch?.max!==stage.max || !isTransferItem(item) ||
+           item.serverRevision!==stage.revision || row.baseRevision!==stage.revision ||
+           Object.keys(SYNC_V2_SCHEMAS.items.fields).filter(k=>k!=='max').some(k=>JSON.stringify(item[k]??null)!==JSON.stringify(before[k]??null)) ||
+           importScoreBinding(current.scores.filter(r=>r.itemId===stage.itemId))!==stage.scores ||
+           current.outbox.some(other=>other.id!==row.id && other.state!=='superseded' && other.store==='items' && other.recordId===stage.itemId))throw Error('IMPORT_CHANGED');
+        repairs.push({...item,max:stage.max,updatedAt:now()});
+      }
+      return {device:{},items:{put:repairs},scores:{},outbox:{}};
+    }
     const puts=[],commands=[],progress=[];
     for(const change of review.maxChanges??[]){
       const item=current.items.find(i=>i.id===change.itemId);
@@ -4571,6 +4641,8 @@ export async function retryGradeImport(mutationId) {
   const changes = (await db.getAll('scores')).map(row => ({ store: 'scores', id: row.id }));
   for (const name of ['items', 'students', 'enrollments']) changes.push(...(await db.getAll(name)).map(row => ({ store: name, id: row.id })));
   await absorb(changes); broadcast(changes);
+  return { teachingId: pending.patch.batch.teachingId, gradeCount: pending.patch.batch.cells.length,
+    addedNames: pending.patch.batch.newStudents?.length ?? 0 };
 }
 
 /** No optimistic account writes: a durable command adopts one canonical receipt. */
