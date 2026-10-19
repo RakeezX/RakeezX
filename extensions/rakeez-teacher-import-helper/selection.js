@@ -48,7 +48,7 @@ export function readSelectedCategoryTable(category) {
   const official=location.protocol==='https:'&&!location.port&&['madrasati.moe.gov.sa','madrasatibeta.moe.gov.sa'].includes(location.hostname);
   const local=['http:','https:'].includes(location.protocol)&&['127.0.0.1','localhost','[::1]'].includes(location.hostname);
   if(!official&&!local)return fail('UNSUPPORTED_ORIGIN');
-  const specs={teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
+  const specs={teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل','المادة'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
   const labels=specs[category];if(!labels)return fail('UNKNOWN_CATEGORY');
   const s=getSelection();if(!s||s.isCollapsed||s.rangeCount!==1)return fail('CANCELLED');
   const cell=node=>(node?.nodeType===1?node:node?.parentElement)?.closest('th,td');
@@ -74,7 +74,7 @@ export function readSelectedCategoryTable(category) {
   for(const label of labels){
     const indices=headings.flatMap((h,i)=>h===label?[i]:[]);
     if(indices.length>1)return fail('AMBIGUOUS_HEADER');
-    if(!indices.length){if(category==='timetable'&&['الحصة','الوقت'].includes(label))continue;return fail('UNRESOLVED_MAPPING');}
+    if(!indices.length){if(category==='timetable'&&['الحصة','الوقت'].includes(label)||category==='classes'&&label==='المادة')continue;return fail('UNRESOLVED_MAPPING');}
     columns.push({label,index:indices[0]});
   }
   const output=[columns.map(c=>c.label).join('\t')];
@@ -243,7 +243,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   const confirmed=dashboard||activeTeacher.length>0||(greetings.length===1&&safeReportLinks>0);
   if(mode==='home'&&!confirmed){if(roles.length!==1)return roleFail('AMBIGUOUS_OR_MISSING_TEACHER_ROLE');return {ok:true,entry,rolePending:true,links:roles,skipped,domain:location.hostname,title:document.title.replace(/https?:\/\/\S+/g,'').slice(0,80),tables:[],warnings:[]};}
   if(['role','gateway'].includes(mode)&&!confirmed)return roleFail('UNCONFIRMED_TEACHER_ROLE');
-  const specs={teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
+  const specs={teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل','المادة'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
   const tables=[],warnings=[];
   const dashboardMetadata=dashboard?metadata(dashboards[0]):[];
 
@@ -282,7 +282,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
     for(const label of specs[category]){
       const indices=headings.flatMap((h,i)=>h===label?[i]:[]);
       if(indices.length>1){invalid='AMBIGUOUS_HEADER';break;}
-      if(!indices.length){if(category==='timetable'&&['الحصة','الوقت'].includes(label))continue;if(label==='الفصل'&&context){columns.push({label,index:-1});continue;}invalid='UNRESOLVED_MAPPING';break;}
+      if(!indices.length){if(category==='timetable'&&['الحصة','الوقت'].includes(label)||category==='classes'&&label==='المادة')continue;if(label==='الفصل'&&context){columns.push({label,index:-1});continue;}invalid='UNRESOLVED_MAPPING';break;}
       columns.push({label,index:indices[0]});
     }
     const output=[columns.map(c=>c.label).join('\t')];

@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "name": "representative_source_adapter",
+      "status": "PASS",
+      "evidence": "Existing closure-free DOM adapter extracts five categories including class subjects from small fabricated visible tables. No source route added, no real school accessed."
+    },
+    {
+      "name": "actual_multi_entity_one_start",
+      "status": "PASS",
+      "evidence": "Installed extension → real receiver/owner/lease/store: 2 classes, 4 pupils, canonical subjects/teachings, 2 weekly slots, teacher/principal/school; zero generated sessions, real ACK NOT_RUN. Two class chunks exercise same-document receiver hash changes."
+    },
+    {
+      "name": "rendered_actual_classes",
+      "status": "PASS",
+      "evidence": "Actual application DOM/CSS shows both saved classes with assigned subjects."
+    },
+    {
+      "name": "retry_reuses_all_identities",
+      "status": "PASS",
+      "evidence": "Deliberate Start from classes route and repeated source preserves exact entities, memberships, slots, profile and outbox; no duplicates or commands."
+    },
+    {
+      "name": "conflicts_preserve_existing_values",
+      "status": "PASS",
+      "evidence": "Different teacher name and occupied timetable slot remain untouched; compact receipt reports two unresolved fields. No fake remote ACK."
+    },
+    {
+      "name": "current_document_owner_session_guards",
+      "status": "PASS",
+      "evidence": "Actual app capability permits harmless same-document hash, rejects replaced session and wrong owner, fresh explicit Start binds current session; complete DB unchanged."
+    },
+    {
+      "name": "transport_rejects_owner_and_document_change",
+      "status": "PASS",
+      "evidence": "Installed worker rejects wrong account and reload as APP_CHANGED; fresh checkpoint binds owner/database/provisioning receipt and unchanged Product data after reload."
+    },
+    {
+      "name": "subjectless_guarded_delete",
+      "status": "NOT_RUN",
+      "evidence": "Existing server n77_delete_teaching requires an existing teaching ID (migration lines 41,69–71); legacy deleteSection is fail-closed. No permitted section-delete service exists in affected source; no real deletion or synthetic success claim."
+    }
+  ],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [
+    "https://xlrubcwjqktzzunrvuns.supabase.co/auth/v1/user"
+  ],
+  "lease": "ACQUIRED browser",
+  "status": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'https://xlrubcwjqktzzunrvuns.supabase.co/auth/v1/user'\n+ ]\n- []\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-one-start-complete-madrasati-20261019/tests/n36-1837/journey.mjs:129:9",
+  "release": "RELEASED browser",
+  "cleanup": "Owned synthetic browser/profile/server closed; owned shared browser lease released"
+}

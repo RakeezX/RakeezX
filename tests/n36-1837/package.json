@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "version": "0.5.16",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.16.zip",
+    "sha256": "3b98d2cbc29006a8a4b8068ef903b45c586aa83ab411c85e3ddf22c6c16fbb73",
+    "bytes": 112249
+  },
+  "files": 25,
+  "reusedHashes": {
+    "source-adapter.js": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c",
+    "source-roster.js": "2bc76e92e5996ca3ad6579bd064cc33dbd0feca797929bd88fc05e02c998a067",
+    "navigation.js": "6a766d1590fdc7713b090e6bb1ec15468de1d4426e7dd6da2847ee6f57dcafb4",
+    "route-diagnostics.js": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a",
+    "class-order.js": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87"
+  },
+  "checks": [
+    "Exact ZIP/source/manifest hashes; immutable 0.5.15",
+    "Unchanged roster reader/pagination/routes: reuse recorded evidence",
+    "Scoped JS syntax and protocol parity",
+    "Actual website download points to verified local 0.5.16 package"
+  ],
+  "stableFolder": {
+    "observedVersion": "0.5.15",
+    "updatedByWorker": false,
+    "existingMinuteUpdater": true,
+    "advanceToCandidate": "NOT_RUN: requires independent publisher verified release"
+  },
+  "provider": "NOT_RUN",
+  "production": "NOT_RUN"
+}

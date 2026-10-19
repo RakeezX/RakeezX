@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head><meta charset="utf-8"><script src="diagnostics-bootstrap.js"></script><meta name="viewport" content="width=device-width, initial-scale=1"><title>مساعد إعداد المعلم</title><link rel="stylesheet" href="lib/rakeez-datetime.css"><link rel="stylesheet" href="popup.css"></head>
 <body><main>
-<header class="popup-header"><h1>استيراد أسماء الطلاب</h1></header><details id="safe-diagnostics"><summary>التشخيص عند الحاجة</summary><button id="copy-safe-report" type="button">نسخ معلومات التشخيص</button><p id="safe-report-status" role="status" aria-live="polite"></p><textarea id="safe-report" readonly hidden dir="ltr" rows="8" aria-label="معلومات التشخيص الآمنة للنسخ اليدوي"></textarea></details><p class="notice">اجمع أسماء الطلاب وفصولهم المتاحة من مدرستي واحفظها في حساب ركيز.</p>
+<header class="popup-header"><h1>استيراد بيانات المعلم والفصول</h1></header><details id="safe-diagnostics"><summary>التشخيص عند الحاجة</summary><button id="copy-safe-report" type="button">نسخ معلومات التشخيص</button><p id="safe-report-status" role="status" aria-live="polite"></p><textarea id="safe-report" readonly hidden dir="ltr" rows="8" aria-label="معلومات التشخيص الآمنة للنسخ اليدوي"></textarea></details><p class="notice">ابدأ لحفظ المتاح من الفصول والمواد والطلاب واسم المعلم والمدير والمدرسة والجدول في حساب ركيز. تُقرأ الصفحات المدعومة فقط، ولا تُستبدل قيمك المختلفة تلقائيًا.</p>
 <section id="one-start-controls">
 
 <button id="one-start" type="button" disabled>ابدأ الاستيراد</button>
@@ -30,7 +30,7 @@
 <button id="handoff-transfer" type="button" disabled>نقل إلى ركيز</button>
 <button id="handoff-cancel" type="button" hidden>إلغاء النقل ومسح البيانات</button><p id="handoff-status" role="status"></p>
 </section>
-<details id="legacy-tools"><summary>الملفات والإدخال اليدوي</summary><p>الاستيراد التلقائي الحالي يدعم الأسماء والفصول فقط؛ لا يستورد بيانات المعلم أو المدير أو المنطقة أو الجدول. الخيارات التالية إدخال يدوي مستقل.</p><details id="run-diagnostics"><summary>التشخيص الآمن (اختياري)</summary>
+<details id="legacy-tools"><summary>الملفات والإدخال اليدوي</summary><p>يُحفظ المتاح من الصفحات المدعومة فقط؛ تظهر الحقول الغائبة والتعارضات في النتيجة. لا يتغير التقويم أو اختيار المنطقة. الخيارات التالية إدخال يدوي مستقل.</p><details id="run-diagnostics"><summary>التشخيص الآمن (اختياري)</summary>
 <p id="entry-state" dir="ltr" aria-label="حالة ربط صفحة المصدر"></p>
 <textarea id="route-diagnostic" readonly hidden dir="ltr" rows="3" aria-label="التشخيص الآمن للمسار"></textarea>
 <button id="copy-route-diagnostic" type="button" hidden>نسخ التشخيص الآمن</button><p id="route-copy-status" role="status"></p></details>

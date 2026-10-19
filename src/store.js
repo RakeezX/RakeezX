@@ -1315,6 +1315,24 @@ export const softDelete = (storeName, id) => storeName === 'sessions'
 /** بيانات المعلّم — تُصدَّر في النسخ الاحتياطية وتُدمج. */
 export const patchProfile = (changes, options = {}) => patch('profile', 'profile', changes, { ...DEFAULT_PROFILE }, options);
 
+// AI: imported profile identity may fill blanks, never replace a teacher's value.
+export async function importSetupProfile(changes, { verifyCurrent } = {}) {
+  assertClassImportAccess();
+  if(state.profile?.ownerId&&state.profile.ownerId!==activeWorkspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
+  const fields = ['teacherName','schoolName','principalName','reportPrincipalName'];
+  if(Object.keys(changes).some(k=>!fields.includes(k)))throw Error('SETUP_PROFILE_FIELD');
+  const previous=JSON.stringify(state.profile), next={...state.profile,...changes,updatedAt:now()};
+  if(Object.entries(changes).some(([k,v])=>typeof v!=='string'||!v.trim()||v.length>80||state.profile[k]&&state.profile[k]!==v))throw Error('SETUP_PROFILE_CONFLICT');
+  const ok=await save({profile:[next]},{verifyCurrent(current){
+    verifyCurrent?.(current);
+    if(JSON.stringify(current.profile.find(p=>p.id==='profile'))!==previous)throw Error('SETUP_PROFILE_CHANGED');
+  }});
+  if(!ok)throw Error('SETUP_PROFILE_SAVE');
+  const profile=await db.get('profile','profile');
+  verifyCurrent?.();state.profile=profile;notify();
+  return state.profile;
+}
+
 /** إعدادات هذا الجهاز — لا تغادره ولا يستوردها ملف نسخة. */
 export const patchDevice = (changes, options = {}) => patch('device', 'device', changes, { ...DEFAULT_DEVICE }, options);
 
@@ -5179,17 +5197,27 @@ function validatedSlot(data) {
   return slot;
 }
 
-export async function addSlot(tchId, weekday, period, times = {}) {
+export async function addSlot(tchId, weekday, period, times = {}, { verifyCurrent } = {}) {
   if (isTeachingArchived(tchId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const slot = validatedSlot({ ...times, teachingId: tchId, weekday: Number(weekday), period: Number(period) });
   const termId = isNonTeachingSlot(slot) ? slot.termId : getTeaching(tchId)?.termId;
+  const parent=verifyCurrent&&!isNonTeachingSlot(slot)?getTeaching(tchId):null;
+  const parentScope=parent?Object.entries({teachings:parent,sections:getSection(parent.sectionId),subjects:getSubject(parent.subjectId)}).map(([name,row])=>({name,id:row?.id,ownerId:row?.ownerId,snapshot:JSON.stringify(row)})):[];
   const existing = allSlots(termId).find(s => s.weekday === slot.weekday && s.period === slot.period);
   if (existing) {
     throw new Error('لديك حصة مسجلة بالفعل في هذا الوقت.');
   }
   
   if (live(state.slots).some((s) => s.id === slot.id)) return null;
-  await save({ slots: [slot] });
+  const saved=await save({ slots: [slot] }, {verifyCurrent:verifyCurrent?current=>{
+    verifyCurrent(current);
+    for(const row of parentScope){
+      if(!row.id||row.ownerId&&row.ownerId!==activeWorkspace?.authUserId||JSON.stringify(current[row.name].find(r=>r.id===row.id))!==row.snapshot)throw Error('SETUP_SLOT_PARENT_CHANGED');
+    }
+    if(current.slots.some(s=>!s.deleted&&s.weekday===slot.weekday&&s.period===slot.period&&
+      (s.termId===termId||current.teachings.some(t=>t.id===s.teachingId&&t.termId===termId))))throw Error('SETUP_SLOT_CHANGED');
+  }:undefined});
+  if(!saved)throw Error('SETUP_SLOT_SAVE');
   return slot;
 }
 

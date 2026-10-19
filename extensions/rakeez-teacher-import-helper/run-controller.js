@@ -149,8 +149,6 @@ async function start(tabId){
   while(next){
    current(ticket);
    // A proved report end is independent of optional metadata/MyStudents discovery.
-   if(job.sourceRows.length&&reportsComplete(job.series)&&next.kind!=='students'&&!job.routes.some(r=>r.kind==='students'&&/^\/SchoolManagmentReports\//i.test(r.path)))break;
-   if(job.sourceRows.length&&reportsComplete(job.series)&&next.kind==='students'&&!/^\/SchoolManagmentReports\//i.test(next.path)&&!job.routes.some(r=>r.kind==='students'&&/^\/SchoolManagmentReports\//i.test(r.path)))break;
    if(job.windowPages&&(job.windowPages>=RUN_LIMITS.pages||Date.now()>=job.deadline))await pauseCollection(ticket);current(ticket);job.pages++;job.windowPages++;
    if(!next.page){
     stage=next.kind==='role'?'role-selection':'navigation-redirect';kind=next.kind;path=next.path;
@@ -171,7 +169,7 @@ async function start(tabId){
 
    }
    page=next.page;if(page.runContext){if(job.context?.schoolId&&page.runContext.schoolId&&job.context.schoolId!==page.runContext.schoolId)throw Error('SCHOOL_CONTEXT_CHANGED');job.context={...job.context,...page.runContext};}
-   for(const school of page.schoolNames??[]){if(job.context?.schoolName&&job.context.schoolName!==school)throw Error('SCHOOL_CONTEXT_CHANGED');job.rosterSchools.add(school);if(job.rosterSchools.size>1)throw Error('SCHOOL_CONTEXT_CHANGED');}
+   for(const school of page.schoolNames??[]){if(job.context?.schoolName&&job.context.schoolName!==school)throw Error('SCHOOL_CONTEXT_CHANGED');job.rosterSchools.add(school);job.context={...job.context,schoolName:school};if(job.rosterSchools.size>1)throw Error('SCHOOL_CONTEXT_CHANGED');}
    if(next.kind==='home'&&page.links.some(l=>l.kind==='gateway'&&l.context?.kind==='selected-teacher-card')){job.pendingSchoolTables=page.tables;page={...page,tables:[]};}
    if(next.kind==='gateway'&&job.pendingSchoolTables.length){page={...page,tables:[...job.pendingSchoolTables,...page.tables]};job.pendingSchoolTables=[];job.gatewaySettleUntil=null;}
    if(page.diagnostic&&(page.warnings.length||page.pagination?.terminal))showDiagnostic(page.diagnostic);
@@ -289,7 +287,10 @@ export function presentCollectedSource(active,coverage){
  review=completedSourceReview(active,active.sourceURL);
  review.expires=window.n36AutomaticBatch?Math.min(active.batchExpires??Date.now()+1800000,Date.now()+1800000):active.expires;
  const rows=active.sourceRows.map(row=>Object.freeze({...row}));
- window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,...coverage,excluded:active.excluded,hasNext:false}}));
+ const setup=(active.categories??[]).filter(c=>c.category!=='students'&&!(active.warnings??[]).some(w=>w.category===c.category)).map(c=>({...c,provenance:['teacher-readonly-run']}));
+ if(rows.length&&!setup.some(c=>c.category==='classes'))setup.push({category:'classes',provenance:['teacher-readonly-run'],rows:[...new Set(rows.map(r=>r.classroom))].map(classroom=>({classroom}))});
+ if(active.context?.schoolName&&!(active.warnings??[]).some(w=>w.category==='school')&&!setup.some(c=>c.category==='school'))setup.push({category:'school',provenance:['teacher-readonly-run'],rows:[{name:active.context.schoolName}]});
+ window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,setup,...coverage,excluded:active.excluded,hasNext:false}}));
  announce('انتهت قراءة الصفحات المتاحة؛ جار استيراد جميع الفصول إلى ركيز المفتوح.');
  if(!window.n36AutomaticBatch)armReview();else reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }

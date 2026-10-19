@@ -1,3 +1,11 @@
+## AI candidate 0.5.16 — 19 October 2026
+
+- Transport checks the original document and account/session/year/term batch capability instead of an exact cached hash URL. A fresh deliberate Start can rebind the same current-account pending batch; workspace deactivation revokes the old capability.
+- The existing visible-table adapters now retain an explicitly labelled class subject. The account-bound v3 payload carries available teacher, principal, school, class/subject and weekly timetable categories through existing guarded store paths. Conflicting profile/timetable values remain unchanged and are counted as unresolved. Missing source fields remain absent. No calendar-region switch or automatic daily sessions.
+- This is synthetic/local evidence only. Actual school extraction/save, remote ACK and Production release are NOT_RUN. Unsupported source layouts/links remain unsupported. No new source route, permission, credential handling or automatic app-tab opening.
+- Remaining blocker: current N77 server Delete requires a real existing teaching ID. Subjectless deletion cannot be enabled by a client-only fix without changing its approved server contract. No dummy subject/teaching, legacy/local delete or real mutation is used.
+- The existing updater may advance only after the independent publisher verifies this immutable release; this worker does not change its stable folder.
+
 ## 0.5.12 — AI-authored one-start owned names batch (19 October 2026)
 
 The explicit Madrasati Start now collects and imports every available class into the ONE already-open, authenticated Rakeez tab in the same window. Start binds that exact document, owner, session, year and term before collecting. There are no repeated class/review/save confirmations in this initiated batch. Noor and manual file/category paths retain their existing explicit review. The sole new host grant is `https://rakeezx.com/*`, needed to find and bind the existing receiver; no school host permissions, cookies, credentials or background collection are added. Reinstall/reload the genuine updated extension and accept its exact app-host permission when Chrome requests it.
