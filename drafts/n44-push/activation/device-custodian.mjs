@@ -73,6 +73,14 @@ export async function execute(action,value){
   await envFile({N44_ONE_DEVICE_TEST_JSON:'null',N44_DELIVERY_ENABLED:'false'});const rows=await list();if(rows.find(r=>r.name==='N44_ONE_DEVICE_TEST_JSON')?.value!==hash('null')||rows.find(r=>r.name==='N44_DELIVERY_ENABLED')?.value!==hash('false'))fail('n44_disable_not_acknowledged');
   s.envDigests.N44_ONE_DEVICE_TEST_JSON=hash('null');s.envDigests.N44_DELIVERY_ENABLED=hash('false');if(s.device1019)s.device1019.disabled=true;await save(s);return receipt('disabled-disposition',{testApprovalDisabled:true,deliveryEnabled:false,registrations:0,providerSendAttempts:0});
  }
+ if(action==='--disabled-target-probe'){
+  if(!s.device1019?.edgeDeployAcknowledged||s.device1019.approval.target!==null)fail('n44_unbound_target_probe_required');
+  const {signedScheduleRequest}=await import('../scheduler-entry.mjs');
+  const request=await signedScheduleRequest('https://'+project+'.supabase.co/functions/v1/n44-notifications/schedule',Buffer.from(s.scheduler,'hex'),{operation:'one-device-test',cursor:s.device1019.approval.runId,limit:1});
+  const response=await fetch(request,{signal:AbortSignal.timeout(15000),redirect:'error'});const r=await response.json();
+  const ok=response.status===200&&Object.keys(r).join(',')==='status'&&r.status==='disabled';
+  const result=await receipt('unbound-target-readback',{httpStatus:response.status,status:r.status,accepted:ok,targetBound:false,providerSendAttempts:0,registrations:0,scope:'Signed original schedule entry rejected unbound test before owner/event/delivery work'});if(!ok)fail('n44_unbound_target_not_disabled');return result;
+ }
  if(action==='--cleanup'){const files=await readdir(phase);return receipt('custody-cleanup',{plaintextTransientInputsAbsent:!files.some(f=>f.startsWith('owned-device-env-')),encryptedRecoveryRetained:files.includes('recovery.dpapi'),originalOwnerRetained:files.includes('owner.json'),noCredentialRotation:true});}
  fail('n44_unknown_scoped_action');
 }

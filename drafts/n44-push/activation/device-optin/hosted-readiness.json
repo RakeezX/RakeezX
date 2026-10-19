@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T10:52:53.858Z",
+  "httpStatus": 200,
+  "status": "ready",
+  "loginExact": true,
+  "roleExact": true,
+  "upstreamSsl": true,
+  "clientTlsAuthorized": true,
+  "sourceBoundary": true,
+  "source": "4c02ab9bfa89b7c25bfc2cd8506ab2cbc80d85ae",
+  "enabled": true,
+  "deliveryEnabled": false,
+  "optIn": {
+    "status": "ready",
+    "protocol": "n44-browser-v2",
+    "capability": "n44-single-device-20261019-v1",
+    "serviceRevision": "n44-browser-service-v2",
+    "serviceSourceSha": "4c02ab9bfa89b7c25bfc2cd8506ab2cbc80d85ae",
+    "publicKey": "BHXWNVDW8ELOjQCymtTKbnaplWrTuzczXEwPbVS006Ev5PNUkCkyvpSrOPAT8OQzOAiwgdKbGX9Qs5034y4SQ40",
+    "expiresAt": 1792428750303,
+    "deliveryEnabled": false,
+    "schedulerEnabled": false,
+    "targetBound": false
+  },
+  "accepted": true,
+  "privateValuesReturned": false
+}

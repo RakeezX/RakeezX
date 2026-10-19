@@ -1,0 +1,7 @@
+/** AI: one nonpersonal request to the newly mounted config route, never a real bearer. */
+import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
+const response=await fetch('https://rakeezx.com/api/n44/push/config',{method:'POST',headers:{origin:'https://rakeezx.com','content-type':'application/json','x-n44-csrf':'1','sec-fetch-site':'same-origin',authorization:'Bearer N44_FABRICATED_NONJWT_NO_ACCOUNT_20261019'},body:JSON.stringify({workspaceId:'N44_SYNTHETIC_NO_ACCOUNT',deviceId:'N44_SYNTHETIC_NO_DEVICE'}),redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});
+const body=await response.json(),ok=response.status===400&&Object.keys(body).join(',')==='status'&&body.status==='rejected';
+await writeFile('tests/n44-device-1019-public-denial.json',JSON.stringify({taskId:'continuous-n44-single-device-optin-ready-20261019',runId:'05fd1236-442a-4fbf-add3-e9b9c20bb8e1',recordedAt:new Date().toISOString(),httpStatus:response.status,status:body.status,accepted:ok,cacheControl:response.headers.get('cache-control'),publicKeyReturned:Object.hasOwn(body,'publicKey'),realBearer:false,actualRegistrations:0,providerSendAttempts:0,scope:'Actual new HTTPS route; fabricated nonJWT only; not hosted teacher/owner or OS delivery proof'},null,2)+'\n');
+assert.equal(ok,true,'new config route must reject fabricated authorization');console.log('PASS: actual new config route400/rejected; no key or account data returned.');
