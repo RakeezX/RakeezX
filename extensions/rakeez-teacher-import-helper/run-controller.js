@@ -279,7 +279,7 @@ async function finishCollection(ticket){
  const warnings=[...new Set(active.warnings.filter(w=>w.category==='students'&&!(w.optional&&complete)).map(w=>w.code))];
  showDiagnostic({run:{...coverage,staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
  $('run-counts').textContent='';
- $('run-missing').textContent='';$('run-skipped').textContent=warnings.length||active.excluded?`تعذّر جمع بعض الصفوف أو الصفحات؛ استُبعد ${active.excluded} صفًا. التفاصيل في التشخيص الاختياري.`:'';
+ $('run-missing').textContent='';$('run-skipped').textContent=active.excluded?`استُبعد ${active.excluded} صفًا؛ التفاصيل في التشخيص.`:warnings.some(code=>!['PAGINATION_MISSING_NEXT','ROSTER_LINKS_UNAVAILABLE'].includes(code))?'بعض الصفحات غير محسومة؛ التفاصيل في التشخيص.':'';
  window.n36Diagnostics?.publish({excluded:active.excluded});
  cancelReports(active);job=null;
  presentCollectedSource({...active,sourceURL:source.url},coverage);

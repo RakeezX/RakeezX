@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "name": "actual_extension_local_save",
+      "status": "PASS",
+      "evidence": "Two fabricated names / one class: actual encrypted extension transport, receiver ownership guard and store transaction; five pending commands, zero remote ACKs, local receipt arithmetic 2 new + 0 existing."
+    },
+    {
+      "name": "saved_roster_immediately_visible",
+      "status": "FAIL",
+      "evidence": "Actual #/classes DOM has zero class cards despite same-owner/year persisted section + two students + two enrollments. No teaching exists: list projects teachings only."
+    },
+    {
+      "name": "reload_same_owner_durable_roster_pending_ack",
+      "status": "PASS",
+      "evidence": "Fresh document re-established actual ownership/provisioning/lease guards; same IDs and five unchanged outbox commands survive reload, still no server ACK."
+    },
+    {
+      "name": "saved_roster_visible_after_reload",
+      "status": "FAIL",
+      "evidence": "Actual classes DOM still has zero class cards after fresh same-owner/year readback; saved identities remain intact."
+    },
+    {
+      "name": "retry_preserves_ids",
+      "status": "PASS",
+      "evidence": "Retry completed source uses existing same-owner/year names: zero duplicate records/commands, unchanged IDs."
+    },
+    {
+      "name": "compact_actual_runner",
+      "status": "PASS",
+      "evidence": "Actual extension run DOM/CSS: diagnostics/manual tools collapsed, Noor contextual, no zero-excluded failure, local-save status distinct from remote Sync."
+    },
+    {
+      "name": "wrong_owner_failclosed",
+      "status": "PASS",
+      "evidence": "Real receiver entry rejects wrong session owner, complete DB unchanged."
+    }
+  ],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [
+    "https://xlrubcwjqktzzunrvuns.supabase.co/auth/v1/user"
+  ],
+  "lease": "ACQUIRED browser",
+  "status": "BLOCKED",
+  "blocker": "Missing allowedPaths src/views/teachings.js and src/views/class-import-center.js: section-only roster visibility and versioned website link live there.",
+  "release": "RELEASED browser",
+  "cleanup": "Owned synthetic browser/profile/server closed; owned shared browser lease released"
+}

@@ -1,0 +1,12 @@
+{
+  "checks": [],
+  "synthetic": true,
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "externalRequests": [],
+  "lease": "ACQUIRED browser",
+  "status": "FAIL",
+  "failure": "page.evaluate: Error: APP_NOT_READY\n    at eval (eval at evaluate (:311:30), <anonymous>:2:88)\n    at async <anonymous>:337:30\n    at stage (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-saved-roster-visible-clean-helper-20261019\\tests\\n36-actual-1719\\journey.mjs:53:17)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-saved-roster-visible-clean-helper-20261019\\tests\\n36-actual-1719\\journey.mjs:63:8",
+  "release": "RELEASED browser",
+  "cleanup": "Owned synthetic browser/profile/server closed; owned shared browser lease released"
+}
