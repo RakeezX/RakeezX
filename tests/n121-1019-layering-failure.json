@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n121-lesson-card-target-actions-20261019",
+  "runId": "32d00c6d-c3c6-4b76-ab26-0396607ab078",
+  "checks": [],
+  "targets": [
+    {
+      "title": "الخامس الابتدائي / N121 · المهارات الرقمية",
+      "hit": "<div class=\"today-focus__class\">الخامس الابتدائي / N121 · المهارات الرقمية</div>",
+      "card": "<section class=\"today-focus is-current\" aria-label=\"تركيز اليوم\" data-session-id=\"se:tch:79ba87f2-9a8b-47b1-85cb-03567e775e53:2026-10-19:11\" style=\"position:relative;isolation:isolate\">\n      <a class=\"home-lesson-class-link\" href=\"#/teaching/tch:79ba87f2-9a8b-47b1-85cb-03567e775e53\" aria-label=\"فتح فصل الخامس الابتدائي / N121 · المهارات الرقمية — الحصة 11\" style=\"position:absolute;inset:0;z-index:1;border-radius:inherit\"></a>\n      <div class=\"today-focus__signal\"><span>الآن</span><i aria-hidden=\"true\"></i></div>\n      <div class=\"today-focus__main\">\n        <div class=\"today-focus__title\">حصتك الحالية</div>\n        <div class=\"today-focus__class\">الخامس الابتدائي / N121 · المهارات الرقمية</div>\n        <div class=\"today-focus__detail\">الحصة 11 · <bdi dir=\"ltr\"><span class=\"time-range\"><span class=\"time-range__token\" dir=\"ltr\" data-time-token=\"start\">20:00</span><span class=\"time-range__dash\" aria-hidden=\"true\"> – </span><span class=\"time-range__token\" dir=\"ltr\" data-time-token=\"end\">20:45</span></span></bdi></div>\n        <div class=\"today-focus__state\"><a href=\"#/teaching/tch:79ba87f2-9a8b-47b1-85cb-03567e775e53/attendance?session=se:tch:79ba87f2-9a8b-47b1-85cb-03567e775e53:2026-10-19:11\" style=\"position:relative;z-index:2;color:inherit\">تم رصد الحضور</a></div>\n      </div>\n      <a class=\"btn btn--primary today-focus__action\" href=\"#/teaching/tch:79ba87f2-9a8b-47b1-85cb-03567e775e53/attendance?session=se:tch:79ba87f2-9a8b-47b1-85cb-03567e775e53:2026-10-19:11\" data-session-id=\"se:tch:79ba87f2-9a8b-47b1-85cb-03567e775e53:2026-10-19:11\" style=\"position:relative;z-index:2\">\n        <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 11.5 11.2 13.7 15.5 9.4\"></path><rect x=\"3\" y=\"4.5\" width=\"18\" height=\"16\" rx=\"2.5\"></rect><path d=\"M8 2.5v4M16 2.5v4M3 9.5h18\"></path></svg> مراجعة الحضور\n      </a>\n    </section>"
+    }
+  ],
+  "origin": "http://127.0.0.1:62268/",
+  "fixture": {
+    "teaching": "tch:79ba87f2-9a8b-47b1-85cb-03567e775e53",
+    "student": "037ef8f2-62cc-4e2a-8062-99407c4d5374",
+    "past": "se:tch:79ba87f2-9a8b-47b1-85cb-03567e775e53:2026-10-19:10",
+    "current": "se:tch:79ba87f2-9a8b-47b1-85cb-03567e775e53:2026-10-19:11"
+  },
+  "status": "FAIL",
+  "error": "page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/#/teaching/tch:79ba87f2-9a8b-47b1-85cb-03567e775e53\" until \"load\"\n============================================================\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n121-lesson-card-target-actions-20261019\\tests\\n121-1019-navigation.mjs:58:16\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n121-lesson-card-target-actions-20261019/tests/n121-1019-navigation.mjs:21:2"
+}

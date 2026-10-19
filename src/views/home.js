@@ -264,6 +264,14 @@ function renderOnboarding(onboarding) {
   `;
 }
 
+// Sibling links keep native keyboard/new-tab navigation without nested actions.
+// Stretch the teaching link across the card; explicit attendance links sit above it.
+function lessonClassLink(session) {
+  return html`<a class="home-lesson-class-link" href="#/teaching/${session.teachingId}"
+    aria-label="فتح فصل ${visibleLatinDigits(store.teachingLabel(store.getTeaching(session.teachingId)))} — الحصة ${session.period}"
+    style="position:absolute;inset:0;z-index:1;border-radius:inherit"></a>`;
+}
+
 function renderTodayFocus(focus) {
   if (!focus) return '';
   const { session, kind } = focus;
@@ -274,15 +282,18 @@ function renderTodayFocus(focus) {
     'past-pending': { eyebrow: 'يتطلب انتباهك', title: 'رصد حضور معلّق', detail: 'انتهت الحصة ولم يُرصد الحضور بعد.', tone: 'is-pending' },
   }[kind];
   return html`
-    <section class="today-focus ${content.tone}" aria-label="تركيز اليوم" data-session-id="${session.id}">
-      <div class="today-focus__signal"><span>${content.eyebrow}</span><i aria-hidden="true"></i></div>
-      <div class="today-focus__main">
+    <section class="today-focus ${content.tone}" aria-label="تركيز اليوم" data-session-id="${session.id}" style="position:relative;isolation:isolate">
+      ${lessonClassLink(session)}
+      <div class="today-focus__signal" style="z-index:auto"><span>${content.eyebrow}</span><i aria-hidden="true"></i></div>
+      <div class="today-focus__main" style="z-index:auto">
         <div class="today-focus__title">${content.title}</div>
         <div class="today-focus__class">${visibleLatinDigits(store.teachingLabel(teaching))}</div>
         <div class="today-focus__detail">الحصة ${session.period}${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</div>
-        <div class="today-focus__state">${store.attendanceCompleteness(session).completed ? 'تم رصد الحضور' : content.detail}</div>
+        <div class="today-focus__state">${store.attendanceCompleteness(session).completed
+          ? html`<a href="#/teaching/${session.teachingId}/attendance?session=${session.id}" style="position:relative;z-index:2;color:inherit">تم رصد الحضور</a>`
+          : content.detail}</div>
       </div>
-      <a class="btn btn--primary today-focus__action" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" data-session-id="${session.id}">
+      <a class="btn btn--primary today-focus__action" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" data-session-id="${session.id}" style="position:relative;z-index:2">
         ${icon('attendance')} ${store.attendanceCompleteness(session).completed ? 'مراجعة الحضور' : 'رصد الحضور'}
       </a>
     </section>
@@ -296,14 +307,15 @@ function renderNeedsAttention(sessions) {
       <div class="section__head"><h2 class="section__title" id="home-attention-title">يحتاج انتباهك</h2></div>
       <div class="list home-attention__list">
         ${sessions.map((session) => html`
-          <a class="row home-attention__row" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" data-session-id="${session.id}">
+          <div class="row home-attention__row" data-session-id="${session.id}" style="position:relative;isolation:isolate">
+            ${lessonClassLink(session)}
             <span class="period">${session.period}</span>
             <span class="row__main">
               <span class="row__title">${visibleLatinDigits(store.teachingLabel(store.getTeaching(session.teachingId)))}</span>
               <span class="row__sub">انتهت الحصة ولم يكتمل رصد الحضور${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</span>
             </span>
-            <span class="row__end"><span class="home-session-state">متابعة الرصد</span>${icon('chev')}</span>
-          </a>
+            <span class="row__end"><a class="home-session-state" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" style="position:relative;z-index:2;color:inherit">متابعة الرصد</a>${icon('chev')}</span>
+          </div>
         `)}
       </div>
     </section>
@@ -434,7 +446,8 @@ export default {
                   const marked = completeness.recorded;
                   const roster = completeness.expected;
                   return html`
-                    <a class="row home-session-row is-session-${presentation.kind}" data-session-id="${s.id}" href="#/teaching/${s.teachingId}/attendance?session=${s.id}">
+                    <div class="row home-session-row is-session-${presentation.kind}" data-session-id="${s.id}" style="position:relative;isolation:isolate">
+                      ${lessonClassLink(s)}
                       <span class="period">${s.period}</span>
                       <span class="row__main">
                         <span class="row__title">${visibleLatinDigits(store.teachingLabel(tch))}</span>
@@ -447,10 +460,10 @@ export default {
                         </span>
                       </span>
                       <span class="row__end">
-                        <span class="home-session-state">${attendanceLabel}</span>
+                        <a class="home-session-state" href="#/teaching/${s.teachingId}/attendance?session=${s.id}" style="position:relative;z-index:2;color:inherit">${attendanceLabel}</a>
                         ${icon('chev')}
                       </span>
-                    </a>
+                    </div>
                   `;
                 })}
               </div>
