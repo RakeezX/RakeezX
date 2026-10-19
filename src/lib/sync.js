@@ -59,6 +59,8 @@ let fullRequested = false;
 let remoteRequested = false;
 let suppressAutoSchedule = false;
 let initialized = false;
+// AI-authored N123: boot lease verification is preparation, not a failed Sync attempt.
+let startupPreparing = false;
 let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
@@ -132,7 +134,7 @@ const remoteSync = createRemoteSync({
       && store.getActiveWorkspace()?.type === 'account'
       && store.getActiveWorkspace()?.authUserId === cloud.user?.id
       && store.getActiveWorkspace()?.ownershipState === 'claimed'
-      && !workspaceClaimRunning && !restorePreparing && !restoreRunning,
+      && !startupPreparing && !workspaceClaimRunning && !restorePreparing && !restoreRunning,
     online: isOnline(), visible: typeof document === 'undefined' || document.visibilityState === 'visible' }),
   getMarker: cloud.fetchOwnerSyncMarker,
   openChannel: cloud.openOwnerSyncChannel,
@@ -176,6 +178,7 @@ function coordinatorOperationalState(durable) {
   if (autoRunning) return 'syncing';
   if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
   if (!isOnline()) return 'offline';
+  if (startupPreparing) return 'pending';
   if (state.status === 'blocked') return 'blocked';
   if (state.status === 'error' && durable.failedCount === 0) return 'error';
   if (remoteSync.diagnostics().pending) return 'pending';
@@ -238,7 +241,9 @@ function cacheOperationalSummary(durable, expectedToken = null) {
   if (expectedToken && expectedToken !== token) return getSyncOperationalSummarySnapshot();
   const normalized = normalizeDurableSummary(durable);
   const currentState = coordinatorOperationalState(normalized);
-  const reason = COORDINATOR_REASON[currentState] ?? [normalized.reasonCategory, normalized.reasonLabel];
+  const reason = startupPreparing && currentState === 'pending'
+    ? ['startup_preparing', 'نتحقق من جاهزية الحساب قبل بدء المزامنة.']
+    : COORDINATOR_REASON[currentState] ?? [normalized.reasonCategory, normalized.reasonLabel];
   const actionableSyncIssue = normalized.actionableSyncIssue || ['auth_required', 'offline', 'error'].includes(currentState);
   operationalSummaryCache = Object.freeze({
     state: currentState,
@@ -313,6 +318,7 @@ function scheduleAutomaticSync({ full = false, immediate = false, remote = false
     stopOwnershipBlockedScheduling(ownership);
     return;
   }
+  if (startupPreparing) return;
   if (!isOnline()) {
     setState({ status: 'offline' });
     return;
@@ -498,9 +504,9 @@ function firstPullError(result) {
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true, remote = false, forRestore = false } = {}) {
-  if (classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
+  if (startupPreparing || classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
   const lifecycleDevice = await db.get('device', 'device');
-  if (classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
+  if (startupPreparing || classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
   if (lifecycleDevice?.studentLifecycleResume || lifecycleDevice?.n77DeleteIntent || lifecycleDevice?.cloudRestoreResume) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
@@ -882,10 +888,21 @@ function setState(updates) {
   notify();
 }
 
-export function init() {
+export function init({ readiness = null } = {}) {
   state.lastSyncedAt = store.state.device?.lastSyncAt || null;
   if (initialized) return;
   initialized = true;
+  startupPreparing = !!readiness;
+  if (readiness) {
+    // A settled renewal (including failure) releases preparation. Real attempts
+    // still pass every existing lease/owner guard and report their own failures.
+    void Promise.resolve(readiness).catch(() => {}).then(() => {
+      startupPreparing = false;
+      void remoteSync.refresh();
+      scheduleAutomaticSync({ full: true, immediate: true });
+      notify();
+    });
+  }
   void getSyncOperationalSummary().catch(() => {});
   store.subscribe((_state, update) => {
     bindPresentationContext();
