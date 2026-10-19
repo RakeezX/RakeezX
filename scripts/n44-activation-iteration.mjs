@@ -9,7 +9,7 @@ import {deriveScram,execute} from './n44-activation-custody.mjs';
 const runId='3edbd211-f3f1-4698-b39c-eaf346722eb5',custodyRun='8288de34-7362-4946-b319-79a28e864be8',project='xlrubcwjqktzzunrvuns',taskId='continuous-n44-finish-bounded-service-activation-20261018';
 const phase='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/n44-live/owned-'+custodyRun+'.tmp',input=phase+'/iteration-'+runId+'.sql';
 const reportFile='tests/n44-finish-iteration.hosted.json';
-const report={aiAuthored:true,taskId,runId,projectId:project,recordedAt:new Date().toISOString(),authenticationAttempts:0,proofSent:false,verifierWrites:0,secretValuesReturned:false};
+const report={aiAuthored:true,taskId,runId,projectId:project,recordedAt:new Date().toISOString(),authenticationAttempts:0,diagnosticProofSent:false,verifierWrites:0,secretValuesReturned:false};
 const fail=code=>{throw Error(code);};
 let state,plain,challenge,leaseOwned=false,restored=false,successful=false;
 async function receipt(){await writeFile(reportFile,JSON.stringify(report,null,2)+'\n');}
@@ -32,8 +32,9 @@ async function sql(text){
 }
 const disabled=`rolname='n44_service_login' and not rolcanlogin and not rolinherit and not rolsuper and not rolcreatedb and not rolcreaterole and not rolreplication and not rolbypassrls and rolconnlimit=-1 and rolvaliduntil is null and not exists(select 1 from pg_auth_members where member=pg_roles.oid)`;
 async function restore(){
+ restored=true; // Unknown mutation outcome must still enter the owned fail-closed disarm.
  await sql(`begin;do $n44$ begin if (select count(*) from pg_roles where ${disabled})<>1 then raise exception 'n44_owned_state_changed';end if;alter role n44_service_login login;grant n44_backend to n44_service_login with inherit false,set true,admin false;end $n44$;commit;select true as restored;`);
- restored=true;state.disarmed=false;await save();
+ state.disarmed=false;await save();
 }
 async function disarm(){
  await sql('begin;alter role n44_service_login nologin;revoke n44_backend from n44_service_login;commit;select true as disarmed;');

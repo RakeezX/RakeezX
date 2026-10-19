@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "runId": "3edbd211-f3f1-4698-b39c-eaf346722eb5",
+  "recordedAt": "2026-10-19T03:45:41.982Z",
+  "scope": "pg native SCRAM client plus server proof verification in memory only",
+  "hostedOperations": 0,
+  "privateValuesReturned": false,
+  "stored16384Announced4096Rejected": true,
+  "samePasswordSaltStored4096Announced4096Accepted": true,
+  "wrongPasswordRejected": true,
+  "futureProvisioningDefault4096": true,
+  "historical16384Explicit": true,
+  "status": "PASS",
+  "sourceSha256": "c6618d59d2a54763b89bda78a806649bff4a71c5c66523736b202a2063e0841e"
+}

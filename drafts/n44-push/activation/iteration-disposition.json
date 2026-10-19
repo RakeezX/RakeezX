@@ -1,0 +1,50 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "3edbd211-f3f1-4698-b39c-eaf346722eb5",
+  "recordedAt": "2026-10-19T03:46:35.705Z",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "sourceCandidateDuringProviderOperation": "0bd7d8f8cc14d886e074fbb44b9dd4c346c49353",
+  "publicChallenge": {
+    "announcedIterationCount": 4096,
+    "expectedStoredIterationCount": 16384,
+    "saltMatchesOwnStoredPublicChallenge": true,
+    "strictTLS": true,
+    "hostnameVerified": true,
+    "proofSent": false
+  },
+  "localProtocolRegression": "PASS",
+  "repair": {
+    "sameOriginalPassword": true,
+    "sameOriginalSalt": true,
+    "storedIterations": 4096,
+    "transactionalExactDisabledRoleAndPrivatePreimageGuard": true,
+    "booleanCredentialEquality": true,
+    "verifierWrites": 1,
+    "correctedAuthenticationAttempts": 1
+  },
+  "failure": {
+    "stage": "connect",
+    "sqlstate": "28P01",
+    "reasonBeyondObservedIterationMismatch": "UNKNOWN",
+    "noFurtherAuthentication": true
+  },
+  "disarm": {
+    "ownedLoginDisabled": true,
+    "backendMembershipRevoked": true,
+    "allOriginalRestrictedFlags": true,
+    "metadataReadBack": true
+  },
+  "custody": {
+    "sameEncryptedRecoveryRetained": true,
+    "transientSqlAbsent": true,
+    "noPrivateValuesRetainedInReceipts": true
+  },
+  "leaseReleased": true,
+  "originalMigrationsReplayed": false,
+  "providerRuntimeOrRouteActivated": false,
+  "newSharedKeysInstalled": false,
+  "actualSendOrCronOrDevice": false,
+  "originalFailuresPreserved": true,
+  "policyFreshness": "Existing18Oct16:07 profile not refreshed; no activation reached."
+}

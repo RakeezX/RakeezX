@@ -74,7 +74,7 @@
       "N44_ENABLED=false",
       "N44_SCHEDULER_ENABLED=false"
     ],
-    "databaseCredential": "n44_service_login NOINHERIT NOBYPASSRLS, exact SET-only n44_backend member; protected client-SCRAM CLI input, DPAPI CurrentUser recovery, strict CA+hostname SESSION pooler5432",
+    "databaseCredential": "n44_service_login NOINHERIT NOBYPASSRLS; current standard SCRAM4096 same-password/salt compatibility repair; restricted LOGIN currently DISABLED with membership revoked after corrected SESSION28P01. Protected CLI/DPAPI/strict CA+hostname custody unchanged.",
     "cryptoJSONKeys": [
       "sealingKeys",
       "activeKeyId",
@@ -101,5 +101,17 @@
     "sha256": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
     "routines": 42,
     "security": "SECURITY INVOKER, intended n44_backend EXECUTE only; fixed errors and original SQLSTATE; exact catalog identity checked before private binds"
+  },
+  "scramCompatibility": {
+    "recordedAt": "2026-10-19T03:46:35.660Z",
+    "actualServerAnnouncedIterations": 4096,
+    "originalStoredIterations": 16384,
+    "saltMatched": true,
+    "samePasswordSaltRepairIterations": 4096,
+    "correctedAuthentication": "FAIL28P01",
+    "ownedLoginEnabled": false,
+    "backendMembership": false,
+    "deliveryEnabled": false,
+    "evidence": "tests/n44-finish-iteration.hosted.json"
   }
 }

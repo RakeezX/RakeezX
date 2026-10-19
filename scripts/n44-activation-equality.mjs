@@ -3,7 +3,7 @@ import {pbkdf2Sync,createHmac,createHash} from 'node:crypto';
 
 // Password is the original task-generated ASCII hex; no Unicode normalization ambiguity.
 export function expectedKeys(password,challenge){
- if(!/^[a-f0-9]{64}$/.test(password)||challenge.iterations!=='16384'||
+ if(!/^[a-f0-9]{64}$/.test(password)||!['4096','16384'].includes(challenge.iterations)||
     !/^[A-Za-z0-9+/]{22}==$/.test(challenge.salt))throw Error('n44_equality_input_shape');
  const salt=Buffer.from(challenge.salt,'base64');
  if(salt.length!==16||salt.toString('base64')!==challenge.salt)throw Error('n44_equality_salt_shape');
@@ -23,10 +23,10 @@ export const challengeSql=`select
  from pg_catalog.pg_authid where ${owned} and split_part(rolpassword,'$',1)='SCRAM-SHA-256';`;
 export function comparisonSql(keys,challenge){
  if(!Buffer.isBuffer(keys.stored)||!Buffer.isBuffer(keys.server)||keys.stored.length!==32||keys.server.length!==32||
-    challenge.iterations!=='16384'||!/^[A-Za-z0-9+/]{22}==$/.test(challenge.salt))throw Error('n44_equality_compare_shape');
+    !['4096','16384'].includes(challenge.iterations)||!/^[A-Za-z0-9+/]{22}==$/.test(challenge.salt))throw Error('n44_equality_compare_shape');
  // Only client-derived keys enter this private SQL input. All values are fixed-format Base64.
  return `select true as "roleStillOwnedAndDisabled",
- split_part(split_part(rolpassword,'$',2),':',2)='${challenge.salt}' and split_part(split_part(rolpassword,'$',2),':',1)='16384' as "publicChallengeShapeValid",
+ split_part(split_part(rolpassword,'$',2),':',2)='${challenge.salt}' and split_part(split_part(rolpassword,'$',2),':',1)='${challenge.iterations}' as "publicChallengeShapeValid",
  split_part(split_part(rolpassword,'$',3),':',1)='${keys.stored.toString('base64')}' as "storedKeyMatchesRecoveredCredential",
  split_part(split_part(rolpassword,'$',3),':',2)='${keys.server.toString('base64')}' as "serverKeyMatchesRecoveredCredential"
  from pg_catalog.pg_authid where ${owned};`;

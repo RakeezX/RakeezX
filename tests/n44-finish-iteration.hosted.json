@@ -1,0 +1,28 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "3edbd211-f3f1-4698-b39c-eaf346722eb5",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T03:44:28.524Z",
+  "authenticationAttempts": 1,
+  "proofSent": false,
+  "verifierWrites": 1,
+  "secretValuesReturned": false,
+  "disabledHandshake": "SERVER_FIRST_RECEIVED",
+  "challenge": {
+    "announcedIterationCount": 4096,
+    "expectedStoredIterationCount": 16384,
+    "saltMatchesOwnStoredPublicChallenge": true,
+    "strictTLS": true,
+    "hostnameVerified": true,
+    "proofSent": false
+  },
+  "compatibilityDefectConfirmed": true,
+  "localProtocolRegression": "PASS",
+  "samePasswordSalt4096Equality": true,
+  "status": "BLOCKED",
+  "failure": "n44_session_connect_28P01",
+  "safeDisarmReadback": true,
+  "leaseReleased": true,
+  "ownedTransientInputAbsent": true
+}

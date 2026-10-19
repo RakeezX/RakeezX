@@ -14,7 +14,8 @@ const phase='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-
 const marker={run,project,phase,purpose:'N44 exact restricted service custody'};
 const cli='C:/Users/Abody/AppData/Local/npm-cache/_npx/0e23c24576954b26/node_modules/supabase/dist/supabase.js';
 const fail=code=>{throw Error(code);};
-export function deriveScram(password,salt=randomBytes(16),iterations=16384){
+// Supavisor compatibility contract: current provisioning4096; historical16384 stays explicit.
+export function deriveScram(password,salt=randomBytes(16),iterations=4096){
  const salted=pbkdf2Sync(password,salt,iterations,32,'sha256'),client=createHmac('sha256',salted).update('Client Key').digest();
  try{return `SCRAM-SHA-256$${iterations}:${salt.toString('base64')}$${createHash('sha256').update(client).digest('base64')}:${createHmac('sha256',salted).update('Server Key').digest('base64')}`;}
  finally{salted.fill(0);client.fill(0);}
