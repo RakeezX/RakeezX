@@ -1,0 +1,33 @@
+{
+  "taskId": "continuous-n123-sync-latency-measured-20261019",
+  "runId": "02cae405-94c0-43f3-ae42-abbd0c4c7c74",
+  "baseSha": "210cce3813b4cf1b45269f671d87fb5221076ab2",
+  "measurements": [
+    {
+      "version": "baseline",
+      "scenario": "full_open_refresh",
+      "ms": 4574.5,
+      "ok": true,
+      "requests": 48,
+      "maximum": 1,
+      "readDelayMs": 80
+    },
+    {
+      "version": "baseline",
+      "scenario": "single_store_edit_including_ACK_hold",
+      "ms": 241.60000002384186
+    }
+  ],
+  "checks": [
+    {
+      "name": "scenario_failure",
+      "status": "FAIL",
+      "evidence": "page.evaluate: Error: Actual pageshow sync did not finish with new reads and healthy summary\n    at eval (eval at evaluate (:311:30), <anonymous>:11:15)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n123-sync-latency-measured-20261019\\tests\\n123-review-1400-browser.mjs:92:29\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n123-sync-latency-measured-20261019\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n123-sync-latency-measured-20261019/tests/n123-review-1400-browser.mjs:70:3"
+    },
+    {
+      "name": "owned_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Canonical isolated helper closed fresh contexts/browser; owned ephemeral loopback server closed in finally. No shared/live browser phase."
+    }
+  ]
+}

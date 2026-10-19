@@ -555,7 +555,9 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     unifiedRestoreOwner = unifiedCapability?.protocol === 'N71_V1' ? cloud.user.id : null;
     const stores = v2StoresFor(snapshot, full, scoreDomainAvailable);
     const pull = await v2Engine.pullAll({ stores, scoreDomainSnapshot: scoreDomainAvailable,
-      readConcurrency: idleReceiver ? 4 : 1 });
+      // AI-authored N123: overlap bounded snapshot reads on every entry path.
+      // The engine still reconciles in dependency order before dispatching.
+      readConcurrency: 4 });
     if (pull.ownershipBlocked) {
       stopOwnershipBlockedScheduling(cloudOwnershipAccess('pull'));
       return false;
@@ -584,7 +586,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     const postPull = skipPostPull ? null : await v2Engine.pullAll({
       stores: v2PostPullStores(snapshot, full || !!writerCapture, scoreDomainAvailable),
       scoreDomainSnapshot: scoreDomainAvailable,
-      readConcurrency: writerCapture ? 4 : 1,
+      readConcurrency: 4,
     });
     if (postPull?.ownershipBlocked) {
       stopOwnershipBlockedScheduling(cloudOwnershipAccess('pull'));
