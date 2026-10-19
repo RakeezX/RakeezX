@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
 import fs from 'node:fs';
+import {verifiedN44SourceStageSplit,n44QualifiedTask} from './n44-qualified-source-evidence.mjs';
 import {verifyPristineN123DependencyCorrection} from './pending-n123-dependency.mjs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -252,7 +253,7 @@ export function verifiedLiveServiceDeclarationRepair(task,result,update){
     &&same(card.requiredChecks,task.requiredChecks)&&same(card.allowedPaths,task.allowedPaths)
     &&Object.entries(card).every(([key,value])=>['objective','completionMode','verificationRepair','servicePublicationEvidence'].includes(key)||same(value,task[key]))
     &&task.requiredChecks?.every(n=>result.checks?.some(c=>c.name===n&&c.status==='PASS'))
-    &&result.checks?.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&['hosted_auth_fixture_and_closed_client_os_delivery','frontend_publication_and_served_source'].includes(c.name))
+    &&result.checks?.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&(['hosted_auth_fixture_and_closed_client_os_delivery','frontend_publication_and_served_source'].includes(c.name)||n44QualifiedTask(task)&&c.name==='n44_register503_actual_cause_and_qualified_existing_service_correction'))
     &&result.blockerType==='none'&&!result.blocker&&verifiedLiveServicePublication(declared,d)&&verifiedDeployment(declared,d);
 }
 
@@ -684,7 +685,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         && typeof update.card.objective === 'string' && update.card.objective.includes('VALIDATION CONTRACT REPAIR — 2026-10-17')
         && update.card.acceptance?.some(item => typeof item === 'string' && item.includes('Cloudflare provider/immutable/served Production parity'))
         && update.card.preparationAuthority?.publication === true;
-      insist(preservesChecks || n36PublisherGateSplit || verifiedPilotPreparation(state.task,json(state.task.resultPath),update), 'This helper cannot remove required checks');
+      insist(preservesChecks || verifiedN44SourceStageSplit(state.task,json(state.task.resultPath),update,json(path.join(rt,'queue','continuous-n44-one-approved-closed-page-push-20261019.json'))) || n36PublisherGateSplit || verifiedPilotPreparation(state.task,json(state.task.resultPath),update), 'This helper cannot remove required checks');
     }
     insist(!dirtyPaths().length, 'Ops checkout must be clean before maintenance');
     const common = cwd => path.resolve(cwd, git(['rev-parse', '--git-common-dir'], cwd));

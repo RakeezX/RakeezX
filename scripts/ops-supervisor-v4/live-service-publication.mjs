@@ -1,5 +1,6 @@
 // AI: real nonsending backend proof, separate from visible frontend asset changes.
 import { createHash } from 'node:crypto';
+import {n44QualifiedTask,buildN44QualifiedEvidence,verifiedN44QualifiedPublication} from './n44-qualified-source-evidence.mjs';
 import {n88AssetTask,buildN88AssetEvidence,verifiedN88AssetPublication} from './n88-live-asset-evidence.mjs';
 const SHA=/^[a-f0-9]{64}$/, GIT=/^[a-f0-9]{40}$/, UUID=/^[a-f0-9-]{36}$/;
 const ROOT='drafts/n44-push/activation/';
@@ -23,6 +24,7 @@ const fixedScope=t=>(correction(t)||t?.id==='continuous-n44-finish-bounded-servi
 // Only the guarded maintainer calls this with immutable git-show bytes at the saved candidate.
 // Runtime/credentials/provider writes are deliberately absent from this module.
 export function buildLiveServiceEvidence(task,receipt,readCandidateFile){
+ if(n44QualifiedTask(task))return buildN44QualifiedEvidence(task,receipt,readCandidateFile);
  if(n88AssetTask(task))return buildN88AssetEvidence(task,receipt,readCandidateFile);
  const raw=Object.fromEntries(SERVICE_ARTIFACTS.map(p=>[p,Buffer.from(readCandidateFile(p))]));
  const [m,f,e,o,c,v]=SERVICE_ARTIFACTS.map(p=>JSON.parse(raw[p].toString('utf8')));
@@ -40,6 +42,7 @@ export function buildLiveServiceEvidence(task,receipt,readCandidateFile){
 }
 
 export function verifiedLiveServicePublication(task,receipt,report=()=>{}){
+ if(n44QualifiedTask(task))return verifiedN44QualifiedPublication(task,receipt);
  if(n88AssetTask(task))return verifiedN88AssetPublication(task,receipt);
  const fail=reason=>{report(reason);return false;};
  try{
