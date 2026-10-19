@@ -166,8 +166,8 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   },
   slots: {
     entity: 'slots',
-    fields: { teachingId: 'teaching_id', weekday: 'weekday', period: 'period' },
-    references: { teachingId: 'teachings' },
+    fields: { teachingId: 'teaching_id', weekday: 'weekday', period: 'period', kind: 'kind', termId: 'term_id' },
+    references: { teachingId: 'teachings', termId: 'terms' },
   },
   sessions: {
     entity: 'sessions',
@@ -353,6 +353,7 @@ export function decodeSyncV2Canonical(store, row) {
     record.latePoints = record.latePoints == null ? null : Number(record.latePoints);
   }
   if (store === 'scoreSubitemCompletions') record.completionState ??= record.checked ? 'regular' : null;
+  if (store === 'slots') { record.kind ??= 'teaching'; record.termId ??= null; }
   if (store === 'sections') {
     record.status ??= 'active';
     record.archivedAt ??= null;

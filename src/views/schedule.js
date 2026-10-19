@@ -18,7 +18,7 @@ import {
   shareOrDownloadSchedule,
 } from "../lib/schedule-export.js";
 import * as store from "../store.js";
-import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingDay, CALENDAR_KIND, safeColor, gradeLabel } from "../models.js";
+import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingDay, CALENDAR_KIND, safeColor, gradeLabel, slotKind, isNonTeachingSlot, slotKindLabel } from "../models.js";
 import { repaint } from "../repaint.js";
 import { getAccountPresentation } from "../lib/account-profile.js";
 
@@ -272,11 +272,11 @@ export function defaultMobileScheduleDay({ today, calendarKind = null } = {}) {
 }
 
 /**
- * لوحة إضافة أو تعديل حصة — ثلاثة حقول فقط: اليوم ورقم الحصة والفصل.
+ * لوحة إضافة أو تعديل حصة — النوع واليوم ورقم الحصة، والفصل للتدريس فقط.
  * الوقت يأتي من ملف التوقيت النشط ويُعرض للتأكيد، ولا يُدخَل يدويًا.
  */
 function slotSheet(defaults = {}) {
-  const isEdit = Boolean(defaults.teachingId && defaults.id);
+  const isEdit = Boolean(defaults.id);
   const list = store.teachings();
   const profile = store.activeTimeProfile();
 
@@ -293,6 +293,13 @@ function slotSheet(defaults = {}) {
     body: html`
       <form id="slot-form">
         <label class="field">
+          <span class="field__label">نوع الحصة</span>
+          <select class="select" name="kind" id="slot-kind">
+            ${[['teaching', 'تدريس'], ['activity', 'نشاط'], ['waiting', 'انتظار']].map(([kind, label]) => html`<option value="${kind}" ${(defaults.kind ?? (list.length ? 'teaching' : 'activity')) === kind ? 'selected' : ''} ${kind === 'teaching' && !list.length ? 'disabled' : ''}>${label}</option>`)}
+          </select>
+        </label>
+        <p class="t-3 fs-sm">النشاط والانتظار موعدان أسبوعيان ثابتان بلا مادة أو طلاب، حتى تعديلهما أو حذفهما.</p>
+        <label class="field" id="slot-teaching-field">
           <span class="field__label">الفصل</span>
           <select class="select" name="teachingId">
             ${list.map(
@@ -332,6 +339,8 @@ function slotSheet(defaults = {}) {
     onMount: (root, done) => {
       const form = root.querySelector("#slot-form");
       const day = root.querySelector("#slot-day");
+      const kind = root.querySelector('#slot-kind');
+      const teachingField = root.querySelector('#slot-teaching-field');
       const period = root.querySelector("#slot-period");
       const text = root.querySelector("#slot-time-text");
       const submit = root.querySelector('[form="slot-form"][type="submit"]');
@@ -345,11 +354,15 @@ function slotSheet(defaults = {}) {
       const occupiedLabel = (slot) => {
         const teaching = store.getTeaching(slot?.teachingId);
         const section = store.getSection(teaching?.sectionId);
-        return section ? shortClassLabel(section) : 'فصل آخر';
+        return isNonTeachingSlot(slot) ? slotKindLabel(slot) : section ? shortClassLabel(section) : 'فصل آخر';
       };
 
       const sync = () => {
-        const tchId = form.querySelector('[name="teachingId"]')?.value;
+        const teachingSelect = form.querySelector('[name="teachingId"]');
+        teachingField.hidden = kind.value !== 'teaching';
+        teachingField.style.display = teachingField.hidden ? 'none' : '';
+        teachingSelect.disabled = kind.value !== 'teaching';
+        const tchId = teachingSelect.disabled ? null : teachingSelect.value;
         const nums = store.availablePeriods(Number(day.value), profile);
         const wanted = Number(period.value);
         period.innerHTML = nums
@@ -364,6 +377,7 @@ function slotSheet(defaults = {}) {
         if (submit) submit.disabled = !available.length;
         render(text, timeHint(day.value, period.value, tchId));
       };
+      kind.addEventListener('change', sync);
       day.addEventListener("change", sync);
       period.addEventListener("change", sync);
       form.querySelector('[name="teachingId"]')?.addEventListener("change", sync);
@@ -373,7 +387,8 @@ function slotSheet(defaults = {}) {
         ev.preventDefault();
         const fd = new FormData(ev.target);
         const teachingId = String(fd.get("teachingId") ?? "");
-        if (!teachingId) return;
+        const selectedKind = String(fd.get('kind'));
+        if (selectedKind === 'teaching' && !teachingId) return;
         const weekday = Number(fd.get("weekday"));
         const selectedPeriod = Number(fd.get("period"));
         if (!Number.isInteger(selectedPeriod) || occupiedSlot(weekday, selectedPeriod)) {
@@ -381,7 +396,9 @@ function slotSheet(defaults = {}) {
           return;
         }
         done({
-          teachingId,
+          teachingId: selectedKind === 'teaching' ? teachingId : null,
+          kind: selectedKind,
+          termId: selectedKind === 'teaching' ? null : store.activeTerm()?.id,
           weekday,
           period: selectedPeriod,
         });
@@ -409,13 +426,13 @@ export default {
 
   render() {
     const list = store.teachings();
-    if (!list.length) {
+    if (!store.activeTerm()) {
       return html`
         <div class="empty">
           <div class="empty__icon">${icon("timetable")}</div>
-          <div class="empty__title">أنشئ فصلًا أولًا</div>
-          <div class="empty__text">الجدول يوزّع فصولك على أيام الأسبوع وحصصه.</div>
-          <a class="btn btn--primary" href="#/classes">${icon("plus")} الفصول</a>
+          <div class="empty__title">اختر فصلًا دراسيًا أولًا</div>
+          <div class="empty__text">يرتبط الجدول بالفصل الدراسي الحالي.</div>
+          <a class="btn btn--primary" href="#/settings">${icon("sliders")} الإعدادات</a>
         </div>
       `;
     }
@@ -540,7 +557,7 @@ export default {
       ${renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toMins, selectedMobileDay, todayIsTeachingDay })}
 
       <p class="t-3 fs-sm mt-6 center">
-        يوزّع الجدول حصصك الأسبوعية تلقائيًا، وتُنشأ حصص الحضور والتقييم المؤرخة منها في سجل كل فصل.
+        يبقى النشاط والانتظار في الجدول أسبوعيًا حتى تعديله أو حذفه. الحضور والتقييم للحصص التدريسية فقط.
       </p>
     `;
   },
@@ -583,7 +600,7 @@ export default {
       });
       if (!data) return;
       try {
-        const slot = await store.addSlot(data.teachingId, data.weekday, data.period);
+        const slot = await store.addSlot(data.teachingId, data.weekday, data.period, { kind: data.kind, termId: data.termId });
         if (!slot) {
           toast("هذه الحصة موجودة في الجدول", "danger");
           return;
@@ -604,7 +621,9 @@ export default {
         id: slot.id,
         weekday: slot.weekday, 
         period: slot.period,
-        teachingId: slot.teachingId 
+        teachingId: slot.teachingId,
+        kind: slotKind(slot),
+        termId: slot.termId
       });
       if (!data) return;
       try {
@@ -688,7 +707,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
                           <div class="slot__top-row">
                             <span class="slot__grade-sec" style="--sec-color: ${safeColor(sec?.color)}">
                               <span class="sec-dot" aria-hidden="true"></span>
-                              <strong>${shortClassLabel(sec)}</strong>
+                              <strong>${isNonTeachingSlot(s) ? slotKindLabel(s) : shortClassLabel(sec)}</strong>
                             </span>
                             <div class="slot__actions">
                               <button class="iconbtn iconbtn--xs" data-act="edit" data-id="${s.id}" aria-label="تعديل الحصة">
@@ -700,7 +719,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
                             </div>
                           </div>
                           <div class="slot__subject-row">
-                            <span class="slot__subject">${store.getSubject(tch?.subjectId)?.name || "مادة"}</span>
+                            <span class="slot__subject">${isNonTeachingSlot(s) ? 'موعد أسبوعي ثابت' : store.getSubject(tch?.subjectId)?.name || "مادة"}</span>
                           </div>
                           <div class="slot__time-row">
                             <span class="slot__time tabular">${t ? fmtTimeRange(t.start, t.end) : "—"}</span>

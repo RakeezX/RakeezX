@@ -6,7 +6,7 @@
  * instead of resolving dated/calendar timing overrides.
  */
 
-import { SCHOOL_WEEKDAYS, WEEKDAYS, periodNumbers, periodTime, gradeLabel, sectionLabel } from '../models.js';
+import { SCHOOL_WEEKDAYS, WEEKDAYS, periodNumbers, periodTime, gradeLabel, sectionLabel, isNonTeachingSlot, slotKindLabel } from '../models.js';
 import { downloadBlob } from './export.js';
 import { getAccountPresentation } from './account-profile.js';
 import { ensureThmanyahFont, installThmanyahInDocument } from './thmanyah-font.js';
@@ -114,8 +114,8 @@ export function buildScheduleExportModel(source, {
         order: periodIndex + 1,
         time: includeTimes ? safeTime(baseProfile, weekday, period, section?.grade ?? null) : null,
         teaching: slot ? {
-          classLabel: compactScheduleClassLabel(section),
-          subjectLabel: compactScheduleSubjectLabel(subject?.name),
+          classLabel: isNonTeachingSlot(slot) ? slotKindLabel(slot) : compactScheduleClassLabel(section),
+          subjectLabel: isNonTeachingSlot(slot) ? 'موعد أسبوعي ثابت' : compactScheduleSubjectLabel(subject?.name),
         } : null,
       };
     }),

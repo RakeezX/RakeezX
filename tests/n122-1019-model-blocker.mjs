@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { makeSlot } from '../src/models.js';
 import { encodeSyncV2Patch, decodeSyncV2Canonical } from '../src/lib/sync-v2.js';
 
-// Diagnostic only: confirms why the existing protocol cannot implement N122.
-// A PASS here is NOT the requested Product save/reload/edit/delete acceptance.
-test('N122 diagnostic: standalone activity and waiting collapse to the same Sync payload', () => {
+// Original failing representation is preserved in commit 70973d46. This is now
+// the regression for the qualified local protocol extension, not rendered UI.
+test('N122: standalone activity and waiting retain distinct kinds and term in Sync', () => {
   const fixture = { id: 'n122-synthetic-slot', teachingId: null, weekday: 1, period: 2,
     termId: 'n122-synthetic-term' };
   const activity = makeSlot({ ...fixture, kind: 'activity' });
@@ -14,12 +14,12 @@ test('N122 diagnostic: standalone activity and waiting collapse to the same Sync
   assert.equal(waiting.kind, 'waiting');
   const activityPatch = encodeSyncV2Patch('slots', activity);
   const waitingPatch = encodeSyncV2Patch('slots', waiting);
-  assert.deepEqual(activityPatch, { teaching_id: null, weekday: 1, period: 2 });
-  assert.deepEqual(waitingPatch, activityPatch);
+  assert.deepEqual(activityPatch, { teaching_id: null, weekday: 1, period: 2, kind: 'activity', term_id: fixture.termId });
+  assert.deepEqual(waitingPatch, { ...activityPatch, kind: 'waiting' });
   const canonical = decodeSyncV2Canonical('slots', { id: fixture.id, ...activityPatch });
   assert.equal(canonical.teachingId, null);
-  assert.equal(Object.hasOwn(canonical, 'kind'), false);
-  assert.equal(Object.hasOwn(canonical, 'termId'), false);
+  assert.equal(canonical.kind, 'activity');
+  assert.equal(canonical.termId, fixture.termId);
 });
 
 test('N122 diagnostic control: existing academic slot identity survives the same codec', () => {
@@ -31,4 +31,7 @@ test('N122 diagnostic control: existing academic slot identity survives the same
   assert.equal(canonical.teachingId, original.teachingId);
   assert.equal(canonical.weekday, original.weekday);
   assert.equal(canonical.period, original.period);
+  const legacy = decodeSyncV2Canonical('slots', { id: original.id, teaching_id: original.teachingId, weekday: 1, period: 1 });
+  assert.equal(legacy.kind, 'teaching');
+  assert.equal(legacy.termId, null);
 });

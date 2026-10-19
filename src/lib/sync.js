@@ -1405,6 +1405,8 @@ const MAPPERS = {
     toCloud: (rec) => ({
       id: rec.id,
       teaching_id: rec.teachingId,
+      kind: rec.kind ?? 'teaching',
+      term_id: rec.termId ?? null,
       weekday: rec.weekday,
       period: rec.period,
       deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
@@ -1414,6 +1416,8 @@ const MAPPERS = {
     fromCloud: (rec) => ({
       id: rec.id,
       teachingId: rec.teaching_id,
+      kind: rec.kind ?? 'teaching',
+      termId: rec.term_id ?? null,
       weekday: rec.weekday,
       period: rec.period,
       updatedAt: normalizeTimestamp(rec.client_updated_at),
