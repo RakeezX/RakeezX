@@ -41,3 +41,15 @@ No SQL/schema/Auth/RLS/role/password/key/fixture/code/pupil mutations, messages,
 ## Result
 
 tests/n88-1837/conclusion.json preserves component PASS, actual FAIL and NOT_RUN boundaries. Resume only after the exact support.js scope correction; actual user-path evidence must come through the proper owner or a normal subsequent safe support report. Whole-product acceptance remains unproven.
+
+## Bounded continuation — run 2ae8ed4f-f05f-487a-a9e3-5420314db9d3
+
+The inactive-card scope correction explicitly added src/lib/support.js. The saved exact patch is now applied to its unchanged current bytes. The existing user-triggered Support submission optionally collects the runtime checkpoint, then reconstructs only finite phase/status/rounded bounded time/fixed source version through its strict sanitizer. It never transmits arbitrary runtime fields or trusts a caller-supplied replacement checkpoint. Existing Auth/input checks precede capture; an unavailable getter cannot prevent an otherwise valid Support request.
+
+tests/n88-1837/support-hook.json is a new tiny direct test of the actual Support module sanitizer and submission handler with inert dependency seams. It passes poisoned extra fields, malformed phase/version/status/time cases, bounds/rounding, handler snapshot selection, missing-getter fallback and Auth/input rejection. Both handler calls are local mocks; real sends/network/browser/service/SQL operations are zero. Source syntax and scoped whitespace checks pass.
+
+The earlier actual DOM/source-CSS invalid/unknown-code/390/1440 branding/natural-ID/owner-guard proof, Auth-budget proof, native49 source/pin, exact Worker upload and served static hashes are reused unchanged. No browser reservation, optional410 retry, custodian action, readiness/log request or service deployment occurred. The previous conclusion.json composite FAIL, latest ui.json lease FAIL and all NOT_RUN evidence remain byte-identical to candidate95bed2c86b53e075abc53baf38df86e5f613809a.
+
+The separate bounded-delivery.json now qualifies both required checks as PASS for this bounded source-contract delivery, including the genuinely completed Support hook. This does not amend the prior failed run or certify the authenticated user journey. Actual authenticated teacher success remains NOT_PROVEN and whole N88 remains OPEN. The sole publisher owns integration and final frontend served-source verification; this worker claims neither step.
+
+Observed origin/main278b86e5870f80f918437915b535a915dab9fc8e matches remote main, with no changes since the saved base overlapping any candidate path. The saved candidate is preserved for serial integration. No browser/server/lease resources were opened in this continuation.
