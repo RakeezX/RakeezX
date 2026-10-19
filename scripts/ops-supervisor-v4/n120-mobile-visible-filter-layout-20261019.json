@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n120-mobile-visible-filter-layout-20261019",
+      "productId": "N120",
+      "activationId": "po-20261012-continuous",
+      "priority": -1997,
+      "scopeKey": "n120-actual-1719",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact dated Product row and affected current origin/main source only. Latest direct human actual trial19October is NEW evidence; do not replay completed prior proofs. Existing sole controller and serial publisher; no manual worker/planner/reviewer, no queue/source/ledger edits. Return exact task/run/base/candidate/check schema. Minimum checks for THIS failure only; reuse unchanged evidence, no full-app suite or cosmetic build requirement. Preserve real student identity/history/grades/owner/session/lease/revisions/true durable ACK/tombstones. No real record/account mutations, new hosted SQL/schema/migrations/Auth/RLS/roles/keys/messages, private profile access or bypass of prior school/browser/tool refusals. Existing client source delivery authorized; LOCAL_READY is not Production. N44 remains explicitly paused. N123/N124/N110/N121/N122 remain CLOSED; new focus regression is N125, not reopening N123. N117 and older deferrals inactive.\n\nPO accepts desktop filters. NEW rejects horizontal mobile/scrolled filterbar; previous horizontal-overflow acceptance no longer Product target. Mobile/small screen: show relevant controls without horizontal drag; compact deliberate2rows/wrap or single concise «تصفية» expandable area reusing current components, responsive stable geometry with no page jitter. Desktop current layout preserved. Keep actual filter/sort/search/reset/context option semantics, labels/accessibility44px targets, no framework/global redesign. Fix only related report/gradebook filter layout as required for uniform mobile treatment; gradebook logic accepted, do not rerun it. One390px andsmall320px plus existingwide layout inspection, no horizontal document/bar scrolling; tiny existing meaningful filter action check only. Also source-read N119 explanation: default report roster currently sorted ascending displayed roll, explicitroll does same while grade report default may grade descending; record exact distinction for user, remove redundant option only where actual identical and no saved legacy value break, no roll/identity/data changes.",
+      "allowedPaths": [
+        "src/styles/filters.css",
+        "src/styles/reports.css",
+        "src/views/reports.js",
+        "src/views/cross-class-reports.js",
+        "src/views/reports-index.js",
+        "src/views/execution-report.js",
+        "src/lib/report-filters.js",
+        "tests/n120-actual-1719/**",
+        "docs/automation-evidence/20261019/N120_MOBILE_VISIBLE_FILTER_LAYOUT.md"
+      ],
+      "verificationPaths": [
+        "src/styles/filters.css"
+      ],
+      "requiredChecks": [
+        "n120_mobile_filters_no_horizontal_drag_desktop_preserved"
+      ],
+      "acceptance": [
+        "Resolve exactly the new actual failure/UX objection, preserve completed prior behavior and unknowns honestly.",
+        "Authorized official source/provider delivery via existing publisher and original service custodian where explicitly assigned; actual PO review separate."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

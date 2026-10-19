@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-missing-class-code-field-20261019",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -1996,
+      "scopeKey": "n107-actual-1719",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-saved-roster-visible-clean-helper-20261019"
+      ],
+      "objective": "Read AGENTS.md, ops contract, latest exact dated Product row and affected current origin/main source only. Latest direct human actual trial19October is NEW evidence; do not replay completed prior proofs. Existing sole controller and serial publisher; no manual worker/planner/reviewer, no queue/source/ledger edits. Return exact task/run/base/candidate/check schema. Minimum checks for THIS failure only; reuse unchanged evidence, no full-app suite or cosmetic build requirement. Preserve real student identity/history/grades/owner/session/lease/revisions/true durable ACK/tombstones. No real record/account mutations, new hosted SQL/schema/migrations/Auth/RLS/roles/keys/messages, private profile access or bypass of prior school/browser/tool refusals. Existing client source delivery authorized; LOCAL_READY is not Production. N44 remains explicitly paused. N123/N124/N110/N121/N122 remain CLOSED; new focus regression is N125, not reopening N123. N117 and older deferrals inactive.\n\nNEW PO omits classcode and receives generic «راجع الأعمدة والبنود والعظمى: رمز الفصل مطلوب (حتى8أحرف...)». Follow prior accepted gradefield behavior: exact missing classcode input visibly marked/focused, concise «أدخل رمز الفصل» field message; avoid generic columns/max prefix. Only genuinely invalid provided code gets short precise constraint. Preserve current approved new-class/file mapping/success behavior. User reports18seconds from confirm to complete; GENERAL measured latency belongs to N125 and previous N123 accepted, do not pretend fieldtext reduces18s. Inspect existing import orchestration for one concrete avoidable wait/repeated ACK scan ONLY if inside owned view, no store/sync/cloud edits and no stripping required durableACK. If not proven, report phases honestly, no newfull performance matrix. One synthetic missing/invalid code view case and existing submit validation, no data suite/oldmax/grade replay. N36 owns destination store/handoff and relatedstyle; this card begins after its delivery to avoid shared import UI conflicts.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/styles/teacher-setup-import.css",
+        "tests/n107-actual-1719/**",
+        "docs/automation-evidence/20261019/N107_MISSING_CLASS_CODE_FIELD.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n107_missing_class_code_precise_field_feedback"
+      ],
+      "acceptance": [
+        "Resolve exactly the new actual failure/UX objection, preserve completed prior behavior and unknowns honestly.",
+        "Authorized official source/provider delivery via existing publisher and original service custodian where explicitly assigned; actual PO review separate."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding."
+    }
+  ]
+}

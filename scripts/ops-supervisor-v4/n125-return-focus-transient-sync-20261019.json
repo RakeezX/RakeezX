@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n125-return-focus-transient-sync-20261019",
+      "productId": "N125",
+      "activationId": "po-20261012-continuous",
+      "priority": -1998,
+      "scopeKey": "n125-actual-1719",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact dated Product row and affected current origin/main source only. Latest direct human actual trial19October is NEW evidence; do not replay completed prior proofs. Existing sole controller and serial publisher; no manual worker/planner/reviewer, no queue/source/ledger edits. Return exact task/run/base/candidate/check schema. Minimum checks for THIS failure only; reuse unchanged evidence, no full-app suite or cosmetic build requirement. Preserve real student identity/history/grades/owner/session/lease/revisions/true durable ACK/tombstones. No real record/account mutations, new hosted SQL/schema/migrations/Auth/RLS/roles/keys/messages, private profile access or bypass of prior school/browser/tool refusals. Existing client source delivery authorized; LOCAL_READY is not Production. N44 remains explicitly paused. N123/N124/N110/N121/N122 remain CLOSED; new focus regression is N125, not reopening N123. N117 and older deferrals inactive.\n\nNEW incident after N123 accepted CLOSED: while app already open switch to another window and return -> blue syncing; second switch/return -> red then clears. N123 startup-readiness proof already complete; DO NOT rerun/reimplement it. Trace focus/pageshow/visibility renewal versus sync capture/receiver and coalesce same return lifecycle without dropping real owner/session change. Actual event-driven source reproduction with two returns and delayed renewal, minimum persistent real error/foreign-owner guard. Neutral pending while prerequisite unsettled, green only after trueACK, genuine errors remain red; no generic swallow/stale owner cache/global retry timeout/debounce/performance rewrite. No real accounts or broad two-tab/N110 matrix. N36 owns store and destination visibility; keep this card to sync lifecycle and app readiness, no store/import source writes.",
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/app.js",
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-warning-policy.js",
+        "src/lib/cloud.js",
+        "tests/n125-actual-1719/**",
+        "docs/automation-evidence/20261019/N125_RETURN_FOCUS_TRANSIENT_SYNC.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync.js"
+      ],
+      "requiredChecks": [
+        "n125_two_return_lifecycles_true_context_error_preserved"
+      ],
+      "acceptance": [
+        "Resolve exactly the new actual failure/UX objection, preserve completed prior behavior and unknowns honestly.",
+        "Authorized official source/provider delivery via existing publisher and original service custodian where explicitly assigned; actual PO review separate."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding."
+    }
+  ]
+}

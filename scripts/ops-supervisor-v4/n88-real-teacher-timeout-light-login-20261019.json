@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-real-teacher-timeout-light-login-20261019",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -1999,
+      "scopeKey": "n88-actual-1719",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact dated Product row and affected current origin/main source only. Latest direct human actual trial19October is NEW evidence; do not replay completed prior proofs. Existing sole controller and serial publisher; no manual worker/planner/reviewer, no queue/source/ledger edits. Return exact task/run/base/candidate/check schema. Minimum checks for THIS failure only; reuse unchanged evidence, no full-app suite or cosmetic build requirement. Preserve real student identity/history/grades/owner/session/lease/revisions/true durable ACK/tombstones. No real record/account mutations, new hosted SQL/schema/migrations/Auth/RLS/roles/keys/messages, private profile access or bypass of prior school/browser/tool refusals. Existing client source delivery authorized; LOCAL_READY is not Production. N44 remains explicitly paused. N123/N124/N110/N121/N122 remain CLOSED; new focus regression is N125, not reopening N123. N117 and older deferrals inactive.\n\nNEW actual PO after repeated-notification fix: opening teacher student space first replaces full page with «جارٍ فتح مساحة طلاب الفصل…» for long time then «تعذر الاتصال...إعادة المحاولة». Diagnose first entry actual class-context/preflight/service sequential requests/timeouts, NOT previous harmless repeated-store event issue. Reuse old no-duplicate-read proof. Need concrete bounded actual request timing/path failure reproduction from current source and existing safe native readiness; no claim fixed from a single document200/408ms. Paint stable teacher shell immediately, keep one bounded loading/action state and recover meaningfully; do not merely hide failure/force cached ready. Preserve owner/session/source/lease invalidation and late reply rejection. Public /student login visually not Rakeez light identity according to user: use existing brand tokens/logo/typeface/clear permanent light surface; heading «مساحة الطالب» placed clearly, short friendly instruction e.g. «أدخل رمز الدخول الذي أعطاك معلمك» then concise6digits/starts1 hint without duplicated labels, field and button spacing/accessibility. Original N88 custodian ONLY may correct existing service/ingress source if demonstrated necessary, exact one deployment/native readback before frontend-ready; preserve prior private browser refusal, no new personal browser read or alternate actor. No schema/SQL/Auth/role/credential/fixture change, no pupil/code mutation. Minimal actual first-entry delayed/failure/success owner guard +390/1440login inspection, no fullcrypto/SQL/hosted journey replay.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal-login.css",
+        "drafts/n88-student-portal/**",
+        "supabase/functions/n88-student-portal/**",
+        "tests/n88-actual-1719/**",
+        "docs/automation-evidence/20261019/N88_REAL_TEACHER_TIMEOUT_LIGHT_LOGIN.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_first_entry_timeout_root_path_and_light_clear_student_login"
+      ],
+      "acceptance": [
+        "Resolve exactly the new actual failure/UX objection, preserve completed prior behavior and unknowns honestly.",
+        "Authorized official source/provider delivery via existing publisher and original service custodian where explicitly assigned; actual PO review separate."
+      ],
+      "preparationAuthority": {
+        "kind": "existing-N88-service-correction-same-original-custodian",
+        "publication": true,
+        "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "newMigrations": 0,
+        "newFixtures": 0,
+        "newAuthUsers": 0,
+        "realPupilMutations": 0,
+        "realSend": false,
+        "existingHostedServiceCorrection": true
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding.",
+      "liveAuthorizationRef": "PO-20261019-1719-N88-ACTUAL-TIMEOUT",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f"
+    }
+  ]
+}

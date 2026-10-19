@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-saved-roster-visible-clean-helper-20261019",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -2000,
+      "scopeKey": "n36-actual-1719",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact dated Product row and affected current origin/main source only. Latest direct human actual trial19October is NEW evidence; do not replay completed prior proofs. Existing sole controller and serial publisher; no manual worker/planner/reviewer, no queue/source/ledger edits. Return exact task/run/base/candidate/check schema. Minimum checks for THIS failure only; reuse unchanged evidence, no full-app suite or cosmetic build requirement. Preserve real student identity/history/grades/owner/session/lease/revisions/true durable ACK/tombstones. No real record/account mutations, new hosted SQL/schema/migrations/Auth/RLS/roles/keys/messages, private profile access or bypass of prior school/browser/tool refusals. Existing client source delivery authorized; LOCAL_READY is not Production. N44 remains explicitly paused. N123/N124/N110/N121/N122 remain CLOSED; new focus regression is N125, not reopening N123. N117 and older deferrals inactive.\n\nActual0.5.14 PO trial:303collected/10classes/7pages,190new+113existing locally saved, receipt saved, no failure; Rakeez146pending class/student changes but NO classes or students visible. This is NOT previous SOURCE_CHANGED and not extraction failure. Trace actual receiver store commit/account/workspace/year/term/class teaching projection/list subscription/filter links and receipt arithmetic. Determine why saved IDs are not visible in current classes/students; do not confuse queued146change commands with303names, do not mark serverACK from local receipt. Do NOT ask reimport/reset/delete/outbox-clear. One small fabricated actual extension→receiver→real list projection in current owner/year fixture must show imported class roster immediately after local save and after reload while remoteACK delayed; retry preserves same identities. If no source cause, retain precise missing sanitized diagnostic rather than guessing. No real browser school/owner inspection or real writes. Also simplify popup/run-page: one concise purpose line, one primary start, compact stage/303names10classes saved-vs-sync status; diagnostics/manual JSON/CSV/certification/Noor wording collapsed or contextual, no duplicate privacy/legal/progress text, no misleading partial warning «تعذر جمع...استبعد0» when no observed failure. Coverage uncertainty can remain concise and honest; never invent complete coverage. If no Rakeez tab, best allowed flow from user Start: offer/open official Rakeez entry from that gesture, await signed-in receiver/owner readiness, then resume same run without rereading names; no extraction before binding ready, no auto-login/credentials, no closing or switching personal tabs, no assumption owner afterlogin. Wrong/different owner remains failclosed. Explain actual existing fields supported: current0.5.14 names/classes ONLY; teacher/principal/region/timetable are not imported by this adapter, do not claim or invent profile fields/schedule extraction in this card. Publish one immutable new extension version and website link; existing stable-folder minute updater must advance with verified package, no new updater/browser reload. Reuse previous extraction/pager proof, only new destination visibility/preflight+compact copy checks.",
+      "allowedPaths": [
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/class-koshoof-bundle.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/store.js",
+        "src/views/classes.js",
+        "src/views/students.js",
+        "extensions/**",
+        "tools/teacher-import-helper/**",
+        "assets/extensions/**",
+        "public/assets/extensions/**",
+        "scripts/build-teacher-import-helper.mjs",
+        "tests/n36-actual-1719/**",
+        "docs/automation-evidence/20261019/N36_SAVED_ROSTER_VISIBLE_CLEAN_HELPER.md"
+      ],
+      "verificationPaths": [
+        "src/lib/n36-extension-handoff.js"
+      ],
+      "requiredChecks": [
+        "n36_local_saved_visible_same_owner_year_and_compact_ready_preflight"
+      ],
+      "acceptance": [
+        "Resolve exactly the new actual failure/UX objection, preserve completed prior behavior and unknowns honestly.",
+        "Authorized official source/provider delivery via existing publisher and original service custodian where explicitly assigned; actual PO review separate."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding.",
+      "completionMode": "repair_source_verification_paths",
+      "verificationPathRepair": {
+        "previousResultSha256": "7a9086bc52f4b65ea43d788ba97216549981c50810ade4c7139bd353a40a3403",
+        "previousPathsSha256": "69aecaa9464c4b5548522fd5ec6ccd45ca2fa3a94ca8ff5c954ba9d47c22ca5c",
+        "reviewedFixtureSha256": "07d97b40e7ab280fab8bf8fa08ab542fc921285de4314178b283b99210d7a51b",
+        "blockedJournalSha256": "9320fdb3fd8729925b2627800bf26aa59114643869a2e275ba16149c5e6defee",
+        "reason": "Parent admission wrongly selected internal build script as served source. Correct only verificationPaths to changed actual src/views/class-import-center.js. Preserve exact candidate, checks, package/source SHA and old missing-asset receipt; no Product or permission change, no test/build replay."
+      }
+    }
+  ]
+}
