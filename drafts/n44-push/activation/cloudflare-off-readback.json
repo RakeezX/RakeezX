@@ -26,14 +26,14 @@
     {
       "name": "n44-notifications-ingress",
       "downloadedSourceExact": true,
-      "version": "eff1dd2e-43bb-4990-8030-27df3004ba5c",
+      "version": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
       "versionResourceKeys": [
         "script",
         "script_runtime",
         "bindings"
       ],
       "scriptMetadata": {
-        "etag": "72a94e68ffc9e0355f659384f39a242e8115bf4c71bef54bdcbc133d78f05e93",
+        "etag": "60425be16bd83d415a6e5294ec5b37562c2833659daea7e7faf72d64c3062f60",
         "handlers": [
           "fetch"
         ],
@@ -53,7 +53,12 @@
       },
       "schedules": {
         "schedules": []
-      }
+      },
+      "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+      "downloadedSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+      "recordedAt": "2026-10-19T06:35:52.750Z",
+      "transportCorrectionRunId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+      "schedulesEvidenceReused": true
     },
     {
       "name": "n44-notifications-scheduler",
@@ -245,5 +250,20 @@
     "correction": "Used documented GET /workers/scripts/{name}; no authorization denial or scope change."
   },
   "routesBeforeActivation": [],
-  "sourceAndPrivacyReadback": "PASS"
+  "sourceAndPrivacyReadback": "PASS",
+  "transportCorrection": {
+    "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+    "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+    "recordedAt": "2026-10-19T06:35:52.750Z",
+    "updatedSources": [
+      "n44-notifications-ingress"
+    ],
+    "nativeEvidence": "drafts/n44-push/activation/transport-after-native.json",
+    "schedulerEvidenceReused": {
+      "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+      "sourceUnchanged": true,
+      "providerReadOrWrite": false
+    },
+    "originalOffUploadAndConfigurationRecordsRetained": true
+  }
 }

@@ -338,19 +338,27 @@
     "schedulerEnabled": false,
     "cron": [],
     "browserEnabled": false,
-    "serviceWorkerEnabled": false
+    "serviceWorkerEnabled": false,
+    "ingressTransport": {
+      "sourceSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
+      "version": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
+      "deploymentId": "9c299159-27e3-462d-834b-953da989a106",
+      "recordedAt": "2026-10-19T06:35:52.750Z",
+      "bindingsPreserved": true,
+      "acceptance": "BLOCKED_AFTER503"
+    }
   },
   "sourceDefaultsRemainOff": true,
   "pendingIngressTransport": {
     "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
-    "runId": "65b5a648-5daf-4334-90d6-948812ca669d",
+    "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
     "state": "BLOCKED",
-    "providerMutationPerformed": false,
-    "nativeSourceExact": false,
+    "reason": "afterPOST-returned503-instead-of401",
+    "providerMutationPerformed": true,
+    "nativeSourceExact": true,
     "receipt": "tests/n44-finish-transport.result.json",
     "localBundleSha256": "cd68b9a8e6d552e08aaf5801fabe272a8113a3135014ce6d9d0a5c8d835f9df7",
-    "reason": "shared-live-mutation-lease-owned-by-active-N88",
     "beforeHttpStatus": 503,
-    "beforeEvidence": "tests/n44-finish-transport.context-read.before.json"
+    "afterHttpStatus": 503
   }
 }

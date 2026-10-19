@@ -24,7 +24,10 @@
       "secretNames": [
         "N44_INGRESS_KEY"
       ],
-      "cron": []
+      "cron": [],
+      "sourceOnlyUpload": true,
+      "bindingsPreserved": true,
+      "recordedAt": "2026-10-19T06:35:52.750Z"
     },
     {
       "name": "n44-notifications-scheduler",
@@ -66,7 +69,20 @@
       "enabled": "true",
       "schedulerEnabled": "false",
       "logpush": false,
-      "tailConsumers": []
+      "tailConsumers": [],
+      "configurationResponseReused": {
+        "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+        "originalArtifact": "drafts/n44-push/activation/transport-baseline/cloudflare-final-readback.json",
+        "freshlyRerun": false
+      },
+      "currentNativeMetadata": {
+        "logpush": false,
+        "tags": null,
+        "tail_consumers": null,
+        "observability": null
+      },
+      "currentNativeMetadataRecordedAt": "2026-10-19T06:35:52.750Z",
+      "unchangedAcrossUpload": true
     },
     {
       "name": "n44-notifications-scheduler",
@@ -117,7 +133,7 @@
     "deployments": {
       "deployments": [
         {
-          "id": "a522d399-f734-40b2-a714-bd135920ba97",
+          "id": "9c299159-27e3-462d-834b-953da989a106",
           "source": "api",
           "strategy": "percentage",
           "author_email": "rakeezxteam@gmail.com",
@@ -127,45 +143,11 @@
           },
           "versions": [
             {
-              "version_id": "94280ce2-5a76-41f1-91f0-feac5248b9d2",
+              "version_id": "f13f8bdb-bf77-4cc7-a40f-159fe543ee63",
               "percentage": 100
             }
           ],
-          "created_on": "2026-10-19T04:08:34.436891Z"
-        },
-        {
-          "id": "8f3430bb-82b7-4cbc-9215-098d01b6abfb",
-          "source": "api",
-          "strategy": "percentage",
-          "author_email": "rakeezxteam@gmail.com",
-          "annotations": {
-            "workers/message": "Automatic deployment on upload.",
-            "workers/triggered_by": "upload"
-          },
-          "versions": [
-            {
-              "version_id": "c01cf33a-c679-4077-97c8-9deebb526aea",
-              "percentage": 100
-            }
-          ],
-          "created_on": "2026-10-19T04:06:47.25791Z"
-        },
-        {
-          "id": "e66ccd8f-02da-4c9f-b10c-c25951220d85",
-          "source": "api",
-          "strategy": "percentage",
-          "author_email": "rakeezxteam@gmail.com",
-          "annotations": {
-            "workers/message": "Automatic deployment on upload.",
-            "workers/triggered_by": "upload"
-          },
-          "versions": [
-            {
-              "version_id": "eff1dd2e-43bb-4990-8030-27df3004ba5c",
-              "percentage": 100
-            }
-          ],
-          "created_on": "2026-10-19T03:59:53.722596Z"
+          "created_on": "2026-10-19T06:35:27.860065Z"
         }
       ]
     },
@@ -196,5 +178,14 @@
   "actualSend": false,
   "schedulerEnabled": false,
   "cron": [],
-  "browserAndSwEnabled": false
+  "browserAndSwEnabled": false,
+  "transportCorrection": {
+    "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+    "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+    "recordedAt": "2026-10-19T06:35:52.750Z",
+    "ingressOnly": true,
+    "privacyChanges": false,
+    "routeChanges": false,
+    "schedulerEvidenceReused": true
+  }
 }

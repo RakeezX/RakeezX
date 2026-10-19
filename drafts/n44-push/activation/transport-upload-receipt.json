@@ -1,0 +1,130 @@
+{
+  "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+  "runId": "0fcbdbd9-bd7c-44f2-aeec-11841077ffcc",
+  "recordedAt": "2026-10-19T06:35:28.432Z",
+  "worker": "n44-notifications-ingress",
+  "before": {
+    "settings": {
+      "result": {
+        "placement": {},
+        "compatibility_date": "2026-10-13",
+        "compatibility_flags": [],
+        "usage_model": "standard",
+        "tags": [],
+        "tail_consumers": [],
+        "logpush": false,
+        "annotations": {
+          "workers/triggered_by": "upload"
+        },
+        "bindings": [
+          {
+            "name": "N44_EDGE_URL",
+            "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications",
+            "type": "plain_text"
+          },
+          {
+            "name": "N44_ENABLED",
+            "text": "true",
+            "type": "plain_text"
+          },
+          {
+            "name": "N44_INGRESS_KEY",
+            "type": "secret_text"
+          },
+          {
+            "name": "N44_PUBLIC_ORIGIN",
+            "text": "https://rakeezx.com",
+            "type": "plain_text"
+          },
+          {
+            "name": "N44_SCHEDULER_ENABLED",
+            "text": "false",
+            "type": "plain_text"
+          }
+        ]
+      },
+      "success": true,
+      "errors": [],
+      "messages": [],
+      "status": 200
+    },
+    "privacy": {
+      "result": {
+        "logpush": false,
+        "tags": null,
+        "tail_consumers": null,
+        "observability": null
+      },
+      "success": true,
+      "errors": [],
+      "messages": [],
+      "status": 200
+    },
+    "deployment": {
+      "id": "31128d40-8dd1-46f9-8d83-1f5421bcf607",
+      "source": "api",
+      "strategy": "percentage",
+      "author_email": "rakeezxteam@gmail.com",
+      "annotations": {
+        "workers/message": "Automatic deployment on upload.",
+        "workers/triggered_by": "upload"
+      },
+      "versions": [
+        {
+          "version_id": "64700bdd-201b-4bdf-9fe3-332bc7f034f0",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-19T04:12:40.97017Z"
+    }
+  },
+  "metadata": {
+    "main_module": "worker.mjs",
+    "keep_bindings": [
+      "plain_text",
+      "secret_text"
+    ],
+    "compatibility_date": "2026-10-13",
+    "compatibility_flags": [],
+    "usage_model": "standard",
+    "tags": [],
+    "tail_consumers": [],
+    "logpush": false
+  },
+  "uploaded": {
+    "result": {
+      "created_on": "2026-10-19T03:59:53.722596Z",
+      "modified_on": "2026-10-19T06:35:27.860065Z",
+      "id": "n44-notifications-ingress",
+      "tag": "86f7f793adbe4f8d8f3d8e19c039122c",
+      "entry_point": "worker.mjs",
+      "tags": [],
+      "deployment_id": "f13f8bdbbf774cc7a40f159fe543ee63",
+      "tail_consumers": [],
+      "logpush": false,
+      "has_assets": false,
+      "has_modules": true,
+      "etag": "60425be16bd83d415a6e5294ec5b37562c2833659daea7e7faf72d64c3062f60",
+      "handlers": [
+        "fetch"
+      ],
+      "named_handlers": [
+        {
+          "name": "createCloudflareEntry",
+          "handlers": [
+            "class"
+          ]
+        }
+      ],
+      "last_deployed_from": "api",
+      "compatibility_date": "2026-10-13",
+      "usage_model": "standard",
+      "startup_time_ms": 1
+    },
+    "success": true,
+    "errors": [],
+    "messages": [],
+    "status": 200
+  },
+  "secretValuesReadOrWritten": false
+}
