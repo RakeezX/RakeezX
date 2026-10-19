@@ -1,0 +1,10 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T10:55:15.485Z",
+  "plaintextTransientInputsAbsent": true,
+  "encryptedRecoveryRetained": true,
+  "originalOwnerRetained": true,
+  "noCredentialRotation": true
+}

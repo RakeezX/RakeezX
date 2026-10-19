@@ -1,0 +1,12 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T10:52:44.491Z",
+  "acknowledged": true,
+  "function": "n44-notifications",
+  "source": "4c02ab9bfa89b7c25bfc2cd8506ab2cbc80d85ae",
+  "preparedSourceSha256": "df1d97a8b6f9d1cfdebd1c5277abab025827fefb689167c46be8155b09cafef9",
+  "deliveryEnabled": false,
+  "targetBound": false
+}

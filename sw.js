@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v73';
+const VERSION = 'rakeezx-v74';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -378,7 +378,9 @@ self.addEventListener('fetch', (event) => {
 
 
 // AI: source-controlled activation; opaque binding is NOT an Auth credential.
-const N44_PUSH_ENABLED = false;
+// No permission or registration here. Reception still requires a matching
+// explicit owner-bound consent receipt installed by the authenticated client.
+const N44_PUSH_ENABLED = true;
 const N44_CONSENT_CACHE = 'rakeezx-n44-consent-v1';
 const N44_CONSENT_KEY = '/__n44_device_consent';
 let n44Epoch = 0, n44Writes = Promise.resolve();

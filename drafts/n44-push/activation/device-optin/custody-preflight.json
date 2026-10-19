@@ -1,0 +1,80 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T10:51:39.897Z",
+  "originalOwnerVerified": true,
+  "encryptedRecoveryRetained": true,
+  "privateValuesReturned": false,
+  "comparison": [
+    {
+      "name": "N44_ENABLED",
+      "matches": true
+    },
+    {
+      "name": "N44_DELIVERY_ENABLED",
+      "matches": true
+    },
+    {
+      "name": "N44_READINESS_ENABLED",
+      "matches": true
+    },
+    {
+      "name": "N44_PUBLIC_ORIGIN",
+      "matches": true
+    },
+    {
+      "name": "N44_AUTH_URL",
+      "matches": true
+    },
+    {
+      "name": "N44_AUTH_API_KEY",
+      "matches": true
+    },
+    {
+      "name": "N44_SERVICE_REVISION",
+      "matches": true
+    },
+    {
+      "name": "N44_SERVICE_SOURCE_SHA",
+      "matches": true
+    },
+    {
+      "name": "N44_SESSION_POLICY_JSON",
+      "matches": true
+    },
+    {
+      "name": "N44_DATABASE_URL",
+      "matches": true
+    },
+    {
+      "name": "N44_DATABASE_CA_CERT",
+      "matches": true
+    },
+    {
+      "name": "N44_INGRESS_KEY",
+      "matches": true
+    },
+    {
+      "name": "N44_SCHEDULER_KEY",
+      "matches": true
+    },
+    {
+      "name": "N44_RATE_KEY",
+      "matches": true
+    },
+    {
+      "name": "N44_CRYPTO_JSON",
+      "matches": true
+    },
+    {
+      "name": "N44_PROVIDER_ORIGINS_JSON",
+      "matches": true
+    }
+  ],
+  "profileObservedAt": 1792339648711,
+  "profileFreshForNewActivation": true,
+  "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+  "serverPublicKey": "BHXWNVDW8ELOjQCymtTKbnaplWrTuzczXEwPbVS006Ev5PNUkCkyvpSrOPAT8OQzOAiwgdKbGX9Qs5034y4SQ40",
+  "unexpectedN44Names": []
+}

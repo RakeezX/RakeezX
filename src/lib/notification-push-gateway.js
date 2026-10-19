@@ -19,6 +19,7 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
     } finally { clearTimeout(timer); }
   };
   return Object.freeze({
+    configuration: () => request('push/config', scope),
     async read() {
       const r = await request('context/read', scope);
       if (r.protocol !== N44_PROTOCOL || !['current', 'absent'].includes(r.status)) throw Error('unavailable');

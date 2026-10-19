@@ -1,0 +1,47 @@
+/** AI: changed config route through actual signed ingress/AuthClient/backend; fabricated ports only. */
+import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
+import {Buffer} from 'node:buffer';
+import {createECDH} from 'node:crypto';
+import {createCloudflareEntry} from '../drafts/n44-push/cloudflare-entry.mjs';
+import {createWebEntry} from '../drafts/n44-push/web-entry.mjs';
+import {signedScheduleRequest,runScheduled} from '../drafts/n44-push/scheduler-entry.mjs';
+import {DEVICE_TEST_ID} from '../drafts/n44-push/one-device-test.mjs';
+const now=Date.now(),origin='https://synthetic.invalid',authUrl='https://auth.synthetic.invalid',source='a'.repeat(40);
+const owner='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',session='11111111-1111-4111-8111-111111111111';
+const key=new Uint8Array(32).fill(1),scheduler=new Uint8Array(32).fill(3);
+const profile={v:2,approvalState:'active',approvalId:'a'.repeat(64),serviceRevision:'n44-browser-service-v2',serviceSourceSha:source,policyChangeRule:'disable-retire-before-auth-policy-change',timeboxSeconds:null,inactivityTimeoutSeconds:null,singleSessionPerUser:false,metadataSha256:'b'.repeat(64),observedAt:now-1000,activatedAt:now-500};
+const pair=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);
+const jwk={...await crypto.subtle.exportKey('jwk',pair.publicKey),kid:'synthetic',alg:'ES256',use:'sig'};
+const encode=x=>Buffer.from(JSON.stringify(x)).toString('base64url');
+const unsigned=encode({alg:'ES256',kid:'synthetic',typ:'JWT'})+'.'+encode({iss:authUrl+'/auth/v1',aud:'authenticated',role:'authenticated',sub:owner,session_id:session,iat:Math.floor(now/1000)-1,exp:Math.floor(now/1000)+3600});
+const token=unsigned+'.'+Buffer.from(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},pair.privateKey,new TextEncoder().encode(unsigned))).toString('base64url');
+const queries=[];let reads=0,sends=0;
+const acquire=async()=>({async query(sql){queries.push(sql);
+ if(sql.startsWith('insert into n44_push_draft.ingress_nonces'))return {rows:[{nonce:'synthetic'}]};
+ if(sql.startsWith('insert into n44_push_draft.ingress_rates'))return {rows:[{count:1}]};
+ if(sql.includes('lock_current_session'))return {rows:[{user_id:owner,session_id:session,not_after_ms:null}]};
+ return {rows:[]};},release(){}});
+const vapid=createECDH('prime256v1');vapid.generateKeys();const publicKey=vapid.getPublicKey().toString('base64url');
+const a={testId:DEVICE_TEST_ID,runId:'a4b73532-2bc6-4327-98e7-89c5edb7bcee',ownerId:owner,workspaceId:'synthetic',deviceId:'synthetic',expiresAt:Math.min(now+3600000,Date.parse('2026-10-20T00:00:00Z')),target:null};
+const options={now:()=>now,authUrl,origin,apiKey:'FABRICATED_PUBLIC',fetch:async url=>{reads++;assert.ok([authUrl+'/auth/v1/.well-known/jwks.json',authUrl+'/auth/v1/user'].includes(url));return url.endsWith('jwks.json')?Response.json({keys:[jwk]}):Response.json({id:owner,is_anonymous:false});},providerOrigins:[],crypto:{sender:{send(){sends++;throw Error('must not send');}}},rateKey:new Uint8Array(32).fill(2),sessionPolicy:profile,serviceSourceSha:source,ingressKey:key,schedulerKey:scheduler,acquire,deviceTest:a,publicVapidKey:publicKey,deliveryEnabled:false};
+const env={N44_ENABLED:'true',N44_PUBLIC_ORIGIN:origin,N44_EDGE_URL:authUrl+'/functions/v1/n44-notifications',N44_INGRESS_KEY:'01'.repeat(32)};
+async function call(patch={},bearer=token,edgeOptions={}) {
+ const edge=createWebEntry({...options,...edgeOptions});
+ const ingress=createCloudflareEntry({now:()=>now,fetch:async(url,init)=>{assert.equal(init.redirect,'manual');return edge(new Request(url,init));}});
+ const request=new Request(origin+'/api/n44/push/config',{method:'POST',headers:{origin,'content-type':'application/json','x-n44-csrf':'1','sec-fetch-site':'same-origin','cf-connecting-ip':'192.0.2.1',authorization:'Bearer '+bearer},body:JSON.stringify({workspaceId:'synthetic',deviceId:'synthetic',...patch})});
+ Object.defineProperty(request,'cf',{value:{tlsVersion:'TLSv1.3'}});return ingress(request,env);
+}
+let response=await call();assert.equal(response.status,200);const body=await response.json();assert.equal(body.status,'ready');assert.equal(body.publicKey,publicKey);assert.equal(body.deliveryEnabled,false);assert.equal(body.schedulerEnabled,false);assert.equal(body.serviceSourceSha,source);
+assert.equal('ownerId' in body,false);assert.equal('target' in body,false);assert.ok(reads>=2);assert.ok(queries.includes('commit'));
+assert.equal((await(await call({deviceId:'wrong'})).json()).status,'disabled');
+assert.equal((await(await call({},token,{deviceTest:null})).json()).status,'disabled');
+assert.equal((await(await call({},token,{deliveryEnabled:true})).json()).status,'disabled');
+assert.equal((await call({},'FABRICATED_INVALID_TOKEN_ONLY')).status,400);
+const edge=createWebEntry(options);
+const request=await signedScheduleRequest(authUrl+'/functions/v1/n44-notifications/schedule',scheduler,{operation:'one-device-test',cursor:a.runId,limit:1},()=>now);
+response=await edge(request);assert.equal((await response.json()).status,'disabled','unbound target cannot send');
+assert.deepEqual(await runScheduled({N44_ENABLED:'false',N44_SCHEDULER_ENABLED:'false'},{fetch(){throw Error('no cron request');}}),{status:'disabled'});
+assert.equal(sends,0);
+const checks=[{name:'actual_signed_config_route_and_auth_gate',status:'PASS',evidence:'Changed route traverses actual Cloudflare HMAC/WebRequest/official AuthClient/backend with fabricated signed JWT and metadata query ports; exact approved scope returns public key/source only after Auth locks/commit; wrong device, absent approval and global delivery ON deny.'},{name:'private_test_requires_bound_target_and_cron_off',status:'PASS',evidence:'Actual signed private schedule request with absent target stays disabled; no generic public send route, disabled scheduler performs zero fetches; sender never invoked.'}];
+await writeFile('tests/n44-device-1019-service.json',JSON.stringify({taskId:'continuous-n44-single-device-optin-ready-20261019',runId:a.runId,checks,scope:'Injected fabricated provider/DB ports; no hosted source/config/readiness claim',providerSendAttempts:0,liveAuthOrSqlOperations:0},null,2)+'\n');console.log('PASS: actual changed service entry with fabricated ports; zero live operations.');

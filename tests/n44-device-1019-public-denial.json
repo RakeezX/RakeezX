@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "recordedAt": "2026-10-19T10:55:40.007Z",
+  "httpStatus": 400,
+  "status": "rejected",
+  "accepted": true,
+  "cacheControl": "no-store, private",
+  "publicKeyReturned": false,
+  "realBearer": false,
+  "actualRegistrations": 0,
+  "providerSendAttempts": 0,
+  "scope": "Actual new HTTPS route; fabricated nonJWT only; not hosted teacher/owner or OS delivery proof"
+}

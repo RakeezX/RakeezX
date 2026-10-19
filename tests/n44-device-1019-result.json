@@ -1,0 +1,73 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "a4b73532-2bc6-4327-98e7-89c5edb7bcee",
+  "state": "BLOCKED",
+  "baseSha": "71b76be39e553ffb60771300d90231042854174a",
+  "scope": "Phase1 source preparation, not hosted opt-in readiness",
+  "checks": [
+    {
+      "name": "affected_local_service_budget_and_actual_ui_sw",
+      "status": "PASS",
+      "evidence": "Focused guard/service/browser proofs passed; exact prepared bundle graph, syntax, migration pins and diff checks passed."
+    },
+    {
+      "name": "official_https_optin_binding_and_source_readback",
+      "status": "NOT_RUN",
+      "evidence": "Last verified native Edge v32 lacks the new single-device capability. Prepared Edge/ingress source is not deployed; N44_ONE_DEVICE_TEST_JSON is not bound. Current worker instruction explicitly prohibits deployment."
+    }
+  ],
+  "proofs": [
+    {
+      "path": "tests/n44-device-1019-guards.json",
+      "sha256": "547e2384ee2a55e74b90c0f5416f808c25edb5c015c10278030c47748cca9173",
+      "checks": [
+        "single_target_durable_total_attempt_budget",
+        "owner_consent_expiry_and_commit_ack_failclosed",
+        "actual_sw_binding_dedupe_clear_and_offline_shell"
+      ]
+    },
+    {
+      "path": "tests/n44-device-1019-browser.json",
+      "sha256": "44a868aa2e86d4fdf6cf115d39bb30727ad13dd0b040abf6e08b1c2d86d58901",
+      "checks": [
+        "actual_ui_explicit_gesture_and_denied_consent",
+        "actual_entry_wrong_source_and_owner_failclosed"
+      ]
+    },
+    {
+      "path": "tests/n44-device-1019-service.json",
+      "sha256": "9eae7c722203191d82b541b9b8814c4fc837061281d762757e0c28ba9069ee8b",
+      "checks": [
+        "actual_signed_config_route_and_auth_gate",
+        "private_test_requires_bound_target_and_cron_off"
+      ]
+    }
+  ],
+  "preparedManifest": "drafts/n44-push/activation/device-optin/manifest.json",
+  "deployedSourceReused": {
+    "version": 32,
+    "sha256": "705a2df980bc411a8a64f5f25b5b72e1f1f58abfdb8671d10125a48cf93a052f"
+  },
+  "historicalFailuresPreserved": [
+    "tests/n44-device-1019-browser.initial-timeout.json",
+    "tests/n44-device-1019-browser.diagnostic-timeout.json",
+    "tests/n44-device-1019-browser.activation-fixture-failure.json",
+    "tests/n44-device-1019-service.initial-dependency-failure.json"
+  ],
+  "providerWrites": 0,
+  "hostedSqlOrAuthOperations": 0,
+  "actualPermissionPrompts": 0,
+  "actualDeviceRegistrations": 0,
+  "providerSendAttemptsAcrossThisPhase": 0,
+  "globalDeliveryEnabledByThisWorker": false,
+  "cronEnabledByThisWorker": false,
+  "osReception": "NOT_RUN",
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true,
+    "browserLease": "RELEASED browser"
+  },
+  "blocker": "Prepared original Edge/ingress capability and private synthetic owner/device approval require authorized service publication/readback; this worker is expressly forbidden to deploy. Frontend stays failclosed against current service.",
+  "retryCondition": "Exact service-publication authority/path for the original N44 resources plus ordinary-UI identification of the designated fabricated owner/device; then source/config/public-key readback before phase2. Do not replay existing proofs, migrations or authentication diagnosis."
+}

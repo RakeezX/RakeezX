@@ -1,0 +1,12 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "checks": [
+    {
+      "name": "public_key_matches_existing_server_pair_and_approval",
+      "status": "PASS",
+      "evidence": "New projection exposes only matching public VAPID/source metadata and unbound-target status; wrong pair, missing approval and delivery ON fail closed. Synthetic in-memory keys only; no prior crypto/PG/UI replay."
+    }
+  ],
+  "liveOperations": 0
+}

@@ -1,0 +1,173 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "edge": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
+    "name": "n44-notifications",
+    "version": 40,
+    "status": "ACTIVE",
+    "verifyJwt": false,
+    "providerBundleSha256": "2daf9926123dcc356d0948c1e5ace56d72bc2c4d09f6d88ddd2fe815b29edc3f",
+    "prior": {
+      "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
+      "version": 38,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "providerBundle": "1c5aee48143a50a73f3a40d3a0c398e46e74b0927922a237a272750f6e16a512"
+    },
+    "sourceReadback": "Native get_edge_function; exact bytes compared locally",
+    "sourceExact": true,
+    "sourceSha256": "df1d97a8b6f9d1cfdebd1c5277abab025827fefb689167c46be8155b09cafef9"
+  },
+  "cloudflare": {
+    "workers": [
+      {
+        "name": "n44-notifications-ingress",
+        "settingsStatus": 200,
+        "bindings": [
+          {
+            "name": "N44_EDGE_URL",
+            "type": "plain_text",
+            "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications"
+          },
+          {
+            "name": "N44_ENABLED",
+            "type": "plain_text",
+            "text": "true"
+          },
+          {
+            "name": "N44_INGRESS_KEY",
+            "type": "secret_text"
+          },
+          {
+            "name": "N44_PUBLIC_ORIGIN",
+            "type": "plain_text",
+            "text": "https://rakeezx.com"
+          },
+          {
+            "name": "N44_SCHEDULER_ENABLED",
+            "type": "plain_text",
+            "text": "false"
+          }
+        ],
+        "logpush": false,
+        "tailConsumers": [],
+        "deployment": {
+          "id": "2b068499-6e1e-4585-a880-959bdd642b86",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "AI: bounded N44 opt-in config route; delivery/c...",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "61192b97-c5e9-49ea-a85c-6a0cd6865b35",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T10:53:59.184184Z"
+        },
+        "schedulesStatus": 200,
+        "schedules": {
+          "schedules": []
+        },
+        "sourceExact": true
+      },
+      {
+        "name": "n44-notifications-scheduler",
+        "settingsStatus": 200,
+        "bindings": [
+          {
+            "name": "N44_EDGE_URL",
+            "type": "plain_text",
+            "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications"
+          },
+          {
+            "name": "N44_ENABLED",
+            "type": "plain_text",
+            "text": "false"
+          },
+          {
+            "name": "N44_PUBLIC_ORIGIN",
+            "type": "plain_text",
+            "text": "https://rakeezx.com"
+          },
+          {
+            "name": "N44_SCHEDULER_ENABLED",
+            "type": "plain_text",
+            "text": "false"
+          },
+          {
+            "name": "N44_SCHEDULER_KEY",
+            "type": "secret_text"
+          }
+        ],
+        "logpush": false,
+        "tailConsumers": [],
+        "deployment": {
+          "id": "c8f1aaaa-6bf3-476a-9f16-b414ac70aefc",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "971e8e93-1bc1-4e40-ab6e-301143f8443d",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T04:12:43.759507Z"
+        },
+        "schedulesStatus": 200,
+        "schedules": {
+          "schedules": []
+        },
+        "sourceExact": true
+      }
+    ],
+    "route": [
+      {
+        "id": "05c0088cf73e4223abaccd1c859e4539",
+        "pattern": "rakeezx.com/api/n44/*",
+        "script": "n44-notifications-ingress",
+        "request_limit_fail_open": false
+      }
+    ],
+    "schedulerRedeployed": false
+  },
+  "ingressUpload": {
+    "success": true,
+    "status": 200,
+    "errors": [],
+    "id": "n44-notifications-ingress",
+    "etag": "d626cccb2a0f7e08ccf18e2bfab69b02874882528132711f80f7341ee2fb96b1",
+    "deployment_id": "61192b97c5e949eaa85c6a0cd6865b35",
+    "observability": {
+      "enabled": false,
+      "head_sampling_rate": null,
+      "logs": {
+        "enabled": false,
+        "destinations": [],
+        "head_sampling_rate": null,
+        "persist": false,
+        "invocation_logs": false
+      },
+      "traces": {
+        "enabled": false,
+        "destinations": [],
+        "persist": false,
+        "head_sampling_rate": null
+      }
+    },
+    "logpush": false,
+    "tail_consumers": [],
+    "secretValueTransmitted": false,
+    "existingBindingsInherited": true
+  }
+}

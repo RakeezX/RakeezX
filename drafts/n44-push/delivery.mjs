@@ -36,7 +36,9 @@ function eligible(tx, r, payload, now, recompute) {
 /** Private scheduler capability only, NOT a public HTTP/admin/campaign handler.
  * No default sender; absent sender is disabled even if ports are misconfigured.
  * atomic is durable/serializable, with fencing + immutable-key constraints. */
-export function createDeliveryBoundary({ repository, clock, recompute, sender = null, envelope = false }) {
+export function createDeliveryBoundary({ repository, clock, recompute, sender = null, envelope = false, beforePermit = null, maxAttempts = LIMITS.attempts, bindingExpiresAt = Infinity }) {
+  if(!Number.isInteger(maxAttempts)||maxAttempts<1||maxAttempts>LIMITS.attempts||beforePermit!==null&&typeof beforePermit!=='function')throw Error('n44_delivery_configuration');
+  if(bindingExpiresAt!==Infinity&&(!Number.isSafeInteger(bindingExpiresAt)||bindingExpiresAt<=0))throw Error('n44_delivery_configuration');
   return Object.freeze({
     async deliver(ownerId, registrationId, raw) {
       try {
@@ -69,7 +71,8 @@ export function createDeliveryBoundary({ repository, clock, recompute, sender = 
             return result('suppressed');
           }
           if (job && now < job.nextAt) return result('backoff');
-          if ((job?.attempts ?? 0) >= LIMITS.attempts) return result('exhausted');
+          if ((job?.attempts ?? 0) >= maxAttempts) return result('exhausted');
+          if (beforePermit && !beforePermit(tx,ownerId,r,payload,now)) return result('disabled');
           // Atomic budgets include retries; rejected subsequent budgets may
           // conservatively consume earlier ones. No successful debit is undone.
           if (!rate(tx, `hour:${r.deviceId}`, now, 3600_000, LIMITS.sendsPerHour) ||
@@ -83,7 +86,7 @@ export function createDeliveryBoundary({ repository, clock, recompute, sender = 
           tx.set('deliveries', key, job);
           return { key, attempt: job.attempts, sealed: r.sealed, payload,
             fingerprint: r.fingerprint, bindingFingerprint: r.bindingFingerprint,
-            ...(envelope ? {binding:{id:r.registrationId,expiresAt:Math.min(r.expiresAt,tx.context(r.workspaceId,r.deviceId).sessionExpiresAt)}} : {}) };
+            ...(envelope ? {binding:{id:r.registrationId,expiresAt:Math.min(r.expiresAt,tx.context(r.workspaceId,r.deviceId).sessionExpiresAt,bindingExpiresAt)}} : {}) };
         });
         if (permit.status) return permit;
         let outcome;
@@ -102,7 +105,7 @@ export function createDeliveryBoundary({ repository, clock, recompute, sender = 
             tx.set('registrations', registrationId, { ...r, state: 'dead', sealed: null, fingerprint: null, bindingFingerprint: null });
           }
           if (state === 'retry' && (!r || !eligible(tx, r, job.payload, now, recompute) ||
-              job.attempts >= LIMITS.attempts || now >= job.expiresAt)) state = 'suppressed';
+              job.attempts >= maxAttempts || now >= job.expiresAt)) state = 'suppressed';
           const nextAt = now + LIMITS.retryBaseMs * 2 ** (job.attempts - 1);
           if (state === 'retry' && nextAt >= job.expiresAt) state = 'suppressed';
           tx.set('deliveries', permit.key, { ...job, state, nextAt });

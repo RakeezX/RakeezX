@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n44-single-device-optin-ready-20261019",
+  "runId": "05fd1236-442a-4fbf-add3-e9b9c20bb8e1",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-19T10:52:34.753Z",
+  "source": "4c02ab9bfa89b7c25bfc2cd8506ab2cbc80d85ae",
+  "namesMatched": [
+    "N44_ONE_DEVICE_TEST_JSON",
+    "N44_SERVICE_SOURCE_SHA",
+    "N44_SESSION_POLICY_JSON",
+    "N44_DELIVERY_ENABLED"
+  ],
+  "scopeDigest": "feb87890d4966dcf23b415cb0512855647f628e539b65c90e829882453e955e4",
+  "publicVapidKey": "BHXWNVDW8ELOjQCymtTKbnaplWrTuzczXEwPbVS006Ev5PNUkCkyvpSrOPAT8OQzOAiwgdKbGX9Qs5034y4SQ40",
+  "expiresAt": 1792428750303,
+  "targetBound": false,
+  "deliveryEnabled": false,
+  "providerSendAttempts": 0,
+  "registrations": 0,
+  "plaintextInputRemoved": true
+}
