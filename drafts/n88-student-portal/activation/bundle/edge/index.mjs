@@ -61,8 +61,8 @@ var deployment_inactive_default = {
     rowBytes: 4096
   },
   timing: {
-    acquireMs: 1e3,
-    transactionMs: 8e3,
+    acquireMs: 6e3,
+    transactionMs: 16e3,
     cleanupMs: 400,
     statementMs: 3e3,
     lockMs: 1e3
@@ -73,7 +73,7 @@ var deployment_inactive_default = {
   },
   pool: {
     max: 2,
-    connectionTimeoutMillis: 1e3,
+    connectionTimeoutMillis: 5e3,
     boundedAdmission: true
   },
   privateLogs: {
@@ -4632,7 +4632,7 @@ function createWebEntry(options) {
         timer = setTimeout(() => {
           abort.abort();
           resolve(privateResponse());
-        }, 11e3);
+        }, 18e3);
       })]);
     } finally {
       clearTimeout(timer);
@@ -4712,17 +4712,7 @@ function createExistingHost(readEnv) {
   const recoveryKeys = new Map(versions.map((v) => [v, key2("N88_RECOVERY_KEY_" + v)]));
   const ca = required("N88_DATABASE_CA_CERT").replaceAll("\r\n", "\n");
   if (createHash9("sha256").update(ca).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n88_database_ca_configuration");
-  const pool = new pg.Pool({
-    connectionString: dbUrl,
-    ssl: { rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2", ca },
-    max: 2,
-    connectionTimeoutMillis: 1e3,
-    idleTimeoutMillis: 1e4,
-    statement_timeout: 3e3,
-    query_timeout: 4e3,
-    application_name: "n88-private-server",
-    allowExitOnIdle: true
-  });
+  const pool = new pg.Pool(databaseConfig(readEnv));
   pool.on("error", () => {
   });
   let waiting = 0;

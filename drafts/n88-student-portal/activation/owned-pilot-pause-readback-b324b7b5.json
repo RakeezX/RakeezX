@@ -1,0 +1,12 @@
+{
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "enabled": false,
+  "enabledFalseProviderDigestMatches": true,
+  "providerDigestField": "value",
+  "rolloutMode": "pilot",
+  "publicEnabled": false,
+  "credentialOrRoleOrFixtureChanged": false,
+  "protectedTemporaryInputRemoved": true,
+  "source": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+  "initialPausedSource": "b670258b74e486a8478e016ce796c7e16dca9ae31632a896f45c6c091706a2dc"
+}

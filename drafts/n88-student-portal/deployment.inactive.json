@@ -49,8 +49,8 @@
     "rowBytes": 4096
   },
   "timing": {
-    "acquireMs": 1000,
-    "transactionMs": 8000,
+    "acquireMs": 6000,
+    "transactionMs": 16000,
     "cleanupMs": 400,
     "statementMs": 3000,
     "lockMs": 1000
@@ -61,7 +61,7 @@
   },
   "pool": {
     "max": 2,
-    "connectionTimeoutMillis": 1000,
+    "connectionTimeoutMillis": 5000,
     "boundedAdmission": true
   },
   "privateLogs": {

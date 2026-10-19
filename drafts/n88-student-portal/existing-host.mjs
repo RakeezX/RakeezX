@@ -8,7 +8,7 @@ import manifest from './deployment.inactive.json' with {type:'json'};
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
 import {assertVerifiedBoundary} from './activation/private-error-boundary.mjs';
-import {assertRestrictedTransport} from './activation/database-transport.mjs';
+import {assertRestrictedTransport,databaseConfig} from './activation/database-transport.mjs';
 import {createRolloutGuard} from './rollout-guard.mjs';
 // Source-side error redaction cannot prevent the database server logging DETAIL.
 // Read only effective session settings before granting the repository this client.
@@ -64,9 +64,9 @@ export function createExistingHost(readEnv) {
   // verification downgrade. Session-mode5432 preserves session/transaction fences.
   const ca=required('N88_DATABASE_CA_CERT').replaceAll('\r\n','\n');
   if(createHash('sha256').update(ca).digest('hex')!=='700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7')throw Error('n88_database_ca_configuration');
-  const pool=new pg.Pool({connectionString:dbUrl,ssl:{rejectUnauthorized:true,servername:db.hostname,minVersion:'TLSv1.2',ca},max:2,
-    connectionTimeoutMillis:1000,idleTimeoutMillis:10000,statement_timeout:3000,query_timeout:4000,
-    application_name:'n88-private-server',allowExitOnIdle:true});
+  // Use the same strict transport configuration that the real readiness session
+  // verified. Its bounded five-second connect includes the provider TLS handshake.
+  const pool=new pg.Pool(databaseConfig(readEnv));
   // No raw pg errors/SQL/parameters in platform logs.
   pool.on('error',()=>{});let waiting=0;
   const acquire=async()=>{

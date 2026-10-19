@@ -462,3 +462,43 @@ Full hosted acceptance and public activation remain NOT_RUN until the same saved
 session resumes after verified pilot publication. No full N88 completion/CLOSED.
 Owned staging cleanup was policy-denied and retained without a bypass; all owned
 processes and phase leases are released. See the exact retained-resource receipt.
+
+## Actual acceptance continuation — run b324b7b5, 2026-10-19
+
+The pilot publication receipt is preserved: candidate35e2cbb6131129ee5997e818e59e0ea6fd3d76a4,
+published01ed8edd78a672a4b01c8d6ab8b4cf692279ced0, verified05:51:14.579Z.
+Normal designated teacher UI created exactly two codes. Same-code recovery after
+reload, actual student login, hidden-default fields, selected name/class/required
+fields and the teacher's existing-task guidance save ACK were observed. No code,
+raw identity, browser credential, private row projection or screenshot was exported.
+
+Full acceptance FAILS at the published runtime: concurrent list/guidance reads
+contend on the unchanged short database lock; a refreshed account binding can
+leave controls unavailable. Rotation/revoke/old-session denial and student guidance
+read remain NOT_RUN, not PASS. No public configuration or final frontend publication.
+
+The bounded frontend correction serializes dispatch and obtains fresh server
+admission after binding renewal. Actual app DOM, handlers, source CSS, account store,
+owner-bound dispatch, wrong-owner rejection and renewed-session behavior pass in
+tests/n88-official-activation-current-entry-ui.json. Private transaction/ACK/owner/
+source/role checks pass in n88-official-activation-hosted-entry-repair.json.
+The pool uses the same proven strict transport configuration as readiness. Bounded
+connect/acquire/transaction/Web/ingress budgets are5000/6000/16000/18000/19000ms;
+statement3000ms and lock1000ms remain unchanged. Fixed phase metadata never exposes
+private exception strings. A same-instance queue experiment did not resolve
+cross-worker contention and was removed; its evidence is marked historical only.
+
+Actual final Edge35 source4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa
+and current ingress source are read back in current-provider-readback-b324b7b5.json.
+N88_ENABLED is safely false via the original protected custodian; exact flag digest
+and anonymous private API503/no-store readbacks pass. Rollout remains pilot, never
+public. The two credentials, selected fields and fabricated private guidance remain
+dormant; canonical roster/grades, original16384 credential, eight immutable SQL files,
+nonce/tombstone history and sealed recovery are preserved. No blind fixture cleanup.
+
+Retry condition: the sole publisher serves the corrected normal teacher runtime,
+then the controller resumes this same session and retained two-pupil fixture.
+Re-enable only the owned pilot through its original protected channel after current
+source/config checks, finish the remaining normal hosted journey and all original
+gates, then consider public mode. This is an implementation/delivery-order blocker,
+not a request for another PO approval. Current result is BLOCKED, not Product CLOSED.

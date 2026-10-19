@@ -1,0 +1,29 @@
+{
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "at": "2026-10-19T06:21:49.830Z",
+  "rows": [
+    {
+      "path": "/api/n88/student/read",
+      "status": 503,
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true
+    },
+    {
+      "path": "/api/n88/teacher/class/list",
+      "status": 503,
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true
+    },
+    {
+      "path": "/student",
+      "status": 200,
+      "noStore": true,
+      "noReferrer": true,
+      "noIndex": true
+    }
+  ],
+  "privateRequestsDisabled": true,
+  "credentialsSent": false
+}

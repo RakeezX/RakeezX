@@ -1,5 +1,5 @@
 {
-  "runId": "3576957c-1cf3-455d-8d62-150b1934b728",
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
   "projectId": "xlrubcwjqktzzunrvuns",
   "httpStatus": 200,
   "status": "ready",
@@ -11,9 +11,9 @@
   "configurationReady": true,
   "rolloutMode": "pilot",
   "rolloutConfigured": true,
-  "source": "cb0371e7815cb2204f6da12ba3d389102a684c1ddf458333493cd1200add4c39",
+  "source": "b670258b74e486a8478e016ce796c7e16dca9ae31632a896f45c6c091706a2dc",
   "enabled": false,
-  "expectedSource": "cb0371e7815cb2204f6da12ba3d389102a684c1ddf458333493cd1200add4c39",
+  "expectedSource": "b670258b74e486a8478e016ce796c7e16dca9ae31632a896f45c6c091706a2dc",
   "sourceMatches": true,
   "transport": "original Supabase Edge IPv6 -> official direct strictTLS",
   "privateMutations": 0

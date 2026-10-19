@@ -27,12 +27,25 @@ export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipG
   return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,session.access_token,context])};
 }
 export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel}={}) {
+  let active, key, disposed=false;
+  const reconcile=()=>{if(disposed)return;let next;try{next=getBinding(false).key;}catch{next=null;}
+    if(active&&next===key)return;active?.dispose();key=next;
+    active=mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel});
+  };
+  reconcile();const unsubscribe=subscribe(reconcile);
+  return {dispose(){disposed=true;unsubscribe?.();active?.dispose();root.replaceChildren();}};
+}
+function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel}) {
   if(!ready(readiness)){unavailable(root);return {dispose(){root.replaceChildren();}};}
   let initial;try{initial=getBinding(false);}catch{unavailable(root);return {dispose(){root.replaceChildren();}};}
   let disposed=false,handle=null,admitted=false;
   const current=write=>{const b=getBinding(write);if(disposed||b.key!==initial.key)throw Error('unavailable');return b;};
   const getContext=()=>{try{return current(false).context;}catch{return null;}};
-  const client=createClassPortalClient({getContext,request:async(path,init)=>{
+  let requestTail=Promise.resolve();
+  const client=createClassPortalClient({getContext,request:(path,init)=>{
+    // List/guidance share the same authoritative short DB lock. Serialize this
+    // owner's browser requests before dispatch, retaining all binding/lease checks.
+    const pending=requestTail.then(async()=>{
     const b=current(true);
     const response=await send(path,{...init,headers:{...init.headers,Authorization:'Bearer '+b.token}});
     current(false);return {ok:response.ok,async json(){const data=await response.json();current(false);
@@ -43,6 +56,7 @@ export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=gl
         admitted=true;
       }
       const {rollout,...ack}=data;return ack;}};
+    });requestTail=pending.then(()=>{},()=>{});return pending;
   }});
   unavailable(root);
   // No controls/private roster until the normal authenticated service admits this owner.

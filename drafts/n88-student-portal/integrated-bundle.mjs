@@ -136,5 +136,15 @@ for(const file of ['drafts/n88-student-portal/task-guidance.mjs','drafts/n88-stu
   'supabase/migrations/20261018034356_n88_exact_activation_staged.sql',dir+'preflight.inactive.sql',dir+'readback.inactive.sql',dir+'identities.inactive.sql',dir+'expected-identities.json',dir+'wrangler.staged.toml',dir+'deploy.staged.json',dir+'toolchain.json',dir+'.gitattributes',
   dir+'metadata-contract.json',dir+'supabase.staged.toml',...['schema-proposal.sql','postgres-repository-schema.sql','canonical-state-schema.inactive.sql','canonical-lock.inactive.sql','auth-session.inactive.sql','ingress.inactive.sql','roles.inactive.sql'].map(f=>'drafts/n88-student-portal/'+f),
   'supabase/functions/n88-student-portal/config.inactive.toml','drafts/n88-student-portal/package-lock.json'])manifest.sources[file]=await textHash(file);
+// Actual hosted continuation supersedes the earlier two explicitly deferred gates.
+// Preserve prior pilot snapshots; never relabel the partial journey as acceptance.
+manifest.stagedActivation.phase='hosted-acceptance-blocked-on-corrected-runtime-publication';
+manifest.stagedActivation.deferredChecks=[];
+manifest.stagedActivation.currentBackendEnabled=false;
+manifest.stagedActivation.publicEnabled=false;
+manifest.stagedActivation.currentEvidence=dir+'continuation-b324b7b5.json';
+manifest.stagedActivation.currentProviderReadback=dir+'current-provider-readback-b324b7b5.json';
+manifest.stagedActivation.requiredCheckResults=JSON.parse(await readFile(dir+'continuation-b324b7b5.json','utf8')).checks;
+for(const file of ['tests/n88-official-activation-current-entry-ui.mjs','tests/n88-official-activation-current-entry-ui.json','tests/n88-official-activation-hosted-entry-repair.mjs','tests/n88-official-activation-hosted-entry-repair.json','tests/n88-official-activation-request-phase.mjs','tests/n88-official-activation-request-phase.json',dir+'continuation-b324b7b5.json',dir+'current-provider-readback-b324b7b5.json',dir+'hosted-journey-b324b7b5.json',dir+'owned-pilot-pause-readback-b324b7b5.json'])manifest.sources[file]=await textHash(file);
 await writeFile(dir+'manifest.json',JSON.stringify(manifest,null,2)+'\n');
 console.log('N88 exact pilot graphs packaged; public activation remains OFF; provider state is recorded separately.');

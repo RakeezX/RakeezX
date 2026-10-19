@@ -1,0 +1,12 @@
+{
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "status": "PASS",
+  "changedSourcePins": 12,
+  "exactChangedProviderOutputs": 2,
+  "originalSqlFilesUnchanged": true,
+  "temporaryPrivateInputsAbsent": true,
+  "allNineAcceptanceChecksPreserved": true,
+  "failedHostedGatesNotRelabeled": true,
+  "publicEnabled": false,
+  "finalFrontendPublished": false
+}

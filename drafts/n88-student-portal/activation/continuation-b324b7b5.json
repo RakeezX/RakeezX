@@ -1,0 +1,62 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "state": "BLOCKED",
+  "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "preservedPilotCandidate": "35e2cbb6131129ee5997e818e59e0ea6fd3d76a4",
+  "checks": [
+    {
+      "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+      "status": "PASS",
+      "evidence": "Reused immutable hosted-activation-outcome.json (eight migrations), exact role/custody history; no SQL, verifier, password or salt change. Current provider source and protected OFF digest read back."
+    },
+    {
+      "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "status": "PASS",
+      "evidence": "current-provider-readback-b324b7b5.json: exact Edge35/Worker bytes, unchanged routes and explicit private logging/Logpush/tails disposition. owned-pilot-off-http-b324b7b5.json confirms private APIs503 and private page headers."
+    },
+    {
+      "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "status": "FAIL",
+      "evidence": "hosted-journey-b324b7b5.json preserves actual two-code creation/recovery, student login/field selection and teacher guidance ACK. Published runtime contention/context failure prevents completing rotation/revoke/old-session denial/student guidance; those remain NOT_RUN."
+    },
+    {
+      "name": "n88_official_publisher_readiness_route_and_served_behavior",
+      "status": "FAIL",
+      "evidence": "Verified pilot receipt01ed8edd retained. Corrected normal runtime has no sole-publisher served-source receipt; full hosted acceptance and public availability remain gated. No final frontend publication claimed."
+    },
+    {
+      "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "Unchanged five actual PG log cases and exact76 typed routine/ACL proof reused. Source4353be6 own strict direct readiness passed earlier this run and current inactive provider bytes match; fixed phases never return private diagnostics."
+    },
+    {
+      "name": "n88_exact_private_guard_membership_inherit_correction",
+      "status": "PASS",
+      "evidence": "Original exact append-only correction/history/readback retained; no membership, grant, role flag or migration changes this run."
+    },
+    {
+      "name": "n88_actual_scram_iteration_compatibility",
+      "status": "PASS",
+      "evidence": "Original same-salt4096/16384 no-proof diagnostic reused; original16384 credential unchanged. Own actual direct strictCA/hostname/upstreamSSL identity proof retained."
+    },
+    {
+      "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+      "status": "PASS",
+      "evidence": "hosted-entry-repair.json: actual nativePG Auth/session/source/owner/CAS/rollback/ACK and two-member admission. current-entry-ui.json: real DOM/CSS/store dispatch, wrong-owner rejection, serialized requests and renewed-session server admission. Current OFF flag verified."
+    },
+    {
+      "name": "n88_pilot_original_service_and_frontend_publisher_package",
+      "status": "PASS",
+      "evidence": "Exact same-service inactive bundle/provider readback and bounded corrected pilot frontend package prepared. Current app-entry checks pass; this is source/package evidence only, not full hosted acceptance or final publication."
+    }
+  ],
+  "blockerType": "implementation",
+  "blocker": "The published pilot runtime concurrently dispatches list/guidance and retains a stale binding after account renewal. The corrected runtime passes actual local app-entry tests, but full hosted acceptance requires its sole-publisher receipt first. Current all-nine-check delivery gate does not admit that intermediate correction.",
+  "retryCondition": "Controller/sole publisher serves the bounded corrected pilot runtime, then resumes the same original session and retained two-fabricated-pupil fixture; no new identity/pair, secret, role or permission.",
+  "currentBackendEnabled": false,
+  "publicEnabled": false,
+  "fixtureDisposition": "One existing fabricated teacher/two existing pupils; two issued credentials, selected fields and saved private guidance retained dormant. No canonical grade/roster changes, real data, sends or blind cleanup.",
+  "resources": "Owned student tab, observer, native PG, local HTTP and disposable browser closed. Browser/integration phases released; live-mutation released before final. Prior denied resources retained untouched.",
+  "finalFrontendPublished": false
+}
