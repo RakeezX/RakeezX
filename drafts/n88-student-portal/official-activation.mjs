@@ -73,6 +73,17 @@ async function execute(action,value){
   return {publicJwk:publicKey.export({format:'jwk'}),phase,protection:'DPAPI CurrentUser + fresh directory current-user ACL',secretValuesReturned:false};
  }
  const state=await load();
+ if(action==='--read-wake-pilot-config'){
+  const activeRun='f8356a7b-0f5d-4804-b1b7-10ff0a8c4043';
+  const card=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-official-student-portal-activation-20261018.json','utf8'));
+  const source=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8')).outputs['edge/index.mjs'];
+  if(process.env.N88_ACTIVATION_RUN_ID!==activeRun||card.stagedActivation?.phase!=='pilot'||card.requiredChecks?.length!==7||card.stagedActivation?.finalRequiredChecks?.length!==9||!state.replacementFixture?.configured||!state.replacementFixture.priorBinding||!state.pilotBinding||state.pilotBinding.studentIds?.length!==2||JSON.stringify(state.replacementFixture.newBinding)!==JSON.stringify(state.pilotBinding)||state.directAuthRefused||state.loginDisarmed||!state.directVerified||source!==state.directSource)fail('n88_wake_readback_preimage');
+  const listed=await official(['secrets','list','--project-ref',project,'--output','json']),rows=Array.isArray(listed)?listed:listed?.rows;
+  const matches=(name,v)=>Array.isArray(rows)&&rows.filter(r=>r.name===name).length===1&&rows.find(r=>r.name===name).value?.toLowerCase()===createHash('sha256').update(v).digest('hex');
+  const result={runId:activeRun,readOnly:true,enabled:matches('N88_ENABLED','true'),pilotMode:matches('N88_ROLLOUT_MODE','pilot'),sameReplacementBinding:matches('N88_PILOT_BINDING',JSON.stringify(state.pilotBinding)),sameSource:matches('N88_SERVICE_SOURCE_SHA',source),readinessEnabled:matches('N88_READINESS_ENABLED','true'),source,activeOwners:1,activePupils:2,priorBindingRetainedEncrypted:true,providerWrites:0,privateQueries:0,identifiersOrValuesReturned:false};
+  if(!result.enabled||!result.pilotMode||!result.sameReplacementBinding||!result.sameSource||!result.readinessEnabled)fail('n88_wake_pilot_config_mismatch');
+  await writeFile(path.join(base,'wake-pilot-config-f8356a7b.json'),JSON.stringify(result,null,2)+'\n');return result;
+ }
  if(action==='--rebind-replacement-pilot'){
   const activeRun='35395ae1-0dc1-4fd1-b598-5441b50a3f09';
   const card=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-official-student-portal-activation-20261018.json','utf8'));

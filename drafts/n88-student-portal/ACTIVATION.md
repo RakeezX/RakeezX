@@ -569,3 +569,24 @@ replacement fabricated fixture remains in restricted pilot. Sole-publisher
 served-source receipt for this exact wake correction is required before the
 remaining hosted wake/context acceptance and authorized final public transition.
 No Product closure, new PO gate or final frontend publication is claimed.
+
+# Exact wake-repair pilot publication f8356a7b
+
+Current authority admits only the existing d1d6bde9 wake/shared-lane correction
+to the replacement pilot. Seven current pilot checks PASS using unchanged
+evidence; all original final9 and acceptance remain mandatory after the actual
+sole-publisher receipt. The two genuine full-stage FAILs remain unchanged in
+replacement-delivery-35395ae1.json and in the new source-bound stage manifest.
+
+The original sealed custodian performed only a metadata digest read: enabled
+pilot, same replacement one-owner/two-pupil binding, readiness flag and exact
+service source all match. No provider write, private query, browser phase, new
+fixture, role, key, credential or SQL operation occurred. Original source/TLS/
+privacy/core journey/wake DOM proofs retain their original records/timestamps.
+Student1 stays revoked; student2 stays active with its prior test session ended.
+See activation/wake-pilot-config-f8356a7b.json and wake-pilot-delivery-f8356a7b.json.
+
+This is LOCAL_READY for the exact restricted wake repair publication only. No
+public-mode enable, final frontend receipt, whole-product acceptance or closure
+is claimed. Resume the same session after the publisher receipt for only the
+newly served wake/current-admission checks and required public-stage guards.
