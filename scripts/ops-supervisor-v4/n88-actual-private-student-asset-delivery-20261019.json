@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-actual-private-student-asset-delivery-20261019",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -1600,
+      "scopeKey": "n88-actual-private-asset-delivery",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261019-N88-SAME-PRIVATE-ASSET-DELIVERY",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "budgetMinutes": 20,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n88-availability-fast-light-entry-20261019"
+      ],
+      "objective": "Read AGENTS/ops contract, current N88 row and exact prior candidate57694266e519eb41d25e18dbb2ed586ea300182b package/evidence only. SAME ORIGINAL N88 private custodian session01a14fc3-b292-7390-9952-8549a286c80f, isolated current-main checkout, supplied taskId/runId. This is NECESSARY remaining service prerequisite, NOT another feature/reviewer/test replay. Your prior N88_AVAILABILITY_FAST_LIGHT_ENTRY.md correctly states existing /student document+JS/CSS are embedded in Cloudflare ingress, but incorrectly assigned ingress deploy to the generic sole publisher. Generic publisher only Git/build/Pages/served verification and NEVER deploys service Workers. Prior frontend c6c8a428 Production receipt proves Pages files only, not updated private document. Root explicitly delegates exact existing ingress asset-only deployment/readback by SAME original custodian BEFORE reporting LOCAL_READY, under latest human light/fast entry mandate and existing service authority. Use exact already prepared activation/package-review-1400.mjs recipe/source/manifests from prior candidate, ensure only private HTML/entry/login CSS/JS changed. Deploy bounded existing ingress with EXACT existing secrets/bindings/routes/privacy/logging/cache policies and original protected CLI/provider channel; no root/model credential exposure. Readback actual served /student and exact embedded assets against already-qualified source/package pins; verify private/no-store headers remain. No backend Edge source/SQL/Auth/RLS/migrations/roles/verifier/key/cookie/token changes, no new provider grant/OAuth/DNS retry, no fixture/account/code rotation/revocation/send, no browser account lease needed. Preserve every real refusal; no alternate actor/tool bypass. Do not rerun previous visual/owner/session/crypto/8migration/nativePG/functional suites because source and inputs unchanged. Existing successful exact-source fixture proof reused; ONLY actual exact ingress source and served private assets delivery proof necessary. Keep teacher/source behavior already published. Save service/provider version+served hashes and exact source-only diff, then LOCAL_READY evidence release via existing sole publisher. Do not claim student changes Production from Pages receipt or prep recipe. Current scope allows indispensable exact existing Cloudflare ingress deployment and native readback; do not invent another approval gate. If actual sanctioned service operation unavailable record exact blocker with prepared unchanged package; no falsely satisfied check.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/activation/**",
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "drafts/n88-student-portal/ACTIVATION.md",
+        "tests/n88-review-1400-served*.json",
+        "docs/automation-evidence/20261019/N88_PRIVATE_ASSET_ACTUAL_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "docs/automation-evidence/20261019/N88_PRIVATE_ASSET_ACTUAL_DELIVERY.md"
+      ],
+      "requiredChecks": [
+        "n88_existing_ingress_private_asset_source_and_actual_served_delivery"
+      ],
+      "acceptance": [
+        "Actual existing private /student document and its embedded assets match already-qualified fast/light source, with unchanged private headers/ingress boundaries.",
+        "No replay of previous local/source/functional tests, no extra service/schema/private context change."
+      ],
+      "preparationAuthority": {
+        "kind": "necessary-existing-ingress-private-asset-prerequisite",
+        "originalCustodianSession": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "origin": "https://rakeezx.com",
+        "exactPreparedCandidate": "57694266e519eb41d25e18dbb2ed586ea300182b",
+        "frontendPublishedSha": "c6c8a4285e341a2d7cd784d0e5311ac58cb63a0a",
+        "existingIngressAssetOnlyDeploy": true,
+        "existingProviderBindingsSecretsRoutesUnchanged": true,
+        "newMigrations": 0,
+        "newRoles": 0,
+        "newAuthUsers": 0,
+        "realStudentMutations": 0,
+        "sends": 0,
+        "publication": true
+      },
+      "releaseAuthority": "Latest direct human19October demands actual official N88 availability and fast permanently light student entry. Existing approved N88 ingress service deployment/readback by original custodian applies to necessary delivery of same qualified private asset package, zero new capability/data/schema/credential/security changes. Generic publisher remains only frontend/Git release owner."
+    }
+  ]
+}
