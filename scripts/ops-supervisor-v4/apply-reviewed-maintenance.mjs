@@ -6,6 +6,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { verifiedDeployment, verifiedSourceOnlyPublication } from './controller.mjs';
+import { buildLiveServiceEvidence, verifiedLiveServicePublication } from './live-service-publication.mjs';
 import { validateControllerReload, buildControllerReloadScript } from './reviewed-controller-reload.mjs';
 import { HISTORICAL_RUNTIME_MODE, verifyHistoricalRuntimeSupersession } from './historical-runtime-supersession.mjs';
 
@@ -220,6 +221,22 @@ export function verifiedSourceOnlyDeclarationRepair(task, result, update) {
     && SHA256.test(proof.reviewedFixtureSha256??'') && proof.reason?.length>=50;
 }
 
+export function verifiedLiveServiceDeclarationRepair(task,result,update){
+  const card=update.card,p=card.verificationRepair,d=task.deliveryReceipt;
+  const declared={...task,servicePublicationEvidence:card.servicePublicationEvidence};
+  return card.completionMode==='reconcile_live_service_publication'
+    &&task.status==='blocked'&&result.state==='LOCAL_READY'&&update.expected.resultState==='LOCAL_READY'
+    &&task.lastFailure==='Publisher returned incomplete or mismatched deployment proof'
+    &&!task.servicePublicationEvidence&&p?.kind==='reviewed-nonsending-service-evidence-v1'
+    &&d?.status==='deployed'&&d.publishedSha===p.publishedSha&&sha256(bytes(d))===p.priorReceiptSha256
+    &&SHA256.test(p.reviewedFixtureSha256??'')&&p.reason?.length>=50
+    &&same(card.requiredChecks,task.requiredChecks)&&same(card.allowedPaths,task.allowedPaths)
+    &&Object.entries(card).every(([key,value])=>['objective','completionMode','verificationRepair','servicePublicationEvidence'].includes(key)||same(value,task[key]))
+    &&task.requiredChecks?.every(n=>result.checks?.some(c=>c.name===n&&c.status==='PASS'))
+    &&result.checks?.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&['hosted_auth_fixture_and_closed_client_os_delivery','frontend_publication_and_served_source'].includes(c.name))
+    &&result.blockerType==='none'&&!result.blocker&&verifiedLiveServicePublication(declared,d)&&verifiedDeployment(declared,d);
+}
+
 export function verifyInactiveIdentity(task, result, update, activationId, historicalContext = null) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
@@ -277,7 +294,7 @@ export function verifyInactiveIdentity(task, result, update, activationId, histo
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
   const historicalSupersession = update.card.completionMode === HISTORICAL_RUNTIME_MODE && verifyHistoricalRuntimeSupersession(task, result, update, historicalContext);
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -379,6 +396,15 @@ export function revisedTask(task, update, commit, at, historicalContext = null) 
     saved.deliveryOwner = null; saved.nextDeliveryAt = null;
     saved.publisherReconciliation = { at, commit, publishedSha: task.deliveryReceipt.publishedSha,
       originalDeliveryReceiptSha256: sha256(bytes(task.deliveryReceipt)), reason: update.materialReason };
+  }
+
+  if(update.card.completionMode==='reconcile_live_service_publication'){
+    insist(verifiedLiveServiceDeclarationRepair(task,json(task.resultPath),update),'Live-service declaration no longer qualifies');
+    insist(verifiedDeployment(saved,saved.deliveryReceipt),'Declared service receipt no longer verifies');
+    saved.status='awaiting_po';saved.productionVerifiedAt=saved.deliveryReceipt.verifiedAt;
+    saved.deliveryOwner=null;saved.nextDeliveryAt=null;
+    saved.publisherReconciliation={at,commit,publishedSha:saved.deliveryReceipt.publishedSha,
+      originalDeliveryReceiptSha256:sha256(bytes(task.deliveryReceipt)),reason:update.materialReason,liveService:true};
   }
 
   if (update.card.completionMode === 'reconcile_source_only_declaration') {
@@ -521,6 +547,10 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     insist(equalPath(task.worktreePath, path.join(root, '.worktrees', task.id)), 'Task worktree is outside its owned path');
     noLinks(task.worktreePath);
     insist(git(['rev-parse', 'HEAD'], task.worktreePath) === update.expected.candidateSha, 'Worktree HEAD differs from preserved candidate: ' + task.id);
+    if(update.card.completionMode==='reconcile_live_service_publication'){
+      const actual=buildLiveServiceEvidence(task,task.deliveryReceipt,p=>execFileSync(WIN_GIT,['show',task.candidateSha+':'+p],{cwd:task.worktreePath,windowsHide:true,maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
+      insist(same(actual,update.card.servicePublicationEvidence),'Declared service evidence differs from immutable candidate artifacts');
+    }
     insist(!git(['status', '--porcelain=v1', '--untracked-files=no'], task.worktreePath), 'Candidate has tracked uncommitted changes: ' + task.id);
     if (update.expected.queuedBaseSha !== undefined) {
       const remoteMain = git(['ls-remote', '--heads', 'origin', 'refs/heads/main']).split(/\s+/)[0];

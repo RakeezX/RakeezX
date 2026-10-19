@@ -6,6 +6,7 @@ import { spawn } from 'node:child_process';
 import { randomUUID, createHash } from 'node:crypto';
 import { readApprovedNotes } from './approved-notes.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { verifiedLiveServicePublication } from './live-service-publication.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SHA = /^[a-f0-9]{40}$/i;
@@ -225,7 +226,7 @@ export function verifiedDeployment(task, receipt, productionUrl = 'https://rakee
     && provider?.headSha === receipt.publishedSha && provider.status === 'completed' && provider.conclusion === 'success'
     && receipt.deploymentId === provider.deploymentId && Boolean(receipt.deploymentId)
     && (receipt.productSourceChangeObserved === true && Array.isArray(receipt.changedAssets) && receipt.changedAssets.length > 0
-      || verifiedSourceOnlyPublication(task, receipt))
+      || verifiedSourceOnlyPublication(task, receipt) || verifiedLiveServicePublication(task, receipt))
     && proof?.production?.origin === new URL(productionUrl).origin && proof?.immutable?.origin === provider.previewUrl
     && [proof?.immutable, proof?.production].every(part => part?.passed === true && Array.isArray(part.assets) && part.assets.length > 0
       && part.assets.every(asset => asset.verified === true && (asset.deleted || /^[a-f0-9]{64}$/.test(asset.expectedSha256 ?? '')

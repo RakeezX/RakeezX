@@ -1,0 +1,734 @@
+{
+  "task": {
+    "id": "continuous-n44-finish-bounded-service-activation-20261018",
+    "productId": "N44",
+    "scopeKey": "n44-exact-nonsending-service-activation",
+    "executionMode": "local",
+    "liveMutation": true,
+    "liveAuthorizationRef": "PO-20261018-1628-FINISH-N44-EXACT-NONSENDING-ACTIVATION",
+    "preparationAuthority": {
+      "publication": true,
+      "supabase": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "function": {
+          "name": "n44-notifications",
+          "sourceOnlyUntilAllReadback": true,
+          "enableDelivery": false
+        }
+      },
+      "providers": {
+        "newHost": false,
+        "newPaidService": false,
+        "existingZoneOnly": "https://rakeezx.com",
+        "route": "/api/n44/*",
+        "ingress": "n44-notifications-ingress",
+        "scheduler": "n44-notifications-scheduler",
+        "cron": [],
+        "deliveryEnabled": false
+      }
+    },
+    "candidateSha": "66412fce87f424e83d999eadd2955c44ae580c3f",
+    "baseSha": "0b9dabb9a95b386232575bd68ae202b2abd5fb0a",
+    "requiredChecks": [
+      "n44_fresh_exact_project_policy_and_secure_provider_custody_prerequisites",
+      "n44_exact_once_schema_and_private_role_readback",
+      "n44_nonsending_real_service_ingress_source_config_readback",
+      "n44_truthful_browser_default_off_user_gesture_and_not_run_device_delivery",
+      "n44_private_database_error_boundary_under_actual_provider_logging",
+      "n44_exact_restricted_login_failure_diagnosis",
+      "n44_recovered_credential_matches_exact_stored_scram_keys",
+      "n44_actual_scram_iteration_compatibility",
+      "n44_post_observed_cache_refresh_restricted_session",
+      "n44_precise_restricted_identity_and_full_tls"
+    ],
+    "allowedPaths": [
+      "drafts/n44-push/**",
+      "supabase/functions/n44-notifications/**",
+      "supabase/migrations/20261018044448_n44_exact_activation_staged.sql",
+      "scripts/n44-activation*.mjs",
+      "scripts/n44-activation*.ps1",
+      "src/app.js",
+      "src/lib/notification-push-client.js",
+      "src/lib/notification-push-browser.js",
+      "src/lib/notification-push-gateway.js",
+      "src/lib/notification-push-core.js",
+      "src/lib/notification-push-runtime.js",
+      "src/views/notification-settings.js",
+      "src/styles/notifications.css",
+      "sw.js",
+      "tests/n44-finish*.mjs",
+      "tests/n44-finish*.json",
+      "tests/fixtures/n44-finish/**",
+      "docs/automation-evidence/20261018/N44_FINISH_SERVICE_STATUS.md",
+      "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql"
+    ],
+    "servicePublicationEvidence": {
+      "version": 1,
+      "kind": "n44-nonsending-live-service",
+      "candidateSha": "66412fce87f424e83d999eadd2955c44ae580c3f",
+      "baseSha": "0b9dabb9a95b386232575bd68ae202b2abd5fb0a",
+      "publishedSha": "0c31266030c58b5fbe28d143d9bc273556780c0a",
+      "artifactHashes": {
+        "drafts/n44-push/activation/manifest.json": "64fdb2e1ecdd14f988839ecc4c11172b0a744aa3a2a01b06e4a0b11e62eb2c5c",
+        "tests/n44-finish-activation-final.json": "e73a671b5d98549a58977bf85f7f9297583d130c7a1feb6cf246f1e6c9982776",
+        "drafts/n44-push/activation/edge-source-readback.json": "e7a72593caab48a04c63bf05816f54761e08700ab4bb4f4de8fd2ed2f36e0557",
+        "drafts/n44-push/activation/cloudflare-off-readback.json": "4d0a02cd929eea90e4712b2bda287aef20605701128ab6df9f077def93e88214",
+        "drafts/n44-push/activation/cloudflare-final-readback.json": "577f087b525da4910c0862b775d6b536b4946ddafcb713e5d389708cf4cee4b5",
+        "drafts/n44-push/activation/cloudflare-final-versions.json": "df351aeae5b0b601c05d449993ef5e15b3ff19bdbe82e576881807107d679319"
+      },
+      "bundleHashes": {
+        "edge/index.mjs": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+        "cloudflare/worker.mjs": "438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40",
+        "scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433"
+      },
+      "manifest": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "outputs": {
+          "edge/index.mjs": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+          "cloudflare/worker.mjs": "438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40",
+          "scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433",
+          "edge/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
+          "edge/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+          "edge/import_map.json": "50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421"
+        },
+        "actualServiceReadback": {
+          "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+          "receipt": "tests/n44-finish-activation-final.json",
+          "serviceEnabled": true,
+          "ingressEnabled": true,
+          "deliveryEnabled": false,
+          "schedulerEnabled": false,
+          "cron": [],
+          "browserEnabled": false,
+          "serviceWorkerEnabled": false
+        }
+      },
+      "final": {
+        "aiAuthored": true,
+        "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+        "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+        "recordedAt": "2026-10-19T04:16:29.540Z",
+        "state": "LOCAL_READY",
+        "scope": "Actual original nonsending service activation only; frontend publisher/PO/device acceptance separate",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "serviceSourceSha": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+        "edgeFunction": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "name": "n44-notifications",
+          "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
+          "version": 4,
+          "status": "ACTIVE",
+          "verifyJwt": false,
+          "providerBundleSha256": "8c46bff41a14277bd72f3905a51dc034abf902a1b5da189aa717a752e13d42f7",
+          "recordedAt": "2026-10-19T04:14:18.138Z"
+        },
+        "edgeSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+        "restrictedIdentityAndFullTls": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+          "recordedAt": "2026-10-19T04:07:25.540Z",
+          "httpStatus": 200,
+          "status": "ready",
+          "loginExact": true,
+          "roleExact": true,
+          "upstreamSsl": true,
+          "clientTlsAuthorized": true,
+          "sourceBoundary": true,
+          "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+          "enabled": true,
+          "deliveryEnabled": false
+        },
+        "providerSecretNamesAndDigestsMatched": [
+          "N44_AUTH_API_KEY",
+          "N44_AUTH_URL",
+          "N44_CRYPTO_JSON",
+          "N44_DATABASE_CA_CERT",
+          "N44_DATABASE_URL",
+          "N44_DELIVERY_ENABLED",
+          "N44_ENABLED",
+          "N44_INGRESS_KEY",
+          "N44_PROVIDER_ORIGINS_JSON",
+          "N44_PUBLIC_ORIGIN",
+          "N44_RATE_KEY",
+          "N44_READINESS_ENABLED",
+          "N44_SCHEDULER_KEY",
+          "N44_SERVICE_REVISION",
+          "N44_SERVICE_SOURCE_SHA",
+          "N44_SESSION_POLICY_JSON"
+        ],
+        "ingressEnabled": true,
+        "route": {
+          "id": "05c0088cf73e4223abaccd1c859e4539",
+          "pattern": "rakeezx.com/api/n44/*",
+          "script": "n44-notifications-ingress",
+          "request_limit_fail_open": false
+        },
+        "schedulerEnabled": false,
+        "cron": [],
+        "deliveryEnabled": false,
+        "browserEnabled": false,
+        "serviceWorkerEnabled": false,
+        "actualUnauthorizedHttp": [
+          {
+            "name": "mountedIngressWrongMethod",
+            "url": "https://rakeezx.com/api/n44/status",
+            "method": "GET",
+            "httpStatus": 401,
+            "denied": true,
+            "bodyKeys": [
+              "error"
+            ],
+            "privateValuesReturned": false,
+            "cacheControl": "no-store, private"
+          },
+          {
+            "name": "edgeWrongAuthDispatch",
+            "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/dispatch",
+            "method": "POST",
+            "httpStatus": 401,
+            "denied": true,
+            "bodyKeys": [
+              "error"
+            ],
+            "privateValuesReturned": false,
+            "cacheControl": "no-store, private"
+          },
+          {
+            "name": "edgeWrongAuthReadiness",
+            "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/readiness",
+            "method": "POST",
+            "httpStatus": 401,
+            "denied": true,
+            "bodyKeys": [
+              "error"
+            ],
+            "privateValuesReturned": false,
+            "cacheControl": "no-store, private"
+          }
+        ],
+        "immutableMigrationsReplayed": false,
+        "personalRowsRead": 0,
+        "authFixtureCreated": false,
+        "realSend": false,
+        "devicePermissionOrRegistration": false,
+        "closedClientOsDelivery": "NOT_RUN",
+        "originalFailuresPreserved": true,
+        "optionalDnsRead": {
+          "status": "FAIL",
+          "code": 10000,
+          "message": "Authentication error",
+          "retried": false,
+          "dnsChanged": false,
+          "requiredMountIndependentlyProved": true
+        },
+        "cleanup": {
+          "liveMutationLeaseReleased": true,
+          "plaintextTransientInputsAbsent": true,
+          "ownedBrowserServerProcessesCreated": false,
+          "encryptedRecoveryRetained": true
+        },
+        "noFrontendPublication": true,
+        "productClosed": false
+      },
+      "edgeSource": {
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "function": "n44-notifications",
+        "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+        "sourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+        "downloadedSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+        "exactBytes": true,
+        "importMapExact": true,
+        "recordedAt": "2026-10-19T04:05:25.202Z",
+        "finalProviderVersion": 4,
+        "finalSourceBytesUnchanged": true,
+        "finalReadbackAt": "2026-10-19T04:15:23.880Z"
+      },
+      "workerSources": [
+        {
+          "name": "n44-notifications-ingress",
+          "exact": true,
+          "version": "eff1dd2e-43bb-4990-8030-27df3004ba5c",
+          "cron": []
+        },
+        {
+          "name": "n44-notifications-scheduler",
+          "exact": true,
+          "version": "137a326f-292c-47ba-ba93-2a7643196113",
+          "cron": []
+        }
+      ],
+      "workerSourceReadback": "PASS",
+      "cloudflare": {
+        "activation": {
+          "status": "PASS",
+          "ingressEnabled": true,
+          "route": {
+            "id": "05c0088cf73e4223abaccd1c859e4539",
+            "pattern": "rakeezx.com/api/n44/*",
+            "script": "n44-notifications-ingress",
+            "request_limit_fail_open": false
+          },
+          "schedulerEnabled": false,
+          "cron": []
+        },
+        "configuration": [
+          {
+            "name": "n44-notifications-ingress",
+            "readback": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "enabled": "true",
+            "schedulerEnabled": "false",
+            "cron": []
+          },
+          {
+            "name": "n44-notifications-scheduler",
+            "readback": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "enabled": "false",
+            "schedulerEnabled": "false",
+            "cron": []
+          }
+        ],
+        "privacy": [
+          {
+            "name": "n44-notifications-ingress",
+            "status": 200,
+            "success": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "configurationResponse": {
+              "enabled": false,
+              "head_sampling_rate": null,
+              "logs": {
+                "enabled": false,
+                "destinations": [],
+                "head_sampling_rate": null,
+                "persist": false,
+                "invocation_logs": false
+              },
+              "traces": {
+                "enabled": false,
+                "destinations": [],
+                "persist": false,
+                "head_sampling_rate": null
+              }
+            }
+          },
+          {
+            "name": "n44-notifications-scheduler",
+            "status": 200,
+            "success": true,
+            "logpush": false,
+            "tailConsumers": [],
+            "configurationResponse": {
+              "enabled": false,
+              "head_sampling_rate": null,
+              "logs": {
+                "enabled": false,
+                "destinations": [],
+                "head_sampling_rate": null,
+                "persist": false,
+                "invocation_logs": false
+              },
+              "traces": {
+                "enabled": false,
+                "destinations": [],
+                "persist": false,
+                "head_sampling_rate": null
+              }
+            }
+          }
+        ]
+      },
+      "versions": [
+        {
+          "name": "n44-notifications-ingress",
+          "status": 200,
+          "deploymentId": "31128d40-8dd1-46f9-8d83-1f5421bcf607",
+          "versions": [
+            {
+              "version_id": "64700bdd-201b-4bdf-9fe3-332bc7f034f0",
+              "percentage": 100
+            }
+          ]
+        },
+        {
+          "name": "n44-notifications-scheduler",
+          "status": 200,
+          "deploymentId": "c8f1aaaa-6bf3-476a-9f16-b414ac70aefc",
+          "versions": [
+            {
+              "version_id": "971e8e93-1bc1-4e40-ab6e-301143f8443d",
+              "percentage": 100
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "receipt": {
+    "version": 1,
+    "ticketId": "N44",
+    "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+    "candidateSha": "66412fce87f424e83d999eadd2955c44ae580c3f",
+    "baseSha": "0b9dabb9a95b386232575bd68ae202b2abd5fb0a",
+    "publishedSha": "0c31266030c58b5fbe28d143d9bc273556780c0a",
+    "productionUrl": "https://rakeezx.com",
+    "at": "2026-10-19T04:24:47.275Z",
+    "status": "deployed",
+    "retryable": false,
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-19T04:24:47.275Z",
+    "repository": "RakeezX/RakeezX",
+    "targetBranch": "main",
+    "deploymentId": "9544b26e-b257-4074-954a-8ced809d0dc5",
+    "previewUrl": "https://9544b26e.rakeezx.pages.dev",
+    "providerStatus": "SUCCESS",
+    "provider": {
+      "checkRunId": "117888798249",
+      "headSha": "0c31266030c58b5fbe28d143d9bc273556780c0a",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-19T04:24:35Z",
+      "completedAt": "2026-10-19T04:24:35Z",
+      "headBranch": null,
+      "deploymentId": "9544b26e-b257-4074-954a-8ced809d0dc5",
+      "previewUrl": "https://9544b26e.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/9544b26e-b257-4074-954a-8ced809d0dc5"
+    },
+    "currentMainSha": "0c31266030c58b5fbe28d143d9bc273556780c0a",
+    "binding": {
+      "candidateSha": "66412fce87f424e83d999eadd2955c44ae580c3f",
+      "declaredBaseSha": "0b9dabb9a95b386232575bd68ae202b2abd5fb0a",
+      "mainAtPreparation": "0b9dabb9a95b386232575bd68ae202b2abd5fb0a",
+      "integrationSha": "66412fce87f424e83d999eadd2955c44ae580c3f",
+      "publishedSha": "0c31266030c58b5fbe28d143d9bc273556780c0a",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "candidate-fast-forward"
+    },
+    "sourceOnlyPaths": [
+      "drafts/n44-push/activation/.gitignore",
+      "drafts/n44-push/activation/boundary-readback.sql",
+      "drafts/n44-push/activation/build-error-boundary.mjs",
+      "drafts/n44-push/activation/bundle/edge/index.mjs",
+      "drafts/n44-push/activation/cloudflare-final-readback.json",
+      "drafts/n44-push/activation/cloudflare-final-versions.json",
+      "drafts/n44-push/activation/cloudflare-off-readback.json",
+      "drafts/n44-push/activation/custody-final-disposition.json",
+      "drafts/n44-push/activation/deploy.staged.json",
+      "drafts/n44-push/activation/disable-provider.mjs",
+      "drafts/n44-push/activation/edge-deploy-routing.json",
+      "drafts/n44-push/activation/edge-deploy.json",
+      "drafts/n44-push/activation/edge-final-metadata.json",
+      "drafts/n44-push/activation/edge-source-readback.json",
+      "drafts/n44-push/activation/error-boundary-contract.json",
+      "drafts/n44-push/activation/error-boundary-identities.json",
+      "drafts/n44-push/activation/finish-phase0.json",
+      "drafts/n44-push/activation/hosted-boundary-readback.json",
+      "drafts/n44-push/activation/hosted-direct-readiness.json",
+      "drafts/n44-push/activation/hosted-direct-startup-failure.json",
+      "drafts/n44-push/activation/hosted-disposition.json",
+      "drafts/n44-push/activation/hosted-migration-history.json",
+      "drafts/n44-push/activation/hosted-off-readback.json",
+      "drafts/n44-push/activation/hosted-original-identities.json",
+      "drafts/n44-push/activation/hosted-original-readback.json",
+      "drafts/n44-push/activation/hosted-session-diagnostic.json",
+      "drafts/n44-push/activation/hosted-session-initial-failure.json",
+      "drafts/n44-push/activation/hosted-session-iteration-diagnostic.json",
+      "drafts/n44-push/activation/hosted-session-post-cache-diagnostic.json",
+      "drafts/n44-push/activation/hosted-session-precise-diagnostic.json",
+      "drafts/n44-push/activation/hosted-session-precise-identity.json",
+      "drafts/n44-push/activation/iteration-disposition.json",
+      "drafts/n44-push/activation/json-env-encoding-diagnostic.json",
+      "drafts/n44-push/activation/login-diagnosis-capability.json",
+      "drafts/n44-push/activation/login-diagnosis-role-metadata.json",
+      "drafts/n44-push/activation/post-cache-final-disposition.json",
+      "drafts/n44-push/activation/precise-session-disposition.json",
+      "drafts/n44-push/activation/prior-20261018-deploy.staged.json",
+      "drafts/n44-push/activation/prior-20261018-manifest.json",
+      "drafts/n44-push/activation/prior-20261019-direct-deploy.staged.json",
+      "drafts/n44-push/activation/prior-20261019-direct-manifest.json",
+      "drafts/n44-push/activation/prior-20261019-iteration-deploy.staged.json",
+      "drafts/n44-push/activation/prior-20261019-iteration-manifest.json",
+      "drafts/n44-push/activation/prior-20261019-post-cache-deploy.staged.json",
+      "drafts/n44-push/activation/prior-20261019-post-cache-manifest.json",
+      "drafts/n44-push/activation/private-error-boundary.mjs",
+      "drafts/n44-push/activation/public-provider-config.json",
+      "drafts/n44-push/activation/secret-digest-diagnostic.json",
+      "drafts/n44-push/activation/secret-readback.json",
+      "drafts/n44-push/database-transport.mjs",
+      "drafts/n44-push/edge-request.mjs",
+      "drafts/n44-push/existing-host.mjs",
+      "drafts/n44-push/readiness-entry.mjs",
+      "scripts/n44-activation-bundle.mjs",
+      "scripts/n44-activation-custody.mjs",
+      "scripts/n44-activation-diagnose.mjs",
+      "scripts/n44-activation-equality-hosted.mjs",
+      "scripts/n44-activation-equality.mjs",
+      "scripts/n44-activation-iteration.mjs",
+      "scripts/n44-activation-post-cache.mjs",
+      "scripts/n44-activation-precise-session.mjs",
+      "scripts/n44-activation-server-first.mjs",
+      "supabase/functions/n44-notifications/index.ts",
+      "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql",
+      "tests/fixtures/n44-finish/.gitignore",
+      "tests/fixtures/n44-finish/boundary-cases.mjs",
+      "tests/n44-finish-activation-final.json",
+      "tests/n44-finish-boundary.failure-1792353259415.json",
+      "tests/n44-finish-boundary.failure-1792353360810.json",
+      "tests/n44-finish-boundary.mjs",
+      "tests/n44-finish-boundary.result.json",
+      "tests/n44-finish-cleanup.json",
+      "tests/n44-finish-delivery-validation.json",
+      "tests/n44-finish-delivery-validation.mjs",
+      "tests/n44-finish-direct-readiness.before-routing.json",
+      "tests/n44-finish-direct-readiness.json",
+      "tests/n44-finish-direct-readiness.mjs",
+      "tests/n44-finish-disable.json",
+      "tests/n44-finish-disable.mjs",
+      "tests/n44-finish-env-serialization.json",
+      "tests/n44-finish-env-serialization.mjs",
+      "tests/n44-finish-hosted-unauthorized.initial-route-404.json",
+      "tests/n44-finish-hosted-unauthorized.json",
+      "tests/n44-finish-iteration-protocol.before-helper-update.json",
+      "tests/n44-finish-iteration-protocol.json",
+      "tests/n44-finish-iteration-protocol.mjs",
+      "tests/n44-finish-iteration.hosted.json",
+      "tests/n44-finish-keyring-selection.json",
+      "tests/n44-finish-login-diagnosis.result.json",
+      "tests/n44-finish-post-cache-session.json",
+      "tests/n44-finish-precise-session.json",
+      "tests/n44-finish-prerequisites.json",
+      "tests/n44-finish-scram-equality.hosted.json",
+      "tests/n44-finish-scram-equality.local.json",
+      "tests/n44-finish-scram-equality.mjs",
+      "tests/n44-finish-service.result.json"
+    ],
+    "changedAssets": [],
+    "productSourceChangeObserved": false,
+    "evidence": {
+      "immutable": {
+        "origin": "https://9544b26e.rakeezx.pages.dev",
+        "checkedAt": "2026-10-19T04:24:42.623Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "bytes": 3952,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "observedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "bytes": 21721,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2d2a14651f2b14836267d4388ef0bb5b4289d7b7bf3e89af9f36380103ff5fdb",
+            "observedSha256": "2d2a14651f2b14836267d4388ef0bb5b4289d7b7bf3e89af9f36380103ff5fdb",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261018/N44_FINISH_SERVICE_STATUS.md",
+            "urlPath": "docs/automation-evidence/20261018/N44_FINISH_SERVICE_STATUS.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "89e59095367fee18d9963c6e10a77303ad88ba8a4eacad05fe663686ebe02c80",
+            "observedSha256": "89e59095367fee18d9963c6e10a77303ad88ba8a4eacad05fe663686ebe02c80",
+            "bytes": 35786,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/activation/manifest.json",
+            "urlPath": "drafts/n44-push/activation/manifest.json",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "64fdb2e1ecdd14f988839ecc4c11172b0a744aa3a2a01b06e4a0b11e62eb2c5c",
+            "observedSha256": "64fdb2e1ecdd14f988839ecc4c11172b0a744aa3a2a01b06e4a0b11e62eb2c5c",
+            "bytes": 15316,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-19T04:24:43.248Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "4523f7c8ec9ea4aeca3fe2d0053ebf3f41077206305e92c43c38f7975bd15679",
+            "bytes": 5257,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "normalizedBytes": 3952,
+            "removedProviderBytes": 1305,
+            "removedSha256": "bdb9fd561fdeb6c4ad366ed777b33734d26db55975b7544f0085662fbbfb6e2e",
+            "providerTransforms": [
+              "cloudflare-analytics-20261017",
+              "cloudflare-jsd-v1"
+            ]
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "observedSha256": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
+            "bytes": 21721,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2d2a14651f2b14836267d4388ef0bb5b4289d7b7bf3e89af9f36380103ff5fdb",
+            "observedSha256": "2d2a14651f2b14836267d4388ef0bb5b4289d7b7bf3e89af9f36380103ff5fdb",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261018/N44_FINISH_SERVICE_STATUS.md",
+            "urlPath": "docs/automation-evidence/20261018/N44_FINISH_SERVICE_STATUS.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "89e59095367fee18d9963c6e10a77303ad88ba8a4eacad05fe663686ebe02c80",
+            "observedSha256": "89e59095367fee18d9963c6e10a77303ad88ba8a4eacad05fe663686ebe02c80",
+            "bytes": 35786,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/activation/manifest.json",
+            "urlPath": "drafts/n44-push/activation/manifest.json",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "64fdb2e1ecdd14f988839ecc4c11172b0a744aa3a2a01b06e4a0b11e62eb2c5c",
+            "observedSha256": "64fdb2e1ecdd14f988839ecc4c11172b0a744aa3a2a01b06e4a0b11e62eb2c5c",
+            "bytes": 15316,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      }
+    },
+    "pushRecovered": false,
+    "poPersonallyTested": false,
+    "closed": false
+  },
+  "result": {
+    "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+    "runId": "6524432d-95a8-4b18-83e8-62ea9fd04bfe",
+    "state": "LOCAL_READY",
+    "candidateSha": "66412fce87f424e83d999eadd2955c44ae580c3f",
+    "baseSha": "0b9dabb9a95b386232575bd68ae202b2abd5fb0a",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-finish-bounded-service-activation-20261018",
+    "changedPaths": [],
+    "checks": [
+      {
+        "name": "n44_fresh_exact_project_policy_and_secure_provider_custody_prerequisites",
+        "status": "PASS",
+        "evidence": "Reused admission/provider/custody evidence in drafts/n44-push/activation/finish-phase0.json, secret-readback.json and tests/n44-finish-activation-final.json. No provider operation or authentication repeated this run."
+      },
+      {
+        "name": "n44_exact_once_schema_and_private_role_readback",
+        "status": "PASS",
+        "evidence": "Reused hosted-migration-history.json and hosted-boundary-readback.json: both immutable migrations already applied, 42 boundary identities verified; no migration replay."
+      },
+      {
+        "name": "n44_nonsending_real_service_ingress_source_config_readback",
+        "status": "PASS",
+        "evidence": "Reused actual Edge version4/source readback, Cloudflare final versions/configuration and mounted HTTP401 evidence. tests/n44-finish-activation-final.json records service/ingress enabled with delivery/scheduler/cron OFF."
+      },
+      {
+        "name": "n44_truthful_browser_default_off_user_gesture_and_not_run_device_delivery",
+        "status": "PASS",
+        "evidence": "Reused final receipt: browser/SW OFF, no notification permission or registration, no real send; closed-client OS delivery explicitly NOT_RUN. Frontend unchanged."
+      },
+      {
+        "name": "n44_private_database_error_boundary_under_actual_provider_logging",
+        "status": "PASS",
+        "evidence": "Reused tests/n44-finish-boundary.result.json: actual native PostgreSQL logs, fixed private errors, original SQLSTATE/types, owner/source/CAS/retry/rollback/ACK preserved. Hosted source boundary verified; no PostgreSQL logging change."
+      },
+      {
+        "name": "n44_exact_restricted_login_failure_diagnosis",
+        "status": "PASS",
+        "evidence": "Reused login diagnosis, iteration and precise-session receipts. Historical28P01 and pooler upstreamSsl=false remain preserved; actual original Edge direct transport subsequently passed full guarded readiness."
+      },
+      {
+        "name": "n44_recovered_credential_matches_exact_stored_scram_keys",
+        "status": "PASS",
+        "evidence": "Reused tests/n44-finish-scram-equality.hosted.json and n44-finish-iteration.hosted.json; protected boolean equality proved without exposing credentials or keys. No credential change this run."
+      },
+      {
+        "name": "n44_actual_scram_iteration_compatibility",
+        "status": "PASS",
+        "evidence": "Reused n44-finish-iteration-protocol.json and n44-finish-iteration.hosted.json: actual16384/4096 mismatch, bounded same-password/salt repair and equality proof preserved."
+      },
+      {
+        "name": "n44_post_observed_cache_refresh_restricted_session",
+        "status": "PASS",
+        "evidence": "Reused n44-finish-post-cache-session.json for successful authentication; its later grouped TLS failure remains historical. Final hosted-direct-readiness.json separately proves successful restricted encrypted runtime session."
+      },
+      {
+        "name": "n44_precise_restricted_identity_and_full_tls",
+        "status": "PASS",
+        "evidence": "Reused actual authenticated readiness HTTP200: loginExact, roleExact, upstreamSsl, clientTlsAuthorized and sourceBoundary all true; service source236f68e0131ca4d2b27fc3014cb33421f90b40c1, delivery=false."
+      },
+      {
+        "name": "n44_delivery_reporting_correction",
+        "status": "PASS",
+        "evidence": "node tests/n44-finish-delivery-validation.mjs, syntax and git diff --check passed. Prior receipt/bundle binding verified locally; optional DNS10000 remains historical FAIL without retry. Commit66412fce87f424e83d999eadd2955c44ae580c3f; worktree clean."
+      },
+      {
+        "name": "hosted_auth_fixture_and_closed_client_os_delivery",
+        "status": "NOT_RUN",
+        "evidence": "No new Auth fixture, personal-data operation, device registration, permission request or actual message authorized/performed."
+      },
+      {
+        "name": "frontend_publication_and_served_source",
+        "status": "NOT_RUN",
+        "evidence": "Independent controller/publisher owns integration, frontend publication and served-source evidence."
+      }
+    ],
+    "summary": [],
+    "blockerType": "none",
+    "blocker": null,
+    "nextAction": "Controller/publisher integrates the exact candidate and verifies served source; retain nonsending flags and existing device/PO acceptance limits."
+  }
+}
