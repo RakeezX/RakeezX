@@ -1,0 +1,12 @@
+{
+  "taskId": "continuous-n119-alphabetic-display-roll-number-20261019",
+  "runId": "1542972d-8046-4d62-a1ae-91bdf3b1b193",
+  "baseSha": "644e6896c24e02e00d46c558a0f87c563f644870",
+  "mode": "original-source-reproduction",
+  "checks": [],
+  "errors": [],
+  "failure": {
+    "message": "locator.waitFor: Timeout 7000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.roster-row').first() to be visible\u001b[22m\n",
+    "stack": "locator.waitFor: Timeout 7000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.roster-row').first() to be visible\u001b[22m\n\n    at rows (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n119-alphabetic-display-roll-number-20261019\\tests\\n119-1019-display-roll.mjs:43:42)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n119-alphabetic-display-roll-number-20261019\\tests\\n119-1019-display-roll.mjs:59:9\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n119-alphabetic-display-roll-number-20261019/tests/n119-1019-display-roll.mjs:50:2"
+  }
+}

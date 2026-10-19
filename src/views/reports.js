@@ -4,7 +4,7 @@ import '../lib/rakeez-datetime.js';
 import { html, icon, toast, fmtNum, fmtPct, fmtDate, fmtDateFull, openSheet } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
-  itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER, displayRoster,
+  itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER, displayRoster, sortStudents,
 } from '../models.js';
 import { downloadCSV } from '../lib/export.js';
 import { demoOutputMarker, markDemoExportRows, markDemoSharedText, reportWithClosing, reportHeader, reportIdentitySheet, reportPageSetup, printReport, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
@@ -91,9 +91,9 @@ function identity(cls) {
 function sortRoster(roster, items, ctx) {
   const arr = [...roster];
   if (sortKey === 'name') {
-    arr.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+    return sortStudents(arr);
   } else if (sortKey === 'roll') {
-    arr.sort((a, b) => (a.rollNo ?? 9999) - (b.rollNo ?? 9999));
+    arr.sort((a, b) => (a.displayNo ?? a.rollNo ?? 9999) - (b.displayNo ?? b.rollNo ?? 9999));
   } else if (sortKey === 'score_desc') {
     arr.sort((a, b) => (studentTotal(items, ctx[b.id]).pct ?? -1) - (studentTotal(items, ctx[a.id]).pct ?? -1));
   } else if (sortKey === 'score_asc') {
