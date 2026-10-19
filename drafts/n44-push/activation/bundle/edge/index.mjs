@@ -3993,9 +3993,28 @@ async function readinessEntry(request2, readEnv, check = checkReadiness) {
   }
 }
 
+// drafts/n44-push/edge-request.mjs
+function edgeRequest(request2, readEnv) {
+  const u = new URL(request2.url), local = "/n44-notifications", publicPath = "/functions/v1/n44-notifications";
+  const origin = readEnv("N44_AUTH_URL");
+  if (origin !== "https://xlrubcwjqktzzunrvuns.supabase.co") throw Error("n44_origin");
+  if (u.pathname === local || u.pathname.startsWith(local + "/")) {
+    const canonical2 = new URL(origin);
+    canonical2.pathname = publicPath + u.pathname.slice(local.length);
+    canonical2.search = u.search;
+    return new Request(canonical2, request2);
+  }
+  return request2;
+}
+
 // supabase/functions/n44-notifications/index.ts
 var runtime;
 Deno.serve(async (request2) => {
+  try {
+    request2 = edgeRequest(request2, (name) => Deno.env.get(name));
+  } catch {
+    return privateResponse();
+  }
   if (new URL(request2.url).pathname === "/functions/v1/n44-notifications/readiness") return readinessEntry(request2, (name) => Deno.env.get(name));
   try {
     runtime ??= createExistingHost((name) => Deno.env.get(name));

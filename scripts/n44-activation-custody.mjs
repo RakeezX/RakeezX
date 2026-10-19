@@ -111,11 +111,31 @@ export async function execute(action,value){
   const signature=await mac(Buffer.from(state.ingress,'hex'),JSON.stringify(['n44-readiness-v1',u.origin,u.pathname,time,nonce,await sha(new TextEncoder().encode(body))]));
   const response=await fetch(u,{method:'POST',headers:{'content-type':'application/json','x-n44-time':time,'x-n44-nonce':nonce,'x-n44-signature':signature},body,signal:AbortSignal.timeout(15000),redirect:'error'});
   const actual=await response.json();const allowed=['status','stage','code','source','enabled','deliveryEnabled','loginExact','roleExact','upstreamSsl','clientTlsAuthorized','sourceBoundary'];
-  if(Object.keys(actual).some(k=>!allowed.includes(k)))fail('n44_readiness_reply_shape');
+  if(Object.keys(actual).some(k=>!allowed.includes(k))){await writeFile(base+'/hosted-direct-startup-failure.json',JSON.stringify({runId:operationRun,httpStatus:response.status,fields:Object.keys(actual),providerCode:/^[A-Z_]{3,50}$/.test(actual.code??'')?actual.code:null,privateDetailsSuppressed:true},null,2)+'\n');fail('n44_readiness_reply_shape');}
   const receipt={projectId:project,runId:operationRun,recordedAt:new Date().toISOString(),httpStatus:response.status,...actual};
   await writeFile(base+'/hosted-direct-readiness.json',JSON.stringify(receipt,null,2)+'\n');
   if(response.status!==200||actual.status!=='ready'||actual.source!==state.source||!actual.loginExact||!actual.roleExact||!actual.upstreamSsl||!actual.clientTlsAuthorized||!actual.sourceBoundary||actual.deliveryEnabled)fail('n44_direct_readiness_unproven');
   state.loginVerified=true;await save(state);return receipt;
+ }
+ if(action==='--repair-json-env'){
+  if(!state.installed||!state.directPreparation||state.serviceEnabled)fail('n44_json_env_repair_gate');
+  const crypto={activeKeyId:'v1',fingerprintKeyId:'v1',activeVapidKeyId:'v1',sealingKeys:[['v1',state.sealing]],endpointHmacKeys:[['v1',state.endpoint]],bindingHmacKeys:[['v1',state.binding]],vapidKeys:[['v1',{publicKey:state.vapidPublic,privateKey:state.vapidPrivate,subject:'https://rakeezx.com'}]]};
+  const values={N44_SESSION_POLICY_JSON:JSON.stringify(state.policy),N44_CRYPTO_JSON:JSON.stringify(crypto),N44_PROVIDER_ORIGINS_JSON:JSON.stringify(['https://fcm.googleapis.com'])};
+  const actual=await official(['secrets','list','--project-ref',project,'--output','json']);const rows=Array.isArray(actual)?actual:actual.rows;
+  const comparison=Object.entries(values).map(([name,value])=>{const r=rows.find(r=>r.name===name),digest=r?.digest??r?.value;return {name,expectedMatches:digest===createHash('sha256').update(value).digest('hex'),retainedEscapedQuoteMatches:digest===createHash('sha256').update(value.replaceAll('"','\\"')).digest('hex')};});
+  await writeFile(base+'/json-env-encoding-diagnostic.json',JSON.stringify({runId:operationRun,comparison,privateValuesReturned:false},null,2)+'\n');
+  if(!comparison.every(r=>r.expectedMatches||r.retainedEscapedQuoteMatches))fail('n44_json_env_encoding_unexplained');
+  if(Object.values(values).some(v=>v.includes("'")))fail('n44_json_env_single_quote_collision');
+  const f=path.join(phase,'owned-json-env.tmp');try{await writeFile(f,Object.entries(values).map(([k,v])=>k+"='"+v+"'").join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',f]);}finally{await unlink(f).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  return {sameValuesReinstalledWithLiteralJsonQuoting:true,names:Object.keys(values),privateValuesReturned:false};
+ }
+ if(action==='--rebind-inactive-source'){
+  if(!state.installed||!state.directPreparation||state.serviceEnabled||!/^[a-f0-9]{40}$/.test(value??''))fail('n44_inactive_source_gate');
+  if(Date.now()-state.policy.observedAt>86400000)fail('n44_profile_stale');
+  state.source=value;state.policy={...state.policy,serviceSourceSha:value,activatedAt:Date.now()};
+  const values={N44_SERVICE_SOURCE_SHA:value,N44_SESSION_POLICY_JSON:JSON.stringify(state.policy)};
+  const f=path.join(phase,'owned-rebind.tmp');try{await writeFile(f,Object.entries(values).map(([k,v])=>k+"='"+v+"'").join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',f]);}finally{await unlink(f).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  for(const [k,v]of Object.entries(values))state.envDigests[k]=createHash('sha256').update(v).digest('hex');await save(state);return {source:value,enabled:false,profileFresh:true};
  }
  if(action==='--post-cache-session'||action==='--precise-session'){
   const precise=action==='--precise-session';
@@ -183,7 +203,9 @@ export async function execute(action,value){
   if(!state.installed||!state.envDigests)fail('n44_not_installed');
   const actual=await official(['secrets','list','--project-ref',project,'--output','json']);
   const rows=Array.isArray(actual)?actual:actual.rows;if(!Array.isArray(rows))fail('n44_secret_metadata_shape');
-  for(const [name,digest]of Object.entries(state.envDigests))if(!rows.some(r=>r.name===name&&r.digest===digest))fail('n44_secret_digest_mismatch');
+  // Official CLI2.120 JSON uses Management API `value` for the displayed DIGEST column.
+  const comparison=Object.entries(state.envDigests).map(([name,digest])=>{const r=rows.find(r=>r.name===name),actual=r?.digest??r?.value;return {name,present:!!r,exactDigest:actual===digest,hexDigest:/^[a-fA-F0-9]{64}$/.test(actual??''),caseInsensitiveDigest:typeof actual==='string'&&actual.toLowerCase()===digest};});
+  if(comparison.some(r=>!r.exactDigest)){await writeFile(base+'/secret-digest-diagnostic.json',JSON.stringify({runId:operationRun,comparison,privateValuesReturned:false},null,2)+'\n');fail('n44_secret_digest_mismatch');}
   return {namesAndDigestsMatched:Object.keys(state.envDigests).sort(),source:state.source,serviceEnabled:!!state.serviceEnabled,deliveryEnabled:false,policyApprovalId:state.policy.approvalId};
  }
  if(action==='--enable-service'){

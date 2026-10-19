@@ -1,0 +1,12 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "name": "n44-notifications",
+  "exitCode": 0,
+  "acknowledged": true,
+  "sourceCandidate": "57e003f89d041729f118856c2f3405686270947c",
+  "readinessOnly": true,
+  "serviceEnabled": false,
+  "deliveryEnabled": false,
+  "recordedAt": "2026-10-19T04:02:47.645Z",
+  "failure": null
+}

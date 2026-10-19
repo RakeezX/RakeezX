@@ -5,6 +5,7 @@ import {createRequire} from 'node:module';
 import {randomBytes,randomUUID,createHash} from 'node:crypto';
 import {databaseConfig,assertRestrictedIdentity} from '../drafts/n44-push/database-transport.mjs';
 import {mac,sha} from '../drafts/n44-push/web-protocol.mjs';
+import {edgeRequest} from '../drafts/n44-push/edge-request.mjs';
 const ca=await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/supabase-prod-ca-2021.crt','utf8');
 const report={aiAuthored:true,runId:'fdaa4ff1-9221-41b9-8661-8a57a9a6e986',recordedAt:new Date().toISOString(),scope:'Synthetic actual transport module and readiness handler only; no hosted DB or UI proof',checks:{}};
 try{
@@ -26,7 +27,10 @@ try{
  const request=async(sigOverride,body='{}')=>{const time=String(Math.floor(Date.now()/1000)),nonce=randomUUID(),path='/functions/v1/n44-notifications/readiness';const sig=await mac(key,JSON.stringify(['n44-readiness-v1',base,path,time,nonce,await sha(new TextEncoder().encode(body))]));return new Request(base+path,{method:'POST',headers:{'content-type':'application/json','x-n44-time':time,'x-n44-nonce':nonce,'x-n44-signature':sigOverride??sig},body});};
  assert.equal((await readinessEntry(await request('0'.repeat(64)),n=>env[n],check)).status,401);assert.equal(checks,0);
  const valid=await request();assert.equal((await readinessEntry(valid.clone(),n=>env[n],check)).status,200);assert.equal(checks,1);assert.equal((await readinessEntry(valid,n=>env[n],check)).status,401);assert.equal(checks,1);
- assert.notEqual((await readinessEntry(await request(undefined,'{}'.repeat(3)),n=>env[n],check)).status,200);assert.equal(checks,1);
+ const routed=await request(),short=new Request('http://edge-runtime/n44-notifications/readiness',routed);
+ assert.equal((await readinessEntry(edgeRequest(short,n=>env[n]),n=>env[n],check)).status,200);assert.equal(checks,2);
+ report.checks.providerLocalPathMapsToSameAuthenticatedProtocol=true;
+ assert.notEqual((await readinessEntry(await request(undefined,'{}'.repeat(3)),n=>env[n],check)).status,200);assert.equal(checks,2);
  report.checks.wrongAuthReplayAndOversizeRejectedBeforeDatabase=true;
  report.status='PASS';
 }catch(e){report.status='FAIL';report.failure=e.code==='ERR_ASSERTION'?'n44_direct_readiness_assertion':'n44_direct_readiness_private_details_suppressed';report.location=e.stack?.split('\n').find(l=>l.includes('.mjs:'));process.exitCode=1;}

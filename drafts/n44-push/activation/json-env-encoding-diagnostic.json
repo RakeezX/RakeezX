@@ -1,0 +1,21 @@
+{
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "comparison": [
+    {
+      "name": "N44_SESSION_POLICY_JSON",
+      "expectedMatches": false,
+      "retainedEscapedQuoteMatches": true
+    },
+    {
+      "name": "N44_CRYPTO_JSON",
+      "expectedMatches": false,
+      "retainedEscapedQuoteMatches": true
+    },
+    {
+      "name": "N44_PROVIDER_ORIGINS_JSON",
+      "expectedMatches": false,
+      "retainedEscapedQuoteMatches": true
+    }
+  ],
+  "privateValuesReturned": false
+}

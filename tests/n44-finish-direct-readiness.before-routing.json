@@ -1,0 +1,16 @@
+{
+  "aiAuthored": true,
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "recordedAt": "2026-10-19T03:58:43.764Z",
+  "scope": "Synthetic actual transport module and readiness handler only; no hosted DB or UI proof",
+  "checks": {
+    "exactDirectHostPortRoleCaAndStrictTls": true,
+    "poolerUpstreamFalseAndWrongIdentityRemainRejected": true,
+    "wrongAuthReplayAndOversizeRejectedBeforeDatabase": true
+  },
+  "status": "PASS",
+  "sources": {
+    "drafts/n44-push/database-transport.mjs": "2f5a4f6dd4d2d5864756d0cab111fc1771b4356b2aed7b551e10529ac89bf88d",
+    "drafts/n44-push/readiness-entry.mjs": "51534b2f4d2ceb6a95376f5a37fb4fd0cf47d2a56f48de72f99c772b97d29516"
+  }
+}

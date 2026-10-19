@@ -1,11 +1,12 @@
 {
   "aiAuthored": true,
   "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
-  "recordedAt": "2026-10-19T03:58:43.764Z",
+  "recordedAt": "2026-10-19T04:04:05.616Z",
   "scope": "Synthetic actual transport module and readiness handler only; no hosted DB or UI proof",
   "checks": {
     "exactDirectHostPortRoleCaAndStrictTls": true,
     "poolerUpstreamFalseAndWrongIdentityRemainRejected": true,
+    "providerLocalPathMapsToSameAuthenticatedProtocol": true,
     "wrongAuthReplayAndOversizeRejectedBeforeDatabase": true
   },
   "status": "PASS",
