@@ -980,7 +980,7 @@ async function boot() {
     try {
       if (isDemoWorkspace()) throw Object.assign(new Error('Demo workspace has no cloud sync'), { code: 'DEMO_SYNC_DISABLED' });
       syncModule = await import('./lib/sync.js');
-      syncModule.init({ readiness: startupLeaseReadiness });
+      syncModule.init({ readiness: startupLeaseReadiness, prepareResume: renewLeaseInBackground });
       // init() already starts the read-only status scan. Do not wait for its
       // outbox/record reads before painting this verified local workspace.
       if (import.meta.env?.DEV) window.__syncModule = syncModule;
@@ -1086,7 +1086,6 @@ async function boot() {
   }
   window.addEventListener('pageshow', onPresentationWake);
   window.addEventListener('online', onPresentationWake);
-  window.addEventListener('online', renewLeaseInBackground);
   window.addEventListener('storage', (event) => {
     if (event.key === cloud.AUTH_STORAGE_KEY && store.getActiveWorkspace()?.type === 'account') {
       let nextOwner = null;

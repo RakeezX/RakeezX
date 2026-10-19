@@ -61,6 +61,9 @@ let suppressAutoSchedule = false;
 let initialized = false;
 // AI-authored N123: boot lease verification is preparation, not a failed Sync attempt.
 let startupPreparing = false;
+// AI N125: a foreground lifecycle owns its prerequisite, before receiver/capture.
+let resumePreparing = null;
+let resumeAwake = false;
 let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
@@ -134,7 +137,7 @@ const remoteSync = createRemoteSync({
       && store.getActiveWorkspace()?.type === 'account'
       && store.getActiveWorkspace()?.authUserId === cloud.user?.id
       && store.getActiveWorkspace()?.ownershipState === 'claimed'
-      && !startupPreparing && !workspaceClaimRunning && !restorePreparing && !restoreRunning,
+      && !startupPreparing && (!resumePreparing || autoRunning) && !workspaceClaimRunning && !restorePreparing && !restoreRunning,
     online: isOnline(), visible: typeof document === 'undefined' || document.visibilityState === 'visible' }),
   getMarker: cloud.fetchOwnerSyncMarker,
   openChannel: cloud.openOwnerSyncChannel,
@@ -178,7 +181,7 @@ function coordinatorOperationalState(durable) {
   if (autoRunning) return 'syncing';
   if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
   if (!isOnline()) return 'offline';
-  if (startupPreparing) return 'pending';
+  if (startupPreparing || resumePreparing) return 'pending';
   if (state.status === 'blocked') return 'blocked';
   if (state.status === 'error' && durable.failedCount === 0) return 'error';
   if (remoteSync.diagnostics().pending) return 'pending';
@@ -243,6 +246,8 @@ function cacheOperationalSummary(durable, expectedToken = null) {
   const currentState = coordinatorOperationalState(normalized);
   const reason = startupPreparing && currentState === 'pending'
     ? ['startup_preparing', 'نتحقق من جاهزية الحساب قبل بدء المزامنة.']
+    : resumePreparing && currentState === 'pending'
+    ? ['resume_preparing', 'نتحقق من جاهزية الحساب قبل استئناف المزامنة.']
     : COORDINATOR_REASON[currentState] ?? [normalized.reasonCategory, normalized.reasonLabel];
   const actionableSyncIssue = normalized.actionableSyncIssue || ['auth_required', 'offline', 'error'].includes(currentState);
   operationalSummaryCache = Object.freeze({
@@ -318,7 +323,7 @@ function scheduleAutomaticSync({ full = false, immediate = false, remote = false
     stopOwnershipBlockedScheduling(ownership);
     return;
   }
-  if (startupPreparing) return;
+  if (startupPreparing || resumePreparing) return;
   if (!isOnline()) {
     setState({ status: 'offline' });
     return;
@@ -369,7 +374,13 @@ function scheduleRetry() {
   // Keep the failed result visible while waiting; a timer is not an active run.
 }
 
-async function scheduleResumeSync() {
+async function scheduleResumeSync(prepareResume, { force = false } = {}) {
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+  if (resumePreparing) { resumeAwake = true; return; }
+  if (resumeAwake && !force) return;
+  resumeAwake = true;
+  // Startup already owns its readiness and initial full pass (N123).
+  if (startupPreparing) return;
   presentationSeverity.verifying(bindPresentationContext());
   notify();
   if (workspaceClaimRunning) return;
@@ -379,8 +390,41 @@ async function scheduleResumeSync() {
     stopOwnershipBlockedScheduling(ownership);
     return;
   }
+  const context = { workspace: store.getActiveWorkspace(), owner: cloud.user.id };
+  const isCurrent = () => store.getActiveWorkspace() === context.workspace && cloud.user?.id === context.owner && !!cloud.session;
+  resumePreparing = context;
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
+  retryScheduled = false;
+  notify();
+  try {
+    // Never renew underneath an earlier active capture; let it finish first.
+    if (autoRunning) await new Promise(resolve => syncSettledWaiters.add(resolve));
+    presentationSeverity.verifying(bindPresentationContext());
+    remoteSync.stop();
+    if (isCurrent()) await prepareResume?.();
+  } catch {
+    // Readiness failure is not success. The following real attempt retains all
+    // owner/lease/Auth guards and reports the actual failure, as at startup.
+  } finally {
+    if (resumePreparing === context) resumePreparing = null;
+    notify();
+  }
+  if (!isCurrent()) {
+    const access = cloudOwnershipAccess('pull');
+    if (!access.allowed) stopOwnershipBlockedScheduling(access);
+    else {
+      // The old lifecycle cannot certify a replacement workspace. Start it
+      // through the current guards rather than dropping a genuine change.
+      void remoteSync.refresh();
+      scheduleAutomaticSync({ full: true, immediate: true });
+    }
+    return;
+  }
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+  void remoteSync.refresh();
   const pending = await pendingOutbox();
+  if (!isCurrent()) return;
   const stale = !state.lastSyncedAt || Date.now() - state.lastSyncedAt >= RESUME_STALE_MS;
   if (pending.length || stale || presentationSeverity.snapshot().awaitingVerification) scheduleAutomaticSync({ full: true, immediate: true });
 }
@@ -504,9 +548,9 @@ function firstPullError(result) {
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true, remote = false, forRestore = false } = {}) {
-  if (startupPreparing || classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
+  if (startupPreparing || resumePreparing || classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
   const lifecycleDevice = await db.get('device', 'device');
-  if (startupPreparing || classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
+  if (startupPreparing || resumePreparing || classDeletionReserved || restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
   if (lifecycleDevice?.studentLifecycleResume || lifecycleDevice?.n77DeleteIntent || lifecycleDevice?.cloudRestoreResume) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
@@ -888,7 +932,7 @@ function setState(updates) {
   notify();
 }
 
-export function init({ readiness = null } = {}) {
+export function init({ readiness = null, prepareResume = null } = {}) {
   state.lastSyncedAt = store.state.device?.lastSyncAt || null;
   if (initialized) return;
   initialized = true;
@@ -928,8 +972,7 @@ export function init({ readiness = null } = {}) {
   else if (cloud.authStatus?.().state === 'auth_required') setState({ status: 'auth_required' });
   if (typeof addEventListener === 'function') {
     addEventListener('online', () => {
-      void remoteSync.refresh();
-      scheduleAutomaticSync({ full: true, immediate: true });
+      void scheduleResumeSync(prepareResume, { force: true });
     });
     addEventListener('offline', () => {
       remoteSync.stop();
@@ -937,12 +980,17 @@ export function init({ readiness = null } = {}) {
       setState({ status: 'offline' });
       void getSyncOperationalSummary().catch(() => {});
     });
-    addEventListener('pagehide', () => remoteSync.stop());
-    addEventListener('pageshow', () => { void remoteSync.refresh(); scheduleResumeSync(); });
+    const leave = () => { resumeAwake = false; remoteSync.stop(); };
+    const resume = () => { void scheduleResumeSync(prepareResume); };
+    // A visible window losing focus does not invalidate an active read capture.
+    addEventListener('blur', () => { resumeAwake = false; });
+    addEventListener('pagehide', leave);
+    addEventListener('pageshow', resume);
+    addEventListener('focus', resume);
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
-        void remoteSync.refresh();
-        if (document.visibilityState === 'visible') scheduleResumeSync();
+        if (document.visibilityState === 'visible') resume();
+        else leave();
       });
     }
   }

@@ -1,0 +1,357 @@
+{
+  "taskId": "continuous-n125-return-focus-transient-sync-20261019",
+  "runId": "a4cffdb4-a229-4390-a948-7d6d37317a88",
+  "baseSha": "0b4e841ca9447373add29c0a62876494a81ecdb8",
+  "baseline": true,
+  "checks": [
+    {
+      "name": "n125_baseline_return_race",
+      "status": "PASS",
+      "evidence": "Already-open actual Settings app, two return event sequences and delayed real identity verification reproduced sync-context-changed and red, followed by recovery."
+    }
+  ],
+  "returns": [
+    {
+      "cycle": 1,
+      "beforeReads": 24,
+      "afterReads": 72,
+      "authReads": 1,
+      "red": true,
+      "states": [
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 28,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 32,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 36,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 40,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 44,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot sync-dot--syncing topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 48,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot sync-dot--syncing topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 48,
+          "authReads": 2,
+          "error": "Sync ownership blocked: sync-context-changed",
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot sync-dot--syncing topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 48,
+          "authReads": 2,
+          "error": "Sync ownership blocked: sync-context-changed",
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 52,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 56,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 60,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 64,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 68,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 72,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "synced",
+          "reason": "none",
+          "reads": 72,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--synced",
+            "sync-dot topbar__teacher-sync sync-dot--synced"
+          ]
+        }
+      ]
+    },
+    {
+      "cycle": 2,
+      "beforeReads": 72,
+      "afterReads": 120,
+      "authReads": 1,
+      "red": true,
+      "states": [
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 76,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 80,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 84,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 88,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 92,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot sync-dot--syncing topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 96,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot sync-dot--syncing topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 96,
+          "authReads": 3,
+          "error": "Sync ownership blocked: sync-context-changed",
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 100,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 104,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 108,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 112,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 116,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "error",
+          "reason": "temporary_sync_failure",
+          "reads": 120,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--error",
+            "sync-dot topbar__teacher-sync sync-dot--error"
+          ]
+        },
+        {
+          "state": "synced",
+          "reason": "none",
+          "reads": 120,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--synced",
+            "sync-dot topbar__teacher-sync sync-dot--synced"
+          ]
+        }
+      ]
+    }
+  ],
+  "failures": [
+    "[rakeezx sync] Automatic sync failed: Error: Sync ownership blocked: sync-context-changed\n    at ownershipBlockedError (http://127.0.0.1:58866/src/lib/sync-ownership.js:146:24)\n    at syncAll (http://127.0.0.1:58866/src/lib/sync.js:614:13)",
+    "[rakeezx sync] Automatic sync failed: Error: Sync ownership blocked: sync-context-changed\n    at ownershipBlockedError (http://127.0.0.1:58866/src/lib/sync-ownership.js:146:24)\n    at syncAll (http://127.0.0.1:58866/src/lib/sync.js:614:13)"
+  ],
+  "cleanup": "Owned isolated contexts/browser and loopback server closed in finally; external requests and Service Workers blocked."
+}

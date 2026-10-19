@@ -162,6 +162,7 @@ function persistedAuthOwner() {
 
 function saveSession(data, { required = true } = {}) {
   const priorSignature = authSignature();
+  const priorSession = session, priorIdentity = user;
   const nextUserId = data?.access_token ? (data.user?.id ?? user?.id) : null;
   const priorPersistedOwner = persistedAuthOwner();
   if (priorPersistedOwner && priorPersistedOwner !== nextUserId) {
@@ -190,6 +191,11 @@ function saveSession(data, { required = true } = {}) {
   if (authSignature() !== priorSignature) {
     if (session) localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
     notify();
+  } else {
+    // AI N125: an identical verification is not a new Sync context. Preserve
+    // references only after comparing every Auth field; real changes still notify.
+    session = priorSession;
+    user = priorIdentity;
   }
 }
 
