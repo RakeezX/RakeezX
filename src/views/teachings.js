@@ -93,7 +93,7 @@ function sheet(existing = null, selectedSectionId = '') {
         <div class="field-row">
           <label class="field">
             <span class="field__label">الصف</span>
-            <select class="select" name="grade">
+            <select class="select" name="grade" ${selectedSectionId ? 'disabled' : ''}>
               ${GRADES.map(
                 (g) => html`<option value="${g.v}" ${Number(c.grade) === g.v ? 'selected' : ''}>${g.label}</option>`
               )}
@@ -101,7 +101,7 @@ function sheet(existing = null, selectedSectionId = '') {
           </label>
           <label class="field">
             <span class="field__label">رمز الفصل</span>
-            <input class="input" name="label" value="${c.label}" required maxlength="8"
+            <input class="input" name="label" value="${c.label}" required maxlength="8" ${selectedSectionId ? 'readonly' : ''}
                    autocomplete="off" placeholder="1">
           </label>
         </div>
@@ -220,7 +220,7 @@ function sheet(existing = null, selectedSectionId = '') {
         }
         const label = String(fd.get('label') ?? '').trim();
         if (!label) return;
-        const grade = Number(fd.get('grade'));
+        const grade = selectedSectionId ? Number(selectedSection.grade) : Number(fd.get('grade'));
         if (selectedSection && Number(selectedSection.grade) === grade &&
             normalizeSectionLabel(selectedSection.label) === normalizeSectionLabel(label)) {
           try { store.validateTeachingContext(selectedSection.id, term.id); }
@@ -267,14 +267,16 @@ let demoBusy = false;
 let createBusy = false;
 
 /** The same create handler is reachable from Classes and class editing. */
-export async function addSubjectToClass(sectionId = '') {
+export async function addSubjectToClass(sectionId = '', { verifyCurrent } = {}) {
   if (createBusy) return;
   createBusy = true;
   try {
+    verifyCurrent?.();
     const workspace = store.getActiveWorkspace();
     if (sectionId) store.validateTeachingContext(sectionId);
     const data = await sheet(null, sectionId);
     if (!data) return;
+    verifyCurrent?.();
     const year = store.activeYear();
     const term = store.activeTerm();
     if (store.getActiveWorkspace() !== workspace || !year || !term || year.id !== data.yearId || term.id !== data.termId ||
@@ -282,7 +284,8 @@ export async function addSubjectToClass(sectionId = '') {
       throw new Error('تغيّر الفصل الدراسي. افتح النموذج مجددًا.');
     }
     if (data.sectionId) store.validateTeachingContext(data.sectionId, term.id);
-    const subject = await store.resolveSubjectSelection(data.subjectSelection);
+    const subject = await store.resolveSubjectSelection(data.subjectSelection, { verifyCurrent });
+    verifyCurrent?.();
     if (store.getActiveWorkspace() !== workspace || store.activeYear()?.id !== year.id ||
         store.activeTerm()?.id !== term.id || store.isTermClosed(term.id)) {
       throw new Error('تغيّر الفصل الدراسي. افتح النموذج مجددًا.');
@@ -293,8 +296,8 @@ export async function addSubjectToClass(sectionId = '') {
       : matchingSection(data);
     if (duplicateTeaching(sec?.id, subject.id, term.id)) throw new Error(DUPLICATE_TEACHING_MESSAGE);
     if (!sec) sec = await store.createSection({ yearId: year.id, grade: data.grade, label: data.label,
-        name: `${data.grade}/${data.label}`, color: safeColor(data.color, autoAssignSectionColor(store.sections())) });
-    await store.createTeaching({ sectionId: sec.id, subjectId: subject.id, termId: term.id });
+        name: `${data.grade}/${data.label}`, color: safeColor(data.color, autoAssignSectionColor(store.sections())) }, { verifyCurrent });
+    await store.createTeaching({ sectionId: sec.id, subjectId: subject.id, termId: term.id }, { verifyCurrent });
     repaint();
   } catch (error) { toast(error.message || 'تعذّر إنشاء الفصل', 'warn'); }
   finally { createBusy = false; }
@@ -342,16 +345,39 @@ function classesToolbar(empty = false) {
     <button class="iconbtn classes-trash" data-act="delete-class-flow" aria-label="حذف الفصل" title="حذف الفصل" ${store.teachings().length ? '' : 'disabled'}>${icon('trash')}</button></div>
   </nav>`;
 }
+
+// AI: a section persists for the year even before a subject is assigned this term.
+function sectionOnlyClasses() {
+  try { store.assertClassImportAccess(); } catch { return []; }
+  const assigned = new Set(store.teachings().map(row => row.sectionId));
+  return store.sections().filter(section => !assigned.has(section.id)).flatMap(section => {
+    try { return [store.readCurrentSectionRoster(section.id)]; } catch { return []; }
+  });
+}
+function renderSectionCard({ section, students }) {
+  return html`<details class="class-card" data-section-roster="${section.id}">
+    <summary class="class-card__main">
+      <span class="class-card__head"><span class="class-card__title">${sectionLabel(section)}</span></span>
+      <span class="class-card__body"><span class="class-card__sub">بلا مادة في الفصل الدراسي الحالي · عرض الطلاب</span><span class="class-card__count">${students.length} طالبًا</span></span>
+    </summary>
+    <div class="card--pad">
+      ${students.length ? html`<ol aria-label="طلاب الفصل">${students.map(student => html`<li data-section-student="${student.id}">${student.name}</li>`)}</ol>` : html`<p>لا يوجد طلاب منتسبون حاليًا.</p>`}
+      <p class="t-3">أضف المادة لفتح أدوات التدريس؛ تبقى أسماء الطلاب وانتساباتهم نفسها.</p>
+      <button class="btn btn--quiet" data-act="add-section-subject" data-section-id="${section.id}">${icon('plus')} إضافة مادة لهذا الفصل</button>
+    </div>
+  </details>`;
+}
 const teachings = {
   title: () => 'الفصول',
   subtitle: () => store.activeTerm()?.name ?? '',
 
   render() {
     const list = store.teachings().slice().sort((a,b) => Number(isDemo(a))-Number(isDemo(b)) || compareAcademicClasses(store.getSection(a.sectionId),store.getSection(b.sectionId)));
+    const sectionOnly = sectionOnlyClasses();
     const term = store.activeTerm();
     const closed = term ? store.isTermClosed(term.id) : false;
 
-    if (!list.length) {
+    if (!list.length && !sectionOnly.length) {
       return html`
         <div class="management-page classes-page">
         ${classesToolbar(true)}
@@ -368,7 +394,9 @@ const teachings = {
       `;
     }
 
-    const totalStudents = new Set(list.flatMap(t => store.students(t.id).map(student => student.id))).size;
+    const totalStudents = new Set([...list.flatMap(t => store.students(t.id).map(student => student.id)), ...sectionOnly.flatMap(entry => entry.students.map(student => student.id))]).size;
+    const cards = [...list.map(teaching => ({ section: store.getSection(teaching.sectionId), teaching })), ...sectionOnly]
+      .sort((a,b) => Number(isDemo(a.teaching ?? a.section))-Number(isDemo(b.teaching ?? b.section)) || compareAcademicClasses(a.section,b.section));
 
     return html`
       <div class="management-page classes-page">
@@ -382,7 +410,7 @@ const teachings = {
       <div class="management-overview classes-overview mb-3" aria-label="ملخص الفصول">
         <div class="classes-overview__metric">
           <span class="classes-overview__label">عدد الفصول</span>
-          <strong class="classes-overview__value tabular">${list.length}</strong>
+          <strong class="classes-overview__value tabular">${cards.length}</strong>
         </div>
         <div class="classes-overview__metric">
           <span class="classes-overview__label">عدد الطلاب</span>
@@ -390,7 +418,7 @@ const teachings = {
         </div>
       </div>
 
-      <div class="class-cards-grid" aria-label="قائمة الفصول">${list.map(renderClassCard)}</div>
+      <div class="class-cards-grid" aria-label="قائمة الفصول">${cards.map(entry => entry.teaching ? renderClassCard(entry.teaching) : renderSectionCard(entry))}</div>
 
 
       </div>
@@ -398,6 +426,26 @@ const teachings = {
   },
 
   actions: {
+    async 'add-section-subject'(el) {
+      const id = el.dataset.sectionId;
+      try {
+        const { section } = store.readCurrentSectionRoster(id);
+        const workspace = store.getActiveWorkspace(), year = store.activeYear().id, term = store.activeTerm().id;
+        const signature = JSON.stringify(section);
+        const yearState = JSON.stringify(store.activeYear()), termState = JSON.stringify(store.activeTerm());
+        const verifyCurrent = current => {
+          if (store.getActiveWorkspace() !== workspace || store.activeYear()?.id !== year || store.activeTerm()?.id !== term ||
+              JSON.stringify(store.readCurrentSectionRoster(id).section) !== signature ||
+              current?.sections && JSON.stringify(current.sections.find(row => row.id === id)) !== signature ||
+              current?.years && JSON.stringify(current.years.find(row => row.id === year)) !== yearState ||
+              current?.terms && JSON.stringify(current.terms.find(row => row.id === term)) !== termState ||
+              current?.device && current.device.some(row => row.id === 'device' && (row.activeYearId !== year || row.activeTermId !== term))) {
+            throw new Error('تغيّر الفصل أو الحساب. أعد فتح الفصل الحالي.');
+          }
+        };
+        await addSubjectToClass(id, { verifyCurrent });
+      } catch (error) { toast(error.message, 'warn'); }
+    },
     async 'delete-class-flow'(el, ev, params = {}) {
       const list = store.teachings();
       if (!list.length) {

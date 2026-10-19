@@ -2,12 +2,13 @@
 <html lang="ar" dir="rtl">
 <head><meta charset="utf-8"><script src="diagnostics-bootstrap.js"></script><meta name="viewport" content="width=device-width, initial-scale=1"><title>مساعد إعداد المعلم</title><link rel="stylesheet" href="lib/rakeez-datetime.css"><link rel="stylesheet" href="popup.css"></head>
 <body><main>
-<header class="popup-header"><h1>مساعد إعداد المعلم</h1><button id="copy-safe-report" type="button">نسخ معلومات التشخيص</button></header><p id="safe-report-status" role="status" aria-live="polite"></p><textarea id="safe-report" readonly hidden dir="ltr" rows="8" aria-label="معلومات التشخيص الآمنة للنسخ اليدوي"></textarea><p class="notice">مدرستي: بدء واحد يستورد أسماء كل الفصول المتاحة إلى حساب ركيز المفتوح. نور: مراجعة العمود المختار.</p>
+<header class="popup-header"><h1>استيراد أسماء الطلاب</h1></header><details id="safe-diagnostics"><summary>التشخيص عند الحاجة</summary><button id="copy-safe-report" type="button">نسخ معلومات التشخيص</button><p id="safe-report-status" role="status" aria-live="polite"></p><textarea id="safe-report" readonly hidden dir="ltr" rows="8" aria-label="معلومات التشخيص الآمنة للنسخ اليدوي"></textarea></details><p class="notice">اجمع أسماء الطلاب وفصولهم المتاحة من مدرستي واحفظها في حساب ركيز.</p>
 <section id="one-start-controls">
-<p>افتح حساب ركيز في تبويب واحد بهذا المتصفح، ثم ابدأ من صفحة مدرستي المصرّح لك بها. تُستورد الأسماء المتاحة فقط؛ لا درجات ولا تعديل في مدرستي.</p>
-<button id="one-start" type="button" disabled>ابدأ جمع واستيراد جميع الفصول إلى ركيز</button>
-<button id="run-cancel" type="button" disabled>إلغاء ومسح المعاينة</button>
-<p id="run-status" role="status" aria-live="polite">لن تبدأ قراءة بمجرد فتح المتصفح أو الإضافة. الاستيراد التلقائي يخص هذا البدء الصريح فقط.</p>
+
+<button id="one-start" type="button" disabled>ابدأ الاستيراد</button>
+<button id="run-cancel" type="button" disabled>إلغاء التشغيل</button>
+<p id="run-status" role="status" aria-live="polite">افتح حساب ركيز في تبويب واحد، ثم ابدأ من صفحة مدرستي المصرّح لك بها.</p>
+<p><a href="https://rakeezx.com/" target="_blank" rel="noopener noreferrer">فتح ركيز وتسجيل الدخول</a></p>
 <div id="school-choices" hidden aria-label="اختر مدرسة واحدة"></div>
 
 <p id="review-remaining" role="timer" aria-label="الوقت المتبقي للمعاينة"></p>
@@ -17,19 +18,19 @@
 <p id="run-skipped" role="status"></p>
 
 </section>
-<section id="noor-controls">
+<details id="noor-controls"><summary>استيراد عمود مختار من نور</summary>
 <h2>نور — العمود الظاهر المختار فقط</h2>
 <p>في https://noor.moe.gov.sa/Noor/ حدّد عنوان «اسم الطالب» في تقرير ظاهر. لن تتنقل الإضافة أو تقرأ صفحات أخرى. الكشف جزئي؛ الصفحات والأعمدة الأخرى غير مجمّعة.</p>
 <label>تسمية فصل هذا التقرير <input id="noor-class" type="text" maxlength="80" autocomplete="off"></label>
 <label><input id="noor-role" type="checkbox"> أؤكد أنني المعلم المصرّح له بهذا التقرير وأن الفصل صحيح</label>
 <button id="noor-start" type="button">معاينة عمود نور المختار</button>
-</section>
+</details>
 <section id="direct-handoff" hidden>
-<p>تُنقل الفصول المتاحة تباعًا، ويُعرض ما لم يتأكد حفظه فقط.</p>
+
 <button id="handoff-transfer" type="button" disabled>نقل إلى ركيز</button>
 <button id="handoff-cancel" type="button" hidden>إلغاء النقل ومسح البيانات</button><p id="handoff-status" role="status"></p>
 </section>
-<details id="legacy-tools"><summary>تفاصيل متقدمة — التشخيص والملفات (اختياري)</summary><details id="run-diagnostics"><summary>التشخيص الآمن (اختياري)</summary>
+<details id="legacy-tools"><summary>الملفات والإدخال اليدوي</summary><p>الاستيراد التلقائي الحالي يدعم الأسماء والفصول فقط؛ لا يستورد بيانات المعلم أو المدير أو المنطقة أو الجدول. الخيارات التالية إدخال يدوي مستقل.</p><details id="run-diagnostics"><summary>التشخيص الآمن (اختياري)</summary>
 <p id="entry-state" dir="ltr" aria-label="حالة ربط صفحة المصدر"></p>
 <textarea id="route-diagnostic" readonly hidden dir="ltr" rows="3" aria-label="التشخيص الآمن للمسار"></textarea>
 <button id="copy-route-diagnostic" type="button" hidden>نسخ التشخيص الآمن</button><p id="route-copy-status" role="status"></p></details>
