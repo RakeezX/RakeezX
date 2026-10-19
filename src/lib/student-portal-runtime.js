@@ -35,7 +35,7 @@ export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipG
     enrolled,(state.students||[]).filter(r=>studentIds.has(r.id)),items,(state.scoreSubitems||[]).filter(r=>itemIds.has(r.itemId))];
   return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,session.access_token,context,source])};
 }
-export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel}={}) {
+export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel,readTimeoutMs=10000}={}) {
   let active, key, disposed=false;
   // The lane survives a binding renewal. Retired reads must finish before the
   // replacement entry acquires the same authoritative server transaction lock.
@@ -43,7 +43,7 @@ export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=gl
   const enqueue=operation=>{const pending=requestTail.then(operation);requestTail=pending.then(()=>{},()=>{});return pending;};
   const reconcileEntry=force=>{if(disposed)return;let next;try{next=getBinding(false).key;}catch{next=null;}
     if(!force&&active&&next===key)return;active?.dispose();key=next;
-    active=mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel,enqueue});
+    active=mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel,enqueue,readTimeoutMs});
   };
   const reconcile=()=>reconcileEntry(false);
   const retry=event=>{if(event.target.closest('[data-n88-retry]'))reconcileEntry(true);};
@@ -56,13 +56,13 @@ export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=gl
   reconcile();const unsubscribe=subscribe(reconcile);
   return {dispose(){disposed=true;unsubscribe?.();root.removeEventListener('click',retry);win.removeEventListener('focus',wake);win.removeEventListener('pageshow',wake);doc.removeEventListener('visibilitychange',wake);active?.dispose();root.replaceChildren();}};
 }
-function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel,enqueue}) {
+function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel,enqueue,readTimeoutMs}) {
   if(!ready(readiness)){classEntryState(root,'disabled');return {dispose(){root.replaceChildren();}};}
   let initial;try{initial=getBinding(false);}catch(e){classEntryState(root,e.portalState||'context');return {dispose(){root.replaceChildren();}};}
   let disposed=false,handle=null,admitted=false,failure='connection';
   const current=write=>{try{const b=getBinding(write);if(disposed||b.key!==initial.key)throw bindingError('context');return b;}catch(e){failure=e.portalState||'context';throw e;}};
   const getContext=()=>{try{return current(false).context;}catch{return null;}};
-  const client=createClassPortalClient({getContext,request:(path,init)=>{
+  const client=createClassPortalClient({getContext,readTimeoutMs,request:(path,init)=>{
     // List/guidance share the same authoritative short DB lock. Serialize this
     // owner's browser requests before dispatch, retaining all binding/lease checks.
     return enqueue(async()=>{
@@ -87,25 +87,32 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
   // No controls/private roster until the normal authenticated service admits this owner.
   void client.listClass(initial.context.teachingId).then(initialList=>{
     current(false);if(!admitted)throw Error('unavailable');
-    const content=root.ownerDocument.createElement('div');root.replaceChildren(content);
+    const content=root.ownerDocument.createElement('div');entryShell(root).replaceChildren(content);
     if(readiness.mode==='pilot'){
       const note=root.ownerDocument.createElement('p');note.setAttribute('role','status');
-      note.textContent='تجربة محدودة · مساحة طلاب الفصل';root.prepend(note);
+      note.textContent='تجربة محدودة · مساحة طلاب الفصل';content.before(note);
     }
     root.dataset.n88EntryState='ready';root.setAttribute('aria-busy','false');
     // Reuse this exact admitted/validated list instead of a second blocking read.
     let firstList=initialList;
     const admittedClient={...client,listClass:async teachingId=>{current(false);if(firstList&&teachingId===initial.context.teachingId){const data=firstList;firstList=null;return data;}return client.listClass(teachingId);}};
     handle=mountClassPortal(content,{client:admittedClient,getContext,subscribe,classLabel});
-  }).catch(e=>{if(!disposed)classEntryState(root,e.portalState||failure);});
+  }).catch(e=>{if(!disposed)classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure));});
   return {dispose(){disposed=true;handle?.dispose();root.replaceChildren();}};
 }
-const classEntryMessages={loading:'جارٍ فتح مساحة طلاب الفصل…',disabled:'مساحة طلاب الفصل غير متاحة حاليًا.',account:'يلزم حساب معلم متصل لفتح مساحة الفصل.',owner:'تعذّر تأكيد سياق الحساب. أعد فتح الفصل من حساب مالكه.',source:'هذا الفصل غير متاح ضمن السياق الدراسي الحالي.',lease:'تعذّر تأكيد صلاحية المزامنة لهذا التبويب. أعد فتح الفصل في التبويب النشط.',session:'انتهت صلاحية الاتصال بالحساب. أعد الاتصال ثم حاول مجددًا.',context:'تغيّر سياق الاتصال. أعد المحاولة لفتح الفصل من جديد.',denied:'لم يسمح الخادم بفتح المساحة لهذا السياق. تحقق من الحساب والفصل ثم أعد المحاولة.',revision:'تحتاج مساحة الطلاب إلى تحديث التطبيق. حدّث الصفحة ثم أعد المحاولة.',connection:'تعذّر الاتصال بمساحة الطلاب. حاول مجددًا.'};
+const classEntryMessages={timeout:'لم تكتمل قراءة الفصل خلال المهلة. أعد المحاولة؛ لم نغيّر أي رمز أو إعداد.',loading:'جارٍ فتح مساحة طلاب الفصل…',disabled:'مساحة طلاب الفصل غير متاحة حاليًا.',account:'يلزم حساب معلم متصل لفتح مساحة الفصل.',owner:'تعذّر تأكيد سياق الحساب. أعد فتح الفصل من حساب مالكه.',source:'هذا الفصل غير متاح ضمن السياق الدراسي الحالي.',lease:'تعذّر تأكيد صلاحية المزامنة لهذا التبويب. أعد فتح الفصل في التبويب النشط.',session:'انتهت صلاحية الاتصال بالحساب. أعد الاتصال ثم حاول مجددًا.',context:'تغيّر سياق الاتصال. أعد المحاولة لفتح الفصل من جديد.',denied:'لم يسمح الخادم بفتح المساحة لهذا السياق. تحقق من الحساب والفصل ثم أعد المحاولة.',revision:'تحتاج مساحة الطلاب إلى تحديث التطبيق. حدّث الصفحة ثم أعد المحاولة.',connection:'تعذّر الاتصال بمساحة الطلاب. حاول مجددًا.'};
+function entryShell(root){
+ let body=root.querySelector('[data-n88-entry-body]');if(body)return body;
+ root.classList.add('n88-entry');
+ const header=root.ownerDocument.createElement('header'),title=root.ownerDocument.createElement('h1');
+ title.textContent='مساحة طلاب الفصل';header.append(title);
+ body=root.ownerDocument.createElement('div');body.dataset.n88EntryBody='';root.replaceChildren(header,body);return body;
+}
 function classEntryState(root,state){
  if(!Object.hasOwn(classEntryMessages,state))state='context';
- root.replaceChildren();root.dataset.n88EntryState=state;root.setAttribute('aria-busy',String(state==='loading'));
- const message=root.ownerDocument.createElement('p');message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.textContent=classEntryMessages[state];root.append(message);
- if(!['loading','disabled'].includes(state)){const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88Retry='';button.textContent='إعادة المحاولة';root.append(button);}
+ const body=entryShell(root);body.replaceChildren();root.dataset.n88EntryState=state;root.setAttribute('aria-busy',String(state==='loading'));
+ const message=root.ownerDocument.createElement('p');message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.textContent=classEntryMessages[state];body.append(message);
+ if(!['loading','disabled'].includes(state)){const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88Retry='';button.textContent='إعادة المحاولة';body.append(button);}
 }
 export function unavailable(root) {
   root.replaceChildren();

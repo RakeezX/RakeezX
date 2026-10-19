@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "capturedAt": "2026-10-19T14:31:13.429Z",
+  "worker": "rakeez-n88-private-ingress",
+  "previousSourceSha256": "ca5ad2fcf735007234cb2f0c39b14ae8481f3709aae1265270fbba6fa48a29b0",
+  "sourceSha256": "4ee37d7cdd0084588615ab6f242c54a312b43484e942877ae6847e00bee369f5",
+  "transportUnchanged": true,
+  "bindingsUnchanged": true,
+  "routesUnchanged": true,
+  "subdomainUnchanged": true,
+  "secretValuesRead": false,
+  "providerWrites": 1,
+  "backendChanges": 0,
+  "upload": {
+    "status": 200,
+    "deployment_id": "9ea7a7ec6e9f4542bdc43c489b08390a",
+    "observability": {
+      "enabled": false,
+      "head_sampling_rate": 0,
+      "logs": {
+        "enabled": false,
+        "head_sampling_rate": 0,
+        "persist": null,
+        "invocation_logs": false
+      },
+      "traces": {
+        "enabled": false,
+        "persist": null,
+        "head_sampling_rate": 0
+      }
+    },
+    "logpush": false,
+    "tail_consumers": []
+  },
+  "deployment": {
+    "id": "637b7d64-7d53-42e1-ad8a-a50e39b2aa84",
+    "created_on": "2026-10-19T14:31:07.622381Z",
+    "versions": [
+      {
+        "version_id": "9ea7a7ec-6e9f-4542-bdc4-3c489b08390a",
+        "percentage": 100
+      }
+    ]
+  },
+  "taskId": "continuous-n88-real-teacher-timeout-light-login-20261019",
+  "runId": "e6bccc29-c697-426a-a9eb-ca185c1f8595",
+  "localSerializationFailure": {
+    "message": "prepared source mismatch",
+    "providerWrites": 0,
+    "reason": "Read-file presentation omitted terminal LF; canonical source restored, hash checked before any API operation."
+  },
+  "cleanup": {
+    "liveMutationLease": "RELEASED live-mutation",
+    "browserLease": "RELEASED browser",
+    "ownedBrowserAndHttpClosed": true
+  },
+  "servedEvidence": "tests/n88-actual-1719/served.json",
+  "actualTeacherReadiness": "NOT_RUN; original signed custodian handle unavailable, browser ownership refusal preserved"
+}

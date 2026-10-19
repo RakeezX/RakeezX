@@ -1,0 +1,20 @@
+{
+  "capturedAt": null,
+  "project": "xlrubcwjqktzzunrvuns",
+  "function": {
+    "name": "n88-student-portal",
+    "status": "ACTIVE",
+    "version": 47,
+    "verify_jwt": false,
+    "ezbr_sha256": "c7c087e17399f6536441e7fcac068c36e059adf100a3c4e123ccf6357aded4e4"
+  },
+  "matchesPreviouslyQualifiedArchive": true,
+  "signedRuntimeReadiness": "NOT_RUN",
+  "originalCustodianBindingPresent": false,
+  "credentialRecoveryOrExtractionAttempted": false,
+  "actualAuthenticatedTeacherRequest": "NOT_RUN",
+  "browserDenialPreserved": "Tab 2005438362 is already part of browser session 01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+  "interpretation": "ACTIVE and matching archive prove provider deployment metadata only; they do not prove current DB/source readiness or diagnose the actual teacher timeout.",
+  "observedDuringRun": "e6bccc29-c697-426a-a9eb-ca185c1f8595",
+  "missingCapability": "Known saved original sealed/env/capability/authority/activeRun bindings were undefined in the available persistent runtime. No original signed-readiness method was available; no new custodian or credential recovery was created."
+}

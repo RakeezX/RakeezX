@@ -1,0 +1,44 @@
+{
+  "taskId": "continuous-n88-real-teacher-timeout-light-login-20261019",
+  "runId": "e6bccc29-c697-426a-a9eb-ca185c1f8595",
+  "status": "PASS",
+  "checks": [
+    {
+      "teacher": "real store/bootstrap/owner guard + actual HTTP: immediate shell, bounded no-response timeout,503 failure then successful re-admission, owner change clears private data",
+      "shellMs": 173,
+      "timeoutMs": 10163
+    },
+    {
+      "width": 390,
+      "layout": {
+        "background": "rgb(244, 247, 245)",
+        "scheme": "light",
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "gap": 20,
+        "logo": true,
+        "overflow": false,
+        "heading": "مساحة الطالب"
+      }
+    },
+    {
+      "width": 1440,
+      "layout": {
+        "background": "rgb(244, 247, 245)",
+        "scheme": "light",
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "gap": 20,
+        "logo": true,
+        "overflow": false,
+        "heading": "مساحة الطالب"
+      }
+    }
+  ],
+  "timings": [],
+  "hostedOwnerProof": false,
+  "privateBrowserRefusalPreserved": true,
+  "reusedTeacher": "ui.teacher-pass.json; teacher source unchanged by heading focus styling",
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

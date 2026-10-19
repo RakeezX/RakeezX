@@ -57,3 +57,15 @@ html[data-n88-student-document]{color-scheme:light;background:#f4f7f5}
 .n88-unified-entry #n88-message{margin:0}
 .n88-unified-entry #n88-message:empty{display:none}
 .n88-unified .n88-unified-resume{margin-block-start:12px;font-size:13px;width:100%}
+
+/* AI: native Rakeez light entry identity, independent of the teacher theme. */
+.n88-unified header{justify-content:center;padding-block:12px 24px}
+.n88-unified-entry{margin-block:32px;box-shadow:var(--shadow-1,0 2px 12px #15253d08)}
+.n88-unified-welcome{color:var(--text-2);margin:0 0 24px;font-size:16px}
+.n88-unified-entry #n88-code-help{font-size:13px;color:var(--text-2);margin:0 0 4px}
+.n88-unified-entry input{text-align:center;font-family:var(--font-num,var(--font));font-size:24px;min-height:56px;background:#fff}
+.n88-unified-entry label{font-weight:var(--fw-semibold,600)}
+
+.n88-unified h1[tabindex="-1"]:focus{outline:none}
+
+.n88-unified h1[tabindex="-1"]:focus{box-shadow:none}
