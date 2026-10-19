@@ -1,0 +1,29 @@
+{
+  "taskId": "continuous-n114-quick-score-undefined-guard-20261019",
+  "runId": "78e4d164-0c2d-4cf1-8111-142a764b43d2",
+  "baseSha": "3fce1195b9c840259e0acea6973efd1436288c29",
+  "mode": "candidate",
+  "checks": [
+    {
+      "name": "n114_actual_plus_minus_owned_score_ack_no_undefined_guard",
+      "status": "PASS",
+      "evidence": "Actual HTTP application grades DOM/CSS/router + and − clicks: exactly two durable participation events, projection null→2→0, original manual score/identities/history unchanged. Actual guard rejects unresolved/foreign owner UI and foreign authenticated dispatch (zero transport calls); two owner-bound pending commands receive two synthetic canonical ACKs, empty outbox, repeat dispatch zero attempts. No real account/service data."
+    }
+  ],
+  "errors": [],
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   -1,\n    1,\n-   -1\n  ]\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n114-quick-score-undefined-guard-20261019/tests/n114-1019-plus-minus.mjs:69:65\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n114-quick-score-undefined-guard-20261019/tests/n114-1019-plus-minus.mjs:42:2",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      attemptCount: 0,\n      baseRevision: 0,\n+     blockedReason: 'ownership:authenticated-user-owner-mismatch',\n-     blockedReason: null,\n      canonicalId: '2bc19574-06e2-4c24-ab35-62c9d8929f54',\n      clientUpdatedAt: 1792397381823,\n      dependencies: [\n        {\n          recordId: 'n73-student1',\n...\n      id: 'v2:29aa7cf8-c012-436f-b263-b89305f8d187',\n+     lastError: {\n+       at: 1792397382115,\n+       code: 'SYNC_OWNERSHIP_BLOCKED',\n+       message: 'Sync ownership blocked: authenticated-user-owner-mismatch',\n+       retryable: false\n+     },\n-     lastError: null,\n      localPatch: {\n        date: '2026-10-19',\n        delta: 1,\n        kind: 'participation',\n        note: '',\n...\n      serverRecordId: '2bc19574-06e2-4c24-ab35-62c9d8929f54',\n+     state: 'blocked',\n-     state: 'pending',\n      store: 'logs'\n    },\n    {\n      attemptCount: 0,\n      baseRevision: 0,\n+     blockedReason: 'ownership:authenticated-user-owner-mismatch',\n-     blockedReason: null,\n      canonicalId: '65770fee-1f3d-4478-a059-a90a49e87d66',\n      clientUpdatedAt: 1792397381957,\n      dependencies: [\n        {\n          recordId: 'n73-student1',\n...\n      id: 'v2:dff94922-5344-4d13-9ad5-34ed6090d300',\n+     lastError: {\n+       at: 1792397382116,\n+       code: 'SYNC_OWNERSHIP_BLOCKED',\n+       message: 'Sync ownership blocked: authenticated-user-owner-mismatch',\n+       retryable: false\n+     },\n-     lastError: null,\n      localPatch: {\n        date: '2026-10-19',\n        delta: -1,\n        kind: 'participation',\n        note: '',\n...\n      serverRecordId: '65770fee-1f3d-4478-a059-a90a49e87d66',\n+     state: 'blocked',\n-     state: 'pending',\n      store: 'logs'\n    }\n  ]\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n114-quick-score-undefined-guard-20261019/tests/n114-1019-plus-minus.mjs:90:88\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n114-quick-score-undefined-guard-20261019/tests/n114-1019-plus-minus.mjs:43:2"
+  ],
+  "observed": {
+    "deltas": [
+      1,
+      -1
+    ],
+    "projection": 0,
+    "acknowledged": 2,
+    "transportCalls": 2
+  },
+  "gradeSourceSha256": "2edf7a46859867c939fb39408f9b921c39452d79de38ca0485d3d219a8ed8bad",
+  "resources": "Canonical isolated local browser closed owned contexts/browser in finally; owned loopback server closed. External requests and Service Workers blocked; no live phase."
+}

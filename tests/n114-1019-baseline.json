@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n114-quick-score-undefined-guard-20261019",
+  "runId": "78e4d164-0c2d-4cf1-8111-142a764b43d2",
+  "baseSha": "3fce1195b9c840259e0acea6973efd1436288c29",
+  "mode": "original-source-reproduction",
+  "checks": [
+    {
+      "name": "original_undefined_guard_reproduced",
+      "status": "PASS",
+      "evidence": "Original immutable grades.js, real + click: runtimeSyncOwnershipGuard is not defined; zero logs."
+    }
+  ],
+  "errors": [],
+  "gradeSourceSha256": "d8153de9aa9826f20f25461417cfcd5426fbdbf9742f1e3634881ff2b01adca9",
+  "resources": "Canonical isolated local browser closed owned contexts/browser in finally; owned loopback server closed. External requests and Service Workers blocked; no live phase."
+}

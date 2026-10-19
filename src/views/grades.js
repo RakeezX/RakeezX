@@ -13,6 +13,7 @@ import * as db from '../lib/db.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
 import { subitemCompletionState, subitemSelectedPoints } from '../lib/score-foundation.js';
+import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 let mode = 'item';        // item | table
 let activeItemId = null;
 let sortKey = 'default';   // default | name | roll | score_desc | score_asc
