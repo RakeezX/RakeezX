@@ -41,7 +41,8 @@
         "docs/automation-evidence/20261019/N36_ONE_START_COMPLETE_MADRASATI.md"
       ],
       "verificationPaths": [
-        "extensions/**"
+        "src/views/class-import-center.js",
+        "src/views/teachings.js"
       ],
       "requiredChecks": [
         "n36_app_changed_safe_one_start_available_setup_and_subjectless_delete"

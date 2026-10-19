@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import {verifiedN44SourceStageSplit,n44QualifiedTask} from './n44-qualified-source-evidence.mjs';
 import {verifyPristineN123DependencyCorrection} from './pending-n123-dependency.mjs';
+import {verifyPristineN36Verification} from './pending-n36-verification.mjs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -113,7 +114,8 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     const exactAttempt = (['blocked','retry_wait'].includes(expected.status) || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS' || expected.status === 'awaiting_po' && card.completionMode === STAGED_ACTIVATION_MODE && card.productId === 'N88' && card.stagedActivation?.phase === 'acceptance-and-public-enable') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? '');
     const pristinePendingSupersession = expected.status === 'pending' && card.completionMode === 'superseded_by_verified_delivery' && ID.test(card.supersededBy ?? '') && GIT_SHA.test(card.supersedingPublishedSha ?? '') && expected.sessionId === null && expected.lastRunId === null && expected.candidateSha === null && Array.isArray(expected.dependsOn);
     const pendingDependencyCorrection = expected.status === 'pending' && update.pendingDependencyCorrection?.version === 1 && expected.sessionId === null && expected.lastRunId === null && expected.candidateSha === null && SHA256.test(expected.queueSha256 ?? '');
-    insist(expected.id === card.id && (exactAttempt || pristinePendingSupersession || pendingDependencyCorrection), 'Expected exact inactive attempt or pristine pending correction: ' + card.id);
+    const pendingVerificationCorrection = expected.status === 'pending' && update.pendingVerificationCorrection?.version === 1 && expected.sessionId === null && expected.lastRunId === null && expected.candidateSha === null && SHA256.test(expected.queueSha256 ?? '');
+    insist(expected.id === card.id && (exactAttempt || pristinePendingSupersession || pendingDependencyCorrection || pendingVerificationCorrection), 'Expected exact inactive attempt or pristine pending correction: ' + card.id);
     insist(typeof card.productId === 'string' && typeof card.scopeKey === 'string' && Array.isArray(card.allowedPaths) && Array.isArray(card.requiredChecks) && card.requiredChecks.every(x => typeof x === 'string' && x.length), 'Incomplete source card: ' + card.id);
     insist(typeof materialReason === 'string' && materialReason.trim().length >= 15, 'A concrete material repair is required');
   }
@@ -563,6 +565,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     const raw = fs.readFileSync(file), task = parse(raw), run = update.expected.lastRunId;
     if (update.expected.status === 'pending') {
       if(update.pendingDependencyCorrection?.version===1){verifyPristineN123DependencyCorrection(task,update,sha256(raw));return {file,raw,task,resultSha256:null,candidateSha:null};}
+      if(update.pendingVerificationCorrection?.version===1){verifyPristineN36Verification(task,update,sha256(raw));return {file,raw,task,resultSha256:null,candidateSha:null};}
       const replacementFile = path.join(rt, 'queue', update.card.supersededBy + '.json'); noLinks(replacementFile);
       const replacement = json(replacementFile);
       verifyPristinePendingSupersession(task, replacement, update, payload.activationId);
