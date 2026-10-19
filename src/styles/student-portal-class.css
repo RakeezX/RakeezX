@@ -50,3 +50,8 @@
 .n88-editor-footer [data-clear]{font-size:var(--fs-sm)}
 @media(max-width:600px){.n88-class-roster>li{grid-template-columns:minmax(0,1fr) auto;gap:var(--sp-1) var(--sp-2)}.n88-class-student strong{grid-column:1/-1}.n88-class [data-code]{width:8.5ch}.n88-class-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.n88-guidance-fields{grid-template-columns:minmax(0,1fr)}}
 @media print{.n88-class [data-code],.n88-class [data-manual]{display:none!important}}
+
+/* AI: public shell precedes private admission and remains through timeout/retry. */
+.n88-entry>header h1{font:inherit;font-size:var(--fs-section,22px);font-weight:var(--fw-semibold,600);margin:0 0 var(--sp-3,12px)}
+.n88-entry>[data-n88-entry-body]{min-block-size:8rem}
+.n88-entry>[data-n88-entry-body]>[role=status]{color:var(--text-2);line-height:1.8;max-inline-size:48rem}

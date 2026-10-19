@@ -1,0 +1,40 @@
+{
+  "capturedAt": "2026-10-19T14:31:44.977Z",
+  "scope": "Unauthenticated static delivery only; not teacher readiness",
+  "requests": [
+    {
+      "path": "/student",
+      "status": 200,
+      "elapsedMs": 377,
+      "sha256": "4e639bc1e441648e1859526d1a2e74e18918e6dcce11f97076361bbfa99e8d77",
+      "qualifiedSha256": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+      "sourceMatches": false,
+      "privateHeaders": true,
+      "setCookie": false,
+      "applicationDocumentExact": true,
+      "rawHtmlDiffersByProviderAppend": true,
+      "providerAppendAttribution": "Unchanged qualified document/native exact bundle; existing documented Cloudflare JSD suffix. Not a raw-byte match."
+    },
+    {
+      "path": "/n88-private/assets/student.mjs",
+      "status": 200,
+      "elapsedMs": 150,
+      "sha256": "42701e7d10756ad1740de04d66ca2ceccd77988e6f76f3a7b6da536e52fd73b8",
+      "qualifiedSha256": "42701e7d10756ad1740de04d66ca2ceccd77988e6f76f3a7b6da536e52fd73b8",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "setCookie": false
+    },
+    {
+      "path": "/n88-private/styles/student-portal-login.css",
+      "status": 200,
+      "elapsedMs": 128,
+      "sha256": "32a1236a70bfab9493228c4456ea7c5bd7b03c22f44f06754d6fa51ef7fca9b5",
+      "qualifiedSha256": "32a1236a70bfab9493228c4456ea7c5bd7b03c22f44f06754d6fa51ef7fca9b5",
+      "sourceMatches": true,
+      "privateHeaders": true,
+      "setCookie": false
+    }
+  ],
+  "status": "PASS"
+}

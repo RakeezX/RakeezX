@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n88-real-teacher-timeout-light-login-20261019",
+  "runId": "e6bccc29-c697-426a-a9eb-ca185c1f8595",
+  "status": "FAIL",
+  "checks": [],
+  "timings": [
+    {
+      "path": "/api/n88/teacher/class/list",
+      "phase": "allow",
+      "elapsedMs": 0
+    }
+  ],
+  "hostedOwnerProof": false,
+  "privateBrowserRefusalPreserved": true,
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-entry-state=owner]') to be visible\u001b[22m\n"
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

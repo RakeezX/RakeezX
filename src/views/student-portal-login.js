@@ -14,12 +14,12 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const enabled = readiness?.enabled === true && !!client;
   const paint = content => {
     if (disposed) return;
-    root.innerHTML = `<header>${brandLockup({ compact: true })}<span class="n88-unified-space">مساحة الطالب</span></header><main>${content}</main>`;
+    root.innerHTML = `<header>${brandLockup({ compact: true })}</header><main>${content}</main>`;
     root.querySelector('h1')?.focus();
   };
   function entry(message = '') {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">دخول الطالب</h1><p id="n88-code-help">6 أرقام تبدأ بـ1</p><form data-claim><label for="n88-unified-code">رمز الدخول</label><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
+    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي أعطاك معلمك</p><form data-claim><label for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
   }

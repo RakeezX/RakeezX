@@ -1,0 +1,39 @@
+{
+  "taskId": "continuous-n88-real-teacher-timeout-light-login-20261019",
+  "runId": "e6bccc29-c697-426a-a9eb-ca185c1f8595",
+  "requiredCheck": "n88_first_entry_timeout_root_path_and_light_clear_student_login",
+  "status": "FAIL",
+  "parts": {
+    "actualApplicationSyntheticFirstEntryAndOwnerGuard": "PASS",
+    "login390And1440RenderedInspection": "PASS",
+    "existingIngressAssetDeploymentAndReadback": "PASS",
+    "nativeEdgeDeploymentMetadata": "PASS",
+    "freshSignedRuntimeReadiness": "NOT_RUN",
+    "actualAuthenticatedTeacherRequestTiming": "NOT_RUN",
+    "actualTeacherFailureCause": "UNKNOWN",
+    "syntaxAndShortCustomReadDeadline": "PASS"
+  },
+  "evidence": [
+    "tests/n88-actual-1719/ui.json",
+    "tests/n88-actual-1719/ui.teacher-pass.json",
+    "tests/n88-actual-1719/ui.initial-failure.json",
+    "tests/n88-actual-1719/native-service.json",
+    "tests/n88-actual-1719/served.json",
+    "drafts/n88-student-portal/activation/private-assets-1719.json"
+  ],
+  "blocker": "Known saved original custodian bindings are unavailable in the active persistent runtime; signed metadata-only readiness cannot be performed through its original sealed channel. The prior actual teacher-tab ownership refusal remains binding. Native ACTIVE/archive identity and static200 are not runtime/teacher proof.",
+  "retryCondition": "Restore the same original N88 sealed custodian handle/channel for signed readiness; obtain the actual first-entry trace only through its existing authorized browser owner when available. No key extraction, alternate actor, new fixture or unchanged retry.",
+  "sourceSha256": {
+    "src/lib/student-portal-runtime.js": "d41594d30ee0210ca2a9c9bcaf53550059599948060b5981876c9355ae64e98d",
+    "src/lib/student-portal-class-client.js": "84e885d6390bc2cde5990e4f3d8f0f3fef7cf8a274f4b78e8e30f65c1fbc9317",
+    "src/styles/student-portal-class.css": "355d8871f3e628f6d32513965abff0624ff5f338afdcfb0b5251fa880f09e516",
+    "src/views/student-portal-login.js": "ade50f88d6e345befcf77a413d3d8fd3b2917e1052be7b0abf62f403ca004385",
+    "src/styles/student-portal-login.css": "32a1236a70bfab9493228c4456ea7c5bd7b03c22f44f06754d6fa51ef7fca9b5"
+  },
+  "cleanup": {
+    "browserLease": "RELEASED browser",
+    "liveMutationLease": "RELEASED live-mutation",
+    "ownedBrowserAndHttpClosed": true
+  },
+  "sourceDefaultCompatibility": "Explicit timeoutMs remains an upper bound when readTimeoutMs is omitted; actual app10s read/15s mutation behavior unchanged by this final constructor compatibility correction."
+}

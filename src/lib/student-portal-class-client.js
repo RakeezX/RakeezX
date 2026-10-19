@@ -17,8 +17,8 @@ export function validPortalFields(fields) {
 function validStudent(s) {
   return exact(s, ['studentId','enrollmentId','revision','label','hasActiveCode','credentialVersion','recoveryStatus','credential']) && id(s.studentId) && id(s.enrollmentId) && revision(s.revision) && typeof s.label === 'string' && s.label.length <= 200 && typeof s.hasActiveCode === 'boolean' && revision(s.credentialVersion) && ['recoverable','legacy','inactive'].includes(s.recoveryStatus) && (s.recoveryStatus==='recoverable' ? s.hasActiveCode && typeof s.credential==='string' && /^1[0-9]{5}$/.test(s.credential) : s.credential===null && (s.recoveryStatus==='legacy' ? s.hasActiveCode : !s.hasActiveCode));
 }
-export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000 } = {}) {
-  if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000) deny('invalid_configuration');
+export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000) } = {}) {
+  if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000 || !Number.isInteger(readTimeoutMs) || readTimeoutMs < 1 || readTimeoutMs > 30000) deny('invalid_configuration');
   let roster = null, rosterKey = null, pending = null, readSequence = 0;
   const readContext = () => { try { return getContext(); } catch { return null; } };
   const consumed = new Set(); // request IDs are one-shot, including uncertain outcomes; fresh review before retry.
@@ -30,14 +30,14 @@ export function createClassPortalClient({ request, getContext = () => null, time
   }
   function current(c) { if (classContextKey(readContext()) !== c.key) deny('stale_context'); }
   async function call(action, teachingId, body, validate, c = context(teachingId)) {
-    let timer; const controller = new AbortController();
+    let timer, timedOut=false; const controller = new AbortController();
     try {
       const result = await Promise.race([
         Promise.resolve().then(async () => { current(c); const response = await request('/api/n88/teacher/class/' + action, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', signal: controller.signal,
           headers: { 'Content-Type': 'application/json', 'X-N88-CSRF': '1' }, body: JSON.stringify({ ...body, teachingId, binding: c.binding }) }),
           ok = response?.ok === true;
           current(c); return { ok, ack: ok ? await response.json() : null }; }),
-        new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error('uncertain')); }, timeoutMs); }),
+        new Promise((_, reject) => { timer = setTimeout(() => { timedOut=true; controller.abort(); reject(new Error('timeout')); }, ['list','guidance-list'].includes(action)?readTimeoutMs:timeoutMs); }),
       ]);
       current(c);
       if (!result.ok) deny('rejected');
@@ -47,7 +47,7 @@ export function createClassPortalClient({ request, getContext = () => null, time
     } catch (e) {
       current(c);
       // Never expose transport errors/bodies, which may contain credentials or personal data.
-      deny(['rejected','invalid_ack'].includes(e?.code) ? e.code : 'uncertain');
+      deny(timedOut?'timeout':['rejected','invalid_ack'].includes(e?.code) ? e.code : 'uncertain');
     } finally { clearTimeout(timer); controller.abort(); }
   }
   function snapshot(teachingId) {
