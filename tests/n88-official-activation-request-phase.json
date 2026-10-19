@@ -1,0 +1,10 @@
+{
+  "runId": "b324b7b5-5bfa-4ddb-8a92-adde7e26fe04",
+  "status": "PASS",
+  "checks": [
+    "finite phase allowlist; raw error/canary suppressed",
+    "503 stays unavailable; callback cannot run after acquire failure",
+    "no SQL, role, Auth, private value or guard changes"
+  ],
+  "hostedProof": false
+}

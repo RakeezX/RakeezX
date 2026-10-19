@@ -138,7 +138,7 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
   limits={...limits}; timing={...timing};
   return Object.freeze({ async transaction(action) {
     must(typeof action==='function');
-    let c, live=true, begun=false, committed=false, destroyed=false;
+    let c, live=true, begun=false, committed=false, destroyed=false, stage='acquire';
     const deadline=Date.now()+timing.transactionMs;
     const fence=()=>must(live && Date.now()<deadline);
     const release=broken=>{ if(c && !destroyed) {destroyed=true; c.release(broken ? unavailable() : undefined);} };
@@ -152,11 +152,11 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
       clearTimeout(acquireTimer); fence();
       must(c && typeof c.query==='function' && typeof c.release==='function');
       await assertVerifiedBoundary(c); fence();
-      await query('begin isolation level read committed'); begun=true;
+      stage='begin';await query('begin isolation level read committed'); begun=true;
       await query("select set_config('statement_timeout',$1,true),set_config('lock_timeout',$2,true),set_config('idle_in_transaction_session_timeout',$3,true),set_config('search_path','pg_catalog',true),set_config('TimeZone','UTC',true),set_config('DateStyle','ISO, YMD',true),set_config('synchronous_commit','on',true)",
         [String(timing.statementMs),String(timing.lockMs),String(timing.transactionMs)]);
       await query(LOCK); // BEFORE any sensitive snapshot lookup; all writers cooperate.
-      const state={}; let count=0, bytes=0, transferred=0;
+      stage='snapshot';const state={}; let count=0, bytes=0, transferred=0;
       for(const name of names) {
         // Also cap against remaining aggregate capacity: never fetch unbounded history.
         const bound=Math.min(limits[name],limits.total-count);
@@ -169,7 +169,7 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
         }); count+=state[name].length;
         bytes+=Buffer.byteLength(JSON.stringify(state[name])); must(bytes<=limits.bytes);
       }
-      const original=snapshot(state,limits);
+      const original=snapshot(state,limits);stage='operation';
       // Trusted runtime canonical binding participates in THIS transaction/lock and
       // durable diff. The fenced query capability cannot outlive the transaction.
       const owners=new Set(),commitGuards=[];
@@ -207,7 +207,7 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
         catch { /* destroy socket below: no reused client with queued/uncertain SQL */ }
         finally {clearTimeout(cleanupTimer);}
       }
-      throw unavailable(); // Never expose PostgreSQL DETAIL/parameters or replay.
+      const error=unavailable();error.safeStage=stage;throw error; // Fixed phase only, never PostgreSQL diagnostics.
     } finally {
       live=false; clearTimeout(timer); clearTimeout(acquireTimer);
       release(!committed); // Broken/uncertain/timed-out clients are destroyed.
