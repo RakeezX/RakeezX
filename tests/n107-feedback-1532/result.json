@@ -1,0 +1,80 @@
+{
+  "taskId": "continuous-n107-clear-import-review-success-20261019",
+  "runId": "b42ed375-f948-4b01-833c-140a4adc5503",
+  "harnessCorrections": [
+    "First run used a summary selector matching its nested advanced summary; narrowed to direct child before rerun. A guessed16px spacing assertion was replaced with the actual loaded CSS nonzero padding check; token sp-3 is12px."
+  ],
+  "checks": [
+    {
+      "name": "missing_grade_390",
+      "status": "PASS",
+      "evidence": "Actual account guard + CSV handler + review click focuses grade, exposes direct field error, clears on selection; advanced ID retained."
+    },
+    {
+      "name": "preview_390",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 390px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "maximum_390",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 390px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "success_390",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 390px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "pending_390",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 390px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "no_mutation_390",
+      "status": "PASS",
+      "evidence": "All affected UI checks leave synthetic records, grades and outbox unchanged."
+    },
+    {
+      "name": "missing_grade_1280",
+      "status": "PASS",
+      "evidence": "Actual account guard + CSV handler + review click focuses grade, exposes direct field error, clears on selection; advanced ID retained."
+    },
+    {
+      "name": "preview_1280",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 1280px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "maximum_1280",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 1280px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "success_1280",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 1280px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "pending_1280",
+      "status": "PASS",
+      "evidence": "Actual app DOM and source CSS at 1280px; presentation fixture only, one review consent, no page overflow."
+    },
+    {
+      "name": "no_mutation_1280",
+      "status": "PASS",
+      "evidence": "All affected UI checks leave synthetic records, grades and outbox unchanged."
+    },
+    {
+      "name": "n107_clear_success_review_and_missing_grade_field_feedback",
+      "status": "PASS",
+      "evidence": "390/1280 actual application checks passed; screenshots and source hashes recorded."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "580195bb765a140c9355db544b6144a09c4849bd9882d89c17dcd8de00570660",
+    "src/styles/teacher-setup-import.css": "ce4ecc5fe40978297aabeb007613f4c20373a370d6dce60162eb6ea6a0a4d23e"
+  },
+  "scope": "Presentation fixtures only; no backend import, live service or acceptance replay."
+}

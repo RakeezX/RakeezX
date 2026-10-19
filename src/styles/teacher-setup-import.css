@@ -18,3 +18,16 @@
 .n36-names, [data-names-receipt] { border: 1px solid var(--border); border-radius: var(--r-sm); padding: var(--sp-3); margin-block: var(--sp-3); }
 .n36-names button { margin-block: var(--sp-2); }
 .n36-sheet [hidden] { display: none !important; }
+
+/* AI-authored N107: compact review and confirmed receipt hierarchy. */
+.n107-success { padding: var(--sp-3); margin-block: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg-sunk); overflow-wrap: anywhere; }
+.n107-success h3, .n107-review h3 { margin-block: 0 .5rem; }
+.n107-success__counts, .n107-review__counts { font-weight: 600; margin-block: .5rem; }
+.n107-context { color: var(--text-3); font-size: .9rem; margin-block: .5rem .75rem; }
+.n107-field-error { color: var(--danger); }
+[data-roster-field="grade"][aria-invalid="true"] { border-color: var(--danger); }
+.n107-review [data-grade-max-impact] { padding-inline-start: .75rem; border-inline-start: 3px solid var(--danger-border); }
+@media (max-width: 480px) { .n107-success .btn { width: 100%; } }
+
+.n107-success__counts { display: flex; flex-wrap: wrap; gap: .25rem 1rem; }
+.n107-success__counts span { white-space: nowrap; }
