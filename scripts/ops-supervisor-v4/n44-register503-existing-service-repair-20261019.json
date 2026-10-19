@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-register503-existing-service-repair-20261019",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -1800,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261019-N44-EXISTING-REGISTER503-REPAIR",
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "budgetMinutes": 30,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n44-publish-qualified-delayed-ack-20261019"
+      ],
+      "objective": "Read AGENTS/ops contract/current N44 row and ONLY affected original service files/proofs. SAME original private custodian CLI session01a14fcd-032c-7ec0-8b0c-0e0395862c61, isolated current-main checkout, exact supplied task/run IDs. Latest real test after qualified15s client publication210cce3813b4cf1b45269f671d87fb5221076ab2 now confirms consent update200 but actual /push/register503, followed by revoke200 and normal updated pushConsent=false/no local subscription/original quiet setting restored. No send invoked, original protected attempt journal records failed registration; preserve it and do not retry live registration, permission, send or old broad tests. This NEW failure is ordinary necessary implementation diagnosis/repair under PO finish-N44 mandate, not a request for another human permission. Root does not access private config or browser tokens; only original custodian retains its already approved protected channel. Diagnose actual registration exception boundary through existing sanctioned source/native evidence, without logging raw subscription endpoints/keys/ciphertext, credentials, Auth/session/profile rows or arbitrary data. Registration catches unavailable around protect and repository; trace finite safe failure phase/classification through existing allowed mechanisms, or reproduce exact runtime/code path with fixed fabricated public test material. Distinguish browser/request validation, deployed crypto/runtime compatibility, private repository/native constraints and actual transport/time limits; do not guess cause or merely increase timeouts. Existing actual consent success means do NOT replay28P01/SCRAM/RESETROLE/TLS/providerOAuth/DNS10000/42routines/2immutable migrations/old crypto or UI suites. Only affected minimal synthetic register path/owner+consent and the new actual failure boundary need qualification; reuse unchanged prior proof. No retired fixture/recollection/school/account mutation. Once concrete code correction qualified, SAME custodian must deploy exact EXISTING n44-notifications Edge/source and existing ingress only if actually affected, then native source/readiness readback BEFORE LOCAL_READY. Generic publisher performs Git/Pages only, never backend deployment. Preserve existing protected config/role/password/verifier/key bytes, global sending OFF and cron empty, exact scoped single-target journal, consent/owner/session/encryption/input/transaction isolation. No new SQL/schema/migration/roles/grants/Auth/RLS/security/logging settings/routes/provider permission or secret extraction. If actual cause requires a necessary append-only private change outside this exact scope, prepare the concrete source/hash/preimage/minimal proof first, record exact missing operation; no duplicate blocked probes or premature user approval. Do not mutate live registration merely to explore. Preserve original failed request and cleanup as FAIL/real evidence, never turn it PASS. This card is service readiness repair ONLY, zero live registration/send; existing original single-test card resumes only after verified correction and still owns ONE provider-send attempt total. Save exact actual cause, qualified source/affected proof, native service version/source/flags and any residual. Release browser/live leases immediately after actual phase, no browser hold during source work. Return LOCAL_READY after actual prerequisites, BLOCKED only specific genuine unmet condition. No worker/queue/card/ledger edits or extra dispatcher.",
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "supabase/functions/n44-notifications/**",
+        "tests/n44-register503-1019*.mjs",
+        "tests/n44-register503-1019*.json",
+        "tests/fixtures/n44-register503-1019/**",
+        "docs/automation-evidence/20261019/N44_REGISTER503_SERVICE_REPAIR.md"
+      ],
+      "verificationPaths": [
+        "docs/automation-evidence/20261019/N44_REGISTER503_SERVICE_REPAIR.md"
+      ],
+      "requiredChecks": [
+        "n44_register503_actual_cause_and_qualified_existing_service_correction"
+      ],
+      "acceptance": [
+        "Specific actual503 cause identified and necessary existing service correction deployed/read back with owner/consent/crypto/private boundaries unchanged; no old proof replay.",
+        "No new live registration/send in service repair. Existing one-device test remains required after correction; no false full closure."
+      ],
+      "preparationAuthority": {
+        "kind": "necessary-existing-service-register503-repair",
+        "publication": true,
+        "originalCustodianSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "existingEdgeService": "n44-notifications",
+        "existingIngress": "n44-notifications-ingress",
+        "existingSourceCorrectionDeployAndReadback": true,
+        "globalDelivery": false,
+        "cron": [],
+        "newMigrations": 0,
+        "newRoles": 0,
+        "managedAuthChange": false,
+        "RlsChange": false,
+        "newCredentials": 0,
+        "newRegistrations": 0,
+        "providerSendAttempts": 0,
+        "originalSharedSendBudgetTotal": 1
+      },
+      "releaseAuthority": "PO explicitly asks solve actual Supabase blocker, complete officialN44 and necessary ordinary fixes with minimal tests, existing provider/auth access and one approved current-device notification. This is exact existing service implementation correction before remaining test, original custodian only, no new schema/Auth/role/credentials/privacy/security authority or extra real delivery."
+    }
+  ]
+}
