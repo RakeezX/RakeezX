@@ -54,11 +54,11 @@ export default {
     const grades = [...new Set(allTeachings.map(t => Number(store.getSection(t.sectionId)?.grade)))].sort((a,b) => a-b);
     const selectedTerm = store.state.terms.find(t => t.id === term());
     const context = [grade === 'all' ? 'جميع الصفوف' : gradeLabel(Number(grade)), teachingId === 'all' ? 'جميع الفصول' : sectionLabel(store.getSection(store.getTeaching(teachingId)?.sectionId)), query && `بحث: ${query}`].filter(Boolean).join(' · ');
-    return html`<article class="print-report report-workspace n70-report-page" dir="rtl" data-report-kind="${followup() ? 'followup' : 'grades'}">
+    return html`<link rel="stylesheet" href="${new URL('../styles/filters.css', import.meta.url).href}"><article class="print-report report-workspace n70-report-page" dir="rtl" data-report-kind="${followup() ? 'followup' : 'grades'}">
       ${reportPageSetup()}
       ${reportHeader({ title: reportTitle(), profile: store.state.profile, year: store.activeYear()?.label, term: selectedTerm?.name, period: context })}
       <header class="report-workspace__head noprint"><div><span class="report-workspace__eyebrow">جميع الفصول</span><h2>${reportTitle()}</h2><p>${followup() ? 'الطالب وفصله وسبب المتابعة من السجلات الحالية.' : 'راجع الدرجات المرصودة عبر الفصول دون تغيير حسابها.'}</p>${demoOutputMarker({screenOnly:true})}</div><div class="n70-head-actions"><button type="button" class="btn btn--primary" data-act="n70-print">${icon('print')} طباعة التقرير</button><button type="button" class="btn btn--ghost" data-act="n70-csv">${icon('download')} تصدير CSV</button></div></header>
-      <section class="surface surface--flat n70-filters noprint" aria-label="عوامل تصفية التقرير">
+      <section class="surface surface--flat n70-filters report-filter-bar noprint" aria-label="عوامل تصفية التقرير">
         <label class="field"><span class="field__label">الفصل الدراسي</span><select class="select" data-change="n70-term">${store.termsOf(store.activeYear()?.id).map(t => html`<option value="${t.id}" ${t.id===term()?'selected':''}>${t.name}</option>`)}</select></label>
         <label class="field"><span class="field__label">الصف</span><select class="select" data-change="n70-grade"><option value="all">جميع الصفوف</option>${grades.map(g => html`<option value="${g}" ${String(g)===grade?'selected':''}>${gradeLabel(g)}</option>`)}</select></label>
         <label class="field"><span class="field__label">الفصل والمادة</span><select class="select" data-change="n70-teaching"><option value="all">جميع الفصول</option>${teachings().map(t => html`<option value="${t.id}" ${t.id===teachingId?'selected':''}>${sectionLabel(store.getSection(t.sectionId))} · ${store.getSubject(t.subjectId)?.name || ''}</option>`)}</select></label>

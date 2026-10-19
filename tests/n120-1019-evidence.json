@@ -1,0 +1,258 @@
+{
+  "check": "n120_existing_filter_semantics_single_compact_responsive_row",
+  "status": "PASS",
+  "evidence": [
+    {
+      "name": "gradebook",
+      "width": 1440,
+      "overflow": false,
+      "controls": [
+        {
+          "left": 655.34375,
+          "right": 1094,
+          "top": 462.390625,
+          "bottom": 506.390625,
+          "height": 44
+        },
+        {
+          "left": 173.6875,
+          "right": 634.34375,
+          "top": 463.390625,
+          "bottom": 507.390625,
+          "height": 44
+        },
+        {
+          "left": 59,
+          "right": 165.6875,
+          "top": 463.390625,
+          "bottom": 507.390625,
+          "height": 44
+        }
+      ]
+    },
+    {
+      "name": "gradebook",
+      "width": 390,
+      "overflow": false,
+      "controls": [
+        {
+          "left": 38,
+          "right": 326,
+          "top": 540.765625,
+          "bottom": 584.765625,
+          "height": 44
+        },
+        {
+          "left": 25,
+          "right": 365,
+          "top": 593.765625,
+          "bottom": 637.765625,
+          "height": 44
+        },
+        {
+          "left": 258.3125,
+          "right": 365,
+          "top": 645.765625,
+          "bottom": 689.765625,
+          "height": 44
+        }
+      ]
+    },
+    {
+      "name": "aggregate",
+      "width": 1440,
+      "overflow": false,
+      "controls": [
+        {
+          "left": 955.609375,
+          "right": 1133,
+          "top": 278.546875,
+          "bottom": 326.9375,
+          "height": 48.390625
+        },
+        {
+          "left": 770.203125,
+          "right": 947.609375,
+          "top": 278.546875,
+          "bottom": 326.9375,
+          "height": 48.390625
+        },
+        {
+          "left": 584.796875,
+          "right": 762.203125,
+          "top": 278.546875,
+          "bottom": 326.9375,
+          "height": 48.390625
+        },
+        {
+          "left": 399.390625,
+          "right": 576.796875,
+          "top": 278.546875,
+          "bottom": 326.9375,
+          "height": 48.390625
+        },
+        {
+          "left": 193.984375,
+          "right": 391.390625,
+          "top": 278.546875,
+          "bottom": 326.9375,
+          "height": 48.390625
+        },
+        {
+          "left": 59,
+          "right": 185.984375,
+          "top": 282.9375,
+          "bottom": 326.9375,
+          "height": 44
+        }
+      ]
+    },
+    {
+      "name": "aggregate",
+      "width": 390,
+      "overflow": false,
+      "controls": [
+        {
+          "left": 199,
+          "right": 365,
+          "top": 305.75,
+          "bottom": 354.140625,
+          "height": 48.390625
+        },
+        {
+          "left": 25,
+          "right": 191,
+          "top": 305.75,
+          "bottom": 354.140625,
+          "height": 48.390625
+        },
+        {
+          "left": 199,
+          "right": 365,
+          "top": 385.328125,
+          "bottom": 433.71875,
+          "height": 48.390625
+        },
+        {
+          "left": 25,
+          "right": 191,
+          "top": 385.328125,
+          "bottom": 433.71875,
+          "height": 48.390625
+        },
+        {
+          "left": 159.984375,
+          "right": 365,
+          "top": 464.90625,
+          "bottom": 513.296875,
+          "height": 48.390625
+        },
+        {
+          "left": 25,
+          "right": 151.984375,
+          "top": 469.296875,
+          "bottom": 513.296875,
+          "height": 44
+        }
+      ]
+    },
+    {
+      "name": "attendance",
+      "width": 1440,
+      "overflow": false,
+      "controls": [
+        {
+          "left": 812.71875,
+          "right": 1133,
+          "top": 408.140625,
+          "bottom": 452.140625,
+          "height": 44
+        },
+        {
+          "left": 564.4375,
+          "right": 804.71875,
+          "top": 403.75,
+          "bottom": 452.140625,
+          "height": 48.390625
+        },
+        {
+          "left": 316.15625,
+          "right": 556.4375,
+          "top": 403.75,
+          "bottom": 452.140625,
+          "height": 48.390625
+        },
+        {
+          "left": 251.59375,
+          "right": 304.15625,
+          "top": 404.140625,
+          "bottom": 448.140625,
+          "height": 44
+        },
+        {
+          "left": 180.515625,
+          "right": 248.59375,
+          "top": 404.140625,
+          "bottom": 448.140625,
+          "height": 44
+        },
+        {
+          "left": 59,
+          "right": 168.515625,
+          "top": 408.140625,
+          "bottom": 452.140625,
+          "height": 44
+        }
+      ]
+    },
+    {
+      "name": "attendance",
+      "width": 390,
+      "overflow": false,
+      "controls": [
+        {
+          "left": 25,
+          "right": 365,
+          "top": 425.75,
+          "bottom": 469.75,
+          "height": 44
+        },
+        {
+          "left": 199,
+          "right": 365,
+          "top": 504.9375,
+          "bottom": 553.328125,
+          "height": 48.390625
+        },
+        {
+          "left": 25,
+          "right": 191,
+          "top": 504.9375,
+          "bottom": 553.328125,
+          "height": 48.390625
+        },
+        {
+          "left": 308.4375,
+          "right": 361,
+          "top": 565.328125,
+          "bottom": 609.328125,
+          "height": 44
+        },
+        {
+          "left": 237.359375,
+          "right": 305.4375,
+          "top": 565.328125,
+          "bottom": 609.328125,
+          "height": 44
+        },
+        {
+          "left": 115.84375,
+          "right": 225.359375,
+          "top": 569.328125,
+          "bottom": 613.328125,
+          "height": 44
+        }
+      ]
+    }
+  ]
+}
