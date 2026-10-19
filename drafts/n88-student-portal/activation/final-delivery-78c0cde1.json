@@ -2,57 +2,57 @@
   "aiAuthored": true,
   "taskId": "continuous-n88-official-student-portal-activation-20261018",
   "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
-  "state": "BLOCKED",
-  "preparing": true,
+  "state": "LOCAL_READY",
+  "preparing": false,
   "currentBackendEnabled": true,
-  "publicEnabled": false,
+  "publicEnabled": true,
   "fullHostedAcceptance": true,
   "hostedEvidence": "drafts/n88-student-portal/activation/served-hosted-78c0cde1.json",
   "checks": [
     {
       "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
       "status": "PASS",
-      "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes."
+      "evidence": "Original eight exact migration/history, restricted role and custody identities reused unchanged; no SQL/role/verifier/key changes. Source-bound fresh protected configuration and original role/TLS PASS: final-config-78c0cde1.json, final-public-readiness-78c0cde1.json."
     },
     {
       "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
       "status": "PASS",
-      "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes."
+      "evidence": "Native original Edge43 exact uploaded source/import-map readback: final-provider-78c0cde1.json. Worker/private asset/logging proofs unchanged; actual public private-document headers and anonymous denial: final-http-78c0cde1.json."
     },
     {
       "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
       "status": "PASS",
-      "evidence": "served-hosted-78c0cde1.json combines unchanged prior actual components with actual published wake/return/ACK proof"
+      "evidence": "served-hosted-78c0cde1.json combines immutable replacement-journey-35395ae1.json component successes with actual published wake/focus/same-value ACK. final-served-78c0cde1.json adds actual public teacher reentry and retained pupil2 login/read/end. Historical FAIL reports remain byte-identical."
     },
     {
       "name": "n88_official_publisher_readiness_route_and_served_behavior",
-      "status": "NOT_RUN",
-      "evidence": "Published pilot receipt9858b900 retained; final public readiness requires the wake correction receipt and remaining actual acceptance. Public mode not enabled."
+      "status": "PASS",
+      "evidence": "Actual published pilot core works against current public backend; /student private headers and deny guards PASS. Final public teacher source actual DOM/owner-guard PASS locally; coherent source-bound candidate ready for sole publisher. Final candidate served-source verification remains publisher-owned, not claimed."
     },
     {
       "name": "n88_private_database_error_boundary_under_actual_provider_logging",
       "status": "PASS",
-      "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true."
+      "evidence": "Original actual PostgreSQL log cases and exact76 typed routine/ACL proofs reused unchanged. New original Edge signed strict identity/TLS/sourceBoundary readiness PASS; final-public-readiness-78c0cde1.json."
     },
     {
       "name": "n88_exact_private_guard_membership_inherit_correction",
       "status": "PASS",
-      "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes."
+      "evidence": "Original append-only exact membership correction/source/history/readback unchanged; no membership/grant/SQL operations in this run."
     },
     {
       "name": "n88_actual_scram_iteration_compatibility",
       "status": "PASS",
-      "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true."
+      "evidence": "Original own public server-first4096 vs stored16384 same-salt diagnostic and direct strictTLS proof reused; original16384 password/verifier/salt unchanged. Current own direct loginExact/roleExact/upstreamSsl/clientTlsAuthorized all true."
     },
     {
       "name": "n88_pilot_owner_admission_and_failclosed_rollout",
       "status": "PASS",
-      "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake."
+      "evidence": "Existing pilot isolation history retained. Public enable occurred only after actual hosted composite PASS via original protected channel; temporary provider owner binding cleared, prior bindings retained encrypted. Missing proof/wrong-owner/source/inactive-context negatives PASS in affected local actual PG entry."
     },
     {
       "name": "n88_pilot_original_service_and_frontend_publisher_package",
-      "status": "NOT_RUN",
-      "evidence": "Original service source/config is unchanged and ready in restricted pilot. Exact new frontend wake/shared-lane package is locally verified; it remains unserved and does not imply full acceptance/public availability."
+      "status": "PASS",
+      "evidence": "Current public service source/config/readiness and actual published pilot compatibility PASS. Final public availability removes temporary pilot title in actual app DOM; no new startup dependency, existing offline shell/private-route exclusions preserved. Final frontend integration/publication remains solely publisher-owned."
     }
   ],
   "publication": {
@@ -60,5 +60,28 @@
     "published": "4adda44802b336997c6276693fc0791637bcfb42",
     "verifiedAt": "2026-10-19T08:57:27.689Z"
   },
-  "historicalFailuresUnchanged": true
+  "historicalFailuresUnchanged": true,
+  "finalFrontendPublication": "Pending sole publisher; no final served-source claim",
+  "currentSource": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c",
+  "fixtureDisposition": {
+    "newAccountsClassesPupilsTasks": 0,
+    "rotationsOrRevokesRepeated": 0,
+    "currentFirstPupil": "revoked",
+    "currentSecondPupil": "active credential; test session ended",
+    "priorFixturePreserved": true,
+    "cumulativeAuthorizedTeachers": 2,
+    "cumulativeAuthorizedPupils": 4
+  },
+  "cleanup": {
+    "ownedStudentClosed": true,
+    "userTeacherPreserved": true,
+    "browserLease": "RELEASED",
+    "liveMutationLease": "RELEASED",
+    "ownedNativePgAndLocalHttpClosed": true,
+    "ownedTemporaryEnvAbsent": true,
+    "priorDeniedResourceUntouched": true
+  },
+  "trialUrl": "https://rakeezx.com/student",
+  "productClosed": false,
+  "poAcceptanceClaimed": false
 }

@@ -1,0 +1,37 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "id": "9da39c86-ed1a-4bbe-91a1-e0d291b07c04",
+  "version": 43,
+  "verify_jwt": false,
+  "ezbr_sha256": "c7c087e17399f6536441e7fcac068c36e059adf100a3c4e123ccf6357aded4e4",
+  "sourceExact": true,
+  "sourceSha256": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c",
+  "priorInactiveSource": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "id": "9da39c86-ed1a-4bbe-91a1-e0d291b07c04",
+    "version": 40,
+    "verify_jwt": false,
+    "ezbr_sha256": "2b083ec892ce1b031f916a6a3d4df127617ecf1333e5489351b9b8dfaa6c4e87",
+    "sourceExact": true,
+    "sourceSha256": "87043cad23cb75545a990a2ac7d90bde01d44ee060a1fd71e8f64af9b60ad4e3",
+    "recordedAt": "2026-10-19 09:32:35 UTC"
+  },
+  "recordedAt": "2026-10-19 09:35:30 UTC",
+  "inactiveDeployedVersion": 42,
+  "cloudflare": {
+    "sourceSha256": "4c962e99b6e9cf634f57bc94cda8bcb6a1caa62bc7eb47d397867d8d6d707b60",
+    "unchanged": true,
+    "reusedPrivacyEvidence": "pilot-ui-correction-provider-75c77bea.json",
+    "workerOrRouteWrites": 0
+  },
+  "runtime": {
+    "mode": "public",
+    "restrictedRole": "n88_backend",
+    "originalScramIterations": 16384,
+    "keysRoleSqlLoggingOrFixtureChanged": false
+  },
+  "temporaryDiagnosticFunctions": {
+    "created": 0,
+    "cleanup": "No temporary function created in this run; original earlier disposition evidence retained."
+  }
+}

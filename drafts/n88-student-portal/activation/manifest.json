@@ -223,13 +223,13 @@
     "tests/n88-six-digit-shared-launcher.mjs": "2a8eeac80819c70141ea078b651293f271520c25bfd4ab184825c561f056633b",
     "tests/n88-six-digit-shared-artifacts.mjs": "3449115e5db6f2db91dd7e121eef72e1b437fcdba5c6b26f5475e09ed793a0a7",
     "tests/n88-six-digit-shared-flood-window.mjs": "76246587b972b7610ee36b48018d465476c17ba5abb822e1c813fb232a99b971",
-    "drafts/n88-student-portal/ACTIVATION.md": "2927980421fe48174dc68ab300a9ce1daab7a5173b3cd4be7b94623a5696ffc9",
+    "drafts/n88-student-portal/ACTIVATION.md": "d1e99d2ba55f488b0cca29cdff1a2b94d5fb0b1eedbae7f7cf27a194f40cf075",
     "drafts/n88-student-portal/six-digit-schema.inactive.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
     "supabase/migrations/20261018110713_n88_six_digit_staged.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
     "drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql": "fe271ff549148e777511327963637c391b52ea13eddc2d7c3bf01615f79e5715",
     "tests/n88-six-digit-redaction.mjs": "7e31c4634798898cf157a06f51c84585efce246da6b559fdf0343bfda294bbbe",
     "tests/n88-six-digit-security.mjs": "27b802cd8fd7d47cdcc34f514d8849361dc07d81f9c72479c09e1b94542c45e1",
-    "drafts/n88-student-portal/integrated-bundle.mjs": "6ecc8d015e0a4f1c9fcdc4716cc65e402fc757b94f524cfb12904b1a879c87c5",
+    "drafts/n88-student-portal/integrated-bundle.mjs": "06353c4ada7c3c566834c6ab378e36c5904878f7e6a5daf42d631b25503343d4",
     "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
     "index.html": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
     "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
@@ -259,7 +259,7 @@
     "drafts/n88-student-portal/activation/identities.inactive.sql": "5a3776447c46e564aa51b8a96c10ab53cb97623edb80a3d6b9a82e16ef4dffb5",
     "drafts/n88-student-portal/activation/expected-identities.json": "7b1419ee45af220bb09c010c6b969a184d7555f0cf67545115f2559b6ef59101",
     "drafts/n88-student-portal/activation/wrangler.staged.toml": "c0971a26d2f54ef6d8527288b2f7ba969cbd2a3700094d829e96bc8db49bcab9",
-    "drafts/n88-student-portal/activation/deploy.staged.json": "836faf0dc5db8c6b22c56fa3e8a868dde89307f71456414ef3350d0d8f7aab0d",
+    "drafts/n88-student-portal/activation/deploy.staged.json": "b9f4d20040d9602cf0ce8ad4a6b9b030e59d32b9638fd6044c78af1d34e6d8ac",
     "drafts/n88-student-portal/activation/toolchain.json": "da359433d928d06cbd3a4159cb48485cef13efa5d91ddc584bdabd23cda1e01a",
     "drafts/n88-student-portal/activation/.gitattributes": "7ac62fb784f0fdf2758169a38d178c300913aa2a94087ffbe6ea1a310ef3e8a8",
     "drafts/n88-student-portal/activation/metadata-contract.json": "76bb288adccb6398855db5d2769e7690308869d232babc3061fc22d75c529504",
@@ -305,15 +305,21 @@
     "drafts/n88-student-portal/activation/wake-pilot-config-f8356a7b.json": "430c38ee8633619757ccb54c0d0be8fa56a06a13fd0efea253271b739e4da0dd",
     "drafts/n88-student-portal/activation/served-hosted-78c0cde1.json": "9654b060bf2af1569dae612d6b3a7f08062c6df6e788fd2b3bf4be9609105164",
     "drafts/n88-student-portal/activation/served-pilot-config-78c0cde1.json": "89081404bc2adfa0df8f0d221c17be1cfe5c0e050f996a6e1ad59c48b4438609",
-    "drafts/n88-student-portal/activation/final-delivery-78c0cde1.json": "f6a68e81f718c5e3dffa79af9837bab14017ae3c75a8b5ddf1bd1dc0f89ae33c",
+    "drafts/n88-student-portal/activation/final-delivery-78c0cde1.json": "e9fa86337db4827edb3e59ddb9ae47ba1feb1b21f06c825513b2dbdffa0cd615",
     "tests/n88-official-activation-public-entry-ui.mjs": "b60827344608a4f708fcdce3cac64d0044767dac5f3650a09bef0826f084e89d",
     "tests/n88-official-activation-public-entry-ui.json": "498207a27094962b9793267aa61376700a66c8dbd2292fb32f8aa7939d0a25ce",
     "tests/n88-official-activation-public-protocol.mjs": "8e3c477d6d2b3c03afac4489acb697d544336a355bc511e4ac6622aa753531ee",
     "tests/n88-official-activation-public-protocol.json": "fd35493efd99d8466ed1617d2630c18b972c3bbb6c272ccdd0e830b6a169a10f",
     "tests/n88-official-activation-public-entry-service.mjs": "14d824888dc1b415671dcc0fb594780f379f22610ae851cb3db414083d3f7dec",
     "tests/n88-official-activation-public-entry-service.json": "5d5bac45d520fbc147d07b19943ec9c099a1972b4c86bee734db46c90f33b6f1",
-    "drafts/n88-student-portal/activation/final-source-stage-78c0cde1.json": "358ccb694eda09f75f2e0d6cfe36fcc24500c5508572baa9f5668f70a2b30d73",
-    "drafts/n88-student-portal/activation/final-inactive-readiness-78c0cde1.json": "e020836e2c527de7893947d69ba3fa186008a861c2422aa2be496e2433306983"
+    "drafts/n88-student-portal/activation/final-source-stage-78c0cde1.json": "d959a97bc0d36893d593bab319eedbc82bdb789588cecf2f7ad00612e7ee02d5",
+    "drafts/n88-student-portal/activation/final-inactive-readiness-78c0cde1.json": "dcd9a34289ffd06e64c0a4507c1d70ea42c34dc454d8b0fbbd6ac180b11863f0",
+    "drafts/n88-student-portal/activation/final-public-readiness-78c0cde1.json": "3441b9e1af4ce14c4d31bff5d0d4170a48609fda5bc18be913889b7cdcbe3314",
+    "drafts/n88-student-portal/activation/final-config-78c0cde1.json": "f2637d17437d0af7bbd9ab6ad1145195b7bff5ace3a4241b17eb02277bab331b",
+    "drafts/n88-student-portal/activation/final-provider-78c0cde1.json": "300dd8b494567ed24e074c90bd087faf61f3e75f75cdc835a27e57aea9678b57",
+    "drafts/n88-student-portal/activation/final-served-78c0cde1.json": "cbb9e690cf0106970714c80a0a4bfa633f0323d8e7eecb59746e87378eb8fc4c",
+    "drafts/n88-student-portal/activation/final-http-78c0cde1.json": "3a110d016d1040f29ee4af138e153ff46d5e76fd1379fc385b6ca1f9c1bb79ba",
+    "docs/automation-evidence/20261018/N88_OFFICIAL_ACTIVATION.md": "2474282ad912a8da8560bc462081b04d6463305c2b9a1ba26bc24a9a1272768e"
   },
   "outputs": {
     "edge/index.mjs": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c",
@@ -771,7 +777,7 @@
     "metadataOnly": true,
     "key": "N88_HMAC_KEY",
     "domain": "n88-readiness-v1",
-    "productEnabled": false
+    "productEnabled": true
   },
   "binarySources": {
     "assets/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951"
@@ -779,84 +785,80 @@
   "stagedActivation": {
     "phase": "full-acceptance-public",
     "defaultMode": "off",
-    "publicEnabled": false,
+    "publicEnabled": true,
     "protectedBindings": [
       "N88_ROLLOUT_MODE",
-      "N88_PILOT_BINDING"
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256",
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED"
     ],
-    "maxOwners": 1,
-    "maxStudents": 2,
     "teacherFrontend": "normal authenticated list admission before controls",
     "privateDocumentDelivery": "original private ingress exact embedded assets",
     "deferredChecks": [],
     "originalAcceptance": "canonical card stagedActivation retained; no full Product readiness",
     "localChecks": {
-      "tests/n88-official-activation-pilot-service.mjs": "8b3074e30ac86ef31e73ac30d2e5cdbbb6cdf67c6ed16f49ba77754c89fe280a",
-      "tests/n88-official-activation-pilot-service.json": "435098d3870a8b4f1d0639ee7fa7fef293022e5f9e197833c64251b8966ee34b",
-      "tests/n88-official-activation-pilot-ui.mjs": "c25fc4a9da4a4b0a783ce082c9d85e774dd37c0dcf4872aa0d521be6b795c6e9",
-      "tests/n88-official-activation-pilot-ui.json": "66a7f00b2ac327eada15299d6aac223afc912260c9aa721fd9c0f8c5b3c41580",
-      "tests/n88-official-activation-pilot-entry.mjs": "1611995aad886f64b621d8802f0ff5334eb919d006dfca9a5bfa837ef38aea45",
-      "tests/n88-official-activation-pilot-entry.json": "f9e9bebdbd0a3140debdee30f1d4e7a389b47cadca1530ee649acc99b4fa4889",
-      "tests/n88-official-activation-pilot-transport.mjs": "81440c21a73aaf4eba65cb47581d775b7bf3ad6cc4320bcd56de8c5bd93ef5ac",
-      "tests/n88-official-activation-pilot-transport.json": "a566bd9d5b0d20c316982450a0823e553cf83e67f66ba7049120e118c2dd0cd1",
-      "tests/n88-official-activation-pilot-hosted-browser.mjs": "dd893a92a84847e98428911ce1f8f154ed3ae38156831db1a915c5fcdf2339c3",
-      "tests/n88-official-activation-pilot-hosted-browser.json": "29f5f619064ef69194d31efcc90e7bad69e3b9a7dee3c8d3ce39e9552429b980"
+      "tests/n88-official-activation-public-entry-ui.mjs": "b60827344608a4f708fcdce3cac64d0044767dac5f3650a09bef0826f084e89d",
+      "tests/n88-official-activation-public-entry-ui.json": "498207a27094962b9793267aa61376700a66c8dbd2292fb32f8aa7939d0a25ce",
+      "tests/n88-official-activation-public-protocol.mjs": "8e3c477d6d2b3c03afac4489acb697d544336a355bc511e4ac6622aa753531ee",
+      "tests/n88-official-activation-public-protocol.json": "fd35493efd99d8466ed1617d2630c18b972c3bbb6c272ccdd0e830b6a169a10f",
+      "tests/n88-official-activation-public-entry-service.mjs": "14d824888dc1b415671dcc0fb594780f379f22610ae851cb3db414083d3f7dec",
+      "tests/n88-official-activation-public-entry-service.json": "5d5bac45d520fbc147d07b19943ec9c099a1972b4c86bee734db46c90f33b6f1"
     },
     "offlineShell": "existing runtime precached; private student/API routes retain bypass; no new browser startup dependency",
     "providerReadback": {
-      "path": "drafts/n88-student-portal/activation/pilot-provider-readback-3576957c.json",
-      "sha256": "cfe5a229b587aa1cde506bf657d79458f65877612d5d39e789d87713c926f543",
-      "edgeSourceMatches": false,
-      "workerSourceMatches": false
+      "path": "drafts/n88-student-portal/activation/final-provider-78c0cde1.json",
+      "sha256": "300dd8b494567ed24e074c90bd087faf61f3e75f75cdc835a27e57aea9678b57",
+      "edgeSourceMatches": true,
+      "workerSourceMatches": true,
+      "workerProofReusedUnchanged": true
     },
     "currentBackendEnabled": true,
     "currentEvidence": "drafts/n88-student-portal/activation/final-delivery-78c0cde1.json",
-    "currentProviderReadback": "drafts/n88-student-portal/activation/final-config-78c0cde1.json",
+    "currentProviderReadback": "drafts/n88-student-portal/activation/final-provider-78c0cde1.json",
     "requiredCheckResults": [
       {
         "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
         "status": "PASS",
-        "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes."
+        "evidence": "Original eight exact migration/history, restricted role and custody identities reused unchanged; no SQL/role/verifier/key changes. Source-bound fresh protected configuration and original role/TLS PASS: final-config-78c0cde1.json, final-public-readiness-78c0cde1.json."
       },
       {
         "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
         "status": "PASS",
-        "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes."
+        "evidence": "Native original Edge43 exact uploaded source/import-map readback: final-provider-78c0cde1.json. Worker/private asset/logging proofs unchanged; actual public private-document headers and anonymous denial: final-http-78c0cde1.json."
       },
       {
         "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
         "status": "PASS",
-        "evidence": "served-hosted-78c0cde1.json combines unchanged prior actual components with actual published wake/return/ACK proof"
+        "evidence": "served-hosted-78c0cde1.json combines immutable replacement-journey-35395ae1.json component successes with actual published wake/focus/same-value ACK. final-served-78c0cde1.json adds actual public teacher reentry and retained pupil2 login/read/end. Historical FAIL reports remain byte-identical."
       },
       {
         "name": "n88_official_publisher_readiness_route_and_served_behavior",
-        "status": "NOT_RUN",
-        "evidence": "Published pilot receipt9858b900 retained; final public readiness requires the wake correction receipt and remaining actual acceptance. Public mode not enabled."
+        "status": "PASS",
+        "evidence": "Actual published pilot core works against current public backend; /student private headers and deny guards PASS. Final public teacher source actual DOM/owner-guard PASS locally; coherent source-bound candidate ready for sole publisher. Final candidate served-source verification remains publisher-owned, not claimed."
       },
       {
         "name": "n88_private_database_error_boundary_under_actual_provider_logging",
         "status": "PASS",
-        "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true."
+        "evidence": "Original actual PostgreSQL log cases and exact76 typed routine/ACL proofs reused unchanged. New original Edge signed strict identity/TLS/sourceBoundary readiness PASS; final-public-readiness-78c0cde1.json."
       },
       {
         "name": "n88_exact_private_guard_membership_inherit_correction",
         "status": "PASS",
-        "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes."
+        "evidence": "Original append-only exact membership correction/source/history/readback unchanged; no membership/grant/SQL operations in this run."
       },
       {
         "name": "n88_actual_scram_iteration_compatibility",
         "status": "PASS",
-        "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true."
+        "evidence": "Original own public server-first4096 vs stored16384 same-salt diagnostic and direct strictTLS proof reused; original16384 password/verifier/salt unchanged. Current own direct loginExact/roleExact/upstreamSsl/clientTlsAuthorized all true."
       },
       {
         "name": "n88_pilot_owner_admission_and_failclosed_rollout",
         "status": "PASS",
-        "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake."
+        "evidence": "Existing pilot isolation history retained. Public enable occurred only after actual hosted composite PASS via original protected channel; temporary provider owner binding cleared, prior bindings retained encrypted. Missing proof/wrong-owner/source/inactive-context negatives PASS in affected local actual PG entry."
       },
       {
         "name": "n88_pilot_original_service_and_frontend_publisher_package",
-        "status": "NOT_RUN",
-        "evidence": "Original service source/config is unchanged and ready in restricted pilot. Exact new frontend wake/shared-lane package is locally verified; it remains unserved and does not imply full acceptance/public availability."
+        "status": "PASS",
+        "evidence": "Current public service source/config/readiness and actual published pilot compatibility PASS. Final public availability removes temporary pilot title in actual app DOM; no new startup dependency, existing offline shell/private-route exclusions preserved. Final frontend integration/publication remains solely publisher-owned."
       }
     ],
     "finalRequiredChecks": [
@@ -969,10 +971,36 @@
       "published": "4adda44802b336997c6276693fc0791637bcfb42",
       "verifiedAt": "2026-10-19T08:57:27.689Z"
     },
-    "rolloutCompatibility": "Legacy list response discriminator retained only for already-published pilot clients; explicit public UI protocol never changes actual Auth/source/rollout admission."
+    "currentConfigurationReadback": "drafts/n88-student-portal/activation/final-config-78c0cde1.json",
+    "rolloutCompatibility": "Legacy list response discriminator retained only for already-published pilot clients; explicit public UI protocol never changes actual Auth/source/rollout admission.",
+    "historicalLocalChecks": {
+      "tests/n88-official-activation-pilot-service.mjs": "8b3074e30ac86ef31e73ac30d2e5cdbbb6cdf67c6ed16f49ba77754c89fe280a",
+      "tests/n88-official-activation-pilot-service.json": "435098d3870a8b4f1d0639ee7fa7fef293022e5f9e197833c64251b8966ee34b",
+      "tests/n88-official-activation-pilot-ui.mjs": "c25fc4a9da4a4b0a783ce082c9d85e774dd37c0dcf4872aa0d521be6b795c6e9",
+      "tests/n88-official-activation-pilot-ui.json": "66a7f00b2ac327eada15299d6aac223afc912260c9aa721fd9c0f8c5b3c41580",
+      "tests/n88-official-activation-pilot-entry.mjs": "1611995aad886f64b621d8802f0ff5334eb919d006dfca9a5bfa837ef38aea45",
+      "tests/n88-official-activation-pilot-entry.json": "f9e9bebdbd0a3140debdee30f1d4e7a389b47cadca1530ee649acc99b4fa4889",
+      "tests/n88-official-activation-pilot-transport.mjs": "81440c21a73aaf4eba65cb47581d775b7bf3ad6cc4320bcd56de8c5bd93ef5ac",
+      "tests/n88-official-activation-pilot-transport.json": "a566bd9d5b0d20c316982450a0823e553cf83e67f66ba7049120e118c2dd0cd1",
+      "tests/n88-official-activation-pilot-hosted-browser.mjs": "dd893a92a84847e98428911ce1f8f154ed3ae38156831db1a915c5fcdf2339c3",
+      "tests/n88-official-activation-pilot-hosted-browser.json": "29f5f619064ef69194d31efcc90e7bad69e3b9a7dee3c8d3ce39e9552429b980"
+    },
+    "historicalProviderReadback": {
+      "path": "drafts/n88-student-portal/activation/pilot-provider-readback-3576957c.json",
+      "sha256": "cfe5a229b587aa1cde506bf657d79458f65877612d5d39e789d87713c926f543",
+      "edgeSourceMatches": false,
+      "workerSourceMatches": false,
+      "historical": true
+    },
+    "pilotLimitsHistorical": {
+      "maxOwners": 1,
+      "maxStudents": 2
+    }
   },
   "activationSemantics": {
-    "enabled": "legacy public activation flag remains false",
-    "gates": "legacy full-public gates remain false; bounded pilot has separate source/provider receipts"
+    "artifact": "Inert deployment flags remain disabled; actual public service state is evidenced separately",
+    "currentProviderReceipt": "drafts/n88-student-portal/activation/final-provider-78c0cde1.json",
+    "currentConfigurationReceipt": "drafts/n88-student-portal/activation/final-config-78c0cde1.json",
+    "finalFrontendPublication": "sole publisher pending; worker does not claim served final source"
   }
 }

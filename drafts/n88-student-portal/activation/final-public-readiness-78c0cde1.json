@@ -1,0 +1,19 @@
+{
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "httpStatus": 200,
+  "status": "PASS",
+  "loginExact": true,
+  "roleExact": true,
+  "upstreamSsl": true,
+  "clientTlsAuthorized": true,
+  "sourceBoundary": true,
+  "configurationReady": true,
+  "rolloutMode": "public",
+  "rolloutConfigured": true,
+  "source": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c",
+  "enabled": true,
+  "expectedSource": "0bc4445ba591ead9e5fc9ea10cb96f0514e3581b3430d9e1e0e70630e558623c",
+  "sourceMatches": true,
+  "privateMutations": 0
+}
