@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n113-indexed-public-search-relevance-20261019",
+      "productId": "N113",
+      "activationId": "po-20261012-continuous",
+      "priority": -1696,
+      "scopeKey": "n113-feedback-1532",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact Product row and affected current origin/main source only. Latest human attachment19October is a genuine NEW failed actual trial, not permission to repeat old proof. Existing sole controller and serial publisher; no manual workers/planners/reviewers, no queue/source/ledger edits by worker. Work isolated, preserve saved candidates and old FAIL evidence, return exact supplied task/run/base/candidate/check schema. Minimal checks necessary for THIS change only; reuse unchanged evidence. Never substitute wording or synthetic success for actual failure diagnosis. No real pupil/account mutations, new Auth/RLS/schema/migration/SQL/roles/credentials/messages, denied school/browser operation or alternate actor/tool bypass. Preserve owner/session/lease/revision, IDs/history, grades, true durable ACK, tombstones and calendar switch hold. Routine implementation and official code delivery already delegated. No private-key/token/profile export. LOCAL_READY is not Production.\n\nPO now supplies actual GoogleSearchConsole URLinspection: homepage indexed, availableonGoogle,HTTPS. Record real indexing confirmed for homepage ONLY, do not redo indexing diagnosis or promise top ranking. Wants stronger truthful relevance for Arabic teacher/education searches and distinguish Rakeez from similarly named competitors. Inspect current public indexed homepage content/meta/structureddata and add only concise accurate branded public description of existing Rakeez teacher value (classes/students/grades/attendance/schedule/reports) where actual gap exists. No keyword stuffing/hiddenSEOtext/fake reviews/features/pricing, private student/teacher routes in sitemap, competitor scraping or new content factory. Use official GoogleSearchCentral primary docs only if web guidance needed. Existing private app/auth routing/design untouched; no new page unless necessary concrete public entry already exists. Minimal actual served public text/head/robots/sitemap check, no wholeapp build/suite for copy. Explain indexing vs ranking; no searchengine console mutations/newcredentials or guaranteed placement.",
+      "allowedPaths": [
+        "index.html",
+        "robots.txt",
+        "sitemap.xml",
+        "src/public/**",
+        "docs/SEO.md",
+        "tests/n113-feedback-1532/**",
+        "docs/automation-evidence/20261019/N113_INDEXED_PUBLIC_SEARCH_RELEVANCE.md"
+      ],
+      "verificationPaths": [
+        "index.html"
+      ],
+      "requiredChecks": [
+        "n113_truthful_indexed_public_teacher_relevance_and_private_exclusion"
+      ],
+      "acceptance": [
+        "Resolve the newly reported actual failure or UX gap with a concrete affected-path reproduction and minimal checks; retain prior accepted sub-results.",
+        "Actual official source/provider delivery evidence through existing serial publisher; do not fabricate PO acceptance or conceal residual limits."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

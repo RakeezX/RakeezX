@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n120-report-specific-filter-options-20261019",
+      "productId": "N120",
+      "activationId": "po-20261012-continuous",
+      "priority": -1697,
+      "scopeKey": "n120-feedback-1532",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact Product row and affected current origin/main source only. Latest human attachment19October is a genuine NEW failed actual trial, not permission to repeat old proof. Existing sole controller and serial publisher; no manual workers/planners/reviewers, no queue/source/ledger edits by worker. Work isolated, preserve saved candidates and old FAIL evidence, return exact supplied task/run/base/candidate/check schema. Minimal checks necessary for THIS change only; reuse unchanged evidence. Never substitute wording or synthetic success for actual failure diagnosis. No real pupil/account mutations, new Auth/RLS/schema/migration/SQL/roles/credentials/messages, denied school/browser operation or alternate actor/tool bypass. Preserve owner/session/lease/revision, IDs/history, grades, true durable ACK, tombstones and calendar switch hold. Routine implementation and official code delivery already delegated. No private-key/token/profile export. LOCAL_READY is not Production.\n\nActual PO accepts gradebook filters now. DO NOT revisit gradebook geometry/handlers or reopen accepted subset. Reports still need context-appropriate options per section and stable compact layout. Inspect ONLY existing actual report sections; remove/hide inapplicable controls and ensure relevant options alter that report correctly, reset only scoped state safely, consistent RTL single row responsive bar with accessible overflow and no geometry wobble. No global filter rewrite, new framework, grades/store/data model change. One narrow/wide inspection and changed report filter semantics, reuse prior geometry proof. List exact report-specific options in delivery note so PO can assess behavior.",
+      "allowedPaths": [
+        "src/views/reports.js",
+        "src/views/cross-class-reports.js",
+        "src/views/reports-index.js",
+        "src/views/execution-report.js",
+        "src/lib/report-filters.js",
+        "src/styles/filters.css",
+        "src/styles/reports.css",
+        "tests/n120-feedback-1532/**",
+        "docs/automation-evidence/20261019/N120_REPORT_SPECIFIC_FILTER_OPTIONS.md"
+      ],
+      "verificationPaths": [
+        "src/views/reports.js"
+      ],
+      "requiredChecks": [
+        "n120_report_context_options_semantics_and_stable_compact_bar"
+      ],
+      "acceptance": [
+        "Resolve the newly reported actual failure or UX gap with a concrete affected-path reproduction and minimal checks; retain prior accepted sub-results.",
+        "Actual official source/provider delivery evidence through existing serial publisher; do not fabricate PO acceptance or conceal residual limits."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-continue-and-number-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct latest PO19October explicitly requests fixing these reported regressions and improvements, appropriate independent controller workers, necessary affected checks only and ready-for-review official delivery. Existing client/runtime behavior corrections within the stated scope are authorized; no direct real records, new SQL/schema/Auth/RLS, real sends or bypass of any recorded tool denial."
+    }
+  ]
+}

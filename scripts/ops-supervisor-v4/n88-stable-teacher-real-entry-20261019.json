@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-stable-teacher-real-entry-20261019",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -1700,
+      "scopeKey": "n88-feedback-1532",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact Product row and affected current origin/main source only. Latest human attachment19October is a genuine NEW failed actual trial, not permission to repeat old proof. Existing sole controller and serial publisher; no manual workers/planners/reviewers, no queue/source/ledger edits by worker. Work isolated, preserve saved candidates and old FAIL evidence, return exact supplied task/run/base/candidate/check schema. Minimal checks necessary for THIS change only; reuse unchanged evidence. Never substitute wording or synthetic success for actual failure diagnosis. No real pupil/account mutations, new Auth/RLS/schema/migration/SQL/roles/credentials/messages, denied school/browser operation or alternate actor/tool bypass. Preserve owner/session/lease/revision, IDs/history, grades, true durable ACK, tombstones and calendar switch hold. Routine implementation and official code delivery already delegated. No private-key/token/profile export. LOCAL_READY is not Production.\n\nActual NEW PO after latest delivered source: teacher first «جارٍ فتح مساحة طلاب الفصل…», then roster and task guidance repeatedly show reading/loading, slow and unstable; public student entry times out at host level «استغرق rakeezx.com وقتًا أطول مما يجب للاستجابة». Diagnose two actual paths, do not just rename messages. Inspect subscribe/store/cloud/context key changes, duplicate remount/re-read scheduling, queued requests/short server locks and actual public document route/ingress response. Retain valid same-context rendered data while harmless store notifications occur, coalesce redundant identical reads; owner/session/source/lease change MUST clear data failclosed. Stable compact geometry, one restrained loading state, no indefinite shimmer or repeated full paint. No unsafe persistent plaintext roster/code cache. Student document must respond promptly before optional session/network reads and stay permanently light; bounded honest actionable errors, no fabricated readiness. Use SAME original N88 custodian only for necessary existing ingress/Edge service source correction with exact native deployment/readback; only if actual source changes require service delivery, perform it once and record actual evidence, do not assign embedded private assets to Pages publisher. No migrations/SQL/roles/keys/Auth/security logging changes or N44 custody. Preserve known browser session ownership refusal: no alternate actor/tab to evade it. Source-level reproduction sufficient where actual browser remains refused, explicitly retain real endpoint/client uncertainty rather than certify actual owner journey. Minimal one actual repeated-notification lifecycle synthetic test plus relevant public route/readiness observation, no re-run prior crypto/nativeSQL/full journey matrix.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal-login.css",
+        "drafts/n88-student-portal/**",
+        "supabase/functions/n88-student-portal/**",
+        "tests/n88-feedback-1532/**",
+        "docs/automation-evidence/20261019/N88_STABLE_TEACHER_REAL_ENTRY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_repeated_context_notifications_stable_reads_and_real_student_document_response"
+      ],
+      "acceptance": [
+        "Resolve the newly reported actual failure or UX gap with a concrete affected-path reproduction and minimal checks; retain prior accepted sub-results.",
+        "Actual official source/provider delivery evidence through existing serial publisher; do not fabricate PO acceptance or conceal residual limits."
+      ],
+      "preparationAuthority": {
+        "kind": "existing-N88-service-correction-same-original-custodian",
+        "publication": true,
+        "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "newMigrations": 0,
+        "newFixtures": 0,
+        "newAuthUsers": 0,
+        "realPupilMutations": 0,
+        "realSend": false,
+        "existingHostedServiceCorrection": true
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding.",
+      "liveAuthorizationRef": "PO-20261019-1532-N88-ACTUAL-FAILURE",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f"
+    }
+  ]
+}

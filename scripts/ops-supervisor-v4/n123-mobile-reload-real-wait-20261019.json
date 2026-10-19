@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n123-mobile-reload-real-wait-20261019",
+      "productId": "N123",
+      "activationId": "po-20261012-continuous",
+      "priority": -1698,
+      "scopeKey": "n123-feedback-1532",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact Product row and affected current origin/main source only. Latest human attachment19October is a genuine NEW failed actual trial, not permission to repeat old proof. Existing sole controller and serial publisher; no manual workers/planners/reviewers, no queue/source/ledger edits by worker. Work isolated, preserve saved candidates and old FAIL evidence, return exact supplied task/run/base/candidate/check schema. Minimal checks necessary for THIS change only; reuse unchanged evidence. Never substitute wording or synthetic success for actual failure diagnosis. No real pupil/account mutations, new Auth/RLS/schema/migration/SQL/roles/credentials/messages, denied school/browser operation or alternate actor/tool bypass. Preserve owner/session/lease/revision, IDs/history, grades, true durable ACK, tombstones and calendar switch hold. Routine implementation and official code delivery already delegated. No private-key/token/profile export. LOCAL_READY is not Production.\n\nActual PO mobile refresh still takes30seconds or more before Sync green after prior four-read-lane fix. This disproves claiming previous synthetic71percent improvement resolves real wait. Diagnose startup/owner lease/auth bootstrap/retry/debounce/long-poll/full-vs-incremental/order/queue paths for actual30s scale; identify concrete fixed wait or avoidable repeated work, measure same bounded conditions before/after. Keep previous four-read-lane correctness proof, no re-running identical fixture matrix. Green only after actual complete durable ACK/reads; do not hide pending or turn fail into success. No blanket retries/outbox reset/lease takeover/session/Auth changes. Only necessary fabricated slow mobile-equivalent startup/return behavior and changed ordering/owner/error safeguards. If no source cause can be established, expose finite timing phases in safe user-click diagnostic with NO IDs/PII/token, retain blocker honestly; no arbitrary global timeout reduction. This task owns general latency including N10713–14seconds observation; do not promise absolute network performance.",
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-warning-policy.js",
+        "src/app.js",
+        "src/store.js",
+        "tests/n123-feedback-1532/**",
+        "docs/automation-evidence/20261019/N123_MOBILE_RELOAD_REAL_WAIT.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync.js"
+      ],
+      "requiredChecks": [
+        "n123_actual_thirty_second_path_measured_and_true_ack_guards"
+      ],
+      "acceptance": [
+        "Resolve the newly reported actual failure or UX gap with a concrete affected-path reproduction and minimal checks; retain prior accepted sub-results.",
+        "Actual official source/provider delivery evidence through existing serial publisher; do not fabricate PO acceptance or conceal residual limits."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding."
+    }
+  ]
+}

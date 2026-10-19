@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-source-change-class-upsert-20261019",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -1699,
+      "scopeKey": "n36-feedback-1532",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact Product row and affected current origin/main source only. Latest human attachment19October is a genuine NEW failed actual trial, not permission to repeat old proof. Existing sole controller and serial publisher; no manual workers/planners/reviewers, no queue/source/ledger edits by worker. Work isolated, preserve saved candidates and old FAIL evidence, return exact supplied task/run/base/candidate/check schema. Minimal checks necessary for THIS change only; reuse unchanged evidence. Never substitute wording or synthetic success for actual failure diagnosis. No real pupil/account mutations, new Auth/RLS/schema/migration/SQL/roles/credentials/messages, denied school/browser operation or alternate actor/tool bypass. Preserve owner/session/lease/revision, IDs/history, grades, true durable ACK, tombstones and calendar switch hold. Routine implementation and official code delivery already delegated. No private-key/token/profile export. LOCAL_READY is not Production.\n\nActual PO0.5.13 diagnostic NOW identifies SOURCE_CHANGED before any saved names:303valid/staged/observed,10classes,7pages,0excluded,unresolved/partial/unproven,receiptunknown. Destination shows CLASS_MAPPING_REQUIRED for ordinary labels «خامس 1»,«خامس 2»,«خامس 3»,«خامس 4» although one-start should create/update all recognized classes automatically. Preserve exact diagnostic attachment in intake evidence, no school recollection/browser-control operation. Trace SOURCE_CHANGED against real extension run-tab vs original source tab/page pagination/collected immutable snapshot and actual receiver handshake; guard must distinguish legitimate completed extraction/normal page movement from truly replaced source without disabling source-owner/expiry protections. Diagnose and fix demonstrated cause, not just generic retry text. Normal recognized Arabic academic grade+section labels must map automatically to current account/year, reuse SAME existing class and SAME existing students, add only genuinely new students, no duplicate classes/pupils on retry. Deterministic supported grade aliases (e.g. خامس) should work; genuinely ambiguous/unparseable source stays unresolved with explicit explanation, never silently guess wrong existing class. Two small fabricated actual extension→receiver/store journeys: reported fifth labels, no initial target classes; then retry existing targets plus one new pupil. Include wrong-source/owner denial and lost ACK resume only if affected. Do NOT replay extractor/pagination/nativeChrome tests or collect actual names. Publish one new immutable extension version with website download; existing minute stable-folder updater is ALREADY fixed and must advance to verified release, no new updater/scheduler or personal Chrome reload. Keep partial coverage truthful but compact; remove misleading expiry text from ordinary happy path.",
+      "allowedPaths": [
+        "extensions/**",
+        "assets/extensions/**",
+        "public/assets/extensions/**",
+        "scripts/build-teacher-import-helper.mjs",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/class-koshoof-bundle.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/views/class-import-center.js",
+        "tests/n36-feedback-1532/**",
+        "docs/automation-evidence/20261019/N36_SOURCE_CHANGE_CLASS_UPSERT.md"
+      ],
+      "verificationPaths": [
+        "scripts/build-teacher-import-helper.mjs"
+      ],
+      "requiredChecks": [
+        "n36_reported_source_changed_and_fifth_class_upsert_retry_no_duplicate"
+      ],
+      "acceptance": [
+        "Resolve the newly reported actual failure or UX gap with a concrete affected-path reproduction and minimal checks; retain prior accepted sub-results.",
+        "Actual official source/provider delivery evidence through existing serial publisher; do not fabricate PO acceptance or conceal residual limits."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261019-actual-review-followups",
+        "publication": true,
+        "manualRealStudentMutations": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct human19October actual review explicitly requests these fixes and official delivery within existing functionality. No new schema/Auth/RLS/credentials/messages or real student writes; all prior tool denials remain binding."
+    }
+  ]
+}
