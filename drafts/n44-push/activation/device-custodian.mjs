@@ -173,3 +173,22 @@ export async function executeRegister503(action){
  }
  fail('n44_unknown_repair_action');
 }
+
+// AI: latest explicit one-probe allowance. Immutable marker precedes normal UI;
+// this entry has no HTTP registration, service config, SQL or sender operation.
+export async function consumeRegister503Diagnostic(){
+ const task='continuous-n44-register503-existing-service-repair-20261019',run='3934ca4d-4107-470d-b214-070916b3d526';
+ const l=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/live-mutation.json','utf8'));
+ if(l.taskId!==task||l.owner?.token!==run||l.resource!=='live-mutation')fail('n44_current_diagnostic_lease_required');
+ const authorityPath='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261019-review-1400/n44-one-diagnostic-registration-authority.json';
+ if(hash(await readFile(authorityPath))!=='438c0dba62d129ba8fab8e53f624c8a9700b99fc46406c505a6ce7501115d53c')fail('n44_diagnostic_authority_changed');
+ const {DIAGNOSTIC_SOURCE,assertDiagnosticAttempt}=await import('./register503-diagnostic-guard.mjs');
+ const s=await load(),d=s.device1019,m=JSON.parse(await readFile('drafts/n44-push/activation/register503/manifest.json','utf8'));
+ if(!s.register503?.deploymentAcknowledged||s.register503.pending||s.source!=='fcf1126acdeee82b3458040d412294853be109f2'||d.source!==s.source||!d.approval||d.disabled||d.pending||d.approval.expiresAt<=Date.now())fail('n44_original_diagnostic_state_required');
+ const journal=path.join(phase,'register503-source-'+DIAGNOSTIC_SOURCE+'-diagnostic-attempt.dpapi'),files=await readdir(phase);
+ assertDiagnosticAttempt({source:m.outputs['edge.mjs'],consumed:files.includes(path.basename(journal)),cleaned:d.registrationDisposition?.status==='failed_unacknowledged_revoked'&&d.registrationDisposition?.consentDisabled===true,targetBound:d.approval.target!==null,sends:d.providerSendAttempts??0});
+ const bytes=Buffer.from(JSON.stringify({task,run,source:DIAGNOSTIC_SOURCE,ownerId:d.approval.ownerId,workspaceId:d.approval.workspaceId,deviceId:d.approval.deviceId,priorRegistrationDisposition:d.registrationDisposition,consumed:true,consumedAt:Date.now(),purpose:'ONE normal UI changed-source diagnostic; no send'}));let encrypted;
+ try{encrypted=dpapi(bytes,true);await writeEncryptedAttemptJournal(journal,encrypted);}finally{bytes.fill(0);encrypted?.fill(0);}
+ const receipt={taskId:task,runId:run,recordedAt:new Date().toISOString(),sourceSha256:DIAGNOSTIC_SOURCE,scopeDigest:d.scopeDigest,consumed:true,immutableEncryptedMarkerAcknowledged:true,originalFailedIdentityPreserved:true,originalApprovalPreserved:true,providerSendAttempts:0,sendJournalPresent:files.includes('one-device-20261019-attempt.dpapi'),privateValuesReturned:false};
+ await writeFile('drafts/n44-push/activation/register503/diagnostic-consumed.json',JSON.stringify(receipt,null,2)+'\n');return receipt;
+}

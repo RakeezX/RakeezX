@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n44-register503-existing-service-repair-20261019",
+  "runId": "3934ca4d-4107-470d-b214-070916b3d526",
+  "status": "PASS",
+  "sourceSha256": "0bc9e6f37bd37dc00f2d2237bd0215034b6751b2facfa58f4b8ce734f545d77c",
+  "checks": [
+    "exact_source_only",
+    "second_probe_denied",
+    "unclean_bound_or_send_state_denied"
+  ],
+  "scope": "New pure admission guard only. Existing exclusive encrypted fsync journal writer reused unchanged.",
+  "providerOperations": 0
+}
