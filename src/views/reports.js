@@ -22,6 +22,25 @@ let a4Preview = false;
 const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف الحضور', grades: 'كشف الدرجات', support: 'تقرير من يحتاج دعمًا' }[tab] ?? 'تقرير الفصل');
 const safeName = (value) => visibleLatinDigits(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
+// AI N120: offer only orderings that the selected document can apply.
+const sortOptions = () => [
+  ['default', tab === 'support' ? 'الأكثر حاجة للدعم' : 'الترتيب الافتراضي (السجل)'],
+  ['name', 'أبجديًا (اسم الطالب)'], ['roll', 'حسب رقم الكشف'],
+  ...(['grades', 'support'].includes(tab) ? [['score_desc', 'الأعلى درجة'], ['score_asc', 'الأقل درجة']] : []),
+  ...(['attendance', 'support'].includes(tab) ? [['absent_desc', 'الأكثر غيابًا']] : []),
+];
+
+function attendanceStudents(report, sessions) {
+  const students = [...report.students];
+  if (sortKey === 'name') return sortStudents(students);
+  if (sortKey === 'roll') students.sort((a, b) => (a.displayNo ?? a.rollNo ?? 9999) - (b.displayNo ?? b.rollNo ?? 9999));
+  if (sortKey === 'absent_desc') {
+    const absences = (id) => sessions.filter(session => report.attendanceBySession.get(session.id)?.get(id)?.status === 'absent').length;
+    students.sort((a, b) => absences(b.id) - absences(a.id));
+  }
+  return students;
+}
+
 export function attendanceSessionsInRange(report, start = '', end = '') {
   return report.sessions.filter((session) => (!start || session.date >= start) && (!end || session.date <= end));
 }
@@ -116,6 +135,8 @@ export default {
 
   // AI N120: retain the sheet across whole-view repaints (filters and quick scores).
   beforeRender() {
+    tab = 'grades'; sortKey = 'default'; attMode = 'brief';
+    filterStartDate = ''; filterEndDate = ''; a4Preview = false;
     if (!document.getElementById('report-filter-style')) {
       const style = document.createElement('link');
       style.id = 'report-filter-style';
@@ -182,18 +203,13 @@ export default {
           <button class="segmented__btn ${tab === 'support' ? 'is-on' : ''}" data-act="tab" data-tab="support">من يحتاج دعمًا</button>
         </div>
 
-        <div class="grades-toolbar report-toolbar report-filter-bar noprint" role="group" aria-label="عوامل تصفية تقرير الفصل">
+        <div class="grades-toolbar report-toolbar report-filter-bar report-filter-bar--context noprint" role="group" tabindex="0" aria-label="عوامل تصفية تقرير الفصل، مرّر أفقيًا لعرض كل الخيارات">
           <label class="field report-toolbar__field">
             <span class="field__label fs-xs">
               ${icon('filter', 'compact')} ترتيب الكشف
             </span>
             <select class="select" data-change="sort" aria-label="ترتيب التقرير">
-              <option value="default" ${sortKey === 'default' ? 'selected' : ''}>الترتيب الافتراضي ${tab === 'support' ? '(الأكثر حاجة للدعم)' : '(السجل)'}</option>
-              <option value="name" ${sortKey === 'name' ? 'selected' : ''}>أبجديًا (اسم الطالب)</option>
-              <option value="roll" ${sortKey === 'roll' ? 'selected' : ''}>حسب رقم الكشف</option>
-              <option value="score_desc" ${sortKey === 'score_desc' ? 'selected' : ''}>الأعلى درجة</option>
-              <option value="score_asc" ${sortKey === 'score_asc' ? 'selected' : ''}>الأقل درجة</option>
-              <option value="absent_desc" ${sortKey === 'absent_desc' ? 'selected' : ''}>الأكثر غيابًا</option>
+              ${sortOptions().map(([value, label]) => html`<option value="${value}" ${sortKey === value ? 'selected' : ''}>${label}</option>`)}
             </select>
           </label>
           ${tab === 'attendance'
@@ -215,6 +231,7 @@ export default {
           <button class="btn btn--sm ${a4Preview ? 'btn--primary' : 'btn--ghost'} report-preview-toggle" data-act="toggle-a4" title="معاينة التقرير بصفحة A4 جاهزة للطباعة" aria-pressed="${a4Preview}">
             ${icon('reports')} ${a4Preview ? 'إغلاق المعاينة' : 'معاينة A4'}
           </button>
+          <button class="btn btn--sm btn--ghost" data-act="reset-filters">مسح التصفية</button>
         </div>
 
         ${a4Preview
@@ -245,8 +262,9 @@ export default {
   },
 
   actions: {
-    tab(el) { tab = el.dataset.tab; repaint(); },
-    sort(el) { sortKey = el.value; repaint(); },
+    tab(el) { tab = el.dataset.tab; sortKey = 'default'; repaint(); },
+    sort(el) { sortKey = sortOptions().some(([value]) => value === el.value) ? el.value : 'default'; repaint(); },
+    'reset-filters'() { sortKey = 'default'; if (tab === 'attendance') { filterStartDate = ''; filterEndDate = ''; attMode = 'brief'; } repaint(); },
     'att-mode'(el) { attMode = el.dataset.mode; repaint(); },
     'toggle-a4'() { a4Preview = !a4Preview; repaint(); },
     'filter-start'(el) { filterStartDate = el.value; repaint(); },
@@ -404,7 +422,7 @@ export default {
         const sessions = attendanceSessionsInRange(report, filterStartDate, filterEndDate);
         if (!sessions.length || !attendanceHasRecords(report, sessions)) { emptyReportNotice('لا يوجد حضور مرصود في الفترة المحددة', 'غيّر نطاق التاريخ أو ارصد الحضور أولًا.'); return; }
         const rows = [['رقم الكشف', 'الطالب', ...sessions.map((session) => `${fmtDateFull(session.date)} · الحصة ${session.period}`), 'الغياب', 'التأخر']];
-        for (const student of report.students) {
+        for (const student of attendanceStudents(report, sessions)) {
           const records = sessions.map((session) => report.attendanceBySession.get(session.id)?.get(student.id) ?? null).filter(Boolean);
           rows.push([(student.displayNo ?? student.rollNo) ?? '', student.name, ...sessions.map((session) => {
             const member = report.rosterBySession.get(session.id)?.members.some((candidate) => candidate.id === student.id);
@@ -462,7 +480,7 @@ function attendanceReport(cls, report) {
   const sessions = attendanceSessionsInRange(report, filterStartDate, filterEndDate);
   if (!sessions.length) return html`<div class="empty"><div class="empty__icon">${icon('attendance')}</div><div class="empty__title">لم يُرصد حضور بعد</div><a class="btn btn--primary noprint" href="#/teaching/${cls.id}/attendance">${icon('attendance')} ابدأ الرصد</a></div>`;
 
-  const visibleStudents = report.students.map((student) => ({
+  const visibleStudents = attendanceStudents(report, sessions).map((student) => ({
     ...student, name: visibleLatinDigits(student.name), rollNo: student.rollNo == null ? student.rollNo : visibleLatinDigits(student.rollNo),
   }));
   const rosterFor = (session, studentId) => report.rosterBySession.get(session.id)?.members.find((student) => student.id === studentId) ?? null;

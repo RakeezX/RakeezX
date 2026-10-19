@@ -1,0 +1,201 @@
+{
+  "baseline": {
+    "rosterOptions": [
+      "default",
+      "name",
+      "roll",
+      "score_desc",
+      "score_asc",
+      "absent_desc"
+    ],
+    "attendanceAbsenceSortIgnoredInSelectedRange": true,
+    "executionUnifiedBarAbsent": true
+  },
+  "checks": [
+    "report-specific-options; roster/grade/support/attendance ordering; date-range absence ordering; detailed and CSV; scoped reset",
+    "attendance-name-1440",
+    "attendance-mode-1440",
+    "aggregate-filter-1440",
+    "execution-pending-1440"
+  ],
+  "layouts": [
+    {
+      "name": "attendance",
+      "width": 1081,
+      "x": 48,
+      "y": 365.5625,
+      "height": 101.578125,
+      "pageOverflow": false,
+      "rtl": "rtl",
+      "wrap": "nowrap",
+      "overflow": false,
+      "controls": [
+        {
+          "y": 408.140625,
+          "height": 44,
+          "width": 237
+        },
+        {
+          "y": 403.75,
+          "height": 48.390625,
+          "width": 167
+        },
+        {
+          "y": 403.75,
+          "height": 48.390625,
+          "width": 167
+        },
+        {
+          "y": 404.140625,
+          "height": 44,
+          "width": 68.5
+        },
+        {
+          "y": 404.140625,
+          "height": 44,
+          "width": 68.5
+        },
+        {
+          "y": 408.140625,
+          "height": 44,
+          "width": 148
+        },
+        {
+          "y": 408.140625,
+          "height": 44,
+          "width": 148
+        }
+      ]
+    },
+    {
+      "name": "aggregate-grades",
+      "width": 1081,
+      "x": 48,
+      "y": 244.359375,
+      "height": 97.578125,
+      "pageOverflow": false,
+      "rtl": "rtl",
+      "wrap": "nowrap",
+      "overflow": false,
+      "controls": [
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.390625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.390625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 282.9375,
+          "height": 44,
+          "width": 148
+        }
+      ]
+    },
+    {
+      "name": "aggregate-followup",
+      "width": 1081,
+      "x": 48,
+      "y": 244.359375,
+      "height": 97.578125,
+      "pageOverflow": false,
+      "rtl": "rtl",
+      "wrap": "nowrap",
+      "overflow": false,
+      "controls": [
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.390625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.390625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 282.9375,
+          "height": 44,
+          "width": 148
+        }
+      ]
+    },
+    {
+      "name": "execution",
+      "width": 1081,
+      "x": 48,
+      "y": 244.359375,
+      "height": 97.578125,
+      "pageOverflow": false,
+      "rtl": "rtl",
+      "wrap": "nowrap",
+      "overflow": false,
+      "controls": [
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.390625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.390625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 278.546875,
+          "height": 48.390625,
+          "width": 173.40625
+        },
+        {
+          "y": 282.9375,
+          "height": 44,
+          "width": 148
+        }
+      ]
+    }
+  ],
+  "error": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('.report-results .gtable--report tbody tr')\nExpected: 1\nReceived: 2\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.count\" with timeout 5000ms\n  - waiting for locator('.report-results .gtable--report tbody tr')\n    14 × locator resolved to 2 elements\n       - unexpected value \"2\"\n"
+}
