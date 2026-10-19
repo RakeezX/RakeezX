@@ -975,12 +975,12 @@ async function boot() {
     store.activateWorkspace(workspaceRouting.workspace);
     if (workspaceRouting.workspace.type === 'demo') await seedDemoWorkspace({ force: demoPreparing });
     await store.init();
-    void renewLeaseInBackground();
+    const startupLeaseReadiness = renewLeaseInBackground();
     // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
     try {
       if (isDemoWorkspace()) throw Object.assign(new Error('Demo workspace has no cloud sync'), { code: 'DEMO_SYNC_DISABLED' });
       syncModule = await import('./lib/sync.js');
-      syncModule.init();
+      syncModule.init({ readiness: startupLeaseReadiness });
       // init() already starts the read-only status scan. Do not wait for its
       // outbox/record reads before painting this verified local workspace.
       if (import.meta.env?.DEV) window.__syncModule = syncModule;

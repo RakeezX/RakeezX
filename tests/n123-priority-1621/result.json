@@ -1,0 +1,95 @@
+{
+  "taskId": "continuous-n123-startup-transient-error-20261019",
+  "runId": "376bb4d1-6dbc-4185-9f38-2c2ddac531df",
+  "baseSha": "258fbbd57740a14fa75cff31a7e243dcafa4acff",
+  "checks": [
+    {
+      "name": "n123_startup_transient_wait_and_genuine_failure_truthful",
+      "status": "PASS",
+      "evidence": "Actual 390px app: delayed refresh/lease startup stayed neutral with zero reads during preparation; then true healthy checkpoint. Real manual Sync read failure remained red with support action; foreign-owner manual entry made zero reads and stayed blocked; grade 18 and empty outbox preserved."
+    }
+  ],
+  "states": [
+    {
+      "state": "pending",
+      "preparing": true,
+      "reads": 0,
+      "dots": [
+        "sync-dot sync-dot--pending",
+        "sync-dot topbar__teacher-sync sync-dot--pending"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 4,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 8,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 12,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 16,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 20,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 24,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "synced",
+      "preparing": false,
+      "reads": 24,
+      "dots": [
+        "sync-dot sync-dot--synced",
+        "sync-dot topbar__teacher-sync sync-dot--synced"
+      ],
+      "error": null
+    }
+  ],
+  "cleanup": "Owned fresh contexts/browser and loopback server closed in finally; external requests and Service Workers blocked."
+}

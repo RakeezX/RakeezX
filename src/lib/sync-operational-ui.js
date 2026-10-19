@@ -26,7 +26,10 @@ export function syncOperationalPresentation(summary = { state: 'idle' }, now = D
   summary = projectSyncStatusSeverity(summary, now);
   const status = Object.hasOwn(STATES, summary.state) ? summary.state : 'idle';
   let [text, label, badge] = STATES[status];
-  if (status === 'pending' && summary.presentationSeverity?.transient) {
+  if (status === 'pending' && summary.reasonCategory === 'startup_preparing') {
+    text = 'جارٍ الاتصال للمزامنة';
+    label = 'نتحقق من جاهزية الحساب قبل بدء المزامنة. لم تتأكد المزامنة بعد.';
+  } else if (status === 'pending' && summary.presentationSeverity?.transient) {
     text = 'بانتظار المزامنة';
     label = 'لم تتأكد المزامنة مع السحابة بعد. سنحاول مرة أخرى.';
   } else if (status === 'pending' && summary.presentationSeverity?.awaitingVerification && !summary.queuedCount) {
@@ -35,7 +38,7 @@ export function syncOperationalPresentation(summary = { state: 'idle' }, now = D
   }
   const help = summary.actionableSyncIssue === true && ['error', 'blocked', 'rejected'].includes(status);
   // No retryability flag exists for rejected work: do not advertise retry as its remedy.
-  const canSync = ['synced', 'pending', 'error', 'blocked'].includes(status) && !summary.automaticSyncActive;
+  const canSync = ['synced', 'pending', 'error', 'blocked'].includes(status) && !summary.automaticSyncActive && summary.reasonCategory !== 'startup_preparing';
   return { status, text, label, badge, help, canSync, summary };
 }
 
@@ -50,6 +53,7 @@ export function renderSyncOperationalSection(summary, { compact = false } = {}) 
   const countText = savedChanges(summary.queuedCount ?? 0);
   const secondary = ui.status === 'synced' ? `آخر مزامنة: ${lastText}`
     : firstSync ? countText
+    : ui.status === 'pending' && summary.reasonCategory === 'startup_preparing' ? ui.label
     : ui.status === 'pending' && summary.presentationSeverity?.transient ? ui.label
     : ui.status === 'pending' && summary.presentationSeverity?.awaitingVerification && !summary.queuedCount ? ui.label
     : ['pending', 'syncing'].includes(ui.status) ? countText

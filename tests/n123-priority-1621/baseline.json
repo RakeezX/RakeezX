@@ -1,0 +1,175 @@
+{
+  "taskId": "continuous-n123-startup-transient-error-20261019",
+  "runId": "376bb4d1-6dbc-4185-9f38-2c2ddac531df",
+  "baseSha": "258fbbd57740a14fa75cff31a7e243dcafa4acff",
+  "checks": [
+    {
+      "name": "baseline_startup_race_reproduced",
+      "status": "PASS",
+      "evidence": "Expired synthetic session refresh changed captured session during first pull; real DOM went red, then green after retry."
+    }
+  ],
+  "states": [
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 4,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 8,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 12,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 16,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot topbar__teacher-sync sync-dot--syncing"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 16,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot sync-dot--syncing topbar__teacher-sync"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 20,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot sync-dot--syncing topbar__teacher-sync"
+      ],
+      "error": null
+    },
+    {
+      "state": "syncing",
+      "preparing": false,
+      "reads": 24,
+      "dots": [
+        "sync-dot sync-dot--syncing",
+        "sync-dot sync-dot--syncing topbar__teacher-sync"
+      ],
+      "error": null
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 24,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot topbar__teacher-sync sync-dot--error"
+      ],
+      "error": "Sync ownership blocked: sync-context-changed"
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 28,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot topbar__teacher-sync sync-dot--error"
+      ],
+      "error": null
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 32,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot topbar__teacher-sync sync-dot--error"
+      ],
+      "error": null
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 36,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot topbar__teacher-sync sync-dot--error"
+      ],
+      "error": null
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 40,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot topbar__teacher-sync sync-dot--error"
+      ],
+      "error": null
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 44,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot topbar__teacher-sync sync-dot--error"
+      ],
+      "error": null
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 48,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot topbar__teacher-sync sync-dot--error"
+      ],
+      "error": null
+    },
+    {
+      "state": "error",
+      "preparing": false,
+      "reads": 48,
+      "dots": [
+        "sync-dot sync-dot--error",
+        "sync-dot sync-dot--error topbar__teacher-sync"
+      ],
+      "error": null
+    },
+    {
+      "state": "synced",
+      "preparing": false,
+      "reads": 48,
+      "dots": [
+        "sync-dot sync-dot--synced",
+        "sync-dot topbar__teacher-sync sync-dot--synced"
+      ],
+      "error": null
+    }
+  ],
+  "cleanup": "Owned fresh contexts/browser and loopback server closed in finally; external requests and Service Workers blocked."
+}
