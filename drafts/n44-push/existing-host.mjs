@@ -9,7 +9,7 @@ import {createPrivatePushPorts} from './private-runtime.mjs';
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
 import {databaseConfig,assertRestrictedIdentity} from './database-transport.mjs';
-import {runtimeFailure} from './runtime-failure.mjs';
+import {runtimeFailure,identityQueryFailure} from './runtime-failure.mjs';
 export async function assertPrivateDatabaseSession(client,onSource=()=>{}) {
   const result=await client.query(`select current_user as role,
     current_setting('log_error_verbosity') as error_verbosity,
@@ -60,11 +60,11 @@ export function createExistingHost(readEnv) {
  const pool=new pg.Pool(transport);
  pool.on('error',()=>{});let waiting=0;
  const acquire=async()=>{if(waiting>=4)throw Error('n44_pool_capacity');waiting++;let c;
-  let phase='connect';try{c=await pool.connect();
-   phase='identity';await assertRestrictedIdentity(c);
+  let phase='connect',identity={targetKind:transport.ssl.servername==='db.xlrubcwjqktzzunrvuns.supabase.co'?'direct':'session',queryCompleted:false,returnedOneRow:false};try{c=await pool.connect();
+   phase='identity';try{await assertRestrictedIdentity(c,flags=>{identity={...identity,...flags};});}catch(e){if(!identity.queryCompleted)identity.queryFailure=identityQueryFailure(e);throw e;}
    phase='set_role';await c.query('set role n44_backend');phase='private_session';await assertPrivateDatabaseSession(c,()=>{phase='source';});
    return {query:async(sql,values)=>{try{return await privateQuery(c,sql,values);}catch(e){throw runtimeFailure('query',e);}},release:e=>c.release(e)};}
-  catch(e){c?.release(Error('n44_database_unavailable'));throw runtimeFailure(phase,e);}finally{waiting--;}};
+  catch(e){c?.release(Error('n44_database_unavailable'));throw runtimeFailure(phase,e,identity);}finally{waiting--;}};
  try {
   const handle=createWebEntry({sessionPolicy,serviceSourceSha,acquire,authUrl,origin,apiKey:required('N44_AUTH_API_KEY'),providerOrigins,crypto,ingressKey,schedulerKey,rateKey,deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true'});
   return Object.freeze({handle,async close(){crypto.close();await pool.end();}});

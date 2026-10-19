@@ -1,0 +1,23 @@
+{
+  "aiAuthored": true,
+  "runId": "6ab9a796-daf6-4d0b-999e-9abfc756f430",
+  "recordedAt": "2026-10-19T07:07:19.856Z",
+  "checks": [
+    {
+      "name": "identity_predicate_negative_projection",
+      "status": "PASS",
+      "evidence": "Actual restricted guard denies each false predicate and missing row; only boolean results/query completion and validated target enum survive."
+    },
+    {
+      "name": "identity_query_classification_and_redaction",
+      "status": "PASS",
+      "evidence": "Query failure distinguished from completed query; only exact known timeout/cancel conditions classified. Distinctive sensitive values, getters, unknown/string predicates and arbitrary target/error enums excluded."
+    },
+    {
+      "name": "identity_positive_guard_preserved",
+      "status": "PASS",
+      "evidence": "Only actual all-true restricted identity/TLS flags pass. No assertion removed or authorized flag synthesized."
+    }
+  ],
+  "networkCalls": 0
+}

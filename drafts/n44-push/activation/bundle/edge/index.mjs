@@ -3781,21 +3781,37 @@ var privateResponse = (status = 503) => new Response('{"error":"unavailable"}', 
 // drafts/n44-push/runtime-failure.mjs
 var phases = /* @__PURE__ */ new Set(["configuration", "configuration_origin", "configuration_revision", "configuration_policy", "configuration_transport", "configuration_crypto", "configuration_provider", "connect", "identity", "set_role", "private_session", "source", "ingress", "query", "deadline"]);
 var tags = /* @__PURE__ */ new WeakMap();
-function runtimeFailure(phase, cause) {
-  const safe = tags.get(cause) ?? (phases.has(phase) ? phase : "configuration");
+var own = (value, name) => value && (typeof value === "object" || typeof value === "function") ? Object.getOwnPropertyDescriptor(value, name)?.value : void 0;
+function identityProjection(value) {
+  const out = {};
+  for (const name of ["loginExact", "roleExact", "upstreamSsl", "clientTlsAuthorized", "queryCompleted", "returnedOneRow"]) {
+    const v = own(value, name);
+    if (typeof v === "boolean") out[name] = v;
+  }
+  for (const [name, allowed] of [["targetKind", ["direct", "session"]], ["queryFailure", ["timeout", "query_cancelled", "pg_or_driver_failure"]]]) {
+    const v = own(value, name);
+    if (allowed.includes(v)) out[name] = v;
+  }
+  return out;
+}
+function identityQueryFailure(cause) {
+  return own(cause, "message") === "Query read timeout" ? "timeout" : own(cause, "code") === "57014" ? "query_cancelled" : "pg_or_driver_failure";
+}
+function runtimeFailure(phase, cause, identity) {
+  const prior = tags.get(cause), safe = prior?.phase ?? (phases.has(phase) ? phase : "configuration");
   const error = new Error("n44_request_unavailable");
-  const own = (name) => cause && (typeof cause === "object" || typeof cause === "function") ? Object.getOwnPropertyDescriptor(cause, name)?.value : void 0;
-  const code = own("code");
-  if (["40001", "40P01"].includes(code) && own("severity") === "ERROR") {
+  const code = own(cause, "code");
+  if (["40001", "40P01"].includes(code) && own(cause, "severity") === "ERROR") {
     error.code = code;
     error.severity = "ERROR";
   }
-  tags.set(error, safe);
+  const projected = prior?.identity ?? (safe === "identity" ? identityProjection({ ...identityProjection(identity), ...identityProjection(own(cause, "safeReadiness")) }) : {});
+  tags.set(error, { phase: safe, identity: projected });
   return error;
 }
 function requestFailure(error, fallback = "configuration") {
-  const phase = tags.get(error) ?? (phases.has(fallback) ? fallback : "configuration");
-  return Response.json({ status: 503, body: { error: "unavailable", phase } }, { headers: PRIVATE_WEB_HEADERS });
+  const tag = tags.get(error), phase = tag?.phase ?? (phases.has(fallback) ? fallback : "configuration");
+  return Response.json({ status: 503, body: { error: "unavailable", phase, ...tag?.identity && Object.keys(tag.identity).length ? { identity: tag.identity } : {} } }, { headers: PRIVATE_WEB_HEADERS });
 }
 
 // drafts/n44-push/web-entry.mjs
@@ -3862,8 +3878,11 @@ function databaseConfig(readEnv) {
   if (!["postgres:", "postgresql:"].includes(db.protocol) || !(direct || session) || !["", "5432"].includes(db.port) || db.pathname !== "/postgres" || !db.password || db.search || db.hash || typeof ca !== "string" || createHash2("sha256").update(ca).digest("hex") !== "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7") throw Error("n44_database_configuration");
   return { connectionString: url, ssl: { ca, rejectUnauthorized: true, servername: db.hostname, minVersion: "TLSv1.2" }, max: 4, connectionTimeoutMillis: 5e3, idleTimeoutMillis: 1e4, statement_timeout: 3e3, query_timeout: 4e3, application_name: "n44-private-server", allowExitOnIdle: true };
 }
-async function assertRestrictedIdentity(client) {
-  const row = (await client.query("select session_user as login,current_user as role,(select ssl from pg_stat_ssl where pid=pg_backend_pid()) as ssl")).rows[0];
+async function assertRestrictedIdentity(client, observe = () => {
+}) {
+  const result2 = await client.query("select session_user as login,current_user as role,(select ssl from pg_stat_ssl where pid=pg_backend_pid()) as ssl");
+  observe({ queryCompleted: true, returnedOneRow: result2.rows?.length === 1 });
+  const row = result2.rows[0];
   const flags = { loginExact: row?.login === "n44_service_login", roleExact: row?.role === "n44_service_login" || row?.role === "n44_backend", upstreamSsl: row?.ssl === true, clientTlsAuthorized: client.connection?.stream?.authorized === true };
   if (Object.values(flags).some((v) => v !== true)) {
     const e = Error("n44_transport_invariants");
@@ -3948,11 +3967,18 @@ function createExistingHost(readEnv) {
       if (waiting >= 4) throw Error("n44_pool_capacity");
       waiting++;
       let c;
-      let phase = "connect";
+      let phase = "connect", identity = { targetKind: transport.ssl.servername === "db.xlrubcwjqktzzunrvuns.supabase.co" ? "direct" : "session", queryCompleted: false, returnedOneRow: false };
       try {
         c = await pool.connect();
         phase = "identity";
-        await assertRestrictedIdentity(c);
+        try {
+          await assertRestrictedIdentity(c, (flags) => {
+            identity = { ...identity, ...flags };
+          });
+        } catch (e) {
+          if (!identity.queryCompleted) identity.queryFailure = identityQueryFailure(e);
+          throw e;
+        }
         phase = "set_role";
         await c.query("set role n44_backend");
         phase = "private_session";
@@ -3968,7 +3994,7 @@ function createExistingHost(readEnv) {
         }, release: (e) => c.release(e) };
       } catch (e) {
         c?.release(Error("n44_database_unavailable"));
-        throw runtimeFailure(phase, e);
+        throw runtimeFailure(phase, e, identity);
       } finally {
         waiting--;
       }
