@@ -6,6 +6,8 @@ import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';import path from 'node:path';
 const project='xlrubcwjqktzzunrvuns',run='8288de34-7362-4946-b319-79a28e864be8';
+// Current authorized continuation owns the phase lease; recovery remains bound to its original owner.
+const operationRun='3edbd211-f3f1-4698-b39c-eaf346722eb5';
 const taskId='continuous-n44-finish-bounded-service-activation-20261018';
 const root=process.cwd(),base=path.resolve('drafts/n44-push/activation');
 const phase='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/n44-live/owned-'+run+'.tmp';
@@ -40,7 +42,7 @@ async function sqlFile(text){
 }
 async function lease(){
  const l=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/live-mutation.json','utf8'));
- if(l.taskId!==taskId||l.owner?.token!==run||l.resource!=='live-mutation')fail('n44_live_phase_not_owned');
+ if(l.taskId!==taskId||l.owner?.token!==operationRun||l.resource!=='live-mutation')fail('n44_live_phase_not_owned');
 }
 export async function execute(action,value){
  if(action==='--prepare-directory'){
@@ -110,7 +112,7 @@ export async function execute(action,value){
    const bundle=await esbuild.build({stdin:{contents:"export {assertPrivateDatabaseSession} from './drafts/n44-push/existing-host.mjs';",resolveDir:root},bundle:true,format:'esm',platform:'node',write:false,plugins:[unused],logLevel:'silent'});
    const {assertPrivateDatabaseSession}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].contents).toString('base64'));sessionStage='source_guard';await assertPrivateDatabaseSession(client);
    state.loginVerified=true;await save(state);return {restrictedLoginAndSetRole:true,sessionMode:true,tls:client.connection.stream.getProtocol(),hostnameVerified:true,upstreamSsl:true,actualSourcePrivacyBoundary:true};
-  }catch(e){const safeCode=/^[A-Z0-9_]{3,60}$/.test(e.code??'')?e.code:'UNCLASSIFIED';await writeFile(base+'/hosted-session-diagnostic.json',JSON.stringify({projectId:project,runId:run,status:'FAIL',stage:sessionStage,code:safeCode,privateDiagnosticsSuppressed:true},null,2)+'\n');if(/^n44_/.test(e.message))throw e;fail('n44_session_'+sessionStage+'_'+safeCode);}finally{await client.end().catch(()=>{});}
+  }catch(e){const safeCode=/^[A-Z0-9_]{3,60}$/.test(e.code??'')?e.code:'UNCLASSIFIED';await writeFile(base+'/hosted-session-iteration-diagnostic.json',JSON.stringify({projectId:project,runId:operationRun,status:'FAIL',stage:sessionStage,code:safeCode,privateDiagnosticsSuppressed:true},null,2)+'\n');if(/^n44_/.test(e.message))throw e;fail('n44_session_'+sessionStage+'_'+safeCode);}finally{await client.end().catch(()=>{});}
  }
  if(action==='--install-env'){
   if(!state.loginVerified||!state.ingress||!state.scheduler||state.installed)fail('n44_install_gate_missing');
