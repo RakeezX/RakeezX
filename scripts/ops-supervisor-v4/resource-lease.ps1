@@ -46,6 +46,17 @@ $queue = (Resolve-Path -LiteralPath (Join-Path $RuntimeRoot 'queue')).Path
 if (!(Split-Path $TaskFile).Equals($queue, [StringComparison]::OrdinalIgnoreCase)) { throw 'Lease requires the canonical queue card' }
 $task = Json $TaskFile; $config = Json (Join-Path $RuntimeRoot 'workflow-v5.json')
 if ($task.workflowVersion -ne 5 -or $task.activationId -ne $config.controller.activationId) { throw 'Card is outside the active controller authorization' }
+function Is-ExplicitN44Hold($ProductId, [string]$Text) {
+ if ($ProductId -ne 'N44') { return $false }
+ foreach ($line in ($Text -split "
+")) { $cells=$line.Split('|'); if ($cells.Length -eq 13 -and $cells[1].Trim() -eq 'N44' -and $cells[7] -match '\bDEFERRED\b' -and $cells[11].Contains('[PO-20261019-1621-TEMPORARY-HOLD]')) { return $true } }
+ return $false
+}
+if ($Action -eq 'acquire' -and $task.productId -eq 'N44') {
+ $repoRoot=Split-Path (Split-Path $RuntimeRoot)
+ $ledgerText=[IO.File]::ReadAllText((Join-Path $repoRoot 'docs\PRODUCT_LEDGER.md'),[Text.Encoding]::UTF8)
+ if (Is-ExplicitN44Hold $task.productId $ledgerText) { throw 'PO_PAUSED_N44: explicit user temporary hold; preserve checkpoint and release existing resources, do not acquire another phase or bypass this hold' }
+}
 $directory = Join-Path $RuntimeRoot 'leases'; $file = Join-Path $directory ($Name + '.json')
 if ($Action -eq 'status') { if (Test-Path -LiteralPath $file) { Get-Content -Raw -LiteralPath $file -Encoding UTF8 } else { 'FREE' }; exit 0 }
 if ($Action -eq 'reap') {
