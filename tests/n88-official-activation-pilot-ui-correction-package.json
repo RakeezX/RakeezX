@@ -1,0 +1,17 @@
+{
+  "runId": "75c77bea-eec3-4a4e-9749-42ab3982de7e",
+  "status": "PASS",
+  "manifestLfSha256": "6904f54bf5cfe012f1a847dd67312fae11f8e7a64bb4e1104fcca354b2f34f9a",
+  "changedSourcePins": 5,
+  "providerOutputMatches": 2,
+  "originalFinalFailuresByteIdentical": true,
+  "fullNineChecksAndAcceptancePreserved": true,
+  "currentSevenPilotChecksPass": true,
+  "runtimeAndActualDomProofReusedUnchanged": true,
+  "genuineRuntimeDiffAgainstObservedMain": true,
+  "observedRemoteMainSha": "3aa2e1df46ee69cdbe917f62b9a392205b0323fc",
+  "sqlRoleCredentialOrFixtureChanges": 0,
+  "protectedTemporaryInputsAbsent": true,
+  "publicEnabled": false,
+  "finalFrontendPublished": false
+}

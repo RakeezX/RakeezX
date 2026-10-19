@@ -136,15 +136,25 @@ for(const file of ['drafts/n88-student-portal/task-guidance.mjs','drafts/n88-stu
   'supabase/migrations/20261018034356_n88_exact_activation_staged.sql',dir+'preflight.inactive.sql',dir+'readback.inactive.sql',dir+'identities.inactive.sql',dir+'expected-identities.json',dir+'wrangler.staged.toml',dir+'deploy.staged.json',dir+'toolchain.json',dir+'.gitattributes',
   dir+'metadata-contract.json',dir+'supabase.staged.toml',...['schema-proposal.sql','postgres-repository-schema.sql','canonical-state-schema.inactive.sql','canonical-lock.inactive.sql','auth-session.inactive.sql','ingress.inactive.sql','roles.inactive.sql'].map(f=>'drafts/n88-student-portal/'+f),
   'supabase/functions/n88-student-portal/config.inactive.toml','drafts/n88-student-portal/package-lock.json'])manifest.sources[file]=await textHash(file);
-// Actual hosted continuation supersedes the earlier two explicitly deferred gates.
-// Preserve prior pilot snapshots; never relabel the partial journey as acceptance.
-manifest.stagedActivation.phase='hosted-acceptance-blocked-on-corrected-runtime-publication';
-manifest.stagedActivation.deferredChecks=[];
-manifest.stagedActivation.currentBackendEnabled=false;
+// PO once-only correction stage publishes the real sequence/context fix. Original
+// final failures remain immutable; all nine return after the publisher's receipt.
+const correction=JSON.parse(await readFile(dir+'pilot-ui-correction-delivery-75c77bea.json','utf8'));
+const originalFinal=JSON.parse(await readFile(dir+'continuation-b324b7b5.json','utf8'));
+const correctionContract=JSON.parse(await readFile(dir+'pilot-ui-correction-stage-contract-75c77bea.json','utf8'));
+manifest.stagedActivation.phase='owner-restricted-pilot-ui-correction';
+manifest.stagedActivation.deferredChecks=correction.historicalFinalFailures.names;
+manifest.stagedActivation.currentBackendEnabled=true;
 manifest.stagedActivation.publicEnabled=false;
-manifest.stagedActivation.currentEvidence=dir+'continuation-b324b7b5.json';
-manifest.stagedActivation.currentProviderReadback=dir+'current-provider-readback-b324b7b5.json';
-manifest.stagedActivation.requiredCheckResults=JSON.parse(await readFile(dir+'continuation-b324b7b5.json','utf8')).checks;
+manifest.stagedActivation.currentEvidence=dir+'pilot-ui-correction-delivery-75c77bea.json';
+manifest.stagedActivation.currentProviderReadback=dir+'pilot-ui-correction-provider-75c77bea.json';
+manifest.stagedActivation.requiredCheckResults=correction.checks;
+manifest.stagedActivation.finalRequiredChecks=originalFinal.checks.map(c=>c.name);
+manifest.stagedActivation.finalAcceptance=correctionContract.finalAcceptance;
+manifest.stagedActivation.currentRequiredChecks=correctionContract.currentRequiredChecks;
+manifest.stagedActivation.originalFinalFailures=correction.historicalFinalFailures;
+manifest.stagedActivation.restoreFullAcceptanceAfterVerifiedCorrectionReceipt=true;
 for(const file of ['tests/n88-official-activation-current-entry-ui.mjs','tests/n88-official-activation-current-entry-ui.json','tests/n88-official-activation-hosted-entry-repair.mjs','tests/n88-official-activation-hosted-entry-repair.json','tests/n88-official-activation-request-phase.mjs','tests/n88-official-activation-request-phase.json',dir+'continuation-b324b7b5.json',dir+'current-provider-readback-b324b7b5.json',dir+'hosted-journey-b324b7b5.json',dir+'owned-pilot-pause-readback-b324b7b5.json'])manifest.sources[file]=await textHash(file);
+for(const file of ['drafts/n88-student-portal/official-activation.mjs',dir+'pilot-ui-correction-stage-contract-75c77bea.json',dir+'pilot-ui-correction-delivery-75c77bea.json',dir+'pilot-ui-correction-provider-75c77bea.json',dir+'pilot-ui-correction-config-75c77bea.json',dir+'pilot-ui-correction-http-75c77bea.json',dir+'pilot-ui-correction-gate.mjs','tests/n88-official-activation-pilot-correction-gate.mjs','tests/n88-official-activation-pilot-correction-gate.json'])manifest.sources[file]=await textHash(file);
+for(const file of [dir+'hosted-pilot-readiness.json',dir+'hosted-pilot-live-readiness.json'])manifest.sources[file]=await textHash(file);
 await writeFile(dir+'manifest.json',JSON.stringify(manifest,null,2)+'\n');
 console.log('N88 exact pilot graphs packaged; public activation remains OFF; provider state is recorded separately.');

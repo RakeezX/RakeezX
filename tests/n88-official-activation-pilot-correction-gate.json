@@ -1,0 +1,9 @@
+{
+  "runId": "75c77bea-eec3-4a4e-9749-42ab3982de7e",
+  "status": "PASS",
+  "checks": [
+    "exact current OFF/pilot/binding/source/local-proof/history/authority preimage",
+    "missing, malformed, mismatch, replay and non-strict TLS/source fail closed",
+    "no provider, credentials, database or fixture touched"
+  ]
+}

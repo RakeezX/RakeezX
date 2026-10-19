@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "75c77bea-eec3-4a4e-9749-42ab3982de7e",
+  "phase": "once-only-owned-pilot-ui-correction",
+  "authorityRef": "PO-20261019-FINISH-N88-OFFICIAL-OWNED-PILOT",
+  "preservedCandidate": "26b819f187e7222937763b29c9023e33d1fd6e66",
+  "currentRequiredChecks": [
+    "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+    "n88_official_exact_provider_ingress_private_document_and_no_logging",
+    "n88_private_database_error_boundary_under_actual_provider_logging",
+    "n88_exact_private_guard_membership_inherit_correction",
+    "n88_actual_scram_iteration_compatibility",
+    "n88_pilot_owner_admission_and_failclosed_rollout",
+    "n88_pilot_original_service_and_frontend_publisher_package"
+  ],
+  "finalRequiredChecks": [
+    "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+    "n88_official_exact_provider_ingress_private_document_and_no_logging",
+    "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+    "n88_official_publisher_readiness_route_and_served_behavior",
+    "n88_private_database_error_boundary_under_actual_provider_logging",
+    "n88_exact_private_guard_membership_inherit_correction",
+    "n88_actual_scram_iteration_compatibility",
+    "n88_pilot_owner_admission_and_failclosed_rollout",
+    "n88_pilot_original_service_and_frontend_publisher_package"
+  ],
+  "finalAcceptance": [
+    "Exact existing migration identities are freshly compared, applied at most once only where absent; unchanged proofs/history retained and no managed Auth policy/global privilege or real source mutation.",
+    "Actual restricted DB, provider custody/version names, exact service code/config, private logging/TLS/route/document readbacks pass; no secret/browser/service-role leak.",
+    "One bounded hosted fabricated-only teacher/student flow proves current code recovery/rotation/revoke/visibility/guidance and authoritative owner/source/session/ACK handling; fixture disposition recorded.",
+    "Only after prerequisites pass, original publisher enables verified official class page and universal /student; unavailable channels produce exact BLOCKED evidence and preserved prepared candidate, never false live readiness.",
+    "Actual observed PostgreSQL logging remains unchanged. A typed private server-side error boundary prevents private values/details from entering server errors, preserves DB types/owner/locks/transactions/ACK, and is locally proven with actual logs then source/ACL/readback verified before hosted activation. One exact append-only private migration maximum; original six immutable.",
+    "After source-bound applied M1 is skipped, exactly the existing postgres-granted n88_guard->postgres INHERIT option is reduced to false, with all other edges/flags/owners/grants/Auth/RLS/data unchanged and original strict expected identity restored. One named append-only correction source, actual local negative/preimage proof and hosted readback; no baseline relaxation or original migration replay."
+  ],
+  "maxExistingTeachers": 1,
+  "maxExistingFabricatedStudents": 2,
+  "publicEnabled": false,
+  "originalFailedResult": "continuation-b324b7b5.json",
+  "originalFailedResultLfSha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83",
+  "restoreFullChecksAfterVerifiedCorrectionReceipt": true
+}

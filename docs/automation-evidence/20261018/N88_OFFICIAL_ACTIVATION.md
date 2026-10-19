@@ -459,3 +459,20 @@ no real data, sends, canonical grade/roster writes or blind cleanup. Public mode
 was never enabled. Sole-publisher receipt for the corrected pilot runtime is the
 changed-input condition before same-session hosted continuation. No PO re-approval
 or Product closure is asserted. Prior evidence below remains historical.
+# Once-only pilot correction75c77bea — publication package
+
+The current seven pilot gates pass; the prior full hosted/publisher FAILs remain
+immutable in continuation-b324b7b5.json (LF SHA25628c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83).
+Original final9 and acceptance remain required after the verified publisher receipt.
+
+Existing strict direct service/source/config readbacks pass after restoration of
+the original protected one-owner/two-pupil pilot only. Edge36/source4353be6a and
+ingress4c962e99 are exact. No public mode, key/role/SQL/Auth/fixture reset or send.
+Actual local DOM/store/owner/session-renewal and serial-dispatch proof is reused
+for unchanged teacher correction26b819f; the new restoration gate has focused
+fail-closed checks. Current provider/HTTP evidence is in pilot-ui-correction-provider-75c77bea.json.
+
+Sole publisher owns integration and served-source verification. This is a genuine
+pilot UI correction package, not whole-Product acceptance. Same-session continuation
+after that receipt restores all9 and tests the remaining/affected real UI journey.
+Historical failure/disposition records below remain unchanged evidence.

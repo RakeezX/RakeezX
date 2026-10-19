@@ -502,3 +502,34 @@ Re-enable only the owned pilot through its original protected channel after curr
 source/config checks, finish the remaining normal hosted journey and all original
 gates, then consider public mode. This is an implementation/delivery-order blocker,
 not a request for another PO approval. Current result is BLOCKED, not Product CLOSED.
+
+## Once-only pilot UI correction — run75c77bea, 2026-10-19
+
+The new bounded stage resolves only the correction-publication ordering dependency.
+Original continuation-b324b7b5.json remains byte-for-byte unchanged, LF SHA256
+28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83;
+its two full-acceptance FAILs are preserved. All final9/acceptance requirements return
+after the sole publisher's verified correction receipt, in the same original session.
+
+N44's named dependency reached awaiting_po before this worker acquired its own
+live-mutation lease. The original sealed custodian restored only N88_ENABLED=true
+under the existing pilot configuration. Exact flag/binding/source digests and own
+direct strictTLS/source readiness pass. No role, SQL, password/verifier/salt, key,
+owner binding, pupil/code/guidance reset, Auth fixture, real-data or sending change.
+Default/invalid rollout remains OFF; public mode was not enabled.
+
+Current Edge36 is exact source4353be6a; current ingress source4c962e99/settings match.
+Only the original ingress secret binding exists on Cloudflare; unchanged explicit
+no-private-logging proof is reused. Current GET settings omit observability, which
+is not relabeled fresh disabled evidence. Anonymous private APIs deny401 and the
+official student document retains no-store/no-referrer/noindex/CSP.
+
+The genuine teacher sequence/context correction in candidate26b819f is unchanged.
+Its actual DOM/CSS/store/ownership/renewal proof is reused, without another Preview
+or live journey. The new pure restoration gate rejects missing/wrong binding,
+source/mode/history/authority/TLS and replay. See pilot-ui-correction-delivery-75c77bea.json
+and pilot-ui-correction-provider-75c77bea.json for the current seven pilot gates.
+This package is LOCAL_READY for the sole publisher's restricted pilot correction,
+not full hosted acceptance, final public publication, PO acceptance or N88 CLOSED.
+Owned live phase is released; retained fabricated data and prior denied resources
+remain untouched. After the receipt, run only remaining/affected normal UI gates.

@@ -1,0 +1,69 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "75c77bea-eec3-4a4e-9749-42ab3982de7e",
+  "stage": "once-only-owned-pilot-ui-correction",
+  "preservedCandidate": "26b819f187e7222937763b29c9023e33d1fd6e66",
+  "edge": {
+    "name": "n88-student-portal",
+    "version": 36,
+    "verifyJwt": false,
+    "eszip": "d15fc5eefd077aa7141a89ce2d2c64f791191a2c6c73b7a5a6828ff3f33fde13",
+    "sourceSha256": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+    "sourceMatches": true
+  },
+  "cloudflare": {
+    "sourceReadStatus": 200,
+    "sourceSha256": "4c962e99b6e9cf634f57bc94cda8bcb6a1caa62bc7eb47d397867d8d6d707b60",
+    "sourceMatches": true,
+    "settingsStatus": 200,
+    "enabled": true,
+    "originExact": true,
+    "upstreamExact": true,
+    "secretNames": [
+      "N88_INGRESS_KEY"
+    ],
+    "logpush": false,
+    "tailConsumers": [],
+    "observabilityPresent": false
+  },
+  "privacyReuse": {
+    "explicitObservabilityDisabledReceipt": "current-provider-readback-b324b7b5.json",
+    "currentSettingsOmitObservability": true,
+    "absenceIsNotFreshDisabledProof": true,
+    "unchangedWorkerSource": true,
+    "accountZoneHeadersLogpushTlsEvidenceReused": true
+  },
+  "backendEnabled": true,
+  "rolloutMode": "pilot",
+  "publicEnabled": false,
+  "ownerBindingUnchanged": true,
+  "maxOwners": 1,
+  "maxExistingFabricatedPupils": 2,
+  "credentialRoleVerifierSaltSqlFixtureChanges": 0,
+  "sharedDependency": {
+    "taskId": "continuous-n44-cloudflare-redirect-transport-fix-20261019",
+    "observedStatus": "awaiting_po",
+    "candidateSha": "6f68b6e8cd148773e51007d990fd9e2c7b54f213"
+  },
+  "privateConfigReadback": "pilot-ui-correction-config-75c77bea.json",
+  "privateReadiness": "hosted-pilot-live-readiness.json",
+  "anonymousReadback": "pilot-ui-correction-http-75c77bea.json",
+  "uiEvidenceReused": "tests/n88-official-activation-current-entry-ui.json",
+  "originalFinalFailures": {
+    "path": "continuation-b324b7b5.json",
+    "lfSha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83",
+    "checks": [
+      {
+        "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+        "status": "FAIL"
+      },
+      {
+        "name": "n88_official_publisher_readiness_route_and_served_behavior",
+        "status": "FAIL"
+      }
+    ],
+    "restoreFullChecksAfterVerifiedCorrectionReceipt": true
+  },
+  "fullHostedAcceptance": false,
+  "finalFrontendPublished": false
+}
