@@ -1,0 +1,331 @@
+{
+  "aiAuthored": true,
+  "sourceOnly": true,
+  "enabled": false,
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "migrationVersion": "20261018044448",
+  "metadata": "b0abdcb656880f0660d43d4678ce1191fb8ccd7eed2e957f519d33aa5f55f334",
+  "sourceHashEncoding": "UTF-8 LF (Git canonical text); bundle outputs SHA256 of exact bytes",
+  "tools": {
+    "supabase": {
+      "version": "2.117.0",
+      "sha256": "442c83f7d455edc0462e94e22d60c9f7f05783fc83d39a0f49dadc78a914a1dd"
+    },
+    "esbuild": {
+      "version": "0.28.1",
+      "sha256": "ec02ee9b14ab332416fedd10614dfb80eed5304d94f67745067c011934a8c3c3"
+    },
+    "wrangler": {
+      "version": "4.148.0",
+      "sha256": "780661a508810f3b65786895b1ca9aacbc4f55d329ae6b8c1e49ec8433569f77"
+    },
+    "denoPreviouslyQualified": {
+      "version": "2.2.12",
+      "sha256": "4dd5f70d571e7cb49956b46e91ba9b91a83ea22bcfba496246174d9062b8d410"
+    },
+    "denoTypecheck": {
+      "version": "2.9.6",
+      "sha256": "2ff9493dfa356be2975f477025ea770088e9e9cb2c83d983236d13561b96b7a6"
+    },
+    "postgres": {
+      "version": "17.6",
+      "sha256": "54e7e05939e61f3462e3fd295bc12292623ad3cf010c02ae9cc3295a64b0770f"
+    },
+    "node": {
+      "version": "v24.19.0",
+      "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+    },
+    "esbuildMainSha256": "8331fe1d8b3a07381f33cc425fcfaa94776e263113653f80ec3ba433e9657e73"
+  },
+  "sources": {
+    "drafts/n44-push/node-globals.mjs": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+    "drafts/n44-push/activation/error-boundary-contract.json": "8eeea87b7a77de0759a6d4c1a106c012073556b0d5ee35b7ab31dc81c7064356",
+    "drafts/n44-push/activation/error-boundary-identities.json": "44f315fe1b150f787b7d1d01d98282d53e24f1290023a6f7c405253cc28d671c",
+    "drafts/n44-push/activation/private-error-boundary.mjs": "1611f96425963ffde1f8b3d645c3e88303510bd2ecbc0ccf4685b96fd68021c3",
+    "drafts/n44-push/session-policy.mjs": "475274a6947fa63972c469c7e713be589b3eb9680b7ba0a9183d78e36afbbb4e",
+    "drafts/n44-push/shared.mjs": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d",
+    "drafts/n44-push/registration.mjs": "464f60c2419d31560ed781c4dcb406fc60611879b7514361faf77a928a64c2ad",
+    "drafts/n44-push/provider-policy.mjs": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+    "drafts/n44-push/subscription-protector.mjs": "e386e3d82e5cf41ab29499a8f94ea2f93c5e7d880ae59789be07c358739451a6",
+    "src/lib/notification-center.js": "cc09773cc6a8092c67cd55e561881fda94b71c1f79310f398a57b08f73b761c3",
+    "src/lib/notification-push-core.js": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+    "drafts/n44-push/committed-permit.mjs": "6cc549a645edd1ebcad0edfd46163b4ebea23c8c48e3524f574eb35f609ea961",
+    "drafts/n44-push/audited-sender.mjs": "e890933c9287a4d9e0812caa40f96fb899d8b3c74d15dd0fbdfab9840d77ae69",
+    "src/lib/notification-state.js": "d3c0d36ab1e40900586a9964f1ff0919e5317df52289afa7ac898ce67f0a4f35",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/delivery.mjs": "45ef62bd567641e06477240b69c75983f56251cfc5be4e53f2956060527fd2f5",
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/private-runtime.mjs": "c7d0739284cbf5c6af9dff93d2b0517df66c2de4578a102df47bea28e840ffe9",
+    "drafts/n44-push/auth-verifier.mjs": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+    "src/lib/score-foundation.js": "d759fbec5a53638f2e05873df76db734430c8aafdc8b069bcdbbd23708e9af48",
+    "src/models.js": "c3799c0dbd8089d1faf39c68cacb0f49495a8afd91cc28f9e3b5a6ba8eef0d2b",
+    "src/lib/calendar-presets.js": "c103057b5eb59c26fb7d7c07cffe6d22a37297e19840311bce86c0406ac62d6a",
+    "src/lib/calendar-runtime.js": "685a5802c775ea45775565ec85d593648b207efbb1d61d800a739c58efe15108",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/backend.mjs": "eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2",
+    "drafts/n44-push/web-protocol.mjs": "96c7c55dcf941db0880c650b0ebec2d107edff57f6eabdb6719c46ebaeb6941f",
+    "drafts/n44-push/web-entry.mjs": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
+    "drafts/n44-push/database-transport.mjs": "2f5a4f6dd4d2d5864756d0cab111fc1771b4356b2aed7b551e10529ac89bf88d",
+    "drafts/n44-push/existing-host.mjs": "773f5798f8e1acab2bc9ded39a6dbaa28353cf67101f07948020662ebd0c92df",
+    "drafts/n44-push/readiness-entry.mjs": "51534b2f4d2ceb6a95376f5a37fb4fd0cf47d2a56f48de72f99c772b97d29516",
+    "drafts/n44-push/edge-request.mjs": "24ad294c8bf63e5d675a3e6f4488e3d5ff207c18ae6d3d3d20683a8fb8d1aacf",
+    "supabase/functions/n44-notifications/index.ts": "9a9d8c94419e683fc36cc8c53167aac0f02824ee751dcef2e8fa6336a794792a",
+    "drafts/n44-push/cloudflare-entry.mjs": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "supabase/functions/n44-notifications/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
+    "supabase/functions/n44-notifications/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+    "scripts/n44-activation-prepare.mjs": "9a57970e5d723bd992be82fe40ad43f22c790a3dd8d41abd562ce69b5b90810c",
+    "scripts/n44-activation-bundle.mjs": "a5bb87bfa6dbdf01cc3cf3b5fdfd0ae35eb5001983c673e284213ddcd6c94f06",
+    "scripts/n44-activation-readback.mjs": "ea6e9e3851735a07e3a9e6831cb02cdf40258635fda05d73e0d4f1daec23936c",
+    "supabase/migrations/20261018044448_n44_exact_activation_staged.sql": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
+    "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
+    "scripts/n44-activation-custody.mjs": "9c703a3a2a4ff87d8fbf6c51f5513c2c332bc456a868d56180cdb2d5fb03f0d9",
+    "drafts/n44-push/activation/build-error-boundary.mjs": "86cf5cd24c60cb75b821863f1ecd2de6944a34abb69e60442bb633d991e4a5d8",
+    "drafts/n44-push/activation/metadata-contract.json": "a8d893d890e243dee110746ef80f937c2525fc4415f3293672c47e29d1146963",
+    "drafts/n44-push/activation/preflight.inactive.sql": "5e4f5cdd5cac95899d6aa9f9c22ed5501f5b46bbce5c0a355b313181cd8cbaa7",
+    "drafts/n44-push/activation/readback.inactive.sql": "52777fc1065b843cf3ab1400478dfe2896b7c7d577ade4766a8b4c060cc08029",
+    "drafts/n44-push/activation/identities.inactive.sql": "06e3c252d7d8550f157b04e3434dabfb1b0e40c53a627645b3c4d6d053c1c01d",
+    "drafts/n44-push/activation/expected-identities.json": "83055fde1a2ee1cdd7d6f0e0eaeaa8d75e1a9ec598560072bcd78d71f581386e",
+    "drafts/n44-push/activation/deploy.staged.json": "18dd86d5ec57618ea4a760246969033130e5eaf0b4dd8d91f36cd99f14e87152",
+    "drafts/n44-push/activation/supabase.staged.toml": "66941ff754c3a375617ddd9a0e364da4fc4dac2c4fe56a03bfee9ce9550d4ff9",
+    "drafts/n44-push/activation/wrangler.staged.toml": "4c9fc344e569b35e40a125c936c6917c0f403def266b39991003ab00ed975efd",
+    "drafts/n44-push/activation/scheduler.staged.toml": "39f8c3d3545c06abbe88eba92c0bd596acacd1d7d7c25b6a895d33c596e4d331",
+    "drafts/n44-push/activation/toolchain.json": "1f00277e89cbe60d2f6a2001ac7860511adf5260ec403397d86143e54680fb44",
+    "drafts/n44-push/activation/client-readiness.json": "1bbadad5349625bdddb8821db1e17768cdd5d928387f1eac6278013b5ef84332",
+    "drafts/n44-push/activation/.gitattributes": "a79691a93b46e49ce460c26ef22afcc03d6eca1e63bf2edbc20e96159510f6c9",
+    "drafts/n44-push/schema-proposal.sql": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+    "drafts/n44-push/existing-host.inactive.sql": "f5b534520db93b0a09e58ab22099652b3c4dcd351015394553c0753917290c2e",
+    "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+    "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+    "drafts/n44-push/deployment.inactive.json": "89866dd757f3ff5f79abc5c250de649049348194997a28a339c8a4aa25c2737c"
+  },
+  "outputs": {
+    "edge/index.mjs": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+    "cloudflare/worker.mjs": "438bc5721e43c3c179e44f5a18e9a748291b913f28ecd1bc1240d2c164188a40",
+    "scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433",
+    "edge/deno.json": "eb511ff7cfab5305c4d84cdade9c98919bb5307d58f683d88778fca61bfdb8f2",
+    "edge/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+    "edge/import_map.json": "50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421"
+  },
+  "graphs": {
+    "edge/index.mjs": {
+      "inputs": [
+        "drafts/n44-push/activation/error-boundary-contract.json",
+        "drafts/n44-push/activation/error-boundary-identities.json",
+        "drafts/n44-push/activation/private-error-boundary.mjs",
+        "drafts/n44-push/audited-sender.mjs",
+        "drafts/n44-push/auth-verifier.mjs",
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/canonical-source.mjs",
+        "drafts/n44-push/committed-permit.mjs",
+        "drafts/n44-push/database-transport.mjs",
+        "drafts/n44-push/delivery.mjs",
+        "drafts/n44-push/edge-request.mjs",
+        "drafts/n44-push/existing-host.mjs",
+        "drafts/n44-push/node-globals.mjs",
+        "drafts/n44-push/postgres-repository.mjs",
+        "drafts/n44-push/private-runtime.mjs",
+        "drafts/n44-push/provider-policy.mjs",
+        "drafts/n44-push/readiness-entry.mjs",
+        "drafts/n44-push/registration.mjs",
+        "drafts/n44-push/runtime-gateway.mjs",
+        "drafts/n44-push/session-policy.mjs",
+        "drafts/n44-push/shared.mjs",
+        "drafts/n44-push/subscription-protector.mjs",
+        "drafts/n44-push/web-entry.mjs",
+        "drafts/n44-push/web-protocol.mjs",
+        "src/lib/calendar-presets.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/notification-center.js",
+        "src/lib/notification-push-core.js",
+        "src/lib/notification-state.js",
+        "src/lib/score-foundation.js",
+        "src/models.js",
+        "supabase/functions/n44-notifications/index.ts"
+      ],
+      "imports": [
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:process",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "pg",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@noble/curves/nist.js",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@noble/curves/nist.js",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:net",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "ipaddr.js",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "web-push",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:dns/promises",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:https",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:tls",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:perf_hooks",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:http",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:perf_hooks",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@supabase/auth-js",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "pg",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:buffer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        }
+      ]
+    },
+    "cloudflare/worker.mjs": {
+      "inputs": [
+        "drafts/n44-push/cloudflare-entry.mjs",
+        "drafts/n44-push/web-protocol.mjs"
+      ],
+      "imports": []
+    },
+    "scheduler/worker.mjs": {
+      "inputs": [
+        "drafts/n44-push/scheduler-entry.mjs",
+        "drafts/n44-push/web-protocol.mjs"
+      ],
+      "imports": []
+    }
+  },
+  "externalDependencies": {
+    "web-push": "3.6.7",
+    "ipaddr.js": "2.5.0",
+    "@supabase/auth-js": "2.118.0",
+    "pg": "8.23.1",
+    "@noble/curves": "1.9.7"
+  },
+  "gates": {
+    "edgeEnabled": false,
+    "cloudflareEnabled": false,
+    "schedulerEnabled": false,
+    "deliveryEnabled": false,
+    "browserEnabled": false,
+    "serviceWorkerEnabled": false,
+    "routes": [],
+    "cron": []
+  }
+}

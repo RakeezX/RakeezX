@@ -1,0 +1,15 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "recordedAt": "2026-10-19T04:07:25.540Z",
+  "httpStatus": 200,
+  "status": "ready",
+  "loginExact": true,
+  "roleExact": true,
+  "upstreamSsl": true,
+  "clientTlsAuthorized": true,
+  "sourceBoundary": true,
+  "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+  "enabled": true,
+  "deliveryEnabled": false
+}

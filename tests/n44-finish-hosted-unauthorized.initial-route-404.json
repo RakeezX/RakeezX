@@ -1,0 +1,41 @@
+{
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "recordedAt": "2026-10-19T04:08:38.903Z",
+  "results": [
+    {
+      "name": "mountedIngressWrongMethod",
+      "url": "https://rakeezx.com/api/n44/status",
+      "method": "GET",
+      "httpStatus": 404,
+      "denied": false,
+      "bodyKeys": [],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store"
+    },
+    {
+      "name": "edgeWrongAuthDispatch",
+      "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/dispatch",
+      "method": "POST",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    },
+    {
+      "name": "edgeWrongAuthReadiness",
+      "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/readiness",
+      "method": "POST",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    }
+  ],
+  "noPushOrAccountOperation": true
+}

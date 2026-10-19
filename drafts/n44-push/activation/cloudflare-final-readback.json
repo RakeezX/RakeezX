@@ -1,0 +1,200 @@
+{
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "activation": {
+    "status": "PASS",
+    "ingressEnabled": true,
+    "route": {
+      "id": "05c0088cf73e4223abaccd1c859e4539",
+      "pattern": "rakeezx.com/api/n44/*",
+      "script": "n44-notifications-ingress",
+      "request_limit_fail_open": false
+    },
+    "schedulerEnabled": false,
+    "cron": []
+  },
+  "configuration": [
+    {
+      "name": "n44-notifications-ingress",
+      "updated": true,
+      "readback": true,
+      "logpush": false,
+      "tailConsumers": [],
+      "enabled": "true",
+      "schedulerEnabled": "false",
+      "secretNames": [
+        "N44_INGRESS_KEY"
+      ],
+      "cron": []
+    },
+    {
+      "name": "n44-notifications-scheduler",
+      "updated": true,
+      "readback": true,
+      "logpush": false,
+      "tailConsumers": [],
+      "enabled": "false",
+      "schedulerEnabled": "false",
+      "secretNames": [
+        "N44_SCHEDULER_KEY"
+      ],
+      "cron": []
+    }
+  ],
+  "privacy": [
+    {
+      "name": "n44-notifications-ingress",
+      "status": 200,
+      "success": true,
+      "configurationResponse": {
+        "enabled": false,
+        "head_sampling_rate": null,
+        "logs": {
+          "enabled": false,
+          "destinations": [],
+          "head_sampling_rate": null,
+          "persist": false,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "destinations": [],
+          "persist": false,
+          "head_sampling_rate": null
+        }
+      },
+      "configurationGet": null,
+      "enabled": "true",
+      "schedulerEnabled": "false",
+      "logpush": false,
+      "tailConsumers": []
+    },
+    {
+      "name": "n44-notifications-scheduler",
+      "status": 200,
+      "success": true,
+      "configurationResponse": {
+        "enabled": false,
+        "head_sampling_rate": null,
+        "logs": {
+          "enabled": false,
+          "destinations": [],
+          "head_sampling_rate": null,
+          "persist": false,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "destinations": [],
+          "persist": false,
+          "head_sampling_rate": null
+        }
+      },
+      "configurationGet": null,
+      "enabled": "false",
+      "schedulerEnabled": "false",
+      "logpush": false,
+      "tailConsumers": []
+    }
+  ],
+  "routeDeploymentReadback": {
+    "zone": {
+      "name": "rakeezx.com",
+      "status": "active",
+      "type": "full",
+      "nameServers": [
+        "khalid.ns.cloudflare.com",
+        "leanna.ns.cloudflare.com"
+      ]
+    },
+    "route": [
+      {
+        "id": "05c0088cf73e4223abaccd1c859e4539",
+        "pattern": "rakeezx.com/api/n44/*",
+        "script": "n44-notifications-ingress",
+        "request_limit_fail_open": false
+      }
+    ],
+    "deployments": {
+      "deployments": [
+        {
+          "id": "a522d399-f734-40b2-a714-bd135920ba97",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "94280ce2-5a76-41f1-91f0-feac5248b9d2",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T04:08:34.436891Z"
+        },
+        {
+          "id": "8f3430bb-82b7-4cbc-9215-098d01b6abfb",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "c01cf33a-c679-4077-97c8-9deebb526aea",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T04:06:47.25791Z"
+        },
+        {
+          "id": "e66ccd8f-02da-4c9f-b10c-c25951220d85",
+          "source": "api",
+          "strategy": "percentage",
+          "author_email": "rakeezxteam@gmail.com",
+          "annotations": {
+            "workers/message": "Automatic deployment on upload.",
+            "workers/triggered_by": "upload"
+          },
+          "versions": [
+            {
+              "version_id": "eff1dd2e-43bb-4990-8030-27df3004ba5c",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-19T03:59:53.722596Z"
+        }
+      ]
+    },
+    "enabled": {
+      "name": "N44_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    }
+  },
+  "preservedFailures": [
+    {
+      "code": 10053,
+      "message": "Binding name 'N44_ENABLED' already in use. Please use a different name and try again.",
+      "correction": "Changed the existing plain_text binding through documented settings PATCH; no binding rename or extra privilege."
+    },
+    {
+      "code": 10000,
+      "operation": "GET exact rakeezx.com CNAME metadata",
+      "message": "Authentication error",
+      "disposition": "Optional diagnosis stopped; no retry/alternate credential/DNS write. Independent authorized mounted HTTP check passed."
+    },
+    {
+      "operation": "initial route HTTP",
+      "status": 404,
+      "disposition": "Preserved initial-route-404 evidence; subsequent actual mounted POST and GET returned401."
+    }
+  ],
+  "actualSend": false,
+  "schedulerEnabled": false,
+  "cron": [],
+  "browserAndSwEnabled": false
+}

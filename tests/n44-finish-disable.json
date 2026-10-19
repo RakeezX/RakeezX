@@ -1,0 +1,10 @@
+{
+  "aiAuthored": true,
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "status": "PASS",
+  "ownedSettingsOnly": true,
+  "secretValuesNotRead": true,
+  "exactOwnedRouteOnly": true,
+  "foreignCollisionRejected": true,
+  "liveRollbackPerformed": false
+}

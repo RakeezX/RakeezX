@@ -1,0 +1,3 @@
+# Exact owned provider preparation/readback copies; canonical bundle hashes are retained.
+provider-deploy/
+provider-readback/

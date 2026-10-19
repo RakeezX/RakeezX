@@ -122,5 +122,24 @@
     "backendMembership": false,
     "evidence": "tests/n44-finish-post-cache-session.json",
     "furtherConnectionAllowance": 0
+  },
+  "runtimeTransport": {
+    "kind": "official_direct_from_original_Edge",
+    "host": "db.xlrubcwjqktzzunrvuns.supabase.co",
+    "port": 5432,
+    "role": "n44_service_login",
+    "caSha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
+    "strictChainHostnameAndDatabaseTls": true
+  },
+  "actualServiceReadback": {
+    "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+    "receipt": "tests/n44-finish-activation-final.json",
+    "serviceEnabled": true,
+    "ingressEnabled": true,
+    "deliveryEnabled": false,
+    "schedulerEnabled": false,
+    "cron": [],
+    "browserEnabled": false,
+    "serviceWorkerEnabled": false
   }
 }

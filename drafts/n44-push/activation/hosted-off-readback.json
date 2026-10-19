@@ -1,0 +1,25 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+  "status": "PASS",
+  "deliveryEnabled": false,
+  "serviceEnabled": false,
+  "edgeSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "actualDirectRestrictedReadiness": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+    "recordedAt": "2026-10-19T04:04:28.702Z",
+    "httpStatus": 200,
+    "status": "ready",
+    "loginExact": true,
+    "roleExact": true,
+    "upstreamSsl": true,
+    "clientTlsAuthorized": true,
+    "sourceBoundary": true,
+    "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+    "enabled": false,
+    "deliveryEnabled": false
+  },
+  "actualCloudflareReceipt": "cloudflare-off-readback.json",
+  "recordedAt": "2026-10-19T04:07:17.447Z"
+}

@@ -79,14 +79,14 @@
     "scripts/n44-activation-readback.mjs": "ea6e9e3851735a07e3a9e6831cb02cdf40258635fda05d73e0d4f1daec23936c",
     "supabase/migrations/20261018044448_n44_exact_activation_staged.sql": "03979346de415c3aef5a97fe00a9d4de04fd58ec9cd5a8b0c58283fb5b4cb67f",
     "supabase/migrations/20261018191000_n44_private_error_boundary_staged.sql": "e38579bfac4987c6aee47d4ec26e6ba0aae6ef9f4f1c827b8d0faaef5a857e83",
-    "scripts/n44-activation-custody.mjs": "9c703a3a2a4ff87d8fbf6c51f5513c2c332bc456a868d56180cdb2d5fb03f0d9",
+    "scripts/n44-activation-custody.mjs": "b5b51bcf051e2dea27036ee08ea2a3ef650a561c462d47da1e5f32cb7f711f4b",
     "drafts/n44-push/activation/build-error-boundary.mjs": "86cf5cd24c60cb75b821863f1ecd2de6944a34abb69e60442bb633d991e4a5d8",
     "drafts/n44-push/activation/metadata-contract.json": "a8d893d890e243dee110746ef80f937c2525fc4415f3293672c47e29d1146963",
     "drafts/n44-push/activation/preflight.inactive.sql": "5e4f5cdd5cac95899d6aa9f9c22ed5501f5b46bbce5c0a355b313181cd8cbaa7",
     "drafts/n44-push/activation/readback.inactive.sql": "52777fc1065b843cf3ab1400478dfe2896b7c7d577ade4766a8b4c060cc08029",
     "drafts/n44-push/activation/identities.inactive.sql": "06e3c252d7d8550f157b04e3434dabfb1b0e40c53a627645b3c4d6d053c1c01d",
     "drafts/n44-push/activation/expected-identities.json": "83055fde1a2ee1cdd7d6f0e0eaeaa8d75e1a9ec598560072bcd78d71f581386e",
-    "drafts/n44-push/activation/deploy.staged.json": "18dd86d5ec57618ea4a760246969033130e5eaf0b4dd8d91f36cd99f14e87152",
+    "drafts/n44-push/activation/deploy.staged.json": "f594ed629e0cda7be99151eb0c92013dbd390386adde50c81f47c2aa3dfcd3cd",
     "drafts/n44-push/activation/supabase.staged.toml": "66941ff754c3a375617ddd9a0e364da4fc4dac2c4fe56a03bfee9ce9550d4ff9",
     "drafts/n44-push/activation/wrangler.staged.toml": "4c9fc344e569b35e40a125c936c6917c0f403def266b39991003ab00ed975efd",
     "drafts/n44-push/activation/scheduler.staged.toml": "39f8c3d3545c06abbe88eba92c0bd596acacd1d7d7c25b6a895d33c596e4d331",
@@ -97,7 +97,8 @@
     "drafts/n44-push/existing-host.inactive.sql": "f5b534520db93b0a09e58ab22099652b3c4dcd351015394553c0753917290c2e",
     "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
     "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
-    "drafts/n44-push/deployment.inactive.json": "89866dd757f3ff5f79abc5c250de649049348194997a28a339c8a4aa25c2737c"
+    "drafts/n44-push/deployment.inactive.json": "89866dd757f3ff5f79abc5c250de649049348194997a28a339c8a4aa25c2737c",
+    "drafts/n44-push/activation/disable-provider.mjs": "b0bb527bf4cef0d15168fbfddd387a65baa39b4100d0c69d4db3149e39acac5c"
   },
   "outputs": {
     "edge/index.mjs": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
@@ -327,5 +328,17 @@
     "serviceWorkerEnabled": false,
     "routes": [],
     "cron": []
-  }
+  },
+  "actualServiceReadback": {
+    "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+    "receipt": "tests/n44-finish-activation-final.json",
+    "serviceEnabled": true,
+    "ingressEnabled": true,
+    "deliveryEnabled": false,
+    "schedulerEnabled": false,
+    "cron": [],
+    "browserEnabled": false,
+    "serviceWorkerEnabled": false
+  },
+  "sourceDefaultsRemainOff": true
 }

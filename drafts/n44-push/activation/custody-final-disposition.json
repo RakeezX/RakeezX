@@ -1,0 +1,18 @@
+{
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "retainedFiles": [
+    "owner.json",
+    "recovery.dpapi"
+  ],
+  "protection": "Existing owned protected directory; CurrentUser DPAPI recovery",
+  "plaintextTransientInputsAbsent": true,
+  "sharedKeysEncryptedHandoff": true,
+  "noPasswordSaltVerifierRotationThisRun": true,
+  "retainedServiceResources": [
+    "n44-notifications",
+    "n44-notifications-ingress",
+    "n44-notifications-scheduler"
+  ],
+  "temporaryFunctionCreated": false,
+  "providerWorkspaceCopiesIgnored": true
+}

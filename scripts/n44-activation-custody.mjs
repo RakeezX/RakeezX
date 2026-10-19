@@ -14,6 +14,7 @@ const phase='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-
 const marker={run,project,phase,purpose:'N44 exact restricted service custody'};
 const cli='C:/Users/Abody/AppData/Local/npm-cache/_npx/0e23c24576954b26/node_modules/supabase/dist/supabase.js';
 const fail=code=>{throw Error(code);};
+export function protectedEnvText(env){return Object.entries(env).map(([k,v])=>{if(k.endsWith('_JSON')){if(v.includes("'"))fail('n44_env_literal_quote_collision');return k+"='"+v+"'";}return k+'='+JSON.stringify(v);}).join('\n')+'\n';}
 // Supavisor compatibility contract: current provisioning4096; historical16384 stays explicit.
 export function deriveScram(password,salt=randomBytes(16),iterations=4096){
  const salted=pbkdf2Sync(password,salt,iterations,32,'sha256'),client=createHmac('sha256',salted).update('Client Key').digest();
@@ -195,7 +196,7 @@ export async function execute(action,value){
   const pub=JSON.parse(await readFile(base+'/public-provider-config.json','utf8'));if(pub.project!==project||!pub.authPublicKey)fail('n44_public_config_missing');
   const crypto={activeKeyId:'v1',fingerprintKeyId:'v1',activeVapidKeyId:'v1',sealingKeys:[['v1',state.sealing]],endpointHmacKeys:[['v1',state.endpoint]],bindingHmacKeys:[['v1',state.binding]],vapidKeys:[['v1',{publicKey:state.vapidPublic,privateKey:state.vapidPrivate,subject:'https://rakeezx.com'}]]};
   const env={N44_ENABLED:'false',N44_DELIVERY_ENABLED:'false',N44_READINESS_ENABLED:'true',N44_PUBLIC_ORIGIN:'https://rakeezx.com',N44_AUTH_URL:'https://'+project+'.supabase.co',N44_AUTH_API_KEY:pub.authPublicKey,N44_SERVICE_REVISION:'n44-browser-service-v2',N44_SERVICE_SOURCE_SHA:state.source,N44_SESSION_POLICY_JSON:JSON.stringify(state.policy),N44_DATABASE_URL:state.databaseTransport==='direct'?`postgresql://n44_service_login:${state.password}@db.${project}.supabase.co:5432/postgres`:`postgresql://n44_service_login.${project}:${state.password}@aws-0-ap-south-1.pooler.supabase.com:5432/postgres`,N44_DATABASE_CA_CERT:await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-1628-finish-20261018/supabase-prod-ca-2021.crt','utf8'),N44_INGRESS_KEY:state.ingress,N44_SCHEDULER_KEY:state.scheduler,N44_RATE_KEY:state.rate,N44_CRYPTO_JSON:JSON.stringify(crypto),N44_PROVIDER_ORIGINS_JSON:JSON.stringify(['https://fcm.googleapis.com'])};
-  const f=path.join(phase,'owned-env.tmp');try{await writeFile(f,Object.entries(env).map(([k,v])=>k+'='+JSON.stringify(v)).join('\n')+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',f]);state.installed=true;await save(state);}finally{await unlink(f).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+  const f=path.join(phase,'owned-env.tmp');try{await writeFile(f,protectedEnvText(env),{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',f]);state.installed=true;await save(state);}finally{await unlink(f).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   state.envDigests=Object.fromEntries(Object.entries(env).map(([k,v])=>[k,createHash('sha256').update(v).digest('hex')]));await save(state);
   return {installed:true,enabled:false,names:Object.keys(env),publicVapidKey:state.vapidPublic,policyApprovalId:state.policy.approvalId,source:state.source};
  }
@@ -206,7 +207,8 @@ export async function execute(action,value){
   // Official CLI2.120 JSON uses Management API `value` for the displayed DIGEST column.
   const comparison=Object.entries(state.envDigests).map(([name,digest])=>{const r=rows.find(r=>r.name===name),actual=r?.digest??r?.value;return {name,present:!!r,exactDigest:actual===digest,hexDigest:/^[a-fA-F0-9]{64}$/.test(actual??''),caseInsensitiveDigest:typeof actual==='string'&&actual.toLowerCase()===digest};});
   if(comparison.some(r=>!r.exactDigest)){await writeFile(base+'/secret-digest-diagnostic.json',JSON.stringify({runId:operationRun,comparison,privateValuesReturned:false},null,2)+'\n');fail('n44_secret_digest_mismatch');}
-  return {namesAndDigestsMatched:Object.keys(state.envDigests).sort(),source:state.source,serviceEnabled:!!state.serviceEnabled,deliveryEnabled:false,policyApprovalId:state.policy.approvalId};
+  const receipt={namesAndDigestsMatched:Object.keys(state.envDigests).sort(),source:state.source,serviceEnabled:!!state.serviceEnabled,deliveryEnabled:false,policyApprovalId:state.policy.approvalId};
+  await writeFile(base+'/secret-readback.json',JSON.stringify({runId:operationRun,recordedAt:new Date().toISOString(),...receipt},null,2)+'\n');return receipt;
  }
  if(action==='--enable-service'){
   if(!state.installed||!state.loginVerified)fail('n44_service_enable_gate_missing');
@@ -216,7 +218,7 @@ export async function execute(action,value){
  if(action==='--disable'){
   // Nonsecret fail-closed flags first; no table drop, policy change or send replay.
   await sqlEnv({N44_ENABLED:'false',N44_DELIVERY_ENABLED:'false'});
-  if(state.loginAcknowledged)await sqlFile('alter role n44_service_login nologin;');
+  if(state.loginAcknowledged)await sqlFile('begin;alter role n44_service_login nologin;revoke n44_backend from n44_service_login;commit;');
   state.serviceEnabled=false;state.disarmed=true;await save(state);return {edgeDisabled:true,deliveryDisabled:true,ownedLoginDisabled:!!state.loginAcknowledged};
  }
  if(action==='--disarm-login'){

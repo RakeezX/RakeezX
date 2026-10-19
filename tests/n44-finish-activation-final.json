@@ -1,0 +1,127 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-finish-bounded-service-activation-20261018",
+  "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+  "recordedAt": "2026-10-19T04:16:29.540Z",
+  "state": "LOCAL_READY",
+  "scope": "Actual original nonsending service activation only; frontend publisher/PO/device acceptance separate",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "serviceSourceSha": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+  "edgeFunction": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "name": "n44-notifications",
+    "id": "91b66efd-70c8-4d7d-bb50-e19f9bf4dced",
+    "version": 4,
+    "status": "ACTIVE",
+    "verifyJwt": false,
+    "providerBundleSha256": "8c46bff41a14277bd72f3905a51dc034abf902a1b5da189aa717a752e13d42f7",
+    "recordedAt": "2026-10-19T04:14:18.138Z"
+  },
+  "edgeSourceSha256": "75d2fd6715a31a0b24ca6bc276ebea7da6ff1e6e9a2c5c79f9c5b62df4056181",
+  "restrictedIdentityAndFullTls": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "runId": "fdaa4ff1-9221-41b9-8661-8a57a9a6e986",
+    "recordedAt": "2026-10-19T04:07:25.540Z",
+    "httpStatus": 200,
+    "status": "ready",
+    "loginExact": true,
+    "roleExact": true,
+    "upstreamSsl": true,
+    "clientTlsAuthorized": true,
+    "sourceBoundary": true,
+    "source": "236f68e0131ca4d2b27fc3014cb33421f90b40c1",
+    "enabled": true,
+    "deliveryEnabled": false
+  },
+  "providerSecretNamesAndDigestsMatched": [
+    "N44_AUTH_API_KEY",
+    "N44_AUTH_URL",
+    "N44_CRYPTO_JSON",
+    "N44_DATABASE_CA_CERT",
+    "N44_DATABASE_URL",
+    "N44_DELIVERY_ENABLED",
+    "N44_ENABLED",
+    "N44_INGRESS_KEY",
+    "N44_PROVIDER_ORIGINS_JSON",
+    "N44_PUBLIC_ORIGIN",
+    "N44_RATE_KEY",
+    "N44_READINESS_ENABLED",
+    "N44_SCHEDULER_KEY",
+    "N44_SERVICE_REVISION",
+    "N44_SERVICE_SOURCE_SHA",
+    "N44_SESSION_POLICY_JSON"
+  ],
+  "ingressEnabled": true,
+  "route": {
+    "id": "05c0088cf73e4223abaccd1c859e4539",
+    "pattern": "rakeezx.com/api/n44/*",
+    "script": "n44-notifications-ingress",
+    "request_limit_fail_open": false
+  },
+  "schedulerEnabled": false,
+  "cron": [],
+  "deliveryEnabled": false,
+  "browserEnabled": false,
+  "serviceWorkerEnabled": false,
+  "actualUnauthorizedHttp": [
+    {
+      "name": "mountedIngressWrongMethod",
+      "url": "https://rakeezx.com/api/n44/status",
+      "method": "GET",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    },
+    {
+      "name": "edgeWrongAuthDispatch",
+      "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/dispatch",
+      "method": "POST",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    },
+    {
+      "name": "edgeWrongAuthReadiness",
+      "url": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n44-notifications/readiness",
+      "method": "POST",
+      "httpStatus": 401,
+      "denied": true,
+      "bodyKeys": [
+        "error"
+      ],
+      "privateValuesReturned": false,
+      "cacheControl": "no-store, private"
+    }
+  ],
+  "immutableMigrationsReplayed": false,
+  "personalRowsRead": 0,
+  "authFixtureCreated": false,
+  "realSend": false,
+  "devicePermissionOrRegistration": false,
+  "closedClientOsDelivery": "NOT_RUN",
+  "originalFailuresPreserved": true,
+  "optionalDnsRead": {
+    "status": "FAIL",
+    "code": 10000,
+    "message": "Authentication error",
+    "retried": false,
+    "dnsChanged": false,
+    "requiredMountIndependentlyProved": true
+  },
+  "cleanup": {
+    "liveMutationLeaseReleased": true,
+    "plaintextTransientInputsAbsent": true,
+    "ownedBrowserServerProcessesCreated": false,
+    "encryptedRecoveryRetained": true
+  },
+  "noFrontendPublication": true,
+  "productClosed": false
+}
