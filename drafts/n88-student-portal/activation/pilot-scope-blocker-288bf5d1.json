@@ -1,0 +1,22 @@
+{
+  "taskId":"continuous-n88-official-student-portal-activation-20261018",
+  "runId":"288bf5d1-c519-414f-91c3-06442d6246ab",
+  "preservedCandidate":"d0640ff1da6086d4b66b70922627ed2163d385e3",
+  "baseSha":"5046e82968cb0055db7a99aea41d65dcb71b2a60",
+  "state":"BLOCKED",
+  "blockerType":"implementation",
+  "classification":"Self-imposed inactive-card source-path omission; not a service/security/tool refusal or missing PO permission.",
+  "completed":{"source":"drafts/n88-student-portal/rollout-guard.mjs","test":"tests/n88-official-activation-rollout.json","purePolicy":"PASS","operationallyIntegrated":false,"frontendEnabled":false},
+  "missingPaths":[
+    {"path":"drafts/n88-student-portal/integrated-service.mjs","reason":"Bind the additional guard after original verified Auth/session and canonical class/source ownership, before teacher list/recovery/fields/guidance/writes; pass the same policy to original credential/student seams."},
+    {"path":"drafts/n88-student-portal/class-credentials.mjs","reason":"Restrict original missing-code batch/rotate/revoke selection to admitted pupils before code creation or recovery; the original designated class has28 members and the pilot budget is2. Preserve original roster/CAS/ACK behavior."},
+    {"path":"drafts/n88-student-portal/numeric-credentials.mjs","reason":"Enforce admitted original credential/member on student claim/read/session paths after existing rate/crypto/source guards and before session writes or private projection. Do not move lookup ahead of rate debit or alter invalid-code behavior."},
+    {"path":"drafts/n88-student-portal/canonical-adapter.mjs","reason":"Restrict this pilot's private membership/publication synchronization to admitted pupils while preserving other rows and original source locks/owner/revision fences. A filtered visible roster alone does not prevent out-of-budget private synchronization writes."}
+  ],
+  "scopeVerifiedAgainst":"Canonical activated task allowedPaths, read only; all4 absent. rollout-guard.mjs is explicitly allowed.",
+  "unsafeSubstitutesRejected":["No source-text rewriting during bundling to modify excluded modules","No query interception or generic privileged wrapper in place of original admission seams","No frontend-only flag or source-only operational PASS"],
+  "retainedEvidence":["activation/continuation-9190735f.json","activation/hosted-direct-readiness.json","activation/hosted-boundary-readback.json","Original eight migration/76-routine/native-log/credential/custody proofs unchanged"],
+  "stagedActivation":"Canonical card stagedActivation originalRequiredChecks/finalRequiredChecks/finalAcceptance retained unchanged; full hosted teacher/student and public rollout groups remain NOT_RUN.",
+  "disposition":{"providerCalls":0,"credentialOrRecoveryRead":false,"ownerOrPupilBindingQueried":false,"roleOrFlagChanges":0,"migrationChanges":0,"frontendPublication":false,"fixtureMutations":0,"messages":0,"phaseResourcesAcquired":false,"priorRejectedResourceTouched":false},
+  "retryCondition":"After this worker is inactive and the publisher idle, the existing approved guarded maintenance helper adds only these4 necessary original service paths to this inactive card. Controller resumes the same saved session/candidate; implement original seams, focused integration negatives, sealed binding, pilot activation and sole-publisher package. No new permission, role, migration or replay of successful auth/schema proofs."
+}

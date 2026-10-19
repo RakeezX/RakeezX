@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "288bf5d1-c519-414f-91c3-06442d6246ab",
+  "status": "PASS",
+  "scope": "Pure additional rollout admission with synthetic identities only",
+  "checks": [
+    "off/default/invalid fail closed",
+    "strict one-owner/exact-two-pupil config",
+    "verified current teacher and matching source required",
+    "wrong owner/source/pupil rejected",
+    "inactive/ended student rejected",
+    "public requires explicit hosted acceptance markers and retains source fences",
+    "private binding not exposed"
+  ],
+  "operationalServiceIntegration": "NOT_RUN",
+  "hostedOrRenderedUiProof": false,
+  "providerWrites": 0
+}

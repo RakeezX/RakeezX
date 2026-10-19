@@ -354,3 +354,29 @@ This is a concrete publication/test-target dependency, not a routine PM approval
 Readiness flags paused and own role NOLOGIN verified; Worker OFF/no routes/previews.
 No migration replay, real records, fixture mutation, code issuance or sending.
 See activation/continuation-9190735f.json for current exact disposition.
+
+Run288bf5d1: latest owner-restricted pilot authority supersedes the previous
+frontend-ordering blocker. Added the explicitly allowed rollout-guard.mjs with
+synthetic focused policy proof: missing/invalid/default OFF, strict private
+one-owner/two-pupil binding, verified current teacher/source admission, wrong
+owner/pupil/source rejection and explicit future public acceptance markers.
+This is pure policy preparation, NOT operational service or rendered-UI PASS.
+
+The activated allowedPaths omits four original execution seams needed to make
+that guard authoritative: integrated-service.mjs, class-credentials.mjs,
+numeric-credentials.mjs and canonical-adapter.mjs under drafts/n88-student-portal/.
+Respectively these own verified teacher/source admission; class batch/rotate/
+revoke; student crypto/rate/session/data admission; and private source-sync
+membership/publication writes. The28-member designated roster must not cause
+more than the two admitted pupils to be synchronized/issued during this pilot.
+No frontend flag, bundler source rewrite or query interception substitutes for
+those original seams. No excluded source was changed.
+
+Exact missing paths/reasons and saved continuation are in
+activation/pilot-scope-blocker-288bf5d1.json. This is a self-imposed card path
+defect for the already approved inactive-card maintenance procedure; it is not
+a new user permission gate or security refusal. No provider/credential/binding
+read, role/config/migration change, fixture mutation, publication or resource
+lease occurred. Prior successful proofs and original stagedActivation full
+acceptance remain unchanged. Operational pilot and full hosted/public groups
+remain NOT_RUN until the exact source scope is repaired and session resumed.
