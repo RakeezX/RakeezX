@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-publish-qualified-delayed-ack-20261019",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -1700,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "budgetMinutes": 15,
+      "idleMinutes": 8,
+      "dependsOn": [
+        "continuous-n44-single-device-optin-ready-20261019"
+      ],
+      "objective": "Read exact current N44 row and saved candidate11696a34dbc1dca8ff92e15a1b7b65c1408f6b3d from original test task only. SAME original custodian session01a14fcd-032c-7ec0-8b0c-0e0395862c61 in this clean current-main worktree, supplied new task/run IDs. This task is solely the MISSING FRONTEND PUBLICATION PREREQUISITE for the already-qualified delayed ACK correction; not another Product implementation, test replay, provider-service deployment or live test. Actual cause/proof saved: client10s abort vs successful consent response around10002ms; ingress deadline12s, qualified client15s passes actual settings path delayed11s and owner fence. Existing test task cannot report its mandatory live-send checks PASS until correction is published; it now depends on this card, preserving candidate/session and ONE-unconsumed-attempt journal. Reuse exact existing source and passing delayed-ACK/one-attempt journal evidence from candidate11696a34, record provenance/source pins. Import ONLY its necessary existing src/lib/notification-push-gateway.js and qualified activation/device-custodian.mjs, activation/device-attempt-journal.mjs plus bounded tests/evidence into current-main checkout by exact path. Do not cherry-pick entire old branch/history or copy protected runtime/config/private journals. Do not run prior successful UI/service/crypto/nativePG/SQL/42routine/browser/11sec timing tests again; source unchanged, prior proof valid. No credentials/keys/session tokens/root private access, no service/Edge/ingress config deployment, no device registration/permission/send, no fixture/account/migration/Auth/RLS/role operation. Only resolve ordinary source integration if current-main actually moved relevant file. Save exact patch and evidence, LOCAL_READY for sole publisher immediately. Publisher proves changed official gateway source; dependent existing test then resumes automatically SAME original session with already granted Chrome permission, actual registration ACK and one-send/cleanup only. Do not wait for PO or add an approval gate.",
+      "allowedPaths": [
+        "src/lib/notification-push-gateway.js",
+        "drafts/n44-push/activation/device-custodian.mjs",
+        "drafts/n44-push/activation/device-attempt-journal.mjs",
+        "tests/n44-device-1019-delayed-ack.mjs",
+        "tests/n44-device-1019-delayed-ack.json",
+        "tests/n44-device-1019-attempt-journal.mjs",
+        "tests/n44-device-1019-attempt-journal.json",
+        "docs/automation-evidence/20261019/N44_QUALIFIED_DELAYED_ACK_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-gateway.js",
+        "docs/automation-evidence/20261019/N44_QUALIFIED_DELAYED_ACK_DELIVERY.md"
+      ],
+      "requiredChecks": [
+        "n44_exact_qualified_delayed_ack_source_provenance_reused"
+      ],
+      "acceptance": [
+        "Exactly already-qualified15s gateway correction and original one-attempt custody code reach official frontend through sole publisher, no live send/registration in prerequisite."
+      ],
+      "preparationAuthority": {
+        "kind": "necessary-qualified-client-correction-publication",
+        "publication": true,
+        "qualifiedCandidate": "11696a34dbc1dca8ff92e15a1b7b65c1408f6b3d",
+        "originalCustodianSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "newTestsRequired": false,
+        "realSends": 0,
+        "deviceRegistrations": 0,
+        "serviceConfigChange": false,
+        "newMigrations": 0,
+        "newAuthUsers": 0
+      },
+      "releaseAuthority": "Existing human one-device-test and ordinary fix/official-delivery delegation applies to necessary qualified client timeout correction. No expansion of total ONE send-attempt budget or provider/schema/Auth/credentials/security scope."
+    }
+  ]
+}
