@@ -1,0 +1,64 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-official-student-portal-activation-20261018",
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "state": "BLOCKED",
+  "preparing": true,
+  "currentBackendEnabled": true,
+  "publicEnabled": false,
+  "fullHostedAcceptance": true,
+  "hostedEvidence": "drafts/n88-student-portal/activation/served-hosted-78c0cde1.json",
+  "checks": [
+    {
+      "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
+      "status": "PASS",
+      "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes."
+    },
+    {
+      "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "status": "PASS",
+      "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes."
+    },
+    {
+      "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "status": "PASS",
+      "evidence": "served-hosted-78c0cde1.json combines unchanged prior actual components with actual published wake/return/ACK proof"
+    },
+    {
+      "name": "n88_official_publisher_readiness_route_and_served_behavior",
+      "status": "NOT_RUN",
+      "evidence": "Published pilot receipt9858b900 retained; final public readiness requires the wake correction receipt and remaining actual acceptance. Public mode not enabled."
+    },
+    {
+      "name": "n88_private_database_error_boundary_under_actual_provider_logging",
+      "status": "PASS",
+      "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true."
+    },
+    {
+      "name": "n88_exact_private_guard_membership_inherit_correction",
+      "status": "PASS",
+      "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes."
+    },
+    {
+      "name": "n88_actual_scram_iteration_compatibility",
+      "status": "PASS",
+      "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true."
+    },
+    {
+      "name": "n88_pilot_owner_admission_and_failclosed_rollout",
+      "status": "PASS",
+      "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake."
+    },
+    {
+      "name": "n88_pilot_original_service_and_frontend_publisher_package",
+      "status": "NOT_RUN",
+      "evidence": "Original service source/config is unchanged and ready in restricted pilot. Exact new frontend wake/shared-lane package is locally verified; it remains unserved and does not imply full acceptance/public availability."
+    }
+  ],
+  "publication": {
+    "candidate": "cd1b0e9b5651f308f113a0af464a4912d653f0f0",
+    "published": "4adda44802b336997c6276693fc0791637bcfb42",
+    "verifiedAt": "2026-10-19T08:57:27.689Z"
+  },
+  "historicalFailuresUnchanged": true
+}

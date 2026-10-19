@@ -1,0 +1,14 @@
+{
+  "aiAuthored": true,
+  "runId": "78c0cde1-994b-441a-9ab5-3ffb68508b66",
+  "status": "PASS",
+  "checks": [
+    "legacy published list response compatible during actual public rollout",
+    "explicit new public UI response discriminator",
+    "pilot remains pilot and off remains off",
+    "actual rollout admission independent of response protocol",
+    "wrong-owner/null-auth denied by unchanged guard",
+    "missing public acceptance proof fails closed"
+  ],
+  "hostedProof": false
+}

@@ -43,6 +43,7 @@ export async function readCanonical(ports,ownerId) {
 }
 const fieldsOff=()=>Object.fromEntries(VISIBILITY_FIELDS.map(f=>[f,false]));
 const bindingKeys=['ownerId','sessionId','leaseId','teachingId','classId','termId','contextRevision'];
+export const classListResponseMode=(mode,protocol)=>mode==='public'&&protocol===undefined?'pilot':mode;
 export function createIntegratedService(options,adapter,baseRepository) {
   const rollout=options.rollout??createRolloutGuard();
   const repository=withCredentialRepository(baseRepository);
@@ -83,6 +84,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
     const match=/^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)$/.exec(request.path);
     if(!match || request.method!=='POST')return deny();
     const action=match[1],body=request.body||{},binding=body.binding;
+    if(action==='list'&&body.uiProtocol!==undefined&&body.uiProtocol!=='n88-public-ui-v1')return deny();
     if(!binding || Object.keys(binding).length!==bindingKeys.length || !bindingKeys.every(k=>typeof binding[k]==='string'&&binding[k].length>0&&binding[k].length<=200) || binding.teachingId!==body.teachingId)return deny();
     // The browser binding is only an echo fence. Auth/current canonical source decides authority.
     const verifyTeacher=async(r,ports)=>{
@@ -124,7 +126,10 @@ export function createIntegratedService(options,adapter,baseRepository) {
           await ports.query('insert into n88_private.class_visibility(owner_id,class_id,term_id,payload) values($1::uuid,$2,$3,$4::jsonb) on conflict(owner_id,class_id,term_id) do update set payload=excluded.payload',[s.ownerId,s.classId,s.termId,JSON.stringify(p)]);
           data={updated:true,policyRevision:p.revision,fields:p.fields};
         }else data={classId:s.classId,rosterRevision,policyRevision:p.revision,visibility:p.fields,students:await Promise.all(members.map(async m=>{const cs=db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId);const c=ownedCredential(db,m),r=c?await recovery.read(ports,c):{status:'inactive',credential:null};return {recoveryStatus:r.status,credential:r.credential,studentId:m.studentId,enrollmentId:m.enrollmentId,revision:m.revision,label:m.label,hasActiveCode:cs.some(c=>c.revokedAt===null),credentialVersion:Math.max(0,...cs.map(c=>c.version))};}))};
-        return {status:200,body:{ack:true,binding,requestId:body.requestId??null,data,rollout:rollout.mode},headers:PRIVATE_HEADERS};
+        // Legacy pilot list clients require their original response discriminator.
+        // Operational mode and all admission decisions still use the actual guard.
+        const responseMode=action==='list'?classListResponseMode(rollout.mode,body.uiProtocol):rollout.mode;
+        return {status:200,body:{ack:true,binding,requestId:body.requestId??null,data,rollout:responseMode},headers:PRIVATE_HEADERS};
       });}catch(e){const phase=['acquire','begin','snapshot'].includes(e.safeStage)?e.safeStage:stage;return {...deny(),status:503,body:{error:'unavailable',stage:phase}};}
     }
     const current=ops.forRequest(request);

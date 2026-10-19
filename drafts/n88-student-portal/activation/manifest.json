@@ -118,7 +118,7 @@
     "drafts/n88-student-portal/activation/hosted-scram-restored-challenge.json": "42af614bcb6afde23c51b80f2e33ef1d3abf4d5678beb9fc155731958cb23edb",
     "tests/n88-official-activation-direct-readiness.mjs": "19011fee87d13cc87f3c9299e86d91eee3546cf378293ef6cad470bab4b2e9b7",
     "tests/n88-official-activation-direct-readiness.json": "640543b7a8ee5c6b3ddf8db99d090c8c17aadff5cb1b70af5c31c07ab9a6e084",
-    "drafts/n88-student-portal/official-activation.mjs": "a4001ba3e1287043f99a64d39fc230ae85fe1d81c7f51ddf9911215b63e913a8",
+    "drafts/n88-student-portal/official-activation.mjs": "6936ab7247580edaf39049ea106fd8eb8e869be826780432250b0e8b0eb9bf09",
     "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
     "drafts/n88-student-portal/activation/ca/provenance.json": "82cbea55c25279317503a264d455ccb33d5be54952b072e088ba5e6cd6f582d4",
     "tests/n88-official-activation-session-pooler.mjs": "9f38a6b6a81efddcd68f7aa6a96c09be9b3a372c9626e54159e387070499b26c",
@@ -139,7 +139,7 @@
     "drafts/n88-student-portal/class-credentials.mjs": "6d5c32265bebb1b72de0ec028ce102bc162a8bdf8e4b46731f8252261a41019e",
     "drafts/n88-student-portal/code-recovery.mjs": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55",
     "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
-    "drafts/n88-student-portal/integrated-service.mjs": "a782ec428b08c65a03c44a3dbbe11580b91976b360392fa6967416ea5cc2d7af",
+    "drafts/n88-student-portal/integrated-service.mjs": "8ca644d1c7d58ae827dd85f9bdf2951c597c33693758666d6d3c26fe6a2e0191",
     "drafts/n88-student-portal/postgres-repository.mjs": "b0d1dfe19a8b0419e629313aabe219e5e9206e4ecf2552fce4dcd6f93db7c3af",
     "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
     "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
@@ -180,7 +180,7 @@
     "src/lib/student-import.js": "449ccf169d92c5238f864562adc036ac6eb20815cf1ebbab69380c224c84b578",
     "src/lib/student-lifecycle.js": "4d4f53b8f50ebc9f643439086bd00283a3afde8886fa05d4300be6fd3582172b",
     "src/lib/student-portal-class-client.js": "6807b9b92c77f71e7c1f40973f687fb39769bcea4c12263dcdee7aa9ef39ab30",
-    "src/lib/student-portal-runtime.js": "40cacdfc17a7e0323f6c26be52169ab0f79d69f977f8e25f04ff7d3918ed73c5",
+    "src/lib/student-portal-runtime.js": "bf67f87cbf86b33a1ed2a98d1378852626050889378cd9d7f04e2b3890654171",
     "src/lib/student-portal-task-guidance-client.js": "de210ff07a7e0b782b1854b0b5d900c695d1727ba0eb46ad043af514fbe504bf",
     "src/lib/subject-catalog.js": "63f201dc1b82772cb32b043e8a7a3444b9a2e91a9f1ea3ba2a4a7547f2fc4cbd",
     "src/lib/sync-ownership.js": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
@@ -229,7 +229,7 @@
     "drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql": "fe271ff549148e777511327963637c391b52ea13eddc2d7c3bf01615f79e5715",
     "tests/n88-six-digit-redaction.mjs": "7e31c4634798898cf157a06f51c84585efce246da6b559fdf0343bfda294bbbe",
     "tests/n88-six-digit-security.mjs": "27b802cd8fd7d47cdcc34f514d8849361dc07d81f9c72479c09e1b94542c45e1",
-    "drafts/n88-student-portal/integrated-bundle.mjs": "56a9adbfded360dc42bfc921ff70f078726000410b113655513af8fa8266a8f5",
+    "drafts/n88-student-portal/integrated-bundle.mjs": "b64b2b9856fa4b5c52d2c7e27c165d6ea9c482bfc9f5ee6b8c99e080f09d2a62",
     "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
     "index.html": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
     "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
@@ -302,10 +302,17 @@
     "tests/n88-official-activation-wake-entry-ui.json": "9046db399294369426477e5ebe6b58113a594b69510b920a0f4219dbe08ef081",
     "tests/n88-official-activation-wake-entry-ui.baseline.json": "2b07d1b82b7145f7cf6ad8f5290606c09e8e48bb95e07449e75ad912b0aa1166",
     "drafts/n88-student-portal/activation/wake-pilot-delivery-f8356a7b.json": "06fccbe7351b3b8a7e6329baae8b87b5848fe4f78da86bdeaadcc39c11cd6b42",
-    "drafts/n88-student-portal/activation/wake-pilot-config-f8356a7b.json": "430c38ee8633619757ccb54c0d0be8fa56a06a13fd0efea253271b739e4da0dd"
+    "drafts/n88-student-portal/activation/wake-pilot-config-f8356a7b.json": "430c38ee8633619757ccb54c0d0be8fa56a06a13fd0efea253271b739e4da0dd",
+    "drafts/n88-student-portal/activation/served-hosted-78c0cde1.json": "9654b060bf2af1569dae612d6b3a7f08062c6df6e788fd2b3bf4be9609105164",
+    "drafts/n88-student-portal/activation/served-pilot-config-78c0cde1.json": "89081404bc2adfa0df8f0d221c17be1cfe5c0e050f996a6e1ad59c48b4438609",
+    "drafts/n88-student-portal/activation/final-delivery-78c0cde1.json": "f6a68e81f718c5e3dffa79af9837bab14017ae3c75a8b5ddf1bd1dc0f89ae33c",
+    "tests/n88-official-activation-public-entry-ui.mjs": "b60827344608a4f708fcdce3cac64d0044767dac5f3650a09bef0826f084e89d",
+    "tests/n88-official-activation-public-entry-ui.json": "498207a27094962b9793267aa61376700a66c8dbd2292fb32f8aa7939d0a25ce",
+    "tests/n88-official-activation-public-protocol.mjs": "8e3c477d6d2b3c03afac4489acb697d544336a355bc511e4ac6622aa753531ee",
+    "tests/n88-official-activation-public-protocol.json": "fd35493efd99d8466ed1617d2630c18b972c3bbb6c272ccdd0e830b6a169a10f"
   },
   "outputs": {
-    "edge/index.mjs": "4353be6ab775483226dea2364075a9543c95fd4dee9071a3129f015fb9e662fa",
+    "edge/index.mjs": "87043cad23cb75545a990a2ac7d90bde01d44ee060a1fd71e8f64af9b60ad4e3",
     "private/assets/student.mjs": "80913524d030d80f4df7799086b0c5b59b25383e19d637fba0ae50973d894c61",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
@@ -766,7 +773,7 @@
     "assets/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951"
   },
   "stagedActivation": {
-    "phase": "pilot",
+    "phase": "full-acceptance-public",
     "defaultMode": "off",
     "publicEnabled": false,
     "protectedBindings": [
@@ -777,10 +784,7 @@
     "maxStudents": 2,
     "teacherFrontend": "normal authenticated list admission before controls",
     "privateDocumentDelivery": "original private ingress exact embedded assets",
-    "deferredChecks": [
-      "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
-      "n88_official_publisher_readiness_route_and_served_behavior"
-    ],
+    "deferredChecks": [],
     "originalAcceptance": "canonical card stagedActivation retained; no full Product readiness",
     "localChecks": {
       "tests/n88-official-activation-pilot-service.mjs": "8b3074e30ac86ef31e73ac30d2e5cdbbb6cdf67c6ed16f49ba77754c89fe280a",
@@ -802,43 +806,53 @@
       "workerSourceMatches": false
     },
     "currentBackendEnabled": true,
-    "currentEvidence": "drafts/n88-student-portal/activation/wake-pilot-delivery-f8356a7b.json",
-    "currentProviderReadback": "drafts/n88-student-portal/activation/wake-pilot-config-f8356a7b.json",
+    "currentEvidence": "drafts/n88-student-portal/activation/final-delivery-78c0cde1.json",
+    "currentProviderReadback": "drafts/n88-student-portal/activation/final-config-78c0cde1.json",
     "requiredCheckResults": [
       {
         "name": "n88_official_exact_six_migration_catalog_role_and_custody_readback",
         "status": "PASS",
-        "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+        "evidence": "Original immutable eight-migration/history/role/custody proofs reused; no migration, role, verifier, salt or key changes. Only authorized normal UI replacement fixture writes."
       },
       {
         "name": "n88_official_exact_provider_ingress_private_document_and_no_logging",
         "status": "PASS",
-        "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+        "evidence": "Fresh native original Edge38 has identical eszip; same-source restricted readiness passes. Unchanged Worker/private-document/route/logging proof reused from pilot-ui-correction-provider-75c77bea.json; no provider logging changes."
+      },
+      {
+        "name": "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+        "status": "PASS",
+        "evidence": "served-hosted-78c0cde1.json combines unchanged prior actual components with actual published wake/return/ACK proof"
+      },
+      {
+        "name": "n88_official_publisher_readiness_route_and_served_behavior",
+        "status": "NOT_RUN",
+        "evidence": "Published pilot receipt9858b900 retained; final public readiness requires the wake correction receipt and remaining actual acceptance. Public mode not enabled."
       },
       {
         "name": "n88_private_database_error_boundary_under_actual_provider_logging",
         "status": "PASS",
-        "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+        "evidence": "Original actual PostgreSQL log cases and exact76 typed routines/ACL/source proofs reused unchanged; fresh direct readiness sourceBoundary=true."
       },
       {
         "name": "n88_exact_private_guard_membership_inherit_correction",
         "status": "PASS",
-        "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+        "evidence": "Original exact applied correction/readback and original expected identity retained; no membership or SQL changes."
       },
       {
         "name": "n88_actual_scram_iteration_compatibility",
         "status": "PASS",
-        "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+        "evidence": "Original same-salt4096/16384 no-final-proof diagnostic reused; original16384 credential unchanged. New-binding direct readiness identity/clientTLS/upstreamSSL all true."
       },
       {
         "name": "n88_pilot_owner_admission_and_failclosed_rollout",
         "status": "PASS",
-        "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake. Reused without rerun; current protected pilot config: wake-pilot-config-f8356a7b.json."
+        "evidence": "Original custodian freshly installed/read back only new designated owner/two UI-created pupils; actual new-owner code/visibility/guidance/rotation ACKs and old-session denial. New actual DOM/store test retains wrong-owner rejection and independent fresh admission after wake."
       },
       {
         "name": "n88_pilot_original_service_and_frontend_publisher_package",
-        "status": "PASS",
-        "evidence": "Exact d1d6bde9 wake/shared-lane runtime and actual DOM/store/CSS proof reused; immutable published baseline FAIL retained. Current seven-check pilot publication package is coherent; full acceptance/public source remain pending."
+        "status": "NOT_RUN",
+        "evidence": "Original service source/config is unchanged and ready in restricted pilot. Exact new frontend wake/shared-lane package is locally verified; it remains unserved and does not imply full acceptance/public availability."
       }
     ],
     "finalRequiredChecks": [
@@ -863,6 +877,8 @@
     "currentRequiredChecks": [
       "n88_official_exact_six_migration_catalog_role_and_custody_readback",
       "n88_official_exact_provider_ingress_private_document_and_no_logging",
+      "n88_official_hosted_fabricated_teacher_student_ack_and_isolation",
+      "n88_official_publisher_readiness_route_and_served_behavior",
       "n88_private_database_error_boundary_under_actual_provider_logging",
       "n88_exact_private_guard_membership_inherit_correction",
       "n88_actual_scram_iteration_compatibility",
@@ -879,10 +895,10 @@
       "status": "FAIL",
       "unchanged": true
     },
-    "restoreFullAcceptanceAfterVerifiedCorrectionReceipt": true,
-    "purpose": "exact-wake-repair-publication",
-    "fullHostedAcceptance": false,
-    "fullAcceptanceRestored": false,
+    "restoreFullAcceptanceAfterVerifiedCorrectionReceipt": false,
+    "purpose": "official-public-availability-after-actual-hosted-acceptance",
+    "fullHostedAcceptance": true,
+    "fullAcceptanceRestored": true,
     "preservedFullStage": {
       "path": "replacement-delivery-35395ae1.json",
       "lfSha256": "1d17214ff55c72d28fbf0b994b3f53c139e55746890c03180007ddc724a43523",
@@ -938,17 +954,18 @@
         "lfSha256": "28c72d3c892382a72ebbd985f16e3e131d5e26461dee5e2c79de53f3e28abb83"
       }
     },
-    "wakeCorrectionPublicationRequired": true,
+    "wakeCorrectionPublicationRequired": false,
     "replacementFixture": {
       "activeOwners": 1,
       "activePupils": 2,
       "priorFixturePreserved": true
     },
     "lastVerifiedCorrectionPublication": {
-      "candidate": "fbfebd29f10b841849c33639a993a973b4da2ca5",
-      "published": "9858b9003da11d7904556adaba663bd432b0ea6e",
-      "verifiedAt": "2026-10-19T07:40:18.803Z"
-    }
+      "candidate": "cd1b0e9b5651f308f113a0af464a4912d653f0f0",
+      "published": "4adda44802b336997c6276693fc0791637bcfb42",
+      "verifiedAt": "2026-10-19T08:57:27.689Z"
+    },
+    "rolloutCompatibility": "Legacy list response discriminator retained only for already-published pilot clients; explicit public UI protocol never changes actual Auth/source/rollout admission."
   },
   "activationSemantics": {
     "enabled": "legacy public activation flag remains false",
