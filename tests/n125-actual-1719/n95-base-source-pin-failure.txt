@@ -1,0 +1,59 @@
+(node:17460) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("./tests/n125-actual-1719/base-loader.mjs", pathToFileURL("./")); register("./tests/n125-actual-1719/base-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ fatal_visibility: Sync scheduling, I/O, persistence, authorization and recovery source remain unchanged (81.9307ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 494.0205
+
+✖ failing tests:
+
+test at tests\n95-sync-status-severity.test.mjs:115:1
+✖ fatal_visibility: Sync scheduling, I/O, persistence, authorization and recovery source remain unchanged (81.9307ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  ... Skipped lines
+
+    'function scheduleAutomaticSync({ full = false, immediate = false, remote = false } = {}) {\n' +
+  +   '  if (classDeletionReserved || restoreRunning || restorePreparing || workspaceClaimRunning || suppressAutoSchedule) return;\n' +
+  -   '  if (restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;\n' +
+      '  if (!cloud.session || !cloud.user) return;\n' +
+      "  const ownership = cloudOwnershipAccess('pull');\n" +
+      '  if (!ownership.allowed) {\n' +
+      '    stopOwnershipBlockedScheduling(ownership);\n' +
+      '    return;\n' +
+      '  }\n' +
+  +   '  if (startupPreparing) return;\n' +
+      '  if (!isOnline()) {\n' +
+      "    setState({ status: 'offline' });\n" +
+      '    return;\n' +
+      '  }\n' +
+      '  if (autoRunning) {\n' +
+  ...
+      'function scheduleRetry() {\n' +
+  +   '  if (classDeletionReserved || workspaceClaimRunning) return;\n' +
+  -   '  if (workspaceClaimRunning) return;\n' +
+      '  if (!cloud.session || !cloud.user || !isOnline()) return;\n' +
+      "  const ownership = cloudOwnershipAccess('pull');\n" +
+      '  if (!ownership.allowed) {\n' +
+      '    stopOwnershipBlockedScheduling(ownership);\n' +
+      '    return;\n' +
+
+      at TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n125-return-focus-transient-sync-20261019/tests/n95-sync-status-severity.test.mjs:125:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "function scheduleAutomaticSync({ full = false, immediate = false, remote = false } = {}) {\n  if (classDeletionReserved || restoreRunning || restorePreparing || workspaceClaimRunning || suppressAutoSchedule) return;\n  if (!cloud.session || !cloud.user) return;\n  const ownership = cloudOwnershipAccess('pull');\n  if (!ownership.allowed) {\n    stopOwnershipBlockedScheduling(ownership);\n    return;\n  }\n  if (startupPreparing) return;\n  if (!isOnline()) {\n    setState({ status: 'offline' });\n    return;\n  }\n  if (autoRunning) {\n    rerunRequested = true;\n    fullRequested ||= full;\n    remoteRequested ||= remote;\n    return;\n  }\n  if (autoTimer) clearTimeout(autoTimer);\n  retryScheduled = false;\n  fullRequested ||= full;\n  remoteRequested ||= remote;\n  autoTimer = setTimeout(() => {\n    autoTimer = null;\n    const requestedFull = fullRequested;\n    const requestedRemote = remoteRequested;\n    fullRequested = false;\n    remoteRequested = false;\n    syncAll({ full: requestedFull, remote: requestedRemote });\n  }, immediate ? 0 : AUTO_SYNC_DEBOUNCE_MS);\n  setState({ status: 'pending' });\n}\n\nfunction retryDelay() {\n  const delay = RETRY_DELAYS_MS[Math.min(retryAttempt, RETRY_DELAYS_MS.length - 1)];\n  retryAttempt = Math.min(retryAttempt + 1, RETRY_DELAYS_MS.length - 1);\n  return delay;\n}\n\nfunction scheduleRetry() {\n  if (classDeletionReserved || workspaceClaimRunning) return;\n  if (!cloud.session || !cloud.user || !isOnline()) return;\n  const ownership = cloudOwnershipAccess('pull');\n  if (!ownership.allowed) {\n    stopOwnershipBlockedScheduling(ownership);\n    return;\n  }\n  if (autoTimer) clearTimeout(autoTimer);\n  retryScheduled = true;\n  autoTimer = setTimeout(() => {\n    autoTimer = null;\n    retryScheduled = false;\n    syncAll({ full: true });\n  }, retryDelay());\n  void getSyncOperationalSummary().catch(() => {});\n  // Keep the failed result visible while waiting; a timer is not an active run.\n}\n\n",
+    expected: "function scheduleAutomaticSync({ full = false, immediate = false, remote = false } = {}) {\n  if (restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;\n  if (!cloud.session || !cloud.user) return;\n  const ownership = cloudOwnershipAccess('pull');\n  if (!ownership.allowed) {\n    stopOwnershipBlockedScheduling(ownership);\n    return;\n  }\n  if (!isOnline()) {\n    setState({ status: 'offline' });\n    return;\n  }\n  if (autoRunning) {\n    rerunRequested = true;\n    fullRequested ||= full;\n    remoteRequested ||= remote;\n    return;\n  }\n  if (autoTimer) clearTimeout(autoTimer);\n  retryScheduled = false;\n  fullRequested ||= full;\n  remoteRequested ||= remote;\n  autoTimer = setTimeout(() => {\n    autoTimer = null;\n    const requestedFull = fullRequested;\n    const requestedRemote = remoteRequested;\n    fullRequested = false;\n    remoteRequested = false;\n    syncAll({ full: requestedFull, remote: requestedRemote });\n  }, immediate ? 0 : AUTO_SYNC_DEBOUNCE_MS);\n  setState({ status: 'pending' });\n}\n\nfunction retryDelay() {\n  const delay = RETRY_DELAYS_MS[Math.min(retryAttempt, RETRY_DELAYS_MS.length - 1)];\n  retryAttempt = Math.min(retryAttempt + 1, RETRY_DELAYS_MS.length - 1);\n  return delay;\n}\n\nfunction scheduleRetry() {\n  if (workspaceClaimRunning) return;\n  if (!cloud.session || !cloud.user || !isOnline()) return;\n  const ownership = cloudOwnershipAccess('pull');\n  if (!ownership.allowed) {\n    stopOwnershipBlockedScheduling(ownership);\n    return;\n  }\n  if (autoTimer) clearTimeout(autoTimer);\n  retryScheduled = true;\n  autoTimer = setTimeout(() => {\n    autoTimer = null;\n    retryScheduled = false;\n    syncAll({ full: true });\n  }, retryDelay());\n  void getSyncOperationalSummary().catch(() => {});\n  // Keep the failed result visible while waiting; a timer is not an active run.\n}\n\n",
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

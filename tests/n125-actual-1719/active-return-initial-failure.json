@@ -1,0 +1,225 @@
+{
+  "taskId": "continuous-n125-return-focus-transient-sync-20261019",
+  "runId": "a4cffdb4-a229-4390-a948-7d6d37317a88",
+  "baseSha": "0b4e841ca9447373add29c0a62876494a81ecdb8",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "scenario",
+      "status": "FAIL",
+      "evidence": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n125-return-focus-transient-sync-20261019/tests/n125-actual-1719/returns.mjs:90:10\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n125-return-focus-transient-sync-20261019/tests/n125-actual-1719/returns.mjs:42:2"
+    }
+  ],
+  "returns": [
+    {
+      "cycle": 1,
+      "beforeReads": 24,
+      "afterReads": 48,
+      "authReads": 1,
+      "red": false,
+      "states": [
+        {
+          "state": "pending",
+          "reason": "resume_preparing",
+          "reads": 24,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--pending",
+            "sync-dot sync-dot--pending topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 28,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--pending",
+            "sync-dot sync-dot--pending topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 28,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 32,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 36,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 40,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 44,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 48,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "synced",
+          "reason": "none",
+          "reads": 48,
+          "authReads": 2,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        }
+      ]
+    },
+    {
+      "cycle": 2,
+      "beforeReads": 48,
+      "afterReads": 72,
+      "authReads": 1,
+      "red": false,
+      "states": [
+        {
+          "state": "pending",
+          "reason": "resume_preparing",
+          "reads": 48,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--pending",
+            "sync-dot sync-dot--pending topbar__teacher-sync"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 52,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 56,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 60,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 64,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 68,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "syncing",
+          "reason": "sync_in_progress",
+          "reads": 72,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--syncing",
+            "sync-dot topbar__teacher-sync sync-dot--syncing"
+          ]
+        },
+        {
+          "state": "synced",
+          "reason": "none",
+          "reads": 72,
+          "authReads": 3,
+          "error": null,
+          "dots": [
+            "sync-dot sync-dot--synced",
+            "sync-dot topbar__teacher-sync sync-dot--synced"
+          ]
+        }
+      ]
+    }
+  ],
+  "activeReturn": {
+    "authReads": 0,
+    "noFailure": true
+  },
+  "cleanup": "Owned isolated contexts/browser and loopback server closed in finally; external requests and Service Workers blocked."
+}
