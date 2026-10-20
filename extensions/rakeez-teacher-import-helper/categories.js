@@ -5,7 +5,7 @@ export const CATEGORIES = Object.freeze({
   teacher: {label:'اسم المعلم', fields:{name:'اسم المعلم'}},
   school: {label:'اسم المدرسة', fields:{name:'اسم المدرسة'}},
   principal: {label:'اسم المدير', fields:{name:'اسم المدير'}},
-  classes: {label:'الفصول', fields:{classroom:'الفصل'}},
+  classes: {label:'الفصول', fields:{classroom:'الفصل',subject:'المادة'}},
   students: {label:'أسماء الطلاب وفصولهم', fields:{name:'اسم الطالب',classroom:'الفصل'}},
   timetable: {label:'الجدول الأسبوعي', fields:{weekday:'اليوم',period:'الحصة',time:'الوقت',classroom:'الفصل',subject:'المادة'}}
 });
@@ -31,7 +31,7 @@ export function validateCategory(category,rows){
   const out={};
   for(const field of Object.keys(spec.fields)){
    const value=row[field];
-   if(category==='timetable'&&['period','time'].includes(field)&&!value)continue;
+   if((category==='timetable'&&['period','time'].includes(field)||category==='classes'&&field==='subject')&&!value)continue;
    if(!value)fail('UNRESOLVED_MAPPING');
    if(field==='name')out[field]=category==='school'?text(value):name(value);
    else if(field==='weekday'){out[field]=clean(value);if(!days.has(out[field]))fail('UNRESOLVED_WEEKDAY');}
@@ -59,7 +59,7 @@ export function parseCategoryTable(category,input){
  for(const [field,label] of Object.entries(spec.fields)){
   const positions=headers.flatMap((h,i)=>h===label?[i]:[]);
   if(positions.length>1)fail('AMBIGUOUS_HEADER');
-  if(!positions.length){if(category==='timetable'&&['period','time'].includes(field))continue;fail('UNRESOLVED_MAPPING');}
+  if(!positions.length){if(category==='timetable'&&['period','time'].includes(field)||category==='classes'&&field==='subject')continue;fail('UNRESOLVED_MAPPING');}
   mapping[field]=positions[0];
  }
  if(rows.some(r=>r.length!==headers.length))fail('IRREGULAR_TABLE');

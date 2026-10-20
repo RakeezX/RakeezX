@@ -112,14 +112,21 @@ function extensionOwnerBinding() {
 let automaticBatch=null, automaticWriting=false;
 export function prepareExtensionBatch(){
  const binding=extensionOwnerBinding();
- if(automaticWriting||store.state.device?.n36NamesBatch?.pending)throw Error('BATCH_PENDING');
- const id=[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
+ if(automaticWriting)throw Error('BATCH_PENDING');
+ const prior=store.state.device?.n36NamesBatch;
+ // A deliberate Start may resume only its current owner's current academic context.
+ if(prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId&&
+    (prior.yearId!==store.activeYear().id||prior.termId!==store.activeTerm().id))throw Error('BATCH_PENDING_OTHER_TERM');
+ const id=prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId?prior.batchId:[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
  automaticBatch={id,binding,session:cloud.session,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
  return id;
 }
 // Stable bridge survives the publisher's bundled asset names; no source-URL injection.
 window.rakeezBeginNamesBatch=prepareExtensionBatch;
 window.rakeezCancelNamesBatch=id=>{if(automaticBatch?.id===id)automaticBatch=null;};
+window.rakeezCheckNamesBatch=id=>{
+ try{if(automaticWriting||!automaticBatch||automaticBatch.id!==id)return false;automaticGuard(automaticBatch);return true;}catch{return false;}
+};
 function automaticGuard(batch){
  if(automaticBatch!==batch||Date.now()>=batch.expires||extensionOwnerBinding()!==batch.binding||cloud.session!==batch.session||
  store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||batch.route&&location.hash!==batch.route)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
@@ -161,17 +168,85 @@ function sourceSection(classroom){
  if(matches.length>1||matches.some(s=>s.deleted||s.status==='archived'))throw Error('CLASS_ARCHIVED_OR_AMBIGUOUS');
  return {section:matches[0],grade,label};
 }
+async function ensureSourceSection(batch,classroom){
+ automaticGuard(batch);
+ let {section,grade,label}=sourceSection(classroom);
+ if(!section){
+  section=await store.createSection({yearId:batch.year,grade,label,name:classroom},{verifyCurrent(current){
+   automaticPersistedGuard(batch,current);
+   if(current.sections.some(s=>s.yearId===batch.year&&Number(s.grade)===grade&&gradeNameKey(s.label)===gradeNameKey(label)))throw Error('CLASS_CHANGED');
+  }});section=store.getSection(section.id);
+ }
+ if(!section||section.deleted||section.status==='archived'||section.ownerId&&section.ownerId!==store.getActiveWorkspace().authUserId)throw Error('CLASS_OWNER_OR_ARCHIVED');
+ return section;
+}
+// AI: a single owner-bound setup batch, through existing store creation paths.
+// Conflicts remain untouched; counts never imply remote acknowledgement.
+async function saveAvailableSetup(batch,categories){
+ const {validateBundle}=await import('../lib/teacher-setup-import.js');
+ const setup=categories.length?validateBundle({schema:'rakeez-private-teacher-setup',version:1,categories}).categories:[];
+ const result={saved:0,existing:0,unresolved:0,missing:['teacher','school','principal','classes','timetable'].filter(k=>!setup.some(c=>c.category===k))};
+ const verifyCurrent=current=>current?automaticPersistedGuard(batch,current):automaticGuard(batch);
+ for(const c of setup.filter(c=>['teacher','school','principal'].includes(c.category))){
+  automaticGuard(batch);
+  const fields={teacher:['teacherName'],school:['schoolName'],principal:['principalName','reportPrincipalName']}[c.category],value=c.rows[0].name;
+  if(fields.some(k=>store.state.profile[k]&&store.state.profile[k]!==value)){result.unresolved++;continue;}
+  const changes=Object.fromEntries(fields.filter(k=>!store.state.profile[k]).map(k=>[k,value]));
+  if(Object.keys(changes).length){await store.importSetupProfile(changes,{verifyCurrent});result.saved++;}else result.existing++;
+ }
+ for(const c of setup.filter(c=>c.category==='classes'))for(const row of c.rows){
+  try{
+   const found=sourceSection(row.classroom).section,section=await ensureSourceSection(batch,row.classroom);result[found?'existing':'saved']++;
+   if(row.subject){
+    const subject=await store.resolveSubjectSelection({token:'custom',customName:row.subject},{verifyCurrent});automaticGuard(batch);
+    const prior=store.state.teachings.find(t=>!t.deleted&&t.sectionId===section.id&&t.subjectId===subject.id&&t.termId===batch.term);
+    if(prior&&store.isTeachingArchived(prior))throw Error('CLASS_ARCHIVED');
+    await store.createTeaching({sectionId:section.id,subjectId:subject.id,termId:batch.term},{verifyCurrent});automaticGuard(batch);result[prior?'existing':'saved']++;
+   }
+  }
+  catch(e){automaticGuard(batch);if(!/^CLASS_/.test(e.message))throw e;result.unresolved++;}
+ }
+ for(const row of setup.find(c=>c.category==='timetable')?.rows??[]){
+  automaticGuard(batch);
+  const weekday=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'].indexOf(row.weekday),period=Number(row.period);
+  // Existing app supports numbered periods 1–12. A time alone cannot invent a period.
+  if(weekday<0||!Number.isInteger(period)||period<1||period>12){result.unresolved++;continue;}
+  let section;
+  try{section=await ensureSourceSection(batch,row.classroom);}catch(e){automaticGuard(batch);if(!/^CLASS_/.test(e.message))throw e;result.unresolved++;continue;}
+  const existing=store.allSlots(batch.term).find(s=>s.weekday===weekday&&s.period===period);
+  const matches=store.state.teachings.filter(t=>!t.deleted&&t.sectionId===section.id&&t.termId===batch.term&&
+   gradeNameKey(store.getSubject(t.subjectId)?.name??'')===gradeNameKey(row.subject));
+  const [startTime,endTime]=row.time?row.time.split('-'):[];
+  if(existing){
+   if(matches.length===1&&existing.teachingId===matches[0].id&&(!startTime||existing.startTime===startTime)&&(!endTime||existing.endTime===endTime))result.existing++;
+   else result.unresolved++;
+   continue;
+  }
+  if(matches.length>1||matches.some(t=>store.isTeachingArchived(t))){result.unresolved++;continue;}
+  const subject=await store.resolveSubjectSelection({token:'custom',customName:row.subject},{verifyCurrent});
+  automaticGuard(batch);
+  const teaching=await store.createTeaching({sectionId:section.id,subjectId:subject.id,termId:batch.term},{verifyCurrent});
+  automaticGuard(batch);
+  await store.addSlot(teaching.id,weekday,period,{...(startTime?{startTime}:{}),...(endTime?{endTime}:{})},{verifyCurrent});
+  automaticGuard(batch);result.saved++;
+ }
+ return result;
+}
 async function saveAutomaticNames(result){
  const batch=automaticBatch;
  if(!batch||result.envelope.batchId!==batch.id)throw Error('BATCH_NOT_INITIATED');
+ if(result.envelope.version===3&&result.envelope.setup.length){
+  const {validateBundle}=await import('../lib/teacher-setup-import.js');
+  validateBundle({schema:'rakeez-private-teacher-setup',version:1,categories:result.envelope.setup});
+ }
  automaticGuard(batch);if(automaticWriting)throw Error('BATCH_BUSY');automaticWriting=true;batch.route=location.hash;
  const envelope=result.envelope,rows=envelope.rows;
- const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(rows))))].map(n=>n.toString(16).padStart(2,'0')).join('');
+ const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(envelope.version===3?{rows,setup:envelope.setup}:rows))))].map(n=>n.toString(16).padStart(2,'0')).join('');
  try{
   const prior=store.state.device?.n36NamesBatch;
   if(prior?.batchId===batch.id&&prior.receipts?.[digest])return prior.receipts[digest];
   await batchCheckpoint(batch,p=>{
-   return {...p,batchId:batch.id,pending:{...p.pending,[digest]:{rows,complete:envelope.complete}},yearId:batch.year,termId:batch.term};
+   return {...p,batchId:batch.id,pending:{...p.pending,[digest]:{rows,complete:envelope.complete,...(envelope.version===3?{setup:envelope.setup}:{} )}},yearId:batch.year,termId:batch.term};
   });
   const {previewStudentRows}=await import('../lib/student-import.js');
   let added=0,existing=0;
@@ -213,14 +288,15 @@ async function saveAutomaticNames(result){
    const after=previewStudentRows(names,0,false,store.sectionRoster(section.id));
    if(after.counts.existing!==names.length||after.counts.ambiguous)throw Error('NAMES_RECEIPT_UNKNOWN');
   }
-  const outcome={status:added?'saved':'existing',added,existing,remaining:0,total:rows.length};
+  const setup=envelope.version===3?await saveAvailableSetup(batch,envelope.setup):null;
+  const outcome={status:added?'saved':'existing',added,existing,remaining:0,total:rows.length,...(setup?{setup}:{})};
   await batchCheckpoint(batch,p=>{const pending={...p.pending};delete pending[digest];return {...p,pending:Object.keys(pending).length?pending:null,receipts:{...p.receipts,[digest]:outcome}};});
-  extensionMessage=`حُفظت الدفعة محليًا: ${added} جديد، ${existing} موجود سابقًا. ${envelope.complete?'':'الكشف غير مكتمل؛ لم تُفترض أسماء الصفحات غير المحسومة.'} المزامنة لم تتأكد بعد.`;
+  extensionMessage=`حُفظت الدفعة محليًا: ${added} جديد، ${existing} موجود سابقًا. ${setup?`حقول إعداد محفوظة: ${setup.saved+setup.existing}؛ تعارضات أو غير مدعوم: ${setup.unresolved}؛ فئات غير متاحة: ${setup.missing.length}.`:''} ${envelope.complete?'':'الكشف غير مكتمل؛ لم تُفترض أسماء الصفحات غير المحسومة.'} المزامنة لم تتأكد بعد.`;
   return outcome;
  }finally{automaticWriting=false;batch.route=null;}
 }
 function clearExtensionPreview() { extensionPreview = extensionOwner = null; clearTimeout(extensionTimer); }
-store.onWorkspaceDeactivation(clearExtensionPreview);
+store.onWorkspaceDeactivation(()=>{clearExtensionPreview();automaticBatch=null;});
 cloud.subscribe(() => {
   if(!extensionOwner)return;
   try { if(extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
@@ -228,8 +304,8 @@ cloud.subscribe(() => {
 function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
-    <p>افتح حساب ركيز في تبويب واحد، ثم ابدأ من إضافة مدرستي لجمع وحفظ أسماء جميع الفصول المتاحة. لا تأكيد لكل فصل؛ تُعرض الحالات غير المحسومة فقط. التغطية الجزئية تبقى جزئية بعد الحفظ.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.15.zip" download>تنزيل إضافة ركيز 0.5.15</a>
+    <p>افتح حساب ركيز في تبويب واحد، ثم ابدأ من إضافة مدرستي لحفظ الفصول والمواد والطلاب وبيانات الإعداد والجدول المتاحة من الصفحات المدعومة. القيم المختلفة لا تُستبدل تلقائيًا. لا تأكيد لكل فصل؛ تُعرض الحالات غير المحسومة فقط. التغطية الجزئية تبقى جزئية بعد الحفظ.</p>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.16.zip" download>تنزيل إضافة ركيز 0.5.16</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
@@ -249,7 +325,7 @@ async function receiveExtension() {
   try {
     const result=await claimHandoff(request);
     if(location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
-    if(result.envelope.version===2){
+    if(result.envelope.version>=2){
       try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);}
       catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+').'+reason+' التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.';await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length});}
       return;
@@ -885,7 +961,7 @@ export const koshoofCenter = {
       try{
        // Fresh explicit resume, never automatic continuation into a switched account/session.
        automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
-       for(const pending of Object.values(p.pending))await saveAutomaticNames({envelope:{version:2,batchId:p.batchId,...pending}});
+       for(const pending of Object.values(p.pending))await saveAutomaticNames({envelope:{version:pending.setup?3:2,batchId:p.batchId,...pending}});
       }catch(error){extensionMessage='الدفعة محفوظة ولم يتأكد اكتمالها: '+error.message;}repaint();
     },
     'roster-page'(el){transfer.page=Number(el.dataset.page);repaint();},

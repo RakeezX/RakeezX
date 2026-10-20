@@ -6,7 +6,7 @@ export const CATEGORIES = Object.freeze({
   teacher: { label: 'اسم المعلم', fields: { name: 'اسم المعلم' } },
   school: { label: 'اسم المدرسة', fields: { name: 'اسم المدرسة' } },
   principal: { label: 'اسم المدير', fields: { name: 'اسم المدير' } },
-  classes: { label: 'الفصول', fields: { classroom: 'الفصل' } },
+  classes: { label: 'الفصول', fields: { classroom: 'الفصل', subject: 'المادة' } },
   students: { label: 'أسماء الطلاب وفصولهم', fields: { name: 'اسم الطالب', classroom: 'الفصل' } },
   timetable: { label: 'الجدول الأسبوعي', fields: { weekday: 'اليوم', period: 'الحصة', time: 'الوقت', classroom: 'الفصل', subject: 'المادة' } },
 });
@@ -53,7 +53,7 @@ export function validateBundle(value) {
     const identities = new Set(), slots = new Set();
     const rows = c.rows.map(row => {
       const fields = Object.keys(CATEGORIES[c.category].fields); keys(row, fields);
-      const out = Object.fromEntries(fields.map(field => [field, fieldValue(field, row[field], c.category)]));
+      const out = Object.fromEntries(fields.filter(field=>!(c.category==='classes'&&field==='subject'&&!row[field])).map(field => [field, fieldValue(field, row[field], c.category)]));
       const identity = fields.map(field => matchingKey(out[field])).join('|');
       if (identities.has(identity)) fail('DUPLICATE'); identities.add(identity);
       if (c.category === 'timetable') for (const field of ['period', 'time']) {
@@ -91,6 +91,7 @@ export function reviewPlan(bundle, selected, context, mappings) {
   const mapped = categories.map(c => ({ ...c, rows: c.rows.map((row, index) => {
     const refs = {}; const label = `${CATEGORIES[c.category].label} — ${index + 1}`;
     for (const field of Object.keys(CATEGORIES[c.category].fields)) {
+      if(c.category==='classes'&&field==='subject'&&!row[field])continue;
       if (!row[field]) issues.push(`${label}: ${CATEGORIES[c.category].fields[field]} غير متوفر.`);
     }
     if (Object.hasOwn(row, 'classroom')) {

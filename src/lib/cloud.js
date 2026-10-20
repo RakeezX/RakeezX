@@ -951,6 +951,35 @@ export async function n77DeleteTeaching({ teachingId, sectionId, fingerprint = n
   return result;
 }
 
+// AI N36: distinct typed section-only transport; old teaching API unchanged.
+export async function n36DeleteSubjectlessSection({ sectionId, yearId, termId, fingerprint = null, mutationId = null,
+  deviceId = null, commit = false }) {
+  const ownerId = user?.id;
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: ownerId });
+  if (!access.allowed || !ownerId || !session?.access_token || !globalThis.navigator?.onLine) {
+    throw Object.assign(new Error('N77 Delete requires a verified online account workspace'), { code: 'N77_OFFLINE_OR_OWNER' });
+  }
+  const assertAccess = () => {
+    if (user?.id !== ownerId || runtimeSyncOwnershipGuard.getWorkspace() !== workspace || !session?.access_token) {
+      throw Object.assign(new Error('N77 Delete account/workspace changed'), { code: 'N77_OWNER_CHANGED' });
+    }
+  };
+  await verifyCurrentAuthIdentity(ownerId);
+  assertAccess();
+  const input = { sectionId, yearId, termId, fingerprint, mutationId, deviceId, commit };
+  const result = mockBackend ? await mockBackend.n36DeleteSubjectlessSection(input)
+    : await request('/rpc/n36_delete_subjectless_section', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+        'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+      body: JSON.stringify({ p_section_id: sectionId, p_year_id: yearId, p_term_id: termId,
+        p_expected_fingerprint: fingerprint, p_mutation_id: mutationId, p_device_id: deviceId,
+        p_commit: commit }),
+    }, false, { assertAccess });
+  assertAccess();
+  return result;
+}
+
 /** Sync V2 section archive/reopen command transport. */
 export async function applySyncV2SectionLifecycleCommand(envelope) {
   if (mockBackend) {

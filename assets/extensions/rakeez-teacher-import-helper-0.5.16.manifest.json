@@ -1,0 +1,138 @@
+{
+  "schema": "rakeez-private-extension-package",
+  "version": "0.5.16",
+  "applicationBaseSha": "fc4a2c9bebd46c4619744a869780626ec158ab24",
+  "officialAccountVerification": "NOT_RUN",
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "c1b121daf3e650817cde0927c9e2fa26d00e30fd4fc800643cb63cf0f850f540",
+      "bytes": 64106
+    },
+    {
+      "file": "categories-popup.js",
+      "sha256": "d62f7116325dba30357d6a8741eccae28839fbf4f17e2cc6454f37c9a58870ef",
+      "bytes": 29036
+    },
+    {
+      "file": "categories.js",
+      "sha256": "80cdd75499420190566d055a4b3ff4fd1600fd08f0fc3dc78421d3f594f89a27",
+      "bytes": 6014
+    },
+    {
+      "file": "class-order.js",
+      "sha256": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87",
+      "bytes": 2269
+    },
+    {
+      "file": "core.js",
+      "sha256": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+      "bytes": 2178
+    },
+    {
+      "file": "diagnostics-bootstrap.js",
+      "sha256": "0817e2042bfa2252f9accfdd723e718fa79887e537172728608d6dbea2299932",
+      "bytes": 6747
+    },
+    {
+      "file": "handoff-protocol.js",
+      "sha256": "57a929a84eb5f077c17be3cfb31af3fa03109c2cac9a163c02790a048813e390",
+      "bytes": 4432
+    },
+    {
+      "file": "handoff-worker.js",
+      "sha256": "c1266d6953dd35ba22ace71a41c59d0d2c9c737fe11ffdedd35fab8c88fd02eb",
+      "bytes": 11430
+    },
+    {
+      "file": "lib/rakeez-datetime-values.js",
+      "sha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "bytes": 1806
+    },
+    {
+      "file": "lib/rakeez-datetime.css",
+      "sha256": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+      "bytes": 3070
+    },
+    {
+      "file": "lib/rakeez-datetime.js",
+      "sha256": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+      "bytes": 7085
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "224e214d26890e760fb68b294c6f601ad86447cb550a56b3e1a1cc1abc55eb79",
+      "bytes": 901
+    },
+    {
+      "file": "navigation.js",
+      "sha256": "6a766d1590fdc7713b090e6bb1ec15468de1d4426e7dd6da2847ee6f57dcafb4",
+      "bytes": 1398
+    },
+    {
+      "file": "popup.css",
+      "sha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+      "bytes": 4061
+    },
+    {
+      "file": "popup.html",
+      "sha256": "b0b1525b14c70375e5e60ac16de2f2578afd3d1f1ead77c36d0bd0e4c2737acf",
+      "bytes": 9251
+    },
+    {
+      "file": "popup.js",
+      "sha256": "0e1a555d42fac03776026d457632cf7979e3a751259685dc82e942317cf75bdc",
+      "bytes": 4596
+    },
+    {
+      "file": "route-diagnostics.js",
+      "sha256": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a",
+      "bytes": 5178
+    },
+    {
+      "file": "run-controller.js",
+      "sha256": "66ac713a756c0857a4a22007dab809b12596cd2aab08cfb1edb490664ff3ea18",
+      "bytes": 41548
+    },
+    {
+      "file": "selection.js",
+      "sha256": "8d52fcdfef49c11625b7d146b05e460f739839fd49e72e56af0dd72d3f24ad89",
+      "bytes": 31947
+    },
+    {
+      "file": "source-adapter.js",
+      "sha256": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c",
+      "bytes": 25742
+    },
+    {
+      "file": "source-roster.js",
+      "sha256": "2bc76e92e5996ca3ad6579bd064cc33dbd0feca797929bd88fc05e02c998a067",
+      "bytes": 3508
+    },
+    {
+      "file": "vendor/flatpickr/LICENSE.md",
+      "sha256": "5fd57afc3905651175947ae44818e91ffcf5b605e4c88fac42d9700243bd9095",
+      "bytes": 1084
+    },
+    {
+      "file": "vendor/flatpickr/ar.js",
+      "sha256": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b",
+      "bytes": 1928
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.css",
+      "sha256": "1b34a42552c96f10e4dfaaa4a367276b03868aacff63c1ac42ffe331352bc754",
+      "bytes": 16166
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.js",
+      "sha256": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1",
+      "bytes": 50679
+    }
+  ],
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.16.zip",
+    "sha256": "3b98d2cbc29006a8a4b8068ef903b45c586aa83ab411c85e3ddf22c6c16fbb73",
+    "bytes": 112249
+  }
+}

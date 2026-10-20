@@ -1,0 +1,194 @@
+{
+  "runId": "4c635c30-9a3d-4255-84c3-4a7da9982bbd",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "migrationPath": "supabase/migrations/20261019161000_n36_subjectless_section_delete.sql",
+  "qualifiedSha256": "bc85aa2d9be0e758978814ced2bf98847c8114fa23afd24c3eae396701f4e587",
+  "comparisons": [
+    {
+      "name": "apply_sync_v2_mutation",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    },
+    {
+      "name": "apply_sync_v2_section_lifecycle_command",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    },
+    {
+      "name": "apply_sync_v2_section_lifecycle_command_before_student_0029",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    },
+    {
+      "name": "lock_student_lifecycle",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    },
+    {
+      "name": "lock_student_lifecycle_statement",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    },
+    {
+      "name": "n71_restore_canonical",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    },
+    {
+      "name": "n77_delete_teaching",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    },
+    {
+      "name": "n77_guard_live_parent",
+      "present": true,
+      "source": true,
+      "signature": true,
+      "acl": true,
+      "config": true,
+      "securityDefiner": true
+    }
+  ],
+  "preimage": {
+    "rls": [
+      {
+        "rls": true,
+        "name": "enrollments",
+        "force": true
+      },
+      {
+        "rls": true,
+        "name": "sections",
+        "force": true
+      },
+      {
+        "rls": true,
+        "name": "students",
+        "force": true
+      },
+      {
+        "rls": true,
+        "name": "sync_mutation_receipts",
+        "force": true
+      },
+      {
+        "rls": true,
+        "name": "teachings",
+        "force": true
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "prosrc": " begin\r\n      if auth.uid() is null then raise exception using errcode='42501',message='Authentication required'; end if;\r\n      perform rakeezx.lock_student_lifecycle(auth.uid());\r\n      return rakeezx.apply_sync_v2_mutation_before_student_0029(p_entity,p_record_id,p_mutation_id,p_device_id,p_base_revision,p_patch,p_operation,p_client_updated_at); end; ",
+        "proname": "apply_sync_v2_mutation",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": "p_entity text, p_record_id text, p_mutation_id text, p_device_id text, p_base_revision bigint, p_patch jsonb, p_operation text, p_client_updated_at bigint"
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "prosrc": " begin\r\n      if auth.uid() is null then raise exception using errcode='42501',message='Authentication required'; end if;\r\n      perform rakeezx.lock_student_lifecycle(auth.uid());\r\n      return rakeezx.apply_sync_v2_section_lifecycle_command_before_student_0029(p_mutation_id,p_device_id,p_command,p_section_id,p_archive_date,p_client_updated_at); end; ",
+        "proname": "apply_sync_v2_section_lifecycle_command",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": "p_mutation_id text, p_device_id text, p_command text, p_section_id text, p_archive_date date, p_client_updated_at bigint"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "prosrc": "\ndeclare\n  v_owner uuid:=auth.uid(); v_receipt rakeezx.sync_mutation_receipts%rowtype; v_section rakeezx.sections%rowtype;\n  v_envelope jsonb; v_result jsonb; v_outcome text; v_conflict boolean:=false; v_now timestamptz:=pg_catalog.clock_timestamp();\nbegin\n  if v_owner is null then raise exception using errcode='42501',message='Authentication required'; end if;\n  if coalesce(p_mutation_id,'')='' or coalesce(p_device_id,'')='' or coalesce(p_section_id,'')='' or\n     p_command not in ('archive_class','reopen_class') or (p_command='archive_class' and p_archive_date is null) then\n    raise exception using errcode='22023',message='Invalid section lifecycle command';\n  end if;\n  v_envelope:=jsonb_build_object('mutationId',p_mutation_id,'deviceId',p_device_id,'command',p_command,\n    'sectionId',p_section_id,'archiveDate',p_archive_date,'clientUpdatedAt',p_client_updated_at);\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text||':sync-v2:'||p_mutation_id,0));\n  select * into v_receipt from rakeezx.sync_mutation_receipts where owner_id=v_owner and mutation_id=p_mutation_id;\n  if found then\n    if v_receipt.request_envelope is distinct from v_envelope then raise exception using errcode='22023',message='Mutation ID was reused with a different request'; end if;\n    return v_receipt.result;\n  end if;\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text||':section-lifecycle:'||p_section_id,0));\n  select * into v_section from rakeezx.sections where owner_id=v_owner and id=p_section_id for update;\n  if not found or v_section.deleted_at is not null then raise exception using errcode='22023',message='Section is unavailable'; end if;\n  perform pg_catalog.set_config('rakeezx.section_lifecycle_write','on',true);\n  if p_command='archive_class' then\n    if v_section.status='archived' then v_outcome:='already_archived';\n    else\n      update rakeezx.sections set status='archived',archived_at=v_now,archive_date=p_archive_date,\n        client_updated_at=p_client_updated_at,device_id=p_device_id where owner_id=v_owner and id=p_section_id returning * into v_section;\n      v_outcome:='archived';\n    end if;\n  else\n    if v_section.status='active' then v_outcome:='already_active';\n    elsif v_section.archived_at is null or v_section.archive_date is null then v_outcome:='rejected_lifecycle';\n    elsif not exists(select 1 from rakeezx.years y where y.owner_id=v_owner and y.id=v_section.year_id and y.deleted_at is null and y.status<>'archived') then v_outcome:='rejected_year';\n    elsif not exists(select 1 from rakeezx.terms tm where tm.owner_id=v_owner and tm.year_id=v_section.year_id and tm.deleted_at is null and tm.status<>'closed') then v_outcome:='rejected_term';\n    else\n      perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(\n        v_owner::text||':active-slot:'||locked.weekday::text||':'||locked.period::text,0))\n      from (select distinct sl.weekday,sl.period from rakeezx.slots sl join rakeezx.teachings t\n        on t.owner_id=sl.owner_id and t.id=sl.teaching_id\n        where sl.owner_id=v_owner and t.section_id=p_section_id and sl.deleted_at is null and t.deleted_at is null\n        order by sl.weekday,sl.period) locked;\n      select exists(\n        select 1 from rakeezx.slots own_slot\n        join rakeezx.teachings own_t on own_t.owner_id=own_slot.owner_id and own_t.id=own_slot.teaching_id\n        join rakeezx.slots other_slot on other_slot.owner_id=own_slot.owner_id and other_slot.weekday=own_slot.weekday and other_slot.period=own_slot.period and other_slot.deleted_at is null\n        left join rakeezx.teachings other_t on other_t.owner_id=other_slot.owner_id and other_t.id=other_slot.teaching_id\n        left join rakeezx.sections other_s on other_s.owner_id=other_t.owner_id and other_s.id=other_t.section_id\n        where own_slot.owner_id=v_owner and own_t.section_id=p_section_id and own_slot.deleted_at is null and own_t.deleted_at is null\n          and ((other_slot.kind in ('activity','waiting') and other_slot.term_id=own_t.term_id) or\n            (other_slot.kind='teaching' and other_t.section_id<>p_section_id and other_t.deleted_at is null and other_s.deleted_at is null and other_s.status='active'))\n      ) into v_conflict;\n      if v_conflict then v_outcome:='rejected_slot_conflict';\n      else\n        update rakeezx.sections set status='active',archived_at=null,archive_date=null,\n          client_updated_at=p_client_updated_at,device_id=p_device_id where owner_id=v_owner and id=p_section_id returning * into v_section;\n        v_outcome:='reopened';\n      end if;\n    end if;\n  end if;\n  select * into v_section from rakeezx.sections where owner_id=v_owner and id=p_section_id;\n  v_result:=jsonb_build_object('mutationId',p_mutation_id,'command',p_command,'outcome',v_outcome,'section',to_jsonb(v_section));\n  insert into rakeezx.sync_mutation_receipts(owner_id,mutation_id,entity,record_id,device_id,base_revision,operation,\n    client_updated_at,request_patch,request_envelope,outcome,applied_groups,conflicted_groups,result)\n  values(v_owner,p_mutation_id,'sections',p_section_id,p_device_id,v_section.revision,'section_lifecycle',p_client_updated_at,\n    '{}'::jsonb,v_envelope,v_outcome,case when v_outcome in ('archived','reopened') then array['lifecycle']::text[] else array[]::text[] end,\n    case when v_outcome like 'rejected_%' then array['lifecycle']::text[] else array[]::text[] end,v_result);\n  return v_result;\nend; ",
+        "proname": "apply_sync_v2_section_lifecycle_command_before_student_0029",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": "p_mutation_id text, p_device_id text, p_command text, p_section_id text, p_archive_date date, p_client_updated_at bigint"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "prosrc": "\r\n  select pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_owner::text||':student-lifecycle-safety',0));\r\n",
+        "proname": "lock_student_lifecycle",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": "p_owner uuid"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "prosrc": "\r\nbegin\r\n  if auth.uid() is not null then perform rakeezx.lock_student_lifecycle(auth.uid()); end if;\r\n  return null;\r\nend; ",
+        "proname": "lock_student_lifecycle_statement",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": ""
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "prosrc": "\ndeclare v_rows jsonb; v_entity text; v_part jsonb;\nbegin\n  if p_owner is null or p_owner<>auth.uid() then raise exception using errcode='42501',message='N71 owner mismatch'; end if;\n  v_rows:=rakeezx.sync_v2_restore_canonical_score_v2(p_owner);\n  foreach v_entity in array array['assignments','submissions'] loop\n    execute format('select coalesce(jsonb_agg(to_jsonb(t) order by id),''[]''::jsonb) from rakeezx.%I t where owner_id=$1',v_entity)\n      into v_part using p_owner;\n    v_rows:=v_rows||jsonb_build_object(v_entity,v_part);\n  end loop;\n  return v_rows;\nend; ",
+        "proname": "n71_restore_canonical",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": "p_owner uuid"
+      },
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "prosrc": "\r\ndeclare\r\n  v_owner uuid := auth.uid();\r\n  v_section rakeezx.sections%rowtype;\r\n  v_teaching rakeezx.teachings%rowtype;\r\n  v_ids text[];\r\n  v_fingerprint text;\r\n  v_scope text;\r\n  v_orphans text[] := '{}'::text[];\r\n  v_receipt rakeezx.sync_mutation_receipts%rowtype;\r\n  v_envelope jsonb;\r\n  v_result jsonb;\r\n  v_now timestamptz := pg_catalog.clock_timestamp();\r\nbegin\r\n  if v_owner is null then raise exception using errcode='42501',message='Authentication required'; end if;\r\n  if coalesce(p_teaching_id,'')='' or coalesce(p_expected_section_id,'')='' or\r\n      char_length(p_teaching_id)>240 or char_length(p_expected_section_id)>240 then\r\n    raise exception using errcode='22023',message='Invalid N77 target';\r\n  end if;\r\n  if p_commit and (coalesce(p_mutation_id,'')='' or coalesce(p_device_id,'')='' or\r\n      coalesce(p_expected_fingerprint,'')='' or char_length(p_mutation_id)>200 or char_length(p_device_id)>200) then\r\n    raise exception using errcode='22023',message='Invalid N77 commit envelope';\r\n  end if;\r\n  if p_commit then\r\n    v_envelope := pg_catalog.jsonb_build_object('teachingId',p_teaching_id,'sectionId',p_expected_section_id,\r\n      'fingerprint',p_expected_fingerprint,'mutationId',p_mutation_id,'deviceId',p_device_id);\r\n    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text||':sync-v2:'||p_mutation_id,0));\r\n    select * into v_receipt from rakeezx.sync_mutation_receipts\r\n      where owner_id=v_owner and mutation_id=p_mutation_id;\r\n    if found then\r\n      if v_receipt.request_envelope is distinct from v_envelope then\r\n        raise exception using errcode='22023',message='Mutation ID was reused with a different request';\r\n      end if;\r\n      return v_receipt.result;\r\n    end if;\r\n  end if;\r\n  -- All N77 scope transitions serialize on the owner/Section row.\r\n  select * into v_section from rakeezx.sections\r\n    where owner_id=v_owner and id=p_expected_section_id for update;\r\n  if not found or v_section.deleted_at is not null then\r\n    raise exception using errcode='22023',message='N77 scope is stale';\r\n  end if;\r\n  select * into v_teaching from rakeezx.teachings\r\n    where owner_id=v_owner and id=p_teaching_id and section_id=v_section.id for update;\r\n  if not found or v_teaching.deleted_at is not null then\r\n    raise exception using errcode='22023',message='N77 scope is stale';\r\n  end if;\r\n  select pg_catalog.array_agg(id order by id) into v_ids from rakeezx.teachings\r\n    where owner_id=v_owner and section_id=v_section.id and deleted_at is null;\r\n  if v_ids is null or not (p_teaching_id=any(v_ids)) then\r\n    raise exception using errcode='22023',message='N77 scope is stale';\r\n  end if;\r\n  v_scope := case when pg_catalog.array_length(v_ids,1)>1 then 'teaching' else 'section' end;\r\n  -- A changed sibling set, selected row or Section invalidates the shown confirmation.\r\n  select pg_catalog.md5(v_owner::text||':'||v_section.id||':'||v_section.revision::text||':'||\r\n    pg_catalog.string_agg(t.id||':'||t.revision::text,',' order by t.id)) into v_fingerprint\r\n    from rakeezx.teachings t where t.owner_id=v_owner and t.section_id=v_section.id and t.deleted_at is null;\r\n  if p_commit and p_expected_fingerprint<>v_fingerprint then\r\n    raise exception using errcode='22023',message='N77 scope is stale';\r\n  end if;\r\n  if v_scope='teaching' then v_ids := array[p_teaching_id]; end if;\r\n  v_result := pg_catalog.jsonb_build_object('ownerId',v_owner,'sectionId',v_section.id,\r\n    'selectedTeachingId',p_teaching_id,'scope',v_scope,'teachingIds',pg_catalog.to_jsonb(v_ids),\r\n    'fingerprint',v_fingerprint);\r\n  if not p_commit then return v_result; end if;\r\n\r\n  -- A final Section Delete also closes live descendants of historical Teaching\r\n  -- tombstones created by older lifecycle code. The confirmation still names\r\n  -- only the final active Teaching.\r\n  if v_scope='section' then\r\n    select pg_catalog.array_agg(id order by id) into v_ids from rakeezx.teachings\r\n      where owner_id=v_owner and section_id=v_section.id;\r\n  end if;\r\n  v_result := v_result || pg_catalog.jsonb_build_object('cascadeTeachingIds',pg_catalog.to_jsonb(v_ids));\r\n\r\n  -- Student identity is shared and local-only assignments/submissions are not\r\n  -- visible to this server. Preserve every student identity; removing the\r\n  -- Section enrollment makes an otherwise unreferenced student invisible in UX.\r\n\r\n  perform pg_catalog.set_config('rakeezx.section_lifecycle_delete','on',true);\r\n  perform pg_catalog.set_config('rakeezx.score_domain_write','on',true);\r\n  -- Descendants first. Every update and receipt shares this RPC transaction.\r\n  update rakeezx.score_subitem_completions c set deleted_at=v_now,device_id=p_device_id\r\n    where c.owner_id=v_owner and c.deleted_at is null and (\r\n      c.subitem_id in (select si.id from rakeezx.score_subitems si join rakeezx.items i\r\n        on i.owner_id=si.owner_id and i.id=si.item_id where si.owner_id=v_owner and i.teaching_id=any(v_ids))\r\n      or c.student_id=any(v_orphans));\r\n  update rakeezx.score_subitems si set deleted_at=v_now,device_id=p_device_id\r\n    where si.owner_id=v_owner and si.deleted_at is null and si.item_id in\r\n      (select id from rakeezx.items where owner_id=v_owner and teaching_id=any(v_ids));\r\n  update rakeezx.scores s set deleted_at=v_now,device_id=p_device_id\r\n    where s.owner_id=v_owner and s.deleted_at is null and (s.student_id=any(v_orphans) or s.item_id in\r\n      (select id from rakeezx.items where owner_id=v_owner and teaching_id=any(v_ids)));\r\n  update rakeezx.attendance a set deleted_at=v_now,device_id=p_device_id\r\n    where a.owner_id=v_owner and a.deleted_at is null and (a.student_id=any(v_orphans) or\r\n      a.teaching_id=any(v_ids) or a.session_id in\r\n      (select id from rakeezx.sessions where owner_id=v_owner and teaching_id=any(v_ids)));\r\n  update rakeezx.session_roster_snapshots s set deleted_at=v_now,device_id=p_device_id\r\n    where s.owner_id=v_owner and s.deleted_at is null and (s.teaching_id=any(v_ids) or\r\n      s.session_id in (select id from rakeezx.sessions where owner_id=v_owner and teaching_id=any(v_ids)) or\r\n      (v_scope='section' and s.section_id=v_section.id));\r\n  update rakeezx.logs l set deleted_at=v_now,device_id=p_device_id\r\n    where l.owner_id=v_owner and l.deleted_at is null and (l.student_id=any(v_orphans) or\r\n      l.teaching_id=any(v_ids) or l.session_id in\r\n      (select id from rakeezx.sessions where owner_id=v_owner and teaching_id=any(v_ids)));\r\n  update rakeezx.notes n set deleted_at=v_now,device_id=p_device_id\r\n    where n.owner_id=v_owner and n.deleted_at is null and (n.student_id=any(v_orphans) or\r\n      n.teaching_id=any(v_ids) or n.session_id in\r\n      (select id from rakeezx.sessions where owner_id=v_owner and teaching_id=any(v_ids)));\r\n  update rakeezx.class_goals set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and teaching_id=any(v_ids);\r\n  update rakeezx.class_charter_selections set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and teaching_id=any(v_ids);\r\n  update rakeezx.group_arrangements set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and teaching_id=any(v_ids);\r\n  update rakeezx.class_rules set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and teaching_id=any(v_ids);\r\n  update rakeezx.slots set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and teaching_id=any(v_ids);\r\n  update rakeezx.sessions set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and teaching_id=any(v_ids);\r\n  update rakeezx.items set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and teaching_id=any(v_ids);\r\n  update rakeezx.teachings set deleted_at=v_now,device_id=p_device_id\r\n    where owner_id=v_owner and deleted_at is null and id=any(v_ids);\r\n  if v_scope='section' then\r\n    update rakeezx.enrollments set deleted_at=v_now,device_id=p_device_id\r\n      where owner_id=v_owner and deleted_at is null and section_id=v_section.id;\r\n    update rakeezx.students set deleted_at=v_now,device_id=p_device_id\r\n      where owner_id=v_owner and deleted_at is null and id=any(v_orphans);\r\n    update rakeezx.sections set deleted_at=v_now,device_id=p_device_id\r\n      where owner_id=v_owner and deleted_at is null and id=v_section.id;\r\n  end if;\r\n  v_result := v_result || pg_catalog.jsonb_build_object('mutationId',p_mutation_id,\r\n    'outcome','deleted','orphanStudentIds',pg_catalog.to_jsonb(v_orphans));\r\n  insert into rakeezx.sync_mutation_receipts(owner_id,mutation_id,entity,record_id,device_id,\r\n    base_revision,operation,request_patch,request_envelope,outcome,applied_groups,\r\n    conflicted_groups,result)\r\n  values(v_owner,p_mutation_id,'lifecycle',p_teaching_id,p_device_id,0,'lifecycle','{}'::jsonb,\r\n    v_envelope,'deleted',array['__deleted__']::text[],array[]::text[],v_result);\r\n  return v_result;\r\nend; ",
+        "proname": "n77_delete_teaching",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": "p_teaching_id text, p_expected_section_id text, p_expected_fingerprint text, p_mutation_id text, p_device_id text, p_commit boolean"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "prosrc": "\r\ndeclare\r\n  v_row jsonb := pg_catalog.to_jsonb(new);\r\n  v_owner uuid := new.owner_id;\r\n  v_section text := v_row->>'section_id';\r\n  v_teaching text := v_row->>'teaching_id';\r\n  v_item text := v_row->>'item_id';\r\n  v_subitem text := v_row->>'subitem_id';\r\n  v_session text := v_row->>'session_id';\r\n  v_student text := v_row->>'student_id';\r\n  v_parent rakeezx.sections%rowtype;\r\nbegin\r\n  if v_row->>'deleted_at' is not null then return new; end if;\r\n  if v_student is not null and not exists (\r\n    select 1 from rakeezx.students where owner_id=v_owner and id=v_student and deleted_at is null\r\n  ) then raise exception using errcode='22023',message='N77 student is unavailable'; end if;\r\n  if v_subitem is not null then\r\n    select si.item_id into v_item from rakeezx.score_subitems si\r\n      where si.owner_id=v_owner and si.id=v_subitem and si.deleted_at is null;\r\n    if v_item is null then raise exception using errcode='22023',message='N77 subitem is unavailable'; end if;\r\n  end if;\r\n  if v_item is not null then\r\n    select i.teaching_id into v_teaching from rakeezx.items i\r\n      where i.owner_id=v_owner and i.id=v_item and i.deleted_at is null;\r\n    if v_teaching is null then raise exception using errcode='22023',message='N77 item is unavailable'; end if;\r\n  end if;\r\n  if v_session is not null then\r\n    if v_teaching is null then\r\n      select s.teaching_id into v_teaching from rakeezx.sessions s\r\n        where s.owner_id=v_owner and s.id=v_session and s.deleted_at is null;\r\n      if v_teaching is null then raise exception using errcode='22023',message='N77 session is unavailable'; end if;\r\n    elsif not exists (select 1 from rakeezx.sessions s where s.owner_id=v_owner and s.id=v_session\r\n      and s.teaching_id=v_teaching and s.deleted_at is null) then\r\n      raise exception using errcode='22023',message='N77 session scope mismatch';\r\n    end if;\r\n  end if;\r\n  if v_teaching is not null then\r\n    select t.section_id into v_section from rakeezx.teachings t\r\n      where t.owner_id=v_owner and t.id=v_teaching and t.deleted_at is null;\r\n    if v_section is null then raise exception using errcode='22023',message='N77 teaching is unavailable'; end if;\r\n  end if;\r\n  if v_section is not null then\r\n    select * into v_parent from rakeezx.sections\r\n      where owner_id=v_owner and id=v_section for share;\r\n    if not found or v_parent.deleted_at is not null then\r\n      raise exception using errcode='22023',message='N77 section is unavailable';\r\n    end if;\r\n  end if;\r\n  return new;\r\nend; ",
+        "proname": "n77_guard_live_parent",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "prosecdef": true,
+        "signature": ""
+      }
+    ],
+    "migration": [],
+    "newFunctions": []
+  },
+  "scope": "metadata only; no Product row reads"
+}

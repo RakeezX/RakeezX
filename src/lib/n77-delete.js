@@ -74,3 +74,31 @@ export function localDeleteWrites(current, receipt, stamp) {
       committedAt: stamp }, updatedAt: stamp }], remove: [] };
   return writes;
 }
+
+// AI: separate protocol. Never relax the existing N77 teaching validator.
+export function validateSubjectlessPlan(plan, {ownerId,sectionId,yearId,termId}, receipt=false) {
+ const fields=['protocol','ownerId','sectionId','yearId','termId','scope','selectedTeachingId','teachingIds','cascadeTeachingIds','enrollmentIds','fingerprint',...(receipt?['mutationId','outcome','orphanStudentIds']:[])];
+ const ids=a=>Array.isArray(a)&&a.length<=10000&&a.every(id=>typeof id==='string'&&id.length>0&&id.length<=240)&&new Set(a).size===a.length;
+ if(!plan||Object.getPrototypeOf(plan)!==Object.prototype||Object.keys(plan).sort().join()!==fields.sort().join()||
+ plan.protocol!=='N36_SECTION_DELETE_V1'||plan.ownerId!==ownerId||plan.sectionId!==sectionId||plan.yearId!==yearId||plan.termId!==termId||plan.scope!=='section'||
+ plan.selectedTeachingId!==null||!Array.isArray(plan.teachingIds)||plan.teachingIds.length||!ids(plan.cascadeTeachingIds)||!ids(plan.enrollmentIds)||
+ !/^[a-f0-9]{32}$/.test(plan.fingerprint)||receipt&&(!plan.mutationId||plan.outcome!=='deleted'||!Array.isArray(plan.orphanStudentIds)||plan.orphanStudentIds.length))throw Error(DELETE_STALE_MESSAGE);
+ return plan;
+}
+export function subjectlessDeleteWrites(current,receipt,stamp) {
+ const device=current.device.find(d=>d.id==='device'),intent=device?.n77DeleteIntent;
+ if(intent?.kind!=='subjectless-section'||intent.sectionId!==receipt.sectionId||intent.ownerId!==receipt.ownerId||
+ intent.mutationId!==receipt.mutationId||intent.plan.fingerprint!==receipt.fingerprint||device.studentLifecycleResume||device.cloudRestoreResume)throw Error(DELETE_STALE_MESSAGE);
+ validateSubjectlessPlan(receipt,intent.plan,true);
+ if(current.sections.some(s=>s.id===receipt.sectionId&&s.ownerId&&s.ownerId!==receipt.ownerId)||
+ current.teachings.some(t=>t.sectionId===receipt.sectionId&&!t.deleted)||
+ receipt.cascadeTeachingIds.some(id=>current.teachings.some(t=>t.id===id&&t.sectionId!==receipt.sectionId))||
+ current.enrollments.some(e=>!e.deleted&&e.sectionId===receipt.sectionId&&!receipt.enrollmentIds.includes(e.id)))throw Error(DELETE_STALE_MESSAGE);
+ if(device.activeYearId!==receipt.yearId||device.activeTermId!==receipt.termId||
+ !current.years.some(y=>y.id===receipt.yearId&&!y.deleted&&y.status==='active')||
+ !current.terms.some(t=>t.id===receipt.termId&&!t.deleted&&t.status==='active'&&t.yearId===receipt.yearId))throw Error(DELETE_STALE_MESSAGE);
+ const writes=localDeleteWrites(current,receipt,stamp);
+ for(const [name,op]of Object.entries(writes))if(!['device','outbox'].includes(name)&&op.put?.some(r=>r.ownerId!=null&&r.ownerId!==receipt.ownerId))throw Error(DELETE_STALE_MESSAGE);
+ writes.device.put[0].n77DeleteReceipt={...writes.device.put[0].n77DeleteReceipt,kind:'subjectless-section',yearId:receipt.yearId,termId:receipt.termId};
+ return writes;
+}

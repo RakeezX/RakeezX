@@ -9,7 +9,7 @@
   stage:['idle','collecting','review','partial','paused','cancelled','expired','error','saving','saved','unresolved'],
   coverage:['complete','partial','paused','unknown'], terminal:['unproven','explicit-next','observed-anchor'],
   endpoint:['none','ambiguous','anchor','span'], transfer:['idle','sending','pending','error','unknown'],
-  failure:['none','SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER'],
+  failure:['none','SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_SETUP','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER'],
   receipt:['not-available','pending','saved','existing','unknown','expired']
  };
  const numbers = ['valid','staged','observed','excluded','classes','processedPages','currentPage'];
