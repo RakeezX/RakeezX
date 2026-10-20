@@ -5,9 +5,9 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;'
 const labels = { name:'اسم الطالب', class:'الفصل', grades:'الدرجات', required:'المهام المطلوبة', completed:'المهام المكتملة', scheduled:'المهام المجدولة' };
 /** AI: per-source drafts stay fenced to the exact class/session/source snapshot. */
 export function mountTaskGuidance(root,{client,getContext,subscribe}) {
- let disposed=false,busy=false,saving=false,sequence=0,bound=null,tasks=[],selected=null,message='',drafts=new Map(),opened=false,readError=false,uncertain=new Set(),suspended=false,queued=false,wakeTimer,operationSequence=0;
+ let disposed=false,busy=false,saving=false,sequence=0,bound=null,tasks=[],selected=null,message='',drafts=new Map(),opened=false,readError=false,uncertain=new Set(),suspended=false,queued=false,wakeTimer,operationSequence=0,loaded=false;
  const current=()=>{try{return classContextKey(getContext());}catch{return null;}};
- const reset=()=>{sequence++;bound=current();tasks=[];selected=null;drafts.clear();message='';readError=false;uncertain.clear();opened=false;};
+ const reset=()=>{sequence++;bound=current();tasks=[];selected=null;drafts.clear();message='';readError=false;uncertain.clear();opened=false;loaded=false;};
  const state=()=>{const task=tasks.find(t=>t.subitemId===selected),draft=task&&(drafts.get(selected)||task);return {task,draft,stale:!!(draft&&task&&(draft.sourceStamp!==task.sourceStamp||draft.revision!==task.revision))};};
  const empty=d=>!d.executionInstructions.trim()&&!d.deliveryInstructions.trim();
  const unchanged=(t,d)=>t.executionInstructions===d.executionInstructions&&t.deliveryInstructions===d.deliveryInstructions;
@@ -38,7 +38,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   clearTimeout(wakeTimer);const k=bound,g=++sequence;
   if(!k||!client?.listGuidance){tasks=[];draw();return;}
   busy=true;operationSequence=g;draw();
-  try{const result=await client.listGuidance(getContext().teachingId);if(disposed||g!==sequence||k!==current())return;tasks=result.tasks;if(readError)message='';readError=false;if(!tasks.some(t=>t.subitemId===selected))selected=tasks[0]?.subitemId||null;
+  try{const result=await client.listGuidance(getContext().teachingId);if(disposed||g!==sequence||k!==current())return;tasks=result.tasks;loaded=true;if(readError)message='';readError=false;if(!tasks.some(t=>t.subitemId===selected))selected=tasks[0]?.subitemId||null;
    const ids=new Set(tasks.map(t=>t.subitemId));for(const id of drafts.keys())if(!ids.has(id))drafts.delete(id);
   }
   catch{if(g===sequence&&k===current()){readError=true;message='تعذّرت قراءة الحالة. مسودتك محفوظة.';}}
@@ -60,7 +60,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   finally{saving=false;busy=false;if(!disposed){if(k!==current())reset();queued=false;draw();await refresh();}}
  };
  const changed=()=>{if(bound===current())return;reset();draw();scheduleRead();};
- const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);reset();tasks=[];draw();},wake=()=>{if(root.ownerDocument.visibilityState==='visible'){suspended=false;scheduleRead();}};
+ const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);reset();tasks=[];draw();},wake=()=>{if(root.ownerDocument.visibilityState==='visible'){const returning=suspended;suspended=false;changed();if(returning||!loaded)scheduleRead();}};
  root.addEventListener('input',input);root.addEventListener('change',change);root.addEventListener('click',click);root.addEventListener('submit',submit);
  win.addEventListener('pagehide',hide);win.addEventListener('pageshow',wake);win.addEventListener('focus',wake);root.ownerDocument.addEventListener('visibilitychange',wake);
  const unsub=subscribe(changed);reset();scheduleRead();
@@ -218,7 +218,9 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     invalidate(); message = ''; draw();
     if (key()) scheduleRead();
   };
-  const wake = () => { if (root.ownerDocument.visibilityState === 'visible') { suspended = false; scheduleRead(); } };
+  // A focus/repaint notification is not a source revision. Revalidate the
+  // binding immediately; only a retired/missing section needs an automatic read.
+  const wake = () => { if (root.ownerDocument.visibilityState === 'visible') { const returning=suspended; suspended = false; changed(); if(returning||!roster)scheduleRead(); } };
   const pagehide = () => { suspended = true; clearTimeout(wakeTimer); invalidate(); busy = mutating || !!readWork; message = 'الرموز مخفية حتى مراجعة القائمة.'; draw(); };
   const win = root.ownerDocument.defaultView;
   root.addEventListener('keydown', keydown); root.addEventListener('click', click); root.addEventListener('submit', submit); root.addEventListener('change', change);

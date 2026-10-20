@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "scope": "Changed classBinding identity only; actual guarded DOM entry covered separately",
+  "checks": [
+    "same-session renewal, canonical row/property order stable",
+    "lease/year/source revision/other Auth session changes invalidate",
+    "expired bearer and owner/authorization denial failclosed"
+  ],
+  "networkCalls": 0
+}

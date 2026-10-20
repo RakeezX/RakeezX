@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n88-stable-class-and-inline-resume-20261020",
+  "runId": "3b230d01-109a-4d91-8ede-6e2efa911e8a",
+  "status": "PASS",
+  "checks": [
+    "Actual route repaint + two same-session bearer renew/focus notifications during each delayed section: baseline key churn reproduced, new key stable, one list/one guidance read, six fields retained",
+    "Actual owner/store guard immediately clears both sections; delayed old-owner reply rejected",
+    "Previous-session missing/expired checks remain on same real form; only accepted projected resume renders profile"
+  ],
+  "hostedTeacherSuccess": "NOT_PROVEN",
+  "readCounts": {
+    "list": 2,
+    "guidance": 2,
+    "studentRead": 3
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

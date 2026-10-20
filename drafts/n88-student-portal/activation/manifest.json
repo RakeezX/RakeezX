@@ -155,7 +155,7 @@
     "src/lib/visible-viewport.js": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
     "src/lib/dom.js": "8b26581da0652916d48211fa55abfc6ac8fa927c3d659a3afc5a3ca649966657",
     "src/lib/brand.js": "0b46aa8ad014afd3b84163bdb2e002e486b606ee9e1ea370b44ca64894c087d5",
-    "src/views/student-portal-login.js": "826927e681a94cdbb804b73a41b87aaee99a062e77d7bef82f9df277122788c0",
+    "src/views/student-portal-login.js": "3c1678e1718fd8663cf8e25fc4801ef90a9c4e05cd37ba4e37bf1c083d3d09b1",
     "drafts/n88-student-portal/client/student-entry.js": "9629d7a895335fe46a548f01147301e15af1cbbadc457d73deab2c29466e5efe",
     "src/lib/calendar-presets.js": "c103057b5eb59c26fb7d7c07cffe6d22a37297e19840311bce86c0406ac62d6a",
     "src/lib/calendar-recovery.js": "0da792e8f8cee9747eee0992ebb8b3c39072cc3ffe6db5ea40ccdd9774e40931",
@@ -180,7 +180,7 @@
     "src/lib/student-import.js": "449ccf169d92c5238f864562adc036ac6eb20815cf1ebbab69380c224c84b578",
     "src/lib/student-lifecycle.js": "4d4f53b8f50ebc9f643439086bd00283a3afde8886fa05d4300be6fd3582172b",
     "src/lib/student-portal-class-client.js": "84e885d6390bc2cde5990e4f3d8f0f3fef7cf8a274f4b78e8e30f65c1fbc9317",
-    "src/lib/student-portal-runtime.js": "0a149d7cb6c60a0396354f4d3e2231cd6871ec8885b448dc2745c259148e7be0",
+    "src/lib/student-portal-runtime.js": "fca204b567c2ea35c0da2d8b3051fb9170d1440126ba4863058c6af11bbe92eb",
     "src/lib/student-portal-task-guidance-client.js": "de210ff07a7e0b782b1854b0b5d900c695d1727ba0eb46ad043af514fbe504bf",
     "src/lib/subject-catalog.js": "63f201dc1b82772cb32b043e8a7a3444b9a2e91a9f1ea3ba2a4a7547f2fc4cbd",
     "src/lib/sync-ownership.js": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
@@ -190,7 +190,7 @@
     "src/lib/workspace-routing.js": "6ffb5f2d51cf9bc6dc805d5a62b1340ea524c360177f65d7a681c30757950e0b",
     "src/lib/workspaces.js": "834d8546970a94dfd912bab56ca8082f7d0bd890529fc565e2d36d41cc91ee1e",
     "src/store.js": "72a420a76c030737253ca24910b700d115869a1afe0d2c72eed8ee64c0f3c409",
-    "src/views/student-portal-class.js": "ea1f98f22ebc4a278e3f62246a56543d56c08b373ec2d10076d1bc569d0e5301",
+    "src/views/student-portal-class.js": "3d92244270830100564103a034d6949b94cb2d0099e4aac4f271b906e29ce8da",
     "supabase/functions/n88-student-portal/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "supabase/functions/n88-student-portal/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
     "src/styles/app.css": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270",
@@ -200,7 +200,7 @@
     "assets/header-dark-standard.svg": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
     "assets/header-dark-compact.svg": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
     "drafts/n88-student-portal/client/student.html": "5fbc18a2058be0b1bf8a1c1100f9204179970bb067e9cadc03ca4a5be0bc33fb",
-    "drafts/n88-student-portal/activation/private-document.mjs": "93b2497260da61edec04647f19e7d8aee40f0e8a251e25d24ef303e937487241",
+    "drafts/n88-student-portal/activation/private-document.mjs": "c6fb44344b7dad1ed5b6fbc28ad1d7e7eb8d023ff30569e90a997b5fe4c77afe",
     "drafts/n88-student-portal/cloudflare-entry.mjs": "4243cd22440bd3097fb8298b73a4736f97d59f418e6c8239c1162c566e9849bc",
     "drafts/n88-student-portal/task-guidance.inactive.sql": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
     "supabase/migrations/20261018125611_n88_task_guidance_staged.sql": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
@@ -331,7 +331,7 @@
   },
   "outputs": {
     "edge/index.mjs": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
-    "private/assets/student.mjs": "28e9d68a0c6231e2b2629e4e0682f2d0ee2336a1fab9733416818a06014d765e",
+    "private/assets/student.mjs": "5f0a7db16624edbd494f5b9924a51fae34752fc0c73794eff9a5aafc96ef8dda",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
     "private/styles/app.css": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
@@ -343,7 +343,7 @@
     "private/assets/brand/header-dark-compact.svg": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
     "private/assets/brand/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
     "private/student.html": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
-    "cloudflare/worker.mjs": "54a72c0161fe301e241d082b381611b67c05d8bba510da9b3e8e95f099fe7e50"
+    "cloudflare/worker.mjs": "ab8a39e7b579e549260f1a25647926be29b3bd86fd92eccd52400096bc2faefc"
   },
   "graphs": {
     "edge/index.mjs": {
@@ -1087,5 +1087,22 @@
     "servedReceipt": "tests/n88-1837/served.json",
     "supportHookApplied": false,
     "conclusion": "tests/n88-1837/conclusion.json"
+  },
+  "stable20261020": {
+    "taskId": "continuous-n88-stable-class-and-inline-resume-20261020",
+    "runId": "3b230d01-109a-4d91-8ede-6e2efa911e8a",
+    "baseSha": "5a91a2b478f63aa0cde33e744f113a404298d0ef",
+    "previousWorker": "54a72c0161fe301e241d082b381611b67c05d8bba510da9b3e8e95f099fe7e50",
+    "worker": "ab8a39e7b579e549260f1a25647926be29b3bd86fd92eccd52400096bc2faefc",
+    "edgeUnchanged": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
+    "staticOnly": true,
+    "hostedTeacherSuccess": "NOT_PROVEN",
+    "staticDelivery": {
+      "receipt": "drafts/n88-student-portal/activation/static-20261020-native.json",
+      "version": "e97c1eab-59ef-46d5-8285-141c0ac56d4e",
+      "served": "tests/n88-20261020/served.json",
+      "uploads": 1,
+      "edgeOperations": 0
+    }
   }
 }

@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "capturedAt": "2026-10-20T08:54:13.811Z",
+  "sourceSha256": "ab8a39e7b579e549260f1a25647926be29b3bd86fd92eccd52400096bc2faefc",
+  "sourceMatch": true,
+  "bindingsUnchanged": true,
+  "routesUnchanged": true,
+  "subdomainUnchanged": true,
+  "privacyUnchanged": true,
+  "privacy": {
+    "logpush": false,
+    "tags": null,
+    "tail_consumers": null,
+    "observability": null
+  },
+  "transportUnchanged": true,
+  "workerUploads": 1,
+  "secretValuesRead": false,
+  "edgeOperations": 0,
+  "deployment": {
+    "id": "e451c1eb-bd8b-4c4c-bbaa-c7fab4109d38",
+    "versions": [
+      {
+        "version_id": "e97c1eab-59ef-46d5-8285-141c0ac56d4e",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-20T08:54:11.7263Z"
+  }
+}
