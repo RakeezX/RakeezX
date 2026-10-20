@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-actual-popup-package-download-link-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -4098,
+      "scopeKey": "continuous-n36-actual-popup-package-download-link-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 15,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-actual-popup-start-idle-20261020",
+        "continuous-n107-current-background-queue-compact-ux-20261020"
+      ],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "Tiny serial delivery companion for actual popup-start extension fix. Depend on BOTH new extension package and N107 compact queue delivery so shared view stays safe. Read upstream task verified provider receipt and exact archiveversion/hash; do not guess0.5.22 before publication or redo engine/303/background/source/runtime proofs. In current origin/main update ONLY extension download link/label/version to verified newly published archive in src/views/class-import-center.js, preserving all N107 compactUX and N36 receiver contracts. Existing archive download listener should remain actual download, not internalnavigation. One targeted actual local click validates exactdownloadhref/version, no accidental navigation; sourcecheck confirms nootherlogicchanged. No fullbrowsermatrix/build suite beyond publisher normalpipeline. No extension source/archivechanges or app/store edits; package stable updater/rootparity are existing delivery phases, not this Producttask. If engine changed noarchive because NO_CHANGE, compare actual verified newest archive and currentlink; return truthful NO_CHANGE when alreadymatches. No real account/school/credential/SQL/Auth operations, no previouslyrefusedautomation. Solepublisher only, noqueueediting; return exactcandidate/base/result.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "tests/n36-popup-package-link-20261020/**",
+        "docs/automation-evidence/20261020/N36_ACTUAL_POPUP_PACKAGE_DOWNLOAD_LINK.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_actual_new_verified_package_link_download_no_navigation"
+      ],
+      "postDeliveryChecks": [],
+      "acceptance": [
+        "Published download points to exact verified popup-start package, with current N107 and receiver behavior retained."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO no newtab and no openpopup; ordinary background implementation under explicitStart",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountMutations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Latest direct PO explicitly requests background independent of popup/newtab. Publish exact existing owner-bound import behavior and sessionjob runtime via solepublisher; no new source/data/security permission."
+    }
+  ]
+}
