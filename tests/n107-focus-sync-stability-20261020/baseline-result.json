@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n107-focus-sync-stability-20261020",
+  "runId": "69386de3-2267-43e4-a4cf-59b578806a89",
+  "checks": [],
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: native select node must stay connected\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/browser.mjs:65:14\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/browser.mjs:29:2"
+  ],
+  "sourceSha256": {
+    "src/app.js": "1c988588bd36b5ab1ac2ee6eae376b76b193760fcdcf40bcc13c6f2704ce6a0d",
+    "src/lib/dom.js": "8b26581da0652916d48211fa55abfc6ac8fa927c3d659a3afc5a3ca649966657"
+  },
+  "servedSource": "10a98fcbec350030c5b72a1ea9132cab196a9ae2",
+  "expectedReproductionFailure": true
+}

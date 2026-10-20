@@ -2,7 +2,7 @@
  * RAKEEZ X — غلاف التطبيق: الإقلاع، والهيكل، وتوجيه الشاشات، وإعادة الرسم.
  */
 
-import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
+import { html, render, renderRegions, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
 import { visibleLatinDigits } from './lib/visible-numerals.js';
 import { displayIdentity, effectiveTheme } from './lib/display-identity.js';
 import { brandLockup } from './lib/brand.js';
@@ -804,6 +804,8 @@ async function refreshSyncOperationalUI() {
 /* ---------- الرسم ---------- */
 
 let renderQueued = false;
+let paintedSession = null;
+let paintedSessionGeneration = 0;
 
 /**
  * يجمع عدة تغييرات في رسمة واحدة.
@@ -824,16 +826,26 @@ function paint() {
   observeNotifications();
   const snap = captureFocus();
   view.beforePaint?.(mainEl, ctx.params);
+  let pageChanged = false;
   try {
+    if (paintedSession !== cloud.session) {
+      paintedSession = cloud.session;
+      paintedSessionGeneration++;
+    }
+    const lease = store.getOfflineLeaseStatus();
+    const contextKey = JSON.stringify([ctx.path, store.getActiveWorkspace(), cloud.user?.id,
+      paintedSessionGeneration, cloud.authStatus().state, lease.state, lease.reason,
+      store.activeYear()?.id, store.activeTerm()?.id]);
     const hubEl = document.getElementById('sidebar-mini-hub');
     if (hubEl) {
-      render(hubEl, renderSidebarMiniHubTrigger());
+      renderRegions(hubEl, [renderSidebarMiniHubTrigger()], contextKey);
     }
-    render(
-      mainEl,
-      html`${topbar(view, ctx.params)}${renderOfflineLease()}
-        <div class="page ${view.wide ? 'page--wide' : ''} ${currentPath() === '/' ? 'page--home' : currentPath() === '/schedule' ? 'page--schedule' : ''} ${currentPath().startsWith('/teaching/') ? 'page--class-workspace' : ''}">${view.render(ctx.params)}</div>`
-    );
+    // A Sync/account header update must not remount unchanged page controls.
+    // Ownership, session, academic scope and permission transitions invalidate all regions.
+    const changed = renderRegions(mainEl, [topbar(view, ctx.params), renderOfflineLease(),
+      html`<div class="page ${view.wide ? 'page--wide' : ''} ${currentPath() === '/' ? 'page--home' : currentPath() === '/schedule' ? 'page--schedule' : ''} ${currentPath().startsWith('/teaching/') ? 'page--class-workspace' : ''}">${view.render(ctx.params)}</div>`
+    ], contextKey);
+    pageChanged = changed[2];
   } catch (err) {
     console.error('[rakeezx] فشل رسم الشاشة', err);
     render(
@@ -849,8 +861,10 @@ function paint() {
     );
     return;
   }
-  restoreFocus(snap);
-  view.afterPaint?.(mainEl, ctx.params);
+  if (pageChanged) {
+    restoreFocus(snap);
+    view.afterPaint?.(mainEl, ctx.params);
+  }
 }
 
 function renderOfflineLease() {

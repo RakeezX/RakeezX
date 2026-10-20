@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n107-focus-sync-stability-20261020",
+  "runId": "69386de3-2267-43e4-a4cf-59b578806a89",
+  "checks": [
+    {
+      "name": "n107_actual_dom_background_update_keeps_active_control",
+      "status": "PASS",
+      "evidence": "Actual owned-account import UI at 1100px/390px: grade/subject native selects remain connected through timed background paints and accept keyboard selection; class-code typing keeps exact node, focus, text and caret. Data/outbox unchanged."
+    },
+    {
+      "name": "n107_import_and_representative_dialog_affected_result_inspected",
+      "status": "PASS",
+      "evidence": "Actual import, relevant custom-subject rerender, changed account header, genuine score-store notification and account dialog/disclosure checked. Dialog focus/open state and data/outbox preserved; narrow screenshots captured."
+    }
+  ],
+  "failures": [
+    "page.waitForFunction: Timeout 10000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-focus-sync-stability-20261020\\tests\\n107-focus-sync-stability-20261020\\browser.mjs:123:16\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/browser.mjs:29:2"
+  ],
+  "sourceSha256": {
+    "src/app.js": "d35b82cc9653abc95e2f9cfc68d6450c9a348113cb2a29f38bf5c01d973d9d8c",
+    "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480"
+  }
+}

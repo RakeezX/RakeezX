@@ -1,0 +1,231 @@
+{
+  "taskId": "continuous-n107-focus-sync-stability-20261020",
+  "runId": "69386de3-2267-43e4-a4cf-59b578806a89",
+  "checks": [
+    {
+      "name": "n107_actual_dom_background_update_keeps_active_control",
+      "status": "PASS",
+      "evidence": "Actual owned-account import UI at 1100px/390px: grade/subject native selects remain connected through timed background paints and accept keyboard selection; class-code typing keeps exact node, focus, text and caret. Data/outbox unchanged."
+    },
+    {
+      "name": "n107_import_and_representative_dialog_affected_result_inspected",
+      "status": "PASS",
+      "evidence": "Actual import, relevant custom-subject rerender, changed account header, genuine score-store notification and account dialog/disclosure checked. Dialog focus/open state and data/outbox preserved; narrow screenshots captured."
+    },
+    {
+      "name": "n107_sync_status_truth_and_owner_recovery_preserved",
+      "status": "PASS",
+      "evidence": "Actual account boot and rendered status dot: pending blue, synced green, blocked/rejected/failed remain non-green; paused real synthetic Sync publishes syncing blue then hard failure red. Typing also survives actual Sync start/failure notifications; workspace deactivation removes cached import controls. Existing owner tests recorded separately. No real service requests."
+    }
+  ],
+  "failures": [],
+  "syncStates": [
+    {
+      "state": "pending",
+      "summary": {
+        "state": "pending",
+        "queuedCount": 1,
+        "pendingCount": 1,
+        "failedCount": 0,
+        "blockedCount": 0,
+        "rejectedCount": 0,
+        "historicalConflictCount": 0,
+        "actionableSyncIssue": true,
+        "affectedCategories": [
+          "students"
+        ],
+        "historicalConflictCategories": [],
+        "reasonCategory": "waiting_for_upload",
+        "reasonLabel": "توجد تغييرات محفوظة محليًا بانتظار الرفع.",
+        "lastSuccessfulSyncAt": 1792527583834,
+        "automaticRetryActive": false,
+        "automaticSyncActive": false,
+        "teacherActionRequired": false,
+        "localWorkSaved": true,
+        "cloudSyncHealthy": false,
+        "safeToContinueUnrelatedWork": true,
+        "studentLifecycleInFlight": false,
+        "classDeletionInFlight": false,
+        "presentationSeverity": {
+          "transient": false,
+          "hardFailure": false,
+          "authRequired": false,
+          "awaitingVerification": false,
+          "failureSince": null,
+          "failedAttempts": 0
+        },
+        "lastSafeFailure": null
+      },
+      "dot": {
+        "color": "rgb(37, 99, 235)",
+        "title": "مركز المعلم: المعلم، تغييرات بانتظار المزامنة"
+      }
+    },
+    {
+      "state": "synced",
+      "summary": {
+        "state": "synced",
+        "queuedCount": 0,
+        "pendingCount": 0,
+        "failedCount": 0,
+        "blockedCount": 0,
+        "rejectedCount": 0,
+        "historicalConflictCount": 0,
+        "actionableSyncIssue": false,
+        "affectedCategories": [],
+        "historicalConflictCategories": [],
+        "reasonCategory": "none",
+        "reasonLabel": "لا توجد تغييرات حالية تحتاج إجراءً.",
+        "lastSuccessfulSyncAt": 1792527583834,
+        "automaticRetryActive": false,
+        "automaticSyncActive": false,
+        "teacherActionRequired": false,
+        "localWorkSaved": true,
+        "cloudSyncHealthy": true,
+        "safeToContinueUnrelatedWork": true,
+        "studentLifecycleInFlight": false,
+        "classDeletionInFlight": false,
+        "presentationSeverity": {
+          "transient": false,
+          "hardFailure": false,
+          "authRequired": false,
+          "awaitingVerification": false,
+          "failureSince": null,
+          "failedAttempts": 0
+        },
+        "lastSafeFailure": null
+      },
+      "dot": {
+        "color": "rgb(21, 128, 61)",
+        "title": "مركز المعلم: المعلم، متزامن"
+      }
+    },
+    {
+      "state": "blocked",
+      "summary": {
+        "state": "blocked",
+        "queuedCount": 1,
+        "pendingCount": 0,
+        "failedCount": 0,
+        "blockedCount": 1,
+        "rejectedCount": 0,
+        "historicalConflictCount": 0,
+        "actionableSyncIssue": true,
+        "affectedCategories": [
+          "students"
+        ],
+        "historicalConflictCategories": [],
+        "reasonCategory": "workspace_ownership_blocked",
+        "reasonLabel": "توقفت المزامنة لحماية بيانات مساحة العمل.",
+        "lastSuccessfulSyncAt": 1792527583834,
+        "automaticRetryActive": false,
+        "automaticSyncActive": false,
+        "teacherActionRequired": true,
+        "localWorkSaved": true,
+        "cloudSyncHealthy": false,
+        "safeToContinueUnrelatedWork": true,
+        "studentLifecycleInFlight": false,
+        "classDeletionInFlight": false,
+        "presentationSeverity": {
+          "transient": false,
+          "hardFailure": false,
+          "authRequired": false,
+          "awaitingVerification": false,
+          "failureSince": null,
+          "failedAttempts": 0
+        },
+        "lastSafeFailure": null
+      },
+      "dot": {
+        "color": "rgb(180, 83, 9)",
+        "title": "مركز المعلم: المعلم، تغييرات تنتظر بيانات مرتبطة"
+      }
+    },
+    {
+      "state": "rejected",
+      "summary": {
+        "state": "rejected",
+        "queuedCount": 1,
+        "pendingCount": 0,
+        "failedCount": 0,
+        "blockedCount": 0,
+        "rejectedCount": 1,
+        "historicalConflictCount": 0,
+        "actionableSyncIssue": true,
+        "affectedCategories": [
+          "students"
+        ],
+        "historicalConflictCategories": [],
+        "reasonCategory": "server_rejected_change",
+        "reasonLabel": "يوجد تغيير لم يقبله الخادم ويحتاج تدخّلًا.",
+        "lastSuccessfulSyncAt": 1792527583834,
+        "automaticRetryActive": false,
+        "automaticSyncActive": false,
+        "teacherActionRequired": true,
+        "localWorkSaved": true,
+        "cloudSyncHealthy": false,
+        "safeToContinueUnrelatedWork": true,
+        "studentLifecycleInFlight": false,
+        "classDeletionInFlight": false,
+        "presentationSeverity": {
+          "transient": false,
+          "hardFailure": false,
+          "authRequired": false,
+          "awaitingVerification": false,
+          "failureSince": null,
+          "failedAttempts": 0
+        },
+        "lastSafeFailure": null
+      },
+      "dot": {
+        "color": "rgb(220, 38, 38)",
+        "title": "مركز المعلم: المعلم، تعذر اعتماد بعض التغييرات"
+      }
+    },
+    {
+      "state": "error",
+      "summary": {
+        "state": "error",
+        "queuedCount": 1,
+        "pendingCount": 0,
+        "failedCount": 1,
+        "blockedCount": 0,
+        "rejectedCount": 0,
+        "historicalConflictCount": 0,
+        "actionableSyncIssue": true,
+        "affectedCategories": [
+          "students"
+        ],
+        "historicalConflictCategories": [],
+        "reasonCategory": "temporary_sync_failure",
+        "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+        "lastSuccessfulSyncAt": 1792527583834,
+        "automaticRetryActive": false,
+        "automaticSyncActive": false,
+        "teacherActionRequired": true,
+        "localWorkSaved": true,
+        "cloudSyncHealthy": false,
+        "safeToContinueUnrelatedWork": true,
+        "studentLifecycleInFlight": false,
+        "classDeletionInFlight": false,
+        "presentationSeverity": {
+          "transient": false,
+          "hardFailure": false,
+          "authRequired": false,
+          "awaitingVerification": false,
+          "failureSince": null,
+          "failedAttempts": 0
+        },
+        "lastSafeFailure": null
+      },
+      "dot": {
+        "color": "rgb(220, 38, 38)",
+        "title": "مركز المعلم: المعلم، تعذر إكمال المزامنة"
+      }
+    }
+  ],
+  "sourceSha256": {
+    "src/app.js": "657dc7938e5705cfa8d7a8f7723566f17a03490f4d0e03e25a1a5813b25a8783",
+    "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480"
+  }
+}

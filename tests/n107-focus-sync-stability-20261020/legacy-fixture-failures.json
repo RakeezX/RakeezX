@@ -1,0 +1,22 @@
+{
+  "checks": [
+    {
+      "name": "n95 legacy coordinator fixture",
+      "status": "FAIL",
+      "evidence": "First coordinator sync returned error instead of expected pending; AUTH_CONTEXT_CHANGED: Score capability owner changed. The fixture uses access_token without session.user. Three standalone presentation/context tests PASS in status-unit-check.txt."
+    },
+    {
+      "name": "automatic-sync-cadence legacy fixture",
+      "status": "FAIL",
+      "evidence": "Both writes refused OFFLINE_LEASE_LIMITED; synthetic helper registers a workspace but this fixture does not establish authenticated owner + renewable lease. No guard disabled or Product source changed to accommodate it."
+    }
+  ],
+  "unchangedProductPaths": [
+    "src/store.js",
+    "src/lib/sync.js",
+    "src/lib/cloud.js",
+    "src/lib/offline-lease.js",
+    "src/lib/sync-v2.js",
+    "src/lib/sync-operational-ui.js"
+  ]
+}
