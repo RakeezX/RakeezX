@@ -1,0 +1,133 @@
+{
+  "taskId": "continuous-n36-deleted-source-class-reimport-20261020",
+  "runId": "afe3e92c-362b-4c23-94a2-ca382929c050",
+  "baseSha": "01940ee3a6fe0f4c79e0ad50c9209662a7ef7517",
+  "checks": [
+    {
+      "name": "deleted",
+      "status": "PASS",
+      "evidence": "Actual saved batch + stale mapping/receipt requalified; fresh destination or unique active reused, old tombstones/history unchanged; identical retry adds no section/student/enrollment/command. No navigation or dummy subject."
+    },
+    {
+      "name": "deleted-setup",
+      "status": "PASS",
+      "evidence": "Actual saved batch + stale mapping/receipt requalified; fresh destination or unique active reused, old tombstones/history unchanged; identical retry adds no section/student/enrollment/command. No navigation or dummy subject."
+    },
+    {
+      "name": "active",
+      "status": "PASS",
+      "evidence": "Actual saved batch + stale mapping/receipt requalified; fresh destination or unique active reused, old tombstones/history unchanged; identical retry adds no section/student/enrollment/command. No navigation or dummy subject."
+    },
+    {
+      "name": "ambiguous",
+      "status": "PASS",
+      "evidence": {
+        "outcome": {
+          "phase": "batch",
+          "step": "validation",
+          "code": "CLASS_ARCHIVED_OR_AMBIGUOUS"
+        },
+        "root": [],
+        "effect": "No child/outbox writes, pending batch retained; persisted competing row preserved where applicable."
+      }
+    },
+    {
+      "name": "archived",
+      "status": "PASS",
+      "evidence": {
+        "outcome": {
+          "phase": "batch",
+          "step": "validation",
+          "code": "CLASS_ARCHIVED_OR_AMBIGUOUS"
+        },
+        "root": [],
+        "effect": "No child/outbox writes, pending batch retained; persisted competing row preserved where applicable."
+      }
+    },
+    {
+      "name": "mapped-foreign",
+      "status": "PASS",
+      "evidence": {
+        "outcome": {
+          "phase": "batch",
+          "step": "validation",
+          "code": "WRITE_FAILED"
+        },
+        "root": [],
+        "effect": "No child/outbox writes, pending batch retained; persisted competing row preserved where applicable."
+      }
+    },
+    {
+      "name": "foreign-account",
+      "status": "PASS",
+      "evidence": "Explicit Start denied with unchanged Product disk/outbox."
+    },
+    {
+      "name": "other-term",
+      "status": "PASS",
+      "evidence": "Explicit Start denied with unchanged Product disk/outbox."
+    },
+    {
+      "name": "race-active",
+      "status": "PASS",
+      "evidence": {
+        "outcome": {
+          "phase": "batch",
+          "step": "validation",
+          "code": "WRITE_FAILED"
+        },
+        "root": [
+          "CLASS_CHANGED"
+        ],
+        "effect": "No child/outbox writes, pending batch retained; persisted competing row preserved where applicable."
+      }
+    },
+    {
+      "name": "race-archive",
+      "status": "PASS",
+      "evidence": {
+        "outcome": {
+          "phase": "batch",
+          "step": "validation",
+          "code": "WRITE_FAILED"
+        },
+        "root": [
+          "CLASS_ARCHIVED_OR_AMBIGUOUS"
+        ],
+        "effect": "No child/outbox writes, pending batch retained; persisted competing row preserved where applicable."
+      }
+    },
+    {
+      "name": "race-mapping",
+      "status": "PASS",
+      "evidence": {
+        "outcome": {
+          "phase": "batch",
+          "step": "validation",
+          "code": "WRITE_FAILED"
+        },
+        "root": [
+          "CLASS_CHANGED"
+        ],
+        "effect": "No child/outbox writes, pending batch retained; persisted competing row preserved where applicable."
+      }
+    }
+  ],
+  "errors": [],
+  "scope": "Synthetic local app only; original actual 0.5.17 journey remains FAILED. No extension changes, school browsing, service mutation or deployment.",
+  "preservedFailures": [],
+  "phase": "race-mapping",
+  "freshIdentity": {
+    "old": "n73-source-section",
+    "new": "sec:ed7147d2-86a8-49c7-b548-6e1f78e13c20",
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "receiptTargets": {
+      "ebdc899380799b3a797afb82d1b277476559af07e90ad6a5de95db1ae0c7fb17": {
+        "خامس1": "sec:ed7147d2-86a8-49c7-b548-6e1f78e13c20"
+      }
+    },
+    "oldHistoryUnchanged": true,
+    "retryAdded": 0
+  },
+  "status": "PASS"
+}
