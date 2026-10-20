@@ -1,4 +1,5 @@
 import * as cloud from './cloud.js';
+import { initialDepartmentCalendarPreset } from './education-department-directory.js';
 
 export const PROFILE_STATUS = Object.freeze({ PENDING: 'PENDING_PROFILE', READY: 'READY' });
 export const TEACHER_FORM = Object.freeze({ MASCULINE: 'masculine', FEMININE: 'feminine' });
@@ -55,7 +56,7 @@ export function isValidSaudiMobile(value) {
   return SAUDI_MOBILE_PATTERN.test(normalized);
 }
 
-export function validateProfileCompletion(profile = {}) {
+export function validateProfileCompletion(profile = {}, { requireDepartment = false } = {}) {
   const teacherName = String(profile.teacherName ?? '').trim();
   const rawPhone = String(profile.phone ?? '').trim();
   const phone = normalizeSaudiMobile(rawPhone);
@@ -64,16 +65,21 @@ export function validateProfileCompletion(profile = {}) {
     ? TEACHER_FORM.FEMININE
     : TEACHER_FORM.MASCULINE;
   const schoolName = String(profile.schoolName ?? '').trim();
+  const educationDepartment = profile.educationDepartment ?? null;
+  const departmentValid = !!initialDepartmentCalendarPreset(educationDepartment);
   return Object.freeze({
-    valid: !!teacherName && phoneValid,
+    valid: !!teacherName && phoneValid && (!requireDepartment || departmentValid),
     missing: Object.freeze([
       ...(!teacherName ? ['teacherName'] : []),
       ...(!phone ? ['phone'] : []),
+      ...(requireDepartment && !educationDepartment ? ['educationDepartment'] : []),
     ]),
     invalid: Object.freeze([
       ...(phone && !phoneValid ? ['phone'] : []),
+      ...(requireDepartment && educationDepartment && !departmentValid ? ['educationDepartment'] : []),
     ]),
-    profile: Object.freeze({ teacherName, phone, teacherForm, schoolName }),
+    profile: Object.freeze({ teacherName, phone, teacherForm, schoolName,
+      ...(departmentValid ? { educationDepartment } : {}) }),
   });
 }
 
@@ -127,13 +133,18 @@ export async function provisionAccount({ api = cloud } = {}) {
 }
 
 export async function completeProfile(profile, { api = cloud } = {}) {
-  const validation = validateProfileCompletion(profile);
+  const ownerId = api.user?.id;
+  const contract = normalizeAccountContract(await api.getAccountContract(), api.user);
+  if (api.user?.id !== ownerId) throw Object.assign(new Error('Profile account changed'), { code: 'ACCOUNT_CONTRACT_OWNER_MISMATCH' });
+  const requireDepartment = !!contract.provisioning && contract.provisioning.state !== 'READY';
+  const validation = validateProfileCompletion(profile, { requireDepartment });
   if (!validation.valid) {
     throw Object.assign(new Error('Teacher name and a valid Saudi mobile number are required'), {
       code: 'PROFILE_REQUIRED_FIELDS_MISSING', missing: validation.missing, invalid: validation.invalid,
     });
   }
   cachedContract = normalizeAccountContract(await api.completeAccountProfile(validation.profile), api.user);
+  if (api.user?.id !== ownerId) throw Object.assign(new Error('Profile account changed'), { code: 'ACCOUNT_CONTRACT_OWNER_MISMATCH' });
   return cachedContract;
 }
 

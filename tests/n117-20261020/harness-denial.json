@@ -1,0 +1,9 @@
+{
+  "runId": "0ebb5450-f191-4951-b332-e54cee3e2455",
+  "originalFailure": "ERR_HTTP_HEADERS_SENT: Cannot write headers after they are sent to the client",
+  "correction": "Read static content before sending HTTP response headers; avoid a second writeHead in error handling.",
+  "denial": "exec_command failed: CreateProcess ... rejected: blocked by policy",
+  "deniedOperation": "Combined owned pg_ctl stop, recursive Remove-Item and qualification rerun command. No command in that rejected invocation ran.",
+  "saferAction": "Separate non-deleting owned pg_ctl stop succeeded: server stopped. No deletion retry through another tool or surface. Harness now retains stopped synthetic runtime directories, excluded from Git.",
+  "nativeChecksBeforeCrash": "Existing account compatibility; all four special departments and Riyadh; atomic wrong mapping/date rejection; owner/anon/no-overload checks passed before the HTTP harness failure. Complete qualification is recorded separately."
+}
