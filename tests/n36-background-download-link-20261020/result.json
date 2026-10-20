@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n36-background-package-download-link-20261020",
+  "runId": "500a6ced-99c0-4b0e-863f-8de8c4de3a43",
+  "name": "n36_download_link_matches_verified_background_package",
+  "baseSha": "20b0744065f08afdd73be096066598ab9b68c47e",
+  "publishedPackageSha": "15991a36f0a7b3f082b85acd1c45a6c9d581f9a2",
+  "reusedVerifiedAt": "2026-10-20T13:42:47.939Z",
+  "archiveSha256": "aeef5c41efe6d16dff68055daed21e6400ff6b8d752eac671cea32dd181fa4b2",
+  "changedScope": "Only download href/version label; N107/receiver code identical",
+  "publication": "NOT_RUN",
+  "preservedHarnessFailure": "Demo view has the existing account-access guard; corrected fixture uses the existing synthetic owned account helper without changing the guard",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.21",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS"
+}
