@@ -1,0 +1,83 @@
+12:20:43 PM [vite] (client) [console.warn] Service Worker registration blocked by Playwright
+12:20:43 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص تحديث عامل الخدمة TypeError: Cannot read properties of undefined (reading 'update')
+    at http://127.0.0.1:19964/src/app.js:1818:19
+12:20:43 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص المخزون TypeError: Cannot read properties of undefined (reading 'active')
+    at http://127.0.0.1:19964/src/app.js:1829:17
+12:20:43 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:44 PM [vite] (client) [console.warn] Service Worker registration blocked by Playwright
+12:20:44 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص تحديث عامل الخدمة TypeError: Cannot read properties of undefined (reading 'update')
+    at http://127.0.0.1:19964/src/app.js:1818:19
+12:20:44 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص المخزون TypeError: Cannot read properties of undefined (reading 'active')
+    at http://127.0.0.1:19964/src/app.js:1829:17
+12:20:44 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:45 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:45 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:46 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:46 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:46 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:47 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:48 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)',
++   'Failed to load resource: the server responded with a status of 404 (Not Found)'
++ ]
+- []
+
+    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n64-abandoned-pending-expiry-20261020/tests/n64-expiry-20261020/ui.mjs:169:14
+    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)
+    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n64-abandoned-pending-expiry-20261020/tests/n64-expiry-20261020/ui.mjs:25:3 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    'Failed to load resource: the server responded with a status of 404 (Not Found)'
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

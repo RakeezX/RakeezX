@@ -1,0 +1,144 @@
+12:20:07 PM [vite] (client) [console.warn] Service Worker registration blocked by Playwright
+12:20:07 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص تحديث عامل الخدمة TypeError: Cannot read properties of undefined (reading 'update')
+    at http://127.0.0.1:19964/src/app.js:1818:19
+12:20:07 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص المخزون TypeError: Cannot read properties of undefined (reading 'active')
+    at http://127.0.0.1:19964/src/app.js:1829:17
+12:20:07 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:08 PM [vite] (client) [console.warn] Service Worker registration blocked by Playwright
+12:20:08 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص تحديث عامل الخدمة TypeError: Cannot read properties of undefined (reading 'update')
+    at http://127.0.0.1:19964/src/app.js:1818:19
+12:20:08 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص المخزون TypeError: Cannot read properties of undefined (reading 'active')
+    at http://127.0.0.1:19964/src/app.js:1829:17
+12:20:08 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:08 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:20:08 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+ExpectError: expect(locator).toBeVisible() failed
+
+Locator: locator('[data-act="retry-email-verification"]')
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "to.be.visible" with timeout 5000ms
+  - waiting for locator('[data-act="retry-email-verification"]')
+
+    at captureRawStack (C:\Users\Abody\Projects\RakeezX\node_modules\playwright-core\lib\coreBundle.js:9681:17)
+    at callMatcherAsStep (C:\Users\Abody\Projects\RakeezX\node_modules\playwright\lib\matchers\expect.js:13310:57)
+    at Object.toBeVisible (C:\Users\Abody\Projects\RakeezX\node_modules\playwright\lib\matchers\expect.js:13300:23)
+    at C:\Users\Abody\Projects\RakeezX\.worktrees\continuous-n64-abandoned-pending-expiry-20261020\tests\n64-expiry-20261020\ui.mjs:104:75
+    at async withIsolatedLocalBrowser (C:\Users\Abody\Projects\RakeezX\scripts\ops-supervisor-v4\isolated-local-browser.mjs:19:10)
+    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n64-abandoned-pending-expiry-20261020/tests/n64-expiry-20261020/ui.mjs:25:3 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      `Locator: locator('[data-act="retry-email-verification"]')\n` +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      '  - Expect "to.be.visible" with timeout 5000ms\n' +
+      `  - waiting for locator('[data-act="retry-email-verification"]')\n`,
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      '  - Expect "to.be.visible" with timeout 5000ms',
+      `  - waiting for locator('[data-act="retry-email-verification"]')`
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- link "انتقل إلى المحتوى":\n' +
+      '  - /url: "#main"\n' +
+      '- main:\n' +
+      '  - status:\n' +
+      '    - text: لم تتأكد مزامنة كل التغييرات مع السحابة بعد.\n' +
+      '    - link "تحتاج مساعدة؟":\n' +
+      '      - /url: "#/support"\n' +
+      '  - heading "الإعدادات" [level=1]\n' +
+      '  - button "تفعيل الوضع الداكن"\n' +
+      `  - 'button "مركز المعلمة: معلمة الاختبار، تعذر إكمال المزامنة"'\n` +
+      '  - group:\n' +
+      '    - text: بياناتك معلمة الاختبار عرض وتعديل\n' +
+      '    - status: أكمل إدارة التعليم من بياناتك\n' +
+      '    - text: اسم المعلمة\n' +
+      '    - textbox "اسم المعلمة":\n' +
+      '      - /placeholder: الاسم كما يظهر في التقارير\n' +
+      '      - text: معلمة الاختبار\n' +
+      '    - text: صفة المستخدم\n' +
+      '    - group "صفة المستخدم":\n' +
+      '      - button "معلم"\n' +
+      '      - button "معلمة" [pressed]\n' +
+      '    - text: اسم المدرسة (اختياري)\n' +
+      '    - textbox "اسم المدرسة (اختياري)":\n' +
+      '      - /placeholder: اسم المدرسة\n' +
+      '    - text: إدارة التعليم\n' +
+      '    - combobox "إدارة التعليم"\n' +
+      '    - text: مطلوبة لإكمال بياناتك. اسم المديرة (اختياري)\n' +
+      '    - textbox "اسم المديرة (اختياري)":\n' +
+      '      - /placeholder: مديرة المدرسة للتقارير\n' +
+      '    - text: رقم الجوال\n' +
+      '    - textbox "رقم الجوال خاص ببيانات الحساب ولا يظهر للطلاب.":\n' +
+      '      - /placeholder: 05xxxxxxxx\n' +
+      '      - text: "0500000000"\n' +
+      '    - text: خاص ببيانات الحساب ولا يظهر للطلاب. البريد الإلكتروني الحالي teacher@example.test\n' +
+      '    - button "تغيير"\n' +
+      '    - status: انتهت مهلة تأكيد الطلب. يمكنك طلب تغيير البريد من جديد.\n' +
+      '    - text: الوصول\n' +
+      '    - status "حالة الوصول": الوصول التجريبي\n' +
+      '  - heading "المظهر والتفاعل" [level=2]\n' +
+      '  - link "الإشعارات":\n' +
+      '    - /url: "#/settings/notifications"\n' +
+      '  - text: المظهر اختر المظهر الأنسب لبيئة العمل\n' +
+      '  - group "مظهر التطبيق":\n' +
+      '    - button "حسب النظام"\n' +
+      '    - button "فاتح" [pressed]\n' +
+      '    - button "داكن"\n' +
+      '  - text: المؤثرات الصوتية أصوات تفاعلية أثناء رصد المشاركة والقرعة\n' +
+      '  - group "المؤثرات الصوتية":\n' +
+      '    - button "تشغيل" [pressed]\n' +
+      '    - button "إيقاف"\n' +
+      '  - text: المؤثرات البصرية الحركة واحتفالات الرصد والقرعة\n' +
+      '  - group "المؤثرات البصرية":\n' +
+      '    - button "تشغيل" [pressed]\n' +
+      '    - button "إيقاف"\n' +
+      '  - heading "البيانات والمساعدة" [level=2]\n' +
+      '  - link "البيانات والنسخ الاحتياطي صدّر سجلّك كله في ملف، أو استرجع نسخة سابقة":\n' +
+      '    - /url: "#/settings/backup"\n' +
+      '  - link "الأرشيف استعراض السنوات والفصول الدراسية المؤرشفة وبياناتها السابقة.":\n' +
+      '    - /url: "#/archive"\n' +
+      '  - link "الدعم تواصل بالبريد أو أرسل طلب دعم خاصًا من داخل التطبيق.":\n' +
+      '    - /url: "#/support"\n' +
+      '  - heading "على جهازك" [level=2]\n' +
+      '  - button "تثبيت ركيز على جهازك إرشادات واضحة خطوة بخطوة لجهازك."\n' +
+      '  - button "عن ركيز المعلم معلومات التطبيق والإصدار"\n' +
+      '- navigation "التنقل الرئيسي":\n' +
+      '  - link "الرئيسية":\n' +
+      '    - /url: "#/"\n' +
+      '  - link "الفصول":\n' +
+      '    - /url: "#/classes"\n' +
+      '  - link "الجدول":\n' +
+      '    - /url: "#/schedule"\n' +
+      '  - link "التقارير":\n' +
+      '    - /url: "#/reports"\n' +
+      '  - link "التقويم":\n' +
+      '    - /url: "#/calendar"\n' +
+      '- link "المساعدة والتواصل":\n' +
+      '  - /url: "#/support"'
+  }
+}
+
+Node.js v24.19.0

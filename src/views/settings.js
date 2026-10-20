@@ -39,6 +39,30 @@ let removeEmailReturnCheck = () => {};
 let emailVerificationInFlight = null;
 let verifiedEmailContext = '';
 let retryEmailVerification = () => {};
+let removeEmailExpiry = () => {};
+// Confirmed project Email OTP policy: presentation expiry is not provider cancellation.
+const EMAIL_CHANGE_LIFETIME_MS = 900000;
+function emailRequestLifecycle(view) {
+  const normalize = value => String(value || '').trim().toLowerCase();
+  const providerPending = normalize(cloud.user?.new_email);
+  const target = providerPending || normalize(view.pending);
+  if (!target || target === normalize(cloud.user?.email) || emailFeedback?.completed) return { pending: false };
+  // A local request retains only the timestamp returned for that exact target.
+  const raw = providerPending ? cloud.user?.email_change_sent_at : view.sentAt;
+  const sentAt = typeof raw === 'string' && raw.trim() ? Date.parse(raw) : NaN;
+  if (!Number.isFinite(sentAt) || sentAt > Date.now()) return { pending: false, unknown: true };
+  const expiresAt = sentAt + EMAIL_CHANGE_LIFETIME_MS;
+  return { pending: Date.now() < expiresAt, expired: Date.now() >= expiresAt, expiresAt };
+}
+function scheduleEmailExpiry(view) {
+  removeEmailExpiry();
+  const lifecycle = emailRequestLifecycle(view);
+  if (!lifecycle.pending) return;
+  const timer = setTimeout(() => {
+    if (currentEmailChangeView() === view) repaint();
+  }, Math.max(1, lifecycle.expiresAt - Date.now()));
+  removeEmailExpiry = () => { clearTimeout(timer); removeEmailExpiry = () => {}; };
+}
 // Presentation only: never persisted, and discarded when the rendered owner changes.
 let emailChangeView = { ownerId: null, sending: false, pending: '', error: '', sheetOpen: false };
 function currentEmailChangeView() {
@@ -301,7 +325,9 @@ const settings = {
     const accountEmail = cloud.user?.email ?? accountContract?.email ?? '';
     const pendingEmail = String(cloud.user?.new_email || emailView.pending || '').trim().toLowerCase();
     emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId: cloud.user?.id, email: accountEmail, pendingEmail });
-    const emailChangePending = Boolean(emailFeedback.requestedEmailChange);
+    const emailLifecycle = emailRequestLifecycle(emailView);
+    const emailChangePending = emailLifecycle.pending && Boolean(emailFeedback.requestedEmailChange);
+    scheduleEmailExpiry(emailView);
     const teacherForm = m.teacherForm === 'feminine' ? 'feminine' : 'masculine';
     const presentation = getAccountPresentation(teacherForm);
     const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
@@ -409,7 +435,9 @@ const settings = {
                       <summary>كيف أكمل تأكيد البريد؟</summary>
                       <p class="field__hint">أكّد الطلب من الرسالتين في بريدك الحالي والجديد. إن لم تجدهما، تحقّق من الرسائل غير المرغوب فيها.</p>
                     </details>`
-                    : emailFeedback.completed ? html`<p class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span></p>` : ''}
+                    : emailFeedback.completed ? html`<p class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span></p>`
+                    : emailLifecycle.expired ? html`<p class="field__hint" role="status" data-email-change-expired>انتهت مهلة تأكيد الطلب. يمكنك طلب تغيير البريد من جديد.</p>`
+                    : emailLifecycle.unknown ? html`<p class="field__hint" role="status" data-email-change-unknown>تعذر تحديد مهلة تأكيد الطلب. لم يُثبت اكتمال التغيير.</p>` : ''}
                 ${emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
               </div>`}
             ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
@@ -655,14 +683,14 @@ const settings = {
     const view = currentEmailChangeView();
     emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email || view.pending });
     removeEmailVerification();
-    const context = () => JSON.stringify([cloud.user?.id, cloud.user?.email, cloud.user?.new_email, view.pending, cloud.session?.access_token]);
+    const context = () => JSON.stringify([cloud.user?.id, cloud.user?.email, cloud.user?.new_email, cloud.user?.email_change_sent_at, view.pending, cloud.session?.access_token]);
     const active = () => request === accountContractRequest && cloud.user?.id === ownerId && Boolean(cloud.session) && currentEmailChangeView() === view;
     const pending = () => Boolean(cloud.user?.new_email || view.pending || emailFeedback?.requestedEmailChange);
     const verifyEmail = (force = false) => {
       if (!active() || view.sending) return;
       if (emailVerificationInFlight) return emailVerificationInFlight;
       if (!force && context() === verifiedEmailContext) return;
-      const before = JSON.stringify([emailFeedback, cloud.user.email, view.verificationError]);
+      const before = JSON.stringify([emailFeedback, cloud.user.email, cloud.user.email_change_sent_at, view.verificationError]);
       const showBusy = pending() || Boolean(view.verificationError);
       const flight = cloud.verifyCurrentAuthIdentity(ownerId);
       emailVerificationInFlight = flight;
@@ -672,7 +700,8 @@ const settings = {
         if (!active() || view.sending) return;
         // Completion additionally requires the provider's pending value to be gone.
         emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email, verified: !cloud.user.new_email });
-        if (emailFeedback.completed) view.pending = '';
+        if (emailFeedback.completed) { view.pending = ''; view.sentAt = ''; }
+        scheduleEmailExpiry(view);
         verifiedEmailContext = context();
         view.verificationError = '';
       }).catch(() => {
@@ -682,7 +711,7 @@ const settings = {
       }).finally(() => {
         if (emailVerificationInFlight === flight) emailVerificationInFlight = null;
         view.verifying = false;
-        if (active() && (showBusy || JSON.stringify([emailFeedback, cloud.user.email, view.verificationError]) !== before)) repaint();
+        if (active() && (showBusy || JSON.stringify([emailFeedback, cloud.user.email, cloud.user.email_change_sent_at, view.verificationError]) !== before)) repaint();
         if (request !== accountContractRequest) retryEmailVerification();
       });
       return flight;
@@ -692,6 +721,7 @@ const settings = {
     removeEmailReturnCheck();
     let lastReturnCheck = -Infinity;
     const checkOnReturn = () => {
+      if (active() && !view.sending) { scheduleEmailExpiry(view); repaint(); }
       if (!active() || !pending() || view.sending || document.visibilityState !== 'visible' || emailVerificationInFlight || Date.now() - lastReturnCheck < 30000) return;
       lastReturnCheck = Date.now();
       verifyEmail(true);
@@ -721,6 +751,7 @@ const settings = {
   },
 
   onUnmount() {
+    removeEmailExpiry();
     removeEmailVerification();
     removeEmailReturnCheck();
     retryEmailVerification = () => {};
@@ -765,6 +796,8 @@ const settings = {
             }
             if (currentEmailChangeView() !== view) return '';
             view.pending = updated.new_email || nextEmail;
+            view.sentAt = updated.email_change_sent_at || '';
+            emailFeedback = verifiedEmailFeedback(null, { ownerId, email: updated.email, pendingEmail: view.pending });
             return '';
           } catch (error) {
             if (currentEmailChangeView() !== view) return '';
