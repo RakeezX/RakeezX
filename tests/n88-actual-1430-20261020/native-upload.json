@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "version": 52,
+  "edge": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+  "sourceExact": true,
+  "verifyJwt": false,
+  "importMapUnchanged": true,
+  "uploads": 1
+}
