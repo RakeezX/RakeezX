@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n113-current-public-semantic-heading-20261020",
+      "productId": "N113",
+      "activationId": "po-20261012-continuous",
+      "priority": -3500,
+      "scopeKey": "continuous-n113-current-public-semantic-heading-20261020",
+      "riskClass": "LOW",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 10,
+      "idleMinutes": 7,
+      "dependsOn": [],
+      "sessionId": "01a1542a-050c-7ee3-921f-ddacf0ee33ba",
+      "objective": "Latest human explicitly asks check/finish N113. Root actually inspected existing Bing20October13:46–13:48UTC: sitemap Success,1 URL discovered, homepage Indexed successfully/URL can appear on Bing. Last indexed crawl18October12:08 local (09:08UTC). Report lists old title too short, H1 missing,2 empty-alt notices. Root ONE current public HTML comparison at13:48:07UTC is saved C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261020-appchanged-n88-cause/n113-current-three-indexed-issues.json: current title is meaningful Arabic49chars and already fixed; H1 count0; both logo images explicitly alt=\"\" aria-hidden=true inside roleimg aria-label brand wrapper, i.e. decorative. Do not label current title/decorative accessibility as broken simply to satisfy old crawler notices. No wholeSEO audit or new engine/provider/browser query; indexed report is actual evidence, preserve indexed-success truth and Google report processing.\nFix ONLY current public boot-shell semantic missing main heading using the existing Rakeez brand/visible boot composition and existing visual styles, no extra marketing block, keyword stuffing, SEO-hidden alternative content, new line/space/shift, duplicate H1 after app mounts, new routes, private content or startup graph changes. Accessible heading must have meaningful Arabic brand name for no-JS/crawler initial HTML. Decorative duplicate light/dark logo should remain decorative under existing single accessible brand label; do not repeat two spoken labels or invent new visual theme. Preserve current good title/meta/canonical/structured data/security/CSP/boot live status/theme/startup behavior. If inspection proves main heading already delivered on current main with exact source, NO_CHANGE with proof instead of duplicate fix. index.html/affected existing boot CSS only if actual necessity; prefer index-only semantic adjustment.\nMinimum check only changed boot DOM: accessible main heading before JS; unchanged existing brand geometry and no duplicate heading once existing route mounts. Text/semantic check plus one affected small boot inspection sufficient, no broad browser-size matrix, engine reindex requests, SEO packages, keyword research, test boilerplate or unrelated app suite. Current title/decorative-alt rationale can be assertions in same proof without source changes. Use existing local isolated browser only if useful; no shared live user browser/source/Supabase/Auth/SQL/cookies/credentials operations. No changes to app/store/import/student functions/N44HOLD/CLOSED. Deliver via existing sole publisher; report HTML/source/served changed asset proof and exact limitation: crawler report won't immediately update until next crawl. Do not claim new Bing/Google crawl, rank or wholePO acceptance from release. Preserve all prior actual indexed/map evidence, no sitemap resubmission/APIkeys/IndexNow/DNS/header changes.",
+      "allowedPaths": [
+        "index.html",
+        "src/styles/app.css",
+        "tests/n113-public-semantic-heading-20261020/**",
+        "docs/automation-evidence/20261020/N113_PUBLIC_SEMANTIC_HEADING.md"
+      ],
+      "verificationPaths": [
+        "index.html"
+      ],
+      "requiredChecks": [
+        "n113_public_initial_heading_accessibility_no_visual_change",
+        "n113_current_title_and_decorative_images_preserved"
+      ],
+      "acceptance": [
+        "Current initial public HTML has a meaningful brand heading without visual clutter or private data.",
+        "Existing title/decorative logo semantics remain correct; solepublisher verifies served change, engine recrawl and ranking stay external."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct PO N113 finish/check plus fresh actual Bing specific issue",
+        "publication": true,
+        "realAccountMutations": 0,
+        "providerSubmission": 0
+      },
+      "releaseAuthority": "Latest direct PO finish N113 authorizes narrow public semantic-heading fix and verified publication; no new indexing submission or service/account change."
+    }
+  ]
+}
