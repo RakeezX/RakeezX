@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-stable-class-and-inline-resume-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -2300,
+      "scopeKey": "n88-po-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS.md, ops contract, latest exact dated Product row and affected current-main source only. Latest direct PO20October confirms new actual behavior after prior verified deliveries. Sole existing controller/serial publisher; no manual workers/queue or ledger edits, no generic old --last or duplicated session. Save exact task/run/base/candidate schema and actual PASS/FAIL/NOT_RUN. Minimum affected verification, reuse unchanged proof; no full suite/build or repeated school read. N44 explicit hold remains; N64/N112/N115/N116/N120/N123/N124/N110/N121/N122 accepted CLOSED. N116 on-demand generation acceptance does NOT prove old calendar-year incident resolved; existing account calendar hold stays. Preserve owners/sessions/leases/history/grade/revision/ACK/delete/Restore. No real pupil/account mutation, real send, SQL/schema/Auth/RLS/role/password/keys or previous tool refusal bypass. LOCAL_READY is not Production or whole-ticket acceptance.\n\nActual PO: student claim now good and brand better, but Previous session button still whole-page «جارٍ الاتصال». Teacher eventually shows1pupil/codes but slow and partial; roster and guidance repeatedly revert to «جارٍ قراءة القائمة/المهام» and fields sometimes absent. Fix this actual lifecycle, do not repeat old native49 Auth-budget/readiness/service tests. Keep student entry mounted with concise inline checking for Previous session too, then navigate only on accepted resume; missing/expired/invalid resume gives inline safe feedback. Keep revoked/rotated/expired/owner/projection/rate guards and valid-session semantics.\nTeacher: trace actual subscriptions/render/reconcile/focus/lease lifecycle and all roster/visibility/guidance load initiations. Current caller contexts and naturally generated teaching IDs, not only handcrafted single initial mount. Determine repeated invalidation/reload cause; keep independent sections stable and reuse/coalesce same authorized identity/class/context in-flight read. Do not blank accepted same-binding data on harmless re-render/refresh; genuine account/session/class/year/term/authorization invalidation immediately clears. Preserve actual service failures and late-response binding guards. Do not replace missing service result with0fields, empty roster or inferred permission. Never use timeout increase/debounce/forcedgreen as causal fix. No code generation/rotation/revocation writes, teacher visibility publication or actual pupil mutation. Link and existing visual identity already accepted; no redesign. Minimal changed actual synthetic DOM case reproducing two refresh/focus/re-render notifications during delayed roster and guidance plus real owner change; one previous-session form path. Reuse unchanged invalid-code/brand/crypto/SQL/source proofs. Actual teacher now sometimes succeeds per PO, but do not claim unobserved full hosted success. Existing safe support diagnostics may be read in ordinary user-triggered path; no extra verify-account flow or trace with IDs/tokens.\nStudent source is also served by existing private ingress. If student asset bytes change, SAME original N88 custodian may package and perform ONE changed-static-assets-only carrier update/readback, preserving bindings/routes/secrets/cache/observability/transport. Original session01a14fc3-b292-7390-9952-8549a286c80f is supplied. Use established owned carrier path and already-pinned native49 source; zero Edge/Auth/SQL/key/readiness deployment/probe or original activation/disarm. Never replay consumed readiness/old stage or browser ownership refusal through another tab/actor. New frontend source must also pass sole publisher. No extra grants or credential extraction.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal-login.css",
+        "src/lib/support.js",
+        "drafts/n88-student-portal/activation/**",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "tests/n88-20261020/**",
+        "docs/automation-evidence/20261020/N88_STABLE_CLASS_INLINE_RESUME.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_stable_same_binding_sections_and_inline_session_resume"
+      ],
+      "acceptance": [
+        "Deliver the exact newly reported behavior without reopening old accepted contracts or changing data semantics.",
+        "Sole publisher verifies served source; actual account journey and user acceptance remain distinct."
+      ],
+      "preparationAuthority": {
+        "kind": "Original N88 custodian, changed static assets only if needed",
+        "publication": true,
+        "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "maxChangedStaticCarrierUploads": 1,
+        "nativeFunctionDeploys": 0,
+        "newMigrations": 0,
+        "newRoles": 0,
+        "newKeys": 0,
+        "realSend": false,
+        "realPupilMutations": 0
+      },
+      "releaseAuthority": "Latest direct PO authorizes these specified corrections and mandatory new-signup department/calendar behavior through existing controller/publication. No unrelated data/service/credential change.",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "liveAuthorizationRef": "PO-20261020-N88-EXACT-UI-CORRECTION-AND-STATIC-ASSETS"
+    }
+  ]
+}
