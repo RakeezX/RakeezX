@@ -1,12 +1,30 @@
 {
   "manifest_version": 3,
-  "name": "ركيز — مساعد إعداد المعلم التجريبي الخاص",
-  "version": "0.5.23",
-  "description": "بدء صريح لاستيراد الفصول والطلاب والمواد وبيانات الإعداد والجدول المتاحة من الصفحات المدعومة؛ نور يبقى بالمراجعة.",
-  "permissions": ["activeTab", "scripting", "storage", "alarms"],
-  "host_permissions": ["https://rakeezx.com/*"],
-  "background": { "service_worker": "handoff-worker.js", "type": "module" },
-  "externally_connectable": { "matches": ["https://rakeezx.com/*"] },
-  "action": { "default_popup": "popup.html" },
-  "content_security_policy": { "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" }
+  "name": "ركيز المعلم - الاستيراد من مدرستي",
+  "version": "0.5.24",
+  "description": "استيراد المتاح من مدرستي إلى حساب ركيز ببدء صريح، مع متابعة التشغيل عند إغلاق نافذة الإضافة.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://rakeezx.com/*"
+  ],
+  "background": {
+    "service_worker": "handoff-worker.js",
+    "type": "module"
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://rakeezx.com/*"
+    ]
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+  }
 }

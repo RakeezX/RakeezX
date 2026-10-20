@@ -1,0 +1,71 @@
+{
+  "checks": [
+    {
+      "name": "original_route_failure_reproduced",
+      "status": "PASS",
+      "evidence": "Exact base worker denies accepted same-document hash transition because tabs snapshot differs from stored URL, then returns pending instead of its claim error."
+    },
+    {
+      "name": "authorized_hash_route_document_claim",
+      "status": "PASS",
+      "evidence": "Hash changed between create/deliver; tabs snapshot stale. Actual receiver same owner/document accepts once, pending stays pending until original outcome, saved receipt and real profile/outbox readback; replay same nonce produces no duplicate."
+    },
+    {
+      "name": "wrong_document_frame_origin_tab_nonce_denied",
+      "status": "PASS",
+      "evidence": "Each wrong sender rejected; original nonce remains unclaimed/unpoisoned; profile/outbox unchanged."
+    },
+    {
+      "name": "claim_error_to_terminal_background_result",
+      "status": "PASS",
+      "evidence": "Actual app catches route rejection; worker n36-result returns failed, actual coordinator stops with exact safe code and zero inferred writes. No timeout increase/new nonce/source scan."
+    },
+    {
+      "name": "current_owner_guard_denial",
+      "status": "PASS",
+      "evidence": "Foreign owner retires actual app receiver grant, no profile/outbox writes."
+    },
+    {
+      "name": "popup_compact_actual_ui",
+      "status": "PASS",
+      "evidence": {
+        "size": [
+          445,
+          600
+        ],
+        "copyTopLeft": {
+          "x": 14,
+          "y": 14,
+          "right": 102.421875,
+          "overflow": false,
+          "height": 600
+        },
+        "actualSourceCSS": true,
+        "noManualNoorModules": true,
+        "terminalCopySafe": true
+      }
+    },
+    {
+      "name": "run-page_compact_actual_ui",
+      "status": "PASS",
+      "evidence": {
+        "size": [
+          1060,
+          800
+        ],
+        "copyTopLeft": {
+          "x": 124,
+          "y": 14,
+          "right": 212.421875,
+          "overflow": false,
+          "height": 800
+        },
+        "actualSourceCSS": true,
+        "noManualNoorModules": true,
+        "terminalCopySafe": true
+      }
+    }
+  ],
+  "boundary": "Actual HTTP source app/DOM/CSS/handlers, synthetic owned account and Chrome APIs. No portal, native MV3 or Production test.",
+  "status": "PASS"
+}

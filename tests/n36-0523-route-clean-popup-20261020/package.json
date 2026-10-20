@@ -1,0 +1,84 @@
+{
+  "status": "PASS",
+  "version": "0.5.24",
+  "runtimeAndArchivedFiles": 29,
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.24.zip",
+    "sha256": "901858c399b04d2c229ae9cea055e83df5d89030fa29c884414380f5608dbd82",
+    "bytes": 134818
+  },
+  "reused": [
+    {
+      "path": "extensions/rakeez-teacher-import-helper/selection.js",
+      "sha256": "d1e85f708d864fa9d8f61d1585e581fe56edba419282a6de64c9e0d82ab27490"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/source-adapter.js",
+      "sha256": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/source-roster.js",
+      "sha256": "2bc76e92e5996ca3ad6579bd064cc33dbd0feca797929bd88fc05e02c998a067"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/navigation.js",
+      "sha256": "fdcbb7e3a797e21f1d7e639a8ffa54be9a8631aaf39418a0dee36b46fc93e3ab"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/background-collector.js",
+      "sha256": "b77ecd733676c76e65734a2446ae547e8b18a8b3f808db4c30abb96be650085e"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/categories-popup.js",
+      "sha256": "85417c917501948fae76931c68532b39eba59ed1aaafcba366bd39edf93485d9"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/categories.js",
+      "sha256": "fcd0b93335a605b1aba6b84651b11188528b9a556648d75bc3cf4a04a182acda"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/popup.js",
+      "sha256": "0e1a555d42fac03776026d457632cf7979e3a751259685dc82e942317cf75bdc"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+      "sha256": "62e2ed5daca4035c9a44196bd337cf595dfd1325c649fdb2e9e25f4554231a00"
+    },
+    {
+      "path": "src/lib/n36-extension-protocol.js",
+      "sha256": "1e3745a9890b6d75f9bb6cd6a9e5e0eb950ebd9164c6edce648abbf2ce244d50"
+    },
+    {
+      "path": "src/views/class-import-center.js",
+      "sha256": "b245d5ea31645453b127bf836a7d101efb470e0ed1beb02301e3d23d50024769"
+    },
+    {
+      "path": "src/store.js",
+      "sha256": "194738a9ad91046f1438ac932c991071c7e98c73685c88cccbc335084a9d1924"
+    },
+    {
+      "path": "src/lib/cloud.js",
+      "sha256": "44cd8f8bd875844152cd79f7a84436aaa5a09dff693c4f532f27c89bf73bb4a2"
+    },
+    {
+      "path": "sw.js",
+      "sha256": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9"
+    },
+    {
+      "path": "assets/extensions/rakeez-teacher-import-helper-0.5.23.zip",
+      "sha256": "e79674c119aabba88bdb5a2196d6860179006aea4055050cd90d81278afc7c55"
+    },
+    {
+      "path": "assets/extensions/rakeez-teacher-import-helper-0.5.23.manifest.json",
+      "sha256": "90c8e382daff6ea0d655bc55e5d3d86d14836275c10c1a22f26a1472f3b5c328"
+    }
+  ],
+  "checks": [
+    "Exact ZIP/source/member SHA256 and size parity; changed and archived JS syntax",
+    "Original .23 archive and supported principal reader unchanged",
+    "No added permissions, hosts or CSP; exact requested identity",
+    "Noor/manual source and original entry snapshots retained but not loaded",
+    "Original deadline, unknown receipt and source/profile/calendar guards reused unchanged"
+  ],
+  "postPublication": "NOT_RUN: independent publisher and serial link companion; no current link/view write or stable-folder install claimed."
+}

@@ -33,6 +33,7 @@ export function handoffRequest(hash = location.hash) {
 }
 export async function claimHandoff(request) {
   if (location.origin !== APP_ORIGIN || !globalThis.chrome?.runtime?.sendMessage) throw Error('HANDOFF_UNAVAILABLE');
+  try {
   const response = await new Promise((resolve,reject)=>{
     const timer=setTimeout(()=>reject(Error('HANDOFF_TIMEOUT')),5000);
     chrome.runtime.sendMessage(request.extensionId,{type:'n36-claim',nonce:request.nonce},result=>{
@@ -42,6 +43,13 @@ export async function claimHandoff(request) {
   });
   const envelope=validateHandoff(response.envelope);
   return {envelope,bundle:handoffBundle(envelope.version===3?{...legacyLifetime(envelope),setup:envelope.setup.filter(c=>c.category!=='department')}:envelope),request};
+  }catch(error){
+   // Counts-free transport diagnosis only. Worker accepts this solely while the
+   // original unclaimed nonce/document still exists; never requeues a claim.
+   const code=['HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_EXPIRED_OR_DENIED','HANDOFF_UNAVAILABLE','HANDOFF_TIMEOUT'].includes(error.message)?error.message:'HANDOFF_UNAVAILABLE';
+   try{chrome.runtime.sendMessage(request.extensionId,{type:'n36-claim-failed',nonce:request.nonce,code},()=>{void chrome.runtime.lastError;});}catch{/* Original error remains authoritative. */}
+   throw error;
+  }
 }
 
 // AI: counts only, bound by the extension to the original receiver tab and nonce.
