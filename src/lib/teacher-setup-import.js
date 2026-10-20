@@ -3,6 +3,7 @@ import { compareAcademicClasses } from './class-order.js';
 import { normalizeDateTimeDigits, validDateTimeValue } from './rakeez-datetime-values.js';
 
 export const CATEGORIES = Object.freeze({
+  department: { label: 'إدارة التعليم', fields: { name: 'إدارة التعليم' } },
   teacher: { label: 'اسم المعلم', fields: { name: 'اسم المعلم' } },
   school: { label: 'اسم المدرسة', fields: { name: 'اسم المدرسة' } },
   principal: { label: 'اسم المدير', fields: { name: 'اسم المدير' } },
@@ -32,7 +33,7 @@ function fieldValue(field, value, category) {
     if (!/^\d{2}:\d{2}(?:-\d{2}:\d{2})?$/.test(v)) fail('INVALID_TIME');
     const parts = v.split('-');
     if (parts.some(part => !validDateTimeValue(part, 'time')) || parts.length === 2 && parts[1] <= parts[0]) fail('INVALID_TIME');
-  } else if (field === 'name' && category !== 'school') {
+  } else if (field === 'name' && !['school','department'].includes(category)) {
     if (v.length < 2 || !/^[\p{L}\p{M}]+(?: [\p{L}\p{M}]+)*$/u.test(v)) fail('INVALID_NAME');
   } else if (v.length < 2 || !/[\p{L}]/u.test(v) || !/^[\p{L}\p{M}0-9 ()-]+$/u.test(v)) fail('INVALID_TEXT');
   return v;
@@ -40,7 +41,7 @@ function fieldValue(field, value, category) {
 export function validateBundle(value) {
   keys(value, ['schema', 'version', 'categories']);
   if (value.schema !== 'rakeez-private-teacher-setup' || value.version !== 1) fail('UNSUPPORTED_SCHEMA');
-  if (!Array.isArray(value.categories) || !value.categories.length || value.categories.length > 6) fail('EMPTY_OR_LIMIT');
+  if (!Array.isArray(value.categories) || !value.categories.length || value.categories.length > 7) fail('EMPTY_OR_LIMIT');
   const seen = new Set(); let count = 0;
   const categories = value.categories.map(c => {
     keys(c, ['category', 'provenance', 'rows']);
@@ -48,7 +49,7 @@ export function validateBundle(value) {
     seen.add(c.category);
     if (!Array.isArray(c.provenance) || !c.provenance.length || c.provenance.length > 3 || c.provenance.some(p => !provenance.has(p))) fail('INVALID_PROVENANCE');
     if (!Array.isArray(c.rows) || !c.rows.length || c.rows.length > 300) fail('EMPTY_OR_LIMIT');
-    if (['teacher', 'school', 'principal'].includes(c.category) && c.rows.length !== 1) fail('AMBIGUOUS_ROLE');
+    if (['teacher', 'school', 'principal', 'department'].includes(c.category) && c.rows.length !== 1) fail('AMBIGUOUS_ROLE');
     count += c.rows.length; if (count > 600) fail('BUNDLE_LIMIT');
     const identities = new Set(), slots = new Set();
     const rows = c.rows.map(row => {
@@ -85,6 +86,7 @@ export function reviewPlan(bundle, selected, context, mappings) {
   const categories = validated.categories.filter(c => selected.has(c.category));
   const issues = [];
   if (!categories.length) issues.push('اختر فئة واحدة على الأقل.');
+  if(categories.some(c=>c.category==='department'))issues.push('إدارة التعليم تُستورد من تشغيل مدرستي الصريح فقط.');
   if (!context.years?.some(y => y.id === context.yearId && y.status === 'active') ||
       !context.terms?.some(t => t.id === context.termId && t.yearId === context.yearId && t.status === 'active')) issues.push('اختر السنة والفصل الدراسي الحاليين.');
   const classes = uniqueOptions(context.classes), subjects = uniqueOptions(context.subjects);

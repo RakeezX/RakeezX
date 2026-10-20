@@ -15,14 +15,15 @@
  };
  enums.failure.push('SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
  const numbers = ['valid','staged','observed','excluded','classes','processedPages','currentPage'];
- const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none'});
+ const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none',fieldResults:[]});
  let state=fresh(), errors=[], background='not-available';
  const ownValue=(o,k)=>Object.getOwnPropertyDescriptor(o,k)?.value;
  function publish(input) {
   if (!input || ![Object.prototype,null].includes(Object.getPrototypeOf(input))) return;
   for(const k of Object.keys(input)) {
    const v=ownValue(input,k);
-   if(numbers.includes(k)) state[k]=Number.isSafeInteger(v)&&v>=0&&v<=1000000?v:null;
+   if(k==='fieldResults'&&Array.isArray(v))state.fieldResults=v.slice(0,36).filter(d=>d&&['teacher','school','principal','department','classes','timetable'].includes(ownValue(d,'field'))&&['saved','current','missing','conflict','unsupported','ambiguous','unrecognized'].includes(ownValue(d,'reason'))&&Number.isSafeInteger(ownValue(d,'count'))&&d.count>0&&d.count<=1200).map(d=>({field:d.field,reason:d.reason,count:d.count}));
+   else if(numbers.includes(k)) state[k]=Number.isSafeInteger(v)&&v>=0&&v<=1000000?v:null;
    else if(Object.hasOwn(enums,k)) state[k]=enums[k].includes(v)?v:(k==='stage'?'error':k==='terminal'?'unproven':k==='endpoint'?'none':k==='receipt'?'not-available':'unknown');
    else if(['hasNext','disabledNext'].includes(k)) state[k]=typeof v==='boolean'?v:null;
   }

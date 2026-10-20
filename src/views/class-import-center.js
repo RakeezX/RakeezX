@@ -17,8 +17,8 @@ import { go } from '../router.js';
 import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding, reviewGradeTransfer } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
-import { handoffRequest, claimHandoff, reportHandoffOutcome } from '../lib/n36-extension-handoff.js';
-import { validateHandoff, HANDOFF_TTL } from '../lib/n36-extension-protocol.js';
+import { handoffRequest, claimHandoff, reportHandoffOutcome, validateHandoff } from '../lib/n36-extension-handoff.js';
+import { HANDOFF_TTL } from '../lib/n36-extension-protocol.js';
 
 
 
@@ -235,18 +235,28 @@ async function ensureSourceSection(batch,classroom){
 async function saveAvailableSetup(batch,categories){
  const {validateBundle}=await import('../lib/teacher-setup-import.js');
  const setup=categories.length?validateBundle({schema:'rakeez-private-teacher-setup',version:1,categories}).categories:[];
- const result={saved:0,existing:0,unresolved:0,missing:['teacher','school','principal','classes','timetable'].filter(k=>!setup.some(c=>c.category===k))};
+ const result={saved:0,existing:0,unresolved:0,missing:['teacher','school','principal','department','classes','timetable'].filter(k=>!setup.some(c=>c.category===k)),details:[]};
+ for(const field of result.missing)result.details.push({field,reason:'missing',count:1});
  const verifyCurrent=current=>current?automaticPersistedGuard(batch,current):automaticGuard(batch);
  for(const c of setup.filter(c=>['teacher','school','principal'].includes(c.category))){
   automaticGuard(batch);
   const fields={teacher:['teacherName'],school:['schoolName'],principal:['principalName','reportPrincipalName']}[c.category],value=c.rows[0].name;
-  if(fields.some(k=>store.state.profile[k]&&store.state.profile[k]!==value)){result.unresolved++;continue;}
-  const changes=Object.fromEntries(fields.filter(k=>!store.state.profile[k]).map(k=>[k,value]));
-  if(Object.keys(changes).length){await store.importSetupProfile(changes,{verifyCurrent});result.saved++;}else result.existing++;
+  const changed=fields.some(k=>store.state.profile[k]!==value),changes=Object.fromEntries(fields.map(k=>[k,value]));
+  await store.importSetupProfile(changes,{verifyCurrent,sourceWins:true});
+  if(changed){result.saved++;result.details.push({field:c.category,reason:'saved',count:1});}
+  else{result.existing++;result.details.push({field:c.category,reason:'current',count:1});}
+ }
+ const department=setup.find(c=>c.category==='department');
+ if(department){
+  const {resolveVisibleEducationDepartment}=await import('../lib/education-department-directory.js');
+  const resolved=resolveVisibleEducationDepartment(department.rows[0].name);
+  if(resolved.status!=='recognized'){result.unresolved++;result.details.push({field:'department',reason:resolved.status,count:1});}
+  else if(store.state.profile.educationDepartment===resolved.value){result.existing++;result.details.push({field:'department',reason:'current',count:1});}
+  else{await store.importSetupProfile({educationDepartment:resolved.value},{verifyCurrent,sourceWins:true});result.saved++;result.details.push({field:'department',reason:'saved',count:1});}
  }
  for(const c of setup.filter(c=>c.category==='classes'))for(const row of c.rows){
   try{
-   const found=sourceSection(row.classroom).section,section=await ensureSourceSection(batch,row.classroom);result[found?'existing':'saved']++;
+   const found=sourceSection(row.classroom).section,section=await ensureSourceSection(batch,row.classroom);result[found?'existing':'saved']++;result.details.push({field:'classes',reason:found?'current':'saved',count:1});
    if(row.subject){
     const subject=await store.resolveSubjectSelection({token:'custom',customName:row.subject},{verifyCurrent});automaticGuard(batch);
     const prior=store.state.teachings.find(t=>!t.deleted&&t.sectionId===section.id&&t.subjectId===subject.id&&t.termId===batch.term);
@@ -254,13 +264,13 @@ async function saveAvailableSetup(batch,categories){
     await store.createTeaching({sectionId:section.id,subjectId:subject.id,termId:batch.term},{verifyCurrent});automaticGuard(batch);result[prior?'existing':'saved']++;
    }
   }
-  catch(e){automaticGuard(batch);if(!/^CLASS_/.test(e.message))throw e;result.unresolved++;}
+  catch(e){automaticGuard(batch);if(!/^CLASS_/.test(e.message))throw e;result.unresolved++;result.details.push({field:'classes',reason:'conflict',count:1});}
  }
  for(const row of setup.find(c=>c.category==='timetable')?.rows??[]){
   automaticGuard(batch);
   const weekday=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'].indexOf(row.weekday),period=Number(row.period);
   // Existing app supports numbered periods 1–12. A time alone cannot invent a period.
-  if(weekday<0||!Number.isInteger(period)||period<1||period>12){result.unresolved++;continue;}
+  if(weekday<0||!Number.isInteger(period)||period<1||period>12){result.unresolved++;result.details.push({field:'timetable',reason:'unsupported',count:1});continue;}
   let section;
   try{section=await ensureSourceSection(batch,row.classroom);}catch(e){automaticGuard(batch);if(!/^CLASS_/.test(e.message))throw e;result.unresolved++;continue;}
   const existing=store.allSlots(batch.term).find(s=>s.weekday===weekday&&s.period===period);
@@ -268,18 +278,19 @@ async function saveAvailableSetup(batch,categories){
    gradeNameKey(store.getSubject(t.subjectId)?.name??'')===gradeNameKey(row.subject));
   const [startTime,endTime]=row.time?row.time.split('-'):[];
   if(existing){
-   if(matches.length===1&&existing.teachingId===matches[0].id&&(!startTime||existing.startTime===startTime)&&(!endTime||existing.endTime===endTime))result.existing++;
-   else result.unresolved++;
+   if(matches.length===1&&existing.teachingId===matches[0].id&&(!startTime||existing.startTime===startTime)&&(!endTime||existing.endTime===endTime)){result.existing++;result.details.push({field:'timetable',reason:'current',count:1});}
+   else{result.unresolved++;result.details.push({field:'timetable',reason:'conflict',count:1});}
    continue;
   }
-  if(matches.length>1||matches.some(t=>store.isTeachingArchived(t))){result.unresolved++;continue;}
+  if(matches.length>1||matches.some(t=>store.isTeachingArchived(t))){result.unresolved++;result.details.push({field:'timetable',reason:'conflict',count:1});continue;}
   const subject=await store.resolveSubjectSelection({token:'custom',customName:row.subject},{verifyCurrent});
   automaticGuard(batch);
   const teaching=await store.createTeaching({sectionId:section.id,subjectId:subject.id,termId:batch.term},{verifyCurrent});
   automaticGuard(batch);
   await store.addSlot(teaching.id,weekday,period,{...(startTime?{startTime}:{}),...(endTime?{endTime}:{})},{verifyCurrent});
-  automaticGuard(batch);result.saved++;
+  automaticGuard(batch);result.saved++;result.details.push({field:'timetable',reason:'saved',count:1});
  }
+ const grouped=new Map();for(const d of result.details){const key=d.field+'|'+d.reason;grouped.set(key,{...d,count:(grouped.get(key)?.count??0)+d.count});}result.details=[...grouped.values()];
  return result;
 }
 async function saveAutomaticNames(result){
@@ -342,7 +353,7 @@ async function saveAutomaticNames(result){
     ...(changed?{receiptHistory:[...(p.receiptHistory??[]),{digest,receipt:priorReceipt,targets:priorTargets??null}]}:{}),
     receipts:{...p.receipts,[digest]:outcome},receiptTargets:{...p.receiptTargets,[digest]:targets}};
   });
-  extensionMessage=`حُفظت الدفعة محليًا: ${added} جديد، ${existing} موجود سابقًا. ${setup?`حقول إعداد محفوظة: ${setup.saved+setup.existing}؛ تعارضات أو غير مدعوم: ${setup.unresolved}؛ فئات غير متاحة: ${setup.missing.length}.`:''} ${envelope.complete?'':'الكشف غير مكتمل؛ لم تُفترض أسماء الصفحات غير المحسومة.'} المزامنة لم تتأكد بعد.`;
+  extensionMessage=`حُفظت الدفعة محليًا: ${added} جديد، ${existing} موجود سابقًا. ${setup?`حقول إعداد حُدثت: ${setup.saved}؛ مطابقة مسبقًا: ${setup.existing}؛ تحتاج مراجعة: ${setup.unresolved}؛ فئات غير متاحة: ${setup.missing.length}.`:''} ${envelope.complete?'':'الكشف غير مكتمل؛ لم تُفترض أسماء الصفحات غير المحسومة.'} المزامنة لم تتأكد بعد.`;
   return outcome;
  }finally{automaticWriting=false;batch.route=null;}
 }
@@ -356,7 +367,7 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>استورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.17.zip" download>تنزيل إضافة ركيز 0.5.17</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.18.zip" download>تنزيل إضافة ركيز 0.5.18</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>

@@ -9,6 +9,9 @@ let draft=null,staged=[],generation=0,sourceRoster=null,chosenClass='',sourceInf
 window.n36HasSourceRoster=()=>!!sourceRoster;
 const automaticFailures=new Set();
 let lastTransferFailure=null,setupReceipt=null,profileFailure=null;
+const setupFields=new Map();
+const reasonRank={missing:0,current:1,saved:2,conflict:3,unsupported:3,ambiguous:3,unrecognized:3};
+function mergeSetupField(map,d){if(!map.has(d.field)||reasonRank[d.reason]>=reasonRank[map.get(d.field).reason])map.set(d.field,d);}
 // AI: diagnostic codes are fixed, counts-only; never surface source text or runtime messages.
 const transferCodes=new Set(['SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_SETUP','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER']);
 const transferCode=error=>transferCodes.has(error?.message)?error.message:'HANDOFF_UNAVAILABLE';
@@ -193,7 +196,7 @@ function renderSourceChoice(){
 window.addEventListener('n36:source-roster',({detail})=>{
  const groups=sourceClasses(detail.rows);
  window.n36Diagnostics?.publish({valid:detail.rows.length,staged:detail.rows.length,classes:groups.length,coverage:detail.coverage,hasNext:detail.hasNextReport,processedPages:detail.processedReportPages,excluded:detail.excluded});
- if(!detail.continuing){classTotals.clear();automaticFailures.clear();lastTransferFailure=null;setupReceipt=null;profileFailure=null;}
+ if(!detail.continuing){setupFields.clear();classTotals.clear();automaticFailures.clear();lastTransferFailure=null;setupReceipt=null;profileFailure=null;}
  for(const group of groups){const prior=classTotals.get(group.classroom)??{collected:0,added:0,existing:0};classTotals.set(group.classroom,{...prior,collected:prior.collected+group.count});}
  clearDraft();staged=[];sourceInfo=detail;sourceRoster=detail.rows;chosenClass='';pendingBatch=null;batchProgress.clear();renderStaged();
  $('source-class-review')?.remove();
@@ -221,7 +224,7 @@ setInterval(async()=>{
   if(pendingBatch!==pending||!result?.ok||result.status==='pending')return;
   window.n36Diagnostics?.publish({receipt:result.status,transfer:result.status==='unknown'?'error':'idle',...(result.failure?{failure:result.failure.code,failurePhase:result.failure.phase,failureStep:result.failure.step}:{})});
   if(['saved','existing'].includes(result.status)&&result.total===pending.count&&result.remaining===0&&result.added+result.existing===pending.count){
-   if(result.setup)setupReceipt=result.setup;
+   if(result.setup){setupReceipt=result.setup;for(const d of result.setup.details??[]){mergeSetupField(setupFields,d);}}
    const progress=batchProgress.get(pending.classroom)??{offset:0,added:0,existing:0};
    batchProgress.set(pending.classroom,{offset:progress.offset+pending.count,added:progress.added+result.added,existing:progress.existing+result.existing});
    const totals=classTotals.get(pending.classroom);if(totals)classTotals.set(pending.classroom,{...totals,added:totals.added+result.added,existing:totals.existing+result.existing});
@@ -250,7 +253,8 @@ function advanceAutomatic(){
   window.n36Diagnostics?.publish({stage:failed?'unresolved':'saved',transfer:failed?'error':'idle',receipt:failed?'unknown':'saved'});
   $('source-retry').hidden=!failed;
   $('source-retry').textContent=profileFailure?'استكمال الدفعة المحفوظة':'استكمال الفصول غير المحسومة فقط';
-  $('handoff-status').textContent=profileFailure?`توقف حفظ إعداد الحساب (${profileFailure.code}). الدفعة محفوظة في ركيز للاستكمال؛ هذا لا يعني فشل مطابقة الفصول. لم يتأكد اكتمال الحفظ أو المزامنة.`:`${automaticFailures.size?'فصول لم يتأكد حفظها: '+automaticFailures.size+'. '+(lastTransferFailure?'('+lastTransferFailure+') '+failureHelp(lastTransferFailure):''):''}حُفظ محليًا ${totals.reduce((n,p)=>n+p.added,0)} اسم جديد؛ موجود سابقًا ${totals.reduce((n,p)=>n+p.existing,0)}. ${automaticFailures.size?'بقيت فصول غير محسومة.':'وصل إيصال الأسماء المتاحة.'} ${setupReceipt?`إعداد محفوظ محليًا: ${setupReceipt.saved+setupReceipt.existing}؛ تعارضات أو حقول غير مدعومة: ${setupReceipt.unresolved}؛ غير متاح من المصدر: ${setupReceipt.missing.map(c=>CATEGORIES[c].label).join('، ')||'لا شيء'}.`:'إعداد المعلم والجدول لم يتأكد حفظه.'} ${sourceInfo.complete?'':'التغطية جزئية؛ لا إثبات اكتمال المصدر.'} المزامنة لم تتأكد بعد.`;
+  $('handoff-status').textContent=profileFailure?`توقف حفظ إعداد الحساب (${profileFailure.code}). الدفعة محفوظة في ركيز للاستكمال؛ لم يتأكد اكتمال الحفظ.`:`الطلاب: ${totals.reduce((n,p)=>n+p.added,0)} جديد، ${totals.reduce((n,p)=>n+p.existing,0)} موجود. ${automaticFailures.size?'تحتاج '+automaticFailures.size+' فصول مراجعة. ':''}${formatSetupFields([...setupFields.values()],sourceInfo.sourceIssues??[])} ${sourceInfo.complete?'':'المتاح جزئي من المصدر. '}${automaticFailures.size?'لم يتأكد اكتمال الحفظ محليًا':'حُفظ المتاح محليًا'}؛ المزامنة لم تتأكد بعد.`;
+  window.n36Diagnostics?.publish({fieldResults:[...setupFields.values(),...(sourceInfo.sourceIssues??[])]});
   $('run-status').textContent=$('handoff-status').textContent;
   window.dispatchEvent(new CustomEvent('n36:automatic-finished',{detail:{unresolved:failed,summary:$('source-class-summary').textContent}}));
   return;
@@ -258,4 +262,11 @@ function advanceAutomatic(){
  chosenClass=group.classroom;$('source-class-select').value=chosenClass;renderSourceChoice();
  $('source-class-names').hidden=true;
  $('handoff-transfer').click();
+}
+
+// Finite labels/reasons only; never interpolate imported private values.
+export function formatSetupFields(details,issues=[]){
+ const fields=new Map();for(const d of details)mergeSetupField(fields,d);for(const d of issues)if(!fields.has(d.field)||fields.get(d.field).reason==='missing')fields.set(d.field,d);
+ const reasons={saved:'حُدث',current:'مطابق مسبقًا',missing:'غير متاح من المصدر',conflict:'تعارض يحتاج مراجعة',unsupported:'بنية غير مدعومة',ambiguous:'أكثر من قيمة؛ لم يتغير',unrecognized:'تسمية غير معروفة؛ لم تتغير'};
+ return [...fields.values()].filter(d=>CATEGORIES[d.field]&&reasons[d.reason]).map(d=>CATEGORIES[d.field].label+': '+reasons[d.reason]).join('؛ ')+'.';
 }

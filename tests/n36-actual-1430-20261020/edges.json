@@ -1,0 +1,32 @@
+{
+  "taskId": "continuous-n36-source-authoritative-profile-and-clear-results-20261020",
+  "runId": "e30aa8ce-3574-412f-9c05-74fa71c0fb88",
+  "baseSha": "fdd9ad563996b6126d89a73860f46cf00e62c15a",
+  "checks": [
+    {
+      "name": "existing_western_calendar_held",
+      "status": "PASS",
+      "evidence": "Recognized Riyadh metadata applies to actual own store while explicitly selected western calendar/year/terms/calendars/days/slots/scores remain byte-identical. No initial-signup calendar logic runs."
+    },
+    {
+      "name": "same_value_source_retires_device_alias",
+      "status": "PASS",
+      "evidence": "Explicit same-value source retires only stale device name override without new profile/outbox writes."
+    },
+    {
+      "name": "admin_role_fence",
+      "status": "PASS",
+      "evidence": "Actual read-only source adapter rejects explicitly labelled administrator role despite available personal metadata."
+    },
+    {
+      "name": "unsupported_action_and_safe_field_diagnostics",
+      "status": "PASS",
+      "evidence": "Actual controller shows actionable unsupported-page result. Real closed details/copy handler allow only field/reason/count, drop arbitrary values/keys. Conflict cannot be masked by another current class."
+    }
+  ],
+  "errors": [],
+  "live": "NOT_RUN",
+  "preservedFailures": [],
+  "phase": "unsupported-diagnostic-dom",
+  "status": "PASS"
+}

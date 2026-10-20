@@ -39,10 +39,11 @@ function stop(code='CANCELLED',diagnostic=null,context=null){
  cancelReports(job??review);generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);clearTimeout(job.expiryTimer);job.sourceRows.length=0;job.fetches.clear();job.routes.length=0;job.categories.length=0;job=null;}clearPreview();window.n36AutomaticBatch=null;
  window.n36Diagnostics?.publish({stage:code==='CANCELLED'?'cancelled':code==='REVIEW_EXPIRED'?'expired':'error'});
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
+ if(['UNVERIFIED_START_ORIGIN','UNSAFE_ROUTE','UNSUPPORTED_SOURCE_SCHEMA'].includes(code)){announce('افتح مدرستي، ثم شغّل الإضافة من واجهة المعلم. هذه الصفحة غير مدعومة؛ لم يُفترض حفظ شيء.');return;}
  if(code==='OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB'){announce('افتح حساب ركيز المسجّل دخوله في تبويب واحد في هذه النافذة وحدّث التطبيق، ثم ابدأ من مدرستي. لم تبدأ قراءة الأسماء.');return;}
  if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة التشغيل ومُسحت الأسماء المؤقتة في الإضافة. ما حُفظ محليًا في ركيز يبقى محفوظًا، والدفعات المعلّقة فيه يمكن استكمالها من الحساب نفسه. لبدء جمع جديد افتح المصدر ثم ابدأ طوعًا.');return;}
  showDiagnostic(diagnostic??{stage:context?.stage??'run',reason:code,category:context?.kind??'students'});
- announce(code==='CANCELLED'?'أُوقف التشغيل ومُسحت الأسماء المؤقتة في الإضافة. ما حُفظ محليًا في ركيز يبقى محفوظًا.':code==='SOURCE_CHANGED'||/CONTEXT|ORIGIN|LOGIN|CLOSED/.test(code)?'تغيّرت صفحة المصدر؛ مُسحت المعاينة. ابدأ مجددًا من الصفحة المصرّح بها.':'تعذّرت القراءة؛ مُسحت المعاينة. التفاصيل في التشخيص الاختياري.');
+ announce(code==='CANCELLED'?'أُوقف التشغيل ومُسحت الأسماء المؤقتة في الإضافة. ما حُفظ محليًا في ركيز يبقى محفوظًا.':code==='SOURCE_CHANGED'||/CONTEXT|ORIGIN|LOGIN|CLOSED/.test(code)?'تغيّرت الصفحة أو جلسة الدخول. افتح واجهة المعلم في مدرستي ثم ابدأ من جديد.':'تعذّرت قراءة هذه الصفحة. افتح واجهة المعلم في مدرستي ثم ابدأ؛ لم يُفترض حفظ شيء.');
 }
 // AI: cancel only this run's source-context requests; never navigate to recover a fetch.
 function cancelReports(active){
@@ -290,8 +291,8 @@ export function presentCollectedSource(active,coverage){
  const setup=(active.categories??[]).filter(c=>c.category!=='students'&&!(active.warnings??[]).some(w=>w.category===c.category)).map(c=>({...c,provenance:['teacher-readonly-run']}));
  if(rows.length&&!setup.some(c=>c.category==='classes'))setup.push({category:'classes',provenance:['teacher-readonly-run'],rows:[...new Set(rows.map(r=>r.classroom))].map(classroom=>({classroom}))});
  if(active.context?.schoolName&&!(active.warnings??[]).some(w=>w.category==='school')&&!setup.some(c=>c.category==='school'))setup.push({category:'school',provenance:['teacher-readonly-run'],rows:[{name:active.context.schoolName}]});
- window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,setup,...coverage,excluded:active.excluded,hasNext:false}}));
- announce('انتهت قراءة الصفحات المتاحة؛ جار استيراد جميع الفصول إلى ركيز المفتوح.');
+ window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,setup,...coverage,excluded:active.excluded,hasNext:false,sourceIssues:(active.warnings??[]).filter(w=>['teacher','principal','school','department'].includes(w.category)).map(w=>({field:w.category,reason:/AMBIGUOUS/.test(w.code)?'ambiguous':'unsupported',count:1}))}}));
+ announce('اكتمل جمع المتاح؛ جار نقله إلى حساب ركيز المفتوح.');
  if(!window.n36AutomaticBatch)armReview();else reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }
 async function noorRead(tabId) {
@@ -341,13 +342,13 @@ if(runToken){
    channel.onmessage=({data})=>{if(data?.token===token&&data.type==='ready'){channel.postMessage({type:'launch',token,tabId:sourceTabId,mode,classroom,role});}if(data?.token===token&&data.type==='launched')resolveReady();};
    const runner=await chrome.tabs.create({url:chrome.runtime.getURL('popup.html')+'?run='+token,active:false});
    try{await readyPromise;await chrome.tabs.update(runner.id,{active:true});}finally{clearTimeout(timer);channel.onmessage=null;}
-  }catch(e){showDiagnostic({stage:'start',reason:/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',category:'students'});announce('تعذّر البدء؛ افتح الإضافة من صفحة المصدر المصرّح بها. التفاصيل في التشخيص الاختياري.');}
+  }catch(e){showDiagnostic({stage:'start',reason:/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',category:'students'});announce('افتح مدرستي، ثم شغّل الإضافة من صفحتها. افتح حساب ركيز وسجّل الدخول في تبويب واحد قبل البدء.');}
   finally{$('one-start').disabled=false;}
  };
  $('one-start').addEventListener('click',()=>launch());
  $('noor-start').addEventListener('click',()=>launch('noor'));
 }
-$('run-reopen').addEventListener('click',()=>{announce('افتح بنفسك تبويب مدرستي المصرّح ثم اضغط زر الإضافة وابدأ؛ لا قراءة قبل اختيارك.');$('run-reopen').hidden=true;});
+$('run-reopen').addEventListener('click',()=>{announce('افتح مدرستي، ثم شغّل الإضافة من صفحتها.');$('run-reopen').hidden=true;});
 $('run-cancel').addEventListener('click',()=>stop());
 window.addEventListener('n36:discard',()=>{if(runToken)stop();});
 window.addEventListener('n36:exported',()=>{if(!runToken||window.n36AutomaticBatch)return;if(review?.source!=='noor'&&window.n36HasSourceRoster?.()){announce('نُقل الفصل المختار للمراجعة فقط. يمكنك اختيار فصل آخر خلال المهلة الأصلية؛ لم تُضف أسماء تلقائيًا.');return;}generation++;clearPreview();$('run-cancel').disabled=true;announce('اكتمل التصدير الصريح ومُسحت المعاينة المؤقتة. لم تُضف بيانات إلى ركيز.');});

@@ -14,7 +14,7 @@ export function safeRoute(origin,path,context=null){return globalThis.rakeezRout
 
 export function mergePage(staged,category,rows){
  const prior=staged.find(c=>c.category===category);
- if(['teacher','school','principal'].includes(category)&&prior&&JSON.stringify(prior.rows)!==JSON.stringify(rows))throw Error('AMBIGUOUS_ROLE_VALUE');
+ if(['teacher','school','principal','department'].includes(category)&&prior&&JSON.stringify(prior.rows)!==JSON.stringify(rows))throw Error('AMBIGUOUS_ROLE_VALUE');
  const unique=[...(prior?.rows??[])];
  for(const row of rows)if(!unique.some(r=>JSON.stringify(r)===JSON.stringify(row)))unique.push(row);
  return [...staged.filter(c=>c.category!==category),{category,provenance:['teacher-readonly-run'],rows:unique}];
