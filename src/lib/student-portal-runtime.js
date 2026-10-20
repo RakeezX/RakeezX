@@ -125,9 +125,7 @@ const classEntryMessages={timeout:'لم تكتمل قراءة الفصل خلا�
 function entryShell(root){
  let body=root.querySelector('[data-n88-entry-body]');if(body)return body;
  root.classList.add('n88-entry');
- const header=root.ownerDocument.createElement('header');header.className='n88-entry-toolbar';
- const studentLink=root.ownerDocument.createElement('a');studentLink.href='/student';studentLink.className='btn btn--quiet n88-student-entry-link';studentLink.textContent='صفحة دخول الطالب';header.append(studentLink);
- body=root.ownerDocument.createElement('div');body.dataset.n88EntryBody='';root.replaceChildren(header,body);return body;
+  body=root.ownerDocument.createElement('div');body.dataset.n88EntryBody='';root.replaceChildren(body);return body;
 }
 function classEntryState(root,state){
  if(!Object.hasOwn(classEntryMessages,state))state='context';

@@ -1,0 +1,13 @@
+{
+  "status": "FAIL",
+  "scope": "Exact app.js topbar function, real route.topActions, runtime error handler and source CSS over HTTP; inert account presentation only",
+  "sizes": [],
+  "failure": {
+    "name": "TimeoutError",
+    "message": "page.waitForFunction: Timeout 30000ms exceeded."
+  },
+  "cleanup": {
+    "browserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

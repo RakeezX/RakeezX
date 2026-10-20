@@ -23,10 +23,13 @@ const columns={years:'id,owner_id,revision,deleted_at,status',terms:'id,owner_id
   scoreSubitemCompletions:'id,owner_id,revision,deleted_at,student_id,subitem_id,checked,completion_state',
   sessions:'id,owner_id,revision,deleted_at,teaching_id,date,status',attendance:'id,owner_id,revision,deleted_at,student_id,teaching_id,session_id,status',
   logs:'id,owner_id,revision,deleted_at,student_id,teaching_id,kind,delta'};
-export async function readCanonical(ports,ownerId) {
+export async function readCanonical(ports,ownerId,listScopeOnly=false) {
   await ports.query('select n88_private.lock_projection_sources($1::uuid,$2::integer)',[ownerId,2000]);
   const canonical={};let bytes=0;
-  for(const table of CANONICAL_PROJECTION_REQUIREMENTS.tables) {
+  // List admission consumes only teaching/term here. Membership synchronization,
+  // the complete source lock/bounds and commit guards still run below. Student
+  // projection, visibility publication and guidance retain the full projection.
+  for(const table of listScopeOnly ? ['terms','teachings'] : CANONICAL_PROJECTION_REQUIREMENTS.tables) {
     // PG bigint revisions must never round through a JavaScript JSON number.
     const selected=columns[table].replace(/\brevision\b/g,'revision::text as revision');
     const r=await ports.query(`select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select ${selected} from rakeezx.${sqlNames[table]||table} where owner_id=$1::uuid order by id limit $2) x) bounded`,[ownerId,2001,2*1024*1024-bytes]);
@@ -58,10 +61,10 @@ export function createIntegratedService(options,adapter,baseRepository) {
     await recovery.append(ports,c,result.code);return result;
   }]));
   const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Riyadh',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  async function scope(db,ports,auth,teachingId,input={}) {
+  async function scope(db,ports,auth,teachingId,input={},listScopeOnly=false) {
     const resolved=await createPgClassResolver()(db,ports,auth,teachingId,input);
     if(!resolved)return null;
-    const canonical=await readCanonical(ports,auth.ownerId);
+    const canonical=await readCanonical(ports,auth.ownerId,listScopeOnly);
     const teaching=canonical.teachings.find(t=>t.id===teachingId),term=canonical.terms.find(t=>t.id===teaching?.termId);
     if(!teaching || !term || term.startDate&&term.startDate>today() || term.endDate&&term.endDate<today())return null;
     return {...resolved,canonical,termId:term.id};
@@ -91,7 +94,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
       const auth=await adapter.verifyTeacher(r,ports);
       return auth?.ownerId===binding.ownerId&&auth.sessionId===binding.sessionId?auth:null;
     };
-    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input).then(s=>{
+    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input,action==='list').then(s=>{
       if(!s||s.classId!==binding.classId||s.termId!==binding.termId||!rollout.admitsTeacher(auth,s))return null;
       // First deliberate admitted teacher access may create its own private context.
       // An existing inactive context is never reactivated; no canonical/Auth write.

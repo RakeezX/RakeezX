@@ -1,0 +1,15 @@
+{
+  "windowStart": "2026-10-20T10:14:00Z",
+  "windowEnd": "2026-10-20T10:40:00Z",
+  "channel": "Existing Supabase query_logs, metadata aggregates only",
+  "calls": 2,
+  "secondCallReason": "Use actual dotted response.status_code learned from first metadata-key aggregate",
+  "nativeVersion": "49",
+  "invocations": 3,
+  "outerHttpStatus": "200",
+  "minimumDurationMs": 3026,
+  "maximumDurationMs": 16288,
+  "businessSuccess": "NOT_PROVEN",
+  "internalFailurePhase": "NOT_PROVEN",
+  "limits": "Transport HTTP200 is not business success. No account/path/payload/headers/IP/token values returned. No further operational window read or signed readiness."
+}

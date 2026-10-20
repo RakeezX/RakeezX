@@ -139,7 +139,7 @@
     "drafts/n88-student-portal/class-credentials.mjs": "6d5c32265bebb1b72de0ec028ce102bc162a8bdf8e4b46731f8252261a41019e",
     "drafts/n88-student-portal/code-recovery.mjs": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55",
     "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
-    "drafts/n88-student-portal/integrated-service.mjs": "2fc377a1848cfa806ce75efa3908c255d0f01be982849d607123a29e553c2871",
+    "drafts/n88-student-portal/integrated-service.mjs": "47794fe50594d3fea33976ddc7b3222dec7997d69ffcea89bcc73dfc22ddee27",
     "drafts/n88-student-portal/postgres-repository.mjs": "b0d1dfe19a8b0419e629313aabe219e5e9206e4ecf2552fce4dcd6f93db7c3af",
     "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
     "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
@@ -180,7 +180,7 @@
     "src/lib/student-import.js": "449ccf169d92c5238f864562adc036ac6eb20815cf1ebbab69380c224c84b578",
     "src/lib/student-lifecycle.js": "4d4f53b8f50ebc9f643439086bd00283a3afde8886fa05d4300be6fd3582172b",
     "src/lib/student-portal-class-client.js": "84e885d6390bc2cde5990e4f3d8f0f3fef7cf8a274f4b78e8e30f65c1fbc9317",
-    "src/lib/student-portal-runtime.js": "fca204b567c2ea35c0da2d8b3051fb9170d1440126ba4863058c6af11bbe92eb",
+    "src/lib/student-portal-runtime.js": "40bffe88683b547742466f6169523f52628b5f73f60a0012ac84beb14f0436eb",
     "src/lib/student-portal-task-guidance-client.js": "de210ff07a7e0b782b1854b0b5d900c695d1727ba0eb46ad043af514fbe504bf",
     "src/lib/subject-catalog.js": "63f201dc1b82772cb32b043e8a7a3444b9a2e91a9f1ea3ba2a4a7547f2fc4cbd",
     "src/lib/sync-ownership.js": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
@@ -190,7 +190,7 @@
     "src/lib/workspace-routing.js": "6ffb5f2d51cf9bc6dc805d5a62b1340ea524c360177f65d7a681c30757950e0b",
     "src/lib/workspaces.js": "834d8546970a94dfd912bab56ca8082f7d0bd890529fc565e2d36d41cc91ee1e",
     "src/store.js": "72a420a76c030737253ca24910b700d115869a1afe0d2c72eed8ee64c0f3c409",
-    "src/views/student-portal-class.js": "3d92244270830100564103a034d6949b94cb2d0099e4aac4f271b906e29ce8da",
+    "src/views/student-portal-class.js": "40457d5ceebe89bdd77db78f9a3bf49d31f99272dd999d939fd44a287446e067",
     "supabase/functions/n88-student-portal/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "supabase/functions/n88-student-portal/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
     "src/styles/app.css": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270",
@@ -242,7 +242,7 @@
     "tests/fixtures/n88-integrated-class/seed.sql": "dc066df6168e5448fe7bcda13e3b001c9e6170b33679fa484f4e13bc8f125c04",
     "tests/fixtures/n88-integrated-class/native-pg.mjs": "b7ef618d7546e26d3ae936297a0c381ab354f962a6618be295955d9d41a6fcdf",
     "src/router.js": "b252f838df395928eb033c359daafcfdcc57d86b537cebaee43c4ade4e8316e4",
-    "src/styles/student-portal-class.css": "355d8871f3e628f6d32513965abff0624ff5f338afdcfb0b5251fa880f09e516",
+    "src/styles/student-portal-class.css": "0fe1fec202f0a86edca902df32d2c36b2a8ada8c10a0e24bc5e2ce9f2d9ea9f4",
     "src/views/teaching-hub.js": "4b9b88adae62e27a7ffc67810c55d89a1d140fc4cb6c525fd1512bd55ae828fc",
     "src/views/students.js": "df19935730b8b1cd20f3e89aaa3633a88b5ac5b09f00013707528af34dcb7e1a",
     "sw.js": "64b37c73544cd46a280c1b316060f087ff595dedc4ed1253d7bccc6ff29d17bc",
@@ -330,7 +330,7 @@
     "docs/automation-evidence/20261019/N88_AVAILABILITY_FAST_LIGHT_ENTRY.md": "bfacd0406d91344f0e9762628dd0d9709224c671f2c954600412227f1bc51d6a"
   },
   "outputs": {
-    "edge/index.mjs": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
+    "edge/index.mjs": "2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea",
     "private/assets/student.mjs": "5f0a7db16624edbd494f5b9924a51fae34752fc0c73794eff9a5aafc96ef8dda",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
@@ -1104,5 +1104,14 @@
       "uploads": 1,
       "edgeOperations": 0
     }
+  },
+  "hosted1336": {
+    "taskId": "continuous-n88-hosted-failure-after-deadline-fix-20261020",
+    "runId": "63d4981f-2d89-4240-acc3-26ea973b4f79",
+    "priorNativeVersion": 49,
+    "priorSource": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
+    "source": "2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea",
+    "privateAssetsChanged": false,
+    "actualTeacherSuccess": "NOT_PROVEN"
   }
 }

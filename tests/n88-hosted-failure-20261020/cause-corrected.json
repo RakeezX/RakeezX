@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "baseline": false,
+  "scope": "Real client / signed ingress / Web entry / Auth SDK / integrated repository, controlled synthetic PostgreSQL port. Not hosted account acceptance.",
+  "checks": [
+    "Unchanged default 10000ms client deadline: baseline 13 sequential bounded reads times out; list-only 2 consumed families succeeds with actual commit ACK. Full source lock and authoritative membership synchronization retained.",
+    "Full 13-family projection remains default for student/visibility/guidance; no SQL/type/lock contract rewritten.",
+    "Wrong owner and resolver source denial fail closed through actual authenticated composition."
+  ],
+  "clientElapsedMs": 1778,
+  "canonicalReads": [
+    "canonical:terms",
+    "canonical:teachings"
+  ]
+}
