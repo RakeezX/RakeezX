@@ -99,9 +99,15 @@ export function sanitizeSupportDiagnostics(input = {}) {
   const diagnostics = {};
   const p=input.n88Portal;
   if(p&&['binding','queue','dispatch','http','response','admitted','failure'].includes(p.phase)&&
-     p.sourceVersion==='n88-class-entry-1837-v1'&&Number.isInteger(p.httpStatus)&&
+     ['n88-class-entry-1837-v1','n88-class-deadline-v1'].includes(p.sourceVersion)&&Number.isInteger(p.httpStatus)&&
      (p.httpStatus===0||p.httpStatus>=100&&p.httpStatus<=599)&&Number.isInteger(p.elapsedMs)&&p.elapsedMs>=0&&p.elapsedMs<=30000)
+    {
     diagnostics.n88Portal={phase:p.phase,httpStatus:p.httpStatus,elapsedMs:Math.round(p.elapsedMs/100)*100,sourceVersion:p.sourceVersion};
+    if(p.sourceVersion==='n88-class-deadline-v1'){
+      if(['none','timeout','rejected','invalid_ack','stale_context','unavailable','uncertain'].includes(p.code))diagnostics.n88Portal.code=p.code;
+      if(['none','configuration','key-configuration','envelope','upstream','upstream-body','upstream-http-5xx','reply','reply-shape','acquire','begin','snapshot','repository','teacher','source','synchronize','projection'].includes(p.stage))diagnostics.n88Portal.stage=p.stage;
+    }
+  }
   const appVersion = inputString(input.appVersion, 40);
   const buildSha = inputString(input.buildSha, 64)?.toLowerCase();
   const buildTimestamp = safeTimestamp(input.buildTimestamp);

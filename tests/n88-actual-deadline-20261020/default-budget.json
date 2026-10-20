@@ -1,0 +1,76 @@
+{
+  "taskId": "continuous-n88-actual-teacher-deadline-cause-20261020",
+  "runId": "bdbf83c0-795c-43cc-86ed-9a6994eb67e7",
+  "browserReadDeadlineMs": 10000,
+  "acquireDependencyMs": [
+    5500,
+    5500
+  ],
+  "status": "PASS",
+  "checks": [
+    {
+      "baseline": "Retired HTTP acquisition occupied FIFO; replacement initial read timed out behind old acquisition plus its own controlled acquisition, within unchanged server limits"
+    },
+    {
+      "correction": "Owned retired HTTP aborted; replacement request succeeds within unchanged configured deadline through real client/signed ingress/Web entry/Auth SDK/repository/commit ACK",
+      "guards": "Actual owner/lease binding clears on owner change; one validated pupil, no guessed result",
+      "layout": {
+        "height": 44,
+        "overflow": false
+      }
+    }
+  ],
+  "actualHostedCause": "NOT_PROVEN",
+  "hostedTeacherSuccess": "NOT_PROVEN",
+  "transport": [
+    {
+      "mode": "baseline",
+      "status": 200,
+      "serviceStage": null,
+      "counts": {
+        "acquisitions": 1,
+        "commits": 1
+      }
+    },
+    {
+      "mode": "baseline",
+      "status": 200,
+      "serviceStage": null,
+      "counts": {
+        "acquisitions": 2,
+        "commits": 2
+      }
+    },
+    {
+      "mode": "corrected",
+      "status": 200,
+      "serviceStage": null,
+      "counts": {
+        "acquisitions": 2,
+        "commits": 1
+      }
+    },
+    {
+      "mode": "corrected",
+      "status": 200,
+      "serviceStage": null,
+      "counts": {
+        "acquisitions": 2,
+        "commits": 2
+      }
+    },
+    {
+      "mode": "corrected",
+      "status": 200,
+      "serviceStage": null,
+      "counts": {
+        "acquisitions": 3,
+        "commits": 3
+      }
+    }
+  ],
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}
