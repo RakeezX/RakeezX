@@ -1,0 +1,64 @@
+{
+  "edge": "2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea",
+  "nativeVersion": 51,
+  "carrier": "ab8a39e7b579e549260f1a25647926be29b3bd86fd92eccd52400096bc2faefc",
+  "configurationVerified": true,
+  "cfSettings": {
+    "placement": {},
+    "compatibility_date": "2026-10-01",
+    "compatibility_flags": [],
+    "usage_model": "standard",
+    "tags": [],
+    "tail_consumers": [],
+    "logpush": false,
+    "annotations": {
+      "workers/message": "AI: N88 inline previous-session static assets only",
+      "workers/triggered_by": "upload"
+    },
+    "bindings": [
+      {
+        "name": "N88_EDGE_URL",
+        "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n88-student-portal",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_ENABLED",
+        "text": "true",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_INGRESS_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "N88_PUBLIC_ORIGIN",
+        "text": "https://rakeezx.com",
+        "type": "plain_text"
+      }
+    ]
+  },
+  "subdomain": {
+    "enabled": false,
+    "previews_enabled": false
+  },
+  "routes": [
+    {
+      "id": "346d924c9746479a89e6e211a41bba14",
+      "pattern": "rakeezx.com/student",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "1bcc93cfb56b42469bdad21724b63a1d",
+      "pattern": "rakeezx.com/n88-private/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "c27599645c3c492f9b25eca0107e3dc9",
+      "pattern": "rakeezx.com/api/n88/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    }
+  ]
+}
