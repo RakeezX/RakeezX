@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-projection-reviewed-frontend-delivery-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -4820,
+      "scopeKey": "n88-projection-one-file-frontend",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 12,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "EXACT ONE-FILE STATIC FRONTEND DELIVERY. Original parent is blocked after preparation candidate9c658ade13bddc0289f3e2cf3a7769533280c2ae; original session/custody remains. Copy ONLY src/lib/student-portal-runtime.js from exact parent Git candidate to your isolated current-origin/main checkout, SHA2567903d9f800dd373f1df853bda6b8b1642e7c73fafacb3c4d12abbcb56a9fcf44; previous served bytes ad064f5f2c2a973faebafe2e4ad28383d0bba12c831659c2b2c9bb232c23408b. Difference is four finite safe projection finalization enum values; sixfield DOM/control unchanged. Preserve all other current-main work; no whole cherry-pick/rebase/custody/backend files or state. Reuse projection-diagnostic-allowlist.json, projection-flush.json and unchanged support-details.json; do not rerun tests/build/browser matrix for exact unchanged reviewed bytes. One exact source/scope comparison suffices. Solepublisher verifies this served file; no actualteacherread or provider/student/PIN/settings/SQL operations. Parent waits your verified publication before protected finalization/read. Return exact runner schema.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "tests/n88-projection-frontend-delivery-20261020/**",
+        "docs/automation-evidence/20261020/N88_PROJECTION_FRONTEND_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_projection_reviewed_frontend_source_bytes_and_scope"
+      ],
+      "acceptance": [
+        "Exact reviewed one-file finite enum change productionverified; no live backend/custody/account operations."
+      ],
+      "preparationAuthority": {
+        "kind": "Root reviewed exact source enum delivery before protected backend promotion",
+        "parentCandidate": "9c658ade13bddc0289f3e2cf3a7769533280c2ae",
+        "sourceSha256": "7903d9f800dd373f1df853bda6b8b1642e7c73fafacb3c4d12abbcb56a9fcf44",
+        "publication": true,
+        "newProviderOperations": 0,
+        "actualTeacherReads": 0
+      },
+      "releaseAuthority": "Direct PO continuing N88 actual failure correction authorizes this exact safe frontend source delivery through solepublisher."
+    }
+  ]
+}

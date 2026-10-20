@@ -15,9 +15,10 @@
       "budgetMinutes": 35,
       "idleMinutes": 12,
       "dependsOn": [
-        "continuous-n88-synchronize-reviewed-frontend-delivery-20261020"
+        "continuous-n88-synchronize-reviewed-frontend-delivery-20261020",
+        "continuous-n88-projection-reviewed-frontend-delivery-20261020"
       ],
-      "objective": "CONTINUE ORIGINAL N88 SESSION WITH NEW SPECIFIC ROOT SOURCE FINDING, LOCAL PREPARATION ONLY. New ACTUAL user-opened same context observation e500: projection/http503 at6500ms, zero worker-triggered requests; exact subcause remains UNKNOWN. Completed native56F628/pinactual57/carrier782afcdcADA/frontendeb00b64 remain verified/immutable; no live request/provider/CLI/Save/log/readiness/credential/SQL/Auth/RLS/schema/config operation in THIS preparation. User still asks real fix, no broad retest.\n\nROOT DIRECT SOURCE FINDING: postgres-repository.mjs loops final rows and awaits EACH private INSERT/UPDATE/DELETE separately before commitGuards and COMMIT. First teacher access synchronizeOwner may add/update303 memberships across10classes even when listingoneclass. Actual broad projection stage covers this finalization and total transaction budget is fixed, so per-row remote roundtrips are a concrete scalability defect candidate, not yet proved actual failure. Inspect/count exact queries in representative existing integrated303/10 composed harness, including first bootstrap and stable second read. Establish baseline under bounded representative synthetic transport latency/virtualclock using REAL repository/adapter callback path, no real DB credentials or school/accountdata. Report any assumed latency as assumption, never actual provider benchmark. Do not re-run old popup/source extraction/legacy-publication test matrices. Prove only per-row query amplification and whether it crosses the unchanged actual transaction budget for this realistic shape.\n\nIf proven, implement SMALLEST bounded batch of the implicated private membership insert/update operations inside SAME existing fenced transaction/verified SQL boundary. Retain exact rowCount/equivalent acknowledged row identity, owner isolation, unchanged constraints, parent order, revocation-before-replacement ordering for credentials, original PKs/CAS/history/parameterization/row+byte caps, no response/PIN before durable COMMIT, rollback/unknownACK/late-work destruction and commit revision guards. NO Promise.all shared connection/parallel transactions, COPY unbounded/write bypass, schema/DDL or longer timeouts/caps. Do not rewrite unrelated credential/delete/private tables merely for optimization. One focused composition with baseline query amplification vs candidate303/10 and stable/no-change, plus batch partial/rowcount error rollback and after-deadline no-late-COMMIT needed; reuse accepted unchanged isolation/source/session/revocation proof. If batching cannot comply, save exact blocker rather than speculative implementation.\n\nAdd finite SAFE repository finalization substages only if useful in same candidate (e.g membership flush, commitguards, commit), so projection doesn't obscure transaction finalization again. Reuse established safe allowlist/6field support control; no raw PG errors/SQL text/identities/secrets/persistent request logs. Keep any diagnostic stages consistent across existing backend/carrier/frontend allowlists; source-only frontend companion can deliver serially later. No actual reads now: e500 evidence is current. Do not ask user to copy anything or choose account again.\n\nAfter supported minimal correction prepare fresh ONE-use projection-promotion gate/supplement under original custodian analogous approved synchronize gate, not reusing consumed markers/old native55 assumptions. Actual prior native sourceF628/service metadata57 and current carrier782afcdc/ADA are known completed receipts; current source pinF628 verified. New gate root must later bind FINAL exact candidate/new output/source/proof hashes/current prepare run and predecessor evidence before any native/publicpin/carrier write or post-change actualteacherread. Existing original custody cwd/session/DPAPI binding/roles/security/config/routes remain. Mechanical normal public SHA Save at most1 is already authorized in principle by PO; no human-only permission gate unless actual tool refusal/unconfirmed outcome occurs. CLI9 consumed remains no retry; no protected actions during preparation. Preserve old strict privateHTML FAIL; unchanged8asset receipts reusable only for unchangedcoveredbytes. No new test fixtures/login/PIN/settings mutations. Return exact candidate/base/run/checks and LOCAL_READY or BLOCKED with prepared next gate and truthful actual unknown; root reviews exact source before sole original custodian promotion. Sole controller/publisher, noqueueedits/manualworker.",
+      "objective": "ROOT EXACT FINAL SOURCE REVIEW COMPLETE candidate9c658ade13bddc0289f3e2cf3a7769533280c2ae. Scoped private membership transport batching reuses SAME verified existing functions, ordered recursive calls, max64rows/128KB, exact per-row affected acknowledgment, same transaction/fences/bounds/roles/function hashes/COMMIT. Local composed303/10 assumed20ms transport: old individual flush exceeds6000ms; new5batches and stable zero writes pass. Disposable PG17 ordered/partial/constraint/cap/capability proof PASS. Finer safe finalization stages reviewed. Actual hosted projection6500ms exact subcause still UNKNOWN. Reuse ALL accepted local proofs; NO test rerun or rebuild. Original session/custodian only; same approvedcandidate HEAD must stay EXACT through pending protected gates, receipts UNTRACKED until all protected opscomplete. No newcommit drift while pin/carrier pending.\n\nFirst dependency continuous-n88-projection-reviewed-frontend-delivery-20261020 must be awaiting_po with providerSUCCESS/exact served src/lib/student-portal-runtime.js hash7903d9f800dd373f1df853bda6b8b1642e7c73fafacb3c4d12abbcb56a9fcf44. Do not merge/rebase original branch to integrate child; separate normal static delivery. Then minimum current providerpreflight exact prior native57/F628/source/signature/config + carrier782afcdc/ADA/routes/settings + publicpinF628. Previous native56/pinF628/carrier782afcdc operations consumed, NEVER replay. Original cwd C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018, absolute approvedcandidate official-activation entry and process-local N88_PROJECTION_RUN_ID actual verified currentattempt, N88_PROJECTION_SESSION_ID originalsession. New --projection-* supplement ONLY: preflight receipt -> --projection-preflight/--projection-begin-service wx -> exact NEW nativea5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe upload ONCE sanctioned Supabase tool, same function/config/verifyJwtfalse/HMAC -> exact source/signature/config readback -> --projection-reconcile-service. No CLI9 retry, readiness/logging/credential/SQL/Auth/RLS/schema/migration/role/config changes.\n\nThen --projection-begin-pin wx, current priorpin independently verified. Use existing logged-in sameproject normal Supabase UI (previous validtab2005439066, current inventory if changed) Edit ONLY PUBLIC noncredential N88_SERVICE_SOURCE_SHA value a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe; exact field/value/native-valid/Saveenabled and ONE normal Save permitted under existing PO full authority. automaticSaveClicksMAX1, CLIwrites0. Do NOT introduce human-only gate or ask permission. Observe normal provider completion then readonly --projection-reconcile-pin actualdigest. Previous F628human/UI evidence is not newtargetsuccess. If actualtool refusal STOP exactroute/no alternateactor; if outcomeunknown afterONEclick, readonly reconcile and preserve unknown, no secondclick/CLI write. Only if actual mechanics fail prepare concrete normal form and report exactreason.\n\nAfter actualnewpinverified, one carrierpreflight against current782afcdc/ADA + newnative -> --projection-begin-carrier wx -> exact NEW carrierdc067be3b58d437d050ca57d2a3634f41f6b1c96d20cfe1114b8e3e988288088 upload ONCE, preservebindings/routes/security/logging/settings. Exactsource/config readback plus coveredassets/privacy, reuse unchanged twelveasset proofs wherevalid; historical privateHTMLstrictFAIL remains FAIL and not remediated by loosening provider injection/CSP. --projection-complete-carrier appendshistory. Unknownprovideroutcomes readonlyreconcile, neverduplicateuploads. Keep alloldgates/markers/recoveryhistory immutable.\n\nAfter BOTH childserved and newnative/pin/carrieractualproof, THIS root card separately authorizes ONE conditional normal actualteacherread in current user-opened affected class. Gate reviewedProjectionPromotion.newTeacherReads0 refers to gate's provider operations; postProjectionTeacherRead explicit bounded UI authority is HERE, no additional root conversation/PM gate needed. Prefer original tab2005438939; one unambiguous CURRENT user-opened rakeezx.com classstudent-space alsoauthorized by latest human openedconfirmation/allclasses report. No random account/class selection. One normal app Update/reload allowed only toactivate verifiedfrontend; automatic classfetch consumes one entry, never reenter/retry. Record alreadyfreshnormalresult withouttrigger if possible. Read successbool/finitecounts or expand visible supportdetails once for six fields. No names/PINs/grades/screenshots/private app/networkstate/clipboard or real code/settings/task mutations. Report any automaticextras truthfully. If new failure exactsafephase, trace only that path locally; no furtherprotectedaction/read budget reuse. Preserve prior historicalFAIL and actual Unknown; one successful list is not wholeN88 closure. Save execution receipts and truthful final result through solecontroller, no manual Product static publishing.",
       "allowedPaths": [
         "src/lib/student-portal-runtime.js",
         "src/lib/student-portal-class-client.js",
@@ -29,9 +30,7 @@
         "docs/automation-evidence/20261020/N88_CURRENT_ACTUAL_TEACHER_CAUSE.md"
       ],
       "verificationPaths": [
-        "src/lib/student-portal-runtime.js",
-        "src/views/student-portal-class.js",
-        "src/styles/student-portal-class.css"
+        "src/lib/student-portal-runtime.js"
       ],
       "requiredChecks": [
         "n88_new_actual_failed_phase_specific_cause",
@@ -44,7 +43,8 @@
         "n88_readonly_deadline_late_work_fence_and_mutation_budget_unchanged",
         "n88_fresh_finite_gate_candidate_and_marker_identity",
         "n88_current_user_opened_context_post_promotion_observation",
-        "n88_projection_membership_flush_query_amplification_and_fences"
+        "n88_projection_membership_flush_query_amplification_and_fences",
+        "n88_projection_actual_service_source_pin_carrier_readback"
       ],
       "acceptance": [
         "Diagnose the newly reported actual teacher connection failure using current stage evidence, not another unchanged artificialtimeout.",
@@ -52,19 +52,138 @@
         "One actual current user-opened class result recorded without replaying completed operations or broad tests; full N88 remains subject to real journey acceptance."
       ],
       "preparationAuthority": {
-        "kind": "New actual projection503 plus concrete per-row private membership flush source finding",
-        "publication": false,
-        "localSyntheticPreparation": true,
-        "actualTeacherReads": 0,
-        "newProviderOperations": 0,
+        "kind": "Root exact final source/gate/SQL-transport review; original custodian execution only",
+        "publication": true,
+        "reviewedProjectionPromotion": {
+          "version": 1,
+          "candidateSha": "9c658ade13bddc0289f3e2cf3a7769533280c2ae",
+          "executionRunBinding": "current-original-controller-attempt",
+          "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+          "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+          "baseSha": "610aa754012d090131e26c59f50750365b6b8328",
+          "coreCandidateSha": "3d2fb96bfc9615ca838ea9ee9f86a7ce5954f13d",
+          "preparedRunId": "900bd0ef-380c-4203-8563-fc41c08001ef",
+          "priorEdge": "f6287a767be772ce42a9db4a2d0d32c69ee495dee982bfa9fb6f32da50a974da",
+          "priorNativeVersion": 57,
+          "priorCarrier": "adaae766f52411a564239d91edb392f67237af57081d47511014e0d7fbedaac6",
+          "priorCarrierVersion": "782afcdc-d090-4aee-a635-bf53d529ddfb",
+          "edge": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+          "carrier": "dc067be3b58d437d050ca57d2a3634f41f6b1c96d20cfe1114b8e3e988288088",
+          "sourcePins": {
+            "drafts/n88-student-portal/activation/database-transport.mjs": "b8dee65bdc57e04da34c9c4ef8cfc5506a38d1140db893675509abe1e2d98326",
+            "drafts/n88-student-portal/activation/edge-request.mjs": "acf653ee96cdd3705fcae5b6dea376130200d14ada27a1016ff4a02fcb361330",
+            "drafts/n88-student-portal/activation/error-boundary-contract.json": "eb93ab6817f5103819b42678c5c3b3c351c044c60fd7121394441f344919a5da",
+            "drafts/n88-student-portal/activation/error-boundary-identities.json": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4",
+            "drafts/n88-student-portal/activation/node-globals.mjs": "1e8c9a351d2b1621e31d616852dac13b4734b439c55ad31c0bed177aadb20157",
+            "drafts/n88-student-portal/activation/private-document.mjs": "307712b0839c00dbd1aff67e9994ffb91f5e9f183b852c7f294233ff11366db3",
+            "drafts/n88-student-portal/activation/private-error-boundary.mjs": "4b19df33f00dec7f992e21c7590fa200be032e2c17c65a0231360de41a2b477a",
+            "drafts/n88-student-portal/activation/readiness-entry.mjs": "fdf2c5cbdf48d7a90c85e0cf816768ca3f77400f62977900a62ab483850b573f",
+            "drafts/n88-student-portal/auth-verifier.mjs": "6605b61c5422a090c8220a346f5a1e7c00aea5bedde212f62b54ed6f4592be2c",
+            "drafts/n88-student-portal/canonical-adapter.mjs": "e14a06c9fdd38618a49f4f63dcd3324d30862933d84e44420eb3b69ce7f9c2c2",
+            "drafts/n88-student-portal/canonical-grade-context.mjs": "1595f7588c9a683be570986bde907c2b6a3eb22ccdc3e00fa8cd43eb8c51152f",
+            "drafts/n88-student-portal/class-credentials.mjs": "6d5c32265bebb1b72de0ec028ce102bc162a8bdf8e4b46731f8252261a41019e",
+            "drafts/n88-student-portal/cloudflare-entry.mjs": "dd7474ddbcfd9254b5b75f189a752a6ec5005bf68efd6f775bc3cc4ef626faa0",
+            "drafts/n88-student-portal/code-recovery.mjs": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55",
+            "drafts/n88-student-portal/deployment.inactive.json": "4a6c0e5ae5f565db5f73ad6db2470e6db8dbad917ce5b98cf175192fdd8849fd",
+            "drafts/n88-student-portal/existing-host.mjs": "6ece0d035677216b122741cf709b1948f9bc96006ba51892a5b59ec87818c0fe",
+            "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
+            "drafts/n88-student-portal/integrated-service.mjs": "b63280d376e8b224f29262deb6ee8bdc0af63f195f6e644758ac3532fa103274",
+            "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
+            "drafts/n88-student-portal/postgres-repository.mjs": "aa6fc3d0e674bbfb91fe198f3d7b72acd537712f4daad6dea5f6a8bda6a9ac4f",
+            "drafts/n88-student-portal/rollout-guard.mjs": "8dbba7aff362cb43426d6d4abe72abe0f04e99284c42de399623cb453d0e2604",
+            "drafts/n88-student-portal/runtime.mjs": "be4295056cb7934e6a3cbb5683814595bee657fbd5fd9aacb893f34e333e5c6b",
+            "drafts/n88-student-portal/service.mjs": "a8fc5c8179611e1c0588bbd3d77f1535084455a00285f9d30cd6eaba81c5c6c5",
+            "drafts/n88-student-portal/student-projection.mjs": "0169150ada144b6c6217ae2168ac30eb2580f72e5bc7b62fc3fd1c87d65dc9ad",
+            "drafts/n88-student-portal/task-guidance.mjs": "a3b929b13ce02d05a211cf9eb078cf3f3403a3ec6db04a7271f3c878741de88a",
+            "drafts/n88-student-portal/visibility-policy.mjs": "2ec1640819029af319bf0ccbefdddd29dd7566f43229937224470a2dd13c73e4",
+            "drafts/n88-student-portal/web-entry.mjs": "18a0bc69efd322d2afe2dd0138f56242cc5948eeca79cc14dd583c69fd78d946",
+            "drafts/n88-student-portal/web-protocol.mjs": "22b77196c6b514c6911785373b907b78b23275c57d7042351e85613a2b4c774c",
+            "src/lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+            "src/lib/score-foundation.js": "d759fbec5a53638f2e05873df76db734430c8aafdc8b069bcdbbd23708e9af48",
+            "src/lib/student-portal-runtime.js": "7903d9f800dd373f1df853bda6b8b1642e7c73fafacb3c4d12abbcb56a9fcf44",
+            "src/models.js": "af9e624621e21686a86599b75eead8289af526072906efbe79e58a84d7b4a5fe",
+            "supabase/functions/n88-student-portal/index.ts": "0582560364c98186ad94347d90fe4d14cbbeff6b00fc3220ef30a6564dd16aff",
+            "tests/n88-actual-current-cause-20261020/finite-composition.mjs": "afd6355fb35c46d7ab82e59164d9bd1f58977b8be660c4cc8383a5cb35f87f5e",
+            "tests/n88-actual-current-cause-20261020/prepare-projection-final.mjs": "f7a77ae5497822acc39ed56032af7451dd05ca0b41bd8b4086778b3e9f10eba9",
+            "tests/n88-actual-current-cause-20261020/projection-batch-native.mjs": "a0a02b14e6cd443aff39a8c6c68ec086ba030d39bf17ecbf4f1ded45d36092cb",
+            "tests/n88-actual-current-cause-20261020/projection-diagnostic-allowlist.mjs": "d392d2ec9ec6153a646f6beebacf511dcaa22136ac926ffb46b9dd0a2c3a8f46",
+            "tests/n88-actual-current-cause-20261020/projection-flush.mjs": "bfb9de56cd6acf55217fdae8841120225ee067dc9c0d8aa2ecabc9104f9d3dd5",
+            "tests/n88-actual-current-cause-20261020/projection-promotion-fixture.mjs": "3a932c0bcb3954574cf1547761b99fa8af2d9d424fb00c8015a3357bb80ed78b"
+          },
+          "modulePins": {
+            "drafts/n88-student-portal/official-activation.mjs": "4b1d657ec4bda523c23c1be37eaf920832e00ea0bc45b428ade2908ca46e8410",
+            "drafts/n88-student-portal/activation/projection-promotion-gate.mjs": "0b244b9a57f3097501133de050d1a1cf9245fe9647d0eb260dd815fa306dde8f",
+            "drafts/n88-student-portal/activation/projection-promotion.mjs": "f89640aa79db6f058834039d571aa54e2b2e9a402c821b934c7f6f62b0dce191"
+          },
+          "proofPins": {
+            "tests/n88-actual-current-cause-20261020/projection-flush.json": "a5d0293dd79d95ba43164d0722f70429bd568c6fd0841da2ffbf5e4b1d66775f",
+            "tests/n88-actual-current-cause-20261020/projection-batch-native.json": "4375ad54cbcf377e15992b78e8eb0c38cc36265848bd39554ab06a8eba1df623",
+            "tests/n88-actual-current-cause-20261020/projection-diagnostic-allowlist.json": "dbce63b42c51b4d2898b9c66e89a9d27a34c21a8c69c8fb82ffea640904e3476",
+            "tests/n88-actual-current-cause-20261020/projection-promotion-fixture.json": "9ac4089913a774b2739537cd8469b5fed00dc6b444ad79f587412ed7714a2bbf",
+            "tests/n88-actual-current-cause-20261020/synchronize-guards.json": "e02cd7be880efc3fabcafb9a300aeed48daa20f1c7891df56d3b8e8b78d88970"
+          },
+          "predecessorPins": {
+            "tests/n88-actual-current-cause-20261020/synchronize-native-readback.json": "a0bfa3c96ac471dda2224e92b16c7f6cb368bd25ea708cfe4eb3186e49e2b5df",
+            "tests/n88-actual-current-cause-20261020/synchronize-public-pin-save-a98a0318.json": "abe217e44df33997ed1023f895f5e15f6d8dc39f47f0db45af51a810465638ff",
+            "tests/n88-actual-current-cause-20261020/synchronize-carrier-readback.json": "9c8b2918c26befd898c3b4767f0c3c3efecc5234aef0ff7f3bf206631936834a",
+            "tests/n88-actual-current-cause-20261020/synchronize-served-assets.json": "d10c7444f35c0267799b9aa1283eb86937a32d457c13b912b3113c4138e1c3aa",
+            "tests/n88-actual-current-cause-20261020/current-user-opened-result-e500d1d4.json": "ae7721ecb361a190fb9ca75d329a724dcb7be682dc7f2b69e9ce650faa1d5d4d"
+          },
+          "packageOutputs": {
+            "edge/index.mjs": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+            "private/assets/student.mjs": "c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470",
+            "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
+            "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
+            "private/styles/app.css": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
+            "private/styles/student-portal-login.css": "3b99e8903436b2faa4e7fcad60ac3513fde322cdd849773a81be387e2de1533f",
+            "edge/import_map.json": "7f6d1a3f45a0dd142f3f6d2e8327bb4f2f138f360fb3e050e4b20af06343b1f6",
+            "private/assets/brand/header-light-standard.svg": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+            "private/assets/brand/header-light-compact.svg": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+            "private/assets/brand/header-dark-standard.svg": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+            "private/assets/brand/header-dark-compact.svg": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+            "private/assets/brand/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
+            "private/student.html": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+            "cloudflare/worker.mjs": "dc067be3b58d437d050ca57d2a3634f41f6b1c96d20cfe1114b8e3e988288088"
+          },
+          "maxChangedNativeDeploys": 1,
+          "maxPublicSourcePinUpdates": 1,
+          "maxChangedCarrierOperations": 1,
+          "appendOnlyAttemptHistory": true,
+          "resetConsumedMarkers": false,
+          "newReadinessRequests": 0,
+          "newCredentials": 0,
+          "newSqlAuthConfiguration": false,
+          "newTeacherReads": 0,
+          "priorExecutionRunIds": [],
+          "publicPinRoute": "provider-confirmed-public-save",
+          "automaticSaveClicks": 1,
+          "cliWrites": 0
+        },
+        "publicSourcePinSave": {
+          "variable": "N88_SERVICE_SOURCE_SHA",
+          "expectedPreviousValue": "f6287a767be772ce42a9db4a2d0d32c69ee495dee982bfa9fb6f32da50a974da",
+          "targetValue": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+          "automaticSaveClicks": 1,
+          "cliWrites": 0,
+          "requiresFormValidAndEnabled": true,
+          "unknownOutcome": "readonly reconciliation, never a second Save"
+        },
+        "postProjectionTeacherRead": {
+          "afterVerifiedFrontendNativePinCarrierOnly": true,
+          "humanContext": "Direct user opened current affected teacher student-space; reports all classes fail",
+          "preferredTab": "2005438939",
+          "maxWorkerTriggeredClassReads": 1,
+          "maxAppActivationReloads": 1,
+          "maxManualRetries": 0,
+          "realPupilOrCodeWrites": 0,
+          "diagnostics": "Exactly six safe fields from visible support details, no clipboard/private state/PII"
+        },
         "newReadinessRequests": 0,
         "newCredentials": 0,
-        "newSqlAuthConfiguration": false,
-        "realPupilOrCodeWrites": 0,
-        "freshExactRootReviewRequiredBeforeProtectedOperations": true
+        "newSqlAuthConfiguration": false
       },
       "liveAuthorizationRef": "PO-20261020-CURRENT-N88-TEACHER-CAUSE",
-      "releaseAuthority": "Direct PO continuing N88 actual failure diagnosis/fix authorizes this scoped local source correction. No protected write/read until exact final candidate review; all completed native/pin/carrier operations stay consumed."
+      "releaseAuthority": "Root reviewed exact minimal membership transport correction under direct PO ongoing N88 fix authority; one NEW native/publicpin/carrier promotion and one conditional current teacher observation only. All previous operations remain consumed."
     }
   ]
 }
