@@ -14,26 +14,37 @@ export function createBackgroundRunner({transport}){
  const mutate=operation=>{const r=mutations.then(operation);mutations=r.catch(()=>{});return r;};
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,phase:j.phase,code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview});
+ const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,Date.now()+30000)});});}
- async function finish(j,phase,code=null){return mutate(async()=>{
+ async function finish(j,phase,code=null,error=null){return mutate(async()=>{
   const v=await load();if(!v||v.id!==j.id)return;
   await chrome.storage.session.remove(JOB);await chrome.alarms.clear(ALARM);
+  j.failureStep=error?.sourceFailureStep??'none';j.failureJobPhase=code?j.phase:'none';
   await chrome.storage.session.set({[VIEW]:{...view(j),phase,code}});
   try{await chrome.scripting.executeScript({target:{tabId:j.tabId,...(j.sourceDocument?{documentIds:[j.sourceDocument]}:{frameIds:[0]})},world:'ISOLATED',func:id=>{for(const [key,c] of globalThis.rakeezReportRequests??[])if(key.startsWith(id+'|'))c.abort();},args:[j.id]});}catch{/* Lost source access is never recovered by navigation. */}
   // Revoke this job only. App-owned durable batches are never deleted.
   await transport({type:'n36-cancel'},authority(j));
  });}
  async function appGuard(j,wait=false){await current(j);const r=await transport({type:'n36-check',batchId:j.batchId,wait},authority(j));if(!r?.ok)throw Error('APP_CHANGED');await current(j);return r.ready;}
- async function source(j,mode='guard'){
-  await current(j);const tab=await chrome.tabs.get(j.tabId);
-  if(tab.url!==j.sourceURL||new URL(tab.url).origin!==j.origin)throw Error('SOURCE_CONTEXT_CHANGED');
-  safeRoute(j.origin,new URL(tab.url).pathname+new URL(tab.url).search,j.context);
-  const probe=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>true});
+ // AI: tabs.url is advisory metadata, not the executing document's URL. Only
+ // fragments may differ within a bound document; paths/queries remain byte exact.
+ function sourceRoute(j,href){
+  const u=new URL(href);if(u.origin!==j.origin)throw Error('SOURCE_CONTEXT_CHANGED');
+  return safeRoute(j.origin,u.href,j.context);
+ }
+ async function descriptor(j){
+  const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>location.href});
   await current(j);
-  if(probe.length!==1||probe[0].frameId!==0||!probe[0].documentId||j.sourceDocument&&probe[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
-  j.sourceDocument=probe[0].documentId;
+  if(r.length!==1||r[0].frameId!==0||!r[0].documentId||typeof r[0].result!=='string'||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
+  return r[0];
+ }
+ async function source(j,mode='guard'){
+  let step=j.phase==='binding'?'source-start':'source-pre-read';
+  try{
+  await current(j);const probe=await descriptor(j);
+  if(sourceRoute(j,probe.result)!==sourceRoute(j,j.sourceURL))throw Error('SOURCE_CONTEXT_CHANGED');
+  j.sourceDocument=probe.documentId;j.sourceURL=probe.result;
   const target={tabId:j.tabId,documentIds:[j.sourceDocument]};
   await chrome.scripting.executeScript({target,world:'ISOLATED',files:['route-diagnostics.js']});
   const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[['students','timetable'].includes(mode)?'guard':mode,null,j.context]});
@@ -46,15 +57,20 @@ export function createBackgroundRunner({transport}){
    const g=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readSourceReportPage,args:['guard']});
    await current(j);if(g.length!==1||g[0].documentId!==j.sourceDocument||!g[0].result?.ok)throw Error(g[0]?.result?.code??'SOURCE_BINDING_CHANGED');
   }
-  if((await chrome.tabs.get(j.tabId)).url!==j.sourceURL)throw Error('SOURCE_CONTEXT_CHANGED');
+  step='source-post-read';
+  const post=await descriptor(j);if(sourceRoute(j,post.result)!==sourceRoute(j,j.sourceURL))throw Error('SOURCE_CONTEXT_CHANGED');
+  j.sourceURL=post.result;
   if(['students','timetable'].includes(mode)){
    const a=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readSourceReportPage,args:[mode,{...j.context,rowOffset:j.next?.rowOffset??0}]});
    await current(j);
    if(a.length!==1||a[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
    if(!a[0].result?.ok){const e=Error(a[0]?.result?.code??'SOURCE_UNAVAILABLE');e.incomplete=a[0]?.result?.incomplete;e.retry=a[0]?.result?.retry;e.observedRows=a[0]?.result?.observedRows;throw e;}
+   const end=await descriptor(j);if(sourceRoute(j,end.result)!==sourceRoute(j,j.sourceURL))throw Error('SOURCE_CONTEXT_CHANGED');
+   j.sourceURL=end.result;
    return a[0].result;
   }
   return r[0].result;
+  }catch(e){e.sourceFailureStep=step;throw e;}
  }
  async function readNext(j){
   const n=j.next;if(n.page)return n;
@@ -80,18 +96,29 @@ export function createBackgroundRunner({transport}){
   return {tables:[],links:[],warnings:[{category:next.kind,code:e.message,optional}],skipped:[]};
  }
  async function settleNavigation(j){
+  try{
   await appGuard(j);const n=j.navigation,tab=await chrome.tabs.get(j.tabId);
-  if(tab.url===n.from){
-   if(tab.status==='loading')return false;
-   throw Error('NAVIGATION_UNCONFIRMED'); // Never replay an uncertain role/navigation command.
-  }
+  // Read back the top document ONLY during this exact owned navigation window.
+  // Do not clear the old binding until destination, frame and deadline are verified.
+  if(!n?.issued||Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
+  const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>location.href});
+  await current(j);
+  if(r.length!==1||r[0].frameId!==0||!r[0].documentId||typeof r[0].result!=='string')throw Error('SOURCE_BINDING_CHANGED');
+  const href=r[0].result,route=sourceRoute(j,href);
   const transition=/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(n.target).pathname);
-  const redirected=transition&&new URL(tab.url).origin===j.origin&&/^\/Dashboards\/Schools\/?$/i.test(new URL(tab.url).pathname);
-  if(tab.url!==n.target&&!redirected)throw Error('SOURCE_CONTEXT_CHANGED');
-  if(tab.status!=='complete'||transition&&!redirected){if(Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');return false;}
-  j.sourceURL=tab.url;j.sourceDocument=null;
+  const redirected=transition&&[j.origin+'/Dashboards/Schools',j.origin+'/Dashboards/Schools/'].includes(route);
+  if(route===sourceRoute(j,n.from)&&!(redirected&&r[0].documentId!==n.documentId)){
+   if(r[0].documentId!==n.documentId)throw Error('SOURCE_BINDING_CHANGED');
+   if(tab.status==='loading')return false;
+   throw Error('NAVIGATION_UNCONFIRMED'); // Never replay an uncertain command.
+  }
+  if(route!==sourceRoute(j,n.target)&&!redirected)throw Error('SOURCE_CONTEXT_CHANGED');
+  if(tab.status!=='complete'||transition&&!redirected)return false;
+  j.sourceURL=href;j.sourceDocument=r[0].documentId;
   let page;try{page=await source(j,n.kind);}catch(e){if(e.retry&&Date.now()<n.deadline)return false;page=partialPage(j,j.next,e);}if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
+  if(Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
   j.next={...j.next,page};j.navigation=null;j.phase='collect';await save(j);return true;
+  }catch(e){e.sourceFailureStep??='source-navigation-settle';throw e;}
  }
  function setup(j){
   const out=j.categories.filter(c=>c.category!=='students'&&!j.warnings.some(w=>w.category===c.category)).map(c=>({...c,provenance:['teacher-readonly-run']}));
@@ -150,7 +177,7 @@ export function createBackgroundRunner({transport}){
     throw Error('JOB_PHASE');
    }
    await save(j);
-  }catch(e){await finish(j,e.message==='CANCELLED'?'cancelled':'stopped',/^[A-Z_]+$/.test(e.message)?e.message:'BACKGROUND_UNAVAILABLE');}
+  }catch(e){await finish(j,e.message==='CANCELLED'?'cancelled':'stopped',/^[A-Z_]+$/.test(e.message)?e.message:'BACKGROUND_UNAVAILABLE',e);}
  }
  function wake(){
   if(running){wakeRequested=true;return running;}
@@ -175,16 +202,16 @@ export function createBackgroundRunner({transport}){
    const origin=startOrigin(tab.url);safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
    if(!Number.isInteger(tab.windowId))throw Error('SOURCE_BINDING_CHANGED');
    const now=Date.now(),j={id:hex(),tabId:tab.id,windowId:tab.windowId,sourceURL:tab.url,origin,sourceDocument:null,createdAt:now,expiresAt:now+1800000,phase:'binding',added:0,existing:0,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],excluded:0,sourceBytes:0,expires:null};
-   let probe;try{probe=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>true});}catch{throw Error('SOURCE_ACCESS_REQUIRED');}
-   if(probe.length!==1||probe[0].frameId!==0||!probe[0].documentId||(await chrome.tabs.get(j.tabId)).url!==j.sourceURL)throw Error('SOURCE_BINDING_CHANGED');
-   j.sourceDocument=probe[0].documentId;
+   let probe;try{probe=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>location.href});}catch{throw Error('SOURCE_ACCESS_REQUIRED');}
+   if(probe.length!==1||probe[0].frameId!==0||!probe[0].documentId||typeof probe[0].result!=='string'||sourceRoute(j,probe[0].result)!==sourceRoute(j,j.sourceURL))throw Error('SOURCE_BINDING_CHANGED');
+   j.sourceDocument=probe[0].documentId;j.sourceURL=probe[0].result;
    // The trusted click is durable before ACK and before any school read.
    await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:now+30000});
    try{
     let begin;try{begin=await transport({type:'n36-begin'},authority(j));}catch{throw Error('APP_NOT_READY');}if(!begin.ok)throw Error(begin.code??'APP_NOT_READY');j.batchId=begin.batchId;j.appTabId=begin.appTabId;
     await appGuard(j);const page=await source(j,'home');if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
-    j.visited.add(routeIdentity(origin,tab.url));j.next={kind:'home',page};j.phase='collect';await save(j);return {ok:true,view:view(j)};
-   }catch(e){await finish(j,'stopped',e.message);throw e;}
+    j.visited.add(routeIdentity(origin,j.sourceURL));j.next={kind:'home',page};j.startPhase='accepted';j.phase='collect';await save(j);return {ok:true,view:view(j)};
+   }catch(e){await finish(j,'stopped',e.message,e);throw e;}
   });starting=op.catch(()=>{});const result=await op;
   // ACK now; the action popup has no ownership of this Promise or job.
   queueMicrotask(()=>wake().catch(()=>{}));return result;

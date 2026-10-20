@@ -384,3 +384,12 @@ Noor/manual selection, paste, CSV and review implementations remain in popup.js,
 Deferred idea only: future Rakeez → Noor grade entry may be studied after current open work is delivered. This note authorizes no task, Noor execution, credentials, grade reads or writes.
 
 Local synthetic checks do not establish an actual school import, missing-principal diagnosis, MV3 installation, served publication or Product acceptance. The existing «قادة المدرسة :» reader, source-authoritative profile policy and calendar hold are unchanged. The controller/publisher owns publication, the serial application download-link companion and stable-folder parity after publication.
+
+
+### 0.5.25 — bound source document readback (AI, 2026-10-20)
+
+The background runner reads the top frame's current URL and documentId before and after source reads. Only a fragment difference in the same document with the exact same path and query is accepted; stale tabs metadata cannot override that document. A new document is admitted only at the exact owned planned destination (or the existing exact teacher-role dashboard redirect), within the job/navigation deadlines and existing school/role/receiver guards. A role redirect returning to the starting dashboard requires a new document; an uncertain command is never replayed.
+
+Safe copied diagnostics retain source-start/source-pre-read/source-post-read/source-navigation-settle, the failure job phase and Start phase. No URL, query value, identity, page content or source document ID enters that report. Source refusals explain the binding/route condition. The compact Madrasati-only popup and closed-popup execution remain in place.
+
+Qualification uses actual popup/readers/CSS over task-owned HTTP fixtures and the actual background ESM with synthetic Chrome/receiver boundaries, stopping after the first necessary planned transition. Baseline 0.5.24 false guards are reproduced; changed document/path/query/school/owner/deadline remain rejected. The two actual 0.5.24 reports do not identify their exact branch: real Madrasati resolution, native Chrome reload, publication and stable-folder physical parity remain unclaimed. The existing updater runs only after independent verified publication. Unchanged receiver/collection/profile/CSV/Noor proofs are reused, not repeated.

@@ -7,8 +7,8 @@ if(new URL(location.href).searchParams.has('run'))document.body.classList.add('r
 function showStartDenial(error){
  const allowed=['SOURCE_ACCESS_REQUIRED','NO_ACTIVE_TAB','UNVERIFIED_START_ORIGIN','SOURCE_BINDING_CHANGED','SOURCE_CONTEXT_CHANGED','JOB_REQUEST','JOB_ACK_INVALID','BACKGROUND_UNAVAILABLE','HANDOFF_UNAVAILABLE','APP_NOT_READY','OPEN_ONE_RAKEEZ_TAB','APP_FINISH_CURRENT_EDIT','APP_UPDATE_REQUIRED','SCHOOL_CHOICE_REQUIRED','REVIEW_EXPIRED'];
  const code=allowed.includes(error?.message)?error.message:'BACKGROUND_UNAVAILABLE';
- window.n36Diagnostics?.publish({stage:'error',startPhase:'denied',failure:code});
  const source=['SOURCE_ACCESS_REQUIRED','NO_ACTIVE_TAB','UNVERIFIED_START_ORIGIN','SOURCE_BINDING_CHANGED','SOURCE_CONTEXT_CHANGED'].includes(code);
+ window.n36Diagnostics?.publish({stage:'error',startPhase:'denied',failure:code,failureStep:source?'source-start':'none',failurePhase:source?'source':'none',failureJobPhase:'none'});
  announce(source?'افتح مدرستي ثم ابدأ الاستيراد من تبويب المصدر نفسه. لم يبدأ الجمع.':code==='APP_FINISH_CURRENT_EDIT'?'أكمل التعديل المفتوح في ركيز ثم ابدأ مجددًا. لم يبدأ الجمع.':code==='APP_UPDATE_REQUIRED'?'حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ مجددًا. لم يبدأ الجمع.':code==='SCHOOL_CHOICE_REQUIRED'?'افتح صفحة المدرسة المطلوبة ودور المعلم في مدرستي ثم ابدأ. لم يبدأ الجمع.':code==='JOB_REQUEST'||code==='JOB_ACK_INVALID'||code==='BACKGROUND_UNAVAILABLE'?'تعذّر تأكيد بدء التشغيل. أعد فتح الإضافة من تبويب مدرستي وتحقق من تحديثها؛ لم يُفترض بدء الجمع.':'افتح حساب ركيز المسجّل دخوله في تبويب واحد، ثم ابدأ من مدرستي. لم يبدأ الجمع.');
 }
 
@@ -18,7 +18,7 @@ function renderBackground(v){
  $('one-start').disabled=popupStartPending||!done;$('run-cancel').disabled=done;
  $('run-counts').textContent='';$('run-missing').textContent='';
  $('run-status').textContent=v.phase==='binding'?'جار التحقق من حساب ركيز…':v.phase==='complete'?'حُفظ المتاح محليًا في ركيز؛ المزامنة السحابية تُتابع من التطبيق.':v.phase==='cancelled'?'أُوقف التشغيل ومُسحت بيانات الإضافة المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.':v.phase==='stopped'?'توقف النقل. تحقق من بقاء صفحتي مدرستي وركيز مفتوحتين بالحساب نفسه، ثم ابدأ عند جاهزيتهما.':'جار نقل البيانات المتاحة… يمكنك إغلاق نافذة الإضافة. أبقِ تبويبي مدرستي وركيز مفتوحين.';
- const codes={HANDOFF_DOCUMENT_OR_ROUTE:'تغيّر مسار الاستلام في ركيز. توقف النقل؛ لم يُفترض حفظ هذه الدفعة. راجع حساب ركيز نفسه.',HANDOFF_SENDER:'تعذّر التحقق من صفحة الاستلام. توقف النقل دون افتراض الحفظ.',APP_UPDATE_REQUIRED:'حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ؛ لم تُحدّث الصفحة تلقائيًا.',APP_FINISH_CURRENT_EDIT:'أكمل التعديل المفتوح في ركيز ثم ابدأ.',SCHOOL_CHOICE_REQUIRED:'افتح صفحة المدرسة المطلوبة ودور المعلم في مدرستي، ثم ابدأ.',RECEIPT_UNKNOWN:'نتيجة الحفظ غير محسومة. استكمل الدفعة المحفوظة من حساب ركيز نفسه؛ لم يُفترض حفظ جديد.',REVIEW_EXPIRED:'انتهت مهلة التشغيل ومُسحت البيانات المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.'};
+ const codes={SOURCE_CONTEXT_CHANGED:'لم يطابق مسار مستند مدرستي المصدر المرتبط بالتشغيل أو وجهة التنقل المخططة. أُوقف التشغيل لحماية سياق المصدر؛ لم يُفترض اكتمال الجمع.',SOURCE_BINDING_CHANGED:'لم يعد مستند مدرستي مطابقًا للمستند المرتبط بالتشغيل. أُوقف التشغيل لحماية سياق المصدر.',HANDOFF_DOCUMENT_OR_ROUTE:'تغيّر مسار الاستلام في ركيز. توقف النقل؛ لم يُفترض حفظ هذه الدفعة. راجع حساب ركيز نفسه.',HANDOFF_SENDER:'تعذّر التحقق من صفحة الاستلام. توقف النقل دون افتراض الحفظ.',APP_UPDATE_REQUIRED:'حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ؛ لم تُحدّث الصفحة تلقائيًا.',APP_FINISH_CURRENT_EDIT:'أكمل التعديل المفتوح في ركيز ثم ابدأ.',SCHOOL_CHOICE_REQUIRED:'افتح صفحة المدرسة المطلوبة ودور المعلم في مدرستي، ثم ابدأ.',RECEIPT_UNKNOWN:'نتيجة الحفظ غير محسومة. استكمل الدفعة المحفوظة من حساب ركيز نفسه؛ لم يُفترض حفظ جديد.',REVIEW_EXPIRED:'انتهت مهلة التشغيل ومُسحت البيانات المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.'};
  if(v.phase==='complete'&&v.needsReview)$('run-status').textContent='حُفظت الأسماء محليًا؛ بعض حقول الإعداد تحتاج مراجعة في التفاصيل. المزامنة تُتابع من ركيز.';
  if(v.phase==='receipt'&&v.code)$('run-status').textContent=codes.RECEIPT_UNKNOWN;
  if(v.phase==='stopped'&&v.code==='HANDOFF_LIMIT_OR_EXPIRED')$('run-status').textContent='توقف النقل عند حد حجم الدفعة أو صلاحيتها. استكمل من الحساب نفسه؛ لم يُفترض اكتمال النقل.';
@@ -26,11 +26,11 @@ function renderBackground(v){
  if(v.phase==='stopped'&&(v.added||v.existing))$('run-status').textContent+=' تم تأكيد '+v.added+' جديد و'+v.existing+' موجود محليًا قبل التوقف؛ المزامنة تُتابع من ركيز.';
  const labels={teacher:'اسم المعلم',school:'اسم المدرسة',principal:'اسم المدير',department:'إدارة التعليم',classes:'الفصول',timetable:'الجدول'},reasons={saved:'حُدث',current:'مطابق',missing:'غير متاح',conflict:'تعارض',unsupported:'غير مدعوم',ambiguous:'غير محسوم',unrecognized:'تسمية غير معروفة'};
  $('automatic-field-details').textContent=(v.fields??[]).map(d=>labels[d.field]+': '+reasons[d.reason]).join(' — ');
- window.n36Diagnostics?.publish({jobPhase:v.phase,transfer:done?(v.phase==='complete'?'idle':'error'):v.phase==='receipt'?'pending':'sending',staged:v.staged,observed:v.observed,stage:v.phase==='binding'?'checking':v.phase==='complete'?'saved':v.phase==='cancelled'?'cancelled':v.phase==='stopped'?'error':'collecting',receipt:v.phase==='receipt'?'pending':v.phase==='complete'?'saved':'not-available',coverage:v.coverage,receiverCapability:v.receiverCapability??'unknown',setupPhase:v.fields?.length?'receipt':'none',failure:v.code??'none',fieldResults:v.fields??[]});
+ window.n36Diagnostics?.publish({jobPhase:v.phase,startPhase:v.startPhase??'none',failureStep:v.failureStep??'none',failureJobPhase:v.failureJobPhase??'none',failurePhase:v.failureStep?.startsWith('source-')?'source':'none',transfer:done?(v.phase==='complete'?'idle':'error'):v.phase==='receipt'?'pending':'sending',staged:v.staged,observed:v.observed,stage:v.phase==='binding'?'checking':v.phase==='complete'?'saved':v.phase==='cancelled'?'cancelled':v.phase==='stopped'?'error':'collecting',receipt:v.phase==='receipt'?'pending':v.phase==='complete'?'saved':'not-available',coverage:v.coverage,receiverCapability:v.receiverCapability??'unknown',setupPhase:v.fields?.length?'receipt':'none',failure:v.code??'none',fieldResults:v.fields??[]});
 }
  const launch=async()=>{
-  if(popupStartPending)return;popupStartPending=true;$('one-start').disabled=true;
-  {backgroundRevision++;announce('جار التحقق من صفحة مدرستي وحساب ركيز…');window.n36Diagnostics?.publish({stage:'checking',startPhase:'source-context',failure:'none',receiverCapability:'unknown'});}
+  if(popupStartPending)return;const previousJobId=backgroundView?.id;popupStartPending=true;$('one-start').disabled=true;
+  {backgroundRevision++;announce('جار التحقق من صفحة مدرستي وحساب ركيز…');window.n36Diagnostics?.publish({stage:'checking',startPhase:'source-context',failure:'none',failureStep:'none',failurePhase:'none',failureJobPhase:'none',receiverCapability:'unknown'});}
   try{
    const tabs=await chrome.tabs.query({active:true,lastFocusedWindow:true});const tab=tabs[0];if(tabs.length!==1||!Number.isInteger(tab?.id))throw Error('NO_ACTIVE_TAB');
    startOrigin(tab.url??'');
@@ -41,7 +41,12 @@ function renderBackground(v){
     if(!/^[a-f0-9]{64}$/.test(result.view?.id)||!['collect','navigation','transfer','prepare','deliver','receipt'].includes(result.view?.phase))throw Error('JOB_ACK_INVALID');
     window.n36Diagnostics?.publish({startPhase:'accepted'});if(backgroundView?.id!==result.view.id||backgroundView.phase==='binding')renderBackground(result.view);return;
    }
-  }catch(e){showStartDenial(e);}
+  }catch(e){
+   // A failed Start may already have a precise durable source failure. Keep it
+   // when the popup stays open; reopening reads the same safe aggregate.
+   let failed;try{failed=(await chrome.runtime.sendMessage({type:'n36-job-status'}))?.view;}catch{}
+   if(failed?.id!==previousJobId&&failed?.phase==='stopped'&&failed.code===e.message)renderBackground(failed);else showStartDenial(e);
+  }
   finally{popupStartPending=false;$('one-start').disabled=!!backgroundView&&!['complete','stopped','cancelled'].includes(backgroundView.phase);}
  };
 
