@@ -1,0 +1,25 @@
+{
+  "name": "n36_0526_diagnostics_package_and_link_exact",
+  "status": "PASS",
+  "baseSha": "10a98fcbec350030c5b72a1ea9132cab196a9ae2",
+  "version": "0.5.26",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.26.zip",
+    "sha256": "401ecb8996b93526ab59e24aa8f3e502d15f4492bf0973baf28d8550675cb74e",
+    "bytes": 137329
+  },
+  "runtimeFiles": 29,
+  "checks": [
+    "ZIP/source/file SHA256 and size parity",
+    "Exact .26 download href + label only",
+    "Manifest permissions/hosts/CSP unchanged",
+    "Immutable .25 ZIP/manifest and unchanged receiver/data/route/date/popup assets",
+    "Changed JS syntax"
+  ],
+  "reusedEvidence": [
+    "tests/n36-0524-package-link-20261020/result.json",
+    "tests/n36-background-no-popup-20261020/browser.json"
+  ],
+  "actualSourceAcceptance": "NOT_RUN: actual observed destination and cause remain unknown; one updated user safe diagnostic is needed",
+  "publicationAndStableParity": "NOT_RUN: independent controller/publisher, followed by existing stable updater only after verified publication"
+}

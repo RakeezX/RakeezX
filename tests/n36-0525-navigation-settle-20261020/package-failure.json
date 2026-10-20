@@ -1,0 +1,1 @@
+{"status":"FAIL","originalFailure":"Exact href/label replacement assertion compared Windows CRLF working file with LF Git blob","correction":"Normalize line endings only in Git-content comparison; ZIP versus actual working source bytes remain exact SHA256/size checks"}

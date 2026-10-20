@@ -9,12 +9,31 @@ const JOB='n36:background-job',VIEW='n36:background-view',ALARM='n36:background-
 const hex=()=>[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
 const encode=j=>({...j,visited:[...j.visited],rosterSchools:[...j.rosterSchools],series:[...j.series].map(([k,v])=>[k,{...v,pages:[...v.pages]}])});
 const decode=j=>({...j,visited:new Set(j.visited),rosterSchools:new Set(j.rosterSchools),series:new Map(j.series.map(([k,v])=>[k,{...v,pages:new Set(v.pages)}]))});
+// AI: diagnostic classification only; never an authorization/redirect allowlist.
+// Exact fixed templates, no arbitrary segments, query keys/values or identifiers.
+export function navigationDiagnostic(origin,n,observed,documentId,status){
+ const category=value=>{try{
+  const u=new URL(value);if(u.origin!==origin||u.username||u.password)return 'other-origin';
+  const p=u.pathname;
+  if(/(?:login|signin|signout|logout|oauth|auth)/i.test(p))return 'login-or-auth';
+  if(/^\/Dashboards\/Schools\/?$/i.test(p))return 'schools-gateway';
+  if(/^\/Dashboards\/Schools\/ChangeUserTypeToTeacherFromParent\/[a-f0-9]{32}\/?$/i.test(p))return 'teacher-role-command';
+  if(/^\/SchoolManagment\/Actions\/Teacher\/[^/]+\/?$/i.test(p))return 'teacher-dashboard';
+  if(/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(p))return 'my-students';
+  if(/^\/SchoolSchedule\/Schedule\/TeacherSchedule\/?$/i.test(p))return 'teacher-schedule';
+  if(/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(p))return 'student-report';
+  if(/^\/TeachersReports\/(?:Statistics\/)?(?:MyInfo|TeacherSchedule|Teacher|ClassStudentInfo)\/[^/]+\/?$/i.test(p))return 'teacher-report';
+  return 'other-path';
+ }catch{return 'invalid';}};
+ let relation='invalid',query='unknown';try{const p=new URL(n.target),o=new URL(observed);query=o.search?'present':'none';relation=o.origin!==p.origin?'different-origin':o.pathname!==p.pathname?'different-path':o.search!==p.search?'different-query':'exact-route';}catch{}
+ return {navigationPlannedKind:['home','role','gateway','metadata','classes','students','timetable'].includes(n.kind)?n.kind:'unknown',navigationPlannedRoute:category(n.target),navigationObservedRoute:category(observed),navigationRelation:relation,navigationQuery:query,navigationDocument:typeof documentId!=='string'||!documentId?'missing':documentId===n.documentId?'same':'new',navigationStatus:['loading','complete'].includes(status)?status:'unknown'};
+}
 export function createBackgroundRunner({transport}){
  let running=null,wakeRequested=false,starting=Promise.resolve(),mutations=Promise.resolve();
  const mutate=operation=>{const r=mutations.then(operation);mutations=r.catch(()=>{});return r;};
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview});
+ const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
@@ -103,6 +122,7 @@ export function createBackgroundRunner({transport}){
   if(!n?.issued||Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
   const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>location.href});
   await current(j);
+  j.navigationDiagnostic=navigationDiagnostic(j.origin,n,r.length===1?r[0].result:null,r.length===1?r[0].documentId:null,tab.status);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||typeof r[0].result!=='string')throw Error('SOURCE_BINDING_CHANGED');
   const href=r[0].result,route=sourceRoute(j,href);
   const transition=/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(n.target).pathname);
@@ -113,11 +133,12 @@ export function createBackgroundRunner({transport}){
    throw Error('NAVIGATION_UNCONFIRMED'); // Never replay an uncertain command.
   }
   if(route!==sourceRoute(j,n.target)&&!redirected)throw Error('SOURCE_CONTEXT_CHANGED');
+  if(r[0].documentId===n.documentId)throw Error('SOURCE_BINDING_CHANGED');
   if(tab.status!=='complete'||transition&&!redirected)return false;
   j.sourceURL=href;j.sourceDocument=r[0].documentId;
   let page;try{page=await source(j,n.kind);}catch(e){if(e.retry&&Date.now()<n.deadline)return false;page=partialPage(j,j.next,e);}if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
   if(Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
-  j.next={...j.next,page};j.navigation=null;j.phase='collect';await save(j);return true;
+  j.next={...j.next,page};j.navigation=null;delete j.navigationDiagnostic;j.phase='collect';await save(j);return true;
   }catch(e){e.sourceFailureStep??='source-navigation-settle';throw e;}
  }
  function setup(j){
