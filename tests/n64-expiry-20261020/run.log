@@ -1,0 +1,38 @@
+12:22:29 PM [vite] (client) [console.warn] Service Worker registration blocked by Playwright
+12:22:29 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص تحديث عامل الخدمة TypeError: Cannot read properties of undefined (reading 'update')
+    at http://127.0.0.1:19964/src/app.js:1818:19
+12:22:29 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص المخزون TypeError: Cannot read properties of undefined (reading 'active')
+    at http://127.0.0.1:19964/src/app.js:1829:17
+12:22:29 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:30 PM [vite] (client) [console.warn] Service Worker registration blocked by Playwright
+12:22:30 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص تحديث عامل الخدمة TypeError: Cannot read properties of undefined (reading 'update')
+    at http://127.0.0.1:19964/src/app.js:1818:19
+12:22:30 PM [vite] (client) [console.warn] [rakeezx] تعذّر فحص المخزون TypeError: Cannot read properties of undefined (reading 'active')
+    at http://127.0.0.1:19964/src/app.js:1829:17
+12:22:30 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:30 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:30 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:31 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:31 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:32 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:32 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+12:22:33 PM [vite] (client) [console.warn] [rakeezx sync] Automatic sync failed: Error: profile: Incomplete cloud read: invalid page or exact count
+    at firstPullError (http://127.0.0.1:19964/src/lib/sync.js:570:10)
+    at syncAll (http://127.0.0.1:19964/src/lib/sync.js:645:23)
+[{"expiredReload":true,"providerMetadataPreserved":true,"originalEmailPreserved":true,"actualOwnerStoreEntry":true,"sourceCSS":true},{"beforeBoundary":true,"exactBoundary":true,"expiryTimerNoAuth":true},{"returnAfterSuspendedTime":true},{"failedReadNeutral":true},{"unavailableTimestampNeutral":true,"invalidAndFutureNeutral":true},{"freshRequest":true,"actualDialogHandlerAndOwnerGuard":true,"viewLocalPendingExpires":true,"syntheticPuts":1},{"actualVerifiedSuccessAfterExpiry":true},{"wrongOwnerReadRejected":true,"ownerSwitchDiscardsState":true},{"missingResources":["http://127.0.0.1:19964/api/n44/push/config"],"syntheticExpected500":true}]

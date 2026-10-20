@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n64-abandoned-pending-expiry-20261020",
+  "runId": "e1881199-ce7a-427a-b749-51bb3149ba9d",
+  "mode": "original-failure-reproduction",
+  "baseSha": "7a68241d47c4501b224ac237a36e9d44c4a377ea",
+  "sourceSha256": null,
+  "results": [
+    {
+      "reproduced": "Expired provider request still displayed pending after actual reload",
+      "ageMs": 900001,
+      "checkpoint": {
+        "email": "teacher@example.test",
+        "pending": "pending@example.test",
+        "owner": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "workspaceType": "account"
+      }
+    }
+  ],
+  "ownedBrowserAndServerClosed": true,
+  "liveJourney": "NOT_RUN; synthetic HTTP application checks only"
+}
