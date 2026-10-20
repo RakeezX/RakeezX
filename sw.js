@@ -107,6 +107,7 @@ const SHELL = [
   './src/views/class-import-center.js',
   './src/lib/student-import-parsers.js',
   './src/lib/grade-transfer.js',
+  './src/lib/class-import-background.js',
   './src/lib/grade-transfer-parsers.js',
   './src/lib/grade-transfer-export.js',
   './src/lib/grade-transfer-xlsx.js',

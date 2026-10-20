@@ -1,0 +1,9 @@
+{
+  "taskId": "continuous-n107-durable-local-import-background-sync-20261020",
+  "runId": "5853408a-7cd2-4fe9-8fd1-b8eb965afaf7",
+  "checks": [],
+  "failures": [
+    "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-import-kind]') to be visible\u001b[22m\n\n    at upload (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-durable-local-import-background-sync-20261020\\tests\\n107-local-background-1522-20261020\\browser.mjs:107:43)\n    at async approve (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-durable-local-import-background-sync-20261020\\tests\\n107-local-background-1522-20261020\\browser.mjs:157:2)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-durable-local-import-background-sync-20261020/tests/n107-local-background-1522-20261020/browser.mjs:198:4\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-durable-local-import-background-sync-20261020/tests/n107-local-background-1522-20261020/browser.mjs:191:2"
+  ],
+  "testedFiles": {}
+}

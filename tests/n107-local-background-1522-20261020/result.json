@@ -1,0 +1,54 @@
+{
+  "taskId": "continuous-n107-durable-local-import-background-sync-20261020",
+  "runId": "5853408a-7cd2-4fe9-8fd1-b8eb965afaf7",
+  "checks": [
+    {
+      "name": "n107_durable_local_plan_navigation_multiple_imports_background_ack",
+      "status": "PASS",
+      "evidence": "Actual DOM local completion before held creation ACK; leave view and create second class with independent durable plan; global runner adopts two exact grade receipts once, max ACK before scoring."
+    },
+    {
+      "name": "n107_reload_unknown_result_owner_and_local_failure",
+      "status": "PASS",
+      "evidence": "Real owned IndexedDB reload recovers exact unknown grade envelope; transaction abort never reports local success; retired workspace hides plans and denies delayed grade ACK adoption/outbox deletion."
+    },
+    {
+      "name": "n107_changed_startup_offline_dependency",
+      "status": "PASS",
+      "evidence": "App account startup installs global coordinator; new module and all 8 direct source imports exist in the existing offline shell. No Service Worker/offline-cache certification claimed."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/app.js": "0e13eae947e022593d03ef0ab2aa18440b59e1f3d3a3981623653578a5a00507",
+    "src/lib/class-import-background.js": "c182aa4bff098a0b8e2f2d024f5f363839158f55b4726d6a190ac5aada13c2d5",
+    "src/lib/sync-v2.js": "cefe3061d8a0a3e5dd73942a3c5725f74cd18c42830813335d5325ebcc21f34d",
+    "src/store.js": "b837a07851edde945155f8399711dee0af1b518bb7823e5ac70c61b4bd7510ab",
+    "src/views/class-import-center.js": "90f37d67d78e8fb142bf20e1c22f4432cb72f573914c9f95b7206ee1c81986f2",
+    "sw.js": "26f780349f0018ed887276934e892cc9fca7bafe6b2f1c93b532f03d94a80735"
+  },
+  "multiple": [
+    {
+      "state": "cloud_confirmed"
+    },
+    {
+      "state": "cloud_confirmed"
+    }
+  ],
+  "recovery": {
+    "reloadPlan": true,
+    "sameMutation": true,
+    "attempts": 2
+  },
+  "offlineDependencies": [
+    "src/lib/class-import-background.js",
+    "src/store.js",
+    "src/lib/db.js",
+    "src/lib/cloud.js",
+    "src/lib/sync.js",
+    "src/lib/sync-v2.js",
+    "src/lib/sync-ownership.js",
+    "src/models.js",
+    "src/lib/grade-transfer.js"
+  ]
+}

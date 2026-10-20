@@ -1,3 +1,4 @@
+import {persistLocalImport,localImportPlans,installImportBackground,retryLocalImport,cancelLocalImport} from '../lib/class-import-background.js';
 import { compareAcademicClasses } from '../lib/class-order.js';
 // AI: real local-file entry, shared class selector, no portal login or bulk save.
 import { html, toast } from '../lib/dom.js';
@@ -56,6 +57,12 @@ function importDurationSummary() {
   const clock=currentImportClock();if(!clock)return null;
   const end=clock.end??performance.now(),ms=n=>Math.min(86400000,Math.max(0,Math.round(n)));
   return {version:1,segment:clock.segment,status:clock.status,elapsedMs:ms(end-clock.start),counts:{names:clock.names,grades:clock.grades},phases:clock.phases.map(p=>({phase:p.phase,status:p.end===null?'running':clock.status==='uncertain'&&p===clock.phases.at(-1)?'uncertain':'completed',durationMs:ms((p.end??end)-p.start)}))};
+}
+function localImportPanel() {
+  const plans=localImportPlans(),current=plans.find(p=>p.id===transfer.localPlanId);
+  const labels={local_ready:'حُفظ على هذا الجهاز؛ جارٍ المزامنة',waiting_creation:'حُفظ على هذا الجهاز؛ انتظار إيصالات الفصل والأسماء',waiting_sync:'حُفظ على هذا الجهاز؛ انتظار المزامنة',syncing:'حُفظ على هذا الجهاز؛ جارٍ تأكيد الدرجات',uncertain:'حُفظ على هذا الجهاز؛ لم يتأكد الإيصال السحابي',needs_review:'حُفظ على هذا الجهاز؛ تحتاج الخطة مراجعة',cloud_confirmed:'تأكد الحفظ السحابي',cancelled:'أُوقفت متابعة الخطة؛ البيانات المحفوظة باقية'};
+  return html`${current ? html`<section class="n107-success" role="status" data-local-import-saved><h3>${labels[current.state]}</h3><p>يمكنك فتح الفصل أو استيراد فصل آخر. تستأنف المتابعة عند فتح التطبيق؛ إغلاق المتصفح قد يوقف التنفيذ مؤقتًا.</p><a class="btn btn--primary" href="#/teaching/${current.created.teachingId}">فتح الفصل</a><button class="btn" data-act="local-import-next">استيراد كشف آخر</button></section>`:''}
+    ${plans.length ? html`<details data-local-import-plans><summary>متابعة الاستيراد المحفوظ على هذا الجهاز (${plans.length})</summary>${plans.map(p=>html`<p>${labels[p.state]} · <a href="#/teaching/${p.created.teachingId}">فتح الفصل</a>${['uncertain','needs_review'].includes(p.state)?html` <button class="btn btn--quiet" data-act="local-import-retry" data-plan="${p.id}">استعادة الطلب نفسه</button>`:''}${!['cloud_confirmed','cancelled'].includes(p.state)?html` <button class="btn btn--quiet" data-act="local-import-cancel" data-plan="${p.id}">إيقاف المتابعة بأمان</button>`:''}</p>`)}</details>`:''}`;
 }
 function importDurationPanel() {
   const summary=importDurationSummary();if(!summary)return '';
@@ -118,7 +125,7 @@ function rosterFilePane(list) {
   transfer.panel = 'import';
   return html`<section class="card card--pad" data-roster-file-flow><h3>استيراد كشف طلاب</h3>
     <label class="field"><span data-grade-file-name>${transfer.rows ? html`الملف المحدد: ${transfer.fileName}` : 'اختر الكشف من جهازك'}</span><input class="input" type="file" accept=".csv,.xlsx" style="${transfer.rows ? 'display:none' : ''}" data-change="grade-file" ${immutable ? 'disabled' : ''}></label>
-    <p class="grade-transfer__hint">ملفات CSV أو Excel (XLSX).</p>
+    <p class="grade-transfer__hint">ملفات CSV أو Excel (XLSX).</p>${localImportPanel()}
     ${!transfer.rows && extensionPreview ? html`<label class="field"><span>فصل موجود لاستقبال أسماء الإضافة فقط</span><select class="select" data-existing-class><option value="">اختر الفصل</option>${list.map(row=>html`<option value="${row.id}" ${hub.existing === row.id ? 'selected' : ''}>${shortTeachingLabel(row)}</option>`)}</select></label>` : ''}
     ${transfer.rows ? html`<details class="n107-destination" ${!transfer.review && !draft.review ? 'open' : ''}><summary>الوجهة ومحتوى الكشف</summary><label class="field"><span>وجهة الاستيراد</span><select class="select" data-import-kind ${immutable ? 'disabled' : ''}><option value="existing" ${hub.kind === 'existing' ? 'selected' : ''}>فصل موجود</option><option value="new" ${hub.kind === 'new' ? 'selected' : ''}>إنشاء فصل جديد</option></select></label>
     ${hub.kind === 'new' ? html`<div class="class-import-manual" data-roster-create>
@@ -514,6 +521,7 @@ function transferPanel(teachingId) {
       ${!review && !draft.review && (!transfer.created || transfer.needsReview && !transfer.plan) ? html`<button class="btn btn--primary" data-act="grade-review" ${transfer.busy || transfer.recovery.length ? 'disabled' : ''}>مراجعة الاستيراد</button>` : ''}
       <button class="btn" data-act="grade-cancel" >إلغاء</button>
     ` : ''}
+
     ${importDurationPanel()}
     ${transfer.created ? html`<p data-roster-partial role="status">${transfer.created.existing ? 'لم يتأكد حفظ درجات الملف بعد.' : `حُفظ الفصل والمادة و${transfer.created.added} اسمًا.`} ${transfer.stage ?? 'الدرجات لم يتأكد حفظها.'}</p>
       ${!transfer.busy && !transfer.recovery.length && transfer.plan ? transfer.needsReview ? html`<button class="btn" data-act="roster-changed-review">مراجعة الأثر المتغيّر</button>` : html`<button class="btn btn--primary" data-act="roster-resume">استكمال الاستيراد</button>` : ''}` : ''}
@@ -537,7 +545,7 @@ function transferPanel(teachingId) {
     ${transfer.writing && !transfer.created ? html`<p data-roster-progress role="status">${draft.review ? 'حفظ الفصل والطلاب…' : 'حفظ الأسماء والدرجات…'}</p>` : ''}
     ${draft.failed && !transfer.created ? html`<p data-roster-partial role="status">لم تكتمل العملية. ${store.classImportReceipt(draft.review)?.sectionId ? 'حُفظ الفصل.' : 'لم يُحفظ الفصل.'} ${store.classImportReceipt(draft.review)?.teachingId ? 'حُفظ إسناد المادة.' : 'لم يُحفظ إسناد المادة.'} الأسماء المحفوظة: ${store.classImportReceipt(draft.review)?.added ?? 0}؛ المتبقية: ${store.classImportReceipt(draft.review)?.pendingNames.length ?? 0}.</p>` : ''}
     ${transfer.message && !(transfer.successCounts && transfer.successTeaching && !transfer.error) ? html`<p class="grade-transfer__message ${transfer.error ? 'is-error' : ''}" role="${transfer.error ? 'alert' : 'status'}">${transfer.message}</p>` : ''}
-    ${transfer.successTeaching && transfer.successCounts && !transfer.error && !transfer.created && !transfer.recovery.length ? html`<section class="n107-success" role="status" data-import-success>
+    ${transfer.successTeaching && transfer.successCounts && !transfer.error && !transfer.localPlanId && !transfer.created && !transfer.recovery.length ? html`<section class="n107-success" role="status" data-import-success>
       <h3>اكتمل الاستيراد</h3>
       <p class="n107-success__counts"><span>الأسماء المحفوظة: ${transfer.successCounts.names}</span><span>الدرجات المحفوظة: ${transfer.successCounts.grades}</span></p>
       <p class="n107-context">${shortTeachingLabel(store.getTeaching(transfer.successTeaching))} · ${store.activeYear()?.label} · ${store.activeTerm()?.name}</p>
@@ -595,6 +603,16 @@ async function transferConfirm(el, retry = false) {
   try {
     assertPlan(current,plan);
     const reviewed = current.review;
+    if(!retry){
+      if(current.importMode==='names')await store.confirmNamesImport(reviewed,true,{verifyCurrent:()=>assertPlan(current,plan)});
+      else if(reviewed.newStudents?.length){
+        const names=reviewed.newStudents.map(r=>r.name),sectionId=store.getTeaching(reviewed.teachingId).sectionId;
+        await store.importStudents(sectionId,names,{verifyCurrent:persisted=>{assertPlan(current,plan);if(persisted&&names.some(name=>persisted.enrollments.some(e=>!e.deleted&&e.sectionId===sectionId&&persisted.students.some(s=>s.id===e.studentId&&gradeNameKey(s.name)===gradeNameKey(name)))))throw importChanged();}});
+      }
+      const created={teachingId:reviewed.teachingId,existing:true,added:reviewed.newStudents?.length??reviewed.names?.length??0};
+      const id=await persistLocalImport({input:current,proposal:current.importMode==='grades'?reviewed:null,created,overwriteConfirmed},()=>assertPlan(current,plan));
+      current.localPlanId=id;current.successTeaching=created.teachingId;current.successCounts={names:created.added,grades:reviewed.cells?.length??0};current.rows=null;current.review=null;current.plan=null;current.created=null;current.error=false;draft={};markImportClock(current,null,'completed');return;
+    }
     if(retry)markImportClock(current,'grade_ack');
     const recovered = retry ? await store.retryGradeImport(el.dataset.mutation) : null;
     if (!retry && transfer.importMode === 'names') await store.confirmNamesImport(transfer.review, true,{verifyCurrent:()=>assertPlan(current,plan)});
@@ -660,6 +678,9 @@ function canOpenKoshoof(p) {
 }
 
 const transferActions = {
+    'local-import-next'(){clearImportClock();transfer=emptyTransfer();draft={};repaint();},
+    async 'local-import-retry'(el){try{await retryLocalImport(el.dataset.plan);}catch{toast('\u062a\u062d\u062a\u0627\u062c \u0627\u0644\u062e\u0637\u0629 \u0645\u0631\u0627\u062c\u0639\u0629','danger');}repaint();},
+    async 'local-import-cancel'(el){try{await cancelLocalImport(el.dataset.plan);}catch{toast('\u0627\u0644\u0637\u0644\u0628 \u063a\u064a\u0631 \u0627\u0644\u0645\u0624\u0643\u062f \u0645\u062d\u0641\u0648\u0638\u061b \u0627\u0633\u062a\u0639\u062f \u0625\u064a\u0635\u0627\u0644\u0647 \u0623\u0648\u0644\u064b\u0627','danger');}repaint();},
     'import-duration-toggle'() { const clock=currentImportClock();if(clock){clock.open=!clock.open;repaint();} },
     async 'import-duration-copy'() {
       const summary=importDurationSummary();if(!summary)return;
@@ -874,7 +895,7 @@ async function saveRosterContinuation(current) {
 }
 function restoreRosterContinuation() {
   const saved=store.state.device?.classFileImportContinuation;
-  if(!saved || saved.version!==1 || saved.ownerId!==workspace?.authUserId || saved.databaseName!==workspace?.databaseName ||
+  if(!saved || saved.backgroundPlanId || saved.version!==1 || saved.ownerId!==workspace?.authUserId || saved.databaseName!==workspace?.databaseName ||
       !saved.created?.teachingId)return;
   const stale=saved.year!==academicBinding(store.activeYear()) || saved.term!==academicBinding(store.activeTerm()) || Date.now()>saved.expires;
   const [fileName,rows,nameColumn,idColumn,mappings,studentChoices,importMode,manual]=JSON.parse(saved.input);
@@ -920,8 +941,9 @@ const classImport = { actions: {
       assertPlan(current,plan);
       const receipt=await store.confirmClassImport(review,true,{verifyCurrent:()=>assertPlan(current,plan)});
       assertPlan(current,plan);draft.failed=false;
-      if(draft.proposal?.cells.length || draft.proposal?.maxChanges?.length){current.created=receipt;current.createdItems=itemSemantics(store.teachingContext(receipt.teachingId).items);current.stage='حفظ الفصل والطلاب';await saveRosterContinuation(current);await continueRoster(current);}
-      else {hub.kind='existing';hub.existing=receipt.teachingId;current.plan=null;current.rows=null;current.review=null;current.successTeaching=receipt.teachingId;current.successCounts={names:receipt.added,grades:0};current.message=`اكتمل الاستيراد. الأسماء المحفوظة: ${receipt.added}${current.importMode==='grades'?' · لا توجد درجات مدخلة في الملف؛ لم تُنشأ بنود درجات من الكشف.':''}`;draft={};}
+      const localPlanId=await persistLocalImport({input:current,proposal:draft.proposal,created:receipt,classReview:review,overwriteConfirmed:current.overwriteConfirmed},()=>assertPlan(current,plan));
+      current.localPlanId=localPlanId;current.successTeaching=receipt.teachingId;current.successCounts={names:receipt.added,grades:draft.proposal?.cells.length??0};
+      current.rows=null;current.review=null;current.plan=null;current.created=null;current.error=false;draft={};
       if(!current.created && !current.error)markImportClock(current,null,'completed');
     }catch(error){markImportClock(current,null,'uncertain');if(transfer===current && draft===currentDraft){draft.failed=true;current.message=error.message;current.error=true;}}
     finally{current.busy=false;current.writing=false;if(transfer===current)repaint();}

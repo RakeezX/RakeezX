@@ -986,6 +986,7 @@ async function boot() {
       if (isDemoWorkspace()) throw Object.assign(new Error('Demo workspace has no cloud sync'), { code: 'DEMO_SYNC_DISABLED' });
       syncModule = await import('./lib/sync.js');
       syncModule.init({ readiness: startupLeaseReadiness, prepareResume: renewLeaseInBackground });
+      (await import('./lib/class-import-background.js')).installImportBackground();
       // init() already starts the read-only status scan. Do not wait for its
       // outbox/record reads before painting this verified local workspace.
       if (import.meta.env?.DEV) window.__syncModule = syncModule;

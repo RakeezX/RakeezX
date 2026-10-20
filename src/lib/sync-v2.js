@@ -419,7 +419,7 @@ export function calendarDependencies(store, record, op = 'create', terms = []) {
 
 // A completed N101 audit is retained history, not outstanding Product work.
 // Pending/failed repairs, foreign audits and every other dirty row still block imports.
-function blocksGradeImport(row, ownerId) {
+export function blocksGradeImport(row, ownerId) {
   const receipt = row.receipt;
   const completedOwnRepair = row.protocol === REPAIR_PROTOCOL && row.state === 'verified' && row.ownerId === ownerId &&
     row.original?.ownerId === ownerId && row.original.state === 'rejected' && receipt?.outcome === 'applied' &&
@@ -922,7 +922,7 @@ export function createSyncV2Engine({
     return result;
   }
 
-  async function queueCommand({ store, recordId, command, patch = {}, groups = [], dependencies = [], baseRevision = 0 }) {
+  async function queueCommand({ store, recordId, command, patch = {}, groups = [], dependencies = [], baseRevision = 0, backgroundImportPlanId = null, verifyCurrent = () => {} }) {
     const schema = schemaFor(store);
     if (!recordId || !command) throw new Error('Invalid Sync V2 command');
     const mutationId = makeId();
@@ -930,7 +930,10 @@ export function createSyncV2Engine({
     let queued;
     await database.applyBatch({ outbox: {}, device: {} }, {
       prepare(current) {
+        verifyCurrent();
         const deviceRecord = current.device.find((record) => record.id === 'device') ?? null;
+        const importPlan=backgroundImportPlanId && deviceRecord?.classFileImportPlans?.[backgroundImportPlanId];
+        if(backgroundImportPlanId && (!importPlan || importPlan.gradeMutationId || importPlan.ownerId!==currentAuthenticatedUserId() || importPlan.created.teachingId!==recordId))throw Error('IMPORT_PLAN_CHANGED');
         if (command === 'score:grade_import' && current.outbox.some(row => blocksGradeImport(row, currentAuthenticatedUserId()))) {
           throw new Error('أكمل المزامنة قبل تأكيد استيراد الدرجات.');
         }
@@ -941,6 +944,7 @@ export function createSyncV2Engine({
           protocol: 'v2', mutationId, deviceId, store, entity: schema.entity,
           recordId, serverRecordId: recordId, canonicalId: recordId,
           logicalRecordKey: `${store}:${recordId}`,
+          ...(backgroundImportPlanId?{backgroundImportPlanId}:{}),
           op: 'command', command, baseRevision: normalizeRevision(baseRevision),
           patch: clone(patch), localPatch: {},
           fields: Object.keys(patch).sort(), groups: [...new Set(groups)].sort(),
@@ -951,7 +955,7 @@ export function createSyncV2Engine({
         });
         return {
           outbox: { put: [queued], remove: [] },
-          device: deviceRecord?.deviceId
+          device: backgroundImportPlanId ? {put:[{...deviceRecord,deviceId,classFileImportPlans:{...deviceRecord.classFileImportPlans,[backgroundImportPlanId]:{...importPlan,gradeMutationId:mutationId,state:'syncing'}}}],remove:[]} : deviceRecord?.deviceId
             ? operationBatch()
             : { put: [{ ...(deviceRecord ?? {}), id: 'device', deviceId, updatedAt: stamp }], remove: [] },
         };
@@ -1647,7 +1651,8 @@ export function createSyncV2Engine({
     });
   }
 
-  async function reconcileDistributionReceipt(mutation, receipt) {
+  async function reconcileDistributionReceipt(mutation, receipt, assertContext = () => {}) {
+    assertContext();
     const entries = [['items', 'items'], ['scoreSubitems', 'score_subitems'],
       ['scoreSubitemCompletions', 'score_subitem_completions'], ['scores', 'scores']];
     const unified = mutation.command === 'score:grade_import' && mutation.patch.batch.newStudents?.length > 0;
@@ -1685,10 +1690,16 @@ export function createSyncV2Engine({
           new Set(rows.map(row => row.id)).size !== rows.length) throw new Error('Distribution receipt owner or row mismatch');
       return [store, rows.map(row => decodeSyncV2Canonical(store, row))];
     }));
-    await database.applyBatch({ ...Object.fromEntries(entries.map(([name]) => [name, {}])), outbox: {} }, {
+    await database.applyBatch({ ...Object.fromEntries(entries.map(([name]) => [name, {}])), outbox: {}, ...(mutation.backgroundImportPlanId?{device:{}}:{}) }, {
       prepare(current) {
+        assertContext();
         if (owner !== currentAuthenticatedUserId()) throw new Error('Distribution owner changed');
         const result = { outbox: { remove: [mutation.id] } };
+        if(mutation.backgroundImportPlanId){
+          const device=current.device.find(r=>r.id==='device'),plan=device?.classFileImportPlans?.[mutation.backgroundImportPlanId];
+          if(!plan || plan.ownerId!==owner || plan.gradeMutationId!==mutation.mutationId)throw Error('IMPORT_PLAN_RECEIPT_CHANGED');
+          result.device={put:[{...device,classFileImportPlans:{...device.classFileImportPlans,[plan.id]:{...plan,state:'cloud_confirmed',gradeReceipt:mutation.mutationId}}}],remove:[]};
+        }
         for (const [store] of entries) result[store] = { put: canonical[store].map(row => {
           const prior = current[store].find(local => local.id === row.id);
           // A lost acknowledgement can arrive after a later canonical pull.
@@ -1788,6 +1799,7 @@ export function createSyncV2Engine({
       // those envelopes unchanged until the stored receipt is reconciled.
       if (pendingFoundationGroup(await database.getAll('outbox'), original)) { result.blocked++; continue; }
       if (onlyMutationId && original.mutationId !== onlyMutationId) continue;
+      if(original.backgroundImportPlanId && onlyMutationId!==original.mutationId){result.blocked++;continue;}
       // N107 is a foreground reviewed stage; reload/ordinary background Sync never starts it.
       if (original.importMaximum === true && onlyMutationId !== original.mutationId) {result.blocked++;continue;}
       if (result.attempted >= maxMutations) break;
@@ -2099,7 +2111,8 @@ export function createSyncV2Engine({
             } }] } };
           } });
         }
-        const mutation = await markAttempt(live);
+        const assertBackground=live.backgroundImportPlanId ? captureMutationContext?.(live) ?? (()=>{throw Error('IMPORT_PLAN_CONTEXT_REQUIRED');}) : ()=>{};
+        const mutation = await markAttempt(live,null,assertBackground);
         result.attempted++;
         try {
           const receipt = mutation.command === 'score:grade_import'
@@ -2128,12 +2141,13 @@ export function createSyncV2Engine({
               subitemId: mutation.patch.subitemId ?? null, checked: mutation.patch.checked ?? null,
               manualValue: mutation.patch.manualValue ?? null,
               ...(Object.hasOwn(mutation.patch, 'completionState') ? { completionState: mutation.patch.completionState } : {}) });
-          if (['score:distribution_apply', 'score:grade_import'].includes(mutation.command)) await reconcileDistributionReceipt(mutation, receipt);
+          if (['score:distribution_apply', 'score:grade_import'].includes(mutation.command)) await reconcileDistributionReceipt(mutation, receipt,assertBackground);
           else await reconcileScoreDomainReceipt(mutation, receipt);
           result.acknowledged++;
         } catch (error) {
-          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
-          else await markFailure(mutation, error);
+          try{assertBackground();}catch{result.blocked++;continue;}
+          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error,assertBackground);
+          else await markFailure(mutation, error,assertBackground);
           stoppedKeys.add(mutation.logicalRecordKey);
           if (isRejectedProtocolError(error)) result.blocked++; else result.failed++;
         }
@@ -2484,7 +2498,7 @@ export function createSyncV2Engine({
       rejected: summary.rejectedCount,
       // Foreground import stages stay visible as pending/error, but cannot
       // make the background scheduler repeatedly request work it cannot send.
-      backgroundPending: outbox.filter(row=>row.state==='pending' && row.importMaximum!==true).length,
+      backgroundPending: outbox.filter(row=>row.state==='pending' && row.importMaximum!==true && !row.backgroundImportPlanId).length,
     };
   }
 
