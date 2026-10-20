@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-owned-write-context-qualification-20261020",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -2710,
+      "scopeKey": "n107-owned-write-context-qualification-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 20,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-setup-profile-save-direct-bridge-20261020"
+      ],
+      "sessionId": "01a158b0-7f96-7413-bbd7-133aaa28cc35",
+      "objective": "Continue SAME saved N107 session. Preserve diagnostic candidates002715c309ffccd71fddd75e4be835c20da96479 and61cdec24f9793b5794e4b5bd357ac89e48a96875; do not replay their unchanged tests. The second candidate found lower-layer counterexamples (receipt adoption after injected owner retirement, HTTP401 retry after changed synthetic session); it did NOT prove cross-database writes or a real application leak. Qualification stopped correctly. Ordinary missing client path/scope is not a fresh PO permission gate: latest user authorizes fixing remaining import issues and protecting ownership. This scope now includes cloud.js for the minimal matching prerequisite, not Auth service changes. Sole existing controller/publisher, minimum changed-boundary checks, no new planner/reviewer or manual Product execution. N44 remains HOLD; N36.17/N117 and accepted closures stay intact.\nFIRST inspect the actual configured coordinator→cloud transport→active owned database caller, not only fake callbacks. With a controlled delayed response/401 and actual app-owned IndexedDB, prove whether current upper-layer context already protects record adoption/queued-envelope retry. Keep synthetic owners/data and intercepted fetch only; no native/hosted requests, SQL, real accounts/files/imports, sends or credential reads. Distinguish same-account token refresh (must still work) from owner/session/workspace/lease retirement. Do not claim a real data defect from lower-layer injection alone.\nIf actual caller proves the invariant already holds, reuse it to decide whether bounded independent creates can be qualified; do not add a redundant broad guard. If a minimal guard is necessary, bind the existing generic owned mutation request/retry AND receipt adoption to its starting authorized owner/database/lease/session context using existing guard primitives. Before any automatic401 retry or local receipt write, revalidate that exact principal/workspace; normal same-owner token refresh remains supported, retired/changed owner cannot resend/adopt into the new owner's DB. Keep genuine response uncertainty and SAME durable envelope/mutation identity; do not delete an outbox entry on unacknowledged/context failure. Recheck before starting queued work. This is transient CLIENT context fencing on existing protocol, not new Auth authorization, JWT trust, login flow, roles/RLS/grants/service configuration/schema, changed server bodies or an Auth SDK rewrite. Old real refusals remain binding. Scope only actual necessary generic owned mutation behavior; don't refactor unrelated Auth/score/delete/calendar/Restore transports.\nQualify actual owned-DB before/after owner/workspace retirement, same-owner refresh allowed, changed-owner401 retry NOT sent, delayed ACK cannot mutate foreign DB/outbox, normal receipt persists before success and unknown-outcome recovery retains same envelope. Existing lower-layer reproductions provide baseline; only newly affected composition needs verification. No full Sync/Auth/SQL/scoring suite or repeated school/pagewalker checks. If further nonlocal redesign is genuinely needed, save the exact coupling and stop that proposed optimization; do not manufacture a PASS.\nAfter this prerequisite is genuinely qualified, a minimal width2 overlap for DIFFERENT NEW STUDENT CREATE envelopes may proceed under the exact previous card constraints: unchanged existing RPC, maximum2 in-flight, same frozen authorized owner/workspace/lease, known parents, distinct IDs, no enrollment/roll/score/max/teaching/patch/delete/Restore/profile/calendar concurrency. Reuse prior28/31 actual-app fixture and owner/ACK proofs; controlled SAME before/after dependency only if a real scheduling implementation exists, never call it hosted18seconds improvement. If not qualified, deliver a substantive qualified context guard independently and explicitly leave performance unproven; do not require a false speed-check PASS for a guard-only fix. No generic Promise.all, new bulk RPC, service write or broad audit.\nSave exact task/run/base/candidate/check schema and original FAIL/NOT_RUN. Required two checks concern actual context safety, not downstream publication. Any optional scheduling must have its own genuine changed-boundary check, otherwise omit it. Sole publisher verifies served effect; actual hosted speed remains18seconds until legitimately measured. Do not close N107 or N125 merely from these synthetic results; N125 incident attribution remains UNKNOWN.",
+      "allowedPaths": [
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "tests/n107-owned-context-20261020/**",
+        "docs/automation-evidence/20261020/N107_OWNED_CONTEXT_QUALIFICATION.md"
+      ],
+      "verificationPaths": [
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js"
+      ],
+      "requiredChecks": [
+        "n107_actual_owned_database_context_qualification",
+        "n107_same_owner_refresh_and_retired_owner_ack_boundaries"
+      ],
+      "acceptance": [
+        "Prove actual composed caller/transport/owned DB behavior rather than infer a leak from isolated injected callbacks.",
+        "Only the minimal existing-RPC context guard or additionally qualified width2 student-create scheduling may change; no backend/Auth configuration or broad protocol rewrite."
+      ],
+      "preparationAuthority": {
+        "kind": "Existing explicit PO import latency request plus new provider/source aggregate evidence",
+        "publication": true,
+        "realAccountMutations": false,
+        "realSend": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false
+      },
+      "releaseAuthority": "Current PO authorizes completing import performance and minimum affected checks through sole publisher. Existing RPC scheduling only; no new service/schema/Auth/RLS, real account/pupil/import/send or prior refusal bypass."
+    }
+  ]
+}
