@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-synchronize-reviewed-frontend-delivery-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3610,
+      "scopeKey": "n88-synchronize-reviewed-frontend-delivery-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 15,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "SERIAL EXACT-SOURCE FRONTEND DELIVERY ONLY. Parent original N88 task is blocked after final source preparation, original session/custody stays intact. Root technically reviewed finite synchronization stage allowlist, failed-list wake lifecycle fix and compact error-only support details; backend actual503 still unresolved until post-source read. Before the parent ONE new teacher read, current production must serve new stage allowlist/support details. Use exact prepared candidate 616facf2dd77f406c8dd07f3d1a63522ef466422 from C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-current-teacher-connection-actual-cause-20261020; source pins {\"src/lib/student-portal-runtime.js\":\"ad064f5f2c2a973faebafe2e4ad28383d0bba12c831659c2b2c9bb232c23408b\",\"src/views/student-portal-class.js\":\"79ed87a79b088d82b9740593721aa39f6a5bb74762602ea85cef6326ad3c9843\",\"src/styles/student-portal-class.css\":\"5606758b91b5bebd8595540f29dc95d5cffe4622d97299714e32f15919a28e23\"}. In your isolated current-origin/main worktree copy ONLY the THREE exact Git source files at that candidate (not full cherry-pick/branch copy), preserve all other main/Product changes. No backend/gate/bundle/provider/private service code or original worktree changes. Parent candidate HEAD cannot move. If meaningful same-file current-main change conflicts with source preimage, preserve it and report exact conflict; no reset.\n\nReuse parent committed tests/n88-actual-current-cause-20261020/synchronize-focused.json and support-details.json and accepted source review; these tests ran on these exact frontend bytes and CSS. Do not rerun browser matrix, credentials/service guard proofs or a new build unless actual merge changed behavior. One source/hash diff check against approved pins, changed JS syntax only if needed, evidence listing exact parent proof pins. Expanding support details exposes exactly six safe fields and no network/clipboard; do not trigger a real teacher read yourself. Existing readiness/enabled state unchanged, no account/student/PIN/settings writes or Auth/SQL/RLS/provider operations, no live/personal browser, no native deploy or sourcepin change. Own synthetic UI fixtures not needed for unchanged exact-byte promotion. Sole publisher integrates/verifies exactly these THREE served sources; LOCAL_READY isn't wholeN88 acceptance. Return exact task/run/base/candidate, evidence, checks, release resources. Original parent worker performs provider operation later in its own session; do not message/run it or edit queue.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/views/student-portal-class.js",
+        "src/styles/student-portal-class.css",
+        "tests/n88-sync-frontend-delivery-20261020/**",
+        "docs/automation-evidence/20261020/N88_SYNCHRONIZE_FRONTEND_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/views/student-portal-class.js",
+        "src/styles/student-portal-class.css"
+      ],
+      "requiredChecks": [
+        "n88_reviewed_frontend_source_bytes_and_scope",
+        "n88_reviewed_frontend_unchanged_behavior_proof_reuse"
+      ],
+      "acceptance": [
+        "Exact reviewed three frontend sources production-verified before the original parent post-correction teacher read.",
+        "No backend/custody/provider activation or real user read/mutation; historical N88 unresolved state retained."
+      ],
+      "preparationAuthority": {
+        "kind": "Root-reviewed exact-source frontend-only staging from prepared original N88 candidate",
+        "parentTaskId": "continuous-n88-current-teacher-connection-actual-cause-20261020",
+        "parentCandidateSha": "616facf2dd77f406c8dd07f3d1a63522ef466422",
+        "sourcePins": {
+          "src/lib/student-portal-runtime.js": "ad064f5f2c2a973faebafe2e4ad28383d0bba12c831659c2b2c9bb232c23408b",
+          "src/views/student-portal-class.js": "79ed87a79b088d82b9740593721aa39f6a5bb74762602ea85cef6326ad3c9843",
+          "src/styles/student-portal-class.css": "5606758b91b5bebd8595540f29dc95d5cffe4622d97299714e32f15919a28e23"
+        },
+        "publication": true,
+        "providerBackendOperations": 0,
+        "newReadinessRequests": 0,
+        "actualTeacherReads": 0,
+        "realDataWrites": 0
+      },
+      "liveAuthorizationRef": "PO-20261020-CURRENT-N88-TEACHER-CAUSE",
+      "releaseAuthority": "Direct PO existing N88 diagnose/fix authorization covers reviewed safe diagnostic/lifecycle frontend delivery through sole publisher; no new access or backend write authority."
+    }
+  ]
+}
