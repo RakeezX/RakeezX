@@ -578,6 +578,7 @@ export async function completeAccountProfile(profile) {
       p_phone: profile.phone,
       p_teacher_form: profile.teacherForm,
       p_school_name: profile.schoolName || null,
+      ...(profile.educationDepartment ? { p_education_department: profile.educationDepartment } : {}),
     }),
   });
 }

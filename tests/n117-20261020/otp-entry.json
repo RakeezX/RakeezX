@@ -1,0 +1,16 @@
+{
+  "checks": [
+    {
+      "name": "new_otp_required_department_entry",
+      "status": "PASS",
+      "evidence": "Actual OTP request/verify/session persistence/reload/owner-profile provisioning reaches required canonical 47-option department form."
+    },
+    {
+      "name": "existing_otp_not_signup",
+      "status": "PASS",
+      "evidence": "Actual OTP return retains existing UUID; READY profile is not provisioned as signup and no initial department form."
+    }
+  ],
+  "scope": "Actual local app DOM and synthetic Auth transport only; no hosted users/messages",
+  "ownedResourcesClosed": true
+}

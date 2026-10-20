@@ -1,5 +1,49 @@
 # N117 — initial department/calendar service prerequisite
 
+## Current continuation — 20 October 2026
+
+Run `0ebb5450-f191-4951-b332-e54cee3e2455` continues saved candidate `e7a4b30ceb03cc94010d8654328e66d8e241dfe7` on base `66a84641fe74b7f0a33c98e2ec9a72b3c31886b9`. The updated card expressly authorizes ONE locally qualified append service correction. **LOCAL_READY** for independent controller integration/publication; no frontend push/deployment or Product acceptance claimed.
+
+### Implemented behavior
+
+- Actual initial profile form requires a canonical department from the existing 47-row directory, displays its approved short label and hint «تحدد إدارة التعليم التقويم المعتمد لحسابك». Exactly the four named departments map to the existing western preset; all 43 others map to general. No directory/date research or competing date policy.
+- Actual OTP return establishes owner → server profile checkpoint → profile completion. Completion sends the durable department through the supported RPC before foundation creation. A fresh owner without a valid department returns to profile completion; READY/restore/claimed-workspace branches retain their calendars.
+- The service validates canonical department/preset consistency and the entire exact existing foundation shape, official term/day dates, identities and normal source codec (`preset:<id>` locally ↔ `moe` on the server). It obtains the existing owner/academic writer mutex before row locks. No new tables, roles, Auth configuration or RLS changes.
+- The mapped preset is chosen before constructing/inserting any foundation. To preserve N58's existing two-terms-before-selection guard, only the year newly inserted within the same atomic transaction receives that preselected preset after its parents exist, before READY/commit/local import. No default preset is provisioned. A preexisting incomplete foundation fails closed; no committed existing year is retagged. READY snapshots/recovery retain the original receipt path.
+- One five-argument completion signature with optional last argument replaces the old public four-argument signature; existing four-argument clients still resolve for existing accounts. Old implementations become owner-only private helpers. No ambiguous public overload, existing calendar switch, N58 API substitution, outbox discard or eager session generation.
+- Existing Settings department writes remain metadata-only. Existing startup assets already include the directory module/JSON in `sw.js`; cache generation advances to v75.
+
+### Actual checks
+
+`node tests/n117-20261020/qualify.mjs`: **11 PASS**, disposable native PostgreSQL 17 with existing application schema and exact saved N58 migrations. The initial unrelated N88/N44 staged-service setup was excluded after its missing Auth fixture failed; those services are untouched. Their full suites were not run. Native scope retains calendar/academic guards and current N122/N36 definitions.
+
+- Required/invalid canonical choice; all four special departments plus Riyadh; all 47 directory entries recognized with exactly four special mappings.
+- Actual profile completion → persisted checkpoint → provisioning; wrong preset/date rejection leaves zero year rows; correct identity/dates; no duplicate year/terms on retry; metadata changes never remap READY years.
+- Foreign owner without checkpoint and anon rejected; private ACLs and single public signature verified. Client owner change during profile preflight issues no completion call.
+- Actual application HTTP DOM, handlers and source CSS at 390/1280: initial form → native owner-checked completion/provisioning. Synthetic response lost AFTER native commit → reload → same department/general calendar, one year/two terms, zero slots/sessions/outbox. Later reload never reprovisions.
+- Actual installed offline shell caches the existing department module; with `navigator.onLine=false`, empty required selection prevents submission before any completion/foundation creation. This is the narrow field gate, not offline restore/cloud certification.
+- Actual stale profile form submitted after synthetic logout is blocked by the application owner guard; native profile remains PROFILE_REQUIRED.
+
+`node tests/n117-20261020/otp-entry.mjs`: **2 PASS**, actual app OTP request/verify/session/reload path reaches the required department form for the synthetic new owner; the same OTP surface preserves an existing UUID without treating it as a new signup. Auth transport is synthetic; no real user or message. The unchanged native qualification is reused.
+
+`node --test tests/n117-20261020/client-mapping.test.mjs`: **1 PASS**, every approved canonical row maps exactly to the existing preset constants; empty, short-label-only and misleading office/city strings are invalid selections. Existing optional metadata-attention validation remains unchanged.
+
+JS syntax and `git diff --check`: **PASS**. No full build, blanket Auth/Sync/calendar suite or real account journey. Original diagnostic and FAIL/NOT_RUN below remain historical evidence and were not replayed. Harness setup/HTTP failures and the exact tool-policy rejection remain in the adjacent original-failure JSON files and `harness-denial.json`; no acceptance failure was edited into PASS.
+
+### One service operation and exact readback
+
+CLI `supabase@2.121.0 migration new n117_initial_department_calendar` created `supabase/migrations/20261020085614_n117_initial_department_calendar.sql`. Qualified immutable SQL SHA256: `f35a1ebadb1ff1b833bf68f4492362adf2bb35c7d05074acd4e8284540832ffe`.
+
+Only after local PASS, official connected Supabase metadata read matched all five relevant preimage bodies/ACLs and showed no N117 migration. The initial read-only metadata query had a SQL syntax error; the corrected metadata-only query succeeded. One `apply_migration` invocation succeeded. Provider history records **`20261020090836 / n117_initial_department_calendar`** (provider-generated version, distinct from CLI filename). Its single stored statement has MD5 `5c4dbe240363de69049eab00fe7f6f92`, exactly matching this SQL file. Never apply it again under the CLI timestamp.
+
+Readback matches the native-qualified bodies: completion `e298f8c2588a742735ca0571fb6ac26d`; provisioning `f6eb00b2589ed8f4f8a5a53537046fe1`. Both retain only postgres/authenticated execute; PUBLIC/anon denied. Renamed helpers are postgres-only. Existing N58 calendar, provisioning-state and foundation-completeness guard bodies/ACLs remain identical. See `tests/n117-20261020/service-preimage.json` and `service-readback.json` for exact metadata/source evidence. No real profile/Auth user/student rows were read or mutated.
+
+Browser and live-mutation leases released. Owned browsers, HTTP listeners and native PostgreSQL clusters stopped. Stopped synthetic runtime directories are retained and Git-excluded because the combined recursive cleanup command was policy-denied; no deletion retry via another surface. No unknown process/lock touched.
+
+The existing-account calendar-switch hold and unresolved old-year incident remain unchanged/UNKNOWN. LOCAL_READY is not served frontend verification, live account acceptance or Product CLOSED; the sole publisher owns those delivery steps.
+
+## Preserved original run — before service scope repair
+
 - Task: `continuous-n117-required-department-initial-calendar-20261020`
 - Run: `db801aaf-cf45-4b9b-bad9-1cfe30fe2322`
 - Base: `66a84641fe74b7f0a33c98e2ec9a72b3c31886b9`

@@ -5,6 +5,7 @@ import { normalizeAccountContract } from './account-profile.js';
 import { accountWorkspaceDatabaseName, createWorkspaceRegistry, normalizeAuthUserId, detectWorkspaceDatabase } from './workspaces.js';
 import { readAccountProvisioningMetadata } from './workspace-routing.js';
 import { calendarPresetRecords, getCalendarPreset } from './calendar-presets.js';
+import { initialDepartmentCalendarPreset } from './education-department-directory.js';
 import { DEFAULT_TIME_PROFILES, makeDevice, makeSubject, makeTimeProfile } from '../models.js';
 
 export const ACCOUNT_PROVISIONING_VERSION = 1;
@@ -16,8 +17,8 @@ const SERVER_ENTITY = Object.freeze({ profile: 'profile', years: 'years', calend
 
 function fail(code, message) { return Object.assign(new Error(message), { code }); }
 
-export function buildAccountFoundationDefaults() {
-  const preset = calendarPresetRecords(getCalendarPreset());
+export function buildAccountFoundationDefaults(presetId) {
+  const preset = calendarPresetRecords(getCalendarPreset(presetId));
   return Object.freeze({
     years: [preset.year], calendars: [preset.calendar], terms: preset.terms,
     calendarDays: preset.calendarDays,
@@ -137,6 +138,14 @@ export async function runAccountProvisioning({ expectedOwnerId, api = cloudDefau
     }
     return Object.freeze({ status: 'not_applicable', contract });
   }
+  // Only a server-confirmed initial setup may choose a preset. READY restores
+  // and receipt repairs above retain their existing calendar, even if profile
+  // metadata was subsequently edited in Settings.
+  const initialPresetId = initialDepartmentCalendarPreset(contract.profile.educationDepartment);
+  if (contract.provisioning.state !== 'READY' && !initialPresetId) {
+    onState('PROFILE_REQUIRED');
+    return Object.freeze({ status: 'profile_required', contract });
+  }
   assertOwner();
   if (!registrations.length) {
     if (presence.exists) throw fail('WORKSPACE_REGISTRY_MISMATCH', 'Unregistered storage cannot be provisioned');
@@ -144,10 +153,15 @@ export async function runAccountProvisioning({ expectedOwnerId, api = cloudDefau
   }
   onState('PROVISIONING');
   const begun = normalizeAccountContract(await api.beginAccountProvisioning(), api.user);
+  assertOwner();
   if (!['PROVISIONING', 'READY'].includes(begun.provisioning?.state)) {
     throw fail('ACCOUNT_PROVISIONING_NOT_READY', 'Server did not accept provisioning');
   }
-  const result = await api.provisionAccountWorkspace(buildAccountFoundationDefaults());
+  if (begun.provisioning?.state !== 'READY' && begun.profile.educationDepartment !== contract.profile.educationDepartment) {
+    throw fail('ACCOUNT_PROVISIONING_PROFILE_CHANGED', 'Initial department changed; retry from the account checkpoint');
+  }
+  const result = await api.provisionAccountWorkspace(buildAccountFoundationDefaults(initialPresetId));
+  assertOwner();
   contract = normalizeAccountContract(result?.contract, api.user);
   if (contract.provisioning?.state !== 'READY' ||
       contract.provisioning.version !== ACCOUNT_PROVISIONING_VERSION ||

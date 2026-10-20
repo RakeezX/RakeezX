@@ -24,3 +24,12 @@ export function searchEducationDepartments(directory, query) {
 export function isOfficialEducationDepartment(directory, value) {
   return typeof value === 'string' && directory.includes(value);
 }
+
+// Initial accounts only. Match canonical directory rows, never city substrings.
+export function initialDepartmentCalendarPreset(educationDepartment) {
+  if (!isOfficialEducationDepartment(EDUCATION_DEPARTMENTS, educationDepartment)) return null;
+  const option = EDUCATION_DEPARTMENT_OPTIONS.find(entry => entry.canonicalName === educationDepartment);
+  if (!option) return null;
+  return ['مكة المكرمة', 'جدة', 'المدينة المنورة', 'الطائف'].includes(option.shortLabel)
+    ? 'sa-western-1448-1449' : 'sa-general-1448-1449';
+}

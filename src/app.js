@@ -34,6 +34,7 @@ import { createPushRuntime, setPushRuntime } from './lib/notification-push-runti
 import { subscribeAcknowledged } from './lib/sync.js';
 import { renderNotificationCenter, renderNotificationBell } from './views/notifications.js';
 import { completeProfile, getAccountPresentation, normalizeSaudiMobile } from './lib/account-profile.js';
+import { EDUCATION_DEPARTMENT_OPTIONS } from './lib/education-department-directory.js';
 import {
   EMAIL_OTP_LENGTH,
   EMAIL_OTP_RESEND_COOLDOWN_SECONDS,
@@ -1218,6 +1219,13 @@ function renderFirstAccountProfile(contract) {
           </div></div>
         <label class="field"><span class="field__label">اسم المدرسة <small>اختياري</small></span>
           <input class="input" name="schoolName" value="${current.schoolName}" /></label>
+        <label class="field"><span class="field__label">إدارة التعليم <small>مطلوب</small></span>
+          <select class="input" name="educationDepartment" required aria-describedby="initial-department-hint">
+            <option value="">اختر إدارة التعليم</option>
+            ${EDUCATION_DEPARTMENT_OPTIONS.map(({ canonicalName, shortLabel }) => html`
+              <option value="${canonicalName}">${shortLabel}</option>`)}
+          </select>
+          <span class="field__hint" id="initial-department-hint">تحدد إدارة التعليم التقويم المعتمد لحسابك</span></label>
         <div class="field__error" role="alert" data-profile-error hidden></div>
         <div class="first-run-status__actions">
           <button class="btn btn--primary" type="submit">متابعة</button>
@@ -1226,6 +1234,7 @@ function renderFirstAccountProfile(contract) {
       </form>
     </div>`);
   const form = app.querySelector('[data-account-profile-form]');
+  form.elements.educationDepartment.value = current.educationDepartment ?? '';
   form.querySelectorAll('[data-profile-form]').forEach((button) => button.addEventListener('click', () => {
     teacherForm = button.dataset.profileForm;
     form.querySelectorAll('[data-profile-form]').forEach((choice) => {
@@ -1246,7 +1255,8 @@ function renderFirstAccountProfile(contract) {
     try {
       if (cloud.user?.id !== ownerId) throw new Error('Profile account changed');
       await completeProfile({ teacherName: form.elements.teacherName.value,
-        phone: form.elements.phone.value, teacherForm, schoolName: form.elements.schoolName.value });
+        phone: form.elements.phone.value, teacherForm, schoolName: form.elements.schoolName.value,
+        educationDepartment: form.elements.educationDepartment.value });
       if (cloud.user?.id !== ownerId) throw new Error('Profile account changed');
       renderInitialRestoreState('PROVISIONING');
       const registry = createWorkspaceRegistry();
