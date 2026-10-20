@@ -69,7 +69,8 @@ let lastSafeFailure = null;
 let resumeEvent = 'automatic';
 function recordSafeFailure(error, phase, startedAt, event = resumeEvent) {
   const known = ['AUTH_REQUIRED', 'AUTH_TIMEOUT', 'AUTH_CONTEXT_CHANGED', 'AUTH_OWNER_MISMATCH',
-    'SYNC_OWNERSHIP_BLOCKED', 'OFFLINE_LEASE_LIMITED', 'LEASE_VERIFY_TIMEOUT'];
+    'SYNC_OWNERSHIP_BLOCKED', 'OFFLINE_LEASE_LIMITED', 'LEASE_VERIFY_TIMEOUT',
+    'REMOTE_MARKER_TIMEOUT', 'REMOTE_MARKER_INVALID', 'REMOTE_REVISION_REGRESSED'];
   const status = Number(error?.status);
   const code = error?.reason === 'sync-context-changed' ? 'CONTEXT_CHANGED'
     : known.includes(error?.code) ? error.code
@@ -682,8 +683,9 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     // earlier store was read. It requests trailing work, even if Broadcast was
     // missed. A failed validation cannot certify the single-pull fast path.
     phase = 'revision_validation';
-    if (remoteCapture && !await remoteSync.check() && skipPostPull) {
-      throw new Error('Remote Sync revision validation unavailable');
+    if (remoteCapture) {
+      if (skipPostPull) await remoteSync.validateFullSync(remoteCapture);
+      else await remoteSync.check(); // Advisory only after a complete post-pull.
     }
     if (skipPostPull && (acknowledgedContext.workspace !== store.getActiveWorkspace() ||
         acknowledgedContext.session !== cloud.session || !cloudOwnershipAccess('pull').allowed)) {

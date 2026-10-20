@@ -1,0 +1,418 @@
+{
+  "taskId": "continuous-n125-revision-validation-actual-evidence-20261020",
+  "runId": "39b4f257-9d29-4a9a-a8b9-8acb4ae1a8d4",
+  "baseSha": "01940ee3a6fe0f4c79e0ad50c9209662a7ef7517",
+  "baseline": true,
+  "checks": [
+    {
+      "name": "baseline_revision_validation_cancellation",
+      "status": "PASS",
+      "evidence": "Actual current coordinator reports revision_validation UNKNOWN after hidden/rapid visible stops the held marker validation, even though no marker transport failure occurred."
+    }
+  ],
+  "beforeWake": {
+    "summary": {
+      "state": "syncing",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": false,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "sync_in_progress",
+      "reasonLabel": "المزامنة تعمل الآن.",
+      "lastSuccessfulSyncAt": 1792493171249,
+      "automaticRetryActive": false,
+      "automaticSyncActive": true,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": false,
+        "authRequired": false,
+        "awaitingVerification": false,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": null
+    },
+    "error": null,
+    "reads": 48,
+    "markers": 4,
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792493169827,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "score": {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "canonicalId": "n73-valid",
+      "deleted": false,
+      "serverCanonical": {
+        "id": "n73-valid",
+        "studentId": "n73-student2",
+        "itemId": "n73-target-exam",
+        "value": 18,
+        "canonicalId": "n73-valid",
+        "serverRevision": 1,
+        "deleted": false
+      }
+    },
+    "outbox": [],
+    "tombstones": [
+      {
+        "id": "n73-second",
+        "updatedAt": 1792493168902,
+        "deleted": true,
+        "sectionId": "n73-second-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "name": "N73 synthetic",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second",
+        "serverCanonical": {
+          "id": "n73-second",
+          "sectionId": "n73-second-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n73-second",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty",
+        "sectionId": "n125-empty-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "canonicalId": "n125-empty",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty",
+          "sectionId": "n125-empty-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n125-empty",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ],
+    "sections": [
+      {
+        "id": "n73-second-section",
+        "updatedAt": 1792493168902,
+        "deleted": true,
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second-section",
+        "serverCanonical": {
+          "id": "n73-second-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n73-second-section",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty-section",
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "canonicalId": "n125-empty-section",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n125-empty-section",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ]
+  },
+  "afterWake": {
+    "summary": {
+      "state": "error",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": true,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "temporary_sync_failure",
+      "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+      "lastSuccessfulSyncAt": 1792493171249,
+      "automaticRetryActive": false,
+      "automaticSyncActive": true,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": true,
+        "authRequired": false,
+        "awaitingVerification": true,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": {
+        "phase": "revision_validation",
+        "code": "UNKNOWN",
+        "event": "visible",
+        "at": "2026-10-20T10:46:12.067Z",
+        "elapsedMs": 258
+      }
+    },
+    "error": null,
+    "reads": 48,
+    "markers": 5,
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792493169827,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "score": {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "canonicalId": "n73-valid",
+      "deleted": false,
+      "serverCanonical": {
+        "id": "n73-valid",
+        "studentId": "n73-student2",
+        "itemId": "n73-target-exam",
+        "value": 18,
+        "canonicalId": "n73-valid",
+        "serverRevision": 1,
+        "deleted": false
+      }
+    },
+    "outbox": [],
+    "tombstones": [
+      {
+        "id": "n73-second",
+        "updatedAt": 1792493168902,
+        "deleted": true,
+        "sectionId": "n73-second-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "name": "N73 synthetic",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second",
+        "serverCanonical": {
+          "id": "n73-second",
+          "sectionId": "n73-second-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n73-second",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty",
+        "sectionId": "n125-empty-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "canonicalId": "n125-empty",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty",
+          "sectionId": "n125-empty-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n125-empty",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ],
+    "sections": [
+      {
+        "id": "n73-second-section",
+        "updatedAt": 1792493168902,
+        "deleted": true,
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second-section",
+        "serverCanonical": {
+          "id": "n73-second-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n73-second-section",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty-section",
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "canonicalId": "n125-empty-section",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n125-empty-section",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ]
+  },
+  "events": [
+    {
+      "status": "synced",
+      "error": null
+    },
+    {
+      "status": "synced",
+      "error": null
+    },
+    {
+      "status": "synced",
+      "error": null
+    },
+    {
+      "status": "error",
+      "error": "Remote Sync revision validation unavailable"
+    },
+    {
+      "status": "error",
+      "error": "Remote Sync revision validation unavailable"
+    },
+    {
+      "status": "error",
+      "error": "Remote Sync revision validation unavailable"
+    },
+    {
+      "status": "pending",
+      "error": "Remote Sync revision validation unavailable"
+    },
+    {
+      "status": "pending",
+      "error": null
+    }
+  ],
+  "cleanup": "Owned fresh isolated contexts/browser and loopback server closed in finally."
+}

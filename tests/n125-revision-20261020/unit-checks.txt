@@ -1,0 +1,25 @@
+✔ receiver stop cancels advisory check, not full validation; stale generation cannot acknowledge (2.5468ms)
+✔ final validation never coalesces with a poll that predates the completed pull (0.539ms)
+✔ genuine HTTP503 cannot validate an earlier pull (0.7758ms)
+✔ genuine authorization cannot validate an earlier pull (0.3512ms)
+✔ genuine fetch failure cannot validate an earlier pull (0.3438ms)
+✔ genuine foreign marker cannot validate an earlier pull (0.4093ms)
+✔ genuine malformed revision cannot validate an earlier pull (0.3312ms)
+✔ genuine absent marker cannot validate an earlier pull (1.1831ms)
+✔ genuine regressed revision cannot validate an earlier pull (0.3601ms)
+✔ unchanged 5000ms deadline aborts owned validation and reports finite timeout (0.9029ms)
+✔ context ownerId change fails closed before/after final read (0.3315ms)
+✔ context workspace change fails closed before/after final read (0.1721ms)
+✔ context token change fails closed before/after final read (0.1658ms)
+✔ context ready change fails closed before/after final read (0.1469ms)
+✔ context proven change fails closed before/after final read (0.1732ms)
+✔ context online change fails closed before/after final read (0.1939ms)
+✔ new finite marker codes remain copyable without exposing arbitrary diagnostic payload (7.1758ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 149.8291

@@ -125,8 +125,43 @@ export function createRemoteSync({ getContext, getMarker, openChannel, requestSy
       // starting the writer's fresh post-dispatch capture.
       if (writer && checking) await checking;
       const capture = await check();
-      if (capture && current(capture.epoch)) coveredFullRevision = BigInt(capture.revision);
-      return capture;
+      if (!capture || !current(capture.epoch)) return null;
+      coveredFullRevision = BigInt(capture.revision);
+      return { ...capture, key: binding.key };
+    },
+    // AI N125: final read belongs to the active full Sync, not the advisory
+    // foreground receiver. Hiding the document must release its socket/lease,
+    // but cannot turn that intentional teardown into a failed server read.
+    // Always read AFTER the pull; an already-inflight poll may predate it.
+    async validateFullSync(capture) {
+      const fail = code => Object.assign(new Error('Remote Sync revision validation unavailable'), { code });
+      const assertContext = () => {
+        const context = getContext();
+        if (!context?.ready || !context.proven || !context.online || !context.token ||
+            `${context.ownerId}:${context.workspace}:${context.token}` !== capture.key) {
+          throw fail('AUTH_CONTEXT_CHANGED');
+        }
+        return context;
+      };
+      const context = assertContext();
+      const controller = new AbortController();
+      let deadline;
+      try {
+        stats.markerChecks++;
+        const marker = await Promise.race([
+          getMarker({ signal: controller.signal }),
+          new Promise((_, reject) => {
+            deadline = timers.setTimeout(() => {
+              reject(fail('REMOTE_MARKER_TIMEOUT')); controller.abort();
+            }, markerTimeoutMs);
+          }),
+        ]);
+        assertContext();
+        if (!validOwnerMarker(marker, context.ownerId)) throw fail('REMOTE_MARKER_INVALID');
+        if (BigInt(marker.revision) < BigInt(capture.revision)) throw fail('REMOTE_REVISION_REGRESSED');
+        // Observe a newer revision, never acknowledge it for the earlier pull.
+        newer(marker.revision, capture.epoch);
+      } finally { timers.clearTimeout(deadline); }
     },
     afterFullSync(capture, success) {
       if (!capture || !current(capture.epoch)) return;
