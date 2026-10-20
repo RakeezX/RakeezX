@@ -17,8 +17,8 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
         'Content-Security-Policy':"default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"}});
     }
     const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),19000);
-    let stage='configuration';
-    const unavailable=()=>new Response('{"error":"unavailable"}',{status:503,headers:{...PRIVATE_WEB_HEADERS,'x-n88-transport-stage':stage}});
+    let stage='configuration',responseRegion=null;
+    const unavailable=()=>new Response('{"error":"unavailable"}',{status:503,headers:{...PRIVATE_WEB_HEADERS,'x-n88-transport-stage':stage,...(responseRegion?{'x-n88-service-region':responseRegion}:{})}});
     try {
       const url=new URL(request.url),origin=env.N88_PUBLIC_ORIGIN,upstream=new URL(env.N88_EDGE_URL);
       if(url.origin!==origin || url.protocol!=='https:' || url.search || !ROUTE.test(url.pathname) || !['GET','POST'].includes(request.method) ||
@@ -48,6 +48,9 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       stage='upstream';
       const result=await send(upstream.href+'/dispatch',{method:'POST',headers:wire,body:payload,
         signal:abort.signal,redirect:'manual',cache:'no-store'});
+      // Only the trusted native response can attest placement; never client input.
+      const region=result.headers.get('x-sb-edge-region');
+      if(request.method==='POST'&&url.pathname==='/api/n88/teacher/class/list'&&['ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','us-east-1','us-west-1','us-west-2','eu-central-1','eu-central-2','eu-west-1','eu-west-2','eu-west-3','sa-east-1'].includes(region))responseRegion=region;
       // Workers does not implement redirect:'error'. Reject redirects explicitly
       // without following Location or forwarding the signed/private envelope.
       if(result.status>=300&&result.status<400)return privateResponse(401);
@@ -59,6 +62,7 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       if(!reply || Object.keys(reply).sort().join(',')!=='body,cookie,status' || ![200,400,401,409,413,429,503].includes(reply.status) ||
         reply.cookie!==null && (typeof reply.cookie!=='string' || reply.cookie.length>4096)){stage='reply-shape';return unavailable();}
       const out=new Headers(PRIVATE_WEB_HEADERS);if(reply.cookie)out.set('set-cookie',reply.cookie);
+      if(responseRegion)out.set('x-n88-service-region',responseRegion);
       // Finite operational phase only; never reflect arbitrary upstream values.
       if(reply.status===503&&['acquire','begin','snapshot','repository','teacher','source','synchronize','projection'].includes(reply.body?.stage))out.set('x-n88-service-stage',reply.body.stage);
       return new Response(JSON.stringify(reply.body),{status:reply.status,headers:out});
