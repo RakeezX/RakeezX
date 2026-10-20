@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-actual-loading-write-and-code-ux-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -2900,
+      "scopeKey": "continuous-n88-actual-loading-write-and-code-ux-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS/ops contract and exact current Product row/affected source only. New direct PO20October actual followup AFTER verified previous releases. Sole controller and serial publisher; no manual Product executor/queue edit or new reviewer. Preserve original candidates/failures and reuse unchanged proofs; minimum newly affected tests only. N125 explicitly UNDER PO TEST, do not reopen/test its old focus case; accepted CLOSED remain closed, N44 explicit HOLD. No old school automation/tool/browser-custody refusal replay or alternate tab/actor bypass. No real pupil/account mutation/send, credential/key extraction, Authconfig/RLS/roles/schema/SQL/migration unless specifically authorized below. Truthful local vs publication vs actual success; fix concrete full user journey at changed boundary, no more timeouts/retries masquerading as solved service.\nActual page aftera7a579e3/version51 still long initial load and «جارٍ قراءة القائمة…», tasks empty or some sections not ready. Create/save shows prolonged «بانتظار إقرار الخادم…». User rejects whole current journey and asks cohesive correction. Latest published list-only2-family optimization is valid source proof but DID NOT resolve actual full teacher flow. Trace actual initial route LIST→roster→guidance plus separate save/create command→membership/projection/commit-ACK, including source SQL/connection/pool/read/write per phase; identify actual redundant full projection/serialized source waits used by remaining actions. Do not merely repeat list optimization, increase deadline, fake immediate success/empty roster, loosen owner/signed ingress/source/session/revision/admission locks, or allow concurrent mutation ambiguity. Static acceptance may inspect all N88 routes but only test changed boundaries, no full crypto/SQL/Auth/readiness suite. ONE bounded ordinary provider aggregate in NEW post11:03 to11:32UTC window if causally needed, finite route/action/stage/status/duration only; no payload/IDs/IP/tokens. Prior outer200 is not business success. If no live inner stage is obtainable say so, trace concrete composition rather than invent actual correlation. Show coherent independently loaded teacher sections, actual reading vs known-empty vs failure, stable state across harmless view updates and truthfully separate pending action from loaded codes/settings. Per-user approved write must retain same idempotency identity on unknown result/retry, never auto-create second code or republish fields silently.\nN88 STUDENT INPUT actual defects: paste not accepted; code disappears on switching windows/tabs and return, and after submit/error/back. Current src/views/student-portal-login.js explicitly input.value='' on submit and visibilitychange→clear→entry reconstructs input. Correct the whole normal form lifecycle with CODE DRAFT IN MEMORY ONLY for this same page, never localStorage/sessionStorage/URL/logs/cookies; retain editable code on invalid/service failure and harmless focus/visibility changes, no forced focus jump. Clear draft on successful claim, explicit session end, real identity/security retirement or disposal. Hiding must still retire private student data/pending response as required, but need not erase an unsubmitted login draft or turn invalid code into global loading. Support native paste/selection replacement,0–9 and existing safe Arabic digit normalization, exactly6digits starts1; do not silently truncate overlong/wrong data into another valid PIN. Do not rely on synthetic ClipboardEvent only; inspect actual browser input/paste behavior with owned local synthetic clipboard, no personal clipboard/credential reads. Form stays visible during claim/resume; previous late generations cannot reveal data. Error/back retains draft appropriately, no persistent secret store.\nTopbar «بوابة دخول الطالب» should be clearer within existing Rakeez design, target=_blank rel=noopener noreferrer, accessible new-page indication; must OPEN NEW TAB without changing teacher route. Current view uses app topActions; inspect handler/router interception so target attribute alone isn't falsely asserted. Minimal actual rendered topbar click proof in synthetic local app, no user personal tab.\nContinue ORIGINAL custodian01a14fc3-b292-7390-9952-8549a286c80f. Servicebaselineversion51 SHA2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea. Protected source state already records one prior source correction; DO NOT replay old one-attempt deployment marker. New explicit feedback authorizes ONE causally qualified changed-service operation/readback for this new action latency, only through ORIGINAL custodian supported fresh append correction, and ONE changed student-static carrier/readback for necessary input fixes. Preserve old preimages/consumed markers; use fresh reviewed correction identity, no overwriting/resetting old attempt markers or broad environment grants. Native source/pin change only if exact qualified, no unrelated SQL/Authconfig/ACL/key/role/migration. Carrier only changed actual student source assets; preserve active source sourcepin, bindings/routes/cache/CSP/noindex/no-referrer/logging/privacy and byte-identical unrelated assets. Fresh changed correction must have valid original owner/candidate/source preflight, source/hash/provider readback. No readiness replay/real teacher/pupil/code mutation for testing; prior browser custody refusal binding. App changes publish sole frontend path. If harness lacks exact new correction capability, save immutable prepared candidate and exact bounded missing capability for root ops repair; don't weaken policy/delete locks or ask PO general permission again.",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/app.js",
+        "src/views/student-portal-class.js",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/styles/student-portal-login.css",
+        "src/styles/student-portal-class.css",
+        "drafts/n88-student-portal/**",
+        "tests/n88-actual-1430-20261020/**",
+        "docs/automation-evidence/20261020/N88_ACTUAL_LOADING_WRITE_CODE.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js"
+      ],
+      "requiredChecks": [
+        "n88_normal_code_paste_draft_error_visibility_privacy",
+        "n88_teacher_full_read_write_phase_cause_and_ack",
+        "n88_topbar_new_page_clear_link",
+        "n88_changed_source_and_student_carrier_readback"
+      ],
+      "acceptance": [
+        "Deliver specifically reported user journey without silent data loss/duplication or relaxed owner/session/ACK checks.",
+        "Sole publisher verifies served effects; retain actual failure/open status unless genuine acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "Exact new N88 actual read/write latency and input correction",
+        "publication": true,
+        "maxNewChangedServiceOperations": 1,
+        "maxChangedStudentCarriers": 1,
+        "newKeys": 0,
+        "newMigrations": 0,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO20October authorizes these exact fixes and current guarded app behavior via sole publisher. No unrelated schema/Auth/permissions changes.",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "liveAuthorizationRef": "PO-20261020-ACTUAL-1430-N88-COHESIVE-JOURNEY"
+    }
+  ]
+}

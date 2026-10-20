@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-source-authoritative-profile-and-clear-results-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -2899,
+      "scopeKey": "continuous-n36-source-authoritative-profile-and-clear-results-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS/ops contract and exact current Product row/affected source only. New direct PO20October actual followup AFTER verified previous releases. Sole controller and serial publisher; no manual Product executor/queue edit or new reviewer. Preserve original candidates/failures and reuse unchanged proofs; minimum newly affected tests only. N125 explicitly UNDER PO TEST, do not reopen/test its old focus case; accepted CLOSED remain closed, N44 explicit HOLD. No old school automation/tool/browser-custody refusal replay or alternate tab/actor bypass. No real pupil/account mutation/send, credential/key extraction, Authconfig/RLS/roles/schema/SQL/migration unless specifically authorized below. Truthful local vs publication vs actual success; fix concrete full user journey at changed boundary, no more timeouts/retries masquerading as solved service.\nPO ACTUAL acceptance now proves full303/10classes students subjects timetable school/principal; repeat0new303existing; delete2pupils then explicitimport2new301existing works; delete2slots then reimport restores slots. Preserve these successes and histories; no repeat303/school/pagewalker/SQL tests. Teacher name NOT updated; initial unresolved1, after manually changing teacher/principal/school unresolved3. Current saveAvailableSetup fields intentionally skip any differing nonempty profile; current store.importSetupProfile also rejects conflict. This is a conservative policy, not proof extraction missing. NEW EXPLICIT ASYNC ANSWER «اعتماد بيانات مدرستي تلقائيًا عند كل تشغيل»: each explicit user Start should authoritatively apply AVAILABLE source teacherName/principalName(report alias)/schoolName, including nonempty differing existing values. This is exact product behavior authorization, not live manual profile mutation. Absent/ambiguous source must NEVER blank values or invent teacher identity; keep wrong-owner/session/year/term/currentdocument/lease/compare-and-swap guards and atomic profile+outbox write, unknown outcome same batch, no duplicateclass/student/slot, no Authidentity/email change. Inspect actual visible teacher name source and app profile display precedence (account profile vs synced teacher profile) so a receipt does not claim visible update while header/settings keep old identity. Reuse existing supported owner profile path if required; no new provisioning/Authconfig/SQL/RPC. Normal name display/provenance updates within approved own profile only; no broad account data rewrite.\nAlso PO asks if educationDepartment can be extracted. Extend only existing supported authorized VISIBLE source contracts: explicit labeled education administration from currently supported page/context, canonical approved47directory mapping. No new school browsing/hidden APIs/liveautomation, no guessed schoolID→region. Report missing/ambiguous/unrecognized if unavailable. Existing account calendar MUST NOT change when importing department; N117 initial signup calendar mapping is CLOSED and existing-calendar hold remains. Personal3fields source-wins explicitStart policy; valid department metadata may fill/update only when confidently visible and existing supported profile field; preserve region/calendar selection behavior where not explicitly authorized, make conservative current value if ambiguity.\nRevise actual UX from wrong-page start→Rakeez login missing→collection→transfer→repeat/result/cancel/error. User gets clear action-oriented source guidance (e.g. «افتح مدرستي، ثم شغّل الإضافة من صفحتها.» with safe supported Madrasati link), not «المصدر المصرح/التشخيص الاختياري» as main error. Don't auto-read on extension open, trigger real school navigation or create extra source access. Existing explicitStart/Noor manual flow remain separate. Simplify normal panel: one start/progress/result, hide advanced/manual confirmation text and duplicated diagnostic controls within actual closed details; remove obsolete perclassmanual review leftovers from automatic result. Existing approved same account receiver opens/continues directly; no importpage navigation or new perclass confirmation. Label source missing vs conflict vs unsupported vs saved vs alreadycurrent accurately. Results must name finite FIELD LABELS/reasons, not just unresolved counts or misleading repeated 'saved32' for unchanged existing data. Keep private names/values ONLY authorized app UI if necessary, never safe diagnostic/transmitted support; diagnostic may expose allowlisted field keys/reason/count only. Explain original1/3 cannot conclusively identify which field from old numeric diagnostics alone, don't fabricate old conflict values. Improve progress/existingtab CTA copy and concise Sync status, no local-save equals cloud proof. No arbitrary time delays/collection cap; optimize only demonstrated redundant same-run work, no broadbenchmark.\nSince extension bytes change, bump0.5.17 once to nextcurrent version through established package process; keep old immutablezip. Local package/source proof beforepublication, solepublisher source/servedreceipt, existing stable updater installs verified package to artifacts/private-tools/n36-current/runtime. Newversion25files parity is postdelivery and NOT required beforepublication; root verifies actualphysical parity after updater. Don't claim Chrome reloaded automatically. Minimal representative actual store+profile+batch source-wins/absent/foreignowner/retry/CAS rollback test and rendered extension fourstates/actionablewrongpage+unsupported/admin confidence; reuse unchanged extraction/fullSync/studentdelete/slotrestore success. No real portal data read or actual profile change for test.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/store.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/account-profile.js",
+        "src/lib/settings-profile-ui.js",
+        "src/lib/education-department-directory.js",
+        "src/lib/n36-extension-handoff.js",
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "tests/n36-actual-1430-20261020/**",
+        "docs/automation-evidence/20261020/N36_SOURCE_PROFILE_CLEAR_RESULTS.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_explicit_start_source_profile_owner_atomic_retry",
+        "n36_department_supported_visible_source_no_calendar_change",
+        "n36_concise_actionable_extension_results_and_wrong_page",
+        "n36_changed_local_package"
+      ],
+      "acceptance": [
+        "Deliver specifically reported user journey without silent data loss/duplication or relaxed owner/session/ACK checks.",
+        "Sole publisher verifies served effects; retain actual failure/open status unless genuine acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "Explicit PO source-wins for teacher/principal/school on each Start; supported department read; UX fix",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false,
+        "existingCalendarChange": false
+      },
+      "releaseAuthority": "Latest direct PO20October authorizes these exact fixes and current guarded app behavior via sole publisher. No unrelated schema/Auth/permissions changes.",
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "postDeliveryChecks": [
+        "n36_verified_package_stable_folder_parity"
+      ]
+    }
+  ]
+}

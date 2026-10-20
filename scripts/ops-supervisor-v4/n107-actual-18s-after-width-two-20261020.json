@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-actual-18s-after-width-two-20261020",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -2898,
+      "scopeKey": "continuous-n107-actual-18s-after-width-two-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 18,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Read AGENTS/ops contract and exact current Product row/affected source only. New direct PO20October actual followup AFTER verified previous releases. Sole controller and serial publisher; no manual Product executor/queue edit or new reviewer. Preserve original candidates/failures and reuse unchanged proofs; minimum newly affected tests only. N125 explicitly UNDER PO TEST, do not reopen/test its old focus case; accepted CLOSED remain closed, N44 explicit HOLD. No old school automation/tool/browser-custody refusal replay or alternate tab/actor bypass. No real pupil/account mutation/send, credential/key extraction, Authconfig/RLS/roles/schema/SQL/migration unless specifically authorized below. Truthful local vs publication vs actual success; fix concrete full user journey at changed boundary, no more timeouts/retries masquerading as solved service.\nNEW PO ACTUAL timing after1cd644f4004e13ab7baddedc8b95fe10ffe4f34c STILL18seconds. Prior35ms synthetic student1674→930ms is valid but NOT actual endtoend improvement; keep it, DO NOT replay A/B or oldharness/tokencontext/width2boundarysuite. PO asks whether import waits for cloud Sync before success. Answer actual path precisely: creation parents/students/enrollments canonical ACK then reviewedmax ACK then grade durable receipt; distinguish unrelated global trailing pull/outbox work from needed import receipts. Trace current waitForCreation→syncAll(false), push/postpull/revision_validation/refresh + maximum/grade confirmation dependencies; real app27/28name fixture alreadyused, don't construct another fullbenchmark merely prove unchanged expected. Main risk: UI waits whole Sync global work despite required receipts alreadycommitted; identify with SOURCE+one bounded new phase trace only at changed wait/dependency. If finite actual provider metadata useful, ONE new bounded window11:03–11:32UTC aggregate path/status/timing only without users/headers/payload/IP, no poll or another projectwide latency audit. Add minimal safe per-import phase-duration/count diagnostic ONLY if needed to obtain real missing cause, no PII/filename/names/code/studentIDs/JWT/URLs or automatic export/send. Do not pretend aggregate correlation with user's exact18s.\nDeliver safe reduction of genuinely unnecessary waits ONLY if actual composition proves no required revision/max/grade/owner ACK skipped; receipt-specific progress can finish before unrelated trailingSync only with all required canonical parent/context checks, exact matching durablegrade receipt and no later rollback/newreviewcontext. Never immediate localsuccess, drop postpull, ignore sync errors, weaken reviewedmaxcontext, re-send grade on timer, clearfailedoutbox or claim userspeedup unmeasured. If new phase shows network/backendwait genuinelyrequired, save exact limited evidence and clear compact importstage UX/diagnostic where helpful, no speculative transport rewrite/newbulkRPC/schema/Authconfig/SQL. Keep N125 operation-owned revisionvalidation intact and don't call it a speed fix. Preserve existing width2 guards and per-envelopeunknown recovery. Scope sync/cloud/grade-transfer only to run independently ofN36store/class-import-center; read otherfiles allowed but if actual minimalfix needs N36-ownedsource, savecandidate+exactscope dependency and let controller serialize afterN36, no parallelwrite. Ordinary missingfile scope is fixable rootops, not newPOpermission. Minimal affected receipt-vs-unrelatedwork/failure/owner guard trace; no broadSync/browsermatrix. Productactualspeed remains18s until genuine ordinaryusage measurement.",
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/lib/cloud.js",
+        "src/lib/remote-sync.js",
+        "src/lib/grade-transfer.js",
+        "tests/n107-actual-1430-20261020/**",
+        "docs/automation-evidence/20261020/N107_ACTUAL_18S_AFTER_WIDTH_TWO.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync.js"
+      ],
+      "requiredChecks": [
+        "n107_actual_import_required_ack_vs_unrelated_wait_cause"
+      ],
+      "acceptance": [
+        "Deliver specifically reported user journey without silent data loss/duplication or relaxed owner/session/ACK checks.",
+        "Sole publisher verifies served effects; retain actual failure/open status unless genuine acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct PO20October actual feedback and matched product correction",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO20October authorizes these exact fixes and current guarded app behavior via sole publisher. No unrelated schema/Auth/permissions changes.",
+      "sessionId": "01a158b0-7f96-7413-bbd7-133aaa28cc35"
+    }
+  ]
+}
