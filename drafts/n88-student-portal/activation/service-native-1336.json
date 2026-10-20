@@ -1,0 +1,14 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "functionName": "n88-student-portal",
+  "version": 50,
+  "sourceSha256": "2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea",
+  "sourceExact": true,
+  "verifyJwt": false,
+  "importMapUnchanged": true,
+  "priorVersion": 49,
+  "changedFunctionUploads": 1,
+  "ingressUploads": 0,
+  "readinessReplayed": false,
+  "observedAt": "2026-10-20T10:55:47.832Z"
+}
