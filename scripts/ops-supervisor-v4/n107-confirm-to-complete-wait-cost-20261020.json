@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-confirm-to-complete-wait-cost-20261020",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -2590,
+      "scopeKey": "n107-confirm-to-complete-wait-cost-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 18,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-setup-profile-save-direct-bridge-20261020"
+      ],
+      "objective": "Latest direct PO asks what is new on N107 and retains actual repeat measurement18seconds from Confirm to Completed for new class28students/31grades. Successful actual import/no duplicates accepted; only latency remains. Existing controller/publisher only. Read current exact row, affected source and existing saved successful checks. Do NOT re-run old whole import/file/parser/SQL/Auth/school/focus/Sync suites or claim local time equals hosted time. N36 writes overlapping store/import view first, hence dependency; use its final verified main without reverting it.\nTrace actual Confirm→class/name local save→outbox ready/drain→teaching/item/enrollment revision ACK→max-change ACK→grade command receipt→success. Find avoidable fixed waits, duplicated sync/drain reads or unnecessary serial operations from code+one narrow composed controlled-dependency timing trace using existing affected harness, no real account/grades/file. Preserve authoritative max-ACK before reviewed scoring, idempotent same-request recovery, one click, owner/lease/context/staleness/grades+history and actual success receipt. No optimistic completion, timeout reduction removing safety, parallel dependent commands, unbounded spin, general Sync redesign or closedN123 reopen. Optimize only a proven wait/redundant action. If no causal avoidable wait can be proved, keep no-change/blocked honest with phase costs; do not manufacture another UX patch. Bound diagnostics to finite phases/timings, no user identities or payloads, and no extra instrumentation visible as user steps. Native/server schemas and Auth remain unchanged.\nRequired affected proof is actual request/ACK ordering and no duplicate/review regression at changed boundary plus reproducible before/after wait count/phase cost under SAME controlled dependency. Reuse unaffected historical grade/file/max/parser proofs. Do not promise hosted improvement without real measurement, and do not request another user import before this investigation. Save candidate and evidence; sole publisher serves only a substantive qualified fix.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/store.js",
+        "src/lib/sync.js",
+        "src/lib/class-import-file.js",
+        "src/lib/grade-transfer.js",
+        "tests/n107-timing-20261020/**",
+        "docs/automation-evidence/20261020/N107_CONFIRM_WAIT_COST.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n107_proven_wait_cost_before_after_same_dependencies",
+        "n107_affected_ack_order_idempotency_and_owner_guards"
+      ],
+      "acceptance": [
+        "Only a proven avoidable wait is changed; actual hosted18seconds remains last real measurement unless new legitimate observation.",
+        "Preserve grades/ACK/context and one-click import; serial publisher verifies affected served source."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct PO measured18seconds and requests completing remaining open work",
+        "publication": true,
+        "realUserMutation": false,
+        "realSend": false,
+        "serviceSchemaChange": false
+      },
+      "releaseAuthority": "Current direct PO authorizes specific import latency improvement through sole publisher; no real import, SQL/Auth/RLS/service mutation."
+    }
+  ]
+}
