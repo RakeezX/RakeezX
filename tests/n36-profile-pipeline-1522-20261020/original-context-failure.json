@@ -1,0 +1,72 @@
+{
+  "sourceSha": "8afa42609cdd9ec228169fc01fd9c985444417bf",
+  "projection": {
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "raw": {
+      "id": "n73-term",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "yearId": "n73-year",
+      "name": "الفصل الدراسي الأول",
+      "index": 1,
+      "startDate": null,
+      "endDate": null,
+      "status": "active",
+      "calendarId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    "display": {
+      "id": "n73-term",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "yearId": "n73-year",
+      "name": "الفصل الدراسي الأول",
+      "index": 1,
+      "startDate": "2026-08-30",
+      "endDate": "2027-01-07",
+      "status": "active",
+      "calendarId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "officialStartDate": "2026-08-30",
+      "officialEndDate": "2027-01-07",
+      "dateSource": "official"
+    }
+  },
+  "serializedReceipt": [
+    {
+      "status": "unknown",
+      "added": 0,
+      "existing": 0,
+      "remaining": 1,
+      "total": 1,
+      "failure": {
+        "phase": "batch",
+        "step": "validation",
+        "code": "BATCH_PERSISTED_CONTEXT_CHANGED"
+      }
+    }
+  ],
+  "diagnostic": {
+    "valid": 1,
+    "staged": 1,
+    "observed": 1,
+    "excluded": 0,
+    "classes": 1,
+    "processedPages": 1,
+    "currentPage": 1,
+    "stage": "unresolved",
+    "coverage": "complete",
+    "terminal": "explicit-next",
+    "endpoint": "none",
+    "hasNext": false,
+    "disabledNext": true,
+    "transfer": "error",
+    "receipt": "unknown",
+    "failure": "BATCH_PERSISTED_CONTEXT_CHANGED",
+    "failurePhase": "batch",
+    "failureStep": "validation",
+    "fieldResults": []
+  }
+}

@@ -1,0 +1,844 @@
+{
+  "profile": [
+    {
+      "id": "profile",
+      "updatedAt": 1792500488316,
+      "deleted": false,
+      "teacherName": "معلم قديم",
+      "schoolName": "مدرسة قديمة",
+      "phone": "",
+      "teacherForm": "masculine",
+      "educationDepartment": null,
+      "reportPrincipalName": "مدير قديم",
+      "principalName": "مدير قديم",
+      "activeTimeProfileId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "device": [
+    {
+      "id": "device",
+      "updatedAt": 1792500489909,
+      "deleted": false,
+      "theme": "light",
+      "activeYearId": "n73-year",
+      "activeTermId": "n73-term",
+      "activeTimeProfileId": "time-profile:default:hybrid",
+      "reportPrincipalName": "",
+      "lastSyncAt": null,
+      "schemaVersion": 8,
+      "deviceId": "n73-synthetic-device",
+      "teacherName": "اسم جهاز قديم",
+      "accountProvisioningReceipt": {
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "contractVersion": 1,
+        "foundationHash": "n36-browser-synthetic"
+      },
+      "n36NamesBatch": {
+        "batchId": "1c2fb79f6f61e17d521f42f8ef110ca71fbc6a58ae60211aa1ac131a4104d3d5",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "receipts": {
+          "ef3b249f7edaee91ea62b7c8859c1c122c1f79d13219b18b8c8549b6fd9f98e1": {
+            "status": "saved",
+            "added": 1,
+            "existing": 0,
+            "remaining": 0,
+            "total": 1,
+            "setup": {
+              "saved": 0,
+              "existing": 1,
+              "unresolved": 3,
+              "missing": [
+                "timetable"
+              ]
+            }
+          }
+        },
+        "pending": null,
+        "yearId": "n73-year",
+        "termId": "n73-term"
+      }
+    }
+  ],
+  "timeProfiles": [
+    {
+      "id": "time-profile:default:hybrid",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "name": "التوقيت المدمج",
+      "periods": [
+        {
+          "period": 1,
+          "start": "07:00",
+          "end": "07:30"
+        },
+        {
+          "period": 2,
+          "start": "07:30",
+          "end": "08:00"
+        },
+        {
+          "period": 3,
+          "start": "08:00",
+          "end": "08:30"
+        },
+        {
+          "period": 4,
+          "start": "08:30",
+          "end": "09:00"
+        },
+        {
+          "period": 5,
+          "start": "09:00",
+          "end": "09:30"
+        },
+        {
+          "period": 6,
+          "start": "09:30",
+          "end": "10:00"
+        },
+        {
+          "period": 7,
+          "start": "10:00",
+          "end": "10:30"
+        },
+        {
+          "period": 8,
+          "start": "10:30",
+          "end": "11:00"
+        }
+      ],
+      "overrides": {
+        "config": {
+          "type": "hybrid",
+          "gap": 0,
+          "assembly": {
+            "enabled": false
+          },
+          "firstPeriodStart": "07:00",
+          "periodDuration": 30,
+          "count": 8,
+          "recess": {
+            "enabled": false
+          }
+        },
+        "remote": [
+          {
+            "period": 1,
+            "start": "07:00",
+            "end": "07:30"
+          },
+          {
+            "period": 2,
+            "start": "07:30",
+            "end": "08:00"
+          },
+          {
+            "period": 3,
+            "start": "08:00",
+            "end": "08:30"
+          },
+          {
+            "period": 4,
+            "start": "08:30",
+            "end": "09:00"
+          },
+          {
+            "period": 5,
+            "start": "09:00",
+            "end": "09:30"
+          },
+          {
+            "period": 6,
+            "start": "09:30",
+            "end": "10:00"
+          },
+          {
+            "period": 7,
+            "start": "10:00",
+            "end": "10:30"
+          },
+          {
+            "period": 8,
+            "start": "10:30",
+            "end": "11:00"
+          }
+        ]
+      },
+      "order": 0,
+      "activeFrom": null,
+      "activeTo": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "time-profile:default:ramadan",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "name": "توقيت رمضان",
+      "periods": [
+        {
+          "period": 1,
+          "start": "09:00",
+          "end": "09:35"
+        },
+        {
+          "period": 2,
+          "start": "09:35",
+          "end": "10:10"
+        },
+        {
+          "period": 3,
+          "start": "10:10",
+          "end": "10:45"
+        },
+        {
+          "period": 4,
+          "start": "10:45",
+          "end": "11:20"
+        },
+        {
+          "period": 5,
+          "start": "11:20",
+          "end": "11:55"
+        },
+        {
+          "period": 6,
+          "start": "11:55",
+          "end": "12:30"
+        }
+      ],
+      "overrides": {
+        "config": {
+          "type": "ramadan",
+          "gap": 0,
+          "assembly": {
+            "enabled": false
+          },
+          "firstPeriodStart": "09:00",
+          "periodDuration": 35,
+          "count": 6,
+          "recess": {
+            "enabled": false
+          }
+        }
+      },
+      "order": 0,
+      "activeFrom": null,
+      "activeTo": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "time-profile:default:summer",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "name": "التوقيت الصيفي",
+      "periods": [
+        {
+          "period": 1,
+          "start": "07:00",
+          "end": "07:45"
+        },
+        {
+          "period": 2,
+          "start": "07:45",
+          "end": "08:30"
+        },
+        {
+          "period": 3,
+          "start": "08:55",
+          "end": "09:40",
+          "grades": [
+            4
+          ]
+        },
+        {
+          "period": 3,
+          "start": "08:30",
+          "end": "09:15"
+        },
+        {
+          "period": 4,
+          "start": "09:40",
+          "end": "10:25"
+        },
+        {
+          "period": 5,
+          "start": "10:25",
+          "end": "11:10"
+        },
+        {
+          "period": 6,
+          "start": "11:10",
+          "end": "11:55"
+        },
+        {
+          "period": 7,
+          "start": "11:55",
+          "end": "12:40"
+        }
+      ],
+      "overrides": {
+        "config": {
+          "type": "summer",
+          "gap": 0,
+          "assembly": {
+            "enabled": true,
+            "start": "06:45",
+            "duration": 15
+          },
+          "firstPeriodStart": "07:00",
+          "periodDuration": 45,
+          "count": 7,
+          "recess": {
+            "enabled": true,
+            "duration": 20,
+            "transition": 5,
+            "rules": [
+              {
+                "grades": [
+                  4
+                ],
+                "afterPeriod": 2
+              },
+              {
+                "grades": [
+                  5,
+                  6
+                ],
+                "afterPeriod": 3
+              }
+            ]
+          }
+        }
+      },
+      "order": 0,
+      "activeFrom": null,
+      "activeTo": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "time-profile:default:winter",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "name": "التوقيت الشتوي",
+      "periods": [
+        {
+          "period": 1,
+          "start": "07:30",
+          "end": "08:15"
+        },
+        {
+          "period": 2,
+          "start": "08:15",
+          "end": "09:00"
+        },
+        {
+          "period": 3,
+          "start": "09:20",
+          "end": "10:05",
+          "grades": [
+            4
+          ]
+        },
+        {
+          "period": 3,
+          "start": "09:00",
+          "end": "09:45"
+        },
+        {
+          "period": 4,
+          "start": "10:05",
+          "end": "10:50"
+        },
+        {
+          "period": 5,
+          "start": "10:50",
+          "end": "11:35"
+        },
+        {
+          "period": 6,
+          "start": "11:35",
+          "end": "12:20"
+        },
+        {
+          "period": 7,
+          "start": "12:20",
+          "end": "13:05"
+        }
+      ],
+      "overrides": {
+        "config": {
+          "type": "winter",
+          "gap": 0,
+          "assembly": {
+            "enabled": true,
+            "start": "07:15",
+            "duration": 15
+          },
+          "firstPeriodStart": "07:30",
+          "periodDuration": 45,
+          "count": 7,
+          "recess": {
+            "enabled": true,
+            "duration": 20,
+            "transition": 0,
+            "rules": [
+              {
+                "grades": [
+                  4
+                ],
+                "afterPeriod": 2
+              },
+              {
+                "grades": [
+                  5,
+                  6
+                ],
+                "afterPeriod": 3
+              }
+            ]
+          }
+        }
+      },
+      "order": 0,
+      "activeFrom": null,
+      "activeTo": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "meta": [],
+  "years": [
+    {
+      "id": "n73-year",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "label": "1448-1449",
+      "hijriStart": 1448,
+      "hijriEnd": 1449,
+      "order": 1448,
+      "status": "active",
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "calendarPresetId": "sa-western-1448-1449"
+    }
+  ],
+  "terms": [
+    {
+      "id": "n73-term",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "yearId": "n73-year",
+      "name": "الفصل الدراسي الأول",
+      "index": 1,
+      "startDate": null,
+      "endDate": null,
+      "status": "active",
+      "calendarId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "tm:n73-year:2",
+      "updatedAt": 1792500488317,
+      "deleted": false,
+      "yearId": "n73-year",
+      "name": "الفصل الدراسي الثاني",
+      "index": 2,
+      "startDate": null,
+      "endDate": null,
+      "status": "upcoming",
+      "calendarId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "subjects": [
+    {
+      "id": "n73-subject",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "name": "N73 synthetic",
+      "slug": "n73-synthetic",
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "sections": [
+    {
+      "id": "n73-second-section",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "yearId": "n73-year",
+      "grade": 5,
+      "label": "3",
+      "name": "5/3",
+      "color": "#0d9488",
+      "order": 0,
+      "status": "active",
+      "archivedAt": null,
+      "archiveDate": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-source-section",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "yearId": "n73-year",
+      "grade": 5,
+      "label": "1",
+      "name": "5/1",
+      "color": "#0d9488",
+      "order": 0,
+      "status": "active",
+      "archivedAt": null,
+      "archiveDate": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-target-section",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "yearId": "n73-year",
+      "grade": 5,
+      "label": "2",
+      "name": "5/2",
+      "color": "#0d9488",
+      "order": 0,
+      "status": "active",
+      "archivedAt": null,
+      "archiveDate": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "teachings": [
+    {
+      "id": "n73-second",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "sectionId": "n73-second-section",
+      "subjectId": "n73-subject",
+      "termId": "n73-term",
+      "order": 0,
+      "name": "N73 synthetic",
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-source",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "sectionId": "n73-source-section",
+      "subjectId": "n73-subject",
+      "termId": "n73-term",
+      "order": 0,
+      "name": "N73 synthetic",
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-target",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "sectionId": "n73-target-section",
+      "subjectId": "n73-subject",
+      "termId": "n73-term",
+      "order": 0,
+      "name": "N73 synthetic",
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "students": [
+    {
+      "id": "3b429262-1ab2-4801-a922-8223320b3488",
+      "updatedAt": 1792500492193,
+      "deleted": false,
+      "name": "طالب اصطناعي",
+      "note": "",
+      "status": "active",
+      "canonicalId": "3b429262-1ab2-4801-a922-8223320b3488",
+      "serverRevision": 0,
+      "syncCreatePending": true
+    },
+    {
+      "id": "n73-student1",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "name": "Synthetic 1",
+      "note": "",
+      "status": "active",
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-student2",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "name": "Synthetic 2",
+      "note": "",
+      "status": "active",
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "enrollments": [
+    {
+      "id": "en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+      "updatedAt": 1792500492193,
+      "deleted": false,
+      "studentId": "3b429262-1ab2-4801-a922-8223320b3488",
+      "sectionId": "n73-source-section",
+      "rollNo": 1,
+      "startDate": "2026-10-20",
+      "endDate": null,
+      "status": "active",
+      "transferNote": "",
+      "canonicalId": "en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+      "serverRevision": 0,
+      "syncCreatePending": true
+    }
+  ],
+  "items": [
+    {
+      "id": "n73-extra",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "teachingId": "n73-target",
+      "name": "Extra",
+      "max": 5,
+      "order": 1,
+      "auto": null,
+      "scoreMode": "direct",
+      "distributionMode": null,
+      "portabilityGroupId": null,
+      "distributionOriginId": null,
+      "distributionVersion": 1,
+      "perPoint": 1,
+      "penalty": 1,
+      "unitId": null,
+      "lessonId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-source-exam",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "teachingId": "n73-source",
+      "name": "Exam",
+      "max": 20,
+      "order": 0,
+      "auto": null,
+      "scoreMode": "direct",
+      "distributionMode": null,
+      "portabilityGroupId": null,
+      "distributionOriginId": null,
+      "distributionVersion": 1,
+      "perPoint": 1,
+      "penalty": 1,
+      "unitId": null,
+      "lessonId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-target-exam",
+      "updatedAt": 1792500488318,
+      "deleted": false,
+      "teachingId": "n73-target",
+      "name": "Exam",
+      "max": 25,
+      "order": 0,
+      "auto": null,
+      "scoreMode": "direct",
+      "distributionMode": null,
+      "portabilityGroupId": null,
+      "distributionOriginId": null,
+      "distributionVersion": 1,
+      "perPoint": 1,
+      "penalty": 1,
+      "unitId": null,
+      "lessonId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "scoreSubitems": [],
+  "scoreSubitemCompletions": [],
+  "scores": [
+    {
+      "id": "n73-cap",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student1",
+      "value": 23,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-extra-score",
+      "itemId": "n73-extra",
+      "studentId": "n73-student1",
+      "value": 4,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-source-score",
+      "itemId": "n73-source-exam",
+      "studentId": "n73-student1",
+      "value": 19,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    }
+  ],
+  "slots": [],
+  "sessions": [],
+  "sessionRosterSnapshots": [],
+  "attendance": [],
+  "logs": [],
+  "calendars": [],
+  "calendarDays": [],
+  "units": [],
+  "lessons": [],
+  "notes": [],
+  "classRules": [],
+  "classGoals": [],
+  "classCharterSelections": [],
+  "groupArrangements": [],
+  "closedTermReports": [],
+  "assignments": [],
+  "submissions": [],
+  "outbox": [
+    {
+      "id": "v2:01daca83-f1aa-4e55-824e-b8badcbc2077",
+      "protocol": "v2",
+      "mutationId": "01daca83-f1aa-4e55-824e-b8badcbc2077",
+      "deviceId": "n73-synthetic-device",
+      "store": "enrollments",
+      "entity": "enrollments",
+      "recordId": "en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+      "serverRecordId": "en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+      "canonicalId": "en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+      "logicalRecordKey": "enrollments:en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+      "op": "create",
+      "baseRevision": 0,
+      "patch": {
+        "student_id": "3b429262-1ab2-4801-a922-8223320b3488",
+        "section_id": "n73-source-section",
+        "start_date": "2026-10-20",
+        "end_date": null,
+        "status": "active",
+        "roll_no": 1,
+        "transfer_note": ""
+      },
+      "localPatch": {
+        "id": "en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+        "updatedAt": 1792500492193,
+        "deleted": false,
+        "studentId": "3b429262-1ab2-4801-a922-8223320b3488",
+        "sectionId": "n73-source-section",
+        "rollNo": 1,
+        "startDate": "2026-10-20",
+        "endDate": null,
+        "status": "active",
+        "transferNote": "",
+        "canonicalId": "en:3b429262-1ab2-4801-a922-8223320b3488:n73-source-section",
+        "serverRevision": 0,
+        "syncCreatePending": true
+      },
+      "fields": [
+        "end_date",
+        "roll_no",
+        "section_id",
+        "start_date",
+        "status",
+        "student_id",
+        "transfer_note"
+      ],
+      "groups": [],
+      "dependencies": [
+        {
+          "store": "students",
+          "recordId": "3b429262-1ab2-4801-a922-8223320b3488",
+          "requiresServerRevision": true
+        },
+        {
+          "store": "sections",
+          "recordId": "n73-source-section",
+          "requiresServerRevision": true
+        }
+      ],
+      "sequence": 1792500492198000,
+      "clientUpdatedAt": 1792500492193,
+      "queuedAt": 1792500492193,
+      "state": "pending",
+      "attemptCount": 0,
+      "envelopeLocked": false,
+      "lastError": null,
+      "blockedReason": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001"
+    },
+    {
+      "id": "v2:36ffc489-9582-4353-8cbc-10994bc434b4",
+      "protocol": "v2",
+      "mutationId": "36ffc489-9582-4353-8cbc-10994bc434b4",
+      "deviceId": "n73-synthetic-device",
+      "store": "students",
+      "entity": "students",
+      "recordId": "3b429262-1ab2-4801-a922-8223320b3488",
+      "serverRecordId": "3b429262-1ab2-4801-a922-8223320b3488",
+      "canonicalId": "3b429262-1ab2-4801-a922-8223320b3488",
+      "logicalRecordKey": "students:3b429262-1ab2-4801-a922-8223320b3488",
+      "op": "create",
+      "baseRevision": 0,
+      "patch": {
+        "name": "طالب اصطناعي",
+        "note": "",
+        "status": "active"
+      },
+      "localPatch": {
+        "id": "3b429262-1ab2-4801-a922-8223320b3488",
+        "updatedAt": 1792500492193,
+        "deleted": false,
+        "name": "طالب اصطناعي",
+        "note": "",
+        "status": "active",
+        "canonicalId": "3b429262-1ab2-4801-a922-8223320b3488",
+        "serverRevision": 0,
+        "syncCreatePending": true
+      },
+      "fields": [
+        "name",
+        "note",
+        "status"
+      ],
+      "groups": [],
+      "dependencies": [],
+      "sequence": 1792500492197000,
+      "clientUpdatedAt": 1792500492193,
+      "queuedAt": 1792500492193,
+      "state": "pending",
+      "attemptCount": 0,
+      "envelopeLocked": false,
+      "lastError": null,
+      "blockedReason": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001"
+    }
+  ]
+}

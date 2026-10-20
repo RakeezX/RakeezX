@@ -6,6 +6,7 @@
  const assets = new Set(['popup.js','categories-popup.js','run-controller.js','handoff-protocol.js','handoff-worker.js','diagnostics-bootstrap.js','route-diagnostics.js','source-roster.js','source-adapter.js','selection.js','core.js','categories.js','navigation.js','class-order.js','rakeez-datetime.js','rakeez-datetime-values.js']);
  const modules = {'popup.js':'not-available','categories-popup.js':'not-available','run-controller.js':'not-available'};
  const enums = {
+  receiverCapability:['source-profile-quiet-v1','unknown'],setupPhase:['none','source','envelope','receipt','receiver-update'],
   stage:['idle','collecting','review','partial','paused','cancelled','expired','error','saving','saved','unresolved'],
   coverage:['complete','partial','paused','unknown'], terminal:['unproven','explicit-next','observed-anchor'],
   endpoint:['none','ambiguous','anchor','span'], transfer:['idle','sending','pending','error','unknown'],
@@ -13,16 +14,17 @@
   receipt:['not-available','pending','saved','existing','unknown','expired'],
   failurePhase:['none','profile','batch'],failureStep:['none','validation','transaction','readback']
  };
- enums.failure.push('SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
+ enums.failure.push('APP_UPDATE_REQUIRED','APP_FINISH_CURRENT_EDIT','SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
  const numbers = ['valid','staged','observed','excluded','classes','processedPages','currentPage'];
- const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none',fieldResults:[]});
+ const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none',fieldResults:[],setupPhase:'none',setupFields:[],receiverCapability:'unknown'});
  let state=fresh(), errors=[], background='not-available';
  const ownValue=(o,k)=>Object.getOwnPropertyDescriptor(o,k)?.value;
  function publish(input) {
   if (!input || ![Object.prototype,null].includes(Object.getPrototypeOf(input))) return;
   for(const k of Object.keys(input)) {
    const v=ownValue(input,k);
-   if(k==='fieldResults'&&Array.isArray(v))state.fieldResults=v.slice(0,36).filter(d=>d&&['teacher','school','principal','department','classes','timetable'].includes(ownValue(d,'field'))&&['saved','current','missing','conflict','unsupported','ambiguous','unrecognized'].includes(ownValue(d,'reason'))&&Number.isSafeInteger(ownValue(d,'count'))&&d.count>0&&d.count<=1200).map(d=>({field:d.field,reason:d.reason,count:d.count}));
+   if(k==='setupFields'&&Array.isArray(v))state.setupFields=v.filter(f=>['teacher','school','principal','department','classes','timetable'].includes(f)).slice(0,6);
+   else if(k==='fieldResults'&&Array.isArray(v))state.fieldResults=v.slice(0,36).filter(d=>d&&['teacher','school','principal','department','classes','timetable'].includes(ownValue(d,'field'))&&['saved','current','missing','conflict','unsupported','ambiguous','unrecognized','navigation-required'].includes(ownValue(d,'reason'))&&Number.isSafeInteger(ownValue(d,'count'))&&d.count>0&&d.count<=1200).map(d=>({field:d.field,reason:d.reason,count:d.count}));
    else if(numbers.includes(k)) state[k]=Number.isSafeInteger(v)&&v>=0&&v<=1000000?v:null;
    else if(Object.hasOwn(enums,k)) state[k]=enums[k].includes(v)?v:(k==='stage'?'error':k==='terminal'?'unproven':k==='endpoint'?'none':k==='receipt'?'not-available':'unknown');
    else if(['hasNext','disabledNext'].includes(k)) state[k]=typeof v==='boolean'?v:null;

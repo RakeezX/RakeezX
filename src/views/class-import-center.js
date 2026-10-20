@@ -18,7 +18,7 @@ import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding, reviewGradeTransfer } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
 import { handoffRequest, claimHandoff, reportHandoffOutcome, validateHandoff } from '../lib/n36-extension-handoff.js';
-import { HANDOFF_TTL } from '../lib/n36-extension-protocol.js';
+import { HANDOFF_TTL, RECEIVER_CAPABILITY } from '../lib/n36-extension-protocol.js';
 
 
 
@@ -153,7 +153,7 @@ export function prepareExtensionBatch(){
  if(prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId&&
     (prior.yearId!==store.activeYear().id||prior.termId!==store.activeTerm().id))throw Error('BATCH_PENDING_OTHER_TERM');
  const id=prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId?prior.batchId:[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
- automaticBatch={id,binding,session:cloud.session,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
+ automaticBatch={id,binding,session:cloud.session,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000};
  resumeCancelled=false;
  return id;
 }
@@ -161,6 +161,7 @@ export function prepareExtensionBatch(){
 let receiverInstalled=false, resumeAttempt=null, resumeCancelled=false;
 export function installExtensionBridge(){
  if(receiverInstalled)return;receiverInstalled=true;
+ window.rakeezNamesCapability=()=>RECEIVER_CAPABILITY;
  window.rakeezBeginNamesBatch=prepareExtensionBatch;
  window.rakeezCancelNamesBatch=id=>{if(automaticBatch?.id===id){automaticBatch=null;resumeCancelled=true;}};
  window.rakeezCheckNamesBatch=id=>{
@@ -189,7 +190,7 @@ async function resumeSavedExtensionBatch(){
    const envelope=validateHandoff({schema:'rakeez-extension-names',version:pending.setup?3:2,source:'madrasati',scope:'reviewed-run',createdAt:stamp,expiresAt:stamp+HANDOFF_TTL,batchId:p.batchId,...pending});
    await saveAutomaticNames({envelope});
   }
-  toast('استُكملت الدفعة المحفوظة لهذا الحساب محليًا. المزامنة لم تتأكد بعد.');
+  extensionMessage='';
  }catch(error){extensionMessage='الدفعة محفوظة ولم يتأكد اكتمالها: '+error.message;}
  repaint();
 }
@@ -387,7 +388,8 @@ async function saveAutomaticNames(result){
     ...(changed?{receiptHistory:[...(p.receiptHistory??[]),{digest,receipt:priorReceipt,targets:priorTargets??null}]}:{}),
     receipts:{...p.receipts,[digest]:outcome},receiptTargets:{...p.receiptTargets,[digest]:targets}};
   });
-  extensionMessage=`حُفظت الدفعة محليًا: ${added} جديد، ${existing} موجود سابقًا. ${setup?`حقول إعداد حُدثت: ${setup.saved}؛ مطابقة مسبقًا: ${setup.existing}؛ تحتاج مراجعة: ${setup.unresolved}؛ فئات غير متاحة: ${setup.missing.length}.`:''} ${envelope.complete?'':'الكشف غير مكتمل؛ لم تُفترض أسماء الصفحات غير المحسومة.'} المزامنة لم تتأكد بعد.`;
+  extensionMessage=''; // Direct success lives only in the initiating extension, never per-class app toast.
+
   return outcome;
  }finally{automaticWriting=false;batch.route=null;}
 }
@@ -404,7 +406,7 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>استورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.18.zip" download>تنزيل إضافة ركيز 0.5.18</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.19.zip" download>تنزيل إضافة ركيز 0.5.19</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
@@ -425,8 +427,8 @@ async function receiveExtension(directRequest=null) {
     const result=await claimHandoff(request);
     if(location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
     if(result.envelope.version>=2){
-      try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);if(directRequest)toast(extensionMessage);}
-      catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+').'+reason+' التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.';await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length,failure:safeBatchFailure(error)});if(directRequest)toast(extensionMessage,'danger');}
+      try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);}
+      catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+').'+reason+(store.state.device?.n36NamesBatch?.pending?' التقدم المسجل محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.':' لم يتأكد تسجيل دفعة للاستكمال؛ أبقِ التشغيل في الإضافة وصحح السبب ثم أعد المحاولة.');await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length,failure:safeBatchFailure(error)});if(directRequest)toast(extensionMessage,'danger');}
       return;
     }
     extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
@@ -1061,7 +1063,7 @@ export const koshoofCenter = {
       if(automaticWriting)return;
       const p=store.state.device?.n36NamesBatch;if(!p?.pending||p.ownerId!==store.getActiveWorkspace()?.authUserId)return;
       try{
-       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
+       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000};
        await batchCheckpoint(automaticBatch,current=>({...current,classMappings:{...current.classMappings,[event.target.dataset.classroom]:event.target.value}}));
        extensionMessage='حُفظت مطابقة الفصل لهذه الدفعة فقط. اضغط الاستكمال للتحقق والحفظ.';
       }catch(error){extensionMessage='تعذّر اعتماد المطابقة: '+error.message;}repaint();
@@ -1082,7 +1084,7 @@ export const koshoofCenter = {
       const p=store.state.device?.n36NamesBatch;if(!p?.pending||p.ownerId!==store.getActiveWorkspace()?.authUserId)return;
       try{
        // Fresh explicit resume, never automatic continuation into a switched account/session.
-       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
+       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000};
        for(const pending of Object.values(p.pending))await saveAutomaticNames({envelope:{version:pending.setup?3:2,batchId:p.batchId,...pending}});
       }catch(error){extensionMessage='الدفعة محفوظة ولم يتأكد اكتمالها: '+error.message;}repaint();
     },
