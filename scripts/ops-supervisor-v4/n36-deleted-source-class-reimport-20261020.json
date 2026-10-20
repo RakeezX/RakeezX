@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-deleted-source-class-reimport-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -2799,
+      "scopeKey": "continuous-n36-deleted-source-class-reimport-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Latest direct PO20October reports actual failure AFTER published corrections. Read current origin/main affected source, exact Product row, AGENTS/ops contract only. Sole existing controller and serial publisher; no manual worker/queue edit. Preserve candidates and actual failures. Minimal checks related to the NEW cause only; reuse unchanged proof. No full suite, repeated old readiness/focus/school/browser tests, new planner or broad audit. No real account/pupil mutation/send, Auth configuration, SQL/migration/RLS/roles/keys/passwords unless explicitly authorized below. N44 remains explicit HOLD; accepted unrelated tickets remain CLOSED. Prior actual tool, school and browser-ownership refusals remain binding: never retry via another tool/actor/tab. Truthful LOCAL_READY vs publication vs actual account success; a synthetic fixture/source parity cannot close this umbrella or prove the reported live journey.\n\n\nNEW ACTUAL13:36RIYADH20OCTOBER:\nActual0.5.17 collection303/10/7 successful, transfer receipt unknown failure CLASS_ARCHIVED_OR_AMBIGUOUS, phasebatch stepvalidation. PO explicitly says classes previously DELETED in same account, now wants one-start reimport. Current sourceSection class-import-center.js line200 matches all year/grade/label including deleted and archived; ensureSourceSection persisted create guard also rejects deleted matches. Distinguish active unique, archived, tombstoned and true ambiguous active matches. Latest explicit Start may safely create a genuinely NEW section identity after deletion, through normal existing create paths and current owner/year/term/lease guards; NEVER restore/reuse deleted identity/history/enrollments, drop tombstone, weaken remote delete or resurrect old commands. If unique active match exists, reuse only it; multiple active matches remain unresolved; archived live section must never silently unarchive or duplicate. Saved batch classMappings/receipts may point to deleted previous IDs: preserve provenance and resolve/retry correct NEW identity without duplicate repeated retry. Whole-batch automatic persisted guard and section create race validation must agree. Use same-account saved batch, no recollection/no navigation/perclass confirmation. Reuse0.5.17 profile transaction/direct receiver successes unchanged. Minimal actual app+IndexedDB representative deletion→explicit-start→new-identity→retry plus active ambiguity/archive/foreign-context fences, not303school/SQL/fullSync. No schema/migration/delete operation or real school automation. App-only fix should not bump/repackage unchanged extension; if actual changed extension bytes necessary, bump once and use established publisher/package+postdelivery stable installer, never require new stable folder prepublication. Keep absent source fields honest. No app.js/cloud/sync.js writes to allow N117/N125 independence.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/lib/extension-import-batch.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/class-import.js",
+        "src/lib/rakeez-bundle-import.js",
+        "tests/n36-deleted-reimport-20261020/**",
+        "docs/automation-evidence/20261020/N36_DELETED_SOURCE_CLASS.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_deleted_class_fresh_identity_retry_and_active_archive_fences"
+      ],
+      "acceptance": [
+        "Correct the specific new reported cause with affected proof; preserve previous valid checks and real user data.",
+        "Existing sole publisher proves actual served result; local success alone does not close actual failed journey."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct latest PO actual failure correction",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO20October authorizes specific corrections and guarded release via sole publisher; no unrelated service/schema/Auth change.",
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e"
+    }
+  ]
+}

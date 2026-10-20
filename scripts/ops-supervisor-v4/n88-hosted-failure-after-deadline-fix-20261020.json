@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-hosted-failure-after-deadline-fix-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -2798,
+      "scopeKey": "continuous-n88-hosted-failure-after-deadline-fix-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Latest direct PO20October reports actual failure AFTER published corrections. Read current origin/main affected source, exact Product row, AGENTS/ops contract only. Sole existing controller and serial publisher; no manual worker/queue edit. Preserve candidates and actual failures. Minimal checks related to the NEW cause only; reuse unchanged proof. No full suite, repeated old readiness/focus/school/browser tests, new planner or broad audit. No real account/pupil mutation/send, Auth configuration, SQL/migration/RLS/roles/keys/passwords unless explicitly authorized below. N44 remains explicit HOLD; accepted unrelated tickets remain CLOSED. Prior actual tool, school and browser-ownership refusals remain binding: never retry via another tool/actor/tab. Truthful LOCAL_READY vs publication vs actual account success; a synthetic fixture/source parity cannot close this umbrella or prove the reported live journey.\n\n\nNEW ACTUAL13:36RIYADH20OCTOBER:\nActual teacher initial class read STILL fails afterad691cd65b97a06ee8e9e2250cd69b295e41f3ce verified09:35:42Z: loading→connection error and/or deadline failure with retry. Prior abort/queue/stable binding fixes are LOCAL causes only and did NOT settle actual incident. Diagnose ONE bounded new hosted operational window20Oct10:14–10:40UTC using existing original custodian/integration channel, finite stage/status/duration/source keys aggregate only, no raw payload/userIDs/IP/tokens. Do not repoll old noentries window or replay consumed signed readiness. If no actual correlation available, preserve uncertainty and trace default actual supported request code. Find concrete cause at real ingress/Edge49/Auth/repository/SQL connection stage, not just more retry/deadline UI. Keep last failure phase/code and business-vsHTTP200 distinction. Do not claim definitive success from syntheticfixture or carrier parity. Continue ORIGINAL custodian01a14fc3-b292-7390-9952-8549a286c80f and existing owned bridge; old consumed marker never replayed, browser-tab custody refusal binding. No another actor/tab/key/service-role/credential route. Native49 baselineSHA420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253 unchanged is not new deployment authority. If ONE concrete needed source correction is causally qualified locally, existing original custodian may apply ONE changed Edgefunction OR changed ingress source update through existing supported deployment path with exact readback; no unchanged upload/newkeys/Authconfig/migration/ACL/RLS/bindings change or real teacher mutation. Mere operational metadata refusal must be recorded and not bypassed.\nAlso move link to actual TOP BAR of teacher class portal and label EXACT «بوابة دخول الطالب». Avoid duplicate heading/link or inner delayed content placement; use existing topbar API/component and compact responsive Rakeez styling/accessibility. Student page accepted identity unchanged. Minimal affected causal regression at changed boundary and header DOM/size inspection only; no whole service or live pupil journey replay. Scope cloud.js excluded to keep N125 independent; if proven needed serialize via dependency.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/teachings.js",
+        "src/styles/student-portal-class.css",
+        "src/lib/support.js",
+        "supabase/functions/**",
+        "drafts/n88-student-portal/**",
+        "tests/n88-hosted-failure-20261020/**",
+        "docs/automation-evidence/20261020/N88_HOSTED_FAILURE_1336.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_new_hosted_failure_cause_and_preserved_guards",
+        "n88_top_bar_student_gateway_link"
+      ],
+      "acceptance": [
+        "Correct the specific new reported cause with affected proof; preserve previous valid checks and real user data.",
+        "Existing sole publisher proves actual served result; local success alone does not close actual failed journey."
+      ],
+      "preparationAuthority": {
+        "kind": "Existing original-custodian exact cause correction only",
+        "publication": true,
+        "maxChangedFunctionDeploys": 1,
+        "maxChangedIngressDeploys": 1,
+        "newKeys": 0,
+        "newMigrations": 0,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO20October authorizes specific corrections and guarded release via sole publisher; no unrelated service/schema/Auth change.",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "liveAuthorizationRef": "PO-20261020-N88-ACTUAL-HOSTED-FAILURE-EXACT-CORRECTION"
+    }
+  ]
+}

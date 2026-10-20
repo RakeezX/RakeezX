@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n125-revision-validation-actual-evidence-20261020",
+      "productId": "N125",
+      "activationId": "po-20261012-continuous",
+      "priority": -2800,
+      "scopeKey": "continuous-n125-revision-validation-actual-evidence-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Latest direct PO20October reports actual failure AFTER published corrections. Read current origin/main affected source, exact Product row, AGENTS/ops contract only. Sole existing controller and serial publisher; no manual worker/queue edit. Preserve candidates and actual failures. Minimal checks related to the NEW cause only; reuse unchanged proof. No full suite, repeated old readiness/focus/school/browser tests, new planner or broad audit. No real account/pupil mutation/send, Auth configuration, SQL/migration/RLS/roles/keys/passwords unless explicitly authorized below. N44 remains explicit HOLD; accepted unrelated tickets remain CLOSED. Prior actual tool, school and browser-ownership refusals remain binding: never retry via another tool/actor/tab. Truthful LOCAL_READY vs publication vs actual account success; a synthetic fixture/source parity cannot close this umbrella or prove the reported live journey.\n\n\nNEW ACTUAL13:36RIYADH20OCTOBER:\nActual repeated app/window switching AND sequential class deletion generate revision_validation / UNKNOWN / visible at 2026-10-20T10:23:13.456Z3271ms,10:24:01.555Z3423ms,10:31:30.915Z3401ms. These are first actual phase evidence; prior isolated focus tests did NOT reproduce. Start sync.js phase revision_validation around line683: remoteCapture && !await remoteSync.check() && skipPostPull throws Remote Sync revision validation unavailable. Trace actual remoteSync.check()/beforeFullSync/marker ownership and event races. Distinguish actual failed marker read from coalesced/inflight/skipped check; determine finite cause from real code composition, not hide all errors/change severity/extend deadline. Inspect relevant remote sync module path with rg; adjust exact scope via proper maintenance if source omitted, no wrong literal glob commands. Reproduce smallest actual coordinator composition exercising rapid visible events during validation and commit/delete tombstone context (synthetic), then correct minimal proven cause. Never acknowledge unknown later revisions, skip required pull, drop tombstones/outbox, reset local data, weaken ownership, or overwrite last real failure. Preserve genuine network/authorization/revision failures. No unchanged focus/whole Sync matrix or real account mutation. Keep real symptom resolution unproven until actual evidence. Scope excludes store.js initially for independent N36; only add it with proven necessity and resource serialization. Coordinate N107 shared wait evidence factually; no speed claim from this guard alone.",
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/lib/remote-sync.js",
+        "src/lib/sync-remote.js",
+        "src/lib/remote-sync-coordinator.js",
+        "src/lib/sync-revision.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync-operational-ui.js",
+        "tests/n125-revision-20261020/**",
+        "docs/automation-evidence/20261020/N125_REVISION_VALIDATION.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync.js"
+      ],
+      "requiredChecks": [
+        "n125_actual_revision_validation_race_and_genuine_failure"
+      ],
+      "acceptance": [
+        "Correct the specific new reported cause with affected proof; preserve previous valid checks and real user data.",
+        "Existing sole publisher proves actual served result; local success alone does not close actual failed journey."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct latest PO actual failure correction",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO20October authorizes specific corrections and guarded release via sole publisher; no unrelated service/schema/Auth change.",
+      "sessionId": "01a154d5-452e-7830-bbba-35670fa2dc52"
+    }
+  ]
+}

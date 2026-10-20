@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n117-signup-department-field-position-20261020",
+      "productId": "N117",
+      "activationId": "po-20261012-continuous",
+      "priority": -2797,
+      "scopeKey": "continuous-n117-signup-department-field-position-20261020",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 10,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Latest direct PO20October reports actual failure AFTER published corrections. Read current origin/main affected source, exact Product row, AGENTS/ops contract only. Sole existing controller and serial publisher; no manual worker/queue edit. Preserve candidates and actual failures. Minimal checks related to the NEW cause only; reuse unchanged proof. No full suite, repeated old readiness/focus/school/browser tests, new planner or broad audit. No real account/pupil mutation/send, Auth configuration, SQL/migration/RLS/roles/keys/passwords unless explicitly authorized below. N44 remains explicit HOLD; accepted unrelated tickets remain CLOSED. Prior actual tool, school and browser-ownership refusals remain binding: never retry via another tool/actor/tab. Truthful LOCAL_READY vs publication vs actual account success; a synthetic fixture/source parity cannot close this umbrella or prove the reported live journey.\n\n\nNEW ACTUAL13:36RIYADH20OCTOBER:\nPO ACTUALLY TESTED N117 and accepts closure AFTER narrow field-order correction: educationDepartment immediately BELOW phone and ABOVE teacher/معلم/معلمة selection in registration/profile completion. Current app.js required profile gate at1200–1236 has department after school. Move existing field intact; preserve same directory/mapping/persistence/events/required/OTP/init and unchanged provision service. No new tests/build/SQL/Auth/profile/OTP journey; inspect affected rendered field order and responsive result using current existing local synthetic gate if useful. Minimal DOM reorder only, avoid refactor/text expansion. Existing actual acceptance is sufficient to close after sole publisher verifies position source/result; root owns ledger closure, worker no queue/ledger edit. Applied migration20261020090836 remains immutable and MUST NOT repeat.",
+      "allowedPaths": [
+        "src/app.js",
+        "docs/automation-evidence/20261020/N117_DEPARTMENT_POSITION.md"
+      ],
+      "verificationPaths": [
+        "src/app.js"
+      ],
+      "requiredChecks": [
+        "n117_department_immediately_after_phone_before_teacher_choice"
+      ],
+      "acceptance": [
+        "Correct the specific new reported cause with affected proof; preserve previous valid checks and real user data.",
+        "Existing sole publisher proves actual served result; local success alone does not close actual failed journey."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct latest PO actual failure correction",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO20October authorizes specific corrections and guarded release via sole publisher; no unrelated service/schema/Auth change.",
+      "sessionId": "01a1587f-74a1-7c13-90e1-e1ada07cfaf1"
+    }
+  ]
+}
