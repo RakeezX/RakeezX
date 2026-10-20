@@ -1,3 +1,15 @@
+## AI candidate 0.5.21 — explicit background job, 20 October 2026
+
+Madrasati Start now owns a bounded session-only job in the existing MV3 worker. The popup is a disposable Start/progress/cancel viewer; no runner tab, window, offscreen document or foregrounding is used. Keep the existing source and authenticated Rakeez tabs open. Necessary known same-origin source navigation remains supported. Noor's separate selected-column/manual review is unchanged.
+
+Private checkpoints, finite Set/Map arrays and the original serialized v3 envelope/nonce remain in chrome.storage.session only. A single pending-phase alarm and actual tab/outcome events resume an unexpired explicit job. Opening the popup or a browser with no session job never collects. Full browser restart clears session storage; continuation while the browser is closed is not promised. Cancellation/expiry clears only this job's private data and alarms, never saved app data.
+
+Preparation and delivery use direct worker transport functions with job authority, original receiver document/capability/batch checks, and original external nonce sender validation. Cursor advancement follows a detailed successful receipt and is checkpointed before receipt cleanup. Pending/unknown outcomes retain the original identity; a genuine original-document final receipt may monotonically resolve an unknown outcome, never duplicate a final ACK. Missing receipts never count as success. An uncertain navigation is stopped rather than replayed.
+
+Actual Product HTTP DOM/handlers/readers, owned IndexedDB profile/outbox/settings and serialized v3 receipts were tested through synthetic Chrome APIs, including fresh worker realms and popup destruction. Native MV3 lifecycle and real portal/account acceptance are NOT_RUN. Permissions, hosts, CSP and unchanged extraction/profile/app code retain prior proofs. Provider/served archive and physical stable-folder 0.5.21 parity remain postdelivery gates; Chrome reload is not claimed.
+
+Historical notes below describe superseded intermediate behavior.
+
 ## AI candidate 0.5.20 — latest PO navigation choice, 20 October 2026
 
 The latest explicit choice prioritizes all supported available data and permits visible source navigation only when necessary. This supersedes 0.5.19's absolute no-navigation default. Known observed student-report GETs stay in place; already supported role/gateway/profile/classes/timetable links again use the existing guarded walker. Its route/teacher/school/context/deadline/cancel/one-role-switch checks are unchanged; no new endpoint, host permission, CSP or source write.

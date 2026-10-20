@@ -1,0 +1,145 @@
+{
+  "taskId": "continuous-n36-background-run-no-tab-or-open-popup-20261020",
+  "runId": "b29c3ee4-665a-451f-9aa1-e332185eb04f",
+  "boundary": "Actual ESM service-worker handlers and real HTTP app/source DOM; synthetic Chrome session/alarms/tab/script APIs. Native MV3 termination NOT_RUN; no portal read.",
+  "checks": [
+    {
+      "name": "n36_background_actual_handlers_popup_closed_complete",
+      "status": "PASS",
+      "evidence": {
+        "sourceReads": 38,
+        "navigation": [
+          "http://127.0.0.1:49586/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "http://127.0.0.1:49586/TeachersReports/MyInfo/fixture"
+        ],
+        "serializedReceipt": [
+          {
+            "status": "saved",
+            "added": 1,
+            "existing": 0,
+            "remaining": 0,
+            "total": 1,
+            "setup": {
+              "saved": 5,
+              "existing": 1,
+              "unresolved": 0,
+              "missing": [],
+              "details": [
+                {
+                  "field": "teacher",
+                  "reason": "saved",
+                  "count": 1
+                },
+                {
+                  "field": "school",
+                  "reason": "saved",
+                  "count": 1
+                },
+                {
+                  "field": "principal",
+                  "reason": "saved",
+                  "count": 1
+                },
+                {
+                  "field": "department",
+                  "reason": "saved",
+                  "count": 1
+                },
+                {
+                  "field": "classes",
+                  "reason": "current",
+                  "count": 1
+                },
+                {
+                  "field": "timetable",
+                  "reason": "saved",
+                  "count": 1
+                }
+              ]
+            }
+          }
+        ],
+        "settingsUpdated": true,
+        "noNewTabs": true
+      }
+    },
+    {
+      "name": "fresh_worker_checkpoint_and_unknown_receipt",
+      "status": "PASS",
+      "evidence": {
+        "sameActionId": true,
+        "deliveries": 1,
+        "duplicateClaims": 0,
+        "duplicateDurableWrites": 0
+      }
+    },
+    {
+      "name": "cancel",
+      "status": "PASS",
+      "evidence": {
+        "phase": "cancelled",
+        "code": "CANCELLED",
+        "deliveries": 0
+      }
+    },
+    {
+      "name": "expiry",
+      "status": "PASS",
+      "evidence": {
+        "phase": "stopped",
+        "code": "REVIEW_EXPIRED",
+        "deliveries": 0
+      }
+    },
+    {
+      "name": "source-document",
+      "status": "PASS",
+      "evidence": {
+        "phase": "stopped",
+        "code": "SOURCE_BINDING_CHANGED",
+        "deliveries": 0
+      }
+    },
+    {
+      "name": "source-url",
+      "status": "PASS",
+      "evidence": {
+        "phase": "stopped",
+        "code": "SOURCE_CONTEXT_CHANGED",
+        "deliveries": 0
+      }
+    },
+    {
+      "name": "app-document",
+      "status": "PASS",
+      "evidence": {
+        "phase": "stopped",
+        "code": "APP_CHANGED",
+        "deliveries": 0
+      }
+    },
+    {
+      "name": "owner",
+      "status": "PASS",
+      "evidence": {
+        "phase": "stopped",
+        "code": "APP_CHANGED",
+        "deliveries": 0
+      }
+    },
+    {
+      "name": "no_job_bootstrap_and_untrusted_start",
+      "status": "PASS",
+      "evidence": "Popup status/alarm bootstrap with no authorized job reads nothing; foreign sender, website and nonexact Start schemas rejected."
+    },
+    {
+      "name": "n36_background_restart_unknown_receipt_cancel_owner_expiry",
+      "status": "PASS",
+      "evidence": "Fresh ESM realms preserve session checkpoint and action identity. Owner/document/source/expiry/cancel fences block delivery and durable changes. Browser full restart is not claimed."
+    }
+  ],
+  "preservedFailures": [
+    "Initial actual composition stopped APP_CHANGED after delivery: busy receiver guard was treated as ownership loss. Corrected pending-receipt path waits without reading source or reposting; document and batch fences retained."
+  ],
+  "status": "PASS"
+}

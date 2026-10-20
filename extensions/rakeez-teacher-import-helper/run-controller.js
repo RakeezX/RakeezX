@@ -319,7 +319,7 @@ if(runToken){
  document.body.classList.add('run-page','automatic-mode');$('manual-controls').hidden=true;$('one-start').hidden=true;
  $('category').hidden=true;announce('بانتظار طلب البدء الصريح؛ فتح هذه الصفحة وحده لا يبدأ قراءة.');
  channel.onmessage=async({data})=>{
-  if(data?.type!=='launch'||data.token!==runToken||!Number.isInteger(data.tabId))return;
+  if(data?.mode!=='noor'||data?.type!=='launch'||data.token!==runToken||!Number.isInteger(data.tabId))return;
   channel.onmessage=null;channel.postMessage({type:'launched',token:runToken});if(data.mode==='noor')await startNoor(data.tabId,data.classroom,data.role);else await start(data.tabId);
  };
  channel.postMessage({type:'ready',token:runToken});
@@ -330,6 +330,10 @@ if(runToken){
    const [tab]=await chrome.tabs.query({active:true,currentWindow:true});if(!tab?.id)throw Error('NO_ACTIVE_TAB');
    const classroom=$('noor-class').value.normalize('NFC').trim().replace(/\s+/g,' '),role=$('noor-role').checked;
    if(mode==='noor'){if(!role)throw Error('TEACHER_CONFIRMATION_REQUIRED');validateCategory('classes',[{classroom}]);const u=new URL(tab.url??'');if(u.origin!=='https://noor.moe.gov.sa'||!u.pathname.startsWith('/Noor/'))throw Error('UNSUPPORTED_NOOR_PAGE');}else startOrigin(tab.url??'');
+   if(mode==='madrasati'){
+    const result=await chrome.runtime.sendMessage({type:'n36-job-start',sourceTabId:tab.id});
+    if(!result?.ok)throw Error(result?.code??'BACKGROUND_UNAVAILABLE');renderBackground(result.view);return;
+   }
    const sourceTabId=tab.id; // Captured before creating/activating the extension run page.
    const token=crypto.randomUUID();let busy=false;
    channel.onmessage=({data})=>{if(data?.type==='busy'&&data.token===token)busy=true;};
@@ -341,13 +345,13 @@ if(runToken){
    const runner=await chrome.tabs.create({url:chrome.runtime.getURL('popup.html')+'?run='+token,active:false});
    try{await readyPromise;await chrome.tabs.update(runner.id,{active:true});}finally{clearTimeout(timer);channel.onmessage=null;}
   }catch(e){showDiagnostic({stage:'start',reason:/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',category:'students'});announce('افتح مدرستي، ثم شغّل الإضافة من صفحتها. افتح حساب ركيز وسجّل الدخول في تبويب واحد قبل البدء.');}
-  finally{$('one-start').disabled=false;}
+  finally{$('one-start').disabled=!!backgroundView&&!['complete','stopped','cancelled'].includes(backgroundView.phase);}
  };
  $('one-start').addEventListener('click',()=>launch());
  $('noor-start').addEventListener('click',()=>launch('noor'));
 }
 $('run-reopen').addEventListener('click',()=>{announce('افتح مدرستي، ثم شغّل الإضافة من صفحتها.');$('run-reopen').hidden=true;});
-$('run-cancel').addEventListener('click',()=>stop());
+$('run-cancel').addEventListener('click',()=>{if(backgroundView?.id&&!['complete','stopped','cancelled'].includes(backgroundView.phase))chrome.runtime.sendMessage({type:'n36-job-cancel',jobId:backgroundView.id}).then(()=>refreshBackground());else stop();});
 window.addEventListener('n36:discard',()=>{if(runToken)stop();});
 window.addEventListener('n36:exported',()=>{if(!runToken||window.n36AutomaticBatch)return;if(review?.source!=='noor'&&window.n36HasSourceRoster?.()){announce('نُقل الفصل المختار للمراجعة فقط. يمكنك اختيار فصل آخر خلال المهلة الأصلية؛ لم تُضف أسماء تلقائيًا.');return;}generation++;clearPreview();$('run-cancel').disabled=true;announce('اكتمل التصدير الصريح ومُسحت المعاينة المؤقتة. لم تُضف بيانات إلى ركيز.');});
 window.n36BeforeExport=async()=>{
@@ -381,3 +385,22 @@ window.addEventListener('n36:automatic-finished',({detail})=>{
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
  clearPreview(false,true);window.n36AutomaticBatch=null;$('run-cancel').disabled=true;$('run-counts').textContent='';
 });
+
+// AI: action popup is a disposable viewer. Opening/closing it never starts/cancels a job.
+let backgroundView=null;
+function renderBackground(v){
+ if(!v)return;backgroundView=v;
+ const done=['complete','stopped','cancelled'].includes(v.phase);
+ $('one-start').disabled=!done;$('run-cancel').disabled=done;
+ $('run-counts').textContent='';$('run-missing').textContent='';
+ $('run-status').textContent=v.phase==='complete'?'حُفظ المتاح محليًا في ركيز؛ المزامنة السحابية تُتابع من التطبيق.':v.phase==='cancelled'?'أُوقف التشغيل ومُسحت بيانات الإضافة المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.':v.phase==='stopped'?'توقف النقل. تحقق من بقاء صفحتي مدرستي وركيز مفتوحتين بالحساب نفسه، ثم ابدأ عند جاهزيتهما.':'جار نقل البيانات المتاحة… يمكنك إغلاق نافذة الإضافة. أبقِ تبويبي مدرستي وركيز مفتوحين.';
+ const codes={APP_UPDATE_REQUIRED:'حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ؛ لم تُحدّث الصفحة تلقائيًا.',APP_FINISH_CURRENT_EDIT:'أكمل التعديل المفتوح في ركيز ثم ابدأ.',SCHOOL_CHOICE_REQUIRED:'افتح صفحة المدرسة المطلوبة ودور المعلم في مدرستي، ثم ابدأ.',RECEIPT_UNKNOWN:'نتيجة الحفظ غير محسومة. استكمل الدفعة المحفوظة من حساب ركيز نفسه؛ لم يُفترض حفظ جديد.',REVIEW_EXPIRED:'انتهت مهلة التشغيل ومُسحت البيانات المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.'};
+ if(v.phase==='complete'&&v.needsReview)$('run-status').textContent='حُفظت الأسماء محليًا؛ بعض حقول الإعداد تحتاج مراجعة في التفاصيل. المزامنة تُتابع من ركيز.';
+ if(v.phase==='receipt'&&v.code)$('run-status').textContent=codes.RECEIPT_UNKNOWN;
+ if(v.code&&codes[v.code])$('run-status').textContent=codes[v.code];
+ const labels={teacher:'اسم المعلم',school:'اسم المدرسة',principal:'اسم المدير',department:'إدارة التعليم',classes:'الفصول',timetable:'الجدول'},reasons={saved:'حُدث',current:'مطابق',missing:'غير متاح',conflict:'تعارض',unsupported:'غير مدعوم',ambiguous:'غير محسوم',unrecognized:'تسمية غير معروفة'};
+ $('automatic-field-details').textContent=(v.fields??[]).map(d=>labels[d.field]+': '+reasons[d.reason]).join(' — ');
+ window.n36Diagnostics?.publish({stage:v.phase==='complete'?'saved':v.phase==='stopped'?'error':'collecting',receipt:v.phase==='receipt'?'pending':v.phase==='complete'?'saved':'not-available',coverage:v.coverage,receiverCapability:'source-profile-quiet-v1',setupPhase:v.fields?.length?'receipt':'none',failure:v.code??'none',fieldResults:v.fields??[]});
+}
+async function refreshBackground(){const r=await chrome.runtime.sendMessage({type:'n36-job-status'});if(r?.ok)renderBackground(r.view);}
+if(!runToken){refreshBackground().catch(()=>{});chrome.storage.onChanged.addListener((changes,area)=>{if(area==='session'&&changes['n36:background-view'])renderBackground(changes['n36:background-view'].newValue);});}
