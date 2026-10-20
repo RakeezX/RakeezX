@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "baseSha": "01940ee3a6fe0f4c79e0ad50c9209662a7ef7517",
+  "checks": [
+    {
+      "name": "n88_new_hosted_failure_cause_and_preserved_guards",
+      "status": "PASS",
+      "qualification": "Concrete source-composition cause and changed native source/pin verified; actual hosted internal correlation/account success NOT_PROVEN."
+    },
+    {
+      "name": "n88_top_bar_student_gateway_link",
+      "status": "PASS",
+      "qualification": "Actual app topbar API/function/view/runtime/CSS,390/1440, one link and heading during error."
+    }
+  ],
+  "evidence": {
+    "cause-baseline": {
+      "path": "tests/n88-hosted-failure-20261020/cause-baseline.json",
+      "sha256": "2d1babd3ec02079587351e017a7becc0e091ec47ed0a15d6632395d08279f28b"
+    },
+    "cause-corrected": {
+      "path": "tests/n88-hosted-failure-20261020/cause-corrected.json",
+      "sha256": "2ef5bd59c1c8df22e55a9a075d5e0264f35dd36a2d3d64a1a50dade11c846573"
+    },
+    "failure-phase": {
+      "path": "tests/n88-hosted-failure-20261020/failure-phase.json",
+      "sha256": "d71a186482aaba05eeaf73acaecf13f7a33c9ba01b63b4675363a98f4615b8b0"
+    },
+    "topbar": {
+      "path": "tests/n88-hosted-failure-20261020/topbar.json",
+      "sha256": "ecbfac17bbc45ee5ea669fd821c1506c83e9699d029919f3ae28498726c5140d"
+    },
+    "native-delivery": {
+      "path": "tests/n88-hosted-failure-20261020/native-delivery.json",
+      "sha256": "c0b79b0275f3a011eb923496fe812daffb27fc44defb8a3697a08cebfeeaae5b"
+    }
+  },
+  "pins": {
+    "src/lib/student-portal-runtime.js": "40bffe88683b547742466f6169523f52628b5f73f60a0012ac84beb14f0436eb",
+    "src/views/student-portal-class.js": "40457d5ceebe89bdd77db78f9a3bf49d31f99272dd999d939fd44a287446e067",
+    "src/styles/student-portal-class.css": "0fe1fec202f0a86edca902df32d2c36b2a8ada8c10a0e24bc5e2ce9f2d9ea9f4",
+    "drafts/n88-student-portal/integrated-service.mjs": "47794fe50594d3fea33976ddc7b3222dec7997d69ffcea89bcc73dfc22ddee27",
+    "drafts/n88-student-portal/official-activation.mjs": "9fd5e5f891d5f5ee81a41047c3750f0ada25540c7988eac6c8418f888c715d2e"
+  },
+  "unchanged": [
+    "src/lib/cloud.js",
+    "src/lib/student-portal-unified-client.js",
+    "src/lib/student-portal-class-client.js",
+    "src/lib/support.js",
+    "drafts/n88-student-portal/activation/private-document.mjs",
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs"
+  ],
+  "actualAuthenticatedTeacherSuccess": "NOT_PROVEN",
+  "wholeProductClosure": false,
+  "frontendPublication": "OWNED_BY_SERIAL_PUBLISHER",
+  "priorFailuresPreserved": true,
+  "cleanup": {
+    "liveMutationLease": "RELEASED",
+    "browserLease": "RELEASED",
+    "ownedServerAndBrowserClosed": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "scope": "Exact app.js topbar function, real route.topActions, runtime error handler and source CSS over HTTP; inert account presentation only",
+  "sizes": [
+    {
+      "width": 390,
+      "height": 44,
+      "top": 8.5,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "height": 44,
+      "top": 12,
+      "overflow": false
+    }
+  ],
+  "cleanup": {
+    "browserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

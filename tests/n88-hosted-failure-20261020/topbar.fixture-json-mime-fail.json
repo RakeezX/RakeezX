@@ -1,0 +1,17 @@
+{
+  "status": "FAIL",
+  "scope": "Exact app.js topbar function, real route.topActions, runtime error handler and source CSS over HTTP; inert account presentation only",
+  "sizes": [],
+  "consoleErrors": [
+    "Failed to load module script: Expected a JSON module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec.",
+    "Failed to load module script: Expected a JSON module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec."
+  ],
+  "failure": {
+    "name": "TimeoutError",
+    "message": "page.waitForFunction: Timeout 5000ms exceeded."
+  },
+  "cleanup": {
+    "browserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "status": "FAIL",
+  "baseline": false,
+  "scope": "Real client / signed ingress / Web entry / Auth SDK / integrated repository, controlled synthetic PostgreSQL port. Not hosted account acceptance.",
+  "checks": [],
+  "clientElapsedMs": 2654,
+  "canonicalReads": [
+    "canonical:terms",
+    "canonical:teachings",
+    "canonical:undefined"
+  ],
+  "failure": {
+    "name": "AssertionError",
+    "message": "Expected values to be strictly equal:\n\n3 !== 2\n"
+  }
+}

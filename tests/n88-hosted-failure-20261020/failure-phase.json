@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "businessHttpStatus": 503,
+  "stage": "source",
+  "privateDetailExposed": false,
+  "actualHostedPhase": "NOT_PROVEN",
+  "scope": "Changed canonical read boundary; actual signed ingress decodes business failure and preserves finite source phase."
+}

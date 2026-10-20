@@ -240,6 +240,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
 // Integration must supply actual service binding and class context. This adapter stays unavailable by default.
 let routeHandle,routeGeneration=0,routeRoot,routeTeaching;
 export default { title: () => 'مساحة طلاب الفصل', back:p=>'#/teaching/'+encodeURIComponent(p.id),render: () => html`<div data-class-portal></div>`,
+  topActions:()=>html`<a class="btn btn--quiet n88-student-gateway" href="/student">بوابة دخول الطالب</a>`,
   afterPaint(root,params) {
     const target=root.querySelector('[data-class-portal]');if(!target||target===routeRoot)return;
     // The shell redraws on pageshow/visibility: retain this route instance and its

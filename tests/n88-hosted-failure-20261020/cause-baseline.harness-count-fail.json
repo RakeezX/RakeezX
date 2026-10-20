@@ -1,0 +1,27 @@
+{
+  "status": "FAIL",
+  "baseline": true,
+  "scope": "Real client / signed ingress / Web entry / Auth SDK / integrated repository, controlled synthetic PostgreSQL port. Not hosted account acceptance.",
+  "checks": [],
+  "clientElapsedMs": 10004,
+  "canonicalReads": [
+    "canonical:years",
+    "canonical:terms",
+    "canonical:sections",
+    "canonical:students",
+    "canonical:enrollments",
+    "canonical:teachings",
+    "canonical:items",
+    "canonical:scores",
+    "canonical:score_subitems",
+    "canonical:score_subitem_completions",
+    "canonical:sessions",
+    "canonical:attendance",
+    "canonical:logs",
+    "canonical:undefined"
+  ],
+  "failure": {
+    "name": "AssertionError",
+    "message": "Expected values to be strictly equal:\n\n14 !== 13\n"
+  }
+}

@@ -1,0 +1,6 @@
+import assert from 'node:assert/strict';import {writeFile} from 'node:fs/promises';import {composition} from './composition.mjs';import {A,SESSION} from '../fixtures/n88-existing-host/provider.mjs';
+const service=composition({classId:'tch:sec:synthetic',teachingId:'tch:teach:synthetic',firstDelay:0,nextDelay:0,failCanonical:true});
+const binding={ownerId:A,sessionId:SESSION,leaseId:'synthetic-lease',teachingId:'tch:teach:synthetic',classId:'tch:sec:synthetic',termId:'term',contextRevision:'1'};
+const response=await service.send('/api/n88/teacher/class/list',{method:'POST',headers:{Authorization:'Bearer '+service.provider.token(),'Content-Type':'application/json','X-N88-CSRF':'1'},body:JSON.stringify({teachingId:binding.teachingId,binding,uiProtocol:'n88-public-ui-v1'})});
+assert.equal(response.status,503);assert.equal(response.headers.get('x-n88-service-stage'),'source');const body=await response.text();assert(!body.includes('SYNTHETIC_PRIVATE_QUERY_DETAIL')&&!body.includes(A));
+await writeFile('tests/n88-hosted-failure-20261020/failure-phase.json',JSON.stringify({status:'PASS',businessHttpStatus:response.status,stage:'source',privateDetailExposed:false,actualHostedPhase:'NOT_PROVEN',scope:'Changed canonical read boundary; actual signed ingress decodes business failure and preserves finite source phase.'},null,2)+'\n');

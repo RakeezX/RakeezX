@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "baseline": true,
+  "scope": "Real client / signed ingress / Web entry / Auth SDK / integrated repository, controlled synthetic PostgreSQL port. Not hosted account acceptance.",
+  "checks": [
+    "Unchanged default 10000ms client deadline: baseline 13 sequential bounded reads times out; list-only 2 consumed families succeeds with actual commit ACK. Full source lock and authoritative membership synchronization retained."
+  ],
+  "clientElapsedMs": 10011,
+  "canonicalReads": [
+    "canonical:years",
+    "canonical:terms",
+    "canonical:sections",
+    "canonical:students",
+    "canonical:enrollments",
+    "canonical:teachings",
+    "canonical:items",
+    "canonical:scores",
+    "canonical:score_subitems",
+    "canonical:score_subitem_completions",
+    "canonical:sessions",
+    "canonical:attendance",
+    "canonical:logs"
+  ]
+}

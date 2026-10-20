@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "functionName": "n88-student-portal",
+  "uploadedVersion": 50,
+  "currentVersion": 51,
+  "sourceSha256": "2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea",
+  "sourceExact": true,
+  "verifyJwt": false,
+  "importMapUnchanged": true,
+  "protectedSourcePin": {
+    "status": "PASS",
+    "source": "2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea",
+    "nativeVersion": 50,
+    "sourcePinReadback": true,
+    "readinessReplayed": false,
+    "keysRolesSqlAuthFixturesUnchanged": true
+  },
+  "changedFunctionUploads": 1,
+  "changedIngressUploads": 0,
+  "privateAssetChanges": 0,
+  "readinessRequests": 0,
+  "accountDataRequests": 0,
+  "actualTeacherSuccess": "NOT_PROVEN",
+  "observedAt": "2026-10-20T10:56:18.997Z",
+  "resourceCleanup": {
+    "liveMutationLease": "RELEASED",
+    "browserLease": "RELEASED",
+    "ownedServerAndBrowserClosed": true
+  }
+}
