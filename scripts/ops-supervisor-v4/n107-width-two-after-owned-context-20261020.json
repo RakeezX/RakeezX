@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-width-two-after-owned-context-20261020",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -2790,
+      "scopeKey": "continuous-n107-width-two-after-owned-context-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 18,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n125-revision-validation-actual-evidence-20261020"
+      ],
+      "sessionId": "01a158b0-7f96-7413-bbd7-133aaa28cc35",
+      "objective": "NEW MATERIAL PREREQUISITE NOW VERIFIED: owned context qualification published8ead5110f0202f1cb4c27f6eeae734c9f93890d4 at10:12:27Z, candidate8f01b296716c20d2025e169c829a44e52262f84e. Its actual engine→defaultRPC→ownedIndexedDB guard protects pre-send,401retry and atomic receipt adoption with same-envelope recovery. Reuse that exact proof/source if unchanged, DO NOT repeat the old NO_CHANGE context diagnostic or widen into another Auth/transport study. Current N125 actual revision_validation fix is a dependency to avoid intersecting sync files. Continue SAME N107 session01a158b0-7f96-7413-bbd7-133aaa28cc35.\n\nDeliver the previously narrowly proposed maximum TWO in-flight independent NEW STUDENT CREATE commands, using existing immutable bound write context and existing engine/outbox paths; no same-ID/dependent enrollment/roll/max/grade/delete/profile/calendar command concurrency. Baseline28/31 trace remains valid; no old parser/wholeSync/Auth/SQL tests. Confirm actual command scheduling can overlap without serial-global envelope coupling, then implement minimal existing scheduler change. Targeted out-of-order siblings/one unknown sibling/retry sameIDs/owner retirement at changed boundary only; reuse unchanged guard suite. One same-delay before/after saved28/31 app trace to prove scheduling benefit, never call it actual18s improvement. No nativeRPC/schema/Auth/newtransport/realaccount changes. If one precise implementation coupling still prevents it, save exact blocker once with boundednextstep, NO further blanketdiagnostic or plan-review task. Preserve section/enrollment→maxACK→gradeACK→receipt order; success only durable confirmed score receipt. Sole publisher verifies changed assets. Actual18s stays latest measured until user ordinary trial.\n\nContinue SAME N107 custodian session, preserving NO_CHANGE candidate002715c309ffccd71fddd75e4be835c20da96479 and original18seconds actual measurement. Original phase trace at current main proved no325ms debounce before success, many per-record sequential creations, valid enrollment→max→grade→receipt ordering; do NOT repeat unchanged baseline/harness/parsing/full Sync tests. Latest direct PO asks completing all remaining work with minimum relevant checks. Sole existing controller/publisher only; no manual Product runner/queue edit. N44 remains HOLD and accepted CLOSED items stay closed.\nNEW MATERIAL EVIDENCE: root performed ONE bounded official provider read-only log aggregate plus schema-key discovery for19October15:00–15:45UTC (no polling, no account/student rows or identifiers). Saved at C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261020-actual-save-timeout/n107-provider-rpc-aggregate.json. Generic mutation upstream processing avg32.5,max71,p95~59.3; teaching creation avg128.5/max198; grade import165 (provider header units, not browser timings). All returned200; counts aggregate project window, NOT tied to a particular user import. This does not prove hosted network cause or a speedup. Combined with actual app's56per-record student/enrollment commands it provides a distinct request-roundtrip investigation, rather than another fixed-wait search. Prior trace/source fingerprints and owner/scoring proofs remain saved. No more provider reads, native SQL, Auth/service changes or real imports needed in this phase.\nNARROW possible optimization: at most TWO concurrently in-flight existing RPCs for genuinely independent NEW STUDENT CREATE envelopes with different IDs, same immutable authorized owner/workspace/lease context, valid already-ACKed parents and no same-record dependency. NO concurrency for enrollment/roll-number, teaching/class/subject creation, existing-student patches, score/max/grades/delete/restore/profile/calendar/unknown-outcome or same-ID mutations. Do not introduce a new bulk RPC/schema/transport policy, widen permissions or generically Promise.all the outbox. Trace actual coordinator command binding/prepare/persist/adopt/invalidation first: if it relies on serial command identity or cannot prove independence, STOP the optimization with exact coupling evidence, not a speculative rewrite. Bound memory/network width to2, no new UI or action. Existing owner/lease/current-session gates, parent ACK, durable per-envelope receipt and replay identity remain authoritative. An owner/lease change stops new starts and prevents cross-owner application. Failure/unknown outcome retains same envelope and receipt recovery; successful siblings remain recoverable, no duplicate pupil/enrollment/grade. Do not remove pre/post-pull, required max ACK or claim success before actual grade receipt. Preserve new N36 direct receiver/profile save, N117 initial calendar and all accepted data contracts.\nOnly if independence is proved implement minimal bounded scheduling in the existing coordinator. Reuse the saved actual-app28/31 fixture and baseline; ONE controlled before/after network dependency trace at identical per-request delay can prove the scheduling benefit, never label it a hosted18s→X result. Targeted out-of-order two-student completion, one failed/unknown sibling, same-ID exclusion and owner/lease retirement checks cover only changed boundary; reuse unchanged parser/score/max/calendar/Auth/SQL/recovery suites. Native SQL/server behavior remains unchanged. If no safe improvement qualifies, preserve a precise NO_CHANGE diagnosis and do not publish evidence as a Product fix. No build/PWA/browser matrix or another review chain. Save exact candidate/base/task/run/check schema. Sole publisher verifies served source for a real qualified change, actual hosted measurement stays18seconds until legitimately observed.",
+      "allowedPaths": [
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "tests/n107-independent-create-20261020/**",
+        "docs/automation-evidence/20261020/N107_INDEPENDENT_STUDENT_CREATE.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync-v2.js"
+      ],
+      "requiredChecks": [
+        "n107_independent_new_student_width_two_proven_safe",
+        "n107_same_dependency_wait_benefit_and_ack_order"
+      ],
+      "acceptance": [
+        "At most two independent new-student creates overlap; all related dependencies, ownership and receipt semantics remain unchanged.",
+        "No hosted speedup claim from synthetic measurements; safe NO_CHANGE if coupling prevents minimal optimization."
+      ],
+      "preparationAuthority": {
+        "kind": "Existing explicit PO import latency request plus new provider/source aggregate evidence",
+        "publication": true,
+        "realAccountMutations": false,
+        "realSend": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false
+      },
+      "releaseAuthority": "Current PO authorizes completing import performance and minimum affected checks through sole publisher. Existing RPC scheduling only; no new service/schema/Auth/RLS, real account/pupil/import/send or prior refusal bypass."
+    }
+  ]
+}
