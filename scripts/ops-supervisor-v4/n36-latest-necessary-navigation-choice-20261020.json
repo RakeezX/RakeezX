@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-latest-necessary-navigation-choice-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -3300,
+      "scopeKey": "continuous-n36-latest-necessary-navigation-choice-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 12,
+      "idleMinutes": 8,
+      "dependsOn": [
+        "continuous-n36-actual-profile-pipeline-quiet-transfer-20261020"
+      ],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "LATEST DIRECT HUMAN ANSWER20October15:39Riyadh DURING preceding active run: «نقل جميع البيانات المتاحة، والسماح بالتنقل عند الضرورة فقط». This SUPERSEDES absolute no-visible-navigation restriction in preceding1522card. Do not omit formerly supported role/profile/school/timetable categories merely to keep source page fixed. Read exact current Product row/intake actual.N36.navigationChoice and PRECEDING published candidate FIRST. If current preceding candidate already preserved necessary navigation and all supported categories, return NO_CHANGE with exact source evidence; no package bump/old test replay. Otherwise remove ONLY newly introduced VISIBLE_NAVIGATION_REQUIRED blanket throw/filter, retain existing safe same-page report fetch and route/currentdocument/teacherrole/school/currentcontext/deadline/cancel/one-role-switch/explicitStart checks. Visible navigation is allowed only when needed for already supported known visible source route, no hidden/unpublished endpoints/permission/CSP/host expansion, source writes or old refused live automation/result read through another actor/tool. Preserve preceding real serialized profile/settings/receipt capability fix and quiet result unchanged. Existing supported schedule/profile transport must not lose coverage. Do not make user confirm each class or reopen Rakeez importpage. Newtab preference remains: avoid newtab where existing approved runner can operate safely; do not add offscreen permission/unsafe injected worker just to avoid tab. Record actual necessary runner limitation honestly if existing browser lifecycle requires it. This is a narrow answer reconciliation, not new full extension overhaul or all303 benchmark. Reuse preceding profile/owner/store/receipt/quiet UI/package proof by unchanged source hashes. Only inspect/check changed route selection: current page knownreport no nav, necessary supported profile/timetable route allowed once, unsupported/foreign route still denied and cancellation preserved; representative pure existing reader fixture, no real portal test. If extension bytes changed after preceding immutable published0.5.19, bump next once to0.5.20 through established package/source/served path and stable updater postdelivery; do not rewrite old zip or claim Chrome reload. Solecontroller and publisher; do not edit queue/start executor. N125/CLOSED untouched; N44 HOLD. Do not rerun old school refusals, Auth/SQL/migrations or actual names/account writes.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "tests/n36-navigation-choice-20261020/**",
+        "docs/automation-evidence/20261020/N36_NECESSARY_NAVIGATION_CHOICE.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/run-controller.js"
+      ],
+      "requiredChecks": [
+        "n36_necessary_supported_navigation_preserves_prior_pipeline",
+        "n36_changed_local_package_or_unchanged_bytes"
+      ],
+      "postDeliveryChecks": [
+        "n36_verified_package_stable_folder_parity"
+      ],
+      "acceptance": [
+        "Full supported source coverage takes priority; visible navigation only when necessary.",
+        "Reuse qualified unchanged profile/quiet pipeline proof and deliver exact changed package through sole publisher."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct human answer allows necessary source navigation to retain all available categories",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountMutations": 0
+      },
+      "releaseAuthority": "Direct latest PO decision reconciles exact ongoing N36 source navigation behavior; existing safeguards and real refusal boundaries remain."
+    }
+  ]
+}
