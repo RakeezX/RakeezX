@@ -13,6 +13,7 @@ import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
+import { installExtensionBridge } from './views/class-import-center.js';
 import { createMarketingAnalytics } from './lib/marketing-analytics.js';
 import { LEASE_STORAGE_PREFIX } from './lib/offline-lease.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
@@ -1040,6 +1041,7 @@ async function boot() {
   delegate(document.getElementById('modal-root'), handlers);
 
   setRepaint(scheduleRender);
+  installExtensionBridge();
   store.onWriteError((error) => toast(error?.code === 'OFFLINE_LEASE_LIMITED' ? error.message : 'تعذّر الحفظ — لم يُسجَّل التعديل', 'danger'));
   store.subscribe((_state, update) => {
     if (update?.render !== false) scheduleRender();

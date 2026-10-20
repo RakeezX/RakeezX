@@ -10,10 +10,12 @@
   coverage:['complete','partial','paused','unknown'], terminal:['unproven','explicit-next','observed-anchor'],
   endpoint:['none','ambiguous','anchor','span'], transfer:['idle','sending','pending','error','unknown'],
   failure:['none','SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_SETUP','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER'],
-  receipt:['not-available','pending','saved','existing','unknown','expired']
+  receipt:['not-available','pending','saved','existing','unknown','expired'],
+  failurePhase:['none','profile','batch'],failureStep:['none','validation','transaction','readback']
  };
+ enums.failure.push('SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
  const numbers = ['valid','staged','observed','excluded','classes','processedPages','currentPage'];
- const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none'});
+ const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none'});
  let state=fresh(), errors=[], background='not-available';
  const ownValue=(o,k)=>Object.getOwnPropertyDescriptor(o,k)?.value;
  function publish(input) {

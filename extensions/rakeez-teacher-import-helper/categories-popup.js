@@ -8,11 +8,11 @@ const $=id=>document.getElementById(id);
 let draft=null,staged=[],generation=0,sourceRoster=null,chosenClass='',sourceInfo=null,pendingBatch=null,batchProgress=new Map(),classTotals=new Map();
 window.n36HasSourceRoster=()=>!!sourceRoster;
 const automaticFailures=new Set();
-let lastTransferFailure=null,setupReceipt=null;
+let lastTransferFailure=null,setupReceipt=null,profileFailure=null;
 // AI: diagnostic codes are fixed, counts-only; never surface source text or runtime messages.
 const transferCodes=new Set(['SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_SETUP','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER']);
 const transferCode=error=>transferCodes.has(error?.message)?error.message:'HANDOFF_UNAVAILABLE';
-const failureHelp=code=>code==='APP_CHANGED'?'ارجع إلى تبويب ركيز الذي بدأ منه التشغيل وصفحة استيراد الكشوف.':code==='BATCH_EXPIRED'||code==='REVIEW_EXPIRED'?'انتهت صلاحية التشغيل؛ استكمل ما وصل إلى ركيز من الحساب نفسه.':code==='SOURCE_CHANGED'?'تغيّرت صفحة المصدر؛ أُوقف النقل لحماية بياناتك.':'تحقق من أن الإضافة وحساب ركيز المفتوح محدّثان، ثم استكمل الفصول غير المحسومة.';
+const failureHelp=code=>code==='APP_CHANGED'?'ارجع إلى تبويب ركيز الذي بدأ منه التشغيل.':code==='BATCH_EXPIRED'||code==='REVIEW_EXPIRED'?'انتهت صلاحية التشغيل؛ استكمل ما وصل إلى ركيز من الحساب نفسه.':code==='SOURCE_CHANGED'?'تغيّرت صفحة المصدر؛ أُوقف النقل لحماية بياناتك.':'تحقق من أن الإضافة وحساب ركيز المفتوح محدّثان، ثم استكمل الدفعة المحفوظة.';
 const sourceBatch=()=>selectedSourceClass(sourceRoster,chosenClass,batchProgress.get(chosenClass)?.offset??0);
 const message=value=>{$('category-status').textContent=value;};
 let sourceView=null,exportRevision=0;
@@ -120,7 +120,7 @@ $('handoff-transfer').addEventListener('click',async()=>{
   if(sourceMode?(revision!==exportRevision||view!==sourceView||!sourceTransferReady()):!$('bundle-review').checked)throw Error('SOURCE_CHANGED');
   const source=window.n36HandoffSource?.();if(!source)throw Error('SOURCE_CHANGED');
   const rows=sourceMode?view.rows:selectedStaged().find(c=>c.category==='students')?.rows;
-  window.n36Diagnostics?.publish({stage:'saving',transfer:'sending',receipt:'not-available',failure:'none'});
+  window.n36Diagnostics?.publish({stage:'saving',transfer:'sending',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none'});
   const createdAt=Date.now();
   const envelope=validateHandoff({schema:'rakeez-extension-names',version:window.n36AutomaticBatch?3:1,...source,...(window.n36AutomaticBatch?{batchId:window.n36AutomaticBatch,complete:sourceInfo.complete,setup:sourceInfo.setup??[]}:{}),createdAt,expiresAt:createdAt+HANDOFF_TTL,rows});
   if(sourceMode){$('source-class-select').disabled=true;$('partial-approval').disabled=true;}
@@ -193,7 +193,7 @@ function renderSourceChoice(){
 window.addEventListener('n36:source-roster',({detail})=>{
  const groups=sourceClasses(detail.rows);
  window.n36Diagnostics?.publish({valid:detail.rows.length,staged:detail.rows.length,classes:groups.length,coverage:detail.coverage,hasNext:detail.hasNextReport,processedPages:detail.processedReportPages,excluded:detail.excluded});
- if(!detail.continuing){classTotals.clear();automaticFailures.clear();lastTransferFailure=null;setupReceipt=null;}
+ if(!detail.continuing){classTotals.clear();automaticFailures.clear();lastTransferFailure=null;setupReceipt=null;profileFailure=null;}
  for(const group of groups){const prior=classTotals.get(group.classroom)??{collected:0,added:0,existing:0};classTotals.set(group.classroom,{...prior,collected:prior.collected+group.count});}
  clearDraft();staged=[];sourceInfo=detail;sourceRoster=detail.rows;chosenClass='';pendingBatch=null;batchProgress.clear();renderStaged();
  $('source-class-review')?.remove();
@@ -209,7 +209,7 @@ window.addEventListener('n36:source-roster',({detail})=>{
  const names=document.createElement('ol');names.id='source-class-names';
  select.addEventListener('change',()=>{chosenClass=select.value;check.checked=false;renderSourceChoice();});
  const retry=document.createElement('button');retry.id='source-retry';retry.type='button';retry.hidden=true;retry.textContent=window.n36AutomaticBatch?'استكمال الفصول غير المحسومة':'إعادة نقل الدفعة نفسها';
- retry.addEventListener('click',()=>{pendingBatch=null;select.disabled=false;retry.hidden=true;renderSourceChoice();if(window.n36AutomaticBatch){automaticFailures.clear();queueMicrotask(advanceAutomatic);}$('handoff-status').textContent='جار استكمال غير المحسوم فقط؛ يفحص ركيز الأسماء الموجودة قبل أي إضافة.';});
+ retry.addEventListener('click',()=>{profileFailure=null;pendingBatch=null;select.disabled=false;retry.hidden=true;renderSourceChoice();if(window.n36AutomaticBatch){automaticFailures.clear();queueMicrotask(advanceAutomatic);}$('handoff-status').textContent='جار استكمال الدفعة؛ يفحص ركيز الأسماء الموجودة قبل أي إضافة.';});
  const approval=$('bundle-review').closest('label');approval.hidden=true;approval.lastChild.textContent=' راجعت أسماء هذه الدفعة والفصل؛ سأطابقه بفصل مملوك لي وأؤكد داخل ركيز';
  const summary=document.createElement('p');summary.id='source-class-summary';summary.textContent=`جُمعت ${sourceRoster.length} أسماء / ${groups.length} فصول`;label.append(select);section.append(summary,coverage,label,status,names,partial,approval,retry);$('direct-handoff').before(section);$('direct-handoff').hidden=false;
  $('legacy-tools').open=false;renderSourceChoice();if(window.n36AutomaticBatch){section.querySelector('label').hidden=true;partial.hidden=true;names.hidden=true;queueMicrotask(advanceAutomatic);}
@@ -219,7 +219,7 @@ setInterval(async()=>{
  try{
   const result=await chrome.runtime.sendMessage({type:'n36-result',actionId:pending.actionId});
   if(pendingBatch!==pending||!result?.ok||result.status==='pending')return;
-  window.n36Diagnostics?.publish({receipt:result.status,transfer:'idle'});
+  window.n36Diagnostics?.publish({receipt:result.status,transfer:result.status==='unknown'?'error':'idle',...(result.failure?{failure:result.failure.code,failurePhase:result.failure.phase,failureStep:result.failure.step}:{})});
   if(['saved','existing'].includes(result.status)&&result.total===pending.count&&result.remaining===0&&result.added+result.existing===pending.count){
    if(result.setup)setupReceipt=result.setup;
    const progress=batchProgress.get(pending.classroom)??{offset:0,added:0,existing:0};
@@ -229,7 +229,7 @@ setInterval(async()=>{
    $('handoff-status').textContent='وصل إيصال ركيز: حُفظت الدفعة محليًا أو تحققت الأسماء الموجودة. لا إثبات مزامنة خادم. يستكمل التشغيل المصرّح الدفعة التالية تلقائيًا.';
   }else{
    // Retain exact rows/cursor on unknown, failure, restart or expiry.
-   if(window.n36AutomaticBatch){automaticFailures.add(pending.classroom);pendingBatch=null;queueMicrotask(advanceAutomatic);}
+   if(window.n36AutomaticBatch){if(result.failure?.phase==='profile')profileFailure=result.failure;else automaticFailures.add(pending.classroom);pendingBatch=null;queueMicrotask(advanceAutomatic);}
    $('source-retry').hidden=false;
    $('handoff-status').textContent='لم يصل إيصال حفظ مؤكد لهذه الدفعة. تحقق من السبب في تبويب ركيز، ثم استكمل غير المحسوم؛ الأسماء المؤكدة لن تتكرر.';
   }
@@ -243,15 +243,16 @@ window.n36Diagnostics?.moduleReady("categories-popup.js");
 function advanceAutomatic(){
  if(!window.n36AutomaticBatch||!sourceRoster||pendingBatch)return;
  const group=sourceClasses(sourceRoster).find(c=>!automaticFailures.has(c.classroom)&&(batchProgress.get(c.classroom)?.offset??0)<c.count);
- if(!group){
+ if(!group||profileFailure){
   const totals=[...batchProgress.values()];
   $('source-class-status').textContent='';
-  window.n36Diagnostics?.publish({stage:automaticFailures.size?'unresolved':'saved',transfer:automaticFailures.size?'error':'idle',receipt:automaticFailures.size?'unknown':'saved'});
-  $('source-retry').hidden=!automaticFailures.size;
-  $('source-retry').textContent='استكمال الفصول غير المحسومة فقط';
-  $('handoff-status').textContent=`${automaticFailures.size?'فصول لم يتأكد حفظها: '+automaticFailures.size+'. '+(lastTransferFailure?'('+lastTransferFailure+') '+failureHelp(lastTransferFailure):''):''}حُفظ محليًا ${totals.reduce((n,p)=>n+p.added,0)} اسم جديد؛ موجود سابقًا ${totals.reduce((n,p)=>n+p.existing,0)}. ${automaticFailures.size?'بقيت فصول غير محسومة.':'وصل إيصال الأسماء المتاحة.'} ${setupReceipt?`إعداد محفوظ محليًا: ${setupReceipt.saved+setupReceipt.existing}؛ تعارضات أو حقول غير مدعومة: ${setupReceipt.unresolved}؛ غير متاح من المصدر: ${setupReceipt.missing.map(c=>CATEGORIES[c].label).join('، ')||'لا شيء'}.`:'إعداد المعلم والجدول لم يتأكد حفظه.'} ${sourceInfo.complete?'':'التغطية جزئية؛ لا إثبات اكتمال المصدر.'} المزامنة لم تتأكد بعد.`;
+  const failed=!!profileFailure||!!automaticFailures.size;
+  window.n36Diagnostics?.publish({stage:failed?'unresolved':'saved',transfer:failed?'error':'idle',receipt:failed?'unknown':'saved'});
+  $('source-retry').hidden=!failed;
+  $('source-retry').textContent=profileFailure?'استكمال الدفعة المحفوظة':'استكمال الفصول غير المحسومة فقط';
+  $('handoff-status').textContent=profileFailure?`توقف حفظ إعداد الحساب (${profileFailure.code}). الدفعة محفوظة في ركيز للاستكمال؛ هذا لا يعني فشل مطابقة الفصول. لم يتأكد اكتمال الحفظ أو المزامنة.`:`${automaticFailures.size?'فصول لم يتأكد حفظها: '+automaticFailures.size+'. '+(lastTransferFailure?'('+lastTransferFailure+') '+failureHelp(lastTransferFailure):''):''}حُفظ محليًا ${totals.reduce((n,p)=>n+p.added,0)} اسم جديد؛ موجود سابقًا ${totals.reduce((n,p)=>n+p.existing,0)}. ${automaticFailures.size?'بقيت فصول غير محسومة.':'وصل إيصال الأسماء المتاحة.'} ${setupReceipt?`إعداد محفوظ محليًا: ${setupReceipt.saved+setupReceipt.existing}؛ تعارضات أو حقول غير مدعومة: ${setupReceipt.unresolved}؛ غير متاح من المصدر: ${setupReceipt.missing.map(c=>CATEGORIES[c].label).join('، ')||'لا شيء'}.`:'إعداد المعلم والجدول لم يتأكد حفظه.'} ${sourceInfo.complete?'':'التغطية جزئية؛ لا إثبات اكتمال المصدر.'} المزامنة لم تتأكد بعد.`;
   $('run-status').textContent=$('handoff-status').textContent;
-  window.dispatchEvent(new CustomEvent('n36:automatic-finished',{detail:{unresolved:automaticFailures.size>0,summary:$('source-class-summary').textContent}}));
+  window.dispatchEvent(new CustomEvent('n36:automatic-finished',{detail:{unresolved:failed,summary:$('source-class-summary').textContent}}));
   return;
  }
  chosenClass=group.classroom;$('source-class-select').value=chosenClass;renderSourceChoice();
