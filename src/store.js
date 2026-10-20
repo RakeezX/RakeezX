@@ -4623,6 +4623,14 @@ async function applyReviewedCommand(command, recordId, patch, verifyCurrent = ()
   verifyCurrent();
   const queued = await engine.queueCommand({ store: 'items', recordId, command, patch, backgroundImportPlanId, verifyCurrent });
   verifyCurrent();
+  if (backgroundImportPlanId) {
+    // The plan/envelope binding committed atomically; show its actual stage while the ACK is pending.
+    const device = await db.get('device', 'device');
+    verifyCurrent();
+    state.device = device;
+    notify({ syncReady: false });
+    broadcast([{ store: 'device', id: 'device' }]);
+  }
   const result = await engine.dispatchPending({ onlyMutationId: queued.mutationId });
   if (result.acknowledged !== 1) {
     const pending = await db.get('outbox', queued.id);

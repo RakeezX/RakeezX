@@ -1,0 +1,34 @@
+{
+  "taskId": "continuous-n107-current-background-queue-compact-ux-20261020",
+  "runId": "9702c98f-2efb-4e10-9c09-90c89b4b151a",
+  "checks": [
+    {
+      "name": "n107_two_imports_background_receipts_grades_and_terminal_active_count",
+      "status": "PASS",
+      "evidence": "Installed automatic Sync/coordinator completes two independent real IndexedDB plans without manual drains; exact four grades and max ACKs each, two durable receipts once; terminal plans leave active count."
+    },
+    {
+      "name": "n107_compact_success_optional_diagnostics_advanced_identity_ui",
+      "status": "PASS",
+      "evidence": "Actual source UI inspected at 390/1100 widths with no overflow; concise local/cloud status, active-only collapsed queue, clean next-file action, advanced identity remains optional and collapsed with ordinary-name guidance."
+    },
+    {
+      "name": "affected_syntax_diff",
+      "status": "PASS",
+      "evidence": "node --check on store.js and class-import-center.js; git diff --check passed."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/store.js": "f90c69878c94c37fb3a9176cb56f25d5e6ccbb5cc176e0c6aa9f987ac62339e6",
+    "src/views/class-import-center.js": "f59d4b756488a44a72448c26023a5c0692434df6aa539d4ab4319164431ada34"
+  },
+  "plans": [
+    {
+      "state": "cloud_confirmed"
+    },
+    {
+      "state": "cloud_confirmed"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "taskId": "continuous-n107-current-background-queue-compact-ux-20261020",
+  "runId": "9702c98f-2efb-4e10-9c09-90c89b4b151a",
+  "checks": [],
+  "failures": [
+    "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-local-import-saved]') to be visible\u001b[22m\n\n    at approve (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-current-background-queue-compact-ux-20261020\\tests\\n107-current-queue-compact-20261020\\browser.mjs:166:59)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-current-background-queue-compact-ux-20261020/tests/n107-current-queue-compact-20261020/browser.mjs:196:4\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-current-background-queue-compact-ux-20261020/tests/n107-current-queue-compact-20261020/browser.mjs:192:2"
+  ],
+  "testedFiles": {},
+  "lastPlans": []
+}

@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n107-current-background-queue-compact-ux-20261020",
+  "runId": "9702c98f-2efb-4e10-9c09-90c89b4b151a",
+  "checks": [
+    {
+      "name": "automatic_two_plan_baseline",
+      "status": "PASS",
+      "evidence": "Two plans progressed using the installed automatic Sync/coordinator, without manual drains."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {},
+  "plans": [
+    {
+      "state": "cloud_confirmed"
+    },
+    {
+      "state": "cloud_confirmed"
+    }
+  ]
+}
