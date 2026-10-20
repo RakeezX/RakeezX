@@ -38,3 +38,20 @@ legacy-fixture-failures.json records two exploratory existing fixtures that fail
 
 No build/push/deploy was performed. No queue/status file was edited. The independent publisher must integrate the candidate and verify the exact served assets src/app.js and src/lib/dom.js (including bundled equivalents) against the candidate. Local evidence is not Production delivery or PO acceptance.
 
+
+## Continuation — corrected regression fixtures
+
+Run: e9e2829b-e609-4fde-b009-c4185ef4443f.
+Previous candidate preserved: cda1032b47272f4e4d4a78f3b144390774fb55da.
+The adapter rejected the previous final result because it included a recorded failing check. This continuation supplies a concrete fixture correction and new passing verification; the old failure records remain unchanged.
+
+The original legacy files are outside this card's allowed paths. Scoped regression files under tests/n107-focus-sync-stability-20261020 retain the original cadence assertions and the complete N95 coordinator/lifecycle test assertions, with original source hashes for provenance. The previously excluded historical source-comparison test remains unrelated to this change; no active assertion was removed to pass.
+
+- authenticated-fixture.mjs installs isolated in-memory localStorage, persists a fabricated session with matching user, uses the existing test Auth hook and renews the real runtime lease API with synthetic verifier evidence. It refreshes the store's lease context after the non-notifying test Auth hook, including owner B. No Product guard is patched.
+- cadence-authenticated.test.mjs asserts the missing lease rejects writes before renewal. It seeds an acknowledged owner profile in both fabricated DB and store: the intended patch/cadence test no longer accidentally exercises bootstrap from an absent persisted profile. Original two-phase Sync-ready, render, durable command and batch-save assertions remain.
+- coordinator-authenticated.test.mjs retains transient failure timing, offline/online presentation, repeated failure escalation, successful recovery, Auth failure, hard failure, durable failed/rejected work, interrupted-lifecycle warning, logout/reset, owner B and mismatched-owner blocking assertions.
+- authenticated-checks-initial.txt preserves the intermediate correction failures: absent canonical persisted profile legitimately triggered an authoritative repaint; owner B's test Auth hook did not refresh the runtime lease context. Both fixture causes were corrected before the final run.
+- authenticated-checks.txt: all 3 regression tests PASS, zero failures. Logged synthetic transport/Auth/data-loss failures are deliberate inputs whose expected outcomes are asserted by the coordinator test.
+- resume-result.json verifies exact current UI source SHA256 matches the saved actual-DOM evidence and that all Product source remains byte-for-byte unchanged from cda1032b. The required UI checks, screenshots and owner/presentation results are reused from the exact saved run; their runId is preserved. No browser/server was relaunched. Existing failure artifacts are historical evidence, not current failed acceptance checks and not overwritten to PASS.
+
+The new candidate changes tests/evidence only on top of the preserved Product repair. It makes no Production/service/queue changes. Publisher verification of the served assets remains pending.

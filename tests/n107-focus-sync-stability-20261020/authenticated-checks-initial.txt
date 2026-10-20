@@ -1,0 +1,82 @@
+✖ optimistic patch renders before Sync is ready, then signals only after durable outbox commit (28.8684ms)
+✔ batch save signals Sync only after its outbox is durable (4.4246ms)
+[rakeezx sync] Automatic sync failed: Error: profile: Failed to fetch
+    at firstPullError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:573:10)
+    at Module.syncAll (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:648:23)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:502:9)
+    at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/coordinator-authenticated.test.mjs:56:16)
+    at async Test.run (node:internal/test_runner/test:1389:7)
+    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+[rakeezx sync] Automatic sync failed: Error: profile: Failed to fetch
+    at firstPullError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:573:10)
+    at Module.syncAll (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:648:23)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:502:9)
+    at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/coordinator-authenticated.test.mjs:75:16)
+    at async Test.run (node:internal/test_runner/test:1389:7)
+    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+[rakeezx sync] Automatic sync failed: Error: profile: Synthetic revoked Auth
+    at firstPullError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:573:10)
+    at Module.syncAll (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:648:23)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:502:9)
+    at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/coordinator-authenticated.test.mjs:82:16)
+    at async Test.run (node:internal/test_runner/test:1389:7)
+    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+[rakeezx sync] Automatic sync failed: Error: profile: Synthetic data-loss failure
+    at firstPullError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:573:10)
+    at Module.syncAll (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:648:23)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:502:9)
+    at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/coordinator-authenticated.test.mjs:88:16)
+    at async Test.run (node:internal/test_runner/test:1389:7)
+    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+[rakeezx sync] Automatic sync failed: Error: profile: Failed to fetch
+    at firstPullError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:573:10)
+    at Module.syncAll (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/sync.js:648:23)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:502:9)
+    at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/coordinator-authenticated.test.mjs:93:16)
+    at async Test.run (node:internal/test_runner/test:1389:7)
+    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+✖ transient_status / fatal_visibility / owner_reset: actual synthetic coordinator and lifecycle events (149.3447ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 1
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 398.8552
+
+✖ failing tests:
+
+test at tests\n107-focus-sync-stability-20261020\cadence-authenticated.test.mjs:20:1
+✖ optimistic patch renders before Sync is ready, then signals only after durable outbox commit (28.8684ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/cadence-authenticated.test.mjs:35:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\n107-focus-sync-stability-20261020\coordinator-authenticated.test.mjs:43:1
+✖ transient_status / fatal_visibility / owner_reset: actual synthetic coordinator and lifecycle events (149.3447ms)
+  Error: يلزم التحقق من الحساب لاستئناف التعديل. يمكنك العرض والتصدير وتنزيل نسخة احتياطية.
+      at leaseWriteError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/offline-lease.js:32:52)
+      at Object.renew (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/src/lib/offline-lease.js:125:61)
+      at renew (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/authenticated-fixture.mjs:20:32)
+      at TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/coordinator-authenticated.test.mjs:118:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    code: 'OFFLINE_LEASE_LIMITED'
+  }
