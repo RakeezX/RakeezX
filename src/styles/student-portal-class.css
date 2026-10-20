@@ -55,3 +55,4 @@
 .topbar__actions .n88-student-gateway{font-size:var(--fs-sm);min-block-size:var(--tap);padding-inline:var(--sp-2);white-space:normal;text-align:center;line-height:1.5}
 .n88-entry>[data-n88-entry-body]{min-block-size:8rem}
 .n88-entry>[data-n88-entry-body]>[role=status]{color:var(--text-2);line-height:1.8;max-inline-size:48rem}
+.n88-entry [data-n88-copy-failure]{margin-inline-start:var(--sp-2);margin-block-start:var(--sp-1)}

@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "scope": "Actual runtime, client, app CSS and real classBinding owner guard over owned loopback HTTP; synthetic clipboard write sink only",
+  "snapshot": {
+    "phase": "http",
+    "code": "rejected",
+    "stage": "repository",
+    "httpStatus": 503,
+    "elapsedMs": 0,
+    "sourceVersion": "n88-class-deadline-v1"
+  },
+  "copyFields": 6,
+  "poisonExcluded": true,
+  "unknownStage": "none",
+  "loadingHasNoCopy": true,
+  "oneStatusRegion": true,
+  "detachedRetryAndDisposedIgnored": true,
+  "ownerChangeBlocksCopy": true,
+  "clipboardFailureInline": true,
+  "networkExports": 0,
+  "personalClipboardReads": 0,
+  "actualTeacherCause": "NOT_PROVEN",
+  "cleanup": "Owned isolated browser/context and HTTP server closed"
+}

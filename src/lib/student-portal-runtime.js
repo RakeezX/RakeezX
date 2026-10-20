@@ -11,6 +11,12 @@ const diagnosticStages=['none','configuration','key-configuration','envelope','u
 function checkpoint(phase,httpStatus=0,elapsedMs=0,code='none',stage='none'){
  if(!['binding','queue','dispatch','http','response','admitted','failure'].includes(phase))return;
  portalDiagnostic={phase,httpStatus:Number.isInteger(httpStatus)&&httpStatus>=100&&httpStatus<=599?httpStatus:0,elapsedMs:Math.min(30000,Math.max(0,Math.round(elapsedMs/100)*100)),sourceVersion:'n88-class-deadline-v1',code:diagnosticCodes.includes(code)?code:'uncertain',stage:diagnosticStages.includes(stage)?stage:'none'};
+ return portalDiagnostic;
+}
+function failureSnapshot(value){
+ if(!value||!['binding','queue','dispatch','http','response','admitted','failure'].includes(value.phase)||!diagnosticCodes.includes(value.code)||!diagnosticStages.includes(value.stage)||value.sourceVersion!=='n88-class-deadline-v1')return null;
+ if(!Number.isInteger(value.httpStatus)||(value.httpStatus!==0&&(value.httpStatus<100||value.httpStatus>599))||!Number.isFinite(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000)return null;
+ return Object.freeze({phase:value.phase,code:value.code,stage:value.stage,httpStatus:value.httpStatus,elapsedMs:Math.round(value.elapsedMs/100)*100,sourceVersion:'n88-class-deadline-v1'});
 }
 // Change only through a separately authorized, service-evidenced activation diff.
 export const PORTAL_READINESS = Object.freeze({ enabled: true, serviceRevision: 'n88-integrated-class-v1', mode: 'public' });
@@ -73,26 +79,27 @@ export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=gl
 }
 function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,classLabel,enqueue,readTimeoutMs}) {
   if(!ready(readiness)){classEntryState(root,'disabled');return {dispose(){root.replaceChildren();}};}
-  let initial;try{initial=getBinding(false);checkpoint('binding');}catch(e){checkpoint('binding',0,0,'unavailable');classEntryState(root,e.portalState||'context');return {dispose(){root.replaceChildren();}};}
+  let ownDiagnostic=null;const record=(...args)=>{ownDiagnostic=checkpoint(...args);};
+  let initial;try{initial=getBinding(false);record('binding');}catch(e){let retired=false;const state=e.portalState||'context';record('binding',0,0,'unavailable');classEntryState(root,state,ownDiagnostic,()=>{if(retired)return false;try{getBinding(false);return false;}catch(next){return (next.portalState||'context')===state;}});return {dispose(){retired=true;root.replaceChildren();}};}
   let disposed=false,handle=null,admitted=false,failure='connection';const entryStarted=performance.now(),lifetime=new AbortController();
   const current=write=>{try{const b=getBinding(write);if(disposed||b.key!==initial.key)throw bindingError('context');return b;}catch(e){failure=e.portalState||'context';throw e;}};
   const getContext=()=>{try{return current(false).context;}catch{return null;}};
   const client=createClassPortalClient({getContext,readTimeoutMs,request:(path,init)=>{
     // List/guidance share the same authoritative short DB lock. Serialize this
     // owner's browser requests before dispatch, retaining all binding/lease checks.
-    const started=performance.now();checkpoint('queue');
+    const started=performance.now();record('queue');
     return enqueue(async()=>{
     if(init.signal?.aborted)throw bindingError('connection');
     const b=current(true);
     // Version only the list response contract; this marker grants no admission.
     // Older published pilot clients keep working during the public source rollout.
     const body=path.endsWith('/list')&&readiness.mode==='public'?JSON.stringify({...JSON.parse(init.body),uiProtocol:'n88-public-ui-v1'}):init.body;
-    checkpoint('dispatch',0,performance.now()-started);
+    record('dispatch',0,performance.now()-started);
     const signal=AbortSignal.any([init.signal,lifetime.signal]);
     const response=await send(path,{...init,signal,body,headers:{...init.headers,Authorization:'Bearer '+b.token}});
     if(signal.aborted)throw bindingError('context');
     const stage=response.headers?.get('x-n88-service-stage')||response.headers?.get('x-n88-transport-stage')||'none';
-    checkpoint('http',response.status,performance.now()-started,'none',stage);
+    record('http',response.status,performance.now()-started,'none',stage);
     if(!response.ok)failure=[401,403].includes(response.status)?'denied':'connection';
     current(false);return {ok:response.ok,async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
       // Server admission follows verified Auth/session/current source ownership.
@@ -101,13 +108,13 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
         if(data.rollout!==readiness.mode){failure='revision';throw bindingError('revision');}
         admitted=true;
       }
-      const {rollout,...ack}=data;checkpoint('response',response.status,performance.now()-started,'none',stage);return ack;}};
+      const {rollout,...ack}=data;record('response',response.status,performance.now()-started,'none',stage);return ack;}};
     });
   }});
   classEntryState(root,'loading');
   // No controls/private roster until the normal authenticated service admits this owner.
   void client.listClass(initial.context.teachingId).then(initialList=>{
-    current(false);if(!admitted)throw Error('unavailable');checkpoint('admitted',200,portalDiagnostic?.elapsedMs||0);
+    current(false);if(!admitted)throw Error('unavailable');record('admitted',200,ownDiagnostic?.elapsedMs||0);
     const content=root.ownerDocument.createElement('div');entryShell(root).replaceChildren(content);
     if(readiness.mode==='pilot'){
       const note=root.ownerDocument.createElement('p');note.setAttribute('role','status');
@@ -118,7 +125,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     let firstList=initialList;
     const admittedClient={...client,listClass:async teachingId=>{current(false);if(firstList&&teachingId===initial.context.teachingId){const data=firstList;firstList=null;return data;}return client.listClass(teachingId);}};
     handle=mountClassPortal(content,{client:admittedClient,getContext,subscribe,classLabel});
-  }).catch(e=>{if(!disposed){const last=portalDiagnostic;checkpoint(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure));}});
+  }).catch(e=>{if(!disposed){const last=ownDiagnostic;record(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure),ownDiagnostic,()=>{try{current(false);return true;}catch{return false;}});}});
   return {dispose(){disposed=true;lifetime.abort();handle?.dispose();root.replaceChildren();}};
 }
 const classEntryMessages={timeout:'لم تكتمل قراءة الفصل خلال المهلة. أعد المحاولة؛ لم نغيّر أي رمز أو إعداد.',loading:'جارٍ فتح مساحة طلاب الفصل…',disabled:'مساحة طلاب الفصل غير متاحة حاليًا.',account:'يلزم حساب معلم متصل لفتح مساحة الفصل.',owner:'تعذّر تأكيد سياق الحساب. أعد فتح الفصل من حساب مالكه.',source:'هذا الفصل غير متاح ضمن السياق الدراسي الحالي.',lease:'تعذّر تأكيد صلاحية المزامنة لهذا التبويب. أعد فتح الفصل في التبويب النشط.',session:'انتهت صلاحية الاتصال بالحساب. أعد الاتصال ثم حاول مجددًا.',context:'تغيّر سياق الاتصال. أعد المحاولة لفتح الفصل من جديد.',denied:'لم يسمح الخادم بفتح المساحة لهذا السياق. تحقق من الحساب والفصل ثم أعد المحاولة.',revision:'تحتاج مساحة الطلاب إلى تحديث التطبيق. حدّث الصفحة ثم أعد المحاولة.',connection:'تعذّر الاتصال بمساحة الطلاب. حاول مجددًا.'};
@@ -130,11 +137,23 @@ function entryShell(root){
  // shell must never keep a second status fragment beside its authoritative body.
  if(root.childNodes.length!==1||root.firstChild!==body)root.replaceChildren(body);return body;
 }
-function classEntryState(root,state){
+function classEntryState(root,state,diagnostic=null,isCurrent=()=>false){
  if(!Object.hasOwn(classEntryMessages,state))state='context';
  const body=entryShell(root);body.replaceChildren();root.dataset.n88EntryState=state;root.setAttribute('aria-busy',String(state==='loading'));
  const message=root.ownerDocument.createElement('p');message.dataset.n88EntryStatus='';message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.textContent=classEntryMessages[state];body.append(message);
  if(!['loading','disabled'].includes(state)){const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88Retry='';button.textContent='إعادة المحاولة';body.append(button);}
+ const snapshot=failureSnapshot(diagnostic);
+ if(!['loading','disabled'].includes(state)&&snapshot){
+  const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88CopyFailure='';button.textContent='نسخ تفاصيل التعذّر';body.append(button);
+  const valid=()=>root.contains(button)&&root.contains(body)&&isCurrent();
+  button.addEventListener('click',async()=>{
+   if(!valid()||button.disabled)return;
+   button.disabled=true;
+   try{const clipboard=root.ownerDocument.defaultView.navigator.clipboard;if(!clipboard?.writeText)throw Error('unavailable');await clipboard.writeText(JSON.stringify(snapshot));if(valid())button.textContent='تم النسخ';}
+   catch{if(valid())button.textContent='تعذّر النسخ';}
+   finally{if(valid())button.disabled=false;}
+  });
+ }
 }
 export function unavailable(root) {
   root.replaceChildren();
