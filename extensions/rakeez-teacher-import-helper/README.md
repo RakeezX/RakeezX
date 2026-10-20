@@ -1,3 +1,11 @@
+## AI candidate 0.5.17 — 20 October 2026
+
+The explicit Start binds the existing authenticated application document and delivers to its shell receiver without changing its route or opening the import page. The app automatically resumes an exact saved same-owner/year/term batch after readiness using a fresh guarded grant; ambiguous class mappings remain optional manual recovery. No school routes, extraction rules or permissions changed.
+
+Profile imports compare the hydrated persisted singleton inside one profile/outbox transaction and update memory only after commit. Conflicting values remain untouched. Unknown receipts carry only a finite failure phase/step/code into safe diagnostics; a profile-wide failure stops the batch instead of labelling every class unresolved. Compact fifth/sixth-grade names resolve only to unique matching existing destinations.
+
+Synthetic actual-app/IndexedDB/controller/worker evidence covers storage rollback, postcommit unknown, duplicate-free saved-batch resume after reload, and foreign-account rejection. The real reported 0.5.16 journey remains FAILED. Live account success, publication, stable-folder 0.5.17 installation and Chrome reload are NOT_RUN by this worker; publication and subsequent stable update belong to the existing controller/publisher/updater.
+
 ## AI candidate 0.5.16 — 19 October 2026
 
 - Transport checks the original document and account/session/year/term batch capability instead of an exact cached hash URL. A fresh deliberate Start can rebind the same current-account pending batch; workspace deactivation revokes the old capability.

@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "version": "0.5.17",
+  "baseSha": "7a68241d47c4501b224ac237a36e9d44c4a377ea",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.17.zip",
+    "sha256": "3eb3338ff482b84329a5623af54b2f7cd48182c37aa6b6cba22e206c70c6dc47",
+    "bytes": 113269
+  },
+  "runtimeFiles": 25,
+  "checks": [
+    "Exact ZIP/source/SHA256/size parity",
+    "Original extraction/lifecycle modules unchanged; proof reused",
+    "Protocol parity, unchanged narrow permissions/CSP, changed JS syntax",
+    "Previous 0.5.16 immutable",
+    "Current stable runtime read-only hash verification"
+  ],
+  "stable": {
+    "version": "0.5.16",
+    "sourceTaskId": "continuous-n36-one-start-complete-madrasati-20261019",
+    "publishedSha": "66a84641fe74b7f0a33c98e2ec9a72b3c31886b9",
+    "filesVerified": 25,
+    "updated": false
+  },
+  "deliveryGate": {
+    "status": "NOT_RUN",
+    "reason": "Independent publisher must first verify source/served 0.5.17 package; existing n36-stable-sync then installs those exact bytes and records version/hash. Current stable remains 0.5.16. Chrome reload NOT_RUN."
+  }
+}

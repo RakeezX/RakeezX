@@ -1,0 +1,138 @@
+{
+  "taskId": "continuous-n36-setup-profile-save-direct-bridge-20261020",
+  "runId": "3b675661-fb0a-4ca6-851b-9fde523c5ab2",
+  "checks": [
+    {
+      "name": "hydrated_profile_transaction",
+      "status": "PASS",
+      "evidence": "Actual account store and IndexedDB; missing persisted defaults no longer cause a false conflict."
+    },
+    {
+      "name": "profile_rollback_conflict_unknown_retry_owner",
+      "status": "PASS",
+      "evidence": "Injected IndexedDB QuotaExceededError aborts profile+outbox with no optimistic singleton notification; real concurrent value and foreign account rejected. Postcommit unknown is preserved, then same-value retry creates no command duplicate."
+    },
+    {
+      "name": "one_start_app_shell_no_navigation",
+      "status": "PASS",
+      "evidence": "Actual controller collected-source entry → category handlers → real worker → shell nonce receiver → authenticated store/IndexedDB. Two existing canonical destinations, subjects/profile/timetable/names saved; no navigation, new app tab or per-class confirmation. Production origin constant translated to owned loopback only in fixture; real Chrome and live journey NOT_RUN."
+    },
+    {
+      "name": "saved_batch_reload_resume_foreign_fence_and_safe_diagnostics",
+      "status": "PASS",
+      "evidence": "Actual IndexedDB profile failure returned unknown/profile/transaction/QuotaExceededError through real worker + extension safe report, kept batch, stopped global failure without labelling both classes unresolved. Foreign account denied with unchanged disk/outbox. After actual reload and delayed same-owner hydration, fresh grant automatically resumed saved names/setup without navigation or duplicate student/enrollment/slot writes."
+    },
+    {
+      "name": "route_free_transport_fences",
+      "status": "PASS",
+      "evidence": "Real worker rejects foreign origin/tab, old document, changed current route, nonce replay, expired batch and non-allowlisted receipt code. Actual app grant rejects changed session/term and invalid offline lease."
+    }
+  ],
+  "errors": [],
+  "preservedFailures": [
+    {
+      "failure": "page.waitForFunction: Timeout 20000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-setup-profile-save-direct-bridge-20261020\\tests\\n36-actual-save-20261020\\browser.mjs:104:17\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-setup-profile-save-direct-bridge-20261020/tests/n36-actual-save-20261020/browser.mjs:33:2"
+    },
+    {
+      "failure": "page.waitForFunction: Timeout 10000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-setup-profile-save-direct-bridge-20261020\\tests\\n36-actual-save-20261020\\browser.mjs:106:21\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-setup-profile-save-direct-bridge-20261020/tests/n36-actual-save-20261020/browser.mjs:35:2",
+      "debug": {
+        "runner": "حُفظ محليًا 2 اسم جديد؛ موجود سابقًا 0. وصل إيصال الأسماء المتاحة. إعداد محفوظ محليًا: 8؛ تعارضات أو حقول غير مدعومة: 0؛ غير متاح من المصدر: لا شيء. المزامنة لم تتأكد بعد.",
+        "handoff": "حُفظ محليًا 2 اسم جديد؛ موجود سابقًا 0. وصل إيصال الأسماء المتاحة. إعداد محفوظ محليًا: 8؛ تعارضات أو حقول غير مدعومة: 0؛ غير متاح من المصدر: لا شيء.  المزامنة لم تتأكد بعد.",
+        "app": "",
+        "worker": {
+          "navigation": [],
+          "received": [
+            {
+              "accepted": true
+            },
+            {
+              "accepted": true
+            }
+          ],
+          "claims": [
+            {
+              "type": "n36-claim"
+            },
+            {
+              "type": "n36-outcome"
+            },
+            {
+              "type": "n36-claim"
+            },
+            {
+              "type": "n36-outcome"
+            }
+          ],
+          "documentId": "synthetic-document-one"
+        },
+        "records": {}
+      }
+    },
+    {
+      "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#copy-safe-report')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" id=\"copy-safe-report\">نسخ معلومات التشخيص</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-setup-profile-save-direct-bridge-20261020\\tests\\n36-actual-save-20261020\\browser.mjs:136:46\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-setup-profile-save-direct-bridge-20261020/tests/n36-actual-save-20261020/browser.mjs:35:2"
+    },
+    {
+      "failure": "SyntaxError: Unexpected end of JSON input\n    at JSON.parse (<anonymous>)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-setup-profile-save-direct-bridge-20261020/tests/n36-actual-save-20261020/browser.mjs:138:20\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-setup-profile-save-direct-bridge-20261020/tests/n36-actual-save-20261020/browser.mjs:35:2"
+    }
+  ],
+  "worker": {
+    "navigation": [],
+    "received": [
+      {
+        "accepted": true
+      },
+      {
+        "accepted": true
+      },
+      {
+        "accepted": true
+      },
+      {
+        "accepted": true
+      }
+    ],
+    "claims": [
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-outcome"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-outcome"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-outcome"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-claim"
+      },
+      {
+        "type": "n36-outcome"
+      }
+    ],
+    "documentId": "synthetic-document-two"
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "newEagerDependencies": [
+    "src/views/class-import-center.js",
+    "src/lib/demo.js",
+    "src/lib/class-koshoof-bundle.js",
+    "src/lib/grade-transfer-xlsx.js",
+    "src/lib/grade-transfer-export.js",
+    "src/lib/zip.js",
+    "src/views/students.js",
+    "src/lib/avatar.js",
+    "src/lib/n36-extension-handoff.js",
+    "src/lib/n36-extension-protocol.js"
+  ],
+  "scope": "Static dependency closure newly added by app-shell receiver; each exact resource remains in existing offline SHELL. No live SW/cache certification."
+}

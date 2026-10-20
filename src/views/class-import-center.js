@@ -18,6 +18,7 @@ import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding, reviewGradeTransfer } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
 import { handoffRequest, claimHandoff, reportHandoffOutcome } from '../lib/n36-extension-handoff.js';
+import { validateHandoff, HANDOFF_TTL } from '../lib/n36-extension-protocol.js';
 
 
 
@@ -112,21 +113,52 @@ function extensionOwnerBinding() {
 let automaticBatch=null, automaticWriting=false;
 export function prepareExtensionBatch(){
  const binding=extensionOwnerBinding();
- if(automaticWriting)throw Error('BATCH_PENDING');
+ if(automaticWriting||extensionBusy)throw Error('BATCH_PENDING');
  const prior=store.state.device?.n36NamesBatch;
  // A deliberate Start may resume only its current owner's current academic context.
  if(prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId&&
     (prior.yearId!==store.activeYear().id||prior.termId!==store.activeTerm().id))throw Error('BATCH_PENDING_OTHER_TERM');
  const id=prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId?prior.batchId:[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
  automaticBatch={id,binding,session:cloud.session,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.activeYear()),termState:JSON.stringify(store.activeTerm()),expires:Date.now()+1800000};
+ resumeCancelled=false;
  return id;
 }
-// Stable bridge survives the publisher's bundled asset names; no source-URL injection.
-window.rakeezBeginNamesBatch=prepareExtensionBatch;
-window.rakeezCancelNamesBatch=id=>{if(automaticBatch?.id===id)automaticBatch=null;};
-window.rakeezCheckNamesBatch=id=>{
- try{if(automaticWriting||!automaticBatch||automaticBatch.id!==id)return false;automaticGuard(automaticBatch);return true;}catch{return false;}
-};
+// AI: one receiver in the authenticated app shell, independent of route mounts.
+let receiverInstalled=false, resumeAttempt=null, resumeCancelled=false;
+export function installExtensionBridge(){
+ if(receiverInstalled)return;receiverInstalled=true;
+ window.rakeezBeginNamesBatch=prepareExtensionBatch;
+ window.rakeezCancelNamesBatch=id=>{if(automaticBatch?.id===id){automaticBatch=null;resumeCancelled=true;}};
+ window.rakeezCheckNamesBatch=id=>{
+  try{if(automaticWriting||extensionBusy||!automaticBatch||automaticBatch.id!==id)return false;automaticGuard(automaticBatch);return true;}catch{return false;}
+ };
+ window.rakeezReceiveNamesBatch=(request,id)=>{
+  if(!/^[a-p]{32}$/.test(request?.extensionId)||!/^[a-f0-9]{64}$/.test(request?.nonce)||!window.rakeezCheckNamesBatch(id))return false;
+  void receiveExtension(request);return true;
+ };
+ const resume=()=>{void resumeSavedExtensionBatch();};
+ store.subscribe(resume);cloud.subscribe(resume);resume();
+}
+async function resumeSavedExtensionBatch(){
+ if(automaticWriting||extensionBusy||resumeCancelled)return;
+ const p=store.state.device?.n36NamesBatch;
+ if(!p?.pending)return;
+ let binding;try{binding=extensionOwnerBinding();}catch{return;}
+ if(p.ownerId!==store.getActiveWorkspace().authUserId||p.yearId!==store.activeYear().id||p.termId!==store.activeTerm().id)return;
+ const key=JSON.stringify([binding,p.batchId,Object.keys(p.pending)]);
+ if(resumeAttempt?.key===key&&resumeAttempt.session===cloud.session)return;
+ resumeAttempt={key,session:cloud.session};
+ try{
+  prepareExtensionBatch();
+  for(const pending of Object.values(p.pending)){
+   const stamp=Date.now();
+   const envelope=validateHandoff({schema:'rakeez-extension-names',version:pending.setup?3:2,source:'madrasati',scope:'reviewed-run',createdAt:stamp,expiresAt:stamp+HANDOFF_TTL,batchId:p.batchId,...pending});
+   await saveAutomaticNames({envelope});
+  }
+  toast('استُكملت الدفعة المحفوظة لهذا الحساب محليًا. المزامنة لم تتأكد بعد.');
+ }catch(error){extensionMessage='الدفعة محفوظة ولم يتأكد اكتمالها: '+error.message;}
+ repaint();
+}
 function automaticGuard(batch){
  if(automaticBatch!==batch||Date.now()>=batch.expires||extensionOwnerBinding()!==batch.binding||cloud.session!==batch.session||
  store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||batch.route&&location.hash!==batch.route)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
@@ -160,7 +192,7 @@ function sourceSection(classroom){
  let grade,label;
  // AI: first/second/third without an academic stage remain ambiguous.
  const aliases={4:['رابع','الرابع'],5:['خامس','الخامس'],6:['سادس','السادس']};
- for(const g of GRADES){for(const prefix of [key(g.label),...(aliases[g.v]??[])]){if(name.startsWith(prefix+' ')||name.startsWith(prefix+'/')||name.startsWith(prefix+'(')){grade=g.v;label=name.slice(prefix.length).replace(/^[ /(-]+|[ )]+$/g,'').trim();break;}}if(grade)break;}
+ for(const g of GRADES){for(const prefix of [key(g.label),...(aliases[g.v]??[])]){if(name.startsWith(prefix)&&/^(?:[ /(-]|[0-9])/.test(name.slice(prefix.length))){grade=g.v;label=name.slice(prefix.length).replace(/^[ /(-]+|[ )]+$/g,'').trim();break;}}if(grade)break;}
  const numeric=name.match(/^(1[0-2]|[1-9])\s*[/(-]\s*([\p{L}\p{N} ._-]{1,8})\)?$/u);
  if(numeric){grade=Number(numeric[1]);label=numeric[2].trim();}
  if(!grade||!label||label.length>8||!/^[\p{L}\p{N} ._-]+$/u.test(label))throw Error('CLASS_MAPPING_REQUIRED');
@@ -305,19 +337,19 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>استورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.16.zip" download>تنزيل إضافة ركيز 0.5.16</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.17.zip" download>تنزيل إضافة ركيز 0.5.17</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
       <li>عند تحديث ملفات الإضافة في المجلد نفسه، اضغط «إعادة تحميل» في صفحة الإضافات.</li>
     </ol></details>
     ${extensionPreview ? html`<p role="status">${extensionPreview.envelope.source === 'noor' ? 'نور — عمود ظاهر مختار؛ صفحات وأعمدة أخرى غير مجمّعة' : 'مدرستي — الأسماء التي راجعتها في الإضافة فقط'} · ${extensionPreview.envelope.rows.length} اسمًا. اختر الفصل والمادة أدناه.</p><button class="btn btn--primary" data-act="n36-extension-review" ${!hub.existing || hub.kind === 'new' ? 'disabled' : ''}>مراجعة أسماء الإضافة</button><button class="btn btn--quiet" data-act="n36-extension-cancel">إلغاء ومسح النقل</button>` : ''}
-    ${store.state.device?.n36NamesBatch?.pending ? html`<details open><summary>الفصول غير المحسومة فقط</summary>${[...new Set(Object.values(store.state.device.n36NamesBatch.pending).flatMap(p=>p.rows.map(r=>r.classroom)))].map(classroom=>html`<label class="field"><span>${classroom} — حدّد فصلًا موجودًا إذا لم تُحسم المطابقة</span><select class="select" data-n36-batch-map data-classroom="${classroom}"><option value="">المطابقة من اسم المصدر</option>${store.sections().filter(s=>s.status!=='archived'&&(!s.ownerId||s.ownerId===store.getActiveWorkspace().authUserId)).map(s=>html`<option value="${s.id}" ${store.state.device.n36NamesBatch.classMappings?.[classroom]===s.id?'selected':''}>${sectionLabel(s)}</option>`)}</select></label>`)}</details><button class="btn" data-act="n36-batch-resume">استكمال دفعة الأسماء المحفوظة لهذا الحساب</button>` : ''}
+    ${store.state.device?.n36NamesBatch?.pending ? html`<details><summary>مطابقة الفصول التي تحتاج مراجعة</summary>${[...new Set(Object.values(store.state.device.n36NamesBatch.pending).flatMap(p=>p.rows.map(r=>r.classroom)))].filter(classroom=>{try{sourceSection(classroom);return false;}catch{return true;}}).map(classroom=>html`<label class="field"><span>${classroom} — حدّد فصلًا موجودًا إذا لم تُحسم المطابقة</span><select class="select" data-n36-batch-map data-classroom="${classroom}"><option value="">المطابقة من اسم المصدر</option>${store.sections().filter(s=>s.status!=='archived'&&(!s.ownerId||s.ownerId===store.getActiveWorkspace().authUserId)).map(s=>html`<option value="${s.id}" ${store.state.device.n36NamesBatch.classMappings?.[classroom]===s.id?'selected':''}>${sectionLabel(s)}</option>`)}</select></label>`)}</details><button class="btn" data-act="n36-batch-resume">استكمال الدفعة المحفوظة لهذا الحساب</button>` : ''}
     <p role="status" data-n36-handoff-status>${extensionBusy ? 'جار استلام المعاينة المؤقتة…' : extensionMessage}</p>
   </section>`;
 }
-async function receiveExtension() {
-  let request; try { request=handoffRequest(); } catch { extensionMessage='رابط النقل غير صالح. أعد النقل من الإضافة ثم أعد المحاولة.'; history.replaceState(null,'','#/classes/koshoof?import=1'); repaint(); return; }
+async function receiveExtension(directRequest=null) {
+  let request; try { request=directRequest??handoffRequest(); } catch { extensionMessage='رابط النقل غير صالح. أعد النقل من الإضافة ثم أعد المحاولة.'; history.replaceState(null,'','#/classes/koshoof?import=1'); repaint(); return; }
   if(!request || extensionBusy)return;
   let owner; try { owner=extensionOwnerBinding(); } catch { return; }
   const route=location.hash;
@@ -326,14 +358,18 @@ async function receiveExtension() {
     const result=await claimHandoff(request);
     if(location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
     if(result.envelope.version>=2){
-      try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);}
-      catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+').'+reason+' التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.';await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length});}
+      try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);if(directRequest)toast(extensionMessage);}
+      catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+').'+reason+' التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.';await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length,failure:safeBatchFailure(error)});if(directRequest)toast(extensionMessage,'danger');}
       return;
     }
     extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
     extensionTimer=setTimeout(()=>{clearExtensionPreview();extensionMessage='انتهت المعاينة. أعد النقل من الإضافة ثم أعد المحاولة.';repaint();},Math.max(0,result.envelope.expiresAt-Date.now()));
   } catch (error) { const code=['HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER','HANDOFF_EXPIRED_OR_DENIED','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_TIMEOUT','OWNER_CHANGED'].includes(error.message)?error.message:'HANDOFF_UNAVAILABLE';extensionMessage='تعذّر النقل ('+code+'). ارجع إلى حساب ركيز الذي بدأ منه التشغيل واستكمل الفصول غير المحسومة من الإضافة. لم يُفترض حفظ هذه الدفعة.'; }
-  finally { extensionBusy=false;if(location.hash===route)history.replaceState(null,'','#/classes/koshoof?import=1');repaint(); }
+  finally { extensionBusy=false;if(!directRequest&&location.hash===route)history.replaceState(null,'','#/classes/koshoof?import=1');repaint(); }
+}
+function safeBatchFailure(error){
+ const codes=['SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED'];
+ return {phase:error.message==='SETUP_PROFILE_SAVE'?'profile':'batch',step:['transaction','readback'].includes(error.phase)?error.phase:'validation',code:codes.includes(error.code)?error.code:codes.includes(error.message)?error.message:'WRITE_FAILED'};
 }
 function setupBinding(teachingId) {
   store.assertClassOperationsAccess(teachingId);

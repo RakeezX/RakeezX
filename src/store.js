@@ -1318,19 +1318,47 @@ export const patchProfile = (changes, options = {}) => patch('profile', 'profile
 // AI: imported profile identity may fill blanks, never replace a teacher's value.
 export async function importSetupProfile(changes, { verifyCurrent } = {}) {
   assertClassImportAccess();
-  if(state.profile?.ownerId&&state.profile.ownerId!==activeWorkspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
+  const workspace=activeWorkspace, session=cloud.session;
+  const guard=current=>{
+    if(activeWorkspace!==workspace||cloud.session!==session)throw Error('SETUP_PROFILE_OWNER');
+    assertClassImportAccess();
+    verifyCurrent?.(current);
+  };
+  if(state.profile?.ownerId&&state.profile.ownerId!==workspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
   const fields = ['teacherName','schoolName','principalName','reportPrincipalName'];
   if(Object.keys(changes).some(k=>!fields.includes(k)))throw Error('SETUP_PROFILE_FIELD');
-  const previous=JSON.stringify(state.profile), next={...state.profile,...changes,updatedAt:now()};
+  const previous=structuredClone(state.profile);
   if(Object.entries(changes).some(([k,v])=>typeof v!=='string'||!v.trim()||v.length>80||state.profile[k]&&state.profile[k]!==v))throw Error('SETUP_PROFILE_CONFLICT');
-  const ok=await save({profile:[next]},{verifyCurrent(current){
-    verifyCurrent?.(current);
-    if(JSON.stringify(current.profile.find(p=>p.id==='profile'))!==previous)throw Error('SETUP_PROFILE_CHANGED');
-  }});
-  if(!ok)throw Error('SETUP_PROFILE_SAVE');
-  const profile=await db.get('profile','profile');
-  verifyCurrent?.();state.profile=profile;notify();
-  return state.profile;
+  let phase='transaction';
+  try {
+    // SINGLETON: compare the same hydrated shape as init/refresh, then prepare
+    // the profile and its owner-bound outbox atomically. No optimistic render
+    // may replace the snapshot while verifyCurrent is still checking it.
+    const committed=await db.applyBatch({profile:{},outbox:{},device:{},years:{},terms:{}},{prepare(current){
+      guard(current);
+      const raw=current.profile.find(p=>p.id==='profile');
+      const hydrated={...DEFAULT_PROFILE,...raw};
+      if(raw?.ownerId&&raw.ownerId!==workspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
+      const keys=[...new Set([...Object.keys(hydrated),...Object.keys(previous)])];
+      if(keys.some(k=>JSON.stringify(hydrated[k])!==JSON.stringify(previous[k])))throw Error('SETUP_PROFILE_CHANGED');
+      const next=syncV2Record('profile',{...hydrated,...changes,updatedAt:now()},{pendingCreate:!raw});
+      const changed=Object.keys(changes).filter(k=>hydrated[k]!==changes[k]);
+      if(!changed.length)return {};
+      const entry=outboxEntry('profile',next,raw?changed:null,'put',raw??null);
+      return {profile:{put:[next]},...(entry&&(entry.op==='create'||entry.fields.length)?{outbox:{put:[entry]}}:{})};
+    }});
+    phase='readback';
+    guard();
+    const profile=committed.profile?.put[0];
+    if(profile){state.profile=profile;broadcast([{store:'profile',id:'profile'}]);notify();}
+    return state.profile;
+  } catch(cause) {
+    reportWriteError(cause,{op:'importSetupProfile',phase});
+    // Finite non-PII cause survives the public wrapper and extension receipt.
+    const codes=['SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError'];
+    const code=codes.includes(cause.code)?cause.code:codes.includes(cause.message)?cause.message:codes.includes(cause.name)?cause.name:'WRITE_FAILED';
+    throw Object.assign(Error('SETUP_PROFILE_SAVE',{cause}),{code,phase});
+  }
 }
 
 /** إعدادات هذا الجهاز — لا تغادره ولا يستوردها ملف نسخة. */

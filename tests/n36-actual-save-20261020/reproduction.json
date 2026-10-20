@@ -1,0 +1,58 @@
+{
+  "taskId": "continuous-n36-setup-profile-save-direct-bridge-20261020",
+  "runId": "3b675661-fb0a-4ca6-851b-9fde523c5ab2",
+  "checks": [],
+  "errors": [],
+  "reproduction": {
+    "status": "EXPECTED_FAILURE",
+    "before": {
+      "id": "profile",
+      "updatedAt": 1792487938310,
+      "deleted": false,
+      "teacherName": "",
+      "schoolName": "",
+      "phone": "",
+      "reportPrincipalName": "",
+      "principalName": "",
+      "activeTimeProfileId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    "after": {
+      "id": "profile",
+      "updatedAt": 1792487938310,
+      "deleted": false,
+      "teacherName": "",
+      "schoolName": "",
+      "phone": "",
+      "reportPrincipalName": "",
+      "principalName": "",
+      "activeTimeProfileId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    "memory": {
+      "id": "profile",
+      "updatedAt": 1792487938310,
+      "deleted": false,
+      "teacherName": "",
+      "schoolName": "",
+      "phone": "",
+      "teacherForm": "masculine",
+      "educationDepartment": null,
+      "reportPrincipalName": "",
+      "principalName": "",
+      "activeTimeProfileId": null,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1
+    },
+    "error": {
+      "message": "SETUP_PROFILE_SAVE"
+    },
+    "root": {
+      "message": "SETUP_PROFILE_CHANGED",
+      "name": "Error"
+    }
+  },
+  "status": "PASS"
+}

@@ -40,7 +40,6 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       const tab=tabs[0];
       const result=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:async()=>{
         if(document.querySelector('.sheet,[role=dialog],[aria-busy=true]')||document.activeElement?.matches('input,textarea,select,[contenteditable=true]'))throw Error('APP_FINISH_CURRENT_EDIT');
-        if(location.hash!=='#/classes/koshoof?import=1')location.hash='#/classes/koshoof?import=1';
         const deadline=Date.now()+15000;
         while(typeof window.rakeezBeginNamesBatch!=='function'&&Date.now()<deadline)await new Promise(r=>setTimeout(r,50));
         if(typeof window.rakeezBeginNamesBatch!=='function')throw Error('APP_UPDATE_REQUIRED');
@@ -68,7 +67,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     const envelope = validateHandoff(message.envelope);
     await clearAll();
     const nonce = [...crypto.getRandomValues(new Uint8Array(32))].map(v=>v.toString(16).padStart(2,'0')).join('');
-    const url = APP_ORIGIN + '/' + handoffRoute(chrome.runtime.id, nonce);
+    let url = APP_ORIGIN + '/' + handoffRoute(chrome.runtime.id, nonce);
     // Bind v2 to the Start document and existing tab; v1 retains the newly-created-tab contract.
     const batch=envelope.version>=2?(await chrome.storage.session.get('batch:'+envelope.batchId))['batch:'+envelope.batchId]:null;
     if(envelope.version>=2&&(!batch||batch.runnerTabId!==sender.tab?.id||Date.now()>=batch.expiresAt))throw Error('BATCH_EXPIRED');
@@ -76,6 +75,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     if(batch){
       const u=new URL(tab.url);
       if(u.origin!==APP_ORIGIN||u.pathname!=='/'||u.search)throw Error('APP_CHANGED');
+      url=tab.url;
       // The current document and app capability, not a cached tabs URL/hash, own the batch.
       const checks=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:id=>window.rakeezCheckNamesBatch?.(id)===true,args:[envelope.batchId]});
       if(checks.length!==1||checks[0].frameId!==0||checks[0].documentId!==batch.documentId||checks[0].result!==true)throw Error('APP_CHANGED');
@@ -83,7 +83,13 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     try {
       await chrome.storage.session.set({[key(nonce)]:{...await seal(envelope),tabId:tab.id,url,documentId:batch?.documentId??null,runnerTabId:sender.tab?.id}});
       await chrome.alarms.create(key(nonce), {when:Math.min(Date.now()+HANDOFF_TTL,envelope.expiresAt)});
-      await chrome.tabs.update(tab.id,{url,...(batch?{}:{active:true})});
+      if(batch){
+        // Current document receiver claims the nonce without changing route,
+        // opening an import page, or creating another app tab. Do not await its
+        // async claim here: claims use this same serialized worker mailbox.
+        const received=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:(request,id)=>window.rakeezReceiveNamesBatch?.(request,id)===true,args:[{extensionId:chrome.runtime.id,nonce},envelope.batchId]});
+        if(received.length!==1||received[0].frameId!==0||received[0].documentId!==batch.documentId||received[0].result!==true)throw Error('APP_CHANGED');
+      }else await chrome.tabs.update(tab.id,{url,active:true});
     } catch (error) { await erase(nonce); if(!batch)await chrome.tabs.remove(tab.id); throw error; }
     return {ok:true,actionId:nonce};
   }).then(reply,error=>reply({ok:false,code:['OPEN_ONE_RAKEEZ_TAB','APP_FINISH_CURRENT_EDIT','APP_UPDATE_REQUIRED','APP_FRAME','APP_DOCUMENT_BINDING','APP_NOT_READY','BATCH_EXPIRED','APP_CHANGED','HANDOFF_SCHEMA','HANDOFF_SETUP','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE'].includes(error.message)?error.message:'HANDOFF_UNAVAILABLE'}));
@@ -97,7 +103,9 @@ chrome.runtime.onMessageExternal.addListener((message, sender, reply) => {
       const u=new URL(sender.url??'https://invalid.invalid');
       if(!r||r.outcome||sender.id||sender.origin!==APP_ORIGIN||u.origin!==APP_ORIGIN||u.pathname!=='/'||u.search||sender.tab?.id!==r.tabId||r.documentId&&sender.documentId!==r.documentId||Date.now()>=r.expiresAt)throw Error('RECEIPT_SENDER');
       const o=message.outcome;
-      if(!o||Object.keys(o).sort().join()!==(r.version===3&&o.setup?'added,existing,remaining,setup,status,total':'added,existing,remaining,status,total')||!['saved','existing','unknown'].includes(o.status)||!['added','existing','remaining','total'].every(k=>Number.isSafeInteger(o[k])&&o[k]>=0&&o[k]<=300)||o.total!==r.total)throw Error('RECEIPT_SCHEMA');
+      const expected=['added','existing','remaining','status','total',...(r.version===3&&o?.setup?['setup']:[]),...(o?.failure?['failure']:[])].sort().join();
+      if(!o||Object.keys(o).sort().join()!==expected||!['saved','existing','unknown'].includes(o.status)||!['added','existing','remaining','total'].every(k=>Number.isSafeInteger(o[k])&&o[k]>=0&&o[k]<=300)||o.total!==r.total)throw Error('RECEIPT_SCHEMA');
+      if(o.failure&&(o.status!=='unknown'||Object.keys(o.failure).sort().join()!=='code,phase,step'||!['profile','batch'].includes(o.failure.phase)||!['validation','transaction','readback'].includes(o.failure.step)||!['SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED'].includes(o.failure.code)))throw Error('RECEIPT_FAILURE');
       if(o.setup){const v=o.setup;if(r.version!==3||Object.keys(v).sort().join()!=='existing,missing,saved,unresolved'||!['saved','existing','unresolved'].every(k=>Number.isSafeInteger(v[k])&&v[k]>=0&&v[k]<=1200)||!Array.isArray(v.missing)||v.missing.length>5||v.missing.some(c=>!['teacher','school','principal','classes','timetable'].includes(c)))throw Error('RECEIPT_SETUP');}
       if(o.status!=='unknown'&&(o.remaining!==0||o.added+o.existing!==r.total))throw Error('RECEIPT_INCOMPLETE');
       await chrome.storage.session.set({[k]:{...r,outcome:o}});return {ok:true};
