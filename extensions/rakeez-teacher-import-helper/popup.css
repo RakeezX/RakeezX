@@ -61,3 +61,11 @@ summary { cursor: pointer; padding-block: 12px; }
 #copy-safe-report {width:auto;max-width:100%;background:transparent;color:var(--brand);font-size:13px}
 #safe-report-status:empty {display:none}
 #safe-report {font-size:12px;max-height:16rem}
+
+/* Automatic result is brief; manual review and duplicate route controls remain separate. */
+.automatic-mode #structured-category,.automatic-mode #legacy-names,.automatic-mode #manual-controls,.automatic-mode #run-diagnostics {display:none!important}
+#automatic-field-details:empty {display:none}
+
+.automatic-mode #run-status {display:block!important}
+
+.automatic-mode #run-counts,.automatic-mode #run-missing,.automatic-mode #run-skipped {display:none}

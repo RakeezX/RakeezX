@@ -1,0 +1,449 @@
+{
+  "taskId": "continuous-n36-actual-profile-pipeline-quiet-transfer-20261020",
+  "runId": "5e44b41c-b04b-41e0-bd2f-0fd6de387b49",
+  "baseSha": "8afa42609cdd9ec228169fc01fd9c985444417bf",
+  "checks": [
+    {
+      "name": "legacy_receiver_rejected_before_read",
+      "status": "PASS",
+      "evidence": "New actual worker rejects immutable old receiver capability before binding/reading/writing; no auto reload/navigation."
+    },
+    {
+      "name": "legacy_composition_reproduced",
+      "status": "PASS",
+      "evidence": "Immutable .17 receiver + .18 extraction/controller/encrypted worker serialization yields unchanged three old profile values, legacy setup-count toast and empty fieldResults. Synthetic causal reproduction, not attribution of the PO device."
+    },
+    {
+      "name": "n36_real_serialized_setup_profile_settings_receipt",
+      "status": "PASS",
+      "evidence": "Real supported source HTML → actual injected readers/merge/controller → v3 serialized/encrypted worker → global app receiver → owned IndexedDB profile/outbox → real serialized setup.details → fieldResults → actual Settings/header. All old fields replaced, existing legacy receipts requalified, repeat unchanged, foreign owner blocked before source read. Calendar unchanged."
+    },
+    {
+      "name": "n36_quiet_direct_result_and_supported_no_navigation_contract",
+      "status": "PASS",
+      "evidence": "Actual Start handler stays in current extension surface, source and Settings routes unchanged; no Chrome tabs.create/update. Known observed student report GET only. Unvisited timetable stays partial; concise result, optional closed field details, no automatic app toasts/manual checkbox."
+    },
+    {
+      "name": "stale_receiver_real_start_action",
+      "status": "PASS",
+      "evidence": "Actual new extension Start against immutable old app receiver gives lawful update action before extractor/transfer/write, with no reload or navigation."
+    },
+    {
+      "name": "stale_receiver_real_start_action",
+      "status": "PASS",
+      "evidence": "Actual new extension Start against immutable old app receiver gives lawful update action before extractor/transfer/write, with no reload or navigation."
+    },
+    {
+      "name": "original_raw_display_context_failure",
+      "status": "PASS",
+      "evidence": "Immutable current-main receiver rejects calendar-derived display term versus raw persisted term in full serialized pipeline; original unknown receipt preserved and no profile/outbox change. Corrected candidate positive/negative proofs reused."
+    },
+    {
+      "name": "gateway_requires_voluntary_navigation",
+      "status": "PASS",
+      "evidence": "Actual role-card DOM is recognized by the existing reader, but new Start stops with a voluntary-page action without redundant school confirmation, navigation, transfer or write."
+    }
+  ],
+  "live": "NOT_RUN",
+  "errors": [],
+  "preservedFailures": [
+    {
+      "phase": "legacy",
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'اسم جهاز قديم'\n- 'معلم قديم'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:27:150\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "legacy",
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n+   code: 'HANDOFF_UNAVAILABLE',\n-   code: 'APP_UPDATE_REQUIRED',\n    ok: false\n  }\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:29:129\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "legacy",
+      "failure": "page.waitForFunction: Timeout 20000ms exceeded.\n    at run (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-actual-profile-pipeline-quiet-transfer-20261020\\tests\\n36-profile-pipeline-1522-20261020\\browser.mjs:38:16)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:40:28\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "legacy",
+      "failure": "page.waitForFunction: Timeout 20000ms exceeded.\n    at run (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-actual-profile-pipeline-quiet-transfer-20261020\\tests\\n36-profile-pipeline-1522-20261020\\browser.mjs:38:20)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:40:28\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "legacy",
+      "failure": "page.waitForFunction: Timeout 20000ms exceeded.\n    at run (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-actual-profile-pipeline-quiet-transfer-20261020\\tests\\n36-profile-pipeline-1522-20261020\\browser.mjs:38:20)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:40:28\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "current",
+      "failure": "page.waitForFunction: Timeout 20000ms exceeded.\n    at run (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-actual-profile-pipeline-quiet-transfer-20261020\\tests\\n36-profile-pipeline-1522-20261020\\browser.mjs:38:20)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:40:28\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "current",
+      "failure": "Error: Actual pipeline returned unknown; guard preserved\n    at run (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:39:417)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:41:28\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "gateway-guard",
+      "failure": "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-actual-profile-pipeline-quiet-transfer-20261020\\tests\\n36-profile-pipeline-1522-20261020\\browser.mjs:42:246\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    },
+    {
+      "phase": "gateway-guard",
+      "failure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /لن نتنقل بدلًا منك/. Input:\n\n'تعذّرت قراءة هذه الصفحة. افتح واجهة المعلم في مدرستي ثم ابدأ؛ لم يُفترض حفظ شيء.'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:42:825\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-profile-pipeline-quiet-transfer-20261020/tests/n36-profile-pipeline-1522-20261020/browser.mjs:21:92"
+    }
+  ],
+  "legacy": {
+    "profileUpdated": false,
+    "fieldResults": [],
+    "setupReceipts": [
+      {
+        "saved": 0,
+        "existing": 1,
+        "unresolved": 3,
+        "missing": [
+          "timetable"
+        ]
+      }
+    ],
+    "toast": [
+      "حُفظت الدفعة محليًا: 1 جديد، 0 موجود سابقًا. حقول إعداد محفوظة: 1؛ تعارضات أو غير مدعوم: 3؛ فئات غير متاحة: 1.  المزامنة لم تتأكد بعد."
+    ],
+    "envelopeFieldKeys": [
+      [
+        "teacher",
+        "school",
+        "principal",
+        "classes"
+      ]
+    ]
+  },
+  "current": {
+    "diagnostic": {
+      "schema": "rakeez-safe-diagnostics",
+      "reportVersion": 1,
+      "extensionVersion": "0.5.19",
+      "context": "popup",
+      "browser": {
+        "family": "chromium",
+        "major": 151,
+        "platform": "Windows"
+      },
+      "layout": {
+        "innerWidth": 1080,
+        "innerHeight": 950,
+        "devicePixelRatio": 1,
+        "visualScale": 1,
+        "root": {
+          "clientWidth": 1080,
+          "clientHeight": 950,
+          "scrollWidth": 1080,
+          "scrollHeight": 950,
+          "computedWidth": 1080
+        },
+        "body": {
+          "clientWidth": 840,
+          "clientHeight": 601,
+          "scrollWidth": 840,
+          "scrollHeight": 601,
+          "computedWidth": 840
+        },
+        "main": {
+          "clientWidth": 840,
+          "clientHeight": 601,
+          "scrollWidth": 840,
+          "scrollHeight": 601,
+          "computedWidth": 840
+        }
+      },
+      "health": {
+        "bootstrap": "ready",
+        "modules": {
+          "popup.js": "ready",
+          "categories-popup.js": "ready",
+          "run-controller.js": "ready"
+        },
+        "background": "ready"
+      },
+      "collection": {
+        "valid": 1,
+        "staged": 1,
+        "observed": 1,
+        "excluded": 0,
+        "classes": 1,
+        "processedPages": 1,
+        "currentPage": 1,
+        "stage": "saved",
+        "coverage": "complete",
+        "terminal": "explicit-next",
+        "endpoint": "none",
+        "hasNext": false,
+        "disabledNext": true,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "fieldResults": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "navigation-required",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [
+          "teacher",
+          "school",
+          "principal",
+          "department",
+          "classes"
+        ],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "errors": []
+    },
+    "sourceReads": 30,
+    "createdTabs": 0,
+    "visibleNavigations": 0,
+    "appRoute": "#/settings",
+    "envelopeFieldKeys": [
+      [
+        "teacher",
+        "school",
+        "principal",
+        "department",
+        "classes"
+      ],
+      [
+        "teacher",
+        "school",
+        "principal",
+        "department",
+        "classes"
+      ],
+      [
+        "teacher",
+        "school",
+        "principal",
+        "department",
+        "classes"
+      ],
+      [
+        "teacher",
+        "school",
+        "principal",
+        "department",
+        "classes"
+      ]
+    ],
+    "serializedReceipts": [
+      {
+        "status": "existing",
+        "added": 0,
+        "existing": 1,
+        "remaining": 0,
+        "total": 1,
+        "setup": {
+          "saved": 4,
+          "existing": 1,
+          "unresolved": 0,
+          "missing": [
+            "timetable"
+          ],
+          "details": [
+            {
+              "field": "timetable",
+              "reason": "missing",
+              "count": 1
+            },
+            {
+              "field": "teacher",
+              "reason": "saved",
+              "count": 1
+            },
+            {
+              "field": "school",
+              "reason": "saved",
+              "count": 1
+            },
+            {
+              "field": "principal",
+              "reason": "saved",
+              "count": 1
+            },
+            {
+              "field": "department",
+              "reason": "saved",
+              "count": 1
+            },
+            {
+              "field": "classes",
+              "reason": "current",
+              "count": 1
+            }
+          ]
+        }
+      },
+      {
+        "status": "existing",
+        "added": 0,
+        "existing": 1,
+        "remaining": 0,
+        "total": 1,
+        "setup": {
+          "saved": 0,
+          "existing": 5,
+          "unresolved": 0,
+          "missing": [
+            "timetable"
+          ],
+          "details": [
+            {
+              "field": "timetable",
+              "reason": "missing",
+              "count": 1
+            },
+            {
+              "field": "teacher",
+              "reason": "current",
+              "count": 1
+            },
+            {
+              "field": "school",
+              "reason": "current",
+              "count": 1
+            },
+            {
+              "field": "principal",
+              "reason": "current",
+              "count": 1
+            },
+            {
+              "field": "department",
+              "reason": "current",
+              "count": 1
+            },
+            {
+              "field": "classes",
+              "reason": "current",
+              "count": 1
+            }
+          ]
+        }
+      },
+      {
+        "status": "existing",
+        "added": 0,
+        "existing": 1,
+        "remaining": 0,
+        "total": 1,
+        "setup": {
+          "saved": 0,
+          "existing": 1,
+          "unresolved": 3,
+          "missing": [
+            "timetable"
+          ]
+        }
+      },
+      {
+        "status": "unknown",
+        "added": 0,
+        "existing": 0,
+        "remaining": 1,
+        "total": 1,
+        "failure": {
+          "phase": "batch",
+          "step": "validation",
+          "code": "BATCH_PERSISTED_CONTEXT_CHANGED"
+        }
+      }
+    ],
+    "toastEvents": [
+      "لم يتأكد حفظ هذه الدفعة (BATCH_PERSISTED_CONTEXT_CHANGED). التقدم محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال."
+    ],
+    "oldReceiptsPreserved": 1,
+    "ownerOutboxCount": 6
+  },
+  "guardChecks": {
+    "wrongDocument": "BATCH_EXPIRED",
+    "oldReceipt": "RECEIPT_SETUP",
+    "rawTermConflict": "BATCH_PERSISTED_CONTEXT_CHANGED",
+    "profileOutboxUnchanged": true,
+    "actionableFailureToasts": 1
+  },
+  "phase": "gateway-guard",
+  "gatewayRead": {
+    "ok": true,
+    "entry": {
+      "pageKind": "teacher-gateway",
+      "readyState": "complete",
+      "roleMarkers": 1,
+      "schoolOptions": 1,
+      "navMarkers": 0,
+      "actionMarkers": 0,
+      "safeReadLinks": 0,
+      "iframeCount": 0,
+      "linkStats": {
+        "href": 1,
+        "empty": 0,
+        "javascript": 0,
+        "queryRejected": 0,
+        "inlineHandler": 0,
+        "readPath": 0,
+        "originRejected": 0,
+        "formRejected": 0
+      }
+    },
+    "runContext": {
+      "kind": "selected-teacher-card",
+      "href": "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?Name=%D9%85%D8%B9%D9%84%D9%85",
+      "roleTargetId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "schoolName": "مدرسة المصدر"
+    },
+    "links": [
+      {
+        "kind": "gateway",
+        "path": "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?Name=%D9%85%D8%B9%D9%84%D9%85",
+        "context": {
+          "kind": "selected-teacher-card",
+          "href": "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?Name=%D9%85%D8%B9%D9%84%D9%85",
+          "roleTargetId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "schoolName": "مدرسة المصدر"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "category": "school",
+        "text": "اسم المدرسة\tمدرسة المصدر"
+      }
+    ],
+    "warnings": [],
+    "skipped": []
+  },
+  "gatewayStatus": "لم يبدأ النقل: لا كشف طلاب متاح من روابط القراءة المدعومة في هذه الصفحة. افتح بنفسك واجهة المعلم التي تعرض رابط الكشف ثم ابدأ. لن نتنقل بدلًا منك.",
+  "status": "PASS"
+}

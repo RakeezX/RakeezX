@@ -5,7 +5,7 @@ import {reviewNames} from './core.js';
 import {CATEGORIES,parseCategoryTable,validateCategory,bundle} from './categories.js';
 import {RUN_LIMITS,startOrigin,safeRoute,mergePage} from './navigation.js';
 import './route-diagnostics.js';
-const $=id=>document.getElementById(id),runToken=new URL(location.href).searchParams.get('run');
+const $=id=>document.getElementById(id);let runToken=new URL(location.href).searchParams.get('run');
 const channel=new BroadcastChannel('rakeez-private-one-start');
 let generation=0,job=null,review=null,reviewTimer=null,reviewClock=null,guardBusy=false,choiceReject=null,continueReject=null;
 const kindLabel=kind=>({start:'صفحة البداية',role:'دور المعلم',gateway:'مدخل المدرسة',metadata:'بيانات المعلم',classes:'الفصول',students:'أسماء الطلاب',timetable:'الجدول الأسبوعي'}[kind]??'الفئة');
@@ -40,6 +40,9 @@ function stop(code='CANCELLED',diagnostic=null,context=null){
  window.n36Diagnostics?.publish({stage:code==='CANCELLED'?'cancelled':code==='REVIEW_EXPIRED'?'expired':'error'});
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
  if(['UNVERIFIED_START_ORIGIN','UNSAFE_ROUTE','UNSUPPORTED_SOURCE_SCHEMA'].includes(code)){announce('افتح مدرستي، ثم شغّل الإضافة من واجهة المعلم. هذه الصفحة غير مدعومة؛ لم يُفترض حفظ شيء.');return;}
+ if(code==='SOURCE_NOT_AVAILABLE'){announce('لم يبدأ النقل: لا كشف طلاب متاح من روابط القراءة المدعومة في هذه الصفحة. افتح بنفسك واجهة المعلم التي تعرض رابط الكشف ثم ابدأ. لن نتنقل بدلًا منك.');return;}
+ if(code==='APP_FINISH_CURRENT_EDIT'){window.n36Diagnostics?.publish({failure:'APP_FINISH_CURRENT_EDIT'});announce('أكمل التعديل أو أغلق النافذة المفتوحة في ركيز ثم ابدأ مجددًا. لم تبدأ قراءة المصدر أو نقل البيانات.');return;}
+ if(code==='APP_UPDATE_REQUIRED'){window.n36Diagnostics?.publish({failure:'APP_UPDATE_REQUIRED',setupPhase:'receiver-update'});announce('حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ مجددًا. لم تبدأ قراءة المصدر أو نقل البيانات؛ لن تُحدّث الصفحة تلقائيًا.');return;}
  if(code==='OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB'){announce('افتح حساب ركيز المسجّل دخوله في تبويب واحد في هذه النافذة وحدّث التطبيق، ثم ابدأ من مدرستي. لم تبدأ قراءة الأسماء.');return;}
  if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة التشغيل ومُسحت الأسماء المؤقتة في الإضافة. ما حُفظ محليًا في ركيز يبقى محفوظًا، والدفعات المعلّقة فيه يمكن استكمالها من الحساب نفسه. لبدء جمع جديد افتح المصدر ثم ابدأ طوعًا.');return;}
  showDiagnostic(diagnostic??{stage:context?.stage??'run',reason:code,category:context?.kind??'students'});
@@ -132,13 +135,14 @@ async function start(tabId){
  let stage='start-path',kind='start',path='';
  try{
   const tab=await chrome.tabs.get(tabId),origin=startOrigin(tab.url??'');
-  const beginResult=await chrome.runtime.sendMessage({type:'n36-begin'});if(!beginResult?.ok)throw Error('OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB');window.n36AutomaticBatch=beginResult.batchId;window.n36CollectionFinished=false;
+  const beginResult=await chrome.runtime.sendMessage({type:'n36-begin'});if(!beginResult?.ok)throw Error(['APP_UPDATE_REQUIRED','APP_FINISH_CURRENT_EDIT'].includes(beginResult?.code)?beginResult.code:'OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB');window.n36Diagnostics?.publish({receiverCapability:beginResult.receiverCapability});window.n36AutomaticBatch=beginResult.batchId;window.n36CollectionFinished=false;
   path=new URL(tab.url).pathname+new URL(tab.url).search;
   safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
   job={tabId,origin,batchExpires:Date.now()+1800000,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),fetches:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0,excluded:0,windowPages:0,sourceBytes:0,expires:null,expiryTimer:null};
   job.timer=setTimeout(()=>{if(job?.sourceRows.length===0&&ticket===generation)stop('TIME_LIMIT');},RUN_LIMITS.milliseconds); // No names held indefinitely during entry/choice.
   const alive=()=>ticket===generation&&!!job;
   stage='role-selection';kind='role';await ready(tabId,origin,ticket);let page=await inspect(tabId,origin,'home',alive);current(ticket);
+  if(page.schoolChoices||page.rolePending||page.links.some(l=>['gateway','role'].includes(l.kind)))throw Error('SOURCE_NOT_AVAILABLE');
   if(page.schoolChoices){
    announce('اختر مدرسة واحدة لهذا التشغيل؛ لن تُقرأ بيانات مدرسة قبل اختيارك.');
    const choice=await new Promise((resolve,reject)=>{choiceReject=reject;$('school-choices').hidden=false;for(const school of page.schoolChoices){const button=document.createElement('button');button.type='button';button.textContent=school.label;button.addEventListener('click',()=>resolve(school),{once:true});$('school-choices').append(button);}});
@@ -154,11 +158,11 @@ async function start(tabId){
    if(!next.page){
     stage=next.kind==='role'?'role-selection':'navigation-redirect';kind=next.kind;path=next.path;
     const labels={role:'دور المعلم',gateway:'مدخل المدرسة',metadata:'بيانات المعلم',classes:'الفصول',students:'أسماء الطلاب',timetable:'الجدول الأسبوعي'};
-    const target=safeRoute(origin,next.path,next.context??job.context);if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(job.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');job.roleSwitchUsed=true;}announce(`التقدم: صفحة ${job.pages}، ${labels[next.kind]}. قراءة فقط داخل ${new URL(origin).hostname}.`);
+    const target=safeRoute(origin,next.path,next.context??job.context);if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(job.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');job.roleSwitchUsed=true;}announce('جار قراءة البيانات المتاحة…');
     job.readOffset=next.rowOffset??0;
     try{
      if(next.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(target).pathname))next.page=await readReport(next,ticket,alive);
-     else {await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+30000;next.page=await inspect(tabId,origin,next.kind,alive);}current(ticket);
+     else throw Error('VISIBLE_NAVIGATION_REQUIRED');current(ticket);
     }
     catch(e){if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT')throw e;current(ticket);
      const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname);
@@ -216,10 +220,11 @@ async function start(tabId){
     catch(e){if(e.message==='SCHOOL_CONTEXT_CHANGED')throw e;job.warnings.push({category:table.category,code:/^[A-Z_]+$/.test(e.message)?e.message:'UNRESOLVED_CATEGORY'});}
    }
    window.n36Diagnostics?.publish({stage:'collecting',staged:job.sourceRows.length,observed:job.studentRowsSeen,excluded:job.excluded,processedPages:job.reportPages});
-   $('run-counts').textContent=`${job.pages} صفحات؛ ${job.sourceRows.length} طلاب؛ ${job.categories.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.`;
+   $('run-counts').textContent=window.n36AutomaticBatch?'':`${job.pages} صفحات؛ ${job.sourceRows.length} طلاب؛ ${job.categories.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.`;
    if(page.rowContinuation!==null&&page.rowContinuation!==undefined)job.routes.unshift({kind:'students',path:next.path,rowOffset:page.rowContinuation});
    for(const link of page.links){
     try{safeRoute(origin,link.path,link.context??job.context);}catch(e){throw routeError(e,link.kind==='role'?'role-selection':'navigation-redirect',link.kind,link.path);}
+    if(!(link.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(link.path,origin).pathname))){job.warnings.push({category:link.kind,code:'VISIBLE_NAVIGATION_REQUIRED',optional:true});continue;}
     if(sourcePageSeen(origin,link.path)||job.visited.has(routeIdentity(origin,link.path))||job.routes.some(r=>routeIdentity(origin,r.path)===routeIdentity(origin,link.path))){if(link.pagination)job.loops++;continue;}
     if(link.pagination)job.routes.unshift(link);else job.routes.push(link);
    }
@@ -231,12 +236,7 @@ async function start(tabId){
   }
   current(ticket);await inspect(tabId,origin,'guard',alive);current(ticket);
   if(job.sourceRows.length)await finishCollection(ticket);
-  else {
-   const valid=job.categories.filter(c=>!job.warnings.some(w=>w.category===c.category));
-   clearTimeout(job.timer);const context=job.context;job=null;
-   if(valid.length){review={tabId,origin,context,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};window.dispatchEvent(new CustomEvent('n36:preview',{detail:valid}));armReview();}
-   announce('انتهى جمع الصفحات المتاحة؛ لا أسماء أخرى صالحة في هذه النافذة. لا ادعاء باكتمال الكشف.');
-  }
+  else stop('SOURCE_NOT_AVAILABLE');
  }catch(e){if(ticket===generation){routeError(e,stage,kind,path);stop(/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',e.diagnostic,{stage,kind});}}
 }
 // AI: completed rows belong to the run's original source, never the active run tab.
@@ -288,11 +288,11 @@ export function presentCollectedSource(active,coverage){
  review=completedSourceReview(active,active.sourceURL);
  review.expires=window.n36AutomaticBatch?Math.min(active.batchExpires??Date.now()+1800000,Date.now()+1800000):active.expires;
  const rows=active.sourceRows.map(row=>Object.freeze({...row}));
- const setup=(active.categories??[]).filter(c=>c.category!=='students'&&!(active.warnings??[]).some(w=>w.category===c.category)).map(c=>({...c,provenance:['teacher-readonly-run']}));
+ const setup=(active.categories??[]).filter(c=>c.category!=='students'&&!(active.warnings??[]).some(w=>w.category===c.category&&w.code!=='VISIBLE_NAVIGATION_REQUIRED')).map(c=>({...c,provenance:['teacher-readonly-run']}));
  if(rows.length&&!setup.some(c=>c.category==='classes'))setup.push({category:'classes',provenance:['teacher-readonly-run'],rows:[...new Set(rows.map(r=>r.classroom))].map(classroom=>({classroom}))});
  if(active.context?.schoolName&&!(active.warnings??[]).some(w=>w.category==='school')&&!setup.some(c=>c.category==='school'))setup.push({category:'school',provenance:['teacher-readonly-run'],rows:[{name:active.context.schoolName}]});
- window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,setup,...coverage,excluded:active.excluded,hasNext:false,sourceIssues:(active.warnings??[]).filter(w=>['teacher','principal','school','department'].includes(w.category)).map(w=>({field:w.category,reason:/AMBIGUOUS/.test(w.code)?'ambiguous':'unsupported',count:1}))}}));
- announce('اكتمل جمع المتاح؛ جار نقله إلى حساب ركيز المفتوح.');
+ window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,setup,...coverage,excluded:active.excluded,hasNext:false,sourceIssues:(active.warnings??[]).filter(w=>['teacher','principal','school','department','classes','timetable'].includes(w.category)).map(w=>({field:w.category,reason:w.code==='VISIBLE_NAVIGATION_REQUIRED'?'navigation-required':/AMBIGUOUS/.test(w.code)?'ambiguous':'unsupported',count:1}))}}));
+ window.n36Diagnostics?.publish({setupPhase:'source',setupFields:setup.map(c=>c.category)});announce('جار حفظ المتاح في ركيز…');
  if(!window.n36AutomaticBatch)armReview();else reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }
 async function noorRead(tabId) {
@@ -332,6 +332,7 @@ if(runToken){
    const [tab]=await chrome.tabs.query({active:true,currentWindow:true});if(!tab?.id)throw Error('NO_ACTIVE_TAB');
    const classroom=$('noor-class').value.normalize('NFC').trim().replace(/\s+/g,' '),role=$('noor-role').checked;
    if(mode==='noor'){if(!role)throw Error('TEACHER_CONFIRMATION_REQUIRED');validateCategory('classes',[{classroom}]);const u=new URL(tab.url??'');if(u.origin!=='https://noor.moe.gov.sa'||!u.pathname.startsWith('/Noor/'))throw Error('UNSUPPORTED_NOOR_PAGE');}else startOrigin(tab.url??'');
+   if(mode==='madrasati'){runToken=crypto.randomUUID();document.body.classList.add('run-page','automatic-mode');$('one-start').hidden=true;$('noor-controls').hidden=true;await start(tab.id);return;}
    const sourceTabId=tab.id; // Captured before creating/activating the extension run page.
    const token=crypto.randomUUID();let busy=false;
    channel.onmessage=({data})=>{if(data?.type==='busy'&&data.token===token)busy=true;};
@@ -381,5 +382,5 @@ window.addEventListener('n36:automatic-finished',({detail})=>{
  window.n36CollectionFinished=true;
  if(detail.unresolved)return; // Explicit retry can still preflight the bounded original source.
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
- clearPreview(false,true);window.n36AutomaticBatch=null;$('run-cancel').disabled=true;$('run-counts').textContent=detail.summary??'';
+ clearPreview(false,true);window.n36AutomaticBatch=null;$('run-cancel').disabled=true;$('run-counts').textContent='';
 });

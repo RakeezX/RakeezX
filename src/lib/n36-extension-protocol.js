@@ -1,4 +1,5 @@
 // AI: names-only boundary shared verbatim with the private MV3 package.
+export const RECEIVER_CAPABILITY = 'source-profile-quiet-v1';
 export const HANDOFF_TTL = 120000;
 // AI: v3 carries only the already-supported, explicitly read setup categories.
 export function validateSetupCategories(categories) {

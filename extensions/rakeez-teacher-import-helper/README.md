@@ -1,3 +1,15 @@
+## AI candidate 0.5.19 — 20 October 2026
+
+Explicit Start now checks the existing app document's `source-profile-quiet-v1` capability before reading source data. An old receiver receives a concise update action using the app's existing update control; no automatic app reload/navigation or Service Worker mutation. Existing edit/modal guards remain and explain how to continue. Successful v3 receipts require finite setup.details rather than accepting legacy count-only profile success. Action-popup grants and receipts bind the sender document and current window; another popup cannot cancel/claim its resources.
+
+The guarded batch snapshot now compares raw year/term records to raw IndexedDB records, not calendar-derived display dates or warning labels. Genuine raw context/account changes still fail closed. Existing atomic source-wins profile/outbox, absent-field, owner, history and calendar policies are preserved.
+
+Madrasati Start runs in the existing extension action surface, source tab and authenticated Rakeez tab. It creates no runner/app tab and performs no visible source navigation. Only previously supported, actually observed, same-school report GET links can be followed in place. Role switches, MyStudents, metadata and timetable pages needing visible navigation are skipped and explained inside optional details. This does not promise all school pages/fields; a page with no eligible report tells the user to open the appropriate teacher page themselves. Noor's separate explicit manual flow remains unchanged.
+
+Rakeez has no per-class success toast or import-page count dump. The extension shows one brief local-save/sync-unverified result; finite field/coverage details and diagnostics stay closed. Genuine failures remain actionable and unknown outcomes are retained. No new host permission, API route, CSP, hidden endpoint, session cloning or live account action.
+
+Synthetic full-composition proof includes the actual source extractor, merge, envelope serialization, encrypted worker claim, app receiver, guarded persistent profile/outbox and rendered Settings/header. An immutable old receiver reproduces old count-only toast/empty fieldResults; this is a causal synthetic example, not proof of which cached code the PO's device used. The new live journey, provider/served package, postdelivery stable install and Chrome reload are unverified here.
+
 ## AI candidate 0.5.18 — 20 October 2026
 
 Each explicit Madrasati Start now adopts AVAILABLE teacher, principal/report-alias and school names, including differing existing values, under the same account/document/year/term/lease/CAS guards. Missing or ambiguous values never blank a profile. The persisted profile and its owner-bound outbox remain atomic; stale device-only name overrides are retired in that transaction so header and settings agree. Auth identity/email and unrelated device fields are untouched.
