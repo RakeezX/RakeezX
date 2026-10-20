@@ -342,7 +342,7 @@ function classesToolbar(empty = false) {
     <button class="btn btn--quiet" data-act="add">${icon('plus')} إنشاء أول فصل</button>` : html`<button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button>
     <a class="btn btn--quiet" href="#/classes/koshoof">استيراد وتصدير الكشوف</a>`}
     <div class="classes-tools-left"><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button>
-    <button class="iconbtn classes-trash" data-act="delete-class-flow" aria-label="حذف الفصل" title="حذف الفصل" ${store.teachings().length ? '' : 'disabled'}>${icon('trash')}</button></div>
+    <button class="iconbtn classes-trash" data-act="delete-class-flow" aria-label="حذف الفصل" title="حذف الفصل" ${store.teachings().length||subjectlessDeleteTargets().length ? '' : 'disabled'}>${icon('trash')}</button></div>
   </nav>`;
 }
 
@@ -354,6 +354,10 @@ function sectionOnlyClasses() {
     try { return [store.readCurrentSectionRoster(section.id)]; } catch { return []; }
   });
 }
+function subjectlessDeleteTargets(){
+ return sectionOnlyClasses().filter(({section})=>!store.state.teachings.some(t=>!t.deleted&&t.sectionId===section.id))
+  .map(({section})=>({id:'n36-section:'+section.id,sectionId:section.id,subjectless:true}));
+}
 function renderSectionCard({ section, students }) {
   return html`<details class="class-card" data-section-roster="${section.id}">
     <summary class="class-card__main">
@@ -364,6 +368,7 @@ function renderSectionCard({ section, students }) {
       ${students.length ? html`<ol aria-label="طلاب الفصل">${students.map(student => html`<li data-section-student="${student.id}">${student.name}</li>`)}</ol>` : html`<p>لا يوجد طلاب منتسبون حاليًا.</p>`}
       <p class="t-3">أضف المادة لفتح أدوات التدريس؛ تبقى أسماء الطلاب وانتساباتهم نفسها.</p>
       <button class="btn btn--quiet" data-act="add-section-subject" data-section-id="${section.id}">${icon('plus')} إضافة مادة لهذا الفصل</button>
+      ${subjectlessDeleteTargets().some(t=>t.sectionId===section.id)?html`<button class="btn btn--quiet" data-act="delete-class-flow" data-id="${'n36-section:'+section.id}">${icon('trash')} حذف الفصل</button>`:''}
     </div>
   </details>`;
 }
@@ -447,13 +452,16 @@ const teachings = {
       } catch (error) { toast(error.message, 'warn'); }
     },
     async 'delete-class-flow'(el, ev, params = {}) {
-      const list = store.teachings();
+      const list = [...store.teachings(),...subjectlessDeleteTargets()];
+      params={...params,id:params.id??el?.dataset?.id};
       if (!list.length) {
         toast('لا توجد فصول لحذفها', 'warn');
         return;
       }
 
       let selectedId = list.some(t => t.id === params.id) ? params.id : list[0].id;
+      const target=()=>list.find(t=>t.id===selectedId);
+      const deleteScope=()=>target()?.subjectless?store.subjectlessDeleteScope(target().sectionId):store.classDeleteScope(selectedId);
 
       await openSheet({
         title: 'حذف فصل',
@@ -565,7 +573,9 @@ const teachings = {
             let demoPlan;
             const workspace = store.getActiveWorkspace();
             try {
-              scope = store.classDeleteScope(selectedId);
+              scope = deleteScope();
+              if(target()?.subjectless){plan=await store.previewDeleteSubjectlessSection(target().sectionId);}
+              else
               if (isDemo(store.getTeaching(selectedId)) && workspace?.type === 'account') {
                 demoPlan = await previewDemoPackageDelete(selectedId);
               } else if (!isDemo(store.getTeaching(selectedId))) {
@@ -578,7 +588,7 @@ const teachings = {
             if (workspace !== store.getActiveWorkspace()) { toast('تغيّرت مساحة العمل. أعد فتح قائمة الحذف.', 'warn'); done(undefined); return; }
             if (requestedId !== selectedId) { renderStep2(); return; }
             const selectedTch = store.getTeaching(selectedId);
-            const sec = selectedTch ? store.getSection(selectedTch.sectionId) : null;
+            const sec = store.getSection(target()?.sectionId);
             const sub = selectedTch ? store.getSubject(selectedTch.subjectId) : null;
             const demo = selectedTch ? isDemo(selectedTch) : false;
 
@@ -598,7 +608,7 @@ const teachings = {
                 <p class="class-delete-confirm-box__consequence">
                   ${scope.kind === 'subject'
                     ? 'ستُحذف هذه المادة ودرجاتها وحصصها وحضورها وملاحظاتها. سيبقى الفصل وطلابه وبقية المواد.'
-                    : 'هذه آخر مادة في الفصل؛ سيُحذف الفصل ودرجاته وحصصه وحضوره وملاحظاته.'}
+                    : target()?.subjectless?'سيُحذف الفصل وانتساب طلابه؛ تبقى هويات الطلاب وسجلاتهم في الفصول الأخرى.': 'هذه آخر مادة في الفصل؛ سيُحذف الفصل ودرجاته وحصصه وحضوره وملاحظاته.'}
                 </p>
                 <p class="class-delete-confirm-box__note">
                   ${demo && scope.kind === 'class' ? 'سيُحذف الفصل التجريبي وبياناته المحلية فقط.'
@@ -657,13 +667,14 @@ const teachings = {
                   if (workspace !== store.getActiveWorkspace() || selectedId !== requestedId) {
                     throw new Error('تغيّرت مساحة العمل أو الفصل المحدد. أعد فتح قائمة الحذف.');
                   }
-                  if (store.classDeleteScope(selectedId).signature !== scope.signature) {
+                  if (deleteScope().signature !== scope.signature) {
                     toast('تغيّرت مواد الفصل. راجع نطاق الحذف وأكّد مجددًا.', 'warn');
                     renderStep2();
                     return;
                   }
                   let result;
-                  if (demoPlan) result = await deleteDemoPackage(demoPlan.packageId, demoPlan);
+                  if(target()?.subjectless) result=await store.deleteSubjectlessSection(target().sectionId,plan);
+                  else if (demoPlan) result = await deleteDemoPackage(demoPlan.packageId, demoPlan);
                   else if (demo) result = await store.deleteDemoTeachingScope(selectedId, scope.sectionId, scope.kind === 'subject' ? 'teaching' : 'section');
                   else result = await store.deleteTeaching(selectedId, plan);
                   if (result === false) throw new Error('تعذّر حذف الفصل. لم يكتمل الحفظ.');

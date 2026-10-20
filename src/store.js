@@ -28,14 +28,14 @@ const db = new Proxy(rawDB, { get(target, name) {
     return target[name](...args);
   };
 } });
-import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js';
+import { getScoreFoundationCapability, n77DeleteTeaching, n36DeleteSubjectlessSection } from './lib/cloud.js';
 // Bind the copy protocol to its module identity. A previous offline/HTTP cache
 // must not supply the two-mode engine to the automatic-safe account entry.
 import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js?n100=automatic-safe-v1';
 import { classGroups } from './lib/class-import-file.js';
 import { previewStudentRows, importContext, confirmStudentImport } from './lib/student-import.js';
 import { reviewGradeTransfer, gradeCommand, isTransferItem, importScoreBinding, importItemBinding } from './lib/grade-transfer.js';
-import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
+import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites, validateSubjectlessPlan, subjectlessDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, calendarDependencies, createSyncV2Engine } from './lib/sync-v2.js';
@@ -3343,6 +3343,80 @@ async function executeDeleteTeaching(tchId, plan, bindCheckpoint) {
   notify();
   broadcast([{ store: 'teachings', id: tchId }, { store: 'sections', id: plan.sectionId }]);
   return receipt;
+}
+
+// AI N36: independent section-only lifecycle with the existing durable exclusion.
+function subjectlessContext(sectionId){
+ assertLeaseWritable();
+ const workspace=activeWorkspace,ownerId=workspace?.authUserId,section=getSection(sectionId),year=activeYear(),term=activeTerm();
+ const access=runtimeSyncOwnershipGuard.cloudAccess({operation:'pull',authenticatedUserId:cloud.user?.id});
+ if(!state.ready||workspace?.type!=='account'||workspace.ownershipState!=='claimed'||!workspace.syncEligible||!ownerId||
+ !cloud.session||cloud.user?.id!==ownerId||cloud.session.user?.id!==ownerId||!access.allowed||access.workspaceOwnerId!==ownerId||
+ rawDB.getActiveDatabaseName()!==workspace.databaseName||!section||!year||!term||section.yearId!==year.id||term.yearId!==year.id||
+ year.status!=='active'||term.status!=='active'||section.status!=='active'||[section,year,term].some(r=>r.ownerId!=null&&r.ownerId!==ownerId)||
+ state.teachings.some(t=>!t.deleted&&t.sectionId===sectionId)||
+ state.enrollments.some(e=>e.sectionId===sectionId&&e.ownerId!=null&&e.ownerId!==ownerId)||
+ sectionRoster(sectionId).some(s=>s.ownerId!=null&&s.ownerId!==ownerId))throw Error(DELETE_STALE_MESSAGE);
+ if(!globalThis.navigator?.onLine)throw Error(DELETE_RETRY_MESSAGE);
+ return {workspace,ownerId,sectionId,yearId:year.id,termId:term.id};
+}
+export function subjectlessDeleteScope(sectionId){
+ const c=subjectlessContext(sectionId);
+ return {sectionId,kind:'class',signature:JSON.stringify([sectionId,c.ownerId,c.yearId,c.termId,[]])};
+}
+function checkSubjectlessPending(device,c){
+ if(device?.studentLifecycleResume||device?.cloudRestoreResume)throw Error(DELETE_STALE_MESSAGE);
+ const p=device?.n77DeleteIntent;
+ if(p&&(p.kind!=='subjectless-section'||p.ownerId!==c.ownerId||p.sectionId!==c.sectionId||p.yearId!==c.yearId||p.termId!==c.termId))throw Error(DELETE_STALE_MESSAGE);
+ return p;
+}
+export async function previewDeleteSubjectlessSection(sectionId){
+ const c=subjectlessContext(sectionId),device=await db.get('device','device');
+ const p=checkSubjectlessPending(device,c);
+ if(p)return validateSubjectlessPlan(p.plan,c);
+ if((await db.getAll('outbox')).some(r=>r.state!=='superseded'))throw Error('أكمل مزامنة التغييرات المعلّقة قبل حذف الفصل، ثم أعد المحاولة.');
+ try{
+  const plan=validateSubjectlessPlan(await n36DeleteSubjectlessSection(c),c);
+  if(subjectlessContext(sectionId).workspace!==c.workspace)throw Error(DELETE_STALE_MESSAGE);
+  return plan;
+ }catch(e){if(e.message===DELETE_STALE_MESSAGE)throw e;throw Error(DELETE_SERVER_UNAVAILABLE_MESSAGE);}
+}
+export async function deleteSubjectlessSection(sectionId,plan){
+ const c=subjectlessContext(sectionId);validateSubjectlessPlan(plan,c);
+ const {runClassDeletionExclusive}=await import('./lib/sync.js');
+ return runClassDeletionExclusive(async bindCheckpoint=>{
+  try{
+   let intent;
+   await db.applyBatch({device:{},outbox:{},sections:{},teachings:{},years:{},terms:{},enrollments:{},students:{}},{allowStudentLifecycle:true,prepare(current){
+    const live=subjectlessContext(sectionId);if(live.workspace!==c.workspace)throw Error(DELETE_STALE_MESSAGE);
+    if(!current.sections.some(r=>r.id===sectionId&&!r.deleted&&r.status==='active'&&r.yearId===c.yearId)||
+     current.teachings.some(t=>!t.deleted&&t.sectionId===sectionId)||
+     current.enrollments.some(e=>e.sectionId===sectionId&&e.ownerId!=null&&e.ownerId!==c.ownerId)||
+     current.students.some(s=>s.ownerId!=null&&s.ownerId!==c.ownerId&&current.enrollments.some(e=>e.sectionId===sectionId&&e.studentId===s.id))||
+     !current.years.some(y=>y.id===c.yearId&&!y.deleted&&y.status==='active')||!current.terms.some(t=>t.id===c.termId&&!t.deleted&&t.status==='active'&&t.yearId===c.yearId))throw Error(DELETE_STALE_MESSAGE);
+    const device=current.device.find(d=>d.id==='device');if(!device)throw Error(DELETE_STALE_MESSAGE);
+    const prior=checkSubjectlessPending(device,c);
+    if(prior&&prior.plan.fingerprint!==plan.fingerprint||!prior&&current.outbox.some(r=>r.state!=='superseded'))throw Error(DELETE_STALE_MESSAGE);
+    intent=prior??{kind:'subjectless-section',selectedTeachingId:null,sectionId,ownerId:c.ownerId,yearId:c.yearId,termId:c.termId,plan,mutationId:uid(),deviceId:device.deviceId??uid()};
+    return {device:{put:[{...device,deviceId:intent.deviceId,n77DeleteIntent:intent,updatedAt:now()}]}};
+   }});
+   bindCheckpoint(intent);state.device=await db.get('device','device');notify();
+   let receipt;
+   try{receipt=await n36DeleteSubjectlessSection({...c,fingerprint:plan.fingerprint,mutationId:intent.mutationId,deviceId:intent.deviceId,commit:true});}
+   catch(e){if(e.code==='22023'){await clearRejectedN77Intent(intent.mutationId);throw Error(DELETE_STALE_MESSAGE);}throw Error(DELETE_AMBIGUOUS_MESSAGE);}
+   try{
+    validateSubjectlessPlan(receipt,c,true);
+    if(receipt.mutationId!==intent.mutationId||receipt.fingerprint!==plan.fingerprint||JSON.stringify(receipt.cascadeTeachingIds)!==JSON.stringify(plan.cascadeTeachingIds)||JSON.stringify(receipt.enrollmentIds)!==JSON.stringify(plan.enrollmentIds)||subjectlessContext(sectionId).workspace!==c.workspace)throw Error(DELETE_STALE_MESSAGE);
+    await db.applyBatch(Object.fromEntries(db.STORES.filter(n=>!['profile','meta'].includes(n)).map(n=>[n,{}])),{allowStudentLifecycle:true,prepare(current){
+     if(subjectlessContext(sectionId).workspace!==c.workspace)throw Error(DELETE_STALE_MESSAGE);
+     return subjectlessDeleteWrites(current,receipt,now());
+    }});
+   }catch{throw Error(DELETE_AMBIGUOUS_MESSAGE);}
+   const loaded=await Promise.all(COLLECTIONS.map(n=>db.getAll(n)));
+   if(activeWorkspace!==c.workspace)throw Error(DELETE_AMBIGUOUS_MESSAGE);
+   COLLECTIONS.forEach((n,i)=>{state[n]=loaded[i];});state.device=await db.get('device','device');notify();broadcast([{store:'sections',id:sectionId}]);return receipt;
+  }finally{if(activeWorkspace===c.workspace){state.device=await db.get('device','device');notify();}}
+ },{ownerId:c.ownerId,teachingId:null,sectionId,kind:'subjectless-section'});
 }
 
 function throwLegacyDeleteUpdateRequired() {

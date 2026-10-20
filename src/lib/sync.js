@@ -206,7 +206,7 @@ function classDeletionInFlight() {
     cloudOwnershipAccess('pull').allowed && !store.state.device?.cloudRestoreResume &&
     !store.state.device?.studentLifecycleResume &&
     (!checkpoint || (checkpoint.ownerId === liveClassDeletion.ownerId &&
-      checkpoint.selectedTeachingId === liveClassDeletion.teachingId &&
+      (liveClassDeletion.kind==='subjectless-section' ? checkpoint.kind==='subjectless-section'&&checkpoint.sectionId===liveClassDeletion.sectionId&&checkpoint.selectedTeachingId===null : checkpoint.selectedTeachingId === liveClassDeletion.teachingId) &&
       checkpoint.mutationId === liveClassDeletion.mutationId));
 }
 
@@ -860,7 +860,7 @@ export async function runStudentLifecycleExclusive(task, identity) {
 }
 
 /** Drain a pass before creating the N77 checkpoint that excludes normal writes. */
-export async function runClassDeletionExclusive(task, { ownerId, teachingId }) {
+export async function runClassDeletionExclusive(task, { ownerId, teachingId, sectionId=null, kind='teaching' }) {
   if (classDeletionReserved || restoreRunning || restorePreparing || workspaceClaimRunning) {
     throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
   }
@@ -877,10 +877,10 @@ export async function runClassDeletionExclusive(task, { ownerId, teachingId }) {
       throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
     }
     assertCloudOwnership('pull');
-    liveClassDeletion = { ownerId, teachingId, contextToken };
+    liveClassDeletion = { ownerId, teachingId, sectionId, kind, contextToken };
     presentationSeverity.verifying(contextToken);
     reservedClassDeletionTask = () => task(intent => {
-      if (intent.ownerId !== ownerId || intent.selectedTeachingId !== teachingId || !intent.mutationId ||
+      if (intent.ownerId !== ownerId || (kind==='subjectless-section' ? intent.kind!==kind||intent.sectionId!==sectionId||intent.selectedTeachingId!==null : intent.selectedTeachingId !== teachingId) || !intent.mutationId ||
           bindPresentationContext() !== contextToken || !liveClassDeletion) {
         throw new Error('Class deletion checkpoint identity mismatch');
       }
