@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-0524-source-context-before-collection-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -4700,
+      "scopeKey": "n36-0524-source-context-start-navigation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "LATEST ACTUAL USER after published/physicallyinstalled0.5.24: TWO same diagnostics popup445x324, readyrun-controller/background, jobPhase stopped/stageerror, staged0/observed0, SOURCE_CONTEXT_CHANGED, startPhase/fieldResults/setup none, receivercapability ready. Source read failed BEFORE any collection/profile delivery. This is a NEW source-side failure, NOT previous completed HANDOFF_DOCUMENT_OR_ROUTE or TTL. Do not repeat old303collection/profile/receiver/CSV/Noor proofs. Current compact UI acceptance retained; no need redesign screenshot matrix. User had already confirmed running from Madrasati, don't blindly ask that again or generic both tabs message.\n\nTrace EXACT three SOURCE_CONTEXT_CHANGED call sites in background-runner source pre/postguards and planned navigation settle, from popup explicit Start/background binding onward. Inspect actual current source descriptor/document URL vs tabs metadata/planned transitions and normalization/redirect/popup-close races. Build one representative alreadyauthorized synthetic background Start->source verification->FIRST necessary planned transition, using .24 baseline to reproduce the actual class of guard rejection and corrected composition, retaining exact document/frame/origin/source-school/role/session/owner/job deadline and destination allowlist. Accept only demonstrably same-source binding or exact owned planned navigation; no any-same-origin shortcut, broad query/path normalization, automatic role/nav replay, forcedcollection despite actualcontextchange or assumption manualchangedsource. Distinguish stale tab metadata/allowed hash/canonical URL transition from genuine switched school/account/document. If document navigation requires sanctioned exact route readback, bind from authoritative current document under same job/nonce rather than cached tabs string; do not adopt unknown document. Preserve source-route and genuine mismatch protections.\n\nDiagnostics currently cannot identify WHICH guard failed. Add finite SAFE source failureStep enum (start/pre-read/post-read/navigation-settle as appropriate) and job/start phase into existing top-left diagnostic copy, without URLs/query params/context tokens/IDs/names/page content. Result wording must explain actual condition, not generic closedtabs. Do not use diagnostic addition alone to claim solved; prove causal correction if possible. Unknown actual branch stays unknown if source evidence insufficient. No real Madrasati browser automation/control/result read or previously refused operations through another actor/tool; synthetic owned local fixture only, no real accounts/pupils/credentials, SQL/Auth/RLS/schema/Sync-global/providerconfig changes. No extra source permission or navigation pages. Existing popup canclose/no newtab/oneStart/quietRakeez/sourcewins profile/calendarhold contracts retained. Noor/manual code remains inactive/preserved, not newly surfaced.\n\nSmallest relevant composition and one genuine wrong source/document/owner refusal suffice, reuse .24 unchanged receiver/data/package tests. If Product changed, bump ONCE .24->.25, same permissions/hosts/CSP, immutable .24 preserved. N107 has delivered and shared import view FREE: update exact .25 downloadhref+label in SAME candidate, no extra companion. Existing stable updater installs AFTER verifiedpublication; root actual physical parity once. N88 works different runtime/service paths, no interference. Solecontroller/publisher, isolated fresh current origin/main, preserve other modifications. Return exact LOCAL_READY/BLOCKED, candidate/base/checks and truthful remaining actual-source acceptance.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "tests/n36-0524-source-context-20261020/**",
+        "docs/automation-evidence/20261020/N36_0524_SOURCE_CONTEXT.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/background-runner.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_actual_source_context_start_first_transition_focused",
+        "n36_safe_source_phase_real_context_denial",
+        "n36_0525_package_and_link_exact"
+      ],
+      "postDeliveryChecks": [
+        "n36_verified_package_stable_folder_parity"
+      ],
+      "acceptance": [
+        "New before-collection source guard failure diagnosed/corrected without weakening document/school/owner/job protection; no claim from previous handoff fix.",
+        "Finite safe diagnostics identifies exact failing step; same compact Madrasati-only UI and .25 source/archive/link/stable delivery if changed."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct user two actual .24 SOURCE_CONTEXT_CHANGED reports",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountMutations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Direct PO continuing N36 one-start import correction and previously authorized ordinary import behavior; solepublisher, no new school/access/service permission."
+    }
+  ]
+}
