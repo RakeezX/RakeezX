@@ -1,0 +1,220 @@
+{
+  "taskId": "continuous-n107-safe-import-phase-clock-20261020",
+  "runId": "6e3bdfb7-e5c4-42c9-90c3-246e8345caa2",
+  "checks": [
+    {
+      "name": "actual_duration_held_receipts_and_success",
+      "status": "PASS",
+      "evidence": "Actual small app import: collapsed details; held creation/max/grade phases measured; no success before durable receipt; finite copied2/4 aggregate; no persistence; dispose clears panel."
+    },
+    {
+      "name": "failure_reload_owner_privacy",
+      "status": "PASS",
+      "evidence": "Rejection reports uncertain without grades; reload has no prior clock; explicit continuation begins a new labelled segment; actual workspace/session retirement removes summary/copy UI. No PII/raw errors in support JSON."
+    },
+    {
+      "name": "n107_actual_import_phase_clock_durable_ack_owner_privacy",
+      "status": "PASS",
+      "evidence": "Changed-boundary actual DOM/store/owned-command proof only; existing negative owner/max/unknown-request guards reused unchanged."
+    },
+    {
+      "name": "syntax_diff_and_visual",
+      "status": "PASS",
+      "evidence": "node --check affected view/harness; git diff --check; actual390px screenshot inspected. No new module/import, style, storage or service dependency."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "04b7a87d79b69bde6621c66c248bf73a49ecbb60fdd8618859a475450ab51562",
+    "src/store.js": "d89a77dbf874d9f833131a432f3ae07240eacd9ae8bf863a0068ea48c52b3c83",
+    "src/lib/grade-transfer.js": "cfea5d2637a5f81e9caf8fe116d93d8fa7713ee212c4863802b1f0a767cb37b3",
+    "tests/n107-phase-clock-20261020/browser.mjs": "6eaf28710f0de5f3c344083289a597021c67a2aa53dc7500e2a8bf3b70d818a9"
+  },
+  "observations": {
+    "creation": {
+      "version": 1,
+      "segment": "attempt",
+      "status": "running",
+      "elapsedMs": 565,
+      "counts": {
+        "names": 2,
+        "grades": 4
+      },
+      "phases": [
+        {
+          "phase": "prepare",
+          "status": "completed",
+          "durationMs": 181
+        },
+        {
+          "phase": "creation_ack",
+          "status": "running",
+          "durationMs": 384
+        }
+      ]
+    },
+    "maximum": {
+      "version": 1,
+      "segment": "attempt",
+      "status": "running",
+      "elapsedMs": 904,
+      "counts": {
+        "names": 2,
+        "grades": 4
+      },
+      "phases": [
+        {
+          "phase": "prepare",
+          "status": "completed",
+          "durationMs": 181
+        },
+        {
+          "phase": "creation_ack",
+          "status": "completed",
+          "durationMs": 495
+        },
+        {
+          "phase": "maximum_ack",
+          "status": "running",
+          "durationMs": 229
+        }
+      ]
+    },
+    "grade": {
+      "version": 1,
+      "segment": "attempt",
+      "status": "running",
+      "elapsedMs": 1149,
+      "counts": {
+        "names": 2,
+        "grades": 4
+      },
+      "phases": [
+        {
+          "phase": "prepare",
+          "status": "completed",
+          "durationMs": 181
+        },
+        {
+          "phase": "creation_ack",
+          "status": "completed",
+          "durationMs": 495
+        },
+        {
+          "phase": "maximum_ack",
+          "status": "completed",
+          "durationMs": 265
+        },
+        {
+          "phase": "finalize",
+          "status": "completed",
+          "durationMs": 4
+        },
+        {
+          "phase": "grade_ack",
+          "status": "running",
+          "durationMs": 204
+        }
+      ]
+    },
+    "success": {
+      "version": 1,
+      "segment": "attempt",
+      "status": "completed",
+      "elapsedMs": 1234,
+      "counts": {
+        "names": 2,
+        "grades": 4
+      },
+      "phases": [
+        {
+          "phase": "prepare",
+          "status": "completed",
+          "durationMs": 181
+        },
+        {
+          "phase": "creation_ack",
+          "status": "completed",
+          "durationMs": 495
+        },
+        {
+          "phase": "maximum_ack",
+          "status": "completed",
+          "durationMs": 265
+        },
+        {
+          "phase": "finalize",
+          "status": "completed",
+          "durationMs": 4
+        },
+        {
+          "phase": "grade_ack",
+          "status": "completed",
+          "durationMs": 251
+        },
+        {
+          "phase": "finalize",
+          "status": "completed",
+          "durationMs": 38
+        }
+      ]
+    }
+  },
+  "recovery": {
+    "uncertain": {
+      "version": 1,
+      "segment": "attempt",
+      "status": "uncertain",
+      "elapsedMs": 714,
+      "counts": {
+        "names": 2,
+        "grades": 4
+      },
+      "phases": [
+        {
+          "phase": "prepare",
+          "status": "completed",
+          "durationMs": 312
+        },
+        {
+          "phase": "creation_ack",
+          "status": "completed",
+          "durationMs": 310
+        },
+        {
+          "phase": "maximum_ack",
+          "status": "uncertain",
+          "durationMs": 92
+        }
+      ]
+    },
+    "continuation": {
+      "version": 1,
+      "segment": "continuation",
+      "status": "uncertain",
+      "elapsedMs": 87,
+      "counts": {
+        "names": 2,
+        "grades": 4
+      },
+      "phases": [
+        {
+          "phase": "prepare",
+          "status": "completed",
+          "durationMs": 1
+        },
+        {
+          "phase": "creation_ack",
+          "status": "completed",
+          "durationMs": 23
+        },
+        {
+          "phase": "maximum_ack",
+          "status": "uncertain",
+          "durationMs": 63
+        }
+      ]
+    }
+  },
+  "baseSha": "fc127d275c3e2e762e3b42ce0c3ac9fc5ade9fcf"
+}

@@ -28,6 +28,39 @@ let transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nam
 
 // AI-authored N107: the parsed file belongs to the hub, not its destination.
 const emptyTransfer = () => ({ importMode:'names', panel:'import', rows:null, mappings:[], nameColumn:-1, idColumn:-1, review:null, recovery:[], message:'', busy:false });
+// AI N107: same-document observation only; never attached to a persisted batch.
+let importClock = null;
+const durationLabels = Object.freeze({prepare:'التحضير والحفظ المحلي',creation_ack:'انتظار إيصالات الفصل والأسماء',maximum_ack:'طلب العظمى وتأكيد إيصالها',grade_ack:'طلب الدرجات وتأكيد إيصالها',finalize:'إتمام النتيجة'});
+const durationStatuses = Object.freeze({running:'جارٍ',completed:'اكتمل',uncertain:'لم يتأكد الاكتمال'});
+const durationCount = n => Math.min(30000,Math.max(0,Math.trunc(Number(n)||0)));
+function clearImportClock() { importClock = null; }
+function currentImportClock(current = transfer) {
+  if(importClock && (importClock.current!==transfer || importClock.workspace!==store.getActiveWorkspace() || importClock.session!==cloud.session || importClock.route!==location.hash))clearImportClock();
+  return importClock?.current===current ? importClock : null;
+}
+function startImportClock(current,continuation=false,names=0,grades=0) {
+  importClock={current,workspace:store.getActiveWorkspace(),session:cloud.session,route:location.hash,start:performance.now(),end:null,segment:continuation?'continuation':'attempt',status:'running',phases:[],names:durationCount(names),grades:durationCount(grades),open:false};
+  markImportClock(current,'prepare');
+}
+function markImportClock(current,phase,status=null) {
+  const clock=currentImportClock(current);if(!clock || clock.end!==null)return;
+  const at=performance.now(),prior=clock.phases.at(-1);
+  if(prior && prior.end===null)prior.end=at;
+  if(phase && durationLabels[phase] && clock.phases.length<8)clock.phases.push({phase,start:at,end:null});
+  if(status){
+    if(status==='completed' && current.successCounts){clock.names=durationCount(current.successCounts.names);clock.grades=durationCount(current.successCounts.grades);}
+    clock.status=status;clock.end=at;
+  }
+}
+function importDurationSummary() {
+  const clock=currentImportClock();if(!clock)return null;
+  const end=clock.end??performance.now(),ms=n=>Math.min(86400000,Math.max(0,Math.round(n)));
+  return {version:1,segment:clock.segment,status:clock.status,elapsedMs:ms(end-clock.start),counts:{names:clock.names,grades:clock.grades},phases:clock.phases.map(p=>({phase:p.phase,status:p.end===null?'running':clock.status==='uncertain'&&p===clock.phases.at(-1)?'uncertain':'completed',durationMs:ms((p.end??end)-p.start)}))};
+}
+function importDurationPanel() {
+  const summary=importDurationSummary();if(!summary)return '';
+  return html`<details data-import-duration ${importClock.open?'open':''}><summary data-act="import-duration-toggle">تفاصيل المدة</summary><p>${summary.segment==='continuation'?'مدة الاستكمال في هذه الصفحة فقط؛ المدة السابقة غير متاحة.':'المدة منذ هذا التأكيد في الصفحة.'} ${durationStatuses[summary.status]} · ${(summary.elapsedMs/1000).toFixed(1)} ثانية</p><p>تُحدّث القيم عند فتح التفاصيل أو نسخها، وليست مؤشرًا لنجاح المزامنة العامة.</p><ul>${summary.phases.map(p=>html`<li data-import-phase="${p.phase}">${durationLabels[p.phase]}: ${(p.durationMs/1000).toFixed(1)} ثانية · ${durationStatuses[p.status]}</li>`)}</ul><button class="btn btn--quiet" data-act="import-duration-copy">نسخ ملخص المدة</button></details>`;
+}
 function assertFileCurrent() {
   const previous = transfer;
   bind();
@@ -41,6 +74,7 @@ async function rosterRecovery(id = hub.existing) {
 const prospectiveItems = defaultItemsFor('prospective').map((item,i)=>({...item,id:`prospective-default-${i}`,serverRevision:1}));
 const destinationItems = () => hub.kind === 'existing' && hub.existing ? store.teachingContext(hub.existing).items : prospectiveItems;
 function resetDestination() {
+  clearImportClock();
   draft = {};
   if (!transfer.rows) return;
   const items = destinationItems();
@@ -358,8 +392,11 @@ async function saveAutomaticNames(result){
  }finally{automaticWriting=false;batch.route=null;}
 }
 function clearExtensionPreview() { extensionPreview = extensionOwner = null; clearTimeout(extensionTimer); }
-store.onWorkspaceDeactivation(()=>{clearExtensionPreview();automaticBatch=null;});
+store.onWorkspaceDeactivation(()=>{clearImportClock();clearExtensionPreview();automaticBatch=null;});
 cloud.subscribe(() => {
+  const hadClock=!!importClock;
+  currentImportClock();
+  if(hadClock && !importClock)repaint();
   if(!extensionOwner)return;
   try { if(extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
 });
@@ -475,6 +512,7 @@ function transferPanel(teachingId) {
       ${!review && !draft.review && (!transfer.created || transfer.needsReview && !transfer.plan) ? html`<button class="btn btn--primary" data-act="grade-review" ${transfer.busy || transfer.recovery.length ? 'disabled' : ''}>مراجعة الاستيراد</button>` : ''}
       <button class="btn" data-act="grade-cancel" >إلغاء</button>
     ` : ''}
+    ${importDurationPanel()}
     ${transfer.created ? html`<p data-roster-partial role="status">${transfer.created.existing ? 'لم يتأكد حفظ درجات الملف بعد.' : `حُفظ الفصل والمادة و${transfer.created.added} اسمًا.`} ${transfer.stage ?? 'الدرجات لم يتأكد حفظها.'}</p>
       ${!transfer.busy && !transfer.recovery.length && transfer.plan ? transfer.needsReview ? html`<button class="btn" data-act="roster-changed-review">مراجعة الأثر المتغيّر</button>` : html`<button class="btn btn--primary" data-act="roster-resume">استكمال الاستيراد</button>` : ''}` : ''}
     ${review || draft.review ? html`<div data-grade-review>
@@ -549,11 +587,13 @@ async function transferConfirm(el, retry = false) {
   }
   const overwriteConfirmed=root.querySelector('[data-grade-overwrite-confirm]')?.checked ?? false;
   const enrollmentConfirmed=true;
+  startImportClock(current,retry||!!current.created,current.review?.names?.length??current.review?.entries?.length??0,current.review?.cells?.length??0);
   const plan=current.maximumReview && current.plan ? current.plan : capturePlan();current.plan=plan;
   transfer.busy = true; transfer.writing = true; repaint();
   try {
     assertPlan(current,plan);
     const reviewed = current.review;
+    if(retry)markImportClock(current,'grade_ack');
     const recovered = retry ? await store.retryGradeImport(el.dataset.mutation) : null;
     if (!retry && transfer.importMode === 'names') await store.confirmNamesImport(transfer.review, true,{verifyCurrent:()=>assertPlan(current,plan)});
     else if (!retry) {
@@ -567,15 +607,17 @@ async function transferConfirm(el, retry = false) {
       }
       if(!fresh.cells.length) {
         await store.confirmNamesImport(store.reviewNamesImport(fresh.teachingId,current),true,{verifyCurrent:()=>assertPlan(current,plan)});
-      } else await store.confirmGradeImport(fresh, { approved: true, overwriteConfirmed, enrollmentConfirmed,verifyCurrent:()=>{assertPlan(current,plan);assertGradePreservation(current);if(JSON.stringify(store.reviewGradeImport(fresh.teachingId,current))!==JSON.stringify(fresh))throw importChanged();} });
+      } else {markImportClock(current,'grade_ack');await store.confirmGradeImport(fresh, { approved: true, overwriteConfirmed, enrollmentConfirmed,verifyCurrent:()=>{assertPlan(current,plan);assertGradePreservation(current);if(JSON.stringify(store.reviewGradeImport(fresh.teachingId,current))!==JSON.stringify(fresh))throw importChanged();} });}
     }
+    markImportClock(current,'finalize');
     const teaching = store.getTeaching(recovered?.teachingId ?? reviewed?.teachingId ?? current.created?.teachingId);
     const savedNames = current.created?.added ?? recovered?.addedNames ?? reviewed?.names?.length ?? reviewed?.newStudents?.length ?? 0;
     const gradeCount = recovered?.gradeCount ?? reviewed?.cells?.length ?? 0;
     await clearRosterContinuation(current);
     current.rows = null; current.review = null; current.created = null;current.plan=null;current.maximumReview=null; draft = {}; current.error = false; current.successTeaching = teaching?.id; current.successCounts = {names:savedNames,grades:gradeCount};
     current.message = teaching ? `${teachingLabel(teaching)} · الأسماء المحفوظة: ${savedNames} · الأسماء المعلقة: 0${gradeCount ? ` · الدرجات المحفوظة: ${gradeCount}` : ''}` : 'تم تأكيد إيصال الطلب المحفوظ.';
-  } catch (error) { current.message = error.message; current.error = true; }
+    markImportClock(current,null,'completed');
+  } catch (error) { markImportClock(current,null,'uncertain');current.message = error.message; current.error = true; }
   finally { current.busy = false; current.writing = false; if (transfer === current) { current.recovery = await rosterRecovery(); repaint(); } }
 }
 
@@ -616,12 +658,19 @@ function canOpenKoshoof(p) {
 }
 
 const transferActions = {
+    'import-duration-toggle'() { const clock=currentImportClock();if(clock){clock.open=!clock.open;repaint();} },
+    async 'import-duration-copy'() {
+      const summary=importDurationSummary();if(!summary)return;
+      try { await navigator.clipboard.writeText(JSON.stringify(summary));toast('\u0646\u064f\u0633\u062e \u0645\u0644\u062e\u0635 \u0627\u0644\u0645\u062f\u0629'); } catch { toast('\u062a\u0639\u0630\u0651\u0631 \u0646\u0633\u062e \u0627\u0644\u0645\u0644\u062e\u0635','danger'); }
+      repaint();
+    },
     async 'grade-file'(el, ev, params) {
       const prior = transfer;
       if (allowed()) return;
       draft = {}; fileSession = cloud.session;
       const file = el.files?.[0];
       if (!file || prior.writing) return;
+      clearImportClock();
       const current = transfer = { ...prior, maximumReview:null,plan:null,created:null, rows:null, mappings:[], review:null, busy:false, writing:false, successTeaching:null, successCounts:null };
       current.busy = true; current.rows = null; current.review = null; current.message = 'جار قراءة الملف محليًا…'; current.error = false; repaint();
       try {
@@ -701,7 +750,7 @@ let hub = { selected: new Set(), namesOnly: true };
 function bind() {
   const next = JSON.stringify([store.activeYear()?.id, store.activeTerm()?.id, store.getActiveWorkspace()?.leaseGeneration, cloud.user?.id]);
   if (workspace !== store.getActiveWorkspace() || scope !== next || fileSession !== cloud.session) {
-    draft = {}; transferBinding = null; transfer = emptyTransfer(); hub = { selected: new Set(), namesOnly: true }; fileSession = cloud.session; workspace = store.getActiveWorkspace(); scope = next;
+    clearImportClock();draft = {}; transferBinding = null; transfer = emptyTransfer(); hub = { selected: new Set(), namesOnly: true }; fileSession = cloud.session; workspace = store.getActiveWorkspace(); scope = next;
   }
 }
 function allowed() { try { store.assertClassImportAccess(); return ''; } catch (error) { return error.message; } }
@@ -740,8 +789,10 @@ function reboundSemantics(review, changes) {
     itemRevision:changes.some(m=>m.itemId===c.itemId)?0:c.itemRevision}))});
 }
 async function acknowledgeMaximums(current,plan,review) {
+  markImportClock(current,'maximum_ack');
   assertPlan(current,plan);current.stage='انتظار إيصال تغيير العظمى';repaint();
   await store.confirmImportMaximums(review,{verifyCurrent:()=>assertPlan(current,plan)});
+  markImportClock(current,'finalize');
   assertPlan(current,plan);
   const fresh=current.created?.existing ? store.reviewGradeImport(review.teachingId,current) : boundGradeReview(current,plan);
   if(reboundSemantics(fresh,review.maxChanges)!==reboundSemantics(review,review.maxChanges))throw importChanged();
@@ -842,22 +893,26 @@ async function continueRoster(current) {
     assertPlan(current,plan);current.stage='انتظار المزامنة';repaint();
     let actual;
     if(current.created?.existing)actual=current.maximumReview;
-    else actual=await waitForCreation(current,plan);
+    else {markImportClock(current,'creation_ack');actual=await waitForCreation(current,plan);}
     if(actual.maxChanges.length || current.maximumReview){current.maximumReview ??= actual;await saveRosterContinuation(current);actual=await acknowledgeMaximums(current,plan,current.maximumReview);}
     assertPlan(current,plan);current.stage='حفظ الدرجات';current.review=actual;repaint();
+    if(actual.cells.length)markImportClock(current,'grade_ack');
     if(actual.cells.length)await store.confirmGradeImport(actual,{approved:true,overwriteConfirmed:current.overwriteConfirmed===true,enrollmentConfirmed:true,verifyCurrent:()=>{assertPlan(current,plan);assertGradePreservation(current);const fresh=current.created?.existing?store.reviewGradeImport(actual.teachingId,current):boundGradeReview(current,plan);if(JSON.stringify(fresh)!==JSON.stringify(actual))throw importChanged();}});
     assertPlan(current,plan);
+    markImportClock(current,'finalize');
     await clearRosterContinuation(current);
     current.rows=null;current.review=null;current.plan=null;current.created=null;current.maximumReview=null;draft={};current.successTeaching=actual.teachingId;current.successCounts={names:plan.classReview?.names.length ?? actual.newStudents.length,grades:actual.cells.length};
     hub.kind='existing';hub.existing=actual.teachingId;
     current.message=`اكتمل الاستيراد. الأسماء المحفوظة: ${plan.classReview?.names.length ?? actual.newStudents.length} · الدرجات المحفوظة: ${actual.cells.length}`;current.error=false;
-  } catch(error) {current.stage='الدرجات لم يتأكد حفظها.';current.message=error.message;current.error=true;current.needsReview=error.message===importChanged().message;}
+    markImportClock(current,null,'completed');
+  } catch(error) {markImportClock(current,null,'uncertain');current.stage='الدرجات لم يتأكد حفظها.';current.message=error.message;current.error=true;current.needsReview=error.message===importChanged().message;}
   finally{current.busy=false;current.writing=false;current.recovery=await rosterRecovery(current.created?.teachingId);if(transfer===current)repaint();}
 }
 const classImport = { actions: {
   async 'class-import-confirm'() {
     const current=transfer,currentDraft=draft,review=draft.review;
     if(!review || locked() || allowed())return;
+    startImportClock(current,!!current.created,review.names.length,draft.proposal?.cells.length??0);
     const plan=current.plan ?? capturePlan();current.plan=plan;current.busy=true;current.writing=true;repaint();
     try {
       assertPlan(current,plan);
@@ -865,7 +920,8 @@ const classImport = { actions: {
       assertPlan(current,plan);draft.failed=false;
       if(draft.proposal?.cells.length || draft.proposal?.maxChanges?.length){current.created=receipt;current.createdItems=itemSemantics(store.teachingContext(receipt.teachingId).items);current.stage='حفظ الفصل والطلاب';await saveRosterContinuation(current);await continueRoster(current);}
       else {hub.kind='existing';hub.existing=receipt.teachingId;current.plan=null;current.rows=null;current.review=null;current.successTeaching=receipt.teachingId;current.successCounts={names:receipt.added,grades:0};current.message=`اكتمل الاستيراد. الأسماء المحفوظة: ${receipt.added}${current.importMode==='grades'?' · لا توجد درجات مدخلة في الملف؛ لم تُنشأ بنود درجات من الكشف.':''}`;draft={};}
-    }catch(error){if(transfer===current && draft===currentDraft){draft.failed=true;current.message=error.message;current.error=true;}}
+      if(!current.created && !current.error)markImportClock(current,null,'completed');
+    }catch(error){markImportClock(current,null,'uncertain');if(transfer===current && draft===currentDraft){draft.failed=true;current.message=error.message;current.error=true;}}
     finally{current.busy=false;current.writing=false;if(transfer===current)repaint();}
   },
   'roster-changed-review'(){
@@ -890,7 +946,7 @@ const classImport = { actions: {
     }catch(error){current.message=error.message;current.error=true;}
     repaint();
   },
-  async 'roster-resume'(){if(locked() || !transfer.plan || transfer.needsReview || transfer.recovery.length)return;transfer.cancelled=false;transfer.busy=true;transfer.writing=true;await continueRoster(transfer);},
+  async 'roster-resume'(){if(locked() || !transfer.plan || transfer.needsReview || transfer.recovery.length)return;startImportClock(transfer,true,transfer.plan.classReview?.names.length??transfer.created?.added??0,transfer.maximumReview?.cells.length??draft.proposal?.cells.length??0);transfer.cancelled=false;transfer.busy=true;transfer.writing=true;await continueRoster(transfer);},
   'class-import-reset'(){cancelImport();},
 }};
 async function cancelImport(){
@@ -898,7 +954,7 @@ async function cancelImport(){
   try{if(current.created)await store.cancelClassFileImportContinuation(current.created.teachingId);else await clearRosterContinuation(current);}
   catch(error){if(transfer===current){current.cancelling=false;current.cancelled=false;current.message=error.message;current.error=true;repaint();}return;}
   if(transfer!==current)return;
-  draft={};transfer={...emptyTransfer(),recovery:current.recovery,message:'أُغلقت المراجعة. أي بيانات حُفظت سابقًا تبقى محفوظة.'};repaint();
+  clearImportClock();draft={};transfer={...emptyTransfer(),recovery:current.recovery,message:'أُغلقت المراجعة. أي بيانات حُفظت سابقًا تبقى محفوظة.'};repaint();
 }
 function compactReview(review,creation) {
   const entries=creation ? transfer.rows.slice(1).map((r,i)=>({row:i+2,name:String(r[transfer.nameColumn]??''),status:'new'})) : review.entries;
@@ -962,7 +1018,7 @@ function existingPane() {
 }
 export const koshoofCenter = {
   title: () => 'استيراد وتصدير الكشوف', back, onMount: focus,
-  onUnmount() { transfer.cancelled=true;transfer.stopWait?.();hub.route = null; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; clearExtensionPreview(); },
+  onUnmount() { clearImportClock();transfer.cancelled=true;transfer.stopWait?.();hub.route = null; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; clearExtensionPreview(); },
   render(p = {}) {
     bind(); const denial = allowed(); if (denial) { bindTransfer(null); return classAccessFeedback(p.id ? p : {}) || unavailable(denial); }
     contextRoute(p);
