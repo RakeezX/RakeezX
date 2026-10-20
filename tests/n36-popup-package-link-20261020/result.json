@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n36-actual-popup-package-download-link-20261020",
+  "runId": "3ecd0da9-c4b6-4ff8-bed0-36e14612ce48",
+  "name": "n36_actual_new_verified_package_link_download_no_navigation",
+  "baseSha": "3d05e0057a1bf1fc0ec080c6d1af8c017ca72808",
+  "publishedPackageSha": "3d05e0057a1bf1fc0ec080c6d1af8c017ca72808",
+  "reusedVerifiedAt": "2026-10-20T16:15:24.219Z",
+  "archiveSha256": "f1d0936757f8d0cb03b88cf7ac289ce4cb3cf858f34f850f91a239f1c19f78a9",
+  "changedScope": "Only download href/version label; N107/receiver code identical",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper, real app route/DOM/download handler, fresh isolated HTTP browser",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.22",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS"
+}
