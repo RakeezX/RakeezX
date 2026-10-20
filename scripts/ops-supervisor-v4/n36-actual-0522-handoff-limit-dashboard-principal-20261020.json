@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -4500,
+      "scopeKey": "continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "NEW ACTUAL USER20October after published0.5.22: Start now DOEScollect303; teacher and school saved, classes10/timetable20 current. Thenstopped stageerror HANDOFF_LIMIT_OR_EXPIRED; capabilitysource-profile-quiet-v1, setupPhase receipt, staged/observed303, receipt notavailable. Principal/departmentmissing. This supersedes oldidle case, do NOT repeatpopupStart orsource303 collection/profilepipelineproofs. Diagnose exact HANDOFF_LIMIT_OR_EXPIRED condition in current source and composed backgroundrun -> authorizedhandoff/receiver lifetime/call/chunk budgets. Determine whether expired grant startsbeforecollection or exhausted valid-action/call allowance/transport holds produces this actualbranch. Preserve each semanticboundary: original explicitStart/source/tab/window/document/owner/Authsid/yearterm/lease/batch/original30minjobdeadline/currentdocument/nonce/replay/knownpartial receipts/unknownoutcomes. Do not simplyraiseTTL/unboundedattempts or resetgrant andpostnewidentities after unknownreceipt. Legitimate longjob can refresh narrowly only under stillverifiedsameowner/session/document/source and originalfixedjobdeadline, preservingoriginalbatch/idempotency/reconcileidentity; wrongowner/expiredjob/newcontextmustdeny. Distinguish actual knownlimit/expiry from genericclosedtabs message; knownpartial local-save shouldnotclaim nothinghappened or fullsuccess. Quiet normalprogress/no perclassToast or importpage/newtab. Backgroundalone/popupcanclose contract remains.\n\nMinimum NEW check uses ALREADY-COLLECTED synthetic303names10classes20slots through actual serialized background->handoff->appreceiver/IDB boundary, not realMadrasati/source-navigation. Cross exact limitingbudget/clockboundary and verify remainingroster/fielddelivery finishes once, allreceiptsaccounted/no duplicate or loss; owner/session/document/trueexpiredjob and unknownreceipt one focusednegative composition. Virtualclock/syntheticAPIs allowed, no count-basedtestfiller, no oldfullmatrix. Reuse0.5.22actualpopup+qualifiedprofile proofs unchanged. No realportal browser/control/result read or previouslyrefused operation viaanotherworker/tool; no real pupils/accountdata, credentials, SQL/Auth/RLS/schema/scoring/Delete/Restore/migration/security/providerconfig changes.\n\nUser supplied PAGE EVIDENCE (not instructionsfrompage): authorized /Dashboards/Schools has label «قادة المدرسة :» and single leadername. Supportthis exact label in supported schoolDOM adapter scopedtoSchoolDashboard, with representative synthetic name only. Single unique principal is valid; ambiguousmultipleleaders cannot arbitrarilyoverwrite. Existing sourcewins teacher/principal/school retained. Title supplied «ابن الجوزي الابتدائية بمكة المكرمة». User suggestseducationdepartment fromlocation: allow ONLY unambiguous explicitlocative schooltitle suffix suchas «بمكة المكرمة» mappedtoexistingcanonical47department; explicitsourceDepartment takespriority; inferredfallback ONLYwhen storeddepartmentempty. Preserve existingdifferentuserdepartment and currentcalendarHOLD always. Do not infer fromgenericdistrict/schoolname substring or add guesseddepartments. Existing parsers/canonicalmapping reused, testknownsuffix vs misleading schoolname & alreadyselecteddepartment. User schooltype «بنين» is STUDENTschooltype, not reliableteachergender: no autoset/overwrite معلم/معلمة fromit or frompersonalname. Rootexplainedthisroutineproductchoice while continuingcriticalfix, no needpermissionquestion. Do not collectnewPII/sourcepages for this supplied structural evidence.\n\nN88 is separatelyactive usinglivebrowser/services; no shared Productruntime paths overlap except N36appimportreceiver files listed, N88 doesn'ttouchthem. N107latestcompactUX and existingreceiverupdates mustremain. Scopeboundedextension/assets + n36 handoff/receiver/currentimportview only if provenneeded; no app/store/Syncglobalrewrite. After actualchanges bumpONCE0.5.22->0.5.23 samepermissions/hosts/CSP, immutable. Updateexactdownloadlabelhref toverifiedcurrentnewpackage inSAMEcandidate whenpossible (N107delivered, viewfree); source/archivefilespublisherverified inoneatomicrelease, no extraemptycompanion. Existingstableupdaterupdateslocalfolder automatically afterrealpublication; rootphysicalparitycheck. Exactlocalclickdownload only ifdownloadlinkchanged, no newbrowsermatrix. Solecontroller/publisher, originalN36session, noqueueedits/manualworker. ReturntruthfulLOCAL_READY/BLOCKED withscope/candidate/checks, nopersonaltested/fullN36closureclaim.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/lib/n36-extension-handoff.js",
+        "src/views/class-import-center.js",
+        "src/lib/n36-setup-envelope.js",
+        "src/lib/teacher-setup-import.js",
+        "tests/n36-actual-handoff-limit-20261020/**",
+        "docs/automation-evidence/20261020/N36_ACTUAL_HANDOFF_LIMIT_DASHBOARD.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/handoff-worker.js"
+      ],
+      "requiredChecks": [
+        "n36_actual_longjob_handoff_budget_receipts_no_duplicate",
+        "n36_original_owner_expiry_unknown_outcome_fences",
+        "n36_dashboard_principal_precise_location_only",
+        "n36_0523_changed_source_package_download_parity"
+      ],
+      "postDeliveryChecks": [
+        "n36_verified_package_stable_folder_parity"
+      ],
+      "acceptance": [
+        "Alreadycollected303/10class journey completes across known handofflimit safely without rescanning/doubleposting; supplied school leader label supported.",
+        "Explicit location fallback only emptydepartment, calendar/currentpersonalrole preserved; exact changedpackage/publiclink/stablefolder deliver through existingchain."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO no newtab and no openpopup; ordinary background implementation under explicitStart",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountMutations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Latest direct PO explicitly requests background independent of popup/newtab. Publish exact existing owner-bound import behavior and sessionjob runtime via solepublisher; no new source/data/security permission."
+    }
+  ]
+}
