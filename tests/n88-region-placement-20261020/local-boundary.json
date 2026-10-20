@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "baseSha": "e225cb07e54ae6175ac7f641ad4027de1d330c07",
+  "liveCarrierBasis": "9c658ade13bddc0289f3e2cf3a7769533280c2ae",
+  "priorCarrier": "dc067be3b58d437d050ca57d2a3634f41f6b1c96d20cfe1114b8e3e988288088",
+  "carrier": "3fbf524a87ac496fdebc9f74e2ab57ad810661d094d63a9c6148ae1c5d81fd3a",
+  "source": "e928ed52923bd2cc2e71bc2e7fbc320f3a66dbaecd0c3128b22a49da92a59550",
+  "comparisons": 40,
+  "trustedRegion": "ap-south-1",
+  "onlyRoute": "POST /api/n88/teacher/class/list",
+  "clientOverrideRejected": true,
+  "queryOverrideDenied": true,
+  "signedEnvelopeBodyUrlAndMetadataIdentical": true,
+  "unrelatedRoutesIdentical": true,
+  "liveCarrierByteDeltaOnlyFixedHeader": true,
+  "deadlinesAndPrivateAssetBytesUnchanged": true,
+  "networkCalls": 0,
+  "realCredentials": 0,
+  "limitation": "Synthetic intercepted transport proves placement boundary, not actual execution region or hosted causation."
+}

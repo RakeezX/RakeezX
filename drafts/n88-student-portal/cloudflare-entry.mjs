@@ -40,6 +40,8 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       // Fixed upstream URL and metadata headers: private route, PIN, bearer and
       // cookie occur ONLY in TLS request body, never managed invocation URL/headers.
       const wire=new Headers({'content-type':'application/json'});
+      // Trusted placement is carrier-owned, outside the unchanged signed envelope.
+      if(request.method==='POST'&&url.pathname==='/api/n88/teacher/class/list')wire.set('x-region','ap-south-1');
       for(const [n,v] of Object.entries({'x-n88-time':time,'x-n88-nonce':nonce,'x-n88-source':source,'x-n88-signature':signature}))wire.set(n,v);
       const payload=JSON.stringify({path:url.pathname,method:request.method,headers:FORWARDED.map(n=>headers.get(n)||''),body:encodeBytes(bytes)});
       if(new TextEncoder().encode(payload).length>24576)return privateResponse(413);
