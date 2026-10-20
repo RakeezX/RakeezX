@@ -1,0 +1,9 @@
+{
+  "taskId": "continuous-n107-minimal-import-controls-20261020",
+  "runId": "893e0f66-5275-4ec0-82af-d1a1f9f435ab",
+  "checks": [],
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'-1' !== '1'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-minimal-import-controls-20261020/tests/n107-minimal-controls-20261020/browser.mjs:58:10\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-minimal-import-controls-20261020/tests/n107-minimal-controls-20261020/browser.mjs:24:2"
+  ],
+  "viewSha256": "2e414e7b8c5fd8aabbc3aa4e438350606cf1faf3506a91cb31623d2c76064642"
+}
