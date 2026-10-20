@@ -1,0 +1,49 @@
+{
+  "windowStart": "2026-10-20T19:45:50Z",
+  "windowEnd": "2026-10-20T19:46:15Z",
+  "provider": "Supabase query_logs, read-only aggregate metadata only",
+  "expectedNativeVersion": 59,
+  "records": [
+    {
+      "calls": 1,
+      "deployedVersion": "51",
+      "executionRegion": "ap-south-1",
+      "httpStatus": "200",
+      "minExecutionMs": 516,
+      "maxExecutionMs": 516
+    },
+    {
+      "calls": 4,
+      "deployedVersion": "52",
+      "executionRegion": "eu-central-2",
+      "httpStatus": "200",
+      "minExecutionMs": 7758,
+      "maxExecutionMs": 8051
+    }
+  ],
+  "qualifiedListCorrelation": "NOT_ESTABLISHED",
+  "regionCheck": "FAIL",
+  "queries": [
+    {
+      "purpose": "Discover finite log attribute names only",
+      "result": "5 window records; attribute names, no request/header values read"
+    },
+    {
+      "purpose": "Exact expected native dispatch pathname aggregate",
+      "result": "empty; provider pathname shape unconfirmed"
+    },
+    {
+      "purpose": "Corrected aggregate invocation",
+      "result": "INVALID_ARGUMENT: mistyped project ref; ref must be exactly 20 characters long; no service action"
+    },
+    {
+      "purpose": "Expected native version59 aggregate using correct project",
+      "result": "empty"
+    },
+    {
+      "purpose": "Same fixed-window metadata aggregate without guessed path/version filter",
+      "result": "records above; no personal fields, request URLs, IDs or request headers selected"
+    }
+  ],
+  "limitation": "Do not attribute the single ap-south-1 record to the authorized class list. No polling/new class read performed."
+}

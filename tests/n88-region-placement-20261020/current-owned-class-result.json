@@ -1,0 +1,41 @@
+{
+  "taskId": "continuous-n88-trusted-region-placement-20261020",
+  "runId": "d2d77330-ce85-4c3c-af8a-3ff917051e52",
+  "sourceCandidate": "3ff84041bd8a19a6941302cb7095c9208cbddbcd",
+  "startedAt": "2026-10-20T19:45:51.632Z",
+  "loadedCheckpointAt": "2026-10-20T19:46:00.807Z",
+  "context": {
+    "originalDedicatedTab": true,
+    "sameVerifiedOrigin": true,
+    "currentExistingClassPortal": true,
+    "loginFormAbsent": true,
+    "noAccountOrClassSwitch": true
+  },
+  "workerTriggeredClassReads": 1,
+  "normalReloads": 1,
+  "manualRetries": 0,
+  "supportDetailsExpands": 0,
+  "realMutations": 0,
+  "renderedResult": {
+    "loaded": true,
+    "rosterCount": 4,
+    "fieldCount": 6,
+    "publishedFieldCount": 0,
+    "taskCount": 0,
+    "errorDetailsPresent": false
+  },
+  "timing": {
+    "loadedByMsAfterReload": 9175,
+    "requestElapsedMs": null,
+    "httpStatus": null,
+    "serviceStage": null,
+    "note": "DOM completion upper bound, not request transport timing. Initial visible-locator wait timed out; subsequent read-only checkpoint found the loaded roster. No second request."
+  },
+  "regionVerified": false,
+  "actualRequestCorrelation": "NOT_ESTABLISHED",
+  "automaticExtras": "Unknown: metadata window has five records, not attributable to this list. No network/private-state inspection.",
+  "acceptance": "BLOCKED: rendered list succeeds, but actual execution region/elapsed request not verified",
+  "nativeDeployments": 0,
+  "providerSecretWrites": 0,
+  "priorFailures": "Historical source503/6600ms, privateHTML strict-byte FAIL and prior fresh-asset HTTPS timeout preserved unchanged."
+}

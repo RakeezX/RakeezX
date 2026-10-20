@@ -35,7 +35,7 @@ const run=async(factory,path,method,malicious=false)=>{
  }});
  const headers={'cf-connecting-ip':'192.0.2.1',origin:env.N88_PUBLIC_ORIGIN,'content-type':'application/json',authorization:'Bearer synthetic'};
  if(malicious)Object.assign(headers,{'x-region':'eu-central-2',forceFunctionRegion:'us-east-1','x-forwarded-for':'192.0.2.2'});
- const request=new Request(env.N88_PUBLIC_ORIGIN+path,{method,headers,...(method==='POST'?{body:'{"synthetic":true}'}:{})});
+ const request=new Request(env.N88_PUBLIC_ORIGIN+path,{method,headers,...(method==='POST'?{body:'{"synthetic":true,"forceFunctionRegion":"eu-central-2","x-region":"us-east-1"}'}:{})});
  Object.defineProperty(request,'cf',{value:{tlsVersion:'TLSv1.3'}});
  const response=await handler(request,env);
  return {sent,status:response.status,headers:Object.fromEntries(response.headers),body:await response.text()};

@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-20T19:45:13.706Z",
+  "source": "3fbf524a87ac496fdebc9f74e2ab57ad810661d094d63a9c6148ae1c5d81fd3a",
+  "sourceExact": true,
+  "settingsUnchanged": true,
+  "subdomainUnchanged": true,
+  "routesUnchanged": true,
+  "versions": [
+    {
+      "version_id": "e699b953-5e67-4dc3-be1a-73f6cf85b0c4",
+      "percentage": 100
+    }
+  ],
+  "runId": "d2d77330-ce85-4c3c-af8a-3ff917051e52",
+  "uploads": 1,
+  "sourceReadbacks": 1,
+  "nativeDeployments": 0,
+  "configurationChanges": 0,
+  "priorFailuresPreserved": true
+}
