@@ -1,0 +1,231 @@
+{
+  "taskId": "continuous-n36-actual-popup-start-idle-20261020",
+  "runId": "df985944-0715-4d5f-8c25-8cb791715f26",
+  "checks": [
+    {
+      "name": "original_popup_idle_reproduced",
+      "status": "PASS",
+      "evidence": {
+        "diagnostic": {
+          "valid": null,
+          "staged": null,
+          "observed": null,
+          "excluded": null,
+          "classes": null,
+          "processedPages": null,
+          "currentPage": null,
+          "stage": "idle",
+          "coverage": "unknown",
+          "terminal": "unproven",
+          "endpoint": "none",
+          "hasNext": null,
+          "disabledNext": null,
+          "transfer": "idle",
+          "receipt": "not-available",
+          "failure": "none",
+          "failurePhase": "none",
+          "failureStep": "none",
+          "fieldResults": [],
+          "setupPhase": "none",
+          "setupFields": [],
+          "receiverCapability": "unknown"
+        },
+        "popupStatus": "افتح مدرستي، ثم شغّل الإضافة من صفحتها. افتح حساب ركيز وسجّل الدخول في تبويب واحد قبل البدء.",
+        "senderShape": "Own extension id + popup URL; optional documentId/tab absent"
+      }
+    },
+    {
+      "name": "untrusted_contexts_denied",
+      "status": "PASS",
+      "evidence": "Foreign extension, opaque file URL, foreign popup hostname and child frame cannot Start; no job/source reads."
+    },
+    {
+      "name": "valid-no-document",
+      "status": "PASS",
+      "evidence": {
+        "durableBeforeAck": true,
+        "sameJobOnDuplicate": true,
+        "popupClosedComplete": true,
+        "receiverCapability": "source-profile-quiet-v1",
+        "queries": [
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "active": true,
+            "windowId": 1
+          },
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "url": "http://127.0.0.1:49628/*",
+            "windowId": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "valid-current-window-empty",
+      "status": "PASS",
+      "evidence": {
+        "durableBeforeAck": true,
+        "sameJobOnDuplicate": true,
+        "popupClosedComplete": true,
+        "receiverCapability": "source-profile-quiet-v1",
+        "queries": [
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "active": true,
+            "windowId": 1
+          },
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "url": "http://127.0.0.1:49628/*",
+            "windowId": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "valid-non-tab-frame",
+      "status": "PASS",
+      "evidence": {
+        "durableBeforeAck": true,
+        "sameJobOnDuplicate": true,
+        "popupClosedComplete": true,
+        "receiverCapability": "source-profile-quiet-v1",
+        "queries": [
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "active": true,
+            "windowId": 1
+          },
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "url": "http://127.0.0.1:49628/*",
+            "windowId": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "close-before-ack",
+      "status": "PASS",
+      "evidence": {
+        "durableBeforeAck": true,
+        "sameJobOnDuplicate": true,
+        "popupClosedComplete": true,
+        "receiverCapability": "source-profile-quiet-v1",
+        "queries": [
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "active": true,
+            "windowId": 1
+          },
+          {
+            "active": true,
+            "lastFocusedWindow": true
+          },
+          {
+            "url": "http://127.0.0.1:49628/*",
+            "windowId": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "late_ack_keeps_final_view",
+      "status": "PASS",
+      "evidence": "A delayed Start ACK cannot replace the newer completed storage view with collecting."
+    },
+    {
+      "name": "unsupported",
+      "status": "PASS",
+      "evidence": {
+        "stage": "error",
+        "failure": "UNVERIFIED_START_ORIGIN",
+        "status": "افتح مدرستي ثم ابدأ الاستيراد من تبويب المصدر نفسه. لم يبدأ الجمع.",
+        "sourceReads": 0
+      }
+    },
+    {
+      "name": "source-denied",
+      "status": "PASS",
+      "evidence": {
+        "stage": "error",
+        "failure": "SOURCE_ACCESS_REQUIRED",
+        "status": "افتح مدرستي ثم ابدأ الاستيراد من تبويب المصدر نفسه. لم يبدأ الجمع.",
+        "sourceReads": 0
+      }
+    },
+    {
+      "name": "selection-changed",
+      "status": "PASS",
+      "evidence": {
+        "stage": "error",
+        "failure": "SOURCE_BINDING_CHANGED",
+        "status": "افتح مدرستي ثم ابدأ الاستيراد من تبويب المصدر نفسه. لم يبدأ الجمع.",
+        "sourceReads": 0
+      }
+    },
+    {
+      "name": "owner-denied",
+      "status": "PASS",
+      "evidence": {
+        "stage": "error",
+        "failure": "APP_NOT_READY",
+        "status": "افتح حساب ركيز المسجّل دخوله في تبويب واحد، ثم ابدأ من مدرستي. لم يبدأ الجمع.",
+        "sourceReads": 0
+      }
+    }
+  ],
+  "live": "NOT_RUN",
+  "boundary": "Actual shipped HTTP popup DOM/handlers/CSS + serialized MessageSender/runtime + actual ESM worker and application owner guard; synthetic Chrome APIs. No native MV3/source account proof.",
+  "original": {
+    "diagnostic": {
+      "valid": null,
+      "staged": null,
+      "observed": null,
+      "excluded": null,
+      "classes": null,
+      "processedPages": null,
+      "currentPage": null,
+      "stage": "idle",
+      "coverage": "unknown",
+      "terminal": "unproven",
+      "endpoint": "none",
+      "hasNext": null,
+      "disabledNext": null,
+      "transfer": "idle",
+      "receipt": "not-available",
+      "failure": "none",
+      "failurePhase": "none",
+      "failureStep": "none",
+      "fieldResults": [],
+      "setupPhase": "none",
+      "setupFields": [],
+      "receiverCapability": "unknown"
+    },
+    "popupStatus": "افتح مدرستي، ثم شغّل الإضافة من صفحتها. افتح حساب ركيز وسجّل الدخول في تبويب واحد قبل البدء.",
+    "senderShape": "Own extension id + popup URL; optional documentId/tab absent"
+  },
+  "status": "PASS"
+}

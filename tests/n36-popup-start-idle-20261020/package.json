@@ -1,0 +1,45 @@
+{
+  "name": "n36_changed_0522_package_permissions_parity",
+  "status": "PASS",
+  "version": "0.5.22",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.22.zip",
+    "sha256": "f1d0936757f8d0cb03b88cf7ac289ce4cb3cf858f34f850f91a239f1c19f78a9",
+    "bytes": 128752
+  },
+  "runtimeFiles": 27,
+  "reusedSource": [
+    "categories-popup.js",
+    "categories.js",
+    "class-order.js",
+    "core.js",
+    "handoff-protocol.js",
+    "lib/rakeez-datetime-values.js",
+    "lib/rakeez-datetime.css",
+    "lib/rakeez-datetime.js",
+    "navigation.js",
+    "popup.css",
+    "popup.html",
+    "popup.js",
+    "route-diagnostics.js",
+    "selection.js",
+    "source-adapter.js",
+    "source-roster.js",
+    "vendor/flatpickr/LICENSE.md",
+    "vendor/flatpickr/ar.js",
+    "vendor/flatpickr/flatpickr.min.css",
+    "vendor/flatpickr/flatpickr.min.js",
+    "background-collector.js"
+  ],
+  "checks": [
+    "Exact source/ZIP/member/SHA256/size parity",
+    "Same permission/host/CSP manifest except version",
+    "Previous .21 immutable; app/store/SW/receiver untouched",
+    "Real source/transport/nonce/receipt guards and collection coordinator byte-identical outside Start/view boundary",
+    "Changed JS syntax"
+  ],
+  "postDelivery": {
+    "status": "NOT_RUN",
+    "reason": "Sole publisher verifies immutable/served .22, existing updater installs exact archive, controller verifies physical 27-file parity. Chrome reload not claimed."
+  }
+}

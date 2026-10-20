@@ -325,14 +325,18 @@ if(runToken){
  channel.postMessage({type:'ready',token:runToken});
 }else{
  const launch=async(mode='madrasati')=>{
-  $('one-start').disabled=true;
+  if(popupStartPending)return;popupStartPending=true;$('one-start').disabled=true;
+  if(mode==='madrasati'){backgroundRevision++;announce('جار التحقق من صفحة مدرستي وحساب ركيز…');window.n36Diagnostics?.publish({stage:'checking',startPhase:'source-context',failure:'none',receiverCapability:'unknown'});}
   try{
-   const [tab]=await chrome.tabs.query({active:true,currentWindow:true});if(!tab?.id)throw Error('NO_ACTIVE_TAB');
+   const tabs=await chrome.tabs.query(mode==='madrasati'?{active:true,lastFocusedWindow:true}:{active:true,currentWindow:true});const tab=tabs[0];if(tabs.length!==1||!Number.isInteger(tab?.id))throw Error('NO_ACTIVE_TAB');
    const classroom=$('noor-class').value.normalize('NFC').trim().replace(/\s+/g,' '),role=$('noor-role').checked;
    if(mode==='noor'){if(!role)throw Error('TEACHER_CONFIRMATION_REQUIRED');validateCategory('classes',[{classroom}]);const u=new URL(tab.url??'');if(u.origin!=='https://noor.moe.gov.sa'||!u.pathname.startsWith('/Noor/'))throw Error('UNSUPPORTED_NOOR_PAGE');}else startOrigin(tab.url??'');
    if(mode==='madrasati'){
+    window.n36Diagnostics?.publish({startPhase:'worker-ack'});
     const result=await chrome.runtime.sendMessage({type:'n36-job-start',sourceTabId:tab.id});
-    if(!result?.ok)throw Error(result?.code??'BACKGROUND_UNAVAILABLE');renderBackground(result.view);return;
+    if(!result?.ok)throw Error(result?.code??'BACKGROUND_UNAVAILABLE');
+    if(!/^[a-f0-9]{64}$/.test(result.view?.id)||!['collect','navigation','transfer','prepare','deliver','receipt'].includes(result.view?.phase))throw Error('JOB_ACK_INVALID');
+    window.n36Diagnostics?.publish({startPhase:'accepted'});if(backgroundView?.id!==result.view.id||backgroundView.phase==='binding')renderBackground(result.view);return;
    }
    const sourceTabId=tab.id; // Captured before creating/activating the extension run page.
    const token=crypto.randomUUID();let busy=false;
@@ -344,8 +348,8 @@ if(runToken){
    channel.onmessage=({data})=>{if(data?.token===token&&data.type==='ready'){channel.postMessage({type:'launch',token,tabId:sourceTabId,mode,classroom,role});}if(data?.token===token&&data.type==='launched')resolveReady();};
    const runner=await chrome.tabs.create({url:chrome.runtime.getURL('popup.html')+'?run='+token,active:false});
    try{await readyPromise;await chrome.tabs.update(runner.id,{active:true});}finally{clearTimeout(timer);channel.onmessage=null;}
-  }catch(e){showDiagnostic({stage:'start',reason:/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',category:'students'});announce('افتح مدرستي، ثم شغّل الإضافة من صفحتها. افتح حساب ركيز وسجّل الدخول في تبويب واحد قبل البدء.');}
-  finally{$('one-start').disabled=!!backgroundView&&!['complete','stopped','cancelled'].includes(backgroundView.phase);}
+  }catch(e){if(mode==='madrasati'){showStartDenial(e);}else{showDiagnostic({stage:'start',reason:/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',category:'students'});announce('افتح مدرستي، ثم شغّل الإضافة من صفحتها. افتح حساب ركيز وسجّل الدخول في تبويب واحد قبل البدء.');}}
+  finally{popupStartPending=false;$('one-start').disabled=!!backgroundView&&!['complete','stopped','cancelled'].includes(backgroundView.phase);}
  };
  $('one-start').addEventListener('click',()=>launch());
  $('noor-start').addEventListener('click',()=>launch('noor'));
@@ -387,20 +391,28 @@ window.addEventListener('n36:automatic-finished',({detail})=>{
 });
 
 // AI: action popup is a disposable viewer. Opening/closing it never starts/cancels a job.
-let backgroundView=null;
+let backgroundView=null,popupStartPending=false,backgroundRevision=0;
+function showStartDenial(error){
+ const allowed=['SOURCE_ACCESS_REQUIRED','NO_ACTIVE_TAB','UNVERIFIED_START_ORIGIN','SOURCE_BINDING_CHANGED','SOURCE_CONTEXT_CHANGED','JOB_REQUEST','JOB_ACK_INVALID','BACKGROUND_UNAVAILABLE','HANDOFF_UNAVAILABLE','APP_NOT_READY','OPEN_ONE_RAKEEZ_TAB','APP_FINISH_CURRENT_EDIT','APP_UPDATE_REQUIRED','SCHOOL_CHOICE_REQUIRED','REVIEW_EXPIRED'];
+ const code=allowed.includes(error?.message)?error.message:'BACKGROUND_UNAVAILABLE';
+ window.n36Diagnostics?.publish({stage:'error',startPhase:'denied',failure:code});
+ const source=['SOURCE_ACCESS_REQUIRED','NO_ACTIVE_TAB','UNVERIFIED_START_ORIGIN','SOURCE_BINDING_CHANGED','SOURCE_CONTEXT_CHANGED'].includes(code);
+ announce(source?'افتح مدرستي ثم ابدأ الاستيراد من تبويب المصدر نفسه. لم يبدأ الجمع.':code==='APP_FINISH_CURRENT_EDIT'?'أكمل التعديل المفتوح في ركيز ثم ابدأ مجددًا. لم يبدأ الجمع.':code==='APP_UPDATE_REQUIRED'?'حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ مجددًا. لم يبدأ الجمع.':code==='SCHOOL_CHOICE_REQUIRED'?'افتح صفحة المدرسة المطلوبة ودور المعلم في مدرستي ثم ابدأ. لم يبدأ الجمع.':code==='JOB_REQUEST'||code==='JOB_ACK_INVALID'||code==='BACKGROUND_UNAVAILABLE'?'تعذّر تأكيد بدء التشغيل. أعد فتح الإضافة من تبويب مدرستي وتحقق من تحديثها؛ لم يُفترض بدء الجمع.':'افتح حساب ركيز المسجّل دخوله في تبويب واحد، ثم ابدأ من مدرستي. لم يبدأ الجمع.');
+}
+
 function renderBackground(v){
- if(!v)return;backgroundView=v;
+ if(!v)return;backgroundRevision++;backgroundView=v;
  const done=['complete','stopped','cancelled'].includes(v.phase);
- $('one-start').disabled=!done;$('run-cancel').disabled=done;
+ $('one-start').disabled=popupStartPending||!done;$('run-cancel').disabled=done;
  $('run-counts').textContent='';$('run-missing').textContent='';
- $('run-status').textContent=v.phase==='complete'?'حُفظ المتاح محليًا في ركيز؛ المزامنة السحابية تُتابع من التطبيق.':v.phase==='cancelled'?'أُوقف التشغيل ومُسحت بيانات الإضافة المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.':v.phase==='stopped'?'توقف النقل. تحقق من بقاء صفحتي مدرستي وركيز مفتوحتين بالحساب نفسه، ثم ابدأ عند جاهزيتهما.':'جار نقل البيانات المتاحة… يمكنك إغلاق نافذة الإضافة. أبقِ تبويبي مدرستي وركيز مفتوحين.';
+ $('run-status').textContent=v.phase==='binding'?'جار التحقق من حساب ركيز…':v.phase==='complete'?'حُفظ المتاح محليًا في ركيز؛ المزامنة السحابية تُتابع من التطبيق.':v.phase==='cancelled'?'أُوقف التشغيل ومُسحت بيانات الإضافة المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.':v.phase==='stopped'?'توقف النقل. تحقق من بقاء صفحتي مدرستي وركيز مفتوحتين بالحساب نفسه، ثم ابدأ عند جاهزيتهما.':'جار نقل البيانات المتاحة… يمكنك إغلاق نافذة الإضافة. أبقِ تبويبي مدرستي وركيز مفتوحين.';
  const codes={APP_UPDATE_REQUIRED:'حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ؛ لم تُحدّث الصفحة تلقائيًا.',APP_FINISH_CURRENT_EDIT:'أكمل التعديل المفتوح في ركيز ثم ابدأ.',SCHOOL_CHOICE_REQUIRED:'افتح صفحة المدرسة المطلوبة ودور المعلم في مدرستي، ثم ابدأ.',RECEIPT_UNKNOWN:'نتيجة الحفظ غير محسومة. استكمل الدفعة المحفوظة من حساب ركيز نفسه؛ لم يُفترض حفظ جديد.',REVIEW_EXPIRED:'انتهت مهلة التشغيل ومُسحت البيانات المؤقتة. ما حُفظ في ركيز يبقى محفوظًا.'};
  if(v.phase==='complete'&&v.needsReview)$('run-status').textContent='حُفظت الأسماء محليًا؛ بعض حقول الإعداد تحتاج مراجعة في التفاصيل. المزامنة تُتابع من ركيز.';
  if(v.phase==='receipt'&&v.code)$('run-status').textContent=codes.RECEIPT_UNKNOWN;
  if(v.code&&codes[v.code])$('run-status').textContent=codes[v.code];
  const labels={teacher:'اسم المعلم',school:'اسم المدرسة',principal:'اسم المدير',department:'إدارة التعليم',classes:'الفصول',timetable:'الجدول'},reasons={saved:'حُدث',current:'مطابق',missing:'غير متاح',conflict:'تعارض',unsupported:'غير مدعوم',ambiguous:'غير محسوم',unrecognized:'تسمية غير معروفة'};
  $('automatic-field-details').textContent=(v.fields??[]).map(d=>labels[d.field]+': '+reasons[d.reason]).join(' — ');
- window.n36Diagnostics?.publish({stage:v.phase==='complete'?'saved':v.phase==='stopped'?'error':'collecting',receipt:v.phase==='receipt'?'pending':v.phase==='complete'?'saved':'not-available',coverage:v.coverage,receiverCapability:'source-profile-quiet-v1',setupPhase:v.fields?.length?'receipt':'none',failure:v.code??'none',fieldResults:v.fields??[]});
+ window.n36Diagnostics?.publish({staged:v.staged,observed:v.observed,stage:v.phase==='binding'?'checking':v.phase==='complete'?'saved':v.phase==='cancelled'?'cancelled':v.phase==='stopped'?'error':'collecting',receipt:v.phase==='receipt'?'pending':v.phase==='complete'?'saved':'not-available',coverage:v.coverage,receiverCapability:v.receiverCapability??'unknown',setupPhase:v.fields?.length?'receipt':'none',failure:v.code??'none',fieldResults:v.fields??[]});
 }
-async function refreshBackground(){const r=await chrome.runtime.sendMessage({type:'n36-job-status'});if(r?.ok)renderBackground(r.view);}
+async function refreshBackground(){const revision=backgroundRevision;const r=await chrome.runtime.sendMessage({type:'n36-job-status'});if(r?.ok&&revision===backgroundRevision&&!popupStartPending)renderBackground(r.view);}
 if(!runToken){refreshBackground().catch(()=>{});chrome.storage.onChanged.addListener((changes,area)=>{if(area==='session'&&changes['n36:background-view'])renderBackground(changes['n36:background-view'].newValue);});}

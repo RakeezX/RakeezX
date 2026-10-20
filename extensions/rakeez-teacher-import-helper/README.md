@@ -1,3 +1,11 @@
+## AI candidate 0.5.22 — actual popup Start boundary, 20 October 2026
+
+An explicit action-popup click now enters a visible checking state, resolves the active source from the last focused browser window, and sends the exact internal Start request. The worker checks the own-extension popup protocol/hostname/path and top frame, the selected/focused source tab, then its actual document and the original owner-ready app batch. Optional MessageSender.documentId/tab metadata of the disposable popup is not required; source/app document guards remain mandatory. A rejected Start reports a finite phase/code and action, never a healthy-looking idle state.
+
+The original .21 actual popup/worker composition was reproduced with a valid own-popup sender missing optional documentId: Start was sent, JOB_REQUEST was returned, and diagnostics stayed idle/unknown with no job. This establishes a concrete local failure, not a claim that the PO device's native sender was inspected. Chrome documents those fields as optional. Source selection with an unavailable popup currentWindow is separately covered; no scanning for another school tab or implicit fresh collection is added.
+
+A durable job precedes ACK, and accepted work continues if the popup closes even before ACK delivery. Duplicate Start retains one job/batch. Stale initial status and delayed Start ACK cannot overwrite newer progress/results. Only safe phase/code/count diagnostics are added; no URLs/tab IDs/names/credentials. Same 27-file runtime, permissions, hosts, CSP and receiver v3 protocol. No new tab/window/offscreen, no keepalive or open-popup requirement. Previous source/profile/session/unknown-receipt proofs are reused unchanged. Native MV3 and real portal/account acceptance remain NOT_RUN. Provider/served archive and physical stable-folder parity are postdelivery; Chrome reload is not claimed.
+
 ## AI candidate 0.5.21 — explicit background job, 20 October 2026
 
 Madrasati Start now owns a bounded session-only job in the existing MV3 worker. The popup is a disposable Start/progress/cancel viewer; no runner tab, window, offscreen document or foregrounding is used. Keep the existing source and authenticated Rakeez tabs open. Necessary known same-origin source navigation remains supported. Noor's separate selected-column/manual review is unchanged.

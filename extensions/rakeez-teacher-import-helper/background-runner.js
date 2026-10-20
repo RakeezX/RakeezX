@@ -14,7 +14,7 @@ export function createBackgroundRunner({transport}){
  const mutate=operation=>{const r=mutations.then(operation);mutations=r.catch(()=>{});return r;};
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,phase:j.phase,code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],coverage:j.coverage?.coverage??'unknown',needsReview:!!j.needsReview});
+ const view=j=>({id:j.id,phase:j.phase,code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null){return mutate(async()=>{
@@ -160,20 +160,27 @@ export function createBackgroundRunner({transport}){
   if(m.type==='n36-job-cancel'&&Object.keys(m).sort().join()==='jobId,type'){
    const j=await load();if(j?.id===m.jobId)await finish(j,'cancelled','CANCELLED');return {ok:true};
   }
-  if(m.type!=='n36-job-start'||Object.keys(m).sort().join()!=='sourceTabId,type'||!Number.isInteger(m.sourceTabId)||!sender.documentId)throw Error('JOB_REQUEST');
+  if(m.type!=='n36-job-start'||Object.keys(m).sort().join()!=='sourceTabId,type'||!Number.isInteger(m.sourceTabId))throw Error('JOB_REQUEST');
   const op=starting.then(async()=>{
    const existing=await load();if(existing){try{await current(existing);return {ok:true,view:view(existing)};}catch{await finish(existing,'stopped','REVIEW_EXPIRED');}}
-   const [tab]=await chrome.tabs.query({active:true,currentWindow:true});if(tab?.id!==m.sourceTabId)throw Error('SOURCE_BINDING_CHANGED');
+   // An action popup is not a tab and optional MessageSender.documentId is
+   // not an authorization source. The own-extension popup URL is checked by
+   // the worker; bind the explicit active browser tab and its REAL document.
+   const tab=await chrome.tabs.get(m.sourceTabId);
+   if(!Number.isInteger(tab?.windowId))throw Error('SOURCE_BINDING_CHANGED');
+   const selected=await chrome.tabs.query({active:true,windowId:tab.windowId});
+   const focused=await chrome.tabs.query({active:true,lastFocusedWindow:true});
+   if(selected.length!==1||selected[0].id!==tab.id||focused.length!==1||focused[0].id!==tab.id)throw Error('SOURCE_BINDING_CHANGED');
    const origin=startOrigin(tab.url);safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
    if(!Number.isInteger(tab.windowId))throw Error('SOURCE_BINDING_CHANGED');
    const now=Date.now(),j={id:hex(),tabId:tab.id,windowId:tab.windowId,sourceURL:tab.url,origin,sourceDocument:null,createdAt:now,expiresAt:now+1800000,phase:'binding',added:0,existing:0,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],excluded:0,sourceBytes:0,expires:null};
-   const probe=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>true});
+   let probe;try{probe=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>true});}catch{throw Error('SOURCE_ACCESS_REQUIRED');}
    if(probe.length!==1||probe[0].frameId!==0||!probe[0].documentId||(await chrome.tabs.get(j.tabId)).url!==j.sourceURL)throw Error('SOURCE_BINDING_CHANGED');
    j.sourceDocument=probe[0].documentId;
    // The trusted click is durable before ACK and before any school read.
    await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:now+30000});
    try{
-    const begin=await transport({type:'n36-begin'},authority(j));if(!begin.ok)throw Error(begin.code??'APP_NOT_READY');j.batchId=begin.batchId;j.appTabId=begin.appTabId;
+    let begin;try{begin=await transport({type:'n36-begin'},authority(j));}catch{throw Error('APP_NOT_READY');}if(!begin.ok)throw Error(begin.code??'APP_NOT_READY');j.batchId=begin.batchId;j.appTabId=begin.appTabId;
     await appGuard(j);const page=await source(j,'home');if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
     j.visited.add(routeIdentity(origin,tab.url));j.next={kind:'home',page};j.phase='collect';await save(j);return {ok:true,view:view(j)};
    }catch(e){await finish(j,'stopped',e.message);throw e;}
