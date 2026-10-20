@@ -1,5 +1,5 @@
-import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 #!/usr/bin/env node
+import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
 import fs from 'node:fs';
 import {verifiedN44SourceStageSplit,n44QualifiedTask} from './n44-qualified-source-evidence.mjs';
