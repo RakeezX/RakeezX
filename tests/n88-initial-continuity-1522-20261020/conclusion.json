@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n88-initial-class-and-pending-login-continuity-20261020",
+  "runId": "54179cfe-5fbb-468e-ad0c-0d7ac832c97c",
+  "baseSha": "4e70f0a3550910db58cfac0436c8d06303177de9",
+  "state": "BLOCKED",
+  "checks": [
+    {"name":"n88_initial_real_entry_cause_and_single_error","status":"FAIL","evidence":"ui.json: real default runtime/client/signed synthetic composition times out waiting for response body at unchanged 10000ms; one request and one current status versus two injected stale-fragment statuses on baseline. Actual PO duplicate origin and actual hosted timeout cause NOT_PROVEN. provider-window.json records one 5911ms outer200 native53 invocation without action/stage or account correlation."},
+    {"name":"n88_one_pending_login_visibility_safe_continuity","status":"PASS","evidence":"student.json: seven actual view/client HTTP cases cover result while hidden, return before completion, resume success/denial, completed-hidden retirement, in-flight retirement and disposal. One claim/read sequence, no focus reissue, no private hidden DOM. Browser visibility events are synthetic; no actual hosted user acceptance claim."},
+    {"name":"n88_changed_source_and_student_static_delivery","status":"NOT_RUN","evidence":"qualification.json: changed student JS/carrier prepared; every other private asset and ingress transport byte-identical, native53 graph unchanged. Current original-custodian module only admits previously consumed correction identities. Separately reviewed current-task/candidate static-only append gate is absent; no protected write attempted."}
+  ],
+  "localSubproofs": {"syntaxAndPackageScope":"PASS","singleOwnedEntryError":"PASS","actualTeacherSuccess":"NOT_PROVEN"},
+  "preservedFailures": ["student.resume-counter-fixture-fail.json: harness expected claim1 for resume-denied; corrected to claim0 before latest seven-case PASS", "Prior transformed-HTML strict-byte FAIL from injected security challenge remains untouched"],
+  "networkWrites": 0,
+  "newReadinessRequests": 0,
+  "nativeDeploys": 0,
+  "staticUploads": 0,
+  "cleanup": "Owned local browser/server closed; phase lease released by test finally",
+  "nextCondition": "Review immutable prepared candidate for one fresh original-custodian static-only task/run/candidate gate. Keep teacher incident open until permitted existing phase/correlation evidence identifies its actual cause; no unchanged retry or alternate browser actor."
+}

@@ -1,0 +1,9 @@
+{
+  "windowUTC": ["2026-10-20T12:09:00Z", "2026-10-20T12:25:00Z"],
+  "operation": "One ordinary aggregate function operational metadata query",
+  "reads": 1,
+  "result": {"action":"not_recorded","stage":"not_recorded","invocations":1,"minimum_ms":5911,"maximum_ms":5911,"outer_http_status":"200","version":"53"},
+  "actualTeacherCorrelation": "NOT_PROVEN",
+  "businessResult": "NOT_RECORDED",
+  "limitation": "Outer HTTP success and duration do not establish the reported request, its failing phase or business success. No further query or consumed readiness replay."
+}

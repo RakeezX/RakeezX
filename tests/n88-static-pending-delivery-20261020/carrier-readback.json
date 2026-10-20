@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "source": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+  "sourceExact": true,
+  "configurationUnchanged": true,
+  "version": "28568dc0-f03e-44f5-a5b4-704319a404df",
+  "native": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+  "servedAssetsExact": true,
+  "uploads": 1,
+  "settings": {
+    "placement": {},
+    "compatibility_date": "2026-10-01",
+    "compatibility_flags": [],
+    "usage_model": "standard",
+    "tags": [],
+    "tail_consumers": [],
+    "logpush": false,
+    "annotations": {
+      "workers/triggered_by": "upload"
+    },
+    "bindings": [
+      {
+        "name": "N88_EDGE_URL",
+        "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n88-student-portal",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_ENABLED",
+        "text": "true",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_INGRESS_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "N88_PUBLIC_ORIGIN",
+        "text": "https://rakeezx.com",
+        "type": "plain_text"
+      }
+    ]
+  },
+  "subdomain": {
+    "enabled": false,
+    "previews_enabled": false
+  },
+  "routes": [
+    {
+      "id": "346d924c9746479a89e6e211a41bba14",
+      "pattern": "rakeezx.com/student",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "1bcc93cfb56b42469bdad21724b63a1d",
+      "pattern": "rakeezx.com/n88-private/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "c27599645c3c492f9b25eca0107e3dc9",
+      "pattern": "rakeezx.com/api/n88/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    }
+  ],
+  "documentHttpByteExact": false,
+  "documentObservation": "Prior strict HTML comparison FAIL due Cloudflare security injection preserved; no protection changes.",
+  "actualTeacherSuccess": "NOT_PROVEN"
+}

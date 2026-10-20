@@ -49,11 +49,12 @@ export function projectUnifiedStudentData(data) {
 
 export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch } = {}) {
   if (typeof send !== 'function') throw fail();
-  let generation = 0, controller, disposed = false;
-  function invalidate() { generation++; controller?.abort(); controller = null; }
+  let generation = 0, retirement = 0, controller, disposed = false;
+  function cancelRequest() { generation++; controller?.abort(); controller = null; }
+  function invalidate() { retirement++; cancelRequest(); }
   async function call(action, body) {
     if (disposed) throw fail();
-    invalidate(); const checkpoint = generation;
+    cancelRequest(); const checkpoint = generation;
     const owned = controller = new AbortController();
     const timeout = setTimeout(() => owned.abort(), 15000);
     try {
@@ -79,7 +80,8 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     } finally { clearTimeout(timeout); body = null; if (checkpoint === generation) controller = null; }
   }
   return Object.freeze({
-    claim(value) { let code = normalizeStudentCode(value); if (!validStudentCode(code)) return Promise.reject(fail('format')); const pending = call('claim', { code }).then(() => call('read')); code = ''; return pending; },
+    claim(value) { let code = normalizeStudentCode(value); if (!validStudentCode(code)) return Promise.reject(fail('format')); const context=retirement,pending = call('claim', { code }),checkpoint=generation;code='';return pending.then(()=>{if(disposed||context!==retirement||checkpoint!==generation)throw fail('stale');return call('read');}); },
+    captureContext:()=>retirement,isContextCurrent:context=>!disposed&&context===retirement,
     read: () => call('read'), end: () => call('end', {}), invalidate, dispose() { disposed = true; invalidate(); }
   });
 }
