@@ -304,7 +304,7 @@ cloud.subscribe(() => {
 function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
-    <p>افتح حساب ركيز في تبويب واحد، ثم ابدأ من إضافة مدرستي لحفظ الفصول والمواد والطلاب وبيانات الإعداد والجدول المتاحة من الصفحات المدعومة. القيم المختلفة لا تُستبدل تلقائيًا. لا تأكيد لكل فصل؛ تُعرض الحالات غير المحسومة فقط. التغطية الجزئية تبقى جزئية بعد الحفظ.</p>
+    <p>استورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.</p>
     <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.16.zip" download>تنزيل إضافة ركيز 0.5.16</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
