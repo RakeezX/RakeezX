@@ -1,0 +1,7 @@
+{
+  "scenario": "lease",
+  "checks": [],
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-width-two-after-owned-context-20261020/tests/n107-independent-create-20261020/boundary.mjs:81:10\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:502:9)"
+  ]
+}

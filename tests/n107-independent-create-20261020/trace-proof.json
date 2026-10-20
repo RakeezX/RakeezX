@@ -1,0 +1,11 @@
+{
+  "name": "n107_same_dependency_wait_benefit_and_ack_order",
+  "status": "PASS",
+  "beforeStudentPhaseMs": 1674.1974,
+  "afterStudentPhaseMs": 930.6895999999997,
+  "fixedDependencyMs": 35,
+  "beforePeak": 1,
+  "afterPeak": 2,
+  "endToEndTiming": "NOT_RUN: capture unavailable; original harness total-time assertion FAIL retained in app-timing.json",
+  "scope": "Saved actual-app28/31 traces and existing DOM/store assertions completed before the optional total-time assertion; only student-phase benefit is qualified. No hosted speed claim."
+}

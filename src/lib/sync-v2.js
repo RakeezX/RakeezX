@@ -746,6 +746,7 @@ export function createSyncV2Engine({
   ownershipGuard = createSyncOwnershipGuard(),
   currentAuthenticatedUserId = () => null,
   captureMutationContext = null,
+  independentStudentCreates = false,
 } = {}) {
   if (!database?.applyBatch || !database?.getAll) throw new Error('Sync V2 requires a transactional database adapter');
 
@@ -1036,13 +1037,16 @@ export function createSyncV2Engine({
     return queueCommand({ store:'attendance', recordId:`fill:${sessionId}`, command:'attendance:fill', patch:{ sessionId,status,studentIds:[...studentIds] }, groups:['status'], dependencies: uniqueDependencies([{ store:'sessions',recordId:sessionId,requiresServerRevision:true }, ...studentIds.map((recordId)=>({store:'students',recordId,requiresServerRevision:true}))]) });
   }
 
-  async function markAttempt(mutation, expectedWorkspace = null, assertContext = () => {}) {
+  async function markAttempt(mutation, expectedWorkspace = null, assertContext = () => {}, verifyPending = null) {
     let locked = mutation;
     const contextualCreate = mutation.store === 'sessions' && mutation.op === 'create' && mutation.patch?.calendar_context;
     await database.applyBatch(mutation.importMaximum === true ? {outbox:{},device:{},items:{},scores:{},teachings:{},terms:{},years:{},sections:{}} : mutation.sessionRepairOf ? Object.fromEntries(REPAIR_STORES.map(name => [name, {}])) : contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
       prepare(current) {
         assertContext();
         const existing = current.outbox.find((row) => row.id === mutation.id);
+        if (verifyPending && !verifyPending(existing, current.outbox)) {
+          locked = null; return { outbox: operationBatch() };
+        }
         if (mutation.importMaximum===true && (!existing || ['rejected','superseded'].includes(existing.state))) {
           locked=null;return {outbox:operationBatch()};
         }
@@ -1705,6 +1709,51 @@ export function createSyncV2Engine({
     });
   }
 
+  // AI N107: only a never-sent, standalone student identity may join one pair.
+  // All aliases must be the requested ID; patches/replays and same-ID successors stay serial.
+  function independentStudent(row, rows) {
+    return row?.protocol === 'v2' && row.store === 'students' && row.entity === 'students' &&
+      row.op === 'create' && row.state === 'pending' && row.ownerId && row.baseRevision === 0 &&
+      !row.envelopeLocked && !row.attemptCount && !row.bootstrap && !row.sessionRepairOf &&
+      row.recordId && row.recordId === row.serverRecordId && row.recordId === row.canonicalId &&
+      !pendingFoundationGroup(rows, row) &&
+      !(row.dependencies ?? []).some(d => d.mutationId || d.store === 'students') &&
+      !rows.some(other => other.id !== row.id && other.state !== 'superseded' && other.store === 'students' &&
+        [other.recordId, other.serverRecordId, other.canonicalId].includes(row.recordId));
+  }
+
+  async function dispatchStudent(original, assertPass) {
+    const outcome = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
+    const assertOwned = captureMutationContext(original);
+    const assertContext = () => { assertPass(); assertOwned(); };
+    let mutation;
+    try {
+      assertContext();
+      const rows = await database.getAll('outbox'), live = rows.find(r => r.id === original.id);
+      if (!independentStudent(live, rows) ||
+          !ownershipGuard.cloudAccess({operation:'dispatch',authenticatedUserId:currentAuthenticatedUserId(),command:live}).allowed ||
+          (await dependencyReadiness(live, rows.filter(r => r.id !== live.id))).state !== 'ready') {
+        outcome.blocked++; return outcome;
+      }
+      const student = await database.get('students', live.recordId);
+      if (!student || student.deleted || normalizeRevision(student.serverRevision) > 0) { outcome.blocked++; return outcome; }
+      mutation = await markAttempt(live, null, assertContext, independentStudent);
+      if (!mutation) { outcome.blocked++; return outcome; }
+      outcome.attempted++;
+      const receipt = await transport.applyMutation(mutationEnvelope(mutation), {assertAccess:assertContext});
+      if (receipt?.canonicalId !== mutation.recordId || receipt.canonical?.id !== mutation.recordId ||
+          receipt.canonical?.owner_id !== mutation.ownerId) throw new Error('Independent student receipt identity mismatch');
+      await reconcileReceipt(mutation, receipt, null, assertContext);
+      outcome.acknowledged++;
+    } catch (error) {
+      try { assertContext(); } catch { outcome.blocked++; return outcome; }
+      if (!mutation) throw error;
+      if (isRejectedProtocolError(error)) { await markRejected(mutation, 'protocol-rejected', error, assertContext); outcome.blocked++; }
+      else { await markFailure(mutation, error, assertContext); outcome.failed++; }
+    }
+    return outcome;
+  }
+
   async function dispatchPending({ maxMutations = Infinity, onlyMutationId = null } = {}) {
     const assertDispatchContext = captureMutationContext?.() ?? (() => {});
     await recoverRejectedScoreCreates();
@@ -1713,7 +1762,23 @@ export function createSyncV2Engine({
     const stoppedKeys = new Set();
     const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
 
-    for (const original of snapshot) {
+    for (let index = 0; index < snapshot.length; index++) {
+      const original = snapshot[index], sibling = snapshot[index + 1];
+      if (independentStudentCreates && captureMutationContext && !onlyMutationId &&
+          result.attempted + 2 <= maxMutations && original.ownerId === sibling?.ownerId &&
+          original.recordId !== sibling?.recordId && independentStudent(original, allRows) && independentStudent(sibling, allRows)) {
+        // Exactly two owned RPCs; join both durable outcomes before any later command.
+        index++;
+        const outcomes = await Promise.allSettled([
+          dispatchStudent(original, assertDispatchContext), dispatchStudent(sibling, assertDispatchContext),
+        ]);
+        for (const item of outcomes) {
+          if (item.status === 'rejected') throw item.reason;
+          for (const key of ['attempted','acknowledged','failed','blocked']) result[key] += item.value[key];
+        }
+        try { assertDispatchContext(); } catch { break; }
+        continue;
+      }
       // Retiring this pass leaves every unsent/uncertain envelope untouched.
       if (original.op !== 'command') {
         try { assertDispatchContext(); }

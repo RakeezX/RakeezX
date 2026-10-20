@@ -1,0 +1,49 @@
+{
+  "scenario": "same-id",
+  "checks": [
+    {
+      "name": "changed_pair_boundary",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "maxInFlight": 2,
+  "events": [
+    {
+      "start": 1,
+      "active": 1,
+      "operation": "create"
+    },
+    {
+      "finish": 1,
+      "active": 0
+    },
+    {
+      "start": 2,
+      "active": 1,
+      "operation": "create"
+    },
+    {
+      "start": 3,
+      "active": 2,
+      "operation": "create"
+    },
+    {
+      "finish": 2,
+      "active": 1
+    },
+    {
+      "finish": 3,
+      "active": 0
+    },
+    {
+      "start": 4,
+      "active": 1,
+      "operation": "patch"
+    },
+    {
+      "finish": 4,
+      "active": 0
+    }
+  ]
+}

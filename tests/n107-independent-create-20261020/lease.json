@@ -1,0 +1,31 @@
+{
+  "scenario": "lease",
+  "checks": [
+    {
+      "name": "changed_pair_boundary",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "maxInFlight": 2,
+  "events": [
+    {
+      "start": 1,
+      "active": 1,
+      "operation": "create"
+    },
+    {
+      "start": 2,
+      "active": 2,
+      "operation": "create"
+    },
+    {
+      "finish": 1,
+      "active": 1
+    },
+    {
+      "finish": 2,
+      "active": 0
+    }
+  ]
+}
