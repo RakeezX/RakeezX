@@ -56,3 +56,6 @@
 .n88-entry>[data-n88-entry-body]{min-block-size:8rem}
 .n88-entry>[data-n88-entry-body]>[role=status]{color:var(--text-2);line-height:1.8;max-inline-size:48rem}
 .n88-entry [data-n88-copy-failure]{margin-inline-start:var(--sp-2);margin-block-start:var(--sp-1)}
+.n88-entry [data-n88-failure-details]{margin-block-start:var(--sp-2);max-inline-size:48rem;font-size:var(--fs-sm)}
+.n88-entry [data-n88-failure-details]>summary{cursor:pointer;color:var(--text-2);padding-block:var(--sp-1)}
+.n88-entry [data-n88-failure-text]{direction:ltr;text-align:start;white-space:pre-wrap;overflow-wrap:anywhere;padding:var(--sp-2);border:1px solid var(--border);border-radius:var(--r-sm)}

@@ -222,7 +222,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   };
   // A focus/repaint notification is not a source revision. Revalidate the
   // binding immediately; only a retired/missing section needs an automatic read.
-  const wake = () => { if (root.ownerDocument.visibilityState === 'visible') { const returning=suspended; suspended = false; changed(); if(returning||!roster)scheduleRead(); } };
+  const wake = () => { if (root.ownerDocument.visibilityState === 'visible') { const returning=suspended; suspended = false; changed(); if(!retry&&(returning||!roster))scheduleRead(); } };
   const pagehide = () => { suspended = true; clearTimeout(wakeTimer); invalidate(); busy = mutating || !!readWork; message = 'الرموز مخفية حتى مراجعة القائمة.'; draw(); };
   const win = root.ownerDocument.defaultView;
   root.addEventListener('keydown', keydown); root.addEventListener('click', click); root.addEventListener('submit', submit); root.addEventListener('change', change);

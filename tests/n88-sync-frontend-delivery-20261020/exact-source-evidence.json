@@ -1,0 +1,145 @@
+{
+  "taskId": "continuous-n88-synchronize-reviewed-frontend-delivery-20261020",
+  "runId": "b8818048-d71c-451f-b159-5bda1cc0e9a6",
+  "baseSha": "8ac65257e6b7465745627e52970cd36f22e0fbd5",
+  "parentCandidateSha": "616facf2dd77f406c8dd07f3d1a63522ef466422",
+  "sourcePreimageSha": "610aa754012d090131e26c59f50750365b6b8328",
+  "checks": {
+    "n88_reviewed_frontend_source_bytes_and_scope": "PASS",
+    "n88_reviewed_frontend_unchanged_behavior_proof_reuse": "PASS",
+    "changedJavaScriptSyntax": "PASS"
+  },
+  "sources": [
+    {
+      "path": "src/lib/student-portal-runtime.js",
+      "sha256": "ad064f5f2c2a973faebafe2e4ad28383d0bba12c831659c2b2c9bb232c23408b"
+    },
+    {
+      "path": "src/views/student-portal-class.js",
+      "sha256": "79ed87a79b088d82b9740593721aa39f6a5bb74762602ea85cef6326ad3c9843"
+    },
+    {
+      "path": "src/styles/student-portal-class.css",
+      "sha256": "5606758b91b5bebd8595540f29dc95d5cffe4622d97299714e32f15919a28e23"
+    }
+  ],
+  "reusedProofs": [
+    {
+      "commit": "616facf2dd77f406c8dd07f3d1a63522ef466422",
+      "path": "tests/n88-actual-current-cause-20261020/synchronize-focused.json",
+      "sha256": "8935f2a3069f85e6ba52fe86299d5c73b1c2349e4bf4b595d9af608271d2e6b0",
+      "gitBlob": "3a66e9798bff0cb5fd3b80f82decd678b221059d",
+      "result": {
+        "status": "PASS",
+        "cases": [
+          {
+            "fault": "lock",
+            "diagnostic": {
+              "phase": "http",
+              "httpStatus": 503,
+              "elapsedMs": 0,
+              "sourceVersion": "n88-class-deadline-v1",
+              "code": "rejected",
+              "stage": "synchronize-lock"
+            },
+            "acquisitions": 1,
+            "commits": 0,
+            "rollbacks": 1,
+            "destroyed": 1,
+            "lateWrites": 0,
+            "transactionBudgets": [
+              6000
+            ]
+          },
+          {
+            "fault": "memberships",
+            "diagnostic": {
+              "phase": "http",
+              "httpStatus": 503,
+              "elapsedMs": 0,
+              "sourceVersion": "n88-class-deadline-v1",
+              "code": "rejected",
+              "stage": "synchronize-memberships"
+            },
+            "acquisitions": 1,
+            "commits": 0,
+            "rollbacks": 1,
+            "destroyed": 1,
+            "lateWrites": 0,
+            "transactionBudgets": [
+              6000
+            ]
+          },
+          {
+            "fault": "sources",
+            "diagnostic": {
+              "phase": "http",
+              "httpStatus": 503,
+              "elapsedMs": 0,
+              "sourceVersion": "n88-class-deadline-v1",
+              "code": "rejected",
+              "stage": "synchronize-sources"
+            },
+            "acquisitions": 1,
+            "commits": 0,
+            "rollbacks": 1,
+            "destroyed": 1,
+            "lateWrites": 0,
+            "transactionBudgets": [
+              6000
+            ]
+          },
+          {
+            "fault": "deadline",
+            "diagnostic": {
+              "phase": "http",
+              "httpStatus": 503,
+              "elapsedMs": 6000,
+              "sourceVersion": "n88-class-deadline-v1",
+              "code": "rejected",
+              "stage": "synchronize-lock"
+            },
+            "acquisitions": 1,
+            "commits": 0,
+            "rollbacks": 1,
+            "destroyed": 1,
+            "lateWrites": 0,
+            "transactionBudgets": [
+              6000
+            ]
+          }
+        ],
+        "hostedCause": "NOT_PROVEN",
+        "lifecycle": {
+          "failedListWakeReplay": false,
+          "explicitRetry": true,
+          "ownerInvalidation": true,
+          "actualDomHandlersCss": true
+        },
+        "cleanup": "Owned browser/server closed; phase lease released"
+      }
+    },
+    {
+      "commit": "616facf2dd77f406c8dd07f3d1a63522ef466422",
+      "path": "tests/n88-actual-current-cause-20261020/support-details.json",
+      "sha256": "7c0f035b826e6da9cf466506dda1ab10fdaad1c7e3db708ea9ee175f02b592cc",
+      "gitBlob": "c52c9b88b109f7ccd0cb31f94d440a5b1d154737",
+      "result": {
+        "status": "PASS",
+        "actualRuntimeOwnerGuardDomHandlersCss": true,
+        "collapsedErrorOnly": true,
+        "visibleFieldsExactlySix": true,
+        "stage": "synchronize-sources",
+        "expandNetworkRequests": 0,
+        "collapseClearsText": true,
+        "ownerChangeRetiresSnapshot": true,
+        "disposeRemovesDetails": true,
+        "clipboardAccess": 0,
+        "providerOperations": 0,
+        "cleanup": "Owned browser/server closed; phase lease released"
+      }
+    }
+  ],
+  "scope": "Exact three Git blobs copied; current-main matches common source preimage in all three files. Other main changes preserved. No behavior-changing merge.",
+  "limits": "Parent hostedCause NOT_PROVEN remains unchanged; backend actual503 unresolved. No build or browser checks repeated, no teacher read, provider operation, account/data mutation, push or deployment. Production verification belongs to sole publisher. No phase resources acquired."
+}
