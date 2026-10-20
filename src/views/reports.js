@@ -28,8 +28,8 @@ const hasDistinctRollOrder = (students) => [...students]
   .sort((a, b) => (a.displayNo ?? a.rollNo ?? 9999) - (b.displayNo ?? b.rollNo ?? 9999))
   .some((student, index) => student.id !== students[index].id);
 const sortOptions = (historical = false, distinctAttendanceRoll = false) => [
-  ['default', tab === 'support' ? 'الأكثر حاجة للدعم' : historical ? 'الترتيب الافتراضي (السجل)' : distinctAttendanceRoll ? 'أبجديًا (الافتراضي)' : 'أبجديًا حسب رقم الكشف (الافتراضي)'],
-  ...(historical || tab === 'support' ? [['name', historical ? 'أبجديًا (اسم الطالب)' : 'أبجديًا حسب رقم الكشف']] : []),
+  ['default', tab === 'support' ? 'الأكثر حاجة للدعم' : historical ? 'الترتيب الافتراضي (السجل)' : distinctAttendanceRoll ? 'أبجديًا' : 'أبجديًا'],
+  ...(historical || tab === 'support' ? [['name', historical ? 'أبجديًا' : 'أبجديًا']] : []),
   ...(historical || distinctAttendanceRoll ? [['roll', 'حسب رقم الكشف']] : []),
   ...(['grades', 'support'].includes(tab) ? [['score_desc', 'الأعلى درجة'], ['score_asc', 'الأقل درجة']] : []),
   ...(['attendance', 'support'].includes(tab) ? [['absent_desc', 'الأكثر غيابًا']] : []),
