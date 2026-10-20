@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-actual-popup-start-idle-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -4100,
+      "scopeKey": "continuous-n36-actual-popup-start-idle-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "LATEST ACTUAL PO20October: Chrome155/Windows extension0.5.21 POPUP has healthy modules/background/errors[], but clicking Start never starts: collection stage=idle, all counts null, receiverCapability=unknown. This is NEW actual popup entry failure BEFORE collection/handoff, not old APP_CHANGED. Diagnose actual actionpopup Start -> source tab resolution -> internal runtime serialized message -> MV3 background durable checkpoint/ack. Reproduce this exact composition with real shipped handlers and synthetic Chrome API boundary; do not certify a DOMfree engine-only test as popup journey proof. Determine whether source context selection, popup event binding, message handler/schema/race or worker bootstrap causes silent no-op. Inspect actual manifest entry/popup/run-controller/handoff-worker/background engine only. Start must select the authorized existing Madrasati source tab from action context correctly, or give a clear actionable reason without leaving apparent idle after accepted click; never falsely claim started. No collection on popup-open without explicit Start. On correct source and existing authenticated Rakeez, one click must persist accepted job before replying and continue if popup closes. Existing source/Rakeez tabs stay open; navigation only necessary; NO newtab/window/offscreen or permanent keepalive. If started from unsupported page, clear 'افتح مدرستي ثم ابدأ الاستيراد' guidance, not silent generic instruction. Keep source/owner/document/grant/session/TTL and unknown-receipt guarantees unchanged. Preserve quiet UI and sourcewins profile teacher/principal/school choice. Reuse the previous qualified background/receiver/profile/303 proofs; run only new actual popup start serialized composition and relevant context/denied/no-double-Start checks. No repeated full matrix, real school browser/control/result reader or previously refused operation through another tool/actor. No real pupils/accounts, credential extraction, Auth/SQL/RLS/schema or security setting changes.\nProduct implementation belongs ONLY to existing controller worker; one publisher delivers. Ordinary code/synthetic fixes and exact published behavior are authorized by current PO. Read current origin/main and relevant Product row; do not use stale root source. N107 works app/store/view independently: DO NOT touch src/**, sw.js or shared app docs. Extension-only new tests under own directory. Package source changes ONCE from0.5.21 to0.5.22 with same permissions/hosts/CSP and immutable prior archive; verify changed source/zip members. Existing stable updater installs only provider-verified new archive; root checks physical folder parity after delivery. Download link update is a separate tiny serialized card after N107, do not block engine delivery for link. Do not hand-edit queue or launch substitute worker. Return actual result/candidate/base; no Production claim before publisher, no actual native MV3/account acceptance invented.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "tests/n36-popup-start-idle-20261020/**",
+        "docs/automation-evidence/20261020/N36_ACTUAL_POPUP_START_IDLE.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/handoff-worker.js"
+      ],
+      "requiredChecks": [
+        "n36_actual_popup_click_serialized_background_accept_or_actionable_denial",
+        "n36_popup_context_close_double_start_owner_fence",
+        "n36_changed_0522_package_permissions_parity"
+      ],
+      "postDeliveryChecks": [
+        "n36_verified_package_stable_folder_parity"
+      ],
+      "acceptance": [
+        "Actual shipped popup entry and background handshake starts under valid authorized source/receiver or explains a concrete denial; never silently stays idle after an accepted Start.",
+        "No new tabs or open-popup dependency, original data/session boundaries preserved; exact changed package delivered with truthful evidence."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO no newtab and no openpopup; ordinary background implementation under explicitStart",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountMutations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Latest direct PO explicitly requests background independent of popup/newtab. Publish exact existing owner-bound import behavior and sessionjob runtime via solepublisher; no new source/data/security permission."
+    }
+  ]
+}

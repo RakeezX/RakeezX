@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-current-background-queue-compact-ux-20261020",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -4099,
+      "scopeKey": "continuous-n107-current-background-queue-compact-ux-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "sessionId": "01a158b0-7f96-7413-bbd7-133aaa28cc35",
+      "objective": "LATEST ACTUAL PO20October: local completion NOW186ms for28 names/31grades, clear actual speed improvement. Two successive file imports create queue1then2: first cloudconfirmed, second waits class/name receipts. User asks correctness and real background sync AND simpler UI. Do not repeat old18s benchmark or claim186ms cloudconfirmed; preserve durable local completion. Inspect real coordinator composition, current pending/terminal receipts and view. Prove representative two imports/local transaction -> navigation/nextimport -> actual Product outbox ACK coordinator -> each correct max/grade command and terminal receipt once. Diagnose any terminal completed jobs still counted as pending and any secondplan stuck after deps ACK; do NOT hide pending/failure or mark cloudconfirmed on localreceipt. Preserve owner/session/lease/CAS/unknownACK same IDs/maxbeforegrades/deletedclass/grades/identity/history. Reuse unchanged previous qualified owner/reload matrix; add only focused new two-plan progression/terminal-retirement and UI checks, not broad suite. A terminal confirmed import should leave active count (can retain bounded optional history) and must not clutter new file selection. Display concise human status/local saved with background sync; class/nextfile actions. Keep actionable failures/review and safe stop accessible when needed, not raw technical queue rows for normal success. Raw timing JSON is optional diagnostic-only, never default. Remove long technical success paragraphs and repeated counts; no blanket warning. Optional Rakeez ID matching only helps stable identity/duplicate or renamed names; keep collapsed advanced if still genuinely supported, clear ordinary user does not need it. Do not change matching/score contracts to satisfy cosmetics. Inspect actual interface at narrow mobile/desktop widths once after changed content; preserve existing compact unified import hub. Scope includes app/store/coordinator/view and existing test boundaries only; N36 works extension/assets independently. Do NOT edit extension/archive paths. Download-link0.5.22 companion may follow this task serially. No real account/pupil writes or new service/SQL/Auth/security operations, no background outbox clearing. Sole original worker/controller/publisher. Read current origin/main and exact row, preserve existing real delivery, return truthful LOCAL_READY/BLOCKED and candidate, no umbrella Product closure.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/store.js",
+        "src/lib/grade-transfer.js",
+        "src/lib/class-file-import.js",
+        "src/lib/class-import-background.js",
+        "src/lib/class-import-workflow.js",
+        "src/lib/db.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/app.js",
+        "sw.js",
+        "tests/n107-local-background-1522-20261020/**",
+        "docs/automation-evidence/20261020/N107_DURABLE_LOCAL_BACKGROUND_IMPORT.md",
+        "tests/n107-current-queue-compact-20261020/**",
+        "docs/automation-evidence/20261020/N107_CURRENT_QUEUE_COMPACT_UX.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n107_two_imports_background_receipts_grades_and_terminal_active_count",
+        "n107_compact_success_optional_diagnostics_advanced_identity_ui"
+      ],
+      "acceptance": [
+        "Two independently durable imports drain correct grades after dependency receipts without blocking next class; cloudconfirmation remains truthful.",
+        "Ordinary success/next import is concise; terminal successes do not inflate active jobs and raw timings remain optional."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO20October15:22Riyadh exact requested fixes",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO permits this specific code/UI behavior correction and normal owner-bound app writes via sole publisher; no unrelated live service/permission changes."
+    }
+  ]
+}
