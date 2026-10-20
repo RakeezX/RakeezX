@@ -17,7 +17,9 @@ export function validPortalFields(fields) {
 function validStudent(s) {
   return exact(s, ['studentId','enrollmentId','revision','label','hasActiveCode','credentialVersion','recoveryStatus','credential']) && id(s.studentId) && id(s.enrollmentId) && revision(s.revision) && typeof s.label === 'string' && s.label.length <= 200 && typeof s.hasActiveCode === 'boolean' && revision(s.credentialVersion) && ['recoverable','legacy','inactive'].includes(s.recoveryStatus) && (s.recoveryStatus==='recoverable' ? s.hasActiveCode && typeof s.credential==='string' && /^1[0-9]{5}$/.test(s.credential) : s.credential===null && (s.recoveryStatus==='legacy' ? s.hasActiveCode : !s.hasActiveCode));
 }
-export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000) } = {}) {
+// Finite same-origin carrier attestation only; never preserve arbitrary header text.
+export const classListRegion = value => ['ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','us-east-1','us-west-1','us-west-2','eu-central-1','eu-central-2','eu-west-1','eu-west-2','eu-west-3','sa-east-1'].includes(value) ? value : 'unknown';
+export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000), onListDiagnostic = () => {} } = {}) {
   if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000 || !Number.isInteger(readTimeoutMs) || readTimeoutMs < 1 || readTimeoutMs > 30000) deny('invalid_configuration');
   let roster = null, rosterKey = null, pending = null, readSequence = 0;
   const readContext = () => { try { return getContext(); } catch { return null; } };
@@ -34,25 +36,34 @@ export function createClassPortalClient({ request, getContext = () => null, time
   }
   function current(c) { if (classContextKey(readContext()) !== c.key) deny('stale_context'); }
   async function call(action, teachingId, body, validate, c = context(teachingId)) {
-    let timer, timedOut=false; const controller = new AbortController();
+    let timer, timedOut=false,region='unknown',outcome='failure'; const controller = new AbortController(),started=performance.now(),sequence=readSequence;
+    const diagnostic=value=>{try{onListDiagnostic(value);}catch{/* Diagnostic observers never change a request result. */}};
+    if(action==='list')diagnostic(null);
     try {
       const result = await Promise.race([
         Promise.resolve().then(async () => { current(c); const response = await request('/api/n88/teacher/class/' + action, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', signal: controller.signal,
           headers: { 'Content-Type': 'application/json', 'X-N88-CSRF': '1' }, body: JSON.stringify({ ...body, teachingId, binding: c.binding }) }),
           ok = response?.ok === true;
-          current(c); return { ok, ack: ok ? await response.json() : null }; }),
+          current(c);if(action==='list'&&!controller.signal.aborted)region=classListRegion(response?.headers?.get('x-n88-service-region'));
+          return { ok, ack: ok ? await response.json() : null }; }),
         new Promise((_, reject) => { timer = setTimeout(() => { timedOut=true; controller.abort(); reject(new Error('timeout')); }, ['list','guidance-list'].includes(action)?readTimeoutMs:timeoutMs); }),
       ]);
       current(c);
       if (!result.ok) deny('rejected');
       const ack = result.ack;
       if (!exact(ack, ['ack','binding','requestId','data']) || ack.ack !== true || !exact(ack.binding, bindingKeys) || bindingKeys.some(k => ack.binding[k] !== c.binding[k]) || ack.requestId !== (body.requestId ?? null) || !validate(ack.data)) deny('invalid_ack');
-      return structuredClone(ack.data);
+      const data=structuredClone(ack.data);outcome='success';return data;
     } catch (e) {
       current(c);
       // Never expose transport errors/bodies, which may contain credentials or personal data.
       deny(timedOut?'timeout':['rejected','invalid_ack'].includes(e?.code) ? e.code : 'uncertain');
-    } finally { clearTimeout(timer); controller.abort(); }
+    } finally {
+      clearTimeout(timer); controller.abort();
+      if(action==='list'&&sequence===readSequence&&classContextKey(readContext())===c.key){
+        const elapsed=performance.now()-started;
+        diagnostic(Object.freeze({region,elapsedMs:Number.isFinite(elapsed)?Math.min(30000,Math.max(0,Math.round(elapsed))):null,outcome}));
+      }
+    }
   }
   function snapshot(teachingId) {
     const c = context(teachingId);

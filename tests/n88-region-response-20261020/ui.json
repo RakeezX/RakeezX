@@ -1,0 +1,91 @@
+{
+  "status": "PASS",
+  "runId": "267848ca-6455-4b13-8088-63a960922547",
+  "scope": "Actual app authenticated runtime, ownership guard, class client/view and source CSS; fresh loopback synthetic contexts",
+  "checks": [
+    {
+      "scenario": "success",
+      "status": "PASS",
+      "diagnostic": {
+        "region": "ap-south-1",
+        "elapsedMs": 12,
+        "outcome": "success"
+      },
+      "resultAndTextPreserved": true,
+      "initialListReads": 1
+    },
+    {
+      "scenario": "missing",
+      "status": "PASS",
+      "diagnostic": {
+        "region": "unknown",
+        "elapsedMs": 5,
+        "outcome": "success"
+      },
+      "resultAndTextPreserved": true,
+      "initialListReads": 1
+    },
+    {
+      "scenario": "invalid-header",
+      "status": "PASS",
+      "diagnostic": {
+        "region": "unknown",
+        "elapsedMs": 4,
+        "outcome": "success"
+      },
+      "resultAndTextPreserved": true,
+      "initialListReads": 1
+    },
+    {
+      "scenario": "failure",
+      "status": "PASS",
+      "diagnostic": {
+        "region": "ap-south-1",
+        "elapsedMs": 3,
+        "outcome": "failure"
+      },
+      "resultAndTextPreserved": true,
+      "initialListReads": 1
+    },
+    {
+      "scenario": "invalid-ack",
+      "status": "PASS",
+      "diagnostic": {
+        "region": "ap-south-1",
+        "elapsedMs": 5,
+        "outcome": "failure"
+      },
+      "resultAndTextPreserved": true,
+      "initialListReads": 1
+    },
+    {
+      "scenario": "timeout",
+      "status": "PASS",
+      "diagnostic": {
+        "region": "unknown",
+        "elapsedMs": 62,
+        "outcome": "failure"
+      },
+      "resultAndTextPreserved": true,
+      "initialListReads": 1
+    },
+    {
+      "scenario": "owner-retire",
+      "status": "PASS",
+      "diagnosticRetired": true
+    },
+    {
+      "scenario": "lease-retire",
+      "status": "PASS",
+      "diagnosticRetired": true
+    }
+  ],
+  "actualTeacherReads": 0,
+  "providerOperations": 0,
+  "foreignRequestsBlocked": true,
+  "persistentProfiles": false,
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

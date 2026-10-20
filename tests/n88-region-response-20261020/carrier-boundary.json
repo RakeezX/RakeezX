@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "baseSha": "10a98fcbec350030c5b72a1ea9132cab196a9ae2",
+  "preimage": "3fbf524a87ac496fdebc9f74e2ab57ad810661d094d63a9c6148ae1c5d81fd3a",
+  "carrier": "2f96fdc067e3658f8105f1c6de73d730fd3d62100c98490bdd0d1604c1204b15",
+  "source": "5f1cf774d59655890e970d0d2c1f33e023e1bbc32e2385104ae9e2ad368c6d80",
+  "comparisons": 120,
+  "supportedRegions": 15,
+  "onlyListResponse": true,
+  "clientHeadersIgnored": true,
+  "invalidAndMissingUnknown": true,
+  "signedEnvelopeBodyUrlAndOtherRoutesUnchanged": true,
+  "privacyAndDeadlinesUnchanged": true,
+  "realNetworkCalls": 0,
+  "providerOperations": 0,
+  "actualExecutionRegion": "UNKNOWN"
+}
