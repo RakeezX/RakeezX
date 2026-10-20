@@ -436,7 +436,6 @@ const settings = {
                       <p class="field__hint">أكّد الطلب من الرسالتين في بريدك الحالي والجديد. إن لم تجدهما، تحقّق من الرسائل غير المرغوب فيها.</p>
                     </details>`
                     : emailFeedback.completed ? html`<p class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span></p>`
-                    : emailLifecycle.expired ? html`<p class="field__hint" role="status" data-email-change-expired>انتهت مهلة تأكيد الطلب. يمكنك طلب تغيير البريد من جديد.</p>`
                     : emailLifecycle.unknown ? html`<p class="field__hint" role="status" data-email-change-unknown>تعذر تحديد مهلة تأكيد الطلب. لم يُثبت اكتمال التغيير.</p>` : ''}
                 ${emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
               </div>`}

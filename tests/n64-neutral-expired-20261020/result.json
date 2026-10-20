@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n64-expired-request-neutral-settings-20261020",
+  "runId": "0b5a8eae-c3fe-442b-814a-797d2687dfb8",
+  "sourceSha256": "954a938fabbd20b94c90d2fa0d0bd34b94d459661b0dfe365dfba0d17dfef374",
+  "results": [
+    {
+      "expiredNeutral": true,
+      "currentEmailAndChangeAction": true,
+      "noReplacementReminder": true,
+      "providerMetadataPreserved": true,
+      "actualOwnerStoreAndSourceCSS": true
+    },
+    {
+      "nonexpiredPendingInstructionsPreserved": true
+    },
+    {
+      "verifiedSuccessPreserved": true,
+      "authMutations": [],
+      "pageErrors": []
+    }
+  ],
+  "reusedEvidence": "tests/n64-expiry-20261020/result.json; unchanged time/owner/request/failure logic",
+  "ownedBrowserAndServerClosed": true,
+  "liveJourney": "NOT_RUN"
+}
