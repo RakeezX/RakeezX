@@ -7,16 +7,16 @@
  const modules = {'popup.js':'not-available','categories-popup.js':'not-available','run-controller.js':'not-available'};
  const enums = {
   receiverCapability:['source-profile-quiet-v1','unknown'],setupPhase:['none','source','envelope','receipt','receiver-update'],
-  stage:['idle','collecting','review','partial','paused','cancelled','expired','error','saving','saved','unresolved'],
+  startPhase:['none','source-context','worker-ack','accepted','denied'],stage:['checking','idle','collecting','review','partial','paused','cancelled','expired','error','saving','saved','unresolved'],
   coverage:['complete','partial','paused','unknown'], terminal:['unproven','explicit-next','observed-anchor'],
   endpoint:['none','ambiguous','anchor','span'], transfer:['idle','sending','pending','error','unknown'],
   failure:['none','SOURCE_CHANGED','REVIEW_EXPIRED','HANDOFF_SCHEMA','HANDOFF_SETUP','HANDOFF_BATCH','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_VALUE','HANDOFF_DUPLICATE','HANDOFF_UNAVAILABLE','BATCH_EXPIRED','APP_CHANGED','APP_FRAME','APP_DOCUMENT_BINDING','HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER'],
   receipt:['not-available','pending','saved','existing','unknown','expired'],
   failurePhase:['none','profile','batch'],failureStep:['none','validation','transaction','readback']
  };
- enums.failure.push('SOURCE_BINDING_CHANGED','SOURCE_CONTEXT_CHANGED','SOURCE_CLOSED','APP_CLOSED','NAVIGATION_UNCONFIRMED','START_INTERRUPTED','SCHOOL_CHOICE_REQUIRED','RECEIPT_UNKNOWN','CANCELLED','APP_UPDATE_REQUIRED','APP_FINISH_CURRENT_EDIT','SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
+ enums.failure.push('SOURCE_ACCESS_REQUIRED','NO_ACTIVE_TAB','UNVERIFIED_START_ORIGIN','JOB_REQUEST','JOB_ACK_INVALID','BACKGROUND_UNAVAILABLE','HANDOFF_UNAVAILABLE','APP_NOT_READY','OPEN_ONE_RAKEEZ_TAB','SOURCE_BINDING_CHANGED','SOURCE_CONTEXT_CHANGED','SOURCE_CLOSED','APP_CLOSED','NAVIGATION_UNCONFIRMED','START_INTERRUPTED','SCHOOL_CHOICE_REQUIRED','RECEIPT_UNKNOWN','CANCELLED','APP_UPDATE_REQUIRED','APP_FINISH_CURRENT_EDIT','SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
  const numbers = ['valid','staged','observed','excluded','classes','processedPages','currentPage'];
- const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none',fieldResults:[],setupPhase:'none',setupFields:[],receiverCapability:'unknown'});
+ const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',startPhase:'none',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none',fieldResults:[],setupPhase:'none',setupFields:[],receiverCapability:'unknown'});
  let state=fresh(), errors=[], background='not-available';
  const ownValue=(o,k)=>Object.getOwnPropertyDescriptor(o,k)?.value;
  function publish(input) {

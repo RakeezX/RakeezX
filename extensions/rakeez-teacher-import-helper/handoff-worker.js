@@ -126,7 +126,8 @@ import {createBackgroundRunner} from './background-runner.js';
 async function transport(message,authority){return enqueue(()=>handleTransport(message,authority));}
 const background=createBackgroundRunner({transport});
 chrome.runtime.onMessage.addListener((message,sender,reply)=>{
- if(sender.id!==chrome.runtime.id||!sender.url||new URL(sender.url).origin!==new URL(chrome.runtime.getURL('popup.html')).origin||new URL(sender.url).pathname!=='/popup.html')return;
+ const expected=new URL(chrome.runtime.getURL('popup.html'));let caller;try{caller=new URL(sender.url);}catch{return;}
+ if(sender.id!==chrome.runtime.id||caller.protocol!==expected.protocol||caller.hostname!==expected.hostname||caller.pathname!==expected.pathname||sender.frameId!=null&&![-1,0].includes(sender.frameId))return;
  if(message?.type==='n36-health'&&Object.keys(message).join()==='type'){reply({ok:true,health:'ready'});return;}
  const operation=message?.type?.startsWith('n36-job-')?background.message(message,sender):transport(message,sender);
  operation.then(reply,e=>reply({ok:false,code:/^[A-Z_]+$/.test(e.message)?e.message:'HANDOFF_UNAVAILABLE'}));return true;
