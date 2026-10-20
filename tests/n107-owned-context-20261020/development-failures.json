@@ -1,0 +1,10 @@
+[
+  {
+    "stage": "initial composed harness",
+    "error": "Incomplete cloud read: invalid page or exact count",
+    "correction": "Fixture now returns mandatory exact content-range header."
+  },
+  {
+    "failure": "Error: يلزم التحقق من الحساب لاستئناف التعديل. يمكنك العرض والتصدير وتنزيل نسخة احتياطية.\n    at leaseWriteError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-owned-write-context-qualification-20261020/src/lib/offline-lease.js:32:52)\n    at Object.renew (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-owned-write-context-qualification-20261020/src/lib/offline-lease.js:125:61)\n    at runOwnerRetirement (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-owned-write-context-qualification-20261020/tests/n107-owned-context-20261020/composition.mjs:67:31)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-owned-write-context-qualification-20261020/tests/n107-owned-context-20261020/composition.mjs:87:5"
+  }
+]

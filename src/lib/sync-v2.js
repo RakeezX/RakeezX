@@ -745,6 +745,7 @@ export function createSyncV2Engine({
   makeId = uid,
   ownershipGuard = createSyncOwnershipGuard(),
   currentAuthenticatedUserId = () => null,
+  captureMutationContext = null,
 } = {}) {
   if (!database?.applyBatch || !database?.getAll) throw new Error('Sync V2 requires a transactional database adapter');
 
@@ -1035,11 +1036,12 @@ export function createSyncV2Engine({
     return queueCommand({ store:'attendance', recordId:`fill:${sessionId}`, command:'attendance:fill', patch:{ sessionId,status,studentIds:[...studentIds] }, groups:['status'], dependencies: uniqueDependencies([{ store:'sessions',recordId:sessionId,requiresServerRevision:true }, ...studentIds.map((recordId)=>({store:'students',recordId,requiresServerRevision:true}))]) });
   }
 
-  async function markAttempt(mutation, expectedWorkspace = null) {
+  async function markAttempt(mutation, expectedWorkspace = null, assertContext = () => {}) {
     let locked = mutation;
     const contextualCreate = mutation.store === 'sessions' && mutation.op === 'create' && mutation.patch?.calendar_context;
     await database.applyBatch(mutation.importMaximum === true ? {outbox:{},device:{},items:{},scores:{},teachings:{},terms:{},years:{},sections:{}} : mutation.sessionRepairOf ? Object.fromEntries(REPAIR_STORES.map(name => [name, {}])) : contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
       prepare(current) {
+        assertContext();
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (mutation.importMaximum===true && (!existing || ['rejected','superseded'].includes(existing.state))) {
           locked=null;return {outbox:operationBatch()};
@@ -1106,9 +1108,10 @@ export function createSyncV2Engine({
     return locked;
   }
 
-  async function markFailure(mutation, error) {
+  async function markFailure(mutation, error, assertContext = () => {}) {
     await database.applyBatch({ outbox: {} }, {
       prepare(current) {
+        assertContext();
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
         if (pendingFoundationGroup(current.outbox, existing)) return { outbox: operationBatch() };
@@ -1142,7 +1145,8 @@ export function createSyncV2Engine({
     });
   }
 
-  async function reconcileReceipt(mutation, result, expectedWorkspace = null) {
+  async function reconcileReceipt(mutation, result, expectedWorkspace = null, assertContext = () => {}) {
+    assertContext();
     const resultMutationId = result?.mutationId;
     if (resultMutationId !== mutation.mutationId) throw new Error('Sync V2 receipt mutationId mismatch');
     if (mutation.importMaximum === true) {
@@ -1173,6 +1177,7 @@ export function createSyncV2Engine({
 
     await database.applyBatch(scope, {
       prepare(current) {
+        assertContext();
         const currentMutation = current.outbox.find((row) => row.id === mutation.id);
         if (!currentMutation) return Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
         const writes = Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
@@ -1472,9 +1477,10 @@ export function createSyncV2Engine({
     return { state: 'ready', reason: null };
   }
 
-  async function markRejected(mutation, reason, error = null) {
+  async function markRejected(mutation, reason, error = null, assertContext = () => {}) {
     await database.applyBatch({ outbox: {} }, {
       prepare(current) {
+        assertContext();
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
         if (pendingFoundationGroup(current.outbox, existing)) return { outbox: operationBatch() };
@@ -1700,6 +1706,7 @@ export function createSyncV2Engine({
   }
 
   async function dispatchPending({ maxMutations = Infinity, onlyMutationId = null } = {}) {
+    const assertDispatchContext = captureMutationContext?.() ?? (() => {});
     await recoverRejectedScoreCreates();
     const allRows = await database.getAll('outbox');
     const snapshot = sortMutations(allRows.filter((row) => row.protocol === 'v2'));
@@ -1707,6 +1714,11 @@ export function createSyncV2Engine({
     const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
 
     for (const original of snapshot) {
+      // Retiring this pass leaves every unsent/uncertain envelope untouched.
+      if (original.op !== 'command') {
+        try { assertDispatchContext(); }
+        catch { result.blocked++; break; }
+      }
       // Pending atomic N58 repairs own only their exact reviewed group. Preserve
       // those envelopes unchanged until the stored receipt is reconciled.
       if (pendingFoundationGroup(await database.getAll('outbox'), original)) { result.blocked++; continue; }
@@ -2096,6 +2108,9 @@ export function createSyncV2Engine({
         continue;
       }
 
+      const assertOwned = captureMutationContext?.(live) ?? (() => {});
+      const assertContext = () => { assertDispatchContext(); assertOwned(); };
+      const contextCurrent = () => { try { assertContext(); return true; } catch { return false; } };
       const repairWorkspace = live.sessionRepairOf || live.importMaximum === true ? ownershipGuard.getWorkspace() : null;
       const repairContextCurrent = () => !repairWorkspace || ownershipGuard.getWorkspace() === repairWorkspace &&
         currentAuthenticatedUserId() === live.ownerId;
@@ -2107,8 +2122,9 @@ export function createSyncV2Engine({
         }
       }
       let mutation;
-      try { mutation = await markAttempt(live, repairWorkspace); }
+      try { mutation = await markAttempt(live, repairWorkspace, assertContext); }
       catch (error) {
+        if (!contextCurrent()) { result.blocked++; break; }
         if (error.code === 'N58_REPAIR_PENDING') { result.blocked++; continue; }
         if (!live.sessionRepairOf && live.importMaximum !== true) throw error;
         if (repairContextCurrent()) await markDependencyBlock(live, error.message);
@@ -2117,14 +2133,16 @@ export function createSyncV2Engine({
       if (!mutation) continue; // Cancellation won the atomic send/retire race.
       result.attempted++;
       try {
-        const receipt = await transport.applyMutation(mutationEnvelope(mutation));
+        const receipt = await transport.applyMutation(mutationEnvelope(mutation), { assertAccess: assertContext });
+        if (!contextCurrent()) { result.blocked++; break; }
         if (!repairContextCurrent()) { result.blocked++; continue; }
-        await reconcileReceipt(mutation, receipt, repairWorkspace);
+        await reconcileReceipt(mutation, receipt, repairWorkspace, assertContext);
         result.acknowledged++;
       } catch (error) {
+        if (!contextCurrent()) { result.blocked++; break; }
         if (!repairContextCurrent()) { result.blocked++; continue; }
-        if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
-        else await markFailure(mutation, error);
+        if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error, assertContext);
+        else await markFailure(mutation, error, assertContext);
         stoppedKeys.add(mutation.logicalRecordKey);
         if (isRejectedProtocolError(error)) result.blocked++;
         else result.failed++;

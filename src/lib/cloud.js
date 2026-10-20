@@ -4,6 +4,7 @@
  */
 
 import { readCompleteTable } from './complete-read.js';
+import { getActiveDatabaseName } from './db.js';
 import { runtimeSyncOwnershipGuard, assertNewProductWrite } from './sync-ownership.js';
 import { revokeOwnerLeases, runtimeOfflineLease, workspaceLeaseBinding } from './offline-lease.js';
 
@@ -635,12 +636,38 @@ export async function upsertRecords(tableName, records) {
  * Callers must retain the exact envelope (especially mutationId) until this
  * request returns a canonical receipt.
  */
-export async function applySyncV2Mutation(envelope) {
+// AI N107: transient fence for existing owned generic RPCs, never a new protocol.
+// Auth generation survives same-owner token refresh but retires logout/owner changes.
+export function captureOwnedMutationContext(command = null) {
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  if (workspace.type !== 'account') return () => {};
+  const owner = user?.id, generation = authContextGeneration;
+  const databaseName = getActiveDatabaseName();
+  let retired = false;
+  return () => {
+    if (retired || !session || user?.id !== owner || owner !== workspace.authUserId ||
+        generation !== authContextGeneration || runtimeSyncOwnershipGuard.getWorkspace() !== workspace ||
+        databaseName !== workspace.databaseName || getActiveDatabaseName() !== databaseName ||
+        command && command.ownerId !== owner) {
+      retired = true;
+      throw Object.assign(new Error('Owned mutation context changed'), { code: 'OWNED_MUTATION_CONTEXT_CHANGED' });
+    }
+    try { runtimeOfflineLease().assertWritable(); }
+    catch (error) { retired = true; throw error; }
+  };
+}
+
+export async function applySyncV2Mutation(envelope, { assertAccess = () => {} } = {}) {
+  const assertOwned = captureOwnedMutationContext();
+  const assertContext = () => { assertAccess(); assertOwned(); };
+  assertContext();
   if (mockBackend) {
     if (typeof mockBackend.applySyncV2Mutation !== 'function') {
       throw new Error('Mock backend does not implement Sync V2 mutation RPC');
     }
-    return mockBackend.applySyncV2Mutation(envelope);
+    const receipt = await mockBackend.applySyncV2Mutation(envelope);
+    assertContext();
+    return receipt;
   }
   if (!user) throw new Error('Not authenticated');
 
@@ -662,7 +689,7 @@ export async function applySyncV2Mutation(envelope) {
       p_operation: envelope.operation,
       p_client_updated_at: envelope.clientUpdatedAt ?? null,
     }),
-  });
+  }, false, { assertAccess: assertContext });
 }
 
 // N58: ordinary authenticated owner RPCs. No privileged key or arbitrary owner.

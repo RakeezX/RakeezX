@@ -1,0 +1,115 @@
+{
+  "taskId": "continuous-n107-owned-write-context-qualification-20261020",
+  "runId": "4690d799-da5a-428d-8763-3ad02ae18464",
+  "baseSha": "64d6ee3ad4c765561d55148a6f004f480881290b",
+  "checks": [
+    {
+      "name": "n107_actual_owned_database_context_qualification",
+      "status": "PASS",
+      "evidence": "Actual store.importStudents -> runtime syncAll -> default cloud RPC -> real DB adapter/fake IndexedDB. Baseline owner401: two sends, adoption, removed envelope in original DB. Guarded owner401: one send, no adoption, original envelope retained. Foreign DB sentinel and student stores unchanged after workspace retirement."
+    },
+    {
+      "name": "n107_same_owner_refresh_and_retired_owner_ack_boundaries",
+      "status": "PASS",
+      "evidence": "Same-owner actual refresh RPC and normal receipt succeed; owner ACK, workspace, lease, logout/login and atomic-prepare retirement preserve the locked original request. Lost-after-commit response replays identical mutation/body, then adopts one receipt."
+    },
+    {
+      "name": "syntax_scope_offline_shell",
+      "status": "PASS",
+      "evidence": "Syntax checks on three affected modules/harness and git diff --check. Existing sw.js shell contains cloud/db/sync/sync-v2; no new startup file."
+    }
+  ],
+  "baseline": [
+    {
+      "name": "actual_store_coordinator_changed_owner401",
+      "studentRequests": 2,
+      "adopted": true,
+      "envelopeRetained": false
+    }
+  ],
+  "scenarios": {
+    "owner401": [
+      {
+        "name": "actual_store_coordinator_owner401",
+        "studentRequests": 1,
+        "adopted": false,
+        "envelopeRetained": true
+      }
+    ],
+    "ownerack": [
+      {
+        "name": "actual_store_coordinator_ownerack",
+        "studentRequests": 1,
+        "adopted": false,
+        "envelopeRetained": true
+      }
+    ],
+    "workspace": [
+      {
+        "name": "actual_store_coordinator_workspace",
+        "studentRequests": 1,
+        "adopted": false,
+        "envelopeRetained": true
+      }
+    ],
+    "lease": [
+      {
+        "name": "actual_store_coordinator_lease",
+        "studentRequests": 1,
+        "adopted": false,
+        "envelopeRetained": true
+      }
+    ],
+    "session": [
+      {
+        "name": "actual_store_coordinator_session",
+        "studentRequests": 1,
+        "adopted": false,
+        "envelopeRetained": true
+      }
+    ],
+    "atomic": [
+      {
+        "name": "actual_store_coordinator_atomic",
+        "studentRequests": 1,
+        "adopted": false,
+        "envelopeRetained": true
+      }
+    ],
+    "refresh": [
+      {
+        "name": "actual_store_coordinator_refresh",
+        "studentRequests": 2,
+        "adopted": true,
+        "envelopeRetained": false
+      }
+    ],
+    "normal": [
+      {
+        "name": "actual_store_coordinator_normal",
+        "studentRequests": 1,
+        "adopted": true,
+        "envelopeRetained": false
+      }
+    ],
+    "lost": [
+      {
+        "name": "actual_store_coordinator_lost",
+        "studentRequests": 1,
+        "adopted": false,
+        "envelopeRetained": true,
+        "sameEnvelopeRecovered": true
+      }
+    ]
+  },
+  "optionalStudentConcurrency": "NOT_RUN; deliberately omitted, guard-only delivery; no latency improvement claimed",
+  "sourceHashes": {
+    "src/lib/cloud.js": "b64d0598b36dc0f7971e52fa83fe49fab92bd4fe84ee8cc4bbbdfb8ea1f7bfaa",
+    "src/lib/sync-v2.js": "32513ecd6d3c3fae10e2f4a3b186d594c9fc9bf077cfe0fbe14cedf93b1a1b0d",
+    "src/lib/sync.js": "2e034437cde69b76365a5f33ae78a3f0901c95de507a75835ee33328a2d43156",
+    "src/lib/db.js": "c72011471d26cc655d183e6b5e178f0b0534505805b777a02a54650c248674a0",
+    "src/lib/sync-ownership.js": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
+    "src/lib/offline-lease.js": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86",
+    "tests/n107-owned-context-20261020/composition.mjs": "9be117b02487439d734eefd3ef21021a613503e1c6195fa8747a8e14bf867249"
+  }
+}

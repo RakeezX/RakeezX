@@ -110,6 +110,7 @@ const syncSettledWaiters = new Set();
 const v2Engine = createSyncV2Engine({
   ownershipGuard: runtimeSyncOwnershipGuard,
   currentAuthenticatedUserId: () => cloud.user?.id ?? null,
+  captureMutationContext: cloud.captureOwnedMutationContext,
 });
 
 const COORDINATOR_REASON = Object.freeze({
