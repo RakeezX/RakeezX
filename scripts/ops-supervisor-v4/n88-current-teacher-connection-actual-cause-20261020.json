@@ -15,7 +15,7 @@
       "budgetMinutes": 25,
       "idleMinutes": 10,
       "dependsOn": [],
-      "objective": "RECOVER EXISTING DIAGNOSTIC ONLY, then inspect ONLY evidenced causal graph. Native54/pin/carrier already actually deployed and reconciled; no protected operation remains. Evidence commit4cef771d170ed7394a566bacf86ab24bde7e088b is current original-session worktree. Reuse all proofs; do not rerun previous tests or source/provider/deploy preflights.\n\nRoot inspected your Copy collector and current product src/lib/student-portal-runtime.js. Your collector requires stage /^[a-z_-]{1,40}$/, but actual product allowlist includes upstream-http-5xx. Thus null tuple might mean an overly narrow collector, NOT empty clipboard; no causal stage is established yet. The clipboard is not to be dumped or printed. Exact original Chrome teacher tab2005438939 remained at already-generated error; do not navigate, reload, retry, click Copy again, enter another account/class, or trigger network/class/list. Acquire only browser phase lease. Read normal DOM ONLY for finite Copy button state (تم النسخ/تعذّر النسخ/current Copy label); no pupil/class names or screenshot. Read documented TAB clipboard.readText ONCE without another Copy click. Parse privately and clear raw variable. Validate exactly six fields using actual product finite sets: phases binding,queue,dispatch,http,response,admitted,failure; codes none,timeout,rejected,invalid_ack,stale_context,unavailable,uncertain; stages none,configuration,key-configuration,envelope,upstream,upstream-body,upstream-http-5xx,reply,reply-shape,acquire,begin,snapshot,repository,teacher,source,synchronize,projection; httpStatus0or100..599; finite elapsed0..30000; sourceVersion n88-class-deadline-v1. Do not use a regex excluding allowed digits. Output/persist ONLY validated six-field tuple OR finite booleans describing invalid/empty/parse/key/allowlist failures, never raw clipboard/arbitrary values. No OS clipboard, hidden browser/app state, credentials, request headers/body, live logs/tails/readiness/provider probes. If actual tool rejects stop that route with exact reason, no bypass.\n\nIf recovered tuple valid, save this same-read evidence and inspect ONLY its implicated source path. Prepare smallest causal correction plus necessary targeted regression if actual stage supports one. Do not guess latency cause or call it fixed from local proof. Prepare next immutable candidate/source/package pins for root to review if live delivery is required: previous native/carrier write budgets are consumed; ZERO new provider writes/keys/Auth/SQL/schema/RLS/migrations/scopes in this recovery. Root is active and will authorize exact evidenced follow-up without another PO question. If tuple still unavailable, preserve exact finite reason and original already-generated error; prepare concrete normal-user Copy handoff from that existing page without new request. Do not ask user to rerun/reimport. N36 independent worker still active, N107 shipped, N113 processing; N44HOLD,N64/N125CLOSED.\n\nPreserve original session/custody and consumed markers/history. Required check union including historical FAIL unchanged. Release owned resource lease. Return BLOCKED/external only for concrete new root condition; do not autotry unchanged. No manual dispatcher/publisher or source-redeploy repetition.",
+      "objective": "MATERIALLY NEW DIRECT USER DIAGNOSTIC: BOTH returned phase=http,code=rejected,stage=synchronize,httpStatus=503,sourceVersion=n88-class-deadline-v1,elapsedMs7400and6400. User says error disappears/reappears and delayed reply; do NOT attribute either tuple to our exact prior controlled request or invent timestamp/request correlation. This proves actual hosted failure reached ports.synchronizeOwner after previous service stages. Native54/publicpin/carrier were verified; consumed markers/history remain immutable. No need further browser/clipboard/unchanged probe. Original session01a14fc3-b292-7390-9952-8549a286c80f/worktree candidate388830 preserved, controller only.\n\nFIRST save the direct human allowlisted evidence and trace ONLY the stage synchronize graph: integrated-service class/list -> repository synchronizeOwner -> canonical-adapter and exact lock_canonical_sources source/queries/bounds/field transformations. Distinguish statement/lock/transaction budget, adapter/data invariants and needless work; do not automatically increase deadlines, remove canonical ownership/active/deletion guards, or call any suspected subcause proven without evidence. Stage and6.4/7.4sec narrow location, not exact SQL failure. Reuse earlier snapshot/teacher/source/acquire/timeout/credential guard proofs. Read only affected files and actual applied migration definitions needed for this phase; no archive sweep or repeat all tests.\n\nIf a concrete source/schema/index/privilege mismatch question requires provider evidence, existing sanctioned Supabase integration may READ ONLY known n88_private lock_canonical_sources definition, affected function/grant/index metadata or a bounded synthetic non-user EXPLAIN without ANALYZE. No locks selecting real rows, user account/student/code/grade data, role/Auth config, secrets, pg_stat_activity/querytext logs, migrations/DDL/DML/advisors sweeps or credential extraction. No live probes/tail/old aggregate logs. Follow Supabase and postgres best-practices skill for implicated graph only. No new permission question for ordinary code/harness choices.\n\nImplement the smallest causally supported correction locally; reproduce the identified failure with the actual composed service/repository and representative owned synthetic account shape, then demonstrate correction and only affected owner/source/session/deletion/recovery/ACK safeguards. Use existing local PG fixture if it is the implicated need and already available; don't relaunch expensive broad suites. If stage remains too broad, prefer a precise safe finite substage/reason inside synchronize with source-level regression over guessed fix, preserving diagnostic privacy/guarding; prepare exact next immutable candidate, source/output pins and current live predecessor for root review. Root is active, not a PO approval gate. Do not end with another unchanged timeout fixture or request a user rerun.\n\nUSER reports error intermittently disappears/returns. Inspect existing class entry lifecycle in src/lib/student-portal-runtime.js and view only to determine whether store repaint/visibility causes automatic re-entry and wipes failure/typed state; fix a concrete proven lifecycle defect if found without new requests or real writes. Stable current roster/controls, per-class owner/session epoch, changed account/class invalidation and explicit Retry must retain safeguards; no hidden browser/app state reads.\n\nPrevious diagnostic deployment budgets consumed. ZERO provider deploy/CLIset/DashboardSave/pinwrite/carrierupload/new class entry/readiness until exact qualified next candidate is prepared and root review adds separately bounded new source operation. Do not rerun preflights requiring old53 or copy64/pin old source. Current native54 SHA d65c283daab57d2ddbeba03ca8b2529d8d7598783e98c9f6ce39bb9870885830, carrier versione07b122d-ab42-42e4-9712-85c10a28e886 SHAa5f4ebd8909c96b4eec4ca334599e6c967f344a0499b6178958cac02d5def3a3, studentJS unchangedc32c3fc5...; existing HTML byte parityFAIL staysFAIL.\n\nN36.23 actually published54ba54f47ae5228f25f4aa1d7cd1cb344f2c6bd0 and stable27physicalfilesverified, no independent Product work needed. N107compactqueue shipped; N113 awaits engines; N44HOLD,N64/N125CLOSED. Preserve all required-check union/historical FAIL; qualify any new phase evidence distinctly from full actual causal PASS. Save meaningful candidate/evidence and return BLOCKED/external only for exact prepared root operation condition, not an unchanged implementation retry. Sole publisher/controller/original custody only; release owned leases.",
       "allowedPaths": [
         "src/lib/student-portal-runtime.js",
         "src/lib/student-portal-class-client.js",
@@ -197,6 +197,43 @@
           "newCopyClicks": 0,
           "tabClipboardReads": 1,
           "reason": "Root source review found collector stage regexp excludes digit 5 although product explicitly allows upstream-http-5xx. Invalid tuple does not establish empty clipboard; inspect only the already-generated snapshot without a new class read."
+        },
+        "humanSynchronizeEvidence": {
+          "receivedAt": "2026-10-20T17:29:53.355Z",
+          "source": "direct trusted user reply to diagnostic Copy handoff",
+          "diagnostics": [
+            {
+              "phase": "http",
+              "code": "rejected",
+              "stage": "synchronize",
+              "httpStatus": 503,
+              "elapsedMs": 7400,
+              "sourceVersion": "n88-class-deadline-v1"
+            },
+            {
+              "phase": "http",
+              "code": "rejected",
+              "stage": "synchronize",
+              "httpStatus": 503,
+              "elapsedMs": 6400,
+              "sourceVersion": "n88-class-deadline-v1"
+            }
+          ],
+          "samePriorControlledRequest": "NOT_ESTABLISHED",
+          "intermittentErrorDisappearsAndReturns": true,
+          "newBrowserReadRequired": false
+        },
+        "synchronizeCausalPreparation": {
+          "publicationPreparation": true,
+          "providerReadOnly": "Known n88_private/rakeezx function definitions, grants and index metadata only if specific static/source question requires it; no user row payload, secrets, logs or broad queries",
+          "newNativeDeploysBeforeRootCandidateReview": 0,
+          "newCarrierOperationsBeforeRootCandidateReview": 0,
+          "newPinWritesBeforeRootCandidateReview": 0,
+          "newReadinessRequests": 0,
+          "newActualTeacherReadsBeforeQualifiedCorrection": 0,
+          "newCredentials": 0,
+          "newSqlAuthConfiguration": false,
+          "realPupilOrCodeWrites": 0
         }
       },
       "liveAuthorizationRef": "PO-20261020-CURRENT-N88-TEACHER-CAUSE",
