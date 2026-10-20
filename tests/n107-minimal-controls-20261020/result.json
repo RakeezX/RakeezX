@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n107-minimal-import-controls-20261020",
+  "runId": "893e0f66-5275-4ec0-82af-d1a1f9f435ab",
+  "checks": [
+    {
+      "name": "n107_changed_view_destination_identity_stop_semantics",
+      "status": "PASS",
+      "evidence": "Actual HTTP app/CSS, owner-guarded file/mapping handlers, direct destination controls, hidden ordinary ID with preserved auto-ID and duplicate row choices; pending optional stop, uncertain recovery and no terminal stop; desktop/mobile no overflow. Stop engine unchanged; no save/dispatch/reload matrix."
+    }
+  ],
+  "failures": [],
+  "viewSha256": "2e414e7b8c5fd8aabbc3aa4e438350606cf1faf3506a91cb31623d2c76064642"
+}
