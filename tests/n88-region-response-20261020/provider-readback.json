@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-20T20:48:17.521Z",
+  "source": "2f96fdc067e3658f8105f1c6de73d730fd3d62100c98490bdd0d1604c1204b15",
+  "sourceExact": true,
+  "settingsUnchanged": true,
+  "routesUnchanged": true,
+  "subdomainUnchanged": true,
+  "versions": [
+    {
+      "version_id": "b8e5e6a7-8242-48cb-a3ab-478cc32fcd4e",
+      "percentage": 100
+    }
+  ],
+  "runId": "267848ca-6455-4b13-8088-63a960922547",
+  "operationCandidateSha": "b1bfbb54bb4210eabeca2cd43209e126d7c393d1",
+  "preimage": "3fbf524a87ac496fdebc9f74e2ab57ad810661d094d63a9c6148ae1c5d81fd3a",
+  "preimageVersion": "e699b953-5e67-4dc3-be1a-73f6cf85b0c4",
+  "uploads": 1,
+  "sourceReadbacks": 1,
+  "nativeDeployments": 0,
+  "sqlAuthSchemaChanges": 0,
+  "realTeacherOrStudentWrites": 0,
+  "actualClassReads": 0,
+  "frontendServed": "PENDING_SOLE_PUBLISHER",
+  "hostedExecutionRegion": "UNKNOWN",
+  "historicalFailures": "Preserved original503/6600ms, blocked results, privateHTML strict-byte FAIL and unrelated five log records; no new log query."
+}

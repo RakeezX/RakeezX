@@ -1,0 +1,10 @@
+{
+  "runId": "267848ca-6455-4b13-8088-63a960922547",
+  "pins": {
+    "src/lib/student-portal-runtime.js": "b3b8732215c87e8aa75642d73bd4a9104ff9d584eb8a22c46260bddbf39428f8",
+    "src/lib/student-portal-class-client.js": "ab433591d9efbe657cdf2936806e8201a02e97015bbf1335c7343b159d039911"
+  },
+  "servedVerification": "PENDING_SOLE_PUBLISHER",
+  "postPublicationActualObservation": "NOT_RUN",
+  "newStartupDependencies": false
+}
