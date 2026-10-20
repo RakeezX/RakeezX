@@ -1,0 +1,42 @@
+{
+  "taskId": "continuous-n107-focus-sync-stability-20261020",
+  "runId": "e9e2829b-e609-4fde-b009-c4185ef4443f",
+  "baseSha": "10a98fcbec350030c5b72a1ea9132cab196a9ae2",
+  "reusedUiEvidence": {
+    "runId": "69386de3-2267-43e4-a4cf-59b578806a89",
+    "candidateSha": "cda1032b47272f4e4d4a78f3b144390774fb55da",
+    "file": "tests/n107-focus-sync-stability-20261020/result.json",
+    "sourceSha256": {
+      "src/app.js": "657dc7938e5705cfa8d7a8f7723566f17a03490f4d0e03e25a1a5813b25a8783",
+      "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480"
+    },
+    "allProductSourceUnchanged": true
+  },
+  "checks": [
+    {
+      "name": "n107_actual_dom_background_update_keeps_active_control",
+      "status": "PASS",
+      "evidence": "Actual owned-account import UI at 1100px/390px: grade/subject native selects remain connected through timed background paints and accept keyboard selection; class-code typing keeps exact node, focus, text and caret. Data/outbox unchanged. Reused from saved run after matching source digests; no browser replay."
+    },
+    {
+      "name": "n107_import_and_representative_dialog_affected_result_inspected",
+      "status": "PASS",
+      "evidence": "Actual import, relevant custom-subject rerender, changed account header, genuine score-store notification and account dialog/disclosure checked. Dialog focus/open state and data/outbox preserved; narrow screenshots captured. Reused from saved run after matching source digests; no browser replay."
+    },
+    {
+      "name": "n107_sync_status_truth_and_owner_recovery_preserved",
+      "status": "PASS",
+      "evidence": "Actual account boot and rendered status dot: pending blue, synced green, blocked/rejected/failed remain non-green; paused real synthetic Sync publishes syncing blue then hard failure red. Typing also survives actual Sync start/failure notifications; workspace deactivation removes cached import controls. Existing owner tests recorded separately. No real service requests. Reused from saved run after matching source digests; no browser replay."
+    },
+    {
+      "name": "authenticated_cadence_and_coordinator_regression",
+      "status": "PASS",
+      "evidence": "authenticated-checks.txt: 3/3 tests pass. Existing original cadence and N95 coordinator assertions retained with persisted synthetic owner session, refreshed lease context, renewed lease and acknowledged profile fixture; missing-lease refusal asserted. Prior failures retained, not relabelled."
+    }
+  ],
+  "historicalFailures": {
+    "file": "tests/n107-focus-sync-stability-20261020/legacy-fixture-failures.json",
+    "resolution": "Current valid-fixture regression run passes; original legacy invocations remain historical failures."
+  },
+  "resources": "No browser/server launched in this continuation; prior owned cleanup evidence reused."
+}

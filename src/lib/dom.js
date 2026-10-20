@@ -43,9 +43,71 @@ export function html(strings, ...values) {
 
 /** يضع قالبًا داخل عنصر. */
 export function render(el, tpl) {
+  renderedRegions.delete(el);
   el.innerHTML = tpl && tpl[RAW] ? tpl.value : String(tpl ?? '');
   wireVisibleNumberInputs(el);
   return el;
+}
+
+// AI N107: compare generated markup, not live DOM (draft values, native selects,
+// disclosures and afterPaint bindings belong to the current document).
+const renderedRegions = new WeakMap();
+export function renderRegions(el, templates, contextKey) {
+  let previous = renderedRegions.get(el);
+  if (previous?.contextKey !== contextKey || previous?.regions.length !== templates.length ||
+      previous?.regions.some(region => region.start.parentNode !== el || region.end.parentNode !== el)) {
+    el.replaceChildren();
+    previous = { contextKey, regions: templates.map(() => {
+      const start = document.createComment('region'), end = document.createComment('/region');
+      el.append(start, end);
+      return { start, end, markup: null };
+    }) };
+    renderedRegions.set(el, previous);
+  }
+  return templates.map((tpl, index) => {
+    const markup = tpl && tpl[RAW] ? tpl.value : String(tpl ?? '');
+    const region = previous.regions[index];
+    if (region.markup === markup) return false;
+    const fragment = document.createElement('template');
+    fragment.innerHTML = markup;
+    // A change handler may commit a draft value without requesting a paint.
+    // Adopting that already-visible value must not later replace its neighbours
+    // (in particular, a native select opened just after the input blurred).
+    if (region.markup !== null) {
+      const prior = document.createElement('template');
+      prior.innerHTML = region.markup;
+      const oldInputs = [...prior.content.querySelectorAll('input')];
+      const newInputs = [...fragment.content.querySelectorAll('input')];
+      const liveInputs = [];
+      for (let node = region.start.nextSibling; node !== region.end; node = node.nextSibling) {
+        if (node.nodeType === 1) {
+          if (node.matches('input')) liveInputs.push(node);
+          liveInputs.push(...node.querySelectorAll('input'));
+        }
+      }
+      if (oldInputs.length === newInputs.length && liveInputs.length === newInputs.length) {
+        const adopted = [];
+        newInputs.forEach((input, i) => {
+          if (input.getAttribute('value') !== oldInputs[i].getAttribute('value') &&
+              liveInputs[i].value === input.value) {
+            if (input.hasAttribute('value')) oldInputs[i].setAttribute('value', input.getAttribute('value'));
+            else oldInputs[i].removeAttribute('value');
+            adopted.push(i);
+          }
+        });
+        if (adopted.length && prior.content.isEqualNode(fragment.content)) {
+          adopted.forEach(i => { liveInputs[i].defaultValue = newInputs[i].defaultValue; });
+          region.markup = markup;
+          return false;
+        }
+      }
+    }
+    wireVisibleNumberInputs(fragment.content);
+    while (region.start.nextSibling !== region.end) region.start.nextSibling.remove();
+    region.end.before(fragment.content);
+    region.markup = markup;
+    return true;
+  });
 }
 
 /** ينشئ عنصرًا من قالب ويعيد أول عقدة فيه. */

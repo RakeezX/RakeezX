@@ -1,0 +1,15 @@
+✔ claimed workspace binds offline local mutations to its persisted owner without live Auth (3.9033ms)
+✔ matching account dispatches and ownerId remains local-only metadata (5.323ms)
+✔ Account A command cannot leave the client while Account B is authenticated and resumes as A (2.8436ms)
+✔ wrong workspace and ownerless claimed commands remain safety-blocked (0.9421ms)
+✔ cross-account pull is blocked before network or reconciliation (0.6317ms)
+✔ Demo is never cloud eligible and cannot create a cloud outbox command (0.4092ms)
+✔ temporary legacy-unclaimed path preserves ownerless Production behavior without implicit claim (2.0643ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 155.3061

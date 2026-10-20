@@ -1,0 +1,12 @@
+{
+  "taskId": "continuous-n107-focus-sync-stability-20261020",
+  "runId": "69386de3-2267-43e4-a4cf-59b578806a89",
+  "checks": [],
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/browser.mjs:63:14\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-focus-sync-stability-20261020/tests/n107-focus-sync-stability-20261020/browser.mjs:24:2"
+  ],
+  "sourceSha256": {
+    "src/app.js": "d35b82cc9653abc95e2f9cfc68d6450c9a348113cb2a29f38bf5c01d973d9d8c",
+    "src/lib/dom.js": "bc5fd9a18a2cb361f06ed8d71c9d669573458e35e4aae394753288c854055ba1"
+  }
+}

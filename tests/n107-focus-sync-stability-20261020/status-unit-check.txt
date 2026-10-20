@@ -1,0 +1,11 @@
+✔ transient_status: actual Product mapper uses time AND distinct attempts, never render/wake counts (3.8826ms)
+✔ fatal_visibility: hard categories bypass quiet windows and retain support/actions (1.2005ms)
+✔ owner_reset: context tokens reject stale callbacks, logout/reload reset only presentation (0.4597ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 211.485
