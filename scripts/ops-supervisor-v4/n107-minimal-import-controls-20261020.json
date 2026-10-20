@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "preparationAuthority": {
+        "kind": "Latest direct PO20October extension/import UX and actual transport failure",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSchoolRead": false,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Latest PO explicitly requests these exact corrections and normal authorized import behavior; sole controller/publisher, no new provider/data permission.",
+      "id": "continuous-n107-minimal-import-controls-20261020",
+      "productId": "N107",
+      "priority": -4590,
+      "scopeKey": "n107-import-view-only-minimal-controls",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "budgetMinutes": 20,
+      "objective": "Latest PO20October: remove visible «الوجهة ومحتوى الكشف» heading. Keep useful actual destination/class/subject controls laid out directly; do not remove functionality with the heading. Remove normal visible optional advanced identity block «خيارات متقدمة للمطابقة / المطابقة بالاسم تلقائية... / معرف ركيز (اختياري)» if not necessary for ordinary workflow. Preserve supported stable-ID matching for duplicate/renamed names internally and any genuine ambiguity resolution when required; don't silently change reviewed mapping, automatic export-ID detection or saved plans. Inspect existing mapping before choosing minimal removal. User asks WHY «إيقاف المتابعة بأمان» exists: document exact implementation semantics, visibility, alreadydispatched/unknownACK behavior and saved data retained, without speculating. Keep necessary stop for genuinely actionable pending/problem operations in compact optional context, not normal completed success clutter; no unasked removal of recovery safety. Main normal success concise; no raw timing JSON default. Existing186ms local durable completion/background coordinator/outbox proof reusable; user reports no new datafailure. Do not rerun grades matrix/coordinator/reload tests or old18s benchmark; one isolated changed-view check and targeted mapping/stop behavior only if behavior actually changed. Scope ONLY view and tiny UX evidence/test. Do NOT edit extension/archive or app/store/coordinator files, no real account/browser/cloud operations. N36 .24 engine/popup proceeds independently excluding this view; root serial downloadlink companion later. Sole publisher verifies changed served view, no full N107 closure without useracceptance.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "tests/n107-minimal-controls-20261020/**",
+        "docs/automation-evidence/20261020/N107_MINIMAL_IMPORT_CONTROLS.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n107_changed_view_destination_identity_stop_semantics"
+      ],
+      "acceptance": [
+        "Unnecessary heading and ordinary ID clutter removed without changing identity or durable saved import contracts.",
+        "Necessary follow-up stop remains understandable and compact; saved grades never described as deleted by stopping."
+      ]
+    }
+  ]
+}
