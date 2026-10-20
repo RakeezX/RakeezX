@@ -214,7 +214,7 @@ const gradesView = {
         <div class="grades-01c__filters">
           <label class="grades-01c__sort">
           <select class="select" data-change="sort" aria-label="ترتيب الطلاب">
-            <option value="default" ${['default', 'name', 'roll'].includes(sortKey) ? 'selected' : ''}>أبجديًا حسب رقم الكشف (الافتراضي)</option>
+            <option value="default" ${['default', 'name', 'roll'].includes(sortKey) ? 'selected' : ''}>أبجديًا</option>
             <option value="score_desc" ${sortKey === 'score_desc' ? 'selected' : ''}>الأعلى درجة</option>
             <option value="score_asc" ${sortKey === 'score_asc' ? 'selected' : ''}>الأقل درجة</option>
           </select>
