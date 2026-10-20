@@ -1,0 +1,80 @@
+{
+  "taskId": "continuous-n36-latest-necessary-navigation-choice-20261020",
+  "runId": "3d444859-790d-4877-a68d-c288769c31a3",
+  "checks": [
+    {
+      "name": "report",
+      "status": "PASS",
+      "navigation": [],
+      "setup": [
+        [
+          "teacher",
+          "school",
+          "principal",
+          "department",
+          "classes"
+        ]
+      ],
+      "runnerTabs": 1
+    },
+    {
+      "name": "necessary",
+      "status": "PASS",
+      "navigation": [
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/MyInfo/fixture"
+      ],
+      "setup": [
+        [
+          "teacher",
+          "school",
+          "timetable",
+          "principal",
+          "department",
+          "classes"
+        ]
+      ],
+      "runnerTabs": 1
+    },
+    {
+      "name": "unsupported",
+      "status": "PASS",
+      "navigation": [
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "setup": [
+        [
+          "teacher",
+          "school",
+          "principal",
+          "department",
+          "timetable",
+          "classes"
+        ]
+      ],
+      "runnerTabs": 1
+    },
+    {
+      "name": "foreign",
+      "status": "PASS",
+      "navigation": [],
+      "setup": [],
+      "runnerTabs": 1
+    },
+    {
+      "name": "cancel",
+      "status": "PASS",
+      "navigation": [
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "setup": [],
+      "runnerTabs": 1
+    }
+  ],
+  "live": "NOT_RUN",
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-latest-necessary-navigation-choice-20261020/tests/n36-navigation-choice-20261020/browser.mjs:23:319\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-latest-necessary-navigation-choice-20261020/tests/n36-navigation-choice-20261020/browser.mjs:12:62"
+  ],
+  "phase": "cancel",
+  "status": "PASS"
+}

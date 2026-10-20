@@ -1,3 +1,11 @@
+## AI candidate 0.5.20 — latest PO navigation choice, 20 October 2026
+
+The latest explicit choice prioritizes all supported available data and permits visible source navigation only when necessary. This supersedes 0.5.19's absolute no-navigation default. Known observed student-report GETs stay in place; already supported role/gateway/profile/classes/timetable links again use the existing guarded walker. Its route/teacher/school/context/deadline/cancel/one-role-switch checks are unchanged; no new endpoint, host permission, CSP or source write.
+
+The existing durable extension runner is used for a walk that can navigate. One extension runner tab may open; an active same-source run is detected by the existing probe. This avoids relying on the temporary action popup surviving a navigation/losing focus. It does not open a Rakeez import/app tab, add offscreen access or claim native Chrome lifecycle testing. A zero-new-tab native journey is not certified here.
+
+0.5.19 receiver compatibility, raw calendar-context snapshots, owner-bound atomic profile/outbox, real serialized receipt details and quiet result stay unchanged. Their qualified evidence is reused by exact source hashes; only route selection and deterministic package identity are newly checked. No live school/account reading or writes. Provider/served 0.5.20 and the subsequent existing stable updater remain postdelivery gates; Chrome reload is not claimed.
+
 ## AI candidate 0.5.19 — 20 October 2026
 
 Explicit Start now checks the existing app document's `source-profile-quiet-v1` capability before reading source data. An old receiver receives a concise update action using the app's existing update control; no automatic app reload/navigation or Service Worker mutation. Existing edit/modal guards remain and explain how to continue. Successful v3 receipts require finite setup.details rather than accepting legacy count-only profile success. Action-popup grants and receipts bind the sender document and current window; another popup cannot cancel/claim its resources.

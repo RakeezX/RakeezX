@@ -40,7 +40,7 @@ function stop(code='CANCELLED',diagnostic=null,context=null){
  window.n36Diagnostics?.publish({stage:code==='CANCELLED'?'cancelled':code==='REVIEW_EXPIRED'?'expired':'error'});
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
  if(['UNVERIFIED_START_ORIGIN','UNSAFE_ROUTE','UNSUPPORTED_SOURCE_SCHEMA'].includes(code)){announce('افتح مدرستي، ثم شغّل الإضافة من واجهة المعلم. هذه الصفحة غير مدعومة؛ لم يُفترض حفظ شيء.');return;}
- if(code==='SOURCE_NOT_AVAILABLE'){announce('لم يبدأ النقل: لا كشف طلاب متاح من روابط القراءة المدعومة في هذه الصفحة. افتح بنفسك واجهة المعلم التي تعرض رابط الكشف ثم ابدأ. لن نتنقل بدلًا منك.');return;}
+ if(code==='SOURCE_NOT_AVAILABLE'){announce('لم يُعثر على كشف طلاب مدعوم قابل للنقل. راجع واجهة المعلم ثم أعد البدء؛ لم يُفترض اكتمال المصدر.');return;}
  if(code==='APP_FINISH_CURRENT_EDIT'){window.n36Diagnostics?.publish({failure:'APP_FINISH_CURRENT_EDIT'});announce('أكمل التعديل أو أغلق النافذة المفتوحة في ركيز ثم ابدأ مجددًا. لم تبدأ قراءة المصدر أو نقل البيانات.');return;}
  if(code==='APP_UPDATE_REQUIRED'){window.n36Diagnostics?.publish({failure:'APP_UPDATE_REQUIRED',setupPhase:'receiver-update'});announce('حدّث ركيز من زر التحديث داخل التطبيق ثم ابدأ مجددًا. لم تبدأ قراءة المصدر أو نقل البيانات؛ لن تُحدّث الصفحة تلقائيًا.');return;}
  if(code==='OPEN_ONE_AUTHENTICATED_RAKEEZ_TAB'){announce('افتح حساب ركيز المسجّل دخوله في تبويب واحد في هذه النافذة وحدّث التطبيق، ثم ابدأ من مدرستي. لم تبدأ قراءة الأسماء.');return;}
@@ -142,7 +142,6 @@ async function start(tabId){
   job.timer=setTimeout(()=>{if(job?.sourceRows.length===0&&ticket===generation)stop('TIME_LIMIT');},RUN_LIMITS.milliseconds); // No names held indefinitely during entry/choice.
   const alive=()=>ticket===generation&&!!job;
   stage='role-selection';kind='role';await ready(tabId,origin,ticket);let page=await inspect(tabId,origin,'home',alive);current(ticket);
-  if(page.schoolChoices||page.rolePending||page.links.some(l=>['gateway','role'].includes(l.kind)))throw Error('SOURCE_NOT_AVAILABLE');
   if(page.schoolChoices){
    announce('اختر مدرسة واحدة لهذا التشغيل؛ لن تُقرأ بيانات مدرسة قبل اختيارك.');
    const choice=await new Promise((resolve,reject)=>{choiceReject=reject;$('school-choices').hidden=false;for(const school of page.schoolChoices){const button=document.createElement('button');button.type='button';button.textContent=school.label;button.addEventListener('click',()=>resolve(school),{once:true});$('school-choices').append(button);}});
@@ -162,7 +161,7 @@ async function start(tabId){
     job.readOffset=next.rowOffset??0;
     try{
      if(next.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(target).pathname))next.page=await readReport(next,ticket,alive);
-     else throw Error('VISIBLE_NAVIGATION_REQUIRED');current(ticket);
+     else {await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+30000;next.page=await inspect(tabId,origin,next.kind,alive);}current(ticket);
     }
     catch(e){if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT')throw e;current(ticket);
      const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname);
@@ -224,7 +223,6 @@ async function start(tabId){
    if(page.rowContinuation!==null&&page.rowContinuation!==undefined)job.routes.unshift({kind:'students',path:next.path,rowOffset:page.rowContinuation});
    for(const link of page.links){
     try{safeRoute(origin,link.path,link.context??job.context);}catch(e){throw routeError(e,link.kind==='role'?'role-selection':'navigation-redirect',link.kind,link.path);}
-    if(!(link.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(link.path,origin).pathname))){job.warnings.push({category:link.kind,code:'VISIBLE_NAVIGATION_REQUIRED',optional:true});continue;}
     if(sourcePageSeen(origin,link.path)||job.visited.has(routeIdentity(origin,link.path))||job.routes.some(r=>routeIdentity(origin,r.path)===routeIdentity(origin,link.path))){if(link.pagination)job.loops++;continue;}
     if(link.pagination)job.routes.unshift(link);else job.routes.push(link);
    }
@@ -288,10 +286,10 @@ export function presentCollectedSource(active,coverage){
  review=completedSourceReview(active,active.sourceURL);
  review.expires=window.n36AutomaticBatch?Math.min(active.batchExpires??Date.now()+1800000,Date.now()+1800000):active.expires;
  const rows=active.sourceRows.map(row=>Object.freeze({...row}));
- const setup=(active.categories??[]).filter(c=>c.category!=='students'&&!(active.warnings??[]).some(w=>w.category===c.category&&w.code!=='VISIBLE_NAVIGATION_REQUIRED')).map(c=>({...c,provenance:['teacher-readonly-run']}));
+ const setup=(active.categories??[]).filter(c=>c.category!=='students'&&!(active.warnings??[]).some(w=>w.category===c.category)).map(c=>({...c,provenance:['teacher-readonly-run']}));
  if(rows.length&&!setup.some(c=>c.category==='classes'))setup.push({category:'classes',provenance:['teacher-readonly-run'],rows:[...new Set(rows.map(r=>r.classroom))].map(classroom=>({classroom}))});
  if(active.context?.schoolName&&!(active.warnings??[]).some(w=>w.category==='school')&&!setup.some(c=>c.category==='school'))setup.push({category:'school',provenance:['teacher-readonly-run'],rows:[{name:active.context.schoolName}]});
- window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,setup,...coverage,excluded:active.excluded,hasNext:false,sourceIssues:(active.warnings??[]).filter(w=>['teacher','principal','school','department','classes','timetable'].includes(w.category)).map(w=>({field:w.category,reason:w.code==='VISIBLE_NAVIGATION_REQUIRED'?'navigation-required':/AMBIGUOUS/.test(w.code)?'ambiguous':'unsupported',count:1}))}}));
+ window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows,setup,...coverage,excluded:active.excluded,hasNext:false,sourceIssues:(active.warnings??[]).filter(w=>['teacher','principal','school','department','classes','timetable'].includes(w.category)).map(w=>({field:w.category,reason:/AMBIGUOUS/.test(w.code)?'ambiguous':'unsupported',count:1}))}}));
  window.n36Diagnostics?.publish({setupPhase:'source',setupFields:setup.map(c=>c.category)});announce('جار حفظ المتاح في ركيز…');
  if(!window.n36AutomaticBatch)armReview();else reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }
@@ -318,7 +316,7 @@ async function startNoor(tabId,classroom,role) {
 // Progress lives only in this explicit extension run page; transport alone uses short-lived session storage.
 if(runToken){
  $('noor-controls').hidden=true;
- document.body.classList.add('run-page');$('manual-controls').hidden=true;$('one-start').hidden=true;
+ document.body.classList.add('run-page','automatic-mode');$('manual-controls').hidden=true;$('one-start').hidden=true;
  $('category').hidden=true;announce('بانتظار طلب البدء الصريح؛ فتح هذه الصفحة وحده لا يبدأ قراءة.');
  channel.onmessage=async({data})=>{
   if(data?.type!=='launch'||data.token!==runToken||!Number.isInteger(data.tabId))return;
@@ -332,7 +330,6 @@ if(runToken){
    const [tab]=await chrome.tabs.query({active:true,currentWindow:true});if(!tab?.id)throw Error('NO_ACTIVE_TAB');
    const classroom=$('noor-class').value.normalize('NFC').trim().replace(/\s+/g,' '),role=$('noor-role').checked;
    if(mode==='noor'){if(!role)throw Error('TEACHER_CONFIRMATION_REQUIRED');validateCategory('classes',[{classroom}]);const u=new URL(tab.url??'');if(u.origin!=='https://noor.moe.gov.sa'||!u.pathname.startsWith('/Noor/'))throw Error('UNSUPPORTED_NOOR_PAGE');}else startOrigin(tab.url??'');
-   if(mode==='madrasati'){runToken=crypto.randomUUID();document.body.classList.add('run-page','automatic-mode');$('one-start').hidden=true;$('noor-controls').hidden=true;await start(tab.id);return;}
    const sourceTabId=tab.id; // Captured before creating/activating the extension run page.
    const token=crypto.randomUUID();let busy=false;
    channel.onmessage=({data})=>{if(data?.type==='busy'&&data.token===token)busy=true;};
