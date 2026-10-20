@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-current-failure-safe-copy-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3401,
+      "scopeKey": "continuous-n88-current-failure-safe-copy-20261020",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 8,
+      "idleMinutes": 6,
+      "dependsOn": [
+        "continuous-n88-deliver-qualified-pending-login-static-20261020"
+      ],
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "objective": "Specific missing evidence path from latest actual N88 teacher class timeout: operational aggregate records outer200/native53 duration5911ms but no action/stage/accountcorrelation; original teacher-cause gate remains honest FAIL/BLOCKED. Current runtime already keeps a finite nonPII phase/status/ms/code/stage/sourceVersion checkpoint, but source support UI does NOT expose copy of this data; it only attaches to a real supportsend. Do not ask user to send support/message, openDevTools or repeat import/failedjourney solelyforcheck. Make CURRENT failed class entry offer one small optional «نسخ تفاصيل التعذّر» action next to Retry (or closed details), visible ONLY in error, no normal page clutter or second error/status region. Copy a finite immutable failure snapshot captured for that still-owned entry: phase/code/stage/httpStatus/elapsedMs/sourceVersion only, all validated allowlists/ranges, no owner/student/class/request/session IDs, token, URL, cookies, names, scores, rawerror/response/headerbody, arbitrary object spread or live logs. No automatic network/export/copy. Existing browser clipboard only when user clicks; no personal clipboard read; failure toast concise if clipboard unavailable. A late previousentry cannot copy stale diagnostics into a newer entry; dispose/retry clears old copied UI and respects current owner/root generation, one authoritative error area remains. Do not change runtime timeout, retry, network, service/readiness/Auth/sourcepin or protectedstaticcarrier; frontendruntime file only (same function bound to existing page), no new startup module dependency. Do not acquire personal browser or actualaccountdata. This supplies exact missing condition for actual cause diagnosis during ordinary future use; NOT a claimed teacher fix or full N88 readiness. Reuse all prior service, student7case and errorregion proof by unchanged behavior; ONE minimal rendered failedentry exercise verifies allowed exact copy and no rawpayload, late/disposed snapshot notadopted, normalstate has nobutton. No full security/crypto/service/clipboard/browsermatrix/providerpoll. Sole publisher/frontend sourceeffect verification; preserve original failedteacher gate and held native53. N44HOLD, N125CLOSED untouched.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/styles/student-portal-class.css",
+        "tests/n88-safe-failure-copy-20261020/**",
+        "docs/automation-evidence/20261020/N88_CURRENT_FAILURE_SAFE_COPY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_error_only_current_finite_snapshot_copy_no_payload"
+      ],
+      "acceptance": [
+        "Current actual-failure stage can be copied without supportsend or new test; private data never enters copied snapshot.",
+        "No claimed actual rootcause resolution or service change; existing failure remains actionable."
+      ],
+      "preparationAuthority": {
+        "kind": "Necessary bounded actual-cause evidence UX under PO diagnose-final-cause mandate",
+        "publication": true,
+        "networkWrites": 0,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "PO ongoing actual N88 diagnosis/fix mandate permits this small optional error-only finite diagnostic UI, no service/data permission expansion."
+    }
+  ]
+}
