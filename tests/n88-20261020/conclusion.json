@@ -1,0 +1,58 @@
+{
+  "taskId": "continuous-n88-stable-class-and-inline-resume-20261020",
+  "runId": "3b230d01-109a-4d91-8ede-6e2efa911e8a",
+  "baseSha": "5a91a2b478f63aa0cde33e744f113a404298d0ef",
+  "state": "LOCAL_READY",
+  "requiredCheck": {
+    "name": "n88_stable_same_binding_sections_and_inline_session_resume",
+    "status": "PASS",
+    "evidence": [
+      "tests/n88-20261020/ui.json",
+      "tests/n88-20261020/binding.json",
+      "drafts/n88-student-portal/activation/static-20261020-native.json",
+      "tests/n88-20261020/served.json"
+    ]
+  },
+  "actualHostedTeacherSuccess": "NOT_PROVEN",
+  "wholeN88Closed": false,
+  "publisherFrontendSourceReceipt": "NOT_RUN; sole publisher",
+  "sourceCause": "Binding key included bearer bytes and exp; same Auth-session refresh retired admitted sections. Canonical ordering also represented as a false source change. Both are now stable without removing actual guard checks.",
+  "changedCompiledOutputs": [
+    "cloudflare/worker.mjs",
+    "private/assets/student.mjs"
+  ],
+  "nativeSourceSha256": "ab8a39e7b579e549260f1a25647926be29b3bd86fd92eccd52400096bc2faefc",
+  "edgeUnchanged": true,
+  "staticCarrierUploads": 1,
+  "historicalFailures": [
+    "tests/n88-20261020/ui.initial-fail.json",
+    "tests/n88-20261020/ui.harness-notification-fail.json"
+  ],
+  "harnessRepair": "Initial extra synthetic pagehide/re-entry assumption timed out; narrowed to the requested natural source/focus lifecycle. Next source test omitted an emitted notification (setMockAuth does not notify); corrected revision and explicit focus, without changing Product guards.",
+  "syntax": "PASS node --check affected runtime/class/login/package",
+  "scope": "PASS allowed paths only; no current-main overlap",
+  "observedOriginMain": "d8ffc4e9d6f6a5c002518222b60d721de4abb2b5",
+  "unchangedProofs": [
+    "tests/n88-1837/ui.previous-pass.json",
+    "tests/n88-1837/auth-budget.json",
+    "drafts/n88-student-portal/activation/service-final-1837.json"
+  ],
+  "noReplay": {
+    "oldReadiness": true,
+    "native49Deployment": true,
+    "SQL": true,
+    "AuthRoleKeys": true,
+    "hostedJourney": true,
+    "privateBrowserRefusal": true
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLeaseReleased": true,
+    "liveMutationLeaseReleased": true
+  },
+  "sourcePins": {
+    "src/lib/student-portal-runtime.js": "fca204b567c2ea35c0da2d8b3051fb9170d1440126ba4863058c6af11bbe92eb",
+    "src/views/student-portal-class.js": "3d92244270830100564103a034d6949b94cb2d0099e4aac4f271b906e29ce8da",
+    "src/views/student-portal-login.js": "3c1678e1718fd8663cf8e25fc4801ef90a9c4e05cd37ba4e37bf1c083d3d09b1"
+  }
+}

@@ -40,7 +40,13 @@ export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipG
     studentIds=new Set(enrolled.map(r=>r.studentId)), items=(state.items||[]).filter(r=>r.teachingId===teachingId),itemIds=new Set(items.map(r=>r.id));
   const source=[(state.years||[]).filter(r=>r.id===term.yearId),(state.sections||[]).filter(r=>r.id===teaching.sectionId),
     enrolled,(state.students||[]).filter(r=>studentIds.has(r.id)),items,(state.scoreSubitems||[]).filter(r=>itemIds.has(r.itemId))];
-  return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,session.access_token,context,source])};
+  // Refreshing the bearer within the SAME verified Auth session is not a new
+  // disclosure identity. Every request still obtains the current bearer and runs
+  // all owner/lease/expiry/source guards. Canonical row order is not a revision.
+  const {validUntil:deadline,...identity}=context;
+  const stable=value=>Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])])):value;
+  const snapshot=source.map(rows=>rows.slice().sort((a,b)=>String(a.id).localeCompare(String(b.id))).map(stable));
+  return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,identity,snapshot])};
 }
 export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel,readTimeoutMs=10000}={}) {
   let active, key, disposed=false;

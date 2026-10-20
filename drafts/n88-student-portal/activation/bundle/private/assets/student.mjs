@@ -211,11 +211,11 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => inlineEntry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
   }
-  async function run(action, ending = false, sameForm = false) {
+  async function run(action, ending = false, sameForm = false, resuming = false) {
     if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
     busy = true;
     const checkpoint = ++generation;
-    if (sameForm) inlineEntry("\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632\u2026");
+    if (sameForm) inlineEntry(resuming ? "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u062C\u0644\u0633\u0629\u2026" : "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632\u2026");
     else paint('<h1 tabindex="-1">\u062C\u0627\u0631\u064D \u0627\u0644\u0627\u062A\u0635\u0627\u0644\u2026</h1><p role="status">\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631</p>');
     try {
       const data = await action();
@@ -225,7 +225,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === "rate") cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1e3;
-      if (sameForm) inlineEntry("\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0645\u0632. \u062A\u062D\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0651\u0645\u0643.", true);
+      if (sameForm) inlineEntry(resuming ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0645\u0632. \u062A\u062D\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0651\u0645\u0643.", !resuming);
       else entry(error?.kind === "session" ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0641\u062A\u062D \u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632 \u0623\u0648 \u062D\u0627\u0648\u0644 \u0644\u0627\u062D\u0642\u064B\u0627.");
     } finally {
       if (checkpoint === generation) {
@@ -282,7 +282,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   const beforeInput = (event) => rejectOverflow(event);
   const paste = (event) => rejectOverflow(event, true);
   const click = (event) => {
-    if (event.target.closest("[data-resume]")) void run(() => client.read());
+    if (event.target.closest("[data-resume]")) void run(() => client.read(), false, true, true);
     if (event.target.closest("[data-read]")) void run(() => client.read());
     if (event.target.closest("[data-end]")) void run(() => client.end(), true);
   };

@@ -1,0 +1,22 @@
+{
+  "taskId": "continuous-n88-stable-class-and-inline-resume-20261020",
+  "runId": "3b230d01-109a-4d91-8ede-6e2efa911e8a",
+  "status": "FAIL",
+  "checks": [
+    "Actual route repaint + two same-session bearer renew/focus notifications during each delayed section: baseline key churn reproduced, new key stable, one list/one guidance read, six fields retained"
+  ],
+  "hostedTeacherSuccess": "NOT_PROVEN",
+  "failure": {
+    "name": "AssertionError",
+    "message": "server phase timed out",
+    "counts": {
+      "list": 1,
+      "guidance-list": 1,
+      "read": 0
+    }
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

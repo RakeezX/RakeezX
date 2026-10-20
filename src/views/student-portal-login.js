@@ -50,10 +50,10 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     form.querySelector('[role=status]').textContent=cooling?'يرجى الانتظار قليلًا قبل المحاولة مجددًا.':message;
     clearTimeout(timer);if(cooling)timer=setTimeout(()=>inlineEntry('يمكنك المحاولة مجددًا.'),Math.max(1,cooldownUntil-Date.now()));
   }
-  async function run(action, ending = false, sameForm = false) {
+  async function run(action, ending = false, sameForm = false, resuming = false) {
     if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
     busy = true; const checkpoint = ++generation;
-    if(sameForm)inlineEntry('جارٍ التحقق من الرمز…');
+    if(sameForm)inlineEntry(resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…');
     else paint('<h1 tabindex="-1">جارٍ الاتصال…</h1><p role="status">يرجى الانتظار</p>');
     try {
       const data = await action();
@@ -62,7 +62,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === 'rate') cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1000;
-      if(sameForm)inlineEntry('تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.',true);
+      if(sameForm)inlineEntry(resuming?'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.':'تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.',!resuming);
       else entry(error?.kind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.' : 'تعذّر فتح المساحة. تحقق من الرمز أو حاول لاحقًا.');
     } finally { if (checkpoint === generation) {busy = false;if(sameForm&&root.querySelector('[data-claim]')){const m=root.querySelector('#n88-message').textContent;inlineEntry(m,root.querySelector('input').getAttribute('aria-invalid')==='true');}} }
   }
@@ -94,7 +94,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const beforeInput = event => rejectOverflow(event);
   const paste = event => rejectOverflow(event, true);
   const click = event => {
-    if (event.target.closest('[data-resume]')) void run(() => client.read());
+    if (event.target.closest('[data-resume]')) void run(() => client.read(),false,true,true);
     if (event.target.closest('[data-read]')) void run(() => client.read());
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
   };
