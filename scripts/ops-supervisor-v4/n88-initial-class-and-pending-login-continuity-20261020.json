@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-initial-class-and-pending-login-continuity-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3199,
+      "scopeKey": "continuous-n88-initial-class-and-pending-login-continuity-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "objective": "LATEST DIRECT PO20October15:22Riyadh actual feedback supersedes prior published readiness. Read current origin/main (ops checkout can be stale), AGENTS/ops contract, exact Product row and affected files only. Existing controller owns dispatch and one publisher delivers; no manual executor or queue change. Preserve prior actual failures/successes/candidates and reuse unaffected proof. Minimum affected checks only, no broad suite, new benchmark chain or filler. N125 now accepted CLOSED; N44 explicit HOLD, N113 only engine processing. No old actual school automation/result-read/browser-custody/tool-policy refusal replay through any other actor/tool/tab. No real pupil/account mutation, email/send, credential extraction, Auth configuration, SQL/schema/RLS/roles/migration or security-setting changes. Ordinary app owner-bound writes remain within exact existing Product contracts. Do not call local source proof actual account success.\nActual AFTER native53/40649c3/3827ac4 published correction still fails teacher initial class entry: «جارٍ فتح مساحة طلاب الفصل…» then same timeout message DUPLICATED twice and Retry. Do not repeat list13→2, mutation2family proof, extend deadline, or label previous controlled2540ms as actual resolution. Trace actual default runtime entry composition getBinding→binding/source readiness→teacher list→roster mount; identify which phase reaches deadline using one NEW bounded provider metadata aggregate only if needed (12:09–12:25UTC), finite action/stage/status/duration counts only, no IDs/URLs/payload/header/IP/credential. Prior outer200 does not prove inner success. Inspect whether per-phase auth/session lookup/connection or repeated store/focus reconciliation retires/restarts the same entry, and whether stale source ingress pins or native query graph are actually causally involved. Code-level delayed-stage fixture must use REAL entry runtime and client/adapters, not standalone list success. Keep loaded state stable, one authoritative error area, no duplicate banners or fake empty known roster/settings. Retain exact current owner/workspace/session/context/source revision and no stale response exposing data. Stop unchanged retry after concrete same cause recurs twice; save exact missing cause if unavailable, no more guessed service redeploy.\nStudent NEW requirement: pressing Login starts «جارٍ التحقق من الرمز…», switching window/page and returning currently stops completion. Previous hide→clear(true) increments generation and invalidates pending client intentionally; draft preservation alone DID NOT meet user request. Preserve ONE same-page claim/resume operation through ordinary visibility/focus hide/return, keep form+pending status stable and finish on return with safe existing same identity/context. Hide must still clear/mask private rendered student data; do not reveal data while hidden. Only adopt exact in-flight result when original page/context/session still valid; real disposal, route/security identity retirement, explicit end must retire request and clear draft. Never reissue claim on focus or create second session/code from timer. Memory only PIN, no storage/URL/logging; preserve already proven native paste/selection/Arabic digits and error draft without replay full clipboard suite. Test real composition hide→resultwhilehidden→return, returnbeforecompletion, late result after disposal/securitychange, same requestcount1; loaded private data hiding stays protected. Claim/resume form must not go global «جارٍ الاتصال…».\nCurrent native53 SHAfc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358 and carrier5d5b1f27-b8d5-4686-8c27-e15abc3eb02b SHA6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326. Current studentJS750dbd95aa8c9f690509f84c90367c8ac6b42c11feb69fbdc5196ca1238204f1. Source/static security-headers and original custody remain. Cloudflare transformed HTML strict-byte comparison FAILED because injected security challenge script; retain failure, inspect causality only through allowed ordinary evidence, never disable protections/modify CSP to hide it. Actual authenticated teacher journey remains UNPROVEN, no alternate user tab because old browser custody refusal binding.\nContinue ORIGINAL custodian session. Exact new feedback authorizes ONE fresh changed source deployment/public pin readback only IF causally qualified for actual initial-entry fault, and ONE changed student asset carrier for pending continuity, through original supported protected custodian. No old consumed1430/readiness/attempt marker reset/replay. Fresh task/run/preparedcandidate/source/carrier-bound append-only attempt gate and immutable prior preimages required. Existing drafts scope includes narrow harness branch repair under matched original custody, but before protected network writes save exact qualified changed hashes and missing-capability fact if current harness lacks separately reviewed new branch; root ops can review immutable candidate once. No broad environment grant, keys/newroles/routes/bindings/security/Auth/SQL. Changed static assets only, unrelated transport+assets byteidentical, privacy/noindex/no-referrer retained. Source/publicpin native readback then static carrier readback, frontend sole publisher. Reuse old successes by source hash. If only frontend change, no native redeploy at all.",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/views/student-portal-class.js",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/styles/student-portal-login.css",
+        "src/styles/student-portal-class.css",
+        "src/app.js",
+        "drafts/n88-student-portal/**",
+        "tests/n88-initial-continuity-1522-20261020/**",
+        "docs/automation-evidence/20261020/N88_INITIAL_CLASS_PENDING_CONTINUITY.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js"
+      ],
+      "requiredChecks": [
+        "n88_initial_real_entry_cause_and_single_error",
+        "n88_one_pending_login_visibility_safe_continuity",
+        "n88_changed_source_and_student_static_delivery"
+      ],
+      "acceptance": [
+        "Correct the specific reported journey at its real composition boundary and preserve owner, durable data and recovery guarantees.",
+        "Use sole publisher and truthful changed-source/served evidence; no false umbrella closure or user success."
+      ],
+      "preparationAuthority": {
+        "kind": "Exact actual N88 class-entry failure and pending-login continuity",
+        "publication": true,
+        "maxCausallyQualifiedChangedServiceOperations": 1,
+        "maxChangedStudentCarriers": 1,
+        "newCredentials": 0,
+        "newMigrations": 0,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO permits this specific code/UI behavior correction and normal owner-bound app writes via sole publisher; no unrelated live service/permission changes.",
+      "liveAuthorizationRef": "PO-20261020-ACTUAL-1522-N88-SERIOUS-CONTINUITY"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n64-expired-request-neutral-settings-20261020",
+      "productId": "N64",
+      "activationId": "po-20261012-continuous",
+      "priority": -3200,
+      "scopeKey": "continuous-n64-expired-request-neutral-settings-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 10,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "sessionId": "01a15898-ab7f-7812-9653-ed872d1f6244",
+      "objective": "LATEST DIRECT PO20October15:22Riyadh actual feedback supersedes prior published readiness. Read current origin/main (ops checkout can be stale), AGENTS/ops contract, exact Product row and affected files only. Existing controller owns dispatch and one publisher delivers; no manual executor or queue change. Preserve prior actual failures/successes/candidates and reuse unaffected proof. Minimum affected checks only, no broad suite, new benchmark chain or filler. N125 now accepted CLOSED; N44 explicit HOLD, N113 only engine processing. No old actual school automation/result-read/browser-custody/tool-policy refusal replay through any other actor/tool/tab. No real pupil/account mutation, email/send, credential extraction, Auth configuration, SQL/schema/RLS/roles/migration or security-setting changes. Ordinary app owner-bound writes remain within exact existing Product contracts. Do not call local source proof actual account success.\nThe prior expiry implementation correctly ends pending at authoritative900seconds, but shows persistent «انتهت مهلة تأكيد الطلب. يمكنك طلب تغيير البريد من جديد.» in normal settings. PO explicitly rejects this text: after expiry render neutral current-email + change button as though no request pending. Remove the expired reminder, do not add replacement page/toast/hint. Preserve nonexpired pending instructions, real successful new-email confirmation, new explicit request, failed verification and original account guards. This is tiny presentation correction only in settings.js, not new Auth lifecycle. Inspect rendered expired vs pending/success branch using existing fixture or small targeted check, reuse all previous expiry/owner/time proofs; no real email/15minute wait/SDK or full Auth suite. Prior successful email-change accepted by user remains valid; once changed copy is verified published, record correction ready for accepted closure without claiming provider metadata deleted.",
+      "allowedPaths": [
+        "src/views/settings.js",
+        "tests/n64-neutral-expired-20261020/**",
+        "docs/automation-evidence/20261020/N64_NEUTRAL_EXPIRED_SETTINGS.md"
+      ],
+      "verificationPaths": [
+        "src/views/settings.js"
+      ],
+      "requiredChecks": [
+        "n64_expired_settings_neutral_pending_success_preserved"
+      ],
+      "acceptance": [
+        "Correct the specific reported journey at its real composition boundary and preserve owner, durable data and recovery guarantees.",
+        "Use sole publisher and truthful changed-source/served evidence; no false umbrella closure or user success."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO20October15:22Riyadh exact requested fixes",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO permits this specific code/UI behavior correction and normal owner-bound app writes via sole publisher; no unrelated live service/permission changes."
+    }
+  ]
+}

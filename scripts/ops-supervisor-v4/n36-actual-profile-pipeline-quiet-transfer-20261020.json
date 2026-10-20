@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-actual-profile-pipeline-quiet-transfer-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -3198,
+      "scopeKey": "continuous-n36-actual-profile-pipeline-quiet-transfer-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 30,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n64-expired-request-neutral-settings-20261020"
+      ],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "LATEST DIRECT PO20October15:22Riyadh actual feedback supersedes prior published readiness. Read current origin/main (ops checkout can be stale), AGENTS/ops contract, exact Product row and affected files only. Existing controller owns dispatch and one publisher delivers; no manual executor or queue change. Preserve prior actual failures/successes/candidates and reuse unaffected proof. Minimum affected checks only, no broad suite, new benchmark chain or filler. N125 now accepted CLOSED; N44 explicit HOLD, N113 only engine processing. No old actual school automation/result-read/browser-custody/tool-policy refusal replay through any other actor/tool/tab. No real pupil/account mutation, email/send, credential extraction, Auth configuration, SQL/schema/RLS/roles/migration or security-setting changes. Ordinary app owner-bound writes remain within exact existing Product contracts. Do not call local source proof actual account success.\nActual0.5.18 now used by PO but personal settings still Abdullah AlMabdi/old or unfilled teacher/school/principal and educationDepartment absent. Diagnostic fieldResults:[] although source-wins and safe details were just published. Treat as actual integration failure, do NOT repeat standalone importSetupProfile/header fixture and claim solved. User's quoted app toast still OLD «حقول إعداد محفوظة...تعارضات أوغيرمدعوم...» whereas new main says «حقول إعداد حُدثت/مطابقة مسبقًا/تحتاج مراجعة». This is concrete evidence to examine stale app receiver/version/capability and old pending batch/receipt replay, not conclusive attribution. Trace actual source extractor→setup categories→version3 envelope perclass serialization→global receiver saveAvailableSetup→atomic profile/outbox→outcome/setup.details→workerreceipt aggregate→fieldResults→real settings input value/header update. Missing source fields must not claim current/saved; no fields array lost due partial results/fallback/old checkpoint. Add safe exact phase/fieldreason or receiver capability where needed, not personal values. If stale app receiver is causal, handshake before transfer/read identifies supported capabilities, use existing lawful update path and clear concise action if update cannot safely occur; do not navigate/reload user personal page or mutate SW/bypass stale source checks. Correct one concrete full composition with source fixture including all3nonempty oldprofile and existing account header; observe final rendered settings plus owner-bound durable write and serialized receipt (not hand-supplied object). Source-wins each explicitStart for AVAILABLE teacher/principal/school remains EXPLICIT user choice. Preserve actual previous303/10class/subject/timetable repeat0new/readd2pupil/readd2slot successes; no repeat whole school303/Sync/delete suite. Department only explicit supported visible labeled source and approved directory match, no guessed schoolregion/hidden API; existing calendar stays fixed. No real portal/account test or old denied read.\nQuiet fast UX: successful direct extension batch must NOT toast every class/update or fill Rakeez import page with counts/metadata; remain on current teacherpage. Extension shows one brief truthful progress/result, e.g availabledata savedlocal/syncpending distinguishable without technical clutter; no repeatedtoast. Keep genuine actionable failures visible once, field details optional closed advanced section only. Remove malformed «. .», obsolete manual review checkbox/duplicate diagnostic controls from automatic result. No pointless new confirmation/page/tab. Keep source coverage missing info in optional detail without false complete-source proof.\nPO requests no source page navigation and no new tab. First inspect existing supported reader/walker route contracts and whether exact currently authorized known report data can be read without visible navigation. Prefer one explicitStart in existing source tab and existing authenticated Rakeez tab; no automatic new runner/importpage/tab. Do not silently promise allpages if only current visible page is available. No hidden/unpublished endpoints, sessioncloning, automationstart via refused tool, or permission/CSP/host expansion. If collecting all supported pages inherently needs visible navigation, document exact constrained alternatives and userdecision needed; finish quiet/profilefix independently, do not invent workaround to old school refusal. Optimize demonstrated redundant same-run collection only, no broad timing suite. Do not delete intentional partial/unknown accounting.\nAllowed settings.js serial after N64 due source overlap. Worker must rebase current accepted publication and not reintroduce expired warning or alter email. Changed extension bytes bump0.5.19 once, immutable oldzips; local package/source proof, solepublisher verifies servedarchive, existing updater updates25file stablefolder postdelivery (root physicalverification after receipt). Never claim Chrome reload/actual liveprofile success.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/views/settings.js",
+        "src/store.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/account-profile.js",
+        "src/lib/settings-profile-ui.js",
+        "src/lib/education-department-directory.js",
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/class-file-import.js",
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "tests/n36-profile-pipeline-1522-20261020/**",
+        "docs/automation-evidence/20261020/N36_ACTUAL_PROFILE_PIPELINE_QUIET_TRANSFER.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_real_serialized_setup_profile_settings_receipt",
+        "n36_quiet_direct_result_and_supported_no_navigation_contract",
+        "n36_changed_local_package"
+      ],
+      "acceptance": [
+        "Correct the specific reported journey at its real composition boundary and preserve owner, durable data and recovery guarantees.",
+        "Use sole publisher and truthful changed-source/served evidence; no false umbrella closure or user success."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO20October15:22Riyadh exact requested fixes",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO permits this specific code/UI behavior correction and normal owner-bound app writes via sole publisher; no unrelated live service/permission changes.",
+      "postDeliveryChecks": [
+        "n36_verified_package_stable_folder_parity"
+      ]
+    }
+  ]
+}

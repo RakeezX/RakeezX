@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-durable-local-import-background-sync-20261020",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -3197,
+      "scopeKey": "continuous-n107-durable-local-import-background-sync-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-actual-profile-pipeline-quiet-transfer-20261020"
+      ],
+      "sessionId": "01a158b0-7f96-7413-bbd7-133aaa28cc35",
+      "objective": "LATEST DIRECT PO20October15:22Riyadh actual feedback supersedes prior published readiness. Read current origin/main (ops checkout can be stale), AGENTS/ops contract, exact Product row and affected files only. Existing controller owns dispatch and one publisher delivers; no manual executor or queue change. Preserve prior actual failures/successes/candidates and reuse unaffected proof. Minimum affected checks only, no broad suite, new benchmark chain or filler. N125 now accepted CLOSED; N44 explicit HOLD, N113 only engine processing. No old actual school automation/result-read/browser-custody/tool-policy refusal replay through any other actor/tool/tab. No real pupil/account mutation, email/send, credential extraction, Auth configuration, SQL/schema/RLS/roles/migration or security-setting changes. Ordinary app owner-bound writes remain within exact existing Product contracts. Do not call local source proof actual account success.\nNEW PRODUCT CHOICE PO asks end import step after storing in Rakeez device, let cloud sync continue without blocking nextclass. Implement durable LOCAL_READY completion with truthful concise «حُفظ على هذا الجهاز؛ جارٍ المزامنة» status, link to class and freedom to start nextimport; DO NOT call cloudconfirmed complete before canonicalgrade ACK. This SUPERSEDES old UI contract requiring wait allcloudreceipts before usercanleave, but NOT persistence/owner/maximum/grade/unknownoutcome safety. Actual18seconds repeated unchanged; no new speed claim or broad network rewrite.\nInspect existing owner-device IndexedDB n107 continuation, confirmClassImport/importStudents, grade-transfer planning/review/maxintent, outbox and app-global runner subscription. Design minimal durable local import workflow/intent persisted BEFORE localcompletion, containing ONLY required owner/workspace/year/term/version/reviewedmax/filegrade/createdidentities context in existing owner-scoped storage. No PIN/credential; grade data alreadyauthorized ownedlocalstore. Existing newclass/subject/student/enrollment locally visible and savedgrades or durable plannedgradeintent after canonicalmax must not be lost on page exit. Atomically or recovery-idempotently commit localplan; UI never reports saved if transaction failed. A page-unmounted promise is NOT durable execution. One app-global background coordinator processes persisted plans after dependencies ACK, retains same command IDs for unknown results, respects original maxreview contract/context, makes no illegal same-name duplicatecolumns. Existing matching name uses filemax approved choice, no falsecontextchanged because own parent ACK. Must not doubleexecute on secondtab/focus/reload, consume wrongowner plans, clearfailedoutbox/unknownreceipt, resurrectdeletedclass, or bypass owner/session/lease/CAS guards. Sync/global runner should progress with page navigation and resume sameowner appreload, while differentaccount/logout hidesprivate state and never posts under newowner. Browser fullyclosed may suspend execution; persistence resumes on nextopen, do not promise background worker after browserclosed. No automatic realdata/testimport.\nMultiple imports must be independently durable with one safe serialized command runner (or existing supported perplan ordering), old singleton continuation must not overwrite priorpending import when teacheropensnextclass. Preserve explicit cancel/rejectedmax/reviewneeded state and source identities/history; localcompletion not silently reinterpret unreviewederrors. If changedcontext/userintent requires review, markthat plan locally actionable without blocking unrelated work and do not autoresend unknown mutation. No newSQL/RPC/schema/Auth/permissions. Keep width2 and operation-owned N125validation unchanged unless exact fileboundary requires minimal integration. Reuse all unaffected transport/clipboard/UIgrade suite proof. Minimum realIndexedDB composition: storeplan/localvisible→leaveview+nextimport→cloudACK drain correctgrades once; appreload recovery/unknownresult sameenvelope; failedlocaltransaction no success; ownerchange/lateACK denial. Smallrepresentative fixture, not303/endtoendbrowsermatrix. Report localready vs cloudconfirmed separately and actualnetworktime remainsunmeasured. Tests should prove new durability, not mirror sourcecode. Depend N36 toserialize store/view changes. Scope includes global coordinator startup and sw.js only if new offline import dependency actually requires cache entry; check affected offlinegraph once, not full buildmatrix.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/store.js",
+        "src/lib/grade-transfer.js",
+        "src/lib/class-file-import.js",
+        "src/lib/class-import-background.js",
+        "src/lib/class-import-workflow.js",
+        "src/lib/db.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/app.js",
+        "sw.js",
+        "tests/n107-local-background-1522-20261020/**",
+        "docs/automation-evidence/20261020/N107_DURABLE_LOCAL_BACKGROUND_IMPORT.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n107_durable_local_plan_navigation_multiple_imports_background_ack",
+        "n107_reload_unknown_result_owner_and_local_failure",
+        "n107_changed_startup_offline_dependency"
+      ],
+      "acceptance": [
+        "Correct the specific reported journey at its real composition boundary and preserve owner, durable data and recovery guarantees.",
+        "Use sole publisher and truthful changed-source/served evidence; no false umbrella closure or user success."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO20October15:22Riyadh exact requested fixes",
+        "publication": true,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Latest direct PO permits this specific code/UI behavior correction and normal owner-bound app writes via sole publisher; no unrelated live service/permission changes."
+    }
+  ]
+}
