@@ -7,7 +7,7 @@ import { mountClassPortal } from '../views/student-portal-class.js';
 let portalDiagnostic=null;
 export function studentPortalDiagnostic(){return portalDiagnostic?{...portalDiagnostic}:null;}
 const diagnosticCodes=['none','timeout','rejected','invalid_ack','stale_context','unavailable','uncertain'];
-const diagnosticStages=['none','configuration','key-configuration','envelope','upstream','upstream-body','upstream-http-5xx','reply','reply-shape','acquire','begin','snapshot','repository','teacher','source','synchronize','projection'];
+const diagnosticStages=['none','configuration','key-configuration','envelope','upstream','upstream-body','upstream-http-5xx','reply','reply-shape','acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate','projection'];
 function checkpoint(phase,httpStatus=0,elapsedMs=0,code='none',stage='none'){
  if(!['binding','queue','dispatch','http','response','admitted','failure'].includes(phase))return;
  portalDiagnostic={phase,httpStatus:Number.isInteger(httpStatus)&&httpStatus>=100&&httpStatus<=599?httpStatus:0,elapsedMs:Math.min(30000,Math.max(0,Math.round(elapsedMs/100)*100)),sourceVersion:'n88-class-deadline-v1',code:diagnosticCodes.includes(code)?code:'uncertain',stage:diagnosticStages.includes(stage)?stage:'none'};
@@ -146,6 +146,15 @@ function classEntryState(root,state,diagnostic=null,isCurrent=()=>false){
  if(!['loading','disabled'].includes(state)&&snapshot){
   const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88CopyFailure='';button.textContent='نسخ تفاصيل التعذّر';body.append(button);
   const valid=()=>root.contains(button)&&root.contains(body)&&isCurrent();
+  const details=root.ownerDocument.createElement('details');details.dataset.n88FailureDetails='';
+  const summary=root.ownerDocument.createElement('summary');summary.textContent='تفاصيل الدعم';
+  const text=root.ownerDocument.createElement('pre');text.dataset.n88FailureText='';
+  details.append(summary,text);body.append(details);
+  // Populate only on normal expansion while the original owner/context remains
+  // current. No clipboard, network, hidden state or arbitrary diagnostic fields.
+  const retire=()=>{text.textContent='';details.open=false;details.remove();};
+  details.addEventListener('toggle',()=>{if(!valid()){retire();return;}text.textContent=details.open?JSON.stringify(snapshot,null,2):'';});
+  summary.addEventListener('click',event=>{if(!valid()){event.preventDefault();retire();}});
   button.addEventListener('click',async()=>{
    if(!valid()||button.disabled)return;
    button.disabled=true;
