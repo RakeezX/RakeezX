@@ -22,6 +22,7 @@ function safeFailureText(failure) {
   if (!failure || !['ownership', 'resume_readiness', 'marker', 'capability', 'pull', 'dispatch', 'post_pull', 'revision_validation', 'local_refresh'].includes(failure.phase) ||
       !['automatic', 'focus', 'visible', 'pageshow', 'online'].includes(failure.event) ||
       !['CONTEXT_CHANGED', 'AUTH_REQUIRED', 'AUTH_TIMEOUT', 'AUTH_CONTEXT_CHANGED', 'AUTH_OWNER_MISMATCH', 'SYNC_OWNERSHIP_BLOCKED', 'OFFLINE_LEASE_LIMITED', 'LEASE_VERIFY_TIMEOUT', 'FETCH_FAILED', 'UNKNOWN',
+        'REMOTE_MARKER_TIMEOUT', 'REMOTE_MARKER_INVALID', 'REMOTE_REVISION_REGRESSED',
         ...[400, 401, 403, 404, 409, 429, 500, 502, 503, 504].map(status => `HTTP_${status}`)].includes(failure.code) ||
       !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(failure.at) ||
       !Number.isInteger(failure.elapsedMs) || failure.elapsedMs < 0 || failure.elapsedMs > 120000) return '';

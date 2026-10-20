@@ -1,0 +1,14 @@
+✔ signal during full pull is not acknowledged by earlier captured marker; failure permits retry (3.7288ms)
+✔ a full pull covers its captured revision; only a newer signal requests trailing work (0.4886ms)
+✔ hidden workspace releases receiver; visible resumes; unsupported capability opens no channel (0.6846ms)
+✔ writer post-pull covers own echo and concurrent revisions captured before pulling (0.5054ms)
+✔ newer concurrent revision during pull is not acknowledged; missed signal also requests follow-up (0.4069ms)
+✔ failed writer pull never acknowledges own echo and account change invalidates active capture (0.3534ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 126.7435

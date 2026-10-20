@@ -1,0 +1,816 @@
+{
+  "taskId": "continuous-n125-revision-validation-actual-evidence-20261020",
+  "runId": "39b4f257-9d29-4a9a-a8b9-8acb4ae1a8d4",
+  "baseSha": "01940ee3a6fe0f4c79e0ad50c9209662a7ef7517",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "scenario",
+      "status": "FAIL",
+      "evidence": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(!evidence.events.some(e=>e.status==='error'||e.error==='Remote Sync revision validation unavailable'))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n125-revision-validation-actual-evidence-20261020/tests/n125-revision-20261020/validation.mjs:95:10\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n125-revision-validation-actual-evidence-20261020/tests/n125-revision-20261020/validation.mjs:52:2"
+    }
+  ],
+  "genuineFailure": {
+    "summary": {
+      "state": "error",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": true,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "temporary_sync_failure",
+      "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+      "lastSuccessfulSyncAt": 1792493210301,
+      "automaticRetryActive": true,
+      "automaticSyncActive": false,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": true,
+        "authRequired": false,
+        "awaitingVerification": false,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": {
+        "phase": "revision_validation",
+        "code": "HTTP_503",
+        "event": "automatic",
+        "at": "2026-10-20T10:46:50.796Z",
+        "elapsedMs": 219
+      }
+    },
+    "error": "Synthetic private marker failure",
+    "reads": 48,
+    "markers": 4,
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792493209040,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "score": {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "canonicalId": "n73-valid",
+      "deleted": false,
+      "serverCanonical": {
+        "id": "n73-valid",
+        "studentId": "n73-student2",
+        "itemId": "n73-target-exam",
+        "value": 18,
+        "canonicalId": "n73-valid",
+        "serverRevision": 1,
+        "deleted": false
+      }
+    },
+    "outbox": [],
+    "tombstones": [
+      {
+        "id": "n73-second",
+        "updatedAt": 1792493208330,
+        "deleted": false,
+        "sectionId": "n73-second-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "name": "N73 synthetic",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 1,
+        "canonicalId": "n73-second",
+        "serverCanonical": {
+          "id": "n73-second",
+          "sectionId": "n73-second-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n73-second",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      },
+      {
+        "id": "n125-empty",
+        "sectionId": "n125-empty-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "canonicalId": "n125-empty",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty",
+          "sectionId": "n125-empty-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n125-empty",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ],
+    "sections": [
+      {
+        "id": "n73-second-section",
+        "updatedAt": 1792493208330,
+        "deleted": false,
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 1,
+        "canonicalId": "n73-second-section",
+        "serverCanonical": {
+          "id": "n73-second-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n73-second-section",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      },
+      {
+        "id": "n125-empty-section",
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "canonicalId": "n125-empty-section",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n125-empty-section",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ]
+  },
+  "beforeWake": {
+    "summary": {
+      "state": "error",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": true,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "temporary_sync_failure",
+      "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+      "lastSuccessfulSyncAt": 1792493210301,
+      "automaticRetryActive": true,
+      "automaticSyncActive": true,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": true,
+        "authRequired": false,
+        "awaitingVerification": false,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": {
+        "phase": "revision_validation",
+        "code": "REMOTE_MARKER_TIMEOUT",
+        "event": "automatic",
+        "at": "2026-10-20T10:46:56.144Z",
+        "elapsedMs": 5232
+      }
+    },
+    "error": null,
+    "reads": 72,
+    "markers": 7,
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792493209040,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "score": {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "canonicalId": "n73-valid",
+      "deleted": false,
+      "serverCanonical": {
+        "id": "n73-valid",
+        "studentId": "n73-student2",
+        "itemId": "n73-target-exam",
+        "value": 18,
+        "canonicalId": "n73-valid",
+        "serverRevision": 1,
+        "deleted": false
+      }
+    },
+    "outbox": [],
+    "tombstones": [
+      {
+        "id": "n73-second",
+        "updatedAt": 1792493208330,
+        "deleted": true,
+        "sectionId": "n73-second-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "name": "N73 synthetic",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second",
+        "serverCanonical": {
+          "id": "n73-second",
+          "sectionId": "n73-second-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n73-second",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty",
+        "sectionId": "n125-empty-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "canonicalId": "n125-empty",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty",
+          "sectionId": "n125-empty-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n125-empty",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ],
+    "sections": [
+      {
+        "id": "n73-second-section",
+        "updatedAt": 1792493208330,
+        "deleted": true,
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second-section",
+        "serverCanonical": {
+          "id": "n73-second-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n73-second-section",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty-section",
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "canonicalId": "n125-empty-section",
+        "serverRevision": 1,
+        "deleted": false,
+        "serverCanonical": {
+          "id": "n125-empty-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n125-empty-section",
+          "serverRevision": 1,
+          "deleted": false
+        }
+      }
+    ]
+  },
+  "afterWake": {
+    "summary": {
+      "state": "error",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": true,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "temporary_sync_failure",
+      "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+      "lastSuccessfulSyncAt": 1792493210301,
+      "automaticRetryActive": false,
+      "automaticSyncActive": true,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": true,
+        "authRequired": false,
+        "awaitingVerification": true,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": {
+        "phase": "revision_validation",
+        "code": "REMOTE_MARKER_TIMEOUT",
+        "event": "automatic",
+        "at": "2026-10-20T10:46:56.144Z",
+        "elapsedMs": 5232
+      }
+    },
+    "error": null,
+    "reads": 88,
+    "markers": 7,
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792493209040,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "score": {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "canonicalId": "n73-valid",
+      "deleted": false,
+      "serverCanonical": {
+        "id": "n73-valid",
+        "studentId": "n73-student2",
+        "itemId": "n73-target-exam",
+        "value": 18,
+        "canonicalId": "n73-valid",
+        "serverRevision": 1,
+        "deleted": false
+      }
+    },
+    "outbox": [],
+    "tombstones": [
+      {
+        "id": "n73-second",
+        "updatedAt": 1792493208330,
+        "deleted": true,
+        "sectionId": "n73-second-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "name": "N73 synthetic",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second",
+        "serverCanonical": {
+          "id": "n73-second",
+          "sectionId": "n73-second-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n73-second",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty",
+        "sectionId": "n125-empty-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "canonicalId": "n125-empty",
+        "serverRevision": 3,
+        "deleted": true,
+        "serverCanonical": {
+          "id": "n125-empty",
+          "sectionId": "n125-empty-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n125-empty",
+          "serverRevision": 3,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      }
+    ],
+    "sections": [
+      {
+        "id": "n73-second-section",
+        "updatedAt": 1792493208330,
+        "deleted": true,
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second-section",
+        "serverCanonical": {
+          "id": "n73-second-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n73-second-section",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty-section",
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "canonicalId": "n125-empty-section",
+        "serverRevision": 3,
+        "deleted": true,
+        "serverCanonical": {
+          "id": "n125-empty-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n125-empty-section",
+          "serverRevision": 3,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      }
+    ]
+  },
+  "final": {
+    "summary": {
+      "state": "syncing",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": false,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "sync_in_progress",
+      "reasonLabel": "المزامنة تعمل الآن.",
+      "lastSuccessfulSyncAt": 1792493216811,
+      "automaticRetryActive": false,
+      "automaticSyncActive": true,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": false,
+        "authRequired": false,
+        "awaitingVerification": true,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": {
+        "phase": "revision_validation",
+        "code": "REMOTE_MARKER_TIMEOUT",
+        "event": "automatic",
+        "at": "2026-10-20T10:46:56.144Z",
+        "elapsedMs": 5232
+      }
+    },
+    "error": null,
+    "reads": 140,
+    "markers": 9,
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792493209040,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"synthetic-n123\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "score": {
+      "id": "n73-valid",
+      "itemId": "n73-target-exam",
+      "studentId": "n73-student2",
+      "value": 18,
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "serverRevision": 1,
+      "canonicalId": "n73-valid",
+      "deleted": false,
+      "serverCanonical": {
+        "id": "n73-valid",
+        "studentId": "n73-student2",
+        "itemId": "n73-target-exam",
+        "value": 18,
+        "canonicalId": "n73-valid",
+        "serverRevision": 1,
+        "deleted": false
+      }
+    },
+    "outbox": [],
+    "tombstones": [
+      {
+        "id": "n73-second",
+        "updatedAt": 1792493208330,
+        "deleted": true,
+        "sectionId": "n73-second-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "name": "N73 synthetic",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second",
+        "serverCanonical": {
+          "id": "n73-second",
+          "sectionId": "n73-second-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n73-second",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty",
+        "sectionId": "n125-empty-section",
+        "subjectId": "n73-subject",
+        "termId": "n73-term",
+        "order": 0,
+        "canonicalId": "n125-empty",
+        "serverRevision": 3,
+        "deleted": true,
+        "serverCanonical": {
+          "id": "n125-empty",
+          "sectionId": "n125-empty-section",
+          "subjectId": "n73-subject",
+          "termId": "n73-term",
+          "order": 0,
+          "canonicalId": "n125-empty",
+          "serverRevision": 3,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      }
+    ],
+    "sections": [
+      {
+        "id": "n73-second-section",
+        "updatedAt": 1792493208330,
+        "deleted": true,
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "serverRevision": 2,
+        "canonicalId": "n73-second-section",
+        "serverCanonical": {
+          "id": "n73-second-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n73-second-section",
+          "serverRevision": 2,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      },
+      {
+        "id": "n125-empty-section",
+        "yearId": "n73-year",
+        "grade": 5,
+        "label": "3",
+        "name": "5/3",
+        "color": "#0d9488",
+        "order": 0,
+        "status": "active",
+        "archivedAt": null,
+        "archiveDate": null,
+        "canonicalId": "n125-empty-section",
+        "serverRevision": 3,
+        "deleted": true,
+        "serverCanonical": {
+          "id": "n125-empty-section",
+          "yearId": "n73-year",
+          "grade": 5,
+          "label": "3",
+          "name": "5/3",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archivedAt": null,
+          "archiveDate": null,
+          "canonicalId": "n125-empty-section",
+          "serverRevision": 3,
+          "deleted": true,
+          "deletedAt": "2026-10-20T10:00:00Z"
+        },
+        "deletedAt": "2026-10-20T10:00:00Z"
+      }
+    ]
+  },
+  "events": [
+    {
+      "status": "error",
+      "error": "Remote Sync revision validation unavailable"
+    },
+    {
+      "status": "error",
+      "error": "Remote Sync revision validation unavailable"
+    },
+    {
+      "status": "error",
+      "error": null
+    },
+    {
+      "status": "error",
+      "error": null
+    },
+    {
+      "status": "error",
+      "error": null
+    },
+    {
+      "status": "synced",
+      "error": null
+    },
+    {
+      "status": "pending",
+      "error": null
+    },
+    {
+      "status": "pending",
+      "error": null
+    },
+    {
+      "status": "pending",
+      "error": null
+    },
+    {
+      "status": "pending",
+      "error": null
+    },
+    {
+      "status": "pending",
+      "error": null
+    }
+  ],
+  "cleanup": "Owned fresh isolated contexts/browser and loopback server closed in finally."
+}
