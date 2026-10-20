@@ -1,0 +1,42 @@
+{
+  "taskId": "continuous-n88-actual-teacher-deadline-cause-20261020",
+  "runId": "bdbf83c0-795c-43cc-86ed-9a6994eb67e7",
+  "status": "PASS",
+  "checks": [
+    {
+      "failurePhase": "dispatch/timeout remains after late response; subsequent actual acquire503 remains http/rejected/acquire",
+      "privateFieldsAbsent": true
+    }
+  ],
+  "actualHostedCause": "NOT_PROVEN",
+  "hostedTeacherSuccess": "NOT_PROVEN",
+  "transport": [
+    {
+      "mode": "service-failure",
+      "status": 503,
+      "serviceStage": "acquire",
+      "counts": {
+        "acquisitions": 1,
+        "commits": 0
+      }
+    },
+    {
+      "mode": "service-failure",
+      "status": 503,
+      "serviceStage": "acquire",
+      "counts": {
+        "acquisitions": 2,
+        "commits": 0
+      }
+    }
+  ],
+  "errorLayout": {
+    "overflow": false,
+    "rootWidth": 390,
+    "messageWidth": 390
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

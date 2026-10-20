@@ -1,0 +1,42 @@
+{
+  "taskId": "continuous-n88-actual-teacher-deadline-cause-20261020",
+  "runId": "bdbf83c0-795c-43cc-86ed-9a6994eb67e7",
+  "browserReadDeadlineMs": 10000,
+  "acquireDependencyMs": [
+    5500,
+    5500
+  ],
+  "status": "FAIL",
+  "checks": [],
+  "actualHostedCause": "NOT_PROVEN",
+  "hostedTeacherSuccess": "NOT_PROVEN",
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-entry-state=timeout]') to be visible\u001b[22m\n",
+    "checkpoint": {
+      "diagnostic": {
+        "phase": "queue",
+        "httpStatus": 0,
+        "elapsedMs": 0,
+        "sourceVersion": "n88-class-entry-1837-v1"
+      },
+      "entryState": "loading",
+      "abortAny": "function"
+    }
+  },
+  "transport": [
+    {
+      "mode": "baseline",
+      "status": 200,
+      "serviceStage": null,
+      "counts": {
+        "acquisitions": 1,
+        "commits": 1
+      }
+    }
+  ],
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

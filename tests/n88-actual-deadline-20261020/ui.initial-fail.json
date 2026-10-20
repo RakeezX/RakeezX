@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n88-actual-teacher-deadline-cause-20261020",
+  "runId": "bdbf83c0-795c-43cc-86ed-9a6994eb67e7",
+  "status": "FAIL",
+  "checks": [],
+  "actualHostedCause": "NOT_PROVEN",
+  "hostedTeacherSuccess": "NOT_PROVEN",
+  "failure": {
+    "name": "Error",
+    "message": "page.evaluate: TypeError: Cannot assign to read only property 'leaseGeneration' of object '#<Object>'\n    at Object.renew (http://127.0.0.1:56782/boot.js:1:619)\n    at eval (eval at evaluate (:311:30), <anonymous>:1:12)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

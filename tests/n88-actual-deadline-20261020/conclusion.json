@@ -1,0 +1,76 @@
+{
+  "taskId": "continuous-n88-actual-teacher-deadline-cause-20261020",
+  "runId": "bdbf83c0-795c-43cc-86ed-9a6994eb67e7",
+  "baseSha": "7a68241d47c4501b224ac237a36e9d44c4a377ea",
+  "state": "LOCAL_READY",
+  "checks": [
+    {
+      "name": "n88_actual_initial_read_deadline_cause_and_phase",
+      "status": "PASS",
+      "evidence": [
+        "tests/n88-actual-deadline-20261020/default-budget.json",
+        "tests/n88-actual-deadline-20261020/ui.json",
+        "tests/n88-actual-deadline-20261020/support.json"
+      ],
+      "scope": "Retired FIFO work consuming initial replacement deadline reproduced/corrected in actual client/ingress/server composition; actual hosted incident attribution NOT_PROVEN"
+    },
+    {
+      "name": "n88_teacher_entry_link_compact_and_single_heading",
+      "status": "PASS",
+      "evidence": [
+        "tests/n88-actual-deadline-20261020/ui.json",
+        "tests/n88-actual-deadline-20261020/layout.json",
+        "tests/n88-actual-deadline-20261020/ready-390.png",
+        "tests/n88-actual-deadline-20261020/error-390.png"
+      ]
+    }
+  ],
+  "sourcePins": {
+    "src/lib/student-portal-runtime.js": "a8f068d23982abf06218629d0bace83b54c86e9af3a6e0a8bb80d72291b5fc4d",
+    "src/lib/support.js": "17f1b78cb81dc7534cc7c13a29ff0f28d1762b5d88aefd7dd27c9b941489b56f",
+    "src/styles/student-portal-class.css": "069443a72ed7386d13b779966d0937208b746cd36bc7e37e699da20b45e8aefd"
+  },
+  "providerRead": {
+    "calls": 1,
+    "evidence": "tests/n88-actual-deadline-20261020/provider-window.json",
+    "matchingRows": 0,
+    "actualCause": "NOT_PROVEN"
+  },
+  "unchanged": {
+    "browserReadDeadlineMs": 10000,
+    "repositoryAcquireMs": 6000,
+    "repositoryTransactionMs": 16000,
+    "webEntryMs": 18000,
+    "ingressMs": 19000,
+    "native49SourceSha256": "420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253",
+    "studentAssets": true,
+    "stableBindingProof": true
+  },
+  "operations": {
+    "nativeFunctionDeploys": 0,
+    "staticCarrierUploads": 0,
+    "custodyActions": 0,
+    "readinessCalls": 0,
+    "realSends": 0,
+    "sqlAuthRlsRolesKeysFixturesRealMutations": 0,
+    "privateBrowserRetries": 0
+  },
+  "actualHostedTeacherSuccess": "NOT_PROVEN",
+  "wholeN88Closed": false,
+  "finalFrontendPublication": "NOT_RUN; sole publisher",
+  "scopeCheck": "PASS; allowed paths only, no affected current-main overlap",
+  "observedOriginMain": "191d9b28862b50fd20248c6e801b3cfb52dac729",
+  "syntax": "PASS node --check runtime/support and test helpers",
+  "diffCheck": "PASS",
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLeaseReleased": true,
+    "liveOrIntegrationPhaseOpened": false
+  },
+  "preservedFailures": [
+    "ui.initial-fail.json",
+    "ui.composition-fail.json",
+    "ui.fixture-auth-fail.json",
+    "default-budget.wait-harness-fail.json"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n88-actual-teacher-deadline-cause-20261020",
+  "runId": "bdbf83c0-795c-43cc-86ed-9a6994eb67e7",
+  "status": "FAIL",
+  "checks": [
+    {
+      "baseline": "Retired HTTP request occupied FIFO until old500ms deadline; replacement initial read used same500ms bound and timed out behind old acquisition550ms + its own200ms dependency"
+    }
+  ],
+  "actualHostedCause": "NOT_PROVEN",
+  "hostedTeacherSuccess": "NOT_PROVEN",
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.n88-class-roster>li') to be visible\u001b[22m\n"
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

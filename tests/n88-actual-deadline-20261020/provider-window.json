@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "operation": "One bounded ordinary read-only operational aggregate; no personal payload/headers/tokens/URLs returned",
+  "project": "xlrubcwjqktzzunrvuns",
+  "window": {
+    "start": "2026-10-20T08:59:02Z",
+    "end": "2026-10-20T09:17:00Z"
+  },
+  "filter": "function_edge_logs; exact existing N88 function identity",
+  "result": {
+    "matchedInvocations": 0,
+    "outerStatuses": [],
+    "alternateOuterStatuses": [],
+    "durationMsIfPresent": 0
+  },
+  "interpretation": "No matching evidence under this exact filter. Zero duration is not a measured latency. This does not establish absence of requests or attribute the actual teacher timeout.",
+  "calls": 1,
+  "rawPrivateLogReads": 0
+}
