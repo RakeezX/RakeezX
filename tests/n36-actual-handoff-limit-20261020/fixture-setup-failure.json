@@ -1,0 +1,24 @@
+{
+  "taskId": "continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020",
+  "runId": "536e4ab3-78b9-4172-817b-9284060be45d",
+  "checks": [],
+  "boundary": "Actual background ESM handlers, serialized v3 claim/outcomes, application owner guards, IndexedDB and rendered settings on owned HTTP. Synthetic Chrome APIs and previously-collected data; native MV3/portal not tested.",
+  "status": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HANDOFF_SETUP'\n- 'HANDOFF_LIMIT_OR_EXPIRED'\n           ^\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020/tests/n36-actual-handoff-limit-20261020/browser.mjs:46:158\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020/tests/n36-actual-handoff-limit-20261020/browser.mjs:17:62",
+  "debug": {
+    "view": {
+      "id": "433e69c367afdadc1c615b3f6753d63c1ff58d423bea823842a17cb86edaa748",
+      "phase": "stopped",
+      "code": "HANDOFF_SETUP",
+      "added": 0,
+      "existing": 0,
+      "fields": [],
+      "staged": 303,
+      "observed": 303,
+      "coverage": "complete",
+      "receiverCapability": "source-profile-quiet-v1",
+      "needsReview": false
+    },
+    "deliveries": 0
+  }
+}

@@ -1,3 +1,7 @@
+## 0.5.23 — bounded transfer window and visible dashboard leader
+
+V3 accepts a positive remaining handoff window up to the existing two-minute maximum. It never extends the original review/job deadline or refreshes a grant. The paired app adapter preserves the actual timestamps while retaining legacy schema/row validation. The exact visible SchoolDashboard leader label supports one unique name; multiple leaders remain ambiguous. A stopped partial result reports only confirmed local counts. Permissions, source routes, popup-independent execution and receipt identity guards are unchanged. Native portal/user success remains unverified.
+
 ## AI candidate 0.5.22 — actual popup Start boundary, 20 October 2026
 
 An explicit action-popup click now enters a visible checking state, resolves the active source from the last focused browser window, and sends the exact internal Start request. The worker checks the own-extension popup protocol/hostname/path and top frame, the selected/focused source tab, then its actual document and the original owner-ready app batch. Optional MessageSender.documentId/tab metadata of the disposable popup is not required; source/app document guards remain mandatory. A rejected Start reports a finite phase/code and action, never a healthy-looking idle state.

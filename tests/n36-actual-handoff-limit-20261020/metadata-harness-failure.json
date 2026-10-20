@@ -1,0 +1,105 @@
+{
+  "taskId": "continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020",
+  "runId": "536e4ab3-78b9-4172-817b-9284060be45d",
+  "checks": [
+    {
+      "name": "original",
+      "status": "PASS",
+      "evidence": {
+        "code": "HANDOFF_LIMIT_OR_EXPIRED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "complete",
+      "status": "PASS",
+      "evidence": {
+        "added": 303,
+        "receipts": 10,
+        "uniqueActions": 10,
+        "principalRendered": true,
+        "department": "empty filled canonical",
+        "calendarAndRoleUnchanged": true,
+        "originalDeadlinesUnchanged": true
+      }
+    },
+    {
+      "name": "unknown",
+      "status": "PASS",
+      "evidence": {
+        "added": 303,
+        "receipts": 10,
+        "uniqueActions": 10,
+        "principalRendered": true,
+        "department": "existing preserved",
+        "calendarAndRoleUnchanged": true,
+        "originalDeadlinesUnchanged": true
+      }
+    },
+    {
+      "name": "owner",
+      "status": "PASS",
+      "evidence": {
+        "code": "APP_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "session",
+      "status": "PASS",
+      "evidence": {
+        "code": "APP_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "app-document",
+      "status": "PASS",
+      "evidence": {
+        "code": "APP_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "source-document",
+      "status": "PASS",
+      "evidence": {
+        "code": "SOURCE_BINDING_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "expired",
+      "status": "PASS",
+      "evidence": {
+        "code": "REVIEW_EXPIRED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    }
+  ],
+  "boundary": "Actual background ESM handlers, serialized v3 claim/outcomes, application owner guards, IndexedDB and rendered settings on owned HTTP. Synthetic Chrome APIs and previously-collected data; native MV3/portal not tested.",
+  "status": "FAIL",
+  "failure": "page.evaluate: TypeError: globalThis.rakeezRouteDiagnostic is not a function\n    at validateAnchor (http://127.0.0.1:49642/extensions/rakeez-teacher-import-helper/selection.js:180:63)\n    at http://127.0.0.1:49642/extensions/rakeez-teacher-import-helper/selection.js:199:69\n    at Array.filter (<anonymous>)\n    at safeRead (http://127.0.0.1:49642/extensions/rakeez-teacher-import-helper/selection.js:199:41)\n    at Module.readAutomaticTeacherPage (http://127.0.0.1:49642/extensions/rakeez-teacher-import-helper/selection.js:202:37)\n    at eval (eval at evaluate (:311:30), <anonymous>:1:82)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020\\tests\\n36-actual-handoff-limit-20261020\\browser.mjs:52:87\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020/tests/n36-actual-handoff-limit-20261020/browser.mjs:17:62",
+  "debug": {
+    "view": {
+      "id": "a591dfe682cf86f873d5cdfd4394b77a5eef4734ccbffae969994b17d8c64b7e",
+      "phase": "stopped",
+      "code": "REVIEW_EXPIRED",
+      "added": 0,
+      "existing": 0,
+      "fields": [],
+      "staged": 303,
+      "observed": 303,
+      "coverage": "complete",
+      "receiverCapability": "source-profile-quiet-v1",
+      "needsReview": false
+    },
+    "deliveries": 0
+  }
+}

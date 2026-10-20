@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "extension",
+      "status": "PASS",
+      "evidence": "Positive short v3 window through exact TTL, original timestamps retained; expired/future/overlong/over-row/duplicate/extra-key/prototype/legacy-short envelopes denied. Department path retains same lifetime."
+    },
+    {
+      "name": "application",
+      "status": "PASS",
+      "evidence": "Positive short v3 window through exact TTL, original timestamps retained; expired/future/overlong/over-row/duplicate/extra-key/prototype/legacy-short envelopes denied. Department path retains same lifetime."
+    }
+  ]
+}

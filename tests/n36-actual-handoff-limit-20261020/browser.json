@@ -1,0 +1,152 @@
+{
+  "taskId": "continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020",
+  "runId": "536e4ab3-78b9-4172-817b-9284060be45d",
+  "reusedChecks": [
+    "original",
+    "unknown",
+    "owner",
+    "session",
+    "app-document",
+    "source-document",
+    "expired",
+    "partial_result_actual_popup",
+    "complete",
+    "explicit",
+    "n36_dashboard_principal_precise_location_only",
+    "n36_actual_longjob_handoff_budget_receipts_no_duplicate",
+    "n36_original_owner_expiry_unknown_outcome_fences"
+  ],
+  "checks": [
+    {
+      "name": "original",
+      "status": "PASS",
+      "evidence": {
+        "code": "HANDOFF_LIMIT_OR_EXPIRED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "unknown",
+      "status": "PASS",
+      "evidence": {
+        "added": 303,
+        "receipts": 10,
+        "uniqueActions": 10,
+        "principalRendered": true,
+        "department": "existing preserved",
+        "calendarAndRoleUnchanged": true,
+        "originalDeadlinesUnchanged": true
+      }
+    },
+    {
+      "name": "owner",
+      "status": "PASS",
+      "evidence": {
+        "code": "APP_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "session",
+      "status": "PASS",
+      "evidence": {
+        "code": "APP_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "app-document",
+      "status": "PASS",
+      "evidence": {
+        "code": "APP_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "source-document",
+      "status": "PASS",
+      "evidence": {
+        "code": "SOURCE_BINDING_CHANGED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "expired",
+      "status": "PASS",
+      "evidence": {
+        "code": "REVIEW_EXPIRED",
+        "noDelivery": true,
+        "noDurableWrite": true
+      }
+    },
+    {
+      "name": "partial_result_actual_popup",
+      "status": "PASS",
+      "evidence": {
+        "knownPartial": 31,
+        "finiteLimitMessage": true,
+        "noNewStart": true
+      }
+    },
+    {
+      "name": "complete",
+      "status": "PASS",
+      "evidence": {
+        "added": 303,
+        "receipts": 10,
+        "uniqueActions": 10,
+        "principalRendered": true,
+        "department": "empty filled canonical",
+        "calendarAndRoleUnchanged": true,
+        "originalDeadlinesUnchanged": true
+      }
+    },
+    {
+      "name": "explicit",
+      "status": "PASS",
+      "evidence": {
+        "added": 1,
+        "receipts": 1,
+        "uniqueActions": 1,
+        "principalRendered": true,
+        "department": "labelled department wins over suffix",
+        "calendarAndRoleUnchanged": true,
+        "originalDeadlinesUnchanged": true
+      }
+    },
+    {
+      "name": "n36_dashboard_principal_precise_location_only",
+      "status": "PASS",
+      "evidence": {
+        "singleVisibleLeader": true,
+        "multipleLeadersDenied": true,
+        "suffix": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+        "misleading": null,
+        "existing": null,
+        "ambiguous": null
+      }
+    },
+    {
+      "name": "n36_actual_longjob_handoff_budget_receipts_no_duplicate",
+      "status": "PASS",
+      "evidence": "Original 60-second remaining window rejected; corrected same already-collected 303/10/20 checkpoint completes with ten serialized receipts. Maximum two-minute envelope TTL and fixed review/job deadlines retained."
+    },
+    {
+      "name": "n36_original_owner_expiry_unknown_outcome_fences",
+      "status": "PASS",
+      "evidence": "Owner, session, source/app documents and true job expiry deny before delivery. Unknown receipt survives fresh worker with same action/batch and no duplicate post."
+    },
+    {
+      "name": "original_dashboard_linked_leader_missing",
+      "status": "PASS",
+      "evidence": "Exact visible leader label with linked single name was omitted by original DOM reader; corrected path is exercised through actual store/settings above."
+    }
+  ],
+  "boundary": "Actual background ESM handlers, serialized v3 claim/outcomes, application owner guards, IndexedDB and rendered settings on owned HTTP. Synthetic Chrome APIs and previously-collected data; native MV3/portal not tested.",
+  "status": "PASS"
+}

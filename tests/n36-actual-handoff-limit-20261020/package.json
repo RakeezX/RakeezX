@@ -1,0 +1,51 @@
+{
+  "name": "n36_0523_changed_source_package_download_parity",
+  "status": "PASS",
+  "version": "0.5.23",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.23.zip",
+    "sha256": "e79674c119aabba88bdb5a2196d6860179006aea4055050cd90d81278afc7c55",
+    "bytes": 129313
+  },
+  "runtimeFiles": 27,
+  "reusedSource": [
+    "categories-popup.js",
+    "categories.js",
+    "class-order.js",
+    "core.js",
+    "diagnostics-bootstrap.js",
+    "handoff-worker.js",
+    "lib/rakeez-datetime-values.js",
+    "lib/rakeez-datetime.css",
+    "lib/rakeez-datetime.js",
+    "navigation.js",
+    "popup.css",
+    "popup.html",
+    "popup.js",
+    "route-diagnostics.js",
+    "source-adapter.js",
+    "source-roster.js",
+    "vendor/flatpickr/LICENSE.md",
+    "vendor/flatpickr/ar.js",
+    "vendor/flatpickr/flatpickr.min.css",
+    "vendor/flatpickr/flatpickr.min.js",
+    "background-runner.js",
+    "background-collector.js"
+  ],
+  "actualLocalDownload": {
+    "status": "PASS",
+    "hash": "e79674c119aabba88bdb5a2196d6860179006aea4055050cd90d81278afc7c55",
+    "navigationUnchanged": true
+  },
+  "checks": [
+    "Exact source/ZIP/member/SHA256/size parity",
+    "Same permission/host/CSP manifest except version",
+    "Previous .22 immutable; global app/store/SW and legacy protocol untouched",
+    "Worker transport/nonce/receipt guards and entire background coordinator unchanged",
+    "Changed JS syntax"
+  ],
+  "postDelivery": {
+    "status": "NOT_RUN",
+    "reason": "Sole publisher verifies immutable/served .23, existing updater installs exact archive, controller verifies physical 27-file parity. Chrome reload not claimed."
+  }
+}

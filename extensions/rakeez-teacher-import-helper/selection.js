@@ -134,11 +134,23 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
       if(validValue(value))values.push(value);
     }return [...new Set(values)];
   };
+  // Exact SchoolDashboard leader label; read only visible name text, never hrefs.
+  const dashboardLeaders=scope=>{
+    if(!/^\/Dashboards\/Schools\/?$/i.test(location.pathname))return [];
+    const values=[];
+    for(const n of Array.from(scope.querySelectorAll('dt,p,li,div,span,strong,b,label')).filter(visible)){
+      if(!['قادة المدرسة','قادة المدرسة:'].includes(roleText(n)))continue;
+      const sibling=n.nextElementSibling;
+      if(!sibling||!visible(sibling)||sibling.querySelector('input,textarea,button,iframe,table,script,style'))continue;
+      const leaves=Array.from(sibling.querySelectorAll('a,span,li,p,div')).filter(visible).filter(el=>!Array.from(el.querySelectorAll('a,span,li,p,div')).some(visible));
+      for(const v of (leaves.length?leaves.map(roleText):[roleText(sibling)]))if(validValue(v)&&/^[\p{L}\p{M}]+(?: [\p{L}\p{M}]+)*$/u.test(v))values.push(v);
+    }return [...new Set(values)];
+  };
   const metadata=scope=>{
     const result=[];const school=labelValues(scope,['اسم المدرسة']);
     if(!school.length){const named=Array.from(scope.querySelectorAll('.school-name')).filter(visible).map(roleText).filter(validValue);if(new Set(named).size===1)school.push(named[0]);}
     if(!school.length){const titles=Array.from(scope.querySelectorAll('h2,h3,h4,h5')).filter(visible).map(roleText).filter(v=>validValue(v)&&!/^مرحبا بك /.test(v));if(new Set(titles).size===1)school.push(titles[0]);}
-    for(const [category,values] of [['school',school],['principal',labelValues(scope,['قادة المدرسة','مدير المدرسة','قائد المدرسة','اسم المدير'])]])if(values.length===1)result.push({category,text:(category==='school'?'اسم المدرسة':'اسم المدير')+'\t'+values[0]});
+    for(const [category,values] of [['school',school],['principal',[...new Set([...labelValues(scope,['قادة المدرسة','مدير المدرسة','قائد المدرسة','اسم المدير']),...dashboardLeaders(scope)])]]])for(const value of values)result.push({category,text:(category==='school'?'اسم المدرسة':'اسم المدير')+'\t'+value});
     return result;
   };
   const observedSchoolIds=[...new Set(Array.from(document.querySelectorAll('a[href]')).filter(visible).flatMap(a=>{try{const u=new URL(a.getAttribute('href'),location.href);return u.origin===location.origin&&/^\/(?:SchoolManagment\/Actions\/MyStudents|SchoolSchedule\/Schedule\/TeacherSchedule)\/?$/i.test(u.pathname)&&[...u.searchParams].length===1&&/^[a-f0-9]{32}$/i.test(u.searchParams.get('SchoolId')??'')?[u.searchParams.get('SchoolId').toLowerCase()]:[];}catch{return [];}}))];

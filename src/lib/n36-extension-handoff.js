@@ -1,17 +1,26 @@
 // AI: ephemeral transport only. Saving remains in the existing guarded import UI.
-import { APP_ORIGIN, handoffRoute, validateHandoff as validateLegacyHandoff, handoffBundle } from './n36-extension-protocol.js';
+import { APP_ORIGIN, HANDOFF_TTL, handoffRoute, validateHandoff as validateLegacyHandoff, handoffBundle } from './n36-extension-protocol.js';
 import { validateBundle } from './teacher-setup-import.js';
 // Additive visible-department adapter. The immutable legacy transport still
 // validates every envelope/row/fence, while the existing bundle validates metadata.
+// v3 may use a SHORTER remaining window, never extend the original job/review
+// deadline. Adapt only timestamps for the immutable legacy row/schema validator;
+// return the real createdAt/expiresAt and retain every owner/document fence.
+function legacyLifetime(value,now=Date.now()){
+ if(value?.version===3&&Object.getPrototypeOf(value)===Object.prototype&&Number.isSafeInteger(value.createdAt)&&Number.isSafeInteger(value.expiresAt)&&value.createdAt<=now+5000&&value.expiresAt>now&&value.expiresAt-value.createdAt>0&&value.expiresAt-value.createdAt<=HANDOFF_TTL)return {...value,createdAt:value.expiresAt-HANDOFF_TTL};
+ return value;
+}
 export function validateHandoff(value,now=Date.now()){
+ if(!value||Object.getPrototypeOf(value)!==Object.prototype)throw Error('HANDOFF_SCHEMA');
+ const bounded=legacyLifetime(value,now);
  const department=value?.version===3&&Array.isArray(value.setup)?value.setup.filter(c=>c?.category==='department'):[];
- if(!department.length)return validateLegacyHandoff(value,now);
+ if(!department.length){const checked=validateLegacyHandoff(bounded,now);return {...checked,createdAt:value.createdAt};}
  if(department.length!==1||value.setup.length>6||value.setup.reduce((n,c)=>n+(c?.rows?.length??601),0)>600)throw Error('HANDOFF_SETUP');
  const checked=validateBundle({schema:'rakeez-private-teacher-setup',version:1,categories:department}).categories[0];
  if(checked.provenance.length!==1||checked.provenance[0]!=='teacher-readonly-run')throw Error('HANDOFF_SETUP');
- const legacy=validateLegacyHandoff({...value,setup:value.setup.filter(c=>c.category!=='department')},now);
+ const legacy=validateLegacyHandoff({...bounded,setup:value.setup.filter(c=>c.category!=='department')},now);
  if(new TextEncoder().encode(JSON.stringify(value)).length>100000)throw Error('HANDOFF_LIMIT_OR_EXPIRED');
- return {...legacy,setup:[...legacy.setup,checked]};
+ return {...legacy,createdAt:value.createdAt,setup:[...legacy.setup,checked]};
 }
 export function handoffRequest(hash = location.hash) {
   const [path, query] = hash.split('?');
@@ -32,7 +41,7 @@ export async function claimHandoff(request) {
     });
   });
   const envelope=validateHandoff(response.envelope);
-  return {envelope,bundle:handoffBundle(envelope.version===3?{...envelope,setup:envelope.setup.filter(c=>c.category!=='department')}:envelope),request};
+  return {envelope,bundle:handoffBundle(envelope.version===3?{...legacyLifetime(envelope),setup:envelope.setup.filter(c=>c.category!=='department')}:envelope),request};
 }
 
 // AI: counts only, bound by the extension to the original receiver tab and nonce.

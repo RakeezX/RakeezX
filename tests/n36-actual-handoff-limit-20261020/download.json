@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020",
+  "runId": "536e4ab3-78b9-4172-817b-9284060be45d",
+  "name": "n36_0523_local_download_no_navigation",
+  "baseSha": "b990848dc3b0300bcb8f4ea56c992dce7cb2d063",
+  "archiveSha256": "e79674c119aabba88bdb5a2196d6860179006aea4055050cd90d81278afc7c55",
+  "changedScope": "Only department fallback and href/version; all other N107/receiver logic identical",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper, real app route/DOM/download handler, fresh isolated HTTP browser",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.23",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS"
+}

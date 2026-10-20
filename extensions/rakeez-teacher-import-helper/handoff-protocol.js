@@ -37,7 +37,7 @@ export function validateHandoff(value, now = Date.now()) {
       !['madrasati','noor'].includes(value.source) ||
       value.scope !== (value.source === 'noor' ? 'selected-visible-partial' : 'reviewed-run') ||
       !Number.isSafeInteger(value.createdAt) || !Number.isSafeInteger(value.expiresAt) ||
-      value.createdAt > now + 5000 || value.expiresAt <= now || value.expiresAt - value.createdAt !== HANDOFF_TTL ||
+      value.createdAt > now + 5000 || value.expiresAt <= now || (value.version===3 ? value.expiresAt-value.createdAt<=0 || value.expiresAt-value.createdAt>HANDOFF_TTL : value.expiresAt-value.createdAt!==HANDOFF_TTL) ||
       !Array.isArray(value.rows) || !value.rows.length || value.rows.length > 300 ||
       new TextEncoder().encode(JSON.stringify(value)).length > 100000) throw Error('HANDOFF_LIMIT_OR_EXPIRED');
   const seen = new Set();
