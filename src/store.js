@@ -2863,6 +2863,30 @@ export async function saveClassFileImportContinuation(value, { expectedTeachingI
     state.device=committed.device.put[0];broadcast([{store:'device',id:'device'}]);
   }
 }
+// AI N107: independent owner-device import plans; no cloud payload or credential.
+export async function updateLocalImportPlans(change, { verifyCurrent = () => {} } = {}) {
+  const workspace=assertClassImportAccess(), session=cloud.session;
+  const committed=await db.applyBatch({device:{},outbox:{},teachings:{},sections:{}},{prepare(current){
+    verifyCurrent();assertLeaseWritable();
+    if(assertClassImportAccess()!==workspace || cloud.session!==session)throw Error('IMPORT_PLAN_CONTEXT');
+    const device=current.device.find(r=>r.id==='device');if(!device)throw Error('IMPORT_PLAN_DEVICE');
+    const next=change(structuredClone(device.classFileImportPlans??{}),current,device);
+    return {device:{put:[{...device,classFileImportPlans:next,updatedAt:now()}]}};
+  }});
+  if(activeWorkspace===workspace && cloud.session===session){state.device=committed.device.put[0];notify({syncReady:false});broadcast([{store:'device',id:'device'}]);}
+}
+export async function saveLocalImportPlan(value, options={}) {
+  const workspace=assertClassImportAccess();
+  if(value.ownerId!==workspace.authUserId || value.databaseName!==workspace.databaseName || value.version!==1)throw Error('IMPORT_PLAN_OWNER');
+  await updateLocalImportPlans((plans,current)=>{
+    if(plans[value.id])throw Error('IMPORT_PLAN_EXISTS');
+    const teaching=current.teachings.find(r=>r.id===value.created.teachingId),section=current.sections.find(r=>r.id===teaching?.sectionId);
+    if(!teaching || teaching.deleted || !section || section.deleted || teaching.termId!==value.termId)throw Error('IMPORT_PLAN_CHANGED');
+    return {...plans,[value.id]:structuredClone(value)};
+  },options);
+  return value.id;
+}
+
 // AI-authored N107: cancellation settles only this continuation's commands.
 // An uncertain envelope must recover its genuine receipt before being released.
 export async function cancelClassFileImportContinuation(expectedTeachingId) {
@@ -4593,11 +4617,11 @@ export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds,
   })();
 }
 
-async function applyReviewedCommand(command, recordId, patch, verifyCurrent = () => {}) {
+async function applyReviewedCommand(command, recordId, patch, verifyCurrent = () => {}, backgroundImportPlanId = null) {
   const engine = createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,
-    currentAuthenticatedUserId: () => cloud.user?.id ?? null });
+    currentAuthenticatedUserId: () => cloud.user?.id ?? null, captureMutationContext: cloud.captureOwnedMutationContext });
   verifyCurrent();
-  const queued = await engine.queueCommand({ store: 'items', recordId, command, patch });
+  const queued = await engine.queueCommand({ store: 'items', recordId, command, patch, backgroundImportPlanId, verifyCurrent });
   verifyCurrent();
   const result = await engine.dispatchPending({ onlyMutationId: queued.mutationId });
   if (result.acknowledged !== 1) {
@@ -4744,7 +4768,7 @@ export async function confirmImportMaximums(review, { verifyCurrent = () => {} }
   guard();return saved.maxProgress;
 }
 
-export async function confirmGradeImport(review, { overwriteConfirmed = false, enrollmentConfirmed = false, approved = false, verifyCurrent = () => {} } = {}) {
+export async function confirmGradeImport(review, { overwriteConfirmed = false, enrollmentConfirmed = false, approved = false, verifyCurrent = () => {}, backgroundImportPlanId = null } = {}) {
   if (!approved) return false;
   verifyCurrent();
   assertCloudRestoreWritable(); assertLeaseWritable();
@@ -4760,7 +4784,7 @@ export async function confirmGradeImport(review, { overwriteConfirmed = false, e
   verifyCurrent(); assertLeaseWritable();
   if (review.ownerId !== cloud.user?.id || activeWorkspace?.databaseName !== review.databaseName || activeTerm()?.id !== review.termId ||
     (batch.newStudents?.length ? capability?.unifiedProtocol !== 'N90_UNIFIED_V1' || capability?.unifiedVersion !== 1 : capability?.protocol !== 'N90_REVIEWED_V1' || capability?.version !== 1)) throw new Error('قدرة استيراد الدرجات غير متاحة.');
-  await applyReviewedCommand('score:grade_import', review.teachingId, { batch }, verifyCurrent);
+  await applyReviewedCommand('score:grade_import', review.teachingId, { batch }, verifyCurrent, backgroundImportPlanId);
   return true;
 }
 
