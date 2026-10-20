@@ -136,6 +136,7 @@ export function createBackgroundRunner({transport}){
     if(j.phase==='receipt'){
      const r=await transport({type:'n36-result',actionId:j.pending.actionId},authority(j));
      if(!r.ok||r.status==='expired')throw Error('RECEIPT_UNKNOWN');
+     if(r.status==='failed')throw Error(r.code??'HANDOFF_UNAVAILABLE');
      if(r.status==='pending')break;
      if(r.status==='unknown'){j.code=r.failure?.code??'RECEIPT_UNKNOWN';await save(j);break;}
      if(!['saved','existing'].includes(r.status)||r.total!==j.pending.envelope.rows.length||!r.setup?.details?.length)throw Error('RECEIPT_UNKNOWN');

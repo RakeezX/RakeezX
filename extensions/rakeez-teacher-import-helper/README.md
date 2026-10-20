@@ -371,3 +371,16 @@ Before any Production extension release obtain exact authority for a teacher-con
 
 ## 0.5.6 — AI-authored, 17 October 2026
 Teacher-triggered ClassStudentInfo GETs run in the source tab isolated world, up to three concurrent requests, with eight-second per-request timeout. Only observed exact-report links are admitted; no report-page navigation/fallback, credentials inspection or new permissions. Inert HTML uses the same labelled name/class/school parser with static hidden-node exclusions, not live getClientRects. Review windows remain ephemeral for five minutes; per-class explicit Rakeez confirmation and local/existing/unknown receipts remain mandatory. Failed pages retain a partial subset, never fabricated completeness. Official continuation and real-account saving remain NOT_RUN; N36 OPEN.
+
+
+## AI — 0.5.24, 20 October 2026: exact-document delivery and compact Madrasati UI
+
+Identity: **ركيز المعلم - الاستيراد من مدرستي**. The active popup/run page loads only the background viewer, navigation policy and dependency-free safe diagnostics. One explicit Start uses the existing durable Madrasati job; closing the popup never cancels it. No new tabs, portal hosts, permissions, CSP or Noor writes were added.
+
+Delivery now captures the exact URL from the original authorized document when its owner/session-bound receiver accepts the original nonce. Claim reads that document's URL instead of comparing an old tabs URL snapshot. The captured route cannot be rebound on replay. Different documents, frames, origins, tabs and nonce identities remain denied. A bound pre-claim rejection becomes a failed transport result and a stopped background view; it never becomes a save receipt. Pending/unknown claimed operations retain the original identity, deadline and reconciliation rules.
+
+Noor/manual selection, paste, CSV and review implementations remain in popup.js, categories-popup.js and archive-popup-0.5.23.html plus archive-run-controller-0.5.23.js. These archived entry files are source history, not active pages or loaded modules. Future reactivation needs its own approved Product task.
+
+Deferred idea only: future Rakeez → Noor grade entry may be studied after current open work is delivered. This note authorizes no task, Noor execution, credentials, grade reads or writes.
+
+Local synthetic checks do not establish an actual school import, missing-principal diagnosis, MV3 installation, served publication or Product acceptance. The existing «قادة المدرسة :» reader, source-authoritative profile policy and calendar hold are unchanged. The controller/publisher owns publication, the serial application download-link companion and stable-folder parity after publication.

@@ -26,6 +26,24 @@ async function open(record) {
   const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(record.iv)},secret,new Uint8Array(record.ciphertext));
   return validateHandoff(JSON.parse(new TextDecoder().decode(plain)));
 }
+// AI: bind the exact route of the authorized receiver document, never tabs.url's
+// asynchronous snapshot. A replay cannot rebind the original nonce to another route.
+async function deliverRecord(nonce,h,batchId){
+ const r=await chrome.scripting.executeScript({target:{tabId:h.tabId,documentIds:[h.documentId]},world:'MAIN',func:(request,id,expected)=>{
+  const url=location.href;
+  if(expected&&url!==expected)return {accepted:false,url};
+  return {accepted:window.rakeezReceiveNamesBatch?.(request,id)===true,url};
+ },args:[{extensionId:chrome.runtime.id,nonce},batchId,h.deliveryURL??null]});
+ if(r.length!==1||r[0].frameId!==0||r[0].documentId!==h.documentId||r[0].result?.accepted!==true)throw Error('APP_CHANGED');
+ const url=r[0].result.url,u=new URL(url);
+ if(u.origin!==APP_ORIGIN||u.pathname!=='/'||u.search)throw Error('APP_CHANGED');
+ await chrome.storage.session.set({[key(nonce)]:{...h,url,deliveryURL:url}});
+}
+const claimFailureCodes=new Set(['HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_EXPIRED_OR_DENIED','HANDOFF_UNAVAILABLE','HANDOFF_TIMEOUT']);
+async function failedClaim(nonce,record,code){
+ await chrome.storage.session.set({[key(nonce)]:{...record,failure:record.failure??(claimFailureCodes.has(code)?code:'HANDOFF_UNAVAILABLE')}});
+ queueMicrotask(()=>background.wake());
+}
 async function handleTransport(message,sender){
     if(sender.jobId&&message.type!=='n36-cancel'){
       const job=(await chrome.storage.session.get('n36:background-job'))['n36:background-job'];
@@ -37,8 +55,7 @@ async function handleTransport(message,sender){
       if(receipt&&runnerMatches(receipt,sender))return {ok:true,actionId:message.actionId};
       if(!h||!runnerMatches(h,sender))throw Error('HANDOFF_EXPIRED');
       await handleTransport({type:'n36-check',batchId:message.batchId},sender);
-      const received=await chrome.scripting.executeScript({target:{tabId:h.tabId,frameIds:[0]},world:'MAIN',func:(request,id)=>window.rakeezReceiveNamesBatch?.(request,id)===true,args:[{extensionId:chrome.runtime.id,nonce:message.actionId},message.batchId]});
-      if(received.length!==1||received[0].frameId!==0||received[0].documentId!==h.documentId||received[0].result!==true)throw Error('APP_CHANGED');
+      await deliverRecord(message.actionId,h,message.batchId);
       return {ok:true,actionId:message.actionId};
     }
     if (message?.type === 'n36-begin') {
@@ -67,7 +84,7 @@ async function handleTransport(message,sender){
     if(message?.type==='n36-result'){
       if(!/^[a-f0-9]{64}$/.test(message.actionId))throw Error('RECEIPT_KEY');
       const k='receipt:'+message.actionId,r=(await chrome.storage.session.get(k))[k];
-      if(!r){const h=(await chrome.storage.session.get(key(message.actionId)))[key(message.actionId)];return {ok:true,status:h&&runnerMatches(h,sender)?'pending':'expired'};}
+      if(!r){const h=(await chrome.storage.session.get(key(message.actionId)))[key(message.actionId)];return h&&runnerMatches(h,sender)?{ok:true,status:h.failure?'failed':'pending',...(h.failure?{code:h.failure}:{})}:{ok:true,status:'expired'};}
       if(!runnerMatches(r,sender)||Date.now()>=r.expiresAt)return {ok:true,status:'expired'};
       if(!r.outcome)return {ok:true,status:'pending'};
       if(!sender.jobId){await chrome.storage.session.remove(k);await chrome.alarms.clear(key(message.actionId));}
@@ -113,8 +130,7 @@ async function handleTransport(message,sender){
         // Current document receiver claims the nonce without changing route,
         // opening an import page, or creating another app tab. Do not await its
         // async claim here: claims use this same serialized worker mailbox.
-        const received=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:(request,id)=>window.rakeezReceiveNamesBatch?.(request,id)===true,args:[{extensionId:chrome.runtime.id,nonce},envelope.batchId]});
-        if(received.length!==1||received[0].frameId!==0||received[0].documentId!==batch.documentId||received[0].result!==true)throw Error('APP_CHANGED');
+        const h=(await chrome.storage.session.get(key(nonce)))[key(nonce)];await deliverRecord(nonce,h,envelope.batchId);
       }else await chrome.tabs.update(tab.id,{url,active:true});
     } catch (error) { await erase(nonce); if(!batch)await chrome.tabs.remove(tab.id); throw error; }
     return {ok:true,actionId:nonce};
@@ -134,11 +150,11 @@ chrome.runtime.onMessage.addListener((message,sender,reply)=>{
 });
 chrome.runtime.onMessageExternal.addListener((message, sender, reply) => {
   enqueue(async()=>{
-    if (!message || !['n36-claim','n36-cancel','n36-outcome'].includes(message.type) || !/^[a-f0-9]{64}$/.test(message.nonce)) throw Error('HANDOFF_REQUEST');
+    if (!message || !['n36-claim','n36-cancel','n36-outcome','n36-claim-failed'].includes(message.type) || !/^[a-f0-9]{64}$/.test(message.nonce)) throw Error('HANDOFF_REQUEST');
     if(message.type==='n36-outcome'){
       const k='receipt:'+message.nonce,r=(await chrome.storage.session.get(k))[k];
       const u=new URL(sender.url??'https://invalid.invalid');
-      if(!r||(r.outcome&&!(r.jobId&&r.outcome.status==='unknown'&&['saved','existing'].includes(message.outcome?.status)))||sender.id||sender.origin!==APP_ORIGIN||u.origin!==APP_ORIGIN||u.pathname!=='/'||u.search||sender.tab?.id!==r.tabId||r.documentId&&sender.documentId!==r.documentId||Date.now()>=r.expiresAt)throw Error('RECEIPT_SENDER');
+      if(!r||(r.outcome&&!(r.jobId&&r.outcome.status==='unknown'&&['saved','existing'].includes(message.outcome?.status)))||sender.id||sender.frameId!==0||sender.origin!==APP_ORIGIN||u.origin!==APP_ORIGIN||u.pathname!=='/'||u.search||sender.tab?.id!==r.tabId||r.documentId&&sender.documentId!==r.documentId||Date.now()>=r.expiresAt)throw Error('RECEIPT_SENDER');
       const o=message.outcome;
       const expected=['added','existing','remaining','status','total',...(r.version===3&&o?.setup?['setup']:[]),...(o?.failure?['failure']:[])].sort().join();
       if(!o||Object.keys(o).sort().join()!==expected||!['saved','existing','unknown'].includes(o.status)||!['added','existing','remaining','total'].every(k=>Number.isSafeInteger(o[k])&&o[k]>=0&&o[k]<=300)||o.total!==r.total)throw Error('RECEIPT_SCHEMA');
@@ -149,16 +165,25 @@ chrome.runtime.onMessageExternal.addListener((message, sender, reply) => {
       await chrome.storage.session.set({[k]:{...r,outcome:o}});queueMicrotask(()=>background.wake());return {ok:true};
     }
     const record = (await chrome.storage.session.get(key(message.nonce)))[key(message.nonce)];
-    if (!record || sender.id || sender.origin !== APP_ORIGIN || sender.tab?.id !== record.tabId) throw Error('HANDOFF_SENDER');
+    if (!record || sender.id || sender.frameId!==0 || sender.origin !== APP_ORIGIN || sender.tab?.id !== record.tabId) throw Error('HANDOFF_SENDER');
     if(record.documentId){
-      // Chrome MessageSender.url is the original document URL after hash navigation.
-      // Require the original document AND read back the actual exact current nonce route.
-      const u=new URL(sender.url??'https://invalid.invalid'),tab=await chrome.tabs.get(record.tabId);
-      if(sender.documentId!==record.documentId||u.origin!==APP_ORIGIN||u.pathname!=='/'||u.search||tab.url!==record.url)throw Error('HANDOFF_DOCUMENT_OR_ROUTE');
+      const u=new URL(sender.url??'https://invalid.invalid');
+      if(sender.documentId!==record.documentId||u.origin!==APP_ORIGIN||u.pathname!=='/'||u.search)throw Error('HANDOFF_DOCUMENT_OR_ROUTE');
+      // Read the actual document URL. MessageSender.url can retain its initial
+      // hash and tabs.url can lag replaceState/hash changes in this same document.
+      const r=await chrome.scripting.executeScript({target:{tabId:record.tabId,documentIds:[record.documentId]},world:'MAIN',func:()=>location.href});
+      if(r.length!==1||r[0].frameId!==0||r[0].documentId!==record.documentId||r[0].result!==record.url){
+        await failedClaim(message.nonce,record,'HANDOFF_DOCUMENT_OR_ROUTE');throw Error('HANDOFF_DOCUMENT_OR_ROUTE');
+      }
     }else if(sender.url!==record.url)throw Error('HANDOFF_SENDER');
+    if(message.type==='n36-claim-failed'){
+      if(!claimFailureCodes.has(message.code))throw Error('HANDOFF_REQUEST');
+      await failedClaim(message.nonce,record,message.code);return {ok:true};
+    }
+    if(record.failure)throw Error(record.failure);
     if (message.type === 'n36-cancel'){await erase(message.nonce);return {ok:true};}
     if((await chrome.storage.session.get('receipt:'+message.nonce))['receipt:'+message.nonce])throw Error('HANDOFF_ALREADY_CLAIMED');
-    const envelope=await open(record);
+    let envelope;try{envelope=await open(record);}catch(error){await failedClaim(message.nonce,record,error.message);throw error;}
     await chrome.storage.session.set({['receipt:'+message.nonce]:{tabId:record.tabId,documentId:record.documentId,jobId:record.jobId??null,runnerTabId:record.runnerTabId,runnerDocumentId:record.runnerDocumentId,total:envelope.rows.length,version:envelope.version,expiresAt:Date.now()+HANDOFF_TTL}});
     await erase(message.nonce);
     await chrome.alarms.create(key(message.nonce),{when:Date.now()+HANDOFF_TTL});

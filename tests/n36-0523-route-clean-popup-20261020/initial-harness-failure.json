@@ -1,0 +1,12 @@
+{
+  "checks": [
+    {
+      "name": "original_route_failure_reproduced",
+      "status": "PASS",
+      "evidence": "Exact base worker denies accepted same-document hash transition because tabs snapshot differs from stored URL, then returns pending instead of its claim error."
+    }
+  ],
+  "boundary": "Actual HTTP source app/DOM/CSS/handlers, synthetic owned account and Chrome APIs. No portal, native MV3 or Production test.",
+  "status": "FAIL",
+  "failure": "Error: APP_FINISH_CURRENT_EDIT\n    at handleTransport (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-0523-route-and-clean-madrasati-ui-20261020\\extensions\\rakeez-teacher-import-helper\\handoff-worker.js:76:100)"
+}
