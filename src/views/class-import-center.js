@@ -18,7 +18,7 @@ import { go } from '../router.js';
 import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding, reviewGradeTransfer } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
-import { handoffRequest, claimHandoff, reportHandoffOutcome, validateHandoff } from '../lib/n36-extension-handoff.js';
+import { handoffRequest, claimHandoff, reportHandoffOutcome, validateHandoff, captureReceiverSession } from '../lib/n36-extension-handoff.js';
 import { HANDOFF_TTL, RECEIVER_CAPABILITY } from '../lib/n36-extension-protocol.js';
 
 
@@ -151,16 +151,22 @@ function extensionOwnerBinding() {
   return JSON.stringify([w.authUserId,w.id,w.databaseName,w.leaseGeneration]);
 }
 // AI: explicit extension Start grants one document/session-bound names batch.
-let automaticBatch=null, automaticWriting=false;
-export function prepareExtensionBatch(){
+let automaticBatch=null, automaticWriting=false,receiverReason='NO_GRANT',directDraining=false;
+const directRequests=new Map();
+export function prepareExtensionBatch({resume=false}={}){
  const binding=extensionOwnerBinding();
+ if(automaticBatch){
+  try{automaticGuard(automaticBatch);if(!resume)automaticBatch.explicit=true;return automaticBatch.id;}catch{automaticBatch=null;}
+ }
+ directRequests.clear();
  if(automaticWriting||extensionBusy)throw Error('BATCH_PENDING');
  const prior=store.state.device?.n36NamesBatch;
  // A deliberate Start may resume only its current owner's current academic context.
  if(prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId&&
     (prior.yearId!==store.activeYear().id||prior.termId!==store.activeTerm().id))throw Error('BATCH_PENDING_OTHER_TERM');
  const id=prior?.pending&&prior.ownerId===store.getActiveWorkspace().authUserId?prior.batchId:[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
- automaticBatch={id,binding,session:cloud.session,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000};
+ receiverReason='READY';
+ automaticBatch={id,binding,assertSession:captureReceiverSession(cloud),explicit:!resume,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000};
  resumeCancelled=false;
  return id;
 }
@@ -169,41 +175,61 @@ let receiverInstalled=false, resumeAttempt=null, resumeCancelled=false;
 export function installExtensionBridge(){
  if(receiverInstalled)return;receiverInstalled=true;
  window.rakeezNamesCapability=()=>RECEIVER_CAPABILITY;
- window.rakeezBeginNamesBatch=prepareExtensionBatch;
- window.rakeezCancelNamesBatch=id=>{if(automaticBatch?.id===id){automaticBatch=null;resumeCancelled=true;}};
- window.rakeezCheckNamesBatch=id=>{
-  try{if(automaticWriting||extensionBusy||!automaticBatch||automaticBatch.id!==id)return false;automaticGuard(automaticBatch);return true;}catch{return false;}
+ window.rakeezBeginNamesBatch=()=>prepareExtensionBatch();
+ window.rakeezCancelNamesBatch=id=>{if(automaticBatch?.id===id){automaticBatch=null;directRequests.clear();resumeCancelled=true;}};
+ window.rakeezNamesBatchStatus=id=>{
+  try{if(!automaticBatch||automaticBatch.id!==id)return {ready:false,reason:receiverReason==='NO_GRANT'?'NO_GRANT':receiverReason};automaticGuard(automaticBatch);return {ready:true,reason:automaticWriting||extensionBusy?'SAME_BATCH_BUSY':'READY'};}
+  catch(error){receiverReason=['EXPIRED','AUTH_SESSION','OWNER_OR_LEASE','ACADEMIC_CONTEXT'].includes(error.receiverReason)?error.receiverReason:'OWNER_OR_LEASE';automaticBatch=null;directRequests.clear();return {ready:false,reason:receiverReason};}
  };
+ // Valid same-batch busy work is serialized backpressure, not lost authority.
+ window.rakeezCheckNamesBatch=id=>window.rakeezNamesBatchStatus(id).ready;
  window.rakeezReceiveNamesBatch=(request,id)=>{
-  if(!/^[a-p]{32}$/.test(request?.extensionId)||!/^[a-f0-9]{64}$/.test(request?.nonce)||!window.rakeezCheckNamesBatch(id))return false;
-  void receiveExtension(request);return true;
+  if(!request||Object.keys(request).sort().join()!=='extensionId,nonce'||!/^[a-p]{32}$/.test(request.extensionId)||!/^[a-f0-9]{64}$/.test(request.nonce)||!window.rakeezCheckNamesBatch(id))return false;
+  const key=request.extensionId+'|'+request.nonce;
+  if(directRequests.has(key))return true;
+  if([...directRequests.values()].some(v=>v.state==='queued'))return false;
+  directRequests.set(key,{request:{...request},batch:automaticBatch,state:'queued'});void drainDirectRequests();return true;
  };
  const resume=()=>{void resumeSavedExtensionBatch();};
  store.subscribe(resume);cloud.subscribe(resume);resume();
 }
+async function drainDirectRequests(){
+ if(directDraining||automaticWriting||extensionBusy)return;
+ const entry=[...directRequests.values()].find(v=>v.state==='queued');if(!entry)return;
+ try{automaticGuard(entry.batch);}catch{entry.state='retired';return;}
+ entry.state='active';directDraining=true;
+ try{await receiveExtension(entry.request);}finally{entry.state='done';directDraining=false;queueMicrotask(()=>{void drainDirectRequests();});}
+}
 async function resumeSavedExtensionBatch(){
- if(automaticWriting||extensionBusy||resumeCancelled)return;
+ if(automaticWriting||extensionBusy||resumeCancelled||automaticBatch?.explicit)return;
  const p=store.state.device?.n36NamesBatch;
  if(!p?.pending)return;
  let binding;try{binding=extensionOwnerBinding();}catch{return;}
  if(p.ownerId!==store.getActiveWorkspace().authUserId||p.yearId!==store.activeYear().id||p.termId!==store.activeTerm().id)return;
  const key=JSON.stringify([binding,p.batchId,Object.keys(p.pending)]);
- if(resumeAttempt?.key===key&&resumeAttempt.session===cloud.session)return;
- resumeAttempt={key,session:cloud.session};
+ if(resumeAttempt?.key===key)return;
+ resumeAttempt={key};
  try{
-  prepareExtensionBatch();
+  prepareExtensionBatch({resume:true});
+  const resumedBatch=automaticBatch;
   for(const pending of Object.values(p.pending)){
+   if(automaticBatch!==resumedBatch||resumedBatch.explicit)break;
    const stamp=Date.now();
    const envelope=validateHandoff({schema:'rakeez-extension-names',version:pending.setup?3:2,source:'madrasati',scope:'reviewed-run',createdAt:stamp,expiresAt:stamp+HANDOFF_TTL,batchId:p.batchId,...pending});
    await saveAutomaticNames({envelope});
   }
   extensionMessage='';
  }catch(error){extensionMessage='الدفعة محفوظة ولم يتأكد اكتمالها: '+error.message;}
+ finally{void drainDirectRequests();}
  repaint();
 }
 function automaticGuard(batch){
- if(automaticBatch!==batch||Date.now()>=batch.expires||extensionOwnerBinding()!==batch.binding||cloud.session!==batch.session||
- store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||batch.route&&location.hash!==batch.route)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
+ const deny=reason=>{const e=Error('BATCH_OWNER_OR_SESSION_CHANGED');e.receiverReason=reason;throw e;};
+ if(automaticBatch!==batch)deny('NO_GRANT');
+ if(Date.now()>=batch.expires)deny('EXPIRED');
+ try{if(extensionOwnerBinding()!==batch.binding)deny('OWNER_OR_LEASE');}catch{deny('OWNER_OR_LEASE');}
+ try{batch.assertSession();}catch{deny('AUTH_SESSION');}
+ if(store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||JSON.stringify(store.getYear(batch.year))!==batch.yearState||JSON.stringify(store.getTerm(batch.term))!==batch.termState)deny('ACADEMIC_CONTEXT');
 }
 function automaticPersistedGuard(batch,current){
  automaticGuard(batch);
@@ -398,10 +424,10 @@ async function saveAutomaticNames(result){
   extensionMessage=''; // Direct success lives only in the initiating extension, never per-class app toast.
 
   return outcome;
- }finally{automaticWriting=false;batch.route=null;}
+ }finally{automaticWriting=false;batch.route=null;void drainDirectRequests();}
 }
 function clearExtensionPreview() { extensionPreview = extensionOwner = null; clearTimeout(extensionTimer); }
-store.onWorkspaceDeactivation(()=>{clearImportClock();clearExtensionPreview();automaticBatch=null;});
+store.onWorkspaceDeactivation(()=>{clearImportClock();clearExtensionPreview();automaticBatch=null;directRequests.clear();});
 cloud.subscribe(() => {
   const hadClock=!!importClock;
   currentImportClock();
@@ -432,7 +458,7 @@ async function receiveExtension(directRequest=null) {
   extensionBusy=true; clearExtensionPreview();
   try {
     const result=await claimHandoff(request);
-    if(location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
+    if(!directRequest&&location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
     if(result.envelope.version>=2){
       try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);}
       catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+error.message+').'+reason+(store.state.device?.n36NamesBatch?.pending?' التقدم المسجل محفوظ في هذا الحساب؛ استكمل الدفعة نفسها من الإضافة أو زر الاستكمال.':' لم يتأكد تسجيل دفعة للاستكمال؛ أبقِ التشغيل في الإضافة وصحح السبب ثم أعد المحاولة.');await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length,failure:safeBatchFailure(error)});if(directRequest)toast(extensionMessage,'danger');}
@@ -441,7 +467,7 @@ async function receiveExtension(directRequest=null) {
     extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
     extensionTimer=setTimeout(()=>{clearExtensionPreview();extensionMessage='انتهت المعاينة. أعد النقل من الإضافة ثم أعد المحاولة.';repaint();},Math.max(0,result.envelope.expiresAt-Date.now()));
   } catch (error) { const code=['HANDOFF_DOCUMENT_OR_ROUTE','HANDOFF_SENDER','HANDOFF_EXPIRED_OR_DENIED','HANDOFF_LIMIT_OR_EXPIRED','HANDOFF_TIMEOUT','OWNER_CHANGED'].includes(error.message)?error.message:'HANDOFF_UNAVAILABLE';extensionMessage='تعذّر النقل ('+code+'). ارجع إلى حساب ركيز الذي بدأ منه التشغيل واستكمل الفصول غير المحسومة من الإضافة. لم يُفترض حفظ هذه الدفعة.'; }
-  finally { extensionBusy=false;if(!directRequest&&location.hash===route)history.replaceState(null,'','#/classes/koshoof?import=1');repaint(); }
+  finally { extensionBusy=false;void drainDirectRequests();if(!directRequest&&location.hash===route)history.replaceState(null,'','#/classes/koshoof?import=1');repaint(); }
 }
 function safeBatchFailure(error){
  const codes=['SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED'];
@@ -1082,10 +1108,10 @@ export const koshoofCenter = {
     if (hub.tab === 'import') void receiveExtension();
     const listen = (selector, handler) => root.querySelectorAll(selector).forEach(el => { if (el.dataset.bound) return; el.dataset.bound = 'true'; el.addEventListener('change', handler); });
     listen('[data-n36-batch-map]',async event=>{
-      if(automaticWriting)return;
+      if(automaticWriting||extensionBusy||directDraining)return;
       const p=store.state.device?.n36NamesBatch;if(!p?.pending||p.ownerId!==store.getActiveWorkspace()?.authUserId)return;
       try{
-       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000};
+       if(prepareExtensionBatch()!==p.batchId)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
        await batchCheckpoint(automaticBatch,current=>({...current,classMappings:{...current.classMappings,[event.target.dataset.classroom]:event.target.value}}));
        extensionMessage='حُفظت مطابقة الفصل لهذه الدفعة فقط. اضغط الاستكمال للتحقق والحفظ.';
       }catch(error){extensionMessage='تعذّر اعتماد المطابقة: '+error.message;}repaint();
@@ -1102,11 +1128,11 @@ export const koshoofCenter = {
   actions: {
     ...classImport.actions,
     async 'n36-batch-resume'(){
-      if(automaticWriting)return;
+      if(automaticWriting||extensionBusy||directDraining)return;
       const p=store.state.device?.n36NamesBatch;if(!p?.pending||p.ownerId!==store.getActiveWorkspace()?.authUserId)return;
       try{
        // Fresh explicit resume, never automatic continuation into a switched account/session.
-       automaticBatch={id:p.batchId,binding:extensionOwnerBinding(),session:cloud.session,year:p.yearId,term:p.termId,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000};
+       if(prepareExtensionBatch()!==p.batchId)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
        for(const pending of Object.values(p.pending))await saveAutomaticNames({envelope:{version:pending.setup?3:2,batchId:p.batchId,...pending}});
       }catch(error){extensionMessage='الدفعة محفوظة ولم يتأكد اكتمالها: '+error.message;}repaint();
     },

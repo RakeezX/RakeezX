@@ -1,0 +1,107 @@
+{
+  "taskId": "continuous-n36-current-appchanged-receiver-context-20261020",
+  "runId": "c226fb0c-7562-4066-a7a0-7627cb7641ee",
+  "checks": [
+    {
+      "name": "n36_current_appchanged_fence_specific_reproduction",
+      "status": "PASS",
+      "evidence": "Immutable current receiver accepts grant, then same owner/Authsid with a refreshed session object makes checkNamesBatch false before envelope acceptance. Profile/outbox unchanged; source not read."
+    },
+    {
+      "name": "same_batch_busy_autoresume_and_unknown_identity",
+      "status": "PASS",
+      "evidence": "Same-grant busy check remains valid; duplicate original nonce coalesces once, explicit grant survives pending-batch refresh/autoresume event, same Authsid refresh and harmless route change. Delayed original receipt reconciles with no second claim/write."
+    },
+    {
+      "name": "n36_serialized_setup_receipt_settings_after_fence_fix",
+      "status": "PASS",
+      "evidence": {
+        "receiverAccepted": true,
+        "settingsUpdated": true,
+        "receipt": {
+          "status": "saved",
+          "added": 1,
+          "existing": 0,
+          "remaining": 0,
+          "total": 1,
+          "setup": {
+            "saved": 3,
+            "existing": 0,
+            "unresolved": 0,
+            "missing": [
+              "department",
+              "classes",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        "calendarUnchanged": true
+      }
+    },
+    {
+      "name": "manual_same_account_recovery_preserved",
+      "status": "PASS",
+      "evidence": "Actual optional saved-batch resume handler uses the same session fence and completes current data without duplicate outbox."
+    },
+    {
+      "name": "different_authsid_denied",
+      "status": "PASS",
+      "evidence": "Same owner with a genuinely different Auth session ID retires the original grant."
+    },
+    {
+      "name": "raw-term_denied",
+      "status": "PASS",
+      "evidence": "Current receiver retires original grant; profile/outbox unchanged."
+    },
+    {
+      "name": "year_denied",
+      "status": "PASS",
+      "evidence": "Current receiver retires original grant; profile/outbox unchanged."
+    },
+    {
+      "name": "expiry_denied",
+      "status": "PASS",
+      "evidence": "Current receiver retires original grant; profile/outbox unchanged."
+    },
+    {
+      "name": "n36_same_verified_session_refresh_and_real_owner_context_denial",
+      "status": "PASS",
+      "evidence": "Actual owned receiver accepts refresh and rejects different Authsid/foreign owner; unchanged profile/outbox on denial."
+    }
+  ],
+  "live": "NOT_RUN",
+  "boundary": "Real HTTP app/receiver/owner guard/IndexedDB/settings and actual unchanged extension worker through synthetic Chrome API. No source extraction.",
+  "status": "PASS"
+}
