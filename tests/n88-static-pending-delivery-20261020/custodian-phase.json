@@ -1,0 +1,12 @@
+{
+  "taskId":"continuous-n88-deliver-qualified-pending-login-static-20261020",
+  "runId":"a006560f-9483-45af-8241-119defddbf2c",
+  "originalSessionId":"01a14fc3-b292-7390-9952-8549a286c80f",
+  "preflight":{"status":"PASS","originalOwner":true,"nativePinUnchanged":true,"historyPreimage":true,"providerWrites":0},
+  "reservation":{"status":"PASS","attemptReserved":true},
+  "postReservationPreflight":{"status":"FAIL","code":"n88_static1522_attempt_consumed","expectedRefusal":true,"additionalUploads":0},
+  "completion":{"status":"PASS","historyAppended":true,"nativePinUnchanged":true},
+  "lease":"RELEASED integration",
+  "oldMarkersReset":false,
+  "protectedValuesReturned":false
+}

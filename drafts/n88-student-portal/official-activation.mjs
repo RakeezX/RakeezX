@@ -5,6 +5,7 @@
 import assert from 'node:assert/strict';
 import {pilotCorrectionRestoreReady} from './activation/pilot-ui-correction-gate.mjs';
 import {CORRECTION1430,correction1430Gate} from './activation/correction-1430-gate.mjs';
+import {STATIC1522,static1522Gate} from './activation/static-1522-gate.mjs';
 import {randomBytes,generateKeyPairSync,privateDecrypt,createPrivateKey,constants,pbkdf2Sync,createHmac,createHash} from 'node:crypto';
 import {spawnSync,execFileSync} from 'node:child_process';
 import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
@@ -46,6 +47,37 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(['--static1522-preflight','--static1522-begin','--static1522-complete'].includes(action)){
+  const c=STATIC1522,currentRun=process.env.N88_STATIC1522_RUN_ID;
+  if(path.resolve(root)!==path.resolve(c.root))fail('n88_static1522_original_root');
+  const q=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+c.task+'.json','utf8')),review=static1522Gate(q,currentRun);
+  const taskRoot=fileURLToPath(new URL('../../',import.meta.url)),local=p=>path.join(taskRoot,p),digest=x=>createHash('sha256').update(x).digest('hex');
+  for(const [p,h]of Object.entries(review.sourcePins)){
+   const bytes=(await readFile(local(p),'utf8')).replaceAll('\r\n','\n');
+   if(digest(bytes)!==h||bytes!==execFileSync('git',['show',c.candidate+':'+p],{cwd:taskRoot,encoding:'utf8',maxBuffer:1048576}).replaceAll('\r\n','\n'))fail('n88_static1522_source_drift');
+  }
+  for(const [p,h]of Object.entries(review.packageOutputs)){
+   const file='drafts/n88-student-portal/activation/bundle/'+p,bytes=await readFile(local(file));
+   if(digest(bytes)!==h||!bytes.equals(execFileSync('git',['show',c.candidate+':'+file],{cwd:taskRoot,maxBuffer:8388608})))fail('n88_static1522_package_drift');
+  }
+  if(digest((await readFile(local('tests/n88-initial-continuity-1522-20261020/qualification.json'),'utf8')).replaceAll('\r\n','\n'))!==review.qualificationSha256)fail('n88_static1522_qualification_drift');
+  const state=await load();if(state.loginDisarmed||state.directAuthRefused||!state.directVerified||state.directSource!==c.unchangedNative)fail('n88_static1522_owned_preimage');
+  const rows=await official(['secrets','list','--project-ref',project,'--output','json']),list=Array.isArray(rows)?rows:rows?.rows;
+  if(list?.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA').length!==1||list.find(r=>r.name==='N88_SERVICE_SOURCE_SHA').value?.toLowerCase()!==digest(c.unchangedNative))fail('n88_static1522_pin_drift');
+  const last=state.carrierCorrections?.at(-1);if(!last||last.source!==c.priorCarrier)fail('n88_static1522_carrier_history');
+  const attempt=path.join(phase,'static1522-'+c.candidate+'-attempt.json'),complete=path.join(phase,'static1522-'+c.candidate+'-complete.json');
+  const stamp={taskId:c.task,runId:currentRun,preparedCandidate:c.candidate,source:c.carrier,prior:c.priorCarrier,native:c.unchangedNative};
+  if(action==='--static1522-preflight'){try{await readFile(attempt);fail('n88_static1522_attempt_consumed');}catch(e){if(e.code!=='ENOENT')throw e;}return {status:'PASS',originalOwner:true,nativePinUnchanged:true,historyPreimage:true,providerWrites:0};}
+  const receipt=async name=>JSON.parse(await readFile(local('tests/n88-static-pending-delivery-20261020/'+name+'.json'),'utf8'));
+  if(action==='--static1522-begin'){
+   const r=await receipt('provider-preflight');if(r.source!==c.priorCarrier||!r.configurationVerified||r.native!==c.unchangedNative)fail('n88_static1522_provider_preimage');
+   await writeFile(attempt,JSON.stringify(stamp)+'\n',{flag:'wx'});return {status:'PASS',attemptReserved:true};
+  }
+  assert.deepEqual(JSON.parse(await readFile(attempt,'utf8')),stamp);
+  const r=await receipt('carrier-readback');if(r.source!==c.carrier||!r.sourceExact||!r.configurationUnchanged||!r.servedAssetsExact||r.native!==c.unchangedNative)fail('n88_static1522_readback');
+  await writeFile(complete,JSON.stringify({...stamp,version:r.version})+'\n',{flag:'wx'});
+  state.carrierCorrections=[...state.carrierCorrections,{...stamp,version:r.version}];await save(state);return {status:'PASS',historyAppended:true,nativePinUnchanged:true};
+ }
  if(['--1430-preflight','--1430-begin-service','--1430-pin-service','--1430-begin-carrier','--1430-complete-carrier'].includes(action)){
   const c=CORRECTION1430,currentRun=process.env.N88_1430_RUN_ID;
   if(path.resolve(root)!==path.resolve('C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018'))fail('n88_1430_original_root');

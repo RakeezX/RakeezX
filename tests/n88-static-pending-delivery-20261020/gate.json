@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "positive": 1,
+  "negative": 11,
+  "scope": "Pure task/run/session/candidate/hash/preimage/boundary/consumed gate",
+  "protectedWrites": 0
+}

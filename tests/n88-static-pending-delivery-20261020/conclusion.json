@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "scope": "PARTIAL_SUBFIX_ONLY",
+  "preparedCandidate": "7c4f8dbd15d1decc2045e322a4f0b2e9930fe687",
+  "studentSevenCaseProof": "REUSED_UNCHANGED_PASS",
+  "singleOwnedErrorSubproof": "REUSED_UNCHANGED_PASS",
+  "originalActualTeacherCauseGate": "FAIL_PRESERVED",
+  "actualTeacherSuccess": "NOT_PROVEN",
+  "carrier": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+  "version": "28568dc0-f03e-44f5-a5b4-704319a404df",
+  "native": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+  "nativeVersion": 53,
+  "uploads": 1,
+  "nativeDeploys": 0,
+  "publicPinChanges": 0,
+  "readinessRequests": 0,
+  "priorHTMLStrictByteComparison": "FAIL_PRESERVED",
+  "cleanup": "Integration lease released; no browser/server launched in this delivery phase"
+}
