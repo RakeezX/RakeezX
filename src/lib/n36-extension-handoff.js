@@ -40,3 +40,20 @@ export async function reportHandoffOutcome(request,outcome){
  if(location.origin!==APP_ORIGIN||!request)return false;
  return new Promise(resolve=>{const timer=setTimeout(()=>resolve(false),1500);chrome.runtime.sendMessage(request.extensionId,{type:'n36-outcome',nonce:request.nonce,outcome},r=>{clearTimeout(timer);resolve(!chrome.runtime.lastError&&r?.ok===true);});});
 }
+
+// AI: additional session-continuity fence, never JWT-only authorization.
+// The authoritative cloud ownership/generation/database/lease guard runs first.
+// Claims are used only to DENY a different Auth session; no metadata grants access.
+export function captureReceiverSession(cloud){
+ const assertOwned=cloud.captureOwnedMutationContext(),initial=cloud.session;
+ const sid=token=>{try{const parts=String(token??'').split('.');if(parts.length!==3||parts[1].length>16000)return null;const body=JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));return typeof body.session_id==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.session_id)?body.session_id.toLowerCase():null;}catch{return null;}};
+ const originalSid=sid(initial?.access_token);let retired=false;
+ return ()=>{
+  try{
+   if(retired||typeof initial?.access_token!=='string'||!initial.access_token)throw Error('AUTH_SESSION_CHANGED');
+   assertOwned();
+   if(!cloud.session?.access_token||cloud.authStatus().state!=='authenticated'||cloud.session.user?.id!==cloud.user?.id)throw Error('AUTH_SESSION_CHANGED');
+   if(originalSid?sid(cloud.session.access_token)!==originalSid:cloud.session!==initial&&cloud.session.access_token!==initial?.access_token)throw Error('AUTH_SESSION_CHANGED');
+  }catch{retired=true;throw Error('BATCH_OWNER_OR_SESSION_CHANGED');}
+ };
+}

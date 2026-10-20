@@ -1,0 +1,139 @@
+{
+  "status": "PASS",
+  "baseSha": "15991a36f0a7b3f082b85acd1c45a6c9d581f9a2",
+  "proof": [
+    {
+      "path": "src/store.js",
+      "sha256": "9c3335ba49687242ca1ee9c595868e76daae071fa365295f1e15faad36b32778"
+    },
+    {
+      "path": "src/lib/cloud.js",
+      "sha256": "44cd8f8bd875844152cd79f7a84436aaa5a09dff693c4f532f27c89bf73bb4a2"
+    },
+    {
+      "path": "src/lib/n36-extension-protocol.js",
+      "sha256": "1e3745a9890b6d75f9bb6cd6a9e5e0eb950ebd9164c6edce648abbf2ce244d50"
+    },
+    {
+      "path": "sw.js",
+      "sha256": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/README.md",
+      "sha256": "7d9bff1ed7340319a0b471dd7c9e4019c48298f33b861688663279a1a9f945a7"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/categories-popup.js",
+      "sha256": "85417c917501948fae76931c68532b39eba59ed1aaafcba366bd39edf93485d9"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/categories.js",
+      "sha256": "fcd0b93335a605b1aba6b84651b11188528b9a556648d75bc3cf4a04a182acda"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/class-order.js",
+      "sha256": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/core.js",
+      "sha256": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+      "sha256": "4e5bde8379b7475c509f2f2f1948dc5d2e4067c28d98d1b4071ed6056e144a5c"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+      "sha256": "6fd9fb5321b9dc478135584a133a5663ddb940dbca0fd5905a7be62527e72802"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+      "sha256": "5b520bce5d93bed6e05efda86dff9651f811aaa370a1418df8838fbf2f1f6ed9"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/lib/rakeez-datetime-values.js",
+      "sha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/lib/rakeez-datetime.css",
+      "sha256": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/lib/rakeez-datetime.js",
+      "sha256": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/manifest.json",
+      "sha256": "79a87a1b720fc7421c95c1660700016248d375625fa7c94b629e312f2ce55c0c"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/navigation.js",
+      "sha256": "fdcbb7e3a797e21f1d7e639a8ffa54be9a8631aaf39418a0dee36b46fc93e3ab"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/popup.css",
+      "sha256": "8b956db904f7fbce7343b508d99b14bbd0077f703d5800e14722d8f9f551b53b"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/popup.html",
+      "sha256": "12943e38d5f18a2e89b5b17d42d87a2c42cb0d46ef16730b15bd4fbfb6dbf7cb"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/popup.js",
+      "sha256": "0e1a555d42fac03776026d457632cf7979e3a751259685dc82e942317cf75bdc"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+      "sha256": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/run-controller.js",
+      "sha256": "ab5a4e54b715422811fd70f652ea7d37afccb4543a9777576596ccb148e0817b"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/selection.js",
+      "sha256": "c55a90a2845a64378ff815fac0140c93a12587945d29808d82f9921fcbfeba13"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/source-adapter.js",
+      "sha256": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/source-roster.js",
+      "sha256": "2bc76e92e5996ca3ad6579bd064cc33dbd0feca797929bd88fc05e02c998a067"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/vendor/flatpickr/LICENSE.md",
+      "sha256": "5fd57afc3905651175947ae44818e91ffcf5b605e4c88fac42d9700243bd9095"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/vendor/flatpickr/ar.js",
+      "sha256": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/vendor/flatpickr/flatpickr.min.css",
+      "sha256": "1b34a42552c96f10e4dfaaa4a367276b03868aacff63c1ac42ffe331352bc754"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/vendor/flatpickr/flatpickr.min.js",
+      "sha256": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/background-runner.js",
+      "sha256": "3d7952f8bbe96853aaeb5a26d0af1a02346c5bb2b05b9afb88a38b8f84ecfeb2"
+    },
+    {
+      "path": "extensions/rakeez-teacher-import-helper/background-collector.js",
+      "sha256": "b77ecd733676c76e65734a2446ae547e8b18a8b3f808db4c30abb96be650085e"
+    },
+    {
+      "path": "assets/extensions/rakeez-teacher-import-helper-0.5.21.zip",
+      "sha256": "aeef5c41efe6d16dff68055daed21e6400ff6b8d752eac671cea32dd181fa4b2"
+    },
+    {
+      "path": "assets/extensions/rakeez-teacher-import-helper-0.5.21.manifest.json",
+      "sha256": "85fc154781c2b6e5e71fc826e97109ed8e871ba25d31617dd1403ef31d6222f2"
+    }
+  ],
+  "scope": "Extension 0.5.21 package, N107 implementation, cloud/store/protocol/SW and download link unchanged; existing offline dependency retained. No live Sync/offline certification."
+}
