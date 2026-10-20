@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-safe-import-phase-clock-20261020",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -2890,
+      "scopeKey": "continuous-n107-safe-import-phase-clock-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 15,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-source-authoritative-profile-and-clear-results-20261020"
+      ],
+      "sessionId": "01a158b0-7f96-7413-bbd7-133aaa28cc35",
+      "objective": "Continue SAME N107 session. NEW PREPARED MATERIAL EVIDENCE: exact NO_CHANGE candidatec013ff7c04acb0e619f07047461c54fac154bf47, taskcontinuous-n107-actual-18s-after-width-two-20261020/run78305d9d-c469-4307-954f-3533912d29cc. Reuse its bounded trace: maximum can start while trailing Sync reads held; parent enrollment ACK→maxACK→grade durableACK gates success. No whole-Sync excess wait proven, actual18seconds remains unexplained. Do NOT replay that experiment, old35ms A/B, width2/context safety suites or make another speculative speed patch. Source NO_CHANGE result immutable; no relabel/publish diagnostic candidate. Controller cannot repair NO_CHANGE as BLOCKED via existing helper; this is a concrete new IMPLEMENTATION card for the precisely missing per-import observations with newly admitted view/store paths, serialized AFTER activeN36. No fresh planner/reviewer or paidloop.\nImplement MINIMAL owner-bound SAME-DOCUMENT per-import elapsed phase summary in actual class-import-center import path and strictly needed store methods: local preparation/creation, required creation ACK wait, maximum request→ACK, grade request→durableACK, final success/uncertain. Use monotonic clock and honest start/end boundaries; no result inference from clock/empty outbox/fullSyncgreen. Existing callbacks/returns preferred, no sync architecture/newRPC/service/API. At most one compact collapsed «تفاصيل المدة» on existing import pending/success/error UI with overall elapsed and plain phase labels/durations, optional user-click copy finite allowlisted summary. Keep normal user flow uncluttered and no new step/button needed to complete import. This instrumentation must make next ORDINARY import's real18s phase cause observable; cannot retroactively invent current measurement or require another real user import as test.\nPrivacy: only finite phase/status/durationMs and aggregate counts(names,grades), no names/IDs/files/filecontent/gradesvalues/emails/authPIN/JWT/URLs/rawerror strings in copied/support data. Memory-only tied to owner/workspace/page attempt; clear on actual owner/sessionworkspace retirement and dispose, don't persist in localStorage/sessionStorage/device/outbox or add networktelemetry/automatic send. UI reload with existing savedbatch must NOT claim old phase durations; begin new observable continuation segment and label honestly. No stale previous attempt mixed into current results. Clock never changes retries/cancellation/actions, canonical context/parent/max/grade receipt checks or pending envelopes. Keep N125 under POtest unchanged, N44HOLD, N117CLOSED. Real account/pupil mutation/send/schema/Auth/SQL forbidden.\nMinimum changed-boundary qualification: actual application existing small synthetic import with controlled phase gates confirms displayed/copy durations correspond to held requiredACK boundaries and durable-success event, and failure/owner reset leaks no prior summary/PII. Reuse saved actual fixture/baseline and originaltrace fingerprints; only candidate run needed, no newbeforeafterbenchmark/fullSync/crypto/SQL/PWA/buildsuite. Affected syntax/diff required. This publishes an observation/UX improvement, NOT a speedup. Solepublisher verifies changedservedsource; real time remains18s until actual future feedback. Save exacttask/run/candidate/base JSON; noqueue/ledgeredit.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/store.js",
+        "src/lib/grade-transfer.js",
+        "tests/n107-phase-clock-20261020/**",
+        "docs/automation-evidence/20261020/N107_SAFE_IMPORT_PHASE_CLOCK.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n107_actual_import_phase_clock_durable_ack_owner_privacy"
+      ],
+      "acceptance": [
+        "Phase summary truthfully separates required durable ACKs in actual import, without modifying command or success semantics.",
+        "Only an observation improvement is claimed; current actual18s and diagnostic NO_CHANGE evidence preserved."
+      ],
+      "preparationAuthority": {
+        "kind": "Current user latency question and bounded material missing observation after saved trace",
+        "publication": true,
+        "realSend": false,
+        "realAccountMutations": 0
+      },
+      "releaseAuthority": "Existing explicit PO import speed/work completion authority covers this minimal non-PII duration UI through sole publisher. No backend or actual import mutation."
+    }
+  ]
+}
