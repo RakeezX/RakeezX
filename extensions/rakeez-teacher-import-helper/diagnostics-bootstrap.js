@@ -3,7 +3,7 @@
  'use strict';
  const run = new URLSearchParams(location.search).has('run');
  if (run) document.documentElement.classList.add('run-context');
- const assets = new Set(['popup.js','categories-popup.js','run-controller.js','handoff-protocol.js','handoff-worker.js','diagnostics-bootstrap.js','route-diagnostics.js','source-roster.js','source-adapter.js','selection.js','core.js','categories.js','navigation.js','class-order.js','rakeez-datetime.js','rakeez-datetime-values.js']);
+ const assets = new Set(['popup.js','categories-popup.js','run-controller.js','handoff-protocol.js','handoff-worker.js','diagnostics-bootstrap.js','route-diagnostics.js','source-roster.js','source-adapter.js','selection.js','core.js','categories.js','navigation.js','class-order.js','background-runner.js','background-collector.js','rakeez-datetime.js','rakeez-datetime-values.js']);
  const modules = {'popup.js':'not-available','categories-popup.js':'not-available','run-controller.js':'not-available'};
  const enums = {
   receiverCapability:['source-profile-quiet-v1','unknown'],setupPhase:['none','source','envelope','receipt','receiver-update'],
@@ -14,7 +14,7 @@
   receipt:['not-available','pending','saved','existing','unknown','expired'],
   failurePhase:['none','profile','batch'],failureStep:['none','validation','transaction','readback']
  };
- enums.failure.push('APP_UPDATE_REQUIRED','APP_FINISH_CURRENT_EDIT','SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
+ enums.failure.push('SOURCE_BINDING_CHANGED','SOURCE_CONTEXT_CHANGED','SOURCE_CLOSED','APP_CLOSED','NAVIGATION_UNCONFIRMED','START_INTERRUPTED','SCHOOL_CHOICE_REQUIRED','RECEIPT_UNKNOWN','CANCELLED','APP_UPDATE_REQUIRED','APP_FINISH_CURRENT_EDIT','SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED','WRITE_FAILED');
  const numbers = ['valid','staged','observed','excluded','classes','processedPages','currentPage'];
  const fresh = () => Object.assign(Object.fromEntries(numbers.map(k=>[k,null])),{stage:'idle',coverage:'unknown',terminal:'unproven',endpoint:'none',hasNext:null,disabledNext:null,transfer:'idle',receipt:'not-available',failure:'none',failurePhase:'none',failureStep:'none',fieldResults:[],setupPhase:'none',setupFields:[],receiverCapability:'unknown'});
  let state=fresh(), errors=[], background='not-available';
