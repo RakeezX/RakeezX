@@ -1,0 +1,57 @@
+{
+  "taskId": "continuous-n88-actual-loading-write-and-code-ux-20261020",
+  "runId": "77b9930b-3bca-4a49-bc4f-7896d5a9b310",
+  "state": "BLOCKED",
+  "baseSha": "fdd9ad563996b6126d89a73860f46cf00e62c15a",
+  "localQualification": "PASS",
+  "sourcePins": {
+    "src/views/student-portal-login.js": "da356963ce76e3de74ad62a03511dd2e393d839dac6177721d346a5624dce0d0",
+    "src/views/student-portal-class.js": "57bc399cbdf13f4e03e100cabfdeac3ba7ddbb6006050a3177683872aad277f6",
+    "src/lib/student-portal-class-client.js": "add56ddad98c5ef3e1b743f1036214939e750c092af4ab17731e402ca0d550e5",
+    "drafts/n88-student-portal/integrated-service.mjs": "46699c6bcf067ddc906b7c4c82773da755f68d3ff447864e53956ce306610875"
+  },
+  "prepared": {
+    "edge": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+    "worker": "6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326",
+    "student": "750dbd95aa8c9f690509f84c90367c8ac6b42c11feb69fbdc5196ca1238204f1"
+  },
+  "checks": [
+    {
+      "name": "n88_normal_code_paste_draft_error_visibility_privacy",
+      "status": "PASS",
+      "evidence": "student-component.json; exact unchanged student source, native clipboard/DOM input + actual client, component passed before preserved teacher failure."
+    },
+    {
+      "name": "n88_teacher_full_read_write_phase_cause_and_ack",
+      "status": "PASS",
+      "evidence": "write-baseline.json/write-corrected.json: unchanged15000ms command deadline,13→2 consumed families,2540ms committed synthetic ACK. ui.json and save-identity.json: independent guidance states, unknown outcome requires review, exact request identity replay; no automatic writes. Actual hosted cause/success remains unproven."
+    },
+    {
+      "name": "n88_topbar_new_page_clear_link",
+      "status": "PASS",
+      "evidence": "ui.json and teacher-390.png: actual topbar/view/router/delegate click, new owned tab, opener null, teacher URL unchanged."
+    },
+    {
+      "name": "n88_changed_source_and_student_carrier_readback",
+      "status": "NOT_RUN",
+      "evidence": "Prepared exact packages only. Original custodian has no fresh task/run/candidate-bound correction/preflight branch; old1336/1837 gates are prior task/source-bound and must not be reused."
+    }
+  ],
+  "scope": {
+    "privateAssetChangedOnly": "/n88-private/assets/student.mjs",
+    "allOtherPrivateAssetsByteIdentical": true,
+    "carrierTransportOutsideAssetsByteIdentical": true,
+    "originalSourcePinBridgeUnchanged": true,
+    "hostedMutations": 0,
+    "newReadinessRequests": 0,
+    "newOperationalLogWindows": 0,
+    "actualTeacherSuccess": "NOT_PROVEN",
+    "wholeN88Closed": false
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED",
+    "ownedSyntheticClipboardCleared": true
+  },
+  "blocker": "Missing fresh original-custodian task/run/candidate preflight and append-only source correction/carrier attempt capability for this incident. Existing state is not reported absent and provider authentication was not rejected."
+}

@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "positiveAndNegativeIdentityHashConsumedChecks": true,
+  "originalOwnedReadonlyPreflight": "PASS",
+  "nativePreimageExact": true,
+  "oldLocalSuitesReplayed": false
+}

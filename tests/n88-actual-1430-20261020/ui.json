@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Guidance loads on explicit opening; unloaded/reading/known empty distinct. Loaded roster/settings retained during pending/unknown command; writes disabled until review; explicit retry uses exact original request ID/body; committed ACK required before code shown.",
+    "Actual app topbar function + real DOM delegate/router source: native click opens student page in new owned tab, teacher URL unchanged, opener null."
+  ],
+  "scope": "Actual source DOM/handlers/client/CSS with synthetic responses; fresh owned contexts, no live account",
+  "clipboard": "Only freshly written synthetic text pasted with native Control+V; no clipboard readText/personal clipboard read.",
+  "phase": "teacher",
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

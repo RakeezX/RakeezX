@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "evidence": "Native paste, Arabic digits, selection replacement; overlong insertion never truncated into PIN. Invalid/401 retain same form/draft. Hidden pending response retired, harmless visibility/focus/back retain draft/selection; success/end/explicit clear erase. No persistent storage.",
+  "sourceSha256": "da356963ce76e3de74ad62a03511dd2e393d839dac6177721d346a5624dce0d0",
+  "originArtifact": "ui.teacher-fail.json",
+  "originalCompositeFailurePreserved": true,
+  "componentCompletedBeforeTeacherFailure": true,
+  "unchangedComponentReused": true,
+  "clipboard": "Only freshly written synthetic text pasted with native Control+V; no clipboard readText/personal clipboard read.",
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

@@ -1462,7 +1462,7 @@ function createIntegratedService(options, adapter, baseRepository) {
       const auth = await adapter.verifyTeacher(r2, ports);
       return auth?.ownerId === binding.ownerId && auth.sessionId === binding.sessionId ? auth : null;
     };
-    const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input, action === "list").then((s) => {
+    const resolveClass = (db, ports, auth, teachingId, input) => scope(db, ports, auth, teachingId ?? body.teachingId, input, ["list", "issue-missing", "rotate", "revoke"].includes(action)).then((s) => {
       if (!s || s.classId !== binding.classId || s.termId !== binding.termId || !rollout.admitsTeacher(auth, s)) return null;
       if (["pilot", "public"].includes(rollout.mode) && !db.contexts.some((c) => c.ownerId === auth.ownerId)) db.contexts.push({ namespace: (rollout.mode === "pilot" ? "n88_pilot_" : "n88_owner_") + randomUUID4(), ownerId: auth.ownerId, active: true });
       return s;

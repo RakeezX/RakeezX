@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "source": "6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326",
+  "sourceExact": true,
+  "configurationUnchanged": true,
+  "subdomain": {
+    "enabled": false,
+    "previews_enabled": false
+  },
+  "routes": [
+    {
+      "id": "346d924c9746479a89e6e211a41bba14",
+      "pattern": "rakeezx.com/student",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "1bcc93cfb56b42469bdad21724b63a1d",
+      "pattern": "rakeezx.com/n88-private/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "c27599645c3c492f9b25eca0107e3dc9",
+      "pattern": "rakeezx.com/api/n88/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    }
+  ],
+  "version": "5d5b1f27-b8d5-4686-8c27-e15abc3eb02b",
+  "logpush": false,
+  "tailConsumers": [],
+  "uploads": 1,
+  "servedAssetsExact": true,
+  "servedAssetScope": "Changed student.mjs; all other asset bytes and native document exact via carrier identity.",
+  "documentHttpByteExact": false,
+  "documentHttpObservation": "Platform Cloudflare challenge injection; strict failed comparison preserved separately.",
+  "native": {
+    "version": 53,
+    "sourceExact": true,
+    "pin": {
+      "status": "PASS",
+      "sourcePinReadback": true,
+      "source": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+      "keysRolesSqlAuthUnchanged": true
+    }
+  },
+  "preparedCandidate": "9d191311fb7f05ef377f2d719486b1f5cb17c6a1",
+  "preparedRun": "77b9930b-3bca-4a49-bc4f-7896d5a9b310",
+  "runId": "cdf8bf21-b318-4e6a-a60f-dc533199fa47",
+  "at": "2026-10-20T12:03:40.500Z"
+}

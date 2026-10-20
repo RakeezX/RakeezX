@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "baseline": false,
+  "scope": "Actual model IDs/client/signed ingress/Web entry/Auth SDK/repository/typed query adapter with controlled synthetic PG port; no hosted mutation or real teacher acceptance.",
+  "commandElapsedMs": 2540,
+  "commandCanonicalReads": [
+    "canonical:terms",
+    "canonical:teachings"
+  ],
+  "guards": "Full projection remains required for visibility/guidance/student; source lock, membership synchronization and commit ACK preserved. Wrong-owner/source negatives unchanged and reused from prior exact composition boundary."
+}

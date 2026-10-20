@@ -26,7 +26,7 @@ const columns={years:'id,owner_id,revision,deleted_at,status',terms:'id,owner_id
 export async function readCanonical(ports,ownerId,listScopeOnly=false) {
   await ports.query('select n88_private.lock_projection_sources($1::uuid,$2::integer)',[ownerId,2000]);
   const canonical={};let bytes=0;
-  // List admission consumes only teaching/term here. Membership synchronization,
+  // List and credential-command admission consume only teaching/term here. Membership synchronization,
   // the complete source lock/bounds and commit guards still run below. Student
   // projection, visibility publication and guidance retain the full projection.
   for(const table of listScopeOnly ? ['terms','teachings'] : CANONICAL_PROJECTION_REQUIREMENTS.tables) {
@@ -94,7 +94,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
       const auth=await adapter.verifyTeacher(r,ports);
       return auth?.ownerId===binding.ownerId&&auth.sessionId===binding.sessionId?auth:null;
     };
-    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input,action==='list').then(s=>{
+    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input,['list','issue-missing','rotate','revoke'].includes(action)).then(s=>{
       if(!s||s.classId!==binding.classId||s.termId!==binding.termId||!rollout.admitsTeacher(auth,s))return null;
       // First deliberate admitted teacher access may create its own private context.
       // An existing inactive context is never reactivated; no canonical/Auth write.

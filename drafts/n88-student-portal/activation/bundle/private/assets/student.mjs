@@ -161,7 +161,7 @@ var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "
 var displayNumber = (value) => value === null ? "\u0644\u0645 \u062A\u064F\u0631\u0635\u062F" : escape(value);
 function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
-  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0;
+  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = "";
   const previousDir = root.getAttribute("dir");
   root.classList.add("n88-unified");
   root.dir = "rtl";
@@ -177,7 +177,9 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   };
   function entry(message = "") {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p class="n88-unified-welcome">\u0623\u062F\u062E\u0644 \u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644 \u0627\u0644\u0630\u064A \u0632\u0648\u0651\u062F\u0643 \u0628\u0647 \u0645\u0639\u0644\u0651\u0645\u0643.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><p id="n88-code-help">6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u06401</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form>${enabled ? '<button type="button" class="btn btn--ghost n88-unified-resume" data-resume>\u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629</button>' : ""}</section>`);
+    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628</h1><p class="n88-unified-welcome">\u0623\u062F\u062E\u0644 \u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644 \u0627\u0644\u0630\u064A \u0632\u0648\u0651\u062F\u0643 \u0628\u0647 \u0645\u0639\u0644\u0651\u0645\u0643.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">\u0631\u0645\u0632 \u0627\u0644\u062F\u062E\u0648\u0644</label><p id="n88-code-help">6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u06401</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? "disabled" : ""}><p id="n88-message" role="status">${escape(!enabled ? "\u0645\u0633\u0627\u062D\u0629 \u0627\u0644\u0637\u0627\u0644\u0628 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u064B\u0627. \u0644\u0645 \u062A\u064F\u0641\u0639\u0651\u0644 \u0627\u0644\u062E\u062F\u0645\u0629 \u0628\u0639\u062F." : cooling ? "\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627." : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? "disabled" : ""}>\u062F\u062E\u0648\u0644 \u0627\u0644\u0637\u0627\u0644\u0628</button></form>${enabled ? '<button type="button" class="btn btn--ghost n88-unified-resume" data-resume>\u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629</button>' : ""}</section>`);
+    const field = root.querySelector("[data-claim] input");
+    if (field) field.value = codeDraft;
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -220,6 +222,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     try {
       const data = await action();
       if (disposed || checkpoint !== generation) return;
+      codeDraft = "";
       if (ending) entry("\u0627\u0646\u062A\u0647\u062A \u0627\u0644\u062C\u0644\u0633\u0629.");
       else show(data);
     } catch (error) {
@@ -242,12 +245,10 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     event.preventDefault();
     if (busy || !enabled) return;
     const input2 = root.querySelector("input");
-    let code = normalizeStudentCode(input2.value);
-    input2.value = "";
+    let code = codeDraft = normalizeStudentCode(input2.value);
     if (!validStudentCode(code)) {
       code = "";
       inlineEntry("\u0623\u062F\u062E\u0644 6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1.", true);
-      input2.focus();
       return;
     }
     void run(() => {
@@ -260,7 +261,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     if (event.target.matches("[data-claim] input")) {
       event.target.setCustomValidity("");
       event.target.removeAttribute("aria-invalid");
-      event.target.value = normalizeStudentCode(event.target.value);
+      event.target.value = codeDraft = normalizeStudentCode(event.target.value);
     }
   };
   const rejectOverflow = (event, pasted = false) => {
@@ -271,7 +272,6 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     const proposed = field.value.slice(0, field.selectionStart ?? field.value.length) + added + field.value.slice(field.selectionEnd ?? field.value.length);
     if (normalizeStudentCode(proposed).length > 6) {
       event.preventDefault();
-      field.value = "";
       inlineEntry("\u0623\u062F\u062E\u0644 6 \u0623\u0631\u0642\u0627\u0645 \u062A\u0628\u062F\u0623 \u0628\u0627\u0644\u0631\u0642\u0645 1.", true);
     } else if (pasted) {
       event.preventDefault();
@@ -286,19 +286,24 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     if (event.target.closest("[data-read]")) void run(() => client.read());
     if (event.target.closest("[data-end]")) void run(() => client.end(), true);
   };
-  function clear() {
+  function clear(preserveDraft = false) {
+    if (preserveDraft) {
+      const field = root.querySelector("[data-claim] input");
+      if (field) codeDraft = normalizeStudentCode(field.value);
+    } else codeDraft = "";
     generation++;
     busy = false;
     clearTimeout(timer);
     client?.invalidate?.();
-    entry();
+    if (preserveDraft && root.querySelector("[data-claim]")) inlineEntry();
+    else entry();
   }
-  const hide = () => clear();
+  const hide = () => clear(true);
   const visible = () => {
-    if (doc.visibilityState === "hidden") clear();
+    if (doc.visibilityState === "hidden") clear(true);
   };
   const pageshow = (event) => {
-    if (event.persisted) clear();
+    if (event.persisted) clear(true);
   };
   root.addEventListener("beforeinput", beforeInput);
   root.addEventListener("paste", paste);

@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n88-actual-loading-write-and-code-ux-20261020",
+  "runId": "77b9930b-3bca-4a49-bc4f-7896d5a9b310",
+  "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "module": "drafts/n88-student-portal/official-activation.mjs",
+  "originalCwd": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+  "missingCapability": "Fresh current-task/run/candidate-bound original-owned-state preflight and append-only changed-source/static-carrier attempt gate",
+  "oldActionsNeverReplay": ["--1336-source-preflight", "--1336-pin-qualified-source", "--1837-pin-qualified-source", "old readiness/activation/disarm actions"],
+  "baselineNativeVersion": 51,
+  "baselineSource": "2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea",
+  "preparedEdge": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+  "preparedCarrier": "6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326",
+  "preparedStudentJs": "750dbd95aa8c9f690509f84c90367c8ac6b42c11feb69fbdc5196ca1238204f1",
+  "serviceUploadsAttempted": 0,
+  "carrierUploadsAttempted": 0,
+  "signedReadinessAttempts": 0,
+  "protectedStateMissingClaimed": false,
+  "providerLoginFailureClaimed": false,
+  "retryCondition": "Scoped inactive ops correction adds the reviewed gate; sole controller resumes exact saved original session/candidate. Preserve all previous markers and permissions."
+}

@@ -4,11 +4,12 @@
  */
 import assert from 'node:assert/strict';
 import {pilotCorrectionRestoreReady} from './activation/pilot-ui-correction-gate.mjs';
+import {CORRECTION1430,correction1430Gate} from './activation/correction-1430-gate.mjs';
 import {randomBytes,generateKeyPairSync,privateDecrypt,createPrivateKey,constants,pbkdf2Sync,createHmac,createHash} from 'node:crypto';
-import {spawnSync} from 'node:child_process';
+import {spawnSync,execFileSync} from 'node:child_process';
 import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
 import {createRequire} from 'node:module';
-import {pathToFileURL} from 'node:url';
+import {pathToFileURL,fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {serverFirst} from './activation/server-first.mjs';
 import {createRolloutGuard} from './rollout-guard.mjs';
@@ -45,6 +46,45 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(['--1430-preflight','--1430-begin-service','--1430-pin-service','--1430-begin-carrier','--1430-complete-carrier'].includes(action)){
+  const c=CORRECTION1430,currentRun=process.env.N88_1430_RUN_ID;
+  if(path.resolve(root)!==path.resolve('C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018'))fail('n88_1430_original_root');
+  const q=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+c.task+'.json','utf8')),review=correction1430Gate(q,currentRun);
+  const taskRoot=fileURLToPath(new URL('../../',import.meta.url)),local=rel=>path.join(taskRoot,rel),digest=x=>createHash('sha256').update(x).digest('hex');
+  execFileSync('git',['merge-base','--is-ancestor',c.candidate,'HEAD'],{cwd:taskRoot,windowsHide:true});
+  for(const [p,h]of Object.entries(review.sourcePins))if(digest((await readFile(local(p),'utf8')).replaceAll('\r\n','\n'))!==h)fail('n88_1430_source_drift');
+  for(const [p,h]of Object.entries(review.packageOutputs))if(digest(await readFile(local('drafts/n88-student-portal/activation/bundle/'+p)))!==h)fail('n88_1430_package_drift');
+  if(digest((await readFile(local('tests/n88-actual-1430-20261020/conclusion.json'),'utf8')).replaceAll('\r\n','\n'))!==review.localConclusionSha256)fail('n88_1430_local_conclusion_drift');
+  const state=await load();if(state.loginDisarmed||state.directAuthRefused||!state.directVerified||![c.priorEdge,c.edge].includes(state.directSource))fail('n88_1430_owned_preimage');
+  const markerFor=kind=>path.join(phase,'incident-1430-'+c.preparedRun+'-'+kind+'-attempt.json');
+  const receipt=async name=>JSON.parse(await readFile(local('tests/n88-actual-1430-20261020/'+name+'.json'),'utf8'));
+  const stamp={taskId:c.task,preparedRunId:c.preparedRun,runId:currentRun,candidateSha:c.candidate,edge:c.edge,carrier:c.carrier};
+  const pin=async()=>{const rows=await official(['secrets','list','--project-ref',project,'--output','json']),list=Array.isArray(rows)?rows:rows?.rows;const found=list?.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA');if(found?.length!==1)fail('n88_1430_pin_identity');return found[0].value?.toLowerCase();};
+  if(action==='--1430-preflight'){
+   if(state.directSource!==c.priorEdge||await pin()!==digest(c.priorEdge))fail('n88_1430_provider_preimage');
+   return {status:'PASS',originalOwnedState:true,priorSourceMatches:true,readinessReplayed:false,providerWrites:0};
+  }
+  if(action==='--1430-begin-service'){
+   const r=await receipt('provider-preflight');if(state.directSource!==c.priorEdge||r.edge!==c.priorEdge||r.nativeVersion!==51||r.carrier!==c.priorCarrier||!r.configurationVerified||await pin()!==digest(c.priorEdge))fail('n88_1430_native_preimage');
+   await writeFile(markerFor('service'),JSON.stringify(stamp)+'\n',{flag:'wx'});return {status:'PASS',serviceAttemptReserved:true};
+  }
+  if(action==='--1430-pin-service'){
+   assert.deepEqual(JSON.parse(await readFile(markerFor('service'),'utf8')),stamp);
+   const r=await receipt('native-upload');if(r.edge!==c.edge||r.sourceExact!==true||r.verifyJwt!==false||r.version!==52)fail('n88_1430_native_readback');
+   if(state.directSource!==c.priorEdge||await pin()!==digest(c.priorEdge))fail('n88_1430_pin_preimage');
+   await writeFile(markerFor('pin'),JSON.stringify(stamp)+'\n',{flag:'wx'});
+   const file=path.join(phase,'owned-1430-source.env');try{await writeFile(file,'N88_SERVICE_SOURCE_SHA='+c.edge+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+   if(await pin()!==digest(c.edge))fail('n88_1430_pin_readback');
+   state.sourceCorrections=[...(state.sourceCorrections||[]),{...stamp,prior:c.priorEdge,source:c.edge,nativeVersion:r.version}];state.directSource=c.edge;await save(state);return {status:'PASS',sourcePinReadback:true,source:c.edge,keysRolesSqlAuthUnchanged:true};
+  }
+  if(action==='--1430-begin-carrier'){
+   const r=await receipt('provider-preflight');if(state.directSource!==c.edge||await pin()!==digest(c.edge)||r.carrier!==c.priorCarrier||!r.configurationVerified)fail('n88_1430_carrier_preimage');
+   await writeFile(markerFor('carrier'),JSON.stringify(stamp)+'\n',{flag:'wx'});return {status:'PASS',carrierAttemptReserved:true};
+  }
+  assert.deepEqual(JSON.parse(await readFile(markerFor('carrier'),'utf8')),stamp);const r=await receipt('carrier-readback');
+  if(r.source!==c.carrier||!r.sourceExact||!r.configurationUnchanged||!r.servedAssetsExact||state.directSource!==c.edge)fail('n88_1430_carrier_readback');
+  await writeFile(markerFor('carrier-complete'),JSON.stringify({...stamp,version:r.version})+'\n',{flag:'wx'});state.carrierCorrections=[...(state.carrierCorrections||[]),{...stamp,prior:c.priorCarrier,source:c.carrier,version:r.version}];await save(state);return {status:'PASS',carrierHistoryAppended:true};
+ }
  if(['--1336-source-preflight','--1336-pin-qualified-source'].includes(action)){
   const incidentRun='63d4981f-2d89-4240-acc3-26ea973b4f79',taskId='continuous-n88-hosted-failure-after-deadline-fix-20261020';
   const prior='420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253',source='2d11d053328fdfb70a188d1c9db80b174e2ed27ccb0f5c009a1d12b1370320ea';

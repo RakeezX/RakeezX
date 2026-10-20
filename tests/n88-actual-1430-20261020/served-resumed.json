@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "scope": "Changed student JS bytes and private headers only; actual account flow not tested",
+  "path": "/n88-private/assets/student.mjs",
+  "sha256": "750dbd95aa8c9f690509f84c90367c8ac6b42c11feb69fbdc5196ca1238204f1",
+  "privateHeaders": true,
+  "documentHttpByteExact": false,
+  "documentObservation": "Preserved served-document-difference.json: provider inserts Cloudflare challenge script after application module; native carrier document remains exact. No security configuration changed.",
+  "newReadinessRequests": 0
+}
