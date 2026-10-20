@@ -2,13 +2,13 @@
 export const HANDOFF_TTL = 120000;
 // AI: v3 carries only the already-supported, explicitly read setup categories.
 export function validateSetupCategories(categories) {
-  const specs={teacher:['name'],school:['name'],principal:['name'],classes:['classroom','subject'],timetable:['weekday','period','time','classroom','subject']};
-  if(!Array.isArray(categories)||categories.length>5)throw Error('HANDOFF_SETUP');
+  const specs={department:['name'],teacher:['name'],school:['name'],principal:['name'],classes:['classroom','subject'],timetable:['weekday','period','time','classroom','subject']};
+  if(!Array.isArray(categories)||categories.length>6)throw Error('HANDOFF_SETUP');
   const seen=new Set();let count=0;
   return categories.map(c=>{
     if(!c||Object.getPrototypeOf(c)!==Object.prototype||Object.keys(c).sort().join()!=='category,provenance,rows'||!specs[c.category]||seen.has(c.category)||
        !Array.isArray(c.provenance)||c.provenance.length!==1||c.provenance[0]!=='teacher-readonly-run'||!Array.isArray(c.rows)||!c.rows.length||c.rows.length>300)throw Error('HANDOFF_SETUP');
-    seen.add(c.category);count+=c.rows.length;if(count>600||['teacher','school','principal'].includes(c.category)&&c.rows.length!==1)throw Error('HANDOFF_SETUP');
+    seen.add(c.category);count+=c.rows.length;if(count>600||['teacher','school','principal','department'].includes(c.category)&&c.rows.length!==1)throw Error('HANDOFF_SETUP');
     const rows=c.rows.map(row=>{
       if(!row||Object.getPrototypeOf(row)!==Object.prototype||Object.keys(row).some(k=>!specs[c.category].includes(k)))throw Error('HANDOFF_SETUP');
       for(const k of specs[c.category]){

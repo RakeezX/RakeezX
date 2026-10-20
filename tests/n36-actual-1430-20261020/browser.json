@@ -1,0 +1,49 @@
+{
+  "taskId": "continuous-n36-source-authoritative-profile-and-clear-results-20261020",
+  "runId": "e30aa8ce-3574-412f-9c05-74fa71c0fb88",
+  "baseSha": "fdd9ad563996b6126d89a73860f46cf00e62c15a",
+  "checks": [
+    {
+      "name": "visible_department_confidence",
+      "status": "PASS",
+      "evidence": "Actual supported visible dashboard reads labelled teacher/principal/school/department. Hidden/absent department excluded, multiple values flagged; all approved 47 short labels map exactly, unknown stays unrecognized. No school-ID inference."
+    },
+    {
+      "name": "source_wins_visible_profile_repeat_absent",
+      "status": "PASS",
+      "evidence": "Actual app-shell/worker/store applies all three differing names + recognized department; header and settings show new teacher name, legacy device override retired atomically. Repeat produces no new student/enrollment/section/outbox command; absent/unknown source preserves values and calendar."
+    },
+    {
+      "name": "atomic_rollback_owner_cas_unknown_retry",
+      "status": "PASS",
+      "evidence": "Actual IndexedDB quota abort rolls back profile/outbox; concurrent snapshot rejects, postcommit unknown preserved and same-value retry creates no command duplicate; foreign account denied."
+    },
+    {
+      "name": "rendered_ready_wrong_page_result_cancelled",
+      "status": "PASS",
+      "evidence": "Actual shipped extension DOM/CSS and handlers: closed advanced/manual controls, actionable wrong-page link with zero source reads, finite field-labelled saved/current results without private values, separate cancellation message. No per-class/import-page requirement."
+    }
+  ],
+  "errors": [],
+  "live": "NOT_RUN",
+  "preservedFailures": [
+    {
+      "phase": "visible-source",
+      "failure": "page.evaluate: TypeError: globalThis.rakeezRouteDiagnostic is not a function\n    at validateAnchor (http://127.0.0.1:49544/extensions/rakeez-teacher-import-helper/selection.js:168:63)\n    at http://127.0.0.1:49544/extensions/rakeez-teacher-import-helper/selection.js:187:69\n    at Array.filter (<anonymous>)\n    at safeRead (http://127.0.0.1:49544/extensions/rakeez-teacher-import-helper/selection.js:187:41)\n    at Module.readAutomaticTeacherPage (http://127.0.0.1:49544/extensions/rakeez-teacher-import-helper/selection.js:190:37)\n    at eval (eval at evaluate (:311:30), <anonymous>:1:83)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-source-authoritative-profile-and-clear-results-20261020\\tests\\n36-actual-1430-20261020\\browser.mjs:25:32\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-authoritative-profile-and-clear-results-20261020/tests/n36-actual-1430-20261020/browser.mjs:18:2"
+    },
+    {
+      "phase": "visible-source",
+      "failure": "page.evaluate: TypeError: Cannot read properties of undefined (reading '0')\n    at Module.readAutomaticTeacherPage (http://127.0.0.1:49544/extensions/rakeez-teacher-import-helper/selection.js:299:150)\n    at eval (eval at evaluate (:311:30), <anonymous>:1:169)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-source-authoritative-profile-and-clear-results-20261020\\tests\\n36-actual-1430-20261020\\browser.mjs:25:32\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-authoritative-profile-and-clear-results-20261020/tests/n36-actual-1430-20261020/browser.mjs:18:2"
+    },
+    {
+      "phase": "rendered-extension",
+      "failure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /أُوقف التشغيل/. Input:\n\n'الطلاب: 0 جديد، 1 موجود. الجدول الأسبوعي: غير متاح من المصدر؛ اسم المعلم: حُدث؛ اسم المدرسة: مطابق مسبقًا؛ اسم المدير: مطابق مسبقًا؛ إدارة التعليم: مطابق مسبقًا؛ الفصول: مطابق مسبقًا. حُفظ محليًا؛ المزامنة لم تتأكد بعد.'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-authoritative-profile-and-clear-results-20261020/tests/n36-actual-1430-20261020/browser.mjs:62:83\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-authoritative-profile-and-clear-results-20261020/tests/n36-actual-1430-20261020/browser.mjs:18:2"
+    },
+    {
+      "phase": "rendered-extension",
+      "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#run-cancel:not([disabled])') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-source-authoritative-profile-and-clear-results-20261020\\tests\\n36-actual-1430-20261020\\browser.mjs:67:55\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-authoritative-profile-and-clear-results-20261020/tests/n36-actual-1430-20261020/browser.mjs:18:2"
+    }
+  ],
+  "phase": "rendered-extension",
+  "status": "PASS"
+}

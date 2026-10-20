@@ -1,3 +1,13 @@
+## AI candidate 0.5.18 — 20 October 2026
+
+Each explicit Madrasati Start now adopts AVAILABLE teacher, principal/report-alias and school names, including differing existing values, under the same account/document/year/term/lease/CAS guards. Missing or ambiguous values never blank a profile. The persisted profile and its owner-bound outbox remain atomic; stale device-only name overrides are retired in that transaction so header and settings agree. Auth identity/email and unrelated device fields are untouched.
+
+An explicitly labelled VISIBLE education-administration value from the supported teacher context may update only educationDepartment, using exact approved 47-directory labels. Unknown/ambiguous/missing values are reported without guessing a school region; existing calendar/year/term remain unchanged. No new portal routes, hidden APIs, background reads or permission grants.
+
+Normal UI is one start/progress/result. Advanced/manual/diagnostic tools stay in closed details; wrong-page/login/unsupported/cancel states give a next action. Results distinguish updated/current/missing/conflicting/unsupported fields; safe support diagnostics contain only allowlisted field keys/reasons/counts. Old unresolved counts 1/3 alone cannot identify their historical fields or values.
+
+Local actual-app/IndexedDB/extension evidence only. Existing accepted 303-student/deletion/slot/full-flow evidence is reused. Sole publisher must verify immutable/served 0.5.18, then existing stable updater installs the exact verified package; Chrome reload and this new live profile journey are not claimed here.
+
 ## AI candidate 0.5.17 — 20 October 2026
 
 The explicit Start binds the existing authenticated application document and delivers to its shell receiver without changing its route or opening the import page. The app automatically resumes an exact saved same-owner/year/term batch after readiness using a fresh guarded grant; ambiguous class mappings remain optional manual recovery. No school routes, extraction rules or permissions changed.

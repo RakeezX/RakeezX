@@ -48,7 +48,7 @@ export function readSelectedCategoryTable(category) {
   const official=location.protocol==='https:'&&!location.port&&['madrasati.moe.gov.sa','madrasatibeta.moe.gov.sa'].includes(location.hostname);
   const local=['http:','https:'].includes(location.protocol)&&['127.0.0.1','localhost','[::1]'].includes(location.hostname);
   if(!official&&!local)return fail('UNSUPPORTED_ORIGIN');
-  const specs={teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل','المادة'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
+  const specs={department:['إدارة التعليم'],teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل','المادة'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
   const labels=specs[category];if(!labels)return fail('UNKNOWN_CATEGORY');
   const s=getSelection();if(!s||s.isCollapsed||s.rangeCount!==1)return fail('CANCELLED');
   const cell=node=>(node?.nodeType===1?node:node?.parentElement)?.closest('th,td');
@@ -243,11 +243,13 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   const confirmed=dashboard||activeTeacher.length>0||(greetings.length===1&&safeReportLinks>0);
   if(mode==='home'&&!confirmed){if(roles.length!==1)return roleFail('AMBIGUOUS_OR_MISSING_TEACHER_ROLE');return {ok:true,entry,rolePending:true,links:roles,skipped,domain:location.hostname,title:document.title.replace(/https?:\/\/\S+/g,'').slice(0,80),tables:[],warnings:[]};}
   if(['role','gateway'].includes(mode)&&!confirmed)return roleFail('UNCONFIRMED_TEACHER_ROLE');
-  const specs={teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل','المادة'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
+  const specs={department:['إدارة التعليم'],teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل','المادة'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
   const tables=[],warnings=[];
   const dashboardMetadata=dashboard?metadata(dashboards[0]):[];
 
-  const scalar={teacher:[],school:[],principal:[]};
+  const scalar={teacher:[],school:[],principal:[],department:[]};
+  scalar.department.push(...labelValues(document.body,['إدارة التعليم','الإدارة التعليمية','إدارة التعليم التابعة لها']));
+  scalar.teacher.push(...labelValues(document.body,['اسم المعلم','اسم المعلمة']));
   const allTables=Array.from(document.querySelectorAll('table')).filter(visible);if(allTables.length>30)return fail('PAGE_LIMIT');
   for(const table of allTables){
     if(table.parentElement.closest('table')||table.querySelector('table'))continue;

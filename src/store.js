@@ -1315,8 +1315,8 @@ export const softDelete = (storeName, id) => storeName === 'sessions'
 /** بيانات المعلّم — تُصدَّر في النسخ الاحتياطية وتُدمج. */
 export const patchProfile = (changes, options = {}) => patch('profile', 'profile', changes, { ...DEFAULT_PROFILE }, options);
 
-// AI: imported profile identity may fill blanks, never replace a teacher's value.
-export async function importSetupProfile(changes, { verifyCurrent } = {}) {
+// AI: only the explicit guarded source run may replace available profile values.
+export async function importSetupProfile(changes, { verifyCurrent, sourceWins = false } = {}) {
   assertClassImportAccess();
   const workspace=activeWorkspace, session=cloud.session;
   const guard=current=>{
@@ -1325,10 +1325,15 @@ export async function importSetupProfile(changes, { verifyCurrent } = {}) {
     verifyCurrent?.(current);
   };
   if(state.profile?.ownerId&&state.profile.ownerId!==workspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
-  const fields = ['teacherName','schoolName','principalName','reportPrincipalName'];
+  const fields = ['teacherName','schoolName','principalName','reportPrincipalName','educationDepartment'];
   if(Object.keys(changes).some(k=>!fields.includes(k)))throw Error('SETUP_PROFILE_FIELD');
+  if(sourceWins&&typeof verifyCurrent!=='function')throw Error('SETUP_PROFILE_FIELD');
+  if(changes.educationDepartment){
+    const {EDUCATION_DEPARTMENTS,isOfficialEducationDepartment}=await import('./lib/education-department-directory.js');
+    if(!isOfficialEducationDepartment(EDUCATION_DEPARTMENTS,changes.educationDepartment))throw Error('SETUP_PROFILE_FIELD');
+  }
   const previous=structuredClone(state.profile);
-  if(Object.entries(changes).some(([k,v])=>typeof v!=='string'||!v.trim()||v.length>80||state.profile[k]&&state.profile[k]!==v))throw Error('SETUP_PROFILE_CONFLICT');
+  if(Object.entries(changes).some(([k,v])=>typeof v!=='string'||!v.trim()||v.length>80||!sourceWins&&state.profile[k]&&state.profile[k]!==v))throw Error('SETUP_PROFILE_CONFLICT');
   let phase='transaction';
   try {
     // SINGLETON: compare the same hydrated shape as init/refresh, then prepare
@@ -1343,14 +1348,20 @@ export async function importSetupProfile(changes, { verifyCurrent } = {}) {
       if(keys.some(k=>JSON.stringify(hydrated[k])!==JSON.stringify(previous[k])))throw Error('SETUP_PROFILE_CHANGED');
       const next=syncV2Record('profile',{...hydrated,...changes,updatedAt:now()},{pendingCreate:!raw});
       const changed=Object.keys(changes).filter(k=>hydrated[k]!==changes[k]);
-      if(!changed.length)return {};
-      const entry=outboxEntry('profile',next,raw?changed:null,'put',raw??null);
-      return {profile:{put:[next]},...(entry&&(entry.op==='create'||entry.fields.length)?{outbox:{put:[entry]}}:{})};
+      const entry=changed.length?outboxEntry('profile',next,raw?changed:null,'put',raw??null):null;
+      const device=current.device.find(d=>d.id==='device');
+      const legacy=sourceWins&&device&&['teacherName','schoolName','principalName'].some(k=>Object.hasOwn(changes,k)&&Object.hasOwn(device,k));
+      const cleaned=legacy?{...device}:null;
+      if(cleaned)for(const k of ['teacherName','schoolName','principalName'])if(Object.hasOwn(changes,k))delete cleaned[k];
+      return {...(changed.length?{profile:{put:[next]}}:{}),...(cleaned?{device:{put:[cleaned]}}:{}),...(entry&&(entry.op==='create'||entry.fields.length)?{outbox:{put:[entry]}}:{})};
     }});
     phase='readback';
     guard();
     const profile=committed.profile?.put[0];
-    if(profile){state.profile=profile;broadcast([{store:'profile',id:'profile'}]);notify();}
+    if(committed.device?.put[0])state.device={...state.device,...committed.device.put[0]};
+    if(sourceWins)for(const k of ['teacherName','schoolName','principalName'])if(Object.hasOwn(changes,k))delete state.device[k];
+    if(profile)state.profile=profile;
+    if(profile||committed.device?.put[0]){broadcast([...(profile?[{store:'profile',id:'profile'}]:[]),...(committed.device?.put[0]?[{store:'device',id:'device'}]:[])]);notify();}
     return state.profile;
   } catch(cause) {
     reportWriteError(cause,{op:'importSetupProfile',phase});

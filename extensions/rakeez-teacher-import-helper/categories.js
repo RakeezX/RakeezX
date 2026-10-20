@@ -2,6 +2,7 @@
 import {reviewNames} from './core.js';
 import {normalizeDateTimeDigits,validDateTimeValue} from './lib/rakeez-datetime-values.js';
 export const CATEGORIES = Object.freeze({
+  department: {label:'إدارة التعليم', fields:{name:'إدارة التعليم'}},
   teacher: {label:'اسم المعلم', fields:{name:'اسم المعلم'}},
   school: {label:'اسم المدرسة', fields:{name:'اسم المدرسة'}},
   principal: {label:'اسم المدير', fields:{name:'اسم المدير'}},
@@ -24,7 +25,7 @@ export function validateCategory(category,rows){
  const spec=CATEGORIES[category];if(!spec||!Array.isArray(rows))fail('INVALID_CATEGORY');
  if(!rows.length)fail('EMPTY_CATEGORY');
  if(rows.length>300)fail('CATEGORY_ROW_LIMIT');
- if(['teacher','school','principal'].includes(category)&&rows.length!==1)fail('AMBIGUOUS_ROLE');
+ if(['teacher','school','principal','department'].includes(category)&&rows.length!==1)fail('AMBIGUOUS_ROLE');
  const seen=new Set(),slots=new Set();
  return rows.map(row=>{
   if(!row||Object.keys(row).some(f=>!Object.hasOwn(spec.fields,f)))fail('UNKNOWN_FIELD');
@@ -33,7 +34,7 @@ export function validateCategory(category,rows){
    const value=row[field];
    if((category==='timetable'&&['period','time'].includes(field)||category==='classes'&&field==='subject')&&!value)continue;
    if(!value)fail('UNRESOLVED_MAPPING');
-   if(field==='name')out[field]=category==='school'?text(value):name(value);
+   if(field==='name')out[field]=['school','department'].includes(category)?text(value):name(value);
    else if(field==='weekday'){out[field]=clean(value);if(!days.has(out[field]))fail('UNRESOLVED_WEEKDAY');}
    else if(field==='period'){out[field]=clean(value);if(!/^(?:[1-9]|1[0-9]|20)$/.test(out[field]))fail('INVALID_PERIOD');}
    else if(field==='time')out[field]=time(value);
@@ -51,7 +52,7 @@ export function parseCategoryTable(category,input){
  const rows=input.replace(/^\uFEFF/,'').trim().split(/\r?\n/).map(r=>r.split('\t'));
  const spec=CATEGORIES[category];if(!spec)fail('UNKNOWN_CATEGORY');
  if(rows.length>301||rows.some(r=>r.length>50))fail('LIMIT');
- if(['teacher','school','principal'].includes(category)){
+ if(['teacher','school','principal','department'].includes(category)){
   if(rows.length!==1||rows[0].length!==2||clean(rows[0][0])!==spec.fields.name)fail('UNRESOLVED_ROLE_LABEL');
   return validateCategory(category,[{name:rows[0][1]}]);
  }
@@ -68,13 +69,13 @@ export function parseCategoryTable(category,input){
 export function stageCategory(staged,category,rows,source){
  if(!['pasted-visible','selected-visible','teacher-readonly-run'].includes(source))fail('INVALID_PROVENANCE');
  const prior=staged.find(c=>c.category===category);
- const merged=['teacher','school','principal'].includes(category)?rows:[...(prior?.rows??[]),...rows];
+ const merged=['teacher','school','principal','department'].includes(category)?rows:[...(prior?.rows??[]),...rows];
  const next={category,provenance:[...new Set([...(prior?.provenance??[]),source])],rows:validateCategory(category,merged)};
  const result=[...staged.filter(c=>c.category!==category),next];
  if(result.reduce((n,c)=>n+c.rows.length,0)>600)fail('BUNDLE_LIMIT');return result;
 }
 export function bundle(staged){
- if(!staged.length||staged.length>6)fail('EMPTY_OR_LIMIT');
+ if(!staged.length||staged.length>7)fail('EMPTY_OR_LIMIT');
  const seen=new Set();
  const categories=staged.map(c=>{
   if(!c||Object.keys(c).some(f=>!['category','provenance','rows'].includes(f))||seen.has(c.category))fail('INVALID_CATEGORY');seen.add(c.category);

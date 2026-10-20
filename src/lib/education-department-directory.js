@@ -25,6 +25,14 @@ export function isOfficialEducationDepartment(directory, value) {
   return typeof value === 'string' && directory.includes(value);
 }
 
+// Explicit visible label values only; no school/city substring inference.
+export function resolveVisibleEducationDepartment(value) {
+  const key = text => normalizeDepartmentSearch(text).trim().replace(/\s+/g, ' ');
+  const matches = EDUCATION_DEPARTMENT_OPTIONS.filter(row => [row.canonicalName, row.shortLabel].some(text => key(text) === key(value)));
+  return matches.length === 1 ? { status:'recognized', value:matches[0].canonicalName }
+    : { status:matches.length ? 'ambiguous' : 'unrecognized', value:null };
+}
+
 // Initial accounts only. Match canonical directory rows, never city substrings.
 export function initialDepartmentCalendarPreset(educationDepartment) {
   if (!isOfficialEducationDepartment(EDUCATION_DEPARTMENTS, educationDepartment)) return null;

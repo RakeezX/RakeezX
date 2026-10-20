@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "version": "0.5.18",
+  "baseSha": "fdd9ad563996b6126d89a73860f46cf00e62c15a",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.18.zip",
+    "sha256": "97273b3c150c7367ce47cadcebd8c663d32f0f20b9efc2ef00f7385dd769339c",
+    "bytes": 114873
+  },
+  "runtimeFiles": 25,
+  "checks": [
+    "Exact ZIP/source/SHA256/size parity",
+    "Unaffected source adapter/roster/route/date proofs reused",
+    "Additive department app/extension validation parity and malformed rejection; unchanged permissions/CSP; changed JS syntax; existing offline shell modules present",
+    "Previous 0.5.17 immutable",
+    "Stable installation is a postpublication gate"
+  ],
+  "deliveryGate": {
+    "status": "NOT_RUN",
+    "reason": "Independent publisher must first verify source/served 0.5.18 package; existing n36-stable-sync then installs those exact bytes and records version/hash. Chrome reload NOT_RUN."
+  }
+}
