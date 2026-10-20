@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-current-teacher-connection-actual-cause-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3600,
+      "scopeKey": "continuous-n88-current-teacher-connection-actual-cause-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 25,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "objective": "Latest direct PO20October actual feedback after0.5.20 and N88 safe-copy publication. Existing controller/serial publisher only; preserve active N36background and N107 candidates, no overlapping manual agent/queue edits. Read exact current Product row/current originmain/affected files only. Minimum changed-boundary checks, reuse unchanged proofs. N125/N64/CLOSED stay closed, N44HOLD. Preserve actual tool/school/resultreader/browser-custody refusals, no alternate actor/newtab to evade refusal. No real pupil/account/code writes, real send, credentials extraction, Auth config/keys/roles/RLS/schema/SQL/migrations. Local owner-bound application behavior release retains exact user authority and isolation/max/grade/outbox/history/nonce/document guards. Never call localfixture or outer200 actual user success.\nHuman explicitly asks a dedicated independent N88worker NOW to establish/fix actual teacher-space failure, no repeated checks. Actual CURRENT page says «تعذّر الاتصال بمساحة الطلاب. حاول مجددًا.» with Retry and new Copyfailure button; not only oldgeneric timeout. Previous fullcause gate FAIL and partialstudent/singleerror/copy publications remain intact. First use NEW current six-field failed-entry snapshot from human async reply if present in latest Product row or C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261020-appchanged-n88-cause/intake.json; no newtrial merely toobtain it. Root already asked user click Copy on EXISTING error, not Retry/reload. DO NOT rerun old body-delay fixture, clipboard7cases,13→2projectionbenchmark, old5.911s aggregate, crypto/SQL/readiness/browsermatrix or raise deadline. One specifically changed boundary cause reproduction only after actual phase/code/stage guides it.\nFresh current USER-REPORTED existing Chrome tab is2005438939, URL https://rakeezx.com/#/teaching/tch:428aa4aa-0e14-4511-9d92-f2c97daa154a/student-portal (fresh inventory20Oct13:27UTC, not the old deniedTab2005438362). Continue ORIGINAL custodian actor/session; root has NOT claimed this N88tab. Only use this exact newly reported existing page if normal tool ownership permits original custodian, within bounded live-browser phase lease, programmatic background DOM only. This is current user-directed diagnosis, NOT authority to reclaim a lockedtab or create/claim another substitute. If this tab is owned by someoneelse/denied, STOP that route and use user-pasted snapshot; no ownerlock delete/tool/actor/tab workaround or personal foreground/OSinput. Read errorDOM/click existing Copy only; read known pageclipboard result as finite6fields, no arbitrary personal clipboard/hidden browserstate/storage/JWT/cookies/token extraction. No real create/rotate/revoke/publish/save writes or fixture login. One normal readonly Retry on this exact page MAY verify a CAUSALLY QUALIFIED published correction after source arrives; no repeated blind retries. Samepage reload only if needed for exact newlypublished frontend and no edit/work-in-progress, no otherpersonal navigation. If evidence already supports actual failure phase, prefer it over new requests.\nIf legitimate operational metadata is needed, ONE fresh bounded13:19–13:33UTC aggregate on existing n88function/native53 and ingress source stage/status/duration/actionfamily only, no users/requestIDs/payload/URLs/IP/headers/tracecontent or general accountscan. Use current official Supabase docs/changelog where APIactuallychanges; read skill, don't open broad audits. Phase x-n88-service-stage/x-n88-transport-stage allowlisted values can guide source/ingress query; outer200 alone is not businesssuccess. Actualfailedstage may be binding/queue/dispatch/http/body/sourcerevision/Auth/DBlock; inspect only implicated sourcebranch and current deployedrevision, do not redeploy byguess.\nNative53 source fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358; latest carrier28568dc0-f03e-44f5-a5b4-704319a404df source ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c; student c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470. Source/publicpin/native/currentcarrier readback only whencausallyneeded, don'trepeat allunchangedassets. Root/policy neverseesprotectedkeys. Actual cause fix may be runtime, ingress transport or nativegraph: allow narrow codechange at actual implicatedbranch while preserving sourcepin/signature/replay/lock/COMMIT/currentowner/session/lease/roster/policy/unknownACK semantics. No configuration/security/CSP/roles changes. If source or transport needs livechange, exactlyONE causallyqualified changednative deploy and publicpin update and/or ONE changedcarrier operation through ORIGINAL protectedcustodian may be prepared; do not reuse/reset old consumed readiness/1336/1430/static1522markers. Newimmutable task/run/candidate/preimage/hash review required before protected networkwrite; if gate lacks reviewedcandidate save exact qualifiedcandidate+neededcapability for rootops once, not newPOgeneralpermission or bypass. No speculative native54/loggingrollout to compensate for missingactualsnapshot. If cause is frontendonly, deploy no native/carrier. Existing studentassets/privacyheaders/controls unchanged unlessdirectlyaffected; no replay of successful student suite. Prior CloudflareHTML strictbyteFAIL remains, protection unchanged.\nRequired outcome: actual phase→specific faultybranch→minimum representative reproduction→fix→matched service/source/servedreadback and permitted existing teacherpage read when possible. Report exact actual vs simulated/effect limits; no fullN88closure without acceptance. If no actualphase is available from permitted currentpage/user/provider, return BLOCKED with blockerType external and exact missingfinite snapshot/currentlegitimate read condition, do not spend25minutes replayingfixtures or misclassify lackevidence asimplementation retry. OriginalactualcauseFAIL remains. Newevidence only restarts thiswork. No app/store edits whileN107active; if genuinely needed source path missing save exactcause/path for normal serialized cardrepair.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/views/student-portal-class.js",
+        "src/styles/student-portal-class.css",
+        "drafts/n88-student-portal/**",
+        "tests/n88-actual-current-cause-20261020/**",
+        "docs/automation-evidence/20261020/N88_CURRENT_ACTUAL_TEACHER_CAUSE.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_new_actual_failed_phase_specific_cause",
+        "n88_causal_correction_owner_source_ack_guards",
+        "n88_exact_changed_runtime_service_delivery_or_unchanged_prerequisites"
+      ],
+      "acceptance": [
+        "Diagnose the newly reported actual teacher connection failure using current stage evidence, not another unchanged artificialtimeout.",
+        "Publish qualified specific correction through originalcustody/solepublisher, preserve genuine failures/unknowns and exact userjourney status."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct user currentteacher failure and independent worker mandate",
+        "publication": true,
+        "readonlyCurrentTeacherTab": "2005438939",
+        "maxNewCausallyQualifiedNativeDeploys": 1,
+        "maxChangedCarrierOperations": 1,
+        "newReadinessRequests": 0,
+        "newCredentials": 0,
+        "newSqlAuthConfiguration": false,
+        "realPupilOrCodeWrites": 0
+      },
+      "liveAuthorizationRef": "PO-20261020-CURRENT-N88-TEACHER-CAUSE",
+      "releaseAuthority": "Direct latest PO diagnose/fix N88 actualteacher failure permits exact qualified source/transport/runtime correction via originalcustodian and solepublisher, no unrelated live/data/security authority."
+    }
+  ]
+}

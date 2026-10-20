@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-current-appchanged-receiver-context-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -3599,
+      "scopeKey": "continuous-n36-current-appchanged-receiver-context-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 20,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n36-background-run-no-tab-or-open-popup-20261020"
+      ],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "Latest direct PO20October actual feedback after0.5.20 and N88 safe-copy publication. Existing controller/serial publisher only; preserve active N36background and N107 candidates, no overlapping manual agent/queue edits. Read exact current Product row/current originmain/affected files only. Minimum changed-boundary checks, reuse unchanged proofs. N125/N64/CLOSED stay closed, N44HOLD. Preserve actual tool/school/resultreader/browser-custody refusals, no alternate actor/newtab to evade refusal. No real pupil/account/code writes, real send, credentials extraction, Auth config/keys/roles/RLS/schema/SQL/migrations. Local owner-bound application behavior release retains exact user authority and isolation/max/grade/outbox/history/nonce/document guards. Never call localfixture or outer200 actual user success.\nNEW actual0.5.20 trace:303/10/7, stageunresolved, transfererror, receiptunknown, failureAPP_CHANGED; setupPhase=envelope, setupFields=[school,principal,teacher,timetable,classes], receiverCapability=source-profile-quiet-v1, fieldResults=[]. Teacher says personaldata notupdated. This proves supported setupdata reached envelope and receiver is current; do NOT repeat old stalecapability/standalonesetter/fullsource303 proof or dismiss as oldapp. Real failure is between captured receivergrant and app acceptance, before outcome. Backgroundnewengine changes are independent but do not automaticallyfix thisapp fence. Read latest backgroundcandidate/publication first and preserve it. N107 owns store/view untilterminal; controller serializes thisapp-onlycard, never overlap samefiles manually.\nInspect exact APP_CHANGED sites in current handoffworker: URL/mainframe/currentdocument/capability+checkNamesBatch and receiveNamesBatch false. Readonly extensioncode allowed, do not edit runningbackgroundengine. Current app prepareExtensionBatch captures cloud.session object and automaticGuard rejects any object replacement, even a refreshed alreadyverified SAME Authsession; checkNamesBatch also folds temporary automaticWriting/extensionBusy into false, and auto-resume can contend with explicit activegrant. Diagnose these concrete fencebranches using actual app/receiver with existing synthetic fixture and serialized envelope, not re-extraction. Ordinary verified same-authsid bearerrefresh/samepage harmlessroute must not masquerade as account/documentchange, but genuine newowner/Authsid/workspace/lease/year/rawterm/document/expiry must still retiregrant. Compare stable authoritative alreadyverified owner/workspace/database/lease/Authsession fence, never trust editableusermetadata/JWTdecode alone as authorization; keep cloud.authStatus/owner/lease guards and fixedoriginalTTL, don'trefreshgrant onto anotheraccount/currentterm. If actualfencecause isn'tproved, preserve ambiguity and expose ONLY finite branch reason in same error diagnostics rather than broadAPP_CHANGED; neverclaim actualdocument changed from umbrella code.\nTemporary current samebatch writerbusy is backpressure, not proof of appchange: use existing serialized sameintent/outcome coordination rather than clearing grant, creatingnewnonce/batch or auto-freshStart. Prevent savedbatch autoresume replacing/competing with explicit currentgrant; no unknownwrite duplicates. If postaccept/outcomeunknown, retain originalidentity and reconcile rather than erasingnonce/crossowner state. No suppressing realowner/sourcefailure, no arbitrarydeadlineextension/foreverpoll. Publicreceiverv3 schema/capability must remain compatible with alreadyapproved newbackground engine; no extensionprotocolwrite in thisapp-onlyphase. If narrownewengine boundary fix is required, save exactmissingfile+candidate for serialized correction, no concurrenttouch ornewPOapproval. Appguard diagnostics can supply finite boolean/status/reason to existingcapability/check route without exposingIDs/values/tokens; preserve strict document/nonce enforcement atworker.\nMinimum changed-boundary composition: real owner-bound receivercheck→serializedsetup→profile/outbox→actualsettings with a sameAuthsession refreshedobject/harmlessroute event, plus genuine differentAuthsid/owner/context denial. If busy race is causal, one deterministic existingautoresume/explicitgrant case and unknownsameidentity proof; otherwise do not inventextra suite. Reuse source extraction/package/profilewrite/grade/Sync/Delete proofs. No live school automation/resultreader, personalaccountreads/writes/Auth/SQL, no existingcalendar switch. Actual metadata source available doesn't imply cloudsuccess. Deliver appfix via solepublisher, currentdownloadlink mustpreserve latestbackgroundpackage and N107 localimportchanges. WholeN36 staysopenfor actualresult.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/n36-receiver-binding.js",
+        "tests/n36-current-appchanged-20261020/**",
+        "docs/automation-evidence/20261020/N36_CURRENT_APPCHANGED_RECEIVER.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_current_appchanged_fence_specific_reproduction",
+        "n36_same_verified_session_refresh_and_real_owner_context_denial",
+        "n36_serialized_setup_receipt_settings_after_fence_fix"
+      ],
+      "acceptance": [
+        "Fix the new actual envelope-stage rejection without repeating extraction or weakening owner/document/nonce/atomicwrite guards.",
+        "Reuse background/N107 successful source and deliver through solepublisher; report actualuser outcome unproven until observed."
+      ],
+      "preparationAuthority": {
+        "kind": "New actual currentcapability APP_CHANGED envelope regression",
+        "publication": true,
+        "realAccountMutations": 0
+      },
+      "releaseAuthority": "Latest direct PO actual0.5.20 failedtransfer correction permits exactexisting owner-bound appreceiver fix, no extra source/Auth/schema/permission."
+    }
+  ]
+}
