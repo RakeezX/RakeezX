@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-actual-teacher-deadline-cause-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -2600,
+      "scopeKey": "continuous-n88-actual-teacher-deadline-cause-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Latest direct PO20October reports actual failure AFTER published corrections. Read current origin/main affected source, exact Product row, AGENTS/ops contract only. Sole existing controller and serial publisher; no manual worker/queue edit. Preserve candidates and actual failures. Minimal checks related to the NEW cause only; reuse unchanged proof. No full suite, repeated old readiness/focus/school/browser tests, new planner or broad audit. No real account/pupil mutation/send, Auth configuration, SQL/migration/RLS/roles/keys/passwords unless explicitly authorized below. N44 remains explicit HOLD; accepted unrelated tickets remain CLOSED. Prior actual tool, school and browser-ownership refusals remain binding: never retry via another tool/actor/tab. Truthful LOCAL_READY vs publication vs actual account success; a synthetic fixture/source parity cannot close this umbrella or prove the reported live journey.\n\nActual PO now gets loading followed by EXACT «لم تكتمل قراءة الفصل خلال المهلة…» after publication393df95878d0ecf94477ddd4922e723022e297a5 at08:59Z. Prior stable-key/token-refresh repair and its proofs are saved; do not repeat or claim that this new timeout is solved by them. Diagnose the CURRENT initial teacher list request end to end: app binding/dispatch queue, browser deadline, private ingress, native49 handler/Auth/SQL/projection/response. Identify which wait can exceed deadline from real code composition and, if needed, ONE bounded ordinary provider operational metadata read for the NEW post08:59 window, finite phase/status/timing only, no personal payload/IDs/tokens/URLs. Outer HTTP200 is not business success. Existing last diagnostic checkpoint must preserve actual failing phase/code rather than overwrite all failures as generic. If there is no causal evidence do not invent it or merely add retries/timeouts. Never remove admission/readiness/Auth/owner/session/revision/projection checks or show guessed empty roster. Same-binding stable sections must remain fixed; genuine binding changes clear secrets immediately and reject late responses. Do not regenerate/rotate/publish anything in a real teacher account.\nUser also rejects placement of «صفحة دخول الطالب»: place a compact secondary link in the actual class portal toolbar/header, avoid duplicated «مساحة طلاب الفصل» headings; keep accessible during a service error and preserve same Rakeez style/responsive layout. Only affected DOM inspection needed. Previous-session inline check and current accepted student identity remain unchanged.\nContinue ORIGINAL custodian session01a14fc3-b292-7390-9952-8549a286c80f and existing owned bridge. Old signed readiness marker consumed, do NOT replay. No browser ownership refusal bypass, new key/service role/client grant or credential extraction. Exact native49 sourceSHA420a57e65cc242652f266693c5280f9b112791cdeb556910f90796c39d5b0253 is prior baseline, no unchanged redeploy. If and ONLY IF a concrete changed service source is locally qualified and necessary for this reported request deadline, one original-custodian Edge-function update/readback is allowed through existing supported deployment path, preserving ACL/auth guard/environment/bindings/activation and no migration or Authconfig. If static assets actually change, ONE changed-assets-only private-ingress carrier update/readback max, no unchanged carrier upload. Ordinary frontend delivery remains sole publisher. Reuse prior preserved guards; new case must include real client/ingress/server composition with controlled slow relevant dependency and failure phase, plus unaffected guards at the changed boundary. No complete service suite. Keep actual teacher success unproven unless legitimately observed; no further user retry request before a causal fix.",
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/lib/student-portal-task-guidance-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/teachings.js",
+        "src/styles/student-portal-class.css",
+        "src/lib/support.js",
+        "supabase/functions/**",
+        "drafts/n88-student-portal/**",
+        "tests/n88-actual-deadline-20261020/**",
+        "docs/automation-evidence/20261020/N88_ACTUAL_TEACHER_DEADLINE.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_actual_initial_read_deadline_cause_and_phase",
+        "n88_teacher_entry_link_compact_and_single_heading"
+      ],
+      "acceptance": [
+        "Reproduce and correct the specifically reported failure in the actual application composition with synthetic data, preserve owner/persistence/ACK/isolation guards.",
+        "Deliver through the existing publisher with source/effect evidence; keep live journey unverified until actually observed."
+      ],
+      "preparationAuthority": {
+        "kind": "Original custodian exact existing service correction only if concrete new cause proved",
+        "publication": true,
+        "maxChangedFunctionDeploys": 1,
+        "maxChangedStaticCarrierUploads": 1,
+        "newMigrations": 0,
+        "newRoles": 0,
+        "newKeys": 0,
+        "realAccountMutations": 0,
+        "realSend": false
+      },
+      "releaseAuthority": "Direct PO20October authorizes these specific fixes and normal guarded application writes in their existing contracts, through the sole publisher. No unrelated schema/Auth/permission change.",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "liveAuthorizationRef": "PO-20261020-N88-ACTUAL-TEACHER-TIMEOUT-MATCHED-CORRECTION"
+    }
+  ]
+}

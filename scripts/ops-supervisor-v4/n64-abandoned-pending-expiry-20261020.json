@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n64-abandoned-pending-expiry-20261020",
+      "productId": "N64",
+      "activationId": "po-20261012-continuous",
+      "priority": -2599,
+      "scopeKey": "continuous-n64-abandoned-pending-expiry-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Latest direct PO20October reports actual failure AFTER published corrections. Read current origin/main affected source, exact Product row, AGENTS/ops contract only. Sole existing controller and serial publisher; no manual worker/queue edit. Preserve candidates and actual failures. Minimal checks related to the NEW cause only; reuse unchanged proof. No full suite, repeated old readiness/focus/school/browser tests, new planner or broad audit. No real account/pupil mutation/send, Auth configuration, SQL/migration/RLS/roles/keys/passwords unless explicitly authorized below. N44 remains explicit HOLD; accepted unrelated tickets remain CLOSED. Prior actual tool, school and browser-ownership refusals remain binding: never retry via another tool/actor/tab. Truthful LOCAL_READY vs publication vs actual account success; a synthetic fixture/source parity cannot close this umbrella or prove the reported live journey.\n\nPreviously CLOSED successful actual email-change and copy remain accepted. User now explicitly requests abandoned expired email-change request cease appearing as pending in Rakeez, as though no change were requested, rather than lifetime pending. Official project Email OTP Expiration was read20October08:41:900seconds=15minutes, Secure Email Change ON; relevant official docs verified this setting covers email-change links. Existing provider pending metadata automatically clearing at expiry was NOT proven. Do not promise actual provider cancellation from link expiry alone. Scope: implement truthful expiry of pending UI state from authoritative provider email_change_sent_at/request timestamp and900s confirmed policy, including already abandoned pending observed after reload, view-local pending, return/focus, owner isolation and a fresh new request. Do not infer completion/adopt new email from elapsed time, expired metadata, stale cache or failed identity read. Keep original email/current account and actual success verification. Do not silently renew/send another change, resend/cancel a live Auth request or PATCH Auth config via alternate tool: prior actual N64 refusal remains binding. No Auth/network mutation needed for this frontend lifecycle. If timestamp unavailable, cannot fabricate it; preserve neutral state and document exact remaining prerequisite without a perpetual misleading pending flag. Authoritative verify read remains existing supported channel, owner bound; no synthetic successful feedback. Concise expiry wording if useful: «انتهت مهلة تأكيد الطلب. يمكنك طلب تغيير البريد من جديد.» Do not add page/button/step or extra technical text. Integrate in existing settings.js only to avoid active N117 settings-profile-ui/cloud scope. Minimal affected expiry-boundary/refresh-old-pending/new-request/success/owner-change/failure tests with controlled time and existing view/helper; no real email request or wait15minutes. Do not claim provider metadata deletion; distinguish expired Rakeez request UI and expired link from provider internal row.",
+      "allowedPaths": [
+        "src/views/settings.js",
+        "tests/n64-expiry-20261020/**",
+        "docs/automation-evidence/20261020/N64_ABANDONED_PENDING_EXPIRY.md"
+      ],
+      "verificationPaths": [
+        "src/views/settings.js"
+      ],
+      "requiredChecks": [
+        "n64_abandoned_pending_expiry_owner_reload_and_success"
+      ],
+      "acceptance": [
+        "Reproduce and correct the specifically reported failure in the actual application composition with synthetic data, preserve owner/persistence/ACK/isolation guards.",
+        "Deliver through the existing publisher with source/effect evidence; keep live journey unverified until actually observed."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct PO20October actual failed result and exact requested correction",
+        "publication": true,
+        "realSend": false,
+        "realUserMutation": false
+      },
+      "releaseAuthority": "Direct PO20October authorizes these specific fixes and normal guarded application writes in their existing contracts, through the sole publisher. No unrelated schema/Auth/permission change."
+    }
+  ]
+}

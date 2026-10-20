@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-setup-profile-save-direct-bridge-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -2598,
+      "scopeKey": "continuous-n36-setup-profile-save-direct-bridge-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n117-required-department-initial-calendar-20261020"
+      ],
+      "objective": "Latest direct PO20October reports actual failure AFTER published corrections. Read current origin/main affected source, exact Product row, AGENTS/ops contract only. Sole existing controller and serial publisher; no manual worker/queue edit. Preserve candidates and actual failures. Minimal checks related to the NEW cause only; reuse unchanged proof. No full suite, repeated old readiness/focus/school/browser tests, new planner or broad audit. No real account/pupil mutation/send, Auth configuration, SQL/migration/RLS/roles/keys/passwords unless explicitly authorized below. N44 remains explicit HOLD; accepted unrelated tickets remain CLOSED. Prior actual tool, school and browser-ownership refusals remain binding: never retry via another tool/actor/tab. Truthful LOCAL_READY vs publication vs actual account success; a synthetic fixture/source parity cannot close this umbrella or prove the reported live journey.\n\nActual extension0.5.16 collected303names/10classes/7pages but Rakeez toast «تعذر الحفظ - لم يسجل التعديل», then SETUP_PROFILE_SAVE. Existing classes appeared WITHOUT subjects; no profile/timetable update. All10classes listed unresolved even though same destinations exist: خامس1..8 and سادس6,7 vs الخامس الابتدائي/1..8 and السادس الابتدائي/6,7. Extension diagnostics misleadingly failure:none, receipt:unknown. Collection proof is intact; do NOT repeat school collection/reinstall or ask user reimport. Saved current-account batch must remain resumable. Mark previous full flow as FAILED actual, never infer save success from303collection or a published asset.\nStart with actual src/store.js importSetupProfile→save→db.applyBatch and real hydrated persisted profile shape, SINGLETON semantics, optimistic memory notification, prior snapshot comparisons, verifyCurrent callback and root reportWriteError. SETUP_PROFILE_SAVE hides actual failure: reproduce exact error with real module+IndexedDB shape using small representative existing destination classes/profile (no need303 fixtures). Fix minimal actual guarded transaction, do not remove verifyCurrent/lease/owner/conflict guards or overwrite existing differing teacher/profile values. Prove rollback/unknown outcome and saved-batch retry without duplicates, including owner/account changes. Preserve low-level finite phase/code into existing safe receipt/diagnostics; never include students/names/tokens. A generic class error list must not mislabel every class as unresolved on a profile-wide failure.\nUser's required happy path: ONE Start from existing Madrasati extension, available classes+subjects+students+teacher/principal/school+timetable go directly to already logged-in Rakeez without navigating/opening the import page or asking a confirmation per class. Existing import-route-only receiver is not sufficient; trace the full existing source/bridge/receiver lifecycle and place normal authenticated receiver in appropriate always-available app shell if needed. Keep one receiver, nonce/grant/owner/session/database/year/term/lease/current-document/lifetime fences and explicit user Start. Existing exact same-account saved batch must automatically resume after receiver ready, with current grant and validation, not blind replay of old/foreign batch. Existing manual recovery page remains optional for genuinely ambiguous source mapping/conflict only. Do not claim arbitrary hidden/unread school data exists; extract only current supported authorized visible fields, don't widen school browsing/execution authority. Source absent vs conflicting vs save failure must be honest. Use safe canonical class matching and unique existing destinations, not guessed global map; never duplicate children/grades/history or create dummy subject. Preserve actual calendar, educationDepartment and initial N117 behavior.\nDependencies intentionally wait N117 because app.js/store/profile/sw scope overlaps. Rebase new implementation on its verified current main; do not overwrite its required new-signup changes. The earlier subjectless delete migration already applied/read back; reuse unchanged and DO NOT reapply. No new SQL/Auth/RLS/schema/provisioning service or real user mutation in this task.\nAfter affected local actual app+extension integration qualification, bump from current extension0.5.16 once, produce package through established workflow, sole publisher source/served hash proof, then existing n36-stable-sync updater installs exact verified package to artifacts/private-tools/n36-current/runtime and records actual version/hash. Do not merely update site link or say Chrome reloaded; leave actual Chrome reload state honest. Minimal newly affected application-store transaction, automatic app-shell bridge no-navigation, same-account retry/foreign-owner fence and changed startup-module offline dependency if added; no old full extraction/pagewalker/SQL/delete/Restore/whole Sync suite. Concise progress/result copy and no new import-page requirement.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/app.js",
+        "src/views/class-import-center.js",
+        "src/lib/extension-bridge.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/class-import.js",
+        "src/lib/db.js",
+        "src/lib/rakeez-bundle-import.js",
+        "src/lib/extension-import-batch.js",
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "sw.js",
+        "tests/n36-actual-save-20261020/**",
+        "docs/automation-evidence/20261020/N36_SETUP_PROFILE_DIRECT_BRIDGE.md"
+      ],
+      "verificationPaths": [
+        "src/store.js"
+      ],
+      "requiredChecks": [
+        "n36_real_profile_transaction_failure_and_saved_batch_retry",
+        "n36_one_start_current_account_app_shell_without_import_navigation",
+        "n36_changed_package_and_stable_folder_same_verified_version"
+      ],
+      "acceptance": [
+        "Reproduce and correct the specifically reported failure in the actual application composition with synthetic data, preserve owner/persistence/ACK/isolation guards.",
+        "Deliver through the existing publisher with source/effect evidence; keep live journey unverified until actually observed."
+      ],
+      "preparationAuthority": {
+        "kind": "Direct PO20October actual failed result and exact requested correction",
+        "publication": true,
+        "realSend": false,
+        "realUserMutation": false
+      },
+      "releaseAuthority": "Direct PO20October authorizes these specific fixes and normal guarded application writes in their existing contracts, through the sole publisher. No unrelated schema/Auth/permission change."
+    }
+  ]
+}
