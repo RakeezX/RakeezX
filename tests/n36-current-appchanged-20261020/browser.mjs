@@ -5,7 +5,7 @@ import {syntheticService,owner,foreignOwner} from '../n73-account-flow-fixture.m
 const taskId='continuous-n36-current-appchanged-receiver-context-20261020',runId='c226fb0c-7562-4066-a7a0-7627cb7641ee',baseSha='15991a36f0a7b3f082b85acd1c45a6c9d581f9a2',base='http://127.0.0.1:49602',root=resolve('.'),folder='tests/n36-current-appchanged-20261020/';let service,original=false,worker;
 const result={taskId,runId,checks:[],live:'NOT_RUN',boundary:'Real HTTP app/receiver/owner guard/IndexedDB/settings and actual unchanged extension worker through synthetic Chrome API. No source extraction.'};
 const server=createServer(async(req,res)=>{try{const u=new URL(req.url,base);if(u.pathname.startsWith('/__n73/')){let body='';for await(const c of req)body+=c;res.setHeader('content-type','application/json');res.end(JSON.stringify(await service.request(u.pathname.slice(7),JSON.parse(body||'{}'))));return;}
- 
+
  const f=resolve(root,u.pathname==='/'?'index.html':'.'+decodeURIComponent(u.pathname));if(!f.startsWith(root+sep))throw Error('Outside root');let bytes=await fs.readFile(f);if(original&&u.pathname==='/src/views/class-import-center.js')bytes=execFileSync('git',['show',baseSha+':src/views/class-import-center.js']);if(u.pathname==='/src/lib/n36-extension-protocol.js')bytes=Buffer.from(bytes.toString().replace('https://rakeezx.com',base));res.setHeader('content-type',({'.html':'text/html;charset=utf-8','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2'})[extname(f)]||'application/octet-stream');res.end(bytes);}catch(e){res.writeHead(404);res.end(e.message);}});
 
 const pass=(name,evidence)=>{result.checks.push({name,status:'PASS',evidence});console.log('PASS '+name);};
@@ -42,4 +42,3 @@ try{await new Promise(r=>server.listen(49602,'127.0.0.1',r));await withIsolatedL
  pass('n36_same_verified_session_refresh_and_real_owner_context_denial','Actual owned receiver accepts refresh and rejects different Authsid/foreign owner; unchanged profile/outbox on denial.');worker.kill();await c.close();
  }
  });result.status='PASS';}catch(e){result.status='FAIL';result.failure=e.stack;process.exitCode=1;}finally{await new Promise(r=>server.close(r));await fs.writeFile(folder+'browser.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));}
-
