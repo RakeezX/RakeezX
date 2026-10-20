@@ -11,7 +11,7 @@ import {syntheticService,owner} from '../n73-account-flow-fixture.mjs';
 import {decodeSyncV2Canonical,SYNC_V2_SCHEMAS,encodeSyncV2Patch} from '../../src/lib/sync-v2.js';
 import {makeEnrollment,makeItem,makeStudent,makeTeaching,defaultItemsFor} from '../../src/models.js';
 
-const taskId='continuous-n107-width-two-after-owned-context-20261020',runId='44d64481-ed7b-49ab-a4a0-d598f5e2cee4';
+const taskId='continuous-n107-width-two-after-owned-context-20261020',runId='6f3ddb17-a21f-4caf-ae90-1a5884f868f5';
 const base='http://127.0.0.1:49761',root=resolve('.');
 
 const evidence={taskId,runId,checks:[],failures:[],testedFiles:{}};
@@ -190,16 +190,18 @@ async function assertResult(page){
  return {teachingId:t.id,gradeMutationId:requests[0].mutationId,scores:scores.map(s=>[s.id,s.value])};
 }
 
+const candidateOnly=process.argv.includes('--candidate-only');
 let variant='before',trace=[],started=0,active=0,peak=0;
 try{
  await new Promise((ok,fail)=>{server.once('error',fail);server.listen(49761,'127.0.0.1',ok);});
  await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+taskId+'.json',runId,url:base,timeoutMs:120000},async({createContext})=>{
-  for(const v of ['before','after']){
+  for(const v of (candidateOnly?['after']:['before','after'])){
    variant=v;active=peak=0;const {context,page}=await fresh(createContext);
    try{
-    await page.evaluate(()=>{globalThis.__time={};document.addEventListener('click',e=>{if(e.target.closest('[data-act="class-import-confirm"]'))globalThis.__time.confirm=Date.now();},true);new MutationObserver(()=>{if(globalThis.__time.confirm&&!globalThis.__time.success&&document.querySelector('[data-roster-file-flow]')?.textContent.includes('ÇáÏÑÌÇÊ ÇáãÍÝæÙÉ: 31'))globalThis.__time.success=Date.now();}).observe(document.body,{subtree:true,childList:true,characterData:true});});
+    await page.evaluate(()=>{globalThis.__time={};document.addEventListener('click',e=>{if(e.target.closest('[data-act="class-import-confirm"]'))globalThis.__time.confirm=Date.now();},true);new MutationObserver(()=>{if(globalThis.__time.confirm&&!globalThis.__time.success&&document.querySelector('[data-import-success]'))globalThis.__time.success=Date.now();}).observe(document.body,{subtree:true,childList:true,characterData:true});});
     await approve(page);await complete(page);await assertResult(page);
     const timing=await page.evaluate(()=>globalThis.__time),total=Number.isFinite(timing.success-timing.confirm)?timing.success-timing.confirm:null;
+    assert.ok(Number.isFinite(total)&&total>0,'Actual click-to-success timer must be captured');
     const students=trace.filter(e=>e.phase==='mutation'&&e.entity==='students'),enrollments=trace.filter(e=>e.phase==='mutation'&&e.entity==='enrollments'),maximum=trace.find(e=>e.phase==='mutation'&&e.entity==='items'),grade=trace.find(e=>e.phase==='grade');
     assert.equal(students.length,28);assert.equal(enrollments.length,28);assert.equal(peak,v==='before'?1:2);
     assert.ok(Math.max(...students.map(e=>e.ack))<enrollments[0].start);assert.ok(Math.max(...enrollments.map(e=>e.ack))<maximum.start);assert.ok(maximum.ack<grade.start);
@@ -207,8 +209,9 @@ try{
     console.log(JSON.stringify({variant:v,total,peak,studentPhaseMs:evidence[v].studentPhaseMs}));
    }finally{await context.close();}
   }
-  assert.ok(evidence.after.studentPhaseMs<evidence.before.studentPhaseMs*0.8);
-  pass('n107_same_dependency_wait_benefit_and_ack_order','Actual app28/31 one-click A/B, same35ms per service request. Before runtime opt-out and after width2; distinct student overlap only, all student ACKs before enrollments, enrollment ACKs before max request, max ACK before grade command, durable31-score receipt before rendered success; no duplicates/zero/blank regression.');
+  if(!candidateOnly)assert.ok(evidence.after.studentPhaseMs<evidence.before.studentPhaseMs*0.8);
+  if(candidateOnly)pass('n107_repaired_actual_app_success_timer','Existing data-import-success DOM marker replaces encoding-corrupted prose matcher. Actual candidate click/success timestamps captured; durable28/31 receipt and affected ACK ordering asserted. Original A/B and failure preserved, no new comparison pair.');
+  if(!candidateOnly)pass('n107_same_dependency_wait_benefit_and_ack_order','Actual app28/31 one-click A/B, same35ms per service request. Before runtime opt-out and after width2; distinct student overlap only, all student ACKs before enrollments, enrollment ACKs before max request, max ACK before grade command, durable31-score receipt before rendered success; no duplicates/zero/blank regression.');
  });
 }catch(error){evidence.failures.push(error.stack);console.error(error.stack);process.exitCode=1;}
-finally{server.closeAllConnections();await new Promise(r=>server.close(r));await writeFile('tests/n107-independent-create-20261020/app-timing.json',JSON.stringify(evidence,null,2));}
+finally{server.closeAllConnections();await new Promise(r=>server.close(r));await writeFile('tests/n107-independent-create-20261020/'+(candidateOnly?'app-timing-repair.json':'app-timing.json'),JSON.stringify(evidence,null,2));}

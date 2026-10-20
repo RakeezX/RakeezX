@@ -1,0 +1,486 @@
+{
+  "taskId": "continuous-n107-width-two-after-owned-context-20261020",
+  "runId": "6f3ddb17-a21f-4caf-ae90-1a5884f868f5",
+  "checks": [
+    {
+      "name": "n107_repaired_actual_app_success_timer",
+      "status": "PASS",
+      "evidence": "Existing data-import-success DOM marker replaces encoding-corrupted prose matcher. Actual candidate click/success timestamps captured; durable28/31 receipt and affected ACK ordering asserted. Original A/B and failure preserved, no new comparison pair."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {},
+  "after": {
+    "fixedDependencyMs": 35,
+    "totalMs": 3257,
+    "studentPhaseMs": 860.7021000000002,
+    "peak": 2,
+    "studentRequests": 28,
+    "enrollmentRequests": 28,
+    "gradeReceipts": 1,
+    "trace": [
+      {
+        "phase": "pull",
+        "entity": "enrollments",
+        "start": 194.60339999999997,
+        "ack": 242.42020000000002
+      },
+      {
+        "phase": "pull",
+        "entity": "students",
+        "start": 194.8508999999999,
+        "ack": 242.69959999999992
+      },
+      {
+        "phase": "pull",
+        "entity": "subjects",
+        "start": 195.11369999999988,
+        "ack": 242.84359999999992
+      },
+      {
+        "phase": "pull",
+        "entity": "teachings",
+        "start": 195.37819999999988,
+        "ack": 242.99429999999984
+      },
+      {
+        "phase": "pull",
+        "entity": "sections",
+        "start": 261.95939999999996,
+        "ack": 305.3236999999999
+      },
+      {
+        "phase": "pull",
+        "entity": "terms",
+        "start": 262.13969999999995,
+        "ack": 305.56669999999986
+      },
+      {
+        "phase": "pull",
+        "entity": "years",
+        "start": 262.47270000000003,
+        "ack": 305.76559999999995
+      },
+      {
+        "phase": "mutation",
+        "entity": "subjects",
+        "start": 330.30050000000006,
+        "ack": 368.09749999999985
+      },
+      {
+        "phase": "mutation",
+        "entity": "sections",
+        "start": 389.25699999999983,
+        "ack": 430.5209
+      },
+      {
+        "phase": "teaching",
+        "entity": null,
+        "start": 448.8862999999999,
+        "ack": 495.0416
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 520.8725999999999,
+        "ack": 556.7896999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 521.7155,
+        "ack": 557.2179999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 583.0410999999999,
+        "ack": 620.0151999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 583.5985999999998,
+        "ack": 620.3847000000001
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 642.7581999999998,
+        "ack": 682.0443
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 643.2482999999997,
+        "ack": 682.4027000000001
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 700.799,
+        "ack": 745.5641999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 701.2817,
+        "ack": 745.9398000000001
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 769.9384,
+        "ack": 808.5481999999997
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 770.7257,
+        "ack": 808.9423999999999
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 842.9252000000001,
+        "ack": 884.8469
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 843.5104999999999,
+        "ack": 885.0981999999999
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 903.529,
+        "ack": 946.9205999999999
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 904.1374999999998,
+        "ack": 947.2228
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 962.6968999999999,
+        "ack": 1009.6068
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 963.5518999999999,
+        "ack": 1009.9166999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1026.8469999999998,
+        "ack": 1071.7368000000001
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1027.3119000000002,
+        "ack": 1072.0839999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1096.9904000000001,
+        "ack": 1133.7133
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1098.2554,
+        "ack": 1134.1358999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1160.0216999999998,
+        "ack": 1195.2379999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1160.9366999999997,
+        "ack": 1196.3881000000001
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1221.3980000000001,
+        "ack": 1257.0490999999997
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1222.0133999999998,
+        "ack": 1257.3667999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1278.94,
+        "ack": 1319.9481999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1279.5225999999998,
+        "ack": 1320.3047000000001
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1345.3359,
+        "ack": 1381.2087999999999
+      },
+      {
+        "phase": "mutation",
+        "entity": "students",
+        "start": 1346.0729999999999,
+        "ack": 1381.5747000000001
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1401.1531,
+        "ack": 1442.5611
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1453.4153000000001,
+        "ack": 1489.6075999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1500.0641999999998,
+        "ack": 1546.1158999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1556.6245,
+        "ack": 1606.9317
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1620.8809999999999,
+        "ack": 1667.6513
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1678.5812999999998,
+        "ack": 1713.9683
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1725.0286,
+        "ack": 1760.6151999999997
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1771.8618999999999,
+        "ack": 1807.7682
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1820.0807,
+        "ack": 1855.3817
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1873.4616999999998,
+        "ack": 1916.2907
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1927.9854,
+        "ack": 1978.6324
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 1990.3753000000002,
+        "ack": 2025.2548000000002
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2037.9474,
+        "ack": 2086.0715
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2099.7154,
+        "ack": 2147.7219999999998
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2162.9820999999997,
+        "ack": 2209.9838999999997
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2223.6437,
+        "ack": 2271.4982
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2283.4651,
+        "ack": 2332.2975
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2345.2307,
+        "ack": 2394.7541
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2407.2707,
+        "ack": 2455.6302
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2467.5836,
+        "ack": 2516.4272
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2527.612,
+        "ack": 2562.7644
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2574.268,
+        "ack": 2624.5715
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2636.4961999999996,
+        "ack": 2685.3347999999996
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2696.7826999999997,
+        "ack": 2746.1814999999997
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2757.135,
+        "ack": 2792.3599999999997
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2804.0870999999997,
+        "ack": 2853.821
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2865.2649,
+        "ack": 2914.7048999999997
+      },
+      {
+        "phase": "mutation",
+        "entity": "enrollments",
+        "start": 2926.3095000000003,
+        "ack": 2962.1054999999997
+      },
+      {
+        "phase": "pull",
+        "entity": "enrollments",
+        "start": 3014.862,
+        "ack": 3052.0298000000003
+      },
+      {
+        "phase": "pull",
+        "entity": "students",
+        "start": 3015.0626,
+        "ack": 3052.6450999999997
+      },
+      {
+        "phase": "pull",
+        "entity": "subjects",
+        "start": 3015.432,
+        "ack": 3052.9304
+      },
+      {
+        "phase": "pull",
+        "entity": "teachings",
+        "start": 3015.5832,
+        "ack": 3053.1318
+      },
+      {
+        "phase": "mutation",
+        "entity": "items",
+        "start": 3056.6865,
+        "ack": 3094.8801000000003
+      },
+      {
+        "phase": "pull",
+        "entity": "sections",
+        "start": 3073.8112,
+        "ack": 3110.0824000000002
+      },
+      {
+        "phase": "pull",
+        "entity": "terms",
+        "start": 3074.4759000000004,
+        "ack": 3110.3347000000003
+      },
+      {
+        "phase": "pull",
+        "entity": "years",
+        "start": 3074.8986999999997,
+        "ack": 3110.4867000000004
+      },
+      {
+        "phase": "pull",
+        "entity": "items",
+        "start": 3075.2132,
+        "ack": 3110.7428
+      },
+      {
+        "phase": "snapshot",
+        "entity": null,
+        "start": 3152.807,
+        "ack": 3202.0392
+      },
+      {
+        "phase": "grade",
+        "entity": null,
+        "start": 3153.8269,
+        "ack": 3204.1067000000003
+      }
+    ]
+  }
+}

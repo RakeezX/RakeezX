@@ -1,6 +1,6 @@
 {
   "taskId": "continuous-n107-width-two-after-owned-context-20261020",
-  "runId": "44d64481-ed7b-49ab-a4a0-d598f5e2cee4",
+  "runId": "6f3ddb17-a21f-4caf-ae90-1a5884f868f5",
   "baseSha": "8bf1fee99a177435eda66f3de2da95d2935aad48",
   "checks": [
     {
@@ -21,13 +21,18 @@
     },
     {
       "name": "optional_ui_total_timer",
-      "status": "FAIL",
-      "evidence": "Single A/B app run reached real28/31 success in both variants, but new total-time capture was unavailable. Original final assertion failure retained in app-timing.json; no whole-flow or hosted timing result claimed."
+      "status": "PASS",
+      "evidence": "Corrected DOM-marker observer captured actual candidate click-to-success3257ms locally; same width2,28/31 durable receipt and ACK checks passed. Original total-capture FAIL and original A/B preserved. No whole-flow before/after or hosted speed claim."
     },
     {
       "name": "syntax_and_scope",
       "status": "PASS",
       "evidence": "node --check affected source/harness; git diff --check. No new module/startup dependency or shell change."
+    },
+    {
+      "name": "n107_repaired_actual_app_success_timer",
+      "status": "PASS",
+      "evidence": "node tests/n107-independent-create-20261020/app-timing.mjs --candidate-only; zero current failures, captured positive finite click/success interval via actual data-import-success DOM marker."
     }
   ],
   "sourceHashes": {
@@ -35,7 +40,16 @@
     "src/lib/sync.js": "753b801cdff017d719c19c88cabb5b65bc39fc059ccdae19883f83479ea0a33f",
     "src/lib/cloud.js": "44cd8f8bd875844152cd79f7a84436aaa5a09dff693c4f532f27c89bf73bb4a2",
     "tests/n107-independent-create-20261020/boundary.mjs": "173701a9ca7559f31b03a02acd61cbca7a6ce56e0ee6d9210ce87bc736e148e7",
-    "tests/n107-independent-create-20261020/app-timing.mjs": "cc8bf10d62787cab37d5e88c61d0a92cb3038206ea7cb3d71ce34431afe8a394",
+    "tests/n107-independent-create-20261020/app-timing.mjs": "0de7399a4eb2822b23714948844125affdc6d4e7de49623f2207a74af6b24647",
     "tests/n107-independent-create-20261020/trace-proof.mjs": "501fdb59f39b48679841912417e2e74f15af6f5ffaed3a3fa1d66a2d68daf41c"
+  },
+  "previousAttempt": {
+    "candidateSha": "c223154cd83394c16a10cd160432eb765b7191a9",
+    "failure": "Candidate validation: An affected check must pass and no recorded check may fail",
+    "preservedEvidence": [
+      "qualification-initial.json",
+      "app-timing.json"
+    ],
+    "correction": "Replace encoding-corrupted text matcher with existing data-import-success DOM selector; verify candidate-only, no A/B replay."
   }
 }

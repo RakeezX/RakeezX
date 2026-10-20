@@ -4,7 +4,19 @@ Task `continuous-n107-width-two-after-owned-context-20261020`
 Run `44d64481-ed7b-49ab-a4a0-d598f5e2cee4`  
 Base `8bf1fee99a177435eda66f3de2da95d2935aad48`.
 
-**LOCAL_READY.** Runtime Sync may overlap exactly two independent, never-sent new-student CREATE RPCs. It joins both durable outcomes before moving to another pair or command. The same-delay local actual-app trace reduced the student-request phase from **1674.20ms to930.69ms** (about44%). This is a synthetic phase result, not a hosted or whole-import speed measurement. **18 seconds remains the last actual hosted measurement.** The optional new total-time observer did not produce a usable duration; its original FAIL is retained rather than replaced with an optimistic total.
+**LOCAL_READY.** Runtime Sync may overlap exactly two independent, never-sent new-student CREATE RPCs. It joins both durable outcomes before moving to another pair or command. The same-delay local actual-app trace reduced the student-request phase from **1674.20ms to930.69ms** (about44%). This is a synthetic phase result, not a hosted or whole-import speed measurement. **18 seconds remains the last actual hosted measurement.** The initial total-time observer failed; its original FAIL is retained and the candidate-only repair below now supplies a valid local duration without replaying the A/B pair.
+
+## Harness correction after candidate validation rejection
+
+Current run `6f3ddb17-a21f-4caf-ae90-1a5884f868f5`; original candidate `c223154cd83394c16a10cd160432eb765b7191a9` preserved. The prior result was rejected because it included the failed optional total-time check. This is a concrete harness correction, not deletion or reclassification of that failure.
+
+Inspection found the new success observer matched encoding-corrupted Arabic prose. The actual application already exposes `[data-import-success]`; the repaired observer now uses that ASCII DOM marker and requires a finite positive click-to-success interval. No Product source changed in this repair.
+
+`node tests/n107-independent-create-20261020/app-timing.mjs --candidate-only` **PASS**, zero current failures: one candidate-only actual-app synthetic run captured **3257ms** from actual click to rendered success, max2,28 names/31 durable grades, one grade receipt and preserved enrollment/max/grade ACK ordering. This is a local fixture duration, **not** a hosted result or a new whole-flow comparison. The original single A/B pair was not repeated. Existing independent-create and unchanged context safety evidence is reused.
+
+Original `app-timing.json` remains byte-for-byte unchanged, including its FAIL and missing totals. Original `qualification.json` is preserved as `qualification-initial.json`. Current `qualification.json` records the new run and the genuinely passing repaired check; no historical failure is represented as a passing execution. The canonical isolated helper and owned loopback server closed in finally. Syntax and whitespace checks PASS; no deployment, queue/status or live-data changes.
+
+The following section preserves the original implementation record, including its then-unresolved timer failure. That specific harness limitation is superseded by the candidate-only repair above; the missing **baseline** whole-flow duration remains unmeasured, and hosted18s remains unchanged.
 
 ## Authority and prerequisite reuse
 

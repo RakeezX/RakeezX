@@ -1,0 +1,41 @@
+{
+  "taskId": "continuous-n107-width-two-after-owned-context-20261020",
+  "runId": "44d64481-ed7b-49ab-a4a0-d598f5e2cee4",
+  "baseSha": "8bf1fee99a177435eda66f3de2da95d2935aad48",
+  "checks": [
+    {
+      "name": "n107_independent_new_student_width_two_proven_safe",
+      "status": "PASS",
+      "evidence": "Actual store/coordinator/default-RPC/owned-IDB boundary scenarios: out-of-order siblings, committed sibling lost-response recovery with identical envelope, same-ID patch exclusion, owner and lease retirement stopping third start. Max2; unrelated/dependent commands serial."
+    },
+    {
+      "name": "n107_same_dependency_wait_benefit_and_ack_order",
+      "status": "PASS",
+      "beforeStudentPhaseMs": 1674.1974,
+      "afterStudentPhaseMs": 930.6895999999997,
+      "fixedDependencyMs": 35,
+      "beforePeak": 1,
+      "afterPeak": 2,
+      "endToEndTiming": "NOT_RUN: capture unavailable; original harness total-time assertion FAIL retained in app-timing.json",
+      "scope": "Saved actual-app28/31 traces and existing DOM/store assertions completed before the optional total-time assertion; only student-phase benefit is qualified. No hosted speed claim."
+    },
+    {
+      "name": "optional_ui_total_timer",
+      "status": "FAIL",
+      "evidence": "Single A/B app run reached real28/31 success in both variants, but new total-time capture was unavailable. Original final assertion failure retained in app-timing.json; no whole-flow or hosted timing result claimed."
+    },
+    {
+      "name": "syntax_and_scope",
+      "status": "PASS",
+      "evidence": "node --check affected source/harness; git diff --check. No new module/startup dependency or shell change."
+    }
+  ],
+  "sourceHashes": {
+    "src/lib/sync-v2.js": "c0bcdde64b836799a280cdedd480bc765ad8e18800fd294c65f9ed7ba80fd3d4",
+    "src/lib/sync.js": "753b801cdff017d719c19c88cabb5b65bc39fc059ccdae19883f83479ea0a33f",
+    "src/lib/cloud.js": "44cd8f8bd875844152cd79f7a84436aaa5a09dff693c4f532f27c89bf73bb4a2",
+    "tests/n107-independent-create-20261020/boundary.mjs": "173701a9ca7559f31b03a02acd61cbca7a6ce56e0ee6d9210ce87bc736e148e7",
+    "tests/n107-independent-create-20261020/app-timing.mjs": "cc8bf10d62787cab37d5e88c61d0a92cb3038206ea7cb3d71ce34431afe8a394",
+    "tests/n107-independent-create-20261020/trace-proof.mjs": "501fdb59f39b48679841912417e2e74f15af6f5ffaed3a3fa1d66a2d68daf41c"
+  }
+}
