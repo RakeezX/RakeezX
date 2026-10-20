@@ -1,0 +1,18 @@
+{
+  "taskId":"continuous-n88-initial-class-and-pending-login-continuity-20261020",
+  "preparedRunId":"54179cfe-5fbb-468e-ad0c-0d7ac832c97c",
+  "candidateIdentity":"The AI commit containing this immutable artifact; use its full Git SHA for review, not a mutable branch name",
+  "originalSessionId":"01a14fc3-b292-7390-9952-8549a286c80f",
+  "originalCustodianRoot":"C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+  "nativeUnchanged":"fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+  "priorCarrier":"6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326",
+  "carrier":"ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+  "student":"c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470",
+  "missingCapability":"A separately reviewed current-task/current-resumed-run/prepared-candidate original-custodian static-only append correction gate. Existing correction-1430-gate.mjs binds a different task/run/candidate and consumed carrier preimage; it must not be reused or reset.",
+  "requiredBoundary":"Original owned marker/protected state, current running task/run and immutable reviewed source/package pins; fresh wx one-attempt record before network write; reconcile unknown result by exact provider readback, never second upload; preserve all old records and security invariants.",
+  "maximumChangedStaticUploads":1,
+  "nativeSourceOrPublicPinUpdates":0,
+  "readinessRequests":0,
+  "unrelatedAssetsAndTransport":"BYTE_IDENTICAL; qualification.json",
+  "status":"PREPARED_NOT_DELIVERED"
+}

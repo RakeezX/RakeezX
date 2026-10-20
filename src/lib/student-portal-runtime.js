@@ -123,14 +123,17 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
 }
 const classEntryMessages={timeout:'لم تكتمل قراءة الفصل خلال المهلة. أعد المحاولة؛ لم نغيّر أي رمز أو إعداد.',loading:'جارٍ فتح مساحة طلاب الفصل…',disabled:'مساحة طلاب الفصل غير متاحة حاليًا.',account:'يلزم حساب معلم متصل لفتح مساحة الفصل.',owner:'تعذّر تأكيد سياق الحساب. أعد فتح الفصل من حساب مالكه.',source:'هذا الفصل غير متاح ضمن السياق الدراسي الحالي.',lease:'تعذّر تأكيد صلاحية المزامنة لهذا التبويب. أعد فتح الفصل في التبويب النشط.',session:'انتهت صلاحية الاتصال بالحساب. أعد الاتصال ثم حاول مجددًا.',context:'تغيّر سياق الاتصال. أعد المحاولة لفتح الفصل من جديد.',denied:'لم يسمح الخادم بفتح المساحة لهذا السياق. تحقق من الحساب والفصل ثم أعد المحاولة.',revision:'تحتاج مساحة الطلاب إلى تحديث التطبيق. حدّث الصفحة ثم أعد المحاولة.',connection:'تعذّر الاتصال بمساحة الطلاب. حاول مجددًا.'};
 function entryShell(root){
- let body=root.querySelector('[data-n88-entry-body]');if(body)return body;
+ let body=[...root.children].find(node=>node.hasAttribute('data-n88-entry-body'));
  root.classList.add('n88-entry');
-  body=root.ownerDocument.createElement('div');body.dataset.n88EntryBody='';root.replaceChildren(body);return body;
+ if(!body){body=root.ownerDocument.createElement('div');body.dataset.n88EntryBody='';}
+ // This root is exclusively owned by the entry runtime. A retained/repainted
+ // shell must never keep a second status fragment beside its authoritative body.
+ if(root.childNodes.length!==1||root.firstChild!==body)root.replaceChildren(body);return body;
 }
 function classEntryState(root,state){
  if(!Object.hasOwn(classEntryMessages,state))state='context';
  const body=entryShell(root);body.replaceChildren();root.dataset.n88EntryState=state;root.setAttribute('aria-busy',String(state==='loading'));
- const message=root.ownerDocument.createElement('p');message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.textContent=classEntryMessages[state];body.append(message);
+ const message=root.ownerDocument.createElement('p');message.dataset.n88EntryStatus='';message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.textContent=classEntryMessages[state];body.append(message);
  if(!['loading','disabled'].includes(state)){const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88Retry='';button.textContent='إعادة المحاولة';body.append(button);}
 }
 export function unavailable(root) {

@@ -1,0 +1,45 @@
+{
+  "status": "FAIL",
+  "student": [
+    {
+      "scenario": "hidden-result",
+      "claimRequests": 1,
+      "readRequests": 1,
+      "pass": true,
+      "hiddenDataRendered": false,
+      "focusReissue": false
+    },
+    {
+      "scenario": "return-before-result",
+      "claimRequests": 1,
+      "readRequests": 1,
+      "pass": true,
+      "hiddenDataRendered": false,
+      "focusReissue": false
+    },
+    {
+      "scenario": "resume-hidden-result",
+      "claimRequests": 0,
+      "readRequests": 1,
+      "pass": true,
+      "hiddenDataRendered": false,
+      "focusReissue": false
+    }
+  ],
+  "teacher": [],
+  "actualTeacherCause": "NOT_PROVEN",
+  "scope": "Real route/runtime/classBinding/store/owner guard/client/signed ingress/Web entry/Auth SDK/repository with synthetic PG port. Student actual view/client over HTTP; synthetic visibility events, no personal browser.",
+  "failure": {
+    "name": "AssertionError",
+    "message": "Expected values to be strictly equal:\n\n0 !== 1\n",
+    "stack": [
+      "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:",
+      "",
+      "0 !== 1"
+    ]
+  },
+  "cleanup": {
+    "ownedServerAndBrowserClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

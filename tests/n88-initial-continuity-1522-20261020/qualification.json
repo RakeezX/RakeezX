@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "scope": "Local source/package parity only; no hosted readiness or delivery claim",
+  "sources": {
+    "src/views/student-portal-login.js": "c362ce7e131211e9a6ff132948bac8184eeaa9c6ea6d038279641f81aa2adb11",
+    "src/lib/student-portal-unified-client.js": "5dfe3737adc6fe973e918eccdf49309e8359e1acd2e4fe801d37cd151fe678b2",
+    "src/lib/student-portal-runtime.js": "552031e3339c4ca1a8bd25a861e560cc65dd9ea3677f5b49e74bcbf9da965978"
+  },
+  "changedOutputs": [
+    "cloudflare/worker.mjs",
+    "private/assets/student.mjs"
+  ],
+  "edgeUnchanged": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+  "priorCarrier": "6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326",
+  "carrier": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+  "student": "c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470",
+  "otherPrivateAssetsAndTransport": "BYTE_IDENTICAL",
+  "actualTeacherCause": "NOT_PROVEN",
+  "delivery": "NOT_RUN",
+  "protectedCustodianAndConsumedGate": "UNCHANGED"
+}

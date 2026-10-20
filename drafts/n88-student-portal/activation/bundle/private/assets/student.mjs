@@ -48,15 +48,19 @@ function projectUnifiedStudentData(data) {
 }
 function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch } = {}) {
   if (typeof send !== "function") throw fail();
-  let generation = 0, controller, disposed = false;
-  function invalidate() {
+  let generation = 0, retirement = 0, controller, disposed = false;
+  function cancelRequest() {
     generation++;
     controller?.abort();
     controller = null;
   }
+  function invalidate() {
+    retirement++;
+    cancelRequest();
+  }
   async function call(action, body) {
     if (disposed) throw fail();
-    invalidate();
+    cancelRequest();
     const checkpoint = generation;
     const owned = controller = new AbortController();
     const timeout = setTimeout(() => owned.abort(), 15e3);
@@ -93,10 +97,15 @@ function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch } = {
     claim(value) {
       let code = normalizeStudentCode(value);
       if (!validStudentCode(code)) return Promise.reject(fail("format"));
-      const pending = call("claim", { code }).then(() => call("read"));
+      const context = retirement, pending = call("claim", { code }), checkpoint = generation;
       code = "";
-      return pending;
+      return pending.then(() => {
+        if (disposed || context !== retirement || checkpoint !== generation) throw fail("stale");
+        return call("read");
+      });
     },
+    captureContext: () => retirement,
+    isContextCurrent: (context) => !disposed && context === retirement,
     read: () => call("read"),
     end: () => call("end", {}),
     invalidate,
@@ -161,7 +170,7 @@ var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "
 var displayNumber = (value) => value === null ? "\u0644\u0645 \u062A\u064F\u0631\u0635\u062F" : escape(value);
 function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
-  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = "";
+  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = "", pendingCompletion = null, pendingForm = false, pendingMessage = "";
   const previousDir = root.getAttribute("dir");
   root.classList.add("n88-unified");
   root.dir = "rtl";
@@ -216,28 +225,63 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   async function run(action, ending = false, sameForm = false, resuming = false) {
     if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
     busy = true;
-    const checkpoint = ++generation;
-    if (sameForm) inlineEntry(resuming ? "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u062C\u0644\u0633\u0629\u2026" : "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632\u2026");
+    const checkpoint = ++generation, context = client.captureContext?.();
+    pendingForm = sameForm;
+    pendingMessage = resuming ? "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u062C\u0644\u0633\u0629\u2026" : "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632\u2026";
+    if (sameForm) inlineEntry(pendingMessage);
     else paint('<h1 tabindex="-1">\u062C\u0627\u0631\u064D \u0627\u0644\u0627\u062A\u0635\u0627\u0644\u2026</h1><p role="status">\u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631</p>');
     try {
       const data = await action();
       if (disposed || checkpoint !== generation) return;
+      if (client.isContextCurrent && !client.isContextCurrent(context)) {
+        clear();
+        return;
+      }
       codeDraft = "";
-      if (ending) entry("\u0627\u0646\u062A\u0647\u062A \u0627\u0644\u062C\u0644\u0633\u0629.");
-      else show(data);
+      if (doc.visibilityState === "hidden") {
+        const field = root.querySelector("[data-claim] input");
+        if (field) field.value = "";
+      }
+      pendingCompletion = { checkpoint, context, data, ending, sameForm, resuming };
+      adoptCompletion();
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === "rate") cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1e3;
-      if (sameForm) inlineEntry(resuming ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0645\u0632. \u062A\u062D\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0651\u0645\u0643.", !resuming);
-      else entry(error?.kind === "session" ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0641\u062A\u062D \u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632 \u0623\u0648 \u062D\u0627\u0648\u0644 \u0644\u0627\u062D\u0642\u064B\u0627.");
+      if (client.isContextCurrent && !client.isContextCurrent(context)) {
+        clear();
+        return;
+      }
+      pendingCompletion = { checkpoint, context, errorKind: error?.kind || "unavailable", ending, sameForm, resuming };
+      adoptCompletion();
     } finally {
-      if (checkpoint === generation) {
+      if (checkpoint === generation && !pendingCompletion) {
         busy = false;
+        pendingForm = false;
         if (sameForm && root.querySelector("[data-claim]")) {
           const m = root.querySelector("#n88-message").textContent;
           inlineEntry(m, root.querySelector("input").getAttribute("aria-invalid") === "true");
         }
       }
+    }
+  }
+  function adoptCompletion() {
+    const result = pendingCompletion;
+    if (!result || disposed || doc.visibilityState === "hidden") return;
+    pendingCompletion = null;
+    if (result.checkpoint !== generation) return;
+    if (client.isContextCurrent && !client.isContextCurrent(result.context)) {
+      clear();
+      return;
+    }
+    busy = false;
+    pendingForm = false;
+    if (result.errorKind) {
+      if (result.sameForm) inlineEntry(result.resuming ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0645\u0632. \u062A\u062D\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0651\u0645\u0643.", !result.resuming);
+      else entry(result.errorKind === "session" ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0641\u062A\u062D \u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632 \u0623\u0648 \u062D\u0627\u0648\u0644 \u0644\u0627\u062D\u0642\u064B\u0627.");
+    } else {
+      codeDraft = "";
+      if (result.ending) entry("\u0627\u0646\u062A\u0647\u062A \u0627\u0644\u062C\u0644\u0633\u0629.");
+      else show(result.data);
     }
   }
   const submit = (event) => {
@@ -293,17 +337,28 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     } else codeDraft = "";
     generation++;
     busy = false;
+    pendingForm = false;
+    pendingCompletion = null;
+    pendingMessage = "";
     clearTimeout(timer);
     client?.invalidate?.();
     if (preserveDraft && root.querySelector("[data-claim]")) inlineEntry();
     else entry();
   }
-  const hide = () => clear(true);
+  const hide = () => clear();
   const visible = () => {
-    if (doc.visibilityState === "hidden") clear(true);
+    if (doc.visibilityState === "hidden") {
+      if (busy && pendingForm) {
+        inlineEntry(pendingMessage);
+        return;
+      }
+      clear(true);
+    } else {
+      adoptCompletion();
+    }
   };
   const pageshow = (event) => {
-    if (event.persisted) clear(true);
+    if (event.persisted) clear();
   };
   root.addEventListener("beforeinput", beforeInput);
   root.addEventListener("paste", paste);

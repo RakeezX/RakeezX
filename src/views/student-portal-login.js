@@ -6,7 +6,7 @@ const displayNumber = value => value === null ? 'لم تُرصد' : escape(value
 
 export function mountUnifiedStudentPortal(root, { client, readiness = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
-  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = '';
+  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = '',pendingCompletion=null,pendingForm=false,pendingMessage='';
   const previousDir = root.getAttribute('dir');
   root.classList.add('n88-unified'); root.dir = 'rtl';
   const style = doc.createElement('link'); style.rel = 'stylesheet';
@@ -53,20 +53,36 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   }
   async function run(action, ending = false, sameForm = false, resuming = false) {
     if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
-    busy = true; const checkpoint = ++generation;
-    if(sameForm)inlineEntry(resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…');
+    busy = true; const checkpoint = ++generation,context=client.captureContext?.();
+    pendingForm=sameForm;pendingMessage=resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…';
+    if(sameForm)inlineEntry(pendingMessage);
     else paint('<h1 tabindex="-1">جارٍ الاتصال…</h1><p role="status">يرجى الانتظار</p>');
     try {
       const data = await action();
       if (disposed || checkpoint !== generation) return;
+      if(client.isContextCurrent&&!client.isContextCurrent(context)){clear();return;}
       codeDraft='';
-      if (ending) entry('انتهت الجلسة.'); else show(data);
+      if(doc.visibilityState==='hidden'){const field=root.querySelector('[data-claim] input');if(field)field.value='';}
+      pendingCompletion={checkpoint,context,data,ending,sameForm,resuming};
+      adoptCompletion();
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === 'rate') cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1000;
-      if(sameForm)inlineEntry(resuming?'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.':'تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.',!resuming);
-      else entry(error?.kind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.' : 'تعذّر فتح المساحة. تحقق من الرمز أو حاول لاحقًا.');
-    } finally { if (checkpoint === generation) {busy = false;if(sameForm&&root.querySelector('[data-claim]')){const m=root.querySelector('#n88-message').textContent;inlineEntry(m,root.querySelector('input').getAttribute('aria-invalid')==='true');}} }
+      if(client.isContextCurrent&&!client.isContextCurrent(context)){clear();return;}
+      pendingCompletion={checkpoint,context,errorKind:error?.kind||'unavailable',ending,sameForm,resuming};
+      adoptCompletion();
+    } finally { if (checkpoint === generation&&!pendingCompletion) {busy = false;pendingForm=false;if(sameForm&&root.querySelector('[data-claim]')){const m=root.querySelector('#n88-message').textContent;inlineEntry(m,root.querySelector('input').getAttribute('aria-invalid')==='true');}} }
+  }
+  function adoptCompletion(){
+    const result=pendingCompletion;if(!result||disposed||doc.visibilityState==='hidden')return;
+    pendingCompletion=null;
+    if(result.checkpoint!==generation)return;
+    if(client.isContextCurrent&&!client.isContextCurrent(result.context)){clear();return;}
+    busy=false;pendingForm=false;
+    if(result.errorKind){
+      if(result.sameForm)inlineEntry(result.resuming?'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.':'تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.',!result.resuming);
+      else entry(result.errorKind==='session'?'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.':'تعذّر فتح المساحة. تحقق من الرمز أو حاول لاحقًا.');
+    }else{codeDraft='';if(result.ending)entry('انتهت الجلسة.');else show(result.data);}
   }
   const submit = event => {
     if (!event.target.matches('[data-claim]')) return;
@@ -102,14 +118,19 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   };
   function clear(preserveDraft=false) {
     if(preserveDraft){const field=root.querySelector('[data-claim] input');if(field)codeDraft=normalizeStudentCode(field.value);}else codeDraft='';
-    generation++; busy = false; clearTimeout(timer); client?.invalidate?.();
+    generation++; busy = false;pendingForm=false;pendingCompletion=null;pendingMessage=''; clearTimeout(timer); client?.invalidate?.();
     // Retire private data/pending replies, retaining only this page's editable
     // unsubmitted draft. An existing entry keeps its DOM, selection and focus.
     if(preserveDraft&&root.querySelector('[data-claim]'))inlineEntry();else entry();
   }
-  const hide = () => clear(true);
-  const visible = () => { if (doc.visibilityState === 'hidden') clear(true); };
-  const pageshow = event => { if (event.persisted) clear(true); };
+  const hide = () => clear(); // Actual navigation/retirement is not ordinary tab visibility.
+  const visible = () => {
+    if(doc.visibilityState==='hidden'){
+      if(busy&&pendingForm){inlineEntry(pendingMessage);return;}
+      clear(true); // Loaded private data is retired, never kept rendered while hidden.
+    }else{adoptCompletion();}
+  };
+  const pageshow = event => { if (event.persisted) clear(); };
   root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
   win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
   entry();
