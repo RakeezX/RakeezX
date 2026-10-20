@@ -1,0 +1,25 @@
+{
+  "name": "n36_0525_package_and_link_exact",
+  "status": "PASS",
+  "baseSha": "a6b3998bd5fad914082dd2269685d20d813be950",
+  "version": "0.5.25",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.25.zip",
+    "sha256": "07184e13fde116ff66abd24915a6f26679917fa842e5b0ddc0261e5cf017a94f",
+    "bytes": 136319
+  },
+  "runtimeFiles": 29,
+  "checks": [
+    "ZIP/source/file SHA256 and size parity",
+    "Exact .25 download href + label only",
+    "Manifest permissions/hosts/CSP unchanged",
+    "Immutable .24 ZIP/manifest and unchanged receiver/data/route/date/popup assets",
+    "Changed JS syntax"
+  ],
+  "reusedEvidence": [
+    "tests/n36-0524-package-link-20261020/result.json",
+    "tests/n36-background-no-popup-20261020/browser.json"
+  ],
+  "actualSourceAcceptance": "NOT_RUN: real Madrasati and exact failing actual branch remain unknown",
+  "publicationAndStableParity": "NOT_RUN: independent controller/publisher, followed by existing stable updater only after verified publication"
+}
