@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-background-run-no-tab-or-open-popup-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -3500,
+      "scopeKey": "continuous-n36-background-run-no-tab-or-open-popup-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [
+        "continuous-n36-latest-necessary-navigation-choice-20261020"
+      ],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "LATEST DIRECT HUMAN20October: after choosing allavailable data with navigation only when necessary, user explicitly rejects choosing between new runner tab and keeping actionpopup open: «لا يوجد حل افضل؟ بدون فتح تبويب جديد، وبدون الزام المستخدم بجعل نافذة الاضافة مفتوحة على طول؟». Adopt durable BACKGROUND collection with existing MV3 serviceworker; popup is Start/progress/cancel viewer only. This supersedes keeper/newrunner behavior in0.5.20; that is intermediate, NOT final accepted UX. No auto newtab/window/offscreen document/notifications, no foregrounding source or Rakeez importpage, no requirementpopupstaysopen. Existing source Madrasati tab and authenticated Rakeez tab must remain open/authorized; if closed/logout/wrongowner/changedcontext stop truthfully, never silently reopen, login or change account. Visible source navigation allowed only when necessary under same knownsupported route/teacherrole/school/document fences. Preserve full supported roster/subjects/profile/timetable and latest rawyear/term guard, sourcewins profile, receiver capability, mandatory detailed v3receipts, quietsuccess and optionalfinite diagnostics. Reuse previous qualified pipeline and navigation/source proofs, no full303/school/SQL/Sync/Delete/browser matrix.\nOfficial primary docs verified by root20October (use these exact stable APIs, no separate search/audit): https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle describes30s idle,5min event,30sfetch limits and persistence; https://developer.chrome.com/docs/extensions/reference/api/alarms describes wake/recreate alarms (new persistAcrossSessions Chrome150 only, do not rely on it); https://developer.chrome.com/docs/extensions/develop/concepts/activeTab confirms same-origin navigation retains explicit action grant. Current permissions ALREADY activeTab,scripting,storage,alarms, host onlyrakeezx.com; keep exact permissions/host/CSP/connect-src none. No newschool host, offscreen/debugger/management/identity grant, keepalive ping/fake API loop or hiddenendpoint. MV3 background has no DOM/WebStorage: factor existing DOMfree collection coordinator from run-controller, use unchanged closurefree source readers through existing authorized chrome.scripting/tab APIs and observed sameorigin readroutes, no externalfetch from serviceworker to bypass CSP. UI updates from storage/runtime events, not body/window globals in engine. Noor manual selectedcolumn/review remains manual and separate.\nPersist serializable bounded explicit-Start job/checkpoint in EXISTING chrome.storage.session only (private source rows already allowed there under runTTL), not sync/local permanent studentdata. Preserve original retention/coverage/cancel/expiry and jobID/sourceTab/origin/teacherrole/school/fixedstartdeadline/accountRakeezdocument/batch/session fences. Save durablecheckpoint before acknowledgingStart; explicitpopup userclick only, deny websites/externalsenders/newbrowserstartup without existing unexpired authorized job. No automatic fresh collection on popupopen/browserstartup/login. Event/alarms resume ONLY this stored authorized unexpired job/phase; Chrome fullrestart clears sessionjob, do not promise continuation with browserclosed or lostsourceaccess. Existing alarmspermission can revive sleeping worker; recreate one pendingjob alarm on each workerbootstrap, clear on finish/cancel/expiry, no permanent polling. Single in-flight runner within worker; races duplicateStart/reopenedpopup/alarms do not doublecollect/post. Do not persistfunctions/promises/DOM/session bearer/credentials. Correctly rehydrate Set/Map as finite arrays if used. Cancellation survives popupclosure and workerrestart, clears owned pendingjob/private snapshots/alarms under exactidentity and never erases saved appdata.\nOriginal handoff-worker owns Rakeez grants/nonces/receiverdoc and externalclaims/outcomes. Refactor internal validated transport functions for same-serviceworker engine; do not send runtime messages to self and assume recipient, spoof old popup sender/tab, bypass nonce/document/account checks or broaden externally_connectable. Start is trusted internalpopup schema bound to explicit activeTab, selectedsource and owner-ready receiver BEFORE schoolread. Every resume and chunk verifies original current tabs/grants/currentdocument/role and still-owned Rakeez capability/batch; actual user navigation/newowner cannot be mistaken for owned planned transition. Source navigation checkpoint before needed tabs.update and verify expected resulting route; never drag userback from unrelated navigation. Outcomeunknown retains original exact actionID/nonce/batch and reconciles existing durable receipts, never blindly post newidentity; completed class/category not recollected merely popupclosed/SWrestarted. No auto step success from missing receipt. Return compact local-saved/syncpending result, optional field reasons only, no repeated app toast/PII diagnostics.\nMinimum NEW meaningful verification: actual Product backgroundmodule/handlers with persistent synthetic Chrome sessionstorage+alarms/sourceIOboundaries, popup destroyed immediately afterStart still finishes representative complete source→same v3handoff/receipt; simulate actual worker termination+freshmodule restart after checkpoint and unknownreceipt with sameidentity, no duplicate acknowledgments; cancel/expiry/source/Rakeezowner/documentchange stop and no source/appwrite. All chrome.tabs.create/window/offscreen calls fail in this fixture; necessary sameorigin source tabs.update remains allowed. Prefer owned real MV3 worker lifecycle proof in isolated emptyprofile with synthetic IO if supported without changing Product security; label synthetic API boundary vs actual native Chrome honestly. No real Madrasati browser/control/read or previously refused already-open result workaround; preserve prior refusals. Reuse unaffected profile/route/package baseline and apply targeted package parity after changed bytes, no repeated fulltestchain. No weakening Product origins/grants just forfixture. If ordinary missingtestpath/harness issue, correct within bounded tests, not newPOapproval. No real account/pupil operations/SQL/Auth.\nSince runtime changes bump current0.5.20 once to0.5.21, immutable oldassets, exact source/ZIP25files plus new engine file count if necessary, same permissions/CSP. Sole publisher verifies served archive and existing stable updater installs actual verified package afterdelivery; rootpostcheck physicalfiles. DO NOT edit src/views/class-import-center.js or app/store: N107 is running independently there. Companion tiny link card handles published download label after this; don't block backgroundfix or touch concurrent file. N125CLOSED,N44HOLD; worker cannot edit queue or call Product executor. Return truthful candidate/result and actual failure if blocked, no fake native acceptance.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "tests/n36-background-no-popup-20261020/**",
+        "docs/automation-evidence/20261020/N36_BACKGROUND_NO_POPUP.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/handoff-worker.js"
+      ],
+      "requiredChecks": [
+        "n36_background_actual_handlers_popup_closed_complete",
+        "n36_background_restart_unknown_receipt_cancel_owner_expiry",
+        "n36_background_changed_package_no_new_permissions"
+      ],
+      "postDeliveryChecks": [
+        "n36_verified_package_stable_folder_parity"
+      ],
+      "acceptance": [
+        "One explicit Start continues independently of actionpopup without any new tab/window and preserves all supported collection and identity contracts.",
+        "Durable bounded same-session recovery and exact receipts; publish real source/served assets, distinguish actual Chrome/source evidence."
+      ],
+      "preparationAuthority": {
+        "kind": "Latest direct PO no newtab and no openpopup; ordinary background implementation under explicitStart",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountMutations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Latest direct PO explicitly requests background independent of popup/newtab. Publish exact existing owner-bound import behavior and sessionjob runtime via solepublisher; no new source/data/security permission."
+    }
+  ]
+}

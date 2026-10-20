@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-background-package-download-link-20261020",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -3150,
+      "scopeKey": "continuous-n36-background-package-download-link-20261020",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 6,
+      "idleMinutes": 5,
+      "dependsOn": [
+        "continuous-n36-background-run-no-tab-or-open-popup-20261020"
+      ],
+      "sessionId": "01a15898-c634-72b2-b4a5-231a378e7d8e",
+      "objective": "Tiny integration after verified N36background package. N107 owns appimportview while running, so wait normal controller pathserialization then preserve its entire localbackground import change. Read actual preceding N36background verified receipt/current manifest version and update ONLY extensiondownloadhref/versionlabel in src/views/class-import-center.js to the verified published immutable0.5.21 (or actual latest from predecessor). Existing clean fullavailable description remains; if necessary one concise sentence «يستمر النقل في الخلفية ويمكنك إغلاق نافذة الإضافة.» only after predecessor proven. No source engine/service/store/grade/UI redesign, no repeated extension/owner/SW tests/buildmatrix. If link already matches exact verified package returnNO_CHANGE withsourceevidence. Inspect affected rendered/downloadline and gitdiff; existing immutable/production archiveproof reuse. No app importpage navigation, realdata/Auth/SQL/notifications, worker/queue changes. Sole publisher frontend sourceeffect verification. Do not close wholeN36 or claim actualMadrasati newbackground acceptance. This separate smallcard avoids overlapping Productwrites with activeN107; not a newreviewstage.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "tests/n36-background-download-link-20261020/**",
+        "docs/automation-evidence/20261020/N36_BACKGROUND_DOWNLOAD_LINK.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_download_link_matches_verified_background_package"
+      ],
+      "acceptance": [
+        "Current download points to actual published backgroundpackage and preserves independent N107 changes."
+      ],
+      "preparationAuthority": {
+        "kind": "Necessary official download reference for approved backgroundversion",
+        "publication": true,
+        "realAccountMutations": 0
+      },
+      "releaseAuthority": "Existing PO delivery authority for exact approved extensionversion link and concise description; no other behavior."
+    }
+  ]
+}
