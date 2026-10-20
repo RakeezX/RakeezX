@@ -6,7 +6,7 @@ const displayNumber = value => value === null ? 'لم تُرصد' : escape(value
 
 export function mountUnifiedStudentPortal(root, { client, readiness = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
-  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0;
+  let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = '';
   const previousDir = root.getAttribute('dir');
   root.classList.add('n88-unified'); root.dir = 'rtl';
   const style = doc.createElement('link'); style.rel = 'stylesheet';
@@ -19,7 +19,8 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   };
   function entry(message = '') {
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي زوّدك به معلّمك.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" maxlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="btn btn--ghost n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
+    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي زوّدك به معلّمك.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="btn btn--ghost n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
+    const field=root.querySelector('[data-claim] input');if(field)field.value=codeDraft;
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
   }
@@ -58,6 +59,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     try {
       const data = await action();
       if (disposed || checkpoint !== generation) return;
+      codeDraft='';
       if (ending) entry('انتهت الجلسة.'); else show(data);
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
@@ -69,13 +71,13 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const submit = event => {
     if (!event.target.matches('[data-claim]')) return;
     event.preventDefault(); if (busy || !enabled) return;
-    const input = root.querySelector('input'); let code = normalizeStudentCode(input.value); input.value = '';
-    if (!validStudentCode(code)) { code = ''; inlineEntry('أدخل 6 أرقام تبدأ بالرقم 1.',true); input.focus(); return; }
+    const input = root.querySelector('input'); let code = codeDraft = normalizeStudentCode(input.value);
+    if (!validStudentCode(code)) { code = ''; inlineEntry('أدخل 6 أرقام تبدأ بالرقم 1.',true); return; }
     void run(() => { const pending = client.claim(code); code = ''; return pending; },false,true);
   };
   const input = event => { if (event.target.matches('[data-claim] input')) {
     event.target.setCustomValidity(''); event.target.removeAttribute('aria-invalid');
-    event.target.value = normalizeStudentCode(event.target.value);
+    event.target.value = codeDraft = normalizeStudentCode(event.target.value);
   } };
   // Reject overlong paste/insertion before native maxlength can silently truncate it.
   const rejectOverflow = (event, pasted = false) => {
@@ -85,7 +87,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if (typeof added !== 'string') return;
     const proposed = field.value.slice(0, field.selectionStart ?? field.value.length) + added + field.value.slice(field.selectionEnd ?? field.value.length);
     if (normalizeStudentCode(proposed).length > 6) {
-      event.preventDefault(); field.value = '';
+      event.preventDefault();
       inlineEntry('أدخل 6 أرقام تبدأ بالرقم 1.',true);
     } else if (pasted) {
       event.preventDefault(); field.value = normalizeStudentCode(proposed); input({target:field});
@@ -98,10 +100,16 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if (event.target.closest('[data-read]')) void run(() => client.read());
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
   };
-  function clear() { generation++; busy = false; clearTimeout(timer); client?.invalidate?.(); entry(); }
-  const hide = () => clear();
-  const visible = () => { if (doc.visibilityState === 'hidden') clear(); };
-  const pageshow = event => { if (event.persisted) clear(); };
+  function clear(preserveDraft=false) {
+    if(preserveDraft){const field=root.querySelector('[data-claim] input');if(field)codeDraft=normalizeStudentCode(field.value);}else codeDraft='';
+    generation++; busy = false; clearTimeout(timer); client?.invalidate?.();
+    // Retire private data/pending replies, retaining only this page's editable
+    // unsubmitted draft. An existing entry keeps its DOM, selection and focus.
+    if(preserveDraft&&root.querySelector('[data-claim]'))inlineEntry();else entry();
+  }
+  const hide = () => clear(true);
+  const visible = () => { if (doc.visibilityState === 'hidden') clear(true); };
+  const pageshow = event => { if (event.persisted) clear(true); };
   root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
   win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
   entry();

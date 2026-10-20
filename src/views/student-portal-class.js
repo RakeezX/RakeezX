@@ -26,11 +26,11 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   const selection=focus?.tagName==='TEXTAREA'?[focus.selectionStart,focus.selectionEnd]:null;
   const focusKey=focus&&(focus.name||[...focus.attributes].find(a=>a.name.startsWith('data-guidance-'))?.name);
   const {task,draft,stale}=state();
-  root.innerHTML=`<details class="n88-task-guidance" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body"><p role="status" aria-live="polite">${esc(message||(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy&&!tasks.length?'جارٍ قراءة المهام…':''))}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&!busy&&!readError?'<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>':''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="2">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="2">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><label data-clear hidden><input type="checkbox" name="confirmClear"> أؤكد نشر المهمة دون تعليمات</label><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
+  root.innerHTML=`<details class="n88-task-guidance" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body"><p role="status" aria-live="polite">${esc(message||(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy&&!tasks.length?'جارٍ قراءة المهام…':''))}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&loaded&&!busy&&!readError?'<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>':''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="2">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="2">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><label data-clear hidden><input type="checkbox" name="confirmClear"> أؤكد نشر المهمة دون تعليمات</label><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
   updateControls();
   if(focusKey){const next=[...root.querySelectorAll('button,select,textarea,input')].find(e=>e.name===focusKey||e.hasAttribute(focusKey));next?.focus({preventScroll:true});if(next&&selection)next.setSelectionRange(...selection);}
  }
- function scheduleRead(){if(disposed||suspended)return;if(busy){if(operationSequence!==sequence)queued=true;return;}clearTimeout(wakeTimer);wakeTimer=setTimeout(()=>void refresh(),40);}
+ function scheduleRead(){if(disposed||suspended||!opened)return;if(busy){if(operationSequence!==sequence)queued=true;return;}clearTimeout(wakeTimer);wakeTimer=setTimeout(()=>void refresh(),40);}
  async function refresh(){
   if(disposed||suspended)return;
   if(bound!==current())reset();
@@ -46,6 +46,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
  }
  const input=e=>{if(bound!==current()){reset();draw();return;}if(!e.target.closest('[data-guidance]'))return;const {task}=state();if(!task)return;const form=root.querySelector('form');drafts.set(selected,{...(drafts.get(selected)||task),executionInstructions:form.elements.executionInstructions.value,deliveryInstructions:form.elements.deliveryInstructions.value});updateControls();};
  const change=e=>{if(bound!==current()){reset();draw();return;}if(e.target.matches('[data-guidance-source]')){selected=e.target.value;message='';draw();}else if(e.target.name==='confirmClear')updateControls();};
+ const toggle=()=>{const details=root.querySelector('details');if(!details)return;opened=details.open;if(opened&&!loaded&&!busy&&!readError)scheduleRead();};
  const click=e=>{if(bound!==current()){reset();draw();return;}if(e.target.closest('[data-guidance-refresh]'))void refresh();if(e.target.closest('[data-guidance-revalidate]')&&!busy&&!readError){const {task,draft}=state();if(task&&draft){drafts.set(selected,{...draft,sourceStamp:task.sourceStamp,revision:task.revision});uncertain.delete(selected);message='';draw();}}};
  const submit=async e=>{
   if(!e.target.matches('[data-guidance]'))return;e.preventDefault();
@@ -61,10 +62,10 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
  };
  const changed=()=>{if(bound===current())return;reset();draw();scheduleRead();};
  const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);reset();tasks=[];draw();},wake=()=>{if(root.ownerDocument.visibilityState==='visible'){const returning=suspended;suspended=false;changed();if(returning||!loaded)scheduleRead();}};
- root.addEventListener('input',input);root.addEventListener('change',change);root.addEventListener('click',click);root.addEventListener('submit',submit);
+ root.addEventListener('toggle',toggle,true);root.addEventListener('input',input);root.addEventListener('change',change);root.addEventListener('click',click);root.addEventListener('submit',submit);
  win.addEventListener('pagehide',hide);win.addEventListener('pageshow',wake);win.addEventListener('focus',wake);root.ownerDocument.addEventListener('visibilitychange',wake);
- const unsub=subscribe(changed);reset();scheduleRead();
- return {refresh,contextChanged:changed,dispose(){disposed=true;sequence++;clearTimeout(wakeTimer);drafts.clear();unsub?.();win.removeEventListener('pagehide',hide);win.removeEventListener('pageshow',wake);win.removeEventListener('focus',wake);root.ownerDocument.removeEventListener('visibilitychange',wake);root.removeEventListener('input',input);root.removeEventListener('change',change);root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.replaceChildren();}};
+ const unsub=subscribe(changed);reset();draw();
+ return {refresh,contextChanged:changed,dispose(){disposed=true;sequence++;clearTimeout(wakeTimer);drafts.clear();unsub?.();win.removeEventListener('pagehide',hide);win.removeEventListener('pageshow',wake);win.removeEventListener('focus',wake);root.ownerDocument.removeEventListener('visibilitychange',wake);root.removeEventListener('toggle',toggle,true);root.removeEventListener('input',input);root.removeEventListener('change',change);root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.replaceChildren();}};
 }
 export function mountClassPortal(root, { client, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), share = typeof navigator.share==='function' ? data=>navigator.share(data) : null, requestId = () => crypto.randomUUID() } = {}) {
   let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer, wakeTimer, readWork = null, mutating = false, queued = false, suspended = false, retry = false, draft = null, draftRevision = null, settingsOpen = false;
@@ -78,7 +79,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   const shareText=s=>`مرحبًا ${s.label}،\nرمز دخولك: ${s.credential}\n${new URL('/student',root.ownerDocument.defaultView.location.origin).href}\nافتح صفحة الطالب وأدخل الرمز لعرض مساحتك الدراسية.`;
   function draw() {
     if (disposed) return;
-    const ready = !!client && !!key(), writable = ready && !!roster && !busy;
+    const ready = !!client && !!key(), writable = ready && !!roster && !busy && !retry;
     const focused = root.ownerDocument.activeElement;
     const focusAction = root.contains(focused) ? { action: focused.dataset.action, index: focused.dataset.index, name: focused.name } : null;
     settingsOpen = panel.querySelector('.n88-class-settings')?.open ?? settingsOpen;
@@ -129,7 +130,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
           if (draft && draftRevision !== result.policyRevision) { draft = null; draftRevision = null; message = 'تغيّرت إعدادات الحقول؛ راجع اختيارك من جديد.'; }
           else message = '';
         }
-      } catch { if (valid(g, k)) { clearSecrets(); roster = null; retry = true; message = 'تعذّرت قراءة القائمة. راجعها للمتابعة.'; } }
+      } catch { if (valid(g, k)) { clearSecrets(); retry = true; message = 'تعذّرت قراءة القائمة. البيانات المعروضة من آخر قراءة مؤكدة؛ راجعها للمتابعة.'; } }
       finally {
         if (readWork === work) readWork = null;
         busy = mutating;
@@ -144,7 +145,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   }
 
   async function perform(operation, success) {
-    if (busy || !roster || !key()) return;
+    if (busy || retry || !roster || !key()) return;
     const g = ++generation, k = key(), oldRoster = roster;
     mutating = true; busy = true; selected = null; outcomes = []; clearSecrets(); message = 'بانتظار إقرار الخادم…'; draw();
     try {
@@ -156,7 +157,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
       if(valid(refreshGeneration,k)&&roster){message=outcomeMessage;outcomes=outcomeLines;draw();}
     } catch {
       if (!valid(g, k)) return;
-      clearSecrets(); roster = null; queued = false; retry = true; message = 'نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير.';
+      clearSecrets(); queued = false; retry = true; message = 'نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير. الإعدادات المعروضة من آخر قراءة مؤكدة.';
     } finally { mutating = false; busy = !!readWork; if (!disposed) { if (key() !== boundKey) invalidate(); draw(); if (queued) { queued = false; scheduleRead(); } } }
   }
   const keydown = e => { if(e.key==='Escape'){const menu=e.target.closest('.n88-student-more[open]');if(menu){menu.open=false;menu.querySelector('summary').focus();e.preventDefault();}} };
@@ -166,6 +167,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     const action = button.dataset.action;
     if (busy) return;
     if (action === 'refresh') { void refresh(); return; }
+    if(retry)return;
     if (!roster) return;
     if(action==='copy-student'||action==='share-student') {
       const s=roster.students[Number(button.dataset.index)];if(!s?.credential)return;
@@ -203,7 +205,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   };
   const submit = e => {
     if (!e.target.matches('[data-visibility]')) return;
-    e.preventDefault(); if (busy || !roster) return;
+    e.preventDefault(); if (busy || retry || !roster) return;
     if (key() !== boundKey) { invalidate(); void refresh(); return; }
     const fields = Object.fromEntries(PORTAL_FIELDS.map(f => [f, e.target.elements.namedItem(f).checked]));
     void perform(r => client.saveVisibility(context().teachingId, { policyRevision: r.policyRevision, fields }), () => { draft = null; draftRevision = null; message = 'حُفظت الحقول المختارة.'; });
@@ -240,7 +242,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
 // Integration must supply actual service binding and class context. This adapter stays unavailable by default.
 let routeHandle,routeGeneration=0,routeRoot,routeTeaching;
 export default { title: () => 'مساحة طلاب الفصل', back:p=>'#/teaching/'+encodeURIComponent(p.id),render: () => html`<div data-class-portal></div>`,
-  topActions:()=>html`<a class="btn btn--quiet n88-student-gateway" href="/student">بوابة دخول الطالب</a>`,
+  topActions:()=>html`<a class="btn btn--ghost n88-student-gateway" href="/student" target="_blank" rel="noopener noreferrer" aria-label="بوابة دخول الطالب (تفتح في علامة تبويب جديدة)">بوابة دخول الطالب <span aria-hidden="true">↗</span></a>`,
   afterPaint(root,params) {
     const target=root.querySelector('[data-class-portal]');if(!target||target===routeRoot)return;
     // The shell redraws on pageshow/visibility: retain this route instance and its

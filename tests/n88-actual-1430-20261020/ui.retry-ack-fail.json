@@ -1,0 +1,30 @@
+{
+  "status": "FAIL",
+  "checks": [],
+  "scope": "Actual source DOM/handlers/client/CSS with synthetic responses; fresh owned contexts, no live account",
+  "clipboard": "Only freshly written synthetic text pasted with native Control+V; no clipboard readText/personal clipboard read.",
+  "phase": "teacher",
+  "teacherState": {
+    "error": "invalid_ack",
+    "roster": 1,
+    "codes": 0,
+    "status": [
+      "نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير. الإعدادات المعروضة من آخر قراءة مؤكدة.",
+      ""
+    ],
+    "calls": 2
+  },
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-code]') to be visible\u001b[22m\n",
+    "stack": [
+      "locator.waitFor: Timeout 5000ms exceeded.",
+      "Call log:",
+      "\u001b[2m  - waiting for locator('[data-code]') to be visible\u001b[22m"
+    ]
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

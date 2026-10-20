@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "baseline": true,
+  "scope": "Actual model IDs/client/signed ingress/Web entry/Auth SDK/repository/typed query adapter with controlled synthetic PG port; no hosted mutation or real teacher acceptance.",
+  "commandElapsedMs": 15001,
+  "commandCanonicalReads": [
+    "canonical:years",
+    "canonical:terms",
+    "canonical:sections",
+    "canonical:students",
+    "canonical:enrollments",
+    "canonical:teachings",
+    "canonical:items",
+    "canonical:scores",
+    "canonical:score_subitems",
+    "canonical:score_subitem_completions",
+    "canonical:sessions",
+    "canonical:attendance",
+    "canonical:logs"
+  ]
+}

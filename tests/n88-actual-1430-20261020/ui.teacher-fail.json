@@ -1,0 +1,22 @@
+{
+  "status": "FAIL",
+  "checks": [
+    "Native paste, Arabic digits, selection replacement; overlong insertion never truncated into PIN. Invalid/401 retain same form/draft. Hidden pending response retired, harmless visibility/focus/back retain draft/selection; success/end/explicit clear erase. No persistent storage."
+  ],
+  "scope": "Actual source DOM/handlers/client/CSS with synthetic responses; fresh owned contexts, no live account",
+  "clipboard": "Only freshly written synthetic text pasted with native Control+V; no clipboard readText/personal clipboard read.",
+  "phase": "teacher",
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-code]') to be visible\u001b[22m\n",
+    "stack": [
+      "locator.waitFor: Timeout 30000ms exceeded.",
+      "Call log:",
+      "\u001b[2m  - waiting for locator('[data-code]') to be visible\u001b[22m"
+    ]
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

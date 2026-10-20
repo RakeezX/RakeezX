@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "scope": "Actual client methods, inert request seam, no network/send/mutation",
+  "checks": [
+    "Explicit reviewed visibility/guidance retry reuses exact original request ID/body after unknown outcome.",
+    "No background retry; valid bound ACK required; owner retirement denies further save."
+  ],
+  "automaticRetries": 0,
+  "persistentState": false
+}

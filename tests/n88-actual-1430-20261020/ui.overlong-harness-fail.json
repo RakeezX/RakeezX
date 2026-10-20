@@ -1,0 +1,14 @@
+{
+  "status": "FAIL",
+  "checks": [],
+  "scope": "Actual source DOM/handlers/client/CSS with synthetic responses; fresh owned contexts, no live account",
+  "clipboard": "Only freshly written synthetic text pasted with native Control+V; no clipboard readText/personal clipboard read.",
+  "failure": {
+    "name": "AssertionError",
+    "message": "Expected values to be strictly equal:\n\n1 !== 0\n"
+  },
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "lease": "RELEASED browser"
+  }
+}

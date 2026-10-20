@@ -21,7 +21,11 @@ export function createClassPortalClient({ request, getContext = () => null, time
   if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000 || !Number.isInteger(readTimeoutMs) || readTimeoutMs < 1 || readTimeoutMs > 30000) deny('invalid_configuration');
   let roster = null, rosterKey = null, pending = null, readSequence = 0;
   const readContext = () => { try { return getContext(); } catch { return null; } };
-  const consumed = new Set(); // request IDs are one-shot, including uncertain outcomes; fresh review before retry.
+  const consumed = new Set();
+  // Same-page uncertain commands retain their original complete identity after
+  // review. Only an explicit identical intent can replay it; never auto-retry.
+  const unknown = new Map(), guidanceUnknown = new Map();
+  const intentKey=(c,action,body)=>JSON.stringify([c.key,action,Object.entries(body).filter(([k])=>!['requestId','expectedRosterRevision'].includes(k)).sort(([a],[b])=>a.localeCompare(b))]);
   function context(teachingId) {
     const c = readContext(), key = classContextKey(c);
     if (!request || !key || c.teachingId !== teachingId) deny('unavailable');
@@ -57,10 +61,16 @@ export function createClassPortalClient({ request, getContext = () => null, time
   }
   function mutate(teachingId, body, action, validate) {
     const { c, r } = snapshot(teachingId);
-    if (!id(body.requestId) || consumed.has(body.requestId)) deny('review_required');
+    if (!id(body.requestId)) deny('review_required');
     if (pending) deny('busy');
-    consumed.add(body.requestId); readSequence++;
-    const work = call(action, teachingId, { ...body, expectedRosterRevision: r.rosterRevision }, validate, c);
+    const intent=intentKey(c,action,body),prior=unknown.get(intent);
+    const command=prior??{ ...body, expectedRosterRevision: r.rosterRevision };
+    if(consumed.has(command.requestId)&&!prior)deny('review_required');
+    consumed.add(command.requestId); readSequence++;
+    const work = call(action, teachingId, command, data=>validate(data,command), c).then(result=>{unknown.delete(intent);return result;},error=>{
+      if(classContextKey(readContext())===c.key)unknown.set(intent,structuredClone(command));
+      throw error;
+    });
     pending = work;
     return work.finally(() => { roster = null; if (pending === work) pending = null; });
   }
@@ -71,10 +81,10 @@ export function createClassPortalClient({ request, getContext = () => null, time
     },
     async saveGuidance(teachingId,guidance) {
       if(pending) deny('busy');
-      const requestId=crypto.randomUUID(), c=context(teachingId);
+      const c=context(teachingId),intent=intentKey(c,'guidance-save',guidance),requestId=guidanceUnknown.get(intent)??crypto.randomUUID();
       const work=call('guidance-save',teachingId,{requestId,guidance},d=>validGuidanceAck(d,guidance),c);
       pending=work;
-      try{return await work;}finally{if(pending===work)pending=null;}
+      try{const result=await work;guidanceUnknown.delete(intent);return result;}catch(error){if(classContextKey(readContext())===c.key)guidanceUnknown.set(intent,requestId);throw error;}finally{if(pending===work)pending=null;}
     },
     async listClass(teachingId) {
       if (pending) deny('busy');
@@ -87,8 +97,8 @@ export function createClassPortalClient({ request, getContext = () => null, time
     issueMissingClassCodes(teachingId, body) {
       const { r } = snapshot(teachingId);
       if (!exact(body, ['requestId','expectedRosterRevision']) || body.expectedRosterRevision !== r.rosterRevision) deny('review_required');
-      return mutate(teachingId, body, 'issue-missing', d => {
-        if (!exact(d, ['requestId','created','skipped','failed','uncertain']) || d.requestId !== body.requestId || typeof d.uncertain !== 'boolean' || !['created','skipped','failed'].every(k => Array.isArray(d[k]))) return false;
+      return mutate(teachingId, body, 'issue-missing', (d,command) => {
+        if (!exact(d, ['requestId','created','skipped','failed','uncertain']) || d.requestId !== command.requestId || typeof d.uncertain !== 'boolean' || !['created','skipped','failed'].every(k => Array.isArray(d[k]))) return false;
         const seen = new Set();
         for (const kind of ['created','skipped','failed']) for (const entry of d[kind]) {
           const s = r.students.find(s => s.studentId === entry.studentId);
