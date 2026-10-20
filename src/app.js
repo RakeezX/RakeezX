@@ -1214,13 +1214,6 @@ function renderFirstAccountProfile(contract) {
           <input class="input" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national"
                  maxlength="10" required pattern="05[0-9]{8}" value="${current.phone}" />
           <span class="field__hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span></label>
-        <div class="field"><span class="field__label">صفة المستخدم</span>
-          <div class="segmented settings-teacher-form" role="group" aria-label="صفة المستخدم">
-            <button class="segmented__btn ${teacherForm === 'masculine' ? 'is-on' : ''}" type="button" data-profile-form="masculine" aria-pressed="${String(teacherForm === 'masculine')}">معلم</button>
-            <button class="segmented__btn ${teacherForm === 'feminine' ? 'is-on' : ''}" type="button" data-profile-form="feminine" aria-pressed="${String(teacherForm === 'feminine')}">معلمة</button>
-          </div></div>
-        <label class="field"><span class="field__label">اسم المدرسة <small>اختياري</small></span>
-          <input class="input" name="schoolName" value="${current.schoolName}" /></label>
         <label class="field"><span class="field__label">إدارة التعليم <small>مطلوب</small></span>
           <select class="input" name="educationDepartment" required aria-describedby="initial-department-hint">
             <option value="">اختر إدارة التعليم</option>
@@ -1228,6 +1221,13 @@ function renderFirstAccountProfile(contract) {
               <option value="${canonicalName}">${shortLabel}</option>`)}
           </select>
           <span class="field__hint" id="initial-department-hint">تحدد إدارة التعليم التقويم المعتمد لحسابك</span></label>
+        <div class="field"><span class="field__label">صفة المستخدم</span>
+          <div class="segmented settings-teacher-form" role="group" aria-label="صفة المستخدم">
+            <button class="segmented__btn ${teacherForm === 'masculine' ? 'is-on' : ''}" type="button" data-profile-form="masculine" aria-pressed="${String(teacherForm === 'masculine')}">معلم</button>
+            <button class="segmented__btn ${teacherForm === 'feminine' ? 'is-on' : ''}" type="button" data-profile-form="feminine" aria-pressed="${String(teacherForm === 'feminine')}">معلمة</button>
+          </div></div>
+        <label class="field"><span class="field__label">اسم المدرسة <small>اختياري</small></span>
+          <input class="input" name="schoolName" value="${current.schoolName}" /></label>
         <div class="field__error" role="alert" data-profile-error hidden></div>
         <div class="first-run-status__actions">
           <button class="btn btn--primary" type="submit">متابعة</button>
