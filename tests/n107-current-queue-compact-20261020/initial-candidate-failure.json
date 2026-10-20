@@ -1,0 +1,37 @@
+{
+  "taskId": "continuous-n107-current-background-queue-compact-ux-20261020",
+  "runId": "9702c98f-2efb-4e10-9c09-90c89b4b151a",
+  "checks": [
+    {
+      "name": "n107_two_imports_background_receipts_grades_and_terminal_active_count",
+      "status": "PASS",
+      "evidence": "Installed automatic Sync/coordinator completes two independent real IndexedDB plans without manual drains; exact four grades and max ACKs each, two durable receipts once; terminal plans leave active count."
+    }
+  ],
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-current-background-queue-compact-ux-20261020/tests/n107-current-queue-compact-20261020/browser.mjs:209:72\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-current-background-queue-compact-ux-20261020/tests/n107-current-queue-compact-20261020/browser.mjs:192:2"
+  ],
+  "testedFiles": {},
+  "plans": [
+    {
+      "state": "cloud_confirmed"
+    },
+    {
+      "state": "cloud_confirmed"
+    }
+  ],
+  "lastPlans": [
+    {
+      "id": "436237b4-7e6e-4191-a8f5-01049df5f591",
+      "state": "cloud_confirmed",
+      "teachingId": "tch:c37aa846-f1a0-4d63-9d6b-820c816d2ef4",
+      "gradeMutationId": "223a7ff6-ac2f-4bd7-b3c4-91fb6ca5e2ff"
+    },
+    {
+      "id": "8f565e90-8ca9-4b87-87b7-745afa77acd3",
+      "state": "cloud_confirmed",
+      "teachingId": "tch:9ecba5e6-166f-4c4e-8506-52443c5c6682",
+      "gradeMutationId": "05c02d89-5a46-432b-b485-cb2b8eaf8b50"
+    }
+  ]
+}
