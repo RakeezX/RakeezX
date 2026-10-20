@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-region-response-attestation-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3501,
+      "scopeKey": "n88-region-response-attestation-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 25,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "N88 current owned-class roster visibly loaded once after the trusted ap-south-1 carrier change, but Supabase function logs for that exact window contain no N88 function-specific row; the five region records are unrelated. Preserve the prior blocked result, the original 503/6600ms, and this unknown causal attribution. The already deployed carrier source is SHA 3fbf524a87ac496fdebc9f74e2ab57ad810661d094d63a9c6148ae1c5d81fd3a at Cloudflare version e699b953-5e67-4dc3-be1a-73f6cf85b0c4. Main now includes candidate e8db854262e6db4e00522e627d541d3c7fbd2c19; the immutable live carrier artifact is tests/n88-region-placement-20261020/carrier.mjs in that candidate. Current native N88 version59 remains unchanged.\n\nMake ONE bounded observability correction for POST /api/n88/teacher/class/list: read the documented x-sb-edge-region header from the trusted Supabase response in the carrier, allowlist the known supported region token, and return it as a same-origin, no-store, private response header only on this list response. Never accept, reflect or forward a client-supplied region/diagnostic header; preserve fixed upstream x-region: ap-south-1, HMAC/body/source pin, TLS/owner/route/privacy guards, deadlines, response shape, other routes, cache control and no secret/header logging. On the frontend class-list client/view, consume only this finite header and a monotonic local request duration, and expose safe region/timing status in a nonvisible diagnostic DOM attribute after the actual list completes. Do not put technical details into ordinary user text or store names/IDs/credentials/URLs. Handle a missing/invalid header as unknown without masking list success/failure. No change to native, SQL, Auth, roles, schema, grades, codes or student data.\n\nQualify the actual carrier wire/response boundary locally: fixed region on upstream, malicious client header ignored, only allowlisted upstream region reflected, unchanged other routes/envelope and safe missing-header behavior. Qualify frontend request/result/DOM diagnostic binding synthetically with fabricated data. Reuse unchanged PG17/303/owner/receipt proofs. Then perform at most ONE exact Cloudflare carrier promotion through the existing authorized custody route using the currently deployed carrier as immutable preimage, and verify source/settings/routes/version readback. Do not perform a real teacher class request before the changed frontend asset is published; the sole publisher integrates/verifies that asset. Return LOCAL_READY only with exact local checks and provider readback; the subsequent bounded post-publication evidence card will observe one current owned-class response. If provider refuses or source preimage differs, return BLOCKED without another upload. No Product CLOSED or 100% claim.\n\nCARD-SCOPE CORRECTION 2026-10-20: the authenticated runtime adapter at src/lib/student-portal-runtime.js owns the initial list response and strips response headers before the class client; include only that exact file for finite header hand-through and initial success/failure diagnostic binding. The original blocked result, session, candidate, provider budget and all safeguards remain unchanged.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/views/student-portal-class.js",
+        "tests/n88-region-response-20261020/**",
+        "docs/automation-evidence/20261020/N88_REGION_RESPONSE_ATTESTATION.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/views/student-portal-class.js"
+      ],
+      "requiredChecks": [
+        "n88_region_response_fixed_source_and_allowlisted_reply",
+        "n88_client_diagnostic_binding_private_and_result_preserved",
+        "n88_unchanged_signed_envelope_other_routes_and_safeguards",
+        "n88_exact_new_carrier_provider_readback"
+      ],
+      "acceptance": [
+        "Changed frontend diagnostic is served exactly and the bounded carrier source/readback match; no native/data change or premature real-request claim.",
+        "A separate one-use post-publication observation is still required before attributing a region to the actual list response."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261020 N88 bounded response-region attribution",
+        "publication": true,
+        "carrierDeployments": 1,
+        "carrierSourceReadbacks": 1,
+        "nativeDeployments": 0,
+        "prePublicationClassReads": 0,
+        "studentOrTeacherWrites": 0,
+        "sqlAuthSchemaChanges": 0
+      },
+      "liveAuthorizationRef": "PO-20261020-CONTINUE-N88-REGION-ATTESTATION",
+      "releaseAuthority": "User's direct 2026-10-20 instruction to continue until actual issues are evidenced authorizes this narrow same-origin region attribution, with one carrier promotion and sole-publisher frontend delivery; prior data/security safeguards remain binding."
+    }
+  ]
+}
