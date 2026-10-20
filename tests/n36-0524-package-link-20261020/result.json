@@ -1,0 +1,68 @@
+{
+  "taskId": "continuous-n36-0524-verified-package-link-20261020",
+  "runId": "6bba93d2-7477-4560-9c33-e06d2f20b5a0",
+  "name": "n36_exact_0524_verified_archive_download_link",
+  "status": "PASS",
+  "baseSha": "77915580a01ee4ea2fc9e50d6a5358f77452d110",
+  "href": "/assets/extensions/rakeez-teacher-import-helper-0.5.24.zip",
+  "label": "تنزيل إضافة ركيز 0.5.24",
+  "archiveSha256": "901858c399b04d2c229ae9cea055e83df5d89030fa29c884414380f5608dbd82",
+  "archiveBytes": 134818,
+  "scope": "Exact link extraction, syntax, immutable archive manifest and reused upstream publication receipts; all other view bytes unchanged.",
+  "reused": [
+    {
+      "taskId": "continuous-n36-0523-route-and-clean-madrasati-ui-20261020",
+      "candidateSha": "9c7a9b7f845499d1e2b0122b1b9609a941b84c59",
+      "publishedSha": "77915580a01ee4ea2fc9e50d6a5358f77452d110",
+      "verifiedAt": "2026-10-20T18:37:33.000Z",
+      "assets": [
+        {
+          "phase": "immutable",
+          "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.24.zip",
+          "url": "https://0350ff7c.rakeezx.pages.dev/assets/extensions/rakeez-teacher-import-helper-0.5.24.zip",
+          "sha256": "901858c399b04d2c229ae9cea055e83df5d89030fa29c884414380f5608dbd82"
+        },
+        {
+          "phase": "immutable",
+          "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.24.manifest.json",
+          "url": "https://0350ff7c.rakeezx.pages.dev/assets/extensions/rakeez-teacher-import-helper-0.5.24.manifest.json",
+          "sha256": "9c35a1be70332a7f5a3a98e9fc740cfd144c15f6184bdd0bd6e9cf12e3e2f5cf"
+        },
+        {
+          "phase": "production",
+          "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.24.zip",
+          "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.24.zip",
+          "sha256": "901858c399b04d2c229ae9cea055e83df5d89030fa29c884414380f5608dbd82"
+        },
+        {
+          "phase": "production",
+          "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.24.manifest.json",
+          "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.24.manifest.json",
+          "sha256": "9c35a1be70332a7f5a3a98e9fc740cfd144c15f6184bdd0bd6e9cf12e3e2f5cf"
+        }
+      ]
+    },
+    {
+      "taskId": "continuous-n107-minimal-import-controls-20261020",
+      "candidateSha": "8e240a028dc9e0e890c7e73b1520d662dbc614b4",
+      "publishedSha": "489372c98e6fc1932ea8975763fdcf0c8773391a",
+      "verifiedAt": "2026-10-20T18:35:31.373Z",
+      "assets": [
+        {
+          "phase": "immutable",
+          "repoPath": "src/views/class-import-center.js",
+          "url": "https://7004c342.rakeezx.pages.dev/src/views/class-import-center.js",
+          "sha256": "95769f53d0e22ddebe207480193eb635bd370cb4ae292bb0f48fbef9d8a7a6f9"
+        },
+        {
+          "phase": "production",
+          "repoPath": "src/views/class-import-center.js",
+          "url": "https://rakeezx.com/src/views/class-import-center.js",
+          "sha256": "95769f53d0e22ddebe207480193eb635bd370cb4ae292bb0f48fbef9d8a7a6f9"
+        }
+      ]
+    }
+  ],
+  "renderedUi": "NOT_RUN: copy-only source assertion requested by activated card; unchanged rendered evidence reused.",
+  "currentCandidatePublication": "NOT_RUN: independent publisher owns changed served view/archive verification."
+}
