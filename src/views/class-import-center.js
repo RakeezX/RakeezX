@@ -167,13 +167,19 @@ function automaticPersistedGuard(batch,current){
  automaticGuard(batch);
  const device=current.device?.find(d=>d.id==='device');
  if(device&&(device.activeYearId!==batch.year||device.activeTermId!==batch.term))throw Error('BATCH_PERSISTED_TERM_CHANGED');
+ const saved=device?.n36NamesBatch;
+ if(saved&&(saved.ownerId!==store.getActiveWorkspace().authUserId||saved.pending&&saved.batchId!==batch.id))throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
  if(current.years&&JSON.stringify(current.years.find(y=>y.id===batch.year))!==batch.yearState||
  current.terms&&JSON.stringify(current.terms.find(t=>t.id===batch.term))!==batch.termState)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');
+ if(current.sections)for(const [classroom,expected] of batch.sectionTargets??[]){
+  const found=sourceSection(classroom,{sections:current.sections,device:device??store.state.device,yearId:batch.year}).section;
+  if(!found||JSON.stringify(found)!==JSON.stringify(expected))throw Error('CLASS_CHANGED');
+ }
 }
 async function batchCheckpoint(batch,change){
  automaticGuard(batch);
  const db=await import('../lib/db.js');
- const committed=await db.applyBatch({device:{}},{prepare(current){
+ const committed=await db.applyBatch({device:{},sections:{},years:{},terms:{}},{prepare(current){
   automaticPersistedGuard(batch,current);
   const device=current.device.find(d=>d.id==='device');if(!device)throw Error('BATCH_DEVICE');
   const prior=device.n36NamesBatch;
@@ -183,11 +189,16 @@ async function batchCheckpoint(batch,change){
  }});
  automaticGuard(batch);store.state.device={...store.state.device,n36NamesBatch:committed.device.put[0].n36NamesBatch};
 }
-function sourceSection(classroom){
- const saved=store.state.device?.n36NamesBatch?.classMappings?.[classroom];
- if(saved){const section=store.getSection(saved);if(!section||section.yearId!==store.activeYear().id||section.status==='archived')throw Error('CLASS_MAPPING_CHANGED');return {section};}
-
+function sourceSection(classroom,{sections=store.state.sections,device=store.state.device,yearId=store.activeYear().id}={}){
+ const owner=store.getActiveWorkspace().authUserId;
+ const saved=device?.n36NamesBatch?.classMappings?.[classroom];
  const key=v=>String(v).normalize('NFC').replace(/[إأآٱ]/g,'ا').replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/\s+/g,' ').trim();
+ // A saved mapping is provenance, never permission to revive its tombstone.
+ // Its natural key can find/create a NEW identity even for a manually mapped
+ // source label; a missing/foreign/year-changed mapping still fails closed.
+ const mapped=saved?sections.find(s=>s.id===saved):null;
+ if(saved&&(!mapped||mapped.yearId!==yearId||mapped.ownerId&&mapped.ownerId!==owner))throw Error('CLASS_MAPPING_CHANGED');
+ if(mapped&&!mapped.deleted&&mapped.status==='archived')throw Error('CLASS_ARCHIVED_OR_AMBIGUOUS');
  const name=key(classroom).replace(/^الصف /,'');
  let grade,label;
  // AI: first/second/third without an academic stage remain ambiguous.
@@ -195,21 +206,28 @@ function sourceSection(classroom){
  for(const g of GRADES){for(const prefix of [key(g.label),...(aliases[g.v]??[])]){if(name.startsWith(prefix)&&/^(?:[ /(-]|[0-9])/.test(name.slice(prefix.length))){grade=g.v;label=name.slice(prefix.length).replace(/^[ /(-]+|[ )]+$/g,'').trim();break;}}if(grade)break;}
  const numeric=name.match(/^(1[0-2]|[1-9])\s*[/(-]\s*([\p{L}\p{N} ._-]{1,8})\)?$/u);
  if(numeric){grade=Number(numeric[1]);label=numeric[2].trim();}
+ if(mapped){grade=Number(mapped.grade);label=mapped.label;}
  if(!grade||!label||label.length>8||!/^[\p{L}\p{N} ._-]+$/u.test(label))throw Error('CLASS_MAPPING_REQUIRED');
- const matches=store.state.sections.filter(s=>s.yearId===store.activeYear().id&&Number(s.grade)===grade&&key(s.label)===key(label));
- if(matches.length>1||matches.some(s=>s.deleted||s.status==='archived'))throw Error('CLASS_ARCHIVED_OR_AMBIGUOUS');
- return {section:matches[0],grade,label};
+ const matches=sections.filter(s=>!s.deleted&&s.yearId===yearId&&Number(s.grade)===grade&&key(s.label)===key(label));
+ if(matches.some(s=>s.ownerId&&s.ownerId!==owner))throw Error('CLASS_OWNER_OR_ARCHIVED');
+ const active=matches.filter(s=>s.status!=='archived');
+ if(active.length>1||!active.length&&matches.length)throw Error('CLASS_ARCHIVED_OR_AMBIGUOUS');
+ return {section:active[0],grade,label};
 }
 async function ensureSourceSection(batch,classroom){
  automaticGuard(batch);
  let {section,grade,label}=sourceSection(classroom);
  if(!section){
+  const mapping=store.state.device?.n36NamesBatch?.classMappings?.[classroom];
   section=await store.createSection({yearId:batch.year,grade,label,name:classroom},{verifyCurrent(current){
    automaticPersistedGuard(batch,current);
-   if(current.sections.some(s=>s.yearId===batch.year&&Number(s.grade)===grade&&gradeNameKey(s.label)===gradeNameKey(label)))throw Error('CLASS_CHANGED');
+   const device=current.device.find(d=>d.id==='device');
+   const resolved=sourceSection(classroom,{sections:current.sections,device,yearId:batch.year});
+   if(device?.n36NamesBatch?.classMappings?.[classroom]!==mapping||resolved.section||resolved.grade!==grade||resolved.label!==label)throw Error('CLASS_CHANGED');
   }});section=store.getSection(section.id);
  }
  if(!section||section.deleted||section.status==='archived'||section.ownerId&&section.ownerId!==store.getActiveWorkspace().authUserId)throw Error('CLASS_OWNER_OR_ARCHIVED');
+ (batch.sectionTargets??=new Map()).set(classroom,structuredClone(section));
  return section;
 }
 // AI: a single owner-bound setup batch, through existing store creation paths.
@@ -275,8 +293,8 @@ async function saveAutomaticNames(result){
  const envelope=result.envelope,rows=envelope.rows;
  const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(envelope.version===3?{rows,setup:envelope.setup}:rows))))].map(n=>n.toString(16).padStart(2,'0')).join('');
  try{
-  const prior=store.state.device?.n36NamesBatch;
-  if(prior?.batchId===batch.id&&prior.receipts?.[digest])return prior.receipts[digest];
+  // A counts-only receipt can outlive a deleted destination. Requalify the
+  // actual current identities/rosters on retry instead of acknowledging it.
   await batchCheckpoint(batch,p=>{
    return {...p,batchId:batch.id,pending:{...p.pending,[digest]:{rows,complete:envelope.complete,...(envelope.version===3?{setup:envelope.setup}:{} )}},yearId:batch.year,termId:batch.term};
   });
@@ -285,14 +303,7 @@ async function saveAutomaticNames(result){
   for(const classroom of new Set(rows.map(r=>r.classroom))){
    automaticGuard(batch);
    const names=rows.filter(r=>r.classroom===classroom).map(r=>[r.name]);
-   let {section,grade,label}=sourceSection(classroom);
-   if(!section){
-    section=await store.createSection({yearId:batch.year,grade,label,name:classroom},{verifyCurrent(current){
-     automaticPersistedGuard(batch,current);
-     if(current.sections.some(s=>s.yearId===batch.year&&Number(s.grade)===grade&&gradeNameKey(s.label)===gradeNameKey(label)))throw Error('CLASS_CHANGED');
-    }});
-    section=store.getSection(section.id);
-   }
+   const section=await ensureSourceSection(batch,classroom);
    if(section.deleted||section.status==='archived'||section.ownerId&&section.ownerId!==store.getActiveWorkspace().authUserId)throw Error('CLASS_OWNER_OR_ARCHIVED');
    const teachings=store.state.teachings.filter(t=>!t.deleted&&t.status!=='archived'&&t.sectionId===section.id&&t.termId===batch.term);
    const roster=store.sectionRoster(section.id),owner=store.getActiveWorkspace().authUserId;
@@ -322,7 +333,15 @@ async function saveAutomaticNames(result){
   }
   const setup=envelope.version===3?await saveAvailableSetup(batch,envelope.setup):null;
   const outcome={status:added?'saved':'existing',added,existing,remaining:0,total:rows.length,...(setup?{setup}:{})};
-  await batchCheckpoint(batch,p=>{const pending={...p.pending};delete pending[digest];return {...p,pending:Object.keys(pending).length?pending:null,receipts:{...p.receipts,[digest]:outcome}};});
+  await batchCheckpoint(batch,p=>{
+   const pending={...p.pending};delete pending[digest];
+   const targets=Object.fromEntries([...(batch.sectionTargets??[])].map(([name,section])=>[name,section.id]));
+   const priorReceipt=p.receipts?.[digest],priorTargets=p.receiptTargets?.[digest];
+   const changed=priorReceipt&&JSON.stringify(priorTargets)!==JSON.stringify(targets);
+   return {...p,pending:Object.keys(pending).length?pending:null,
+    ...(changed?{receiptHistory:[...(p.receiptHistory??[]),{digest,receipt:priorReceipt,targets:priorTargets??null}]}:{}),
+    receipts:{...p.receipts,[digest]:outcome},receiptTargets:{...p.receiptTargets,[digest]:targets}};
+  });
   extensionMessage=`حُفظت الدفعة محليًا: ${added} جديد، ${existing} موجود سابقًا. ${setup?`حقول إعداد محفوظة: ${setup.saved+setup.existing}؛ تعارضات أو غير مدعوم: ${setup.unresolved}؛ فئات غير متاحة: ${setup.missing.length}.`:''} ${envelope.complete?'':'الكشف غير مكتمل؛ لم تُفترض أسماء الصفحات غير المحسومة.'} المزامنة لم تتأكد بعد.`;
   return outcome;
  }finally{automaticWriting=false;batch.route=null;}

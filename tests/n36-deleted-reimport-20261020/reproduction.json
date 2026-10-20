@@ -1,0 +1,33 @@
+{
+  "taskId": "continuous-n36-deleted-source-class-reimport-20261020",
+  "runId": "afe3e92c-362b-4c23-94a2-ca382929c050",
+  "baseSha": "01940ee3a6fe0f4c79e0ad50c9209662a7ef7517",
+  "checks": [
+    {
+      "name": "original_deleted_rejection",
+      "status": "PASS",
+      "evidence": "Frozen base application served over HTTP reproduces unknown / CLASS_ARCHIVED_OR_AMBIGUOUS; no new destination or roster written."
+    }
+  ],
+  "errors": [],
+  "scope": "Synthetic local app only; original actual 0.5.17 journey remains FAILED. No extension changes, school browsing, service mutation or deployment.",
+  "preservedFailures": [],
+  "phase": "deleted",
+  "reproduction": {
+    "outcome": {
+      "ok": true,
+      "status": "unknown",
+      "added": 0,
+      "existing": 0,
+      "remaining": 1,
+      "total": 1,
+      "failure": {
+        "phase": "batch",
+        "step": "validation",
+        "code": "CLASS_ARCHIVED_OR_AMBIGUOUS"
+      }
+    },
+    "originalSourceSha": "01940ee3a6fe0f4c79e0ad50c9209662a7ef7517"
+  },
+  "status": "PASS"
+}

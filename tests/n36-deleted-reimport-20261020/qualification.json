@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "baseSha": "01940ee3a6fe0f4c79e0ad50c9209662a7ef7517",
+  "checks": [
+    "Eleven affected actual-app/IndexedDB cases passed; baseline failure preserved",
+    "0.5.17 profile transaction/direct receiver/lifetime guard code byte-identical; evidence reused",
+    "Extension/package remains 0.5.17 unchanged; no repack or stable updater invocation",
+    "No startup imports/SW/app/store/cloud/sync changes; affected JS syntax PASS"
+  ],
+  "sourceSha256": "816381879d1d99b829dcb66a9f94c53fbd80af34221834078ff504d06c543661",
+  "priorEvidence": "tests/n36-actual-save-20261020/browser.json",
+  "browserEvidence": "tests/n36-deleted-reimport-20261020/browser.json",
+  "liveJourney": "NOT_RUN",
+  "publication": "NOT_RUN"
+}
