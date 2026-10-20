@@ -1,0 +1,1 @@
+{"check":"scope.mjs initial assertion","status":"FAIL","cause":"git show returns LF while Windows worktree reads CRLF; initial direct string equality failed outside localImportPanel","correction":"Normalize CRLF to LF for both source inputs; no Product source changes."}

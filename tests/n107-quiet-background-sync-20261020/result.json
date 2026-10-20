@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n107-quiet-background-sync-20261020",
+  "runId": "8c838923-1131-4655-8a58-7c085db2ff86",
+  "checks": [
+    {
+      "name": "n107_routine_background_progress_hidden",
+      "status": "PASS",
+      "evidence": "Actual served app: all four routine states omit background panel and safe-stop controls; terminal plans add no recovery panel. Rendering preserves synthetic plan/data/outbox snapshots."
+    },
+    {
+      "name": "n107_uncertain_recovery_and_safe_stop_reachable",
+      "status": "PASS",
+      "evidence": "Uncertain and needs_review show one actionable recovery row even beside routine/terminal plans. Retry retains exact plan binding; native options disclosure reveals safe-stop and honest receipt warning; plan/data/outbox snapshots unchanged."
+    }
+  ],
+  "failures": [],
+  "viewSha256": "80d3d0000e23b1001293ed57ad8b29e005b3610125453a18d63df5dc26b24794"
+}

@@ -1,0 +1,8 @@
+{
+  "baseSha": "3789084a5142c785e97ae228ef9dbe1d451be397",
+  "check": {
+    "name": "n107_affected_result_inspected_and_sync_unchanged",
+    "status": "PASS",
+    "evidence": "Only localImportPanel differs from base; its current-plan receipt markup and all code outside it are identical after line-ending normalization. Queue/Sync/owner/grades/retry/cancel modules and handlers unchanged. Desktop 1100px and narrow 390px actual app/source CSS screenshots inspected; no horizontal overflow. Browser/store snapshots unchanged; no synthetic service commits."
+  }
+}

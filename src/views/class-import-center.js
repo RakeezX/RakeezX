@@ -60,12 +60,11 @@ function importDurationSummary() {
 }
 function localImportPanel() {
   const plans=localImportPlans(),current=plans.find(p=>p.id===transfer.localPlanId);
-  // Terminal receipts remain durable history; only unfinished work is active.
-  const active=plans.filter(p=>!['cloud_confirmed','cancelled'].includes(p.state));
+  // AI N107: routine plans continue silently; only recovery needs page controls.
+  const actionable=plans.filter(p=>['uncertain','needs_review'].includes(p.state));
   const labels={local_ready:'جارٍ المزامنة',waiting_creation:'جارٍ مزامنة الفصل والطلاب',waiting_sync:'بانتظار المزامنة',syncing:'جارٍ مزامنة الدرجات',uncertain:'لم تتأكد المزامنة بعد',needs_review:'تحتاج المراجعة',cloud_confirmed:'تأكد الحفظ السحابي',cancelled:'أُوقفت المتابعة'};
-  const needsAction=active.some(p=>['uncertain','needs_review'].includes(p.state));
   return html`${current ? html`<section class="n107-success" role="status" data-local-import-saved><h3>${current.state==='cloud_confirmed'?labels[current.state]:'حُفظ على هذا الجهاز'}</h3>${current.state!=='cloud_confirmed'?html`<p>${labels[current.state]}</p>`:''}<a class="btn btn--primary" href="#/teaching/${current.created.teachingId}">فتح الفصل</a><button class="btn" data-act="local-import-next">استيراد كشف آخر</button></section>`:''}
-    ${active.length ? html`<details data-local-import-plans data-active-import-count="${active.length}" ${needsAction?'open':''}><summary>المزامنة في الخلفية (${active.length})</summary><p class="grade-transfer__hint">إيقاف المتابعة لا يحذف الفصل أو الطلاب أو الدرجات المحفوظة. الطلب غير المؤكد يحتاج استعادة إيصاله قبل الإيقاف.</p>${active.map(p=>html`<p><a href="#/teaching/${p.created.teachingId}">${shortTeachingLabel(store.getTeaching(p.created.teachingId))||'فتح الفصل'}</a> · ${labels[p.state]??'تحتاج المراجعة'}${['uncertain','needs_review'].includes(p.state)?html` <button class="btn btn--quiet" data-act="local-import-retry" data-plan="${p.id}">استكمال المزامنة</button>`:''} <button class="btn btn--quiet" data-act="local-import-cancel" data-plan="${p.id}">إيقاف المتابعة بأمان</button></p>`)}</details>`:''}`;
+    ${actionable.length ? html`<section data-local-import-plans aria-label="متابعة الاستيراد"><p>استيراد يحتاج متابعة</p>${actionable.map(p=>html`<div><p><a href="#/teaching/${p.created.teachingId}">${shortTeachingLabel(store.getTeaching(p.created.teachingId))||'فتح الفصل'}</a> · ${labels[p.state]} <button class="btn btn--quiet" data-act="local-import-retry" data-plan="${p.id}">استكمال المزامنة</button></p><details><summary>خيارات المتابعة</summary><p class="grade-transfer__hint">إيقاف المتابعة لا يحذف الفصل أو الطلاب أو الدرجات المحفوظة. الطلب غير المؤكد يحتاج استعادة إيصاله قبل الإيقاف.</p><button class="btn btn--quiet" data-act="local-import-cancel" data-plan="${p.id}">إيقاف المتابعة بأمان</button></details></div>`)}</section>`:''}`;
 }
 function importDurationPanel() {
   const summary=importDurationSummary();if(!summary)return '';
