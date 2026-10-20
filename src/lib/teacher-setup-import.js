@@ -140,3 +140,16 @@ export function bundleNamesTargets(bundle, selected, context, mappings) {
     name: `${source} · ${context.subjects.find(s => s.id === t.subjectId)?.name || 'مادة غير متوفرة'}`,
     rows: students.rows.filter(r => r.proposed.classroom === source).map(r => [r.proposed.name]) })));
 }
+
+// PO: an explicit locative suffix is weaker than a labelled department. Only
+// fill an empty profile; canonical directory remains the persistence authority.
+export async function sourceSchoolDepartmentFallback(schoolName,currentDepartment){
+ if(String(currentDepartment??'').trim()||typeof schoolName!=='string')return null;
+ const {EDUCATION_DEPARTMENT_OPTIONS,resolveVisibleEducationDepartment}=await import('./education-department-directory.js');
+ const text=schoolName.normalize('NFC').trim().replace(/\s+/g,' ');
+ const matches=EDUCATION_DEPARTMENT_OPTIONS.filter(row=>text.endsWith(' ب'+row.shortLabel)&&text.length>row.shortLabel.length+3);
+ const locatives=EDUCATION_DEPARTMENT_OPTIONS.filter(row=>text.endsWith(' ب'+row.shortLabel)||text.includes(' ب'+row.shortLabel+' '));
+ if(matches.length!==1||locatives.length!==1)return null;
+ const resolved=resolveVisibleEducationDepartment(matches[0].shortLabel);
+ return resolved.status==='recognized'?resolved.value:null;
+}

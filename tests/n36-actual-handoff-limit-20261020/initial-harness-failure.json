@@ -1,0 +1,9 @@
+{
+  "taskId": "continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020",
+  "runId": "536e4ab3-78b9-4172-817b-9284060be45d",
+  "checks": [],
+  "boundary": "Actual background ESM handlers, serialized v3 claim/outcomes, application owner guards, IndexedDB and rendered settings on owned HTTP. Synthetic Chrome APIs and previously-collected data; native MV3/portal not tested.",
+  "status": "FAIL",
+  "failure": "Error: Invalid bounded local browser check\n    at withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:10:152)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-0522-handoff-limit-dashboard-principal-20261020/tests/n36-actual-handoff-limit-20261020/browser.mjs:17:68\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "debug": null
+}

@@ -317,6 +317,13 @@ async function saveAvailableSetup(batch,categories){
   if(changed){result.saved++;result.details.push({field:c.category,reason:'saved',count:1});}
   else{result.existing++;result.details.push({field:c.category,reason:'current',count:1});}
  }
+ // Explicit labelled source always wins. A precise school-title suffix only
+ // fills an empty department; it never changes calendar or personal role.
+ if(!setup.some(c=>c.category==='department')){
+  const {sourceSchoolDepartmentFallback}=await import('../lib/teacher-setup-import.js');
+  const value=await sourceSchoolDepartmentFallback(setup.find(c=>c.category==='school')?.rows[0]?.name,store.state.profile.educationDepartment);
+  if(value&&!store.state.profile.educationDepartment){automaticGuard(batch);await store.importSetupProfile({educationDepartment:value},{verifyCurrent});result.saved++;result.missing=result.missing.filter(f=>f!=='department');result.details=result.details.filter(d=>d.field!=='department');result.details.push({field:'department',reason:'saved',count:1});}
+ }
  const department=setup.find(c=>c.category==='department');
  if(department){
   const {resolveVisibleEducationDepartment}=await import('../lib/education-department-directory.js');
@@ -442,7 +449,7 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>استورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.22.zip" download>تنزيل إضافة ركيز 0.5.22</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.23.zip" download>تنزيل إضافة ركيز 0.5.23</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>
