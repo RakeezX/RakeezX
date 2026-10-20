@@ -112,6 +112,7 @@ const v2Engine = createSyncV2Engine({
   ownershipGuard: runtimeSyncOwnershipGuard,
   currentAuthenticatedUserId: () => cloud.user?.id ?? null,
   captureMutationContext: cloud.captureOwnedMutationContext,
+  independentStudentCreates: true,
 });
 
 const COORDINATOR_REASON = Object.freeze({
