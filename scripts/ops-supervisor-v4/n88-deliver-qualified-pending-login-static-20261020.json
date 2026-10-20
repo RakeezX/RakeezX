@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-deliver-qualified-pending-login-static-20261020",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3400,
+      "scopeKey": "continuous-n88-deliver-qualified-pending-login-static-20261020",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 14,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "objective": "PARTIAL DELIVERY ONLY, not revival or PASS of original actual teacher-cause FAIL. Latest PO asks continuity of pending studentlogin and serious actual teacher diagnosis. Immutable prepared candidate 7c4f8dbd15d1decc2045e322a4f0b2e9930fe687 contains qualified student visibility continuity and one authoritative error-area correction; actual teacher cause remained NOT_PROVEN with honest FAIL in original continuous-n88-initial-class-and-pending-login-continuity-20261020 result. Leave that original gate and incident BLOCKED/open, preserve all raw failures and no successful teacher claim. This new card only delivers already-qualified known subfix, so do NOT change the old FAIL to PASS, repeat its provider window, implement another guessed teacher fix, raise timeouts, deploy native53 again or drop real owner/security checks. Use prepared candidate first (scoped cherry-pick/reconcile from current main in owned worktree), no reimplementation/new student suite; verify source/package hashes match reviewed authority and reuse unchanged student seven-case PASS and single-error subproof. Preserve N64 latest closed copy and concurrent N36 changes during integration.\nOriginal custodian supported static delivery harness lacks fresh reviewed current-task/run/preparedcandidate1522 gate; this is ordinary narrow harness omission, not provider/tool rejection. Exact reviewed authority below permits implementing ONE separately named static-only branch in existing official-activation.mjs and new pure local gate module. Require ORIGINAL session/root/protected owner/state, current RUNNING this new task/current resumedrun, immutable reviewed prepared candidate/sourcepins and packageoutputs, prior current carrier 6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326 and unchangednative fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358. Refuse wrongtask/run/session/candidate/hash/preimage/consumedunknown attempt and unrelated asset/transport/config. Keep all old1336/1430/readiness/source/static markers and protected invariants unchanged; never reset/reuse them. Fresh wx one-attempt record BEFORE networkupload, append-only history, exact provider readback/reconcile unknown outcome without second upload. Root does not read protected credentials, actor/tab/channel cannot change. Only ONE changed-static carrier operation/readback for reviewed carrier ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c and student c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470. Native graph/version53/sourcepin must be read back UNCHANGED, no native deploy/env push/keys/SQL/Auth/roles/RLS/schema/migrations/rollout/routes/bindings/security/logging settings. Unrelated privateassets and transport byteidentical; readback exact new carrier/source and actual changed studentJS with existing noindex/no-referrer/privacyheaders. Prior strictHTMLbyteFAIL due Cloudflare injection remains FAIL, do not disable protection or claim everyHTMLbyteidentical. No new readiness/realteacher/pupil/code mutation/cookie acquisition or denied browser workaround.\nMinimal pure freshgate positive+negative identity/hash/consumed tests and originalowner readonlypreflight only; unchanged service/UI proofs reused hashes. Then actual changedcarrier uploadonce/readback through originalcustodian. Frontend runtime/unifiedclient/login changes go through solepublisher after prerequisite. Requiredchecks reflect PARTIAL scope explicitly, not fullactualteacher acceptance. Retain original blocked cause and exact next needed live phase/correlation evidence; this card releases useful correction, does not close N88. Return BLOCKED on genuine provider/policy refusal with exact evidence, no paid unchanged retry. No worker/queue edits/manual productlaunch.",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/lib/student-portal-runtime.js",
+        "drafts/n88-student-portal/**",
+        "tests/n88-initial-continuity-1522-20261020/**",
+        "tests/n88-static-pending-delivery-20261020/**",
+        "docs/automation-evidence/20261020/N88_INITIAL_CLASS_PENDING_CONTINUITY.md",
+        "docs/automation-evidence/20261020/N88_PARTIAL_PENDING_STATIC_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js"
+      ],
+      "requiredChecks": [
+        "n88_qualified_pending_subproof_hash_reused_teacher_fail_preserved",
+        "n88_fresh_original_custodian_static_only_gate",
+        "n88_changed_student_carrier_and_native_unchanged_readback"
+      ],
+      "acceptance": [
+        "Deliver only qualified pendinglogin/single-error partial correction, keep actual teacher timeout unresolved and original failed gate intact.",
+        "One original-custodian changed-static upload with source/served readback, solefrontendpublisher."
+      ],
+      "preparationAuthority": {
+        "kind": "Root-reviewed immutable partial candidate under latest exact PO mandate",
+        "publication": true,
+        "reviewedStatic1522": {
+          "version": 1,
+          "scope": "PARTIAL_PUBLISHED_SUBFIX_ONLY_KEEP_ORIGINAL_ACTUAL_TEACHER_FAILURE",
+          "originalTaskId": "continuous-n88-initial-class-and-pending-login-continuity-20261020",
+          "originalRunId": "54179cfe-5fbb-468e-ad0c-0d7ac832c97c",
+          "preparedCandidateSha": "7c4f8dbd15d1decc2045e322a4f0b2e9930fe687",
+          "originalSessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+          "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+          "unchangedNative": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+          "priorCarrier": "6fc34a44346cb8b052236a23fafdf62caf5b3b1ec5c3544a22eda4bf6673e326",
+          "carrier": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+          "student": "c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470",
+          "sourcePins": {
+            "src/views/student-portal-login.js": "c362ce7e131211e9a6ff132948bac8184eeaa9c6ea6d038279641f81aa2adb11",
+            "src/lib/student-portal-unified-client.js": "5dfe3737adc6fe973e918eccdf49309e8359e1acd2e4fe801d37cd151fe678b2",
+            "src/lib/student-portal-runtime.js": "552031e3339c4ca1a8bd25a861e560cc65dd9ea3677f5b49e74bcbf9da965978"
+          },
+          "packageOutputs": {
+            "edge/index.mjs": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+            "private/assets/student.mjs": "c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470",
+            "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
+            "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
+            "private/styles/app.css": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
+            "private/styles/student-portal-login.css": "3b99e8903436b2faa4e7fcad60ac3513fde322cdd849773a81be387e2de1533f",
+            "edge/import_map.json": "7f6d1a3f45a0dd142f3f6d2e8327bb4f2f138f360fb3e050e4b20af06343b1f6",
+            "private/assets/brand/header-light-standard.svg": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+            "private/assets/brand/header-light-compact.svg": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+            "private/assets/brand/header-dark-standard.svg": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+            "private/assets/brand/header-dark-compact.svg": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+            "private/assets/brand/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
+            "private/student.html": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+            "cloudflare/worker.mjs": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c"
+          },
+          "qualificationSha256": "0144860cdac3e8f4b50bfdee2dad59fd0ae236df231e449595aa59207c2d3e77",
+          "maxChangedStaticUploads": 1,
+          "nativeDeploys": 0,
+          "publicPinChanges": 0,
+          "newReadinessRequests": 0,
+          "oldTeacherCauseGate": {
+            "status": "FAIL",
+            "preserved": true
+          },
+          "appendOnlyAttemptHistory": true,
+          "resetConsumedMarkers": false
+        },
+        "maxChangedStaticUploads": 1,
+        "nativeDeploys": 0,
+        "publicPinChanges": 0,
+        "newReadinessRequests": 0,
+        "realAccountMutations": 0
+      },
+      "liveAuthorizationRef": "PO-20261020-ACTUAL-1522-PARTIAL-STATIC-REVIEW",
+      "releaseAuthority": "Latest PO authorizes exact pendinglogin behavior correction; approved original custody and one reviewed changedstatic carrier only, no new service/data permission."
+    }
+  ]
+}
