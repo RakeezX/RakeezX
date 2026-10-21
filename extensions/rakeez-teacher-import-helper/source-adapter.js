@@ -3,7 +3,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  // Transport executes ONLY inside the explicitly authorized source tab, never the extension page.
  if(mode==='fetch')return (async()=>{
   const binding=globalThis.location.href,u=new URL(runContext.path,binding);
-  const fail=code=>{throw Error(code);};
+  const fail=(code,setupRejectReason=null)=>{const e=Error(code);if(setupRejectReason){e.setupKind=runContext.setupKind;e.setupRejectReason=setupRejectReason;}throw e;};
   const setup=['metadata','classes','timetable'].includes(runContext.setupKind),kind=runContext.setupKind;
   const setupRoute=kind==='metadata'?/^\/TeachersReports\/(?:Statistics\/)?MyInfo\/[A-Za-z0-9_-]{1,80}\/?$/i:kind==='classes'?/^\/TeachersReports\/(?:Statistics\/)?Teacher\/[A-Za-z0-9_-]{1,80}\/?$/i:/^\/(?:TeachersReports\/(?:Statistics\/)?TeacherSchedule\/[A-Za-z0-9_-]{1,80}|SchoolSchedule\/Schedule\/TeacherSchedule)\/?$/i;
   const menu=/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(u.pathname);
@@ -15,16 +15,17 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    if(!runContext.readProof||typeof globalThis.rakeezTeacherReadGuard!=='function')fail('UNCONFIRMED_TEACHER_ROLE');
    if(globalThis.rakeezTeacherReadGuard.jobId!==runContext.requestId.split('|')[0])fail('TEACHER_CONTEXT_CHANGED');
    const teacher=globalThis.rakeezTeacherReadGuard();if(!teacher.ok)fail(teacher.code);if(teacher.proof!==runContext.readProof)fail('TEACHER_CONTEXT_CHANGED');
-   if(setup&&(!setupRoute.test(u.pathname)||u.hash))fail('UNSAFE_SETUP_LINK');
+   if(setup&&(!setupRoute.test(u.pathname)||u.hash))fail('UNSAFE_SETUP_LINK','route-shape');
    if(runContext.schoolBinding!=='bound'&&setup&&kind!=='metadata')fail('SCHOOL_CONTEXT_UNCONFIRMED');
    if(menu||setup||!runContext.observedReport){
     const styles=new WeakMap();const style=n=>{if(!styles.has(n))styles.set(n,getComputedStyle(n));return styles.get(n);};
     const anchors=Array.from(globalThis.document.querySelectorAll('a[href]')).filter(a=>{for(let n=a;n;n=n.parentElement){const c=style(n);if(n.hidden||n.getAttribute('aria-hidden')==='true'||c.display==='none'||c.visibility!=='visible'||Number(c.opacity)===0)return false;}return a.getClientRects().length>0;}).filter(a=>{try{return new URL(a.getAttribute('href'),binding).href===u.href;}catch{return false;}});
-    if(!anchors.length||anchors.some(a=>a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[disabled],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK');
+    if(!anchors.length)fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK',setup?'live-link-absent':null);
+    if(anchors.some(a=>a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[disabled],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK',setup?'live-link-unsafe':null);
    }
    const guard=readSourceReportPage('guard');if(!guard.ok)fail(guard.code);
   };
-  try{check();}catch(e){return {ok:false,code:e.message,incomplete:true};}
+  try{check();}catch(e){return {ok:false,code:e.message,incomplete:true,...(e.setupRejectReason?{setupKind:e.setupKind,setupRejectReason:e.setupRejectReason}:{})};}
   const controllers=globalThis.rakeezReportRequests??=new Map();
   if(controllers.size>=3)fail('FETCH_CONCURRENCY');
   const controller=new AbortController();controllers.set(runContext.requestId,controller);
@@ -46,6 +47,8 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    const doc=template.content;
    if(doc.querySelector('input[type=password],form[action*="Login" i],meta[http-equiv=refresh i]'))fail('LOGIN_OR_LOGOUT');
    const guard=readSourceReportPage('guard',runContext,{document:doc,url:u.href});if(!guard.ok)fail(guard.code);
+   // AI: auth/role stops retain priority; reject base before setup identity/field/link readers.
+   if(setup&&doc.querySelector('base[href]'))fail('UNSAFE_SETUP_LINK','response-base');
    // AI: explicit fields only, from inert bounded HTML. Never a generic heading.
    const shown=n=>{for(let e=n;e;e=e.parentElement)if(e.hidden||e.matches('[inert],.hidden,.d-none,.sr-only,[aria-hidden=true]')||e.style.display==='none'||e.style.visibility==='hidden'||e.style.opacity==='0')return false;return true;};
    const field=n=>n&&shown(n)&&!n.querySelector('script,style,iframe,input,table,a,button')?n.textContent.trim().replace(/\s+/g,' '):'';
@@ -57,7 +60,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    if(expected.length&&teachers.some(n=>!expected.includes(n)))fail('TEACHER_CONTEXT_CHANGED');
    if(schools.length>1||runContext.schoolName&&schools.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
    for(const a of doc.querySelectorAll('a[href]')){const v=new URL(a.getAttribute('href'),u.href);for(const [key,id] of v.searchParams)if(key.toLowerCase()==='schoolid'&&id.toLowerCase()!==runContext.schoolId.toLowerCase())fail('SCHOOL_CONTEXT_CHANGED');}
-   if((menu||setup)&&doc.querySelector('base[href]'))fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK');
+   if(menu&&doc.querySelector('base[href]'))fail('UNSAFE_ROSTER_LINK');
    if(setup){
     const identity=globalThis.rakeezSetupPageReader?.('metadata',runContext,{document:doc,url:u.href});
     if(!identity)fail('SETUP_READER_UNAVAILABLE');if(!identity.ok)fail(identity.code);
@@ -81,7 +84,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    const allSchools=[...new Set([...schools,...value.schoolNames??[]])];
    if(allSchools.length>1||runContext.schoolName&&allSchools.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
    return {...value,schoolNames:allSchools,links:value.links.map(l=>({...l,readEvidence:'validated-response'}))};
-  }catch(e){return {ok:false,code:controller.signal.aborted?'FETCH_CANCELLED_OR_TIMEOUT':(/^[A-Z_]+$/.test(e.message)?e.message:'REPORT_FETCH_FAILED'),incomplete:true};}
+  }catch(e){return {ok:false,code:controller.signal.aborted?'FETCH_CANCELLED_OR_TIMEOUT':(/^[A-Z_]+$/.test(e.message)?e.message:'REPORT_FETCH_FAILED'),incomplete:true,...(e.setupRejectReason?{setupKind:e.setupKind,setupRejectReason:e.setupRejectReason}:{})};}
   finally{clearTimeout(timer);controllers.delete(runContext.requestId);}
  })();
  const document=source?.document??globalThis.document,location=source?new URL(source.url):globalThis.location;

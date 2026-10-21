@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "version": "0.5.35",
+  "baseSha": "0bca7554e60adca6b19ad804e4370874d9f5676b",
+  "runtimeFiles": 29,
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.35.zip",
+    "sha256": "025fb2a896fb6027789575c0cd35ff4cfd9e3740b55137b81e7880a79ea71aef",
+    "bytes": 146711
+  },
+  "runtimeFingerprint": "fb42847b089be504105e851c83131369132d5fd484a4306085f5a4943ade22f1",
+  "inputs": [
+    "candidate-classes-final",
+    "candidate-timetable-final",
+    "serial-metadata",
+    "negative-after-final",
+    "negative-before-between",
+    "serial-critical",
+    "serial-unknown-receipt",
+    "strict-anchor-controls",
+    "safe-setup",
+    "serial-large"
+  ],
+  "checks": [
+    "Immutable .34 reproduction",
+    "Actual app 303 rows / 300+3 receipts and independent coverage",
+    "Before/after/between identity denials",
+    "Unknown receipt is honest; reimport existing with unchanged student records",
+    "Strict non-GET/download/disabled/form rejection",
+    "Exact ZIP/source/29-file SHA256 parity",
+    "Version-only manifest permissions/CSP; exact app link change",
+    "Protected receiver/owner/store/coverage/caps and old archives unchanged",
+    "Affected JS syntax and diff check"
+  ],
+  "production": "NOT_RUN",
+  "installedStableParity": "NOT_RUN",
+  "actualPortalAcceptance": "PENDING"
+}

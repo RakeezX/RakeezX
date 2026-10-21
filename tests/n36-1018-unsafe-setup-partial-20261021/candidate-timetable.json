@@ -1,0 +1,127 @@
+{
+  "taskId": "continuous-n36-1018-unsafe-setup-partial-20261021",
+  "runId": "a12841fa-8aaf-4ea6-a297-bed06b462096",
+  "baseSha": "0bca7554e60adca6b19ad804e4370874d9f5676b",
+  "version": "0.5.35",
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.34.zip",
+    "observedAt": "2026-10-21T10:31:49.518Z",
+    "sha256": "70ed0905ed3a04ccdbb7872daf4d0fd5f56071d56ebe85af9e9db68f77f23ffd",
+    "bytes": 145745,
+    "files": 29
+  },
+  "runtimeFingerprint": "fb42847b089be504105e851c83131369132d5fd484a4306085f5a4943ade22f1",
+  "model": {
+    "tiles": 20,
+    "styleCostMs": 0,
+    "scriptDelayMs": 0,
+    "holdMs": 0,
+    "inlineCounters": true,
+    "clock": "anchored wall elapsed plus cumulative actual computed-style calls times fixed cost; no phase-directed jumps; browser GET abort timer remains native 8s"
+  },
+  "harnessCorrection": "Chrome storage/session get no longer awaits source.evaluate; style counters returned with the same reader result, with no extra source evaluation. Descriptors/app checks never schedule a counter probe. Prior harness artifacts preserved.",
+  "boundary": "Public immutable 0.5.34 ZIP; actual popup/CSS, serialized source readers, ESM background/collector, actual receiver ownership guards and IndexedDB. Synthetic Chrome/account service; loopback protocol substitution only.",
+  "cases": [
+    {
+      "mode": "onclick-before",
+      "status": "FAIL",
+      "assertionFailure": "Harness terminal wait expired",
+      "view": {
+        "phase": "collect",
+        "code": null,
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "preliminary",
+        "readProofPresent": false,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 138
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 4,
+            "ms": 55
+          },
+          "appGuard": {
+            "count": 2,
+            "ms": 26
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 308,
+        "pendingReadProofs": 0,
+        "wallMs": 100200,
+        "modeledMs": 100200,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 4,
+            "wallMs": 49,
+            "modeledMs": 49
+          },
+          "app-guard": {
+            "count": 4,
+            "wallMs": 38,
+            "modeledMs": 38
+          },
+          "script-load": {
+            "count": 3,
+            "wallMs": 66,
+            "modeledMs": 66
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 37,
+            "modeledMs": 37
+          },
+          "descriptor-post-read": {
+            "count": 2,
+            "wallMs": 26,
+            "modeledMs": 26
+          },
+          "source-guard": {
+            "count": 1,
+            "wallMs": 99800,
+            "modeledMs": 99800
+          }
+        }
+      },
+      "networkPending": [],
+      "fetches": [],
+      "requests": 1,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    }
+  ],
+  "status": "FAIL",
+  "failure": "Harness failed outside completed case",
+  "resources": {
+    "origin": "http://127.0.0.1:49921",
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "not required: active synthetic loopback-only helper"
+  }
+}

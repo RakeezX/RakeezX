@@ -1,0 +1,468 @@
+{
+  "taskId": "continuous-n36-1018-unsafe-setup-partial-20261021",
+  "runId": "a12841fa-8aaf-4ea6-a297-bed06b462096",
+  "baseSha": "0bca7554e60adca6b19ad804e4370874d9f5676b",
+  "version": "0.5.34",
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.34.zip",
+    "observedAt": "2026-10-21T10:22:42.807Z",
+    "sha256": "70ed0905ed3a04ccdbb7872daf4d0fd5f56071d56ebe85af9e9db68f77f23ffd",
+    "bytes": 145745,
+    "files": 29
+  },
+  "runtimeFingerprint": "50adadce212303614c43e66032b73f4f277fceed9362de6b6a9755c522dacf73",
+  "model": {
+    "tiles": 20,
+    "styleCostMs": 0,
+    "scriptDelayMs": 0,
+    "holdMs": 0,
+    "inlineCounters": true,
+    "clock": "anchored wall elapsed plus cumulative actual computed-style calls times fixed cost; no phase-directed jumps; browser GET abort timer remains native 8s"
+  },
+  "harnessCorrection": "Chrome storage/session get no longer awaits source.evaluate; style counters returned with the same reader result, with no extra source evaluation. Descriptors/app checks never schedule a counter probe. Prior harness artifacts preserved.",
+  "boundary": "Public immutable 0.5.34 ZIP; actual popup/CSS, serialized source readers, ESM background/collector, actual receiver ownership guards and IndexedDB. Synthetic Chrome/account service; loopback protocol substitution only.",
+  "cases": [
+    {
+      "mode": "onclick-before",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {
+        "phase": "stopped",
+        "code": "AMBIGUOUS_OR_MISSING_TEACHER_ROLE",
+        "startPhase": "worker-ack",
+        "failureStep": "source-start",
+        "failureJobPhase": "binding",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "schoolBindingState": "none",
+        "readProofPresent": false,
+        "schoolIdPresent": false,
+        "schoolBadgePresent": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "none",
+        "timings": {
+          "home": {
+            "count": 1,
+            "ms": 57
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 1,
+            "ms": 3
+          },
+          "appGuard": {
+            "count": 1,
+            "ms": 9
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 0,
+        "pendingReadProofs": 0,
+        "wallMs": 542,
+        "modeledMs": 542,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 2,
+            "wallMs": 12,
+            "modeledMs": 12
+          },
+          "app-guard": {
+            "count": 3,
+            "wallMs": 40,
+            "modeledMs": 40
+          },
+          "script-load": {
+            "count": 1,
+            "wallMs": 23,
+            "modeledMs": 23
+          },
+          "source-home": {
+            "count": 1,
+            "wallMs": 29,
+            "modeledMs": 29
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 3,
+            "modeledMs": 3
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [],
+      "fetches": [],
+      "requests": 1,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "onclick-after",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {
+        "phase": "stopped",
+        "code": "AMBIGUOUS_OR_MISSING_TEACHER_ROLE",
+        "startPhase": "worker-ack",
+        "failureStep": "source-start",
+        "failureJobPhase": "binding",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "schoolBindingState": "none",
+        "readProofPresent": false,
+        "schoolIdPresent": false,
+        "schoolBadgePresent": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "none",
+        "timings": {
+          "home": {
+            "count": 1,
+            "ms": 54
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 1,
+            "ms": 7
+          },
+          "appGuard": {
+            "count": 1,
+            "ms": 7
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 0,
+        "pendingReadProofs": 0,
+        "wallMs": 367,
+        "modeledMs": 367,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 2,
+            "wallMs": 12,
+            "modeledMs": 12
+          },
+          "app-guard": {
+            "count": 3,
+            "wallMs": 27,
+            "modeledMs": 27
+          },
+          "script-load": {
+            "count": 1,
+            "wallMs": 24,
+            "modeledMs": 24
+          },
+          "source-home": {
+            "count": 1,
+            "wallMs": 21,
+            "modeledMs": 21
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 10,
+            "modeledMs": 10
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [],
+      "fetches": [],
+      "requests": 1,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "route-before",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {
+        "phase": "stopped",
+        "code": "AMBIGUOUS_OR_MISSING_TEACHER_ROLE",
+        "startPhase": "worker-ack",
+        "failureStep": "source-start",
+        "failureJobPhase": "binding",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "schoolBindingState": "none",
+        "readProofPresent": false,
+        "schoolIdPresent": false,
+        "schoolBadgePresent": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "none",
+        "timings": {
+          "home": {
+            "count": 1,
+            "ms": 39
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 1,
+            "ms": 3
+          },
+          "appGuard": {
+            "count": 1,
+            "ms": 7
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 0,
+        "pendingReadProofs": 0,
+        "wallMs": 276,
+        "modeledMs": 276,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 2,
+            "wallMs": 8,
+            "modeledMs": 8
+          },
+          "app-guard": {
+            "count": 3,
+            "wallMs": 33,
+            "modeledMs": 33
+          },
+          "script-load": {
+            "count": 1,
+            "wallMs": 11,
+            "modeledMs": 11
+          },
+          "source-home": {
+            "count": 1,
+            "wallMs": 24,
+            "modeledMs": 24
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 4,
+            "modeledMs": 4
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [],
+      "fetches": [],
+      "requests": 1,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "absent-before",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {
+        "phase": "stopped",
+        "code": "AMBIGUOUS_OR_MISSING_TEACHER_ROLE",
+        "startPhase": "worker-ack",
+        "failureStep": "source-start",
+        "failureJobPhase": "binding",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "schoolBindingState": "none",
+        "readProofPresent": false,
+        "schoolIdPresent": false,
+        "schoolBadgePresent": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "none",
+        "timings": {
+          "home": {
+            "count": 1,
+            "ms": 61
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 1,
+            "ms": 13
+          },
+          "appGuard": {
+            "count": 1,
+            "ms": 12
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 0,
+        "pendingReadProofs": 0,
+        "wallMs": 338,
+        "modeledMs": 338,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 2,
+            "wallMs": 19,
+            "modeledMs": 19
+          },
+          "app-guard": {
+            "count": 3,
+            "wallMs": 37,
+            "modeledMs": 37
+          },
+          "script-load": {
+            "count": 1,
+            "wallMs": 16,
+            "modeledMs": 16
+          },
+          "source-home": {
+            "count": 1,
+            "wallMs": 30,
+            "modeledMs": 30
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 3,
+            "modeledMs": 3
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [],
+      "fetches": [],
+      "requests": 1,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "base-before",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {
+        "phase": "stopped",
+        "code": "AMBIGUOUS_OR_MISSING_TEACHER_ROLE",
+        "startPhase": "worker-ack",
+        "failureStep": "source-start",
+        "failureJobPhase": "binding",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "schoolBindingState": "none",
+        "readProofPresent": false,
+        "schoolIdPresent": false,
+        "schoolBadgePresent": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "none",
+        "timings": {
+          "home": {
+            "count": 1,
+            "ms": 40
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 1,
+            "ms": 7
+          },
+          "appGuard": {
+            "count": 1,
+            "ms": 6
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 0,
+        "pendingReadProofs": 0,
+        "wallMs": 268,
+        "modeledMs": 268,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 2,
+            "wallMs": 12,
+            "modeledMs": 12
+          },
+          "app-guard": {
+            "count": 3,
+            "wallMs": 28,
+            "modeledMs": 28
+          },
+          "script-load": {
+            "count": 1,
+            "wallMs": 15,
+            "modeledMs": 15
+          },
+          "source-home": {
+            "count": 1,
+            "wallMs": 18,
+            "modeledMs": 18
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 8,
+            "modeledMs": 8
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [],
+      "fetches": [],
+      "requests": 1,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    }
+  ],
+  "status": "FAIL",
+  "resources": {
+    "origin": "http://127.0.0.1:49918",
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "not required: active synthetic loopback-only helper"
+  }
+}

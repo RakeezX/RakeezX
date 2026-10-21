@@ -1,0 +1,6 @@
+{
+  "status": "FAIL",
+  "phase": "evidence serialization after eight passing runtime cases",
+  "error": "TypeError: Cannot read properties of undefined (reading 'details') at safeCase, runtime.mjs:189; unknown receipt intentionally contains no setup details",
+  "correction": "Serialize absent optional receipt details as an empty list; Product code and acceptance assertions unchanged. Re-run edge-controls under a new label."
+}

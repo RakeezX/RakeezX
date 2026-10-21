@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "n36_0534_actual_303_unsafe_setup_reproduced_and_subreason_bounded",
+      "status": "PASS",
+      "evidence": "baseline-0534.json: public immutable .34 ZIP SHA256 70ed0905ed3a04ccdbb7872daf4d0fd5f56071d56ebe85af9e9db68f77f23ffd, full popup/background/content/actual receiver runtime. Five fixtures cover four rejection gates and both primary onclick DOM orders; all stage/bind 303 and stop with zero transfer. PO actual setup kind/subreason remains unknown."
+    },
+    {
+      "name": "n36_0535_303_roster_saved_setup_partial_and_identity_denials",
+      "status": "PASS",
+      "evidence": "51 candidate full-runtime cases in package.json inputs: optional metadata/classes/timetable rejection before GET, after GET and between guards; 300+3 saved/current receipts; rejected field unavailable; independent student coverage; 21 zero-transfer identity/school/unsafe-student/auth negatives; unknown receipt preserves only the actual first 300 without a second transfer; reimport existing 300+3 leaves student records unchanged. Source/receiver handlers use actual app ownership/store guards. serial-large.json: 640 tiles, 100ms script delay, 60.641s, 480493 style calls, periodic guard present. Original harness/startup failures retained."
+    },
+    {
+      "name": "n36_0535_safe_diagnostics_package_link_parity",
+      "status": "PASS",
+      "evidence": "diagnostics.json: 12 fixed-enum kind/reason pairs and malicious URL/query/HTML/name rejection. Native 430px actual popup/CSS warning inspected. package.json: version .35 ZIP/source/exact 29-file SHA256 parity, immutable older archives, unchanged permissions/CSP, receiver/store/route/coverage/date/caps. download.json: actual app HTTP DOM/handler downloaded SHA256 025fb2a896fb6027789575c0cd35ff4cfd9e3740b55137b81e7880a79ea71aef. Owned contexts closed and resource-cleanup.json reports zero task-port listeners. Production and installed stable parity NOT_RUN: sole publisher owns these phases."
+    }
+  ],
+  "baselineCases": 5,
+  "candidateRuntimeCases": 51,
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.35.zip",
+    "sha256": "025fb2a896fb6027789575c0cd35ff4cfd9e3740b55137b81e7880a79ea71aef",
+    "bytes": 146711
+  },
+  "production": "NOT_RUN",
+  "installedStableParity": "NOT_RUN",
+  "actualPortalAcceptance": "PENDING",
+  "ownedResources": "Closed; isolated synthetic helper needs no shared browser lease"
+}

@@ -1,0 +1,73 @@
+{
+  "taskId": "continuous-n36-1018-unsafe-setup-partial-20261021",
+  "runId": "a12841fa-8aaf-4ea6-a297-bed06b462096",
+  "baseSha": "0bca7554e60adca6b19ad804e4370874d9f5676b",
+  "version": "0.5.35",
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.34.zip",
+    "observedAt": "2026-10-21T10:39:02.562Z",
+    "sha256": "70ed0905ed3a04ccdbb7872daf4d0fd5f56071d56ebe85af9e9db68f77f23ffd",
+    "bytes": 145745,
+    "files": 29
+  },
+  "runtimeFingerprint": "fb42847b089be504105e851c83131369132d5fd484a4306085f5a4943ade22f1",
+  "model": {
+    "tiles": 20,
+    "styleCostMs": 0,
+    "scriptDelayMs": 0,
+    "holdMs": 0,
+    "inlineCounters": true,
+    "clock": "anchored wall elapsed plus cumulative actual computed-style calls times fixed cost; no phase-directed jumps; browser GET abort timer remains native 8s"
+  },
+  "harnessCorrection": "Chrome storage/session get no longer awaits source.evaluate; style counters returned with the same reader result, with no extra source evaluation. Descriptors/app checks never schedule a counter probe. Prior harness artifacts preserved.",
+  "boundary": "Public immutable 0.5.34 ZIP; actual popup/CSS, serialized source readers, ESM background/collector, actual receiver ownership guards and IndexedDB. Synthetic Chrome/account service; loopback protocol substitution only.",
+  "cases": [
+    {
+      "mode": "onclick-missing-before",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {},
+      "networkPending": [],
+      "fetches": [],
+      "requests": 0,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "onclick-conflict-before",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {},
+      "networkPending": [],
+      "fetches": [],
+      "requests": 0,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "onclick-unsafe-student-before",
+      "status": "FAIL",
+      "assertionFailure": "Fixture assertion failed",
+      "view": {},
+      "networkPending": [],
+      "fetches": [],
+      "requests": 1,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    }
+  ],
+  "status": "FAIL",
+  "failure": "Harness failed outside completed case",
+  "resources": {
+    "origin": "http://127.0.0.1:49924",
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "not required: active synthetic loopback-only helper"
+  }
+}

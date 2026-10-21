@@ -38,7 +38,7 @@ export function createBackgroundRunner({transport}){
  async function timed(j,key,fn){const started=Date.now();try{return await fn();}finally{const r=(j.timings??={})[key]??={count:0,ms:0};r.count=Math.min(10000,r.count+1);r.ms=Math.min(3600000,r.ms+Math.max(0,Date.now()-started));}}
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,timings:timingView(j),phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
+ const view=j=>({id:j.id,timings:timingView(j),phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',setupPartial:!!j.setupRejections?.length,setupUnavailable:[...new Set((j.setupRejections??[]).map(r=>r.setupKind))],setupKind:j.setupRejections?.at(-1)?.setupKind??'none',setupRejectReason:j.setupRejections?.at(-1)?.setupRejectReason??'none',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
@@ -127,7 +127,8 @@ export function createBackgroundRunner({transport}){
   }
   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   await source(j,'read-proof');await appGuard(j);
-  if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;throw e;}
+  if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;
+   if(setupKind&&r[0].result?.setupKind===setupKind&&['route-shape','live-link-absent','live-link-unsafe','response-base'].includes(r[0].result?.setupRejectReason)){e.setupKind=setupKind;e.setupRejectReason=r[0].result.setupRejectReason;}throw e;}
   return r[0].result;
  }
  async function readNext(j){
@@ -149,7 +150,14 @@ export function createBackgroundRunner({transport}){
    if(!j.context?.schoolId||j.context?.schoolBinding!=='bound'&&n.kind!=='metadata')return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SETUP_SCHOOL_UNAVAILABLE'}],skipped:[]}};
    await source(j,'read-proof');await appGuard(j);
    if(!j.setupLinks?.some(l=>l.kind===n.kind&&l.path===n.path))throw Error('UNOBSERVED_SETUP_LINK');
-   return {...n,page:await fetchPage(j,n,n.kind)};
+   try{return {...n,page:await fetchPage(j,n,n.kind)};}catch(e){
+    // AI: only a classified optional setup rejection may recover. All document,
+    // teacher, owner/session/batch and roster failures retain their original stop.
+    if(e.message!=='UNSAFE_SETUP_LINK'||e.setupKind!==n.kind||!e.setupRejectReason||!j.context.schoolId||!j.context.readProof)throw e;
+    await source(j,'read-proof');await appGuard(j);
+    (j.setupRejections??=[]).push({setupKind:n.kind,setupRejectReason:e.setupRejectReason});
+    return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SETUP_FIELDS_UNAVAILABLE'}],skipped:[]}};
+   }
   }
   if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(j.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');j.roleSwitchUsed=true;}
   // A crash before update may only resume if still in the original document;
@@ -212,7 +220,7 @@ export function createBackgroundRunner({transport}){
  }
  function setup(j){
   const out=j.categories.filter(c=>c.category!=='students'&&!j.warnings.some(w=>w.category===c.category)).map(c=>({...c,provenance:['teacher-readonly-run']}));
-  if(!out.some(c=>c.category==='classes'))out.push({category:'classes',provenance:['teacher-readonly-run'],rows:[...new Set(j.sourceRows.map(r=>r.classroom))].map(classroom=>({classroom}))});
+  if(!j.setupRejections?.some(r=>r.setupKind==='classes')&&!out.some(c=>c.category==='classes'))out.push({category:'classes',provenance:['teacher-readonly-run'],rows:[...new Set(j.sourceRows.map(r=>r.classroom))].map(classroom=>({classroom}))});
   if(j.context?.schoolName&&!j.warnings.some(w=>w.category==='school')&&!out.some(c=>c.category==='school'))out.push({category:'school',provenance:['teacher-readonly-run'],rows:[{name:j.context.schoolName}]});
   return out;
  }
@@ -233,6 +241,8 @@ export function createBackgroundRunner({transport}){
      if(j.next)continue;
      if(j.context?.schoolBinding!=='bound'||!j.context.schoolName||!j.context.schoolId||!j.context.readProof)throw Error('SCHOOL_CONTEXT_UNCONFIRMED');
      if(!j.sourceRows.length)throw Error('SOURCE_NOT_AVAILABLE');
+     // AI: a pending optional rejection is recoverable only once the roster itself binds the school.
+     if(j.setupRejections?.length&&(!j.reportPath||j.rosterSchools.size!==1||!j.rosterSchools.has(j.context.schoolName)))throw Error('SCHOOL_CONTEXT_UNCONFIRMED');
      j.coverage=sourceCoverage({series:j.series,warnings:j.warnings,pendingReportPages:j.remainingReportPages??0});j.phase='transfer';j.classIndex=0;j.offset=0;await save(j);continue;
     }
     if(['transfer','prepare','deliver'].includes(j.phase)&&(j.context?.schoolBinding!=='bound'||!j.context.schoolName||!j.context.schoolId||!j.context.readProof))throw Error('SCHOOL_CONTEXT_UNCONFIRMED');
