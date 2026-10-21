@@ -7,6 +7,7 @@ const displayNumber = value => value === null ? 'لم تُرصد' : escape(value
 export function mountUnifiedStudentPortal(root, { client, readiness = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
   let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = '',pendingCompletion=null,pendingForm=false,pendingMessage='';
+  let returnRead = null, endingSession = false;
   const previousDir = root.getAttribute('dir');
   root.classList.add('n88-unified'); root.dir = 'rtl';
   const style = doc.createElement('link'); style.rel = 'stylesheet';
@@ -52,7 +53,9 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     clearTimeout(timer);if(cooling)timer=setTimeout(()=>inlineEntry('يمكنك المحاولة مجددًا.'),Math.max(1,cooldownUntil-Date.now()));
   }
   async function run(action, ending = false, sameForm = false, resuming = false) {
-    if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
+    if (disposed || busy || !enabled || doc.visibilityState === 'hidden' || Date.now() < cooldownUntil) return;
+    returnRead = null;
+    endingSession = ending;
     busy = true; const checkpoint = ++generation,context=client.captureContext?.();
     pendingForm=sameForm;pendingMessage=resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…';
     if(sameForm)inlineEntry(pendingMessage);
@@ -69,7 +72,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === 'rate') cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1000;
       if(client.isContextCurrent&&!client.isContextCurrent(context)){clear();return;}
-      pendingCompletion={checkpoint,context,errorKind:error?.kind||'unavailable',ending,sameForm,resuming};
+      pendingCompletion={checkpoint,context,errorKind:error?.kind||'unavailable',claimState:error?.claimState,ending,sameForm,resuming};
       adoptCompletion();
     } finally { if (checkpoint === generation&&!pendingCompletion) {busy = false;pendingForm=false;if(sameForm&&root.querySelector('[data-claim]')){const m=root.querySelector('#n88-message').textContent;inlineEntry(m,root.querySelector('input').getAttribute('aria-invalid')==='true');}} }
   }
@@ -80,8 +83,13 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if(client.isContextCurrent&&!client.isContextCurrent(result.context)){clear();return;}
     busy=false;pendingForm=false;
     if(result.errorKind){
-      if(result.sameForm)inlineEntry(result.resuming?'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.':'تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.',!result.resuming);
-      else entry(result.errorKind==='session'?'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.':'تعذّر فتح المساحة. تحقق من الرمز أو حاول لاحقًا.');
+      const rejected = !result.resuming && result.claimState === 'rejected' && result.errorKind === 'session';
+      const message = rejected ? 'تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.'
+        : result.errorKind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.'
+        : result.claimState === 'accepted' ? 'قُبل الرمز، لكن تعذّر عرض المساحة. اضغط متابعة جلسة سابقة لإعادة قراءة الجلسة.'
+        : result.claimState === 'uncertain' ? 'تعذّر تأكيد الدخول. اضغط متابعة جلسة سابقة للتحقق قبل إدخال الرمز مجددًا.'
+        : 'تعذّر الاتصال بالمساحة. يمكنك متابعة جلسة سابقة للمحاولة مجددًا.';
+      if(result.sameForm)inlineEntry(message,rejected);else entry(message);
     }else{codeDraft='';if(result.ending)entry('انتهت الجلسة.');else show(result.data);}
   }
   const submit = event => {
@@ -89,7 +97,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     event.preventDefault(); if (busy || !enabled) return;
     const input = root.querySelector('input'); let code = codeDraft = normalizeStudentCode(input.value);
     if (!validStudentCode(code)) { code = ''; inlineEntry('أدخل 6 أرقام تبدأ بالرقم 1.',true); return; }
-    void run(() => { const pending = client.claim(code); code = ''; return pending; },false,true);
+    void run(() => { const pending = client.claim(code); code = ''; codeDraft = ''; input.value = ''; return pending; },false,true);
   };
   const input = event => { if (event.target.matches('[data-claim] input')) {
     event.target.setCustomValidity(''); event.target.removeAttribute('aria-invalid');
@@ -117,6 +125,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
   };
   function clear(preserveDraft=false) {
+    returnRead = null;
     if(preserveDraft){const field=root.querySelector('[data-claim] input');if(field)codeDraft=normalizeStudentCode(field.value);}else codeDraft='';
     generation++; busy = false;pendingForm=false;pendingCompletion=null;pendingMessage=''; clearTimeout(timer); client?.invalidate?.();
     // Retire private data/pending replies, retaining only this page's editable
@@ -127,8 +136,17 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const visible = () => {
     if(doc.visibilityState==='hidden'){
       if(busy&&pendingForm){inlineEntry(pendingMessage);return;}
+      if(returnRead)return; // Duplicate notifications cannot renew a retired context.
+      const shouldRead = !endingSession && (root.querySelector('[data-end]') || busy);
       clear(true); // Loaded private data is retired, never kept rendered while hidden.
-    }else{adoptCompletion();}
+      if (shouldRead) returnRead = { context: client?.captureContext?.() };
+    }else{
+      const returning = returnRead; returnRead = null;
+      if (returning) {
+        if(client.isContextCurrent && !client.isContextCurrent(returning.context)){clear();return;}
+        void run(() => client.read(), false, true, true);
+      } else adoptCompletion();
+    }
   };
   const pageshow = event => { if (event.persisted) clear(); };
   root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);

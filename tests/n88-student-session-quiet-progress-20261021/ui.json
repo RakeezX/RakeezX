@@ -1,0 +1,261 @@
+{
+  "status": "PASS",
+  "student": [
+    {
+      "target": "/source",
+      "scenario": "twice",
+      "status": "PASS",
+      "counts": {
+        "claim": 2,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "return",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "expired",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "revoked",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "read-error",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "read-malformed",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "claim-error",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "hidden-pending",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "pagehide",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "end-hidden",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 1
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "retire",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "dispose",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "read-timeout",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "twice",
+      "status": "PASS",
+      "counts": {
+        "claim": 2,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "return",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "expired",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "revoked",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "read-error",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "read-malformed",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "claim-error",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "hidden-pending",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "pagehide",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "end-hidden",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 1
+      }
+    },
+    {
+      "scenario": "revoked-claim",
+      "status": "PASS"
+    }
+  ],
+  "teacher": [
+    {
+      "width": 390,
+      "status": "PASS",
+      "pendingBeforeACK": true,
+      "oneInitialList": true,
+      "copyOwnerRetirement": true
+    },
+    {
+      "width": 1280,
+      "status": "PASS",
+      "pendingBeforeACK": true,
+      "oneInitialList": true,
+      "copyOwnerRetirement": true
+    },
+    {
+      "scenario": "lease-retirement",
+      "status": "PASS"
+    }
+  ],
+  "scope": "Synthetic memory repository and actual numeric handler/credential adapter; no PG durability, live service or hosted acceptance proof.",
+  "cleanup": "Owned isolated contexts/browser and loopback server closed"
+}

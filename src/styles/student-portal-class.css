@@ -65,3 +65,10 @@
 .n88-entry [data-n88-list-copy-status]:empty{display:none}
 .n88-entry [data-n88-list-copy-text]{display:block;width:100%;max-width:100%;font:inherit;font-family:var(--font-num);resize:vertical;padding:var(--sp-2);color:var(--text);background:var(--bg-sunk);border:1px solid var(--border);border-radius:var(--r-sm)}
 .n88-entry [data-n88-list-copy-text][hidden]{display:none}
+
+/* AI: keep routine progress accessible immediately, reveal it gently for slower reads. */
+.n88-class-status{min-block-size:1.8rem}
+.n88-entry[data-n88-entry-state=loading] [data-n88-entry-status],
+.n88-task-guidance[aria-busy=true] .n88-guidance-body>[role=status]{font-size:var(--fs-sm);color:var(--text-2);animation:n88-quiet-progress .15s .3s both}
+@keyframes n88-quiet-progress{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.n88-entry[data-n88-entry-state=loading] [data-n88-entry-status],.n88-task-guidance[aria-busy=true] .n88-guidance-body>[role=status]{animation:none}}

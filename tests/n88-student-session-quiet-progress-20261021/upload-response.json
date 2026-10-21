@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"observedAt\": \"2026-10-21T05:46:36.002Z\",\n  \"status\": 200,\n  \"success\": true,\n  \"source\": \"6108647af490b79e5cfff9c0909726aa2282628f034eb9bbea5076f35dc83e3b\",\n  \"id\": \"rakeez-n88-private-ingress\",\n  \"modifiedOn\": \"2026-10-21T05:46:35.364421Z\",\n  \"resultKeys\": [\n    \"created_on\",\n    \"modified_on\",\n    \"id\",\n    \"tag\",\n    \"entry_point\",\n    \"tags\",\n    \"deployment_id\",\n    \"tail_consumers\",\n    \"logpush\",\n    \"has_assets\",\n    \"has_modules\",\n    \"etag\",\n    \"handlers\",\n    \"named_handlers\",\n    \"last_deployed_from\",\n    \"compatibility_date\",\n    \"usage_model\",\n    \"startup_time_ms\"\n  ],\n  \"uploads\": 1,\n  \"nativeUploads\": 0,\n  \"rawSecretValuesUsed\": false\n}"
+    }
+  ]
+}

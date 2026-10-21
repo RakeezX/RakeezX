@@ -80,7 +80,22 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     } finally { clearTimeout(timeout); body = null; if (checkpoint === generation) controller = null; }
   }
   return Object.freeze({
-    claim(value) { let code = normalizeStudentCode(value); if (!validStudentCode(code)) return Promise.reject(fail('format')); const context=retirement,pending = call('claim', { code }),checkpoint=generation;code='';return pending.then(()=>{if(disposed||context!==retirement||checkpoint!==generation)throw fail('stale');return call('read');}); },
+    async claim(value) {
+      let code = normalizeStudentCode(value);
+      if (!validStudentCode(code)) throw fail('format');
+      const context = retirement, pending = call('claim', { code }), checkpoint = generation;
+      code = ''; value = null;
+      try { await pending; }
+      catch (error) {
+        // A lost response may already have set the HttpOnly cookie. Only an
+        // explicit denial is a rejected code; never retry this POST internally.
+        if (error.kind === 'stale') throw error;
+        throw Object.assign(error, { claimState: ['session', 'rate'].includes(error.kind) ? 'rejected' : 'uncertain' });
+      }
+      if (disposed || context !== retirement || checkpoint !== generation) throw fail('stale');
+      try { return await call('read'); }
+      catch (error) { throw Object.assign(error, { claimState: 'accepted' }); }
+    },
     captureContext:()=>retirement,isContextCurrent:context=>!disposed&&context===retirement,
     read: () => call('read'), end: () => call('end', {}), invalidate, dispose() { disposed = true; invalidate(); }
   });

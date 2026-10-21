@@ -1,0 +1,102 @@
+{
+  "status": "FAIL",
+  "student": [
+    {
+      "target": "/source",
+      "scenario": "twice",
+      "status": "PASS",
+      "counts": {
+        "claim": 2,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "return",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "expired",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "revoked",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "read-error",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "read-malformed",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "claim-error",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "hidden-pending",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "pagehide",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    }
+  ],
+  "teacher": [],
+  "scope": "Synthetic memory repository and actual numeric handler/credential adapter; no PG durability, live service or hosted acceptance proof.",
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 6000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('انتهت الجلسة.', { exact: true }) to be visible\u001b[22m\n"
+  },
+  "cleanup": "Owned isolated contexts/browser and loopback server closed"
+}
