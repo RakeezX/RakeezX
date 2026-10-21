@@ -52,3 +52,15 @@ The canonical isolated-local-browser helper owns disposable contexts/browser. Po
 Version: **0.5.33**. Archive: `assets/extensions/rakeez-teacher-import-helper-0.5.33.zip`, **143911 bytes**, SHA256 `48bf7ce0af84bac3739b39ad143c91456eada39a00b5fbe801f1b3d5fbc5b5d0`. Companion manifest lists the same exact **29 files**.
 
 Production publication and stable installed-folder parity are **NOT_RUN** here; the independent controller/sole publisher owns those phases. Actual Madrasati/manual acceptance remains unverified and N36 is not CLOSED. Local package/source parity is not a claim that the stable folder was updated.
+
+## Saved-session continuation: result classification
+
+Continuation run `8adeead2-377d-4fb2-9ff4-d7c447042267` resumes Product candidate `6bcd95d8806eddecb13935398508473e58e8565c`. The prior result was rejected by candidate validation: `An affected check must pass and no recorded check may fail`. The final result had incorrectly mixed the intentionally failing historical .32 acceptance outcome into candidate readiness checks, although .33's affected acceptance checks passed.
+
+The aggregation now gives the distinct **failure-reproduction assertions** their own check, `n36_0532_immutable_setup_order_failure_reproduction`. It requires the historical .32 outcome to remain FAIL and verifies its exact failure codes and zero deliveries. It does not relabel .32 acceptance as PASS. `immutable.json`, all raw browser/receiver results and the prior committed result classification remain preserved; the new aggregate additionally records `immutableAcceptanceStatus: FAIL` and the original evidence run ID.
+
+Only this aggregation and documentation changed during continuation. The .33 executable/package/link and all 17 successful scenarios remain unchanged and are reused. No browser or service phase was reopened. The current-run aggregate was checked with:
+
+```powershell
+node tests/n36-0636-missing-myinfo-setup-order-20261021/checks.mjs --run-id=8adeead2-377d-4fb2-9ff4-d7c447042267
+```

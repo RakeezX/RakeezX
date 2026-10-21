@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 const folder='tests/n36-0636-missing-myinfo-setup-order-20261021/';
+const runId=process.argv.find(arg=>arg.startsWith('--run-id='))?.slice('--run-id='.length);
+if(runId)assert.match(runId,/^[a-f0-9-]{36}$/);
 const read=async name=>JSON.parse(await fs.readFile(folder+name+'.json','utf8'));
 const [immutable,candidate,download,pkg]=await Promise.all(['immutable','candidate','download','package'].map(read));
 assert.equal(immutable.status,'FAIL');assert.equal(immutable.cases.length,8);
@@ -39,10 +41,10 @@ const manifest=JSON.parse(await fs.readFile('assets/extensions/rakeez-teacher-im
 const fingerprint=createHash('sha256');for(const f of [...manifest.files].sort((a,b)=>a.file<b.file?-1:a.file>b.file?1:0)){fingerprint.update(f.file);fingerprint.update(await fs.readFile('extensions/rakeez-teacher-import-helper/'+f.file));}
 assert.equal(candidate.runtimeFingerprint,fingerprint.digest('hex'));assert.equal(download.archiveSha256,manifest.archive.sha256);
 const checks=[
- {name:'n36_0532_immutable_full_runtime_no_myinfo_opposite_dom_order_setup_receipts',status:'FAIL',evidence:'immutable.json: public .32 hash verified; 4 no-MyInfo dashboard/card cases PASS with setup GETs and 300+3 saved receipts. Four explicit empty-school MyInfo cases fail SCHOOL_CONTEXT_CHANGED with zero delivery; NO_CHANGE is invalid.'},
+ {name:'n36_0532_immutable_setup_order_failure_reproduction',status:'PASS',evidence:'Reproduction assertions passed: immutable.json retains status FAIL and four empty-school SCHOOL_CONTEXT_CHANGED failures with zero delivery; four no-MyInfo dashboard/card cases retain PASS and 300+3 saved receipts. This check validates the captured reproduction, not .32 acceptance; NO_CHANGE remains invalid.'},
  {name:'n36_0533_if_needed_safe_deferred_route_and_zero_transfer_negatives',status:'PASS',evidence:'candidate.json: 8 setup/order/card cases PASS; 9 missing/conflicting school and owner/document/session negatives stop with zero receiver delivery. Both 300+3 saved receipts retain teacher/principal/school/classes/timetable. Exact setup GETs occur once, after report binding; source URL/resource allowlist and ownership/grades/year preservation pass.'},
  {name:'n36_0533_if_needed_300_plus_3_package_link_and_29_file_parity',status:'PASS',evidence:'package.json/download.json: all 29 packaged files byte/hash-match source, permissions/CSP and historical packages unchanged; actual app download DOM/handler returns exact .33 ZIP with no navigation. Stable installed folder/Production are publisher-owned, NOT_RUN here.'},
  {name:'n36_if_changed_verified_package_stable_folder_parity',status:'NOT_RUN',evidence:'Independent controller/sole publisher owns integration, Production verification and stable 29-file installation. No push/deploy or real source/account access by worker.'}
 ];
-await fs.writeFile(folder+'checks.json',JSON.stringify({taskId:candidate.taskId,runId:candidate.runId,baseSha:candidate.baseSha,archive:manifest.archive,runtimeFingerprint:candidate.runtimeFingerprint,checks},null,2)+'\n');
+await fs.writeFile(folder+'checks.json',JSON.stringify({taskId:candidate.taskId,runId:runId??candidate.runId,baseSha:candidate.baseSha,reusedEvidenceRunId:candidate.runId,reusedProductCandidateSha:'6bcd95d8806eddecb13935398508473e58e8565c',immutableAcceptanceStatus:immutable.status,archive:manifest.archive,runtimeFingerprint:candidate.runtimeFingerprint,checks},null,2)+'\n');
 console.log(JSON.stringify({status:'PASS',immutableFailurePreserved:true,positives:positives.length,zeroDeliveryNegatives:negatives.length,checks}));
