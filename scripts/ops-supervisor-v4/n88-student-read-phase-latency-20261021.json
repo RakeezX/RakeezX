@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-student-read-phase-latency-20261021",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3700,
+      "scopeKey": "n88-student-read-measured-latency-20261021",
+      "dependsOn": [],
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 70,
+      "idleMinutes": 12,
+      "objective": "PO actual post-quiet Production feedback: on returning to the same student tab the page still waits with 'لحظات ونجهّز مساحتك…'; this is not accepted as a speed fix. Previous safe successful student GET diagnostics took 5500–6500ms, while a controlled UI fixture dispatched the one return GET in 1–2ms and a 6000ms transport hold produced about 6000ms wall time. Do not relabel or conceal latency as a fix. Start with current published N88 source and immutable receipts. Map the actual GET /api/n88/student/read path: existing-host acquire includes pool.connect, TLS/role/private-boundary checks (pool max 2, connect timeout 5000ms, idle 10000ms); repository acquire cap 6000ms then bounded snapshot; numeric session validation and synchronizeOwner lock/read; full readCanonical projection lock and 13 canonical families; visibility policy, task guidance, projection and acknowledged COMMIT. Use fabricated owner data and deterministic injected delays to record red-first end-to-end, per-phase, warm/idle and query-count measurements; distinguish pool connection, transport/boundary, snapshot, sync, projection, guidance and commit without assuming the real account bottleneck. Preserve exact owner isolation, valid/expired/revoked/rotated cookie behavior, immediate server revocation, canonical freshness, term/membership, teacher visibility, score/guidance correctness, bounded reads, rollback/unknown-commit and no private display before authoritative success. If measurement establishes one causal unnecessary operation, make only that scoped correction and show same-fixture before/after wall time and guard parity. If it cannot establish a causal optimization, add only a finite safe phase-timing diagnostic on successful student GET, readable through the EXISTING opt-in 'نسخ تفاصيل التحقق' support control: fixed phase names and rounded bounded durations, no IDs, data sizes, SQL, raw errors, cookie, student data or diagnostic difference on denied responses. The current signed native-to-Cloudflare dispatch envelope admits exactly body,cookie,status, and web-entry forwards only Set-Cookie; a service-only header cannot reach the student browser. If using a safe response header, extend that strict envelope with only a finite typed successful-GET phase value, validate it at the Cloudflare boundary, emit the same-origin no-store response header, parse its fixed allowlist on that same completed successful GET, and include it in the existing optional copy control. Test service-to-envelope-to-Cloudflare-to-client-to-copy parity, denied-response uniformity and stale/later-in-flight exclusion; if the bridge cannot be proven, return BLOCKED rather than leaving an unreachable diagnostic. Do not claim speed from instrumentation. The optional copy is local only and never sent automatically. Keep existing private/no-store headers and one GET per return. Do not change region, SQL/schema/RLS/Auth, keys, grade policy, service timeouts/caps, pool security checks, or skip synchronizeOwner/full projection to chase a number without proof. No real account request, student/teacher mutation, personal browser or copied credentials by the worker. A changed native source may be uploaded exactly once with one source-pin update ONLY after red-first causal evidence or the bounded diagnostic gate, fresh original-custodian task/run/candidate-bound preflight, append-only attempt custody, official source/config/pin readback, and private served/transport parity before LOCAL_READY. If the diagnostic path changes the private student asset, at most one separately gated static carrier upload is allowed with exact served JS/source parity after the native gate; no static upload for the native-only causal path. Sole Product publisher handles main/Pages. If an official tool refuses or safe causal/diagnostic proof fails, preserve candidate and return BLOCKED with exact reason. N88 remains open until an actual postpublication positive-session timing result; one synthetic PASS or HTTP 200 is insufficient.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/activation/database-transport.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/canonical-adapter.mjs",
+        "drafts/n88-student-portal/numeric-credentials.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/task-guidance.mjs",
+        "drafts/n88-student-portal/web-entry.mjs",
+        "drafts/n88-student-portal/web-protocol.mjs",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-login.js",
+        "drafts/n88-student-portal/client/student-entry.js",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs",
+        "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs",
+        "drafts/n88-student-portal/activation/private-document.mjs",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "tests/n88-student-read-phase-latency-20261021/**",
+        "docs/automation-evidence/20261021/N88_STUDENT_READ_PHASE_LATENCY.md",
+        "drafts/n88-student-portal/activation/official-activation.mjs",
+        "drafts/n88-student-portal/activation/package-20261020.mjs",
+        "drafts/n88-student-portal/activation/static-student-read-latency-20261021-gate.mjs"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs"
+      ],
+      "requiredChecks": [
+        "n88_student_get_phase_red_first_and_causal_measurement",
+        "n88_student_get_auth_revoke_visibility_owner_boundaries",
+        "n88_student_get_guidance_projection_commit_parity",
+        "n88_student_get_measured_improvement_or_private_finite_diagnostic",
+        "n88_student_get_native_custody_pin_and_served_parity"
+      ],
+      "acceptance": [
+        "Before/after fabricated warm and idle runs identify the changed bottleneck, or an optional successful-GET phase diagnostic is bounded and honestly marked as diagnostic only.",
+        "Expired, revoked, rotated, wrong-owner and membership/visibility changes remain denied; no stale private projection appears during return or after End Session.",
+        "One original-custodian native upload/source-pin update at most; diagnostic client changes may use one separately guarded private static carrier upload with exact served parity. No region, SQL/Auth/schema or real-account operation.",
+        "N88 performance acceptance requires an actual postpublication valid-session GET timing observation; synthetic improvement alone does not close the ticket."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261021-N88-student-GET-measured-latency",
+        "publication": true,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "maxChangedNativeFunctionUploads": 1,
+        "maxPublicSourcePinUpdates": 1,
+        "maxChangedPrivateStaticUploads": 1,
+        "maxChangedStudentCarrierUploads": 1,
+        "diagnosticOnlyOnSuccessfulGet": true,
+        "diagnosticOnlyFixedRoundedPhaseDurations": true,
+        "newReadinessRequests": 0,
+        "sqlAuthSchemaChanges": 0,
+        "regionChanges": 0,
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "appendOnlyAttemptHistory": true,
+        "resetConsumedMarkers": false,
+        "officialCloudflareConnection": {
+          "serverName": "rakeez_cloudflare",
+          "endpoint": "https://mcp.cloudflare.com/mcp",
+          "sameSavedSessionReadOnlyCapabilityRequired": true,
+          "noRawSecretToolArguments": true
+        }
+      },
+      "releaseAuthority": "The PO's actual slow student-return report authorizes bounded red-first measurement, a measured causal student GET correction or a finite successful-GET phase diagnostic exposed only through the optional safe-copy control, and normal publication. The original N88 custodian alone may upload one changed native function/update its exact source pin and, only for diagnostic client changes, one changed private static carrier after separate fresh scoped preflights/readbacks and exact served parity. No live account read/write, SQL/Auth/schema/RLS/region change, cap relaxation, consumed attempt reuse or tool-denial bypass. The sole Product publisher handles main/Pages. Actual latency acceptance is separate.",
+      "liveAuthorizationRef": "PO-20261021-N88-STUDENT-GET-MEASURED-LATENCY"
+    }
+  ]
+}

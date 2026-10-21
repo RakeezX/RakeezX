@@ -435,6 +435,30 @@ export function workerPublicationInstruction(task) {
       && authority.officialCloudflareConnection.noRawSecretToolArguments === true) {
     return 'Only the one changed private static student carrier upload expressly authorized in this activated card may be done by the original custodian after fresh task/run/candidate-bound guarded preflight and exact provider/served readback. This prerequisite must precede LOCAL_READY. Do not push Product main, deploy a native service, change the public pin, or publish frontend Production: the independent controller owns Product publication. Any actual tool denial remains binding.';
   }
+  if (task.id === 'continuous-n88-student-read-phase-latency-20261021'
+      && task.productId === 'N88'
+      && task.liveAuthorizationRef === 'PO-20261021-N88-STUDENT-GET-MEASURED-LATENCY'
+      && authority?.kind === 'PO-20261021-N88-student-GET-measured-latency'
+      && authority.publication === true
+      && authority.realAccountReads === 0
+      && authority.realStudentTeacherWrites === 0
+      && authority.maxChangedNativeFunctionUploads === 1
+      && authority.maxPublicSourcePinUpdates === 1
+      && authority.maxChangedPrivateStaticUploads === 1
+      && authority.maxChangedStudentCarrierUploads === 1
+      && authority.diagnosticOnlyOnSuccessfulGet === true
+      && authority.diagnosticOnlyFixedRoundedPhaseDurations === true
+      && authority.newReadinessRequests === 0
+      && authority.sqlAuthSchemaChanges === 0
+      && authority.regionChanges === 0
+      && authority.appendOnlyAttemptHistory === true
+      && authority.resetConsumedMarkers === false
+      && authority.originalCustodianRoot === 'C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018'
+      && authority.officialCloudflareConnection?.serverName === 'rakeez_cloudflare'
+      && authority.officialCloudflareConnection.sameSavedSessionReadOnlyCapabilityRequired === true
+      && authority.officialCloudflareConnection.noRawSecretToolArguments === true) {
+    return 'Only after red-first measured causal evidence or a finite safe successful-GET diagnostic may the original custodian upload at most one changed native service and update its exact public source pin, after fresh task/run/candidate-bound preflight and exact provider/served readback before LOCAL_READY. Only if the diagnostic changes the private student client may that custodian separately upload at most one changed private static student carrier after its own fresh scoped gate and exact served parity before LOCAL_READY. Do not push Product main or publish frontend Production: the independent publisher owns Product publication. No real account action, SQL/Auth/schema/region change, unrelated upload or tool-denial bypass.';
+  }
   return 'Do not push or deploy: the independent controller publishes and verifies it.';
 }
 
