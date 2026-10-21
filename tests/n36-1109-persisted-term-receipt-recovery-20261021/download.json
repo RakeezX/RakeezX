@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
+  "runId": "5e50775e-0e75-4434-b2dc-900ff34a6e99",
+  "baseSha": "f3f4fe4c074881e5eac9a4a767cb1140d023be32",
+  "name": "n36_0536_actual_app_download",
+  "archiveSha256": "1a2a4d1f70e27a30f262b176c65c22e8d412e5ff8d6cede1ee7d073ced21b46f",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper; actual app DOM/download handler over HTTP; fresh isolated context.",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.36",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "origin": "http://127.0.0.1:49931"
+  }
+}

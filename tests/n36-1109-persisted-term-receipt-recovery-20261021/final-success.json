@@ -1,0 +1,1947 @@
+{
+  "taskId": "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
+  "runId": "5e50775e-0e75-4434-b2dc-900ff34a6e99",
+  "baseSha": "f3f4fe4c074881e5eac9a4a767cb1140d023be32",
+  "version": "0.5.36",
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.35.zip",
+    "observedAt": "2026-10-21T11:54:15.181Z",
+    "sha256": "025fb2a896fb6027789575c0cd35ff4cfd9e3740b55137b81e7880a79ea71aef",
+    "bytes": 146711,
+    "files": 29
+  },
+  "applicationFiles": {
+    "src/views/class-import-center.js": "f75c10a9817107f27bf2903c2e05caa5068daf833c730b1740556fea29d064ed",
+    "src/lib/n36-extension-handoff.js": "d95275279d4e549ce3911ea17e404fc35c5cf417c623f7f4d5f9d46625d24ed4"
+  },
+  "runtimeFingerprint": "f0f9576e38a5e68241dee113eb19526126a8ddff8bd62ec108affc127c5c681a",
+  "cases": [
+    {
+      "scenario": "missing-year",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 105
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2220
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 844
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 450
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 610
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 303,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 105
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2220
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 844
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 450
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 610
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "complete",
+        "stage": "saved",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "status": "PASS"
+    },
+    {
+      "scenario": "missing-term",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 141
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2377
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 886
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 497
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 634
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 303,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 141
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2377
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 886
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 497
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 634
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "complete",
+        "stage": "saved",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "status": "PASS"
+    },
+    {
+      "scenario": "deleted-year",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 124
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2372
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 879
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 501
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 656
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 303,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 124
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2372
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 879
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 501
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 656
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "complete",
+        "stage": "saved",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "status": "PASS"
+    },
+    {
+      "scenario": "deleted-term",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 137
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2331
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 838
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 508
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 620
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 303,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 137
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2331
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 838
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 508
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 620
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "complete",
+        "stage": "saved",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "status": "PASS"
+    },
+    {
+      "scenario": "optimistic",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 122
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2483
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 860
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 522
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 746
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 303,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 122
+          },
+          "sourceGuard": {
+            "count": 32,
+            "ms": 2483
+          },
+          "descriptor": {
+            "count": 68,
+            "ms": 860
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 522
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 746
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "complete",
+        "stage": "saved",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "status": "PASS"
+    },
+    {
+      "scenario": "multiclass",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 111
+          },
+          "sourceGuard": {
+            "count": 42,
+            "ms": 2931
+          },
+          "descriptor": {
+            "count": 88,
+            "ms": 1123
+          },
+          "appGuard": {
+            "count": 44,
+            "ms": 620
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 640
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 303,
+      "deliveries": 4,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 100,
+          "existing": 0,
+          "remaining": 0,
+          "total": 100,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 100,
+          "existing": 0,
+          "remaining": 0,
+          "total": 100,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 100,
+          "existing": 0,
+          "remaining": 0,
+          "total": 100,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 4,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 111
+          },
+          "sourceGuard": {
+            "count": 42,
+            "ms": 2931
+          },
+          "descriptor": {
+            "count": 88,
+            "ms": 1123
+          },
+          "appGuard": {
+            "count": 44,
+            "ms": 620
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 640
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "complete",
+        "stage": "saved",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  },
+  "status": "PASS"
+}

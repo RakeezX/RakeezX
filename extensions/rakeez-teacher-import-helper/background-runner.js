@@ -38,7 +38,7 @@ export function createBackgroundRunner({transport}){
  async function timed(j,key,fn){const started=Date.now();try{return await fn();}finally{const r=(j.timings??={})[key]??={count:0,ms:0};r.count=Math.min(10000,r.count+1);r.ms=Math.min(3600000,r.ms+Math.max(0,Date.now()-started));}}
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,timings:timingView(j),phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',setupPartial:!!j.setupRejections?.length,setupUnavailable:[...new Set((j.setupRejections??[]).map(r=>r.setupKind))],setupKind:j.setupRejections?.at(-1)?.setupKind??'none',setupRejectReason:j.setupRejections?.at(-1)?.setupRejectReason??'none',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
+ const view=j=>({id:j.id,timings:timingView(j),phase:j.phase,startPhase:j.startPhase??'worker-ack',receiverCheckpoint:j.receiverProgress?.checkpoint??'none',receiverRelation:j.receiverProgress?.relation??'unresolved',confirmedRows:j.receiverProgress?.confirmedRows??0,confirmedReceipts:j.receiverProgress?.confirmedReceipts??0,pendingRows:j.receiverProgress?.pendingRows??0,pendingSavedRows:j.receiverProgress?.pendingSavedRows??0,failurePhase:j.receiverFailure?.phase??'none',failureStep:j.receiverFailure?.step??j.failureStep??'none',failureJobPhase:j.receiverFailure?'receipt':j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',setupPartial:!!j.setupRejections?.length,setupUnavailable:[...new Set((j.setupRejections??[]).map(r=>r.setupKind))],setupKind:j.setupRejections?.at(-1)?.setupKind??'none',setupRejectReason:j.setupRejections?.at(-1)?.setupRejectReason??'none',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
@@ -50,6 +50,12 @@ export function createBackgroundRunner({transport}){
   // Revoke this job only. App-owned durable batches are never deleted.
   await transport({type:'n36-cancel'},authority(j));
  });}
+ // AI: a denied receiver may still have reported a bounded UNKNOWN receipt.
+ // Read only this job's nonce for diagnosis; never consume saved/current here.
+ function noteUnknown(j,r){
+  if(!r?.ok||r.status!=='unknown')return false;
+  j.receiverProgress=r.progress??null;j.receiverFailure=r.failure??null;j.code=r.failure?.code??'RECEIPT_UNKNOWN';return true;
+ }
  async function appGuard(j,wait=false){return timed(j,'appGuard',()=>appGuardRead(j,wait));}
  async function appGuardRead(j,wait=false){await current(j);const r=await transport({type:'n36-check',batchId:j.batchId,wait},authority(j));if(!r?.ok)throw Error('APP_CHANGED');await current(j);return r.ready;}
  // AI: tabs.url is advisory metadata, not the executing document's URL. Only
@@ -232,7 +238,10 @@ export function createBackgroundRunner({transport}){
    while(Date.now()<until){
     await current(j);
     if(j.phase==='binding')throw Error('START_INTERRUPTED');
-    if(!await appGuard(j,j.phase==='receipt'))break;
+    if(!await appGuard(j,j.phase==='receipt')){
+     if(j.phase==='receipt'){const r=await transport({type:'n36-result',actionId:j.pending.actionId},authority(j));if(!noteUnknown(j,r))j.code='APP_CHANGED';}
+     break;
+    }
     if(j.phase==='navigation'){if(!await settleNavigation(j))break;continue;}
     await source(j,j.phase==='collect'&&['home','role','gateway'].includes(j.next?.kind)?'home':'guard');
     if(j.phase==='collect'){
@@ -267,9 +276,9 @@ export function createBackgroundRunner({transport}){
      if(!r.ok||r.status==='expired')throw Error('RECEIPT_UNKNOWN');
      if(r.status==='failed')throw Error(r.code??'HANDOFF_UNAVAILABLE');
      if(r.status==='pending')break;
-     if(r.status==='unknown'){j.code=r.failure?.code??'RECEIPT_UNKNOWN';await save(j);break;}
+     if(noteUnknown(j,r)){await save(j);break;}
      if(!['saved','existing'].includes(r.status)||r.total!==j.pending.envelope.rows.length||!r.setup?.details?.length)throw Error('RECEIPT_UNKNOWN');
-     j.added+=r.added;j.existing+=r.existing;j.needsReview ||= r.setup.unresolved>0;const ranks={missing:0,current:1,saved:2,conflict:3,unsupported:3,ambiguous:3,unrecognized:3},fields=new Map((j.fields??[]).map(d=>[d.field,d]));
+     j.receiverProgress=null;j.receiverFailure=null;j.added+=r.added;j.existing+=r.existing;j.needsReview ||= r.setup.unresolved>0;const ranks={missing:0,current:1,saved:2,conflict:3,unsupported:3,ambiguous:3,unrecognized:3},fields=new Map((j.fields??[]).map(d=>[d.field,d]));
      for(const d of r.setup.details)if(!fields.has(d.field)||ranks[d.reason]>=ranks[fields.get(d.field).reason])fields.set(d.field,d);j.fields=[...fields.values()];j.code=null;
      j.offset+=r.total;const group=sourceClasses(j.sourceRows)[j.classIndex];if(j.offset===group.count){j.classIndex++;j.offset=0;}
      // Checkpoint cursor BEFORE removing a consumed receipt. Crashes cannot double ACK.
@@ -310,7 +319,7 @@ export function createBackgroundRunner({transport}){
    // The trusted click is durable before ACK and before any school read.
    await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:now+30000});
    try{
-    let begin;try{begin=await transport({type:'n36-begin'},authority(j));}catch{throw Error('APP_NOT_READY');}if(!begin.ok)throw Error(begin.code??'APP_NOT_READY');j.batchId=begin.batchId;j.appTabId=begin.appTabId;
+    let begin;try{begin=await transport({type:'n36-begin'},authority(j));}catch(e){throw Error(['APP_ACADEMIC_SELECTION_REQUIRED','APP_BATCH_UNRESOLVED'].includes(e.message)?e.message:'APP_NOT_READY');}if(!begin.ok)throw Error(begin.code??'APP_NOT_READY');j.batchId=begin.batchId;j.appTabId=begin.appTabId;
     await appGuard(j);const page=await source(j,'home');if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
     j.visited.add(routeIdentity(origin,j.sourceURL));j.next={kind:'home',page};j.startPhase='accepted';j.phase='collect';await save(j);return {ok:true,view:view(j)};
    }catch(e){await finish(j,'stopped',e.message,e);throw e;}
