@@ -11,6 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { verifiedDeployment, verifiedSourceOnlyPublication } from './controller.mjs';
 import { buildLiveServiceEvidence, verifiedLiveServicePublication } from './live-service-publication.mjs';
+import { n88MobileNativeTask } from './n88-mobile-native-publication.mjs';
 import { STAGED_ACTIVATION_MODE, verifiedActivationStageContinuation, verifiedPilotStagePreparation } from './staged-activation-contract.mjs';
 import { validateControllerReload, buildControllerReloadScript } from './reviewed-controller-reload.mjs';
 import { HISTORICAL_RUNTIME_MODE, verifyHistoricalRuntimeSupersession } from './historical-runtime-supersession.mjs';
@@ -250,7 +251,7 @@ export function verifiedLiveServiceDeclarationRepair(task,result,update){
   return card.completionMode==='reconcile_live_service_publication'
     &&task.status==='blocked'&&result.state==='LOCAL_READY'&&update.expected.resultState==='LOCAL_READY'
     &&task.lastFailure==='Publisher returned incomplete or mismatched deployment proof'
-    &&!task.servicePublicationEvidence&&p?.kind==='reviewed-nonsending-service-evidence-v1'
+    &&!task.servicePublicationEvidence&&(p?.kind==='reviewed-nonsending-service-evidence-v1'||n88MobileNativeTask(task)&&p?.kind==='reviewed-n88-mobile-native-publication-v1')
     &&d?.status==='deployed'&&d.publishedSha===p.publishedSha&&sha256(bytes(d))===p.priorReceiptSha256
     &&SHA256.test(p.reviewedFixtureSha256??'')&&p.reason?.length>=50
     &&same(card.requiredChecks,task.requiredChecks)&&same(card.allowedPaths,task.allowedPaths)
