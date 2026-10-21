@@ -1,0 +1,229 @@
+{
+  "taskId": "continuous-n36-1150-ownerless-year-term-selection-20261021",
+  "runId": "a721f179-0912-45cf-9d37-3cdf4aaffc8c",
+  "baseSha": "e710fcbbf51fcaa59715e45e4aa15aaa353bb1e3",
+  "predecessor": "6f9cd28eab5e44f63bafd5eb3aab99dcbbe3506e",
+  "appHash": "cfcd47f178781010bc61ea2ef2e5af095dd2a4040f26745c560f132ae42ff494",
+  "baselineHash": "e520fe96c564c460798524366bffaf3ec1c7cee2b4cce5a2f05fa9952ac8056a",
+  "runtimeFingerprint": "2ed83a2e961b34842744844ccbea9e8463442a9903d01428f6c57c134ff34fc2",
+  "status": "PASS",
+  "certifiedCases": 26,
+  "evidence": [
+    {
+      "file": "baseline.json",
+      "scenario": "ownerless-active",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+      "sha256": "11dd0c5be48ced2584bccfc9003ea707b77f164d770eee2611307e4baea1bb29"
+    },
+    {
+      "file": "baseline.json",
+      "scenario": "ownerless-upcoming",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+      "sha256": "11dd0c5be48ced2584bccfc9003ea707b77f164d770eee2611307e4baea1bb29"
+    },
+    {
+      "file": "baseline.json",
+      "scenario": "owned-upcoming",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+      "sha256": "11dd0c5be48ced2584bccfc9003ea707b77f164d770eee2611307e4baea1bb29"
+    },
+    {
+      "file": "baseline-persisted-ownerless.json",
+      "scenario": "ownerless-disk",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+      "sha256": "1bbe8424fc214ea3f8ba133401166728b2cfb369c22a5456bc48fb293d2cc267"
+    },
+    {
+      "file": "candidate-positive.json",
+      "scenario": "ownerless-active",
+      "status": "PASS",
+      "saved": 303,
+      "code": null,
+      "sha256": "674d49c07c2d4bb944f13385af483adbef4d3b58190d355ff42f7f122da48ea5"
+    },
+    {
+      "file": "candidate-positive.json",
+      "scenario": "ownerless-upcoming",
+      "status": "PASS",
+      "saved": 303,
+      "code": null,
+      "sha256": "674d49c07c2d4bb944f13385af483adbef4d3b58190d355ff42f7f122da48ea5"
+    },
+    {
+      "file": "candidate-positive.json",
+      "scenario": "owned-upcoming",
+      "status": "PASS",
+      "saved": 303,
+      "code": null,
+      "sha256": "674d49c07c2d4bb944f13385af483adbef4d3b58190d355ff42f7f122da48ea5"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "foreign-year",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "foreign-term",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "closed-term",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_NOT_READY",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "archived-year",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_NOT_READY",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "after-term-owner",
+      "status": "PASS",
+      "saved": 300,
+      "code": "BATCH_PERSISTED_CONTEXT_CHANGED",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "start-owner",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_NOT_READY",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "start-session",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_NOT_READY",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "start-database",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_NOT_READY",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "candidate-initial-pending-assertion.json",
+      "scenario": "start-lease",
+      "status": "PASS",
+      "saved": 0,
+      "code": "APP_NOT_READY",
+      "sha256": "4e6aba3d76b448db8ae7c123f6b4619abbba69155fb0ce4214c44cf3e3f3ded8"
+    },
+    {
+      "file": "ownerless-receipt-selection-regressions.json",
+      "scenario": "existing",
+      "status": "PASS",
+      "saved": 303,
+      "code": null,
+      "sha256": "dae09ed9d0d2e01ff26dfb5f00eeb88fa38cf28273ae27a3f99dc59879020b88"
+    },
+    {
+      "file": "ownerless-receipt-selection-regressions.json",
+      "scenario": "missing-year",
+      "status": "PASS",
+      "saved": 303,
+      "code": null,
+      "sha256": "dae09ed9d0d2e01ff26dfb5f00eeb88fa38cf28273ae27a3f99dc59879020b88"
+    },
+    {
+      "file": "ownerless-receipt-selection-regressions.json",
+      "scenario": "optimistic",
+      "status": "PASS",
+      "saved": 303,
+      "code": null,
+      "sha256": "dae09ed9d0d2e01ff26dfb5f00eeb88fa38cf28273ae27a3f99dc59879020b88"
+    },
+    {
+      "file": "ownerless-receipt-selection-regressions.json",
+      "scenario": "cross-tab",
+      "status": "PASS",
+      "saved": 0,
+      "code": "BATCH_PERSISTED_TERM_CHANGED",
+      "sha256": "dae09ed9d0d2e01ff26dfb5f00eeb88fa38cf28273ae27a3f99dc59879020b88"
+    },
+    {
+      "file": "ownerless-receipt-selection-regressions.json",
+      "scenario": "after-chunk",
+      "status": "PASS",
+      "saved": 300,
+      "code": "BATCH_PERSISTED_TERM_CHANGED",
+      "sha256": "dae09ed9d0d2e01ff26dfb5f00eeb88fa38cf28273ae27a3f99dc59879020b88"
+    },
+    {
+      "file": "ownerless-transaction-unknown-regressions.json",
+      "scenario": "transaction-drift",
+      "status": "PASS",
+      "saved": 0,
+      "code": "BATCH_PERSISTED_TERM_CHANGED",
+      "sha256": "9e3ee97b455d12d1e77a000b4379b226a1b65b3d443d73e32bb7c5ed8ddb9889"
+    },
+    {
+      "file": "ownerless-transaction-unknown-regressions.json",
+      "scenario": "after-document",
+      "status": "PASS",
+      "saved": 300,
+      "code": "BATCH_OWNER_OR_SESSION_CHANGED",
+      "sha256": "9e3ee97b455d12d1e77a000b4379b226a1b65b3d443d73e32bb7c5ed8ddb9889"
+    },
+    {
+      "file": "ownerless-transaction-unknown-regressions.json",
+      "scenario": "saved-before-receipt",
+      "status": "PASS",
+      "saved": 300,
+      "code": "WRITE_FAILED",
+      "sha256": "9e3ee97b455d12d1e77a000b4379b226a1b65b3d443d73e32bb7c5ed8ddb9889"
+    },
+    {
+      "file": "ownerless-transaction-unknown-regressions.json",
+      "scenario": "readback-unknown",
+      "status": "PASS",
+      "saved": 300,
+      "code": "WRITE_FAILED",
+      "sha256": "9e3ee97b455d12d1e77a000b4379b226a1b65b3d443d73e32bb7c5ed8ddb9889"
+    },
+    {
+      "file": "ownerless-transaction-unknown-regressions.json",
+      "scenario": "missing-term",
+      "status": "PASS",
+      "saved": 303,
+      "code": null,
+      "sha256": "9e3ee97b455d12d1e77a000b4379b226a1b65b3d443d73e32bb7c5ed8ddb9889"
+    }
+  ],
+  "originalFailuresPreserved": [
+    "harness-missing-vm-flag.json",
+    "baseline-disk-fixture-first.json",
+    "candidate-initial-pending-assertion.json"
+  ],
+  "scope": "App-only year/term owner and writable qualification; extension/ZIP/store/models/shared libraries/offline shell unchanged",
+  "production": "NOT_RUN; independent publisher",
+  "actual0535Receipt": "Unresolved; no replay or expired nonce acknowledgement"
+}

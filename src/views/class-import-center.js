@@ -157,7 +157,7 @@ let automaticBatch=null, automaticWriting=false,receiverReason='NO_GRANT',direct
 const directRequests=new Map();
 export async function prepareExtensionBatch({resume=false}={}){
  const year=store.activeYear(),term=store.activeTerm(),owner=store.getActiveWorkspace()?.authUserId;
- if(!year||!term||term.yearId!==year.id||store.getYear(year.id)?.ownerId!==owner||store.getTerm(term.id)?.ownerId!==owner)throw Error('APP_ACADEMIC_SELECTION_REQUIRED');
+ if(!year||!term||term.yearId!==year.id||[year,term].some(row=>row.ownerId!=null&&row.ownerId!==owner))throw Error('APP_ACADEMIC_SELECTION_REQUIRED');
  const binding=extensionOwnerBinding();
  if(automaticBatch&&!automaticBatch.qualified)throw Error('BATCH_PENDING');
  if(automaticBatch){
@@ -228,7 +228,10 @@ function persistedSelection(batch,current){
  const liveTerms=current.terms.filter(t=>!t.deleted&&t.yearId===year?.id),rawTerm=current.terms.find(t=>!t.deleted&&t.id===device.activeTermId);
  const term=rawTerm??(liveTerms.length===1?liveTerms[0]:null);
  if(!year||!term)throw Error('APP_ACADEMIC_SELECTION_REQUIRED');
- if(year.ownerId!==owner||term.ownerId!==owner||year.status!=='active'||term.status!=='active'||term.yearId!==year.id)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');
+ // Same contract as assertClassImportAccess/isTermClosed: local/claimed rows
+ // may be ownerless only under the surrounding bound-account guards. Check
+ // the transaction's rows here, rather than the potentially older store rows.
+ if([year,term].some(row=>row.ownerId!=null&&row.ownerId!==owner)||year.status==='archived'||term.status==='closed'||term.yearId!==year.id)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');
  if(year.id!==batch.year||term.id!==batch.term)throw Error('BATCH_PERSISTED_TERM_CHANGED');
  return [device.activeYearId,device.activeTermId];
 }

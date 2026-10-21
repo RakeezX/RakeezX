@@ -1,0 +1,44 @@
+{
+  "taskId": "continuous-n36-1150-ownerless-year-term-selection-20261021",
+  "runId": "a721f179-0912-45cf-9d37-3cdf4aaffc8c",
+  "baseSha": "e710fcbbf51fcaa59715e45e4aa15aaa353bb1e3",
+  "version": "0.5.36",
+  "baselineApp": true,
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.35.zip",
+    "observedAt": "2026-10-21T12:18:44.262Z",
+    "sha256": "025fb2a896fb6027789575c0cd35ff4cfd9e3740b55137b81e7880a79ea71aef",
+    "bytes": 146711,
+    "files": 29
+  },
+  "applicationFiles": {
+    "src/views/class-import-center.js": "e520fe96c564c460798524366bffaf3ec1c7cee2b4cce5a2f05fa9952ac8056a",
+    "src/lib/n36-extension-handoff.js": "d95275279d4e549ce3911ea17e404fc35c5cf417c623f7f4d5f9d46625d24ed4"
+  },
+  "runtimeFingerprint": "2ed83a2e961b34842744844ccbea9e8463442a9903d01428f6c57c134ff34fc2",
+  "cases": [
+    {
+      "scenario": "ownerless-active",
+      "storeAccess": "allowed",
+      "status": "FAIL",
+      "error": "TypeError: vm.SourceTextModule is not a constructor\n    at module (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:47:477)\n    at backgroundFixture (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:48:14)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-1150-ownerless-year-term-selection-20261021/runtime.mjs:141:17\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-1150-ownerless-year-term-selection-20261021/runtime.mjs:87:2"
+    },
+    {
+      "scenario": "ownerless-upcoming",
+      "storeAccess": "allowed",
+      "status": "FAIL",
+      "error": "TypeError: vm.SourceTextModule is not a constructor\n    at module (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:47:477)\n    at backgroundFixture (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:48:14)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-1150-ownerless-year-term-selection-20261021/runtime.mjs:141:17\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-1150-ownerless-year-term-selection-20261021/runtime.mjs:87:2"
+    },
+    {
+      "scenario": "owned-upcoming",
+      "storeAccess": "allowed",
+      "status": "FAIL",
+      "error": "TypeError: vm.SourceTextModule is not a constructor\n    at module (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:47:477)\n    at backgroundFixture (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:48:14)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-1150-ownerless-year-term-selection-20261021/runtime.mjs:141:17\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-1150-ownerless-year-term-selection-20261021/tests/n36-1150-ownerless-year-term-selection-20261021/runtime.mjs:87:2"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  },
+  "status": "FAIL"
+}

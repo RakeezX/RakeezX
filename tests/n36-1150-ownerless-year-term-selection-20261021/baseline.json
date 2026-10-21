@@ -1,0 +1,431 @@
+{
+  "taskId": "continuous-n36-1150-ownerless-year-term-selection-20261021",
+  "runId": "a721f179-0912-45cf-9d37-3cdf4aaffc8c",
+  "baseSha": "e710fcbbf51fcaa59715e45e4aa15aaa353bb1e3",
+  "version": "0.5.36",
+  "baselineApp": true,
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.35.zip",
+    "observedAt": "2026-10-21T12:18:55.116Z",
+    "sha256": "025fb2a896fb6027789575c0cd35ff4cfd9e3740b55137b81e7880a79ea71aef",
+    "bytes": 146711,
+    "files": 29
+  },
+  "applicationFiles": {
+    "src/views/class-import-center.js": "e520fe96c564c460798524366bffaf3ec1c7cee2b4cce5a2f05fa9952ac8056a",
+    "src/lib/n36-extension-handoff.js": "d95275279d4e549ce3911ea17e404fc35c5cf417c623f7f4d5f9d46625d24ed4"
+  },
+  "runtimeFingerprint": "2ed83a2e961b34842744844ccbea9e8463442a9903d01428f6c57c134ff34fc2",
+  "cases": [
+    {
+      "scenario": "ownerless-active",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 0,
+            "ms": 0
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 0,
+            "ms": 0
+          },
+          "appGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "worker-ack",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "binding",
+        "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "unknown",
+        "needsReview": false,
+        "schoolBindingState": "none",
+        "readProofPresent": false
+      },
+      "saved": 0,
+      "deliveries": 0,
+      "receipts": [],
+      "unsafeGETs": 0,
+      "staged": 0,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "baselineRegression": "Store allows import but predecessor denies explicit Start",
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 0,
+        "observed": 0,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 0,
+            "ms": 0
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 0,
+            "ms": 0
+          },
+          "appGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        },
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "none",
+        "schoolBadgePresent": null,
+        "schoolIdPresent": null,
+        "readProofPresent": false,
+        "entryKind": "none",
+        "roleProofKind": "none",
+        "proofNavMarkers": null,
+        "proofActionMarkers": null,
+        "proofReadLinks": null,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "stopped",
+        "stage": "error",
+        "startPhase": "worker-ack",
+        "coverage": "unknown",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "error",
+        "receipt": "not-available",
+        "failure": "APP_ACADEMIC_SELECTION_REQUIRED",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "binding",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "unknown"
+      },
+      "status": "PASS"
+    },
+    {
+      "scenario": "ownerless-upcoming",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 0,
+            "ms": 0
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 0,
+            "ms": 0
+          },
+          "appGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "worker-ack",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "binding",
+        "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "unknown",
+        "needsReview": false,
+        "schoolBindingState": "none",
+        "readProofPresent": false
+      },
+      "saved": 0,
+      "deliveries": 0,
+      "receipts": [],
+      "unsafeGETs": 0,
+      "staged": 0,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "baselineRegression": "Store allows import but predecessor denies explicit Start",
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 0,
+        "observed": 0,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 0,
+            "ms": 0
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 0,
+            "ms": 0
+          },
+          "appGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        },
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "none",
+        "schoolBadgePresent": null,
+        "schoolIdPresent": null,
+        "readProofPresent": false,
+        "entryKind": "none",
+        "roleProofKind": "none",
+        "proofNavMarkers": null,
+        "proofActionMarkers": null,
+        "proofReadLinks": null,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "stopped",
+        "stage": "error",
+        "startPhase": "worker-ack",
+        "coverage": "unknown",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "error",
+        "receipt": "not-available",
+        "failure": "APP_ACADEMIC_SELECTION_REQUIRED",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "binding",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "unknown"
+      },
+      "status": "PASS"
+    },
+    {
+      "scenario": "owned-upcoming",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 0,
+            "ms": 0
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 0,
+            "ms": 0
+          },
+          "appGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "worker-ack",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "binding",
+        "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "unknown",
+        "needsReview": false,
+        "schoolBindingState": "none",
+        "readProofPresent": false
+      },
+      "saved": 0,
+      "deliveries": 0,
+      "receipts": [],
+      "unsafeGETs": 0,
+      "staged": 0,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "baselineRegression": "Store allows import but predecessor denies explicit Start",
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 0,
+        "observed": 0,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 0,
+            "ms": 0
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 0,
+            "ms": 0
+          },
+          "appGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        },
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "none",
+        "schoolBadgePresent": null,
+        "schoolIdPresent": null,
+        "readProofPresent": false,
+        "entryKind": "none",
+        "roleProofKind": "none",
+        "proofNavMarkers": null,
+        "proofActionMarkers": null,
+        "proofReadLinks": null,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "stopped",
+        "stage": "error",
+        "startPhase": "worker-ack",
+        "coverage": "unknown",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "error",
+        "receipt": "not-available",
+        "failure": "APP_ACADEMIC_SELECTION_REQUIRED",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "binding",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "unknown"
+      },
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  },
+  "status": "PASS"
+}
