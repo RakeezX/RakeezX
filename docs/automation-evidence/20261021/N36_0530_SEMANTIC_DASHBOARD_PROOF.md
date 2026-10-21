@@ -1,0 +1,29 @@
+# N36 — 0.5.30 semantic dashboard read-proof / 0.5.31 candidate
+
+AI implementation, 2026-10-21. Task `continuous-n36-0530-semantic-dashboard-read-proof-20261021`, run `a6728982-7092-4a9e-995e-1da13954a419`. Base `ac977c717011f84456727e292881f8dd7dbbb7b0`. Scope is the activated synthetic card; no school account/browser or real data accessed.
+
+## Result
+
+Immutable 0.5.30 accepts Start on the fabricated complete teacher dashboard without a visible role badge or greeting, then stops during collect at `source-pre-read / UNCONFIRMED_TEACHER_ROLE`: zero staged/observed rows, zero transfers/receipts and zero navigation. The test loads the actual .30 coordinator/reader from the verified historical ZIP, rather than reproducing its logic in a lookalike.
+
+0.5.31 accepts positive structural teacher evidence as an alternative to the existing active-role or unique-greeting proof. It is restricted to the current complete live dashboard, coherent visible teacher navigation groups, exact safe observed MyStudents and teacher-schedule links, and the already bound school name/SchoolId. It requires the previously captured source proof; fetched menus cannot establish this authority. Structure (visible semantic controls, their kinds and observed read destinations) joins the internal document fingerprint. Existing source URL/document, selected card, owner/session/batch and response checks remain in force. Explicit nonteacher roles, multiple greetings, weak/incoherent/hidden navigation, loading/login, unsafe/foreign links and missing/mismatched school context stop. Explicit feminine administrator role labels also refuse; principal-name metadata remains valid.
+
+Safe copied diagnostics add only `entryKind`, `roleProofKind` (`semantic-dashboard`, `active-role`, `greeting`, `none`) and bounded navigation/action/read-link counts (2/3/20 maximum). Invalid values become `none`/null. No name, URL, school ID, document ID or student value is added to this report. Existing private proof is internal, never copied into diagnostics.
+
+## Affected verification
+
+All checks exercise actual JS over task-owned loopback HTTP using the canonical isolated-browser helper, fresh disposable contexts, blocked Service Workers/external requests and bounded finally cleanup. Portal markup and Chrome APIs are synthetic; application receiver/store/ownership checks and popup DOM/handlers/CSS are actual source.
+
+- `browser.mjs` / `browser.json`: 47 cases. Exact immutable .30 failure; .31 dashboard and selected-card redirect; stationary ordinary GETs; 300+3 unique roster rows and saved receipts; supported metadata/classes/timetable; partial coverage; before/during/after role/school/URL/document/owner drift; response origin/type/size/login/context refusal and mismatched receipt. Diagnostics contain no fixture identity or student values. Screenshots inspected: `baseline-0530-zero-row-stop.png` and `supported-result.png` show finite stopped/saved states with no layout overflow.
+- `receiver.mjs` / `receiver.json`: 13 cases using actual application receiver, synthetic authenticated service, real store/IndexedDB and guarded handoff. Dashboard and selected-card starts each save full/partial 300+3 receipts; teacher, principal/report-principal, school, class subject and timetable persist. Owner/session/batch/receiver-route/document drift refuses without deliveries or data changes. Scores/year data remain unchanged. Actual rendered app download returns the exact .31 archive without navigation.
+- `proof-cases.mjs` / `proof-cases.json`: 27 direct source proof cases and real diagnostic bootstrap allowlist check. Positive semantic/active-role/greeting paths; fetched-dashboard rejection; incoherent/hidden/name-only menus, absent/mismatched school/SchoolId, unsafe/foreign/inline-handler link, loading, multiple greetings, administrator/parent/student, login, structural/name drift. Both read-proof and roster-guard exercised.
+- `package.mjs` / `package.json`: immutable historical packages preserved; 29 source/archive entries match hashes and sizes; permissions/hosts/CSP unchanged; exact app href/label replacement only; changed JS syntax. No new startup dependency, route permission, fetch method or receiver/store change.
+- `checks.mjs` / `checks.json` bind browser and receiver evidence to the same final 29-file runtime fingerprint and required check names.
+
+The first new source harness run incorrectly kept its synthetic role mutation hidden after removing the visible badge; that run failed its expected refusal and is retained in `browser.json.previousFailures`. Making that synthetic conflicting role visible corrected the test. A direct negative case separately exposed that `مديرة المدرسة` was absent from selection's explicit role enum; it initially returned true against the false assertion, then passed after adding explicit feminine administrator labels. Neither failure was relabeled as a pass. Canonical LF archive/source checks caught a temporary documentation/EOL byte mismatch during preparation; original README bytes were restored and final package rebuilt before final runtime evidence. No deployed behavior was involved.
+
+## Package and delivery boundary
+
+Version `0.5.31`, ZIP `assets/extensions/rakeez-teacher-import-helper-0.5.31.zip`, SHA256 `ffb5638b256928678b318311aa097f5eb8f908639efef879c57939fded5d31e8`, 142532 bytes, exactly 29 entries. Manifest records individual hashes. Runtime evidence fingerprint: `6a0f47c197c68f9a0f889d89e41140776e5bc73de79ffcb44bb5c8cbd24cc689`.
+
+Production/public served verification and stable installed-folder 29-file parity are NOT RUN by this worker. The independent controller/sole publisher owns integration and these post-delivery steps; no push, deployment, stable-folder mutation or browser reload occurred. Actual Madrasati acceptance remains pending the PO manual .31 trial. N36 remains open.

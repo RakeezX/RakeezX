@@ -33,7 +33,7 @@ export function createBackgroundRunner({transport}){
  const mutate=operation=>{const r=mutations.then(operation);mutations=r.catch(()=>{});return r;};
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic});
+ const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
@@ -70,6 +70,7 @@ export function createBackgroundRunner({transport}){
   const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,mode==='read-proof'?{...j.context,readJobId:j.id}:j.context]});
   await current(j);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
+  if(r[0].result?.proofDiagnostic)j.proofDiagnostic=r[0].result.proofDiagnostic;
   if(!r[0].result?.ok){const e=Error(r[0].result?.code??'SOURCE_UNAVAILABLE');e.retry=r[0].result?.retry;e.incomplete=r[0].result?.incomplete;throw e;}
   if(mode==='home'&&j.context?.kind==='selected-teacher-card'&&r[0].result.runContext?.kind==='selected-teacher-card'&&['roleTargetId','href','schoolName'].some(k=>j.context[k]!==r[0].result.runContext[k]))throw Error('SCHOOL_CONTEXT_CHANGED');
   j.sourceDocument=r[0].documentId;

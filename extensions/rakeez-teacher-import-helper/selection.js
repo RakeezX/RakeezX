@@ -103,7 +103,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
     return parts.join('').normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,'').replace(/\s*[:：]\s*/g,': ').trim().replace(/\s+/g,' ');
   };
   const teacher=['معلم','معلمة','المعلم','المعلمة','دور المعلم','دور المعلمة','واجهة المعلم','واجهة المعلمة'];
-  const admin=['مدير المدرسة','قائد المدرسة','المشرف','الإداري','المدير'];
+  const admin=['مدير المدرسة','مديرة المدرسة','قائد المدرسة','قائدة المدرسة','المشرف','المشرفة','الإداري','الإدارية','المدير','المديرة'];
   const cardSelector='article,section,li,fieldset,.card,.panel,.school-card';
   const entryPath=/^\/(?:SchoolManagment\/Actions\/Teacher\/[^/]+|Dashboards\/Schools)\/?$/i.test(location.pathname);
   const roleValuesIn=scope=>[...new Set(Array.from(scope.querySelectorAll('p,span,div,li,dt,strong,b,label')).filter(visible).map(roleText).map(v=>/^الدور\s*:?\s*(.+)$/.exec(v)?.[1]).filter(v=>[...teacher,...admin,'ولي الأمر','ولي أمر','الطالب','الطالبة'].includes(v)))];
@@ -207,9 +207,13 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   const semanticDashboard=entryPath&&navMarkers===2&&actionMarkers>=2&&coherent(['قائمة الطلاب','سجلات المتابعة اليومية'])&&(coherent(['الجدول الدراسي','سجلات متابعة الفصول'])||coherent(['الجدول الدراسي','تقارير المعلم']));
   if(semanticDashboard)dashboards.push(body);
   const dashboard=semanticDashboard;
+  // AI: structural role proof is confined to the complete, bound live dashboard.
+  const semanticRoleProof=!source&&dashboard&&document.readyState==='complete'&&!Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible)&&['قائمة الطلاب','الجدول الدراسي'].every(label=>matching(label).length===1&&safeRead(label).length===1&&!matching(label)[0].hasAttribute('onclick'));
+  const roleProofKind=activeTeacher.length?'active-role':greetings.length===1?'greeting':semanticRoleProof?'semantic-dashboard':'none';
+  const proofDiagnostic={entryKind:cards.length?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',roleProofKind,proofNavMarkers:Math.min(navMarkers,2),proofActionMarkers:Math.min(actionMarkers,3),proofReadLinks:Math.min(readTargets.length,20)};
   const entry={pageKind:cards.length||gatewayRejected?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',readyState:document.readyState,roleMarkers:Math.min(roleValuesIn(body).length,10),schoolOptions:Math.min(cards.length,20),navMarkers,actionMarkers,safeReadLinks:Math.min(readTargets.length,20),iframeCount:Math.min(document.querySelectorAll('iframe').length,20),linkStats};
   let safeReportLinks=0,explicitRoles=0;
-  const roleFail=(code,stage='role-selection')=>({...fail(code),diagnostic:{version:'0.4.5',stage,reason:code,category:'role',entry}});
+  const roleFail=(code,stage='role-selection')=>({...fail(code),diagnostic:{version:'0.4.5',stage,reason:code,category:'role',entry},proofDiagnostic});
   if(adminConflict)return roleFail('NON_TEACHER_ROLE');
   if(runContext?.schoolId&&observedSchoolIds.some(id=>id!==runContext.schoolId.toLowerCase()))return roleFail('SCHOOL_CONTEXT_CHANGED');
   if(observedSchoolIds.length>1)return roleFail('AMBIGUOUS_SCHOOL_CONTEXT');
@@ -224,26 +228,27 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   // AI: proof belongs to this live teacher document, never to a badge-less fetched menu.
   const welcomeCandidates=dashboard?Array.from(body.querySelectorAll('p,span,h1,h2,h3')).filter(visible).filter(n=>!Array.from(n.children).some(child=>/^مرحبا بك /.test(roleText(child)))).map(roleText).filter(v=>/^مرحبا بك /.test(v)):[];
   const welcomeNames=[...new Set(welcomeCandidates.map(v=>v.slice('مرحبا بك '.length)).filter(v=>validValue(v)&&!/[0-9٠-٩]/.test(v)))];
-  const currentTeacherProof=()=>JSON.stringify({url:location.href,school:shownSchool,schoolId:observedSchoolIds[0],roles:[...new Set(activeTeacher)].sort(),greetings,teacher:[...new Set([...labelValues(body,['اسم المعلم','اسم المعلمة']),...welcomeNames])].sort()});
+  const currentTeacherProof=()=>JSON.stringify({url:location.href,school:shownSchool,schoolId:observedSchoolIds[0],semantic:semanticRoleProof?{navMarkers,actionMarkers,controls:controls.filter(n=>['قائمة الطلاب','سجلات المتابعة اليومية','الجدول الدراسي','سجلات متابعة الفصول','تقارير المعلم'].includes(roleText(n))).map(n=>[n.tagName,roleText(n),n.tagName==='A'?new URL(n.href).pathname+new URL(n.href).search:'']).sort()}:null,roles:[...new Set(activeTeacher)].sort(),greetings,teacher:[...new Set([...labelValues(body,['اسم المعلم','اسم المعلمة']),...welcomeNames])].sort()});
   if(mode==='read-proof'){
     if(!entryPath||document.readyState!=='complete'||document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
     if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
-    if(!activeTeacher.length&&greetings.length!==1)return roleFail('UNCONFIRMED_TEACHER_ROLE');
+    if(!activeTeacher.length&&greetings.length!==1&&!(semanticRoleProof&&runContext?.readProof))return roleFail('UNCONFIRMED_TEACHER_ROLE');
     if(!runContext?.schoolId||!runContext.schoolName||shownSchool!==runContext.schoolName||observedSchoolIds.length!==1||observedSchoolIds[0]!==runContext.schoolId.toLowerCase())return roleFail('SCHOOL_CONTEXT_CHANGED');
     const proof=currentTeacherProof();
     if(runContext.readProof&&runContext.readProof!==proof)return roleFail('TEACHER_CONTEXT_CHANGED');
     globalThis.rakeezTeacherReadGuard=()=>readAutomaticTeacherPage('read-proof',null,{...runContext,readProof:proof});
     globalThis.rakeezTeacherReadGuard.jobId=runContext.readJobId;
     globalThis.rakeezSetupPageReader=(kind,context,input)=>readAutomaticTeacherPage(kind,null,context,input);
-    return {ok:true,proof};
+    return {ok:true,proof,proofDiagnostic};
   }
   if(mode==='roster-guard'){
     if(document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
     if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
-    if(!activeTeacher.length&&greetings.length!==1)return roleFail('UNCONFIRMED_TEACHER_ROLE');
+    if(!activeTeacher.length&&greetings.length!==1&&!(semanticRoleProof&&runContext?.readProof))return roleFail('UNCONFIRMED_TEACHER_ROLE');
     if(!runContext?.schoolId||!runContext.schoolName||shownSchool!==runContext.schoolName)return roleFail('SCHOOL_CONTEXT_CHANGED');
     try{globalThis.rakeezRoutePolicy(location.origin,location.href,runContext);}catch(e){return roleFail(e.message);}
-    return {ok:true,domain:location.hostname};
+    if(semanticRoleProof&&(!runContext.readProof||runContext.readProof!==currentTeacherProof()||observedSchoolIds.length!==1||observedSchoolIds[0]!==runContext.schoolId.toLowerCase()))return roleFail('TEACHER_CONTEXT_CHANGED');
+    return {ok:true,domain:location.hostname,proofDiagnostic};
   }
   if(mode==='guard'){if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');return {ok:true,domain:location.hostname};}
   if(mode==='home'&&(cards.length||gatewayRejected)){
@@ -346,5 +351,5 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   for(const [category,values] of Object.entries(scalar)){
     const distinct=[...new Set(values)];if(distinct.length===1)tables.push({category,text:specs[category][0]+'\t'+distinct[0]});else if(distinct.length>1)warnings.push({category,code:'AMBIGUOUS_ROLE_VALUE'});
   }
-  return {ok:true,entry,runContext:source?null:shownSchool?{...routeContext,schoolName:shownSchool,...(routeContext?.schoolId&&(activeTeacher.length||greetings.length===1)?{readProof:currentTeacherProof()}: {})}:routeContext,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:(document.title??'').replace(/https?:\/\/\S+/g,'').slice(0,80)};
+  return {ok:true,entry,proofDiagnostic,runContext:source?null:shownSchool?{...routeContext,schoolName:shownSchool,...(routeContext?.schoolId&&(activeTeacher.length||greetings.length===1||semanticRoleProof)?{readProof:currentTeacherProof()}: {})}:routeContext,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:(document.title??'').replace(/https?:\/\/\S+/g,'').slice(0,80)};
 }
