@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "publication": "NOT_RUN",
+  "priorCarrierSha256": "6978352dfa73746a9c4a2cc85e822545483427d4834f172a04abb963f136068e",
+  "carrierSha256": "a2308758f0611510f04f71cee50f69ffe35b936183d8d3e20847304adfb67091",
+  "studentSha256": "c5c5101e41afc253f2dbd770c0ddf93cb0cd1f9bbcded9d2aa1d5154a7b1abe3",
+  "styleSha256": "2a67b8c32793d52b4e2f5daff17ac72f6775235b7d4862495c0963c714c5e7f9",
+  "changedPrivateAssets": [
+    "/n88-private/assets/student.mjs",
+    "/n88-private/styles/student-portal-login.css"
+  ],
+  "allOtherCarrierBytesIdentical": true
+}

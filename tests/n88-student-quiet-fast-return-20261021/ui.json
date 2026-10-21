@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "6f338b83-ed40-4a6a-a30e-2d3c8c4a0a0f",
+  "baseline": false,
+  "checks": [
+    "source-390: ordinary-hide-show-duplicates-single-current-get-and-separated-delay",
+    "source-390: hidden-first-get-late-response-retired",
+    "source-390: no-cookie-denied-expired-revoked-entry-503-timeout-late-recovery",
+    "source-390: return-denial-unavailable-timeout-never-false-signout-or-private",
+    "source-390: end-hidden-ack-uncertain-pagehide-no-read-or-post-replay",
+    "source-1280: ordinary-hide-show-duplicates-single-current-get-and-separated-delay",
+    "source-1280: hidden-first-get-late-response-retired",
+    "source-1280: no-cookie-denied-expired-revoked-entry-503-timeout-late-recovery",
+    "source-1280: return-denial-unavailable-timeout-never-false-signout-or-private",
+    "source-1280: end-hidden-ack-uncertain-pagehide-no-read-or-post-replay",
+    "private-390: ordinary-hide-show-duplicates-single-current-get-and-separated-delay",
+    "private-390: hidden-first-get-late-response-retired",
+    "private-390: no-cookie-denied-expired-revoked-entry-503-timeout-late-recovery",
+    "private-390: return-denial-unavailable-timeout-never-false-signout-or-private",
+    "private-390: end-hidden-ack-uncertain-pagehide-no-read-or-post-replay",
+    "private-1280: ordinary-hide-show-duplicates-single-current-get-and-separated-delay",
+    "private-1280: hidden-first-get-late-response-retired",
+    "private-1280: no-cookie-denied-expired-revoked-entry-503-timeout-late-recovery",
+    "private-1280: return-denial-unavailable-timeout-never-false-signout-or-private",
+    "private-1280: end-hidden-ack-uncertain-pagehide-no-read-or-post-replay"
+  ],
+  "timings": [
+    {
+      "entry": "source",
+      "width": 390,
+      "controlledDelayMs": 600,
+      "observedDelayMs": 612,
+      "initialDispatchMs": 11,
+      "returnDispatchMs": 1,
+      "dispatches": 2
+    },
+    {
+      "entry": "source",
+      "width": 1280,
+      "controlledDelayMs": 6000,
+      "observedDelayMs": 6002,
+      "initialDispatchMs": 11,
+      "returnDispatchMs": 2,
+      "dispatches": 2
+    },
+    {
+      "entry": "private",
+      "width": 390,
+      "controlledDelayMs": 600,
+      "observedDelayMs": 602,
+      "initialDispatchMs": 12,
+      "returnDispatchMs": 1,
+      "dispatches": 2
+    },
+    {
+      "entry": "private",
+      "width": 1280,
+      "controlledDelayMs": 6000,
+      "observedDelayMs": 6006,
+      "initialDispatchMs": 9,
+      "returnDispatchMs": 1,
+      "dispatches": 2
+    }
+  ],
+  "errors": [],
+  "limits": "Synthetic loopback actual application only; no live account, private service request, browser profile or provider operation.",
+  "lease": "ACQUIRED browser",
+  "release": "RELEASED browser"
+}
