@@ -59,3 +59,9 @@
 .n88-entry [data-n88-failure-details]{margin-block-start:var(--sp-2);max-inline-size:48rem;font-size:var(--fs-sm)}
 .n88-entry [data-n88-failure-details]>summary{cursor:pointer;color:var(--text-2);padding-block:var(--sp-1)}
 .n88-entry [data-n88-failure-text]{direction:ltr;text-align:start;white-space:pre-wrap;overflow-wrap:anywhere;padding:var(--sp-2);border:1px solid var(--border);border-radius:var(--r-sm)}
+.n88-entry [data-n88-list-support]{margin-block:var(--sp-2);max-inline-size:48rem;font-size:var(--fs-sm)}
+.n88-entry [data-n88-list-support]>summary{cursor:pointer;color:var(--text-2);padding-block:var(--sp-2);min-block-size:var(--tap)}
+.n88-entry [data-n88-list-support]>button{margin-block:var(--sp-2);white-space:normal;min-block-size:var(--tap)}
+.n88-entry [data-n88-list-copy-status]:empty{display:none}
+.n88-entry [data-n88-list-copy-text]{display:block;width:100%;max-width:100%;font:inherit;font-family:var(--font-num);resize:vertical;padding:var(--sp-2);color:var(--text);background:var(--bg-sunk);border:1px solid var(--border);border-radius:var(--r-sm)}
+.n88-entry [data-n88-list-copy-text][hidden]{display:none}

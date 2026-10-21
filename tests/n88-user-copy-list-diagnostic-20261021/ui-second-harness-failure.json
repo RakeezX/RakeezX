@@ -1,0 +1,59 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "width": 390,
+      "mode": "success",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "mode": "failure",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1280,
+      "mode": "success",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1280,
+      "mode": "failure",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "retire": "owner",
+      "status": "PASS",
+      "inflightAndDetachedRetired": true
+    }
+  ],
+  "failure": {
+    "name": "TimeoutError",
+    "message": "page.waitForFunction: Timeout 5000ms exceeded."
+  },
+  "cleanup": "Owned isolated browser, contexts and loopback server closed"
+}

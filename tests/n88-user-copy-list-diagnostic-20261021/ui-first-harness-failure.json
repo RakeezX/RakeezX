@@ -1,0 +1,54 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "width": 390,
+      "mode": "success",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "mode": "failure",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1280,
+      "mode": "success",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1280,
+      "mode": "failure",
+      "status": "PASS",
+      "finiteCopy": true,
+      "invalidAndMissingAbsent": true,
+      "clipboardDeniedAndUnavailableFallback": true,
+      "legacyFailureCopyPreserved": true,
+      "oneListRequest": true,
+      "noHorizontalOverflow": true
+    }
+  ],
+  "failure": {
+    "name": "AssertionError",
+    "message": "Expected values to be strictly equal:\n\n1 !== 0\n"
+  },
+  "cleanup": "Owned isolated browser, contexts and loopback server closed"
+}

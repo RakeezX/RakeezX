@@ -18,6 +18,44 @@ function failureSnapshot(value){
  if(!Number.isInteger(value.httpStatus)||(value.httpStatus!==0&&(value.httpStatus<100||value.httpStatus>599))||!Number.isFinite(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000)return null;
  return Object.freeze({phase:value.phase,code:value.code,stage:value.stage,httpStatus:value.httpStatus,elapsedMs:Math.round(value.elapsedMs/100)*100,sourceVersion:'n88-class-deadline-v1'});
 }
+// AI: serialize only this finite public attestation, never the attribute wholesale.
+function listResponseSnapshot(root){
+ try{
+  const raw=root.getAttribute('data-n88-list-response');if(!raw||raw.length>256)return null;
+  const value=JSON.parse(raw);
+  if(!value||Object.keys(value).length!==3||!['region','elapsedMs','outcome'].every(k=>Object.hasOwn(value,k)))return null;
+  if(typeof value.region!=='string'||(value.region!=='unknown'&&classListRegion(value.region)!==value.region)||!Number.isInteger(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000||!['success','failure'].includes(value.outcome))return null;
+  return JSON.stringify({schema:'n88-list-response-v1',region:value.region,elapsedMs:value.elapsedMs,outcome:value.outcome});
+ }catch{return null;}
+}
+function listResponseSupport(root,isCurrent){
+ const body=entryShell(root),doc=root.ownerDocument;
+ let details=body.querySelector('[data-n88-failure-details]');
+ if(!details){details=doc.createElement('details');const summary=doc.createElement('summary');summary.textContent='تفاصيل الدعم';details.append(summary);body.append(details);}
+ details.dataset.n88ListSupport='';
+ const button=doc.createElement('button');button.type='button';button.className='btn';button.dataset.n88CopyList='';button.textContent='نسخ تفاصيل قراءة القائمة';
+ const status=doc.createElement('p');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.dataset.n88ListCopyStatus='';
+ const fallback=doc.createElement('textarea');fallback.readOnly=true;fallback.hidden=true;fallback.dir='ltr';fallback.rows=3;fallback.setAttribute('aria-label','تفاصيل قراءة القائمة للنسخ اليدوي');fallback.dataset.n88ListCopyText='';
+ details.append(button,status,fallback);
+ const valid=()=>root.contains(details)&&root.contains(button)&&isCurrent();
+ const clear=()=>{fallback.value='';fallback.hidden=true;status.textContent='';};
+ const absent=()=>{clear();status.textContent='لا تتوفر تفاصيل لهذه القراءة. لم يُنسخ شيء.';};
+ details.addEventListener('toggle',()=>{clear();if(details.open&&(!valid()||!listResponseSnapshot(root)))absent();});
+ button.addEventListener('click',async()=>{
+  if(button.disabled)return;clear();
+  const text=valid()?listResponseSnapshot(root):null;if(!text){absent();return;}
+  button.disabled=true;
+  try{
+   const clipboard=doc.defaultView.navigator.clipboard;if(!clipboard?.writeText)throw Error('unavailable');
+   await clipboard.writeText(text);
+   if(valid()&&listResponseSnapshot(root)===text)status.textContent='تم نسخ تفاصيل القراءة.';
+   else clear();
+  }catch{
+   if(valid()&&listResponseSnapshot(root)===text){fallback.value=text;fallback.hidden=false;status.textContent='تعذّر النسخ التلقائي. حدّد النص وانسخه يدويًا.';}
+   else clear();
+  }finally{button.disabled=false;}
+ });
+}
 // Change only through a separately authorized, service-evidenced activation diff.
 export const PORTAL_READINESS = Object.freeze({ enabled: true, serviceRevision: 'n88-integrated-class-v1', mode: 'public' });
 const bindingError = state => Object.assign(new Error('Student portal context unavailable'), { portalState: state });
@@ -131,6 +169,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     let firstList=initialList;
     const admittedClient={...client,listClass:async teachingId=>{current(false);if(firstList&&teachingId===initial.context.teachingId){const data=firstList;firstList=null;return data;}return client.listClass(teachingId);}};
     handle=mountClassPortal(content,{client:admittedClient,getContext,subscribe,classLabel});
+    listResponseSupport(root,()=>{try{current(false);return true;}catch{return false;}});
   }).catch(e=>{if(!disposed){const last=ownDiagnostic;record(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure),ownDiagnostic,()=>{try{current(false);return true;}catch{return false;}});}});
   return {dispose(){disposed=true;lifetime.abort();handle?.dispose();root.removeAttribute('data-n88-list-response');root.replaceChildren();}};
 }
@@ -169,6 +208,7 @@ function classEntryState(root,state,diagnostic=null,isCurrent=()=>false){
    finally{if(valid())button.disabled=false;}
   });
  }
+ if(!['loading','disabled'].includes(state))listResponseSupport(root,isCurrent);
 }
 export function unavailable(root) {
   root.replaceChildren();
