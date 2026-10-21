@@ -138,24 +138,24 @@
     "drafts/n88-student-portal/rollout-guard.mjs": "8dbba7aff362cb43426d6d4abe72abe0f04e99284c42de399623cb453d0e2604",
     "drafts/n88-student-portal/class-credentials.mjs": "6d5c32265bebb1b72de0ec028ce102bc162a8bdf8e4b46731f8252261a41019e",
     "drafts/n88-student-portal/code-recovery.mjs": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55",
-    "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
-    "drafts/n88-student-portal/integrated-service.mjs": "2faf3567ddf0f83b41ad811b2c586ae1cbacbe72ae60fc383b826d7372812734",
-    "drafts/n88-student-portal/postgres-repository.mjs": "b0d1dfe19a8b0419e629313aabe219e5e9206e4ecf2552fce4dcd6f93db7c3af",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/integrated-service.mjs": "49d1f2ab320bb6a15f87d6ca0a890a3163076d61850d56e2b9bada688caf04d8",
+    "drafts/n88-student-portal/postgres-repository.mjs": "cac60b27ab569e2d28440829fd8dea5074f607ac7528e8890a0f21a76de3bd92",
     "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
     "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
     "drafts/n88-student-portal/auth-verifier.mjs": "6605b61c5422a090c8220a346f5a1e7c00aea5bedde212f62b54ed6f4592be2c",
     "drafts/n88-student-portal/runtime.mjs": "0c2abe8d798b302656c4a13d46c2ada6035b1e1afa2401c7c1a1c5a553e8b2c2",
-    "drafts/n88-student-portal/web-protocol.mjs": "22b77196c6b514c6911785373b907b78b23275c57d7042351e85613a2b4c774c",
-    "drafts/n88-student-portal/web-entry.mjs": "347d45eb147dcfcc7f26b74270c50830e4a8120cfdc469209a601291d8d73f72",
-    "drafts/n88-student-portal/existing-host.mjs": "6ece0d035677216b122741cf709b1948f9bc96006ba51892a5b59ec87818c0fe",
+    "drafts/n88-student-portal/web-protocol.mjs": "885448bc8ecb3736edf1ffc34460096f71a8d7cb5ce2b4cb05d25575d9a0d2ff",
+    "drafts/n88-student-portal/web-entry.mjs": "5d1c6045b5e088ed5f1fc4d8fb31d2fcfc53f6396faec8101310d0451df3435d",
+    "drafts/n88-student-portal/existing-host.mjs": "60f2b17f88da8fb93d64adae7789aabb99d94b34f9a8f2e4235463f558829cfe",
     "drafts/n88-student-portal/activation/edge-request.mjs": "acf653ee96cdd3705fcae5b6dea376130200d14ada27a1016ff4a02fcb361330",
     "supabase/functions/n88-student-portal/index.ts": "0582560364c98186ad94347d90fe4d14cbbeff6b00fc3220ef30a6564dd16aff",
-    "src/lib/student-portal-unified-client.js": "5dfe3737adc6fe973e918eccdf49309e8359e1acd2e4fe801d37cd151fe678b2",
+    "src/lib/student-portal-unified-client.js": "5bda68a51083214421d34edf1ce338634a4db8778968b7551076df3f8bdf541d",
     "src/lib/visible-numerals.js": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575",
     "src/lib/visible-viewport.js": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
     "src/lib/dom.js": "8b26581da0652916d48211fa55abfc6ac8fa927c3d659a3afc5a3ca649966657",
     "src/lib/brand.js": "0b46aa8ad014afd3b84163bdb2e002e486b606ee9e1ea370b44ca64894c087d5",
-    "src/views/student-portal-login.js": "c362ce7e131211e9a6ff132948bac8184eeaa9c6ea6d038279641f81aa2adb11",
+    "src/views/student-portal-login.js": "b2c123fd5da51759ba7bddb2f0f573a1149e31d48fd8174e9ccb2f4f856a3612",
     "drafts/n88-student-portal/client/student-entry.js": "9629d7a895335fe46a548f01147301e15af1cbbadc457d73deab2c29466e5efe",
     "src/lib/calendar-presets.js": "c103057b5eb59c26fb7d7c07cffe6d22a37297e19840311bce86c0406ac62d6a",
     "src/lib/calendar-recovery.js": "0da792e8f8cee9747eee0992ebb8b3c39072cc3ffe6db5ea40ccdd9774e40931",
@@ -201,7 +201,7 @@
     "assets/header-dark-compact.svg": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
     "drafts/n88-student-portal/client/student.html": "5fbc18a2058be0b1bf8a1c1100f9204179970bb067e9cadc03ca4a5be0bc33fb",
     "drafts/n88-student-portal/activation/private-document.mjs": "307712b0839c00dbd1aff67e9994ffb91f5e9f183b852c7f294233ff11366db3",
-    "drafts/n88-student-portal/cloudflare-entry.mjs": "4243cd22440bd3097fb8298b73a4736f97d59f418e6c8239c1162c566e9849bc",
+    "drafts/n88-student-portal/cloudflare-entry.mjs": "97046b668126dd806862269ed48e8c9e619dff87abaf4451cf16b7f108266852",
     "drafts/n88-student-portal/task-guidance.inactive.sql": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
     "supabase/migrations/20261018125611_n88_task_guidance_staged.sql": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
     "drafts/n88-student-portal/activation/task-guidance-preflight.inactive.sql": "fa32961139fc76fea92d35e2812e0782899fd3ef77a34bbb71cf42fc61ac9436",
@@ -330,8 +330,8 @@
     "docs/automation-evidence/20261019/N88_AVAILABILITY_FAST_LIGHT_ENTRY.md": "bfacd0406d91344f0e9762628dd0d9709224c671f2c954600412227f1bc51d6a"
   },
   "outputs": {
-    "edge/index.mjs": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
-    "private/assets/student.mjs": "c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470",
+    "edge/index.mjs": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "private/assets/student.mjs": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
     "private/styles/app.css": "46a5a99ff34fe2c95231695aa185bbfe0ca5593efd81ac9d4e3157fe3b651bd7",
@@ -343,7 +343,7 @@
     "private/assets/brand/header-dark-compact.svg": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
     "private/assets/brand/icon-192.png": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
     "private/student.html": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
-    "cloudflare/worker.mjs": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c"
+    "cloudflare/worker.mjs": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50"
   },
   "graphs": {
     "edge/index.mjs": {
@@ -1174,5 +1174,19 @@
     "actualTeacherRead": "NOT_RUN",
     "frontendPublication": "SOLE_PUBLISHER_OWNED",
     "verifiedAt": "2026-10-21T11:24:09.370Z"
+  },
+  "studentReadPhasePreparation": {
+    "taskId": "continuous-n88-student-read-phase-latency-20261021",
+    "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+    "status": "PASS",
+    "priorNative": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "native": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "priorCarrier": "a2308758f0611510f04f71cee50f69ffe35b936183d8d3e20847304adfb67091",
+    "carrier": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+    "student": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
+    "nativeExactReversiblePatches": 15,
+    "allOtherCarrierBytesIdentical": true,
+    "staticCssUnchanged": true,
+    "providerOperations": 0
   }
 }

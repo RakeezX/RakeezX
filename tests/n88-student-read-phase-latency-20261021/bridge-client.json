@@ -1,0 +1,11 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "status": "PASS",
+  "checks": [
+    "canonical: typed exact allowlist, no-store, uniform denials, unknown fields, legacy and route isolation",
+    "packaged: typed exact allowlist, no-store, uniform denials, unknown fields, legacy and route isolation",
+    "client: completed successful current GET only; later in-flight, hidden, superseded, denied, malformed, absent, End excluded"
+  ],
+  "providerOperations": 0
+}

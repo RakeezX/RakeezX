@@ -175,7 +175,7 @@ export function createNumericCredentialOperations({ keys, activeKeyVersion, rese
         if(!m || m.enrollmentId!==s.enrollmentId || m.classId!==s.classId || m.revision!==s.membershipRevision || m.canonicalStamp!==s.canonicalStamp) {
           s.revokedAt=time; return denied();
         }
-        return {status:200,body:await project(db,m,ports)};
+        return {status:200,body:await project(db,m,ports),readPhaseDiagnostic:true};
       };
         if(!claim)return response(await repository.transaction(authenticate));
         // The repository creates an opaque capability ONLY after acknowledged

@@ -3,6 +3,8 @@
  * CLI args/output never carry a password, verifier or secret value.
  */
 import assert from 'node:assert/strict';
+import {runLatencyStaticPhase} from '../../tests/n88-student-read-phase-latency-20261021/static-gate.mjs';
+import {LATENCY,runLatencyNativePhase,digest as latencyDigest} from '../../tests/n88-student-read-phase-latency-20261021/native-gate.mjs';
 import {MOBILE503,runMobile503Phase,digest as mobile503Digest} from '../../tests/n88-mobile-class-source-503-20261021/native-gate.mjs';
 import {pilotCorrectionRestoreReady} from './activation/pilot-ui-correction-gate.mjs';
 import {CORRECTION1430,correction1430Gate} from './activation/correction-1430-gate.mjs';
@@ -120,6 +122,78 @@ async function execute(action,value){
     return {safeAnonymousDenial:true,httpStatus:401,region:response.headers.get('x-n88-service-region'),noCookie:true,noStore:true,noReferrer:true,nosniff:true,carrierSource:receipt.provider.sourceSha256,carrierUnchanged:true};
    }
   });
+ }
+ if(['--latency-preflight','--latency-upload','--latency-pin','--latency-complete','--latency-static-preflight','--latency-static-begin','--latency-static-complete'].includes(action)){
+  const c=LATENCY,taskRoot=fileURLToPath(new URL('../../',import.meta.url));
+  if(path.resolve(root)!==path.resolve(c.originalRoot)||path.resolve(taskRoot)!==path.resolve(c.taskRoot))fail('n88_latency_original_context');
+  const runtime='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/',evidence=path.join(taskRoot,c.evidence),json=async f=>JSON.parse((await readFile(f,'utf8')).replace(/^\uFEFF/,''));
+  const candidate=process.env.N88_LATENCY_CANDIDATE,currentRun=process.env.N88_LATENCY_RUN_ID;
+  const card=await json(runtime+'queue/'+c.task+'.json'),workflow=await json(runtime+'workflow-v5.json');
+  const leases={};for(const name of ['integration','live-mutation'])leases[name]=await json(runtime+'leases/'+name+'.json');
+  const receiptFile=name=>{if(!/^[a-z-]+$/.test(name))fail('n88_latency_receipt_path');return path.join(evidence,name+'.json');};
+  const ownedFile=name=>{if(!/^latency-(native-attempt|pin-attempt|native-complete|static-attempt|static-complete)\.json$/.test(name))fail('n88_latency_owned_path');return path.join(phase,name);};
+  const readConfig=async()=>{
+   const raw=await official(['secrets','list','--project-ref',project,'--output','json']),list=Array.isArray(raw)?raw:raw?.rows;
+   if(!Array.isArray(list))fail('n88_latency_config_shape');
+   const entries=list.map(r=>({name:r.name,digest:r.value??r.digest})).sort((a,b)=>a.name.localeCompare(b.name));
+   if(entries.some(r=>typeof r.name!=='string'||!/^[a-f0-9]{64}$/i.test(r.digest??''))||new Set(entries.map(r=>r.name)).size!==entries.length)fail('n88_latency_config_identity');
+   const selected=entries.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA');if(selected.length!==1)fail('n88_latency_pin_missing');
+   return {pinDigest:selected[0].digest.toLowerCase(),otherConfigDigest:latencyDigest(JSON.stringify(entries.filter(r=>r.name!=='N88_SERVICE_SOURCE_SHA')))};
+  };
+  const verifyCandidate=async checked=>{
+   if(!/^[a-f0-9]{40}$/.test(checked??'')||execFileSync('git',['rev-parse','HEAD'],{cwd:taskRoot,encoding:'utf8'}).trim()!==checked)fail('n88_latency_candidate_head');
+   execFileSync('git',['merge-base','--is-ancestor',c.sourceCandidate,checked],{cwd:taskRoot,windowsHide:true});
+   for(const file of ['drafts/n88-student-portal/official-activation.mjs',c.evidence+'native-gate.mjs'])if((await readFile(path.join(taskRoot,file),'utf8')).replaceAll('\r\n','\n')!==execFileSync('git',['show',checked+':'+file],{cwd:taskRoot,encoding:'utf8',maxBuffer:2097152}).replaceAll('\r\n','\n'))fail('n88_latency_gate_source_drift');
+   for(const file of ['drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/activation/bundle/edge/index.mjs',c.evidence+'diagnostic-qualification.json',c.evidence+'diagnostic-service.json'])if((await readFile(path.join(taskRoot,file),'utf8')).replaceAll('\r\n','\n')!==execFileSync('git',['show',checked+':'+file],{cwd:taskRoot,encoding:'utf8',maxBuffer:2097152}).replaceAll('\r\n','\n'))fail('n88_latency_prepared_source_drift');
+   const proof=await json(path.join(evidence,'diagnostic-qualification.json'));if(proof.localStatus!=='PASS'||proof.native!==c.source||proof.priorNative!==c.prior)fail('n88_latency_local_proof');
+   for(const file of Object.keys(proof.sourceHashes)){const actual=(await readFile(path.join(taskRoot,file),'utf8')).replaceAll('\r\n','\n'),committed=execFileSync('git',['show',checked+':'+file],{cwd:taskRoot,encoding:'utf8',maxBuffer:2097152}).replaceAll('\r\n','\n');if(actual!==committed||latencyDigest(actual)!==proof.sourceHashes[file])fail('n88_latency_qualified_source_drift');}
+  };
+  const readProvider=async(when,expected)=>{
+   if(!['before','pre-upload','uploaded','pre-pin','pinned','static-before','static-after'].includes(when))fail('n88_latency_read_phase');
+   const temporary=path.join(evidence,'native-read-'+currentRun+'-'+when+'.tmp');
+   if(path.dirname(temporary)!==path.resolve(evidence))fail('n88_latency_read_path');await mkdir(temporary,{recursive:false});
+   try{
+    const raw=await official(['functions','list','--project-ref',project,'--output','json']),list=Array.isArray(raw)?raw:raw?.functions,found=list?.filter(f=>f.slug==='n88-student-portal'||f.name==='n88-student-portal');
+    if(found?.length!==1||!Number.isInteger(found[0].version)||found[0].verify_jwt!==false)fail('n88_latency_function_identity');
+    await official(['functions','download','n88-student-portal','--project-ref',project,'--use-api','--workdir',temporary,'--output','json']);
+    const sources=[],maps=[];
+    const visit=async dir=>{for(const item of await readdir(dir,{withFileTypes:true})){const file=path.join(dir,item.name);if(item.isDirectory())await visit(file);else{const bytes=await readFile(file);if(/\.(js|mjs|ts)$/.test(item.name)&&latencyDigest(bytes)===expected)sources.push(file);if(item.name==='import_map.json')maps.push(JSON.parse(bytes.toString()));}}};await visit(temporary);
+    if(sources.length!==1||maps.length!==1)fail('n88_latency_source_map_identity');
+    const expectedMap=await json(path.join(taskRoot,'drafts/n88-student-portal/activation/bundle/edge/import_map.json'));assert.deepEqual(maps[0],expectedMap,'n88_latency_import_map_changed');
+    return {source:expected,sourceExact:true,version:found[0].version,verifyJwt:false,importMapDigest:latencyDigest(JSON.stringify(maps[0])),...await readConfig()};
+   }finally{if(path.dirname(temporary)!==path.resolve(evidence)||!temporary.startsWith(path.resolve(taskRoot)+path.sep))fail('n88_latency_cleanup_path');await rm(temporary,{recursive:true});}
+  };
+  const ports={
+   card,run:currentRun,candidate,activationId:workflow.controller.activationId,leases,verifyCandidate,
+   readOwned:async name=>{await owned();return json(ownedFile(name));},writeOwned:async(name,data)=>{await owned();await writeFile(ownedFile(name),JSON.stringify(data)+'\n',{flag:'wx'});},
+   readReceipt:name=>json(receiptFile(name)),writeReceipt:(name,data)=>writeFile(receiptFile(name),JSON.stringify(data,null,2)+'\n',{flag:'wx'}),load,save,readProvider,
+   upload:async()=>{
+    const temporary=path.join(evidence,'native-upload-'+currentRun+'.tmp'),functionDir=path.join(temporary,'supabase/functions/n88-student-portal');
+    if(path.dirname(temporary)!==path.resolve(evidence))fail('n88_latency_upload_path');await mkdir(temporary,{recursive:false});
+    try{
+     await mkdir(functionDir,{recursive:true});
+     const bytes=await readFile(path.join(taskRoot,'drafts/n88-student-portal/activation/bundle/edge/index.mjs'));if(latencyDigest(bytes)!==c.source)fail('n88_latency_upload_source');await writeFile(path.join(functionDir,'index.mjs'),bytes,{flag:'wx'});
+     for(const name of ['deno.json','deno.lock','import_map.json'])await writeFile(path.join(functionDir,name),await readFile(path.join(taskRoot,'drafts/n88-student-portal/activation/bundle/edge/',name)),{flag:'wx'});
+     await writeFile(path.join(temporary,'supabase/config.toml'),'project_id = "'+project+'"\n[functions.n88-student-portal]\nverify_jwt = false\nentrypoint = "./functions/n88-student-portal/index.mjs"\nimport_map = "./functions/n88-student-portal/import_map.json"\n',{flag:'wx'});
+     await official(['functions','deploy','n88-student-portal','--project-ref',project,'--use-api','--no-verify-jwt','--workdir',temporary,'--output','json']);
+    }finally{if(path.dirname(temporary)!==path.resolve(evidence)||!temporary.startsWith(path.resolve(taskRoot)+path.sep))fail('n88_latency_upload_cleanup_path');await rm(temporary,{recursive:true});}
+   },
+   pin:async()=>{await owned();const file=path.join(phase,'latency-public-source-pin.env');try{await writeFile(file,'N88_SERVICE_SOURCE_SHA='+c.source+'\n',{flag:'wx'});await official(['secrets','set','--project-ref',project,'--env-file',file]);}finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}},
+   readTransport:async when=>{
+    const receipt=await json(receiptFile('transport-'+when));if(receipt.taskId!==c.task||receipt.runId!==currentRun||receipt.candidateSha!==candidate||receipt.officialServer!=='rakeez_cloudflare'||receipt.sourceExact!==true)fail('n88_latency_carrier_receipt');
+    if(Date.now()-Date.parse(receipt.observedAt)>15*60*1000)fail('n88_latency_carrier_receipt_stale');
+    if(when==='after'){const before=await json(receiptFile('transport-before'));assert.deepEqual(receipt.provider,before.provider,'n88_latency_carrier_changed');}
+    // Empty anonymous list fails binding before repository/consume_ingress: no
+    // credentials, identity, readiness, canonical/student query or database write.
+    const response=await fetch('https://rakeezx.com/api/n88/teacher/class/list',{method:'POST',redirect:'error',cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(25000),headers:{origin:'https://rakeezx.com','content-type':'application/json','x-n88-csrf':'1','sec-fetch-site':'same-origin'},body:'{}'});
+    const bytes=await response.arrayBuffer();if(bytes.byteLength>256)fail('n88_latency_anonymous_response_bound');
+    const body=JSON.parse(Buffer.from(bytes).toString());assert.deepEqual(body,{error:'unavailable'},'n88_latency_anonymous_response');
+    if(response.status!==401||response.headers.has('set-cookie')||!response.headers.get('cache-control')?.includes('no-store')||response.headers.get('referrer-policy')!=='no-referrer'||response.headers.get('x-content-type-options')!=='nosniff')fail('n88_latency_anonymous_private_boundary');
+    return {safeAnonymousDenial:true,httpStatus:401,region:response.headers.get('x-n88-service-region'),noCookie:true,noStore:true,noReferrer:true,nosniff:true,carrierSource:receipt.provider.sourceSha256,carrierUnchanged:true};
+   }
+  };
+  if(action.startsWith('--latency-static-'))return runLatencyStaticPhase(action.slice('--latency-static-'.length),{...ports,readServed:()=>readFile(path.join(evidence,'served-student.mjs'))});
+  return runLatencyNativePhase(action.slice('--latency-'.length),ports);
  }
  if(['--student-pending-static-owned-preflight','--student-pending-static-read-native-before','--student-pending-static-read-native-after','--student-pending-static-preflight','--student-pending-static-begin','--student-pending-static-complete'].includes(action)){
   const c=STUDENT_PENDING_STATIC,currentRun=process.env.N88_STUDENT_PENDING_RUN_ID;

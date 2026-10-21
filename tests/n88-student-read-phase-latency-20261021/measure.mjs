@@ -11,8 +11,11 @@ import {startNativePg} from '../fixtures/n88-integrated-class/native-pg.mjs';
 import {A,SESSION,authUrl} from '../fixtures/n88-existing-host/provider.mjs';
 import boundary from '../../drafts/n88-student-portal/activation/error-boundary-contract.json' with {type:'json'};
 import {FORWARDED,encodeBytes,sha,mac,signingText} from '../../drafts/n88-student-portal/web-protocol.mjs';
+import {validateReadPhases} from '../../drafts/n88-student-portal/web-protocol.mjs';
+import {createUnifiedStudentPortalClient} from '../../src/lib/student-portal-unified-client.js';
 
-const taskId='continuous-n88-student-read-phase-latency-20261021',runId='5f1e5bac-172f-4c84-a95e-81370ee532dd';
+const diagnostic=process.argv.includes('--diagnostic');
+const taskId='continuous-n88-student-read-phase-latency-20261021',runId=diagnostic?'2c1fb6b8-d4ce-428a-8539-65e83d5a6a86':'5f1e5bac-172f-4c84-a95e-81370ee532dd';
 const root='C:/Users/Abody/Projects/RakeezX',dir='tests/n88-student-read-phase-latency-20261021/';
 const nativeFile='drafts/n88-student-portal/activation/bundle/edge/index.mjs';
 const digest=b=>createHash('sha256').update(b).digest('hex');
@@ -42,7 +45,8 @@ function classify(sql){
 }
 try{
  const source=await readFile(nativeFile,'utf8'),receipt=JSON.parse(await readFile('tests/n88-mobile-class-source-503-20261021/native-complete.json','utf8'));
- assert.equal(digest(source.replaceAll('\r\n','\n')),receipt.source);assert.equal(receipt.status,'PASS');assert.equal(receipt.sourceExact,true);assert.equal(receipt.publicPinMatches,true);
+ if(diagnostic){const prepared=JSON.parse(await readFile(dir+'package.json','utf8'));assert.equal(digest(source.replaceAll('\r\n','\n')),prepared.native);assert.equal(prepared.priorNative,receipt.source);}
+ else{assert.equal(digest(source.replaceAll('\r\n','\n')),receipt.source);assert.equal(receipt.status,'PASS');assert.equal(receipt.sourceExact,true);assert.equal(receipt.publicPinMatches,true);}
  report.source={baseSha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),nativeSha256:receipt.source,version:receipt.nativeVersion,receipt:'tests/n88-mobile-class-source-503-20261021/native-complete.json',receiptSha256:digest(await readFile('tests/n88-mobile-class-source-503-20261021/native-complete.json'))};
  const marker='// supabase/functions/n88-student-portal/index.ts';assert.equal(source.split(marker).length,2);
  const require=createRequire(import.meta.url),esbuild=require('C:/Users/Abody/AppData/Local/npm-cache/_npx/32026684e21afda6/node_modules/esbuild/lib/main.js');
@@ -86,14 +90,30 @@ try{
   const bytes=method==='GET'?new Uint8Array():new TextEncoder().encode(JSON.stringify(body)),time=String(Math.floor(Date.now()/1000)),nonce=crypto.randomUUID(),source='b'.repeat(64);
   const signature=await mac(asKey('N88_INGRESS_KEY'),signingText({origin,path,method,headers,bodyHash:await sha(bytes),time,nonce,source}));
   const wire=new Headers({'content-type':'application/json','x-n88-time':time,'x-n88-nonce':nonce,'x-n88-source':source,'x-n88-signature':signature});
+  if(diagnostic)wire.set('x-n88-read-phase-version','1');
   const r=await host.handle(new Request(authUrl+'/functions/v1/n88-student-portal/dispatch',{method:'POST',headers:wire,body:JSON.stringify({path,method,headers:FORWARDED.map(n=>headers.get(n)||''),body:encodeBytes(bytes)})}));assert.equal(r.status,200);
   assert.match(r.headers.get('cache-control'),/no-store/);return r.json();
  };
  const claim=await call('claim','',{code});assert.equal(claim.status,200);const cookie=claim.cookie.split(';')[0];
  const baseline=await call('read',cookie);assert.equal(baseline.status,200);assert.equal(baseline.body.version,'n88-student-v3');assert(baseline.body.grades);assert(baseline.body.work);
+ if(diagnostic){
+  assert(validateReadPhases(baseline.readPhases));assert.equal(baseline.readPhaseDiagnostic,undefined);
+  report.preparedNativeSha256=digest(source.replaceAll('\r\n','\n'));
+  const {createCloudflareEntry}=await import('../../drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs');
+  const carrier=createCloudflareEntry({fetch:async(url,init)=>host.handle(new Request(url,init))});let reads=0;
+  const client=createUnifiedStudentPortalClient({fetch:async(url,init)=>{reads++;const req=new Request(origin+url,{...init,headers:{...init.headers,cookie,'cf-connecting-ip':'192.0.2.1'}});req.cf={tlsVersion:'TLSv1.3'};const reply=await carrier(req,{N88_ENABLED:'true',N88_PUBLIC_ORIGIN:origin,N88_EDGE_URL:authUrl+'/functions/v1/n88-student-portal',N88_INGRESS_KEY:env.N88_INGRESS_KEY});assert.equal(reply.status,200);assert.match(reply.headers.get('cache-control'),/no-store/);return reply;}});
+  assert.deepEqual(await client.read(),baseline.body);assert(validateReadPhases(client.getDiagnostic().readPhases));assert.equal(reads,1);client.dispose();assert.equal(client.getDiagnostic()?.readPhases,undefined);
+  report.serviceEnvelopeCarrierClientParity='PASS';
+  const {createCloudflareEntry:oldEntry}=await import('../n88-student-quiet-fast-return-20261021/carrier.mjs');
+  const oldCarrier=oldEntry({fetch:async(url,init)=>host.handle(new Request(url,init))}),oldRequest=new Request(origin+'/api/n88/student/read',{headers:{cookie,'cf-connecting-ip':'192.0.2.1'}});oldRequest.cf={tlsVersion:'TLSv1.3'};
+  const oldReply=await oldCarrier(oldRequest,{N88_ENABLED:'true',N88_PUBLIC_ORIGIN:origin,N88_EDGE_URL:authUrl+'/functions/v1/n88-student-portal',N88_INGRESS_KEY:env.N88_INGRESS_KEY});assert.equal(oldReply.status,200);assert.equal(oldReply.headers.get('x-n88-student-read-phases'),null);assert.deepEqual(await oldReply.json(),baseline.body);report.oldCarrierCompatibility='PASS';
+ }
+ if(process.argv.includes('--bridge-only')){report.status='PASS';}
+ else{
  const measure=async(name,phase=null,ms=0)=>{
   events=[];delayPhase=phase;delayMs=ms;delayUsed=false;const start=performance.now(),reply=await call('read',cookie),wallMs=performance.now()-start;
   assert.equal(reply.status,200);assert.deepEqual(reply.body,baseline.body);
+  if(diagnostic){assert(validateReadPhases(reply.readPhases));const mapped={poolConnect:'pool',transportBoundary:'boundary',snapshot:'snapshot',synchronize:'sync',projectionRead:'canonical',visibility:'visibility',guidance:'guidance',commit:'commit'};if(phase)assert(reply.readPhases[mapped[phase]]>=250,phase+' duration reaches diagnostic');}
   const groups={};for(const e of events){const g=groups[e.phase]??={queryCount:0,ms:0};g.queryCount++;g.ms+=e.ms;}
   assert.equal(groups.poolConnect.queryCount,1);assert.equal(groups.commit.queryCount,1);assert.equal(groups.projectionRead.queryCount,14);assert.equal(groups.synchronize.queryCount,3);
   if(phase){assert(delayUsed);assert(groups[phase].ms>=ms-2);assert(wallMs>=ms-2);}
@@ -101,7 +121,7 @@ try{
   report.runs.push({name,injectedPhase:phase,injectedMs:ms,wallMs:Math.round(wallMs),queryCount:events.length-1,phases:phaseMs,residualJsAndEnvelopeMs:Math.round(wallMs-events.reduce((sum,e)=>sum+e.ms,0)),projectionAndGuidanceEqual:true});delayPhase=null;
  };
  operation='warm/idle red-first characterization';
- if(process.argv.includes('--guards-only')){
+ if(!diagnostic&&process.argv.includes('--guards-only')){
   const file=dir+'measurement-before-owner-fixture-failure.json',prior=JSON.parse(await readFile(file,'utf8'));
   assert.equal(prior.source.nativeSha256,report.source.nativeSha256);assert.equal(prior.runs.length,11);assert.equal(prior.failure.message,'23503');
   report.runs=prior.runs;report.reusedMeasurements={path:file,sha256:digest(await readFile(file)),reason:'Original characterization complete; correct invalid wrong-owner fixture without replaying unchanged phase runs.'};
@@ -110,7 +130,7 @@ try{
  // Explicit fixture idle: evict the LOCAL PG pool and recreate it. This does not
  // claim native remote session-pooler/TLS behavior or use a real-account request.
  await pg.restart();await measure('idle-local-restarted');
- for(const phase of ['poolConnect','transportBoundary','snapshot','synchronize','projectionRead','visibility','guidance','commit'])await measure('controlled-'+phase,phase,180);
+ for(const phase of ['poolConnect','transportBoundary','snapshot','synchronize','projectionRead','visibility','guidance','commit'])await measure('controlled-'+phase,phase,diagnostic?360:180);
  }
  report.causalConclusion='Every injected phase contributes to wall time; no unnecessary operation or real-account bottleneck established. Diagnostic branch required; no speed fix claimed.';
  operation='guard parity';
@@ -155,9 +175,10 @@ try{
  assert.equal((await teacher('revoke',{requestId:'synthetic_phase_revoke_001',studentId:afterRotate.studentId,enrollmentId:afterRotate.enrollmentId,revision:afterRotate.revision,credentialVersion:afterRotate.credentialVersion})).status,200);
  await deny('revoked credential cookie',rotatedCookie);
  report.status='PASS';
+ }
 }catch(e){report.failure={operation,name:e.name,message:e.name==='AssertionError'?e.message.split('\n')[0]:e.code??e.message.slice(0,180),...(e.name==='AssertionError'&&typeof e.actual==='number'?{actual:e.actual,expected:e.expected}:{})};process.exitCode=1;}
 finally{
  delete globalThis[port];await host?.close();
  try{await pg?.close();report.cleanup.ownedPgClosed=!!pg;}finally{if(leased)report.cleanup.integrationLease=lease('release');}
- await writeFile(dir+'measurement.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+ await writeFile(dir+(process.argv.includes('--bridge-only')?'compatibility.json':diagnostic?'diagnostic-service.json':'measurement.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,runs:report.runs.length,guards:report.guards,cleanup:report.cleanup,failure:report.failure}));
 }

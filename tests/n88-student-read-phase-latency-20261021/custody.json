@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "negativeAuthorityVariants": 18,
+  "nativeUploads": 1,
+  "pinUpdates": 1,
+  "duplicateUploadPinStaticReservationAndCompletionDenied": true,
+  "appendOnlyPriorHistoryRetained": true,
+  "syntheticOnly": true,
+  "actualProviderOperations": 0
+}

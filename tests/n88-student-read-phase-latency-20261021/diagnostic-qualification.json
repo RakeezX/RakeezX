@@ -1,0 +1,43 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "localStatus": "PASS",
+  "diagnosticOnly": true,
+  "speedImprovementClaimed": false,
+  "priorNative": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "native": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "carrier": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+  "student": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
+  "sourceHashes": {
+    "drafts/n88-student-portal/existing-host.mjs": "60f2b17f88da8fb93d64adae7789aabb99d94b34f9a8f2e4235463f558829cfe",
+    "drafts/n88-student-portal/postgres-repository.mjs": "cac60b27ab569e2d28440829fd8dea5074f607ac7528e8890a0f21a76de3bd92",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/integrated-service.mjs": "49d1f2ab320bb6a15f87d6ca0a890a3163076d61850d56e2b9bada688caf04d8",
+    "drafts/n88-student-portal/web-entry.mjs": "5d1c6045b5e088ed5f1fc4d8fb31d2fcfc53f6396faec8101310d0451df3435d",
+    "drafts/n88-student-portal/web-protocol.mjs": "885448bc8ecb3736edf1ffc34460096f71a8d7cb5ce2b4cb05d25575d9a0d2ff",
+    "drafts/n88-student-portal/cloudflare-entry.mjs": "97046b668126dd806862269ed48e8c9e619dff87abaf4451cf16b7f108266852",
+    "drafts/n88-student-portal/official-activation.mjs": "dbf82ce5c1a14c4bb7b5acdecda7f018b7ba5b2ef7ad81ef070854fa71ff5020",
+    "src/lib/student-portal-unified-client.js": "5bda68a51083214421d34edf1ce338634a4db8778968b7551076df3f8bdf541d",
+    "src/views/student-portal-login.js": "b2c123fd5da51759ba7bddb2f0f573a1149e31d48fd8174e9ccb2f4f856a3612",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
+    "tests/n88-student-read-phase-latency-20261021/native-gate.mjs": "92e0611c895037a6a452e9babbf44883ba3cb8c77eecddaed96a7cfd30da0a1d",
+    "tests/n88-student-read-phase-latency-20261021/static-gate.mjs": "64c72b933b0778f1da4632bc21177c2feff84ccab2c839907c392f83a3dc3a65"
+  },
+  "evidence": {
+    "measurement.json": "2a00b8ffe6c266ad40713c84e280bd2080c6303d9b67250ff71c089dbe0f297f",
+    "bridge-red-first.json": "0ef63d8c58988e74738849e0f6d224bbbfbe9209a0b0c00e40148982d1ed7baa",
+    "diagnostic-service.json": "12c5d0b6874a190c04b891c6d415a5ebd08bfa62c154f3bfc1fa057e19553ee6",
+    "compatibility.json": "112f80e9913c0751b53f7cb9d7bb4080be7038029d61b40cac2157fc1844e31b",
+    "bridge-client.json": "d7a3348ae6dc9370bdee0e310f253a056e2d8fa2e5ef62637ef7de146b4c3a4f",
+    "ui.json": "b52320941783b9fc58d7153c01b2aabe9898d43c58d2d5bc99f45cc4e9ae4f74",
+    "custody.json": "4862ffaf39ea02e2afc1a32bbba12ebf90cd378e8a0815f97463e067c0eb2edc",
+    "package.json": "18dee7f3a5533620da85b6d05bec6a0b97d03d7417e0c8b196aa0f2a8a19a0ab"
+  },
+  "originalMeasurementsReused": true,
+  "deniedResponsesUniform": true,
+  "oldCarrierNativeCompatibility": true,
+  "providerPrerequisite": "NOT_RUN",
+  "realAccountRequests": 0
+}
