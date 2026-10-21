@@ -126,7 +126,13 @@ export function createBackgroundRunner({transport}){
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||typeof r[0].result!=='string')throw Error('SOURCE_BINDING_CHANGED');
   const href=r[0].result,route=sourceRoute(j,href);
   const transition=/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(n.target).pathname);
-  const redirected=transition&&[j.origin+'/Dashboards/Schools',j.origin+'/Dashboards/Schools/'].includes(route);
+  // AI: the selected card command may return an opaque teacher dashboard ID.
+  // It is neither the role target nor SchoolId; independent readers bind those.
+  // This exception exists only inside the issued, single-use navigation window.
+  const dashboard=new URL(href);
+  const selectedTransition=transition&&j.roleSwitchUsed&&['role','gateway'].includes(n.kind)&&j.context?.kind==='selected-teacher-card'&&sourceRoute(j,n.target)===safeRoute(j.origin,j.context.href,j.context);
+  const teacherDashboard=selectedTransition&&dashboard.origin===j.origin&&/^\/SchoolManagment\/Actions\/Teacher\/[a-f0-9]{32}\/?$/i.test(dashboard.pathname)&&!dashboard.href.split('#')[0].includes('?');
+  const redirected=transition&&[j.origin+'/Dashboards/Schools',j.origin+'/Dashboards/Schools/'].includes(route)||teacherDashboard;
   if(route===sourceRoute(j,n.from)&&!(redirected&&r[0].documentId!==n.documentId)){
    if(r[0].documentId!==n.documentId)throw Error('SOURCE_BINDING_CHANGED');
    if(tab.status==='loading')return false;
@@ -137,6 +143,7 @@ export function createBackgroundRunner({transport}){
   if(tab.status!=='complete'||transition&&!redirected)return false;
   j.sourceURL=href;j.sourceDocument=r[0].documentId;
   let page;try{page=await source(j,n.kind);}catch(e){if(e.retry&&Date.now()<n.deadline)return false;page=partialPage(j,j.next,e);}if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
+  await appGuard(j);
   if(Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
   j.next={...j.next,page};j.navigation=null;delete j.navigationDiagnostic;j.phase='collect';await save(j);return true;
   }catch(e){e.sourceFailureStep??='source-navigation-settle';throw e;}
