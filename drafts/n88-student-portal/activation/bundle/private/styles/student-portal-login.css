@@ -75,3 +75,10 @@ html[data-n88-student-document]{color-scheme:light;background:#f4f7f5}
 .n88-unified-entry .input:focus{border-color:var(--brand-text);box-shadow:0 0 0 3px var(--action-focus-ring)}
 .n88-unified-entry .btn--primary{background:var(--action-primary);color:var(--action-primary-ink)}
 .n88-unified-entry [aria-invalid=true]{border-color:var(--danger,#dc2626)}
+
+/* AI: optional finite support copy; no payload or automatic transmission. */
+.n88-student-support{max-width:480px;margin:20px auto;color:var(--text-2);font-size:13px}
+.n88-student-support summary{cursor:pointer;min-height:44px;padding-block:10px}
+.n88-student-support textarea{width:100%;min-height:120px;font:12px/1.6 monospace;overflow-wrap:anywhere}
+.n88-student-support [data-copy-status]:empty{display:none}
+@media print{.n88-student-support{display:none}}

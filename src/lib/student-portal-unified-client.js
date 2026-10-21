@@ -1,4 +1,4 @@
-/** AI: inactive universal student transport; no identity lookup, storage or diagnostics. */
+/** AI: universal student transport; no identity lookup or storage. Finite opt-in diagnostics only. */
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
 
 export const normalizeStudentCode = value => typeof value === 'string' ? normalizeDateTimeDigits(value).replace(/ /g, '') : '';
@@ -49,14 +49,33 @@ export function projectUnifiedStudentData(data) {
 
 export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, timeoutMs = 15000 } = {}) {
   if (typeof send !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 15000) throw fail();
-  let generation = 0, retirement = 0, controller, disposed = false;
-  function cancelRequest() { generation++; controller?.abort(); controller = null; }
-  function invalidate() { retirement++; cancelRequest(); }
-  async function call(action, body) {
+  let generation = 0, retirement = 0, controller, disposed = false, lastDiagnostic = null, retireDiagnostic;
+  const reasons = ['visible','hidden','pagehide','disposed','context','superseded','deadline'];
+  const visibility = () => globalThis.document?.visibilityState === 'hidden' ? 'hidden' : 'visible';
+  function cancelRequest(reason = 'superseded') {
+    retireDiagnostic?.(reason); retireDiagnostic = null;
+    generation++; controller?.abort(); controller = null;
+  }
+  function invalidate(reason = 'context') { retirement++; cancelRequest(reasons.includes(reason) ? reason : 'context'); }
+  async function call(action, body, phase = 'manual') {
     if (disposed) throw fail();
     cancelRequest(); const checkpoint = generation;
-    const owned = controller = new AbortController();
-    const timeout = setTimeout(() => owned.abort(), timeoutMs);
+    const owned = controller = new AbortController(), started = performance.now();
+    let timedOut = false, statusClass = 'none', recorded = false;
+    const record = (outcome, reason = 'visible') => {
+      if (recorded || !['read','end'].includes(action)) return;
+      recorded = true;
+      lastDiagnostic = Object.freeze({action, phase: action === 'end' ? 'end' : ['initial','return','manual'].includes(phase) ? phase : 'manual', outcome,
+        httpStatusClass: statusClass, elapsedMs: Math.min(15000, Math.max(0, Math.floor((performance.now() - started) / 250) * 250)),
+        visibility: visibility(), retirementReason: reason});
+    };
+    retireDiagnostic = reason => record(reason === 'deadline' ? 'timeout' : 'stale', reason);
+    const timeout = setTimeout(() => { timedOut = true; owned.abort(); }, timeoutMs);
+    const withinDeadline = () => {
+      if (owned.signal.aborted || performance.now() - started >= timeoutMs) {
+        timedOut = true; owned.abort(); throw fail('timeout');
+      }
+    };
     try {
       return await Promise.race([ (async () => {
       const response = await send('/api/n88/student/' + action, {
@@ -67,19 +86,24 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       });
       body = null;
       if (checkpoint !== generation) throw fail('stale');
-      if (!response.ok) {
+      withinDeadline(); // A suspended tab may resume promise jobs before its timer.
+      statusClass = response.status >= 200 && response.status < 300 ? '2xx' : response.status >= 400 && response.status < 500 ? '4xx' : response.status >= 500 && response.status < 600 ? '5xx' : 'other';
+      if (!response.ok || action === 'read' && response.status !== 200) {
         const retry = Number(response.headers?.get('Retry-After'));
         throw fail(response.status === 429 ? 'rate' : [401, 403, 410].includes(response.status) ? 'session' : 'unavailable', response.status === 429 ? Math.min(300, Math.max(1, Number.isFinite(retry) ? retry : 30)) : 0);
       }
-      if (action === 'end' || action === 'claim') return null;
+      if (action === 'end' || action === 'claim') { record('success'); return null; }
       const data = await response.json();
       if (checkpoint !== generation) throw fail('stale');
-      return projectUnifiedStudentData(data);
+      withinDeadline();
+      const projected = projectUnifiedStudentData(data); record('success'); return projected;
       })(), new Promise((_, reject) => { owned.signal.addEventListener('abort', () => reject(fail()), { once: true }); }) ]);
     } catch (error) {
       // Never forward server bodies, transport messages, credentials or payloads.
-      throw fail(checkpoint !== generation ? 'stale' : ['rate', 'session'].includes(error?.kind) ? error.kind : 'unavailable', error?.retryAfter || 0);
-    } finally { clearTimeout(timeout); body = null; if (checkpoint === generation) controller = null; }
+      const kind = checkpoint !== generation ? 'stale' : timedOut ? 'timeout' : ['rate', 'session'].includes(error?.kind) ? error.kind : 'unavailable';
+      record(kind === 'session' ? 'denied' : kind, timedOut ? 'deadline' : 'visible');
+      throw fail(kind, error?.retryAfter || 0);
+    } finally { clearTimeout(timeout); body = null; if (checkpoint === generation) { controller = null; retireDiagnostic = null; } }
   }
   return Object.freeze({
     async claim(value) {
@@ -99,6 +123,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       catch (error) { throw Object.assign(error, { claimState: 'accepted' }); }
     },
     captureContext:()=>retirement,isContextCurrent:context=>!disposed&&context===retirement,
-    read: () => call('read'), end: () => call('end', {}), invalidate, dispose() { disposed = true; invalidate(); }
+    getDiagnostic: () => lastDiagnostic ? {...lastDiagnostic} : null,
+    read: ({phase = 'manual'} = {}) => call('read', undefined, phase), end: () => call('end', {}, 'end'), invalidate, dispose() { disposed = true; invalidate('disposed'); }
   });
 }

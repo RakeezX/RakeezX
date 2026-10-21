@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "checks": [
+    "read-http-200-finite-no-replay",
+    "read-http-401-finite-no-replay",
+    "read-http-403-finite-no-replay",
+    "read-http-410-finite-no-replay",
+    "read-http-429-finite-no-replay",
+    "read-http-503-finite-no-replay",
+    "end-http-200-finite-no-replay",
+    "end-http-401-finite-no-replay",
+    "end-http-403-finite-no-replay",
+    "end-http-410-finite-no-replay",
+    "end-http-429-finite-no-replay",
+    "end-http-503-finite-no-replay",
+    "read-suspended-timer-late-promise-is-timeout",
+    "end-suspended-timer-late-promise-is-timeout",
+    "read-fetch-timeout-ignores-abort-no-late-adoption",
+    "end-fetch-timeout-ignores-abort-no-late-adoption",
+    "read-body-timeout-ignores-abort-no-late-adoption",
+    "read-hidden-retirement-no-ack",
+    "read-pagehide-retirement-no-ack",
+    "read-disposed-retirement-no-ack",
+    "read-context-retirement-no-ack",
+    "end-hidden-retirement-no-ack",
+    "end-pagehide-retirement-no-ack",
+    "end-disposed-retirement-no-ack",
+    "end-context-retirement-no-ack",
+    "superseded-read-cannot-overwrite-current-diagnostic",
+    "malformed-raw-error-claim-budget-and-diagnostic-allowlist"
+  ]
+}
