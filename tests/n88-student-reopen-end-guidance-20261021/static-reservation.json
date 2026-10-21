@@ -1,0 +1,15 @@
+{
+  "taskId": "continuous-n88-student-reopen-end-guidance-20261021",
+  "runId": "05421e19-d5a7-47ee-8b6b-32259e1adf68",
+  "preparedCandidate": "e4bc710757b6e359d22455600c38d077cff25345",
+  "observedAt": "2026-10-21T06:23:14.552Z",
+  "status": "PASS",
+  "source": "91f3d8db87be1d86091a04143df07fb0ba7147c3f98a570eca1721f96f62b30d",
+  "prior": "6108647af490b79e5cfff9c0909726aa2282628f034eb9bbea5076f35dc83e3b",
+  "native": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+  "nativeVersion": 59,
+  "priorVersion": "b3cc0e6b-4cf9-4cd4-8b46-4f52b8afc645",
+  "preflightDigest": "17e674e18e55e68b361de4c43a12bd70252e65e479ad62b0c306c0bb51d25fd8",
+  "attemptReserved": true,
+  "maxUploads": 1
+}

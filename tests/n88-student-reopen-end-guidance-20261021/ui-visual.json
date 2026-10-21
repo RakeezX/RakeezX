@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "actual-guidance-pending-visible-after-existing-css-delay-390",
+      "status": "PASS"
+    },
+    {
+      "name": "actual-guidance-pending-visible-after-existing-css-delay-1280",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "release": "RELEASED browser"
+}

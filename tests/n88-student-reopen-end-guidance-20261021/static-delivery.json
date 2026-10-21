@@ -1,0 +1,11 @@
+{
+  "taskId": "continuous-n88-student-reopen-end-guidance-20261021",
+  "runId": "05421e19-d5a7-47ee-8b6b-32259e1adf68",
+  "preparedCandidate": "e4bc710757b6e359d22455600c38d077cff25345",
+  "observedAt": "2026-10-21T06:25:18.491Z",
+  "status": "PASS",
+  "sourceExact": true,
+  "servedAssetExact": true,
+  "historyAppended": true,
+  "nativePinUnchanged": true
+}

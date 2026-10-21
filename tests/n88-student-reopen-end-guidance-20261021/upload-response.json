@@ -1,0 +1,40 @@
+{
+  "observedAt": "2026-10-21T06:24:11.386Z",
+  "officialServer": "rakeez_cloudflare",
+  "taskId": "continuous-n88-student-reopen-end-guidance-20261021",
+  "runId": "05421e19-d5a7-47ee-8b6b-32259e1adf68",
+  "preparedCandidate": "e4bc710757b6e359d22455600c38d077cff25345",
+  "uploads": 1,
+  "sourceSha256": "91f3d8db87be1d86091a04143df07fb0ba7147c3f98a570eca1721f96f62b30d",
+  "success": true,
+  "status": 200,
+  "result": {
+    "created_on": "2026-10-19T04:32:36.34903Z",
+    "modified_on": "2026-10-21T06:24:10.990126Z",
+    "id": "rakeez-n88-private-ingress",
+    "tag": "6e580570537741f796ee1de1dc5a59a5",
+    "entry_point": "worker.mjs",
+    "tags": [],
+    "deployment_id": "1dd58a96b2b5440b8ae0d9a3342e074e",
+    "tail_consumers": [],
+    "logpush": false,
+    "has_assets": false,
+    "has_modules": true,
+    "etag": "e7b0cb2f597a3d5593dd40c148846fcd8095a4045551ea44c8a42edbbf25ea85",
+    "handlers": [
+      "fetch"
+    ],
+    "named_handlers": [
+      {
+        "name": "createCloudflareEntry",
+        "handlers": [
+          "class"
+        ]
+      }
+    ],
+    "last_deployed_from": "api",
+    "compatibility_date": "2026-10-01",
+    "usage_model": "standard",
+    "startup_time_ms": 2
+  }
+}

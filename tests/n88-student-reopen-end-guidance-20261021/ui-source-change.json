@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "guidance-source-stamp-change-preserves-draft-blocks-save-until-explicit-revalidation-owner-retirement",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "release": "RELEASED browser"
+}

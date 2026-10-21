@@ -1,0 +1,43 @@
+{
+  "taskId": "continuous-n88-student-reopen-end-guidance-20261021",
+  "runId": "05421e19-d5a7-47ee-8b6b-32259e1adf68",
+  "baseSha": "96e123e73399616d4820da421618734d60c61521",
+  "preparedCandidate": "e4bc710757b6e359d22455600c38d077cff25345",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "n88_fresh_document_cookie_backed_bootstrap_is_owned_bounded_and_private",
+      "status": "PASS",
+      "evidence": "tests/n88-student-reopen-end-guidance-20261021/ui-student.json, ui-additional.json, ui-cooldown.json and transport.json: synthetic cookie-backed reload/reopen, valid/denied/unavailable/timeout and retirement/context fences."
+    },
+    {
+      "name": "n88_end_retires_private_dom_and_distinguishes_ack_from_uncertain_completion",
+      "status": "PASS",
+      "evidence": "tests/n88-student-reopen-end-guidance-20261021/ui-student.json and transport.json: immediate private DOM retirement; ACK/denial/recovery, abort-ignoring transport/body deadline, independent 15s view deadline and late reply."
+    },
+    {
+      "name": "n88_guidance_busy_error_and_draft_states_are_finite_and_truthful",
+      "status": "PASS",
+      "evidence": "tests/n88-student-reopen-end-guidance-20261021/ui-teacher.json, ui-additional.json, ui-visual.json, ui-source-change.json: actual admitted runtime/store entry, 10s timeout, queue/return, failure/retry, retained draft, source/owner retirement and 390/1280px visible pending."
+    },
+    {
+      "name": "n88_confirmation_review_has_zero_write_until_explicit_confirm",
+      "status": "PASS",
+      "evidence": "tests/n88-student-reopen-end-guidance-20261021/ui-teacher.json and ui-additional.json: rotate/revoke review and cancel zero commands; explicit matching Confirm invokes exactly one synthetic command; owner retirement removes review without write."
+    },
+    {
+      "name": "n88_changed_private_static_custody_provider_and_served_parity",
+      "status": "PASS",
+      "evidence": "tests/n88-student-reopen-end-guidance-20261021/static-delivery.json and carrier-readback.json: one reserved upload, provider version 1dd58a96-b2b5-440b-8ae0-d9a3342e074e, exact carrier/native/served hashes; unchanged native v59/public pin/configuration; append-only original-custodian completion."
+    },
+    {
+      "name": "syntax_and_scoped_diff",
+      "status": "PASS",
+      "evidence": "Six affected production/gate modules pass node --check; git diff --check passes; no owned browser/integration/live-mutation lease or native temporary directory remains."
+    }
+  ],
+  "phaseResourcesReleased": true,
+  "privateStaticUploadBudgetConsumed": true,
+  "frontendProduction": "NOT_RUN",
+  "poAcceptance": "NOT_RUN"
+}
