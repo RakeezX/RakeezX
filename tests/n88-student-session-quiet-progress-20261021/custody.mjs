@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile,writeFile} from 'node:fs/promises';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {STUDENT_SESSION_STATIC as c,studentSessionStaticGate,verifyStudentStaticArtifacts,runStudentSessionStaticPhase,staticDigest as sha} from '../../drafts/n88-student-portal/activation/static-student-session-20261021-gate.mjs';
-const dir=c.evidence,report={status:'FAIL',checks:[],providerOperations:0,privateStateReads:0,uploads:0};
+const dir=c.evidence,report={status:'FAIL',taskId:c.task,runId:c.run,preparedCandidate:c.candidate,checks:[],providerOperations:0,privateStateReads:0,uploads:0};
 const card=JSON.parse((await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+c.task+'.json','utf8')).replace(/^\uFEFF/,''));
 const config=JSON.parse(await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/workflow-v5.json','utf8'));
 const prior=await readFile('tests/n88-region-response-20261020/carrier.mjs'),prepared=await readFile(dir+'carrier.mjs'),student=await readFile('drafts/n88-student-portal/activation/bundle/private/assets/student.mjs');
@@ -46,6 +46,9 @@ try{
  const oldHistory=structuredClone(happy.state.carrierCorrections);await runStudentSessionStaticPhase('complete',happy.ports);assert.equal(happy.saves,1);assert.deepEqual(happy.state.carrierCorrections.slice(0,-1),oldHistory);assert.equal(happy.state.carrierCorrections.at(-1).source,c.carrier);
  const again=await runStudentSessionStaticPhase('complete',happy.ports);assert.equal(again.alreadyRecorded,true);assert.equal(happy.saves,1);await assert.rejects(runStudentSessionStaticPhase('begin',happy.ports));
  pass('single_attempt_and_append_only_completion','Preflight read-only; begin reserves candidate-wide exclusive attempt; duplicate begin denied; complete appends once; repeated complete is idempotent.');
+ const previousRun=fixture(),previousMarker=Buffer.from(JSON.stringify({runId:'cc3bb704-ba52-4611-8b52-3e8ba7560642',preparedCandidate:c.candidate,maxUploads:1}));previousRun.files.set(attempt,previousMarker);
+ await assert.rejects(runStudentSessionStaticPhase('begin',previousRun.ports),/attempt_consumed/);assert.deepEqual(previousRun.files.get(attempt),previousMarker);assert.equal(previousRun.saves,0);
+ pass('new_run_does_not_replenish_candidate_upload','Previous-run candidate-wide attempt remains unchanged and prevents a new reservation. No live marker was read, replaced or deleted.');
  const broken=fixture();broken.failCandidate();await assert.rejects(runStudentSessionStaticPhase('begin',broken.ports),/source drift/);assert.equal(broken.loads,0);
  for(const [name,value]of [['provider-preimage.mjs',student],['provider-native.mjs',student],['carrier.mjs',prior]]){
   const f=fixture();f.files.set(name,value);await assert.rejects(runStudentSessionStaticPhase('begin',f.ports));assert(!f.files.has(attempt));

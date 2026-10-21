@@ -1,5 +1,8 @@
 {
   "status": "PASS",
+  "taskId": "continuous-n88-student-session-and-quiet-progress-20261021",
+  "runId": "097be9c0-0598-4857-83c8-9a2896a2e0d3",
+  "preparedCandidate": "60c947a5cd8937fa8a06ec59a5269b3b7c94ae47",
   "checks": [
     {
       "name": "unchanged_product_and_ui_proof_reused",
@@ -15,6 +18,11 @@
       "name": "single_attempt_and_append_only_completion",
       "status": "PASS",
       "evidence": "Preflight read-only; begin reserves candidate-wide exclusive attempt; duplicate begin denied; complete appends once; repeated complete is idempotent."
+    },
+    {
+      "name": "new_run_does_not_replenish_candidate_upload",
+      "status": "PASS",
+      "evidence": "Previous-run candidate-wide attempt remains unchanged and prevents a new reservation. No live marker was read, replaced or deleted."
     },
     {
       "name": "preimage_and_freshness_fail_before_reservation",
@@ -40,7 +48,7 @@
   "providerOperations": 0,
   "privateStateReads": 0,
   "uploads": 0,
-  "guardSha256": "828aa870277eced4426dfbaf36a36aa7070a9ff1c99380cbc6af3dde01449348",
+  "guardSha256": "094f701d88dfee0b653b410c8c9cb7e38899f04cfef2355205779179953692ab",
   "officialEntrySha256": "d921cee12cdd13e5b9deaad6dd074f96f748acf68d90e3c2b56efd691b16204e",
   "servedParity": "NOT_RUN",
   "publication": "NOT_RUN"
