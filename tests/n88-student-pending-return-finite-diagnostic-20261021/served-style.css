@@ -1,0 +1,84 @@
+/* AI: compact student presentation; shared RAKEEZ identity/tokens, no teacher navigation. */
+.n88-unified{color-scheme:light;--bg:#f4f7f5;--bg-elev:#fff;--text:#15253d;--text-2:#334155;--text-3:#64748b;--border:#dce7e1;--border-strong:#bfd2c8;--brand:#18a878;--brand-hover:#25b98a;--brand-active:#13936a;--brand-text:#0f7655;--brand-soft:#e8f6f1;--action-primary:var(--brand);--action-primary-hover:var(--brand-hover);--action-primary-active:var(--brand-active);--action-primary-ink:#06231f;--action-focus-ring:color-mix(in srgb,var(--brand) 34%,transparent);font-family:var(--font,system-ui,sans-serif);background:var(--bg,#f4f7f5);color:var(--text,#15253d);line-height:1.8;min-height:100dvh;padding:24px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.n88-unified,.n88-unified *{box-sizing:border-box}
+.n88-unified header,.n88-unified main{max-width:1040px;margin:auto;min-width:0}
+.n88-unified header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--border,#d4dce5)}
+.n88-unified .brand-lockup{inline-size:216px;flex-shrink:0;max-inline-size:70%}
+.n88-unified-space{color:var(--text-2,#52645b);font-size:14px}
+.n88-unified h1{font-size:clamp(24px,3vw,30px);line-height:1.5;margin:0 0 8px}
+.n88-unified h2{display:flex;align-items:center;gap:12px;justify-content:space-between;font-size:19px;margin:0 0 12px;line-height:1.6}
+.n88-unified h3{font-size:16px;font-weight:600;margin:0}
+.n88-unified-profile{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-block:28px}
+.n88-unified-name{font-size:19px;font-weight:700;margin:0}
+.n88-unified-class{color:var(--text-2,#52645b);margin:0;font-size:14px}
+.n88-unified-entry{max-width:480px;margin:40px auto}
+.n88-unified-entry,.n88-unified-sections>section{padding:24px;border:1px solid var(--border,#d4dce5);border-radius:var(--r-lg,16px);background:var(--bg-elev,#fff);min-width:0}
+.n88-unified input,.n88-unified button{font:inherit;min-height:44px;padding:8px 16px;border:1px solid var(--border-strong,#758596);border-radius:var(--r-sm,8px);background:var(--bg-elev,#fff);color:var(--text,#15253d);max-width:100%}
+.n88-unified input,.n88-unified label,.n88-unified button[type=submit]{display:block;width:100%}
+.n88-unified input{letter-spacing:.13em;font-variant-numeric:tabular-nums}
+.n88-unified button{cursor:pointer}
+.n88-unified button[type=submit]{background:var(--action-primary,#165c50);color:var(--action-primary-ink,#fff);border-color:transparent}
+.n88-unified :disabled{opacity:.65;cursor:default}
+.n88-unified :focus-visible{outline:3px solid var(--brand-text,#165c50);outline-offset:3px}
+.n88-unified-actions{display:flex;gap:8px;flex-wrap:wrap}
+.n88-unified-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-bottom:24px;align-items:start}
+.n88-unified-grades{grid-column:1/-1}
+.n88-unified table{width:100%;border-collapse:collapse;text-align:start;font-size:16px}
+.n88-unified th,.n88-unified td{padding:12px 8px;border-bottom:1px solid var(--border,#d4dce5);text-align:start}
+.n88-unified thead{color:var(--text-2,#52645b);font-size:14px}
+.n88-unified td{width:25%}
+.n88-unified small{display:block;font-weight:normal;color:var(--text-2,#52645b);font-size:12px}
+.n88-unified-total{display:flex;justify-content:space-between;gap:12px;margin:16px 8px 0}
+.n88-unified-count{font-size:13px;font-weight:500;min-width:28px;text-align:center;border-radius:99px;background:var(--bg);color:var(--text-2,#52645b)}
+.n88-unified-work+.n88-unified-work{border-top:1px solid var(--border,#d4dce5)}
+.n88-unified-work summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding-block:10px;cursor:pointer;font-weight:600}
+.n88-unified-work summary::marker{content:''}
+.n88-unified-work summary::-webkit-details-marker{display:none}
+.n88-unified-detail-hint{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:400;color:var(--text-2,#52645b);flex-shrink:0}
+.n88-unified-detail-hint::after{content:'+';font-size:20px}
+.n88-unified-work[open] .n88-unified-detail-hint::after{content:'−'}
+.n88-unified-detail{padding:0 0 12px;color:var(--text-2,#52645b);font-size:14px}
+.n88-unified-detail p{margin:4px 0}
+.n88-unified-instruction{white-space:pre-line}
+.n88-unified article.n88-unified-work{padding-block:12px}
+.n88-unified-empty{color:var(--text-2,#52645b);font-size:14px;margin:0}
+@media(max-width:700px){.n88-unified{padding:16px}.n88-unified-sections{grid-template-columns:1fr}.n88-unified-entry,.n88-unified-sections>section{padding:20px}.n88-unified-profile{align-items:start;flex-direction:column;gap:16px;padding-block:24px}.n88-unified-actions{width:100%}.n88-unified-actions button{flex:1}.n88-unified th,.n88-unified td{padding-inline:4px}}
+@media print{.n88-unified form,.n88-unified-actions{display:none}}
+
+/* AI: escaped multiline task guidance. */
+.n88-guidance-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Standalone student scope stays light without changing teacher theme/preferences. */
+html[data-n88-student-document]{color-scheme:light;background:#f4f7f5}
+.n88-unified .brand-lockup .brand-lockup__image--light{display:block}
+.n88-unified .brand-lockup .brand-lockup__image--dark{display:none}
+.n88-unified-entry form{display:grid;gap:8px}
+.n88-unified-entry button[type=submit]{margin-block-start:12px}
+.n88-unified-entry #n88-message{margin:0}
+.n88-unified-entry #n88-message:empty{display:none}
+.n88-unified .n88-unified-resume{margin-block-start:12px;font-size:13px;width:100%}
+
+/* AI: native Rakeez light entry identity, independent of the teacher theme. */
+.n88-unified header{justify-content:center;padding-block:12px 24px}
+.n88-unified-entry{margin-block:32px;box-shadow:var(--shadow-1,0 2px 12px #15253d08)}
+.n88-unified-welcome{color:var(--text-2);margin:0 0 24px;font-size:16px}
+.n88-unified-entry #n88-code-help{font-size:13px;color:var(--text-2);margin:0 0 4px}
+.n88-unified-entry input{text-align:center;font-family:var(--font-num,var(--font));font-size:24px;min-height:56px;background:#fff}
+.n88-unified-entry label{font-weight:var(--fw-semibold,600)}
+
+.n88-unified h1[tabindex="-1"]:focus{outline:none}
+
+.n88-unified h1[tabindex="-1"]:focus{box-shadow:none}
+
+.n88-unified-entry.first-run-auth form{gap:var(--sp-2)}
+.n88-unified-entry .input{border-color:var(--border-strong);background:var(--bg-elev)}
+.n88-unified-entry .input:focus{border-color:var(--brand-text);box-shadow:0 0 0 3px var(--action-focus-ring)}
+.n88-unified-entry .btn--primary{background:var(--action-primary);color:var(--action-primary-ink)}
+.n88-unified-entry [aria-invalid=true]{border-color:var(--danger,#dc2626)}
+
+/* AI: optional finite support copy; no payload or automatic transmission. */
+.n88-student-support{max-width:480px;margin:20px auto;color:var(--text-2);font-size:13px}
+.n88-student-support summary{cursor:pointer;min-height:44px;padding-block:10px}
+.n88-student-support textarea{width:100%;min-height:120px;font:12px/1.6 monospace;overflow-wrap:anywhere}
+.n88-student-support [data-copy-status]:empty{display:none}
+@media print{.n88-student-support{display:none}}

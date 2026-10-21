@@ -1,0 +1,13 @@
+{
+  "status": 200,
+  "success": true,
+  "observedAt": "2026-10-21T07:22:30.711Z",
+  "taskId": "continuous-n88-student-pending-return-finite-diagnostic-20261021",
+  "runId": "7887c6ac-bedd-4282-af4d-5b5322617cc7",
+  "preparedCandidate": "139fd8a9654945e5923afa3b9ef5b9467431a575",
+  "uploads": 1,
+  "sourceSha256": "6978352dfa73746a9c4a2cc85e822545483427d4834f172a04abb963f136068e",
+  "id": "rakeez-n88-private-ingress",
+  "etag": "4b7ea1f711055e7a6923a41d73c2c876dfc298527e277821216931af5835f71e",
+  "deployment_id": "c0a1d52d90b44239bde9faed75fc20c7"
+}

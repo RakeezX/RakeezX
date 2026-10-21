@@ -2,3 +2,4 @@
 *.mjs -text
 *.json -text
 *.png -text
+*.css -text
