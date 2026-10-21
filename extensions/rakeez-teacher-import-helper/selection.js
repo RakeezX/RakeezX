@@ -220,6 +220,19 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   if(mode==='gateway'&&entryPath&&(document.readyState!=='complete'||Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible)))return {...roleFail('ENTRY_PENDING'),retry:true};
   // AI: optional MyStudents timeout requires positive teacher + selected school
   // evidence in this document, not merely absence of an administrator badge.
+  // AI: proof belongs to this live teacher document, never to a badge-less fetched menu.
+  const currentTeacherProof=()=>JSON.stringify({url:location.href,school:shownSchool,schoolId:observedSchoolIds[0],roles:[...new Set(activeTeacher)].sort(),greetings,teacher:labelValues(document.body,['اسم المعلم','اسم المعلمة']).sort()});
+  if(mode==='read-proof'){
+    if(!entryPath||document.readyState!=='complete'||document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
+    if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
+    if(!activeTeacher.length&&greetings.length!==1)return roleFail('UNCONFIRMED_TEACHER_ROLE');
+    if(!runContext?.schoolId||!runContext.schoolName||shownSchool!==runContext.schoolName||observedSchoolIds.length!==1||observedSchoolIds[0]!==runContext.schoolId.toLowerCase())return roleFail('SCHOOL_CONTEXT_CHANGED');
+    const proof=currentTeacherProof();
+    if(runContext.readProof&&runContext.readProof!==proof)return roleFail('TEACHER_CONTEXT_CHANGED');
+    globalThis.rakeezTeacherReadGuard=()=>readAutomaticTeacherPage('read-proof',null,{...runContext,readProof:proof});
+    globalThis.rakeezTeacherReadGuard.jobId=runContext.readJobId;
+    return {ok:true,proof};
+  }
   if(mode==='roster-guard'){
     if(document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
     if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
@@ -330,5 +343,5 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   for(const [category,values] of Object.entries(scalar)){
     const distinct=[...new Set(values)];if(distinct.length===1)tables.push({category,text:specs[category][0]+'\t'+distinct[0]});else if(distinct.length>1)warnings.push({category,code:'AMBIGUOUS_ROLE_VALUE'});
   }
-  return {ok:true,entry,runContext:routeContext,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:document.title.replace(/https?:\/\/\S+/g,'').slice(0,80)};
+  return {ok:true,entry,runContext:shownSchool?{...routeContext,schoolName:shownSchool,...(routeContext?.schoolId&&(activeTeacher.length||greetings.length===1)?{readProof:currentTeacherProof()}: {})}:routeContext,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:document.title.replace(/https?:\/\/\S+/g,'').slice(0,80)};
 }

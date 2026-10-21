@@ -1,0 +1,128 @@
+{
+  "taskId": "continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021",
+  "runId": "c99d549c-a227-4366-b5c8-d70ab928514f",
+  "runtimeFingerprint": "a918aa6880da7a75ce8959cc26d6398909581791774c8cee749d0c3d476613ee",
+  "boundary": "Actual application ownership/session/batch guards, ESM worker, serialized receiver, IndexedDB and UI; synthetic Chrome APIs and synthetic service only. Reuses existing loopback protocol substitution. Source collection held before first read for deterministic owner/session/batch denials; no live time/portal.",
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: {\"id\":\"e5a6ba96f3cd4d725ced1423b8918cbfdf51352a1d184be5de904cf039625bef\",\"phase\":\"stopped\",\"startPhase\":\"accepted\",\"failureStep\":\"source-pre-read\",\"failureJobPhase\":\"collect\",\"code\":\"SCHOOL_CONTEXT_CHANGED\",\"added\":0,\"existing\":0,\"fields\":[],\"staged\":0,\"observed\":0,\"coverage\":\"unknown\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false}\n+ actual - expected\n\n+ 'stopped'\n- 'complete'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021/tests/n36-0528-my-students-teacher-proof-20261021/receiver.mjs:34:9\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021/tests/n36-0528-my-students-teacher-proof-20261021/receiver.mjs:16:62",
+    "Error: Worker fixture deadline: {\"id\":\"a7b7c24da1f9bd1967ea2f5ec4fff94a3aa98bd9bb3f5c8598bdf2ee554cb5aa\",\"phase\":\"complete\",\"startPhase\":\"accepted\",\"failureStep\":\"none\",\"failureJobPhase\":\"none\",\"code\":null,\"added\":303,\"existing\":0,\"fields\":[{\"field\":\"teacher\",\"reason\":\"missing\",\"count\":1},{\"field\":\"principal\",\"reason\":\"missing\",\"count\":1},{\"field\":\"department\",\"reason\":\"missing\",\"count\":1},{\"field\":\"timetable\",\"reason\":\"missing\",\"count\":1},{\"field\":\"school\",\"reason\":\"saved\",\"count\":1},{\"field\":\"classes\",\"reason\":\"current\",\"count\":1}],\"staged\":303,\"observed\":303,\"coverage\":\"complete\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false}\n    at Object.wait (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021/tests/n36-actual-handoff-limit-20261020/worker-fixture.mjs:29:151)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021/tests/n36-0528-my-students-teacher-proof-20261021/receiver.mjs:25:2\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021/tests/n36-0528-my-students-teacher-proof-20261021/receiver.mjs:16:62",
+    "TypeError: Cannot set properties of undefined (setting 'documentId')\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021/tests/n36-0528-my-students-teacher-proof-20261021/receiver.mjs:29:60\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0528-my-students-teacher-proof-readonly-get-20261021/tests/n36-0528-my-students-teacher-proof-20261021/receiver.mjs:16:62"
+  ],
+  "checks": [
+    {
+      "mode": "complete",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "partial",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "partial",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "owner",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "session",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "receiver",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "batch",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "BATCH_EXPIRED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "receiver-route",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    }
+  ],
+  "reusedChecks": [],
+  "status": "PASS"
+}

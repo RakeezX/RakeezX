@@ -41,7 +41,7 @@ export function createBackgroundRunner({transport}){
   await chrome.storage.session.remove(JOB);await chrome.alarms.clear(ALARM);
   j.failureStep=error?.sourceFailureStep??'none';j.failureJobPhase=code?j.phase:'none';
   await chrome.storage.session.set({[VIEW]:{...view(j),phase,code}});
-  try{await chrome.scripting.executeScript({target:{tabId:j.tabId,...(j.sourceDocument?{documentIds:[j.sourceDocument]}:{frameIds:[0]})},world:'ISOLATED',func:id=>{for(const [key,c] of globalThis.rakeezReportRequests??[])if(key.startsWith(id+'|'))c.abort();},args:[j.id]});}catch{/* Lost source access is never recovered by navigation. */}
+  try{await chrome.scripting.executeScript({target:{tabId:j.tabId,...(j.sourceDocument?{documentIds:[j.sourceDocument]}:{frameIds:[0]})},world:'ISOLATED',func:id=>{if(globalThis.rakeezTeacherReadGuard?.jobId===id)delete globalThis.rakeezTeacherReadGuard;for(const [key,c] of globalThis.rakeezReportRequests??[])if(key.startsWith(id+'|'))c.abort();},args:[j.id]});}catch{/* Lost source access is never recovered by navigation. */}
   // Revoke this job only. App-owned durable batches are never deleted.
   await transport({type:'n36-cancel'},authority(j));
  });}
@@ -59,6 +59,7 @@ export function createBackgroundRunner({transport}){
   return r[0];
  }
  async function source(j,mode='guard'){
+  if(mode==='guard'&&j.context?.readProof)mode='read-proof';
   let step=j.phase==='binding'?'source-start':'source-pre-read';
   try{
   await current(j);const probe=await descriptor(j);
@@ -66,13 +67,14 @@ export function createBackgroundRunner({transport}){
   j.sourceDocument=probe.documentId;j.sourceURL=probe.result;
   const target={tabId:j.tabId,documentIds:[j.sourceDocument]};
   await chrome.scripting.executeScript({target,world:'ISOLATED',files:['route-diagnostics.js']});
-  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,j.context]});
+  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,mode==='read-proof'?{...j.context,readJobId:j.id}:j.context]});
   await current(j);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   if(!r[0].result?.ok){const e=Error(r[0].result?.code??'SOURCE_UNAVAILABLE');e.retry=r[0].result?.retry;e.incomplete=r[0].result?.incomplete;throw e;}
   if(mode==='home'&&j.context?.kind==='selected-teacher-card'&&r[0].result.runContext?.kind==='selected-teacher-card'&&['roleTargetId','href','schoolName'].some(k=>j.context[k]!==r[0].result.runContext[k]))throw Error('SCHOOL_CONTEXT_CHANGED');
   j.sourceDocument=r[0].documentId;
-  if(mode==='guard'){
+  if(mode==='read-proof'){if(j.context.readProof&&j.context.readProof!==r[0].result.proof)throw Error('TEACHER_CONTEXT_CHANGED');j.context={...j.context,readProof:r[0].result.proof};}
+  if(['guard','read-proof'].includes(mode)){
    const g=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readSourceReportPage,args:['guard']});
    await current(j);if(g.length!==1||g[0].documentId!==j.sourceDocument||!g[0].result?.ok)throw Error(g[0]?.result?.code??'SOURCE_BINDING_CHANGED');
   }
@@ -97,11 +99,24 @@ export function createBackgroundRunner({transport}){
   const n=j.next;if(n.page)return n;
   await appGuard(j);await source(j,['role','gateway'].includes(n.kind)?'home':'guard');
   const target=safeRoute(j.origin,n.path,n.context??j.context);
-  if(n.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(target).pathname)){
-   const path=new URL(target).pathname;if(j.reportPath&&j.reportPath!==path)throw Error('REPORT_CONTEXT_CHANGED');j.reportPath=path;
+  const menu=n.kind==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname);
+  const report=n.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(target).pathname);
+  if(menu||report){
+   await source(j,'read-proof');await appGuard(j);
+   if(report){const path=new URL(target).pathname;if(j.reportPath&&j.reportPath!==path)throw Error('REPORT_CONTEXT_CHANGED');j.reportPath=path;}
    const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['fetch',{...j.context,path:n.path,sourceURL:j.sourceURL,rowOffset:n.rowOffset??0,requestId:j.id+'|'+n.path+'|'+(n.rowOffset??0),remainingMs:Math.min(8000,j.expiresAt-Date.now())}]});
-   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;throw e;}
-   await source(j);await appGuard(j);return {...n,page:r[0].result};
+   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
+   // Failed responses receive the same post-read source/app checks as successful ones.
+   await source(j,'read-proof');await appGuard(j);
+   if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;throw e;}
+   return {...n,page:r[0].result};
+  }
+  // Unimplemented student routes never fall through to visible navigation.
+  if(n.kind==='students')throw Error('UNSAFE_ROSTER_LINK');
+  // AI: once a teacher document exposes its SchoolId menu, keep this bounded
+  // read run there. Optional unsupported categories remain explicit, never navigated.
+  if(['metadata','classes','timetable'].includes(n.kind)&&j.context?.schoolId){
+   return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SOURCE_BOUND_READ_UNAVAILABLE'}],skipped:[]}};
   }
   if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(j.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');j.roleSwitchUsed=true;}
   // A crash before update may only resume if still in the original document;
@@ -111,7 +126,7 @@ export function createBackgroundRunner({transport}){
   await chrome.tabs.update(j.tabId,{url:target});return null;
  }
  function partialPage(j,next,e){
-  if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT'||/CONTEXT|BINDING|ORIGIN|LOGIN|ROLE|UNSAFE|SCHOOL|SESSION/.test(e.message))throw e;
+  if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT'||/CONTEXT|BINDING|ORIGIN|LOGIN|ROLE|UNSAFE|SCHOOL|SESSION|REPORT_RESPONSE|REPORT_CONTENT_TYPE|REPORT_SIZE|FETCH_/.test(e.message))throw e;
   if(e.observedRows)j.studentRowsSeen+=e.observedRows;
   const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.rosterCause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(next.path,j.origin).pathname);
   return {tables:[],links:[],warnings:[{category:next.kind,code:e.message,optional}],skipped:[]};

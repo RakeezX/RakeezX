@@ -4,12 +4,20 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  if(mode==='fetch')return (async()=>{
   const binding=globalThis.location.href,u=new URL(runContext.path,binding);
   const fail=code=>{throw Error(code);};
+  const menu=/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(u.pathname);
   const check=()=>{
    if(globalThis.location.href!==runContext.sourceURL)fail('SOURCE_CONTEXT_CHANGED');
    globalThis.rakeezRoutePolicy(globalThis.location.origin,u.href,runContext);
    const match=/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/([a-f0-9]{32})\/?$/i.exec(u.pathname);
-   if(!match||!runContext.schoolId||match[1].toLowerCase()!==runContext.schoolId.toLowerCase())fail('SCHOOL_CONTEXT_CHANGED');
-   if(!readSourceReportPage('guard').ok)fail('NON_TEACHER_ROLE');
+   if(!runContext.schoolId||(!menu&&(!match||match[1].toLowerCase()!==runContext.schoolId.toLowerCase())))fail('SCHOOL_CONTEXT_CHANGED');
+   if(!runContext.readProof||typeof globalThis.rakeezTeacherReadGuard!=='function')fail('UNCONFIRMED_TEACHER_ROLE');
+   if(globalThis.rakeezTeacherReadGuard.jobId!==runContext.requestId.split('|')[0])fail('TEACHER_CONTEXT_CHANGED');
+   const teacher=globalThis.rakeezTeacherReadGuard();if(!teacher.ok)fail(teacher.code);if(teacher.proof!==runContext.readProof)fail('TEACHER_CONTEXT_CHANGED');
+   if(menu){
+    const anchors=Array.from(globalThis.document.querySelectorAll('a[href]')).filter(a=>{for(let n=a;n;n=n.parentElement){const c=getComputedStyle(n);if(n.hidden||n.getAttribute('aria-hidden')==='true'||c.display==='none'||c.visibility!=='visible'||Number(c.opacity)===0)return false;}return a.getClientRects().length>0;}).filter(a=>{try{return new URL(a.getAttribute('href'),binding).href===u.href;}catch{return false;}});
+    if(!anchors.length||anchors.some(a=>a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))fail('UNSAFE_ROSTER_LINK');
+   }
+   const guard=readSourceReportPage('guard');if(!guard.ok)fail(guard.code);
   };
   try{check();}catch(e){return {ok:false,code:e.message,incomplete:true};}
   const controllers=globalThis.rakeezReportRequests??=new Map();
@@ -27,10 +35,21 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    try{while(true){const {done,value}=await reader.read();check();if(done)break;bytes+=value.byteLength;if(bytes>2000000)fail('REPORT_SIZE');html+=decoder.decode(value,{stream:true});}html+=decoder.decode();}
    finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
    check();
-   const doc=new DOMParser().parseFromString(html,'text/html');
+   // Template contents stay inert, including images/frames/styles. Never insert
+   // fetched nodes into a live document or execute fetched code/resources.
+   const template=globalThis.document.createElement('template');template.innerHTML=html;
+   const doc=template.content;
    if(doc.querySelector('input[type=password],form[action*="Login" i],meta[http-equiv=refresh i]'))fail('LOGIN_OR_LOGOUT');
    const guard=readSourceReportPage('guard',runContext,{document:doc,url:u.href});if(!guard.ok)fail(guard.code);
+   const labels=Array.from(doc.querySelectorAll('p,span,small,div,b,strong,label,dt')).map(n=>n.textContent.trim().replace(/\s+/g,' '));
+   const schools=[...new Set([...Array.from(doc.querySelectorAll('.school-name')).map(n=>n.textContent.trim().replace(/\s+/g,' ')),...labels.flatMap(v=>/^اسم المدرسة: .{2,80}$/.test(v)?[v.slice(13)]:[])])];
+   const teachers=labels.flatMap(v=>/^اسم المعلم(?:ة)?: .{2,80}$/.test(v)?[v.replace(/^اسم المعلم(?:ة)?: /,'')]:[]);
+   const expected=JSON.parse(runContext.readProof).teacher;
+   if(expected.length&&teachers.some(n=>!expected.includes(n)))fail('TEACHER_CONTEXT_CHANGED');
+   if(schools.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
+   if(menu&&doc.querySelector('base[href]'))fail('UNSAFE_ROSTER_LINK');
    const value=readSourceReportPage('students',runContext,{document:doc,url:u.href});
+   if(menu&&!value.ok&&value.code==='ROSTER_LINKS_PENDING'&&value.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT')return {ok:true,tables:[],links:[],warnings:[{category:'students',code:'ROSTER_LINKS_UNAVAILABLE',optional:true}],skipped:[],pagination:null,schoolNames:[]};
    if(!value.ok)fail(value.code);
    if(runContext.schoolName&&value.schoolNames?.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
    return value;
@@ -43,6 +62,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  // Negative active-role guard complements the existing origin/school/session guard, including at export.
  // Role badges only: a principal's metadata name never establishes the current user's role.
  if(mode==='guard'){
+  if(document.querySelector('input[type=password],form[action*="Login" i],meta[http-equiv=refresh i]')||Array.from(document.querySelectorAll('h1,h2,[role=heading]')).filter(visible).some(n=>['تسجيل الدخول','انتهت الجلسة','رمز التحقق','تم تعطيل الحساب','تم حذف الحساب','الحساب غير نشط','Sign in','Login'].includes(text(n))))return {ok:false,code:'LOGIN_OR_LOGOUT'};
   const nonTeacher=new Set(['مدير المدرسة','قائد المدرسة','مديرة المدرسة','قائدة المدرسة','مسؤول النظام','المشرف','الإداري','المدير','ولي الأمر','ولي أمر','الطالب','الطالبة']);
   const active=Array.from(document.querySelectorAll('[aria-current]:not([aria-current=false]),[aria-selected=true],option:checked,[role=status],[data-role]')).filter(visible).map(n=>text(n).replace(/^الدور\s*:?\s*/,''));
   const labelled=Array.from(document.querySelectorAll('p,span,small,div,b,strong,label')).filter(n=>visible(n)&&!n.querySelector('table')).map(text).filter(v=>/^الدور\s*:?\s*/.test(v)).map(v=>v.replace(/^الدور\s*:?\s*/,''));
@@ -80,7 +100,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  const days=new Set(['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']);
  const candidates=[];
  for(const table of all){
-  if(table.parentElement.closest('table')||table.querySelector('table'))continue;
+  if(table.parentElement?.closest('table')||table.querySelector('table'))continue;
   const rows=Array.from(table.rows).filter(visible);if(mode!=='students'&&rows.length>301)return diagnostic('ROW_LIMIT');if(rows.length<2)continue;
   const head=Array.from(rows[0].cells);if(head.length>50||!head.every(visible))continue;
   const titles=head.map(text),find=set=>titles.flatMap((v,i)=>set.has(v)?[i]:[]);

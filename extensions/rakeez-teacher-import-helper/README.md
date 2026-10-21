@@ -1,3 +1,9 @@
+## 0.5.29 — bounded source-document GET (AI, 2026-10-21)
+
+The positively verified teacher dashboard stays open while the exact visible MyStudents?SchoolId link is read with a bounded same-origin GET. Server HTML is parsed inertly, and only existing allowlisted roster report/pagination links are read. A missing teacher badge in the fetched menu is not identity evidence: current teacher/school/link/document and Rakeez owner/session/batch authority are checked before and after each request and before transfer. The selected teacher-card command remains single-use; no extra source permissions, external receiver, hidden iframe, guessed URL or Noor read is added.
+
+Missing menu links retain available rows and unproved coverage unless independent terminal reports prove completeness with no other student warning. Optional categories requiring another visible navigation are left unresolved in this source-bound run. The existing 300-row handoff, review/partial consent and exact save receipts remain unchanged. Real school compatibility requires the later PO manual .29 trial. Production archive/link and 29-file stable parity are publisher checks, not local results.
+
 ## AI candidate 0.5.27 — selected teacher command redirect, 21 October 2026
 
 Only an issued, unexpired, single-use command from the selected teacher card may settle to the same-origin `/SchoolManagment/Actions/Teacher/<32-hex>` dashboard (optional trailing slash, no query). The opaque dashboard segment is neither roleTargetId nor SchoolId and is never included in safe diagnostics. Completion and a new top document precede the existing independent teacher/school/SchoolId reader guards; receiver authority is checked again after reading. Exact planned read destinations and the existing Schools return remain supported. No uncertain command replay or general same-origin redirect allowance.

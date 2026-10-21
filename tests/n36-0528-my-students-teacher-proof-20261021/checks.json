@@ -1,0 +1,32 @@
+[
+  {
+    "name": "n36_actual_0528_no_role_badge_menu_reproduced_and_resolved",
+    "status": "PASS",
+    "evidence": "tests/n36-0528-my-students-teacher-proof-20261021/browser.json: immutable .28 reproduces 303 staged/observed then exact MyStudents query/new/complete document and UNCONFIRMED_TEACHER_ROLE, zero transfer; .29 succeeds from dashboard, selected teacher card and greeting-only dashboard without menu/report navigation. Missing menu links retain rows; only independent terminal reports permit complete coverage."
+  },
+  {
+    "name": "n36_readonly_get_teacher_school_owner_document_denials_and_receipts",
+    "status": "PASS",
+    "evidence": "tests/n36-0528-my-students-teacher-proof-20261021/browser.json: 39 real HTTP popup/readers/CSS cases, current positive teacher/school/SchoolId/account/document denials before/during/after GET, response login/role/origin/query/unsafe-link/MIME/header+chunk-size denial, inert scripts/resources and owned cleanup. tests/n36-0528-my-students-teacher-proof-20261021/receiver.json: 7 actual app/store/receiver journeys; exact 300+3 saved receipts and 303 IndexedDB rows, partial path and owner/session/document/batch/receiver-route denials with no writes; scores/years and existing consent guards retained."
+  },
+  {
+    "name": "n36_0529_package_link_and_safe_diagnostic_exact",
+    "status": "PASS",
+    "evidence": "tests/n36-0528-my-students-teacher-proof-20261021/package.json, browser.json, receiver.json, actual-download-link.png: 29-file ZIP/source SHA256 parity, immutable prior packages, unchanged permissions/CSP/receiver/data boundary; actual app download hash 6e5d748e928eb4d4f2430270f30ae1beeb5f566553b13fe0c597f33cc64f3027 and finite actual popup/copy-handler fixed-code diagnostics contain no source names/IDs/URLs."
+  },
+  {
+    "name": "owned_local_resources_released",
+    "status": "PASS",
+    "evidence": "Canonical withIsolatedLocalBrowser finally closed owned contexts/browser; owned HTTP servers closed in finally. TCP probes: [{\"port\":49748,\"status\":\"closed\",\"code\":\"ECONNREFUSED\"},{\"port\":49749,\"status\":\"closed\",\"code\":\"ECONNREFUSED\"}]"
+  },
+  {
+    "name": "n36_verified_package_stable_folder_parity",
+    "status": "NOT_RUN",
+    "evidence": "Independent publisher must verify served Production ZIP/link and then stable-runtime 29-file parity. No push/deploy/stable-folder mutation or native browser reload performed."
+  },
+  {
+    "name": "actual_madrasati_import",
+    "status": "NOT_RUN",
+    "evidence": "PO manual .29 school trial pending; no portal, personal/dedicated school browser, real-source read, credentials or real-data mutation."
+  }
+]
