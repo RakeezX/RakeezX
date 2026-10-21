@@ -12,7 +12,7 @@ function sourcePageSeen(job,origin,path){
 export function consumePage(job,next){
  const origin=job.origin;
    let page=next.page;if(page.runContext){if(job.context?.schoolId&&page.runContext.schoolId&&job.context.schoolId!==page.runContext.schoolId)throw Error('SCHOOL_CONTEXT_CHANGED');job.context={...job.context,...page.runContext};}
-   for(const school of page.schoolNames??[]){if(job.context?.schoolName&&job.context.schoolName!==school)throw Error('SCHOOL_CONTEXT_CHANGED');job.rosterSchools.add(school);job.context={...job.context,schoolName:school};if(job.rosterSchools.size>1)throw Error('SCHOOL_CONTEXT_CHANGED');}
+   for(const school of page.schoolNames??[]){if(job.context?.schoolName&&job.context.schoolName!==school)throw Error('SCHOOL_CONTEXT_CHANGED');job.rosterSchools.add(school);job.context={...job.context,schoolName:school,schoolBinding:'bound'};if(job.rosterSchools.size>1)throw Error('SCHOOL_CONTEXT_CHANGED');}
    if(next.kind==='home'&&page.links.some(l=>l.kind==='gateway'&&l.context?.kind==='selected-teacher-card')){job.pendingSchoolTables=page.tables;page={...page,tables:[]};}
    if(next.kind==='gateway'&&job.pendingSchoolTables.length){page={...page,tables:[...job.pendingSchoolTables,...page.tables]};job.pendingSchoolTables=[];job.gatewaySettleUntil=null;}
 
@@ -56,15 +56,15 @@ export function consumePage(job,next){
     }
     catch(e){if(e.message==='SCHOOL_CONTEXT_CHANGED')throw e;job.warnings.push({category:table.category,code:/^[A-Z_]+$/.test(e.message)?e.message:'UNRESOLVED_CATEGORY'});}
    }
-   if(page.rowContinuation!==null&&page.rowContinuation!==undefined)job.routes.unshift({kind:'students',path:next.path,rowOffset:page.rowContinuation});
+   if(page.rowContinuation!==null&&page.rowContinuation!==undefined)job.routes.unshift({kind:'students',path:next.path,readEvidence:next.readEvidence,rowOffset:page.rowContinuation});
    if(['home','role','gateway'].includes(next.kind)){job.setupLinks??=[];for(const link of page.links)if(['metadata','classes','timetable'].includes(link.kind)&&!job.setupLinks.some(l=>l.kind===link.kind&&l.path===link.path))job.setupLinks.push({kind:link.kind,path:link.path});}
    for(const link of page.links){
     try{safeRoute(origin,link.path,link.context??job.context);}catch(e){throw e;}
     if(sourcePageSeen(job,origin,link.path)||job.visited.has(routeIdentity(origin,link.path))||job.routes.some(r=>routeIdentity(origin,r.path)===routeIdentity(origin,link.path))){if(link.pagination)job.loops++;continue;}
     if(link.pagination)job.routes.unshift(link);else job.routes.push(link);
    }
-   // Process actual report hrefs in page order even when responses settle out of order.
-   job.routes.sort((a,b)=>{const page=r=>r.kind==='students'&&/^\/SchoolManagmentReports\//.test(r.path)?Number(new URL(r.path,origin).searchParams.get('page')??1):Infinity;return page(a)-page(b);});
+   // AI: resolve school from observed metadata/menu first; keep actual report hrefs in page order.
+   job.routes.sort((a,b)=>{const page=r=>job.context?.schoolBinding!=='bound'&&r.kind==='metadata'?-2:job.context?.schoolBinding!=='bound'&&r.kind==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(r.path,origin).pathname)?-1:r.kind==='students'&&/^\/SchoolManagmentReports\//.test(r.path)?Number(new URL(r.path,origin).searchParams.get('page')??1):Infinity;return page(a)-page(b);});
    job.next=job.routes.shift()??null;if(job.next)job.visited.add(routeIdentity(origin,job.next.path));
    if(job.memoryFull){job.remainingReportPages=[job.next,...job.routes].filter(r=>r?.kind==='students'&&/^\/SchoolManagmentReports\//i.test(r.path)).length;job.next=null;job.routes=[];}
    if(!job.next)for(const category of ['teacher','principal','school','classes','timetable']){

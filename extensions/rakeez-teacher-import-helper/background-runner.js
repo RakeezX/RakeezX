@@ -33,7 +33,7 @@ export function createBackgroundRunner({transport}){
  const mutate=operation=>{const r=mutations.then(operation);mutations=r.catch(()=>{});return r;};
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic});
+ const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
@@ -70,7 +70,7 @@ export function createBackgroundRunner({transport}){
   const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,mode==='read-proof'?{...j.context,readJobId:j.id}:j.context]});
   await current(j);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
-  if(r[0].result?.proofDiagnostic)j.proofDiagnostic=r[0].result.proofDiagnostic;
+  if(r[0].result?.proofDiagnostic)j.proofDiagnostic={...j.proofDiagnostic,...r[0].result.proofDiagnostic};
   if(!r[0].result?.ok){const e=Error(r[0].result?.code??'SOURCE_UNAVAILABLE');e.retry=r[0].result?.retry;e.incomplete=r[0].result?.incomplete;throw e;}
   if(mode==='home'&&j.context?.kind==='selected-teacher-card'&&r[0].result.runContext?.kind==='selected-teacher-card'&&['roleTargetId','href','schoolName'].some(k=>j.context[k]!==r[0].result.runContext[k]))throw Error('SCHOOL_CONTEXT_CHANGED');
   j.sourceDocument=r[0].documentId;
@@ -96,6 +96,25 @@ export function createBackgroundRunner({transport}){
   return r[0].result;
   }catch(e){e.sourceFailureStep=step;throw e;}
  }
+ // AI: source GETs remain read-only and receiver-free until school binding completes.
+ async function fetchPage(j,n,setupKind=null){
+  let settled=false;
+  const pending=chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['fetch',{...j.context,...(setupKind?{setupKind}:{}),observedReport:n.readEvidence==='validated-response',rowOffset:n.rowOffset??0,path:n.path,sourceURL:j.sourceURL,requestId:j.id+'|'+n.path+'|'+(n.rowOffset??0),remainingMs:Math.min(8000,j.expiresAt-Date.now())}]}).finally(()=>{settled=true;});
+  let r;
+  try{
+   // Receiver owner/session/batch and live teacher/document remain gates while
+   // the bounded request is pending, as well as before and after it.
+   while(!settled){await Promise.race([pending,new Promise(resolve=>setTimeout(resolve,100))]);if(!settled){await appGuard(j);await source(j,'read-proof');}}
+   r=await pending;
+  }catch(e){
+   await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:key=>globalThis.rakeezReportRequests?.get(key)?.abort(),args:[j.id+'|'+n.path+'|'+(n.rowOffset??0)]}).catch(()=>{});
+   await pending.catch(()=>{});throw e;
+  }
+  await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
+  await source(j,'read-proof');await appGuard(j);
+  if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;throw e;}
+  return r[0].result;
+ }
  async function readNext(j){
   const n=j.next;if(n.page)return n;
   await appGuard(j);await source(j,['role','gateway'].includes(n.kind)?'home':'guard');
@@ -105,37 +124,17 @@ export function createBackgroundRunner({transport}){
   if(menu||report){
    await source(j,'read-proof');await appGuard(j);
    if(report){const path=new URL(target).pathname;if(j.reportPath&&j.reportPath!==path)throw Error('REPORT_CONTEXT_CHANGED');j.reportPath=path;}
-   const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['fetch',{...j.context,path:n.path,sourceURL:j.sourceURL,rowOffset:n.rowOffset??0,requestId:j.id+'|'+n.path+'|'+(n.rowOffset??0),remainingMs:Math.min(8000,j.expiresAt-Date.now())}]});
-   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
-   // Failed responses receive the same post-read source/app checks as successful ones.
-   await source(j,'read-proof');await appGuard(j);
-   if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;throw e;}
-   return {...n,page:r[0].result};
+   return {...n,page:await fetchPage(j,n)};
   }
   // Unimplemented student routes never fall through to visible navigation.
   if(n.kind==='students')throw Error('UNSAFE_ROSTER_LINK');
   // AI: ordinary setup reads use only hrefs captured in this verified teacher
   // document. Never navigate or expand discovery from a fetched response.
   if(['metadata','classes','timetable'].includes(n.kind)){
-   if(!j.context?.schoolId||!j.context?.schoolName)return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SETUP_SCHOOL_UNAVAILABLE'}],skipped:[]}};
+   if(!j.context?.schoolId||j.context?.schoolBinding!=='bound'&&n.kind!=='metadata')return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SETUP_SCHOOL_UNAVAILABLE'}],skipped:[]}};
    await source(j,'read-proof');await appGuard(j);
    if(!j.setupLinks?.some(l=>l.kind===n.kind&&l.path===n.path))throw Error('UNOBSERVED_SETUP_LINK');
-   let settled=false;
-   const pending=chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['fetch',{...j.context,setupKind:n.kind,path:n.path,sourceURL:j.sourceURL,requestId:j.id+'|'+n.path,remainingMs:Math.min(8000,j.expiresAt-Date.now())}]}).finally(()=>{settled=true;});
-   let r;
-   try{
-    // Receiver owner/session/batch and live teacher/document remain gates while
-    // the bounded request is pending, as well as before and after it.
-    while(!settled){await Promise.race([pending,new Promise(resolve=>setTimeout(resolve,100))]);if(!settled){await appGuard(j);await source(j,'read-proof');}}
-    r=await pending;
-   }catch(e){
-    await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:key=>globalThis.rakeezReportRequests?.get(key)?.abort(),args:[j.id+'|'+n.path]}).catch(()=>{});
-    await pending.catch(()=>{});throw e;
-   }
-   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
-   await source(j,'read-proof');await appGuard(j);
-   if(!r[0].result?.ok)throw Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');
-   return {...n,page:r[0].result};
+   return {...n,page:await fetchPage(j,n,n.kind)};
   }
   if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(j.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');j.roleSwitchUsed=true;}
   // A crash before update may only resume if still in the original document;
@@ -217,9 +216,11 @@ export function createBackgroundRunner({transport}){
      let next;try{next=await readNext(j);}catch(e){next={...j.next,page:partialPage(j,j.next,e)};}if(!next)continue;
      consumePage(j,next);j.pages++;await save(j);
      if(j.next)continue;
+     if(j.context?.schoolBinding!=='bound'||!j.context.schoolName||!j.context.schoolId||!j.context.readProof)throw Error('SCHOOL_CONTEXT_UNCONFIRMED');
      if(!j.sourceRows.length)throw Error('SOURCE_NOT_AVAILABLE');
      j.coverage=sourceCoverage({series:j.series,warnings:j.warnings,pendingReportPages:j.remainingReportPages??0});j.phase='transfer';j.classIndex=0;j.offset=0;await save(j);continue;
     }
+    if(['transfer','prepare','deliver'].includes(j.phase)&&(j.context?.schoolBinding!=='bound'||!j.context.schoolName||!j.context.schoolId||!j.context.readProof))throw Error('SCHOOL_CONTEXT_UNCONFIRMED');
     if(j.phase==='transfer'){
      const group=sourceClasses(j.sourceRows)[j.classIndex];
      if(!group){await finish(j,'complete');return;}
