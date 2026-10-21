@@ -133,4 +133,3 @@ try {
  mode='';for(const ok of releases.splice(0))ok();if(browser)await browser.close();if(server){server.closeAllConnections();await new Promise(ok=>server.close(ok));}if(leased)report.release=lease('release');await fs.writeFile(dir+(process.argv.includes('--cooldown')?'ui-cooldown.json':process.argv.includes('--additional')?'ui-additional.json':process.argv.includes('--teacher')?'ui-teacher.json':process.argv.includes('--student')?'ui-student.json':'ui.json'),JSON.stringify(report,null,2)+'\n');
 }
 console.log(JSON.stringify({status:report.status,checks:report.checks.length}));
-
