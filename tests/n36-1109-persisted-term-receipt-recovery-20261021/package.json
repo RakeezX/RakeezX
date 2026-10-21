@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "version": "0.5.36",
+  "baseSha": "f3f4fe4c074881e5eac9a4a767cb1140d023be32",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.36.zip",
+    "sha256": "1a2a4d1f70e27a30f262b176c65c22e8d412e5ff8d6cede1ee7d073ced21b46f",
+    "bytes": 147844
+  },
+  "files": 29,
+  "baselineCases": 6,
+  "acceptedCases": 30,
+  "inputs": {
+    "certified-prospective-and-start": {
+      "fileStatus": "PASS",
+      "acceptedScenarios": [
+        "missing-year",
+        "missing-term",
+        "deleted-year",
+        "deleted-term",
+        "optimistic",
+        "multiclass",
+        "existing",
+        "ambiguous",
+        "ambiguous-year",
+        "disk-ambiguous",
+        "conflicting-year",
+        "foreign-term",
+        "foreign-term-disk",
+        "persistent-start",
+        "new-selection"
+      ],
+      "failedScenariosRetained": []
+    },
+    "certified-receiver-and-isolation": {
+      "fileStatus": "PASS",
+      "acceptedScenarios": [
+        "cross-tab",
+        "after-chunk",
+        "transaction-drift",
+        "owner",
+        "session",
+        "lease",
+        "document",
+        "saved-before-receipt",
+        "readback-unknown",
+        "fallback-ambiguous-at-write",
+        "after-owner",
+        "after-session",
+        "after-lease",
+        "after-document"
+      ],
+      "failedScenariosRetained": []
+    },
+    "denied-saved-receipt-control": {
+      "fileStatus": "PASS",
+      "acceptedScenarios": [
+        "denied-saved-receipt"
+      ],
+      "failedScenariosRetained": []
+    }
+  },
+  "checks": [
+    "Immutable public .35 receipt uncertainty at independent boundaries",
+    "Unique missing/deleted fallback and real patchDevice delayed write settle before collection",
+    "Exact saved/current 303 receipts, 300-row cap, per-class ordering and 4-class fixture",
+    "Ambiguity/persistent/new selection stop before source GET",
+    "Owner/session/lease/document/selection deny before and inside student transaction; earlier receipts retained",
+    "Same batch/nonce read-only progress, no recollection/replay, expired/different-document denial",
+    "Bounded diagnostics, actual popup/app DOM and unchanged safe source/time/Sync guards",
+    "Exact 29-file ZIP/source SHA256 parity; unchanged permissions/CSP and old packages",
+    "Affected syntax and diff checks"
+  ],
+  "production": "NOT_RUN",
+  "installedStableParity": "NOT_RUN",
+  "actualPOBatch": "UNRESOLVED_NOT_INSPECTED"
+}

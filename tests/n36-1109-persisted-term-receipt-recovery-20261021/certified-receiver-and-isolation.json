@@ -1,0 +1,2951 @@
+{
+  "taskId": "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
+  "runId": "5e50775e-0e75-4434-b2dc-900ff34a6e99",
+  "baseSha": "f3f4fe4c074881e5eac9a4a767cb1140d023be32",
+  "version": "0.5.36",
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.35.zip",
+    "observedAt": "2026-10-21T12:05:44.252Z",
+    "sha256": "025fb2a896fb6027789575c0cd35ff4cfd9e3740b55137b81e7880a79ea71aef",
+    "bytes": 146711,
+    "files": 29
+  },
+  "applicationFiles": {
+    "src/views/class-import-center.js": "f75c10a9817107f27bf2903c2e05caa5068daf833c730b1740556fea29d064ed",
+    "src/lib/n36-extension-handoff.js": "d95275279d4e549ce3911ea17e404fc35c5cf417c623f7f4d5f9d46625d24ed4"
+  },
+  "runtimeFingerprint": "d1b263f64925c6d8d8a0360178fb249bf4186a285bc2eb5d4c5bc521bf88d536",
+  "cases": [
+    {
+      "scenario": "cross-tab",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 101
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1771
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 680
+          },
+          "appGuard": {
+            "count": 27,
+            "ms": 424
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 619
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "BATCH_PERSISTED_TERM_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 0,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_PERSISTED_TERM_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "none",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 101
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1833
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 708
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 435
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 619
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "BATCH_PERSISTED_TERM_CHANGED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "recoveryText": "لا يوجد أثر محلي موثوق يثبت الحفظ؛ نتيجة الإضافة ما زالت غير محسومة. لم تُعد كتابة أي صف.",
+      "localProgress": {
+        "checkpoint": "none",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "sameBatchAndNoncePreserved": true,
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "after-chunk",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 120
+          },
+          "sourceGuard": {
+            "count": 31,
+            "ms": 2184
+          },
+          "descriptor": {
+            "count": 66,
+            "ms": 894
+          },
+          "appGuard": {
+            "count": 33,
+            "ms": 469
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 611
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "original-term",
+        "confirmedRows": 300,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "BATCH_PERSISTED_TERM_CHANGED",
+        "added": 300,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 300,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 3,
+          "total": 3,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_PERSISTED_TERM_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "receipts",
+            "relation": "original-term",
+            "confirmedRows": 300,
+            "confirmedReceipts": 1,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 300,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "original-term",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 120
+          },
+          "sourceGuard": {
+            "count": 31,
+            "ms": 2184
+          },
+          "descriptor": {
+            "count": 66,
+            "ms": 894
+          },
+          "appGuard": {
+            "count": 33,
+            "ms": 469
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 611
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "BATCH_PERSISTED_TERM_CHANGED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "recoveryText": "إيصالات محلية مؤكدة: 1 (300 صفًا). من الصفوف المعلقة يوجد حاليًا 0 من 0 في الكشف المحلي. نتيجة الإضافة غير المحسومة لم تتغير؛ لم تُعد كتابة أي صف. اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.",
+      "localProgress": {
+        "checkpoint": "receipts",
+        "relation": "original-term",
+        "confirmedRows": 300,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "sameBatchAndNoncePreserved": true,
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "transaction-drift",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 117
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1727
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 734
+          },
+          "appGuard": {
+            "count": 27,
+            "ms": 407
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 650
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "pending",
+        "receiverRelation": "original-term",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "BATCH_PERSISTED_TERM_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 0,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_PERSISTED_TERM_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "pending",
+            "relation": "original-term",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 300,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "pending",
+        "receiverRelation": "original-term",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 117
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1810
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 773
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 419
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 650
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "BATCH_PERSISTED_TERM_CHANGED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "recoveryText": "إيصالات محلية مؤكدة: 0 (0 صفًا). من الصفوف المعلقة يوجد حاليًا 0 من 300 في الكشف المحلي. نتيجة الإضافة غير المحسومة لم تتغير؛ لم تُعد كتابة أي صف. اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.",
+      "localProgress": {
+        "checkpoint": "pending",
+        "relation": "original-term",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 0
+      },
+      "sameBatchAndNoncePreserved": true,
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "owner",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 137
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1781
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 709
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 398
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 614
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "OFFLINE_LEASE_LIMITED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 0,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "OFFLINE_LEASE_LIMITED"
+          },
+          "progress": {
+            "checkpoint": "unresolved",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 137
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1781
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 709
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 398
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 614
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "OFFLINE_LEASE_LIMITED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "session",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 104
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1756
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 674
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 420
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 619
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "pending",
+        "receiverRelation": "same",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 0,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_OWNER_OR_SESSION_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "pending",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 300,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "pending",
+        "receiverRelation": "same",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 104
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1756
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 674
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 420
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 619
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "lease",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 104
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1667
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 679
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 423
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 637
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "OFFLINE_LEASE_LIMITED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 0,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "OFFLINE_LEASE_LIMITED"
+          },
+          "progress": {
+            "checkpoint": "unresolved",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 104
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1667
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 679
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 423
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 637
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "OFFLINE_LEASE_LIMITED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "document",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 131
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1762
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 732
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 422
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 619
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 0,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_OWNER_OR_SESSION_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "unresolved",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 131
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1762
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 732
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 422
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 619
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "recoveryText": "لا يوجد أثر محلي موثوق يثبت الحفظ؛ نتيجة الإضافة ما زالت غير محسومة. لم تُعد كتابة أي صف.",
+      "localProgress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "sameBatchAndNoncePreserved": true,
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "saved-before-receipt",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 137
+          },
+          "sourceGuard": {
+            "count": 27,
+            "ms": 1829
+          },
+          "descriptor": {
+            "count": 58,
+            "ms": 754
+          },
+          "appGuard": {
+            "count": 29,
+            "ms": 440
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 636
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "rows-before-receipt",
+        "receiverRelation": "same",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 300,
+        "failurePhase": "batch",
+        "failureStep": "transaction",
+        "failureJobPhase": "receipt",
+        "code": "WRITE_FAILED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 300,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "transaction",
+            "code": "WRITE_FAILED"
+          },
+          "progress": {
+            "checkpoint": "rows-before-receipt",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 300,
+            "pendingSavedRows": 300
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 300,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "rows-before-receipt",
+        "receiverRelation": "same",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 137
+          },
+          "sourceGuard": {
+            "count": 27,
+            "ms": 1829
+          },
+          "descriptor": {
+            "count": 58,
+            "ms": 754
+          },
+          "appGuard": {
+            "count": 29,
+            "ms": 440
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 636
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "WRITE_FAILED",
+        "failurePhase": "batch",
+        "failureStep": "transaction",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "recoveryText": "إيصالات محلية مؤكدة: 0 (0 صفًا). من الصفوف المعلقة يوجد حاليًا 300 من 300 في الكشف المحلي. نتيجة الإضافة غير المحسومة لم تتغير؛ لم تُعد كتابة أي صف.",
+      "localProgress": {
+        "checkpoint": "rows-before-receipt",
+        "relation": "same",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 300
+      },
+      "sameBatchAndNoncePreserved": true,
+      "sameNonceDuplicateIgnored": true,
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "readback-unknown",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 133
+          },
+          "sourceGuard": {
+            "count": 27,
+            "ms": 1806
+          },
+          "descriptor": {
+            "count": 58,
+            "ms": 760
+          },
+          "appGuard": {
+            "count": 29,
+            "ms": 427
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 603
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "rows-before-receipt",
+        "receiverRelation": "same",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 300,
+        "failurePhase": "batch",
+        "failureStep": "readback",
+        "failureJobPhase": "receipt",
+        "code": "WRITE_FAILED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 300,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "readback",
+            "code": "WRITE_FAILED"
+          },
+          "progress": {
+            "checkpoint": "rows-before-receipt",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 300,
+            "pendingSavedRows": 300
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 300,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "rows-before-receipt",
+        "receiverRelation": "same",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 133
+          },
+          "sourceGuard": {
+            "count": 27,
+            "ms": 1806
+          },
+          "descriptor": {
+            "count": 58,
+            "ms": 760
+          },
+          "appGuard": {
+            "count": 29,
+            "ms": 427
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 603
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "WRITE_FAILED",
+        "failurePhase": "batch",
+        "failureStep": "readback",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "recoveryText": "إيصالات محلية مؤكدة: 0 (0 صفًا). من الصفوف المعلقة يوجد حاليًا 300 من 300 في الكشف المحلي. نتيجة الإضافة غير المحسومة لم تتغير؛ لم تُعد كتابة أي صف.",
+      "localProgress": {
+        "checkpoint": "rows-before-receipt",
+        "relation": "same",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 300,
+        "pendingSavedRows": 300
+      },
+      "sameBatchAndNoncePreserved": true,
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "fallback-ambiguous-at-write",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 121
+          },
+          "sourceGuard": {
+            "count": 25,
+            "ms": 1881
+          },
+          "descriptor": {
+            "count": 54,
+            "ms": 716
+          },
+          "appGuard": {
+            "count": 27,
+            "ms": 439
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 663
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "WRITE_FAILED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 0,
+      "deliveries": 1,
+      "receipts": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 300,
+          "total": 300,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "WRITE_FAILED"
+          },
+          "progress": {
+            "checkpoint": "none",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": false,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 121
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1956
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 744
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 447
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 663
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "WRITE_FAILED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [],
+        "setupPhase": "none",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "after-owner",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 156
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2071
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 831
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 473
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 668
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "OFFLINE_LEASE_LIMITED",
+        "added": 300,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 300,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 3,
+          "total": 3,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "OFFLINE_LEASE_LIMITED"
+          },
+          "progress": {
+            "checkpoint": "unresolved",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 156
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2071
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 831
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 473
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 668
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "OFFLINE_LEASE_LIMITED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "after-session",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 151
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2003
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 809
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 476
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 611
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "pending",
+        "receiverRelation": "same",
+        "confirmedRows": 300,
+        "confirmedReceipts": 1,
+        "pendingRows": 3,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "added": 300,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 300,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 3,
+          "total": 3,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_OWNER_OR_SESSION_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "pending",
+            "relation": "same",
+            "confirmedRows": 300,
+            "confirmedReceipts": 1,
+            "pendingRows": 3,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 300,
+        "confirmedReceipts": 1,
+        "pendingRows": 3,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "pending",
+        "receiverRelation": "same",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 151
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2003
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 809
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 476
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 611
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "after-lease",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 130
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2135
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 841
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 462
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 618
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "OFFLINE_LEASE_LIMITED",
+        "added": 300,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 300,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 3,
+          "total": 3,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "OFFLINE_LEASE_LIMITED"
+          },
+          "progress": {
+            "checkpoint": "unresolved",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 130
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2135
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 841
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 462
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 618
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "OFFLINE_LEASE_LIMITED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "after-document",
+      "view": {
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 133
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2043
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 834
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 483
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 650
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "code": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "added": 300,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "saved": 300,
+      "deliveries": 2,
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 3,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department",
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 3,
+          "total": 3,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_OWNER_OR_SESSION_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "unresolved",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "unsafeGETs": 0,
+      "staged": 303,
+      "selectedTermUnchanged": true,
+      "pending": true,
+      "diagnostic": {
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 303,
+        "observed": 303,
+        "excluded": null,
+        "classes": null,
+        "processedPages": null,
+        "currentPage": null,
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 133
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2043
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 834
+          },
+          "appGuard": {
+            "count": 34,
+            "ms": 483
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 650
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "live-link-unsafe",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "receipt",
+        "stage": "collecting",
+        "startPhase": "accepted",
+        "coverage": "complete",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": null,
+        "disabledNext": null,
+        "transfer": "pending",
+        "receipt": "pending",
+        "failure": "BATCH_OWNER_OR_SESSION_CHANGED",
+        "failurePhase": "batch",
+        "failureStep": "validation",
+        "failureJobPhase": "receipt",
+        "fieldResults": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1"
+      },
+      "expiredAndDifferentDocumentDenied": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,33 @@
+{
+  "taskId": "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
+  "runId": "5e50775e-0e75-4434-b2dc-900ff34a6e99",
+  "checks": [
+    {
+      "name": "n36_0535_actual_persisted_term_unknown_reproduced_at_receiver_boundaries",
+      "status": "PASS",
+      "evidence": "baseline-certified.json: 6 immutable public 0.5.35 full-runtime boundary reproductions; actual PO boundary remains unknown."
+    },
+    {
+      "name": "n36_0536_same_batch_settlement_and_real_term_drift_fail_closed",
+      "status": "PASS",
+      "evidence": "certified-prospective-and-start.json (15), certified-receiver-and-isolation.json (14), denied-saved-receipt-control.json (1): 30 final cases; same batch/nonce, durable progress and negative controls."
+    },
+    {
+      "name": "n36_0536_receipt_readback_diagnostics_package_parity",
+      "status": "PASS",
+      "evidence": "package.json and download.json: exact local 29-file 0.5.36 parity, bounded diagnostics, native actual-app download SHA256 1a2a4d1f70e27a30f262b176c65c22e8d412e5ff8d6cede1ee7d073ced21b46f; affected syntax/diff checks."
+    }
+  ],
+  "resources": {
+    "ownedLoopbackPorts": [
+      49929,
+      49931
+    ],
+    "listenerCountAfterFinally": 0,
+    "isolatedBrowserFinally": true,
+    "sharedBrowserLease": "not acquired: eligible isolated local phase"
+  },
+  "production": "NOT_RUN",
+  "installedStableParity": "NOT_RUN",
+  "actualPOBatch": "UNRESOLVED_NOT_INSPECTED"
+}
