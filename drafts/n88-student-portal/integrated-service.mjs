@@ -24,10 +24,14 @@ const columns={years:'id,owner_id,revision,deleted_at,status',terms:'id,owner_id
   sessions:'id,owner_id,revision,deleted_at,teaching_id,date,status',attendance:'id,owner_id,revision,deleted_at,student_id,teaching_id,session_id,status',
   logs:'id,owner_id,revision,deleted_at,student_id,teaching_id,kind,delta'};
 export async function readCanonical(ports,ownerId,listScopeOnly=false) {
-  await ports.query('select n88_private.lock_projection_sources($1::uuid,$2::integer)',[ownerId,2000]);
+  // Admission reads only terms/teachings: keep the canonical owner/row/bound
+  // fence, without locking unrelated score/attendance/log projection families.
+  // Full student, visibility and guidance reads still require the projection lock.
+  await ports.query(listScopeOnly ? 'select n88_private.lock_canonical_sources($1::uuid,$2::integer)' :
+    'select n88_private.lock_projection_sources($1::uuid,$2::integer)',[ownerId,2000]);
   const canonical={};let bytes=0;
   // List and credential-command admission consume only teaching/term here. Membership synchronization,
-  // the complete source lock/bounds and commit guards still run below. Student
+  // the canonical source lock/bounds and commit guards still run below. Student
   // projection, visibility publication and guidance retain the full projection.
   for(const table of listScopeOnly ? ['terms','teachings'] : CANONICAL_PROJECTION_REQUIREMENTS.tables) {
     // PG bigint revisions must never round through a JavaScript JSON number.

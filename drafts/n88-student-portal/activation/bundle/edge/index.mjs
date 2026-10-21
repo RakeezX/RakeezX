@@ -1394,7 +1394,7 @@ var columns = {
   logs: "id,owner_id,revision,deleted_at,student_id,teaching_id,kind,delta"
 };
 async function readCanonical(ports, ownerId, listScopeOnly = false) {
-  await ports.query("select n88_private.lock_projection_sources($1::uuid,$2::integer)", [ownerId, 2e3]);
+  await ports.query(listScopeOnly ? "select n88_private.lock_canonical_sources($1::uuid,$2::integer)" : "select n88_private.lock_projection_sources($1::uuid,$2::integer)", [ownerId, 2e3]);
   const canonical = {};
   let bytes = 0;
   for (const table of listScopeOnly ? ["terms", "teachings"] : CANONICAL_PROJECTION_REQUIREMENTS.tables) {
@@ -1512,7 +1512,7 @@ function createIntegratedService(options, adapter, baseRepository) {
           return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2, rollout: responseMode }, headers: PRIVATE_HEADERS };
         });
       } catch (e) {
-        const phase = ["acquire", "begin", "snapshot"].includes(e.safeStage) ? e.safeStage : stage;
+        const phase = ["acquire", "begin", "snapshot"].includes(e.safeStage) || stage === "synchronize" && ["synchronize-lock", "synchronize-memberships", "synchronize-sessions", "synchronize-sources", "synchronize-publications", "synchronize-validate"].includes(e.safeStage) || stage === "projection" && ["projection-finalize", "projection-membership-flush", "projection-commitguards", "projection-commit"].includes(e.safeStage) ? e.safeStage : stage;
         return { ...deny2(), status: 503, body: { error: "unavailable", stage: phase } };
       }
     }
@@ -3954,6 +3954,18 @@ async function privateQuery(client, sql, values = []) {
   return result2;
 }
 var encodeBoundaryParameter = (value) => value === null ? null : Buffer6.from(pgText(value), "utf8").toString("base64");
+async function privateMembershipBatch(client, sql, rows) {
+  const op = operations.get(sql);
+  if (!verified.has(client) || !op?.effect || !["INSERT", "UPDATE"].includes(op.command) || !/^(insert into|update) n88_private\.memberships\b/.test(sql) || !Array.isArray(rows) || rows.length < 1 || rows.length > 64 || rows.some((row) => !Array.isArray(row) || row.length !== op.parameters.length)) fail4();
+  const wire = rows.flatMap((row) => row.map(encodeBoundaryParameter));
+  if (wire.reduce((n, v) => n + (v === null ? 0 : Buffer6.byteLength(v)), 0) > 128 * 1024) fail4();
+  const cols = op.parameters.map((_, i) => "p" + i), call = `n88_private.${op.name}(${cols.map((p) => "i." + p).join(",")})`;
+  const input = rows.map((_, r) => `(${r},${cols.map((_2, c) => "$" + (r * cols.length + c + 1) + "::text").join(",")})`).join(",");
+  const text2 = `with recursive input(ordinal,${cols.join(",")}) as (values ${input}), applied(ordinal,affected) as (select i.ordinal,r.affected from input i cross join lateral ${call} r where i.ordinal=0 union all select i.ordinal,r.affected from applied prior join input i on i.ordinal=prior.ordinal+1 cross join lateral ${call} r) select ordinal,affected from applied order by ordinal`;
+  const result2 = await client.query(text2, wire);
+  if (result2.rows?.length !== rows.length || result2.rows.some((r, i) => Number(r.ordinal) !== i || r.affected !== "1")) fail4();
+  return { rowCount: rows.length };
+}
 
 // drafts/n88-student-portal/postgres-repository.mjs
 var unavailable = () => new Error("n88_repository_unavailable");
@@ -4216,13 +4228,21 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         fence();
         uuid3(ownerId);
         if (owners.has(ownerId)) return;
-        await synchronize(state, { query }, ownerId);
+        const synchronizePhase = (phase) => {
+          fence();
+          must(["synchronize-lock", "synchronize-memberships", "synchronize-sessions", "synchronize-sources", "synchronize-publications"].includes(phase));
+          stage = phase;
+        };
+        await synchronize(state, { query, synchronizePhase }, ownerId);
         fence();
+        stage = "synchronize-validate";
         snapshot(state, limits);
         owners.add(ownerId);
+        stage = "operation";
       };
       const value = await action(state, Object.freeze({ query, synchronizeOwner, beforeCommit }));
       fence();
+      stage = "projection-finalize";
       const final = snapshot(structuredClone(state), limits), result2 = structuredClone(value);
       transitions(original, final);
       fence();
@@ -4230,15 +4250,40 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         for (const [key2, row] of original[name]) if (!final[name].has(key2))
           must((await query(queries[name].remove, pk(name, row))).rowCount === 1);
       for (const name of names) {
+        if (name === "memberships") {
+          stage = "projection-membership-flush";
+          for (const kind of ["update", "insert"]) {
+            const rows = [...final[name]].filter(([key2, row]) => kind === "update" ? original[name].has(key2) && JSON.stringify(row) !== JSON.stringify(original[name].get(key2)) : !original[name].has(key2)).map(([, row]) => row);
+            for (let at = 0; at < rows.length; ) {
+              const batch = [];
+              let bytes2 = 0;
+              while (at < rows.length && batch.length < 64) {
+                const row = rows[at], size = Buffer7.byteLength(JSON.stringify(row)) * 2;
+                if (batch.length && bytes2 + size > 128 * 1024) break;
+                must(size <= 128 * 1024);
+                batch.push(row);
+                bytes2 += size;
+                at++;
+              }
+              fence();
+              must((await privateMembershipBatch(c, queries[name][kind], batch)).rowCount === batch.length);
+              fence();
+            }
+          }
+          stage = "projection-finalize";
+          continue;
+        }
         for (const [key2, row] of final[name]) if (original[name].has(key2) && JSON.stringify(row) !== JSON.stringify(original[name].get(key2)))
           must((await query(queries[name].update, row)).rowCount === 1);
         for (const [key2, row] of final[name]) if (!original[name].has(key2))
           must((await query(queries[name].insert, row)).rowCount === 1);
       }
+      stage = "projection-commitguards";
       for (const check of commitGuards) {
         await check();
         fence();
       }
+      stage = "projection-commit";
       const ack = await query("commit");
       must(ack.command === "COMMIT");
       committed = true;
@@ -4285,12 +4330,16 @@ var id3 = (parts) => {
   const h = createHash7("sha256").update(JSON.stringify(["n88-publication-v1", ...parts])).digest("hex");
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20, 32)}`;
 };
-function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024, rollout = createRolloutGuard() } = {}) {
+function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024, rollout = createRolloutGuard(), materializeLegacyPublications = true } = {}) {
+  if (typeof materializeLegacyPublications !== "boolean") fail5();
   if (!Number.isSafeInteger(maxRows) || maxRows < 1 || maxRows > 1e4 || !Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 16 * 1024 * 1024) fail5();
-  return async (db, { query }, ownerId) => {
+  return async (db, { query, synchronizePhase = () => {
+  } }, ownerId) => {
+    synchronizePhase("synchronize-lock");
     if (!rollout.allowsOwner(ownerId)) fail5();
     if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(ownerId) || !db.contexts.some((c) => c.ownerId === ownerId && c.active)) fail5();
     await query("select n88_private.lock_canonical_sources($1::uuid,$2::integer)", [ownerId, maxRows]);
+    synchronizePhase("synchronize-memberships");
     const owners = [ownerId];
     const result2 = await query(`select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload
       from (select row_to_json(x)::text as payload from (
@@ -4346,10 +4395,12 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024, rol
         previous.set(key(m), m);
       }
     }
+    synchronizePhase("synchronize-sessions");
     for (const s of db.sessions.filter((s2) => s2.ownerId === ownerId && s2.revokedAt == null && rollout.allowsMember(s2))) {
       const m = db.memberships.find((m2) => key(m2) === key(s));
       if (!m || m.status !== "active" || m.endDate || !m.studentActive || !m.classActive || m.revision !== s.membershipRevision || m.canonicalStamp !== s.canonicalStamp) s.revokedAt = Date.now();
     }
+    synchronizePhase("synchronize-sources");
     const source = await query(`select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload
       from (select row_to_json(x)::text as payload from (
         select i.owner_id,i.id as item_id,left(i.name,160) as title,t.id as teaching_id,t.section_id,
@@ -4362,12 +4413,14 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024, rol
           and i.auto is null order by i.owner_id,i.id limit $2
       ) x) bounded`, [owners, maxRows + 1, maxBytes - bytes]);
     if (source.rows.length > maxRows) fail5();
+    synchronizePhase("synchronize-publications");
     const current = /* @__PURE__ */ new Set();
     for (const row of source.rows) {
       const r = read(row);
       if (!rollout.admitsTeacher({ ownerId, current: true }, { ownerId: r.owner_id, current: true, classId: r.section_id, teachingId: r.teaching_id })) continue;
       const revisions = [r.item_revision, r.teaching_revision, r.term_revision];
       if (!revisions.every((v) => typeof v === "string" && /^[1-9][0-9]*$/.test(v))) fail5();
+      if (!materializeLegacyPublications) continue;
       for (const m of db.memberships.filter((m2) => m2.ownerId === r.owner_id && m2.classId === r.section_id && m2.status === "active" && !m2.endDate && m2.studentActive && m2.classActive && rollout.admitsStudent(m2))) {
         const publicationId = id3([m.ownerId, m.enrollmentId, m.canonicalStamp, r.teaching_id, r.item_id, ...revisions]);
         current.add(publicationId);
@@ -4390,7 +4443,7 @@ function createCanonicalAdapter({ maxRows = 2e3, maxBytes = 2 * 1024 * 1024, rol
         if (db.publications.length > maxRows) fail5();
       }
     }
-    db.publications = db.publications.filter((p) => p.ownerId !== ownerId || !rollout.allowsMember(p) || !rollout.admitsTeacher({ ownerId, current: true }, { current: true, ownerId: p.ownerId, classId: p.classId, teachingId: p.source.teachingId }) || current.has(p.id));
+    if (materializeLegacyPublications) db.publications = db.publications.filter((p) => p.ownerId !== ownerId || !rollout.allowsMember(p) || !rollout.admitsTeacher({ ownerId, current: true }, { current: true, ownerId: p.ownerId, classId: p.classId, teachingId: p.source.teachingId }) || current.has(p.id));
   };
 }
 
@@ -4522,7 +4575,9 @@ function composeService(options, adapter) {
     acquire: options.acquire,
     limits: options.limits,
     timing: options.timing,
-    synchronize: createCanonicalAdapter(options.canonicalBounds)
+    // This host exposes only integrated numeric/student and class routes. Legacy
+    // publications are consumed solely by the separate legacy service host.
+    synchronize: createCanonicalAdapter({ ...options.canonicalBounds, materializeLegacyPublications: false })
   });
   return createIntegratedService(options, adapter, repository);
 }
@@ -4606,6 +4661,8 @@ function createWebEntry(options) {
     }
   };
   const service = composeService(options, adapter);
+  const transactionMs = Math.min(options.timing.transactionMs, 6e3), statementMs = Math.min(options.timing.statementMs, transactionMs);
+  const listService = composeService({ ...options, timing: { ...options.timing, transactionMs, acquireMs: Math.min(options.timing.acquireMs, transactionMs), statementMs, lockMs: Math.min(options.timing.lockMs, statementMs) } }, adapter);
   let running = 0;
   return async (request) => {
     if (running >= 8) return privateResponse();
@@ -4634,7 +4691,8 @@ function createWebEntry(options) {
         const r = { path: path.slice("/api/n88".length), method, body, headers: Object.fromEntries(["cookie", "origin", "content-type", "x-n88-csrf", "sec-fetch-site"].map((n) => [n, h.get(n) || ""])) };
         envelopes.set(r, { authorization: h.get("authorization"), signal: abort.signal, time: time2, nonce, source });
         try {
-          const result2 = await service(r);
+          const selected = method === "POST" && path === "/api/n88/teacher/class/list" ? listService : service;
+          const result2 = await selected(r);
           return Response.json({ status: result2.status, body: result2.body, cookie: result2.headers?.["Set-Cookie"] || null }, { headers: PRIVATE_WEB_HEADERS });
         } finally {
           envelopes.delete(r);
