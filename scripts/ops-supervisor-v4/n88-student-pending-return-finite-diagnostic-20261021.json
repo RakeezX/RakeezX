@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-student-pending-return-finite-diagnostic-20261021",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3540,
+      "scopeKey": "n88-actual-unconfirmed-session-pending-return-and-end-outcome-20261021",
+      "dependsOn": [
+        "continuous-n88-student-reopen-end-guidance-20261021"
+      ],
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 60,
+      "idleMinutes": 12,
+      "objective": "PO 2026-10-21 actual postpublication N88 clarification: on the latest student trial a fresh page first showed 'جارٍ التحقق من الجلسة…' and NO private student data ever appeared before the user moved to another window. On return to that same tab, a code-entry form appeared with 'جارٍ التحقق من الجلسة…' below it. This is not proof that an active session was lost in this particular attempt, although the earlier pre-revoke report remains unproven. End Session displayed a finite pending message and later DID reach a final state within its stated deadline; do not call this a permanent hang. Read the latest N88 Product row, current origin/main and the affected previous delivery only. Prove the current state-machine failure test-first: while a bootstrap or return GET is still unconfirmed, hiding the tab invokes clear(true), which prematurely paints the code form, and visible return invokes run(...sameForm=true), leaving a pending GET message under that form. The form must not communicate signed-out or permit a new code attempt before a bounded current-context authoritative GET resolves. Render a non-private neutral pending state through initial/hidden-return verification; on 200 show only current allowlisted projection, on explicit 401/403/410 show entry, and on 429/5xx/malformed/timeout show a truthful non-private retry state. Preserve one owned GET per return, abort/invalidate of superseded requests, no automatic claim/replay, no cookie/token/code in DOM, URL, storage, logs or diagnostics, and no stale data after pagehide/dispose. A separate synthetic test must cover hiding during End Session: private DOM stays retired; do not claim ACK from an aborted/uncertain POST, silently return to a blank code form, replay POST, or disclose late data. Keep final acknowledged End result and bounded uncertain recovery accessible, and do not regress the already observed finite End completion. Add an OPTIONAL user-triggered safe copy of only finite request action (read/end), phase (initial/return/manual/end), outcome (success/denied/rate/unavailable/timeout/stale), coarse HTTP status class, elapsedMs capped/bucketed, and visibility/retirement reason so a later PO trial can distinguish a slow/denied GET from UI transition. Never include exact URL, cookie, token, student code, name, student/class/owner/session identifiers, request body, response body, headers or provider exception text. No automatic transmission, extra account read, or raw instrumentation. Test actual composition at narrow and desktop widths with a controllable synthetic transport: held initial GET followed by hidden/visible before any private data, 200/401/503/timeout/late completion, same-tab return after prior valid projection, End acknowledged/uncertain/hidden/late completion, single request budget and diagnostic allowlist/clipboard. Use existing service semantics; do not change SQL/Auth/RLS/session cookie policy/native Edge/function/region/public pin. If private student JS changes, the original custodian must run a FRESH task/run/candidate-bound one-upload static gate after exact native/carrier/pin preflight, then provider and served source readback before LOCAL_READY. Preserve historical attempt markers append-only; no consumed gate reuse. Sole publisher handles Product main/frontend Production. Actual Chrome cause and Product acceptance remain open pending user safe diagnostic and postpublication result; do not close N88 or claim 100%. REVIEWED HARNESS SCOPE REPAIR 2026-10-21: the previous BLOCKED result was caused by the controller generic no-deploy prompt despite this card explicitly authorizing one original-custodian private-static carrier prerequisite. The exact-card prompt now distinguishes this carrier from Product main/frontend publication. Continue the same saved session, worktree, candidate and base; do the fresh guarded private-static preflight/upload/readback once, preserve prior PASS evidence, and keep the required static check NOT_RUN until its actual provider and served parity exists. A real tool denial remains binding.",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/styles/student-portal-login.css",
+        "drafts/n88-student-portal/**",
+        "tests/n88-student-pending-return-finite-diagnostic-20261021/**",
+        "docs/automation-evidence/20261021/N88_STUDENT_PENDING_RETURN_FINITE_DIAGNOSTIC.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js"
+      ],
+      "requiredChecks": [
+        "n88_pending_bootstrap_return_never_exposes_code_form_or_private_data_before_verified_result",
+        "n88_read_outcome_is_current_bounded_and_truthful_for_200_401_5xx_timeout_and_late_reply",
+        "n88_end_hidden_ack_uncertainty_and_late_reply_are_safe_and_finite",
+        "n88_optional_diagnostic_is_allowlisted_private_and_adds_no_request",
+        "n88_changed_private_static_custody_and_served_parity"
+      ],
+      "acceptance": [
+        "The latest PO sequence shows neutral pending state rather than a code form while a fresh or returning session GET has no authoritative result.",
+        "End Session keeps private content retired and conveys an acknowledged result or explicit uncertainty without claiming a server outcome from a cancelled request.",
+        "A copied diagnostic gives only finite phase, outcome and elapsed timing for one request; actual student session reliability remains unclaimed until a postpublication PO trial."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261021-N88-actual-pending-return-clarification",
+        "publication": true,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "providerServiceOperations": 0,
+        "sqlAuthSchemaChanges": 0,
+        "regionChanges": 0,
+        "maxChangedPrivateStaticUploads": 1,
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "maxChangedStudentCarrierUploads": 1,
+        "nativeDeployments": 0,
+        "publicPinChanges": 0,
+        "newReadinessRequests": 0,
+        "appendOnlyAttemptHistory": true,
+        "resetConsumedMarkers": false,
+        "officialCloudflareConnection": {
+          "serverName": "rakeez_cloudflare",
+          "endpoint": "https://mcp.cloudflare.com/mcp",
+          "sameSavedSessionReadOnlyCapabilityRequired": true,
+          "noRawSecretToolArguments": true
+        }
+      },
+      "releaseAuthority": "The PO's direct actual N88 clarification authorizes this bounded client-state correction, finite optional diagnostic and publication. The scoped worker may make one changed private static carrier upload through the original N88 custodian after fresh native/carrier/public-pin preflight and append-only task/run/candidate-bound one-attempt reservation; verify exact provider/native/carrier and served student bytes before LOCAL_READY. Sole generic publisher handles Product main/frontend Production. No native Edge/function upload, SQL/Auth/schema/RLS/cookie-policy/region/public-pin change, real student/account read or write, consumed gate reuse, automatic transmission, or bypass of a tool rejection. If guarded private-static publication is unavailable, return BLOCKED rather than publishing an incomplete student fix.",
+      "liveAuthorizationRef": "PO-20261021-N88-STUDENT-PENDING-RETURN-STATIC-DELIVERY"
+    }
+  ]
+}

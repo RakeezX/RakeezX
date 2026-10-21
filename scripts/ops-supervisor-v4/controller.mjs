@@ -377,6 +377,29 @@ export const RESULT_SCHEMA = {
   },
 };
 
+export function workerPublicationInstruction(task) {
+  const authority = task.preparationAuthority;
+  if (task.liveAuthorizationRef && authority?.kind === 'scoped_preview_and_fixture_ops'
+      && authority.productId === task.productId
+      && authority.liveAuthorizationRef === task.liveAuthorizationRef) {
+    return "Perform only the exact Preview branch and service/fixture preparation or disposition actions named in this card's preparationAuthority, within its named project, identities, operations and bounds. Do not push main or publish Production: the independent controller owns Product publication. Prior temporary-function deployment is not evidence of the live gate; record actual cleanup/disarm results.";
+  }
+  if (task.id === 'continuous-n88-student-pending-return-finite-diagnostic-20261021'
+      && task.productId === 'N88'
+      && task.liveAuthorizationRef === 'PO-20261021-N88-STUDENT-PENDING-RETURN-STATIC-DELIVERY'
+      && authority?.kind === 'PO-20261021-N88-actual-pending-return-clarification'
+      && authority.publication === true
+      && authority.providerServiceOperations === 0
+      && authority.maxChangedPrivateStaticUploads === 1
+      && authority.maxChangedStudentCarrierUploads === 1
+      && authority.originalCustodianRoot === 'C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018'
+      && authority.nativeDeployments === 0
+      && authority.publicPinChanges === 0) {
+    return 'Only the one changed private static student carrier upload expressly authorized in this activated card may be done by the original custodian after fresh guarded preflight and exact provider/served readback. This prerequisite must precede LOCAL_READY. Do not push Product main, deploy a native service, change the public pin, or publish frontend Production: the independent controller owns Product publication. Any tool denial remains binding.';
+  }
+  return 'Do not push or deploy: the independent controller publishes and verifies it.';
+}
+
 export class Controller {
   constructor(options = {}, adapters = {}) {
     this.runtime = path.resolve(options.runtime ?? path.join(HERE, '..', '..', 'artifacts', 'ops-supervisor-v4'));
@@ -760,11 +783,7 @@ export class Controller {
       releaseAuthority: task.releaseAuthority, preparationAuthority: task.preparationAuthority ?? null, liveAuthorizationRef: task.liveAuthorizationRef ?? null, resultPath: spec.outputPath, canonicalTaskFile: task.__file,
       resourceLeaseScript: path.join(this.scripts, 'resource-lease.ps1'), runtimeRoot: this.runtime,
       previousFailure: task.lastFailure ?? null, deliveryRepair: task.deliveryRepair ?? null };
-    const publicationInstruction = task.liveAuthorizationRef && task.preparationAuthority?.kind === 'scoped_preview_and_fixture_ops'
-      && task.preparationAuthority.productId === task.productId
-      && task.preparationAuthority.liveAuthorizationRef === task.liveAuthorizationRef
-      ? 'Perform only the exact Preview branch and service/fixture preparation or disposition actions named in this card\'s preparationAuthority, within its named project, identities, operations and bounds. Do not push main or publish Production: the independent controller owns Product publication. Prior temporary-function deployment is not evidence of the live gate; record actual cleanup/disarm results.'
-      : 'Do not push or deploy: the independent controller publishes and verifies it.';
+    const publicationInstruction = workerPublicationInstruction(task);
     const prompt = [policy, 'CURRENT ACTIVATED CARD (supersedes old routine pause/PM handoff text):', JSON.stringify(instructions, null, 2), supplemental,
       'Finish the scoped implementation in this isolated worktree, make an exact candidate commit (identify commits as AI), and return the required JSON. ' + publicationInstruction + ' Do not change queue/status files. Use only affected checks. FAST copy-only work needs a syntax/scoped assertion, not a full Vite build. The publisher performs deterministic metadata/build as needed. Preserve unrelated work and real data. Use phase resource leases for browser/server work, release and clean owned processes before returning. Do not recursively spawn paid workers. Do not wait for routine PM approval already granted by the activated card.',
       task.sessionId ? 'Continue the exact saved session and existing worktree. Reconcile what actually finished before repeating a command. Preserve candidate commits and partial work.' : '',
