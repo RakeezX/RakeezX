@@ -260,6 +260,17 @@ export function verifiedLiveServiceDeclarationRepair(task,result,update){
     &&result.blockerType==='none'&&!result.blocker&&verifiedLiveServicePublication(declared,d)&&verifiedDeployment(declared,d);
 }
 
+// A named post-delivery check belongs to the publisher, so NOT_RUN is expected
+// before the worker's candidate reaches publication. It cannot be required work.
+export function reviewedNameRepairCheckOutcomes(task,result) {
+  return Array.isArray(result?.checks) && result.checks.every(c=>
+    c.status==='PASS' || c.status==='NOT_RUN' && (
+      c.name==='production_publication'
+      || (c.name==='publication_and_official_account' || c.name==='Production_parity_and_official_source_acceptance') && task.productId==='N36'
+      || Array.isArray(task.postDeliveryChecks) && task.postDeliveryChecks.includes(c.name) && !task.requiredChecks?.includes(c.name)
+    ));
+}
+
 export function verifyInactiveIdentity(task, result, update, activationId, historicalContext = null) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
@@ -292,7 +303,7 @@ export function verifyInactiveIdentity(task, result, update, activationId, histo
     && Array.isArray(result.changedPaths) && result.changedPaths.length>0
     && result.changedPaths.every(p=>task.allowedPaths.some(a=>a===p || a.endsWith('/**') && p.startsWith(a.slice(0,-2))))
     && Array.isArray(result.checks) && result.checks.some(c=>c.status==='PASS')
-    && result.checks.every(c=>c.status==='PASS' || c.status==='NOT_RUN' && (c.name==='production_publication' || (c.name==='publication_and_official_account' || c.name==='Production_parity_and_official_source_acceptance') && task.productId==='N36'))
+    && reviewedNameRepairCheckOutcomes(task,result)
     && same(update.card.requiredChecks,task.requiredChecks)
     && same(update.card.allowedPaths,task.allowedPaths)
     && Object.entries(update.card).every(([key,value])=>
