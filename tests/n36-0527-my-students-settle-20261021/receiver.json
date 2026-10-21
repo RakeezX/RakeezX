@@ -1,0 +1,129 @@
+{
+  "taskId": "continuous-n36-0527-my-students-settle-20261021",
+  "runId": "a54b83f0-4082-4c46-b00e-5c4bb84faf40",
+  "runtimeFingerprint": "780f0e007cba4a12d13af7a1319253983c5f7048265904d79a8486f502dd394c",
+  "boundary": "Actual application ownership/session/batch guards, ESM worker, serialized receiver, IndexedDB and UI; synthetic Chrome APIs and synthetic service only. Reuses existing loopback protocol substitution. Deadline checkpoint aged synthetically, not live time/portal.",
+  "previousFailures": [
+    "Error: Worker fixture deadline: {\"id\":\"f6ff0ccdc594516dd03d8fd17945a9e2550e57eb1609e8e543f53f658152cb1a\",\"phase\":\"collect\",\"startPhase\":\"accepted\",\"failureStep\":\"none\",\"failureJobPhase\":\"none\",\"code\":null,\"added\":0,\"existing\":0,\"fields\":[],\"staged\":303,\"observed\":303,\"coverage\":\"unknown\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false}\n    at Object.wait (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-actual-handoff-limit-20261020/worker-fixture.mjs:29:151)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:32:79\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:15:62",
+    "Error: Worker fixture deadline: {\"id\":\"45484d893422221cd393cb2db3b5bce9d5ed07b2b8ef797d92de342d7709957a\",\"phase\":\"receipt\",\"startPhase\":\"accepted\",\"failureStep\":\"none\",\"failureJobPhase\":\"none\",\"code\":null,\"added\":0,\"existing\":0,\"fields\":[],\"staged\":303,\"observed\":303,\"coverage\":\"complete\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false}\n    at Object.wait (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-actual-handoff-limit-20261020/worker-fixture.mjs:29:151)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:32:204\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:15:62",
+    "Error: Actual receiver rejected claim\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:32:391\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:15:62",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'BATCH_EXPIRED'\n- 'APP_CHANGED'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:38:47\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0527-my-students-settle-20261021/tests/n36-0527-my-students-settle-20261021/receiver.mjs:15:62"
+  ],
+  "checks": [
+    {
+      "mode": "complete",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "partial",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "partial",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "owner",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "session",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "receiver",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "batch",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "BATCH_EXPIRED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "receiver-route",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    }
+  ],
+  "reusedChecks": [],
+  "status": "PASS"
+}

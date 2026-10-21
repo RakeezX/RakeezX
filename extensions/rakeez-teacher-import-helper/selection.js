@@ -218,6 +218,16 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   const shownSchool=schoolBadges[0];
   if(runContext?.schoolName&&shownSchool&&runContext.schoolName!==shownSchool)return roleFail('SCHOOL_CONTEXT_CHANGED');
   if(mode==='gateway'&&entryPath&&(document.readyState!=='complete'||Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible)))return {...roleFail('ENTRY_PENDING'),retry:true};
+  // AI: optional MyStudents timeout requires positive teacher + selected school
+  // evidence in this document, not merely absence of an administrator badge.
+  if(mode==='roster-guard'){
+    if(document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
+    if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
+    if(!activeTeacher.length&&greetings.length!==1)return roleFail('UNCONFIRMED_TEACHER_ROLE');
+    if(!runContext?.schoolId||!runContext.schoolName||shownSchool!==runContext.schoolName)return roleFail('SCHOOL_CONTEXT_CHANGED');
+    try{globalThis.rakeezRoutePolicy(location.origin,location.href,runContext);}catch(e){return roleFail(e.message);}
+    return {ok:true,domain:location.hostname};
+  }
   if(mode==='guard'){if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');return {ok:true,domain:location.hostname};}
   if(mode==='home'&&(cards.length||gatewayRejected)){
     if(gatewayRejected)return {...roleFail('UNSAFE_OR_AMBIGUOUS_SCHOOL_CARD','link-discovery'),diagnostic:{...gatewayDiagnostic,stage:'link-discovery',reason:'UNSAFE_OR_AMBIGUOUS_SCHOOL_CARD',entry}};

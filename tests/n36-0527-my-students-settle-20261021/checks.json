@@ -1,0 +1,32 @@
+[
+  {
+    "name": "n36_actual_0527_303_then_my_students_bounded_result",
+    "status": "PASS",
+    "evidence": "tests/n36-0527-my-students-settle-20261021/browser.json and receiver.json: immutable .27 reproduces exact completed/new/query MyStudents timeout with 303 staged; .28 safely finishes terminal/partial scenarios, actual receiver receipts 300 + 3 and 303 IndexedDB rows."
+  },
+  {
+    "name": "n36_teacher_entry_both_paths_and_context_denials",
+    "status": "PASS",
+    "evidence": "tests/n36-0527-my-students-settle-20261021/browser.json: 35 synthetic cases including dashboard and selected teacher-card Start; tests/n36-0527-my-students-settle-20261021/receiver.json: 7 real-app/store scenarios, owner/session/document/batch/route denials without transfer or durable writes."
+  },
+  {
+    "name": "n36_0528_package_link_and_safe_diagnostic_exact",
+    "status": "PASS",
+    "evidence": "tests/n36-0527-my-students-settle-20261021/package.json, browser.json, receiver.json, actual-download-link.png: 29-entry immutable ZIP/source parity, unchanged permission/CSP/receiver boundary, actual UI download hash 8d2240620198941fe5fef74cb736db7b77a4183b4802541c4d8635dda82bd843, real popup copy-handler privacy/finite states."
+  },
+  {
+    "name": "owned_local_resources_released",
+    "status": "PASS",
+    "evidence": "Canonical withIsolatedLocalBrowser finally closed fresh contexts/browser; both owned HTTP servers closed in finally. Post-phase TCP probes: [{\"port\":49738,\"status\":\"closed\",\"code\":\"ECONNREFUSED\"},{\"port\":49739,\"status\":\"closed\",\"code\":\"ECONNREFUSED\"}]"
+  },
+  {
+    "name": "n36_verified_package_stable_folder_parity",
+    "status": "NOT_RUN",
+    "evidence": "Independent publisher must verify Production ZIP/link and then stable-folder runtime parity. No push, deploy, stable update or native Chrome reload performed."
+  },
+  {
+    "name": "actual_madrasati_import",
+    "status": "NOT_RUN",
+    "evidence": "Later PO manual 0.5.28 diagnostic required; no portal account, real collection, credentials or real data touched."
+  }
+]
