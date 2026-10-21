@@ -64,3 +64,9 @@ Only this aggregation and documentation changed during continuation. The .33 exe
 ```powershell
 node tests/n36-0636-missing-myinfo-setup-order-20261021/checks.mjs --run-id=8adeead2-377d-4fb2-9ff4-d7c447042267
 ```
+
+## Required-name correction — resumed run 947c4d46-6f79-4cb5-8290-52ceca171067
+
+The activated card explicitly clarifies that the expected red-first reproduction is reported under the original required name `n36_0532_immutable_full_runtime_no_myinfo_opposite_dom_order_setup_receipts` with PASS for reproduction proof. The aggregate now uses that exact name, replacing only the distinct reproduction alias introduced in the prior continuation. Its assertions and evidence meaning are unchanged: immutable .32 acceptance remains FAIL, all original traces remain untouched, and unchanged .33 evidence is reused. All other aggregate check names and statuses remain unchanged. No Product code/package/link change, new browser phase, publication or queue mutation occurred.
+
+Current-run verification: `node tests/n36-0636-missing-myinfo-setup-order-20261021/checks.mjs --run-id=947c4d46-6f79-4cb5-8290-52ceca171067`, JS syntax, unchanged Product/raw-evidence Git comparison and whitespace checks.

@@ -1,6 +1,6 @@
 {
   "taskId": "continuous-n36-0636-missing-myinfo-setup-order-20261021",
-  "runId": "8adeead2-377d-4fb2-9ff4-d7c447042267",
+  "runId": "947c4d46-6f79-4cb5-8290-52ceca171067",
   "baseSha": "baa8fe5eb4577362d81ab9643aef219331fa2f06",
   "reusedEvidenceRunId": "33864882-7d7d-4a20-a301-78ec47c3fbe1",
   "reusedProductCandidateSha": "6bcd95d8806eddecb13935398508473e58e8565c",
@@ -13,7 +13,7 @@
   "runtimeFingerprint": "9c791bd5975c40ad5534271442808ceb42dcfd03bc475121375bdfec5df075b5",
   "checks": [
     {
-      "name": "n36_0532_immutable_setup_order_failure_reproduction",
+      "name": "n36_0532_immutable_full_runtime_no_myinfo_opposite_dom_order_setup_receipts",
       "status": "PASS",
       "evidence": "Reproduction assertions passed: immutable.json retains status FAIL and four empty-school SCHOOL_CONTEXT_CHANGED failures with zero delivery; four no-MyInfo dashboard/card cases retain PASS and 300+3 saved receipts. This check validates the captured reproduction, not .32 acceptance; NO_CHANGE remains invalid."
     },
