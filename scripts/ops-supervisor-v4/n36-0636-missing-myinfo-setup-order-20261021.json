@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-0636-missing-myinfo-setup-order-20261021",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -3520,
+      "scopeKey": "n36-0532-missing-myinfo-setup-order-proof-20261021",
+      "dependsOn": [
+        "continuous-n36-0531-source-school-binding-before-transfer-20261021"
+      ],
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 55,
+      "idleMinutes": 12,
+      "objective": "N36 0.5.32 is verified in Production and its stable 29-file folder, but the browser fixture report-binding/menu-binding scenarios did not assert classes or timetable and every dashboard scenario supplied a MyInfo link. FIRST use the immutable public 0.5.32 ZIP in the actual popup/background/selection/source-adapter/collector/receiver synthetic loopback runtime to test a semantic teacher dashboard with one validated observed SchoolId, no school badge and NO MyInfo link. Place visibly observed exact same-origin class and timetable links before the visible MyStudents/report link in one DOM order and after it in the opposite order; report school column provides the only explicit school name. Assert the school binds before setup GET, each classes/timetable route is read exactly once after binding, teacher/school/classes/timetable fields are present in both 300+3 saved receiver receipts, 303 rows and coverage remain correct, no visual source navigation occurs, and no unexpected URL/resource is fetched. Also exercise MyInfo link present but empty school field, and selected teacher-card preservation, with the same exact setup assertions. If immutable 0.5.32 passes every case, return NO_CHANGE with captured reproducible evidence and no version or publication; do not manufacture a code change. If a case fails, identify the exact lost/deferred route and make only the minimal queue/read-order correction, add negative tests for absent/conflicting school and owner/document/session drift with zero receiver transfer, then version 0.5.33, package/link and return LOCAL_READY for sole publisher. Never re-read or enqueue a setup route unboundedly, guess a school name/URL/identifier, weaken role/school/readProof gates, transfer students before school binding, or drop supported teacher/principal/school/classes/timetable fields silently. No personal/dedicated Madrasati browser automation, real school/account mutation, Auth/SQL/grades/Sync/permissions changes or Product CLOSED claim. User manual actual source acceptance remains pending only after this narrow proof or verified repair. VALIDATION NAME REPAIR ONLY after local 0.5.33 candidate c38db7dfc2439890cf86a6aec21d7360b079e62d: the immutable 0.5.32 expected red-first reproduction is a PASS for the required check n36_0532_immutable_full_runtime_no_myinfo_opposite_dom_order_setup_receipts because no-MyInfo opposite orders passed and the explicit empty-MyInfo failure was observed as required before repair. Preserve immutable.json status FAIL and every original trace; do not relabel actual 0.5.32 acceptance as successful. Reuse unchanged 0.5.33 PASS candidate evidence, report the original required check name PASS as reproduction proof, keep all other check names and statuses, return exact resumed run/base/candidate. No Product code change or new publication by this ops update.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "tests/n36-0636-missing-myinfo-setup-order-20261021/**",
+        "docs/automation-evidence/20261021/N36_0636_MISSING_MYINFO_SETUP_ORDER.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/background-collector.js",
+        "extensions/rakeez-teacher-import-helper/background-runner.js",
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_0532_immutable_full_runtime_no_myinfo_opposite_dom_order_setup_receipts",
+        "n36_0533_if_needed_safe_deferred_route_and_zero_transfer_negatives",
+        "n36_0533_if_needed_300_plus_3_package_link_and_29_file_parity"
+      ],
+      "postDeliveryChecks": [
+        "n36_if_changed_verified_package_stable_folder_parity"
+      ],
+      "acceptance": [
+        "An immutable public 0.5.32 full-runtime fixture proves no-MyInfo source school binding preserves classes and timetable in both opposite DOM orders, exactly once each, with 300+3 saved receipts; NO_CHANGE is valid only with this evidence.",
+        "If 0.5.32 fails, the narrow 0.5.33 correction passes the same cases and missing/conflicting school or context drift leaves zero receiver deliveries.",
+        "A changed package reaches verified Production and 29-file stable parity through the sole publisher; an unchanged result needs no publication. Neither outcome certifies actual Madrasati acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261021 N36 0.5.32 setup-preservation gap after verified release",
+        "publication": "conditional-on-failed-immutable-fixture-and-repair",
+        "realSchoolRead": false,
+        "realAccountMutations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "The PO authorized completing N36 and preserving supported teacher/school/classes/timetable fields while avoiding another unproven manual trial. Exact synthetic proof or a scoped correction may continue through the controller and sole publisher; personal-browser noninterference and data safeguards remain binding.",
+      "completionMode": "repair_validation_check_names",
+      "checkNameRepair": {
+        "previousResultSha256": "8a25cecb7fd15957849de80403fbd1384c4f12d988e03d76079f3051d5c57660",
+        "previousFailureSha256": "9618e202b4ad8a1320285502fa7dfdf6b5c32642fb5bd445f4fc204bf0a6b862",
+        "reason": "The worker safely reproduced an expected immutable 0.5.32 failure, repaired the empty-school binding in 0.5.33, and passed all 17 guarded runtime cases, package and download. The follow-up result reported that valid red-first reproduction under a new check name instead of the card required name. Resume the exact saved session to report the original required name as PASS for successful reproduction, while preserving the actual FAIL artifact and all Product safeguards."
+      }
+    }
+  ]
+}
