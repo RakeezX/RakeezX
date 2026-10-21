@@ -41,7 +41,7 @@ export function createBackgroundRunner({transport}){
   await chrome.storage.session.remove(JOB);await chrome.alarms.clear(ALARM);
   j.failureStep=error?.sourceFailureStep??'none';j.failureJobPhase=code?j.phase:'none';
   await chrome.storage.session.set({[VIEW]:{...view(j),phase,code}});
-  try{await chrome.scripting.executeScript({target:{tabId:j.tabId,...(j.sourceDocument?{documentIds:[j.sourceDocument]}:{frameIds:[0]})},world:'ISOLATED',func:id=>{if(globalThis.rakeezTeacherReadGuard?.jobId===id)delete globalThis.rakeezTeacherReadGuard;for(const [key,c] of globalThis.rakeezReportRequests??[])if(key.startsWith(id+'|'))c.abort();},args:[j.id]});}catch{/* Lost source access is never recovered by navigation. */}
+  try{await chrome.scripting.executeScript({target:{tabId:j.tabId,...(j.sourceDocument?{documentIds:[j.sourceDocument]}:{frameIds:[0]})},world:'ISOLATED',func:id=>{if(globalThis.rakeezTeacherReadGuard?.jobId===id){delete globalThis.rakeezTeacherReadGuard;delete globalThis.rakeezSetupPageReader;}for(const [key,c] of globalThis.rakeezReportRequests??[])if(key.startsWith(id+'|'))c.abort();},args:[j.id]});}catch{/* Lost source access is never recovered by navigation. */}
   // Revoke this job only. App-owned durable batches are never deleted.
   await transport({type:'n36-cancel'},authority(j));
  });}
@@ -113,10 +113,28 @@ export function createBackgroundRunner({transport}){
   }
   // Unimplemented student routes never fall through to visible navigation.
   if(n.kind==='students')throw Error('UNSAFE_ROSTER_LINK');
-  // AI: once a teacher document exposes its SchoolId menu, keep this bounded
-  // read run there. Optional unsupported categories remain explicit, never navigated.
-  if(['metadata','classes','timetable'].includes(n.kind)&&j.context?.schoolId){
-   return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SOURCE_BOUND_READ_UNAVAILABLE'}],skipped:[]}};
+  // AI: ordinary setup reads use only hrefs captured in this verified teacher
+  // document. Never navigate or expand discovery from a fetched response.
+  if(['metadata','classes','timetable'].includes(n.kind)){
+   if(!j.context?.schoolId||!j.context?.schoolName)return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SETUP_SCHOOL_UNAVAILABLE'}],skipped:[]}};
+   await source(j,'read-proof');await appGuard(j);
+   if(!j.setupLinks?.some(l=>l.kind===n.kind&&l.path===n.path))throw Error('UNOBSERVED_SETUP_LINK');
+   let settled=false;
+   const pending=chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['fetch',{...j.context,setupKind:n.kind,path:n.path,sourceURL:j.sourceURL,requestId:j.id+'|'+n.path,remainingMs:Math.min(8000,j.expiresAt-Date.now())}]}).finally(()=>{settled=true;});
+   let r;
+   try{
+    // Receiver owner/session/batch and live teacher/document remain gates while
+    // the bounded request is pending, as well as before and after it.
+    while(!settled){await Promise.race([pending,new Promise(resolve=>setTimeout(resolve,100))]);if(!settled){await appGuard(j);await source(j,'read-proof');}}
+    r=await pending;
+   }catch(e){
+    await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:key=>globalThis.rakeezReportRequests?.get(key)?.abort(),args:[j.id+'|'+n.path]}).catch(()=>{});
+    await pending.catch(()=>{});throw e;
+   }
+   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
+   await source(j,'read-proof');await appGuard(j);
+   if(!r[0].result?.ok)throw Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');
+   return {...n,page:r[0].result};
   }
   if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(j.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');j.roleSwitchUsed=true;}
   // A crash before update may only resume if still in the original document;

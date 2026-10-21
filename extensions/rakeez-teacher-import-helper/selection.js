@@ -89,10 +89,11 @@ export function readSelectedCategoryTable(category) {
 }
 
 // Closure-free automatic reader. Invoked only by an explicit bounded run, not at startup.
-export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runContext=null) {
+export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runContext=null,source=null) {
+  const document=source?.document??globalThis.document,location=source?new URL(source.url):globalThis.location,body=document.body??document;
   const fail=code=>({ok:false,code});
   const text=n=>n.textContent.trim().replace(/\s+/g,' ');
-  const visible=n=>{for(let el=n;el;el=el.parentElement){const css=getComputedStyle(el);if(el.hidden||el.getAttribute('aria-hidden')==='true'||css.display==='none'||css.visibility!=='visible'||Number(css.opacity)===0)return false;}return n.getClientRects().length>0;};
+  const visible=n=>{for(let el=n;el;el=el.parentElement){const css=source?el.style:getComputedStyle(el);if(el.matches('[inert],.hidden,.d-none,.sr-only')||el.hidden||el.getAttribute('aria-hidden')==='true'||css.display==='none'||(source?css.visibility==='hidden':css.visibility!=='visible')||(css.opacity!==''&&Number(css.opacity)===0))return false;}return source?true:n.getClientRects().length>0;};
   const plain=n=>visible(n)&&!n.querySelector('input,textarea,button,a,iframe,table,script,style')&&Array.from(n.querySelectorAll('*')).every(visible);
   const login=/\b(?:login|signin|logout|oauth)\b/i.test(location.pathname)||Array.from(document.querySelectorAll('input[type=password]')).some(visible)||Array.from(document.querySelectorAll('h1,h2,[role=heading]')).some(n=>visible(n)&&['تسجيل الدخول','انتهت الجلسة','رمز التحقق','تم تعطيل الحساب','تم حذف الحساب','الحساب غير نشط','Sign in','Login'].includes(text(n)));
   if(login)return fail('LOGIN_OR_LOGOUT');
@@ -201,19 +202,19 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   const actionMarkers=['الجدول الدراسي','سجلات متابعة الفصول','تقارير المعلم'].filter(l=>matching(l).length>0).length;
   const readTargets=[...new Set([...safeRead('قائمة الطلاب'),...safeRead('الجدول الدراسي')].map(a=>{const u=new URL(a.href);return u.pathname+u.search;}))];
   const coherent=labels=>matching(labels[0]).some(first=>{
-    for(let scope=first.parentElement,depth=0;scope&&scope!==document.body&&depth<12;scope=scope.parentElement,depth++)if(labels.every(label=>matching(label).some(n=>scope.contains(n))))return true;return false;
+    for(let scope=first.parentElement,depth=0;scope&&scope!==body&&depth<12;scope=scope.parentElement,depth++)if(labels.every(label=>matching(label).some(n=>scope.contains(n))))return true;return false;
   });
   const semanticDashboard=entryPath&&navMarkers===2&&actionMarkers>=2&&coherent(['قائمة الطلاب','سجلات المتابعة اليومية'])&&(coherent(['الجدول الدراسي','سجلات متابعة الفصول'])||coherent(['الجدول الدراسي','تقارير المعلم']));
-  if(semanticDashboard)dashboards.push(document.body);
+  if(semanticDashboard)dashboards.push(body);
   const dashboard=semanticDashboard;
-  const entry={pageKind:cards.length||gatewayRejected?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',readyState:document.readyState,roleMarkers:Math.min(roleValuesIn(document.body).length,10),schoolOptions:Math.min(cards.length,20),navMarkers,actionMarkers,safeReadLinks:Math.min(readTargets.length,20),iframeCount:Math.min(document.querySelectorAll('iframe').length,20),linkStats};
+  const entry={pageKind:cards.length||gatewayRejected?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',readyState:document.readyState,roleMarkers:Math.min(roleValuesIn(body).length,10),schoolOptions:Math.min(cards.length,20),navMarkers,actionMarkers,safeReadLinks:Math.min(readTargets.length,20),iframeCount:Math.min(document.querySelectorAll('iframe').length,20),linkStats};
   let safeReportLinks=0,explicitRoles=0;
   const roleFail=(code,stage='role-selection')=>({...fail(code),diagnostic:{version:'0.4.5',stage,reason:code,category:'role',entry}});
   if(adminConflict)return roleFail('NON_TEACHER_ROLE');
   if(runContext?.schoolId&&observedSchoolIds.some(id=>id!==runContext.schoolId.toLowerCase()))return roleFail('SCHOOL_CONTEXT_CHANGED');
   if(observedSchoolIds.length>1)return roleFail('AMBIGUOUS_SCHOOL_CONTEXT');
   // Compare only explicitly labelled/badged school values, never a generic report heading.
-  const schoolBadges=[...new Set([...labelValues(document.body,['اسم المدرسة']),...Array.from(document.querySelectorAll('.school-name')).filter(visible).map(roleText).filter(validValue)])];
+  const schoolBadges=[...new Set([...labelValues(body,['اسم المدرسة']),...Array.from(document.querySelectorAll('.school-name')).filter(visible).map(roleText).filter(validValue)])];
   if(schoolBadges.length>1)return roleFail('AMBIGUOUS_SCHOOL_CONTEXT');
   const shownSchool=schoolBadges[0];
   if(runContext?.schoolName&&shownSchool&&runContext.schoolName!==shownSchool)return roleFail('SCHOOL_CONTEXT_CHANGED');
@@ -221,7 +222,9 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   // AI: optional MyStudents timeout requires positive teacher + selected school
   // evidence in this document, not merely absence of an administrator badge.
   // AI: proof belongs to this live teacher document, never to a badge-less fetched menu.
-  const currentTeacherProof=()=>JSON.stringify({url:location.href,school:shownSchool,schoolId:observedSchoolIds[0],roles:[...new Set(activeTeacher)].sort(),greetings,teacher:labelValues(document.body,['اسم المعلم','اسم المعلمة']).sort()});
+  const welcomeCandidates=dashboard?Array.from(body.querySelectorAll('p,span,h1,h2,h3')).filter(visible).filter(n=>!Array.from(n.children).some(child=>/^مرحبا بك /.test(roleText(child)))).map(roleText).filter(v=>/^مرحبا بك /.test(v)):[];
+  const welcomeNames=[...new Set(welcomeCandidates.map(v=>v.slice('مرحبا بك '.length)).filter(v=>validValue(v)&&!/[0-9٠-٩]/.test(v)))];
+  const currentTeacherProof=()=>JSON.stringify({url:location.href,school:shownSchool,schoolId:observedSchoolIds[0],roles:[...new Set(activeTeacher)].sort(),greetings,teacher:[...new Set([...labelValues(body,['اسم المعلم','اسم المعلمة']),...welcomeNames])].sort()});
   if(mode==='read-proof'){
     if(!entryPath||document.readyState!=='complete'||document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
     if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
@@ -231,6 +234,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
     if(runContext.readProof&&runContext.readProof!==proof)return roleFail('TEACHER_CONTEXT_CHANGED');
     globalThis.rakeezTeacherReadGuard=()=>readAutomaticTeacherPage('read-proof',null,{...runContext,readProof:proof});
     globalThis.rakeezTeacherReadGuard.jobId=runContext.readJobId;
+    globalThis.rakeezSetupPageReader=(kind,context,input)=>readAutomaticTeacherPage(kind,null,context,input);
     return {ok:true,proof};
   }
   if(mode==='roster-guard'){
@@ -250,7 +254,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
     return {ok:true,entry,runContext:chosen.context,links:[{kind:'gateway',path:chosen.path,context:chosen.context}],tables:chosen.tables,warnings:[],skipped:[]};
   }
   const labels={role:teacher,metadata:['بياناتي','معلوماتي','البيانات الشخصية'],classes:['فصولي','الفصول الدراسية','الفصول التي أدرسها'],students:['قائمة الطلاب','أسماء الطلاب','طلاب الفصل','بيانات الطلاب'],timetable:['جدولي','جدولي الأسبوعي','الجدول الأسبوعي','الجدول الدراسي']};
-  const anchors=Array.from(document.querySelectorAll('a[href]')).filter(visible);if(anchors.length>150)return fail('PAGE_LIMIT');
+  const anchors=source?[]:Array.from(document.querySelectorAll('a[href]')).filter(visible);if(anchors.length>150)return fail('PAGE_LIMIT');
   const links=[],skipped=[];
   for(const a of anchors){
     const title=roleText(a);let kind=Object.keys(labels).find(k=>labels[k].includes(title));
@@ -276,18 +280,19 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   if(adminConflict)return roleFail('NON_TEACHER_ROLE');
   if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
   const confirmed=dashboard||activeTeacher.length>0||(greetings.length===1&&safeReportLinks>0);
-  if(mode==='home'&&!confirmed){if(roles.length!==1)return roleFail('AMBIGUOUS_OR_MISSING_TEACHER_ROLE');return {ok:true,entry,rolePending:true,links:roles,skipped,domain:location.hostname,title:document.title.replace(/https?:\/\/\S+/g,'').slice(0,80),tables:[],warnings:[]};}
+  if(mode==='home'&&!confirmed){if(roles.length!==1)return roleFail('AMBIGUOUS_OR_MISSING_TEACHER_ROLE');return {ok:true,entry,rolePending:true,links:roles,skipped,domain:location.hostname,title:(document.title??'').replace(/https?:\/\/\S+/g,'').slice(0,80),tables:[],warnings:[]};}
   if(['role','gateway'].includes(mode)&&!confirmed)return roleFail('UNCONFIRMED_TEACHER_ROLE');
   const specs={department:['إدارة التعليم'],teacher:['اسم المعلم'],school:['اسم المدرسة'],principal:['اسم المدير'],classes:['الفصل','المادة'],students:['اسم الطالب','الفصل'],timetable:['اليوم','الحصة','الوقت','الفصل','المادة']};
   const tables=[],warnings=[];
   const dashboardMetadata=dashboard?metadata(dashboards[0]):[];
 
   const scalar={teacher:[],school:[],principal:[],department:[]};
-  scalar.department.push(...labelValues(document.body,['إدارة التعليم','الإدارة التعليمية','إدارة التعليم التابعة لها']));
-  scalar.teacher.push(...labelValues(document.body,['اسم المعلم','اسم المعلمة']));
+  scalar.department.push(...labelValues(body,['إدارة التعليم','الإدارة التعليمية','إدارة التعليم التابعة لها']));
+  scalar.teacher.push(...labelValues(document,['اسم المعلم','اسم المعلمة']));
+  if(source){scalar.school.push(...labelValues(document,['اسم المدرسة']),...Array.from(document.querySelectorAll('.school-name')).filter(visible).map(roleText).filter(validValue));scalar.principal.push(...labelValues(document,['اسم المدير','مدير المدرسة','قائد المدرسة','قادة المدرسة']));}
   const allTables=Array.from(document.querySelectorAll('table')).filter(visible);if(allTables.length>30)return fail('PAGE_LIMIT');
   for(const table of allTables){
-    if(table.parentElement.closest('table')||table.querySelector('table'))continue;
+    if(table.parentElement?.closest('table')||table.querySelector('table'))continue;
     const rows=Array.from(table.rows);if(rows.length>301)return fail('ROW_LIMIT');
     const roleHeaders=rows[0]?Array.from(rows[0].cells):[];
     const horizontal=roleHeaders.length&&roleHeaders.every(c=>c.tagName==='TH'&&plain(c))&&roleHeaders.some(c=>Object.keys(scalar).some(k=>text(c)===specs[k][0]));
@@ -308,7 +313,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
     const head=Array.from(rows[0].cells);if(head.length>50||!head.every(plain))continue;
     const headings=head.map(text);
     const category=headings.includes('اسم الطالب')?'students':headings.includes('اليوم')?'timetable':headings.includes('الفصل')?'classes':null;
-    if(!category)continue;
+    if(!category||source&&category!==mode)continue;
     if(warnings.some(w=>w.category===category&&w.code==='AMBIGUOUS_TABLE'))continue;
     if(tables.some(t=>t.category===category)){warnings.push({category,code:'AMBIGUOUS_TABLE'});tables.splice(tables.findIndex(t=>t.category===category),1);continue;}
     const columns=[];let context='',invalid=head.some(c=>c.colSpan!==1||c.rowSpan!==1)?'MERGED_OR_IRREGULAR':'';
@@ -335,13 +340,11 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   }
   if(dashboard){
     for(const t of dashboardMetadata)scalar[t.category].push(t.text.split('\t')[1]);
-    const candidates=Array.from(dashboards[0].querySelectorAll('p,span,h1,h2,h3')).filter(visible).filter(n=>!Array.from(n.children).some(child=>/^مرحبا بك /.test(roleText(child)))).map(roleText).filter(v=>/^مرحبا بك /.test(v));
-    const names=[...new Set(candidates.map(v=>v.slice('مرحبا بك '.length)).filter(v=>validValue(v)&&!/[0-9٠-٩]/.test(v)))];
-    if(names.length===1)scalar.teacher.push(names[0]);else if(names.length>1)warnings.push({category:'teacher',code:'AMBIGUOUS_ROLE_VALUE'});
+    if(welcomeNames.length===1)scalar.teacher.push(welcomeNames[0]);else if(welcomeNames.length>1)warnings.push({category:'teacher',code:'AMBIGUOUS_ROLE_VALUE'});
   }
   if(['students','timetable'].includes(mode)&&(!tables.some(t=>t.category===mode)||warnings.some(w=>w.category===mode))&&!links.some(l=>l.kind===mode&&l.path!==location.pathname+location.search))return {...fail('UNSUPPORTED_SOURCE_SCHEMA'),diagnostic:{version:'0.4.0',stage:'source-schema',reason:'UNSUPPORTED_SOURCE_SCHEMA',category:mode,schema:{tables:allTables.length,expectedCategory:tables.some(t=>t.category===mode),unresolved:warnings.some(w=>w.category===mode)}}};
   for(const [category,values] of Object.entries(scalar)){
     const distinct=[...new Set(values)];if(distinct.length===1)tables.push({category,text:specs[category][0]+'\t'+distinct[0]});else if(distinct.length>1)warnings.push({category,code:'AMBIGUOUS_ROLE_VALUE'});
   }
-  return {ok:true,entry,runContext:shownSchool?{...routeContext,schoolName:shownSchool,...(routeContext?.schoolId&&(activeTeacher.length||greetings.length===1)?{readProof:currentTeacherProof()}: {})}:routeContext,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:document.title.replace(/https?:\/\/\S+/g,'').slice(0,80)};
+  return {ok:true,entry,runContext:source?null:shownSchool?{...routeContext,schoolName:shownSchool,...(routeContext?.schoolId&&(activeTeacher.length||greetings.length===1)?{readProof:currentTeacherProof()}: {})}:routeContext,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:(document.title??'').replace(/https?:\/\/\S+/g,'').slice(0,80)};
 }

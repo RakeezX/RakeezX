@@ -4,18 +4,21 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  if(mode==='fetch')return (async()=>{
   const binding=globalThis.location.href,u=new URL(runContext.path,binding);
   const fail=code=>{throw Error(code);};
+  const setup=['metadata','classes','timetable'].includes(runContext.setupKind),kind=runContext.setupKind;
+  const setupRoute=kind==='metadata'?/^\/TeachersReports\/(?:Statistics\/)?MyInfo\/[A-Za-z0-9_-]{1,80}\/?$/i:kind==='classes'?/^\/TeachersReports\/(?:Statistics\/)?Teacher\/[A-Za-z0-9_-]{1,80}\/?$/i:/^\/(?:TeachersReports\/(?:Statistics\/)?TeacherSchedule\/[A-Za-z0-9_-]{1,80}|SchoolSchedule\/Schedule\/TeacherSchedule)\/?$/i;
   const menu=/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(u.pathname);
   const check=()=>{
    if(globalThis.location.href!==runContext.sourceURL)fail('SOURCE_CONTEXT_CHANGED');
    globalThis.rakeezRoutePolicy(globalThis.location.origin,u.href,runContext);
    const match=/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/([a-f0-9]{32})\/?$/i.exec(u.pathname);
-   if(!runContext.schoolId||(!menu&&(!match||match[1].toLowerCase()!==runContext.schoolId.toLowerCase())))fail('SCHOOL_CONTEXT_CHANGED');
+   if(!runContext.schoolId||(!setup&&!menu&&(!match||match[1].toLowerCase()!==runContext.schoolId.toLowerCase())))fail('SCHOOL_CONTEXT_CHANGED');
    if(!runContext.readProof||typeof globalThis.rakeezTeacherReadGuard!=='function')fail('UNCONFIRMED_TEACHER_ROLE');
    if(globalThis.rakeezTeacherReadGuard.jobId!==runContext.requestId.split('|')[0])fail('TEACHER_CONTEXT_CHANGED');
    const teacher=globalThis.rakeezTeacherReadGuard();if(!teacher.ok)fail(teacher.code);if(teacher.proof!==runContext.readProof)fail('TEACHER_CONTEXT_CHANGED');
-   if(menu){
+   if(setup&&(!setupRoute.test(u.pathname)||u.hash))fail('UNSAFE_SETUP_LINK');
+   if(menu||setup){
     const anchors=Array.from(globalThis.document.querySelectorAll('a[href]')).filter(a=>{for(let n=a;n;n=n.parentElement){const c=getComputedStyle(n);if(n.hidden||n.getAttribute('aria-hidden')==='true'||c.display==='none'||c.visibility!=='visible'||Number(c.opacity)===0)return false;}return a.getClientRects().length>0;}).filter(a=>{try{return new URL(a.getAttribute('href'),binding).href===u.href;}catch{return false;}});
-    if(!anchors.length||anchors.some(a=>a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))fail('UNSAFE_ROSTER_LINK');
+    if(!anchors.length||anchors.some(a=>a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK');
    }
    const guard=readSourceReportPage('guard');if(!guard.ok)fail(guard.code);
   };
@@ -47,7 +50,23 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    const expected=JSON.parse(runContext.readProof).teacher;
    if(expected.length&&teachers.some(n=>!expected.includes(n)))fail('TEACHER_CONTEXT_CHANGED');
    if(schools.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
-   if(menu&&doc.querySelector('base[href]'))fail('UNSAFE_ROSTER_LINK');
+   if((menu||setup)&&doc.querySelector('base[href]'))fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK');
+   if(setup){
+    // Explicit context markers in a response cannot contradict the bound source.
+    for(const a of doc.querySelectorAll('a[href]')){const v=new URL(a.getAttribute('href'),u.href);for(const [key,id] of v.searchParams)if(key.toLowerCase()==='schoolid'&&id.toLowerCase()!==runContext.schoolId.toLowerCase())fail('SCHOOL_CONTEXT_CHANGED');}
+    const identity=globalThis.rakeezSetupPageReader?.('metadata',runContext,{document:doc,url:u.href});
+    if(!identity)fail('SETUP_READER_UNAVAILABLE');if(!identity.ok)fail(identity.code);
+    if(identity.warnings.some(w=>['teacher','school'].includes(w.category)))fail(identity.warnings.some(w=>w.category==='school')?'SCHOOL_CONTEXT_CHANGED':'TEACHER_CONTEXT_CHANGED');
+    for(const t of identity.tables){if(t.category==='teacher'&&expected.length&&!expected.includes(t.text.split('\t')[1]))fail('TEACHER_CONTEXT_CHANGED');if(t.category==='school'&&t.text.split('\t')[1]!==runContext.schoolName)fail('SCHOOL_CONTEXT_CHANGED');}
+    let value=kind==='metadata'?identity:kind==='timetable'?readSourceReportPage(kind,runContext,{document:doc,url:u.href}):globalThis.rakeezSetupPageReader?.(kind,runContext,{document:doc,url:u.href});
+    if(!value)fail('SETUP_READER_UNAVAILABLE');
+    if(!value.ok){if(['SOURCE_PENDING','EMPTY_SOURCE','UNSUPPORTED_SOURCE_SCHEMA'].includes(value.code))return {ok:true,tables:[],links:[],warnings:[{category:kind,code:'SETUP_FIELDS_UNAVAILABLE'}],skipped:[]};fail(value.code);}
+    const accepted=kind==='metadata'?['teacher','school','principal','department']:[kind];
+    value={...value,runContext:null,links:[],skipped:[],tables:value.tables.filter(t=>accepted.includes(t.category))};
+    for(const t of value.tables){if(t.category==='teacher'&&expected.length&&!expected.includes(t.text.split('\t')[1]))fail('TEACHER_CONTEXT_CHANGED');if(t.category==='school'&&t.text.split('\t')[1]!==runContext.schoolName)fail('SCHOOL_CONTEXT_CHANGED');}
+    if(!value.tables.length)value.warnings.push({category:kind,code:'SETUP_FIELDS_UNAVAILABLE'});
+    check();return value;
+   }
    const value=readSourceReportPage('students',runContext,{document:doc,url:u.href});
    if(menu&&!value.ok&&value.code==='ROSTER_LINKS_PENDING'&&value.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT')return {ok:true,tables:[],links:[],warnings:[{category:'students',code:'ROSTER_LINKS_UNAVAILABLE',optional:true}],skipped:[],pagination:null,schoolNames:[]};
    if(!value.ok)fail(value.code);

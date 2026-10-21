@@ -1,0 +1,1753 @@
+{
+  "taskId": "continuous-n36-0529-preserve-supported-setup-readonly-20261021",
+  "runtimeFingerprint": "995d7d0c55b6aca124cda3540d6be85fa19bba00a2e1139cca348b4391aed028",
+  "reusedScenarios": [
+    [
+      true,
+      "dashboard",
+      "complete"
+    ],
+    [
+      false,
+      "dashboard",
+      "complete"
+    ],
+    [
+      false,
+      "role",
+      "complete"
+    ],
+    [
+      false,
+      "dashboard",
+      "partial"
+    ],
+    [
+      false,
+      "dashboard",
+      "menu-report"
+    ],
+    [
+      false,
+      "dashboard",
+      "inert-resources"
+    ],
+    [
+      false,
+      "dashboard",
+      "greeting-only"
+    ],
+    [
+      false,
+      "dashboard",
+      "absent-links"
+    ],
+    [
+      false,
+      "dashboard",
+      "empty-fields"
+    ],
+    [
+      false,
+      "dashboard",
+      "pre-role"
+    ],
+    [
+      false,
+      "dashboard",
+      "pre-greeting"
+    ],
+    [
+      false,
+      "dashboard",
+      "pre-school"
+    ],
+    [
+      false,
+      "dashboard",
+      "pre-school-id"
+    ],
+    [
+      false,
+      "dashboard",
+      "during-role"
+    ],
+    [
+      false,
+      "dashboard",
+      "during-school"
+    ],
+    [
+      false,
+      "dashboard",
+      "during-greeting"
+    ],
+    [
+      false,
+      "dashboard",
+      "during-query"
+    ],
+    [
+      false,
+      "dashboard",
+      "post-query"
+    ],
+    [
+      false,
+      "dashboard",
+      "post-document"
+    ],
+    [
+      false,
+      "dashboard",
+      "post-owner"
+    ],
+    [
+      false,
+      "dashboard",
+      "post-role"
+    ],
+    [
+      false,
+      "dashboard",
+      "post-female-admin"
+    ],
+    [
+      false,
+      "dashboard",
+      "post-school"
+    ],
+    [
+      false,
+      "dashboard",
+      "post-greeting"
+    ],
+    [
+      false,
+      "dashboard",
+      "removed-link"
+    ],
+    [
+      false,
+      "dashboard",
+      "handler-link"
+    ],
+    [
+      false,
+      "dashboard",
+      "teacher-response"
+    ],
+    [
+      false,
+      "dashboard",
+      "teacher-table-response"
+    ],
+    [
+      false,
+      "dashboard",
+      "school-table-response"
+    ],
+    [
+      false,
+      "dashboard",
+      "schoolid-response"
+    ],
+    [
+      false,
+      "dashboard",
+      "redirect"
+    ],
+    [
+      false,
+      "dashboard",
+      "content-type"
+    ],
+    [
+      false,
+      "dashboard",
+      "oversize"
+    ],
+    [
+      false,
+      "dashboard",
+      "chunked-size"
+    ],
+    [
+      false,
+      "dashboard",
+      "login-heading"
+    ],
+    [
+      false,
+      "dashboard",
+      "role-response"
+    ],
+    [
+      false,
+      "dashboard",
+      "school-labelled"
+    ],
+    [
+      false,
+      "dashboard",
+      "login-response"
+    ],
+    [
+      false,
+      "dashboard",
+      "foreign-link"
+    ],
+    [
+      false,
+      "dashboard",
+      "unsafe-link"
+    ],
+    [
+      false,
+      "dashboard",
+      "unsupported-student-route"
+    ],
+    [
+      false,
+      "dashboard",
+      "school-response"
+    ],
+    [
+      false,
+      "dashboard",
+      "receipt-mismatch"
+    ]
+  ],
+  "runId": "8ca15b0a-67c6-4101-9512-211ebc5f4c7c",
+  "baseSha": "1d2ba34a6004ec2915094103e96608ef2b70a768",
+  "boundary": "Real HTTP popup/readers/inert template report fetch/CSS; synthetic VM Chrome authority + receiver receipts. No actual school/native extension acceptance.",
+  "baseline": {
+    "file": "rakeez-teacher-import-helper-0.5.29.zip",
+    "sha256": "6e5d748e928eb4d4f2430270f30ae1beeb5f566553b13fe0c597f33cc64f3027",
+    "bytes": 140480
+  },
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: {\"id\":\"51178cbf6b5367a68f70f8f991c38171f6dc5c1995e5713abfd89f070454899d\",\"phase\":\"stopped\",\"startPhase\":\"accepted\",\"failureStep\":\"none\",\"failureJobPhase\":\"collect\",\"code\":\"REPORT_FETCH_FAILED\",\"added\":0,\"existing\":0,\"fields\":[],\"staged\":303,\"observed\":303,\"coverage\":\"unknown\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false}\n+ actual - expected\n\n+ 'REPORT_FETCH_FAILED'\n- 'complete'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:114:48\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:100:62",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'الأحد'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:120:228\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:100:62",
+    "TypeError: Cannot read properties of undefined (reading '0')\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:119:82\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:100:62",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'unknown'\n- 'UNSAFE_SETUP_LINK'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:126:209\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0529-preserve-supported-setup-readonly-20261021/tests/n36-0529-preserve-supported-setup-20261021/browser.mjs:100:62"
+  ],
+  "scenarios": [
+    {
+      "baseline": true,
+      "entry": "dashboard",
+      "scenario": "complete",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "metadata",
+          "code": "SOURCE_BOUND_READ_UNAVAILABLE"
+        },
+        {
+          "category": "classes",
+          "code": "SOURCE_BOUND_READ_UNAVAILABLE"
+        },
+        {
+          "category": "timetable",
+          "code": "SOURCE_BOUND_READ_UNAVAILABLE"
+        },
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "complete",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "role",
+      "scenario": "complete",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 1,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "partial",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "partial",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": false
+        },
+        {
+          "rows": 3,
+          "complete": false
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "PAGINATION_UNVERIFIED"
+        },
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "menu-report",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "inert-resources",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "greeting-only",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "absent-links",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        },
+        {
+          "category": "principal",
+          "code": "SETUP_LINK_UNAVAILABLE"
+        },
+        {
+          "category": "classes",
+          "code": "SETUP_LINK_UNAVAILABLE"
+        },
+        {
+          "category": "timetable",
+          "code": "SETUP_LINK_UNAVAILABLE"
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "empty-fields",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "metadata",
+          "code": "SETUP_FIELDS_UNAVAILABLE"
+        },
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        },
+        {
+          "category": "principal",
+          "code": "SETUP_FIELD_UNAVAILABLE"
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "pre-role",
+      "expected": "UNCONFIRMED_TEACHER_ROLE",
+      "actual": "UNCONFIRMED_TEACHER_ROLE",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "pre-greeting",
+      "expected": "TEACHER_CONTEXT_CHANGED",
+      "actual": "TEACHER_CONTEXT_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "pre-school",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "pre-school-id",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "during-role",
+      "expected": "NON_TEACHER_ROLE",
+      "actual": "NON_TEACHER_ROLE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "during-school",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "during-greeting",
+      "expected": "TEACHER_CONTEXT_CHANGED",
+      "actual": "TEACHER_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "during-query",
+      "expected": "UNSAFE_ROUTE",
+      "actual": "UNSAFE_ROUTE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "post-query",
+      "expected": "UNSAFE_ROUTE",
+      "actual": "UNSAFE_ROUTE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "post-document",
+      "expected": "SOURCE_BINDING_CHANGED",
+      "actual": "SOURCE_BINDING_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "post-owner",
+      "expected": "APP_CHANGED",
+      "actual": "APP_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "post-role",
+      "expected": "NON_TEACHER_ROLE",
+      "actual": "NON_TEACHER_ROLE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "post-female-admin",
+      "expected": "NON_TEACHER_ROLE",
+      "actual": "NON_TEACHER_ROLE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "post-school",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "post-greeting",
+      "expected": "TEACHER_CONTEXT_CHANGED",
+      "actual": "TEACHER_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "removed-link",
+      "expected": "UNSAFE_SETUP_LINK",
+      "actual": "UNSAFE_SETUP_LINK",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "handler-link",
+      "expected": "UNSAFE_SETUP_LINK",
+      "actual": "UNSAFE_SETUP_LINK",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "teacher-response",
+      "expected": "TEACHER_CONTEXT_CHANGED",
+      "actual": "TEACHER_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "teacher-table-response",
+      "expected": "TEACHER_CONTEXT_CHANGED",
+      "actual": "TEACHER_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "school-table-response",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "schoolid-response",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "redirect",
+      "expected": "REPORT_FETCH_FAILED",
+      "actual": "REPORT_FETCH_FAILED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "content-type",
+      "expected": "REPORT_CONTENT_TYPE",
+      "actual": "REPORT_CONTENT_TYPE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "oversize",
+      "expected": "REPORT_SIZE",
+      "actual": "REPORT_SIZE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "chunked-size",
+      "expected": "REPORT_SIZE",
+      "actual": "REPORT_SIZE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "login-heading",
+      "expected": "LOGIN_OR_LOGOUT",
+      "actual": "LOGIN_OR_LOGOUT",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "role-response",
+      "expected": "NON_TEACHER_ROLE",
+      "actual": "NON_TEACHER_ROLE",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "school-labelled",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "login-response",
+      "expected": "LOGIN_OR_LOGOUT",
+      "actual": "LOGIN_OR_LOGOUT",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "foreign-link",
+      "expected": "UNSAFE_SETUP_LINK",
+      "actual": "UNSAFE_SETUP_LINK",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "unsafe-link",
+      "expected": "LOGIN_OR_LOGOUT",
+      "actual": "LOGIN_OR_LOGOUT",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "unsupported-student-route",
+      "expected": "UNSAFE_ROSTER_LINK",
+      "actual": "UNSAFE_ROSTER_LINK",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "school-response",
+      "expected": "SCHOOL_CONTEXT_CHANGED",
+      "actual": "SCHOOL_CONTEXT_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "receipt-mismatch",
+      "expected": "RECEIPT_UNKNOWN",
+      "actual": "RECEIPT_UNKNOWN",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "complete",
+      "deliveries": 1,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "role",
+      "scenario": "card-principal",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 1,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "metadata-only-teacher",
+      "expected": "complete",
+      "actual": "complete",
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "deliveries": 2,
+      "batches": [
+        {
+          "rows": 300,
+          "complete": true
+        },
+        {
+          "rows": 3,
+          "complete": true
+        }
+      ],
+      "warnings": [
+        {
+          "category": "students",
+          "code": "ROSTER_LINKS_UNAVAILABLE",
+          "optional": true
+        }
+      ],
+      "setup": [
+        {
+          "category": "teacher",
+          "rows": [
+            {
+              "name": "معلم اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "school",
+          "rows": [
+            {
+              "name": "مدرسة اصطناعية"
+            }
+          ]
+        },
+        {
+          "category": "principal",
+          "rows": [
+            {
+              "name": "مدير اصطناعي"
+            }
+          ]
+        },
+        {
+          "category": "classes",
+          "rows": [
+            {
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        },
+        {
+          "category": "timetable",
+          "rows": [
+            {
+              "weekday": "الأحد",
+              "period": "1",
+              "classroom": "خامس1",
+              "subject": "الرياضيات"
+            }
+          ]
+        }
+      ],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "timeout",
+      "expected": "FETCH_CANCELLED_OR_TIMEOUT",
+      "actual": "FETCH_CANCELLED_OR_TIMEOUT",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    },
+    {
+      "baseline": false,
+      "entry": "dashboard",
+      "scenario": "foreign-source-link",
+      "expected": "UNSAFE_SETUP_LINK",
+      "actual": "UNSAFE_SETUP_LINK",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "deliveries": 0,
+      "batches": [],
+      "warnings": [],
+      "navigationCount": 0,
+      "finitePopup": true,
+      "safeDiagnostic": true
+    }
+  ],
+  "status": "PASS"
+}

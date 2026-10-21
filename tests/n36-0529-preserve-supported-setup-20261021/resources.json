@@ -1,0 +1,17 @@
+{
+  "runtimeFingerprint": "995d7d0c55b6aca124cda3540d6be85fa19bba00a2e1139cca348b4391aed028",
+  "ports": [
+    {
+      "port": 49830,
+      "status": "closed",
+      "code": "ECONNREFUSED"
+    },
+    {
+      "port": 49831,
+      "status": "closed",
+      "code": "ECONNREFUSED"
+    }
+  ],
+  "sharedBrowserLease": "Not reserved: approved isolated local/synthetic non-live exception",
+  "cleanup": "Canonical browser finally + owned server finally completed"
+}
