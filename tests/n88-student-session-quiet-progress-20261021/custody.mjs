@@ -25,6 +25,7 @@ try{
  for(const key of ['realAccountReads','realStudentTeacherWrites','providerServiceOperations','sqlAuthSchemaChanges','regionChanges','nativeDeployments','publicPinChanges','newReadinessRequests'])mutants.push(q=>q.preparationAuthority[key]=1);
  for(const key of ['publication','appendOnlyAttemptHistory'])mutants.push(q=>q.preparationAuthority[key]=false);
  mutants.push(q=>q.preparationAuthority.maxChangedPrivateStaticUploads=2,q=>q.preparationAuthority.resetConsumedMarkers=true);
+ mutants.push(q=>q.preparationAuthority.maxChangedStudentCarrierUploads=2,q=>q.preparationAuthority.originalCustodianRoot='wrong');
  for(const change of mutants){const q=structuredClone(card);change(q);assert.throws(()=>studentSessionStaticGate(q,c.run,config.controller.activationId,lease));denied++;}
  for(const bad of [{...lease,resource:'browser'},{...lease,taskId:'wrong'},{...lease,activationId:'wrong'},{...lease,owner:{type:'controller',token:c.run}},{...lease,owner:{type:'worker',token:'wrong'}}]){assert.throws(()=>studentSessionStaticGate(card,c.run,config.controller.activationId,bad));denied++;}
  pass('task_run_candidate_scope_and_lease_fences',`${denied} identity/authority/lease variants deny; exact worker and publisher delivery leases admit.`);
@@ -41,11 +42,13 @@ try{
   return {ports,files,pre,receipt,get state(){return state;},get loads(){return loads;},get saves(){return saves;},failSave:v=>failSave=v,failCandidate:()=>verifyFailure=true,put(name,obj){files.set(name,Buffer.from(JSON.stringify(obj)));}};
  }
  const attempt='owned/student-session-static-'+c.candidate+'-attempt.json',complete='owned/student-session-static-'+c.candidate+'-complete.json';
+ const owned=fixture();owned.files.delete('provider-preflight.json');const ownedResult=await runStudentSessionStaticPhase('owned-preflight',owned.ports);assert.equal(ownedResult.publicPinMatches,true);assert.equal(ownedResult.nativeSource,native);assert.equal(owned.saves,0);assert(!owned.files.has(attempt));
  const happy=fixture();await runStudentSessionStaticPhase('preflight',happy.ports);assert(!happy.files.has(attempt));assert.equal(happy.saves,0);
  await runStudentSessionStaticPhase('begin',happy.ports);assert(happy.files.has(attempt));await assert.rejects(runStudentSessionStaticPhase('begin',happy.ports),/attempt_consumed/);
  const oldHistory=structuredClone(happy.state.carrierCorrections);await runStudentSessionStaticPhase('complete',happy.ports);assert.equal(happy.saves,1);assert.deepEqual(happy.state.carrierCorrections.slice(0,-1),oldHistory);assert.equal(happy.state.carrierCorrections.at(-1).source,c.carrier);
  const again=await runStudentSessionStaticPhase('complete',happy.ports);assert.equal(again.alreadyRecorded,true);assert.equal(happy.saves,1);await assert.rejects(runStudentSessionStaticPhase('begin',happy.ports));
  pass('single_attempt_and_append_only_completion','Preflight read-only; begin reserves candidate-wide exclusive attempt; duplicate begin denied; complete appends once; repeated complete is idempotent.');
+ pass('owned_preflight_is_metadata_only','Original-state/public-pin preflight discloses only the source hash and finite ownership/budget flags, with no reservation/save and no requirement to fabricate fresh provider receipts.');
  const previousRun=fixture(),previousMarker=Buffer.from(JSON.stringify({runId:'cc3bb704-ba52-4611-8b52-3e8ba7560642',preparedCandidate:c.candidate,maxUploads:1}));previousRun.files.set(attempt,previousMarker);
  await assert.rejects(runStudentSessionStaticPhase('begin',previousRun.ports),/attempt_consumed/);assert.deepEqual(previousRun.files.get(attempt),previousMarker);assert.equal(previousRun.saves,0);
  pass('new_run_does_not_replenish_candidate_upload','Previous-run candidate-wide attempt remains unchanged and prevents a new reservation. No live marker was read, replaced or deleted.');

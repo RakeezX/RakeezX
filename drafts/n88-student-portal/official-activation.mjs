@@ -48,7 +48,7 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
- if(['--student-session-static-preflight','--student-session-static-begin','--student-session-static-complete'].includes(action)){
+ if(['--student-session-static-owned-preflight','--student-session-static-preflight','--student-session-static-begin','--student-session-static-complete'].includes(action)){
   const c=STUDENT_SESSION_STATIC,currentRun=process.env.N88_STUDENT_SESSION_RUN_ID;
   if(path.resolve(root)!==path.resolve(c.originalRoot))fail('n88_student_static_original_root');
   const taskRoot=fileURLToPath(new URL('../../',import.meta.url));
@@ -65,7 +65,8 @@ async function execute(action,value){
   return runStudentSessionStaticPhase(action.slice('--student-session-static-'.length),{
    card,run:currentRun,activationId:config.controller.activationId,lease,
    read:async name=>{if(name.startsWith('owned/'))await owned();return readFile(locate(name));},
-   writeExclusive:async(name,bytes)=>{if(!name.startsWith('owned/'))fail('n88_student_static_write');await owned();await writeFile(locate(name),bytes,{flag:'wx'});},load,save,
+   writeExclusive:async(name,bytes)=>{if(!name.startsWith('owned/'))fail('n88_student_static_write');await owned();await writeFile(locate(name),bytes,{flag:'wx'});},
+   load:async()=>{try{return await load();}catch(e){if(['ENOENT','EACCES','EPERM'].includes(e.code))fail('n88_student_static_original_custody_'+e.code.toLowerCase());throw e;}},save,
    readPublicPin:async()=>{
     const rows=await official(['secrets','list','--project-ref',project,'--output','json']),list=Array.isArray(rows)?rows:rows?.rows;
     const found=list?.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA');if(found?.length!==1)fail('n88_student_static_pin_identity');return found[0].value?.toLowerCase();

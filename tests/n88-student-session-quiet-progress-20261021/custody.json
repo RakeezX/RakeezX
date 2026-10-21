@@ -1,7 +1,7 @@
 {
   "status": "PASS",
   "taskId": "continuous-n88-student-session-and-quiet-progress-20261021",
-  "runId": "097be9c0-0598-4857-83c8-9a2896a2e0d3",
+  "runId": "e18953b9-0e47-40fc-abb9-f29183f8905c",
   "preparedCandidate": "60c947a5cd8937fa8a06ec59a5269b3b7c94ae47",
   "checks": [
     {
@@ -12,12 +12,17 @@
     {
       "name": "task_run_candidate_scope_and_lease_fences",
       "status": "PASS",
-      "evidence": "26 identity/authority/lease variants deny; exact worker and publisher delivery leases admit."
+      "evidence": "28 identity/authority/lease variants deny; exact worker and publisher delivery leases admit."
     },
     {
       "name": "single_attempt_and_append_only_completion",
       "status": "PASS",
       "evidence": "Preflight read-only; begin reserves candidate-wide exclusive attempt; duplicate begin denied; complete appends once; repeated complete is idempotent."
+    },
+    {
+      "name": "owned_preflight_is_metadata_only",
+      "status": "PASS",
+      "evidence": "Original-state/public-pin preflight discloses only the source hash and finite ownership/budget flags, with no reservation/save and no requirement to fabricate fresh provider receipts."
     },
     {
       "name": "new_run_does_not_replenish_candidate_upload",
@@ -48,8 +53,8 @@
   "providerOperations": 0,
   "privateStateReads": 0,
   "uploads": 0,
-  "guardSha256": "094f701d88dfee0b653b410c8c9cb7e38899f04cfef2355205779179953692ab",
-  "officialEntrySha256": "d921cee12cdd13e5b9deaad6dd074f96f748acf68d90e3c2b56efd691b16204e",
+  "guardSha256": "093d99f111f7cd663ebb3ca4ef2e6bf071ba9b25b05e541517b3b394c9f40414",
+  "officialEntrySha256": "62667949215ec04562342c5a10153bb33b0ecfdf773fbdeb5bc1a36a584f1f98",
   "servedParity": "NOT_RUN",
   "publication": "NOT_RUN"
 }

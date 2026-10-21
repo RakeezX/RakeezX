@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 export const STUDENT_SESSION_STATIC=Object.freeze({
- task:'continuous-n88-student-session-and-quiet-progress-20261021',run:'097be9c0-0598-4857-83c8-9a2896a2e0d3',
+ task:'continuous-n88-student-session-and-quiet-progress-20261021',run:'e18953b9-0e47-40fc-abb9-f29183f8905c',
  session:'01a15cbf-53b4-7470-9660-9656b213ba19',candidate:'60c947a5cd8937fa8a06ec59a5269b3b7c94ae47',
  base:'ebb8aa4daf5c71f255941c9ffb71fae91c18a155',
  originalRoot:'C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018',
@@ -23,6 +23,7 @@ export function studentSessionStaticGate(card,run,activationId,lease){
  check(card.liveAuthorizationRef===c.authorization&&a?.kind==='PO-20261021-N88-actual-student-return-and-progress'&&a.publication===true,'authorization');
  for(const k of ['realAccountReads','realStudentTeacherWrites','providerServiceOperations','sqlAuthSchemaChanges','regionChanges','nativeDeployments','publicPinChanges','newReadinessRequests'])check(a[k]===0,'boundary_'+k);
  check(a.maxChangedPrivateStaticUploads===1&&a.appendOnlyAttemptHistory===true&&a.resetConsumedMarkers===false,'static_boundary');
+ check(a.maxChangedStudentCarrierUploads===1&&a.originalCustodianRoot===c.originalRoot,'original_custodian_authority');
  const token=card.status==='delivery'?card.deliveryOwner?.instanceId:run;
  check(!!token&&lease?.version===2&&lease.resource==='integration'&&lease.taskId===c.task&&lease.activationId===activationId&&lease.owner?.token===token&&lease.owner?.type===(card.status==='delivery'?'controller':'worker'),'lease');
  return c;
@@ -41,7 +42,7 @@ export function verifyStudentStaticArtifacts(prior,prepared,student){
  * No deploy/SQL/Auth/set-secret capability is accepted by this function. */
 export async function runStudentSessionStaticPhase(action,{card,run,activationId,lease,read,writeExclusive,load,save,readPublicPin,verifyCandidate,now=Date.now}){
  const c=studentSessionStaticGate(card,run,activationId,lease);
- check(['preflight','begin','complete'].includes(action),'action');
+ check(['owned-preflight','preflight','begin','complete'].includes(action),'action');
  await verifyCandidate(c.candidate);
  const json=async name=>JSON.parse((await read(name)).toString().replace(/^\uFEFF/,''));
  const stampName='student-session-static-'+c.candidate+'-attempt.json',completeName='student-session-static-'+c.candidate+'-complete.json';
@@ -51,6 +52,12 @@ export async function runStudentSessionStaticPhase(action,{card,run,activationId
  const native=state.directSource;
  check(await readPublicPin()===staticDigest(native),'public_pin');
  verifyStudentStaticArtifacts(await read('prior-carrier.mjs'),await read('carrier.mjs'),await read('student.mjs'));
+ if(action==='owned-preflight'){
+  await absent(stampName);await absent(completeName);
+  const history=state.carrierCorrections??[];check(Array.isArray(history),'history');
+  check(!history.some(h=>h.taskId===c.task&&h.preparedCandidate===c.candidate),'history_consumed');
+  return {status:'PASS',taskId:c.task,runId:run,preparedCandidate:c.candidate,nativeSource:native,publicPinMatches:true,originalOwner:true,attemptAvailable:true,providerWrites:0,readinessRequests:0};
+ }
  const pre=await json('provider-preflight.json');
  const identity=r=>check(r.taskId===c.task&&r.runId===run&&r.preparedCandidate===c.candidate,'receipt_identity');
  const fresh=r=>{const at=Date.parse(r.observedAt),age=now()-at;check(Number.isFinite(at)&&age>=-30000&&age<=15*60*1000,'receipt_freshness');};
