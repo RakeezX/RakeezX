@@ -60,6 +60,9 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    if(setup){
     const identity=globalThis.rakeezSetupPageReader?.('metadata',runContext,{document:doc,url:u.href});
     if(!identity)fail('SETUP_READER_UNAVAILABLE');if(!identity.ok)fail(identity.code);
+    // AI: an explicitly empty metadata school field supplies no binding or
+    // conflict. Keep the observed report queued to establish the school name.
+    identity.tables=identity.tables.filter(t=>t.category!=='school'||t.text.split('\t')[1]?.trim());
     if(identity.warnings.some(w=>['teacher','school'].includes(w.category)))fail(identity.warnings.some(w=>w.category==='school')?'SCHOOL_CONTEXT_CHANGED':'TEACHER_CONTEXT_CHANGED');
     for(const t of identity.tables){if(t.category==='teacher'&&expected.length&&!expected.includes(t.text.split('\t')[1]))fail('TEACHER_CONTEXT_CHANGED');if(t.category==='school'){const name=t.text.split('\t')[1];if(runContext.schoolName&&name!==runContext.schoolName||schools.some(n=>n!==name))fail('SCHOOL_CONTEXT_CHANGED');if(!schools.includes(name))schools.push(name);}}
     let value=kind==='metadata'?identity:kind==='timetable'?readSourceReportPage(kind,runContext,{document:doc,url:u.href}):globalThis.rakeezSetupPageReader?.(kind,runContext,{document:doc,url:u.href});

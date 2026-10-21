@@ -1,0 +1,36 @@
+{
+  "taskId": "continuous-n36-0636-missing-myinfo-setup-order-20261021",
+  "runId": "947c4d46-6f79-4cb5-8290-52ceca171067",
+  "baseSha": "baa8fe5eb4577362d81ab9643aef219331fa2f06",
+  "reusedEvidenceRunId": "33864882-7d7d-4a20-a301-78ec47c3fbe1",
+  "reusedProductCandidateSha": "6bcd95d8806eddecb13935398508473e58e8565c",
+  "immutableAcceptanceStatus": "FAIL",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.33.zip",
+    "sha256": "48bf7ce0af84bac3739b39ad143c91456eada39a00b5fbe801f1b3d5fbc5b5d0",
+    "bytes": 143911
+  },
+  "runtimeFingerprint": "9c791bd5975c40ad5534271442808ceb42dcfd03bc475121375bdfec5df075b5",
+  "checks": [
+    {
+      "name": "n36_0532_immutable_full_runtime_no_myinfo_opposite_dom_order_setup_receipts",
+      "status": "PASS",
+      "evidence": "Reproduction assertions passed: immutable.json retains status FAIL and four empty-school SCHOOL_CONTEXT_CHANGED failures with zero delivery; four no-MyInfo dashboard/card cases retain PASS and 300+3 saved receipts. This check validates the captured reproduction, not .32 acceptance; NO_CHANGE remains invalid."
+    },
+    {
+      "name": "n36_0533_if_needed_safe_deferred_route_and_zero_transfer_negatives",
+      "status": "PASS",
+      "evidence": "candidate.json: 8 setup/order/card cases PASS; 9 missing/conflicting school and owner/document/session negatives stop with zero receiver delivery. Both 300+3 saved receipts retain teacher/principal/school/classes/timetable. Exact setup GETs occur once, after report binding; source URL/resource allowlist and ownership/grades/year preservation pass."
+    },
+    {
+      "name": "n36_0533_if_needed_300_plus_3_package_link_and_29_file_parity",
+      "status": "PASS",
+      "evidence": "package.json/download.json: all 29 packaged files byte/hash-match source, permissions/CSP and historical packages unchanged; actual app download DOM/handler returns exact .33 ZIP with no navigation. Stable installed folder/Production are publisher-owned, NOT_RUN here."
+    },
+    {
+      "name": "n36_if_changed_verified_package_stable_folder_parity",
+      "status": "NOT_RUN",
+      "evidence": "Independent controller/sole publisher owns integration, Production verification and stable 29-file installation. No push/deploy or real source/account access by worker."
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+AI — 0.5.33: empty MyInfo school fields remain unbound until explicit observed report evidence; supported setup GETs stay guarded and bounded. Synthetic proof only; actual source acceptance remains pending.
+
 ## 0.5.30 — preserve supported setup with stationary reads (AI, 2026-10-21)
 
 Exact metadata/classes/timetable hrefs positively observed on the verified teacher dashboard are read with bounded same-origin GET, alongside the unchanged source-bound roster flow. The selected teacher-card transition remains single-use. Every setup response is inert; scripts/resources never execute and response links are never crawled. Teacher/school/SchoolId/document and Rakeez owner/session/batch are checked before, during and after the request. Missing links/fields are specific unavailable results. Existing dashboard/card fields, 300+3 receipts, review consent and roster coverage remain authoritative.

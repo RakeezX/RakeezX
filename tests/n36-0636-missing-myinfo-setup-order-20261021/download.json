@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-0636-missing-myinfo-setup-order-20261021",
+  "runId": "33864882-7d7d-4a20-a301-78ec47c3fbe1",
+  "baseSha": "baa8fe5eb4577362d81ab9643aef219331fa2f06",
+  "name": "n36_0533_actual_app_download",
+  "archiveSha256": "48bf7ce0af84bac3739b39ad143c91456eada39a00b5fbe801f1b3d5fbc5b5d0",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper; actual app DOM/download handler over HTTP; fresh isolated context.",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.33",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "origin": "http://127.0.0.1:49867"
+  }
+}
