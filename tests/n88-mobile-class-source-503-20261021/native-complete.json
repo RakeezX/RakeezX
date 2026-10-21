@@ -1,0 +1,32 @@
+{
+  "taskId": "continuous-n88-mobile-class-source-503-20261021",
+  "runId": "403b07e3-af18-40d5-befa-70fec488d5ce",
+  "candidateSha": "ee399f57cebd144ea0dfb9a6ccddee435124533b",
+  "sourceCandidate": "7b470d779648b92c73f7d16f9df785ab3de1f771",
+  "prior": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+  "source": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "nativeVersion": 61,
+  "uploadedVersion": 60,
+  "uploads": 1,
+  "pinUpdates": 1,
+  "status": "PASS",
+  "observedAt": "2026-10-21T11:24:09.370Z",
+  "sourceExact": true,
+  "publicPinMatches": true,
+  "otherConfigurationUnchanged": true,
+  "importMapUnchanged": true,
+  "transport": {
+    "safeAnonymousDenial": true,
+    "httpStatus": 401,
+    "region": "ap-south-1",
+    "noCookie": true,
+    "noStore": true,
+    "noReferrer": true,
+    "nosniff": true,
+    "carrierSource": "6978352dfa73746a9c4a2cc85e822545483427d4834f172a04abb963f136068e",
+    "carrierUnchanged": true
+  },
+  "accountRequests": 0,
+  "readinessRequests": 0,
+  "carrierUploads": 0
+}

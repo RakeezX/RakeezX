@@ -1152,5 +1152,27 @@
     "realAccountCause": "NOT_PROVEN",
     "realAccountRequests": 0,
     "providerWrites": 0
+  },
+  "mobileSource503NativePrerequisite": {
+    "taskId": "continuous-n88-mobile-class-source-503-20261021",
+    "runId": "403b07e3-af18-40d5-befa-70fec488d5ce",
+    "sourceCandidate": "7b470d779648b92c73f7d16f9df785ab3de1f771",
+    "operationCandidate": "ee399f57cebd144ea0dfb9a6ccddee435124533b",
+    "sourceSha256": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "uploadedVersion": 60,
+    "currentVersion": 61,
+    "functionUploads": 1,
+    "publicSourcePinUpdates": 1,
+    "otherConfigurationUnchanged": true,
+    "importMapUnchanged": true,
+    "originalCustodianHistoryAppended": true,
+    "providerReadback": "tests/n88-mobile-class-source-503-20261021/native-pin.json",
+    "servedTransportReadback": "tests/n88-mobile-class-source-503-20261021/native-complete.json",
+    "carrierUploads": 0,
+    "realAccountRequests": 0,
+    "newReadinessRequests": 0,
+    "actualTeacherRead": "NOT_RUN",
+    "frontendPublication": "SOLE_PUBLISHER_OWNED",
+    "verifiedAt": "2026-10-21T11:24:09.370Z"
   }
 }

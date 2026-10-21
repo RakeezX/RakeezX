@@ -1,0 +1,79 @@
+{
+  "taskId": "continuous-n88-mobile-class-source-503-20261021",
+  "runId": "403b07e3-af18-40d5-befa-70fec488d5ce",
+  "state": "LOCAL_READY",
+  "baseSha": "0bca7554e60adca6b19ad804e4370874d9f5676b",
+  "sourceCandidate": "7b470d779648b92c73f7d16f9df785ab3de1f771",
+  "operationCandidate": "ee399f57cebd144ea0dfb9a6ccddee435124533b",
+  "checks": [
+    {
+      "name": "n88_source_503_exact_branch_red_first_and_safe_attribution",
+      "status": "PASS",
+      "evidence": "Reused unchanged source-candidate proof: Original source and immutable provider-bound native59 both reproduce source503 with 2003 valid projection-only logs; corrected native/source pass. Actual account cause remains unproven."
+    },
+    {
+      "name": "n88_list_scope_owner_canonical_membership_and_commit_fences",
+      "status": "PASS",
+      "evidence": "Reused unchanged source-candidate proof: Native exact candidate on PG17: canonical-overbound, wrong-owner/session/Auth, stale term/class, current membership, concurrent revision lock and rollback/precommit/COMMIT guards."
+    },
+    {
+      "name": "n88_full_projection_student_visibility_guidance_unchanged",
+      "status": "PASS",
+      "evidence": "Reused unchanged source-candidate proof: Actual native student cookie read, visibility save and guidance-list retain full projection; overbound student read remains denied. Full default source remains byte-identical except admission lock selection."
+    },
+    {
+      "name": "n88_failure_remains_private_bounded_and_truthful",
+      "status": "PASS",
+      "evidence": "Reused unchanged source-candidate proof: No cap/retry/region/SQL/Auth/schema change; exact fixed source503/private headers retained; no secrets in evidence, no real request, no service/browser/UI acceptance claim."
+    },
+    {
+      "name": "n88_changed_native_source_provider_pin_and_served_parity_if_needed",
+      "status": "PASS",
+      "evidence": "Original custodian fresh task/run/candidate-bound preflight; one native upload60 and one pin update61; exact official source/import-map/configuration/pin and unchanged carrier source/settings/routes parity; two anonymous missing-binding401 probes, no account or readiness request."
+    }
+  ],
+  "evidence": {
+    "native-preflight": {
+      "path": "tests/n88-mobile-class-source-503-20261021/native-preflight.json",
+      "sha256": "919a44389b291cfc4803a62a715b99ed876e3108cb6753b8e4eb706f846e8e7c"
+    },
+    "native-upload": {
+      "path": "tests/n88-mobile-class-source-503-20261021/native-upload.json",
+      "sha256": "bb16fe0fc5f7caf5b84045c24977a6165d172928feb4fcdb76ea5e28111da827"
+    },
+    "native-pin": {
+      "path": "tests/n88-mobile-class-source-503-20261021/native-pin.json",
+      "sha256": "5f305c7912645a3a851994d80f55119cb39f9df35536682f5470f71b5e579fde"
+    },
+    "native-complete": {
+      "path": "tests/n88-mobile-class-source-503-20261021/native-complete.json",
+      "sha256": "6b1227973b2fc7dfba635a90d37e1d2d50398e1363d90b1ac1e42014dd1029e3"
+    },
+    "transport-before": {
+      "path": "tests/n88-mobile-class-source-503-20261021/transport-before.json",
+      "sha256": "76c772e7fa616972fc2e9a68f55fe42f4183c619eb4f1c23d321a0741d1646ea"
+    },
+    "transport-after": {
+      "path": "tests/n88-mobile-class-source-503-20261021/transport-after.json",
+      "sha256": "8e0e67b6865c05d2a9c11fa1fb0ddbf74ec6f69b4f721b81931fd5143c5f012f"
+    },
+    "native-gate-tests": {
+      "path": "tests/n88-mobile-class-source-503-20261021/native-gate-tests.json",
+      "sha256": "95d10930fa430e1dcaa0dbf54b99950c3f3f01116c667b8533b33a99b618f615"
+    }
+  },
+  "sourceSha256": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "nativeVersion": 61,
+  "originalCustodianHistoryAppended": true,
+  "consumedMarkersPreserved": true,
+  "wholeProductAcceptance": false,
+  "actualTeacherRead": "NOT_RUN",
+  "frontendProduction": "NOT_PUBLISHED_BY_WORKER",
+  "cleanup": {
+    "integrationLease": "RELEASED",
+    "liveMutationLease": "RELEASED",
+    "ownedTemporaryDirectoriesAbsent": true,
+    "publicPinEnvFileRemoved": true,
+    "browserOrLocalServerStarted": false
+  }
+}

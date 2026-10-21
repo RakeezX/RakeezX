@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n88-mobile-class-source-503-20261021",
+  "runId": "403b07e3-af18-40d5-befa-70fec488d5ce",
+  "candidateSha": "ee399f57cebd144ea0dfb9a6ccddee435124533b",
+  "sourceCandidate": "7b470d779648b92c73f7d16f9df785ab3de1f771",
+  "prior": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+  "source": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "status": "PASS",
+  "observedAt": "2026-10-21T11:23:16.010Z",
+  "provider": {
+    "source": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "sourceExact": true,
+    "version": 60,
+    "verifyJwt": false,
+    "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+    "pinDigest": "72f059b33838227e4b7bd6204e476d7095b8e4ecbc067e180a4a5ae2c67aad8f",
+    "otherConfigDigest": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
+  },
+  "uploads": 1
+}
