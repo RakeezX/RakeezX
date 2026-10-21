@@ -94,15 +94,24 @@ function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch } = {
     }
   }
   return Object.freeze({
-    claim(value) {
+    async claim(value) {
       let code = normalizeStudentCode(value);
-      if (!validStudentCode(code)) return Promise.reject(fail("format"));
+      if (!validStudentCode(code)) throw fail("format");
       const context = retirement, pending = call("claim", { code }), checkpoint = generation;
       code = "";
-      return pending.then(() => {
-        if (disposed || context !== retirement || checkpoint !== generation) throw fail("stale");
-        return call("read");
-      });
+      value = null;
+      try {
+        await pending;
+      } catch (error) {
+        if (error.kind === "stale") throw error;
+        throw Object.assign(error, { claimState: ["session", "rate"].includes(error.kind) ? "rejected" : "uncertain" });
+      }
+      if (disposed || context !== retirement || checkpoint !== generation) throw fail("stale");
+      try {
+        return await call("read");
+      } catch (error) {
+        throw Object.assign(error, { claimState: "accepted" });
+      }
     },
     captureContext: () => retirement,
     isContextCurrent: (context) => !disposed && context === retirement,
@@ -171,6 +180,7 @@ var displayNumber = (value) => value === null ? "\u0644\u0645 \u062A\u064F\u0631
 function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
   let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = "", pendingCompletion = null, pendingForm = false, pendingMessage = "";
+  let returnRead = null, endingSession = false;
   const previousDir = root.getAttribute("dir");
   root.classList.add("n88-unified");
   root.dir = "rtl";
@@ -223,7 +233,9 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     if (cooling) timer = setTimeout(() => inlineEntry("\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."), Math.max(1, cooldownUntil - Date.now()));
   }
   async function run(action, ending = false, sameForm = false, resuming = false) {
-    if (disposed || busy || !enabled || Date.now() < cooldownUntil) return;
+    if (disposed || busy || !enabled || doc.visibilityState === "hidden" || Date.now() < cooldownUntil) return;
+    returnRead = null;
+    endingSession = ending;
     busy = true;
     const checkpoint = ++generation, context = client.captureContext?.();
     pendingForm = sameForm;
@@ -251,7 +263,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
         clear();
         return;
       }
-      pendingCompletion = { checkpoint, context, errorKind: error?.kind || "unavailable", ending, sameForm, resuming };
+      pendingCompletion = { checkpoint, context, errorKind: error?.kind || "unavailable", claimState: error?.claimState, ending, sameForm, resuming };
       adoptCompletion();
     } finally {
       if (checkpoint === generation && !pendingCompletion) {
@@ -276,8 +288,10 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     busy = false;
     pendingForm = false;
     if (result.errorKind) {
-      if (result.sameForm) inlineEntry(result.resuming ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0645\u0632. \u062A\u062D\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0651\u0645\u0643.", !result.resuming);
-      else entry(result.errorKind === "session" ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : "\u062A\u0639\u0630\u0651\u0631 \u0641\u062A\u062D \u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632 \u0623\u0648 \u062D\u0627\u0648\u0644 \u0644\u0627\u062D\u0642\u064B\u0627.");
+      const rejected = !result.resuming && result.claimState === "rejected" && result.errorKind === "session";
+      const message = rejected ? "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0645\u0632. \u062A\u062D\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0651\u0645\u0643." : result.errorKind === "session" ? "\u0627\u0644\u062C\u0644\u0633\u0629 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629 \u0623\u0648 \u0627\u0646\u062A\u0647\u062A. \u0623\u062F\u062E\u0644 \u0631\u0645\u0632\u0643 \u0623\u0648 \u0631\u0627\u062C\u0639 \u0645\u0639\u0644\u0645\u0643." : result.claimState === "accepted" ? "\u0642\u064F\u0628\u0644 \u0627\u0644\u0631\u0645\u0632\u060C \u0644\u0643\u0646 \u062A\u0639\u0630\u0651\u0631 \u0639\u0631\u0636 \u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u0627\u0636\u063A\u0637 \u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629 \u0644\u0625\u0639\u0627\u062F\u0629 \u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u062C\u0644\u0633\u0629." : result.claimState === "uncertain" ? "\u062A\u0639\u0630\u0651\u0631 \u062A\u0623\u0643\u064A\u062F \u0627\u0644\u062F\u062E\u0648\u0644. \u0627\u0636\u063A\u0637 \u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629 \u0644\u0644\u062A\u062D\u0642\u0642 \u0642\u0628\u0644 \u0625\u062F\u062E\u0627\u0644 \u0627\u0644\u0631\u0645\u0632 \u0645\u062C\u062F\u062F\u064B\u0627." : "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0628\u0627\u0644\u0645\u0633\u0627\u062D\u0629. \u064A\u0645\u0643\u0646\u0643 \u0645\u062A\u0627\u0628\u0639\u0629 \u062C\u0644\u0633\u0629 \u0633\u0627\u0628\u0642\u0629 \u0644\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u062C\u062F\u062F\u064B\u0627.";
+      if (result.sameForm) inlineEntry(message, rejected);
+      else entry(message);
     } else {
       codeDraft = "";
       if (result.ending) entry("\u0627\u0646\u062A\u0647\u062A \u0627\u0644\u062C\u0644\u0633\u0629.");
@@ -298,6 +312,8 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     void run(() => {
       const pending = client.claim(code);
       code = "";
+      codeDraft = "";
+      input2.value = "";
       return pending;
     }, false, true);
   };
@@ -331,6 +347,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
     if (event.target.closest("[data-end]")) void run(() => client.end(), true);
   };
   function clear(preserveDraft = false) {
+    returnRead = null;
     if (preserveDraft) {
       const field = root.querySelector("[data-claim] input");
       if (field) codeDraft = normalizeStudentCode(field.value);
@@ -352,9 +369,20 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
         inlineEntry(pendingMessage);
         return;
       }
+      if (returnRead) return;
+      const shouldRead = !endingSession && (root.querySelector("[data-end]") || busy);
       clear(true);
+      if (shouldRead) returnRead = { context: client?.captureContext?.() };
     } else {
-      adoptCompletion();
+      const returning = returnRead;
+      returnRead = null;
+      if (returning) {
+        if (client.isContextCurrent && !client.isContextCurrent(returning.context)) {
+          clear();
+          return;
+        }
+        void run(() => client.read(), false, true, true);
+      } else adoptCompletion();
     }
   };
   const pageshow = (event) => {

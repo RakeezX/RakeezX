@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "student": [
+    {
+      "target": "/source",
+      "scenario": "read-denied",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    },
+    {
+      "target": "/source",
+      "scenario": "late-retire",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 1,
+        "end": 0
+      }
+    },
+    {
+      "target": "/student",
+      "scenario": "read-denied",
+      "status": "PASS",
+      "counts": {
+        "claim": 1,
+        "read": 2,
+        "end": 0
+      }
+    }
+  ],
+  "teacher": [],
+  "scope": "Synthetic memory repository and actual numeric handler/credential adapter; no PG durability, live service or hosted acceptance proof.",
+  "cleanup": "Owned isolated contexts/browser and loopback server closed"
+}

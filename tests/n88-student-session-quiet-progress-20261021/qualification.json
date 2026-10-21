@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "transport": [
+    {
+      "scenario": "claim-denied",
+      "status": "PASS",
+      "noReplay": true
+    },
+    {
+      "scenario": "claim-rate",
+      "status": "PASS",
+      "noReplay": true
+    },
+    {
+      "scenario": "claim-network",
+      "status": "PASS",
+      "noReplay": true
+    },
+    {
+      "scenario": "accepted-read-denied",
+      "status": "PASS",
+      "noReplay": true
+    },
+    {
+      "scenario": "accepted-read-network",
+      "status": "PASS",
+      "noReplay": true
+    },
+    {
+      "scenario": "accepted-read-rate",
+      "status": "PASS",
+      "noReplay": true
+    },
+    {
+      "scenario": "retire-inflight-claim",
+      "status": "PASS"
+    },
+    {
+      "scenario": "retire-inflight-read",
+      "status": "PASS"
+    }
+  ],
+  "changedSourceHashes": {
+    "src/lib/student-portal-unified-client.js": "7fcfbdf5d8dd32c301d8fac461f69c7fee5e64d2380605c6d2f236d6f94d4ca9",
+    "src/views/student-portal-login.js": "3498a3d16f2b8a47becff327f9d90bb9b67b6ca01e91b9f9c2c1c6f09b63b2ca",
+    "src/views/student-portal-class.js": "3ebc14d7d54557a9c9d42b0705052b54a12e5e16a737c582344c5fffdecb0f54",
+    "src/styles/student-portal-class.css": "fc47d8d41fe443b392443fa009fde618af76ff62611d2440f97861ff791df217",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs": "1fc98a575c3590b5294e895944d8dbf830b636da82b7440f53770af340049af8"
+  },
+  "unchanged": {
+    "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
+    "drafts/n88-student-portal/class-credentials.mjs": "6d5c32265bebb1b72de0ec028ce102bc162a8bdf8e4b46731f8252261a41019e",
+    "drafts/n88-student-portal/postgres-repository.mjs": "b0d1dfe19a8b0419e629313aabe219e5e9206e4ecf2552fce4dcd6f93db7c3af",
+    "drafts/n88-student-portal/official-activation.mjs": "451cf2b38db22d1f6d1ef91c555db518dde1b0e2c7ba4998b50d08429e8b9f06",
+    "drafts/n88-student-portal/activation/static-1522-gate.mjs": "0dc656ec3b90d876f148a36205ef2880d102841bdf6581d92fb940fb99fcd3f2",
+    "drafts/n88-student-portal/activation/private-document.mjs": "307712b0839c00dbd1aff67e9994ffb91f5e9f183b852c7f294233ff11366db3",
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+    "drafts/n88-student-portal/activation/manifest.json": "2c967c87c36c1c00f947933e5af6d32fa84f77f56129f5d5aeb207a9627e1060"
+  },
+  "custody": {
+    "status": "BLOCKED",
+    "gateTask": "continuous-n88-deliver-qualified-pending-login-static-20261020",
+    "gateCandidate": "7c4f8dbd15d1decc2045e322a4f0b2e9930fe687",
+    "reason": "Existing original-custodian static1522 gate binds a different immutable task/run/candidate. Current card has no matching reviewed changed-source static correction. No secret state loaded or provider operation attempted.",
+    "missingPaths": [
+      "drafts/n88-student-portal/official-activation.mjs",
+      "drafts/n88-student-portal/activation/static-student-session-20261021-gate.mjs",
+      "drafts/n88-student-portal/activation/private-document.mjs",
+      "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs",
+      "drafts/n88-student-portal/activation/manifest.json"
+    ],
+    "servedParity": "NOT_RUN",
+    "teacherFrontendPublication": "NOT_RUN",
+    "preparedCarrier": {
+      "path": "tests/n88-student-session-quiet-progress-20261021/carrier.mjs",
+      "sha256": "6108647af490b79e5cfff9c0909726aa2282628f034eb9bbea5076f35dc83e3b",
+      "recordedProviderPreimage": "2f96fdc067e3658f8105f1c6de73d730fd3d62100c98490bdd0d1604c1204b15",
+      "scope": "Only the embedded student module base64 differs; all other carrier bytes/assets retain the published region/transport corrections. Provider preimage is recorded historical evidence, not a fresh readback."
+    }
+  },
+  "actualSecondLoginCause": "UNPROVEN: two same-code claims/read pairs succeed through actual numeric handler and credential adapter with memory SQL port; no live session observed.",
+  "baseSha": "ebb8aa4daf5c71f255941c9ffb71fae91c18a155",
+  "observedOriginMain": "b4d9d805e1dd7cd1b42a122b11c6e6e05ea7b170"
+}
