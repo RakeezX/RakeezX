@@ -1,0 +1,177 @@
+{
+  "taskId": "continuous-n36-0531-source-school-binding-before-transfer-20261021",
+  "runId": "87fa9b2d-da18-439b-b928-58b190d9fdb9",
+  "cases": [
+    {
+      "name": "positive",
+      "status": "PASS",
+      "proof": "accepted",
+      "roster": "accepted"
+    },
+    {
+      "name": "active-role",
+      "status": "PASS",
+      "proof": "accepted",
+      "roster": "accepted"
+    },
+    {
+      "name": "greeting",
+      "status": "PASS",
+      "proof": "accepted",
+      "roster": "accepted"
+    },
+    {
+      "name": "fetched-dashboard",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "accepted"
+    },
+    {
+      "name": "weak-menu",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "incoherent-menu",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "hidden-menu",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "name-only",
+      "status": "PASS",
+      "proof": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "no-school",
+      "status": "PASS",
+      "proof": "TEACHER_CONTEXT_CHANGED",
+      "roster": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "name": "mismatched-school",
+      "status": "PASS",
+      "proof": "SCHOOL_CONTEXT_CHANGED",
+      "roster": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "name": "ambiguous-school",
+      "status": "PASS",
+      "proof": "SCHOOL_CONTEXT_CHANGED",
+      "roster": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "name": "mismatched-schoolid",
+      "status": "PASS",
+      "proof": "SCHOOL_CONTEXT_CHANGED",
+      "roster": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "name": "missing-schoolid",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "foreign-link",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "unsafe-link",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "inline-handler",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "query-drift",
+      "status": "PASS",
+      "proof": "TEACHER_CONTEXT_CHANGED",
+      "roster": "UNSAFE_ROUTE"
+    },
+    {
+      "name": "loading",
+      "status": "PASS",
+      "proof": "UNCONFIRMED_TEACHER_ROLE",
+      "roster": "UNCONFIRMED_TEACHER_ROLE"
+    },
+    {
+      "name": "multiple-greetings",
+      "status": "PASS",
+      "proof": "AMBIGUOUS_ROLE",
+      "roster": "AMBIGUOUS_ROLE"
+    },
+    {
+      "name": "conflict-0",
+      "status": "PASS",
+      "proof": "NON_TEACHER_ROLE",
+      "roster": "NON_TEACHER_ROLE"
+    },
+    {
+      "name": "conflict-1",
+      "status": "PASS",
+      "proof": "NON_TEACHER_ROLE",
+      "roster": "NON_TEACHER_ROLE"
+    },
+    {
+      "name": "conflict-2",
+      "status": "PASS",
+      "proof": "NON_TEACHER_ROLE",
+      "roster": "NON_TEACHER_ROLE"
+    },
+    {
+      "name": "conflict-3",
+      "status": "PASS",
+      "proof": "NON_TEACHER_ROLE",
+      "roster": "NON_TEACHER_ROLE"
+    },
+    {
+      "name": "conflict-4",
+      "status": "PASS",
+      "proof": "NON_TEACHER_ROLE",
+      "roster": "NON_TEACHER_ROLE"
+    },
+    {
+      "name": "login",
+      "status": "PASS",
+      "proof": "LOGIN_OR_LOGOUT",
+      "roster": "LOGIN_OR_LOGOUT"
+    },
+    {
+      "name": "structural-drift",
+      "status": "PASS",
+      "proof": "TEACHER_CONTEXT_CHANGED",
+      "roster": "TEACHER_CONTEXT_CHANGED"
+    },
+    {
+      "name": "teacher-name-drift",
+      "status": "PASS",
+      "proof": "TEACHER_CONTEXT_CHANGED",
+      "roster": "TEACHER_CONTEXT_CHANGED"
+    }
+  ],
+  "boundary": "Actual selection.js, popup HTML/handlers/CSS and diagnostics on fresh isolated synthetic HTTP contexts; no school read",
+  "diagnosticAllowlist": "PASS",
+  "status": "PASS",
+  "resources": {
+    "origin": "http://127.0.0.1:49854",
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "not required: active synthetic loopback-only helper"
+  }
+}

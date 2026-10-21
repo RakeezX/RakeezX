@@ -1,0 +1,25 @@
+{
+  "name": "n36_0532_supported_setup_300_plus_3_receipts_package_link_diagnostics",
+  "status": "PASS",
+  "baseSha": "96e123e73399616d4820da421618734d60c61521",
+  "version": "0.5.32",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.32.zip",
+    "sha256": "600532ddac600a66f9b0bc8b6be50b4ea4a4f72352f71c95376296a7719f35b6",
+    "bytes": 143808
+  },
+  "runtimeFiles": 29,
+  "checks": [
+    "ZIP/source/file SHA256 and size parity",
+    "Exact .32 download href + label only",
+    "Manifest permissions/hosts/CSP unchanged",
+    "Immutable .31 ZIP/manifest and unchanged receiver/data/route/date/popup assets",
+    "Changed JS syntax"
+  ],
+  "reusedEvidence": [
+    "tests/n36-0524-package-link-20261020/result.json",
+    "tests/n36-background-no-popup-20261020/browser.json"
+  ],
+  "actualSourceAcceptance": "NOT_RUN: one later manual user diagnostic is required to establish actual source acceptance",
+  "publicationAndStableParity": "NOT_RUN: independent controller/publisher, followed by existing stable updater only after verified publication"
+}

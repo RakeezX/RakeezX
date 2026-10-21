@@ -147,14 +147,14 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
       for(const v of (leaves.length?leaves.map(roleText):[roleText(sibling)]))if(validValue(v)&&/^[\p{L}\p{M}]+(?: [\p{L}\p{M}]+)*$/u.test(v))values.push(v);
     }return [...new Set(values)];
   };
-  const metadata=scope=>{
+  const metadata=(scope,selectedCard=false)=>{
     const result=[];const school=labelValues(scope,['اسم المدرسة']);
     if(!school.length){const named=Array.from(scope.querySelectorAll('.school-name')).filter(visible).map(roleText).filter(validValue);if(new Set(named).size===1)school.push(named[0]);}
-    if(!school.length){const titles=Array.from(scope.querySelectorAll('h2,h3,h4,h5')).filter(visible).map(roleText).filter(v=>validValue(v)&&!/^مرحبا بك /.test(v));if(new Set(titles).size===1)school.push(titles[0]);}
+    if(selectedCard&&!school.length){const titles=Array.from(scope.querySelectorAll('h2,h3,h4,h5')).filter(visible).map(roleText).filter(v=>validValue(v)&&!/^مرحبا بك /.test(v));if(new Set(titles).size===1)school.push(titles[0]);}
     for(const [category,values] of [['school',school],['principal',[...new Set([...labelValues(scope,['قادة المدرسة','مدير المدرسة','قائد المدرسة','اسم المدير']),...dashboardLeaders(scope)])]]])for(const value of values)result.push({category,text:(category==='school'?'اسم المدرسة':'اسم المدير')+'\t'+value});
     return result;
   };
-  const observedSchoolIds=[...new Set(Array.from(document.querySelectorAll('a[href]')).filter(visible).flatMap(a=>{try{const u=new URL(a.getAttribute('href'),location.href);return u.origin===location.origin&&/^\/(?:SchoolManagment\/Actions\/MyStudents|SchoolSchedule\/Schedule\/TeacherSchedule)\/?$/i.test(u.pathname)&&[...u.searchParams].length===1&&/^[a-f0-9]{32}$/i.test(u.searchParams.get('SchoolId')??'')?[u.searchParams.get('SchoolId').toLowerCase()]:[];}catch{return [];}}))];
+  const observedSchoolIds=[...new Set(Array.from(document.querySelectorAll('a[href]')).filter(visible).filter(a=>!a.getAttributeNames().some(k=>/^on/i.test(k))&&!a.closest('form,[inert],[disabled],[aria-disabled=true],.disabled')&&!a.hasAttribute('download')&&(!a.getAttribute('data-method')||a.getAttribute('data-method').toLowerCase()==='get')).flatMap(a=>{try{const u=new URL(a.getAttribute('href'),location.href);return !u.hash&&!u.username&&!u.password&&u.origin===location.origin&&/^\/(?:SchoolManagment\/Actions\/MyStudents|SchoolSchedule\/Schedule\/TeacherSchedule)\/?$/i.test(u.pathname)&&[...u.searchParams].length===1&&/^[a-f0-9]{32}$/i.test(u.searchParams.get('SchoolId')??'')?[u.searchParams.get('SchoolId').toLowerCase()]:[];}catch{return [];}}))];
   // A role-target ID is not assumed to equal SchoolId. Bind the latter from coherent actual read links.
   const routeContext=runContext?.schoolId?runContext:observedSchoolIds.length===1?{...runContext,schoolId:observedSchoolIds[0]}:runContext;
   const linkStats={href:0,empty:0,javascript:0,queryRejected:0,inlineHandler:0,readPath:0,originRejected:0,formRejected:0};
@@ -191,7 +191,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
     const {u,code,diagnostic}=validateAnchor(a,'entry',cardContext);if(code||homes.length!==1||!u||!knownEntry(u)){gatewayRejected++;gatewayDiagnostic??=diagnostic??globalThis.rakeezRouteDiagnostic('link-discovery','UNSAFE_LINK','role',a.getAttribute('href'),'ambiguous-home');continue;}
 
     const path=u.pathname+u.search;
-    const tables=metadata(card),label=tables.find(t=>t.category==='school')?.text.split('\t')[1]??'مدرسة '+(cards.length+1);if(!cards.some(c=>c.path===path&&c.label===label))cards.push({path,label,tables,context:cardContext?{...cardContext,schoolName:label}:null});
+    const tables=metadata(card,true),label=tables.find(t=>t.category==='school')?.text.split('\t')[1]??'مدرسة '+(cards.length+1);if(!cards.some(c=>c.path===path&&c.label===label))cards.push({path,label,tables,context:cardContext?{...cardContext,schoolName:tables.find(t=>t.category==='school')?.text.split('\t')[1]}:null});
   }
   const dashboards=[];
   const controls=Array.from(document.querySelectorAll('a[href],button,[role=tab],[role=menuitem]')).filter(visible);
@@ -210,16 +210,16 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   // AI: structural role proof is confined to the complete, bound live dashboard.
   const semanticRoleProof=!source&&dashboard&&document.readyState==='complete'&&!Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible)&&['قائمة الطلاب','الجدول الدراسي'].every(label=>matching(label).length===1&&safeRead(label).length===1&&!matching(label)[0].hasAttribute('onclick'));
   const roleProofKind=activeTeacher.length?'active-role':greetings.length===1?'greeting':semanticRoleProof?'semantic-dashboard':'none';
-  const proofDiagnostic={entryKind:cards.length?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',roleProofKind,proofNavMarkers:Math.min(navMarkers,2),proofActionMarkers:Math.min(actionMarkers,3),proofReadLinks:Math.min(readTargets.length,20)};
+  const proofDiagnostic={entryKind:cards.length?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',roleProofKind,proofNavMarkers:Math.min(navMarkers,2),proofActionMarkers:Math.min(actionMarkers,3),proofReadLinks:Math.min(readTargets.length,20),schoolBindingState:runContext?.schoolBinding??'none',schoolBadgePresent:labelValues(body,['اسم المدرسة']).length>0||Array.from(document.querySelectorAll('.school-name')).filter(visible).map(roleText).some(validValue),schoolIdPresent:observedSchoolIds.length===1,readProofPresent:!!runContext?.readProof};
   const entry={pageKind:cards.length||gatewayRejected?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',readyState:document.readyState,roleMarkers:Math.min(roleValuesIn(body).length,10),schoolOptions:Math.min(cards.length,20),navMarkers,actionMarkers,safeReadLinks:Math.min(readTargets.length,20),iframeCount:Math.min(document.querySelectorAll('iframe').length,20),linkStats};
   let safeReportLinks=0,explicitRoles=0;
   const roleFail=(code,stage='role-selection')=>({...fail(code),diagnostic:{version:'0.4.5',stage,reason:code,category:'role',entry},proofDiagnostic});
   if(adminConflict)return roleFail('NON_TEACHER_ROLE');
   if(runContext?.schoolId&&observedSchoolIds.some(id=>id!==runContext.schoolId.toLowerCase()))return roleFail('SCHOOL_CONTEXT_CHANGED');
-  if(observedSchoolIds.length>1)return roleFail('AMBIGUOUS_SCHOOL_CONTEXT');
+  if(observedSchoolIds.length>1)return roleFail('SCHOOL_CONTEXT_CHANGED');
   // Compare only explicitly labelled/badged school values, never a generic report heading.
   const schoolBadges=[...new Set([...labelValues(body,['اسم المدرسة']),...Array.from(document.querySelectorAll('.school-name')).filter(visible).map(roleText).filter(validValue)])];
-  if(schoolBadges.length>1)return roleFail('AMBIGUOUS_SCHOOL_CONTEXT');
+  if(schoolBadges.length>1)return roleFail('SCHOOL_CONTEXT_CHANGED');
   const shownSchool=schoolBadges[0];
   if(runContext?.schoolName&&shownSchool&&runContext.schoolName!==shownSchool)return roleFail('SCHOOL_CONTEXT_CHANGED');
   if(mode==='gateway'&&entryPath&&(document.readyState!=='complete'||Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible)))return {...roleFail('ENTRY_PENDING'),retry:true};
@@ -232,8 +232,10 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   if(mode==='read-proof'){
     if(!entryPath||document.readyState!=='complete'||document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
     if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
-    if(!activeTeacher.length&&greetings.length!==1&&!(semanticRoleProof&&runContext?.readProof))return roleFail('UNCONFIRMED_TEACHER_ROLE');
-    if(!runContext?.schoolId||!runContext.schoolName||shownSchool!==runContext.schoolName||observedSchoolIds.length!==1||observedSchoolIds[0]!==runContext.schoolId.toLowerCase())return roleFail('SCHOOL_CONTEXT_CHANGED');
+    if(!runContext?.schoolId||observedSchoolIds.length!==1)return roleFail('SCHOOL_CONTEXT_UNCONFIRMED');
+    if(!activeTeacher.length&&greetings.length!==1&&!semanticRoleProof)return roleFail('UNCONFIRMED_TEACHER_ROLE');
+    if(observedSchoolIds[0]!==runContext.schoolId.toLowerCase()||shownSchool&&runContext.schoolName&&shownSchool!==runContext.schoolName)return roleFail('SCHOOL_CONTEXT_CHANGED');
+    if((!shownSchool||!activeTeacher.length&&greetings.length!==1)&&!runContext.readProof)return roleFail('UNCONFIRMED_TEACHER_ROLE');
     const proof=currentTeacherProof();
     if(runContext.readProof&&runContext.readProof!==proof)return roleFail('TEACHER_CONTEXT_CHANGED');
     globalThis.rakeezTeacherReadGuard=()=>readAutomaticTeacherPage('read-proof',null,{...runContext,readProof:proof});
@@ -351,5 +353,10 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   for(const [category,values] of Object.entries(scalar)){
     const distinct=[...new Set(values)];if(distinct.length===1)tables.push({category,text:specs[category][0]+'\t'+distinct[0]});else if(distinct.length>1)warnings.push({category,code:'AMBIGUOUS_ROLE_VALUE'});
   }
-  return {ok:true,entry,proofDiagnostic,runContext:source?null:shownSchool?{...routeContext,schoolName:shownSchool,...(routeContext?.schoolId&&(activeTeacher.length||greetings.length===1||semanticRoleProof)?{readProof:currentTeacherProof()}: {})}:routeContext,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:(document.title??'').replace(/https?:\/\/\S+/g,'').slice(0,80)};
+  if(warnings.some(w=>w.category==='school'))return roleFail('SCHOOL_CONTEXT_CHANGED');
+  // AI: preliminary proof authorizes bounded source GET only; the worker requires
+  // corroborated explicit school evidence before any receiver envelope exists.
+  const context=source?null:{...routeContext,...(shownSchool?{schoolName:shownSchool}:{}),schoolBinding:shownSchool?'bound':'preliminary',...(routeContext?.schoolId&&(shownSchool||semanticRoleProof)&&(activeTeacher.length||greetings.length===1||semanticRoleProof)?{readProof:currentTeacherProof()}: {})};
+  Object.assign(proofDiagnostic,{schoolBindingState:context?.schoolBinding??'none',schoolBadgePresent:!!shownSchool,schoolIdPresent:observedSchoolIds.length===1,readProofPresent:!!context?.readProof});
+  return {ok:true,entry,proofDiagnostic,runContext:context,rolePending:false,links:links.filter(l=>l.kind!=='role'),skipped,tables,warnings,domain:location.hostname,title:(document.title??'').replace(/https?:\/\/\S+/g,'').slice(0,80)};
 }

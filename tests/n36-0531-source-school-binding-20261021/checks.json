@@ -1,0 +1,40 @@
+{
+  "taskId": "continuous-n36-0531-source-school-binding-before-transfer-20261021",
+  "runId": "87fa9b2d-da18-439b-b928-58b190d9fdb9",
+  "baseSha": "96e123e73399616d4820da421618734d60c61521",
+  "runtimeFingerprint": "3d82165b239072de1866605332574f80365a6c4f83c0ddbb82653d4085c94e94",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.32.zip",
+    "sha256": "600532ddac600a66f9b0bc8b6be50b4ea4a4f72352f71c95376296a7719f35b6",
+    "bytes": 143808
+  },
+  "resolvedVerificationIssues": [
+    {
+      "check": "final package/source aggregation",
+      "originalFailure": "README.md source hash 64d86777e832c3e3e69c65ca4357a6ae177bbd0d5c129e37046646dc8d77639b differed from packaged 3c4115d8b4b7ff6a3813768eb5000bb812bec234d8d3fc43913faa835f5dfb28",
+      "resolution": "Removed only this worker's post-package documentation addition and restored its exact baseline bytes. No executable/runtime or archive changes; existing final HTTP evidence and fingerprint remain valid."
+    }
+  ],
+  "checks": [
+    {
+      "name": "n36_actual_0531_full_runtime_semantic_dashboard_unbound_school_reproduction",
+      "status": "PASS",
+      "evidence": "browser.json: immutable .31 ZIP/runtime accepts Start with semantic dashboard 2/3/2, SchoolId present and no badge; source-pre-read UNCONFIRMED_TEACHER_ROLE, no proof/rows/receipts/navigation. Badge-without-SchoolId and both-absent also reproduced independently."
+    },
+    {
+      "name": "n36_0532_source_school_binding_and_zero_transfer_negatives",
+      "status": "PASS",
+      "evidence": "70 actual popup/source HTTP scenarios, 27 reader/diagnostic cases, 25 actual app/store receiver journeys. Explicit field/table/DL/menu/report-column binding; selected-card cross-check; absent/conflicting school, role, link/response, pending GET owner/session/batch/document and 300-staged-row refusals."
+    },
+    {
+      "name": "n36_0532_supported_setup_300_plus_3_receipts_package_link_diagnostics",
+      "status": "PASS",
+      "evidence": "receiver.json/package.json: actual UI + IndexedDB saved receipts 300+3, supported setup/timetable, complete/partial coverage review, unchanged grades/year and owner-bound Outbox. Actual app download hashes to immutable .32 ZIP; all 29 runtime source/ZIP files match; permissions/CSP/date/receiver assets unchanged. Fixed enum and boolean diagnostic privacy checked."
+    },
+    {
+      "name": "n36_0532_production_and_stable_29_file_parity",
+      "status": "NOT_RUN",
+      "evidence": "Independent controller/sole publisher owns integration, Production proof and the existing stable updater after verified publication. No push, deploy, stable-directory mutation or real portal/account access by this worker."
+    }
+  ]
+}
