@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-student-quiet-fast-return-20261021",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3540,
+      "scopeKey": "n88-actual-student-opening-return-progress-20261021",
+      "dependsOn": [],
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 55,
+      "idleMinutes": 12,
+      "objective": "PO 2026-10-21 reports that opening the student portal, switching to another tab without closing the portal, and returning shows the technical message 'جارٍ التحقق من الجلسة… نراجع الجلسة الحالية مع الخادم. لم تُحسم حالة الجلسة بعد.' and asks for a faster, calmer opening and return. Preserve the previously confirmed actual same-tab valid session and student projection after a bounded read; this report does not prove session loss or a permanent hang. The current view intentionally retires private DOM on hidden and starts one authoritative same-origin GET on visible; the prior actual safe diagnostic measured completed reads at 5500–6500ms. Do not pretend a copy change shortens that service time, skip a necessary server freshness/revoke check, show stale private data before 200, cache a cookie/token/code or present the entry form before authoritative denial. Test the actual current source first with a controllable synthetic transport and visibility/pageshow event sequence: fresh no-cookie 401, valid 200, hidden during first GET, ordinary hide/show after a valid projection, duplicated visibility/pageshow, 503, timeout and late response. Count dispatches and measure client scheduling versus controlled network delay to identify any avoidable duplicate or queued GET. Correct a demonstrated client scheduling delay if found without additional requests or reduced security. Render a branded, quiet, nontechnical pending surface during required verification, with accessible progress and finite error/retry copy, keeping the currently private DOM fully absent. The detailed finite safe user-triggered diagnostic remains under optional Support only; do not put technical phase/server explanation in the normal student journey. Confirm response is adopted only for current visible context, denied/expired/revoked is entry, unavailable remains honest recovery, and End Session retains its acknowledged/uncertain fence. Inspect the affected result at 390px and desktop, plus no flash of code form or private data and no request replay on hidden/visible. If actual service GET latency remains the limiting factor, record it as an unresolved measured service issue rather than claiming a network-speed fix. No real student account/code/read/write or personal browser. If the private student script changes, use the original N88 custodian's fresh task/run/candidate-bound one-upload static gate after native/carrier/public-pin preflight; append-only marker, exact provider/source/served student-asset parity before LOCAL_READY. Do not reuse a consumed prior gate, alter native Edge/SQL/Auth/cookie/region/public pin, or publish main/frontend directly; sole publisher delivers Product frontend. N88 remains open for actual postpublication performance and session acceptance. REVIEWED EXACT GATE SCOPE CORRECTION: first and second saved-session attempts proved that one fresh task/run/candidate-bound private static gate script at drafts/n88-student-portal/activation/static-student-quiet-return-20261021-gate.mjs is required and was omitted from allowedPaths. Add only that gate path; do not reuse a prior consumed gate, change provider/source/native/public pin, widen data authority, or repeat unaffected UI tests. Controller prompt now expressly permits only this exact original-custodian one-upload static prerequisite; preserve the existing candidate/base/session and record official provider/served parity before LOCAL_READY.",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/styles/student-portal-login.css",
+        "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs",
+        "drafts/n88-student-portal/activation/bundle/private/styles/student-portal-login.css",
+        "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "drafts/n88-student-portal/activation/official-activation.mjs",
+        "drafts/n88-student-portal/activation/package-20261020.mjs",
+        "tests/n88-student-quiet-fast-return-20261021/**",
+        "docs/automation-evidence/20261021/N88_STUDENT_QUIET_FAST_RETURN.md",
+        "drafts/n88-student-portal/activation/static-student-quiet-return-20261021-gate.mjs"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/styles/student-portal-login.css"
+      ],
+      "requiredChecks": [
+        "n88_open_return_single_current_authoritative_get_and_finite_latency_accounting",
+        "n88_no_private_or_code_form_flash_before_current_result",
+        "n88_quiet_accessible_pending_and_truthful_denied_unavailable_outcomes",
+        "n88_end_and_late_reply_security_fences_unchanged",
+        "n88_changed_private_static_provider_native_and_served_parity_if_changed"
+      ],
+      "acceptance": [
+        "Opening and ordinary same-tab return show only a calm nontechnical pending surface while needed, with at most one current authoritative GET per phase and no avoidable client delay.",
+        "A valid current 200 renders the allowlisted student data; explicit denial presents entry; 5xx/timeout show bounded recovery without a false sign-out.",
+        "Any claim of faster service response requires actual measured postpublication evidence; a visual change alone is labeled as visual."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261021-N88-student-opening-and-return-feedback",
+        "publication": true,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "maxChangedStudentCarrierUploads": 1,
+        "maxChangedPrivateStaticUploads": 1,
+        "nativeDeployments": 0,
+        "publicPinChanges": 0,
+        "newReadinessRequests": 0,
+        "sqlAuthSchemaChanges": 0,
+        "regionChanges": 0,
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "appendOnlyAttemptHistory": true,
+        "resetConsumedMarkers": false,
+        "officialCloudflareConnection": {
+          "serverName": "rakeez_cloudflare",
+          "endpoint": "https://mcp.cloudflare.com/mcp",
+          "sameSavedSessionReadOnlyCapabilityRequired": true,
+          "noRawSecretToolArguments": true
+        }
+      },
+      "releaseAuthority": "The PO's direct 2026-10-21 student opening/return report authorizes this bounded client scheduling and normal-progress correction. The scoped original N88 custodian may make exactly one changed private static carrier upload after fresh native/carrier/public-pin preflight and append-only task/run/candidate-bound reservation, with exact provider and served asset readback. Sole generic publisher handles Product main/frontend Production. No native function/SQL/Auth/schema/cookie/region/public-pin change, real account/student read or write, consumed gate reuse or bypass of a tool denial. If static custody is unavailable, return BLOCKED with the exact reason.",
+      "liveAuthorizationRef": "PO-20261021-N88-STUDENT-QUIET-RETURN-STATIC"
+    }
+  ]
+}
