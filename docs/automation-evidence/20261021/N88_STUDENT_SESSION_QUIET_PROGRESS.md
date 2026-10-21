@@ -1,4 +1,42 @@
-# N88 student return and quiet progress — prepared, publication BLOCKED
+# N88 student return and quiet progress — local candidate and custody continuation
+
+## Reviewed scope repair — 2026-10-21
+
+Continuation run `cc3bb704-ba52-4611-8b52-3e8ba7560642`, same saved session and prepared Product candidate `60c947a5cd8937fa8a06ec59a5269b3b7c94ae47`. The earlier blocker and results below remain historical evidence. The current card now admits `drafts/n88-student-portal/**` solely for a fresh static-only gate and minimum original-custodian command path, under `PO-20261021-N88-STUDENT-SESSION-STATIC-DELIVERY`.
+
+Added `activation/static-student-session-20261021-gate.mjs` and three narrowly routed commands in the existing `official-activation.mjs`. No old gate, old marker, Product source, bundle, carrier, region, native service or public pin was changed in this continuation. No original-worktree file was overwritten and no protected state was opened. The new module is loaded from this qualified task checkout with the original custodian working directory, so it uses the original owned marker/DPAPI state without moving credentials or replacing the original custodian's working files.
+
+Local readiness means the missing gate implementation is now available for the independent publisher. It does **not** mean private static publication or served parity has run. The instruction “Do not push or deploy: the independent controller publishes and verifies it” remains binding. No live command was invoked from the original custodian, no resource lease was acquired, and no provider/browser/server operation occurred in this continuation.
+
+### New bounded qualification
+
+`node tests/n88-student-session-quiet-progress-20261021/custody.mjs`: PASS; results in `custody.json`. It exercises the actual new phase implementation with synthetic custody/files/CLI ports only:
+
+- Exact original Product/UI/bundle/carrier evidence bytes still match prepared Git candidate60c947a5; unchanged UI checks were reused, not rerun. The original `qualification.json` describes that earlier candidate; its old official-activation unchanged check is not asserted for the newly changed custodian.
+- 26 wrong task/Product/session/run/worktree/base/activation/authority/budget/lease cases deny. Both exact worker and sole-publisher delivery leases admit. Current canonical card's reviewed limits admit locally.
+- Preflight writes nothing. Begin creates an exclusive candidate-wide marker with `wx`, binds native hash/version, prior carrier version, complete receipt digest and prior history digest, and reserves at most one upload. Run changes cannot replenish that marker.
+- A source drift fails before custody load. Wrong native/carrier source bytes, public pin, configuration or stale preflight cannot reserve. Configuration is compared with the recorded immutable preimage, not merely with caller-supplied booleans.
+- 13 negative completions reject wrong metadata, owner/run, version, settings/routes, privacy headers or actual carrier/native/served script bytes. HTTP200 alone never completes the gate. Public native source/pin must remain unchanged.
+- Completion appends one history entry and preserves every old entry/marker. An interrupted protected-save step resumes from the same completed receipt even after a day, without another upload. Repeating completed history does not append twice.
+- The actual official command invoked here from the non-custodian task directory deliberately denies `n88_student_static_original_root` before any protected/provider operation. This is a tested application guard, not a managed-tool refusal or an attempt to access the original custody through a different surface.
+
+Fresh syntax checks for the new gate and affected official command PASS; `git diff --check` PASS. Earlier UI owner/lease/claim/return evidence is reused unchanged. No full build, new Preview, live student claim or account read was performed.
+
+### Exact publisher phase, still NOT_RUN here
+
+The sole publisher must acquire the canonical **integration** phase lease for this task and current delivery identity, and retain the qualified task checkout. Run the absolute task-checkout `drafts/n88-student-portal/official-activation.mjs` with working directory `C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018`, setting only `N88_STUDENT_SESSION_RUN_ID=cc3bb704-ba52-4611-8b52-3e8ba7560642` for these commands:
+
+1. Produce fresh, read-only provider preimages in this task's evidence directory. `provider-preflight.json` binds `{taskId,runId,preparedCandidate,observedAt,nativeSource,nativeVersion,carrierVersion,carrierPercentage:100,settings,routes,subdomain}`. Raw current carrier/native source readbacks go to `provider-preimage.mjs` and `provider-native.mjs`. The native hash is resolved from the original custodian's verified state and independently matched against the provider bytes and public pin digest; no stale draft native hash is substituted. The prior carrier must exactly hash to2f96fdc0…1204b15 and configuration must retain the recorded preimage. No readiness invocation is needed.
+2. Invoke `--student-session-static-preflight`, then `--student-session-static-begin` against the same fresh receipts. The commands enforce the card/run/activation/lease, original root, prepared Git sources and pinned static bytes before accessing protected custody. Begin reserves the candidate-wide owned attempt atomically. If any genuine guard/provider preimage fails, preserve it and stop; do not reset a consumed marker or publish teacher-only completion.
+3. Through the established original static publisher channel only, perform at most the one reserved upload of `tests/n88-student-session-quiet-progress-20261021/carrier.mjs`, retaining bindings/settings/routes/subdomain and native/pin. The new commands have no deploy, SQL/Auth, set-secret or alternate credential capability. Their role matches the established static custody reservation/completion pattern; they do not introduce a new uploader.
+4. Obtain exact raw carrier source readback as `provider-carrier.mjs`, unchanged native source as `provider-native-after.mjs`, and actual public script bytes as `served-student.mjs`. Write `carrier-readback.json` with the same identity and configuration fields, `{source,version,carrierPercentage:100,uploads:1}`, and `{servedUrl:"https://rakeezx.com/n88-private/assets/student.mjs",servedStatus:200,servedType:"text/javascript",servedHeaders:{noStore:true,noReferrer:true,nosniff:true}}`. `servedType` is the MIME media type without charset. Bind actual observed time, not an invented timestamp.
+5. Invoke `--student-session-static-complete`. It independently hashes the raw files and checks the unchanged native/pin/configuration before an exclusive completion marker and append-only protected history. Only after this verified private script step may the independent sole publisher finish frontend delivery and its own served checks. Release its owned phase resources afterward. A receipt assertion alone is not evidence of the provider operations.
+
+Preflight/readback receipts are intentionally absent here: publisher/provider/served checks are NOT_RUN. No claimed deployment or Product acceptance follows from local gate PASS. If these exact operations are unavailable or denied during delivery, report their actual blocker instead of substituting a channel. Historical strict private-HTML byte failure, previous tool denial, 503 and actual second-login cause remain unchanged. The gate checks the changed served student script; it does not relabel historical HTML mismatch PASS.
+
+Observed origin/main after fresh fetch: `a1f22707de4f56a7067c6ce7df6c16e6ff84e8ee`; no base-to-origin changes intersect the affected N88 source/custody paths. The final AI continuation commit is returned by the runner result; no push or queue change was made.
+
+## Original prepared candidate and preserved blocker history
 
 AI implementation for `continuous-n88-student-session-and-quiet-progress-20261021`, run `d56d8290-b64f-493d-9dc8-69b8f84d7c36`, saved session `01a15cbf-53b4-7470-9660-9656b213ba19`.
 Base: `ebb8aa4daf5c71f255941c9ffb71fae91c18a155`. The exact candidate commit is returned in the runner result. No push, deployment, provider operation, queue/status edit or Product closure occurred.

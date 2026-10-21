@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "unchanged_product_and_ui_proof_reused",
+      "status": "PASS",
+      "evidence": "Exact prepared Git bytes retained; UI not rerun. Only student module differs in the current recorded carrier."
+    },
+    {
+      "name": "task_run_candidate_scope_and_lease_fences",
+      "status": "PASS",
+      "evidence": "26 identity/authority/lease variants deny; exact worker and publisher delivery leases admit."
+    },
+    {
+      "name": "single_attempt_and_append_only_completion",
+      "status": "PASS",
+      "evidence": "Preflight read-only; begin reserves candidate-wide exclusive attempt; duplicate begin denied; complete appends once; repeated complete is idempotent."
+    },
+    {
+      "name": "preimage_and_freshness_fail_before_reservation",
+      "status": "PASS",
+      "evidence": "Candidate drift denies before custody load; native/carrier/source/pin/configuration drift and stale preflight cannot reserve."
+    },
+    {
+      "name": "exact_readback_and_configuration_fences",
+      "status": "PASS",
+      "evidence": "13 negative completions reject metadata or actual carrier/native/served byte mismatch; no success marker/history appended."
+    },
+    {
+      "name": "completion_save_interruption_recovers_without_upload",
+      "status": "PASS",
+      "evidence": "Exact completed receipt resumes one history append after synthetic protected-save failure; attempt marker is retained."
+    },
+    {
+      "name": "actual_official_entry_wrong_root_denies",
+      "status": "PASS",
+      "evidence": "Actual command in this non-custodian worktree denies before DPAPI, lease or provider access. No alternate channel attempted."
+    }
+  ],
+  "providerOperations": 0,
+  "privateStateReads": 0,
+  "uploads": 0,
+  "guardSha256": "828aa870277eced4426dfbaf36a36aa7070a9ff1c99380cbc6af3dde01449348",
+  "officialEntrySha256": "d921cee12cdd13e5b9deaad6dd074f96f748acf68d90e3c2b56efd691b16204e",
+  "servedParity": "NOT_RUN",
+  "publication": "NOT_RUN"
+}
