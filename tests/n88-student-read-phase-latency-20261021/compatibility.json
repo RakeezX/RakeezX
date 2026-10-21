@@ -1,0 +1,22 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "status": "PASS",
+  "scope": "Receipt-bound native host -> signed Web Request -> service -> typed boundary -> fabricated local PG17 -> acknowledged reply. Synthetic Pool/TLS attestations, not real network latency.",
+  "runs": [],
+  "guards": [],
+  "cleanup": {
+    "ownedPgClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "source": {
+    "baseSha": "c072fac17ca761751be88982b7ba75e4f0f3aa3f",
+    "nativeSha256": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "version": 61,
+    "receipt": "tests/n88-mobile-class-source-503-20261021/native-complete.json",
+    "receiptSha256": "6b1227973b2fc7dfba635a90d37e1d2d50398e1363d90b1ac1e42014dd1029e3"
+  },
+  "preparedNativeSha256": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "serviceEnvelopeCarrierClientParity": "PASS",
+  "oldCarrierCompatibility": "PASS"
+}

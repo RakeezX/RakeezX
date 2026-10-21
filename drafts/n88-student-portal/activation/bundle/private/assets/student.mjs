@@ -8,6 +8,16 @@ var fail = (kind = "unavailable", retryAfter = 0) => Object.assign(new Error("St
 var object = (value) => value && typeof value === "object" && !Array.isArray(value);
 var text = (value) => typeof value === "string" && value.length <= 2e3;
 var number = (value) => value === null || typeof value === "number" && Number.isFinite(value) && value >= 0;
+function parseStudentReadPhases(value) {
+  try {
+    if (typeof value !== "string" || value.length > 512) return null;
+    const p = JSON.parse(value), names = ["pool", "boundary", "snapshot", "sync", "canonical", "visibility", "guidance", "projection", "commit", "total"];
+    if (!object(p) || Object.keys(p).length !== names.length || !names.every((k) => Object.hasOwn(p, k) && Number.isInteger(p[k]) && p[k] >= 0 && p[k] <= 2e4 && p[k] % 250 === 0)) return null;
+    return Object.freeze(Object.fromEntries(names.map((k) => [k, p[k]])));
+  } catch {
+    return null;
+  }
+}
 function fields(source, rules) {
   if (!object(source)) throw fail();
   const result = {};
@@ -61,15 +71,17 @@ function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, time
   function invalidate(reason = "context") {
     retirement++;
     cancelRequest(reasons.includes(reason) ? reason : "context");
+    if (lastDiagnostic?.readPhases) lastDiagnostic = null;
   }
   async function call(action, body, phase = "manual") {
     if (disposed) throw fail();
     cancelRequest();
+    lastDiagnostic = null;
     const checkpoint = generation;
     const owned = controller = new AbortController(), started = performance.now();
-    let timedOut = false, statusClass = "none", recorded = false;
+    let timedOut = false, statusClass = "none", recorded = false, readPhases = null;
     const record = (outcome, reason = "visible") => {
-      if (recorded || !["read", "end"].includes(action)) return;
+      if (recorded || checkpoint !== generation || !["read", "end"].includes(action)) return;
       recorded = true;
       lastDiagnostic = Object.freeze({
         action,
@@ -78,7 +90,8 @@ function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, time
         httpStatusClass: statusClass,
         elapsedMs: Math.min(15e3, Math.max(0, Math.floor((performance.now() - started) / 250) * 250)),
         visibility: visibility(),
-        retirementReason: reason
+        retirementReason: reason,
+        ...action === "read" && outcome === "success" && readPhases ? { readPhases } : {}
       });
     };
     retireDiagnostic = (reason) => record(reason === "deadline" ? "timeout" : "stale", reason);
@@ -121,6 +134,7 @@ function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, time
         if (checkpoint !== generation) throw fail("stale");
         withinDeadline();
         const projected = projectUnifiedStudentData(data);
+        readPhases = parseStudentReadPhases(response.headers?.get("x-n88-student-read-phases"));
         record("success");
         return projected;
       })(), new Promise((_, reject) => {
@@ -284,6 +298,7 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
   function diagnosticText() {
     const d = client?.getDiagnostic?.();
     if (!d || !["read", "end"].includes(d.action) || !["initial", "return", "manual", "end"].includes(d.phase) || !["success", "denied", "rate", "unavailable", "timeout", "stale"].includes(d.outcome) || !["none", "2xx", "4xx", "5xx", "other"].includes(d.httpStatusClass) || !["visible", "hidden"].includes(d.visibility) || !["visible", "hidden", "pagehide", "disposed", "context", "superseded", "deadline"].includes(d.retirementReason) || !Number.isFinite(d.elapsedMs)) return null;
+    const readPhases = d.action === "read" && d.outcome === "success" && d.httpStatusClass === "2xx" ? parseStudentReadPhases(JSON.stringify(d.readPhases)) : null;
     return JSON.stringify({
       action: d.action,
       phase: d.phase,
@@ -291,7 +306,8 @@ function mountUnifiedStudentPortal(root, { client, readiness: readiness2 = { ena
       httpStatusClass: d.httpStatusClass,
       elapsedMs: Math.min(15e3, Math.max(0, Math.floor(d.elapsedMs / 250) * 250)),
       visibility: d.visibility,
-      retirementReason: d.retirementReason
+      retirementReason: d.retirementReason,
+      ...readPhases ? { readPhases } : {}
     });
   }
   async function copyDiagnostic(button) {

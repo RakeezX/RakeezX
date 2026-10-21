@@ -79,12 +79,14 @@ export function createIntegratedService(options,adapter,baseRepository) {
     return r.rows[0]?.payload||{revision:0,fields:fieldsOff(),members:[]};
   }
   const student=credentials.createStudentHandler({repository,verifyIngress:adapter.verifyIngress,origin:options.origin,project:async(db,m,ports)=>{
-    const canonical=await readCanonical(ports,m.ownerId);
+    const measure=ports.measure??(async(_name,action)=>action());
+    const canonical=await measure('canonical',()=>readCanonical(ports,m.ownerId));
     const terms=canonical.terms.filter(t=>!t.deleted && t.status==='active' && canonical.teachings.some(x=>!x.deleted&&x.sectionId===m.classId&&x.termId===t.id));
     if(terms.length!==1)throw Error('n88_current_term');
-    const s={ownerId:m.ownerId,classId:m.classId,termId:terms[0].id,canonical},policy=await policies(ports,m.ownerId,m.classId,s.termId);
+    const s={ownerId:m.ownerId,classId:m.classId,termId:terms[0].id,canonical},policy=await measure('visibility',()=>policies(ports,m.ownerId,m.classId,s.termId));
     const stored=policy.members.find(p=>p.studentId===m.studentId&&p.enrollmentId===m.enrollmentId);
-    return projectStudentPortal({...inputFor(s,m),visibility:stored||null,taskGuidance:await readTaskGuidance(ports,s)});
+    const taskGuidance=await measure('guidance',()=>readTaskGuidance(ports,s));
+    return measure('projection',()=>projectStudentPortal({...inputFor(s,m),visibility:stored||null,taskGuidance}));
   }});
   return async request=>{
     if(request.path.startsWith('/student/'))return student(request);

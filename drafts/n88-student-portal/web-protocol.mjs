@@ -28,3 +28,20 @@ export async function readBytes(stream,max=4096,signal) {
 export const PRIVATE_WEB_HEADERS=Object.freeze({'cache-control':'no-store, private','referrer-policy':'no-referrer',
   'x-robots-tag':'noindex, nofollow, noarchive','x-content-type-options':'nosniff',vary:'Cookie','content-type':'application/json; charset=utf-8'});
 export const privateResponse=(status=503)=>new Response('{"error":"unavailable"}',{status,headers:PRIVATE_WEB_HEADERS});
+
+// AI: finite successful-GET diagnostic only. Durations are monotonic 250ms
+// buckets, capped at20s; no operation labels derived from requests or SQL.
+export const READ_PHASE_HEADER='x-n88-student-read-phases';
+export const READ_PHASE_NAMES=Object.freeze(['pool','boundary','snapshot','sync','canonical','visibility','guidance','projection','commit','total']);
+export function validateReadPhases(value){
+  return !!value && typeof value==='object' && !Array.isArray(value) && Object.keys(value).length===READ_PHASE_NAMES.length &&
+    READ_PHASE_NAMES.every(k=>Object.hasOwn(value,k)&&Number.isInteger(value[k])&&value[k]>=0&&value[k]<=20000&&value[k]%250===0);
+}
+export function createReadPhaseTiming(){
+  const started=performance.now(),durations=Object.fromEntries(READ_PHASE_NAMES.map(k=>[k,0]));
+  const measure=async(name,action)=>{
+    const start=performance.now();
+    try{return await action();}finally{if(READ_PHASE_NAMES.includes(name)&&name!=='total')durations[name]+=Math.max(0,performance.now()-start);}
+  };
+  return {measure,finish:()=>Object.fromEntries(READ_PHASE_NAMES.map(k=>[k,Math.min(20000,Math.max(0,Math.floor((k==='total'?performance.now()-started:durations[k])/250)*250))]))};
+}

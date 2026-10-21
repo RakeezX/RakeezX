@@ -1,0 +1,599 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "status": "PASS",
+  "scope": "Receipt-bound native host -> signed Web Request -> service -> typed boundary -> fabricated local PG17 -> acknowledged reply. Synthetic Pool/TLS attestations, not real network latency.",
+  "runs": [
+    {
+      "name": "warm-1",
+      "injectedPhase": null,
+      "injectedMs": 0,
+      "wallMs": 34,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 1
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 9
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 5
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 3
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 8
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 0
+        }
+      },
+      "residualJsAndEnvelopeMs": 6,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "warm-2",
+      "injectedPhase": null,
+      "injectedMs": 0,
+      "wallMs": 30,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 7
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 5
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 2
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 7
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 0
+        }
+      },
+      "residualJsAndEnvelopeMs": 5,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "idle-local-restarted",
+      "injectedPhase": null,
+      "injectedMs": 0,
+      "wallMs": 170,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 39
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 25
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 2
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 40
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 5
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 19
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 26
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 4
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 2
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 1
+        }
+      },
+      "residualJsAndEnvelopeMs": 8,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-poolConnect",
+      "injectedPhase": "poolConnect",
+      "injectedMs": 360,
+      "wallMs": 404,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 369
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 8
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 5
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 4
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 8
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 0
+        }
+      },
+      "residualJsAndEnvelopeMs": 7,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-transportBoundary",
+      "injectedPhase": "transportBoundary",
+      "injectedMs": 360,
+      "wallMs": 421,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 382
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 5
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 5
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 9
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 10
+        }
+      },
+      "residualJsAndEnvelopeMs": 7,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-snapshot",
+      "injectedPhase": "snapshot",
+      "injectedMs": 360,
+      "wallMs": 402,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 7
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 372
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 4
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 9
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 1
+        }
+      },
+      "residualJsAndEnvelopeMs": 6,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-synchronize",
+      "injectedPhase": "synchronize",
+      "injectedMs": 360,
+      "wallMs": 404,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 9
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 5
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 369
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 9
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 1
+        }
+      },
+      "residualJsAndEnvelopeMs": 7,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-projectionRead",
+      "injectedPhase": "projectionRead",
+      "injectedMs": 360,
+      "wallMs": 403,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 7
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 5
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 4
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 379
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 0
+        }
+      },
+      "residualJsAndEnvelopeMs": 5,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-visibility",
+      "injectedPhase": "visibility",
+      "injectedMs": 360,
+      "wallMs": 400,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 8
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 4
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 2
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 7
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 373
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 0
+        }
+      },
+      "residualJsAndEnvelopeMs": 5,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-guidance",
+      "injectedPhase": "guidance",
+      "injectedMs": 360,
+      "wallMs": 395,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 8
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 4
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 2
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 5
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 369
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 0
+        }
+      },
+      "residualJsAndEnvelopeMs": 5,
+      "projectionAndGuidanceEqual": true
+    },
+    {
+      "name": "controlled-commit",
+      "injectedPhase": "commit",
+      "injectedMs": 360,
+      "wallMs": 391,
+      "queryCount": 39,
+      "phases": {
+        "poolConnect": {
+          "queryCount": 0,
+          "ms": 0
+        },
+        "transportBoundary": {
+          "queryCount": 4,
+          "ms": 7
+        },
+        "begin": {
+          "queryCount": 3,
+          "ms": 1
+        },
+        "snapshot": {
+          "queryCount": 11,
+          "ms": 3
+        },
+        "ingress": {
+          "queryCount": 1,
+          "ms": 1
+        },
+        "synchronize": {
+          "queryCount": 3,
+          "ms": 3
+        },
+        "projectionRead": {
+          "queryCount": 14,
+          "ms": 8
+        },
+        "visibility": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "guidance": {
+          "queryCount": 1,
+          "ms": 0
+        },
+        "commit": {
+          "queryCount": 1,
+          "ms": 362
+        }
+      },
+      "residualJsAndEnvelopeMs": 5,
+      "projectionAndGuidanceEqual": true
+    }
+  ],
+  "guards": [
+    "missing cookie",
+    "wrong cookie",
+    "expired cookie",
+    "other-owner valid cookie cannot read first owner membership",
+    "membership change immediate retirement",
+    "restored membership cannot revive old cookie",
+    "expired term",
+    "visibility removal omits private sections on next authoritative GET",
+    "COMMIT failure no success projection",
+    "unknown COMMIT acknowledgment no success projection",
+    "failed transport invariant denies",
+    "End Session immediate server revocation",
+    "rotated credential cookie",
+    "revoked credential cookie"
+  ],
+  "cleanup": {
+    "ownedPgClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "source": {
+    "baseSha": "c072fac17ca761751be88982b7ba75e4f0f3aa3f",
+    "nativeSha256": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "version": 61,
+    "receipt": "tests/n88-mobile-class-source-503-20261021/native-complete.json",
+    "receiptSha256": "6b1227973b2fc7dfba635a90d37e1d2d50398e1363d90b1ac1e42014dd1029e3"
+  },
+  "preparedNativeSha256": "3e86f993df3996c996d18b4f6d7f3eabbac9e356208cfef3546d118101804e8b",
+  "serviceEnvelopeCarrierClientParity": "PASS",
+  "causalConclusion": "Every injected phase contributes to wall time; no unnecessary operation or real-account bottleneck established. Diagnostic branch required; no speed fix claimed."
+}

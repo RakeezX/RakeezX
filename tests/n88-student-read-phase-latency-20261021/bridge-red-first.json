@@ -1,0 +1,24 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "5f1e5bac-172f-4c84-a95e-81370ee532dd",
+  "characterization": "PASS",
+  "diagnosticAcceptance": "FAIL",
+  "expectedRed": true,
+  "carrier": {
+    "path": "tests/n88-student-quiet-fast-return-20261021/carrier.mjs",
+    "sha256": "a2308758f0611510f04f71cee50f69ffe35b936183d8d3e20847304adfb67091",
+    "receipt": "tests/n88-student-quiet-fast-return-20261021/static-delivery.json",
+    "receiptSha256": "c186cdae17cc1fbfd8677418451021282120744197df846f9a044dec37130c23"
+  },
+  "ordinarySuccessfulEnvelope": 200,
+  "serviceOnlyHeader": "DROPPED",
+  "finiteExtendedEnvelope": {
+    "status": 503,
+    "stage": "reply-shape"
+  },
+  "deniedHeaderAbsent": true,
+  "missingAllowedPath": "drafts/n88-student-portal/cloudflare-entry.mjs",
+  "reason": "Strict production-carrier reply shape admits only body,cookie,status. Its canonical Cloudflare source is absent from the activated allowedPaths. Do not patch a generated bundle as a source-scope bypass.",
+  "renderedUi": "NOT_RUN: characterization only; no frontend source change",
+  "providerOperations": 0
+}

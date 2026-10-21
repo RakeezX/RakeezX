@@ -1,0 +1,11 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "candidateSha": "0e74c7b4d0a1433a584416164a3ff31a0ccbb4d1",
+  "observedAt": "2026-10-21T12:44:07.268Z",
+  "success": true,
+  "status": 200,
+  "sourceSha256": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+  "uploads": 1,
+  "id": "rakeez-n88-private-ingress"
+}

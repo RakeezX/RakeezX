@@ -3,7 +3,7 @@
  * Provider cf metadata + CF-Connecting-IP at external ingress ONLY. Worker
  * subrequests (CF-Worker header) are denied, including same-zone IP overrides.
  */
-import {ROUTE,FORWARDED,readBytes,sha,mac,signingText,encodeBytes,privateResponse,PRIVATE_WEB_HEADERS} from './web-protocol.mjs';
+import {ROUTE,FORWARDED,readBytes,sha,mac,signingText,encodeBytes,privateResponse,PRIVATE_WEB_HEADERS,READ_PHASE_HEADER,validateReadPhases} from './web-protocol.mjs';
 import {privateAssets} from './activation/private-document.mjs';
 export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}={}) {
   return async (request,env) => {
@@ -40,6 +40,9 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       // Fixed upstream URL and metadata headers: private route, PIN, bearer and
       // cookie occur ONLY in TLS request body, never managed invocation URL/headers.
       const wire=new Headers({'content-type':'application/json'});
+      // Additive carrier capability keeps the old three-field carrier working
+      // between the separately gated native and private-static uploads.
+      if(request.method==='GET'&&url.pathname==='/api/n88/student/read')wire.set('x-n88-read-phase-version','1');
       // Trusted placement is carrier-owned, outside the unchanged signed envelope.
       if(request.method==='POST'&&url.pathname==='/api/n88/teacher/class/list')wire.set('x-region','ap-south-1');
       for(const [n,v] of Object.entries({'x-n88-time':time,'x-n88-nonce':nonce,'x-n88-source':source,'x-n88-signature':signature}))wire.set(n,v);
@@ -59,9 +62,14 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       if(!result.ok){if(result.status>=500){stage='upstream-http-5xx';return unavailable();}return privateResponse(401);}
       stage='reply';
       const reply=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(responseBytes));
-      if(!reply || Object.keys(reply).sort().join(',')!=='body,cookie,status' || ![200,400,401,409,413,429,503].includes(reply.status) ||
+      const hasPhases=reply&&Object.hasOwn(reply,'readPhases');
+      // Timing on denials is discarded identically, never a diagnostic oracle.
+      if(hasPhases&&!(request.method==='GET'&&url.pathname==='/api/n88/student/read'&&reply.status===200))delete reply.readPhases;
+      const phases=hasPhases&&reply.status===200&&request.method==='GET'&&url.pathname==='/api/n88/student/read';
+      if(!reply || Object.keys(reply).sort().join(',')!==(phases?'body,cookie,readPhases,status':'body,cookie,status') || phases&&!validateReadPhases(reply.readPhases) || ![200,400,401,409,413,429,503].includes(reply.status) ||
         reply.cookie!==null && (typeof reply.cookie!=='string' || reply.cookie.length>4096)){stage='reply-shape';return unavailable();}
       const out=new Headers(PRIVATE_WEB_HEADERS);if(reply.cookie)out.set('set-cookie',reply.cookie);
+      if(phases)out.set(READ_PHASE_HEADER,JSON.stringify(reply.readPhases));
       if(responseRegion)out.set('x-n88-service-region',responseRegion);
       // Finite operational phase only; never reflect arbitrary upstream values.
       if(reply.status===503&&['acquire','begin','snapshot','repository','teacher','source','synchronize','projection'].includes(reply.body?.stage))out.set('x-n88-service-stage',reply.body.stage);

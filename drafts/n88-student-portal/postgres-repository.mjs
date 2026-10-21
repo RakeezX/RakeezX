@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import {assertVerifiedBoundary,privateQuery} from './activation/private-error-boundary.mjs';
+import {createReadPhaseTiming} from './web-protocol.mjs';
 /** AI: INACTIVE trusted-server pilot port. No driver/network/Auth/config defaults.
  * All writers must use this SAME global transaction lock. Small, bounded snapshots
  * serialize even async teacher verification: unsuitable for public production scale.
@@ -139,19 +140,21 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
   return Object.freeze({ async transaction(action) {
     must(typeof action==='function');
     let c, live=true, begun=false, committed=false, destroyed=false, stage='acquire';
+    const phases=createReadPhaseTiming(),measure=phases.measure;
     const deadline=Date.now()+timing.transactionMs;
     const fence=()=>must(live && Date.now()<deadline);
     const release=broken=>{ if(c && !destroyed) {destroyed=true; c.release(broken ? unavailable() : undefined);} };
-    const query=async(text,values=[])=>{fence(); const r=await privateQuery(c,text,values); fence(); return r;};
+    const query=async(text,values=[])=>{fence(); const run=()=>privateQuery(c,text,values);
+      const r=await (['begin','snapshot'].includes(stage)||text.startsWith('select case when octet_length(payload::text)') ? measure('snapshot',run):run()); fence(); return r;};
     let timer, acquireTimer;
     const work=(async()=>{
-      const lease=Promise.resolve().then(acquire);
+      const lease=Promise.resolve().then(()=>acquire(measure));
       // If acquisition times out, a later pool lease is destroyed, never leaked/reused.
       lease.then(client=>{if(!live) client.release(unavailable());},()=>{});
       c=await Promise.race([lease,new Promise((_,reject)=>{acquireTimer=setTimeout(()=>reject(unavailable()),timing.acquireMs);})]);
       clearTimeout(acquireTimer); fence();
       must(c && typeof c.query==='function' && typeof c.release==='function');
-      await assertVerifiedBoundary(c); fence();
+      await measure('boundary',()=>assertVerifiedBoundary(c)); fence();
       stage='begin';await query('begin isolation level read committed'); begun=true;
       await query("select set_config('statement_timeout',$1,true),set_config('lock_timeout',$2,true),set_config('idle_in_transaction_session_timeout',$3,true),set_config('search_path','pg_catalog',true),set_config('TimeZone','UTC',true),set_config('DateStyle','ISO, YMD',true),set_config('synchronous_commit','on',true)",
         [String(timing.statementMs),String(timing.lockMs),String(timing.transactionMs)]);
@@ -176,9 +179,9 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
       const beforeCommit=check=>{fence();must(typeof check==='function' && commitGuards.length<8);commitGuards.push(check);};
       const synchronizeOwner=async ownerId=>{
         fence(); uuid(ownerId); if(owners.has(ownerId)) return;
-        await synchronize(state,{query},ownerId); fence(); snapshot(state,limits); owners.add(ownerId);
+        await measure('sync',()=>synchronize(state,{query},ownerId)); fence(); snapshot(state,limits); owners.add(ownerId);
       };
-      const value=await action(state,Object.freeze({query,synchronizeOwner,beforeCommit})); fence();
+      const value=await action(state,Object.freeze({query,synchronizeOwner,beforeCommit,measure})); fence();
       // Neither the callback's retained references nor its result can alter the flush.
       const final=snapshot(structuredClone(state),limits), result=structuredClone(value);
       transitions(original,final); fence();
@@ -194,7 +197,8 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
           must((await query(queries[name].insert,row)).rowCount===1);
       }
       for(const check of commitGuards){await check();fence();}
-      const ack=await query('commit'); must(ack.command==='COMMIT'); committed=true;
+      const ack=await measure('commit',()=>query('commit')); must(ack.command==='COMMIT'); committed=true;
+      if(result?.readPhaseDiagnostic===true){delete result.readPhaseDiagnostic;if(result.status===200)result.readPhases=phases.finish();}
       return result; // No response/cookie/PIN until acknowledged durable commit.
     })();
     try {

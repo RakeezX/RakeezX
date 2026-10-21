@@ -69,13 +69,12 @@ export function createExistingHost(readEnv) {
   const pool=new pg.Pool(databaseConfig(readEnv));
   // No raw pg errors/SQL/parameters in platform logs.
   pool.on('error',()=>{});let waiting=0;
-  const acquire=async()=>{
+  const acquire=async(measure=async(_name,action)=>action())=>{
     if(waiting>=8)throw Error('n88_pool_capacity');waiting++;
     let client;
     try {
-      client=await pool.connect();
-      await assertRestrictedTransport(client);
-      await assertPrivateDatabaseSession(client);
+      client=await measure('pool',()=>pool.connect());
+      await measure('boundary',async()=>{await assertRestrictedTransport(client);await assertPrivateDatabaseSession(client);});
       return client;
     }catch{client?.release(Error('n88_database_unavailable'));throw Error('n88_database_unavailable');}
     finally{waiting--;}

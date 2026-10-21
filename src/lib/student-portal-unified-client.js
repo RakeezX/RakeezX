@@ -7,6 +7,16 @@ const fail = (kind = 'unavailable', retryAfter = 0) => Object.assign(new Error('
 const object = value => value && typeof value === 'object' && !Array.isArray(value);
 const text = value => typeof value === 'string' && value.length <= 2000;
 const number = value => value === null || typeof value === 'number' && Number.isFinite(value) && value >= 0;
+// AI: duplicate finite wire allowlist at the untrusted browser boundary. No new
+// startup module; never copy arbitrary headers or retain a previous GET's phases.
+export function parseStudentReadPhases(value) {
+  try {
+    if(typeof value!=='string'||value.length>512)return null;
+    const p=JSON.parse(value),names=['pool','boundary','snapshot','sync','canonical','visibility','guidance','projection','commit','total'];
+    if(!object(p)||Object.keys(p).length!==names.length||!names.every(k=>Object.hasOwn(p,k)&&Number.isInteger(p[k])&&p[k]>=0&&p[k]<=20000&&p[k]%250===0))return null;
+    return Object.freeze(Object.fromEntries(names.map(k=>[k,p[k]])));
+  }catch{return null;}
+}
 function fields(source, rules) {
   if (!object(source)) throw fail();
   const result = {};
@@ -56,18 +66,19 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     retireDiagnostic?.(reason); retireDiagnostic = null;
     generation++; controller?.abort(); controller = null;
   }
-  function invalidate(reason = 'context') { retirement++; cancelRequest(reasons.includes(reason) ? reason : 'context'); }
+  function invalidate(reason = 'context') { retirement++; cancelRequest(reasons.includes(reason) ? reason : 'context'); if(lastDiagnostic?.readPhases)lastDiagnostic=null; }
   async function call(action, body, phase = 'manual') {
     if (disposed) throw fail();
-    cancelRequest(); const checkpoint = generation;
+    cancelRequest(); lastDiagnostic=null; const checkpoint = generation;
     const owned = controller = new AbortController(), started = performance.now();
-    let timedOut = false, statusClass = 'none', recorded = false;
+    let timedOut = false, statusClass = 'none', recorded = false, readPhases=null;
     const record = (outcome, reason = 'visible') => {
-      if (recorded || !['read','end'].includes(action)) return;
+      if (recorded || checkpoint!==generation || !['read','end'].includes(action)) return;
       recorded = true;
       lastDiagnostic = Object.freeze({action, phase: action === 'end' ? 'end' : ['initial','return','manual'].includes(phase) ? phase : 'manual', outcome,
         httpStatusClass: statusClass, elapsedMs: Math.min(15000, Math.max(0, Math.floor((performance.now() - started) / 250) * 250)),
-        visibility: visibility(), retirementReason: reason});
+        visibility: visibility(), retirementReason: reason,
+        ...(action==='read'&&outcome==='success'&&readPhases?{readPhases}:{})});
     };
     retireDiagnostic = reason => record(reason === 'deadline' ? 'timeout' : 'stale', reason);
     const timeout = setTimeout(() => { timedOut = true; owned.abort(); }, timeoutMs);
@@ -96,7 +107,9 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       const data = await response.json();
       if (checkpoint !== generation) throw fail('stale');
       withinDeadline();
-      const projected = projectUnifiedStudentData(data); record('success'); return projected;
+      const projected = projectUnifiedStudentData(data);
+      readPhases=parseStudentReadPhases(response.headers?.get('x-n88-student-read-phases'));
+      record('success'); return projected;
       })(), new Promise((_, reject) => { owned.signal.addEventListener('abort', () => reject(fail()), { once: true }); }) ]);
     } catch (error) {
       // Never forward server bodies, transport messages, credentials or payloads.

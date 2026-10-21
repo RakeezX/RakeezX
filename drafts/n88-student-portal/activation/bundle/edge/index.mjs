@@ -1,3 +1,20 @@
+// AI: finite successful-GET diagnostic only. Durations are monotonic 250ms
+// buckets, capped at20s; no operation labels derived from requests or SQL.
+const READ_PHASE_HEADER='x-n88-student-read-phases';
+const READ_PHASE_NAMES=Object.freeze(['pool','boundary','snapshot','sync','canonical','visibility','guidance','projection','commit','total']);
+function validateReadPhases(value){
+  return !!value && typeof value==='object' && !Array.isArray(value) && Object.keys(value).length===READ_PHASE_NAMES.length &&
+    READ_PHASE_NAMES.every(k=>Object.hasOwn(value,k)&&Number.isInteger(value[k])&&value[k]>=0&&value[k]<=20000&&value[k]%250===0);
+}
+function createReadPhaseTiming(){
+  const started=performance.now(),durations=Object.fromEntries(READ_PHASE_NAMES.map(k=>[k,0]));
+  const measure=async(name,action)=>{
+    const start=performance.now();
+    try{return await action();}finally{if(READ_PHASE_NAMES.includes(name)&&name!=='total')durations[name]+=Math.max(0,performance.now()-start);}
+  };
+  return {measure,finish:()=>Object.fromEntries(READ_PHASE_NAMES.map(k=>[k,Math.min(20000,Math.max(0,Math.floor((k==='total'?performance.now()-started:durations[k])/250)*250))]))};
+}
+
 // drafts/n88-student-portal/activation/node-globals.mjs
 import { Buffer as Buffer2 } from "node:buffer";
 import process from "node:process";
@@ -1353,7 +1370,7 @@ function createNumericCredentialOperations({
             s.revokedAt = time2;
             return denied2();
           }
-          return { status: 200, body: await project(db, m, ports) };
+          return { status: 200, body: await project(db, m, ports), readPhaseDiagnostic: true };
         };
         if (!claim) return response(await repository.transaction(authenticate));
         const committed = await repository.commitAttemptSession(attempt, authenticate);
@@ -1444,12 +1461,14 @@ function createIntegratedService(options, adapter, baseRepository) {
     return r.rows[0]?.payload || { revision: 0, fields: fieldsOff(), members: [] };
   }
   const student = credentials.createStudentHandler({ repository, verifyIngress: adapter.verifyIngress, origin: options.origin, project: async (db, m, ports) => {
-    const canonical = await readCanonical(ports, m.ownerId);
+    const measure = ports.measure ?? (async (_name, action) => action());
+    const canonical = await measure("canonical", () => readCanonical(ports, m.ownerId));
     const terms = canonical.terms.filter((t) => !t.deleted && t.status === "active" && canonical.teachings.some((x) => !x.deleted && x.sectionId === m.classId && x.termId === t.id));
     if (terms.length !== 1) throw Error("n88_current_term");
-    const s = { ownerId: m.ownerId, classId: m.classId, termId: terms[0].id, canonical }, policy = await policies(ports, m.ownerId, m.classId, s.termId);
+    const s = { ownerId: m.ownerId, classId: m.classId, termId: terms[0].id, canonical }, policy = await measure("visibility", () => policies(ports, m.ownerId, m.classId, s.termId));
     const stored = policy.members.find((p) => p.studentId === m.studentId && p.enrollmentId === m.enrollmentId);
-    return projectStudentPortal({ ...inputFor(s, m), visibility: stored || null, taskGuidance: await readTaskGuidance(ports, s) });
+    const taskGuidance = await measure("guidance", () => readTaskGuidance(ports, s));
+    return measure("projection", () => projectStudentPortal({ ...inputFor(s, m), visibility: stored || null, taskGuidance }));
   } });
   return async (request) => {
     if (request.path.startsWith("/student/")) return student(request);
@@ -4161,6 +4180,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
   return Object.freeze({ async transaction(action) {
     must(typeof action === "function");
     let c, live2 = true, begun = false, committed = false, destroyed = false, stage = "acquire";
+    const phases = createReadPhaseTiming(), measure = phases.measure;
     const deadline = Date.now() + timing.transactionMs;
     const fence = () => must(live2 && Date.now() < deadline);
     const release = (broken) => {
@@ -4171,13 +4191,14 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
     };
     const query = async (text2, values = []) => {
       fence();
-      const r = await privateQuery(c, text2, values);
+      const run = () => privateQuery(c, text2, values);
+      const r = await (["begin", "snapshot"].includes(stage) || text2.startsWith("select case when octet_length(payload::text)") ? measure("snapshot", run) : run());
       fence();
       return r;
     };
     let timer, acquireTimer;
     const work = (async () => {
-      const lease = Promise.resolve().then(acquire);
+      const lease = Promise.resolve().then(() => acquire(measure));
       lease.then((client) => {
         if (!live2) client.release(unavailable());
       }, () => {
@@ -4188,7 +4209,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       clearTimeout(acquireTimer);
       fence();
       must(c && typeof c.query === "function" && typeof c.release === "function");
-      await assertVerifiedBoundary(c);
+      await measure("boundary", () => assertVerifiedBoundary(c));
       fence();
       stage = "begin";
       await query("begin isolation level read committed");
@@ -4233,14 +4254,14 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
           must(["synchronize-lock", "synchronize-memberships", "synchronize-sessions", "synchronize-sources", "synchronize-publications"].includes(phase));
           stage = phase;
         };
-        await synchronize(state, { query, synchronizePhase }, ownerId);
+        await measure("sync", () => synchronize(state, { query, synchronizePhase }, ownerId));
         fence();
         stage = "synchronize-validate";
         snapshot(state, limits);
         owners.add(ownerId);
         stage = "operation";
       };
-      const value = await action(state, Object.freeze({ query, synchronizeOwner, beforeCommit }));
+      const value = await action(state, Object.freeze({ query, synchronizeOwner, beforeCommit, measure }));
       fence();
       stage = "projection-finalize";
       const final = snapshot(structuredClone(state), limits), result2 = structuredClone(value);
@@ -4284,9 +4305,10 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
         fence();
       }
       stage = "projection-commit";
-      const ack = await query("commit");
+      const ack = await measure("commit", () => query("commit"));
       must(ack.command === "COMMIT");
       committed = true;
+      if (result2?.readPhaseDiagnostic === true) { delete result2.readPhaseDiagnostic; if (result2.status === 200) result2.readPhases = phases.finish(); }
       return result2;
     })();
     try {
@@ -4693,7 +4715,7 @@ function createWebEntry(options) {
         try {
           const selected = method === "POST" && path === "/api/n88/teacher/class/list" ? listService : service;
           const result2 = await selected(r);
-          return Response.json({ status: result2.status, body: result2.body, cookie: result2.headers?.["Set-Cookie"] || null }, { headers: PRIVATE_WEB_HEADERS });
+          return Response.json({ status: result2.status, body: result2.body, cookie: result2.headers?.["Set-Cookie"] || null, ...(wire.get("x-n88-read-phase-version") === "1" && path === "/api/n88/student/read" && method === "GET" && result2.status === 200 && validateReadPhases(result2.readPhases) ? {readPhases: result2.readPhases} : {}) }, { headers: PRIVATE_WEB_HEADERS });
         } finally {
           envelopes.delete(r);
         }
@@ -4793,14 +4815,13 @@ function createExistingHost(readEnv) {
   pool.on("error", () => {
   });
   let waiting = 0;
-  const acquire = async () => {
+  const acquire = async (measure = async (_name, action) => action()) => {
     if (waiting >= 8) throw Error("n88_pool_capacity");
     waiting++;
     let client;
     try {
-      client = await pool.connect();
-      await assertRestrictedTransport(client);
-      await assertPrivateDatabaseSession(client);
+      client = await measure("pool", () => pool.connect());
+      await measure("boundary", async () => { await assertRestrictedTransport(client); await assertPrivateDatabaseSession(client); });
       return client;
     } catch {
       client?.release(Error("n88_database_unavailable"));

@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer';
 import { timingSafeEqual } from 'node:crypto';
 import {composeService} from './runtime.mjs';
 import {createTeacherVerifier} from './auth-verifier.mjs';
-import {ROUTE,FORWARDED,decodeBytes,readBytes,sha,mac,signingText,privateResponse,PRIVATE_WEB_HEADERS} from './web-protocol.mjs';
+import {ROUTE,FORWARDED,decodeBytes,readBytes,sha,mac,signingText,privateResponse,PRIVATE_WEB_HEADERS,validateReadPhases} from './web-protocol.mjs';
 export function createWebEntry(options) {
   if(!Buffer.isBuffer(options.ingressKey) || options.ingressKey.length!==32)throw Error('n88_ingress_configuration');
   const envelopes=new WeakMap(),now=options.now||Date.now;
@@ -46,7 +46,8 @@ export function createWebEntry(options) {
         envelopes.set(r,{authorization:h.get('authorization'),signal:abort.signal,time,nonce,source});
         // Cookie/private entry stays in the upstream BODY as well; only the
         // Cloudflare boundary emits it to the same-origin browser response.
-        try {const result=await service(r);return Response.json({status:result.status,body:result.body,cookie:result.headers?.['Set-Cookie']||null},{headers:PRIVATE_WEB_HEADERS});}
+        try {const result=await service(r);return Response.json({status:result.status,body:result.body,cookie:result.headers?.['Set-Cookie']||null,
+          ...(wire.get('x-n88-read-phase-version')==='1'&&path==='/api/n88/student/read'&&method==='GET'&&result.status===200&&validateReadPhases(result.readPhases)?{readPhases:result.readPhases}:{})},{headers:PRIVATE_WEB_HEADERS});}
         finally{envelopes.delete(r);}
       }catch{return privateResponse();}
     };

@@ -1,6 +1,6 @@
 /** AI: reusable actual student page, deliberately unregistered in the teacher app. */
 import { brandLockup } from '../lib/brand.js';
-import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData } from '../lib/student-portal-unified-client.js';
+import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData, parseStudentReadPhases } from '../lib/student-portal-unified-client.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const displayNumber = value => value === null ? 'لم تُرصد' : escape(value);
 
@@ -67,8 +67,10 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       || !['visible','hidden'].includes(d.visibility)
       || !['visible','hidden','pagehide','disposed','context','superseded','deadline'].includes(d.retirementReason)
       || !Number.isFinite(d.elapsedMs)) return null;
+    const readPhases=d.action==='read'&&d.outcome==='success'&&d.httpStatusClass==='2xx'?parseStudentReadPhases(JSON.stringify(d.readPhases)):null;
     return JSON.stringify({action:d.action,phase:d.phase,outcome:d.outcome,httpStatusClass:d.httpStatusClass,
-      elapsedMs:Math.min(15000,Math.max(0,Math.floor(d.elapsedMs/250)*250)),visibility:d.visibility,retirementReason:d.retirementReason});
+      elapsedMs:Math.min(15000,Math.max(0,Math.floor(d.elapsedMs/250)*250)),visibility:d.visibility,retirementReason:d.retirementReason,
+      ...(readPhases?{readPhases}:{})});
   }
   async function copyDiagnostic(button) {
     const text = diagnosticText(), checkpoint = generation;

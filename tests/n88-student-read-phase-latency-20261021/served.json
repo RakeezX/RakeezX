@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "candidateSha": "0e74c7b4d0a1433a584416164a3ff31a0ccbb4d1",
+  "observedAt": "2026-10-21T12:44:34.639Z",
+  "url": "https://rakeezx.com/n88-private/assets/student.mjs",
+  "status": 200,
+  "type": "text/javascript; charset=utf-8",
+  "sha256": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
+  "noStore": true,
+  "noReferrer": true,
+  "nosniff": true
+}

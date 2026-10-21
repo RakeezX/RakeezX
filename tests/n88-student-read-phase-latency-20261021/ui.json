@@ -1,0 +1,15 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "status": "PASS",
+  "checks": [
+    "source-390: actual copy parity, no automatic transmission, no pending/denied/stale phase copy, one return GET, no private DOM on hide, layout fits",
+    "source-1280: actual copy parity, no automatic transmission, no pending/denied/stale phase copy, one return GET, no private DOM on hide, layout fits",
+    "private-390: actual copy parity, no automatic transmission, no pending/denied/stale phase copy, one return GET, no private DOM on hide, layout fits",
+    "private-1280: actual copy parity, no automatic transmission, no pending/denied/stale phase copy, one return GET, no private DOM on hide, layout fits"
+  ],
+  "cleanup": {
+    "ownedBrowserAndServerClosed": true,
+    "browserLease": "RELEASED browser"
+  }
+}

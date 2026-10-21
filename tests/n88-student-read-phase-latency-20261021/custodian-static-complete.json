@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "candidateSha": "0e74c7b4d0a1433a584416164a3ff31a0ccbb4d1",
+  "observedAt": "2026-10-21T12:44:43.234Z",
+  "sourceCandidate": "c072fac17ca761751be88982b7ba75e4f0f3aa3f",
+  "prior": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "source": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "carrier": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+  "student": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
+  "version": "0af9e9d6-b7b6-4c32-8c55-13bffbc506c4",
+  "uploads": 1,
+  "status": "PASS",
+  "sourceExact": true,
+  "servedAssetExact": true,
+  "nativePinUnchanged": true,
+  "historyAppended": true
+}
