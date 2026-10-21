@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-mobile-class-source-503-20261021",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3550,
+      "scopeKey": "n88-actual-mobile-class-source-503-20261021",
+      "dependsOn": [],
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 65,
+      "idleMinutes": 12,
+      "objective": "PO 2026-10-21 actual mobile main-account N88 class-space read failed: safe failure {phase:http,code:rejected,stage:source,httpStatus:503,sourceVersion:n88-class-deadline-v1}; the one list-response attestation was {schema:n88-list-response-v1,region:ap-south-1,elapsedMs:732,outcome:failure}. This is a genuine server-side rejection before the 10000ms browser deadline, not proof of a regional or database cause. Previous same-region list successes at 650/932/1298ms remain valid observations but do not cancel this failure. Read the N88 Product row, current source, exact official service/native pins and affected historical cause evidence. The integrated service sets source before resolveClass, which invokes createPgClassResolver and readCanonical(listScopeOnly=true), then synchronizeOwner only after source; the latter source read currently invokes lock_projection_sources across unrelated projection tables at a 2000-row bound even though list consumes only terms/teachings. Treat a large projection table/lock bound as a hypothesis, not an established account fact. Reproduce this exact source branch test-first with fabricated owner data: >2000 projection-only rows but bounded current canonical sources, plus the inverse canonical-overbound, owner mismatch, stale term/class, denied Auth/session, and concurrent source revision. Check downstream synchronizeOwner's actual canonical lock/limits and transaction/COMMIT guards. The already completed read-only 07:40–10:42Z Supabase aggregate found no source-lock exception markers and cannot attribute the inner 503; do not repeat that window, issue another real account request, or treat the absence as proof against a bound failure. Correct only a causally demonstrated unnecessary list-scope projection lock/read if its removal preserves every consumed list/source/membership/owner/recovery and commit fence; full projection must remain for student read, visibility and guidance. Do not raise caps, add retries, change SQL/migration/RLS/roles/Auth/region, suppress 503, return empty data, or claim success from a fixture. If actual attribution remains too broad, add only a fixed finite source-substage marker at the private service error/log boundary, never raw exception/context/IDs, without changing browser-visible response or the ingress carrier; report exact remaining live-evidence condition. No real account/class/student read or write, personal browser, user code, clipboard or message. One changed native service upload/source-pin update is permitted ONLY for a reviewed source-causal or finite diagnostic delta, after fresh original-custodian task/run/candidate-bound preflight, official provider source/config/pin readback and exclusive append-only attempt; exact native/provider and served transport parity before LOCAL_READY. No static/private student carrier upload; no consumed gate reuse or alternative provider route. Sole publisher integrates frontend source if it changes. N88 stays open until actual postpublication teacher read. REVIEWED HARNESS CORRECTION: the generic controller no-deploy sentence was inconsistent with this exact card-authorized original-custodian native upload and source-pin prerequisite. Continue the same saved session and candidate; complete only the existing one-upload/pin gate with fresh official preflight and exact provider/served readback before LOCAL_READY. Product main/frontend publication remains the sole publisher; any real tool denial remains binding.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/class-credentials.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/official-activation.mjs",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "drafts/n88-student-portal/activation/edge-request.mjs",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "drafts/n88-student-portal/activation/package-20261020.mjs",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "tests/n88-mobile-class-source-503-20261021/**",
+        "docs/automation-evidence/20261021/N88_MOBILE_CLASS_SOURCE_503.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/class-credentials.mjs",
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_source_503_exact_branch_red_first_and_safe_attribution",
+        "n88_list_scope_owner_canonical_membership_and_commit_fences",
+        "n88_full_projection_student_visibility_guidance_unchanged",
+        "n88_failure_remains_private_bounded_and_truthful",
+        "n88_changed_native_source_provider_pin_and_served_parity_if_needed"
+      ],
+      "acceptance": [
+        "A fabricated >2000 unrelated projection-row case does not fail a bounded list unless a consumed source guard requires denial; canonical-overbound and wrong-owner cases still deny.",
+        "Any actual account cause remains qualified only by safe source-specific evidence; a generic 503 or synthetic PASS is not real-account success.",
+        "One guarded changed native prerequisite, if required, has exact provider/pin/served parity before publisher delivery; no SQL/Auth/schema/region or real data operation."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261021-N88-actual-mobile-source-503",
+        "publication": true,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "maxSafeProviderAggregateWindows": 0,
+        "maxChangedNativeFunctionUploads": 1,
+        "maxPublicSourcePinUpdates": 1,
+        "maxChangedPrivateStaticUploads": 0,
+        "newReadinessRequests": 0,
+        "sqlAuthSchemaChanges": 0,
+        "regionChanges": 0,
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "appendOnlyAttemptHistory": true,
+        "resetConsumedMarkers": false
+      },
+      "releaseAuthority": "The PO's direct actual N88 mobile 503 report authorizes a bounded test-first source-causal correction or finite safe source-substage diagnostic and normal publication. The original N88 custodian alone may upload one changed native function and update its exact source pin after fresh scoped preflight and readback; the sole Product publisher handles frontend/main. No SQL/Auth/schema/RLS/roles/keys, region, real account or student data operation, unchanged native upload, consumed attempt reuse or tool-denial bypass. If the original official channel or safe cause proof is unavailable, return BLOCKED with the exact reason and preserve the candidate.",
+      "liveAuthorizationRef": "PO-20261021-N88-MOBILE-SOURCE-503-EXACT-CORRECTION"
+    }
+  ]
+}

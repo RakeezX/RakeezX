@@ -397,6 +397,44 @@ export function workerPublicationInstruction(task) {
       && authority.publicPinChanges === 0) {
     return 'Only the one changed private static student carrier upload expressly authorized in this activated card may be done by the original custodian after fresh guarded preflight and exact provider/served readback. This prerequisite must precede LOCAL_READY. Do not push Product main, deploy a native service, change the public pin, or publish frontend Production: the independent controller owns Product publication. Any tool denial remains binding.';
   }
+  if (task.id === 'continuous-n88-mobile-class-source-503-20261021'
+      && task.productId === 'N88'
+      && task.liveAuthorizationRef === 'PO-20261021-N88-MOBILE-SOURCE-503-EXACT-CORRECTION'
+      && authority?.kind === 'PO-20261021-N88-actual-mobile-source-503'
+      && authority.publication === true
+      && authority.realAccountReads === 0
+      && authority.realStudentTeacherWrites === 0
+      && authority.maxChangedNativeFunctionUploads === 1
+      && authority.maxPublicSourcePinUpdates === 1
+      && authority.maxChangedPrivateStaticUploads === 0
+      && authority.sqlAuthSchemaChanges === 0
+      && authority.regionChanges === 0
+      && authority.appendOnlyAttemptHistory === true
+      && authority.resetConsumedMarkers === false
+      && authority.originalCustodianRoot === 'C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018') {
+    return 'Only the one changed native service upload and exact public source-pin update expressly authorized in this activated card may be done by the original custodian after fresh task/run/candidate-bound guarded preflight and exact provider/served readback. These prerequisites must precede LOCAL_READY. Do not push Product main or publish frontend Production: the independent controller owns Product publication. Any actual tool denial remains binding.';
+  }
+  if (task.id === 'continuous-n88-student-quiet-fast-return-20261021'
+      && task.productId === 'N88'
+      && task.liveAuthorizationRef === 'PO-20261021-N88-STUDENT-QUIET-RETURN-STATIC'
+      && authority?.kind === 'PO-20261021-N88-student-opening-and-return-feedback'
+      && authority.publication === true
+      && authority.realAccountReads === 0
+      && authority.realStudentTeacherWrites === 0
+      && authority.maxChangedPrivateStaticUploads === 1
+      && authority.maxChangedStudentCarrierUploads === 1
+      && authority.nativeDeployments === 0
+      && authority.publicPinChanges === 0
+      && authority.sqlAuthSchemaChanges === 0
+      && authority.regionChanges === 0
+      && authority.appendOnlyAttemptHistory === true
+      && authority.resetConsumedMarkers === false
+      && authority.originalCustodianRoot === 'C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018'
+      && authority.officialCloudflareConnection?.serverName === 'rakeez_cloudflare'
+      && authority.officialCloudflareConnection.sameSavedSessionReadOnlyCapabilityRequired === true
+      && authority.officialCloudflareConnection.noRawSecretToolArguments === true) {
+    return 'Only the one changed private static student carrier upload expressly authorized in this activated card may be done by the original custodian after fresh task/run/candidate-bound guarded preflight and exact provider/served readback. This prerequisite must precede LOCAL_READY. Do not push Product main, deploy a native service, change the public pin, or publish frontend Production: the independent controller owns Product publication. Any actual tool denial remains binding.';
+  }
   return 'Do not push or deploy: the independent controller publishes and verifies it.';
 }
 
