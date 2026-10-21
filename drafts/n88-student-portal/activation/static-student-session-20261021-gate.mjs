@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 export const STUDENT_SESSION_STATIC=Object.freeze({
- task:'continuous-n88-student-session-and-quiet-progress-20261021',run:'e18953b9-0e47-40fc-abb9-f29183f8905c',
+ task:'continuous-n88-student-session-and-quiet-progress-20261021',run:'72d2a929-d31d-4cab-aed5-8274a5dd1fe0',
  session:'01a15cbf-53b4-7470-9660-9656b213ba19',candidate:'60c947a5cd8937fa8a06ec59a5269b3b7c94ae47',
  base:'ebb8aa4daf5c71f255941c9ffb71fae91c18a155',
  originalRoot:'C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018',
@@ -40,9 +40,9 @@ export function verifyStudentStaticArtifacts(prior,prepared,student){
 }
 /** The original custodian supplies owned DPAPI/file/CLI ports. Test ports are synthetic.
  * No deploy/SQL/Auth/set-secret capability is accepted by this function. */
-export async function runStudentSessionStaticPhase(action,{card,run,activationId,lease,read,writeExclusive,load,save,readPublicPin,verifyCandidate,now=Date.now}){
+export async function runStudentSessionStaticPhase(action,{card,run,activationId,lease,read,writeExclusive,load,save,readPublicPin,readNative,verifyCandidate,now=Date.now}){
  const c=studentSessionStaticGate(card,run,activationId,lease);
- check(['owned-preflight','preflight','begin','complete'].includes(action),'action');
+ check(['owned-preflight','read-native-before','read-native-after','preflight','begin','complete'].includes(action),'action');
  await verifyCandidate(c.candidate);
  const json=async name=>JSON.parse((await read(name)).toString().replace(/^\uFEFF/,''));
  const stampName='student-session-static-'+c.candidate+'-attempt.json',completeName='student-session-static-'+c.candidate+'-complete.json';
@@ -52,6 +52,14 @@ export async function runStudentSessionStaticPhase(action,{card,run,activationId
  const native=state.directSource;
  check(await readPublicPin()===staticDigest(native),'public_pin');
  verifyStudentStaticArtifacts(await read('prior-carrier.mjs'),await read('carrier.mjs'),await read('student.mjs'));
+ if(action==='read-native-before'||action==='read-native-after'){
+  if(action==='read-native-before'){await absent(stampName);await absent(completeName);}
+  else{const stamp=await json('owned/'+stampName);check(stamp.runId===run&&stamp.native===native&&stamp.source===c.carrier,'native_readback_attempt');}
+  check(typeof readNative==='function','native_readback_port');
+  const result=await readNative(action==='read-native-before'?'before':'after',native);
+  check(result.nativeSource===native&&result.sourceExact===true&&Number.isInteger(result.nativeVersion)&&result.nativeVersion>0,'native_provider_source');
+  return {status:'PASS',taskId:c.task,runId:run,preparedCandidate:c.candidate,...result,providerWrites:0,readinessRequests:0};
+ }
  if(action==='owned-preflight'){
   await absent(stampName);await absent(completeName);
   const history=state.carrierCorrections??[];check(Array.isArray(history),'history');

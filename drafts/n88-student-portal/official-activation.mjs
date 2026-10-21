@@ -9,7 +9,7 @@ import {STATIC1522,static1522Gate} from './activation/static-1522-gate.mjs';
 import {STUDENT_SESSION_STATIC,runStudentSessionStaticPhase} from './activation/static-student-session-20261021-gate.mjs';
 import {randomBytes,generateKeyPairSync,privateDecrypt,createPrivateKey,constants,pbkdf2Sync,createHmac,createHash} from 'node:crypto';
 import {spawnSync,execFileSync} from 'node:child_process';
-import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,unlink,readdir,rmdir,rm} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import path from 'node:path';
@@ -48,7 +48,7 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
- if(['--student-session-static-owned-preflight','--student-session-static-preflight','--student-session-static-begin','--student-session-static-complete'].includes(action)){
+ if(['--student-session-static-owned-preflight','--student-session-static-read-native-before','--student-session-static-read-native-after','--student-session-static-preflight','--student-session-static-begin','--student-session-static-complete'].includes(action)){
   const c=STUDENT_SESSION_STATIC,currentRun=process.env.N88_STUDENT_SESSION_RUN_ID;
   if(path.resolve(root)!==path.resolve(c.originalRoot))fail('n88_student_static_original_root');
   const taskRoot=fileURLToPath(new URL('../../',import.meta.url));
@@ -70,6 +70,26 @@ async function execute(action,value){
    readPublicPin:async()=>{
     const rows=await official(['secrets','list','--project-ref',project,'--output','json']),list=Array.isArray(rows)?rows:rows?.rows;
     const found=list?.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA');if(found?.length!==1)fail('n88_student_static_pin_identity');return found[0].value?.toLowerCase();
+   },
+   readNative:async(when,native)=>{
+    const evidence=path.join(taskRoot,c.evidence),temporary=path.join(evidence,'native-'+c.run+'-'+when+'.tmp');
+    if(!['before','after'].includes(when)||path.dirname(temporary)!==path.resolve(evidence))fail('n88_student_static_native_path');
+    await mkdir(temporary,{recursive:false});
+    try{
+     const listed=await official(['functions','list','--project-ref',project,'--output','json']);
+     const functions=Array.isArray(listed)?listed:listed?.functions,found=functions?.filter(f=>f.slug==='n88-student-portal'||f.name==='n88-student-portal');
+     if(found?.length!==1||!Number.isInteger(found[0].version))fail('n88_student_static_native_metadata');
+     await official(['functions','download','n88-student-portal','--project-ref',project,'--use-api','--workdir',temporary,'--output','json']);
+     const matches=[],digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+     const visit=async dir=>{for(const entry of await readdir(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())await visit(file);else if(/\.(mjs|js|ts)$/.test(entry.name)){const bytes=await readFile(file);if(digest(bytes)===native)matches.push(bytes);}}};
+     await visit(temporary);if(matches.length!==1)fail('n88_student_static_native_source_mismatch');
+     const filename=when==='before'?'provider-native.mjs':'provider-native-after.mjs';
+     await writeFile(path.join(evidence,filename),matches[0],{flag:'wx'});
+     return {nativeSource:native,nativeVersion:found[0].version,sourceExact:true,verifyJwt:found[0].verify_jwt};
+    }finally{
+     if(path.dirname(temporary)!==path.resolve(evidence)||!path.resolve(temporary).startsWith(path.resolve(taskRoot)+path.sep))fail('n88_student_static_native_cleanup_path');
+     await rm(temporary,{recursive:true});
+    }
    },
    verifyCandidate:async candidate=>{
     execFileSync('git',['merge-base','--is-ancestor',candidate,'HEAD'],{cwd:taskRoot,windowsHide:true});

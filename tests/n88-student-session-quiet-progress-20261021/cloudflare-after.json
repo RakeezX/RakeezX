@@ -1,0 +1,67 @@
+{
+  "observedAt": "2026-10-21T05:48:53.711Z",
+  "officialServer": "rakeez_cloudflare",
+  "sourceSha256": "6108647af490b79e5cfff9c0909726aa2282628f034eb9bbea5076f35dc83e3b",
+  "sourceLength": 194363,
+  "settings": {
+    "placement": {},
+    "compatibility_date": "2026-10-01",
+    "compatibility_flags": [],
+    "usage_model": "standard",
+    "tags": [],
+    "tail_consumers": [],
+    "logpush": false,
+    "annotations": {
+      "workers/triggered_by": "upload"
+    },
+    "bindings": [
+      {
+        "name": "N88_EDGE_URL",
+        "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n88-student-portal",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_ENABLED",
+        "text": "true",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_INGRESS_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "N88_PUBLIC_ORIGIN",
+        "text": "https://rakeezx.com",
+        "type": "plain_text"
+      }
+    ]
+  },
+  "subdomain": {
+    "enabled": false,
+    "previews_enabled": false
+  },
+  "routes": [
+    {
+      "id": "346d924c9746479a89e6e211a41bba14",
+      "pattern": "rakeezx.com/student",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "1bcc93cfb56b42469bdad21724b63a1d",
+      "pattern": "rakeezx.com/n88-private/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "c27599645c3c492f9b25eca0107e3dc9",
+      "pattern": "rakeezx.com/api/n88/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    }
+  ],
+  "version": {
+    "version_id": "b3cc0e6b-4cf9-4cd4-8b46-4f52b8afc645",
+    "percentage": 100
+  }
+}
