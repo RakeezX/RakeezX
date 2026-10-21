@@ -56,7 +56,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  if(Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible))return pending();
  const rosterLabels=new Set(['بيانات الطلاب','قائمة الطلاب','أسماء الطلاب','طلاب الفصل','قائمة طلاب الفصل','كشف الطلاب']);
  const visibleRoster=all.some(t=>Array.from(t.querySelectorAll('th')).filter(visible).some(n=>['اسم الطالب','اسم الطالبة','اسم الطالب/ة'].includes(text(n)))&&Array.from((t.closest('section,article,.report')??t).querySelectorAll('caption,h1,h2,h3')).filter(visible).some(n=>rosterLabels.has(text(n))));
- if(mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(location.pathname)&&!visibleRoster){
+ if(mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(location.pathname)){
   try{globalThis.rakeezRoutePolicy(location.origin,location.href,runContext);}catch(e){return {ok:false,code:e.message};}
   let relevant=0,unsupported=0;
   const links=[];for(const a of Array.from(document.querySelectorAll('a[href]')).filter(visible)){
@@ -69,8 +69,11 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    if(!/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(u.pathname))continue;
    const path=u.pathname+u.search;if(!links.some(l=>l.path===path))links.push({kind:'students',path});
   }
+  if(unsupported)return diagnostic('UNSAFE_ROSTER_LINK');
+  if(!visibleRoster){
   if(!links.length){const d=diagnostic('ROSTER_LINKS_PENDING',true);d.diagnostic.roster={relevant:Math.min(relevant,200),unsupported:Math.min(unsupported,200),iframes:Math.min(document.querySelectorAll('iframe').length,31),cause:unsupported?'RELEVANT_LINK_UNSUPPORTED':'MAIN_FRAME_READ_LINK_ABSENT'};return d;}if(links.length>20)return diagnostic('REPORT_LIMIT');
   return {ok:true,tables:[],links,warnings:[],skipped:[],pagination:null,schoolNames:[]};
+  }
  }
  const field=v=>v.length>0&&v.length<=80&&!/[\t\r\n@]/.test(v);
  const names=new Set(['اسم الطالب','اسم الطالبة','اسم الطالب/ة']),classes=new Set(['الفصل','الصف والفصل']);

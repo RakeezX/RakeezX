@@ -35,7 +35,7 @@ export function createBackgroundRunner({transport}){
  const authority=j=>({jobId:j.id,windowId:j.windowId});
  const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
- async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,Date.now()+30000)});});}
+ async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
   const v=await load();if(!v||v.id!==j.id)return;
   await chrome.storage.session.remove(JOB);await chrome.alarms.clear(ALARM);
@@ -66,7 +66,7 @@ export function createBackgroundRunner({transport}){
   j.sourceDocument=probe.documentId;j.sourceURL=probe.result;
   const target={tabId:j.tabId,documentIds:[j.sourceDocument]};
   await chrome.scripting.executeScript({target,world:'ISOLATED',files:['route-diagnostics.js']});
-  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[['students','timetable'].includes(mode)?'guard':mode,null,j.context]});
+  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,j.context]});
   await current(j);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   if(!r[0].result?.ok){const e=Error(r[0].result?.code??'SOURCE_UNAVAILABLE');e.retry=r[0].result?.retry;e.incomplete=r[0].result?.incomplete;throw e;}
@@ -83,9 +83,11 @@ export function createBackgroundRunner({transport}){
    const a=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readSourceReportPage,args:[mode,{...j.context,rowOffset:j.next?.rowOffset??0}]});
    await current(j);
    if(a.length!==1||a[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
-   if(!a[0].result?.ok){const e=Error(a[0]?.result?.code??'SOURCE_UNAVAILABLE');e.incomplete=a[0]?.result?.incomplete;e.retry=a[0]?.result?.retry;e.observedRows=a[0]?.result?.observedRows;throw e;}
    const end=await descriptor(j);if(sourceRoute(j,end.result)!==sourceRoute(j,j.sourceURL))throw Error('SOURCE_CONTEXT_CHANGED');
    j.sourceURL=end.result;
+   // Failed reads also require post-read binding and app authority checks.
+   await appGuard(j);
+   if(!a[0].result?.ok){const e=Error(a[0]?.result?.code??'SOURCE_UNAVAILABLE');e.incomplete=a[0]?.result?.incomplete;e.retry=a[0]?.result?.retry;e.observedRows=a[0]?.result?.observedRows;e.rosterCause=a[0]?.result?.diagnostic?.roster?.cause;throw e;}
    return a[0].result;
   }
   return r[0].result;
@@ -111,7 +113,7 @@ export function createBackgroundRunner({transport}){
  function partialPage(j,next,e){
   if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT'||/CONTEXT|BINDING|ORIGIN|LOGIN|ROLE|UNSAFE|SCHOOL|SESSION/.test(e.message))throw e;
   if(e.observedRows)j.studentRowsSeen+=e.observedRows;
-  const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(next.path,j.origin).pathname);
+  const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.rosterCause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(next.path,j.origin).pathname);
   return {tables:[],links:[],warnings:[{category:next.kind,code:e.message,optional}],skipped:[]};
  }
  async function settleNavigation(j){
@@ -119,7 +121,7 @@ export function createBackgroundRunner({transport}){
   await appGuard(j);const n=j.navigation,tab=await chrome.tabs.get(j.tabId);
   // Read back the top document ONLY during this exact owned navigation window.
   // Do not clear the old binding until destination, frame and deadline are verified.
-  if(!n?.issued||Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
+  if(!n?.issued||!n.readDocument&&Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
   const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>location.href});
   await current(j);
   j.navigationDiagnostic=navigationDiagnostic(j.origin,n,r.length===1?r[0].result:null,r.length===1?r[0].documentId:null,tab.status);
@@ -139,12 +141,24 @@ export function createBackgroundRunner({transport}){
    throw Error('NAVIGATION_UNCONFIRMED'); // Never replay an uncertain command.
   }
   if(route!==sourceRoute(j,n.target)&&!redirected)throw Error('SOURCE_CONTEXT_CHANGED');
-  if(r[0].documentId===n.documentId)throw Error('SOURCE_BINDING_CHANGED');
-  if(tab.status!=='complete'||transition&&!redirected)return false;
+  if(r[0].documentId===n.documentId||n.readDocument&&r[0].documentId!==n.readDocument)throw Error('SOURCE_BINDING_CHANGED');
+  if(tab.status!=='complete'||transition&&!redirected){if(n.readDocument&&Date.now()>=n.readDeadline)throw Error('SOURCE_BINDING_CHANGED');return false;}
   j.sourceURL=href;j.sourceDocument=r[0].documentId;
-  let page;try{page=await source(j,n.kind);}catch(e){if(e.retry&&Date.now()<n.deadline)return false;page=partialPage(j,j.next,e);}if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
+  // AI: navigation and optional discovery have separate finite budgets. Once the
+  // exact new MyStudents document is bound, a later alarm must read/guard it
+  // again, not misclassify its missing optional links as a role transition.
+  const roster=n.kind==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(dashboard.pathname);
+  if(roster&&!n.readDocument){n.readDocument=r[0].documentId;n.readDeadline=Date.now()+20000;}
+  let page;try{page=await source(j,n.kind);}catch(e){
+   if(roster&&e.retry&&e.message==='ROSTER_LINKS_PENDING'&&e.rosterCause==='MAIN_FRAME_READ_LINK_ABSENT'){
+    if(Date.now()<n.readDeadline)return false;
+    // Recheck role/school after the failed read, as well as URL/document/app.
+    await source(j,'roster-guard');await appGuard(j);
+    e.message='ROSTER_LINKS_UNAVAILABLE';page=partialPage(j,j.next,e);
+   }else{if(e.retry&&Date.now()<(roster?n.readDeadline:n.deadline))return false;page=partialPage(j,j.next,e);}
+  }if(page.schoolChoices)throw Error('SCHOOL_CHOICE_REQUIRED');
   await appGuard(j);
-  if(Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
+  if(!roster&&Date.now()>=n.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
   j.next={...j.next,page};j.navigation=null;delete j.navigationDiagnostic;j.phase='collect';await save(j);return true;
   }catch(e){e.sourceFailureStep??='source-navigation-settle';throw e;}
  }
@@ -247,5 +261,5 @@ export function createBackgroundRunner({transport}){
  chrome.alarms.onAlarm.addListener(a=>{if(a.name===ALARM)wake().catch(()=>{});});
  chrome.tabs.onUpdated.addListener((id,change)=>{if(change.status==='complete'||change.url)load().then(j=>{if(j&&(j.tabId===id||j.appTabId===id))wake().catch(()=>{});}).catch(()=>{});});
  chrome.tabs.onRemoved.addListener(id=>{load().then(j=>{if(j&&(j.tabId===id||j.appTabId===id))finish(j,'stopped',j.tabId===id?'SOURCE_CLOSED':'APP_CLOSED');});});
- return {message,wake,async bootstrap(){const j=await load();if(!j)return;await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,Date.now()+30000)});return wake();}};
+ return {message,wake,async bootstrap(){const j=await load();if(!j)return;await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});return wake();}};
 }
