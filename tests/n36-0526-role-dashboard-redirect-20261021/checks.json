@@ -1,0 +1,27 @@
+[
+  {
+    "name": "n36_actual_0526_role_to_dashboard_loading_then_verified_document",
+    "status": "PASS",
+    "evidence": "tests/n36-0526-role-dashboard-redirect-20261021/browser.json; immutable .26 reproduction and .27 delayed complete/new-document qualification"
+  },
+  {
+    "name": "n36_wrong_route_role_school_owner_document_still_denied",
+    "status": "PASS",
+    "evidence": "tests/n36-0526-role-dashboard-redirect-20261021/browser.json; 27 total synthetic scenarios, no receiver deliveries"
+  },
+  {
+    "name": "n36_0527_package_link_and_safe_diagnostic_exact",
+    "status": "PASS",
+    "evidence": "tests/n36-0526-role-dashboard-redirect-20261021/package.json and browser.json; 29-entry parity, exact link, immutable older archives, real copy-handler privacy"
+  },
+  {
+    "name": "owned_local_resources_released",
+    "status": "PASS",
+    "evidence": "Canonical isolated browser finally closed disposable contexts/browser; owned server closed, loopback 49727 returned ECONNREFUSED."
+  },
+  {
+    "name": "production_and_stable_runtime_parity",
+    "status": "NOT_RUN",
+    "evidence": "Independent controller/publisher phase after candidate integration; no push/deployment/stable update performed."
+  }
+]
