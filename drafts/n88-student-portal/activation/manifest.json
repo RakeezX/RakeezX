@@ -139,7 +139,7 @@
     "drafts/n88-student-portal/class-credentials.mjs": "6d5c32265bebb1b72de0ec028ce102bc162a8bdf8e4b46731f8252261a41019e",
     "drafts/n88-student-portal/code-recovery.mjs": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55",
     "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
-    "drafts/n88-student-portal/integrated-service.mjs": "46699c6bcf067ddc906b7c4c82773da755f68d3ff447864e53956ce306610875",
+    "drafts/n88-student-portal/integrated-service.mjs": "2faf3567ddf0f83b41ad811b2c586ae1cbacbe72ae60fc383b826d7372812734",
     "drafts/n88-student-portal/postgres-repository.mjs": "b0d1dfe19a8b0419e629313aabe219e5e9206e4ecf2552fce4dcd6f93db7c3af",
     "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
     "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
@@ -330,7 +330,7 @@
     "docs/automation-evidence/20261019/N88_AVAILABILITY_FAST_LIGHT_ENTRY.md": "bfacd0406d91344f0e9762628dd0d9709224c671f2c954600412227f1bc51d6a"
   },
   "outputs": {
-    "edge/index.mjs": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+    "edge/index.mjs": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
     "private/assets/student.mjs": "c32c3fc5187a5bba3991b311bb931b3215cc479e562ef1aaa4efac74e7f88470",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
     "edge/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
@@ -1134,5 +1134,23 @@
     "edgeUnchanged": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
     "staticOnly": true,
     "hostedTeacherSuccess": "NOT_PROVEN"
+  },
+  "mobileSource503Preparation": {
+    "taskId": "continuous-n88-mobile-class-source-503-20261021",
+    "runId": "c7c4a888-7a84-4ca5-b5ce-58351c7b6dcb",
+    "baseSha": "0bca7554e60adca6b19ad804e4370874d9f5676b",
+    "immutableNativeRef": "9c658ade13bddc0289f3e2cf3a7769533280c2ae",
+    "priorNativeVersion": 59,
+    "priorNativeSha256": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+    "preparedNativeSha256": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "delta": "Only readCanonical lock selection: canonical for list/credential admission, full projection otherwise",
+    "preservesServedNativeGraph": true,
+    "staleMainGraphNotRebuilt": true,
+    "publication": "NOT_RUN: final user instruction forbids push/deploy",
+    "providerPinUpdate": "NOT_RUN",
+    "providerServedParity": "NOT_RUN",
+    "realAccountCause": "NOT_PROVEN",
+    "realAccountRequests": 0,
+    "providerWrites": 0
   }
 }

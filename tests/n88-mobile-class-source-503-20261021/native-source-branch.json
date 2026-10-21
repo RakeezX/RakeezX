@@ -1,0 +1,66 @@
+{
+  "taskId": "continuous-n88-mobile-class-source-503-20261021",
+  "runId": "c7c4a888-7a84-4ca5-b5ce-58351c7b6dcb",
+  "status": "PASS",
+  "redFirst": false,
+  "native": true,
+  "scope": "Actual local service/SDK/typed-boundary/PG17; fabricated only, no rendered UI or real-account proof",
+  "checks": [
+    {
+      "name": "projection-only overbound list",
+      "status": "PASS",
+      "evidence": "2003 valid logs; same roster/policy/recovery result as bounded baseline; resolver/read/synchronize canonical locks, terms/teachings only and durable COMMIT"
+    },
+    {
+      "name": "full projection guard retained",
+      "status": "PASS",
+      "evidence": "Visibility and guidance actual handlers return private source503; default student projection reader still invokes the actual projection lock and denies overbound"
+    },
+    {
+      "name": "canonical overbound",
+      "status": "PASS",
+      "evidence": "2007 items still deny in resolver canonical lock before list read; no cap raised"
+    },
+    {
+      "name": "owner Auth current session term/class fences",
+      "status": "PASS",
+      "evidence": "Wrong owner/session echo, stale term/class, future/expired term, inactive class, denied provider, absent current DB session and expired signed token deny"
+    },
+    {
+      "name": "membership guards",
+      "status": "PASS",
+      "evidence": "Real canonical synchronizeOwner excludes inactive enrollment; re-read revision updates; ambiguous active enrollment denies"
+    },
+    {
+      "name": "concurrent source revision",
+      "status": "PASS",
+      "evidence": "Independent PG writer cannot revise teaching while resolver/list transaction holds source locks; after COMMIT revision changes produce a different roster stamp"
+    },
+    {
+      "name": "actual full projection entries",
+      "status": "PASS",
+      "evidence": "Cookie-backed actual student read, visibility save and guidance-list succeed when bounded and invoke full projection lock; student read with 2003 logs still privately denies and rolls back, then bounded fresh read succeeds"
+    },
+    {
+      "name": "recovery retained",
+      "status": "PASS",
+      "evidence": "Actual issue-missing durable ACK then AEAD list recovery returns the same active codes with 2003 unrelated logs; credentials never recorded in report"
+    },
+    {
+      "name": "commit fences and truthful private failure",
+      "status": "PASS",
+      "evidence": "Actual SDK beforeCommit current-session failure prevents COMMIT; injected pre-COMMIT failure rolls back already-flushed membership revision; both keep original durable revision and expose only fixed private503; fresh committed list alone advances it"
+    }
+  ],
+  "cleanup": {
+    "ownedNativePgClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "sourceSha256": "2faf3567ddf0f83b41ad811b2c586ae1cbacbe72ae60fc383b826d7372812734",
+  "nativeSha256": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "fabricatedProjectionRows": 2003,
+  "projectionOnlyResult": {
+    "status": 200,
+    "students": 2
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "taskId": "continuous-n88-mobile-class-source-503-20261021",
+  "runId": "c7c4a888-7a84-4ca5-b5ce-58351c7b6dcb",
+  "status": "FAIL",
+  "redFirst": true,
+  "scope": "Actual local service/SDK/typed-boundary/PG17; fabricated only, no rendered UI or real-account proof",
+  "checks": [],
+  "cleanup": {
+    "ownedNativePgClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "sourceSha256": "46699c6bcf067ddc906b7c4c82773da755f68d3ff447864e53956ce306610875",
+  "fabricatedProjectionRows": 2003,
+  "projectionOnlyResult": {
+    "status": 503,
+    "body": {
+      "error": "unavailable",
+      "stage": "source"
+    }
+  },
+  "failure": {
+    "operation": "projection-only overbound list",
+    "name": "AssertionError",
+    "message": "ERR_ASSERTION"
+  },
+  "lastFailureResponse": {
+    "status": 503,
+    "body": {
+      "error": "unavailable",
+      "stage": "source"
+    }
+  }
+}

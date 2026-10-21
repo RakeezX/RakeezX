@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n88-mobile-class-source-503-20261021",
+  "runId": "c7c4a888-7a84-4ca5-b5ce-58351c7b6dcb",
+  "baseSha": "0bca7554e60adca6b19ad804e4370874d9f5676b",
+  "immutableNativeRef": "9c658ade13bddc0289f3e2cf3a7769533280c2ae",
+  "priorNativeVersion": 59,
+  "priorNativeSha256": "a5ca44450359a938128a99f2fa2bac274e9f88cc77d9d665c8e31ffcc67a88fe",
+  "preparedNativeSha256": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "delta": "Only readCanonical lock selection: canonical for list/credential admission, full projection otherwise",
+  "preservesServedNativeGraph": true,
+  "staleMainGraphNotRebuilt": true,
+  "publication": "NOT_RUN: final user instruction forbids push/deploy",
+  "providerPinUpdate": "NOT_RUN",
+  "providerServedParity": "NOT_RUN",
+  "realAccountCause": "NOT_PROVEN",
+  "realAccountRequests": 0,
+  "providerWrites": 0
+}
