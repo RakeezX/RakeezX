@@ -1,0 +1,34 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "candidateSha": "0e74c7b4d0a1433a584416164a3ff31a0ccbb4d1",
+  "observedAt": "2026-10-21T12:40:51.070Z",
+  "sourceCandidate": "c072fac17ca761751be88982b7ba75e4f0f3aa3f",
+  "prior": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "source": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "status": "PASS",
+  "provider": {
+    "source": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "sourceExact": true,
+    "version": 61,
+    "verifyJwt": false,
+    "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+    "pinDigest": "a257dc16377982e0939ac508615962f87175c350ffa9f7c86d3fdd32a65ec5e4",
+    "otherConfigDigest": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
+  },
+  "transport": {
+    "safeAnonymousDenial": true,
+    "httpStatus": 401,
+    "region": "ap-south-1",
+    "noCookie": true,
+    "noStore": true,
+    "noReferrer": true,
+    "nosniff": true,
+    "carrierSource": "a2308758f0611510f04f71cee50f69ffe35b936183d8d3e20847304adfb67091",
+    "carrierUnchanged": true
+  },
+  "historyDigest": "cf6ad848812d02c497da313ffa94b37729d3279b23c6c5e06ad92bdf22b0f64f",
+  "originalCustodian": true,
+  "attemptAvailable": true,
+  "providerWrites": 0
+}

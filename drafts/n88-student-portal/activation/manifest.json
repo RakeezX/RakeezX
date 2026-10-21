@@ -118,7 +118,7 @@
     "drafts/n88-student-portal/activation/hosted-scram-restored-challenge.json": "42af614bcb6afde23c51b80f2e33ef1d3abf4d5678beb9fc155731958cb23edb",
     "tests/n88-official-activation-direct-readiness.mjs": "19011fee87d13cc87f3c9299e86d91eee3546cf378293ef6cad470bab4b2e9b7",
     "tests/n88-official-activation-direct-readiness.json": "640543b7a8ee5c6b3ddf8db99d090c8c17aadff5cb1b70af5c31c07ab9a6e084",
-    "drafts/n88-student-portal/official-activation.mjs": "f98079237763cf411721ad39e5dfdd230234b363f1ef18662d3e20e612e73aa3",
+    "drafts/n88-student-portal/official-activation.mjs": "dbf82ce5c1a14c4bb7b5acdecda7f018b7ba5b2ef7ad81ef070854fa71ff5020",
     "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
     "drafts/n88-student-portal/activation/ca/provenance.json": "82cbea55c25279317503a264d455ccb33d5be54952b072e088ba5e6cd6f582d4",
     "tests/n88-official-activation-session-pooler.mjs": "9f38a6b6a81efddcd68f7aa6a96c09be9b3a372c9626e54159e387070499b26c",
@@ -1188,5 +1188,24 @@
     "allOtherCarrierBytesIdentical": true,
     "staticCssUnchanged": true,
     "providerOperations": 0
+  },
+  "studentReadPhaseDelivery": {
+    "taskId": "continuous-n88-student-read-phase-latency-20261021",
+    "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+    "sourceCandidate": "0e74c7b4d0a1433a584416164a3ff31a0ccbb4d1",
+    "native": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "nativeUploadVersion": 62,
+    "nativePinnedVersion": 63,
+    "nativeUploads": 1,
+    "pinUpdates": 1,
+    "carrier": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+    "carrierVersion": "0af9e9d6-b7b6-4c32-8c55-13bffbc506c4",
+    "carrierUploads": 1,
+    "student": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
+    "receipt": "tests/n88-student-read-phase-latency-20261021/final-checks.json",
+    "diagnosticOnly": true,
+    "performanceAcceptance": "NOT_PROVEN",
+    "realAccountRequests": 0,
+    "frontendPublication": "SOLE_PUBLISHER_OWNED"
   }
 }

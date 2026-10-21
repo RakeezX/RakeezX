@@ -1,0 +1,109 @@
+{
+  "taskId": "continuous-n88-student-read-phase-latency-20261021",
+  "runId": "2c1fb6b8-d4ce-428a-8539-65e83d5a6a86",
+  "state": "LOCAL_READY",
+  "baseSha": "e710fcbbf51fcaa59715e45e4aa15aaa353bb1e3",
+  "sourceCandidate": "0e74c7b4d0a1433a584416164a3ff31a0ccbb4d1",
+  "checks": [
+    {
+      "name": "n88_student_get_phase_red_first_and_causal_measurement",
+      "status": "PASS",
+      "evidence": "Original red-first11-run fabricated measurement reused; changed exact native phase injection proof in diagnostic-service.json. No causal speed improvement claimed."
+    },
+    {
+      "name": "n88_student_get_auth_revoke_visibility_owner_boundaries",
+      "status": "PASS",
+      "evidence": "Changed native14 handler guards and actual source/packaged HTTP DOM current-only copy/retirement proof; uniform denied envelope/header tests."
+    },
+    {
+      "name": "n88_student_get_guidance_projection_commit_parity",
+      "status": "PASS",
+      "evidence": "All successful delayed projections equal baseline, full13-family canonical read retained, failed/unknown COMMIT denies; exact reversible published-native instrumentation."
+    },
+    {
+      "name": "n88_student_get_measured_improvement_or_private_finite_diagnostic",
+      "status": "PASS",
+      "evidence": "Diagnostic only: ten bounded250ms phase durations; service/envelope/carrier/client/copy parity, invalid values, old carrier, denied and stale/later-in-flight exclusions PASS."
+    },
+    {
+      "name": "n88_student_get_native_custody_pin_and_served_parity",
+      "status": "PASS",
+      "evidence": "Actual original-custodian native upload62/pin63 and separate one-carrier upload; exact official source/config/pin/import-map and served JS parity; append-only completion receipts. Both allowances consumed."
+    },
+    {
+      "name": "n88_actual_postpublication_positive_session_latency",
+      "status": "NOT_RUN",
+      "evidence": "No real-account request authorized or made. Actual service speed and N88 Product acceptance remain open; frontend publication belongs to the sole publisher."
+    }
+  ],
+  "receipts": {
+    "bridge-client.json": "d7a3348ae6dc9370bdee0e310f253a056e2d8fa2e5ef62637ef7de146b4c3a4f",
+    "bridge-red-first.json": "0ef63d8c58988e74738849e0f6d224bbbfbe9209a0b0c00e40148982d1ed7baa",
+    "cloudflare-static-after.json": "366447f448d5083bb83a0e939c12cd312e9cc248b484250ba042f0eb5fdcc646",
+    "cloudflare-static-before.json": "ac289e8b0ffcaf1488de2690af6c9f77b27694e71a8a5500ff6329fd44cfe7b9",
+    "compatibility.json": "112f80e9913c0751b53f7cb9d7bb4080be7038029d61b40cac2157fc1844e31b",
+    "custodian-complete.json": "64a3f427c39061f89f7d8e944958e0443ca05d1935483117205e2d0b087b000f",
+    "custodian-pin.json": "5340790b02721ee0710c499c6436ba38430f2247f9f3161ae5349fd1ec3e0f74",
+    "custodian-preflight.json": "9259f3545b44281dbaa5b44a22ba8d25c3b9356e5d664bb22e5dad0579f18476",
+    "custodian-static-begin.json": "e5e0d585432278aee899bb21df1fe03c153c741b50c563cbab0dc3c898dfe746",
+    "custodian-static-complete.json": "a3060b10fcd7fe56e5baf31eb1e0d74292b89326352e13576f2fba22e739bfb7",
+    "custodian-static-preflight.json": "b49bbcaddb5850a0722dca95a1135c901e2f323e15ee0a3ded3c668eae8bd339",
+    "custodian-upload.json": "6a80e45798e8bbdd2e33ff830f6fd4d170a980fa6efc16a55226b095a1a17134",
+    "custody.json": "4862ffaf39ea02e2afc1a32bbba12ebf90cd378e8a0815f97463e067c0eb2edc",
+    "diagnostic-qualification.json": "5aa106bf3af5b4c87367e61e0539aee7e96a4147d37e299b83657834d13baee8",
+    "diagnostic-service-before-carrier-compatibility.json": "ece3a079a6c77f1a2dd49c9f0559d01402ba1dabd6ffb11104a57e1e3328e85a",
+    "diagnostic-service.json": "12c5d0b6874a190c04b891c6d415a5ebd08bfa62c154f3bfc1fa057e19553ee6",
+    "guard-visibility-fixture-failure.json": "bf7436275a4c5d45e1dc91a38367bfa421983f4efb9d55343c2ea98fc395576f",
+    "harness-setup-failure.json": "1e230f614515afde76cbb7569275c0c08049988cc5f98a7b8431de9d6b5222d8",
+    "measurement-before-owner-fixture-failure.json": "03aa80f60387ad325a0e0f09122777b48e8340a5e8c36adf398cc596276137e2",
+    "measurement.json": "2a00b8ffe6c266ad40713c84e280bd2080c6303d9b67250ff71c089dbe0f297f",
+    "native-complete.json": "3295524fb8624c19d42a17764c18051268229be4343bbfec175fc2fd51d47502",
+    "native-pin.json": "a1dd5d77d2fda0c22e32a32843bc0c5056e47d8f277ee4735bd52d65cd1b5cb4",
+    "native-preflight.json": "fb4e491424a4825b7077c8393e1e2f1cddb3e259b71e23a8911cc0de8e1f91c8",
+    "native-upload.json": "5cdd61e2fbac74c105e896c76c35da77cd1759ff980d08be5c63d55cdb281355",
+    "package.json": "18dee7f3a5533620da85b6d05bec6a0b97d03d7417e0c8b196aa0f2a8a19a0ab",
+    "qualification.json": "908e9a034cefe28e6271c42b8010ac8a8453efbe6ca0f4c7a3b27d7d096b0261",
+    "served.json": "be0945a3ba1e3b6a91b64394b1686ea3049eca55e5180e784d70750151be07b2",
+    "static-complete.json": "2d3d9e7c98ce3271e3305019ee06b99e42f94d2d60fa3e868da62f4d118e2f40",
+    "static-preflight.json": "463e24bb16803dd3518f13a3e65d1f4be6d290b964186f5b03def13b97e407ce",
+    "static-reservation.json": "4b9896c0ac42529ff338e0f0594fcfd8fc114408390d4ae1f552b866072af753",
+    "static-upload.json": "36bc4d36b458140195823e3a55966e9587696ec84af8e26b4057de5b3d942c84",
+    "transport-after.json": "36cae3067d2bcf2192cef02dfa136be352a865f93b2dcb0468538654158136e1",
+    "transport-before-with-observed-at.json": "b45efef5a5c4ea34e7148741254b92ae2aa3a136a73d0ecaa04dbf91c6d10d6a",
+    "transport-before.json": "cd1bdca08e7a54c79be1857a6b4ff9279521ad2e1880bff0126eea3188485e16",
+    "ui.json": "b52320941783b9fc58d7153c01b2aabe9898d43c58d2d5bc99f45cc4e9ae4f74"
+  },
+  "sourceHashes": {
+    "drafts/n88-student-portal/existing-host.mjs": "60f2b17f88da8fb93d64adae7789aabb99d94b34f9a8f2e4235463f558829cfe",
+    "drafts/n88-student-portal/postgres-repository.mjs": "cac60b27ab569e2d28440829fd8dea5074f607ac7528e8890a0f21a76de3bd92",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/integrated-service.mjs": "49d1f2ab320bb6a15f87d6ca0a890a3163076d61850d56e2b9bada688caf04d8",
+    "drafts/n88-student-portal/web-entry.mjs": "5d1c6045b5e088ed5f1fc4d8fb31d2fcfc53f6396faec8101310d0451df3435d",
+    "drafts/n88-student-portal/web-protocol.mjs": "885448bc8ecb3736edf1ffc34460096f71a8d7cb5ce2b4cb05d25575d9a0d2ff",
+    "drafts/n88-student-portal/cloudflare-entry.mjs": "97046b668126dd806862269ed48e8c9e619dff87abaf4451cf16b7f108266852",
+    "drafts/n88-student-portal/official-activation.mjs": "dbf82ce5c1a14c4bb7b5acdecda7f018b7ba5b2ef7ad81ef070854fa71ff5020",
+    "src/lib/student-portal-unified-client.js": "5bda68a51083214421d34edf1ce338634a4db8778968b7551076df3f8bdf541d",
+    "src/views/student-portal-login.js": "b2c123fd5da51759ba7bddb2f0f573a1149e31d48fd8174e9ccb2f4f856a3612",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs": "f439d1150b55c25a6a9b1d1cde63cb2bfb66fdf8c89f81a90a55aa192bdbbe1b",
+    "tests/n88-student-read-phase-latency-20261021/native-gate.mjs": "92e0611c895037a6a452e9babbf44883ba3cb8c77eecddaed96a7cfd30da0a1d",
+    "tests/n88-student-read-phase-latency-20261021/static-gate.mjs": "64c72b933b0778f1da4632bc21177c2feff84ccab2c839907c392f83a3dc3a65"
+  },
+  "nativeVersion": 63,
+  "carrierVersion": "0af9e9d6-b7b6-4c32-8c55-13bffbc506c4",
+  "diagnosticOnly": true,
+  "performanceAcceptance": "NOT_PROVEN",
+  "realAccountRequests": 0,
+  "newReadinessRequests": 0,
+  "nativeUploads": 1,
+  "pinUpdates": 1,
+  "carrierUploads": 1,
+  "resources": {
+    "browser": "released; owned contexts/browser/server closed",
+    "integration": "released",
+    "liveMutation": "released",
+    "postgres": "owned fixture closed"
+  },
+  "productPublication": "sole publisher owns main/Pages; not performed here"
+}
