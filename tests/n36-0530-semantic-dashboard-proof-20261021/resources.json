@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-10-21T05:59:08.443Z",
+  "ports": [
+    49842,
+    49843,
+    49844
+  ],
+  "ownedServers": "closed: ECONNREFUSED on every owned loopback port",
+  "browser": "canonical helper finally closes owned contexts/browser; all phases exited",
+  "sharedBrowserLease": "not acquired: authorized isolated synthetic phase"
+}

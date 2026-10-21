@@ -1,0 +1,33 @@
+{
+  "taskId": "continuous-n36-0530-semantic-dashboard-read-proof-20261021",
+  "runId": "a6728982-7092-4a9e-995e-1da13954a419",
+  "baseSha": "ac977c717011f84456727e292881f8dd7dbbb7b0",
+  "runtimeFingerprint": "6a0f47c197c68f9a0f889d89e41140776e5bc73de79ffcb44bb5c8cbd24cc689",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.31.zip",
+    "sha256": "ffb5638b256928678b318311aa097f5eb8f908639efef879c57939fded5d31e8",
+    "bytes": 142532
+  },
+  "checks": [
+    {
+      "name": "n36_actual_0530_dashboard_without_badge_reproduced_and_resolved",
+      "status": "PASS",
+      "evidence": "browser.json: immutable .30 accepted Start then source-pre-read UNCONFIRMED_TEACHER_ROLE; zero rows/receipts/navigation; .31 dashboard and selected-card complete with 300+3."
+    },
+    {
+      "name": "n36_0531_dashboard_teacher_school_owner_document_denials_and_receipts",
+      "status": "PASS",
+      "evidence": "47 actual popup/source scenarios; 27 direct proof/diagnostic cases; 13 real application receiver scenarios including dashboard/card full and partial persistence, owner/session/batch/document denials."
+    },
+    {
+      "name": "n36_0531_package_link_supported_setup_and_safe_diagnostic",
+      "status": "PASS",
+      "evidence": "package.json and receiver.json: 29 source/ZIP hash matches, real app download matches ZIP, same permissions/routes/receiver; bounded diagnostic enums/counts; changed JS syntax."
+    },
+    {
+      "name": "n36_verified_package_stable_folder_parity",
+      "status": "NOT_RUN",
+      "evidence": "Independent publisher/controller owns Production and post-delivery stable runtime update/parity. No push/deploy/stable mutation by worker."
+    }
+  ]
+}

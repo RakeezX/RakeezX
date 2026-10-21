@@ -1,0 +1,544 @@
+{
+  "taskId": "continuous-n36-0530-semantic-dashboard-read-proof-20261021",
+  "runId": "a6728982-7092-4a9e-995e-1da13954a419",
+  "runtimeFingerprint": "6a0f47c197c68f9a0f889d89e41140776e5bc73de79ffcb44bb5c8cbd24cc689",
+  "boundary": "Actual application ownership/session/batch guards, ESM worker, serialized receiver, IndexedDB and UI; synthetic Chrome APIs and synthetic service only. Reuses existing loopback protocol substitution. Source collection held before first read for deterministic owner/session/batch denials; no live time/portal.",
+  "previousFailures": [],
+  "checks": [
+    {
+      "mode": "complete",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "partial",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "partial",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "role-complete",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "complete",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "role-partial",
+      "status": "PASS",
+      "phase": "complete",
+      "code": null,
+      "staged": 303,
+      "observed": 303,
+      "added": 303,
+      "coverage": "partial",
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 300,
+          "added": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "total": 3,
+          "added": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "owner",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "session",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "receiver",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "batch",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "BATCH_EXPIRED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "receiver-route",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 0,
+      "observed": 0,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "during-owner",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "during-session",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "APP_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "during-batch",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "BATCH_EXPIRED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    },
+    {
+      "mode": "during-document",
+      "status": "PASS",
+      "phase": "stopped",
+      "code": "SOURCE_BINDING_CHANGED",
+      "staged": 303,
+      "observed": 303,
+      "added": 0,
+      "coverage": "unknown",
+      "receipts": [],
+      "actualOwnershipGuards": true,
+      "noNavigationReplay": true
+    }
+  ],
+  "reusedChecks": [],
+  "status": "PASS"
+}

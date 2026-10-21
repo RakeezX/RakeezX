@@ -1,0 +1,25 @@
+{
+  "name": "n36_0531_package_link_supported_setup_and_safe_diagnostic",
+  "status": "PASS",
+  "baseSha": "ac977c717011f84456727e292881f8dd7dbbb7b0",
+  "version": "0.5.31",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.31.zip",
+    "sha256": "ffb5638b256928678b318311aa097f5eb8f908639efef879c57939fded5d31e8",
+    "bytes": 142532
+  },
+  "runtimeFiles": 29,
+  "checks": [
+    "ZIP/source/file SHA256 and size parity",
+    "Exact .31 download href + label only",
+    "Manifest permissions/hosts/CSP unchanged",
+    "Immutable .30 ZIP/manifest and unchanged receiver/data/route/date/popup assets",
+    "Changed JS syntax"
+  ],
+  "reusedEvidence": [
+    "tests/n36-0524-package-link-20261020/result.json",
+    "tests/n36-background-no-popup-20261020/browser.json"
+  ],
+  "actualSourceAcceptance": "NOT_RUN: one later manual user diagnostic is required to establish actual source acceptance",
+  "publicationAndStableParity": "NOT_RUN: independent controller/publisher, followed by existing stable updater only after verified publication"
+}
