@@ -1,0 +1,8 @@
+{
+  "status": "FAIL",
+  "checks": [],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "failure": "locator.click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-guidance-refresh]')\u001b[22m\n\u001b[2m    - locator resolved to <button class=\"btn\" type=\"button\" data-guidance-refresh=\"\">مراجعة الحالة</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m  - element was detached from the DOM, retrying\u001b[22m\n",
+  "release": "RELEASED browser"
+}

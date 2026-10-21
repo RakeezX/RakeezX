@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "rate-retry-disabled-until-finite-cooldown-and-hidden-initial-boot-once",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "release": "RELEASED browser"
+}

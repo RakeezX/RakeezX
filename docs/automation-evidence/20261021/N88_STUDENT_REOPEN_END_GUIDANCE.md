@@ -1,0 +1,23 @@
+# N88 — fresh-document session, finite end and guidance
+
+Task `continuous-n88-student-reopen-end-guidance-20261021`, run `05421e19-d5a7-47ee-8b6b-32259e1adf68`; base `96e123e73399616d4820da421618734d60c61521`. Current origin/main was freshly fetched at this same SHA. N88 remains OPEN; actual postpublication pupil behavior and PO acceptance remain unverified.
+
+Fresh mount now reads the current HttpOnly-cookie-backed session once before any code form. Explicit session denial shows entry; network, malformed, rate and timeout outcomes show a non-private authoritative-read retry. Hidden initial mounts defer the read until visible; pageshow/visibility do not duplicate bootstrap. No cookie inspection, private storage, URL data, code replay or payload logging was added. Existing generation, retirement and disposal fences remain.
+
+Explicit End immediately replaces private DOM with an accessible pending explanation, then makes the existing POST once. Both request and response-body waits are bounded independently of AbortSignal cooperation. Only a successful server response reports completion. Uncertain/denied end keeps private DOM retired and offers an explicit GET recovery without replaying End. The view has an independent 15-second bound for end/read; the existing claim-plus-read path retains both transport budgets (31-second outer safety limit).
+
+Guidance now reports the actual pending read even when prior tasks exist, including queue time in the existing 10-second deadline. The owned request lane retires on cancellation even if a fabricated/broken transport ignores abort; expired queued work is never dispatched later. Same-context drafts and open state survive pagehide/return, remain editable after failure, and cannot be saved until current state is confirmed. Focus does not silently retry a failed uninitialized read. Owner/source context changes still retire the bound draft.
+
+Actual application DOM, handlers, CSS and numeric credential/session handler ran over a task-owned loopback HTTP server in fresh synthetic browser contexts under the shared browser lease. No personal profile, Service Worker, remote request or real account/student operation was used. All owned browser/server resources were closed and the lease released in finally.
+
+Focused results under `tests/n88-student-reopen-end-guidance-20261021/`:
+
+- `ui-student.json`: valid cookie reload and actual close/reopen in the same fresh synthetic cookie jar; one read per document; explicit denial/revoke, unavailable read/recovery, end acknowledgment/denial and local retirement at 390/1280px; abort-ignoring read/end and late responses; independent view deadline.
+- `ui-teacher.json`: actual authenticated runtime/store/owner/lease admission with fabricated state; 10-second stalled guidance failure, explicit retry, saved draft through pagehide/return/failure, opening both rotate/revoke reviews and cancelling with zero commands; one explicit matching Confirm invokes exactly one synthetic rotate transport. Its deliberately unsupported synthetic command ACK is not represented as successful service mutation.
+- `ui-additional.json`: real runtime queue timeout/return releases the lane, no late dispatch or duplicate reads; owner retirement removes confirmation before any command; late fresh reads fenced on pagehide, disposal and wrong context.
+- `ui-cooldown.json`: rate retry disabled for the finite server-directed cooldown with no automatic request; hidden initial mount starts exactly one read on visibility/pageshow.
+- `transport.json`: independent fetch/body deadlines, no replay, stale retirement and exact denial/rate/unavailable classification. `qualification.json` pins affected source and evidence bytes; private bundle recipe verifies all other carrier bytes and assets remain identical.
+
+The original failed harness selectors, transient-return observation and actual draft-return failure are retained in separate failure receipts. They are not overwritten as PASS. The corrected composed scenarios passed after material corrections. Narrow/desktop screenshots were visually inspected for pending/retry/failure states; content fits without horizontal overflow. Prior synthetic service/owner guards remain binding, and no broad build or unrelated suite ran.
+
+Private-static prerequisite: prepared source-derived student module and carrier only; actual fresh original-custodian gate/provider/native/public-pin preflight, single permitted upload and served-byte readback are pending below. No native/service/SQL/Auth/RLS/schema/region/cookie-policy/public-pin change is permitted. Teacher frontend Product publication remains with the independent publisher; this worker does not push Git or claim frontend Production delivery.

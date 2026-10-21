@@ -16,7 +16,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   const clearing=empty(draft);form.querySelector('[data-clear]').hidden=!clearing;
   if(!clearing)form.elements.confirmClear.checked=false;
   form.querySelector('[data-guidance-count]').textContent=`${draft.executionInstructions.length} / 400 · ${draft.deliveryInstructions.length} / 400`;
-  form.querySelector('[type=submit]').disabled=busy||readError||uncertain.has(selected)||stale||!current()||(!task.needsRepublication&&unchanged(task,draft))||(clearing&&!form.elements.confirmClear.checked);
+  form.querySelector('[type=submit]').disabled=suspended||busy||readError||uncertain.has(selected)||stale||!current()||(!task.needsRepublication&&unchanged(task,draft))||(clearing&&!form.elements.confirmClear.checked);
  }
  function draw(){
   if(disposed)return;
@@ -26,7 +26,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   const selection=focus?.tagName==='TEXTAREA'?[focus.selectionStart,focus.selectionEnd]:null;
   const focusKey=focus&&(focus.name||[...focus.attributes].find(a=>a.name.startsWith('data-guidance-'))?.name);
   const {task,draft,stale}=state();
-  root.innerHTML=`<details class="n88-task-guidance" aria-busy="${busy}" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body"><p role="status" aria-live="polite">${esc(message||(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy&&!tasks.length?'جارٍ قراءة المهام…':''))}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&loaded&&!busy&&!readError?'<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>':''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="2">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="2">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><label data-clear hidden><input type="checkbox" name="confirmClear"> أؤكد نشر المهمة دون تعليمات</label><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
+  root.innerHTML=`<details class="n88-task-guidance" aria-busy="${busy}" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body"><p role="status" aria-live="polite">${esc(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy?(saving?'جارٍ حفظ التعليمات…':'جارٍ قراءة المهام… يشمل الانتظار في الطابور، بحد أقصى 10 ثوانٍ.'):message)}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&loaded&&!busy&&!readError?'<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>':''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="2">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="2">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><label data-clear hidden><input type="checkbox" name="confirmClear"> أؤكد نشر المهمة دون تعليمات</label><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
   updateControls();
   if(focusKey){const next=[...root.querySelectorAll('button,select,textarea,input')].find(e=>e.name===focusKey||e.hasAttribute(focusKey));next?.focus({preventScroll:true});if(next&&selection)next.setSelectionRange(...selection);}
  }
@@ -37,7 +37,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   if(busy){if(operationSequence!==sequence)queued=true;return;}
   clearTimeout(wakeTimer);const k=bound,g=++sequence;
   if(!k||!client?.listGuidance){tasks=[];draw();return;}
-  busy=true;operationSequence=g;draw();
+  busy=true;operationSequence=g;message='';draw();
   try{const result=await client.listGuidance(getContext().teachingId);if(disposed||g!==sequence||k!==current())return;tasks=result.tasks;loaded=true;if(readError)message='';readError=false;if(!tasks.some(t=>t.subitemId===selected))selected=tasks[0]?.subitemId||null;
    const ids=new Set(tasks.map(t=>t.subitemId));for(const id of drafts.keys())if(!ids.has(id))drafts.delete(id);
   }
@@ -50,7 +50,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
  const click=e=>{if(bound!==current()){reset();draw();return;}if(e.target.closest('[data-guidance-refresh]'))void refresh();if(e.target.closest('[data-guidance-revalidate]')&&!busy&&!readError){const {task,draft}=state();if(task&&draft){drafts.set(selected,{...draft,sourceStamp:task.sourceStamp,revision:task.revision});uncertain.delete(selected);message='';draw();}}};
  const submit=async e=>{
   if(!e.target.matches('[data-guidance]'))return;e.preventDefault();
-  if(busy||bound!==current()){if(bound!==current())reset();draw();return;}
+  if(suspended||busy||bound!==current()){if(bound!==current())reset();draw();return;}
   const {task,draft:d,stale}=state();
   if(!task||stale||uncertain.has(selected)||readError||!current()||(!task.needsRepublication&&unchanged(task,d)))return;
   const guidance={subitemId:task.subitemId,sourceStamp:d.sourceStamp,revision:d.revision,executionInstructions:d.executionInstructions,deliveryInstructions:d.deliveryInstructions,confirmClear:empty(d)&&e.target.elements.confirmClear.checked};
@@ -61,7 +61,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   finally{saving=false;busy=false;if(!disposed){if(k!==current())reset();queued=false;draw();await refresh();}}
  };
  const changed=()=>{if(bound===current())return;reset();draw();scheduleRead();};
- const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);reset();tasks=[];draw();},wake=()=>{if(root.ownerDocument.visibilityState==='visible'){const returning=suspended;suspended=false;changed();if(returning||!loaded)scheduleRead();}};
+ const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);sequence++;queued=false;loaded=false;message='مسودتك محفوظة؛ ستُراجع الحالة عند العودة.';readError=true;draw();},wake=()=>{if(root.ownerDocument.visibilityState==='visible'){const returning=suspended;suspended=false;changed();if(returning||(!loaded&&!readError))scheduleRead();}};
  root.addEventListener('toggle',toggle,true);root.addEventListener('input',input);root.addEventListener('change',change);root.addEventListener('click',click);root.addEventListener('submit',submit);
  win.addEventListener('pagehide',hide);win.addEventListener('pageshow',wake);win.addEventListener('focus',wake);root.ownerDocument.addEventListener('visibilitychange',wake);
  const unsub=subscribe(changed);reset();draw();

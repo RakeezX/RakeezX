@@ -47,8 +47,8 @@ export function projectUnifiedStudentData(data) {
   return result;
 }
 
-export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch } = {}) {
-  if (typeof send !== 'function') throw fail();
+export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, timeoutMs = 15000 } = {}) {
+  if (typeof send !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 15000) throw fail();
   let generation = 0, retirement = 0, controller, disposed = false;
   function cancelRequest() { generation++; controller?.abort(); controller = null; }
   function invalidate() { retirement++; cancelRequest(); }
@@ -56,8 +56,9 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     if (disposed) throw fail();
     cancelRequest(); const checkpoint = generation;
     const owned = controller = new AbortController();
-    const timeout = setTimeout(() => owned.abort(), 15000);
+    const timeout = setTimeout(() => owned.abort(), timeoutMs);
     try {
+      return await Promise.race([ (async () => {
       const response = await send('/api/n88/student/' + action, {
         method: action === 'read' ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
         redirect: 'error', referrerPolicy: 'no-referrer', signal: owned.signal,
@@ -74,6 +75,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       const data = await response.json();
       if (checkpoint !== generation) throw fail('stale');
       return projectUnifiedStudentData(data);
+      })(), new Promise((_, reject) => { owned.signal.addEventListener('abort', () => reject(fail()), { once: true }); }) ]);
     } catch (error) {
       // Never forward server bodies, transport messages, credentials or payloads.
       throw fail(checkpoint !== generation ? 'stale' : ['rate', 'session'].includes(error?.kind) ? error.kind : 'unavailable', error?.retryAfter || 0);

@@ -139,7 +139,14 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     const body=path.endsWith('/list')&&readiness.mode==='public'?JSON.stringify({...JSON.parse(init.body),uiProtocol:'n88-public-ui-v1'}):init.body;
     record('dispatch',0,performance.now()-started);
     const signal=AbortSignal.any([init.signal,lifetime.signal]);
-    const response=await send(path,{...init,signal,body,headers:{...init.headers,Authorization:'Bearer '+b.token}});
+    // Retire this lane even when an injected/failed transport ignores abort.
+    // The client deadline includes time queued here; a timed-out operation is
+    // never dispatched later, and no command is replayed.
+    let cancel;
+    const cancelled=new Promise((_,reject)=>{cancel=()=>reject(bindingError('context'));signal.addEventListener('abort',cancel,{once:true});});
+    let response;
+    try{response=await Promise.race([send(path,{...init,signal,body,headers:{...init.headers,Authorization:'Bearer '+b.token}}),cancelled]);}
+    finally{signal.removeEventListener('abort',cancel);}
     if(signal.aborted)throw bindingError('context');
     const stage=response.headers?.get('x-n88-service-stage')||response.headers?.get('x-n88-transport-stage')||'none';
     record('http',response.status,performance.now()-started,'none',stage);

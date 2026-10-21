@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "guidance-pending-error-return-draft-and-admitted-review-no-write-390",
+      "status": "PASS"
+    },
+    {
+      "name": "guidance-pending-error-return-draft-and-admitted-review-no-write-1280",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "release": "RELEASED browser"
+}

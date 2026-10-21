@@ -1,0 +1,37 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "name": "fresh-valid-denied-reload-close-reopen-390",
+      "status": "PASS"
+    },
+    {
+      "name": "end-ack-denial-recovery-hidden-revoked-390",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh-valid-denied-reload-close-reopen-1280",
+      "status": "PASS"
+    },
+    {
+      "name": "end-ack-denial-recovery-hidden-revoked-1280",
+      "status": "PASS"
+    },
+    {
+      "name": "read-abort-ignoring-timeout-late-private-fence",
+      "status": "PASS"
+    },
+    {
+      "name": "end-abort-ignoring-timeout-late-private-fence",
+      "status": "PASS"
+    },
+    {
+      "name": "independent-view-end-deadline-no-late-ack",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "failure": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-student]').first() to be visible\u001b[22m\n",
+  "release": "RELEASED browser"
+}

@@ -7,7 +7,7 @@ const displayNumber = value => value === null ? 'لم تُرصد' : escape(value
 export function mountUnifiedStudentPortal(root, { client, readiness = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
   let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = '',pendingCompletion=null,pendingForm=false,pendingMessage='';
-  let returnRead = null, endingSession = false;
+  let returnRead = null, endingSession = false, retiredPage = false;
   const previousDir = root.getAttribute('dir');
   root.classList.add('n88-unified'); root.dir = 'rtl';
   const style = doc.createElement('link'); style.rel = 'stylesheet';
@@ -24,6 +24,11 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     const field=root.querySelector('[data-claim] input');if(field)field.value=codeDraft;
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
+  }
+  function recovery(message) {
+    clearTimeout(timer);const cooling=Date.now()<cooldownUntil;
+    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">التحقق من الجلسة</h1><p role="status" aria-live="polite">${escape(message)}${cooling?' يرجى الانتظار قليلًا قبل المحاولة مجددًا.':''}</p><button class="btn btn--primary" data-session-retry ${cooling?'disabled':''}>التحقق مجددًا</button></section>`);
+    if(cooling)timer=setTimeout(()=>recovery(message),Math.max(1,cooldownUntil-Date.now()));
   }
   function show(raw) {
     const data = projectUnifiedStudentData(raw);
@@ -59,9 +64,12 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     busy = true; const checkpoint = ++generation,context=client.captureContext?.();
     pendingForm=sameForm;pendingMessage=resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…';
     if(sameForm)inlineEntry(pendingMessage);
-    else paint('<h1 tabindex="-1">جارٍ الاتصال…</h1><p role="status">يرجى الانتظار</p>');
+    else if(ending) paint('<section class="n88-unified-entry" aria-busy="true"><h1 tabindex="-1">جارٍ إنهاء الجلسة…</h1><p role="status" aria-live="polite">أُخفيت بياناتك من هذه الصفحة. ننتظر تأكيد الخادم لمدة لا تتجاوز 15 ثانية.</p></section>');
+    else paint('<section class="n88-unified-entry" aria-busy="true"><h1 tabindex="-1">جارٍ التحقق من الجلسة…</h1><p role="status">نراجع الجلسة الحالية مع الخادم.</p></section>');
     try {
-      const data = await action();
+      // A transport that ignores AbortSignal still cannot leave this view pending.
+      let deadline;const deadlineMs=sameForm&&!resuming?31000:15000; // claim + authoritative read each retain their existing 15s budget.
+      const data = await Promise.race([Promise.resolve(action()), new Promise((_, reject) => { deadline = setTimeout(() => reject({kind:'unavailable'}), deadlineMs); })]).finally(() => clearTimeout(deadline));
       if (disposed || checkpoint !== generation) return;
       if(client.isContextCurrent&&!client.isContextCurrent(context)){clear();return;}
       codeDraft='';
@@ -89,7 +97,9 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
         : result.claimState === 'accepted' ? 'قُبل الرمز، لكن تعذّر عرض المساحة. اضغط متابعة جلسة سابقة لإعادة قراءة الجلسة.'
         : result.claimState === 'uncertain' ? 'تعذّر تأكيد الدخول. اضغط متابعة جلسة سابقة للتحقق قبل إدخال الرمز مجددًا.'
         : 'تعذّر الاتصال بالمساحة. يمكنك متابعة جلسة سابقة للمحاولة مجددًا.';
-      if(result.sameForm)inlineEntry(message,rejected);else entry(message);
+      if(result.ending) recovery('تعذّر تأكيد إنهاء الجلسة لدى الخادم. بياناتك مخفية هنا. تحقّق من الجلسة مجددًا قبل أي محاولة إنهاء أخرى.');
+      else if(result.resuming && result.errorKind !== 'session') recovery('تعذّر التحقق من الجلسة الآن. لم نؤكد انتهاءها. حاول التحقق مجددًا.');
+      else if(result.sameForm)inlineEntry(message,rejected);else entry(message);
     }else{codeDraft='';if(result.ending)entry('انتهت الجلسة.');else show(result.data);}
   }
   const submit = event => {
@@ -120,6 +130,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const beforeInput = event => rejectOverflow(event);
   const paste = event => rejectOverflow(event, true);
   const click = event => {
+    if (event.target.closest('[data-session-retry]')) void run(() => client.read(),false,false,true);
     if (event.target.closest('[data-resume]')) void run(() => client.read(),false,true,true);
     if (event.target.closest('[data-read]')) void run(() => client.read());
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
@@ -132,7 +143,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     // unsubmitted draft. An existing entry keeps its DOM, selection and focus.
     if(preserveDraft&&root.querySelector('[data-claim]'))inlineEntry();else entry();
   }
-  const hide = () => clear(); // Actual navigation/retirement is not ordinary tab visibility.
+  const hide = () => { retiredPage = true; clear(); }; // Actual navigation/retirement is not ordinary tab visibility.
   const visible = () => {
     if(doc.visibilityState==='hidden'){
       if(busy&&pendingForm){inlineEntry(pendingMessage);return;}
@@ -142,19 +153,22 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       if (shouldRead) returnRead = { context: client?.captureContext?.() };
     }else{
       const returning = returnRead; returnRead = null;
+      if (retiredPage) { retiredPage=false;void run(() => client.read(),false,false,true);return; }
       if (returning) {
         if(client.isContextCurrent && !client.isContextCurrent(returning.context)){clear();return;}
         void run(() => client.read(), false, true, true);
       } else adoptCompletion();
     }
   };
-  const pageshow = event => { if (event.persisted) clear(); };
+  const pageshow = () => { if(retiredPage && doc.visibilityState !== 'hidden'){retiredPage=false;void run(() => client.read(),false,false,true);} };
   root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
   win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
-  entry();
-  // HttpOnly session cookies cannot be safely inspected here. Initial entry is
-  // immediate; explicit resume still requires an authoritative server read.
-  const ready = Promise.resolve();
+  // Never inspect the HttpOnly cookie or persist private state. One current read
+  // decides initial entry; pageshow/focus do not duplicate this bootstrap.
+  let ready;
+  if(!enabled){entry();ready=Promise.resolve();}
+  else if(doc.visibilityState === 'hidden'){retiredPage=true;recovery('أعد فتح الصفحة للتحقق من الجلسة.');ready=Promise.resolve();}
+  else ready=run(() => client.read(),false,false,true);
   return { ready, clear, refresh: () => run(() => client.read()), dispose() {
     if (disposed) return;
     clear(); disposed = true; clearTimeout(timer); client?.dispose?.(); root.replaceChildren(); style.remove();

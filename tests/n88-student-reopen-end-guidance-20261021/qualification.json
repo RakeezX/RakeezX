@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "taskId": "continuous-n88-student-reopen-end-guidance-20261021",
+  "runId": "05421e19-d5a7-47ee-8b6b-32259e1adf68",
+  "baseSha": "96e123e73399616d4820da421618734d60c61521",
+  "changedSourceHashes": {
+    "src/views/student-portal-login.js": "55cdd8417ffee8024bdbefa8aec27069194f7c8f41c2127b8794726fa38a8e77",
+    "src/lib/student-portal-unified-client.js": "eac03eb853899a322a7c495837462907cadf479d0b8223bde6110722ab4e8ab3",
+    "src/views/student-portal-class.js": "43d8b2421b631d808b458e253f29127171eef9a7292ee4f26f8cbd1f98095dcc",
+    "src/lib/student-portal-runtime.js": "a34d95fe9beeb77b19b633fea1fd0a3c2a08a030d98d0636d3c12d802e4359eb",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs": "d1304d2d2d846204f19d44babdf27dd95548874284748189ed1e4f8b5e2083e5"
+  },
+  "evidence": {
+    "ui-student.json": "f500b982d4f49971f150fa4f48d4cff77fd818f9571645253063f1e0b639f3bc",
+    "ui-teacher.json": "3faa3f4514602c7899299fcf60e0393beb4aa3397b0898a3cd9e22ebf2ca9834",
+    "ui-additional.json": "06a3e4c375d3487627142b01fbf1153f8565359911e55c1c6964460ce6cf22c7",
+    "ui-cooldown.json": "22c880eefc6bc05407415df0b26088010bcb7defc94968372d95c2f90132d35a",
+    "transport.json": "60ce742c7aa6dbd22fd25f4f59c260a444833e378b4f0d39ffb140f4531f7216"
+  },
+  "unchanged": {
+    "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
+    "drafts/n88-student-portal/postgres-repository.mjs": "b0d1dfe19a8b0419e629313aabe219e5e9206e4ecf2552fce4dcd6f93db7c3af",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+    "drafts/n88-student-portal/activation/manifest.json": "2c967c87c36c1c00f947933e5af6d32fa84f77f56129f5d5aeb207a9627e1060",
+    "src/lib/student-portal-class-client.js": "ab433591d9efbe657cdf2936806e8201a02e97015bbf1335c7343b159d039911"
+  },
+  "carrierSha256": "91f3d8db87be1d86091a04143df07fb0ba7147c3f98a570eca1721f96f62b30d",
+  "studentSha256": "d1304d2d2d846204f19d44babdf27dd95548874284748189ed1e4f8b5e2083e5",
+  "observedOriginMain": "96e123e73399616d4820da421618734d60c61521",
+  "limitations": "Actual app DOM/handlers/CSS over loopback; synthetic HttpOnly cookie/server numeric composition and real owner/store/lease entry with fabricated state. No actual student/account access or mutation, no live end journey or PO acceptance. Provider static prerequisite is separate."
+}

@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "checks": [
+    "read-fetch-bounded-no-replay",
+    "read-body-bounded-no-replay",
+    "end-fetch-bounded-no-replay",
+    "end-body-bounded-no-replay",
+    "read-retirement-before-late-response",
+    "end-retirement-before-late-response",
+    "explicit-http-401",
+    "explicit-http-403",
+    "explicit-http-410",
+    "explicit-http-429",
+    "explicit-http-503"
+  ]
+}

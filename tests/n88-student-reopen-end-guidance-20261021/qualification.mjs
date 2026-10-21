@@ -1,0 +1,12 @@
+/** AI: pin affected proofs and source bytes for this exact private-static candidate. */
+import assert from 'node:assert/strict';import {readFile,writeFile} from 'node:fs/promises';import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';
+const dir='tests/n88-student-reopen-end-guidance-20261021/',sha=b=>createHash('sha256').update(b).digest('hex');
+const changed=['src/views/student-portal-login.js','src/lib/student-portal-unified-client.js','src/views/student-portal-class.js','src/lib/student-portal-runtime.js','drafts/n88-student-portal/activation/bundle/private/assets/student.mjs'];
+const report={status:'PASS',taskId:'continuous-n88-student-reopen-end-guidance-20261021',runId:'05421e19-d5a7-47ee-8b6b-32259e1adf68',baseSha:'96e123e73399616d4820da421618734d60c61521',changedSourceHashes:{},evidence:{}};
+for(const file of changed)report.changedSourceHashes[file]=sha((await readFile(file,'utf8')).replaceAll('\r\n','\n'));
+for(const file of ['ui-student.json','ui-teacher.json','ui-additional.json','ui-cooldown.json','transport.json']){const b=await readFile(dir+file);assert.equal(JSON.parse(b).status,'PASS');report.evidence[file]=sha(b);}
+execFileSync(process.execPath,[dir+'package.mjs','--check'],{windowsHide:true});
+report.unchanged={};for(const file of ['drafts/n88-student-portal/numeric-credentials.mjs','drafts/n88-student-portal/postgres-repository.mjs','drafts/n88-student-portal/activation/bundle/edge/index.mjs','drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs','drafts/n88-student-portal/activation/manifest.json','src/lib/student-portal-class-client.js']){const b=(await readFile(file,'utf8')).replaceAll('\r\n','\n');assert.equal(b,execFileSync('git',['show',report.baseSha+':'+file],{encoding:'utf8',maxBuffer:2097152}).replaceAll('\r\n','\n'));report.unchanged[file]=sha(b);}
+report.carrierSha256=sha(await readFile(dir+'carrier.mjs'));report.studentSha256=sha(await readFile(changed.at(-1)));report.observedOriginMain=execFileSync('git',['rev-parse','origin/main'],{encoding:'utf8'}).trim();
+report.limitations='Actual app DOM/handlers/CSS over loopback; synthetic HttpOnly cookie/server numeric composition and real owner/store/lease entry with fabricated state. No actual student/account access or mutation, no live end journey or PO acceptance. Provider static prerequisite is separate.';
+await writeFile(dir+'qualification.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,carrier:report.carrierSha256,student:report.studentSha256}));

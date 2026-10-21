@@ -1,0 +1,13 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "name": "fresh-valid-denied-reload-close-reopen-390",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "failure": "locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main dir=\"rtl\" class=\"n88-unified\">…</main> aka getByRole('main').first()\n    2) <main>…</main> aka getByRole('main').nth(1)\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n",
+  "release": "RELEASED browser"
+}

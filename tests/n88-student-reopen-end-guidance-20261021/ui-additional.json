@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "actual-runtime-queue-timeout-return-no-late-dispatch-and-owner-fenced-confirm",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh-read-late-pagehide-privacy-fence",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh-read-late-dispose-privacy-fence",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh-read-late-context-privacy-fence",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "release": "RELEASED browser"
+}
