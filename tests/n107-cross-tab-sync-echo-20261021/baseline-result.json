@@ -1,0 +1,144 @@
+{
+  "baseline": true,
+  "checks": [
+    {
+      "name": "baseline_device_only_echo",
+      "status": "PASS",
+      "delta": [
+        3,
+        3
+      ]
+    }
+  ],
+  "failures": [],
+  "deviceOnly": {
+    "before": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557560658,
+          1792557561030,
+          1792557561581,
+          1792557561955
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561231
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561610
+          }
+        ],
+        "lastSyncAt": 1792557561955,
+        "outbox": []
+      },
+      {
+        "reads": 96,
+        "stamps": [
+          1792557561231,
+          1792557561610
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561581
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561955
+          }
+        ],
+        "lastSyncAt": 1792557561955,
+        "outbox": []
+      }
+    ],
+    "after": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557560658,
+          1792557561030,
+          1792557561581,
+          1792557561955,
+          1792557561972,
+          1792557562659,
+          1792557563343
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561231
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561610
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557562317
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557563000
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557563687
+          }
+        ],
+        "lastSyncAt": 1792557563687,
+        "outbox": []
+      },
+      {
+        "reads": 96,
+        "stamps": [
+          1792557561231,
+          1792557561610,
+          1792557562317,
+          1792557563000,
+          1792557563687
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561581
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561955
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557561972
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557562659
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557563343
+          }
+        ],
+        "lastSyncAt": 1792557563687,
+        "outbox": []
+      }
+    ]
+  }
+}

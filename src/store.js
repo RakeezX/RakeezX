@@ -417,7 +417,10 @@ async function absorb(changes, { render = true } = {}) {
       if (next !== location.hash) location.replace(next);
     }
   }
-  notify({ render });
+  // Device metadata (including Sync completion timestamps) is local display
+  // state. Absorb it in peers without turning it into another cloud Sync wake.
+  // Mixed Product/device batches and outbox-only broadcasts still wake Sync.
+  notify({ render, syncReady: (changes ?? []).some((change) => change.store !== 'device') });
 }
 
 function visibleSyncValue(storeName, record) {

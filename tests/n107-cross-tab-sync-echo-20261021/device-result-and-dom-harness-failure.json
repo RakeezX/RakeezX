@@ -1,0 +1,270 @@
+{
+  "baseline": false,
+  "checks": [
+    {
+      "name": "n107_two_tab_device_only_sync_echo_reproduced_then_stopped",
+      "status": "PASS",
+      "delta": [
+        1,
+        0
+      ]
+    }
+  ],
+  "failures": [
+    "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-cross-tab-sync-echo-20261021\\tests\\n107-cross-tab-sync-echo-20261021\\browser.mjs:71:18\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-cross-tab-sync-echo-20261021/tests/n107-cross-tab-sync-echo-20261021/browser.mjs:22:2"
+  ],
+  "deviceOnly": {
+    "before": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557569671,
+          1792557570052
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570193
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570578
+          }
+        ],
+        "lastSyncAt": 1792557570578,
+        "outbox": []
+      },
+      {
+        "reads": 96,
+        "stamps": [
+          1792557570193,
+          1792557570578
+        ],
+        "updates": [],
+        "lastSyncAt": 1792557570578,
+        "outbox": []
+      }
+    ],
+    "after": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557569671,
+          1792557570052,
+          1792557570927
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570193
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570578
+          }
+        ],
+        "lastSyncAt": 1792557570927,
+        "outbox": []
+      },
+      {
+        "reads": 96,
+        "stamps": [
+          1792557570193,
+          1792557570578
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570927
+          }
+        ],
+        "lastSyncAt": 1792557570927,
+        "outbox": []
+      }
+    ]
+  },
+  "queued": {
+    "before": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557569671,
+          1792557570052,
+          1792557570927
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570193
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570578
+          }
+        ],
+        "lastSyncAt": 1792557570927,
+        "outbox": []
+      },
+      {
+        "reads": 96,
+        "stamps": [
+          1792557570193,
+          1792557570578
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570927
+          }
+        ],
+        "lastSyncAt": 1792557570927,
+        "outbox": []
+      }
+    ],
+    "after": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557569671,
+          1792557570052,
+          1792557570927
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570193
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570578
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570927
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557570927
+          }
+        ],
+        "lastSyncAt": 1792557570927,
+        "outbox": [
+          {
+            "id": "v2:5970529b-c8c4-4e9b-baf9-d72faed8c7cb",
+            "protocol": "v2",
+            "mutationId": "5970529b-c8c4-4e9b-baf9-d72faed8c7cb",
+            "deviceId": "n73-synthetic-device",
+            "store": "profile",
+            "entity": "profile",
+            "recordId": "profile",
+            "serverRecordId": "profile",
+            "canonicalId": "profile",
+            "logicalRecordKey": "profile:profile",
+            "op": "patch",
+            "baseRevision": 1,
+            "patch": {
+              "teacher_name": "Synthetic cross-tab queued edit"
+            },
+            "localPatch": {
+              "teacherName": "Synthetic cross-tab queued edit"
+            },
+            "fields": [
+              "teacher_name"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792557572770000,
+            "clientUpdatedAt": 1792557572763,
+            "queuedAt": 1792557572763,
+            "state": "failed",
+            "attemptCount": 1,
+            "envelopeLocked": true,
+            "lastError": {
+              "message": "Mock backend does not implement Sync V2 mutation RPC",
+              "code": null,
+              "status": null,
+              "at": 1792557573112
+            },
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "lastAttemptAt": 1792557573109
+          }
+        ]
+      },
+      {
+        "reads": 97,
+        "stamps": [
+          1792557570193,
+          1792557570578
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557570927
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557570927
+          }
+        ],
+        "lastSyncAt": 1792557570927,
+        "outbox": [
+          {
+            "id": "v2:5970529b-c8c4-4e9b-baf9-d72faed8c7cb",
+            "protocol": "v2",
+            "mutationId": "5970529b-c8c4-4e9b-baf9-d72faed8c7cb",
+            "deviceId": "n73-synthetic-device",
+            "store": "profile",
+            "entity": "profile",
+            "recordId": "profile",
+            "serverRecordId": "profile",
+            "canonicalId": "profile",
+            "logicalRecordKey": "profile:profile",
+            "op": "patch",
+            "baseRevision": 1,
+            "patch": {
+              "teacher_name": "Synthetic cross-tab queued edit"
+            },
+            "localPatch": {
+              "teacherName": "Synthetic cross-tab queued edit"
+            },
+            "fields": [
+              "teacher_name"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792557572770000,
+            "clientUpdatedAt": 1792557572763,
+            "queuedAt": 1792557572763,
+            "state": "failed",
+            "attemptCount": 1,
+            "envelopeLocked": true,
+            "lastError": {
+              "message": "Mock backend does not implement Sync V2 mutation RPC",
+              "code": null,
+              "status": null,
+              "at": 1792557573112
+            },
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "lastAttemptAt": 1792557573109
+          }
+        ]
+      }
+    ]
+  }
+}

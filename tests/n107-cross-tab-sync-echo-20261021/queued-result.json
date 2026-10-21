@@ -1,0 +1,222 @@
+{
+  "baseline": false,
+  "checks": [
+    {
+      "name": "real_queued_cross_tab_wake_and_durable_dispatch_failure",
+      "status": "PASS",
+      "evidence": "Real patchProfile durably queues owner-bound outbox, peer reads and attempts dispatch; missing synthetic RPC yields durable failed outbox and unhealthy error summary."
+    },
+    {
+      "name": "outbox_only_cross_tab_wake",
+      "status": "PASS",
+      "evidence": "Real queueClosedTermReport persists an owner-bound command and its render:false broadcast still notifies peer with syncReady:true."
+    }
+  ],
+  "failures": [],
+  "queued": {
+    "before": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557646712,
+          1792557647110
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557647880
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557648263
+          }
+        ],
+        "lastSyncAt": 1792557648263,
+        "outbox": []
+      },
+      {
+        "reads": 96,
+        "stamps": [
+          1792557647880,
+          1792557648263
+        ],
+        "updates": [],
+        "lastSyncAt": 1792557648263,
+        "outbox": []
+      }
+    ],
+    "after": [
+      {
+        "reads": 96,
+        "stamps": [
+          1792557646712,
+          1792557647110
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557647880
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557648263
+          },
+          {
+            "render": true,
+            "syncReady": false,
+            "lastSyncAt": 1792557648263
+          },
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557648263
+          }
+        ],
+        "lastSyncAt": 1792557648263,
+        "outbox": [
+          {
+            "id": "v2:5e450d18-f439-44c6-8478-291b62c350e1",
+            "protocol": "v2",
+            "mutationId": "5e450d18-f439-44c6-8478-291b62c350e1",
+            "deviceId": "n73-synthetic-device",
+            "store": "profile",
+            "entity": "profile",
+            "recordId": "profile",
+            "serverRecordId": "profile",
+            "canonicalId": "profile",
+            "logicalRecordKey": "profile:profile",
+            "op": "patch",
+            "baseRevision": 1,
+            "patch": {
+              "teacher_name": "Synthetic cross-tab queued edit"
+            },
+            "localPatch": {
+              "teacherName": "Synthetic cross-tab queued edit"
+            },
+            "fields": [
+              "teacher_name"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792557648631000,
+            "clientUpdatedAt": 1792557648620,
+            "queuedAt": 1792557648620,
+            "state": "failed",
+            "attemptCount": 1,
+            "envelopeLocked": true,
+            "lastError": {
+              "message": "Mock backend does not implement Sync V2 mutation RPC",
+              "code": null,
+              "status": null,
+              "at": 1792557648982
+            },
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "lastAttemptAt": 1792557648977
+          }
+        ]
+      },
+      {
+        "reads": 97,
+        "stamps": [
+          1792557647880,
+          1792557648263
+        ],
+        "updates": [
+          {
+            "render": true,
+            "syncReady": true,
+            "lastSyncAt": 1792557648263
+          }
+        ],
+        "lastSyncAt": 1792557648263,
+        "outbox": [
+          {
+            "id": "v2:5e450d18-f439-44c6-8478-291b62c350e1",
+            "protocol": "v2",
+            "mutationId": "5e450d18-f439-44c6-8478-291b62c350e1",
+            "deviceId": "n73-synthetic-device",
+            "store": "profile",
+            "entity": "profile",
+            "recordId": "profile",
+            "serverRecordId": "profile",
+            "canonicalId": "profile",
+            "logicalRecordKey": "profile:profile",
+            "op": "patch",
+            "baseRevision": 1,
+            "patch": {
+              "teacher_name": "Synthetic cross-tab queued edit"
+            },
+            "localPatch": {
+              "teacherName": "Synthetic cross-tab queued edit"
+            },
+            "fields": [
+              "teacher_name"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792557648631000,
+            "clientUpdatedAt": 1792557648620,
+            "queuedAt": 1792557648620,
+            "state": "failed",
+            "attemptCount": 1,
+            "envelopeLocked": true,
+            "lastError": {
+              "message": "Mock backend does not implement Sync V2 mutation RPC",
+              "code": null,
+              "status": null,
+              "at": 1792557648982
+            },
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "lastAttemptAt": 1792557648977
+          }
+        ]
+      }
+    ]
+  },
+  "failureSummary": {
+    "state": "error",
+    "queuedCount": 1,
+    "pendingCount": 0,
+    "failedCount": 1,
+    "blockedCount": 0,
+    "rejectedCount": 0,
+    "historicalConflictCount": 0,
+    "actionableSyncIssue": true,
+    "affectedCategories": [
+      "account"
+    ],
+    "historicalConflictCategories": [],
+    "reasonCategory": "temporary_sync_failure",
+    "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+    "lastSuccessfulSyncAt": 1792557648263,
+    "automaticRetryActive": true,
+    "automaticSyncActive": false,
+    "teacherActionRequired": false,
+    "localWorkSaved": true,
+    "cloudSyncHealthy": false,
+    "safeToContinueUnrelatedWork": true,
+    "studentLifecycleInFlight": false,
+    "classDeletionInFlight": false,
+    "presentationSeverity": {
+      "transient": false,
+      "hardFailure": true,
+      "authRequired": false,
+      "awaitingVerification": false,
+      "failureSince": null,
+      "failedAttempts": 0
+    },
+    "lastSafeFailure": {
+      "phase": "dispatch",
+      "code": "UNKNOWN",
+      "event": "automatic",
+      "at": "2026-10-21T04:40:48.983Z",
+      "elapsedMs": 12
+    }
+  }
+}
