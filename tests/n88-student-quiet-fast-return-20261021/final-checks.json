@@ -1,0 +1,75 @@
+{
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "f2a49542-bb75-4ad1-bc15-4a8290010e74",
+  "baseSha": "c6e91a85035e2d5f9403f002ffd8254392df2d34",
+  "preparedCandidate": "ee7a8713ce6b912710c082b876aad4d2ee89d071",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "n88_open_return_single_current_authoritative_get_and_finite_latency_accounting",
+      "status": "PASS",
+      "evidence": "Exact original baseline/current DOM proof reused; one GET per initial/return phase, return dispatch 1–2ms, controlled network delay accounted separately. No live speed claim."
+    },
+    {
+      "name": "n88_no_private_or_code_form_flash_before_current_result",
+      "status": "PASS",
+      "evidence": "Exact actual source and private application DOM/handlers/CSS proof at 390/1280px reused, including hidden initial GET, duplicates and late replies."
+    },
+    {
+      "name": "n88_quiet_accessible_pending_and_truthful_denied_unavailable_outcomes",
+      "status": "PASS",
+      "evidence": "Unchanged inspected pending/recovery screenshots, live status, indeterminate progressbar, reduced-motion CSS, denial entry and finite 503/timeout recovery proof reused."
+    },
+    {
+      "name": "n88_end_and_late_reply_security_fences_unchanged",
+      "status": "PASS",
+      "evidence": "Unchanged transport and view control flow; current DOM End acknowledgement/uncertainty/pagehide and unchanged extended deadline/rate/claim/Support proof reused."
+    },
+    {
+      "name": "n88_changed_private_static_provider_native_and_served_parity_if_changed",
+      "status": "PASS",
+      "evidence": "Fresh original-custodian task/run/prepared-candidate reservation; one official carrier upload; exact provider and served JS/CSS with privacy headers; native v61/source/public pin and settings/routes/subdomain unchanged; append-only completion PASS. Allowance consumed; no repeat upload."
+    }
+  ],
+  "reusedEvidence": {
+    "tests/n88-student-quiet-fast-return-20261021/baseline.json": "7eb4dd09b58f7ab1c1f27d7219097a5ace114bd357b1bca8b2055d7b37a92d4f",
+    "tests/n88-student-quiet-fast-return-20261021/ui.json": "b82a4f5c23a178d5e04ff4003ede82a03c1f73c7c4d01d4f80078ea2b14bf7ea",
+    "tests/n88-student-quiet-fast-return-20261021/bundle-preparation.json": "5facee975041d95f40b72a193b016d1d01f831d4a4506f789f0d260fcf187c86",
+    "tests/n88-student-pending-return-finite-diagnostic-20261021/transport.json": "0a0f655b3f97f617be4437a4e67a31975b91ad797a61391eb0ac7eac78c6ad24",
+    "tests/n88-student-pending-return-finite-diagnostic-20261021/ui.json": "5e308fdeb08662355e6d856a45c4e34652f1d88b8703452ebe6aabdcb47218c6",
+    "tests/n88-student-quiet-fast-return-20261021/pending-source-390.png": "2fad5538db92eb362d2db19709c28ad33a02046d78a2009c7b9521a3893eacad",
+    "tests/n88-student-quiet-fast-return-20261021/recovery-source-390.png": "5a67298fa7c5cd39599f59d0924dcbe40db188eb31f02809c427d88f01eb64cb",
+    "tests/n88-student-quiet-fast-return-20261021/pending-source-1280.png": "bfe1b40e535ceaf83e60de23b08148687a1623834887abad1a3653e5d5d8a3bd",
+    "tests/n88-student-quiet-fast-return-20261021/recovery-source-1280.png": "02bc95b78665a0f297513ff44fbe9f080a776eaa08180892b132a4ab1fda50d9",
+    "tests/n88-student-quiet-fast-return-20261021/pending-private-390.png": "7ab3a069a889068b08254975a683d967be2038862d793306323fbbe015cfa8af",
+    "tests/n88-student-quiet-fast-return-20261021/recovery-private-390.png": "5a67298fa7c5cd39599f59d0924dcbe40db188eb31f02809c427d88f01eb64cb",
+    "tests/n88-student-quiet-fast-return-20261021/pending-private-1280.png": "e3e322f24edc6c70bf0e63eccae5d18b009fb8f09899679345751d297867abed",
+    "tests/n88-student-quiet-fast-return-20261021/recovery-private-1280.png": "02bc95b78665a0f297513ff44fbe9f080a776eaa08180892b132a4ab1fda50d9"
+  },
+  "receiptHashes": {
+    "custody.json": "af16d5fa5dbfaf6f1e52aa22704d0e2690e341139d87d38f54452a20c7c15909",
+    "cloudflare-before.json": "1816c909e7c0cd3d81bddec5c0026b97d9d8bbc2977aaa8f27a8e62486db76af",
+    "cloudflare-after.json": "96216b3ddbdf3d47342307dfebf9a6a9eb353962f61916d9fdf41d94c277c4d4",
+    "owned-preflight.json": "d380abc4be270b3597e8711fcecb8ae14a6d6046283ebd23b20fef82a9d6fcc9",
+    "read-native-before.json": "bc2e7840768c2fb0e3ca8b40357fa508c18cc0ca7012512c0c0d751c9803d274",
+    "read-native-after.json": "b9166d7e3ea6739d38d1f4975d4401c7e7e637be42982d1f8ccda7271a2c6529",
+    "provider-preflight.json": "e3f592e67390f7c2e27de166136fe25b1af01fe53e18e1acc51cdace65cf3056",
+    "preflight.json": "1a8e893dc711ff439110202d12f23d933216e6e948c72a9be3b730ba4828de7a",
+    "static-reservation.json": "6de81403fe5e5c1ffe00a37da27746fa72db764229848b8e8b37cccf95388fbd",
+    "upload-response.json": "bd4f363a8c59d9c2bbe5229fb8b73fac50876ba44005d8429bbb3ae341c71e6d",
+    "carrier-readback.json": "d4178fddd3972f0d868099f396e0aebf7302c414dc91b5985a6fcb599a3e2002",
+    "static-delivery.json": "c186cdae17cc1fbfd8677418451021282120744197df846f9a044dec37130c23"
+  },
+  "native": {
+    "version": 61,
+    "source": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+    "unchanged": true
+  },
+  "staticVersion": "654ca67f-9359-4a03-ad12-03a531780f9b",
+  "resources": {
+    "integration": "released",
+    "liveMutation": "released",
+    "browser": "not reacquired; unchanged UI proof reused"
+  },
+  "limits": "Private-static prerequisite only. No Product main push, native deployment, SQL/Auth/cookie/public pin/region/data change, frontend Production publication or PO acceptance. Actual service GET latency remains unresolved."
+}

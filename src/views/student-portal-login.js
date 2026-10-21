@@ -29,7 +29,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   function recovery(message, end = false) {
     screen = end ? 'end-uncertain' : 'recovery';
     clearTimeout(timer);const cooling=Date.now()<cooldownUntil;
-    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">التحقق من الجلسة</h1><p role="status" aria-live="polite">${escape(message)}${cooling?' يرجى الانتظار قليلًا قبل المحاولة مجددًا.':''}</p><button class="btn btn--primary" data-session-retry ${cooling?'disabled':''}>التحقق مجددًا</button></section>`);
+    paint(`<section class="n88-unified-entry"><h1 tabindex="-1">${end ? 'التحقق من الجلسة' : 'مساحة الطالب'}</h1><p role="status" aria-live="polite">${escape(message)}${cooling?' يرجى الانتظار قليلًا قبل المحاولة مجددًا.':''}</p><button class="btn btn--primary" data-session-retry ${cooling?'disabled':''}>${end ? 'التحقق مجددًا' : 'حاول مجددًا'}</button></section>`);
     if(cooling)timer=setTimeout(()=>recovery(message,end),Math.max(1,cooldownUntil-Date.now()));
   }
   function show(raw) {
@@ -53,7 +53,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     screen = ending ? 'end-pending' : 'pending';
     paint(ending
       ? '<section class="n88-unified-entry" aria-busy="true"><h1 tabindex="-1">جارٍ إنهاء الجلسة…</h1><p role="status" aria-live="polite">أُخفيت بياناتك من هذه الصفحة. ننتظر تأكيد الخادم لمدة لا تتجاوز 15 ثانية.</p></section>'
-      : '<section class="n88-unified-entry" aria-busy="true"><h1 tabindex="-1">جارٍ التحقق من الجلسة…</h1><p role="status" aria-live="polite">نراجع الجلسة الحالية مع الخادم. لم تُحسم حالة الجلسة بعد.</p></section>');
+      : '<section class="n88-unified-entry n88-unified-pending"><h1 tabindex="-1">مساحة الطالب</h1><p role="status" aria-live="polite">لحظات ونجهّز مساحتك…</p><div class="n88-unified-progress" role="progressbar" aria-label="جارٍ تجهيز مساحة الطالب" aria-busy="true"></div></section>');
   }
   function endUncertain() {
     recovery('تعذّر تأكيد إنهاء الجلسة لدى الخادم. بياناتك مخفية هنا. تحقّق من الجلسة مجددًا قبل أي محاولة إنهاء أخرى.',true);
@@ -134,7 +134,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
         : result.claimState === 'uncertain' ? 'تعذّر تأكيد الدخول. اضغط التحقق مجددًا قبل إدخال الرمز مجددًا.'
         : 'تعذّر الاتصال بالمساحة. يمكنك متابعة جلسة سابقة للمحاولة مجددًا.';
       if(result.ending) endUncertain();
-      else if((result.resuming || !result.sameForm) && result.errorKind !== 'session') recovery('تعذّر التحقق من الجلسة الآن. لم نؤكد انتهاءها. حاول التحقق مجددًا.');
+      else if((result.resuming || !result.sameForm) && result.errorKind !== 'session') recovery('تعذّر فتح مساحتك الآن. حاول مجددًا.');
       else if(['accepted','uncertain'].includes(result.claimState) && result.errorKind !== 'session') recovery(message);
       else if(result.sameForm && root.querySelector('[data-claim]'))inlineEntry(message,rejected);
       else if(result.sameForm && result.claimState !== 'rejected' && result.errorKind !== 'session') recovery(message);

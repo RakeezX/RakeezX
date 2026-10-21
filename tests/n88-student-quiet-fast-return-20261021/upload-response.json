@@ -1,0 +1,13 @@
+{
+  "status": 200,
+  "success": true,
+  "observedAt": "2026-10-21T11:34:58.014Z",
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "f2a49542-bb75-4ad1-bc15-4a8290010e74",
+  "preparedCandidate": "ee7a8713ce6b912710c082b876aad4d2ee89d071",
+  "uploads": 1,
+  "sourceSha256": "a2308758f0611510f04f71cee50f69ffe35b936183d8d3e20847304adfb67091",
+  "id": "rakeez-n88-private-ingress",
+  "etag": "ca4d9d37817884080f9016c632321a65f1c0a3a345a7a3a9724be9ad2b1f9589",
+  "deployment_id": "654ca67f93594a03ad1203a531780f9b"
+}

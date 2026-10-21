@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "6f338b83-ed40-4a6a-a30e-2d3c8c4a0a0f",
+  "baseSha": "c6e91a85035e2d5f9403f002ffd8254392df2d34",
+  "changedSourceHashes": {
+    "src/views/student-portal-login.js": "06ff186bb2cbb5919384fa02bb81f79c767e84d52e5ddcd04ff67306ec1ae9d1",
+    "src/styles/student-portal-login.css": "2a67b8c32793d52b4e2f5daff17ac72f6775235b7d4862495c0963c714c5e7f9",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs": "c5c5101e41afc253f2dbd770c0ddf93cb0cd1f9bbcded9d2aa1d5154a7b1abe3",
+    "drafts/n88-student-portal/activation/bundle/private/styles/student-portal-login.css": "2a67b8c32793d52b4e2f5daff17ac72f6775235b7d4862495c0963c714c5e7f9"
+  },
+  "evidence": {
+    "baseline.json": "7eb4dd09b58f7ab1c1f27d7219097a5ace114bd357b1bca8b2055d7b37a92d4f",
+    "ui.json": "b82a4f5c23a178d5e04ff4003ede82a03c1f73c7c4d01d4f80078ea2b14bf7ea",
+    "bundle-preparation.json": "5facee975041d95f40b72a193b016d1d01f831d4a4506f789f0d260fcf187c86",
+    "tests/n88-student-pending-return-finite-diagnostic-20261021/transport.json": "0a0f655b3f97f617be4437a4e67a31975b91ad797a61391eb0ac7eac78c6ad24",
+    "tests/n88-student-pending-return-finite-diagnostic-20261021/ui.json": "5e308fdeb08662355e6d856a45c4e34652f1d88b8703452ebe6aabdcb47218c6",
+    "pending-source-390.png": "2fad5538db92eb362d2db19709c28ad33a02046d78a2009c7b9521a3893eacad",
+    "recovery-source-390.png": "5a67298fa7c5cd39599f59d0924dcbe40db188eb31f02809c427d88f01eb64cb",
+    "pending-source-1280.png": "bfe1b40e535ceaf83e60de23b08148687a1623834887abad1a3653e5d5d8a3bd",
+    "recovery-source-1280.png": "02bc95b78665a0f297513ff44fbe9f080a776eaa08180892b132a4ab1fda50d9",
+    "pending-private-390.png": "7ab3a069a889068b08254975a683d967be2038862d793306323fbbe015cfa8af",
+    "recovery-private-390.png": "5a67298fa7c5cd39599f59d0924dcbe40db188eb31f02809c427d88f01eb64cb",
+    "pending-private-1280.png": "e3e322f24edc6c70bf0e63eccae5d18b009fb8f09899679345751d297867abed",
+    "recovery-private-1280.png": "02bc95b78665a0f297513ff44fbe9f080a776eaa08180892b132a4ab1fda50d9"
+  },
+  "checks": [
+    {
+      "name": "unchanged_transport_and_control_flow",
+      "status": "PASS",
+      "evidence": "Entire transport and all view control flow unchanged. Prior same-source finite diagnostic/clipboard, claim-no-replay, suspended-deadline and extended End timeout/rate guards reused; current actual DOM End ack/uncertain/pagehide/late cases also PASS."
+    },
+    {
+      "name": "n88_changed_private_static_provider_native_and_served_parity_if_changed",
+      "status": "NOT_RUN",
+      "evidence": "Current private JS/CSS require a fresh original-custodian task/run/candidate-bound static gate and native/carrier/public-pin preflight, one append-only reserved upload and exact provider/served parity before LOCAL_READY. The established activation gate path for this task is outside allowedPaths; existing gates are bound to prior tasks/candidates and cannot be reused. No current attempt was reserved or marker changed. No deployment performed under the final no-deploy instruction."
+    }
+  ],
+  "limits": "No push/deploy, provider operation, real account/code/data, native/SQL/Auth/cookie/region/public pin change. Product N88 remains open.",
+  "baselineRevision": "c6e91a85035e2d5f9403f002ffd8254392df2d34",
+  "initialHarnessFailure": {
+    "file": "baseline-clock-harness-failure.json",
+    "sha256": "33201661988345307d30a4256eca74047066e64e31f55a6c353e19bac00ebf64",
+    "cause": "Clock installed after request timer creation, so fastForward did not expire that timer. Corrected by installing before navigation. Original failure retained; corrected actual-app delayed/hidden/reload scenarios PASS. Initial dispatch now measures pending-paint to send; module download is not a scheduling queue."
+  },
+  "presentationOnlySourceLines": [
+    32,
+    56,
+    137
+  ],
+  "visualInspection": "PASS: source and private screenshots at 390/1280; branded calm pending and clear recovery, no clipping; actual progressbar/live status and reduced-motion CSS asserted by UI runner.",
+  "privateStaticGate": {
+    "status": "NOT_RUN",
+    "previousGateTask": "continuous-n88-student-pending-return-finite-diagnostic-20261021",
+    "previousGateCandidate": "139fd8a9654945e5923afa3b9ef5b9467431a575",
+    "currentCardRejectedByPreviousGate": "n88_student_static_identity",
+    "missingScopePath": "drafts/n88-student-portal/activation/static-student-quiet-return-20261021-gate.mjs",
+    "reason": "Current private JS/CSS require a fresh original-custodian task/run/candidate-bound static gate and native/carrier/public-pin preflight, one append-only reserved upload and exact provider/served parity before LOCAL_READY. The established activation gate path for this task is outside allowedPaths; existing gates are bound to prior tasks/candidates and cannot be reused. No current attempt was reserved or marker changed. No deployment performed under the final no-deploy instruction.",
+    "retryCondition": "Approved maintenance can add the missing fresh activation gate path to this inactive card and preserve candidate/session. Controller then resumes the saved session for the exact separately bounded static custody phase, resolving the final no-deploy restriction there. Reuse unchanged local proofs; sole publisher retains main/frontend delivery."
+  },
+  "serviceLatency": "Unresolved: historical actual completed GET 5500–6500ms (activated card). Current test controls service delay at 600/6000ms and proves prompt dispatch, not faster live service. No postpublication measurement or performance acceptance claimed."
+}

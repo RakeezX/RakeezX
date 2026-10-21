@@ -1,0 +1,85 @@
+{
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "f2a49542-bb75-4ad1-bc15-4a8290010e74",
+  "preparedCandidate": "ee7a8713ce6b912710c082b876aad4d2ee89d071",
+  "observedAt": "2026-10-21T11:35:50.773Z",
+  "nativeSource": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "nativeVersion": 61,
+  "source": "a2308758f0611510f04f71cee50f69ffe35b936183d8d3e20847304adfb67091",
+  "version": "654ca67f-9359-4a03-ad12-03a531780f9b",
+  "carrierPercentage": 100,
+  "uploads": 1,
+  "settings": {
+    "placement": {},
+    "compatibility_date": "2026-10-01",
+    "compatibility_flags": [],
+    "usage_model": "standard",
+    "tags": [],
+    "tail_consumers": [],
+    "logpush": false,
+    "annotations": {
+      "workers/triggered_by": "upload"
+    },
+    "bindings": [
+      {
+        "name": "N88_EDGE_URL",
+        "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n88-student-portal",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_ENABLED",
+        "text": "true",
+        "type": "plain_text"
+      },
+      {
+        "name": "N88_INGRESS_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "N88_PUBLIC_ORIGIN",
+        "text": "https://rakeezx.com",
+        "type": "plain_text"
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "346d924c9746479a89e6e211a41bba14",
+      "pattern": "rakeezx.com/student",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "1bcc93cfb56b42469bdad21724b63a1d",
+      "pattern": "rakeezx.com/n88-private/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "c27599645c3c492f9b25eca0107e3dc9",
+      "pattern": "rakeezx.com/api/n88/*",
+      "script": "rakeez-n88-private-ingress",
+      "request_limit_fail_open": false
+    }
+  ],
+  "subdomain": {
+    "enabled": false,
+    "previews_enabled": false
+  },
+  "servedUrl": "https://rakeezx.com/n88-private/assets/student.mjs",
+  "servedStatus": 200,
+  "servedType": "text/javascript",
+  "servedHeaders": {
+    "noStore": true,
+    "noReferrer": true,
+    "nosniff": true
+  },
+  "servedStyleUrl": "https://rakeezx.com/n88-private/styles/student-portal-login.css",
+  "servedStyleStatus": 200,
+  "servedStyleType": "text/css",
+  "servedStyleHeaders": {
+    "noStore": true,
+    "noReferrer": true,
+    "nosniff": true
+  }
+}

@@ -1,0 +1,5 @@
+# AI: retain exact prepared carrier and evidence digest bytes across checkouts.
+*.mjs -text
+*.json -text
+*.png -text
+*.css -text

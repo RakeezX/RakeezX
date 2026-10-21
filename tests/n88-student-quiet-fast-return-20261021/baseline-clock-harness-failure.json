@@ -1,0 +1,26 @@
+{
+  "status": "FAIL",
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "6f338b83-ed40-4a6a-a30e-2d3c8c4a0a0f",
+  "baseline": true,
+  "checks": [
+    "source-390: ordinary-hide-show-duplicates-single-current-get-and-separated-delay",
+    "source-390: hidden-first-get-late-response-retired"
+  ],
+  "timings": [
+    {
+      "entry": "source",
+      "width": 390,
+      "controlledDelayMs": 600,
+      "observedDelayMs": 603,
+      "initialDispatchMs": 143.4,
+      "returnDispatchMs": 0.9,
+      "dispatches": 2
+    }
+  ],
+  "errors": [],
+  "limits": "Synthetic loopback actual application only; no live account, private service request, browser profile or provider operation.",
+  "lease": "ACQUIRED browser",
+  "failure": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-session-retry]') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-student-quiet-fast-return-20261021\\tests\\n88-student-quiet-fast-return-20261021\\ui.mjs:87:50",
+  "release": "RELEASED browser"
+}

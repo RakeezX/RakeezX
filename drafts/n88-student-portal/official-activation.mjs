@@ -8,6 +8,7 @@ import {pilotCorrectionRestoreReady} from './activation/pilot-ui-correction-gate
 import {CORRECTION1430,correction1430Gate} from './activation/correction-1430-gate.mjs';
 import {STATIC1522,static1522Gate} from './activation/static-1522-gate.mjs';
 import {STUDENT_PENDING_STATIC,runStudentPendingStaticPhase} from './activation/static-student-pending-20261021-gate.mjs';
+import {STUDENT_QUIET_STATIC,runStudentQuietStaticPhase} from './activation/static-student-quiet-return-20261021-gate.mjs';
 import {STUDENT_REOPEN_STATIC,runStudentReopenStaticPhase} from './activation/static-student-reopen-20261021-gate.mjs';
 import {STUDENT_SESSION_STATIC,runStudentSessionStaticPhase} from './activation/static-student-session-20261021-gate.mjs';
 import {randomBytes,generateKeyPairSync,privateDecrypt,createPrivateKey,constants,pbkdf2Sync,createHmac,createHash} from 'node:crypto';
@@ -167,6 +168,60 @@ async function execute(action,value){
     execFileSync('git',['merge-base','--is-ancestor',candidate,'HEAD'],{cwd:taskRoot,windowsHide:true});
     const proof=await json(path.join(taskRoot,c.evidence+'qualification.json'));
     const paths=[...Object.keys(proof.changedSourceHashes),c.evidence+'carrier.mjs',c.evidence+'ui.json',c.evidence+'bundle-preparation.json',c.evidence+'transport.json',c.evidence+'qualification.json',files['prior-carrier.mjs'],files['configuration-preimage.json']];
+    for(const file of paths){
+     const expected=execFileSync('git',['show',candidate+':'+file],{cwd:taskRoot,maxBuffer:2097152}).toString().replaceAll('\r\n','\n');
+     if((await readFile(path.join(taskRoot,file),'utf8')).replaceAll('\r\n','\n')!==expected)fail('n88_student_static_source_drift');
+    }
+   }
+  });
+ }
+ if(['--student-quiet-static-owned-preflight','--student-quiet-static-read-native-before','--student-quiet-static-read-native-after','--student-quiet-static-preflight','--student-quiet-static-begin','--student-quiet-static-complete'].includes(action)){
+  const c=STUDENT_QUIET_STATIC,currentRun=process.env.N88_STUDENT_QUIET_RUN_ID;
+  if(path.resolve(root)!==path.resolve(c.originalRoot))fail('n88_student_static_original_root');
+  const taskRoot=fileURLToPath(new URL('../../',import.meta.url));
+  if(path.resolve(taskRoot)!==path.resolve(c.taskRoot))fail('n88_student_static_task_root');
+  const runtime='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/';
+  const json=async file=>JSON.parse((await readFile(file,'utf8')).replace(/^\uFEFF/,''));
+  const card=await json(runtime+'queue/'+c.task+'.json'),config=await json(runtime+'workflow-v5.json'),lease=await json(runtime+'leases/integration.json');
+  const files={'prior-carrier.mjs':'tests/n88-student-pending-return-finite-diagnostic-20261021/carrier.mjs','configuration-preimage.json':'tests/n88-student-pending-return-finite-diagnostic-20261021/cloudflare-after.json','style.css':'drafts/n88-student-portal/activation/bundle/private/styles/student-portal-login.css','student.mjs':'drafts/n88-student-portal/activation/bundle/private/assets/student.mjs'};
+  const locate=name=>{
+   if(name.startsWith('owned/')&&/^owned\/student-quiet-static-[a-f0-9]{40}-(attempt|complete)\.json$/.test(name))return path.join(phase,name.slice(6));
+   if(!/^[a-z-]+\.(mjs|json|css)$/.test(name))fail('n88_student_static_file');
+   return path.join(taskRoot,files[name]||c.evidence+name);
+  };
+  return runStudentQuietStaticPhase(action.slice('--student-quiet-static-'.length),{
+   card,run:currentRun,activationId:config.controller.activationId,lease,
+   read:async name=>{if(name.startsWith('owned/'))await owned();return readFile(locate(name));},
+   writeExclusive:async(name,bytes)=>{if(!name.startsWith('owned/'))fail('n88_student_static_write');await owned();await writeFile(locate(name),bytes,{flag:'wx'});},
+   load:async()=>{try{return await load();}catch(e){if(['ENOENT','EACCES','EPERM'].includes(e.code))fail('n88_student_static_original_custody_'+e.code.toLowerCase());throw e;}},save,
+   readPublicPin:async()=>{
+    const rows=await official(['secrets','list','--project-ref',project,'--output','json']),list=Array.isArray(rows)?rows:rows?.rows;
+    const found=list?.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA');if(found?.length!==1)fail('n88_student_static_pin_identity');return found[0].value?.toLowerCase();
+   },
+   readNative:async(when,native)=>{
+    const evidence=path.join(taskRoot,c.evidence),temporary=path.join(evidence,'native-'+c.run+'-'+when+'.tmp');
+    if(!['before','after'].includes(when)||path.dirname(temporary)!==path.resolve(evidence))fail('n88_student_static_native_path');
+    await mkdir(temporary,{recursive:false});
+    try{
+     const listed=await official(['functions','list','--project-ref',project,'--output','json']);
+     const functions=Array.isArray(listed)?listed:listed?.functions,found=functions?.filter(f=>f.slug==='n88-student-portal'||f.name==='n88-student-portal');
+     if(found?.length!==1||!Number.isInteger(found[0].version))fail('n88_student_static_native_metadata');
+     await official(['functions','download','n88-student-portal','--project-ref',project,'--use-api','--workdir',temporary,'--output','json']);
+     const matches=[],digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+     const visit=async dir=>{for(const entry of await readdir(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())await visit(file);else if(/\.(mjs|js|ts)$/.test(entry.name)){const bytes=await readFile(file);if(digest(bytes)===native)matches.push(bytes);}}};
+     await visit(temporary);if(matches.length!==1)fail('n88_student_static_native_source_mismatch');
+     const filename=when==='before'?'provider-native.mjs':'provider-native-after.mjs';
+     await writeFile(path.join(evidence,filename),matches[0],{flag:'wx'});
+     return {nativeSource:native,nativeVersion:found[0].version,sourceExact:true,verifyJwt:found[0].verify_jwt};
+    }finally{
+     if(path.dirname(temporary)!==path.resolve(evidence)||!path.resolve(temporary).startsWith(path.resolve(taskRoot)+path.sep))fail('n88_student_static_native_cleanup_path');
+     await rm(temporary,{recursive:true});
+    }
+   },
+   verifyCandidate:async candidate=>{
+    execFileSync('git',['merge-base','--is-ancestor',candidate,'HEAD'],{cwd:taskRoot,windowsHide:true});
+    const proof=await json(path.join(taskRoot,c.evidence+'qualification.json'));
+    const paths=[...Object.keys(proof.changedSourceHashes),c.evidence+'carrier.mjs',c.evidence+'ui.json',c.evidence+'bundle-preparation.json',c.evidence+'qualification.json',files['prior-carrier.mjs'],files['configuration-preimage.json']];
     for(const file of paths){
      const expected=execFileSync('git',['show',candidate+':'+file],{cwd:taskRoot,maxBuffer:2097152}).toString().replaceAll('\r\n','\n');
      if((await readFile(path.join(taskRoot,file),'utf8')).replaceAll('\r\n','\n')!==expected)fail('n88_student_static_source_drift');

@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "f2a49542-bb75-4ad1-bc15-4a8290010e74",
+  "preparedCandidate": "ee7a8713ce6b912710c082b876aad4d2ee89d071",
+  "checks": [
+    {
+      "name": "unchanged_product_and_ui_proof_reused",
+      "status": "PASS",
+      "evidence": "Exact prepared Git bytes retained; UI not rerun. Only student module and stylesheet differ in the current recorded carrier."
+    },
+    {
+      "name": "task_run_candidate_scope_and_lease_fences",
+      "status": "PASS",
+      "evidence": "29 identity/authority/lease variants deny; exact worker and publisher delivery leases admit."
+    },
+    {
+      "name": "single_attempt_and_append_only_completion",
+      "status": "PASS",
+      "evidence": "Preflight read-only; begin reserves candidate-wide exclusive attempt; duplicate begin denied; complete appends once; repeated complete is idempotent."
+    },
+    {
+      "name": "owned_preflight_is_metadata_only",
+      "status": "PASS",
+      "evidence": "Original-state/public-pin preflight discloses only the source hash and finite ownership/budget flags, with no reservation/save and no requirement to fabricate fresh provider receipts."
+    },
+    {
+      "name": "new_run_does_not_replenish_candidate_upload",
+      "status": "PASS",
+      "evidence": "Previous-run candidate-wide attempt remains unchanged and prevents a new reservation. No live marker was read, replaced or deleted."
+    },
+    {
+      "name": "preimage_and_freshness_fail_before_reservation",
+      "status": "PASS",
+      "evidence": "Candidate drift denies before custody load; native/carrier/source/pin/configuration drift and stale preflight cannot reserve."
+    },
+    {
+      "name": "exact_readback_and_configuration_fences",
+      "status": "PASS",
+      "evidence": "17 negative completions reject metadata or actual carrier/native/served byte mismatch; no success marker/history appended."
+    },
+    {
+      "name": "completion_save_interruption_recovers_without_upload",
+      "status": "PASS",
+      "evidence": "Exact completed receipt resumes one history append after synthetic protected-save failure; attempt marker is retained."
+    },
+    {
+      "name": "actual_official_entry_wrong_root_denies",
+      "status": "PASS",
+      "evidence": "Actual command in this non-custodian worktree denies before DPAPI, lease or provider access. No alternate channel attempted."
+    }
+  ],
+  "providerOperations": 0,
+  "privateStateReads": 0,
+  "uploads": 0,
+  "guardSha256": "c35d3cc30a905f827869c295dd79bf79730933d334e0ee849e40e4f3fe57fc61",
+  "officialEntrySha256": "5f77b74cf7da9102bf32f497030b57b44bc3bb59b4785454830516fdf404225f",
+  "servedParity": "NOT_RUN",
+  "publication": "NOT_RUN"
+}

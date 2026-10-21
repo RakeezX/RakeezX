@@ -82,3 +82,11 @@ html[data-n88-student-document]{color-scheme:light;background:#f4f7f5}
 .n88-student-support textarea{width:100%;min-height:120px;font:12px/1.6 monospace;overflow-wrap:anywhere}
 .n88-student-support [data-copy-status]:empty{display:none}
 @media print{.n88-student-support{display:none}}
+
+/* AI: indeterminate, calm progress; no private placeholder or invented percentage. */
+.n88-unified-pending{text-align:center;padding-block:36px}
+.n88-unified-pending p{color:var(--text-2);margin:8px 0 24px}
+.n88-unified-progress{width:112px;height:4px;margin-inline:auto;border-radius:99px;overflow:hidden;background:var(--brand-soft)}
+.n88-unified-progress::after{content:'';display:block;width:40%;height:100%;margin-inline:auto;border-radius:inherit;background:var(--brand-text);animation:n88-quiet-progress 1.8s ease-in-out infinite}
+@keyframes n88-quiet-progress{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.n88-unified-progress::after{animation:none}}
