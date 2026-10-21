@@ -54,13 +54,15 @@
         "sqlAuthSchemaChanges": 0,
         "regionChanges": 0,
         "maxChangedPrivateStaticUploads": 1,
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "maxChangedStudentCarrierUploads": 1,
         "nativeDeployments": 0,
         "publicPinChanges": 0,
         "newReadinessRequests": 0,
         "appendOnlyAttemptHistory": true,
         "resetConsumedMarkers": false
       },
-      "releaseAuthority": "The PO's direct 2026-10-21 report authorizes correction of the actual N88 student session and UI behavior through the existing one-publisher path. This card authorizes only local/synthetic qualification and existing guarded static/frontend delivery, not a region migration, real student login, service mutation or bypass of previous browser/tool refusal.",
+      "releaseAuthority": "The PO's direct 2026-10-21 report authorizes correction of the actual N88 student session and UI behavior. The same scoped worker may perform the prerequisite one changed private static carrier upload through the original N88 custodian after fresh native/carrier/public-pin preflight and append-only one-attempt reservation, then verify exact provider native/carrier and served student bytes before LOCAL_READY. The sole generic publisher handles Product main and frontend Production only. No native Edge/function upload, SQL/Auth/schema, region or public source-pin change, real student/account read or write, consumed gate reuse, or bypass of a tool rejection. If the guarded static route refuses, return BLOCKED with the actual reason.",
       "liveAuthorizationRef": "PO-20261021-N88-STUDENT-SESSION-STATIC-DELIVERY"
     }
   ]
