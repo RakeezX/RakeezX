@@ -1,0 +1,5 @@
+# AI: preserve prepared carrier, synthetic receipts and evidence digest bytes.
+*.mjs -text
+*.json -text
+*.png -text
+*.css -text

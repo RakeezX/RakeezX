@@ -1,0 +1,8 @@
+{
+  "status": "FAIL",
+  "checks": [],
+  "errors": [],
+  "lease": "ALREADY OWNED browser",
+  "failure": "Unconfirmed GET must not paint code form\n\n1 !== 0\n",
+  "release": "RELEASED browser"
+}

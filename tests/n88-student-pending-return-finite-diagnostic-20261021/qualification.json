@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "taskId": "continuous-n88-student-pending-return-finite-diagnostic-20261021",
+  "runId": "42e76d1c-cba3-404f-b7a3-0fad1b6e919d",
+  "baseSha": "baa8fe5eb4577362d81ab9643aef219331fa2f06",
+  "changedSourceHashes": {
+    "src/views/student-portal-login.js": "d169dd08065d628f6135df2b4b54c4f3b2134513efda49dc73adf10dbf337e92",
+    "src/lib/student-portal-unified-client.js": "4ebdc21aaace8fbab92524b82d900622e4052da1e3ad6d51e5cf6810f639547b",
+    "src/styles/student-portal-login.css": "719a672b4b0d98ed573c665fe89adfbccde0388a38d08adbc25f8349f663a380",
+    "drafts/n88-student-portal/activation/bundle/private/assets/student.mjs": "766e3eb835118fb8987092ba35608e5670923ff4af5e1d5b853b9b16f0b2c083",
+    "drafts/n88-student-portal/activation/bundle/private/styles/student-portal-login.css": "719a672b4b0d98ed573c665fe89adfbccde0388a38d08adbc25f8349f663a380"
+  },
+  "evidence": {
+    "ui.json": "5e308fdeb08662355e6d856a45c4e34652f1d88b8703452ebe6aabdcb47218c6",
+    "transport.json": "0a0f655b3f97f617be4437a4e67a31975b91ad797a61391eb0ac7eac78c6ad24",
+    "bundle-preparation.json": "305444792657e28a0748b98446bc381bd501b1dca4d12d0120c81f851f6bfad0",
+    "test-first-failure.json": "9f2da88f2d1ac8eb08a2127bbff0fd3dda69716d1be66914e0306d9079c626d8",
+    "pending-390.png": "6988238b3e0312c078bc7a64333a63ca2d6ac73729b0c197076644da36eb522a",
+    "retry-390.png": "7fcec37992eb7ff859cefb4468b5c824da33fc2883e94e422bdd480c71feaba0",
+    "end-ack-390.png": "613c2b2a9a1b37166d0c88e8e230b731b744cc8899d0b32159a3bde2fcb95fd9",
+    "end-uncertain-390.png": "5672dd28791006e101c685647597bcd0008f1699e2290d0b3ad9d620b01b2b17",
+    "diagnostic-390.png": "6aaa250ab7e4a8e129e8ce4c8fab51bb5a61d18f9a33e650e56fa0a49a1db478",
+    "pending-1280.png": "db3e83a72aaea7e4c666708398e8bcb44b2490ede0a52a8a9e34dcfedb1808c8",
+    "retry-1280.png": "9bc27ea52704ebe5540fc89db732773e2fb2c4d95a21af8b922d7ce820a86b28",
+    "end-ack-1280.png": "f471ea1a1b481026342cfee8f38a5c235fa71e3bb77c2dd6e8c5c2474eb67914",
+    "end-uncertain-1280.png": "926b76429a9a3c5890e32fbda7b60d99d5895abb0f474d7caf348229720c8a2d",
+    "diagnostic-1280.png": "69468be6ecefe2be0238d2acb81e8d7fab2c161b676158f87a0ff6cf35d1e6fb"
+  },
+  "unchanged": {
+    "drafts/n88-student-portal/numeric-credentials.mjs": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
+    "drafts/n88-student-portal/postgres-repository.mjs": "b0d1dfe19a8b0419e629313aabe219e5e9206e4ecf2552fce4dcd6f93db7c3af",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "fc55f3cc290a5eb66fde44a13e5a9d444a66f9527b220705829b5fabf398a358",
+    "drafts/n88-student-portal/activation/bundle/cloudflare/worker.mjs": "ac0f35fc1ab050555131670a9b8dd8cf1acbdf9a4240188c327111267568420c",
+    "drafts/n88-student-portal/activation/manifest.json": "2c967c87c36c1c00f947933e5af6d32fa84f77f56129f5d5aeb207a9627e1060",
+    "src/lib/student-portal-class-client.js": "ab433591d9efbe657cdf2936806e8201a02e97015bbf1335c7343b159d039911",
+    "tests/n88-student-reopen-end-guidance-20261021/carrier.mjs": "91f3d8db87be1d86091a04143df07fb0ba7147c3f98a570eca1721f96f62b30d",
+    "drafts/n88-student-portal/activation/static-student-reopen-20261021-gate.mjs": "bb46bafa98ee1318c4bd0acb83d44284a8d3a83ef45955bcf96f5301bb9fea69"
+  },
+  "prepared": {
+    "status": "PASS",
+    "publication": "NOT_RUN",
+    "priorCarrierSha256": "91f3d8db87be1d86091a04143df07fb0ba7147c3f98a570eca1721f96f62b30d",
+    "carrierSha256": "6978352dfa73746a9c4a2cc85e822545483427d4834f172a04abb963f136068e",
+    "studentSha256": "766e3eb835118fb8987092ba35608e5670923ff4af5e1d5b853b9b16f0b2c083",
+    "styleSha256": "719a672b4b0d98ed573c665fe89adfbccde0388a38d08adbc25f8349f663a380",
+    "changedPrivateAssets": [
+      "/n88-private/assets/student.mjs",
+      "/n88-private/styles/student-portal-login.css"
+    ],
+    "allOtherCarrierBytesIdentical": true
+  },
+  "privateStaticGate": "NOT_RUN: explicit final user instruction says do not push or deploy; fresh original-custodian task/run/candidate-bound gate, native/carrier/pin preflight, single upload, provider and served JS/CSS parity remain required before LOCAL_READY. No attempt reserved or historical marker changed.",
+  "limits": "Synthetic actual app DOM/handlers/client/CSS, no real account/student request; no provider operation, service change, native/public pin change, deployment or Product acceptance."
+}

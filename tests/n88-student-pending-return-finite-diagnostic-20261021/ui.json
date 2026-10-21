@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "checks": [
+    "held-initial-hidden-return-current-only-390",
+    "projection-return-manual-refresh-single-read-390",
+    "initial-200-denied-rate-503-malformed-timeout-late-390",
+    "return-200-denied-503-view-deadline-late-390",
+    "claim-no-replay-private-input-cleared-current-read-390",
+    "accepted-uncertain-claim-recovery-is-get-only-390",
+    "end-ack-unavailable-hidden-deadline-pagehide-late-no-replay-390",
+    "pagehide-dispose-context-late-private-fences-390",
+    "optional-allowlist-clipboard-fallback-no-extra-request-storage-390",
+    "hidden-bootstrap-one-return-read-390",
+    "held-initial-hidden-return-current-only-1280",
+    "projection-return-manual-refresh-single-read-1280",
+    "initial-200-denied-rate-503-malformed-timeout-late-1280",
+    "return-200-denied-503-view-deadline-late-1280",
+    "claim-no-replay-private-input-cleared-current-read-1280",
+    "accepted-uncertain-claim-recovery-is-get-only-1280",
+    "end-ack-unavailable-hidden-deadline-pagehide-late-no-replay-1280",
+    "pagehide-dispose-context-late-private-fences-1280",
+    "optional-allowlist-clipboard-fallback-no-extra-request-storage-1280",
+    "hidden-bootstrap-one-return-read-1280"
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "release": "RELEASED browser"
+}

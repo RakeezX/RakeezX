@@ -1,0 +1,12 @@
+{
+  "status": "FAIL",
+  "checks": [
+    "held-initial-hidden-return-current-only-390",
+    "projection-return-manual-refresh-single-read-390",
+    "initial-200-denied-rate-503-malformed-timeout-late-390"
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "failure": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-session-retry]') to be visible\u001b[22m\n",
+  "release": "RELEASED browser"
+}
