@@ -1,0 +1,23 @@
+{
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "5ef47f0b-74e7-4ea5-a005-ed5094b9a52c",
+  "baseSha": "c6e91a85035e2d5f9403f002ffd8254392df2d34",
+  "priorCandidate": "75cefb0ace49318fb1674c008663cb3e49c0ae49",
+  "status": "PASS",
+  "checks": [
+    "same handler bytes and surrounding candidate bytes preserved",
+    "exact failed publisher-main file merges without conflict",
+    "merged result retains exact other-task handler/imports",
+    "candidate and simulated merged syntax PASS",
+    "actual wrong-root entry denies before custody or provider access",
+    "all source/UI/static-receipt hashes unchanged; five completed checks reused"
+  ],
+  "providerOperations": 0,
+  "uploads": 0,
+  "uiReruns": 0,
+  "observedPublisherMain": "f3f4fe4c074881e5eac9a4a767cb1140d023be32",
+  "priorOfficialEntrySha256": "5f77b74cf7da9102bf32f497030b57b44bc3bb59b4785454830516fdf404225f",
+  "repairedOfficialEntrySha256": "12c69119949a2ccff5453f7746815c0fe495c4e87d56e2b674e31d0ecd162c36",
+  "reusedFinalChecksSha256": "6de9a2f7b709f94a2203b268819d55203eafafd3976293743d4062bb8f42e59e",
+  "limits": "Original worktree/base retained. No adoption of unrelated main changes, integration worktree mutation, provider call, gate replay, upload, browser/server or frontend publication."
+}

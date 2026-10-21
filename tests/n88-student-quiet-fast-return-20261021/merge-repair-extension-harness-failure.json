@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "5ef47f0b-74e7-4ea5-a005-ed5094b9a52c",
+  "baseSha": "c6e91a85035e2d5f9403f002ffd8254392df2d34",
+  "priorCandidate": "75cefb0ace49318fb1674c008663cb3e49c0ae49",
+  "status": "FAIL",
+  "checks": [],
+  "providerOperations": 0,
+  "uploads": 0,
+  "uiReruns": 0,
+  "observedPublisherMain": "f3f4fe4c074881e5eac9a4a767cb1140d023be32",
+  "failure": "Command failed: C:\\Program Files\\nodejs\\node.exe --check C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-student-quiet-fast-return-20261021\\tests\\n88-student-quiet-fast-return-20261021\\merge-repair-merged.tmp\nnode:internal/modules/esm/get_format:243\r\n  throw new ERR_UNKNOWN_FILE_EXTENSION(ext, filepath);\r\n        ^\r\n\r\nTypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension \".tmp\" for C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-student-quiet-fast-return-20261021\\tests\\n88-student-quiet-fast-return-20261021\\merge-repair-merged.tmp\r\n    at Object.getFileProtocolModuleFormat [as file:] (node:internal/modules/esm/get_format:243:9)\r\n    at defaultGetFormat (node:internal/modules/esm/get_format:283:36)\r\n    at checkSyntax (node:internal/main/check_syntax:67:20) {\r\n  code: 'ERR_UNKNOWN_FILE_EXTENSION'\r\n}\r\n\r\nNode.js v24.19.0\r\n"
+}

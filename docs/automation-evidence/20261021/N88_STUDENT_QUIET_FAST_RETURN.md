@@ -45,3 +45,15 @@ Independent official provider readback and unauthenticated static-only HTTP read
 Native v61/source and public pin remained unchanged after the upload, as did settings/routes/subdomain. At `2026-10-21T11:35:54.428Z`, the original custodian appended the exact completion to its protected history. The allowance is consumed; a new run must not upload again. `static-delivery.json`, `carrier-readback.json` and `final-checks.json` contain the current completion/parity evidence. The integration and live-mutation leases were released; no browser/server was reopened.
 
 All five required affected checks now PASS through reused local proof and the completed static prerequisite. This supports LOCAL_READY for the independent controller. Product main/frontend publication and its verification remain with the sole publisher. No native deployment, public pin change, SQL/Auth/region/cookie/data operation, real account read or Product acceptance occurred. Live service speed remains unmeasured in this run; the earlier 5.5–6.5s latency remains unresolved.
+
+## Publisher merge repair — run 5ef47f0b-74e7-4ea5-a005-ed5094b9a52c
+
+The publisher's attempt to integrate candidate `75cefb0ace49318fb1674c008663cb3e49c0ae49` into observed main `f3f4fe4c074881e5eac9a4a767cb1140d023be32` conflicted because this task and the mobile503 task both inserted their independent custodian handlers at the beginning of `execute`. The retained integration worktree/index was inspected read-only and left untouched.
+
+In the original assigned worktree, the exact quiet-static handler was moved after the existing pending-static handler, before the reopen-static handler. Its bytes, action names, guards and every surrounding candidate byte are unchanged. No unrelated main code was imported into the candidate and the declared base is preserved.
+
+`merge-repair.json` records a successful local three-way merge of this corrected file against the exact failed integration index's ancestor and main stages. The simulated result equals the complete observed-main file plus only this task's import and handler: the mobile503 handler and all other main bytes are retained. Both candidate and simulated merged syntax pass; the actual wrong-root custodian entry still refuses before protected state/provider access. Temporary fixture files were removed in `finally`. This is a merge simulation, not publisher integration or deployment.
+
+All original source/UI hashes and static completion receipt hashes match. `final-checks.json` remains the historical completed five-check proof; `merge-repair.json` bridges its original official-entry hash to the relocated entry without rewriting the prior receipt. The one-upload allowance remains consumed. No UI rerun, provider request, custody replay, browser/server or live resource lease was needed for this local file repair.
+
+`merge-repair-extension-harness-failure.json` preserves an initial check-harness error: Node syntax checking rejects a `.tmp` extension. Using owned `.tmp.mjs` fixture files corrected that harness; the scoped merge/syntax/guard/evidence check then passed. No Product behavior failed in that harness step.
