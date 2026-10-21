@@ -1,3 +1,7 @@
+AI — 0.5.34: invocation-local visibility/style and semantic-text memoization; elapsed pending-GET guard cadence. No cache crosses a read/DOM change. Positive teacher/school/SchoolId, source document and receiver owner/session/batch checks remain before, periodically during, and immediately after bounded GETs. Original 90s pre-row and 8s GET limits remain. Safe diagnostics add only fixed inclusive count/time buckets (home, sourceGuard, descriptor, appGuard, fetchPending), capped at 10,000 calls / 3,600,000 ms; buckets overlap and must not be summed as CPU time.
+
+Synthetic 640-tile native-storage cases complete with 303 rows and two 300+3 saved receipts in both link orders and absent/empty MyInfo cases. Pending and post-periodic-check drift, timeout and abort remain zero-transfer stops. These measured performance results do not identify the exact cause of the PO's zero-row source-post-read failure. Actual Madrasati acceptance, Production verification and stable installed 29-file parity remain pending with the independent publisher/PO.
+
 AI — 0.5.33: empty MyInfo school fields remain unbound until explicit observed report evidence; supported setup GETs stay guarded and bounded. Synthetic proof only; actual source acceptance remains pending.
 
 ## 0.5.30 — preserve supported setup with stationary reads (AI, 2026-10-21)

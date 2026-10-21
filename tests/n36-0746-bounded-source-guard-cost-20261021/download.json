@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-0746-bounded-source-guard-cost-20261021",
+  "runId": "b5269f30-f6d8-42a6-ad9f-383c5b64df3b",
+  "baseSha": "a46dfcfcd152e79067d446cd3e2f2f8f0e87c3aa",
+  "name": "n36_0534_actual_app_download",
+  "archiveSha256": "70ed0905ed3a04ccdbb7872daf4d0fd5f56071d56ebe85af9e9db68f77f23ffd",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper; actual app DOM/download handler over HTTP; fresh isolated context.",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.34",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "origin": "http://127.0.0.1:49880"
+  }
+}

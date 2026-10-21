@@ -1,0 +1,95 @@
+{
+  "actualPO": {
+    "source": "Activated PO card, not independently replayed",
+    "version": "0.5.33",
+    "rows": 0,
+    "failureStep": "source-post-read"
+  },
+  "exactPortalCause": "UNRESOLVED",
+  "prior": [
+    {
+      "commit": "86a5168bc5a8932b8ff25b51f31049ebaccd5480",
+      "file": "tests/n36-0715-pre-row-expiry-20261021/larger-real-clock.json",
+      "sha256": "1a56b743de58826d94aad1bf1baf3bc4e1725eddf2ff83bfeae8d31262f4065a",
+      "status": "OBSERVED_STOP",
+      "view": {
+        "phase": "stopped",
+        "code": "REVIEW_EXPIRED",
+        "startPhase": "accepted",
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "schoolBindingState": "preliminary",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "styleCalls": 23419792,
+      "wallMs": 93317,
+      "pendingReadProofs": 1,
+      "storageHarness": "Source DOM evaluation inside storage.get; diagnostic only"
+    },
+    {
+      "commit": "eb28dc334867a0b098c575d4b96c1c940754d761",
+      "file": "tests/n36-0715-pre-row-expiry-20261021/native-storage-reproduction.json",
+      "sha256": "b3085dc4968d55e121064724bd576fbd296ddf559b3bf71b3de7ac934ec5bf43",
+      "status": "FAIL",
+      "view": {
+        "phase": "collect",
+        "code": null,
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "added": 0,
+        "existing": 0,
+        "staged": 300,
+        "observed": 300,
+        "coverage": "unknown",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "styleCalls": 26811884,
+      "wallMs": 100198,
+      "pendingReadProofs": 1,
+      "storageHarness": "Chrome storage/session get no longer awaits source.evaluate; style counters sampled only after source reader scripting calls. Descriptors/app checks never sample the DOM. Prior harness artifacts preserved."
+    },
+    {
+      "commit": "eb28dc334867a0b098c575d4b96c1c940754d761",
+      "file": "tests/n36-0715-pre-row-expiry-20261021/native-storage-control.json",
+      "sha256": "e1f5641a055088fc95ab29f6d90d9d0befd6b931de42d00630c3e4b952242f36",
+      "status": "PASS",
+      "view": {
+        "phase": "complete",
+        "code": null,
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "added": 303,
+        "existing": 0,
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "styleCalls": 62236,
+      "wallMs": 61795,
+      "pendingReadProofs": 8,
+      "storageHarness": "Chrome storage/session get no longer awaits source.evaluate; style counters returned with the same reader result, with no extra source evaluation. Descriptors/app checks never schedule a counter probe. Prior harness artifacts preserved."
+    }
+  ]
+}

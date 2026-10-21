@@ -1,0 +1,151 @@
+{
+  "taskId": "continuous-n36-0746-bounded-source-guard-cost-20261021",
+  "runId": "b5269f30-f6d8-42a6-ad9f-383c5b64df3b",
+  "baseSha": "a46dfcfcd152e79067d446cd3e2f2f8f0e87c3aa",
+  "version": "0.5.34",
+  "archiveIdentity": {
+    "url": "https://rakeezx.com/assets/extensions/rakeez-teacher-import-helper-0.5.33.zip",
+    "observedAt": "2026-10-21T08:09:31.794Z",
+    "sha256": "48bf7ce0af84bac3739b39ad143c91456eada39a00b5fbe801f1b3d5fbc5b5d0",
+    "bytes": 143911,
+    "files": 29
+  },
+  "runtimeFingerprint": "d0b8ecabc4dbe54971dbda325c090a356a9c94c6762ae8de3e15edf79bd2bc55",
+  "model": {
+    "tiles": 640,
+    "styleCostMs": 0,
+    "scriptDelayMs": 100,
+    "holdMs": 1600,
+    "inlineCounters": true,
+    "clock": "anchored wall elapsed plus cumulative actual computed-style calls times fixed cost; no phase-directed jumps; browser GET abort timer remains native 8s"
+  },
+  "harnessCorrection": "Chrome storage/session get no longer awaits source.evaluate; style counters returned with the same reader result, with no extra source evaluation. Descriptors/app checks never schedule a counter probe. Prior harness artifacts preserved.",
+  "boundary": "Public immutable 0.5.33 ZIP; actual popup/CSS, serialized source readers, ESM background/collector, actual receiver ownership guards and IndexedDB. Synthetic Chrome/account service; loopback protocol substitution only.",
+  "cases": [
+    {
+      "mode": "pending-school-during",
+      "status": "PASS",
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "schoolBindingState": "preliminary",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 1005
+          },
+          "sourceGuard": {
+            "count": 4,
+            "ms": 2306
+          },
+          "descriptor": {
+            "count": 11,
+            "ms": 1208
+          },
+          "appGuard": {
+            "count": 5,
+            "ms": 556
+          },
+          "fetchPending": {
+            "count": 1,
+            "ms": 813
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 53897,
+        "pendingReadProofs": 0,
+        "wallMs": 4791,
+        "modeledMs": 4791,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 7,
+            "wallMs": 760,
+            "modeledMs": 760
+          },
+          "app-guard": {
+            "count": 6,
+            "wallMs": 662,
+            "modeledMs": 662
+          },
+          "script-load": {
+            "count": 6,
+            "wallMs": 696,
+            "modeledMs": 696
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 334,
+            "modeledMs": 334
+          },
+          "descriptor-post-read": {
+            "count": 5,
+            "wallMs": 552,
+            "modeledMs": 552
+          },
+          "source-read-proof": {
+            "count": 4,
+            "wallMs": 638,
+            "modeledMs": 638
+          },
+          "report-guard": {
+            "count": 3,
+            "wallMs": 432,
+            "modeledMs": 432
+          },
+          "report-fetch": {
+            "count": 1,
+            "wallMs": 428,
+            "modeledMs": 428
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 102,
+            "modeledMs": 102
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": true,
+      "networkPending": [
+        {
+          "wallMs": 170,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 2,
+      "navigation": 0,
+      "deliveries": 0,
+      "setupReadCounts": [],
+      "receipts": []
+    }
+  ],
+  "status": "PASS",
+  "resources": {
+    "origin": "http://127.0.0.1:49878",
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "not required: active synthetic loopback-only helper"
+  }
+}

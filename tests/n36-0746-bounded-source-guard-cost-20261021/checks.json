@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "n36_0533_immutable_heavy_guard_cost_and_actual_failure_bound",
+      "status": "PASS",
+      "evidence": "baseline-small/large.json: immutable public ZIP hash verified, native-like storage and unchanged 640-tile workload. Large .33 observation stops at source-pre-read after 92.929s / 24,509,952 style calls; PO source-post-read failure and prior storage-limited / 300-staged harness results remain distinct in prior-boundary.json. No exact portal-cause claim."
+    },
+    {
+      "name": "n36_0534_bounded_guard_cost_and_pending_context_denials",
+      "status": "PASS",
+      "evidence": "Four large cases: 60.219–66.559s, 520,925–619,829 style calls; 18 during/after-last-periodic-check context drift cases plus timeout and abort stop with zero transfer. 6s GET has three periodic checks; native timeout is 8.003s. 27 source/diagnostic checks PASS. Actual ownership/store/score/year and owner-bound Outbox assertions execute in runtime.mjs."
+    },
+    {
+      "name": "n36_0534_full_runtime_300_plus_3_setup_package_link_parity",
+      "status": "PASS",
+      "evidence": "Both link orders × absent/empty MyInfo: 303 actual-app saved rows, 300+3 saved receipts with teacher/principal/school/classes/timetable, exactly one classes/timetable GET and no duplicate setup. package.json proves 29 ZIP/source paths and hashes; download.json proves actual HTTP app DOM/handler download hash. Production and installed stable parity NOT_RUN; independent publisher owns them."
+    }
+  ],
+  "resources": "All recorded owned servers/contexts closed; no live/shared phase lease required",
+  "production": "NOT_RUN",
+  "stableInstalledParity": "NOT_RUN",
+  "actualPortalAcceptance": "PENDING"
+}

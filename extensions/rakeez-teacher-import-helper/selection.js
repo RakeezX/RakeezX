@@ -93,25 +93,49 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   const document=source?.document??globalThis.document,location=source?new URL(source.url):globalThis.location,body=document.body??document;
   const fail=code=>({ok:false,code});
   const text=n=>n.textContent.trim().replace(/\s+/g,' ');
-  const visible=n=>{for(let el=n;el;el=el.parentElement){const css=source?el.style:getComputedStyle(el);if(el.matches('[inert],.hidden,.d-none,.sr-only')||el.hidden||el.getAttribute('aria-hidden')==='true'||css.display==='none'||(source?css.visibility==='hidden':css.visibility!=='visible')||(css.opacity!==''&&Number(css.opacity)===0))return false;}return source?true:n.getClientRects().length>0;};
+  // AI: invocation-local ancestor visibility. Layout rects belong only to the
+  // requested node: a zero-rect ancestor must not hide a visible descendant.
+  // No cache survives this synchronous read or any subsequent DOM mutation.
+  const ancestry=new WeakMap(),visibility=new WeakMap();
+  const visible=n=>{
+    if(visibility.has(n))return visibility.get(n);
+    const path=[];let el=n;
+    while(el&&!ancestry.has(el)){path.push(el);el=el.parentElement;}
+    let shown=el?ancestry.get(el):true;
+    for(const node of path.reverse()){
+      if(shown){const css=source?node.style:getComputedStyle(node);shown=!(node.matches('[inert],.hidden,.d-none,.sr-only')||node.hidden||node.getAttribute('aria-hidden')==='true'||css.display==='none'||(source?css.visibility==='hidden':css.visibility!=='visible')||(css.opacity!==''&&Number(css.opacity)===0));}
+      ancestry.set(node,shown);
+    }
+    const result=shown&&(source?true:n.getClientRects().length>0);visibility.set(n,result);return result;
+  };
   const plain=n=>visible(n)&&!n.querySelector('input,textarea,button,a,iframe,table,script,style')&&Array.from(n.querySelectorAll('*')).every(visible);
   const login=/\b(?:login|signin|logout|oauth)\b/i.test(location.pathname)||Array.from(document.querySelectorAll('input[type=password]')).some(visible)||Array.from(document.querySelectorAll('h1,h2,[role=heading]')).some(n=>visible(n)&&['تسجيل الدخول','انتهت الجلسة','رمز التحقق','تم تعطيل الحساب','تم حذف الحساب','الحساب غير نشط','Sign in','Login'].includes(text(n)));
   if(login)return fail('LOGIN_OR_LOGOUT');
   // Role text excludes decorative/hidden descendants, never exports the greeting/name.
+  const rawRoleText=new WeakMap(),roleTexts=new WeakMap();
+  const roleRaw=el=>{
+    if(rawRoleText.has(el))return rawRoleText.get(el);
+    let value='';
+    if(el.nodeType===3)value=el.textContent;
+    else if(el.nodeType===1&&visible(el)&&!['SVG','IMG','SCRIPT','STYLE'].includes(el.tagName))for(const child of el.childNodes)value+=roleRaw(child);
+    rawRoleText.set(el,value);return value;
+  };
   const roleText=n=>{
-    const parts=[];const walk=el=>{if(el.nodeType===3){parts.push(el.textContent);return;}if(el.nodeType!==1||!visible(el)||['SVG','IMG','SCRIPT','STYLE'].includes(el.tagName))return;for(const child of el.childNodes)walk(child);};walk(n);
-    return parts.join('').normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,'').replace(/\s*[:：]\s*/g,': ').trim().replace(/\s+/g,' ');
+    if(!roleTexts.has(n))roleTexts.set(n,roleRaw(n).normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,'').replace(/\s*[:：]\s*/g,': ').trim().replace(/\s+/g,' '));
+    return roleTexts.get(n);
   };
   const teacher=['معلم','معلمة','المعلم','المعلمة','دور المعلم','دور المعلمة','واجهة المعلم','واجهة المعلمة'];
   const admin=['مدير المدرسة','مديرة المدرسة','قائد المدرسة','قائدة المدرسة','المشرف','المشرفة','الإداري','الإدارية','المدير','المديرة'];
   const cardSelector='article,section,li,fieldset,.card,.panel,.school-card';
   const entryPath=/^\/(?:SchoolManagment\/Actions\/Teacher\/[^/]+|Dashboards\/Schools)\/?$/i.test(location.pathname);
-  const roleValuesIn=scope=>[...new Set(Array.from(scope.querySelectorAll('p,span,div,li,dt,strong,b,label')).filter(visible).map(roleText).map(v=>/^الدور\s*:?\s*(.+)$/.exec(v)?.[1]).filter(v=>[...teacher,...admin,'ولي الأمر','ولي أمر','الطالب','الطالبة'].includes(v)))];
+  const roleValuesCache=new WeakMap(),homeTextCache=new WeakMap();
+  const homesIn=scope=>{if(!homeTextCache.has(scope))homeTextCache.set(scope,Array.from(scope.querySelectorAll('a[href]')).filter(visible).filter(a=>roleText(a)==='الصفحة الرئيسية'));return homeTextCache.get(scope);};
+  const roleValuesIn=scope=>{if(!roleValuesCache.has(scope))roleValuesCache.set(scope,[...new Set(Array.from(scope.querySelectorAll('p,span,div,li,dt,strong,b,label')).filter(visible).map(roleText).map(v=>/^الدور\s*:?\s*(.+)$/.exec(v)?.[1]).filter(v=>[...teacher,...admin,'ولي الأمر','ولي أمر','الطالب','الطالبة'].includes(v)))]);return roleValuesCache.get(scope);};
   // Lowest shared scope is bounded by semantics, never an invented CSS card class.
   const cardFor=n=>{
     if(!entryPath)return n.closest(cardSelector);
     for(let scope=n.parentElement,depth=0;scope&&depth<12;scope=scope.parentElement,depth++){
-      const homes=Array.from(scope.querySelectorAll('a[href]')).filter(visible).filter(a=>roleText(a)==='الصفحة الرئيسية');
+      const homes=homesIn(scope);
       if(homes.length>1)return null;if(homes.length!==1||roleValuesIn(scope).length!==1)continue;
       const headings=[...new Set(Array.from(scope.querySelectorAll('h2,h3,h4,h5')).filter(visible).map(roleText).filter(v=>v.length>1&&v.length<=80&&!['قائمة المدارس','قائمة الأبناء','مدارس الأبناء'].includes(v)))];
       const schoolLabels=Array.from(scope.querySelectorAll('p,span,b,strong,dt,label')).filter(visible).map(roleText);

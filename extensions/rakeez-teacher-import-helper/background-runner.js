@@ -31,9 +31,14 @@ export function navigationDiagnostic(origin,n,observed,documentId,status){
 export function createBackgroundRunner({transport}){
  let running=null,wakeRequested=false,starting=Promise.resolve(),mutations=Promise.resolve();
  const mutate=operation=>{const r=mutations.then(operation);mutations=r.catch(()=>{});return r;};
+ // AI: fixed, bounded, inclusive substep totals only. No source content,
+ // route, identifier or arbitrary metric key is copied into diagnostics.
+ const timingKeys=['home','sourceGuard','descriptor','appGuard','fetchPending'];
+ const timingView=j=>Object.fromEntries(timingKeys.map(k=>[k,{count:Math.min(10000,Math.max(0,Math.trunc(j.timings?.[k]?.count??0))),ms:Math.min(3600000,Math.max(0,Math.trunc(j.timings?.[k]?.ms??0)))}]));
+ async function timed(j,key,fn){const started=Date.now();try{return await fn();}finally{const r=(j.timings??={})[key]??={count:0,ms:0};r.count=Math.min(10000,r.count+1);r.ms=Math.min(3600000,r.ms+Math.max(0,Date.now()-started));}}
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
+ const view=j=>({id:j.id,timings:timingView(j),phase:j.phase,startPhase:j.startPhase??'worker-ack',failureStep:j.failureStep??'none',failureJobPhase:j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
@@ -45,20 +50,23 @@ export function createBackgroundRunner({transport}){
   // Revoke this job only. App-owned durable batches are never deleted.
   await transport({type:'n36-cancel'},authority(j));
  });}
- async function appGuard(j,wait=false){await current(j);const r=await transport({type:'n36-check',batchId:j.batchId,wait},authority(j));if(!r?.ok)throw Error('APP_CHANGED');await current(j);return r.ready;}
+ async function appGuard(j,wait=false){return timed(j,'appGuard',()=>appGuardRead(j,wait));}
+ async function appGuardRead(j,wait=false){await current(j);const r=await transport({type:'n36-check',batchId:j.batchId,wait},authority(j));if(!r?.ok)throw Error('APP_CHANGED');await current(j);return r.ready;}
  // AI: tabs.url is advisory metadata, not the executing document's URL. Only
  // fragments may differ within a bound document; paths/queries remain byte exact.
  function sourceRoute(j,href){
   const u=new URL(href);if(u.origin!==j.origin)throw Error('SOURCE_CONTEXT_CHANGED');
   return safeRoute(j.origin,u.href,j.context);
  }
- async function descriptor(j){
+ async function descriptor(j){return timed(j,'descriptor',()=>descriptorRead(j));}
+ async function descriptorRead(j){
   const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>location.href});
   await current(j);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||typeof r[0].result!=='string'||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   return r[0];
  }
- async function source(j,mode='guard'){
+ async function source(j,mode='guard'){return timed(j,mode==='home'?'home':'sourceGuard',()=>sourceRead(j,mode));}
+ async function sourceRead(j,mode='guard'){
   if(mode==='guard'&&j.context?.readProof)mode='read-proof';
   let step=j.phase==='binding'?'source-start':'source-pre-read';
   try{
@@ -97,14 +105,21 @@ export function createBackgroundRunner({transport}){
   }catch(e){e.sourceFailureStep=step;throw e;}
  }
  // AI: source GETs remain read-only and receiver-free until school binding completes.
- async function fetchPage(j,n,setupKind=null){
+ async function fetchPage(j,n,setupKind=null){return timed(j,'fetchPending',()=>fetchPageRead(j,n,setupKind));}
+ async function fetchPageRead(j,n,setupKind=null){
   let settled=false;
   const pending=chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['fetch',{...j.context,...(setupKind?{setupKind}:{}),observedReport:n.readEvidence==='validated-response',rowOffset:n.rowOffset??0,path:n.path,sourceURL:j.sourceURL,requestId:j.id+'|'+n.path+'|'+(n.rowOffset??0),remainingMs:Math.min(8000,j.expiresAt-Date.now())}]}).finally(()=>{settled=true;});
   let r;
   try{
    // Receiver owner/session/batch and live teacher/document remain gates while
    // the bounded request is pending, as well as before and after it.
-   while(!settled){await Promise.race([pending,new Promise(resolve=>setTimeout(resolve,100))]);if(!settled){await appGuard(j);await source(j,'read-proof');}}
+   // AI: elapsed cadence measured after each complete check; a slow guard does
+   // not trigger a catch-up scan. Mandatory before/after gates remain intact.
+   let checkedAt=Date.now();
+   while(!settled){
+    let timer;try{await Promise.race([pending,new Promise(resolve=>{timer=setTimeout(resolve,Math.max(1,1000-(Date.now()-checkedAt)));})]);}finally{clearTimeout(timer);}
+    if(!settled&&Date.now()-checkedAt>=1000){await appGuard(j);await source(j,'read-proof');checkedAt=Date.now();}
+   }
    r=await pending;
   }catch(e){
    await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:key=>globalThis.rakeezReportRequests?.get(key)?.abort(),args:[j.id+'|'+n.path+'|'+(n.rowOffset??0)]}).catch(()=>{});

@@ -18,7 +18,8 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    if(setup&&(!setupRoute.test(u.pathname)||u.hash))fail('UNSAFE_SETUP_LINK');
    if(runContext.schoolBinding!=='bound'&&setup&&kind!=='metadata')fail('SCHOOL_CONTEXT_UNCONFIRMED');
    if(menu||setup||!runContext.observedReport){
-    const anchors=Array.from(globalThis.document.querySelectorAll('a[href]')).filter(a=>{for(let n=a;n;n=n.parentElement){const c=getComputedStyle(n);if(n.hidden||n.getAttribute('aria-hidden')==='true'||c.display==='none'||c.visibility!=='visible'||Number(c.opacity)===0)return false;}return a.getClientRects().length>0;}).filter(a=>{try{return new URL(a.getAttribute('href'),binding).href===u.href;}catch{return false;}});
+    const styles=new WeakMap();const style=n=>{if(!styles.has(n))styles.set(n,getComputedStyle(n));return styles.get(n);};
+    const anchors=Array.from(globalThis.document.querySelectorAll('a[href]')).filter(a=>{for(let n=a;n;n=n.parentElement){const c=style(n);if(n.hidden||n.getAttribute('aria-hidden')==='true'||c.display==='none'||c.visibility!=='visible'||Number(c.opacity)===0)return false;}return a.getClientRects().length>0;}).filter(a=>{try{return new URL(a.getAttribute('href'),binding).href===u.href;}catch{return false;}});
     if(!anchors.length||anchors.some(a=>a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[disabled],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK');
    }
    const guard=readSourceReportPage('guard');if(!guard.ok)fail(guard.code);
@@ -84,8 +85,27 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
   finally{clearTimeout(timer);controllers.delete(runContext.requestId);}
  })();
  const document=source?.document??globalThis.document,location=source?new URL(source.url):globalThis.location;
- const visible=n=>{for(let el=n;el;el=el.parentElement){const s=source?el.style:getComputedStyle(el);if(el.matches('[inert],.hidden,.d-none,.sr-only,[style*=\"display:none\"],[style*=\"display: none\"]')||el.hidden||el.getAttribute('aria-hidden')==='true'||s.display==='none'||(source?s.visibility==='hidden':s.visibility!=='visible')||(s.opacity!==''&&Number(s.opacity)===0))return false;}return source?true:n.getClientRects().length>0;};
- const text=n=>{const out=[];const walk=x=>{if(x.nodeType===3){out.push(x.textContent);return;}if(x.nodeType!==1||!visible(x)||['INPUT','TEXTAREA','SELECT','SCRIPT','STYLE','IFRAME','SVG','IMG'].includes(x.tagName))return;for(const c of x.childNodes)walk(c);};walk(n);return out.join('').trim().replace(/\s+/g,' ');};
+ // AI: fresh caches for each synchronous parser/guard invocation, including
+ // inert HTML. Never share visibility or derived text across an await or read.
+ const ancestry=new WeakMap(),visibility=new WeakMap(),rawText=new WeakMap(),texts=new WeakMap();
+ const visible=n=>{
+  if(visibility.has(n))return visibility.get(n);
+  const path=[];let el=n;
+  while(el&&!ancestry.has(el)){path.push(el);el=el.parentElement;}
+  let shown=el?ancestry.get(el):true;
+  for(const node of path.reverse()){
+   if(shown){const s=source?node.style:getComputedStyle(node);shown=!(node.matches('[inert],.hidden,.d-none,.sr-only,[style*=\"display:none\"],[style*=\"display: none\"]')||node.hidden||node.getAttribute('aria-hidden')==='true'||s.display==='none'||(source?s.visibility==='hidden':s.visibility!=='visible')||(s.opacity!==''&&Number(s.opacity)===0));}
+   ancestry.set(node,shown);
+  }
+  const result=shown&&(source?true:n.getClientRects().length>0);visibility.set(n,result);return result;
+ };
+ const raw=x=>{
+  if(rawText.has(x))return rawText.get(x);
+  let value='';if(x.nodeType===3)value=x.textContent;
+  else if(x.nodeType===1&&visible(x)&&!['INPUT','TEXTAREA','SELECT','SCRIPT','STYLE','IFRAME','SVG','IMG'].includes(x.tagName))for(const c of x.childNodes)value+=raw(c);
+  rawText.set(x,value);return value;
+ };
+ const text=n=>{if(!texts.has(n))texts.set(n,raw(n).trim().replace(/\s+/g,' '));return texts.get(n);};
  // Negative active-role guard complements the existing origin/school/session guard, including at export.
  // Role badges only: a principal's metadata name never establishes the current user's role.
  if(mode==='guard'){
