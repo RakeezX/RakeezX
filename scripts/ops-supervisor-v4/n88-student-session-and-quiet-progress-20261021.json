@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-student-session-and-quiet-progress-20261021",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -3520,
+      "scopeKey": "n88-actual-student-return-code-result-and-quiet-progress-20261021",
+      "dependsOn": [
+        "continuous-n88-user-copy-list-diagnostic-20261021"
+      ],
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "budgetMinutes": 60,
+      "idleMinutes": 12,
+      "objective": "Latest PO21October actual N88 report: two owned class-list requests succeeded with trusted region ap-south-1 and client elapsedMs 650/932, an improvement but not reliability or region-causality proof. Do not change function/database region, move data, alter provider routing, or infer historical 503 fixed from two successes. Teacher opening still flashes 'جارٍ فتح مساحة طلاب الفصل…' and task panel shows 'جارٍ قراءة المهام…'; creating missing codes shows the technical 'بانتظار إقرار الخادم…'. Student first code login succeeded; second attempt showed invalid-code message, login felt slow, and returning to the page showed entry again. Read only current Product row, prior N88 continuity evidence, current origin/main source and affected files. The current student view deliberately retires private rendered data on visibility hidden but does not perform an authoritative cookie-backed read on visible; correct this ordinary same-page return without retaining private rendered data or claiming an expired session. The claim client posts claim then reads; distinguish actual claim rejection from subsequent projection/read/network failure so a valid accepted code is never described as invalid solely because the follow-up read failed. Preserve a safe explicit resume path for uncertain claim outcome and avoid duplicate claim, automatic code resubmission, rate-budget consumption or leaked codes. On return, perform at most one owned read of the HttpOnly cookie, adopt only current context/generation and visible result; no storage, URL, logs or stale private render. Keep true pagehide/dispose/identity retirement and explicit end as hard boundaries; session expiration or revoked code must still be denied by the existing server. Confirm whether any separate server behavior is demonstrably responsible for second-login rejection using actual composed synthetic claim/read and existing service source; if not, record actual cause as unproven, no backend change in this card. Replace the technical code-generation pending text with a calm user-facing operation message without implying success before durable ACK. Make routine class/task loading less visually jarring, preserving truthful accessible busy/error states and avoiding extra requests or slowdowns. Test actual teacher-class and private student view composition for first successful claim, second valid claim, post-claim read timeout/error, ordinary hide/return, session expired/revoked, slow pending operation, copy/owner/lease retirement, and narrow/desktop visual state. Any static private student asset publication must use the established original N88 custodian and exact changed-source carrier readback; if that guarded route is unavailable, report BLOCKED and do not substitute a tool or deploy the teacher frontend as if the student fix shipped. One sole publisher for frontend. No personal browser, live student login, real code, real pupil/teacher write, SQL/Auth/schema/role/security setting, key or service-region change. Do not claim 100% or close N88 without real postpublication student result.\n\nREVIEWED N88 STATIC CUSTODY SCOPE REPAIR 2026-10-21: The locally qualified candidate 60c947a5cd8937fa8a06ec59a5269b3b7c94ae47 changes the private student script. The admitted narrow paths excluded original official-activation.mjs, and static-1522-gate.mjs binds an older task/candidate and is consumed. Continue this exact saved session/candidate only. Permit edits under drafts/n88-student-portal/** solely to add a fresh task/run/candidate-bound original-custodian static gate and its minimum official-activation.mjs command path. Limit to one changed private static carrier upload and exact provider/served source readback. Verify original native source, carrier and public pin preimages, preserve prior attempt markers append-only and historical failure. No old gate reuse, no native upload, readiness replay, SQL/Auth, credential, region or route change. No live student claim/account read; do not deliver teacher frontend as complete until the private static asset is verified.",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js",
+        "src/lib/student-portal-runtime.js",
+        "src/styles/student-portal-login.css",
+        "src/styles/student-portal-class.css",
+        "drafts/n88-student-portal/**",
+        "tests/n88-student-session-quiet-progress-20261021/**",
+        "docs/automation-evidence/20261021/N88_STUDENT_SESSION_QUIET_PROGRESS.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js"
+      ],
+      "requiredChecks": [
+        "n88_claim_and_projection_failure_are_distinguished_without_code_replay",
+        "n88_private_return_uses_one_owned_authoritative_read_and_hard_retirement",
+        "n88_teacher_progress_copy_and_accessible_loading_visuals_are_truthful",
+        "n88_private_static_custody_and_served_parity_if_changed"
+      ],
+      "acceptance": [
+        "An ordinary return to the student tab checks the existing server session and shows private data only after successful current-context read; actual expired/revoked sessions remain denied.",
+        "A claim accepted but followed by read failure does not tell the user that the code is invalid or silently repeat the claim.",
+        "Region placement remains ap-south-1 until request-specific cause and measured alternative justify a change; previous 503 and second-login root cause remain open if not reproduced."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261021-N88-actual-student-return-and-progress",
+        "publication": true,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "providerServiceOperations": 0,
+        "sqlAuthSchemaChanges": 0,
+        "regionChanges": 0,
+        "maxChangedPrivateStaticUploads": 1,
+        "nativeDeployments": 0,
+        "publicPinChanges": 0,
+        "newReadinessRequests": 0,
+        "appendOnlyAttemptHistory": true,
+        "resetConsumedMarkers": false
+      },
+      "releaseAuthority": "The PO's direct 2026-10-21 report authorizes correction of the actual N88 student session and UI behavior through the existing one-publisher path. This card authorizes only local/synthetic qualification and existing guarded static/frontend delivery, not a region migration, real student login, service mutation or bypass of previous browser/tool refusal.",
+      "liveAuthorizationRef": "PO-20261021-N88-STUDENT-SESSION-STATIC-DELIVERY"
+    }
+  ]
+}
