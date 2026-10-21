@@ -1,0 +1,68 @@
+# N88 student GET phase characterization — blocked before diagnostic implementation
+
+AI-authored checkpoint for task `continuous-n88-student-read-phase-latency-20261021`, run `5f1e5bac-172f-4c84-a95e-81370ee532dd`, saved session `01a15e63-ff70-7d02-b264-2631fc585456`.
+
+Base and observed remote main: `e710fcbbf51fcaa59715e45e4aa15aaa353bb1e3`. Remote observation used `git ls-remote origin refs/heads/main`; local stale main was not used. Worktree: `C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-student-read-phase-latency-20261021`.
+
+**Result: BLOCKED. No speed fix or reachable phase diagnostic has been implemented.** Measurements do not establish an unnecessary operation or the actual account bottleneck. The diagnostic branch requires the canonical Cloudflare boundary source `drafts/n88-student-portal/cloudflare-entry.mjs`, which is absent from the activated card's `allowedPaths`. Editing only a generated worker would leave the source inconsistent and would be a scope workaround. No unreachable service-only instrumentation was added.
+
+## Immutable starting point and actual path
+
+The measurement imports the exact native bundle identified by `tests/n88-mobile-class-source-503-20261021/native-complete.json`: native v61, SHA-256 `ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507`. It removes only the listener tail and exports existing functions in memory. It does not rebuild stale source dependencies over the native graph. This matters because the native bundle also contains previously published synchronization-stage and membership-batch work that is not fully mirrored in the separate source modules.
+
+The Cloudflare characterization imports `tests/n88-student-quiet-fast-return-20261021/carrier.mjs`, SHA-256 `a2308758f0611510f04f71cee50f69ffe35b936183d8d3e20847304adfb67091`, with the prior completed provider/source/served receipt. The generated worker at the generic activation bundle path is not substituted for this receipt-bound carrier. These are immutable recorded delivery identities, **not new provider observations**.
+
+The current student GET traverses:
+
+1. Existing-host bounded pool admission and `pool.connect`; exact TLS/login/role checks; private logging/session checks and typed-boundary catalog identity verification. Pool max2, connect timeout5000ms, idle10000ms remain intact.
+2. Repository acquire deadline6000ms; independent boundary verification, BEGIN/settings/global lock, six bounded legacy snapshot families; credential repository loads five bounded numeric/receipt families.
+3. Signed ingress consumption and numeric cookie/session/credential validation; `synchronizeOwner` canonical lock, memberships and publication-source reads. No bypass or cached identity admission was added.
+4. Full projection lock and all13 canonical families; current term, teacher visibility, bounded task guidance, and existing student projection logic.
+5. Existing durable diff/guards, acknowledged COMMIT, service response, native JSON envelope, Cloudflare validation, client projection and existing opt-in copy.
+
+`web-entry.mjs` currently serializes exactly `status,body,cookie`; only Set-Cookie is forwarded from service headers into that envelope. The current Cloudflare boundary also requires exactly those three keys. A new service header alone cannot reach the browser.
+
+## Red-first measurement, with explicit limits
+
+`tests/n88-student-read-phase-latency-20261021/measure.mjs` runs the actual receipt-bound native `createExistingHost`, signed Web Request handler, service, typed SQL boundary and local PostgreSQL17 fixture. All keys/owners/cookies/teacher admission are fabricated and stay in memory. Teacher setup uses the actual service with a synthetic trusted verifier port. No hosted database or real account request occurs.
+
+The Pool port uses the existing owned local PostgreSQL helper. Its two TLS/private-session attestations are fabricated controlled query results; the exact production guards consume them. This **does not certify real TLS, remote pool reuse, remote idle behavior or transport latency**. The idle scenario restarts the owned local database/pool; it is not an observation of the hosted10000ms idle eviction. Timing spans surround query calls and pool acquisition without changing Product code. Projection CPU/decoding/signing/envelope overhead remains in the explicitly named residual, rather than being misattributed to SQL.
+
+| Local fixture run | Wall time | Controlled delay |
+| --- | ---: | ---: |
+| Warm1 | 45ms | none |
+| Warm2 | 41ms | none |
+| After local pool/database restart | 173ms | none |
+| Pool connect | 239ms | 180ms |
+| Transport/boundary | 241ms | 180ms |
+| Bounded snapshot | 246ms | 180ms |
+| Synchronization | 234ms | 180ms |
+| Full projection reads | 231ms | 180ms |
+| Visibility | 225ms | 180ms |
+| Guidance | 220ms | 180ms |
+| COMMIT | 229ms | 180ms |
+
+Every successful GET has39 client query invocations:37 actual local PG queries plus the two explicitly fabricated transport/session attestations. This includes two actual catalog verifications, three transaction setup calls, eleven snapshot calls, one ingress call, three synchronization calls,14 projection calls (one lock plus13 families), one visibility call, one guidance call and one COMMIT. Pool acquisition is counted separately. Per-phase durations and counts are retained in `measurement.json`.
+
+Every controlled delayed success has the same entire grade/work/guidance projection as the baseline. Each injected delay appears in its selected phase and in end-to-end wall time. This demonstrates attribution capability, **not an optimization**, and does not explain the PO's5500–6500ms real-session observation. No phase, cap, security check, synchronization or full projection was removed.
+
+The initial setup failure is preserved in `harness-setup-failure.json`: missing canonical rollout fixture binding and incorrect visibility field names. `measurement-before-owner-fixture-failure.json` preserves the complete11-run measurements followed by a wrong-owner fixture error23503: the database correctly rejected a session without its composite credential parent. The corrected fixture creates valid second-owner context/credential/session parents and exercises the actual denial. `guard-visibility-fixture-failure.json` preserves a subsequent failure caused by the old publication binding after a membership revision; the harness now deliberately republishes with the current fabricated roster instead of weakening freshness. Corrected guard-only runs reuse the original measurements, identified by hash; they do not rerun those timings or rewrite either original failure.
+
+The completed `measurement.json` records14 actual native-handler guard cases: missing/wrong/expired cookie, a valid other-owner cookie without this owner's membership, immediate membership invalidation, restore without old-cookie revival, expired term, visibility removal, failed COMMIT, unknown COMMIT acknowledgment, invalid transport invariant, End Session, actual credential rotation and actual revocation. All deny or omit private sections as appropriate. No private projection is returned on failed/unknown COMMIT.
+
+## Reachability gate and bounded retry condition
+
+`bridge-red-first.mjs` executes the actual receipt-bound Cloudflare handler with a synthetic upstream:
+
+- Ordinary successful three-field envelope:200.
+- Same envelope with a service-only phase header:200, diagnostic header absent.
+- Finite typed phase value added to the envelope:503 with `reply-shape`; no-store remains.
+- Ordinary denied response:401, no phase diagnostic.
+
+`bridge-red-first.json` truthfully records diagnostic acceptance **FAIL**, while recording characterization PASS. It is not a rendered-UI acceptance claim. No diagnostic body/header/client/copy implementation exists to claim an end-to-end PASS for.
+
+`qualification.json` verifies syntax, exact scoped diff, original source and receipt hashes, and unchanged frontend evidence. Prior actual application HTTP DOM/handlers/CSS evidence and transport retirement/copy tests are reused only after hash equality for the unchanged source and evidence files. No browser/server phase was started here and no new rendered-UI PASS is claimed. No Vite build or blanket suite was run.
+
+The concrete retry condition is an approved **inactive-card** correction adding only `drafts/n88-student-portal/cloudflare-entry.mjs` to `allowedPaths`, followed by controller resumption of this exact saved session/candidate. The worker has not edited the card or queue. Reuse these measurements; implement the fixed rounded bounded successful-GET timing value against the immutable native/carrier graphs, then prove service/envelope/boundary/client/optional-copy parity, uniform denials and stale/later-in-flight exclusion. Only after that gate may the original custodian perform fresh candidate-bound native and separately required static preparation/upload/readbacks under the existing single-attempt authority. No old allowance or receipt can be reused as the new phase.
+
+No Product source changed, no attempt was reserved, and no native/static upload, source-pin update, live SQL/Auth/schema/RLS/region operation, real student/teacher action, Product main push or frontend publication occurred. All owned local databases closed and the integration lease was released in finally. No browser/live-mutation lease was acquired. N88 remains open; actual postpublication positive-session timing and Product acceptance remain unproven.
