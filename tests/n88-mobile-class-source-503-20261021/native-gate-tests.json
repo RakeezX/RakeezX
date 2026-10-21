@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "scope": "Synthetic gate ports only; no live operation",
+  "checks": [
+    "one upload, pin and append-only completion; repeat mutations denied",
+    "identity, current leases and exact authority negatives",
+    "fresh provider preimage and receipt freshness fences",
+    "uncertain upload is consumed and cannot repeat",
+    "upload/pin ordering and uncertain-pin one-shot",
+    "served parity failure remains failure without custody advancement"
+  ]
+}
