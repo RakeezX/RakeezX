@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n88-student-quiet-fast-return-20261021",
+  "runId": "f2a49542-bb75-4ad1-bc15-4a8290010e74",
+  "preparedCandidate": "ee7a8713ce6b912710c082b876aad4d2ee89d071",
+  "observedAt": "2026-10-21T11:31:49.220Z",
+  "status": "PASS",
+  "nativeSource": "ec0efc049b20f7119b3b5eea8b55a93a52bdfd6981647bf97298383a9f37f507",
+  "publicPinMatches": true,
+  "originalOwner": true,
+  "attemptAvailable": true,
+  "providerWrites": 0,
+  "readinessRequests": 0
+}
