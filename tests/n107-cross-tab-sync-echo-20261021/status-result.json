@@ -1,0 +1,126 @@
+{
+  "taskId": "continuous-n107-cross-tab-sync-echo-20261021",
+  "runId": "5932cb85-e839-47b6-8b31-ffec129d95c2",
+  "checks": [
+    {
+      "name": "additional_rendered_indicator_probe",
+      "status": "PASS",
+      "evidence": "Corrected account reload/boot fixture: actual owner-guarded app and source CSS render green with empty outbox, then red after real patchProfile auto-dispatch failure; durable owner-bound failed command retained."
+    }
+  ],
+  "failures": [],
+  "checkpoint": {
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "workspace": {
+      "id": "account:b51e1b326ee7406912c80050ef41b865",
+      "type": "account",
+      "authUserId": "a7300000-0000-4000-8000-000000000001",
+      "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1792557809960,null,null,{\"ownerId\":\"a7300000-0000-4000-8000-000000000001\",\"contractVersion\":1,\"foundationHash\":\"n107-status-local\"}]",
+      "broadcastChannelName": "rakeezx-data:account:b51e1b326ee7406912c80050ef41b865",
+      "workspaceKind": "account-provisioned"
+    },
+    "database": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+    "receipt": {
+      "ownerId": "a7300000-0000-4000-8000-000000000001",
+      "contractVersion": 1,
+      "foundationHash": "n107-status-local"
+    },
+    "students": 2,
+    "outbox": []
+  },
+  "green": {
+    "className": "sync-dot topbar__teacher-sync sync-dot--synced",
+    "color": "rgb(21, 128, 61)"
+  },
+  "failure": {
+    "summary": {
+      "state": "error",
+      "queuedCount": 1,
+      "pendingCount": 0,
+      "failedCount": 1,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": true,
+      "affectedCategories": [
+        "account"
+      ],
+      "historicalConflictCategories": [],
+      "reasonCategory": "temporary_sync_failure",
+      "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+      "lastSuccessfulSyncAt": 1792557810474,
+      "automaticRetryActive": true,
+      "automaticSyncActive": false,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": true,
+        "authRequired": false,
+        "awaitingVerification": false,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": {
+        "phase": "dispatch",
+        "code": "UNKNOWN",
+        "event": "automatic",
+        "at": "2026-10-21T04:43:31.244Z",
+        "elapsedMs": 10
+      }
+    },
+    "outbox": [
+      {
+        "id": "v2:abe551fc-3a73-4edc-8919-9a7d4e326e7d",
+        "protocol": "v2",
+        "mutationId": "abe551fc-3a73-4edc-8919-9a7d4e326e7d",
+        "deviceId": "n73-synthetic-device",
+        "store": "profile",
+        "entity": "profile",
+        "recordId": "profile",
+        "serverRecordId": "profile",
+        "canonicalId": "profile",
+        "logicalRecordKey": "profile:profile",
+        "op": "patch",
+        "baseRevision": 1,
+        "patch": {
+          "teacher_name": "Synthetic rendered failure"
+        },
+        "localPatch": {
+          "teacherName": "Synthetic rendered failure"
+        },
+        "fields": [
+          "teacher_name"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1792557810887000,
+        "clientUpdatedAt": 1792557810879,
+        "queuedAt": 1792557810879,
+        "state": "failed",
+        "attemptCount": 1,
+        "envelopeLocked": true,
+        "lastError": {
+          "message": "Mock backend does not implement Sync V2 mutation RPC",
+          "code": null,
+          "status": null,
+          "at": 1792557811243
+        },
+        "blockedReason": null,
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "lastAttemptAt": 1792557811239
+      }
+    ],
+    "dot": {
+      "className": "sync-dot topbar__teacher-sync sync-dot--error",
+      "color": "rgb(220, 38, 38)"
+    }
+  }
+}

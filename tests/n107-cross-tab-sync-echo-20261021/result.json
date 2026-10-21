@@ -1,6 +1,6 @@
 {
   "taskId": "continuous-n107-cross-tab-sync-echo-20261021",
-  "runId": "a321339f-42fe-41ab-a761-a391577d44e4",
+  "runId": "5932cb85-e839-47b6-8b31-ffec129d95c2",
   "baseSha": "ebb8aa4daf5c71f255941c9ffb71fae91c18a155",
   "checks": [
     {
@@ -25,6 +25,11 @@
       "name": "affected_owner_remote_durability_recovery",
       "status": "PASS",
       "evidence": "affected-checks.txt: 29 tests passed, 0 failed"
+    },
+    {
+      "name": "additional_rendered_indicator_probe",
+      "status": "PASS",
+      "evidence": "Corrected account reload/boot fixture: actual owner-guarded app and source CSS render green with empty outbox, then red after real patchProfile auto-dispatch failure; durable owner-bound failed command retained."
     }
   ],
   "baselineDelta": [
@@ -36,8 +41,12 @@
     0
   ],
   "limitations": [
-    "No new rendered Sync-dot PASS: the demo-to-account fixture retained a non-account header; its timed-out DOM assertion is preserved in device-result-and-dom-harness-failure.json. Unchanged prior rendered status evidence is reused; current real store/coordinator summary checks passed.",
     "Synthetic local only; no real account, service mutation or Production verification."
   ],
-  "sourceSha256": "8036b09143ef862d98ef0ade346fda9ea4c83ccf98513369ffa69aaa14f156c3"
+  "sourceSha256": "8036b09143ef862d98ef0ade346fda9ea4c83ccf98513369ffa69aaa14f156c3",
+  "reusedEvidenceRunId": "a321339f-42fe-41ab-a761-a391577d44e4",
+  "resolvedHarnessFailure": {
+    "original": "device-result-and-dom-harness-failure.json",
+    "correction": "status-browser.mjs boots a receipt-bound account in a fresh document before checking the actual header; status-result.json records PASS and account-dispatch-error.png was inspected. Original failure remains unchanged."
+  }
 }
