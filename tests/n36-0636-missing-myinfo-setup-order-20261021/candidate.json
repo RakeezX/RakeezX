@@ -1,0 +1,4213 @@
+{
+  "taskId": "continuous-n36-0636-missing-myinfo-setup-order-20261021",
+  "runId": "33864882-7d7d-4a20-a301-78ec47c3fbe1",
+  "baseSha": "baa8fe5eb4577362d81ab9643aef219331fa2f06",
+  "version": "0.5.33",
+  "archiveIdentity": {
+    "file": "rakeez-teacher-import-helper-0.5.33.zip",
+    "sha256": "48bf7ce0af84bac3739b39ad143c91456eada39a00b5fbe801f1b3d5fbc5b5d0",
+    "bytes": 143911
+  },
+  "runtimeFingerprint": "9c791bd5975c40ad5534271442808ceb42dcfd03bc475121375bdfec5df075b5",
+  "boundary": "Public immutable ZIP or exact candidate package; actual popup/CSS, serialized source readers, ESM background/collector, actual receiver ownership guards and IndexedDB. Synthetic Chrome/account service; loopback protocol substitution only.",
+  "cases": [
+    {
+      "mode": "no-info-before",
+      "view": {
+        "id": "f864ae5da53bdd8234c7f4114c7d3123c8b548c1a03a9e0762faeed1cc9617d1",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "no-info-after",
+      "view": {
+        "id": "995ae3c6c6f3b9812dce0b39bc443350ed2d13a2c292f97ab5de5c220bad8436",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "empty-info-before",
+      "view": {
+        "id": "1aabaee213ef29ab6fcde3f6c9f437f7beae0e6780f5358e9c759a26c652644f",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "empty-info-after",
+      "view": {
+        "id": "26c759b64494b515f292f339b550ee6a4899ec25254b655c072d6e0c837b3e32",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "card-no-info-before",
+      "view": {
+        "id": "7f0bd8e36a0e9ff69a15a03d7832eede42d3d2ad6c9fb8e6647fb198503ede02",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/Dashboards/Schools",
+        "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9"
+      ],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "card-no-info-after",
+      "view": {
+        "id": "6dd3b4db9fb8a3674c0dba30edaee5b7cf9c5f00cbc16f549459eeaa2017f261",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/Dashboards/Schools",
+        "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9"
+      ],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "card-empty-info-before",
+      "view": {
+        "id": "e49422fd873a7c6c4e809a9a1e4669063123eedf058af4aa9db60666f9b041c8",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/Dashboards/Schools",
+        "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9"
+      ],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "card-empty-info-after",
+      "view": {
+        "id": "a918b9054cd34581dbb5e63a1c66fa25db883132f821ac6e6bf7461de8f9dbd7",
+        "phase": "complete",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 303,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 303,
+        "observed": 303,
+        "coverage": "complete",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        },
+        {
+          "path": "/TeachersReports/Statistics/Teacher/observed",
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/Dashboards/Schools",
+        "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/Teacher/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9"
+      ],
+      "receipts": [
+        {
+          "status": "saved",
+          "added": 300,
+          "existing": 0,
+          "remaining": 0,
+          "total": 300,
+          "setup": {
+            "saved": 5,
+            "existing": 1,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 3,
+          "existing": 0,
+          "remaining": 0,
+          "total": 3,
+          "setup": {
+            "saved": 0,
+            "existing": 6,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundDeliveries": [
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "setup": [
+            {
+              "category": "school",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدرسة اصطناعية"
+                }
+              ]
+            },
+            {
+              "category": "teacher",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "معلم اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "principal",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "name": "مدير اصطناعي"
+                }
+              ]
+            },
+            {
+              "category": "classes",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            },
+            {
+              "category": "timetable",
+              "provenance": [
+                "teacher-readonly-run"
+              ],
+              "rows": [
+                {
+                  "weekday": "الأحد",
+                  "period": "1",
+                  "classroom": "خامس1",
+                  "subject": "الرياضيات"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "deliveries": 2,
+      "setupReadCounts": {
+        "/TeachersReports/Statistics/Teacher/observed": 1,
+        "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 1
+      },
+      "setupAssertions": [],
+      "status": "PASS"
+    },
+    {
+      "mode": "missing-school-before",
+      "view": {
+        "id": "b32e7561b7e5c93c10a9570dd88ef5b471ea0017756dcaacbf1416ccf372417b",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "conflicting-school-before",
+      "view": {
+        "id": "cd461c3f7e436a113e2489e07d72f44773ce93ce5b82d1a9d89aac17539a3832",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 300,
+        "observed": 300,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 300
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "owner-drift-before",
+      "view": {
+        "id": "b661e90aee6de1776ed79c7ca582f18667e250fc4d3afef537b6a91cd64ff7ba",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "APP_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "document-drift-before",
+      "view": {
+        "id": "79b82c70cc016d31273e8184f4c69e19f8bbd4504b32fb8970809588b84fb483",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SOURCE_BINDING_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "session-drift-before",
+      "view": {
+        "id": "cca4b550d122a7ab849b7629337c949eae48cd106610e67e5a907e1df68d97c1",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "APP_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "conflicting-info-before",
+      "view": {
+        "id": "63541f8082dbdec0ded67df0db7556dffcab5e8ff6fc37917aa58b02710c47fc",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "bound",
+          "schoolName": "مدرسة أخرى",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "card-conflicting-info-before",
+      "view": {
+        "id": "f1b45a1305008d159a9d92aa1672d559517ddd26441cd12356469596a68e8ea0",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/Dashboards/Schools",
+        "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9"
+      ],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "empty-info-missing-school-before",
+      "view": {
+        "id": "c26c3d004aec5f7eddf19775c41487d4b80c20e005da495aa585d6ae71b78fce",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": null,
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    },
+    {
+      "mode": "card-empty-info-missing-school-before",
+      "view": {
+        "id": "5ab4518bfeb5b078a320f0f45c073901c1170815881cf3c03bdf33792d5eb135",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "students",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/Dashboards/Schools",
+        "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9"
+      ],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "PASS"
+    }
+  ],
+  "previousFailures": [
+    {
+      "mode": "card-conflicting-info-before",
+      "view": {
+        "id": "7f3efa347cd67475888e44e28a61fe1e0b09188767b0eec7b700220ffcc8fd1e",
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "preliminary",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "fetchTrace": [
+        {
+          "path": "/TeachersReports/Statistics/MyInfo/observed",
+          "kind": "metadata",
+          "schoolBinding": "preliminary",
+          "schoolName": "مدرسة اصطناعية",
+          "schoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": [
+        "/Dashboards/Schools",
+        "/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed"
+      ],
+      "sourceRequests": [
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9",
+        "http://127.0.0.1:49866/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js",
+        "http://127.0.0.1:49866/TeachersReports/Statistics/MyInfo/observed",
+        "http://127.0.0.1:49866/extensions/rakeez-teacher-import-helper/route-diagnostics.js"
+      ],
+      "unexpected": [],
+      "observedDocument": {
+        "links": [
+          "/TeachersReports/Statistics/MyInfo/observed",
+          "/TeachersReports/Statistics/Teacher/observed",
+          "/SchoolSchedule/Schedule/TeacherSchedule?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagment/Actions/MyStudents?SchoolId=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "badges": 0
+      },
+      "navigation": [
+        "http://127.0.0.1:49866/Dashboards/Schools/ChangeUserTypeToTeacherFromParent/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb?Name=%D9%85%D8%AF%D8%B1%D8%B3%D8%A9%20%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A%D8%A9"
+      ],
+      "receipts": [],
+      "deliveries": 0,
+      "status": "FAIL",
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'SCHOOL_CONTEXT_CHANGED'\n- 'APP_CHANGED'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0636-missing-myinfo-setup-order-20261021/tests/n36-0636-missing-myinfo-setup-order-20261021/runtime.mjs:134:12\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0636-missing-myinfo-setup-order-20261021/tests/n36-0636-missing-myinfo-setup-order-20261021/runtime.mjs:70:2"
+    }
+  ],
+  "reusedCases": [
+    "no-info-before",
+    "no-info-after",
+    "empty-info-before",
+    "empty-info-after",
+    "card-no-info-before",
+    "card-no-info-after",
+    "card-empty-info-before",
+    "card-empty-info-after",
+    "missing-school-before",
+    "conflicting-school-before",
+    "owner-drift-before",
+    "document-drift-before",
+    "session-drift-before",
+    "conflicting-info-before",
+    "card-conflicting-info-before"
+  ],
+  "status": "PASS",
+  "resources": {
+    "origin": "http://127.0.0.1:49866",
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "not required: active synthetic loopback-only helper"
+  }
+}

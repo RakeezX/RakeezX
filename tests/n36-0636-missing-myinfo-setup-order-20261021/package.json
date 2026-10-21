@@ -1,0 +1,25 @@
+{
+  "name": "n36_0533_if_needed_300_plus_3_package_link_and_29_file_parity",
+  "status": "PASS",
+  "baseSha": "baa8fe5eb4577362d81ab9643aef219331fa2f06",
+  "version": "0.5.33",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.33.zip",
+    "sha256": "48bf7ce0af84bac3739b39ad143c91456eada39a00b5fbe801f1b3d5fbc5b5d0",
+    "bytes": 143911
+  },
+  "runtimeFiles": 29,
+  "checks": [
+    "ZIP/source/file SHA256 and size parity",
+    "Exact .33 download href + label only",
+    "Manifest permissions/hosts/CSP unchanged",
+    "Immutable .32 ZIP/manifest and unchanged receiver/data/route/date/popup assets",
+    "Changed JS syntax"
+  ],
+  "reusedEvidence": [
+    "tests/n36-0524-package-link-20261020/result.json",
+    "tests/n36-background-no-popup-20261020/browser.json"
+  ],
+  "actualSourceAcceptance": "NOT_RUN: one later manual user diagnostic is required to establish actual source acceptance",
+  "publicationAndStableParity": "NOT_RUN: independent controller/publisher, followed by existing stable updater only after verified publication"
+}
