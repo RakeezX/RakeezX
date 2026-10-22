@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authority": "po-20261022-outcome-flow",
-  "updatedAt": "2026-10-22T20:18:57.989Z",
+  "updatedAt": "2026-10-22T21:01:09.839Z",
   "problems": [
     {
       "key": "n36-unresolved-batch",
@@ -71,7 +71,7 @@
       "productId": "N44",
       "issueNumber": 5,
       "title": "خطة ربط الجهاز ووصول التنبيه خارج الصفحة",
-      "gate": "ready_to_admit",
+      "gate": "waiting_evidence",
       "taskIds": [
         "continuous-n44-register503-existing-service-repair-20261019",
         "continuous-n44-one-approved-closed-page-push-20261019",
@@ -80,7 +80,7 @@
       "currentTaskIds": [
         "continuous-n44-disabled-source-preparation-20261022"
       ],
-      "nextAction": "تأهيل إصلاح محلي محدد لرفض ربط الجهاز من مصدر44 المطابق؛ لا إرسال أو تسجيل أو تمديد نافذة الاختبار القديمة",
+      "nextAction": "Qualified inactive source package delivered as 7140d967; do not rebuild. Existing-custodian service/valid-test readiness remains separate; no expired-window resend.",
       "evidenceNeeded": "مصدر مطابق وسبب مثبت، ثم نطاق اختبار ساري وميزانية محققة؛ لا بيانات أو أسرار"
     },
     {
@@ -95,7 +95,7 @@
       "currentTaskIds": [
         "continuous-n72-webkit-sheet-date-20261022"
       ],
-      "nextAction": "إصلاح عيب مثبت فقط أو NO_CHANGE؛ لا ادعاء آيفون فعلي"
+      "nextAction": "Same saved session: attribute the observed ready-to-placeholder route transition, correct fixture or proved in-scope route lifecycle, then finish WebKit acceptance."
     }
   ],
   "deferredPlan": [

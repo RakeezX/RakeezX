@@ -16,6 +16,8 @@ export function summarizeProblems(jobs, map, at) {
       : active.some(t => t.status === 'delivery') ? 'delivery'
       : active.some(t => t.status === 'pending') ? 'queued'
       : active.some(t => t.status === 'retry_wait') ? 'waiting_retry'
+      : tasks.some(t => p.currentTaskIds?.includes(t.id) && t.noChangeReceipt?.disposition === 'VERIFIED_NO_CHANGE') ? 'checked_no_change'
+      : tasks.some(t => p.currentTaskIds?.includes(t.id) && t.noChangeReceipt?.disposition === 'RECORDED_NO_CHANGE_WITH_CHECK_GAPS') ? 'no_change_check_gaps'
       : tasks.some(t => t.status === 'blocked' && p.currentTaskIds?.includes(t.id)) ? 'blocked'
       : p.gate;
     return { key: p.key, productId: p.productId, issueNumber: p.issueNumber ?? null,

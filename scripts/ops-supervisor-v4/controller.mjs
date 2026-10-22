@@ -7,6 +7,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { readApprovedNotes } from './approved-notes.mjs';
 import { inspectCardReadiness } from './card-readiness.mjs';
 import { readProblemSummary } from './problem-summary.mjs';
+import { inspectNoChange } from './no-change-outcome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { verifiedLiveServicePublication } from './live-service-publication.mjs';
 
@@ -476,7 +477,7 @@ export class Controller {
     this.fingerprintAdapter = adapters.fingerprint;
     this.publisher = adapters.publisher; this.records = adapters.records; this.testOnly = adapters.testOnly === true;
     this.jobs = []; this.deliveryResult = null; this.deliveryInFlight = null; this.progress = null; this.issues = [];
-    this.logCursors = new Map(); this.identity = null; this.stopping = false; this.locked = false;
+    this.logCursors = new Map(); this.noChangeScanned = new Map(); this.identity = null; this.stopping = false; this.locked = false;
   }
   now() { return new Date(this.clock()).toISOString(); }
   async paused() { return this.stopping || await exists(path.join(this.runtime, 'STOP')) || await exists(path.join(this.runtime, 'STOP-REFILL')); }
@@ -903,6 +904,41 @@ export class Controller {
     await this.event(result.blockerType === 'auth' ? 'task_auth_blocker_isolated' : 'task_network_prerequisite_isolated', { taskId: task.id, runId: task.attempt.runId });
     return true;
   }
+  async completeNoChange(task, processes) {
+    const reap=task.lastWorkerReap, runId=task.attempt?.runId;
+    if (!reap?.exactAbsence || reap.runId!==runId || reap.activationId!==task.activationId
+        || !reap.owners?.length || reap.owners.some(o=>processes.some(p=>identityMatches(p,o))))
+      throw Error('No-change worker absence is not verified');
+    const checkpoint=await readJson(task.attempt.checkpointPath);
+    if (!checkpoint?.finishedAt || checkpoint.taskId!==task.id || checkpoint.runId!==runId
+        || checkpoint.sessionId && checkpoint.sessionId!==task.sessionId
+        || task.checkpointIssue || task.eventLogIssue || task.watchdogIncident)
+      throw Error('No-change checkpoint/session differs');
+    const raw=await fs.readFile(task.attempt.outputPath),result=parse(raw);
+    const checked=await inspectNoChange(task,result,{command:this.command,allows:allowed});
+    if (!raw.equals(await fs.readFile(task.attempt.outputPath))) throw Error('No-change original result changed');
+    const receipt={...checked,observedAt:this.now(),originalResultSha256:createHash('sha256').update(raw).digest('hex'),
+      previousStatus:task.status,previousFailure:task.lastFailure??null,originalChecksPreserved:true};
+    await writeJson(path.join(this.runtime,'results',task.id+'.no-change.json'),receipt);
+    const next={...task,noChangeReceipt:receipt,candidateSha:result.candidateSha,
+      runnerPid:null,runnerCreatedAt:null,brokerPid:null,brokerCreatedAt:null,ownedProcesses:[],
+      status:checked.accepted?'closed':'blocked',
+      lastFailure:checked.accepted?null:(task.lastFailure||'NO_CHANGE recorded; check gaps remain in the original result'),
+      failureClass:checked.accepted?null:'external',retryAt:null,nextDeliveryAt:null,productRecordKey:null};
+    if (checked.accepted) next.closedFromNoChangeAt=this.now();
+    await this.save(next);Object.assign(task,next);
+    await this.event(checked.accepted?'no_change_completed':'no_change_check_gaps',
+      {taskId:task.id,runId,candidateSha:result.candidateSha,productDeployed:false,productTicketClosed:false});
+  }
+  async recoverSavedNoChange(task, processes) {
+    const runId=task.attempt?.runId;
+    if (!runId || task.noChangeReceipt || this.noChangeScanned.get(task.id)===runId) return;
+    this.noChangeScanned.set(task.id,runId);
+    const result=await readJson(task.attempt.outputPath);
+    if (result?.state!=='NO_CHANGE' || task.lastFailure!==(result.summary||'No scoped change; requires reconciliation')) return;
+    const eligibility=await this.eligibility(task);if(!eligibility.eligible)return;
+    await this.completeNoChange(task,processes);
+  }
   async reconcile(task, processes) {
     let checkpoint = null;
     try { checkpoint = task.attempt ? await readJson(task.attempt.checkpointPath) : null; }
@@ -948,7 +984,11 @@ export class Controller {
       return;
     }
     if (result?.state === 'BLOCKED') { if (await this.recognizeResourceWait(task, result, processes)) return; await this.failure(task, result.blocker || result.summary, workerBlockerClass(result)); return; }
-    if (result?.state === 'NO_CHANGE') { await this.failure(task, result.summary || 'No scoped change; requires reconciliation', 'external'); return; }
+    if (result?.state === 'NO_CHANGE') {
+      try { await this.completeNoChange(task, processes); }
+      catch(error) { await this.failure(task, 'No-change validation: '+clean(error.message), 'external'); }
+      return;
+    }
     if (!checkpoint && task.attempt?.wrapperStderrPath) {
       const captured = [];
       if (task.attempt.wrapperLaunchPath) {
@@ -1155,6 +1195,10 @@ export class Controller {
     }
     await this.reapFinishedLeases();
     await this.resolveResourceWaits(processes);
+    for (const task of this.jobs.filter(t=>t.status==='blocked'&&t.failureClass==='external')) {
+      try { await this.recoverSavedNoChange(task, processes); }
+      catch(error) { this.issues.push({code:'NO_CHANGE_RECONCILIATION_REJECTED',taskId:task.id,message:clean(error.message)}); }
+    }
     for (const task of this.jobs.filter(t => t.status === 'awaiting_po')) {
       const eligibility = await this.eligibility(task);
       if (eligibility.closed === true) {
