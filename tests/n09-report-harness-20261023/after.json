@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n09-report-harness-residuals-20261023",
+  "runId": "7663fdb0-3ed5-4029-9124-6d04651f6509",
+  "baseSha": "5e646ffbec90eb79861fa123373e88e336620808",
+  "command": "node --import ./tests/n09-report-harness-20261023/run.mjs --test tests/n70-cross-class.test.mjs tests/n70-v21-print-labels.test.mjs",
+  "nodeVersion": "v24.19.0",
+  "exitCode": 0,
+  "tests": 3,
+  "pass": 3,
+  "fail": 0,
+  "skipped": 0,
+  "results": [
+    "PASS: N70 routes, class hierarchy, report reasons and filters use current Product data",
+    "PASS: N70 accepted V2.2 normal and archive routes keep their distinct labels and print/CSV actions",
+    "PASS: N70 retains reviewed filters, empty guard and confirmation with the documented named print helper"
+  ],
+  "kind": "Recorded actual Node test result; no rendered UI or live account claim"
+}

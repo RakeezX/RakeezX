@@ -6,7 +6,7 @@ import * as store from '../src/store.js';
 import reportsIndex from '../src/views/reports-index.js';
 import crossClass from '../src/views/cross-class-reports.js';
 import { match } from '../src/router.js';
-import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+import { reportContext } from './n09-report-harness-20261023/fixture.mjs';
 
 global.document = {
   documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } },
@@ -16,14 +16,9 @@ global.matchMedia = () => ({ matches: false });
 global.location = { hash: '#/reports' };
 
 test('N70 routes, class hierarchy, report reasons and filters use current Product data', async () => {
-  db.closeDB();
-  await activateSyntheticAccountWorkspace();
-  await db.clearAll();
-  await store.init();
   try {
-    const year = store.activeYear();
-    const term = store.activeTerm();
-    await store.save({
+    const { year, term, save } = await reportContext();
+    await save({
       sections: [{ id: 'n70-section', yearId: year.id, grade: 4, section: 'أ' }],
       subjects: [{ id: 'n70-subject', name: 'رياضيات' }],
       teachings: [{ id: 'n70-teaching', sectionId: 'n70-section', subjectId: 'n70-subject', termId: term.id }],
@@ -90,9 +85,7 @@ test('N70 routes, class hierarchy, report reasons and filters use current Produc
     assert.match(String(crossClass.render()), /لا نتائج مطابقة/);
 
     store.deactivateWorkspace('n70-owner-switch');
-    await activateSyntheticAccountWorkspace({ ownerId: '22222222-2222-4222-8222-222222222222' });
-    await db.clearAll();
-    await store.init();
+    await reportContext({ ownerId: '22222222-2222-4222-8222-222222222222' });
     for (const route of ['grades', 'followup']) {
       location.hash = `#/reports/${route}`;
       crossClass.onMount();

@@ -1,0 +1,58 @@
+✔ N70 routes, class hierarchy, report reasons and filters use current Product data (56.9747ms)
+✖ N70 V2.1 normal and archive routes keep their distinct labels and print actions (2.755ms)
+✖ N70 V2.1 keeps filtered, empty, confirmation and profile/device print behavior byte-identical to reviewed V2 (76.0318ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 1
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1353.6402
+
+✖ failing tests:
+
+test at tests\n70-v21-print-labels.test.mjs:18:1
+✖ N70 V2.1 normal and archive routes keep their distinct labels and print actions (2.755ms)
+  Error: Cannot switch an initialized Product workspace in place
+      at Module.activateWorkspace (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-report-harness-residuals-20261023/src/store.js:260:25)
+      at activateSyntheticAccountWorkspace (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-report-harness-residuals-20261023/tests/helpers/synthetic-workspace.mjs:19:18)
+      at async reportContext (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-report-harness-residuals-20261023/tests/n09-report-harness-20261023/fixture.mjs:10:3)
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-report-harness-residuals-20261023/tests/n70-v21-print-labels.test.mjs:20:34)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'WORKSPACE_ALREADY_MOUNTED'
+  }
+
+test at tests\n70-v21-print-labels.test.mjs:61:1
+✖ N70 V2.1 keeps filtered, empty, confirmation and profile/device print behavior byte-identical to reviewed V2 (76.0318ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  ... Skipped lines
+
+    '    async print() {\n' +
+      '      if (!filters(scoped()).length) { await emptyExecutionNotice(); return; }\n' +
+      '      const presentation = getAccountPresentation(store.state.profile?.teacherForm);\n' +
+      '      const confirmed = await openSheet({\n' +
+      "        title: 'تأكيد بيانات التقرير والطباعة',\n" +
+  ...
+      '      setTimeout(() => {\n' +
+  +   "        printReport(archiveRoute ? 'تقرير تنفيذ الحصص' : 'تقرير الحصص والحضور');\n" +
+  -   '        window.print();\n' +
+      '      }, 50);\n' +
+      '    },\n'
+
+      at TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-report-harness-residuals-20261023/tests/n70-v21-print-labels.test.mjs:68:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '    async print() {\n      if (!filters(scoped()).length) { await emptyExecutionNotice(); return; }\n      const presentation = getAccountPresentation(store.state.profile?.teacherForm);\n      const confirmed = await openSheet({\n        title: \'تأكيد بيانات التقرير والطباعة\',\n        desc: `راجع بيانات ${presentation.teacherLabel} والمدرسة و${presentation.principalLabel} للظهور في ترويسة وتوقيع التقرير.`,\n        body: prePrintConfirmationSheet({ profile: store.state.profile, device: store.state.device }),\n        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="pre-print-form">متابعة للطباعة</button>`,\n        onMount: (root, done) => {\n          const form = root.querySelector(\'#pre-print-form\') || root.querySelector(\'#report-identity-form\');\n          form?.addEventListener(\'submit\', (event) => {\n            event.preventDefault();\n            const fd = new FormData(event.currentTarget);\n            done({\n              teacherName: String(fd.get(\'teacherName\') ?? \'\').trim(),\n              schoolName: String(fd.get(\'schoolName\') ?? \'\').trim(),\n              principalName: String(fd.get(\'principalName\') ?? \'\').trim(),\n            });\n          });\n        },\n      });\n      if (!confirmed) return;\n\n      const profilePatch = {};\n      if (confirmed.teacherName !== undefined) profilePatch.teacherName = confirmed.teacherName;\n      if (confirmed.schoolName !== undefined) profilePatch.schoolName = confirmed.schoolName;\n      if (confirmed.principalName !== undefined) {\n        profilePatch.reportPrincipalName = confirmed.principalName;\n        profilePatch.principalName = confirmed.principalName;\n      }\n      if (Object.keys(profilePatch).length) {\n        await store.patchProfile(profilePatch);\n      }\n      if (confirmed.principalName !== undefined) {\n        await store.patchDevice({ reportPrincipalName: confirmed.principalName });\n      }\n\n      repaint();\n\n      setTimeout(() => {\n        printReport(archiveRoute ? \'تقرير تنفيذ الحصص\' : \'تقرير الحصص والحضور\');\n      }, 50);\n    },\n',
+    expected: '    async print() {\n      if (!filters(scoped()).length) { await emptyExecutionNotice(); return; }\n      const presentation = getAccountPresentation(store.state.profile?.teacherForm);\n      const confirmed = await openSheet({\n        title: \'تأكيد بيانات التقرير والطباعة\',\n        desc: `راجع بيانات ${presentation.teacherLabel} والمدرسة و${presentation.principalLabel} للظهور في ترويسة وتوقيع التقرير.`,\n        body: prePrintConfirmationSheet({ profile: store.state.profile, device: store.state.device }),\n        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="pre-print-form">متابعة للطباعة</button>`,\n        onMount: (root, done) => {\n          const form = root.querySelector(\'#pre-print-form\') || root.querySelector(\'#report-identity-form\');\n          form?.addEventListener(\'submit\', (event) => {\n            event.preventDefault();\n            const fd = new FormData(event.currentTarget);\n            done({\n              teacherName: String(fd.get(\'teacherName\') ?? \'\').trim(),\n              schoolName: String(fd.get(\'schoolName\') ?? \'\').trim(),\n              principalName: String(fd.get(\'principalName\') ?? \'\').trim(),\n            });\n          });\n        },\n      });\n      if (!confirmed) return;\n\n      const profilePatch = {};\n      if (confirmed.teacherName !== undefined) profilePatch.teacherName = confirmed.teacherName;\n      if (confirmed.schoolName !== undefined) profilePatch.schoolName = confirmed.schoolName;\n      if (confirmed.principalName !== undefined) {\n        profilePatch.reportPrincipalName = confirmed.principalName;\n        profilePatch.principalName = confirmed.principalName;\n      }\n      if (Object.keys(profilePatch).length) {\n        await store.patchProfile(profilePatch);\n      }\n      if (confirmed.principalName !== undefined) {\n        await store.patchDevice({ reportPrincipalName: confirmed.principalName });\n      }\n\n      repaint();\n\n      setTimeout(() => {\n        window.print();\n      }, 50);\n    },\n',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

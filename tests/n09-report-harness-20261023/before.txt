@@ -1,0 +1,44 @@
+✖ N70 routes, class hierarchy, report reasons and filters use current Product data (26.9161ms)
+node:internal/modules/esm/get_format:243
+  throw new ERR_UNKNOWN_FILE_EXTENSION(ext, filepath);
+        ^
+
+TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".css" for C:\Users\Abody\Projects\RakeezX\.worktrees\continuous-n09-report-harness-residuals-20261023\src\styles\filters.css
+    at Object.getFileProtocolModuleFormat [as file:] (node:internal/modules/esm/get_format:243:9)
+    at defaultGetFormat (node:internal/modules/esm/get_format:283:36)
+    at defaultLoadSync (node:internal/modules/esm/load:161:16)
+    at #loadAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:802:12)
+    at #loadSync (node:internal/modules/esm/loader:834:53)
+    at ModuleLoader.load (node:internal/modules/esm/loader:783:26)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:494:31)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:560:36)
+    at afterResolve (node:internal/modules/esm/loader:607:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:613:12) {
+  code: 'ERR_UNKNOWN_FILE_EXTENSION'
+}
+
+Node.js v24.19.0
+✖ tests\n70-v21-print-labels.test.mjs (1346.9732ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1645.1537
+
+✖ failing tests:
+
+test at tests\n70-cross-class.test.mjs:18:1
+✖ N70 routes, class hierarchy, report reasons and filters use current Product data (26.9161ms)
+  TypeError: Cannot read properties of null (reading 'id')
+      at TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-report-harness-residuals-20261023/tests/n70-cross-class.test.mjs:27:52)
+      at runNextTicks (node:internal/process/task_queues:65:5)
+      at process.processImmediate (node:internal/timers:502:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at tests\n70-v21-print-labels.test.mjs:1:1
+✖ tests\n70-v21-print-labels.test.mjs (1346.9732ms)
+  'test failed'

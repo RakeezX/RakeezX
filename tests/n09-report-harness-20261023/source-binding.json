@@ -1,0 +1,124 @@
+{
+  "retainedCandidate": "3a10f0ae4a47d3231480bdfed70582d94ffb6835",
+  "currentBase": "5e646ffbec90eb79861fa123373e88e336620808",
+  "status": "PASS",
+  "evidencePath": "docs/automation-evidence/20261022/N09_REPORTS_MOBILE_SLICE.md",
+  "evidenceBlob": "888abbf438348f659434e83f62b4aedcb3904cef",
+  "matches": [
+    {
+      "path": "src/views/reports-index.js",
+      "retainedBlob": "0b3a92fa4e01e8f6415241b61afb2105756148b9",
+      "baseBlob": "0b3a92fa4e01e8f6415241b61afb2105756148b9",
+      "status": "PASS"
+    },
+    {
+      "path": "src/views/cross-class-reports.js",
+      "retainedBlob": "983ae6fef890ab6bd5bae41b292bd40890e4f7ae",
+      "baseBlob": "983ae6fef890ab6bd5bae41b292bd40890e4f7ae",
+      "status": "PASS"
+    },
+    {
+      "path": "src/views/execution-report.js",
+      "retainedBlob": "0ab140358d5487519403fae1668d7137a5a21a20",
+      "baseBlob": "0ab140358d5487519403fae1668d7137a5a21a20",
+      "status": "PASS"
+    },
+    {
+      "path": "src/views/reports.js",
+      "retainedBlob": "323ad498f2d2b2e4006dadad7b041d0d35b220a7",
+      "baseBlob": "323ad498f2d2b2e4006dadad7b041d0d35b220a7",
+      "status": "PASS"
+    },
+    {
+      "path": "src/store.js",
+      "retainedBlob": "984d5cf9269234166510bb6e6d8129502e64ea13",
+      "baseBlob": "984d5cf9269234166510bb6e6d8129502e64ea13",
+      "status": "PASS"
+    },
+    {
+      "path": "src/models.js",
+      "retainedBlob": "8789837a8978df2f3c8b10a2438c3724ea2b836d",
+      "baseBlob": "8789837a8978df2f3c8b10a2438c3724ea2b836d",
+      "status": "PASS"
+    },
+    {
+      "path": "src/router.js",
+      "retainedBlob": "9f470f73c81a142d890b711634d43d906fe43f03",
+      "baseBlob": "9f470f73c81a142d890b711634d43d906fe43f03",
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/db.js",
+      "retainedBlob": "ca3b9014693026cae18a0070c22d84845ce136e1",
+      "baseBlob": "ca3b9014693026cae18a0070c22d84845ce136e1",
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/dom.js",
+      "retainedBlob": "88fbca218a3d4af4acf8bbf9247aadf126262a87",
+      "baseBlob": "88fbca218a3d4af4acf8bbf9247aadf126262a87",
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/export.js",
+      "retainedBlob": "e66f9a4804f8f6dc935671efda15888404760f65",
+      "baseBlob": "e66f9a4804f8f6dc935671efda15888404760f65",
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/report-print.js",
+      "retainedBlob": "f47a1afa2754894ad4d3b034a11d03dac9bc6d92",
+      "baseBlob": "f47a1afa2754894ad4d3b034a11d03dac9bc6d92",
+      "status": "PASS"
+    },
+    {
+      "path": "src/styles/work-n70.css",
+      "retainedBlob": "c17f7985f806c1c33c2d135e9b71619d211642ce",
+      "baseBlob": "c17f7985f806c1c33c2d135e9b71619d211642ce",
+      "status": "PASS"
+    },
+    {
+      "path": "src/styles/filters.css",
+      "retainedBlob": "15bcd452284077d900b374a292d2f47704e1dbb3",
+      "baseBlob": "15bcd452284077d900b374a292d2f47704e1dbb3",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/n70-v22-csv.test.mjs",
+      "retainedBlob": "9b6e98355e30e2391e9f53648b3fe9288008830a",
+      "baseBlob": "9b6e98355e30e2391e9f53648b3fe9288008830a",
+      "status": "PASS"
+    },
+    {
+      "path": "index.html",
+      "retainedBlob": "b9c07e1738c2bf1f3911e2f116646f1c5aa45602",
+      "baseBlob": "b9c07e1738c2bf1f3911e2f116646f1c5aa45602",
+      "status": "PASS"
+    },
+    {
+      "path": "package.json",
+      "retainedBlob": "56658d1763448865fb84a1facca001817e7934dc",
+      "baseBlob": "56658d1763448865fb84a1facca001817e7934dc",
+      "status": "PASS"
+    },
+    {
+      "path": "package-lock.json",
+      "retainedBlob": "035400122400c30ccb8ad64e4520a7c3e98081bb",
+      "baseBlob": "035400122400c30ccb8ad64e4520a7c3e98081bb",
+      "status": "PASS"
+    }
+  ],
+  "allApplicationSourceDelta": [
+    "src/generated/build-meta.generated.js",
+    "src/styles/app.css"
+  ],
+  "exceptions": {
+    "src/styles/app.css": "Only --text-3 #64748b to #607087. Retain geometry/interactions, not exact color appearance.",
+    "src/generated/build-meta.generated.js": "Only buildSha and buildTimestamp; other metadata equal."
+  },
+  "reused": [
+    "Actual application Chromium 360/390/1280 geometry, focus, filter/reset and print-handler evidence",
+    "Existing N70 CSV 3/3; real zero/blank, formula protection, private-ID exclusion"
+  ],
+  "newBrowserRun": false
+}
