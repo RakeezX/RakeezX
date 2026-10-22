@@ -1,0 +1,267 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-disabled-source-preparation-20261022",
+  "runId": "fadd3490-e38e-47f4-b35b-d0bc72a48622",
+  "status": "PASS",
+  "runtime": {
+    "deno": "2.2.12",
+    "v8": "13.5.212.10-rusty",
+    "typescript": "5.7.3"
+  },
+  "sourcePath": "drafts/n44-push/activation/register503-composition/edge.mjs",
+  "sourceSha256": "0e1a86d8e64fbfdeb294044a9809cd9f33a7ee44ffc2a48b14687716e1141fe7",
+  "candidateSourceSha256": "18afb81db82b76929278ffe7f024b84c68b546d23ff814d2aeb5c46ea1834513",
+  "startupOmittedSha256": "0da51fe17603d5e446d5627759f5f79b6f4d57307381fff622ec297ba9ec9ba9",
+  "reusedEvidence": {
+    "path": "tests/n44-register503-1019-composition-corrected.json",
+    "sha256": "7e9c2049c11cd0f6b4c58e3ded5b0b680d9c56fc55c5f499c32d33e1d498863b",
+    "note": "Unchanged 50-to-35/crypto/SQL evidence reused; this test adds focused exact bundled-composition coverage only."
+  },
+  "cases": [
+    {
+      "name": "native44_ACK_revoked_same_device_obstruction",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "native44_clean_control",
+      "status": "registered",
+      "queries": 35,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": true
+    },
+    {
+      "name": "native44_expired_approval",
+      "status": "disabled",
+      "queries": 17,
+      "snapshots": 0,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "native44_approval_expires_during_snapshot",
+      "status": "registered",
+      "queries": 35,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": true
+    },
+    {
+      "name": "candidate_ACK_revoked_same_device_new_ID",
+      "status": "registered",
+      "queries": 35,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": true
+    },
+    {
+      "name": "candidate_multiple_ACK_revoked_same_scope",
+      "status": "registered",
+      "queries": 35,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": true
+    },
+    {
+      "name": "candidate_old_ID_reuse",
+      "status": "rejected",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_other_active_identity",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_expired_active_identity_not_ACK_revoked",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_dead_identity_not_ACK_revoked",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_unknown_identity_state",
+      "status": "threw",
+      "queries": 27,
+      "snapshots": 1,
+      "commits": 0,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_revoked_with_residual_material",
+      "status": "threw",
+      "queries": 27,
+      "snapshots": 1,
+      "commits": 0,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_foreign_workspace_retired",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_second_device_active",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_foreign_device_retired",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_wrong_approval_owner",
+      "status": "disabled",
+      "queries": 17,
+      "snapshots": 0,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_mismatched_device",
+      "status": "disabled",
+      "queries": 17,
+      "snapshots": 0,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_mismatched_workspace",
+      "status": "disabled",
+      "queries": 17,
+      "snapshots": 0,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_expired_approval",
+      "status": "disabled",
+      "queries": 17,
+      "snapshots": 0,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_approval_expires_during_snapshot",
+      "status": "disabled",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_no_current_consent",
+      "status": "rejected",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_stale_consent",
+      "status": "rejected",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_owner_session_guard",
+      "status": "rejected",
+      "queries": 7,
+      "snapshots": 0,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_registration_write_budget_consumed",
+      "status": "limited",
+      "queries": 32,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_uncertain_delivery_history_preserved",
+      "status": "registered",
+      "queries": 35,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": true
+    },
+    {
+      "name": "candidate_unknown_COMMIT_not_ACK",
+      "status": "threw",
+      "queries": 36,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_foreign_endpoint_unique_claim_denied",
+      "status": "threw",
+      "queries": 33,
+      "snapshots": 1,
+      "commits": 0,
+      "registeredAck": false
+    },
+    {
+      "name": "candidate_same_ID_idempotent_active_retry",
+      "status": "registered",
+      "activeRows": 1,
+      "registrationWrites": 1
+    },
+    {
+      "name": "candidate_registration_preserves_consumed_send_marker",
+      "status": "registered",
+      "queries": 35,
+      "snapshots": 1,
+      "commits": 1,
+      "registeredAck": true
+    },
+    {
+      "name": "candidate_consumed_total_attempt_denies_send_and_new_run",
+      "status": "denied"
+    },
+    {
+      "name": "unchanged_hard_stop_no_present_day_authority",
+      "status": "denied"
+    }
+  ],
+  "liveOperations": 0,
+  "limitations": [
+    "Fabricated fixed historical clock; existing hard stop unchanged.",
+    "Actual hosted disabled subcause and original503 unknown.",
+    "No service activation, registration, real send or OS arrival proof.",
+    "Unknown COMMIT withholds ACK; fake PG is not a new SQL/transaction certification."
+  ]
+}

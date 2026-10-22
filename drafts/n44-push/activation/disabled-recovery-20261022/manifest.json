@@ -1,0 +1,46 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-disabled-source-preparation-20261022",
+  "runId": "fadd3490-e38e-47f4-b35b-d0bc72a48622",
+  "state": "INACTIVE_SOURCE_ONLY",
+  "baseSha": "edcf95091475096cc40f546d2b07e4840a81a242",
+  "source": {
+    "path": "drafts/n44-push/activation/register503-composition/edge.mjs",
+    "sha256": "0e1a86d8e64fbfdeb294044a9809cd9f33a7ee44ffc2a48b14687716e1141fe7",
+    "nativeVersion": 44,
+    "receiptPath": "drafts/n44-push/activation/register503-composition/native-source-readback.json",
+    "receiptSha256": "3e694bf718d501f0f9fa121226984326af29c95e7698b16621490e45854a3b60",
+    "publishedSourceStage": "019487f174d6b2bb4aaeaf3dc41d8472216e468b"
+  },
+  "candidateSourceSha256": "18afb81db82b76929278ffe7f024b84c68b546d23ff814d2aeb5c46ea1834513",
+  "patchSites": 1,
+  "activation": false,
+  "liveOperations": 0,
+  "sourceHardStopUnchanged": true,
+  "globalDelivery": "OFF_LAST_RECORDED_NOT_READ_BACK",
+  "cron": "OFF_LAST_RECORDED_NOT_READ_BACK",
+  "files": {
+    "drafts/n44-push/activation/disabled-recovery-20261022/patch-native44.mjs": "9d787ba4b8e0f1375f9b0fefd7c2feb2e51178b0f1afd770a1712282f40773c1",
+    "drafts/n44-push/activation/disabled-recovery-20261022/README.md": "c01641408a1e478d9b54a7758700afd6b6a3ed478909e9b052df75793d50b87b",
+    "tests/n44-disabled-recovery-20261022/source44.mjs": "a60396d0414190ca57c7ba36f8e5bc449515b538c86c2e8d857a9320d8d85a87",
+    "tests/n44-disabled-recovery-20261022/result.json": "8a4dce89208fbb1e4635e7ae4984176e78e0e65a43431fc4ab5fe7fb01754094"
+  },
+  "requiredChecks": [
+    {
+      "name": "n44_source44_identity_and_disabled_branch_reproduction",
+      "status": "PASS",
+      "evidence": "tests/n44-disabled-recovery-20261022/result.json (31 focused cases); syntax and exact reversible source transform"
+    },
+    {
+      "name": "n44_same_device_retired_identity_and_consumed_budget_denials",
+      "status": "PASS",
+      "evidence": "tests/n44-disabled-recovery-20261022/result.json (31 focused cases); syntax and exact reversible source transform"
+    },
+    {
+      "name": "n44_inactive_candidate_preserves_source44_single_snapshot_and_no_live_operations",
+      "status": "PASS",
+      "evidence": "tests/n44-disabled-recovery-20261022/result.json (31 focused cases); syntax and exact reversible source transform"
+    }
+  ],
+  "fileFingerprintEncoding": "UTF-8 with CRLF normalized to LF (Git source representation); native44 source fingerprint remains exact bytes"
+}
