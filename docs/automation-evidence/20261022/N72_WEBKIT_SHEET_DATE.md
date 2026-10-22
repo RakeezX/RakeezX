@@ -4,12 +4,19 @@
 
 Blocked before the date-sheet journey. No Product source or styles were changed. This result does not establish that the sheet/date UI passes or fails, and it is not physical iPhone Safari, keyboard, or PWA evidence.
 
-## Attempt
+## Original attempt (preserved)
 
 - Used the canonical `withIsolatedLocalBrowser` helper with `engine: 'webkit'`, fresh contexts, and the task-owned loopback server on port 43172. No browser installation, credentials, persistent profile, or external request was used.
 - The target is the actual app entry and existing calendar term-date sheet, using the approved `planning` date adapter. The intended scenarios are 390px mobile, a 320px short-sheet condition with simulated `visualViewport` compression, and desktop.
 - WebKit loaded the app modules and created `rakeezx-demo` (version 8) and `rakeezx-workspace-registry` (version 1), but the app stayed on `جارٍ تجهيز مساحة عملك…` without rendering `.layout`. A run waited 30 seconds; it timed out before reaching the date sheet. No page or console errors were observed.
 - The controlled WebKit journey therefore did not reach focus, picker placement, dismissal, opener focus, or desktop comparison. Do not interpret those gates as passing.
+
+## Harness recovery — run `9bec8634-2b0f-41aa-8fa0-7b0c925870f9`
+
+- Replaced the raw static file server with the repository's installed Vite host on owned loopback port 43172, read the current run ID from the canonical task file, and requested `preparing` exactly once in each fresh context, following the working N26 app fixture pattern.
+- Actual app boot reached a ready synthetic Demo workspace in WebKit. The journey then remained on `جارٍ تجهيز مساحة عملك…` after changing to `#/calendar`; the calendar action never rendered. This is distinct from the original raw-server/active-empty-Demo failure.
+- The one Chromium diagnostic run with the same Vite/preparing setup reached the real calendar term-date sheet. It showed that Escape closes the surrounding Product sheet and removes the date field, so Escape was removed from the harness's picker-cancel step. The test now dismisses the picker by clicking outside it, checks the field, then exercises the Product sheet cancel action. Chromium output is diagnostic only and does not substitute for WebKit acceptance.
+- The Vite child process and each isolated browser/context are closed by their owning `finally` blocks. No Product source or style changed.
 
 ## Reuse boundary
 
@@ -17,4 +24,4 @@ Existing accepted N20/N38/N69/N54 evidence remains unchanged. The existing N38 d
 
 ## Retry condition
 
-Retry this slice only after the app startup/Demo fixture can complete in the canonical isolated WebKit context and render the current application. Then run the complete bounded journey before considering any presentation change.
+Retry this slice after the current app can stay rendered on `#/calendar` in the canonical isolated WebKit Demo context. Then run the complete bounded journey before considering any presentation change.

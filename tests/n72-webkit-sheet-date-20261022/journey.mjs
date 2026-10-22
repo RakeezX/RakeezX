@@ -1,27 +1,35 @@
-import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
 import { createRequire } from 'node:module';
+import { spawn } from 'node:child_process';
+import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
+import { mkdir, readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { withIsolatedLocalBrowser } from '../../scripts/ops-supervisor-v4/isolated-local-browser.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const taskFile = 'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n72-webkit-sheet-date-20261022.json';
-const runId = '977ef580-0c79-4387-9a2f-da73f4abe525';
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json' };
-const server = createServer(async (req, res) => {
-  const relative = new URL(req.url, 'http://127.0.0.1').pathname === '/' ? 'index.html' : decodeURIComponent(new URL(req.url, 'http://127.0.0.1').pathname).slice(1);
-  const file = path.resolve(root, relative);
-  if (!file.startsWith(root) || !/^(index\.html|manifest\.webmanifest|src\/|assets\/)/.test(relative)) return res.writeHead(403).end();
-  try { res.writeHead(200, { 'content-type': mime[path.extname(file)] ?? 'application/octet-stream' }).end(await readFile(file)); }
-  catch { res.writeHead(404).end(); }
+const task = JSON.parse(await readFile(taskFile, 'utf8'));
+const runId = task.attempt.runId;
+const engine = process.env.N72_ENGINE || 'webkit';
+const evidenceDir = path.dirname(fileURLToPath(import.meta.url));
+const origin = 'http://127.0.0.1:43172';
+const vite = spawn(process.execPath, [fileURLToPath(new URL('../../node_modules/vite/bin/vite.js', import.meta.url)), '--host', '127.0.0.1', '--port', '43172', '--strictPort'], {
+  cwd: root, stdio: 'ignore', windowsHide: true,
 });
-const port = 43172;
-await new Promise((resolve, reject) => { server.once('error', reject); server.listen(port, '127.0.0.1', resolve); });
-const origin = `http://127.0.0.1:${port}`;
+
+async function waitForVite() {
+  const deadline = Date.now() + 15000;
+  while (Date.now() < deadline) {
+    if (vite.exitCode !== null) throw new Error(`Owned Vite exited before readiness (${vite.exitCode})`);
+    try { if ((await fetch(origin)).ok) return; } catch {}
+    await delay(100);
+  }
+  throw new Error('Owned Vite did not become ready on port 43172');
+}
 
 try {
-  await withIsolatedLocalBrowser({ taskFile, runId, url: origin, engine: 'webkit', timeoutMs: 60000 }, async ({ createContext }) => {
+  await waitForVite();
+  await withIsolatedLocalBrowser({ taskFile, runId, url: origin, engine, timeoutMs: 90000 }, async ({ createContext }) => {
     const require = createRequire(new URL('../../package.json', import.meta.url));
     const { expect } = require('@playwright/test');
     const results = [];
@@ -32,21 +40,46 @@ try {
     ]) {
       const context = await createContext({ viewport: scenario.viewport, locale: 'ar-SA', hasTouch: true });
       try {
+        await context.addInitScript(() => sessionStorage.setItem('rakeezx-demo-session-v1', 'preparing'));
         const page = await context.newPage();
         const errors = [];
         page.on('pageerror', error => errors.push(error.message));
         page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-        await page.route('https://xlrubcwjqktzzunrvuns.supabase.co/**', route => route.fulfill({ status: 200, json: [] }));
-        await page.addInitScript(() => sessionStorage.setItem('rakeezx-demo-session-v1', 'active'));
-        await page.goto(`${origin}/`);
-        await page.locator('.layout').waitFor({ timeout: 5000 }).catch(async () => { throw new Error(`App boot state: ${JSON.stringify({ errors, body: await page.locator('body').innerText(), routing: await page.evaluate(() => window.__workspaceRouting ?? null), databases: await page.evaluate(() => indexedDB.databases()), resources: await page.evaluate(() => performance.getEntriesByType('resource').map(r => [r.name, r.responseStatus]).slice(-15)) })}`); });
+        await page.goto(origin, { waitUntil: 'domcontentloaded' });
+        await page.waitForTimeout(500);
+        await page.waitForTimeout(1800);
+        try {
+          await page.waitForFunction(async () => {
+            const store = await import('/src/store.js');
+            return store.state.ready === true && store.getActiveWorkspace()?.type === 'demo' && store.teachings().length > 0 && !!document.querySelector('.layout');
+          }, null, { timeout: 15000 });
+        } catch {
+          const stage = await page.evaluate(async () => {
+            const store = await import('/src/store.js');
+            return { body: document.body.innerText, routing: window.__workspaceRouting ?? null,
+              demoRequest: sessionStorage.getItem('rakeezx-demo-session-v1'), ready: store.state.ready,
+              workspace: store.getActiveWorkspace()?.type ?? null, teachingCount: store.teachings().length,
+              databaseNames: (await indexedDB.databases()).map(db => db.name) };
+          });
+          throw new Error(`App startup stage did not resolve: ${JSON.stringify({ errors, stage })}`);
+        }
         await page.evaluate(() => { location.hash = '#/calendar'; });
-        const opener = page.locator('[data-act="edit-term-in-settings"]').first();
-        await opener.click();
+        try { await page.waitForSelector('[data-act="open-settings"]', { timeout: 10000 }); }
+        catch {
+          throw new Error(`Calendar route state: ${JSON.stringify(await page.evaluate(() => ({ hash: location.hash, title: document.querySelector('h1')?.innerText, body: document.body.innerText.slice(0, 1200), routing: window.__workspaceRouting ?? null })))}`);
+        }
+        const settingsOpener = page.locator('[data-act="open-settings"]');
+        await settingsOpener.click();
+        const settingsSheet = page.locator('.sheet-backdrop').last().locator('.sheet');
+        await settingsSheet.locator('[data-settings-tab="terms"]').click();
+        const termOpener = settingsSheet.locator('[data-act="edit-term-in-settings"]').first();
+        await expect(termOpener).toBeVisible();
+        await termOpener.click();
         const sheet = page.locator('.sheet-backdrop').last().locator('.sheet');
         const input = sheet.locator('#term-dates [name="startDate"]');
         await expect(input).toHaveAttribute('data-rakeez-date-scope', 'planning');
         await input.focus();
+        const originalValue = await input.inputValue();
         if (scenario.compressed) {
           await page.evaluate(({ height, top }) => {
             Object.defineProperties(visualViewport, { height: { configurable: true, value: height }, offsetTop: { configurable: true, value: top }, scale: { configurable: true, value: 1 } });
@@ -60,22 +93,35 @@ try {
         const metrics = await page.evaluate(() => {
           const input = document.querySelector('#term-dates [name="startDate"]');
           const picker = document.querySelector('.flatpickr-calendar.open');
-          const sheet = input.closest('.sheet');
           const box = element => { const r = element.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; };
-          return { viewport: { width: innerWidth, height: visualViewport.height, top: visualViewport.offsetTop }, input: box(input), sheet: box(sheet), picker: box(picker), rtl: document.documentElement.dir, inputValue: input.value, focus: document.activeElement === input, pickerPosition: getComputedStyle(picker).position };
+          const viewport = { width: innerWidth, height: visualViewport.height, top: visualViewport.offsetTop };
+          const popup = box(picker);
+          return { viewport, input: box(input), sheet: box(input.closest('.sheet')), picker: popup, pickerReachable: popup.left >= 0 && popup.right <= innerWidth && popup.top >= viewport.top && popup.bottom <= viewport.top + viewport.height, rtl: document.documentElement.dir, inputValue: input.value, focus: document.activeElement === input, pickerPosition: getComputedStyle(picker).position };
         });
         results.push({ scenario: scenario.name, simulatedCompression: Boolean(scenario.compressed), metrics });
-        await page.keyboard.press('Escape');
+        await sheet.locator('.sheet__head').click();
         await expect(picker).toBeHidden();
+        await expect(input).toBeVisible();
+        await input.focus();
         await expect(input).toBeFocused();
+        await expect(input).toHaveValue(originalValue);
+        expect(metrics.pickerReachable).toBe(true);
         await sheet.locator('[data-sheet-close]').click();
+        const returnedSettings = page.locator('.sheet-backdrop').last().locator('.sheet');
+        await expect(returnedSettings.locator('[data-settings-tab="terms"]')).toBeVisible();
+        await returnedSettings.locator('[data-sheet-close]').click();
         await expect(page.locator('.sheet-backdrop')).toHaveCount(0);
-        await expect(opener).toBeFocused();
+        await expect(settingsOpener).toBeFocused();
         expect(errors).toEqual([]);
+        await mkdir(evidenceDir, { recursive: true });
+        await page.screenshot({ path: path.join(evidenceDir, `${scenario.name}.png`), fullPage: true });
       } finally { await context.close(); }
     }
     process.stdout.write(`${JSON.stringify(results, null, 2)}\n`);
   });
 } finally {
-  await new Promise(resolve => server.close(resolve));
+  if (vite.exitCode === null) {
+    vite.kill();
+    await new Promise(resolve => vite.once('exit', resolve));
+  }
 }
