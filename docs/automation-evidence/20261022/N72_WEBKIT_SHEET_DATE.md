@@ -25,3 +25,11 @@ Existing accepted N20/N38/N69/N54 evidence remains unchanged. The existing N38 d
 ## Retry condition
 
 Retry this slice after the current app can stay rendered on `#/calendar` in the canonical isolated WebKit Demo context. Then run the complete bounded journey before considering any presentation change.
+
+## Route-stage diagnosis — run `5168a102-f267-4a81-b237-00402cc30ad7`
+
+- A bounded 12-second stage capture on Vite port 43173 found a same-document hash transition: `performance.timeOrigin` and the single navigation entry were unchanged, with only the initial navigation and hash navigation in the main-frame event list.
+- Before and after `#/calendar`, `window.__workspaceRouting` was `ready` for the signed-out Demo workspace and the preparing request remained present, but `store.state.ready` stayed false, teaching count stayed zero, `.layout` count stayed zero, and the boot placeholder remained. This capture did not reproduce the prior report's ready-to-placeholder transition; the fresh Demo never became ready in this run.
+- `app.js`, `router.js`, and `calendar.js` returned HTTP 200; no console/page errors or failed requests were observed. A single bounded Chromium comparison with the same Vite/preparing fixture produced the same unready boot stage, so the current failure is not isolated to WebKit and does not establish a Product route regression.
+- An extra read-only IndexedDB probe was invalid: it opened the database without a version and requested stores before confirming the schema, then raised `NotFoundError`. Its context closed in `finally`; it is excluded from application evidence. The route-stage harness no longer performs that probe.
+- No Product source or CSS change is justified by this evidence. The date-sheet WebKit checks and route owner-retirement boundaries remain NOT RUN. Retry when the canonical fresh preparing Demo fixture reaches `store.ready`, seeded teachings, and `.layout`; then capture the route transition and proceed to the date journey.
