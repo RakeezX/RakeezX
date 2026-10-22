@@ -253,13 +253,21 @@ async function qualifyExtensionSelection(batch){
  }
 }
 async function readExtensionProgress(){
- let binding,assertSession;
+ // AI N36: keep the extension's exact public shape; safe detail is app-only.
+ return (await readExtensionProgressResult()).progress;
+}
+async function readExtensionProgressResult(){
+ let binding,assertSession,stage='context-unverified';
+ const unresolved=()=>({checkpoint:'unresolved',relation:'unresolved',confirmedRows:0,confirmedReceipts:0,pendingRows:0,pendingSavedRows:0});
+ const assertCurrent=()=>{assertSession();if(!receiverDocumentLive||extensionOwnerBinding()!==binding)throw Error('OWNER');};
+ const result=(progress,readState)=>({progress,readState,assertCurrent});
  try{
   if(!receiverDocumentLive)throw Error('DOCUMENT');
   binding=extensionOwnerBinding();assertSession=captureReceiverSession(cloud);
-  const current=await readExtensionState();assertSession();if(!receiverDocumentLive||extensionOwnerBinding()!==binding)throw Error('OWNER');
+  assertCurrent();stage='read-incomplete';
+  const current=await readExtensionState();assertCurrent();stage='trace-unverified';
   const p=current.device.find(d=>d.id==='device')?.n36NamesBatch,owner=store.getActiveWorkspace().authUserId;
-  if(!p||p.ownerId!==owner)return {checkpoint:'none',relation:'unresolved',confirmedRows:0,confirmedReceipts:0,pendingRows:0,pendingSavedRows:0};
+  if(!p||p.ownerId!==owner)return result({checkpoint:'none',relation:'unresolved',confirmedRows:0,confirmedReceipts:0,pendingRows:0,pendingSavedRows:0},'no-eligible-trace');
   const {previewStudentRows}=await import('../lib/student-import.js');assertSession();if(!receiverDocumentLive||extensionOwnerBinding()!==binding)throw Error('OWNER');
   const owned=(name,row)=>row.ownerId===owner||row.ownerId==null&&row.syncCreatePending&&current.outbox.some(e=>e.ownerId===owner&&e.store===name&&e.recordId===row.id&&e.op==='create'&&({students:['name'],enrollments:['studentId','sectionId','status'],sections:['yearId','grade','label']}[name]??[]).every(k=>JSON.stringify(e.localPatch?.[k])===JSON.stringify(row[k])));
   let pendingRows=0,pendingSavedRows=0;
@@ -282,14 +290,28 @@ async function readExtensionProgress(){
   const receipts=Object.values(p.receipts??{}).filter(r=>['saved','existing'].includes(r.status)&&r.remaining===0&&['total','added','existing'].every(k=>Number.isSafeInteger(r[k])&&r[k]>=0&&r[k]<=300)&&r.added+r.existing===r.total);
   let relation='same';try{persistedSelection({year:p.yearId,term:p.termId},current);}catch(error){relation=error.message==='BATCH_PERSISTED_TERM_CHANGED'?'original-term':'unresolved';}
   const bound=n=>Math.min(30000,Math.max(0,Math.trunc(n)));
-  return {checkpoint:p.pending?(pendingSavedRows?'rows-before-receipt':'pending'):'receipts',relation,confirmedRows:bound(receipts.reduce((n,r)=>n+r.total,0)),confirmedReceipts:bound(receipts.length),pendingRows:bound(pendingRows),pendingSavedRows:bound(pendingSavedRows)};
- }catch{return {checkpoint:'unresolved',relation:'unresolved',confirmedRows:0,confirmedReceipts:0,pendingRows:0,pendingSavedRows:0};}
+  assertCurrent();
+  return result({checkpoint:p.pending?(pendingSavedRows?'rows-before-receipt':'pending'):'receipts',relation,confirmedRows:bound(receipts.reduce((n,r)=>n+r.total,0)),confirmedReceipts:bound(receipts.length),pendingRows:bound(pendingRows),pendingSavedRows:bound(pendingSavedRows)},'verified-trace');
+ }catch{
+  // Context loss wins over a storage/integrity failure; never paint old counts.
+  try{assertCurrent();}catch{stage='context-unverified';}
+  return result(unresolved(),stage);
+ }
 }
 async function resumeSavedExtensionBatch(){
  if(automaticWriting||extensionBusy)return;
- const progress=await readExtensionProgress();
- extensionMessage=progress.checkpoint==='none'||progress.checkpoint==='unresolved'?'لا يوجد أثر محلي موثوق يثبت الحفظ؛ نتيجة الإضافة ما زالت غير محسومة. لم تُعد كتابة أي صف.':
-  `إيصالات محلية مؤكدة: ${progress.confirmedReceipts} (${progress.confirmedRows} صفًا). من الصفوف المعلقة يوجد حاليًا ${progress.pendingSavedRows} من ${progress.pendingRows} في الكشف المحلي. نتيجة الإضافة غير المحسومة لم تتغير؛ لم تُعد كتابة أي صف.`+(progress.relation==='original-term'?' اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.':'');
+ const result=await readExtensionProgressResult(),progress=result.progress;
+ let readState=result.readState;
+ try{result.assertCurrent();}catch{readState='context-unverified';}
+ const messages={
+  'no-eligible-trace':'اكتملت القراءة المحلية لهذا الحساب ولم تجد أثرًا مؤهلًا لعرض التقدم. هذا لا يعني أن عدد الصفوف المستوردة صفر، ولا يثبت حفظ الدفعة السابقة أو فشلها.',
+  'context-unverified':'تعذّر التحقق من سياق الحساب أو الجلسة أو صلاحية هذه الصفحة؛ لا يمكن عرض تقدم محلي موثوق. تحقق من الحساب والجلسة ثم استخدم القراءة المحلية.',
+  'read-incomplete':'لم تكتمل قراءة التخزين المحلي؛ لا يمكن الاستنتاج أن الأثر أو البيانات غير موجودة. يمكنك إعادة القراءة المحلية فقط.',
+  'trace-unverified':'تعذّر التحقق من الأثر المحلي؛ لا يمكن عرض أعداد موثوقة منه. نتيجة الدفعة السابقة ما زالت غير محسومة.'
+ };
+ extensionMessage=(messages[readState]??
+  `إيصالات محلية مؤكدة: ${progress.confirmedReceipts} (${progress.confirmedRows} صفًا). من الصفوف المعلقة يوجد حاليًا ${progress.pendingSavedRows} من ${progress.pendingRows} في الكشف المحلي.`+(progress.relation==='original-term'?' اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.':''))+
+  ' نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.';
  repaint();
 }
 window.addEventListener('pagehide',()=>{receiverDocumentLive=false;if(automaticBatch)automaticBatch.retired=true;});

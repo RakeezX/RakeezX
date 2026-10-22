@@ -1,0 +1,80 @@
+{
+  "taskId": "continuous-n36-local-readback-distinction-20261023",
+  "runId": "d18bc10f-300d-4f34-bf63-1cdbd2e18e59",
+  "baseSha": "2e43dc14161c6a27af7c30fc6bf29f39fd2a0bc4",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "absent",
+      "text": "لا يوجد أثر محلي موثوق يثبت الحفظ؛ نتيجة الإضافة ما زالت غير محسومة. لم تُعد كتابة أي صف.",
+      "progress": {
+        "checkpoint": "none",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "abort",
+      "text": "لا يوجد أثر محلي موثوق يثبت الحفظ؛ نتيجة الإضافة ما زالت غير محسومة. لم تُعد كتابة أي صف.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "context-before",
+      "text": "لا يوجد أثر محلي موثوق يثبت الحفظ؛ نتيجة الإضافة ما زالت غير محسومة. لم تُعد كتابة أي صف.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 0
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    }
+  ],
+  "unchanged": {
+    "src/lib/n36-extension-handoff.js": "d95275279d4e549ce3911ea17e404fc35c5cf417c623f7f4d5f9d46625d24ed4",
+    "src/lib/n36-extension-protocol.js": "1e3745a9890b6d75f9bb6cd6a9e5e0eb950ebd9164c6edce648abbf2ce244d50",
+    "assets/extensions/rakeez-teacher-import-helper-0.5.37.zip": "bed6dd617411021018d4a81c3c00ec3e33e37289c082e0ddfbb1ef32e3890c4c",
+    "assets/extensions/rakeez-teacher-import-helper-0.5.37.manifest.json": "dec2d2f368cf6314b18609e3494708759348493aee63f54b3787c5ba24d61938"
+  },
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "browserClosedByOwnedHelper": true,
+    "origin": "http://127.0.0.1:49943"
+  }
+}

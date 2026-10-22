@@ -1,0 +1,135 @@
+{
+  "taskId": "continuous-n36-local-readback-distinction-20261023",
+  "runId": "d18bc10f-300d-4f34-bf63-1cdbd2e18e59",
+  "baseSha": "2e43dc14161c6a27af7c30fc6bf29f39fd2a0bc4",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "absent",
+      "text": "اكتملت القراءة المحلية لهذا الحساب ولم تجد أثرًا مؤهلًا لعرض التقدم. هذا لا يعني أن عدد الصفوف المستوردة صفر، ولا يثبت حفظ الدفعة السابقة أو فشلها. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "none",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "foreign",
+      "text": "اكتملت القراءة المحلية لهذا الحساب ولم تجد أثرًا مؤهلًا لعرض التقدم. هذا لا يعني أن عدد الصفوف المستوردة صفر، ولا يثبت حفظ الدفعة السابقة أو فشلها. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "none",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "abort",
+      "text": "لم تكتمل قراءة التخزين المحلي؛ لا يمكن الاستنتاج أن الأثر أو البيانات غير موجودة. يمكنك إعادة القراءة المحلية فقط. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "timeout",
+      "text": "لم تكتمل قراءة التخزين المحلي؛ لا يمكن الاستنتاج أن الأثر أو البيانات غير موجودة. يمكنك إعادة القراءة المحلية فقط. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "context-before",
+      "text": "تعذّر التحقق من سياق الحساب أو الجلسة أو صلاحية هذه الصفحة؛ لا يمكن عرض تقدم محلي موثوق. تحقق من الحساب والجلسة ثم استخدم القراءة المحلية. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 0
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "session-after",
+      "text": "تعذّر التحقق من سياق الحساب أو الجلسة أو صلاحية هذه الصفحة؛ لا يمكن عرض تقدم محلي موثوق. تحقق من الحساب والجلسة ثم استخدم القراءة المحلية. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "receipts",
+        "relation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    }
+  ],
+  "status": "FAIL",
+  "failure": "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-local-readback-distinction-20261023\\tests\\n36-local-readback-20261023\\readback.mjs:77:13\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-local-readback-distinction-20261023/tests/n36-local-readback-20261023/readback.mjs:24:2",
+  "resources": {
+    "serverClosed": true,
+    "browserClosedByOwnedHelper": true,
+    "origin": "http://127.0.0.1:49943"
+  }
+}

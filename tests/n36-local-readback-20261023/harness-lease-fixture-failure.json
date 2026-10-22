@@ -1,0 +1,170 @@
+{
+  "taskId": "continuous-n36-local-readback-distinction-20261023",
+  "runId": "d18bc10f-300d-4f34-bf63-1cdbd2e18e59",
+  "baseSha": "2e43dc14161c6a27af7c30fc6bf29f39fd2a0bc4",
+  "baseline": false,
+  "reusedCases": [
+    "absent",
+    "foreign",
+    "abort",
+    "timeout",
+    "context-before",
+    "session-after"
+  ],
+  "cases": [
+    {
+      "scenario": "absent",
+      "gated": false,
+      "text": "اكتملت القراءة المحلية لهذا الحساب ولم تجد أثرًا مؤهلًا لعرض التقدم. هذا لا يعني أن عدد الصفوف المستوردة صفر، ولا يثبت حفظ الدفعة السابقة أو فشلها. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "none",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "foreign",
+      "gated": false,
+      "text": "اكتملت القراءة المحلية لهذا الحساب ولم تجد أثرًا مؤهلًا لعرض التقدم. هذا لا يعني أن عدد الصفوف المستوردة صفر، ولا يثبت حفظ الدفعة السابقة أو فشلها. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "none",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "abort",
+      "gated": false,
+      "text": "لم تكتمل قراءة التخزين المحلي؛ لا يمكن الاستنتاج أن الأثر أو البيانات غير موجودة. يمكنك إعادة القراءة المحلية فقط. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "timeout",
+      "gated": false,
+      "text": "لم تكتمل قراءة التخزين المحلي؛ لا يمكن الاستنتاج أن الأثر أو البيانات غير موجودة. يمكنك إعادة القراءة المحلية فقط. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "context-before",
+      "gated": false,
+      "text": "تعذّر التحقق من سياق الحساب أو الجلسة أو صلاحية هذه الصفحة؛ لا يمكن عرض تقدم محلي موثوق. تحقق من الحساب والجلسة ثم استخدم القراءة المحلية. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 0
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "session-after",
+      "gated": false,
+      "text": "تعذّر التحقق من سياق الحساب أو الجلسة أو صلاحية هذه الصفحة؛ لا يمكن عرض تقدم محلي موثوق. تحقق من الحساب والجلسة ثم استخدم القراءة المحلية. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "progress": {
+        "checkpoint": "receipts",
+        "relation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 2
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    },
+    {
+      "scenario": "owner-after",
+      "gated": true,
+      "text": "تعذّر مطابقة الفصل مع الحساب النشط\n\nعد إلى الفصول واختر فصلًا تابعًا للحساب الحالي. إذا استمرت المشكلة بعد الاستعادة، تحقق من الحساب في الإعدادات.\n\nالعودة للفصول",
+      "progress": {
+        "checkpoint": "unresolved",
+        "relation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0
+      },
+      "counts": {
+        "writes": 0,
+        "writeTransactions": 0,
+        "messages": 0,
+        "snapshots": 1
+      },
+      "requests": 0,
+      "databaseUnchanged": true
+    }
+  ],
+  "status": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /تعذّر التحقق من سياق الحساب/. Input:\n\n'إيصالات محلية مؤكدة: 1 (2 صفًا). من الصفوف المعلقة يوجد حاليًا 0 من 0 في الكشف المحلي. نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-local-readback-distinction-20261023/tests/n36-local-readback-20261023/readback.mjs:91:236\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-local-readback-distinction-20261023/tests/n36-local-readback-20261023/readback.mjs:25:2",
+  "resources": {
+    "serverClosed": true,
+    "browserClosedByOwnedHelper": true,
+    "origin": "http://127.0.0.1:49943"
+  }
+}
