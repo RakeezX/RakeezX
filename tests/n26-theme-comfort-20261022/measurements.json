@@ -1,0 +1,843 @@
+{
+  "taskId": "continuous-n26-theme-comfort-representative-slice-20261022",
+  "runId": "e88b63d2-eac1-4429-84ef-fc613c4aabec",
+  "origin": "http://127.0.0.1:4178/",
+  "states": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "surface": "home",
+      "themeStored": "true",
+      "title": "رَكيز المعلم — إدارة الفصول والطلاب والحضور والدرجات",
+      "tokens": {
+        "page": "#f4f7f5",
+        "raised": "#ffffff",
+        "subtle": "#edf3ef",
+        "text": "#15253D",
+        "text2": "#334155",
+        "text3": "#607087",
+        "border": "#dce7e1",
+        "borderStrong": "#bfd2c8",
+        "accent": "#18A878",
+        "accentText": "#0f7655",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(244, 247, 245)",
+        "color": "rgb(21, 37, 61)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(21, 37, 61)",
+        "border": "color(srgb 0.809412 0.708549 0.594353)",
+        "borderWidth": "1px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(21, 37, 61)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "",
+          "level": "H1"
+        },
+        {
+          "text": "يحتاج انتباهك",
+          "level": "H2"
+        },
+        {
+          "text": "بقية حصص اليوم",
+          "level": "H2"
+        },
+        {
+          "text": "اختصارات",
+          "level": "H2"
+        },
+        {
+          "text": "نظرة سريعة",
+          "level": "H2"
+        }
+      ],
+      "controls": 38,
+      "scroll": {
+        "width": 390,
+        "height": 1536,
+        "viewport": "390x844"
+      },
+      "contrast": {
+        "primary": 14.27,
+        "secondary": 9.6,
+        "muted": 4.67,
+        "accentLabel": 5.2
+      },
+      "quickTheme": "switch and restore PASS",
+      "screenshot": "390-light-home.png"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "surface": "teaching",
+      "themeStored": "true",
+      "title": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+      "tokens": {
+        "page": "#f4f7f5",
+        "raised": "#ffffff",
+        "subtle": "#edf3ef",
+        "text": "#15253D",
+        "text2": "#334155",
+        "text3": "#607087",
+        "border": "#dce7e1",
+        "borderStrong": "#bfd2c8",
+        "accent": "#18A878",
+        "accentText": "#0f7655",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(244, 247, 245)",
+        "color": "rgb(21, 37, 61)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(21, 37, 61)",
+        "border": "rgb(21, 37, 61)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(21, 37, 61)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+          "level": "H1"
+        }
+      ],
+      "controls": 35,
+      "scroll": {
+        "width": 390,
+        "height": 1283,
+        "viewport": "390x844"
+      },
+      "contrast": {
+        "primary": 14.27,
+        "secondary": 9.6,
+        "muted": 4.67,
+        "accentLabel": 5.2
+      },
+      "screenshot": "390-light-teaching.png"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "surface": "settings",
+      "themeStored": "true",
+      "title": "الإعدادات",
+      "tokens": {
+        "page": "#f4f7f5",
+        "raised": "#ffffff",
+        "subtle": "#edf3ef",
+        "text": "#15253D",
+        "text2": "#334155",
+        "text3": "#607087",
+        "border": "#dce7e1",
+        "borderStrong": "#bfd2c8",
+        "accent": "#18A878",
+        "accentText": "#0f7655",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(244, 247, 245)",
+        "color": "rgb(21, 37, 61)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(21, 37, 61)",
+        "border": "rgb(21, 37, 61)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(21, 37, 61)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "الإعدادات",
+          "level": "H1"
+        },
+        {
+          "text": "المظهر والتفاعل",
+          "level": "H2"
+        },
+        {
+          "text": "البيانات والمساعدة",
+          "level": "H2"
+        },
+        {
+          "text": "على جهازك",
+          "level": "H2"
+        }
+      ],
+      "controls": 34,
+      "scroll": {
+        "width": 390,
+        "height": 2313,
+        "viewport": "390x844"
+      },
+      "contrast": {
+        "primary": 14.27,
+        "secondary": 9.6,
+        "muted": 4.67,
+        "accentLabel": 5.2
+      },
+      "screenshot": "390-light-settings.png"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "dark",
+      "surface": "home",
+      "themeStored": "true",
+      "title": "رَكيز المعلم — إدارة الفصول والطلاب والحضور والدرجات",
+      "tokens": {
+        "page": "#0d1511",
+        "raised": "#14201a",
+        "subtle": "#0a100d",
+        "text": "#eef1f5",
+        "text2": "#a3adba",
+        "text3": "#94a3b8",
+        "border": "#26372e",
+        "borderStrong": "#3c5247",
+        "accent": "#18A878",
+        "accentText": "#5eead4",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(13, 21, 17)",
+        "color": "rgb(238, 241, 245)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(238, 241, 245)",
+        "border": "color(srgb 0.43302 0.39702 0.167059)",
+        "borderWidth": "1px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(238, 241, 245)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "",
+          "level": "H1"
+        },
+        {
+          "text": "يحتاج انتباهك",
+          "level": "H2"
+        },
+        {
+          "text": "بقية حصص اليوم",
+          "level": "H2"
+        },
+        {
+          "text": "اختصارات",
+          "level": "H2"
+        },
+        {
+          "text": "نظرة سريعة",
+          "level": "H2"
+        }
+      ],
+      "controls": 38,
+      "scroll": {
+        "width": 390,
+        "height": 1536,
+        "viewport": "390x844"
+      },
+      "contrast": {
+        "primary": 16.37,
+        "secondary": 8.16,
+        "muted": 7.23,
+        "accentLabel": 12.54
+      },
+      "quickTheme": "switch and restore PASS",
+      "screenshot": "390-dark-home.png"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "dark",
+      "surface": "teaching",
+      "themeStored": "true",
+      "title": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+      "tokens": {
+        "page": "#0d1511",
+        "raised": "#14201a",
+        "subtle": "#0a100d",
+        "text": "#eef1f5",
+        "text2": "#a3adba",
+        "text3": "#94a3b8",
+        "border": "#26372e",
+        "borderStrong": "#3c5247",
+        "accent": "#18A878",
+        "accentText": "#5eead4",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(13, 21, 17)",
+        "color": "rgb(238, 241, 245)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(238, 241, 245)",
+        "border": "rgb(238, 241, 245)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(238, 241, 245)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+          "level": "H1"
+        }
+      ],
+      "controls": 35,
+      "scroll": {
+        "width": 390,
+        "height": 1283,
+        "viewport": "390x844"
+      },
+      "contrast": {
+        "primary": 16.37,
+        "secondary": 8.16,
+        "muted": 7.23,
+        "accentLabel": 12.54
+      },
+      "screenshot": "390-dark-teaching.png"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "dark",
+      "surface": "settings",
+      "themeStored": "true",
+      "title": "الإعدادات",
+      "tokens": {
+        "page": "#0d1511",
+        "raised": "#14201a",
+        "subtle": "#0a100d",
+        "text": "#eef1f5",
+        "text2": "#a3adba",
+        "text3": "#94a3b8",
+        "border": "#26372e",
+        "borderStrong": "#3c5247",
+        "accent": "#18A878",
+        "accentText": "#5eead4",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(13, 21, 17)",
+        "color": "rgb(238, 241, 245)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(238, 241, 245)",
+        "border": "rgb(238, 241, 245)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(238, 241, 245)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "الإعدادات",
+          "level": "H1"
+        },
+        {
+          "text": "المظهر والتفاعل",
+          "level": "H2"
+        },
+        {
+          "text": "البيانات والمساعدة",
+          "level": "H2"
+        },
+        {
+          "text": "على جهازك",
+          "level": "H2"
+        }
+      ],
+      "controls": 34,
+      "scroll": {
+        "width": 390,
+        "height": 2313,
+        "viewport": "390x844"
+      },
+      "contrast": {
+        "primary": 16.37,
+        "secondary": 8.16,
+        "muted": 7.23,
+        "accentLabel": 12.54
+      },
+      "screenshot": "390-dark-settings.png"
+    },
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 768
+      },
+      "theme": "light",
+      "surface": "home",
+      "themeStored": "true",
+      "title": "الرئيسية",
+      "tokens": {
+        "page": "#f4f7f5",
+        "raised": "#ffffff",
+        "subtle": "#edf3ef",
+        "text": "#15253D",
+        "text2": "#334155",
+        "text3": "#607087",
+        "border": "#dce7e1",
+        "borderStrong": "#bfd2c8",
+        "accent": "#18A878",
+        "accentText": "#0f7655",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(244, 247, 245)",
+        "color": "rgb(21, 37, 61)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(21, 37, 61)",
+        "border": "color(srgb 0.809412 0.708549 0.594353)",
+        "borderWidth": "1px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(21, 37, 61)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "الرئيسية",
+          "level": "H1"
+        },
+        {
+          "text": "يحتاج انتباهك",
+          "level": "H2"
+        },
+        {
+          "text": "بقية حصص اليوم",
+          "level": "H2"
+        },
+        {
+          "text": "اختصارات",
+          "level": "H2"
+        },
+        {
+          "text": "نظرة سريعة",
+          "level": "H2"
+        }
+      ],
+      "controls": 38,
+      "scroll": {
+        "width": 1365,
+        "height": 1113,
+        "viewport": "1365x768"
+      },
+      "contrast": {
+        "primary": 14.27,
+        "secondary": 9.6,
+        "muted": 4.67,
+        "accentLabel": 5.2
+      },
+      "quickTheme": "switch and restore PASS",
+      "screenshot": "1365-light-home.png"
+    },
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 768
+      },
+      "theme": "light",
+      "surface": "teaching",
+      "themeStored": "true",
+      "title": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+      "tokens": {
+        "page": "#f4f7f5",
+        "raised": "#ffffff",
+        "subtle": "#edf3ef",
+        "text": "#15253D",
+        "text2": "#334155",
+        "text3": "#607087",
+        "border": "#dce7e1",
+        "borderStrong": "#bfd2c8",
+        "accent": "#18A878",
+        "accentText": "#0f7655",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(244, 247, 245)",
+        "color": "rgb(21, 37, 61)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(21, 37, 61)",
+        "border": "rgb(21, 37, 61)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(21, 37, 61)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+          "level": "H1"
+        }
+      ],
+      "controls": 35,
+      "scroll": {
+        "width": 1365,
+        "height": 1075,
+        "viewport": "1365x768"
+      },
+      "contrast": {
+        "primary": 14.27,
+        "secondary": 9.6,
+        "muted": 4.67,
+        "accentLabel": 5.2
+      },
+      "screenshot": "1365-light-teaching.png"
+    },
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 768
+      },
+      "theme": "light",
+      "surface": "settings",
+      "themeStored": "true",
+      "title": "الإعدادات",
+      "tokens": {
+        "page": "#f4f7f5",
+        "raised": "#ffffff",
+        "subtle": "#edf3ef",
+        "text": "#15253D",
+        "text2": "#334155",
+        "text3": "#607087",
+        "border": "#dce7e1",
+        "borderStrong": "#bfd2c8",
+        "accent": "#18A878",
+        "accentText": "#0f7655",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(244, 247, 245)",
+        "color": "rgb(21, 37, 61)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(21, 37, 61)",
+        "border": "rgb(21, 37, 61)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(21, 37, 61)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "الإعدادات",
+          "level": "H1"
+        },
+        {
+          "text": "المظهر والتفاعل",
+          "level": "H2"
+        },
+        {
+          "text": "البيانات والمساعدة",
+          "level": "H2"
+        },
+        {
+          "text": "على جهازك",
+          "level": "H2"
+        }
+      ],
+      "controls": 34,
+      "scroll": {
+        "width": 1365,
+        "height": 1390,
+        "viewport": "1365x768"
+      },
+      "contrast": {
+        "primary": 14.27,
+        "secondary": 9.6,
+        "muted": 4.67,
+        "accentLabel": 5.2
+      },
+      "screenshot": "1365-light-settings.png"
+    },
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 768
+      },
+      "theme": "dark",
+      "surface": "home",
+      "themeStored": "true",
+      "title": "الرئيسية",
+      "tokens": {
+        "page": "#0d1511",
+        "raised": "#14201a",
+        "subtle": "#0a100d",
+        "text": "#eef1f5",
+        "text2": "#a3adba",
+        "text3": "#94a3b8",
+        "border": "#26372e",
+        "borderStrong": "#3c5247",
+        "accent": "#18A878",
+        "accentText": "#5eead4",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(13, 21, 17)",
+        "color": "rgb(238, 241, 245)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(238, 241, 245)",
+        "border": "color(srgb 0.43302 0.39702 0.167059)",
+        "borderWidth": "1px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(238, 241, 245)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "الرئيسية",
+          "level": "H1"
+        },
+        {
+          "text": "يحتاج انتباهك",
+          "level": "H2"
+        },
+        {
+          "text": "بقية حصص اليوم",
+          "level": "H2"
+        },
+        {
+          "text": "اختصارات",
+          "level": "H2"
+        },
+        {
+          "text": "نظرة سريعة",
+          "level": "H2"
+        }
+      ],
+      "controls": 38,
+      "scroll": {
+        "width": 1365,
+        "height": 1113,
+        "viewport": "1365x768"
+      },
+      "contrast": {
+        "primary": 16.37,
+        "secondary": 8.16,
+        "muted": 7.23,
+        "accentLabel": 12.54
+      },
+      "quickTheme": "switch and restore PASS",
+      "screenshot": "1365-dark-home.png"
+    },
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 768
+      },
+      "theme": "dark",
+      "surface": "teaching",
+      "themeStored": "true",
+      "title": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+      "tokens": {
+        "page": "#0d1511",
+        "raised": "#14201a",
+        "subtle": "#0a100d",
+        "text": "#eef1f5",
+        "text2": "#a3adba",
+        "text3": "#94a3b8",
+        "border": "#26372e",
+        "borderStrong": "#3c5247",
+        "accent": "#18A878",
+        "accentText": "#5eead4",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(13, 21, 17)",
+        "color": "rgb(238, 241, 245)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(238, 241, 245)",
+        "border": "rgb(238, 241, 245)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(238, 241, 245)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "\n        السادس الابتدائي / 2المهارات الرقمية\n      ",
+          "level": "H1"
+        }
+      ],
+      "controls": 35,
+      "scroll": {
+        "width": 1365,
+        "height": 1075,
+        "viewport": "1365x768"
+      },
+      "contrast": {
+        "primary": 16.37,
+        "secondary": 8.16,
+        "muted": 7.23,
+        "accentLabel": 12.54
+      },
+      "screenshot": "1365-dark-teaching.png"
+    },
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 768
+      },
+      "theme": "dark",
+      "surface": "settings",
+      "themeStored": "true",
+      "title": "الإعدادات",
+      "tokens": {
+        "page": "#0d1511",
+        "raised": "#14201a",
+        "subtle": "#0a100d",
+        "text": "#eef1f5",
+        "text2": "#a3adba",
+        "text3": "#94a3b8",
+        "border": "#26372e",
+        "borderStrong": "#3c5247",
+        "accent": "#18A878",
+        "accentText": "#5eead4",
+        "focusRing": "color-mix(in srgb, #18A878 34%, transparent)"
+      },
+      "body": {
+        "background": "rgb(13, 21, 17)",
+        "color": "rgb(238, 241, 245)"
+      },
+      "card": {
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(238, 241, 245)",
+        "border": "rgb(238, 241, 245)",
+        "borderWidth": "0px"
+      },
+      "focus": {
+        "tag": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(238, 241, 245)",
+        "boxShadow": "color(srgb 0.0941176 0.658824 0.470588 / 0.34) 0px 0px 0px 4px",
+        "focusVisible": true
+      },
+      "headings": [
+        {
+          "text": "الإعدادات",
+          "level": "H1"
+        },
+        {
+          "text": "المظهر والتفاعل",
+          "level": "H2"
+        },
+        {
+          "text": "البيانات والمساعدة",
+          "level": "H2"
+        },
+        {
+          "text": "على جهازك",
+          "level": "H2"
+        }
+      ],
+      "controls": 34,
+      "scroll": {
+        "width": 1365,
+        "height": 1390,
+        "viewport": "1365x768"
+      },
+      "contrast": {
+        "primary": 16.37,
+        "secondary": 8.16,
+        "muted": 7.23,
+        "accentLabel": 12.54
+      },
+      "screenshot": "1365-dark-settings.png"
+    }
+  ]
+}
