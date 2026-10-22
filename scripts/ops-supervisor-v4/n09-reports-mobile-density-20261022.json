@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "id": "continuous-n09-reports-mobile-density-20261022",
+      "productId": "N09",
+      "priority": 10,
+      "scopeKey": "n09-reports-mobile-density",
+      "dependsOn": [],
+      "riskClass": "LOW",
+      "validationTier": "STANDARD",
+      "objective": "Latest PO 22 October authorizes prioritizing and completing open and deferred work; activate ONLY this bounded N09 slice while N36/N88 await their separate real evidence. Improve actual reports-index and cross-class reports mobile usability, using existing Rakeez components and fabricated data in isolated loopback contexts at 360 and 390 CSS px with one desktop comparison. Start from current files and reuse the accepted N70 report/print/filter evidence. Inspect for new concrete overflow, clipped controls, unusable touch/focus or needless stacked spacing on these two views; repair only observed problems with scoped styles/minimal markup. Preserve Arabic RTL, all report actions, print/CSV semantics, filtering, teacher data/owner context and desktop appearance. Do not redesign the app, palette or navigation, reopen CLOSED N70, or alter report computation, student data, Sync, database or date contracts. No personal browser, real login or portal. If the slice is already sound, return NO_CHANGE with scoped visual evidence; do not manufacture a defect or claim all N09/mobile/Safari complete. If changed, record actual rendered before/after, run only affected checks and let sole publisher deliver. No broad audit worker, cloned design or unrelated testing.",
+      "allowedPaths": [
+        "src/views/reports-index.js",
+        "src/views/cross-class-reports.js",
+        "src/styles/work-n70.css",
+        "tests/n09-reports-mobile-20261022/**",
+        "docs/automation-evidence/20261022/N09_REPORTS_MOBILE_SLICE.md"
+      ],
+      "verificationPaths": [
+        "src/views/reports-index.js",
+        "src/views/cross-class-reports.js",
+        "src/styles/work-n70.css"
+      ],
+      "requiredChecks": [
+        "n09_reports_actual_mobile_render_and_focus",
+        "n09_reports_no_overflow_or_hidden_actions",
+        "n09_unchanged_data_and_print_contract"
+      ],
+      "acceptance": [
+        "Two scoped report views usable at 360/390 px without new overflow or inaccessible actions.",
+        "Report data/print/filter semantics and accepted N70 behavior preserved.",
+        "Actual affected rendered proof, truthful NO_CHANGE or scoped verified delivery; no whole-app or real-iPhone claim."
+      ],
+      "releaseAuthority": "PO 2026-10-22 explicitly authorizes faster completion of deferred tickets; this activates N09 scoped routine mobile presentation through the original controller/publisher, not a full redesign or live-data mutation.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "1552d1cc40473bf99b44e98d2fe779ea034a8f62",
+        "requiredSourcePaths": [
+          "src/views/reports-index.js",
+          "src/views/cross-class-reports.js",
+          "src/styles/work-n70.css"
+        ],
+        "editPaths": [
+          "src/views/reports-index.js",
+          "src/views/cross-class-reports.js",
+          "src/styles/work-n70.css",
+          "tests/n09-reports-mobile-20261022/layout.mjs",
+          "docs/automation-evidence/20261022/N09_REPORTS_MOBILE_SLICE.md"
+        ],
+        "newPaths": [
+          "tests/n09-reports-mobile-20261022/layout.mjs",
+          "docs/automation-evidence/20261022/N09_REPORTS_MOBILE_SLICE.md"
+        ],
+        "workerChecks": [
+          "n09_reports_actual_mobile_render_and_focus",
+          "n09_reports_no_overflow_or_hidden_actions",
+          "n09_unchanged_data_and_print_contract"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

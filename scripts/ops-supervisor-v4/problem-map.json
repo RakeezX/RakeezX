@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "authority": "po-20261022-outcome-flow",
+  "updatedAt": "2026-10-22T19:17:54.481Z",
+  "problems": [
+    {
+      "key": "n36-unresolved-batch",
+      "productId": "N36",
+      "issueNumber": 1,
+      "title": "حسم الدفعة السابقة",
+      "gate": "waiting_evidence",
+      "taskIds": [
+        "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
+        "continuous-n36-1150-ownerless-year-term-selection-20261021"
+      ],
+      "nextAction": "تفسير قراءة التقدم المحلي قبل أي استيراد جديد",
+      "evidenceNeeded": "ملخص الزر من المتصفح والحساب نفسيهما؛ لا أسماء ولا رموز"
+    },
+    {
+      "key": "n36-school-response",
+      "productId": "N36",
+      "issueNumber": 2,
+      "title": "توافق الجدول وإثبات المدرسة",
+      "gate": "waiting_evidence",
+      "taskIds": [
+        "continuous-n36-1255-visible-timetable-get-20261021",
+        "continuous-n36-school-response-contract-20261022"
+      ],
+      "currentTaskIds": [
+        "continuous-n36-school-response-contract-20261022"
+      ],
+      "nextAction": "حسم العقد من الأدلة الحالية ثم إصلاح مثبت أو تحديد الدليل الناقص؛ لا تجربة دفعة جديدة"
+    },
+    {
+      "key": "n88-student-latency",
+      "productId": "N88",
+      "issueNumber": 3,
+      "title": "سرعة بوابة الطالب",
+      "gate": "waiting_evidence",
+      "taskIds": [
+        "continuous-n88-student-read-phase-latency-20261021"
+      ],
+      "nextAction": "تفسير قياس المراحل الفعلي لطلب ناجح قبل تحسين السبب",
+      "evidenceNeeded": "نسخ تفاصيل التحقق بعد اكتمال العودة؛ لا رمز الطالب"
+    },
+    {
+      "key": "ops-card-contract",
+      "productId": "OPS",
+      "issueNumber": 4,
+      "title": "تقليل التعطيل الذاتي",
+      "gate": "ops_applied",
+      "taskIds": [],
+      "nextAction": "راقب إدخال البطاقات الجديدة ووقت الانتظار؛ فحص النطاق وملخص المشاكل مثبتان، أثر السرعة لم يقس بعد"
+    },
+    {
+      "key": "n09-mobile-reports",
+      "productId": "N09",
+      "issueNumber": null,
+      "title": "تحسين تقارير الجوال — شريحة مؤجلة مفعلة",
+      "gate": "needs_triage",
+      "taskIds": [
+        "continuous-n09-reports-mobile-density-20261022"
+      ],
+      "currentTaskIds": [
+        "continuous-n09-reports-mobile-density-20261022"
+      ],
+      "nextAction": "نتيجة مرئية لشاشتين فقط، ثم ترتيب باقي N09 حسب الدليل؛ لا إغلاق شامل جزئي"
+    }
+  ],
+  "deferredPlan": [
+    {
+      "productIds": [
+        "N26",
+        "N72"
+      ],
+      "order": 2,
+      "next": "بعد الشريحة الحالية: تحضير نطاق محدد من أدلة الواجهة؛ Safari يحتاج إثبات جهاز/محرك مناسب ولا يدّعى من Chromium"
+    },
+    {
+      "productIds": [
+        "N44",
+        "N93"
+      ],
+      "order": 3,
+      "next": "أهلية إعادة الفرز وفق التفويض الجديد؛ يظل الإرسال الحقيقي وعقد الدرجات والدليل الناقص شروطًا محددة لا تفويضًا عامًا"
+    },
+    {
+      "productIds": [
+        "N78",
+        "N32",
+        "N35"
+      ],
+      "order": 4,
+      "next": "نسخ محدودة وفق المنتج والصلاحيات: لوحة قراءة فقط/هوية الطالب/المرفقات؛ لا تفعيل وصول أو استعادة أو تكلفة تخزين تلقائيًا"
+    },
+    {
+      "productIds": [
+        "N18"
+      ],
+      "order": 5,
+      "next": "صيانة التخزين آخرًا؛ لا حذف أو نقل مشروع لمجرد تنظيف القائمة"
+    }
+  ]
+}

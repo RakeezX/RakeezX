@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "id": "continuous-n36-school-response-contract-20261022",
+      "productId": "N36",
+      "priority": -3530,
+      "scopeKey": "n36-school-response-contract",
+      "dependsOn": [
+        "continuous-n36-1255-visible-timetable-get-20261021"
+      ],
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "githubIssue": 2,
+      "objective": "PO 22 October requests execution of the reviewed improvement plan. Resolve exactly GitHub issue 2: whether the .37 timetable-response explicit matching school-name gate rejects a supported correctly source-bound response. Read the current N36 decision and ONLY existing permitted source-structure evidence, source-adapter, selection and background-runner plus .37 immutable tests. The actual unsafe-anchor subtype remains unknown and .35 receipt must not be read, written, cleared, acknowledged or replayed. Establish a short trust table: source document/teacher/observed same-origin exact GET/SchoolId binding, response-school absent, matching, conflicting and context drift. Do not remove a guard merely because a synthetic response omits the field. If retained observed source evidence and the existing contract prove independent school identity sufficient, implement the smallest safe correction, retain explicit conflict/foreign-owner/session/document/batch denials and optional-field partial reporting, use one focused regression fixture and reuse unchanged .37 proof. If evidence cannot establish the decision, return BLOCKED with the exact missing non-personal structural fact; no guessed version, extra paid reviewer, real portal read or user retry. Code/ZIP version change only after a proven defect, not for diagnosis alone. If implementing, use the existing package script and sole publisher; byte parity is publisher evidence, not worker LOCAL_READY. Do not alter .36 selection/term semantics, Auth/RLS/schema/scoring, permission/CSP/origin policy or consume any real-data allowance. Keep the source contract conclusion separate from actual user acceptance. Record the issue and meaningful result; no whole N36 closure.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "tests/n36-school-proof-20261022/**",
+        "docs/automation-evidence/20261022/N36_SCHOOL_RESPONSE_CONTRACT.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "extensions/rakeez-teacher-import-helper/background-runner.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_school_response_contract_source_evidence",
+        "n36_school_response_positive_and_conflict_boundaries",
+        "n36_unknown_receipt_and_existing_identity_preserved"
+      ],
+      "postDeliveryChecks": [
+        "n36_school_contract_exact_published_package_if_changed"
+      ],
+      "acceptance": [
+        "A source-grounded trust decision or one explicit missing evidence condition, not a new synthetic-only claim about the live portal.",
+        "Any correction preserves all actual source/owner/receipt denials and is delivered through the existing publisher; .35 batch is never replayed.",
+        "Existing 303 and 300+3 proofs are reused where unchanged; no account trial or Product acceptance is invented."
+      ],
+      "preparationAuthority": {
+        "kind": "po-20261022-outcome-flow",
+        "publication": "conditional-on-source-grounded-defect-and-affected-proof",
+        "realSchoolRead": false,
+        "realAccountMutations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "PO 2026-10-22 explicitly authorized implementing the reviewed N36 issue and routine scoped fixes through the existing controller/publisher. No school/browser/account access or weaker isolation is authorized.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "1552d1cc40473bf99b44e98d2fe779ea034a8f62",
+        "requiredSourcePaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "extensions/rakeez-teacher-import-helper/selection.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "tests/n36-1255-visible-timetable-get-20261021/runtime.mjs"
+        ],
+        "editPaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "src/views/class-import-center.js",
+          "tests/n36-school-proof-20261022/contract.mjs",
+          "docs/automation-evidence/20261022/N36_SCHOOL_RESPONSE_CONTRACT.md"
+        ],
+        "newPaths": [
+          "tests/n36-school-proof-20261022/contract.mjs",
+          "docs/automation-evidence/20261022/N36_SCHOOL_RESPONSE_CONTRACT.md"
+        ],
+        "workerChecks": [
+          "n36_school_response_contract_source_evidence",
+          "n36_school_response_positive_and_conflict_boundaries",
+          "n36_unknown_receipt_and_existing_identity_preserved"
+        ],
+        "publisherChecks": [
+          "n36_school_contract_exact_published_package_if_changed"
+        ]
+      }
+    }
+  ]
+}

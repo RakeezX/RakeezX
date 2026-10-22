@@ -5,6 +5,8 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID, createHash } from 'node:crypto';
 import { readApprovedNotes } from './approved-notes.mjs';
+import { inspectCardReadiness } from './card-readiness.mjs';
+import { readProblemSummary } from './problem-summary.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { verifiedLiveServicePublication } from './live-service-publication.mjs';
 
@@ -550,6 +552,8 @@ export class Controller {
       }
       const eligibility = await this.eligibility(card);
       if (!eligibility.eligible) { this.issues.push({ code: 'PRODUCT_INELIGIBLE', taskId: card.id, reason: eligibility.reason }); continue; }
+      const readiness = await inspectCardReadiness(card, this.repo);
+      if (!readiness.passed) { this.issues.push({ code: 'CARD_READINESS_FAILED', taskId: card.id, findings: readiness.errors }); continue; }
       const file = path.join(this.runtime, 'queue', card.id + '.json');
       // An adopted activation never overwrites a card from an earlier activation.
       if (await exists(file)) { this.issues.push({ code: 'CARD_ID_ALREADY_EXISTS', taskId: card.id }); continue; }
@@ -1121,7 +1125,8 @@ export class Controller {
   async snapshot(paused, inventoryKnown = true) {
     const active = this.jobs.filter(t => ['running', 'delivery'].includes(t.status));
     const health = summarizeQueueHealth(this.jobs, this.noteCache?.openProducts, this.now());
-    await this.persistSnapshot({ version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId,
+    const problemSummary = await readProblemSummary(this.repo, this.jobs, this.now());
+    await this.persistSnapshot({ version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId, problemSummary,
       activationId: this.config.controller.activationId, controllerAlive: true, processInventoryKnown: inventoryKnown, paused,
       supportedMaxWorkers: 5, maxWorkers: Number(this.config.maxWorkers), runningCount: this.jobs.filter(t => t.status === 'running').length,
       blockedCount: health.blockedAttempts, historicalBlockedCount: health.historicalBlockedAttempts, actionableBlockedCount: health.actionableBlockedAttempts, actionableBlockedProductCount: health.actionableBlockedProductCount, actionableBlockedByProduct: health.actionableBlockedByProduct, verifiedPublicationReceipts: health.verifiedPublicationReceipts, verifiedPublishedProductCount: health.verifiedPublishedProductCount, medianMinutesFromCardToVerifiedPublication: health.medianMinutesFromCardToVerifiedPublication, lastVerifiedDeliveryAt: health.lastVerifiedDeliveryAt, awaitingPOProductCount: new Set(this.jobs.filter(t => t.status === 'awaiting_po').map(t => t.productId)).size, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
