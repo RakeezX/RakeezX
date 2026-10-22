@@ -8,6 +8,56 @@ const locale = { ...Arabic, firstDayOfWeek: 0, amPM: ['صباحًا', 'مساء�
 const selector = 'input[data-rakeez-datetime]';
 const instances = new Map();
 
+// The sheet follows visualViewport; flatpickr's default placement measures
+// innerHeight. Keep a clipped sheet popup in the same visible region.
+function installSheetPickerViewport(instance) {
+  const popup = instance.calendarContainer;
+  const viewport = window.visualViewport;
+  let frame;
+  const reset = () => popup.classList.remove('rakeez-datetime-viewport');
+  const schedule = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      reset();
+      if (!instance.isOpen) return;
+      const sheet = instance.input.closest('.sheet');
+      const height = viewport?.height ?? innerHeight;
+      if (!sheet || Math.abs((viewport?.scale ?? 1) - 1) >= .01) return;
+      instance._positionCalendar();
+      const top = viewport?.offsetTop ?? 0;
+      const bottom = top + height - 8;
+      const natural = popup.getBoundingClientRect();
+      if (natural.top >= top + 8 && natural.bottom <= bottom &&
+          natural.left >= 8 && natural.right <= innerWidth - 8) return;
+      const header = sheet.querySelector('.sheet__head')?.getBoundingClientRect();
+      // Leave the existing sheet close control available to dismiss the popup.
+      const floor = header && header.top >= top && bottom - header.bottom >= 88
+        ? header.bottom + 8 : top + 8;
+      popup.style.setProperty('--rakeez-picker-max-height', `${Math.max(0, bottom - floor)}px`);
+      popup.classList.add('rakeez-datetime-viewport');
+      const rect = popup.getBoundingClientRect();
+      const field = instance.input.getBoundingClientRect();
+      const left = Math.max(8, Math.min(field.right - rect.width, innerWidth - rect.width - 8));
+      const y = Math.max(floor, Math.min(field.bottom + 4, bottom - rect.height));
+      popup.style.setProperty('--rakeez-picker-left', `${left}px`);
+      popup.style.setProperty('--rakeez-picker-top', `${y}px`);
+    });
+  };
+  viewport?.addEventListener('resize', schedule);
+  viewport?.addEventListener('scroll', schedule);
+  window.addEventListener('resize', schedule);
+  return {
+    schedule,
+    close() { cancelAnimationFrame(frame); reset(); },
+    destroy() {
+      cancelAnimationFrame(frame);
+      viewport?.removeEventListener('resize', schedule);
+      viewport?.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    },
+  };
+}
+
 function useAsciiPickerNumerals(element) {
   element.lang = 'en';
   element.dir = 'ltr';
@@ -95,6 +145,7 @@ export function mountDateTimeControl(input) {
     minTime: kind === 'time' && declaredMin ? declaredMin : undefined,
     maxTime: kind === 'time' && declaredMax ? declaredMax : undefined,
     onReady: (_, __, instance) => {
+      instance.rakeezViewport = installSheetPickerViewport(instance);
       instance.calendarContainer.dir = 'rtl';
       instance.calendarContainer.lang = 'ar';
       // Native number controls may paint Arabic-Indic glyphs for an Arabic
@@ -116,6 +167,7 @@ export function mountDateTimeControl(input) {
     },
     onDayCreate: (_, __, ___, day) => useAsciiPickerNumerals(day),
     onOpen: (_, __, instance) => {
+      instance.rakeezViewport.schedule();
       if (kind !== 'date') return;
       const next = dateControlBounds(scope, declaredMin, declaredMax);
       if (next.min !== bounds.min || next.max !== bounds.max) {
@@ -130,6 +182,8 @@ export function mountDateTimeControl(input) {
       if (kind === 'date') syncVisibleYears(instance, bounds);
     },
     onChange: () => validate(),
+    onClose: (_, __, instance) => instance.rakeezViewport.close(),
+    onDestroy: (_, __, instance) => instance.rakeezViewport.destroy(),
   });
   input.value = current;
   validate();

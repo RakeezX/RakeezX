@@ -1,0 +1,117 @@
+{
+  "runId": "4b84a7a9-2061-4f62-a0ac-f7750224ee76",
+  "engine": "webkit",
+  "stageOutcome": "ready",
+  "snapshot": {
+    "timeOrigin": 1792704316104,
+    "navigationEntries": 1,
+    "ready": true,
+    "workspace": "demo",
+    "teachingCount": 8,
+    "layoutCount": 1,
+    "demoRequest": "active",
+    "stages": [
+      {
+        "stage": "registry.close",
+        "status": "begin"
+      },
+      {
+        "stage": "registry.close",
+        "status": "end"
+      },
+      {
+        "stage": "seedDemoWorkspace",
+        "status": "begin"
+      },
+      {
+        "stage": "db.writeAll",
+        "status": "begin"
+      },
+      {
+        "stage": "db.upgrade",
+        "status": "begin"
+      },
+      {
+        "stage": "db.upgrade",
+        "status": "end",
+        "stores": 33
+      },
+      {
+        "stage": "db.open",
+        "status": "end",
+        "version": 8
+      },
+      {
+        "stage": "db.transaction",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.device",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.device",
+        "status": "success",
+        "hasDevice": false
+      },
+      {
+        "stage": "db.guard.run",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.run",
+        "status": "end"
+      },
+      {
+        "stage": "db.transaction",
+        "status": "complete"
+      },
+      {
+        "stage": "db.writeAll",
+        "status": "end"
+      },
+      {
+        "stage": "seedDemoWorkspace",
+        "status": "end"
+      },
+      {
+        "stage": "store.init",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.device",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.device",
+        "status": "success",
+        "hasDevice": true
+      },
+      {
+        "stage": "db.guard.run",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.run",
+        "status": "end"
+      },
+      {
+        "stage": "store.init",
+        "status": "end"
+      }
+    ],
+    "counts": {
+      "put": 1914,
+      "putSuccess": 1914,
+      "clear": 33,
+      "clearSuccess": 33,
+      "errors": 0
+    }
+  },
+  "errors": [],
+  "failedRequests": [],
+  "viteOutput": [
+    "[console.warn] Service Worker registration blocked by Playwright",
+    "[console.warn] [rakeezx] تعذّر فحص تحديث عامل الخدمة @http://127.0.0.1:43173/src/app.js:1836:18"
+  ]
+}

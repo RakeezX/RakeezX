@@ -1,0 +1,38 @@
+{
+  "runId": "4b84a7a9-2061-4f62-a0ac-f7750224ee76",
+  "engine": "webkit",
+  "stageOutcome": "pending-boundary",
+  "snapshot": {
+    "timeOrigin": 1792704173467,
+    "navigationEntries": 1,
+    "ready": false,
+    "workspace": "demo",
+    "teachingCount": 0,
+    "layoutCount": 0,
+    "demoRequest": "preparing",
+    "stages": [
+      {
+        "stage": "registry.close",
+        "status": "begin"
+      },
+      {
+        "stage": "registry.close",
+        "status": "end"
+      },
+      {
+        "stage": "seedDemoWorkspace",
+        "status": "begin"
+      },
+      {
+        "stage": "db.writeAll",
+        "status": "begin"
+      }
+    ]
+  },
+  "errors": [],
+  "failedRequests": [],
+  "viteOutput": [
+    "Re-optimizing dependencies because vite config has changed",
+    "[optimizer] scanning dependencies..."
+  ]
+}
