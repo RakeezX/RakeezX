@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n09-report-harness-residuals-20261023",
+      "productId": "N09",
+      "activationId": "po-20261012-continuous",
+      "priority": -1090,
+      "scopeKey": "n09-report-harness-residuals",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "riskClass": "LOW",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "PO23October requests useful independent parallel work on Sol6.1 Medium Standard. Repair ONLY the two demonstrated residual harness failures from N09, not the sound reports UI or CLOSED N70. Original NO_CHANGE candidate3a10f0ae4a47d3231480bdfed70582d94ffb6835 contains actual 360/390/1280 rendered proof and CSV3/3 PASS; reuse after relevant source-hash comparison, not another browser matrix. Preserve original FAIL receipts. First test n70-cross-class reads activeTerm after clearing a synthetic account and store.init; build explicit valid current fabricated owner/year/term using existing helpers/models in your task-local fixture instead of expecting provisioning from an empty account. Second test n70-v21-print-labels imports real execution-report code with CSS unsupported by bare Node; use an existing suitable runner or narrowly test-only CSS loader, retaining the real JS/view/store and substantive assertions. Do not stub report logic or delete owner/CSV/print assertions. Consult CLOSED N70/D100 for the accepted normal top print+CSV and distinct archive behavior; replace stale literal baselines only with documented approved behavior, not simply to pass. Preserve filters, empty results, owner switch, numeric/blank values, formula protection, print confirmation and private-field exclusion. No Product source, shared helper, package, global runner, worker policy, account/browser/service or student writes. Run only affected checks; do not repeat screenshots or broad suites. If a true Product regression emerges, report its precise assertion without changing Product. Deliver reusable inert test correction with before/after evidence; source-only publication through the existing publisher, not new UI behavior or whole N09 closure. Never change old FAIL to PASS; new tests report new outcomes.",
+      "allowedPaths": [
+        "tests/n70-cross-class.test.mjs",
+        "tests/n70-v21-print-labels.test.mjs",
+        "tests/n09-report-harness-20261023/**",
+        "docs/automation-evidence/20261022/N09_REPORT_HARNESS_RESIDUALS.md"
+      ],
+      "verificationPaths": [
+        "docs/automation-evidence/20261022/N09_REPORT_HARNESS_RESIDUALS.md"
+      ],
+      "requiredChecks": [
+        "n09_retained_render_evidence_source_binding",
+        "n09_cross_class_fixture_and_owner_csv_assertions",
+        "n09_print_labels_module_loading_and_contract",
+        "n09_test_only_changes_and_historical_failures_preserved"
+      ],
+      "acceptance": [
+        "Both affected tests execute their substantive current assertions with valid synthetic setup and proper CSS module loading.",
+        "Prior UI evidence is reused with source binding; Product unchanged, N70 stays CLOSED and old failures remain.",
+        "Reusable tests/evidence delivered as source-only, not a whole-mobile acceptance claim."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-independent-n09-harness-repair",
+        "publication": true,
+        "publicationScope": "inert inactive test harness and evidence source only",
+        "realData": false,
+        "liveMutation": false,
+        "providerOperations": 0,
+        "sharedBrowserRequired": false
+      },
+      "releaseAuthority": "PO23October authorizes independent useful workers on Sol6.1 Medium Standard and routine self-imposed harness repairs. Only source-only inert test/evidence publication via the existing controller/publisher. No Product data/Auth/scoring/Sync/access change or reopening CLOSED N70.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "b76209857498396492bb38280b1fa3229d22c359",
+        "requiredSourcePaths": [
+          "tests/n70-cross-class.test.mjs",
+          "tests/n70-v21-print-labels.test.mjs",
+          "tests/helpers/synthetic-workspace.mjs",
+          "src/views/reports-index.js",
+          "src/views/cross-class-reports.js",
+          "src/views/execution-report.js"
+        ],
+        "editPaths": [
+          "tests/n70-cross-class.test.mjs",
+          "tests/n70-v21-print-labels.test.mjs",
+          "tests/n09-report-harness-20261023/run.mjs",
+          "tests/n09-report-harness-20261023/fixture.mjs",
+          "docs/automation-evidence/20261022/N09_REPORT_HARNESS_RESIDUALS.md"
+        ],
+        "newPaths": [
+          "tests/n09-report-harness-20261023/run.mjs",
+          "tests/n09-report-harness-20261023/fixture.mjs",
+          "docs/automation-evidence/20261022/N09_REPORT_HARNESS_RESIDUALS.md"
+        ],
+        "workerChecks": [
+          "n09_retained_render_evidence_source_binding",
+          "n09_cross_class_fixture_and_owner_csv_assertions",
+          "n09_print_labels_module_loading_and_contract",
+          "n09_test_only_changes_and_historical_failures_preserved"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authority": "po-20261022-outcome-flow",
-  "updatedAt": "2026-10-22T21:01:09.839Z",
+  "updatedAt": "2026-10-22T21:20:08.277Z",
   "problems": [
     {
       "key": "n36-unresolved-batch",
@@ -59,12 +59,13 @@
       "title": "تحسين تقارير الجوال — شريحة مؤجلة مفعلة",
       "gate": "needs_triage",
       "taskIds": [
-        "continuous-n09-reports-mobile-density-20261022"
+        "continuous-n09-reports-mobile-density-20261022",
+        "continuous-n09-report-harness-residuals-20261023"
       ],
       "currentTaskIds": [
-        "continuous-n09-reports-mobile-density-20261022"
+        "continuous-n09-report-harness-residuals-20261023"
       ],
-      "nextAction": "نتيجة مرئية لشاشتين فقط، ثم ترتيب باقي N09 حسب الدليل؛ لا إغلاق شامل جزئي"
+      "nextAction": "إصلاح فحصي تهيئة البيانات وتحميل CSS فقط؛ المنتج ودليل الواجهة محفوظان"
     },
     {
       "key": "n44-device-delivery",
@@ -95,7 +96,7 @@
       "currentTaskIds": [
         "continuous-n72-webkit-sheet-date-20261022"
       ],
-      "nextAction": "Same saved session: attribute the observed ready-to-placeholder route transition, correct fixture or proved in-scope route lifecycle, then finish WebKit acceptance."
+      "nextAction": "إصلاح databaseCounts غير المعرّف وتشخيص حد التهيئة، ثم WebKit؛ Sol6.1 Medium Standard"
     }
   ],
   "deferredPlan": [
