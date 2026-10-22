@@ -1,0 +1,77 @@
+{
+  "runId": "4b84a7a9-2061-4f62-a0ac-f7750224ee76",
+  "engine": "webkit",
+  "stageOutcome": "pending-boundary",
+  "snapshot": {
+    "timeOrigin": 1792704268557,
+    "navigationEntries": 1,
+    "ready": false,
+    "workspace": "demo",
+    "teachingCount": 0,
+    "layoutCount": 0,
+    "demoRequest": "preparing",
+    "stages": [
+      {
+        "stage": "registry.close",
+        "status": "begin"
+      },
+      {
+        "stage": "registry.close",
+        "status": "end"
+      },
+      {
+        "stage": "seedDemoWorkspace",
+        "status": "begin"
+      },
+      {
+        "stage": "db.writeAll",
+        "status": "begin"
+      },
+      {
+        "stage": "db.upgrade",
+        "status": "begin"
+      },
+      {
+        "stage": "db.upgrade",
+        "status": "end",
+        "stores": 33
+      },
+      {
+        "stage": "db.open",
+        "status": "end",
+        "version": 8
+      },
+      {
+        "stage": "db.transaction",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.device",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.device",
+        "status": "success",
+        "hasDevice": false
+      },
+      {
+        "stage": "db.guard.run",
+        "status": "begin"
+      },
+      {
+        "stage": "db.guard.run",
+        "status": "end"
+      }
+    ],
+    "counts": {
+      "put": 1914,
+      "putSuccess": 401,
+      "clear": 33,
+      "clearSuccess": 33,
+      "errors": 0
+    }
+  },
+  "errors": [],
+  "failedRequests": [],
+  "viteOutput": []
+}

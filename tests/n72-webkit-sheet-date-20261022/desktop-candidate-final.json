@@ -1,0 +1,107 @@
+{
+  "runId": "4b84a7a9-2061-4f62-a0ac-f7750224ee76",
+  "engine": "webkit",
+  "scenario": {
+    "name": "desktop",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    }
+  },
+  "label": "candidate-final",
+  "status": "PASS",
+  "boot": {
+    "ready": true,
+    "workspace": {
+      "id": "demo",
+      "type": "demo",
+      "authUserId": null,
+      "databaseName": "rakeezx-demo",
+      "ownershipState": "demo",
+      "syncEligible": false,
+      "broadcastChannelName": "rakeezx-data:demo"
+    },
+    "database": "rakeezx-demo",
+    "teachingCount": 8,
+    "outboxCount": 0,
+    "timeOrigin": 1792704874583,
+    "navigationEntries": 1
+  },
+  "route": {
+    "timeOrigin": 1792704874583,
+    "navigationEntries": 1,
+    "hash": "#/calendar"
+  },
+  "metrics": {
+    "viewport": {
+      "width": 1280,
+      "height": 900,
+      "top": 0
+    },
+    "picker": {
+      "left": 645,
+      "top": 464.2998962402344,
+      "right": 952.875,
+      "bottom": 762.2999267578125,
+      "width": 307.875,
+      "height": 298.0000305175781
+    },
+    "input": {
+      "left": 645,
+      "top": 416.796875,
+      "right": 896,
+      "bottom": 463.59375,
+      "width": 251,
+      "height": 46.796875
+    },
+    "sheet": {
+      "left": 360,
+      "top": 303.203125,
+      "right": 920,
+      "bottom": 596.78125,
+      "width": 560,
+      "height": 293.578125
+    },
+    "pickerReachable": true,
+    "focus": true,
+    "value": "2026-08-30",
+    "rtl": "rtl",
+    "bounds": {
+      "min": "2026-08-01",
+      "max": "2027-12-31"
+    },
+    "constrained": false,
+    "digits": true
+  },
+  "after": {
+    "ready": true,
+    "workspace": "demo",
+    "outboxCount": 0,
+    "terms": [
+      {
+        "id": "demo:term:1",
+        "updatedAt": 1788242400000,
+        "deleted": false,
+        "yearId": "demo:year:1448",
+        "name": "الفصل الدراسي الأول",
+        "index": 1,
+        "startDate": "2026-08-30",
+        "endDate": "2027-01-07",
+        "status": "active",
+        "calendarId": "demo:calendar"
+      },
+      {
+        "id": "demo:term:2",
+        "updatedAt": 1788242400000,
+        "deleted": false,
+        "yearId": "demo:year:1448",
+        "name": "الفصل الدراسي الثاني",
+        "index": 2,
+        "startDate": "2027-01-17",
+        "endDate": "2027-07-01",
+        "status": "upcoming",
+        "calendarId": "demo:calendar"
+      }
+    ]
+  }
+}

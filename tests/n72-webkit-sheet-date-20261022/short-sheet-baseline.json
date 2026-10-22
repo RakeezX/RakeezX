@@ -1,0 +1,80 @@
+{
+  "runId": "4b84a7a9-2061-4f62-a0ac-f7750224ee76",
+  "engine": "webkit",
+  "scenario": {
+    "name": "short-sheet",
+    "viewport": {
+      "width": 320,
+      "height": 420
+    },
+    "compressed": {
+      "height": 230,
+      "top": 35
+    }
+  },
+  "label": "baseline",
+  "status": "FAIL",
+  "boot": {
+    "ready": true,
+    "workspace": {
+      "id": "demo",
+      "type": "demo",
+      "authUserId": null,
+      "databaseName": "rakeezx-demo",
+      "ownershipState": "demo",
+      "syncEligible": false,
+      "broadcastChannelName": "rakeezx-data:demo"
+    },
+    "database": "rakeezx-demo",
+    "teachingCount": 8,
+    "outboxCount": 0,
+    "timeOrigin": 1792704534850,
+    "navigationEntries": 1
+  },
+  "route": {
+    "timeOrigin": 1792704534850,
+    "navigationEntries": 1,
+    "hash": "#/calendar"
+  },
+  "metrics": {
+    "viewport": {
+      "width": 320,
+      "height": 230,
+      "top": 35
+    },
+    "picker": {
+      "left": 10,
+      "top": 168.092041015625,
+      "right": 310,
+      "bottom": 466.092041015625,
+      "width": 300,
+      "height": 298
+    },
+    "input": {
+      "left": 164,
+      "top": 126.375,
+      "right": 288,
+      "bottom": 173.171875,
+      "width": 124,
+      "height": 46.796875
+    },
+    "sheet": {
+      "left": 12,
+      "top": 47,
+      "right": 308,
+      "bottom": 253,
+      "width": 296,
+      "height": 206
+    },
+    "pickerReachable": false,
+    "focus": true,
+    "value": "2026-08-30",
+    "rtl": "rtl",
+    "bounds": {
+      "min": "2026-07-31",
+      "max": "2027-12-30"
+    },
+    "digits": true
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Date picker extends outside visible viewport\n\nfalse !== true\n"
+}

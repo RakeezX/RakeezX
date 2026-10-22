@@ -25,6 +25,17 @@ input.rakeez-datetime--time {
   box-shadow: var(--shadow-3);
   z-index: 2000;
 }
+/* Only clipped sheet popups use this scroll surface. Natural placement and
+   size remain flatpickr-owned whenever the popup fits the visible viewport. */
+.flatpickr-calendar.rakeez-datetime-viewport {
+  position: fixed !important;
+  top: var(--rakeez-picker-top) !important;
+  left: var(--rakeez-picker-left) !important;
+  right: auto !important;
+  max-height: var(--rakeez-picker-max-height);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
 .flatpickr-calendar .flatpickr-months .flatpickr-month,
 .flatpickr-calendar .flatpickr-weekdays,
 .flatpickr-calendar .flatpickr-time input,
