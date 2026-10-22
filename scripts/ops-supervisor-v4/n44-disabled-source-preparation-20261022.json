@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "id": "continuous-n44-disabled-source-preparation-20261022",
+      "productId": "N44",
+      "priority": -100,
+      "scopeKey": "n44-disabled-source-preparation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "githubIssue": 5,
+      "objective": "Latest direct PO22October asks to use available workers on independent tickets, following the N88/N44 review plan. This explicitly activates ONLY local inert N44 source preparation; the old actual-device task remains blocked and its expired send/registration window is NOT resumed or renewed. Produce a qualified source repair for the specific disabled-registration obstruction if reproducible, not another general review. Use the exact recorded native44 source and public code receipts in activation/register503-composition (published source-stage019487f...), and the already retained 50-to-35-roundtrip proof. The bcf40dcf old candidate/source module alone is not the current deployed graph: preserve the single-snapshot correction and do not rebuild stale backend modules over native44. No provider read, secrets/recovery material, private configuration, live SQL, browser account, registration, permission click, send, source pin, deploy, cron or runtime flag action is allowed. Original private custodian01a14fcd-032c-7ec0-8b0c-0e0395862c61 remains the sole later live actor; this new source-only session must not acquire its private custody. Read only current N44 notes, D107, the shared review plan, the named native44 public source/receipts and exact affected code. Reproduce the actual code composition using fixed fabricated auth/context/registration inputs: valid one-device approval with all previous identities ACK-revoked versus old-ID reuse, active/uncertain/foreign identity, expired approval, mismatched device and already-consumed attempt. Distinguish a proved source defect from the unknown actual hosted disabled subcause. If historical revoked identity wrongly blocks a fresh registration on the SAME approved owner/workspace/physical device under CURRENT valid consent and unchanged total attempt budget, prepare the smallest exact native44 patch into the new INACTIVE disabled-recovery directory. Keep original native44/old receipts immutable; no live import or new sender. Prefer a reversible pinned-source patch preserving the existing one-snapshot operation and old-ID rejection; do not copy a stale whole graph. Correct only causally demonstrated source logic, with focused positive/negative cases and source fingerprints. Do not erase tombstones, permit a second active/foreign device, extend approval expiry, reset run/diagnostic/recovery/send journals, or treat unknown COMMIT as ACK. If the only cause reproduced is expired authority or a safety-valid denial, preserve the reason and return NO_CHANGE or specific BLOCKED without inventing a UI fix. A qualified inert code package plus precise later activation prerequisites may return LOCAL_READY under source-only publication; current live push remains OFF as last recorded, not freshly read. Do not claim actual registration, OS arrival, original503 attribution or N44 closure. Reuse unchanged 35-roundtrip/crypto/SQL proof; no old huge matrices, planning workers or repeated live tests.",
+      "allowedPaths": [
+        "drafts/n44-push/activation/disabled-recovery-20261022/**",
+        "tests/n44-disabled-recovery-20261022/**",
+        "docs/automation-evidence/20261022/N44_DISABLED_SOURCE_PREPARATION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/activation/disabled-recovery-20261022/README.md"
+      ],
+      "requiredChecks": [
+        "n44_source44_identity_and_disabled_branch_reproduction",
+        "n44_same_device_retired_identity_and_consumed_budget_denials",
+        "n44_inactive_candidate_preserves_source44_single_snapshot_and_no_live_operations"
+      ],
+      "acceptance": [
+        "Exact source44 reproduction identifies a source defect or an honest finite evidence limitation without a live probe.",
+        "Any inert correction preserves single-snapshot behavior, owner/device/consent/expiry/tombstone/attempt/COMMIT fences; original files and histories remain intact.",
+        "Source-only package is not service activation, real-device proof or full N44 completion; later live work still requires valid original-custodian authority."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261022-independent-local-N44-preparation",
+        "syntheticTesting": true,
+        "publication": true,
+        "publicationScope": "inert inactive draft repair package tests evidence only",
+        "realData": false,
+        "livePushActivation": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "providerOperations": 0,
+        "sharedBrowserRequired": false
+      },
+      "releaseAuthority": "Latest PO22October requests independent workers after reviewing N44. Reversible local qualification and inert source-only publication are authorized through the sole controller/publisher. This does not restart the held original-device card, renew its expired window, grant private-custodian access or authorize any hosted service/account/send/configuration operation.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "ebe6287518e6c84a19ba791a6915cd3083eb53f3",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/register503-composition/edge.mjs",
+          "drafts/n44-push/activation/register503-composition/native-source-readback.json",
+          "drafts/n44-push/activation/build-register503-composition.mjs",
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/registration.mjs",
+          "drafts/n44-push/one-device-test.mjs",
+          "tests/n44-register503-1019-composition.mjs"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/disabled-recovery-20261022/build.mjs",
+          "drafts/n44-push/activation/disabled-recovery-20261022/README.md",
+          "tests/n44-disabled-recovery-20261022/qualification.mjs",
+          "docs/automation-evidence/20261022/N44_DISABLED_SOURCE_PREPARATION.md"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/disabled-recovery-20261022/build.mjs",
+          "drafts/n44-push/activation/disabled-recovery-20261022/README.md",
+          "tests/n44-disabled-recovery-20261022/qualification.mjs",
+          "docs/automation-evidence/20261022/N44_DISABLED_SOURCE_PREPARATION.md"
+        ],
+        "workerChecks": [
+          "n44_source44_identity_and_disabled_branch_reproduction",
+          "n44_same_device_retired_identity_and_consumed_budget_denials",
+          "n44_inactive_candidate_preserves_source44_single_snapshot_and_no_live_operations"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

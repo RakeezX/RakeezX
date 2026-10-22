@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "id": "continuous-n72-webkit-sheet-date-20261022",
+      "productId": "N72",
+      "priority": 20,
+      "scopeKey": "n72-webkit-sheet-date",
+      "riskClass": "LOW",
+      "validationTier": "STANDARD",
+      "objective": "PO22October authorizes productive independent deferred slices; activate ONLY the previously unverified WebKit sheet/date-entry slice of N72, independent of N44 and N88. The canonical isolated-local-browser helper supports engine webkit and installed webkit-2336 executable was observed, so do not substitute Chromium-only evidence or install packages/browsers. Use the current app and approved shared datetime adapter with fabricated local data. Read existing N20/N38/N69/N54 affected accepted evidence only to reuse it; do not reopen CLOSED tickets or repeat report checks. In fresh owned loopback WebKit contexts at 390px and one smaller/sheet-height condition, exercise opening an existing sheet containing the approved date/time input, focus, picker placement, cancel/close, and return to the field. Include bounded controlled visualViewport height/offset changes only where needed and mark them simulated, not an actual iPhone keyboard. Compare desktop/no-short-viewport once and reuse unchanged date semantic tests. If a concrete clipped picker, unreachable action, lost focus or sheet disappearance is reproduced, fix only that presentation/lifecycle defect in the listed shared source paths and prove before/after in WebKit. Preserve RTL, ISO values, date bounds, optional values, approved digits, all save/cancel semantics and original data/account isolation. No new picker, redesign, palette/app.css edit, Auth/store/Sync/scoring/server/SW change or user browser. No physical Safari/iOS/PWA/OS keyboard acceptance claim from this engine. If the slice is sound return NO_CHANGE with bounded proof and no speculative styling. Do not grow into a whole-app audit or paid reviewer chain. Use the canonical isolated helper, owned ports and finally cleanup; release phase resources. Existing publisher owns any genuine Product release and served verification.",
+      "allowedPaths": [
+        "src/lib/visible-viewport.js",
+        "src/lib/rakeez-datetime.js",
+        "src/styles/rakeez-datetime.css",
+        "src/styles/components.css",
+        "tests/n72-webkit-sheet-date-20261022/**",
+        "docs/automation-evidence/20261022/N72_WEBKIT_SHEET_DATE.md"
+      ],
+      "verificationPaths": [
+        "src/lib/visible-viewport.js",
+        "src/lib/rakeez-datetime.js",
+        "src/styles/rakeez-datetime.css",
+        "src/styles/components.css"
+      ],
+      "requiredChecks": [
+        "n72_actual_webkit_sheet_date_focus_and_viewport",
+        "n72_only_observed_defect_before_after_or_no_change",
+        "n72_unchanged_date_storage_bounds_and_desktop_behavior"
+      ],
+      "acceptance": [
+        "Actual installed WebKit runs the specific shared sheet/date journey; simulated viewport and physical-device evidence are clearly distinguished.",
+        "Only a reproduced defect changes code, otherwise NO_CHANGE; no accepted N20/N38/N69 behavior or date/data semantics regresses.",
+        "Bounded local proof and any exact published repair are distinct from whole N72/iPhone/PWA acceptance."
+      ],
+      "releaseAuthority": "PO22October explicitly requests workers on independent open/deferred tickets. Routine scoped presentation repair and verified delivery are delegated to the existing controller/publisher; no new data/access behavior, account browser or replacement date policy is authorized.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "ebe6287518e6c84a19ba791a6915cd3083eb53f3",
+        "requiredSourcePaths": [
+          "src/lib/visible-viewport.js",
+          "src/lib/rakeez-datetime.js",
+          "src/lib/rakeez-datetime-values.js",
+          "src/styles/rakeez-datetime.css",
+          "src/styles/components.css"
+        ],
+        "editPaths": [
+          "src/lib/visible-viewport.js",
+          "src/lib/rakeez-datetime.js",
+          "src/styles/rakeez-datetime.css",
+          "src/styles/components.css",
+          "tests/n72-webkit-sheet-date-20261022/journey.mjs",
+          "docs/automation-evidence/20261022/N72_WEBKIT_SHEET_DATE.md"
+        ],
+        "newPaths": [
+          "tests/n72-webkit-sheet-date-20261022/journey.mjs",
+          "docs/automation-evidence/20261022/N72_WEBKIT_SHEET_DATE.md"
+        ],
+        "workerChecks": [
+          "n72_actual_webkit_sheet_date_focus_and_viewport",
+          "n72_only_observed_defect_before_after_or_no_change",
+          "n72_unchanged_date_storage_bounds_and_desktop_behavior"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authority": "po-20261022-outcome-flow",
-  "updatedAt": "2026-10-22T19:17:54.481Z",
+  "updatedAt": "2026-10-22T20:18:57.989Z",
   "problems": [
     {
       "key": "n36-unresolved-batch",
@@ -40,7 +40,7 @@
       "taskIds": [
         "continuous-n88-student-read-phase-latency-20261021"
       ],
-      "nextAction": "تفسير قياس المراحل الفعلي لطلب ناجح قبل تحسين السبب",
+      "nextAction": "الأولوية تفسير القياس الفعلي، ثم إصلاح سببي ومقارنة أداء وقبول الرحلة وفق N88_N44_REVIEW_PLAN.md؛ لا إعادة التنفيذ المقبول",
       "evidenceNeeded": "نسخ تفاصيل التحقق بعد اكتمال العودة؛ لا رمز الطالب"
     },
     {
@@ -65,20 +65,49 @@
         "continuous-n09-reports-mobile-density-20261022"
       ],
       "nextAction": "نتيجة مرئية لشاشتين فقط، ثم ترتيب باقي N09 حسب الدليل؛ لا إغلاق شامل جزئي"
+    },
+    {
+      "key": "n44-device-delivery",
+      "productId": "N44",
+      "issueNumber": 5,
+      "title": "خطة ربط الجهاز ووصول التنبيه خارج الصفحة",
+      "gate": "ready_to_admit",
+      "taskIds": [
+        "continuous-n44-register503-existing-service-repair-20261019",
+        "continuous-n44-one-approved-closed-page-push-20261019",
+        "continuous-n44-disabled-source-preparation-20261022"
+      ],
+      "currentTaskIds": [
+        "continuous-n44-disabled-source-preparation-20261022"
+      ],
+      "nextAction": "تأهيل إصلاح محلي محدد لرفض ربط الجهاز من مصدر44 المطابق؛ لا إرسال أو تسجيل أو تمديد نافذة الاختبار القديمة",
+      "evidenceNeeded": "مصدر مطابق وسبب مثبت، ثم نطاق اختبار ساري وميزانية محققة؛ لا بيانات أو أسرار"
+    },
+    {
+      "key": "n72-webkit-sheet-date",
+      "productId": "N72",
+      "issueNumber": null,
+      "title": "فحص WebKit للنافذة ومنتقي التاريخ",
+      "gate": "ready_to_admit",
+      "taskIds": [
+        "continuous-n72-webkit-sheet-date-20261022"
+      ],
+      "currentTaskIds": [
+        "continuous-n72-webkit-sheet-date-20261022"
+      ],
+      "nextAction": "إصلاح عيب مثبت فقط أو NO_CHANGE؛ لا ادعاء آيفون فعلي"
     }
   ],
   "deferredPlan": [
     {
       "productIds": [
-        "N26",
-        "N72"
+        "N26"
       ],
       "order": 2,
       "next": "بعد الشريحة الحالية: تحضير نطاق محدد من أدلة الواجهة؛ Safari يحتاج إثبات جهاز/محرك مناسب ولا يدّعى من Chromium"
     },
     {
       "productIds": [
-        "N44",
         "N93"
       ],
       "order": 3,
@@ -100,5 +129,6 @@
       "order": 5,
       "next": "صيانة التخزين آخرًا؛ لا حذف أو نقل مشروع لمجرد تنظيف القائمة"
     }
-  ]
+  ],
+  "reviewPlan": "docs/automation-evidence/20261022/N88_N44_REVIEW_PLAN.md"
 }
