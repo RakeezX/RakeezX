@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-local-readback-distinction-20261023",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -5100,
+      "scopeKey": "n36-local-readback-distinction",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 25,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "githubIssue": 1,
+      "objective": "New actual PO evidence 23 October: the existing local-progress button returned the exact generic no-authoritative-local-trace message. This is the requested input, NOT a missing user action. Source main e71bba8bc6195a9da951ea2ac5ba5903369f88ae proves resumeSavedExtensionBatch conflates checkpoint none with unresolved; readExtensionProgress returns none for missing/foreign-owner marker and unresolved for any guard/read/integrity exception. Fix this specific information-loss seam, not another general diagnosis. First reproduce the identical user-visible output for a successfully completed authorized snapshot with absent checkpoint and an injected read failure / unverified context in an isolated synthetic real-app receiver. Then minimally distinguish safe finite app-only result categories: authorized read completed with no eligible trace, context could not be verified, local storage read did not complete, and trace could not be verified. Do not reveal that a foreign owner marker exists; no names, IDs, raw exceptions, URLs, tokens or stack in UI/copy. A missing checkpoint is NOT zero imported rows; a failed read is NOT proof of absent data. Wording that no row was written applies only to this read action, not historical import. Preserve the exact existing public progress-object shape used by the extension and the 0.5.37 ZIP/manifest; app-only private helper/result presentation may carry safe detail, but window.rakeezNamesLocalProgress and reportHandoffOutcome must retain compatibility. No extension release or reinstall. Keep extensionOwnerBinding, captureReceiverSession, lease/document/owner checks and all existing read eligibility; do not weaken an import guard to gain new read access. Check context before and after asynchronous reads; no old account counts may paint after a switch. Existing confirmed/pending counts and original-term hints remain truthful and bounded, never acknowledge the original unknown nonce. Exercise absent trace, snapshot timeout/abort, invalid context before/after read, malformed owned trace, foreign trace without identifying it, and existing valid receipt/pending presentation only as affected cases. All diagnostics remain user-initiated, readonly and bounded. Prove the button causes zero writes, source GETs, handoff ACKs, import retries or changed selections. Reuse existing fixtures and unchanged evidence; do not rerun the full 303-row collection matrix, build a new evidence platform or probe a browser account. Fix only the named view and scoped tests/evidence; no store/SQL/Auth/schema/Sync/scoring/write-path behavior, new dependency, or permissions. Do not alter or reconstruct the real .35 batch; its result remains unresolved. Do not repeat the rejected browser-read operations or ask the user to repeat the old button before delivery. Deliver this concrete app-only correction via the original publisher, then provide one minimal next read instruction based on the new distinct outcomes, not a claim that the batch or entire N36 is solved.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "tests/n36-local-readback-20261023/**",
+        "docs/automation-evidence/20261023/N36_LOCAL_READBACK_DISTINCTION.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_readback_ambiguous_baseline_and_distinct_actual_ui",
+        "n36_readback_owner_session_document_and_failure_safety",
+        "n36_readback_zero_writes_and_unchanged_transport_contract"
+      ],
+      "acceptance": [
+        "Actual rendered diagnostic distinguishes completed no-trace from uncompleted/unverified read without claiming original save success or failure.",
+        "Owner/session/document/lease checks and exact extension progress schema remain unchanged; no forbidden metadata or cross-owner counts.",
+        "No write/replay/ACK/selection/extension package change; affected tests and original publisher served parity, not false batch acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-N36-actual-local-progress-result",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "PO standing delegated routine fixes and latest N36 P0 direction, with new actual local-progress evidence, authorize this bounded readonly UI/error-classification fix and ordinary frontend publication through the original controller/publisher. No live account/source inspection, batch replay, changed data access, nonce renewal, service operation or full Product closure.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "e71bba8bc6195a9da951ea2ac5ba5903369f88ae",
+        "requiredSourcePaths": [
+          "src/views/class-import-center.js",
+          "src/lib/n36-extension-handoff.js",
+          "src/lib/n36-extension-protocol.js"
+        ],
+        "editPaths": [
+          "src/views/class-import-center.js",
+          "tests/n36-local-readback-20261023/readback.mjs",
+          "docs/automation-evidence/20261023/N36_LOCAL_READBACK_DISTINCTION.md"
+        ],
+        "newPaths": [
+          "tests/n36-local-readback-20261023/readback.mjs",
+          "docs/automation-evidence/20261023/N36_LOCAL_READBACK_DISTINCTION.md"
+        ],
+        "workerChecks": [
+          "n36_readback_ambiguous_baseline_and_distinct_actual_ui",
+          "n36_readback_owner_session_document_and_failure_safety",
+          "n36_readback_zero_writes_and_unchanged_transport_contract"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

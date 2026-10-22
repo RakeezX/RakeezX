@@ -1,21 +1,25 @@
 {
   "version": 1,
   "authority": "po-20261023-focus-n36-n88",
-  "updatedAt": "2026-10-22T21:41:02.311Z",
+  "updatedAt": "2026-10-22T22:10:03.318Z",
   "problems": [
     {
       "key": "n36-unresolved-batch",
       "productId": "N36",
       "issueNumber": 1,
       "title": "[P0] حسم الدفعة السابقة",
-      "gate": "waiting_evidence",
+      "gate": "ready_to_admit",
       "taskIds": [
         "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
-        "continuous-n36-1150-ownerless-year-term-selection-20261021"
+        "continuous-n36-1150-ownerless-year-term-selection-20261021",
+        "continuous-n36-local-readback-distinction-20261023"
       ],
-      "nextAction": "P0: تفسير قراءة التقدم المحلي للدفعة .35 وربطها بسياقها قبل أي استيراد جديد؛ لا إعادة إصدار أو تشغيل بلا دليل.",
-      "evidenceNeeded": "ملخص الزر من المتصفح والحساب نفسيهما؛ لا أسماء ولا رموز",
-      "priorityBand": "P0"
+      "nextAction": "وصل نص القراءة من PO؛ إصلاح خلط غياب الأثر بفشل القراءة داخل التطبيق دون إعادة الدفعة أو تغيير الإضافة. انتظار نتيجة الإصلاح لا إعادة طلب الزر القديم.",
+      "evidenceNeeded": "المدخل السابق مستلم. النتيجة الأصلية غير محسومة؛ لا قراءة حساب آلية ولا إعادة استيراد.",
+      "priorityBand": "P0",
+      "currentTaskIds": [
+        "continuous-n36-local-readback-distinction-20261023"
+      ]
     },
     {
       "key": "n36-school-response",
