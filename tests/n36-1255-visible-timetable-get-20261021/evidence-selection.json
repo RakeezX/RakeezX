@@ -1,0 +1,68 @@
+{
+  "handler-and-pending-final": [
+    "onclick-before",
+    "onclick-after",
+    "pending-auth-loss-before",
+    "pending-batch-loss-before"
+  ],
+  "positive-storage-and-route-contract": [
+    "contract-before",
+    "empty-before",
+    "onclick-reimport-before",
+    "onclick-unknown-pages-before"
+  ],
+  "anchor-controls": [
+    "event-before",
+    "duplicate-before",
+    "nonget-before",
+    "download-before",
+    "disabled-before",
+    "form-before",
+    "inert-before",
+    "different-before",
+    "absent-before",
+    "base-before"
+  ],
+  "identity-before": [
+    "onclick-teacher-drift-before",
+    "onclick-school-drift-before",
+    "onclick-schoolid-drift-before",
+    "onclick-role-drift-before",
+    "onclick-source-url-drift-before",
+    "onclick-roster-missing-before",
+    "onclick-roster-conflict-before"
+  ],
+  "response-controls": [
+    "response-missing-before",
+    "response-conflict-before",
+    "response-teacher-before",
+    "response-schoolid-before",
+    "response-redirect-before",
+    "response-type-before",
+    "response-size-before",
+    "response-timeout-before",
+    "base-response-role-before"
+  ],
+  "remaining-boundaries": [
+    "onclick-owner-drift-before",
+    "onclick-session-drift-before",
+    "onclick-unsafe-student-before",
+    "base-response-login-before",
+    "lateunsafe-before",
+    "lateabsent-before",
+    "onclick-unknown-receipt-before"
+  ],
+  "pending-identity": [
+    "pending-teacher-drift-before",
+    "pending-school-drift-before",
+    "pending-owner-drift-before",
+    "pending-session-drift-before",
+    "pending-owner-drift-late"
+  ],
+  "document-bound-final": [
+    "pending-document-drift-before"
+  ],
+  "bounded-polling-large": [
+    "onclick-before"
+  ]
+}

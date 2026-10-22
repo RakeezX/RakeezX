@@ -7,7 +7,7 @@
  const modules = {'run-controller.js':'not-available'};
  const enums = {
   receiverCheckpoint:['none','unresolved','pending','rows-before-receipt','receipts'],receiverRelation:['unresolved','same','original-term'],
-  setupKind:['none','metadata','classes','timetable'],setupRejectReason:['none','route-shape','live-link-absent','live-link-unsafe','response-base'],
+  setupKind:['none','metadata','classes','timetable'],setupRejectReason:['none','route-shape','live-link-absent','live-link-unsafe','live-link-event','live-link-context','live-link-download','live-link-method','live-link-duplicate','response-base'],
   schoolBindingState:['none','preliminary','bound','unconfirmed','changed'],
   entryKind:['teacher-gateway','teacher-dashboard','unresolved-entry','none'],roleProofKind:['semantic-dashboard','active-role','greeting','none'],
   navigationPlannedKind:['none','home','role','gateway','metadata','classes','students','timetable'],

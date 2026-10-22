@@ -1,0 +1,142 @@
+{
+  "status": "PASS",
+  "kindReasonPairs": [
+    {
+      "kind": "metadata",
+      "reason": "route-shape",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "live-link-absent",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "live-link-unsafe",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "live-link-event",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "live-link-context",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "live-link-download",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "live-link-method",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "live-link-duplicate",
+      "status": "PASS"
+    },
+    {
+      "kind": "metadata",
+      "reason": "response-base",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "route-shape",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "live-link-absent",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "live-link-unsafe",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "live-link-event",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "live-link-context",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "live-link-download",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "live-link-method",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "live-link-duplicate",
+      "status": "PASS"
+    },
+    {
+      "kind": "classes",
+      "reason": "response-base",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "route-shape",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "live-link-absent",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "live-link-unsafe",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "live-link-event",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "live-link-context",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "live-link-download",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "live-link-method",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "live-link-duplicate",
+      "status": "PASS"
+    },
+    {
+      "kind": "timetable",
+      "reason": "response-base",
+      "status": "PASS"
+    }
+  ],
+  "untrustedValues": "clamped; unknown keys discarded; no URL/query/HTML/name sentinel in serialized output",
+  "boundary": "Unit serializer execution only; actual popup DOM/CSS/copy handler exercised by full runtime evidence"
+}

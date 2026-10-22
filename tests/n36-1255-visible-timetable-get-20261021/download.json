@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-1255-visible-timetable-get-20261021",
+  "runId": "755845ba-7bea-4f4d-88bf-c690996e4842",
+  "baseSha": "ed42bc472b009fae04eb34ddd1f23f8fed81df1e",
+  "name": "n36_0537_actual_app_download",
+  "archiveSha256": "bed6dd617411021018d4a81c3c00ec3e33e37289c082e0ddfbb1ef32e3890c4c",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper; actual app DOM/download handler over HTTP; fresh isolated context.",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.37",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "origin": "http://127.0.0.1:49956"
+  }
+}

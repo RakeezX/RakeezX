@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-10-22T18:14:43.4040839Z",
+  "ports": [
+    49955,
+    49956
+  ],
+  "ownedServerListeners": 0,
+  "ownedContexts": "Closed in canonical isolated-browser helper finally",
+  "sharedBrowserLease": "Not acquired; eligible synthetic loopback-only phase",
+  "realPortalActions": 0
+}

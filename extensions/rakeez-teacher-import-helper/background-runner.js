@@ -134,7 +134,7 @@ export function createBackgroundRunner({transport}){
   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   await source(j,'read-proof');await appGuard(j);
   if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;
-   if(setupKind&&r[0].result?.setupKind===setupKind&&['route-shape','live-link-absent','live-link-unsafe','response-base'].includes(r[0].result?.setupRejectReason)){e.setupKind=setupKind;e.setupRejectReason=r[0].result.setupRejectReason;}throw e;}
+   if(setupKind&&r[0].result?.setupKind===setupKind&&['route-shape','live-link-absent','live-link-unsafe','live-link-event','live-link-context','live-link-download','live-link-method','live-link-duplicate','response-base'].includes(r[0].result?.setupRejectReason)){e.setupKind=setupKind;e.setupRejectReason=r[0].result.setupRejectReason;}throw e;}
   return r[0].result;
  }
  async function readNext(j){

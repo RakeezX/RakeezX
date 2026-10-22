@@ -21,7 +21,17 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
     const styles=new WeakMap();const style=n=>{if(!styles.has(n))styles.set(n,getComputedStyle(n));return styles.get(n);};
     const anchors=Array.from(globalThis.document.querySelectorAll('a[href]')).filter(a=>{for(let n=a;n;n=n.parentElement){const c=style(n);if(n.hidden||n.getAttribute('aria-hidden')==='true'||c.display==='none'||c.visibility!=='visible'||Number(c.opacity)===0)return false;}return a.getClientRects().length>0;}).filter(a=>{try{return new URL(a.getAttribute('href'),binding).href===u.href;}catch{return false;}});
     if(!anchors.length)fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK',setup?'live-link-absent':null);
-    if(anchors.some(a=>a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[disabled],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK',setup?'live-link-unsafe':null);
+    // AI: only the one observed timetable GET may carry an inert onclick name.
+    // Never read its value, invoke a handler, click, or navigate. Every check is
+    // repeated around the bounded fetch/stream; mixed duplicate anchors fail.
+    const eventNames=a=>a.getAttributeNames().filter(k=>/^on/i.test(k));
+    let reason=null;
+    if(kind==='timetable'&&anchors.length>1&&anchors.some(a=>eventNames(a).length))reason='live-link-duplicate';
+    else if(anchors.some(a=>eventNames(a).some(k=>kind!=='timetable'||k.toLowerCase()!=='onclick')))reason='live-link-event';
+    else if(anchors.some(a=>a.closest('form,[inert],[disabled],[aria-disabled=true],.disabled')))reason='live-link-context';
+    else if(anchors.some(a=>a.hasAttribute('download')))reason='live-link-download';
+    else if(anchors.some(a=>a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))reason='live-link-method';
+    if(reason)fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK',setup?(kind==='timetable'?reason:'live-link-unsafe'):null);
    }
    const guard=readSourceReportPage('guard');if(!guard.ok)fail(guard.code);
   };
@@ -59,6 +69,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    const expected=JSON.parse(runContext.readProof).teacher;
    if(expected.length&&teachers.some(n=>!expected.includes(n)))fail('TEACHER_CONTEXT_CHANGED');
    if(schools.length>1||runContext.schoolName&&schools.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
+   if(kind==='timetable'&&(!runContext.schoolName||schools.length!==1))fail('SCHOOL_CONTEXT_UNCONFIRMED');
    for(const a of doc.querySelectorAll('a[href]')){const v=new URL(a.getAttribute('href'),u.href);for(const [key,id] of v.searchParams)if(key.toLowerCase()==='schoolid'&&id.toLowerCase()!==runContext.schoolId.toLowerCase())fail('SCHOOL_CONTEXT_CHANGED');}
    if(menu&&doc.querySelector('base[href]'))fail('UNSAFE_ROSTER_LINK');
    if(setup){
