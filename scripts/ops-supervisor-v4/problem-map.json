@@ -1,26 +1,27 @@
 {
   "version": 1,
-  "authority": "po-20261022-outcome-flow",
-  "updatedAt": "2026-10-22T21:20:08.277Z",
+  "authority": "po-20261023-focus-n36-n88",
+  "updatedAt": "2026-10-22T21:41:02.311Z",
   "problems": [
     {
       "key": "n36-unresolved-batch",
       "productId": "N36",
       "issueNumber": 1,
-      "title": "حسم الدفعة السابقة",
+      "title": "[P0] حسم الدفعة السابقة",
       "gate": "waiting_evidence",
       "taskIds": [
         "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
         "continuous-n36-1150-ownerless-year-term-selection-20261021"
       ],
-      "nextAction": "تفسير قراءة التقدم المحلي قبل أي استيراد جديد",
-      "evidenceNeeded": "ملخص الزر من المتصفح والحساب نفسيهما؛ لا أسماء ولا رموز"
+      "nextAction": "P0: تفسير قراءة التقدم المحلي للدفعة .35 وربطها بسياقها قبل أي استيراد جديد؛ لا إعادة إصدار أو تشغيل بلا دليل.",
+      "evidenceNeeded": "ملخص الزر من المتصفح والحساب نفسيهما؛ لا أسماء ولا رموز",
+      "priorityBand": "P0"
     },
     {
       "key": "n36-school-response",
       "productId": "N36",
       "issueNumber": 2,
-      "title": "توافق الجدول وإثبات المدرسة",
+      "title": "[P0] توافق الجدول وإثبات المدرسة",
       "gate": "waiting_evidence",
       "taskIds": [
         "continuous-n36-1255-visible-timetable-get-20261021",
@@ -29,49 +30,27 @@
       "currentTaskIds": [
         "continuous-n36-school-response-contract-20261022"
       ],
-      "nextAction": "حسم العقد من الأدلة الحالية ثم إصلاح مثبت أو تحديد الدليل الناقص؛ لا تجربة دفعة جديدة"
+      "nextAction": "P0: استئناف cccab38e فقط بدليل بنيوي مسموح يحسم هوية المدرسة أو علامة رد مفقودة؛ لا تخمين أو إعادة مراجعة المصدر نفسه.",
+      "priorityBand": "P0"
     },
     {
       "key": "n88-student-latency",
       "productId": "N88",
       "issueNumber": 3,
-      "title": "سرعة بوابة الطالب",
+      "title": "[P0] سرعة بوابة الطالب",
       "gate": "waiting_evidence",
       "taskIds": [
         "continuous-n88-student-read-phase-latency-20261021"
       ],
-      "nextAction": "الأولوية تفسير القياس الفعلي، ثم إصلاح سببي ومقارنة أداء وقبول الرحلة وفق N88_N44_REVIEW_PLAN.md؛ لا إعادة التنفيذ المقبول",
-      "evidenceNeeded": "نسخ تفاصيل التحقق بعد اكتمال العودة؛ لا رمز الطالب"
-    },
-    {
-      "key": "ops-card-contract",
-      "productId": "OPS",
-      "issueNumber": 4,
-      "title": "تقليل التعطيل الذاتي",
-      "gate": "ops_applied",
-      "taskIds": [],
-      "nextAction": "راقب إدخال البطاقات الجديدة ووقت الانتظار؛ فحص النطاق وملخص المشاكل مثبتان، أثر السرعة لم يقس بعد"
-    },
-    {
-      "key": "n09-mobile-reports",
-      "productId": "N09",
-      "issueNumber": null,
-      "title": "تحسين تقارير الجوال — شريحة مؤجلة مفعلة",
-      "gate": "needs_triage",
-      "taskIds": [
-        "continuous-n09-reports-mobile-density-20261022",
-        "continuous-n09-report-harness-residuals-20261023"
-      ],
-      "currentTaskIds": [
-        "continuous-n09-report-harness-residuals-20261023"
-      ],
-      "nextAction": "إصلاح فحصي تهيئة البيانات وتحميل CSS فقط؛ المنتج ودليل الواجهة محفوظان"
+      "nextAction": "P0: تحليل تفاصيل التحقق لطلب ناجح مكتمل ثم إصلاح المرحلة المقاسة ومقارنة قبل/بعد؛ التشخيص المنشور ليس تحسنًا.",
+      "evidenceNeeded": "نسخ تفاصيل التحقق بعد اكتمال العودة؛ لا رمز الطالب",
+      "priorityBand": "P0"
     },
     {
       "key": "n44-device-delivery",
       "productId": "N44",
       "issueNumber": 5,
-      "title": "خطة ربط الجهاز ووصول التنبيه خارج الصفحة",
+      "title": "[P1] خطة ربط الجهاز ووصول التنبيه خارج الصفحة",
       "gate": "waiting_evidence",
       "taskIds": [
         "continuous-n44-register503-existing-service-repair-20261019",
@@ -81,22 +60,50 @@
       "currentTaskIds": [
         "continuous-n44-disabled-source-preparation-20261022"
       ],
-      "nextAction": "Qualified inactive source package delivered as 7140d967; do not rebuild. Existing-custodian service/valid-test readiness remains separate; no expired-window resend.",
-      "evidenceNeeded": "مصدر مطابق وسبب مثبت، ثم نطاق اختبار ساري وميزانية محققة؛ لا بيانات أو أسرار"
+      "nextAction": "P1 بعد N36/N88: إعادة استخدام الحزمة المؤهلة غير المفعلة7140d967؛ الحاضن الأصلي ونطاق ساري قبل أي تسجيل/إرسال.",
+      "evidenceNeeded": "مصدر مطابق وسبب مثبت، ثم نطاق اختبار ساري وميزانية محققة؛ لا بيانات أو أسرار",
+      "priorityBand": "P1"
+    },
+    {
+      "key": "ops-card-contract",
+      "productId": "OPS",
+      "issueNumber": 4,
+      "title": "[LATER] تقليل التعطيل الذاتي",
+      "gate": "ops_applied",
+      "taskIds": [],
+      "nextAction": "صيانة عائق مباشر مثبت لتسليم P0 فقط، لا تطوير منظومة جديدة أو تكرار المراجعات.",
+      "priorityBand": "LATER"
+    },
+    {
+      "key": "n09-mobile-reports",
+      "productId": "N09",
+      "issueNumber": null,
+      "title": "[LATER] تحسين تقارير الجوال — شريحة مؤجلة مفعلة",
+      "gate": "needs_triage",
+      "taskIds": [
+        "continuous-n09-reports-mobile-density-20261022",
+        "continuous-n09-report-harness-residuals-20261023"
+      ],
+      "currentTaskIds": [
+        "continuous-n09-report-harness-residuals-20261023"
+      ],
+      "nextAction": "بعد الأولويات الثلاث فقط؛ شريحة الفحص وإصلاح harness محفوظان، لا إعادة تصميم أو جولة أخرى.",
+      "priorityBand": "LATER"
     },
     {
       "key": "n72-webkit-sheet-date",
       "productId": "N72",
       "issueNumber": null,
-      "title": "فحص WebKit للنافذة ومنتقي التاريخ",
-      "gate": "ready_to_admit",
+      "title": "[LATER] فحص WebKit للنافذة ومنتقي التاريخ",
+      "gate": "needs_triage",
       "taskIds": [
         "continuous-n72-webkit-sheet-date-20261022"
       ],
       "currentTaskIds": [
         "continuous-n72-webkit-sheet-date-20261022"
       ],
-      "nextAction": "إصلاح databaseCounts غير المعرّف وتشخيص حد التهيئة، ثم WebKit؛ Sol6.1 Medium Standard"
+      "nextAction": "احفظ نتيجة الجولة الحالية ونشرها المتحقق؛ لا جولة جانبية جديدة قبل N36/N88 ثم N44.",
+      "priorityBand": "LATER"
     }
   ],
   "deferredPlan": [
@@ -105,14 +112,16 @@
         "N26"
       ],
       "order": 2,
-      "next": "بعد الشريحة الحالية: تحضير نطاق محدد من أدلة الواجهة؛ Safari يحتاج إثبات جهاز/محرك مناسب ولا يدّعى من Chromium"
+      "next": "بعد الشريحة الحالية: تحضير نطاق محدد من أدلة الواجهة؛ Safari يحتاج إثبات جهاز/محرك مناسب ولا يدّعى من Chromium",
+      "activationCondition": "After accepted current N36 and N88 outcomes, then N44; no automatic expansion from empty capacity."
     },
     {
       "productIds": [
         "N93"
       ],
       "order": 3,
-      "next": "أهلية إعادة الفرز وفق التفويض الجديد؛ يظل الإرسال الحقيقي وعقد الدرجات والدليل الناقص شروطًا محددة لا تفويضًا عامًا"
+      "next": "أهلية إعادة الفرز وفق التفويض الجديد؛ يظل الإرسال الحقيقي وعقد الدرجات والدليل الناقص شروطًا محددة لا تفويضًا عامًا",
+      "activationCondition": "After accepted current N36 and N88 outcomes, then N44; no automatic expansion from empty capacity."
     },
     {
       "productIds": [
@@ -121,15 +130,32 @@
         "N35"
       ],
       "order": 4,
-      "next": "نسخ محدودة وفق المنتج والصلاحيات: لوحة قراءة فقط/هوية الطالب/المرفقات؛ لا تفعيل وصول أو استعادة أو تكلفة تخزين تلقائيًا"
+      "next": "نسخ محدودة وفق المنتج والصلاحيات: لوحة قراءة فقط/هوية الطالب/المرفقات؛ لا تفعيل وصول أو استعادة أو تكلفة تخزين تلقائيًا",
+      "activationCondition": "After accepted current N36 and N88 outcomes, then N44; no automatic expansion from empty capacity."
     },
     {
       "productIds": [
         "N18"
       ],
       "order": 5,
-      "next": "صيانة التخزين آخرًا؛ لا حذف أو نقل مشروع لمجرد تنظيف القائمة"
+      "next": "صيانة التخزين آخرًا؛ لا حذف أو نقل مشروع لمجرد تنظيف القائمة",
+      "activationCondition": "After accepted current N36 and N88 outcomes, then N44; no automatic expansion from empty capacity."
     }
   ],
-  "reviewPlan": "docs/automation-evidence/20261022/N88_N44_REVIEW_PLAN.md"
+  "reviewPlan": "docs/automation-evidence/20261022/N88_N44_REVIEW_PLAN.md",
+  "closeoutPlan": "docs/automation-evidence/20261022/N36_N88_CLOSEOUT_FOCUS.md",
+  "parallelDecision": {
+    "requestedDiscretionaryCeiling": 10,
+    "recommendedCoreLanes": 2,
+    "runtimeCapChanged": false,
+    "additionalWorkersRequire": [
+      "new actionable evidence",
+      "disjoint write scopes",
+      "no shared data/service operation",
+      "measured delivery benefit"
+    ],
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "speed": "Standard"
+  }
 }
