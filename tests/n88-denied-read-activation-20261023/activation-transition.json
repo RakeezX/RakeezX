@@ -1,0 +1,14 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "providerOperations": 0,
+  "checks": [
+    "phase and exclusive lease precede provider calls",
+    "wx reservation precedes each single operation",
+    "concurrent non-pin change blocks pin",
+    "unknown upload/pin ACK consumes marker and prevents replay",
+    "old migration/source histories retained"
+  ],
+  "actualServiceProof": false
+}

@@ -27,7 +27,7 @@ export function reconstructExactChanges(current,certificates,expectedKeyset){
  if(!Array.isArray(certificates)||certificates.length>12)fail('certificate_chain');
  const restored=actual.map(r=>({...r}));
  for(const c of [...certificates].reverse()){
-  if(!exact(c,['taskId','sessionId','runId','candidateSha','certificateSha256','committed','producerFinished','publicOperationProofsVerified','beforeAggregate','afterAggregate','keysetDigest','changes'])||c.taskId!==n44Task||c.sessionId!==n44Session||!c.runId||!hex(c.candidateSha,40)||!hex(c.certificateSha256,64)||c.committed!==true||c.producerFinished!==true||c.publicOperationProofsVerified!==true||c.keysetDigest!==keyset||c.afterAggregate!==nonPinDigest(restored)||!hex(c.beforeAggregate,64)||!Array.isArray(c.changes)||!c.changes.length||c.changes.length>4||new Set(c.changes.map(r=>r.name)).size!==c.changes.length)fail('certificate_binding');
+  if(!exact(c,['taskId','sessionId','runId','candidateSha','certificateSha256','committed','configurationPhaseCompleted','publicOperationProofsVerified','beforeAggregate','afterAggregate','keysetDigest','changes'])||c.taskId!==n44Task||c.sessionId!==n44Session||!c.runId||!hex(c.candidateSha,40)||!hex(c.certificateSha256,64)||c.committed!==true||c.configurationPhaseCompleted!==true||c.publicOperationProofsVerified!==true||c.keysetDigest!==keyset||c.afterAggregate!==nonPinDigest(restored)||!hex(c.beforeAggregate,64)||!Array.isArray(c.changes)||!c.changes.length||c.changes.length>4||new Set(c.changes.map(r=>r.name)).size!==c.changes.length)fail('certificate_binding');
   for(const change of c.changes){
    if(!exact(change,['name','previousDigest','currentDigest'])||!['N44_SERVICE_SOURCE_SHA','N44_SESSION_POLICY_JSON','N44_ONE_DEVICE_TEST_JSON','N44_DELIVERY_ENABLED'].includes(change.name)||!hex(change.previousDigest,64)||!hex(change.currentDigest,64)||change.previousDigest===change.currentDigest)fail('certificate_change');
    const entry=restored.find(r=>r.name===change.name);if(!entry||entry.digest!==change.currentDigest)fail('current_change_mismatch');entry.digest=change.previousDigest;
@@ -45,11 +45,13 @@ export function qualifyConfigurationDelta({current,certificates,expectedBaseline
 }
 export function qualifyAuthority(card,{runId,candidateSha,sessionId}){
  const a=card?.preparationAuthority;
+ const phase=a?.committedSharedConfigurationPhase;
+ if(phase?.wholeWorkerCompletionRequired!==false||phase.originalProducerIdentityRequired!==true||phase.actualOperationAndReadbackProofRequired!==true||phase.committedImmutableBytesRequired!==true||phase.exclusiveSharedMutationLeaseRequired!==true||phase.wholeHistoricalAggregateMustMatch!==true||phase.unknownDriftAccepted!==false)fail('phase_authority');
  if(card?.id!==taskId||card.status!=='running'||card.productId!=='N88'||card.sessionId!==custodianSession||sessionId!==custodianSession||card.attempt?.runId!==runId||!runId||!hex(candidateSha,40)||card.liveAuthorizationRef!=='PO-20261023-QUALIFIED-N88-READ-SESSION-PRESERVATION'||a?.projectId!==projectId||a.productId!=='N88'||a.liveAuthorizationRef!==card.liveAuthorizationRef||a.originalPrivateCustodianOnly!==custodianSession||a.qualifiedCandidate!=='d27da1b34cb667be04d49efe354ee6ea811174ed'||a.successorSha256!==successorSource||a.maxChangedNativeFunctionUploads!==1||a.maxPublicSourcePinUpdates!==1||a.maxChangedPrivateStaticUploads!==0||a.newMigrations!==0||a.sqlAuthSchemaChanges!==0||a.realAccountReads!==0||a.realStudentTeacherWrites!==0||a.appendOnlyAttemptHistory!==true||a.resetConsumedMarkers!==false)fail('authority');
  return true;
 }
 export function qualifyReservation({state,history,markerExists,source=successorSource}){
- if(source!==successorSource||markerExists!==false||!Array.isArray(history)||history.some(r=>r.taskId===taskId)||state?.directSource!==priorSource||state.directVerified!==true||state.loginDisarmed||state.directAuthRefused||state.typedReadActivation?.migrationVerified!==true||state.typedReadActivation.migrationVersion!=='20261023070851')fail('consumed_or_custody');
+ if(source!==successorSource||markerExists!==false||!Array.isArray(history)||history.some(r=>r.taskId===taskId)||!Array.isArray(state?.deniedReadTransitions??[])||(state.deniedReadTransitions??[]).some(r=>r.taskId===taskId)||state?.directSource!==priorSource||state.directVerified!==true||state.loginDisarmed||state.directAuthRefused||state.typedReadActivation?.migrationVerified!==true||state.typedReadActivation.migrationVersion!=='20261023070851')fail('consumed_or_custody');
  return true;
 }
 export function qualifyNativePreflight({native,configuration,now=Date.now()}){
