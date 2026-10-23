@@ -1,0 +1,49 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "370692a5-ce70-4d20-965e-ba09b56c10e4",
+  "baseSha": "7fa9b61259df3036caf8e6eda6bf03196d7d4d2e",
+  "scope": "synthetic parser seam only; no rendered application UI PASS",
+  "cases": [
+    {
+      "variant": "style",
+      "status": "PASS",
+      "ok": false,
+      "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "setupRejectReason": "response-school-absent",
+      "syntheticMapping": null
+    },
+    {
+      "variant": "stylesheet",
+      "status": "PASS",
+      "ok": false,
+      "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "setupRejectReason": "response-school-absent",
+      "syntheticMapping": null
+    },
+    {
+      "variant": "hidden-css",
+      "status": "PASS",
+      "ok": false,
+      "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "setupRejectReason": "response-school-absent",
+      "syntheticMapping": null
+    },
+    {
+      "variant": "no-css",
+      "status": "PASS",
+      "ok": true,
+      "code": null,
+      "setupRejectReason": null,
+      "syntheticMapping": "اليوم\tالحصة\tالفصل\tالمادة\nالأحد\t1\tخامس 5\tالمهارات الرقمية"
+    }
+  ],
+  "externalRequests": [],
+  "sourceResponseRelation": "UNKNOWN: actual rendered DOM observed; actual collector GET response not observed",
+  "productFilesUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "browserClosed": true,
+    "leaseRelease": "RELEASED browser"
+  }
+}
