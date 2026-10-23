@@ -155,6 +155,8 @@ function extensionOwnerBinding() {
 // AI: explicit extension Start grants one document/session-bound names batch.
 let automaticBatch=null, automaticWriting=false,receiverReason='NO_GRANT',directDraining=false,receiverDocumentLive=true;
 const directRequests=new Map();
+const N36_HISTORY_LIMIT=4,N36_HISTORY_BYTES=2000000;
+let retainedProgress=[],pendingArchiveOffer=null;
 let profileRecovery=null,profileRecoveryTimer=null; // AI: only a still-live, claimed current-document request; never durable replay authority.
 function clearProfileRecovery(){clearTimeout(profileRecoveryTimer);profileRecoveryTimer=null;profileRecovery=null;}
 export async function prepareExtensionBatch({resume=false}={}){
@@ -254,21 +256,76 @@ async function qualifyExtensionSelection(batch){
   await new Promise(r=>setTimeout(r,50));
  }
 }
+// AI: local device-only preservation. Retained unknown traces grant neither
+// source replay nor an ACK, and are never evicted to make room for a new run.
+async function retainedTraceSummary(trace,owner){
+ if(!trace||trace.ownerId!==owner||!/^[a-f0-9]{64}$/.test(trace.batchId)||!trace.yearId||!trace.termId)throw Error('BATCH_HISTORY_INVALID');
+ const receipts=Object.values(trace.receipts??{});
+ if(receipts.some(r=>!['saved','existing'].includes(r.status)||r.remaining!==0||!['total','added','existing'].every(k=>Number.isSafeInteger(r[k])&&r[k]>=0&&r[k]<=300)||r.added+r.existing!==r.total))throw Error('BATCH_HISTORY_INVALID');
+ let pendingRows=0;
+ for(const [digest,pending] of Object.entries(trace.pending??{})){
+  if(!/^[a-f0-9]{64}$/.test(digest)||!Array.isArray(pending.rows)||!pending.rows.length||pending.rows.length>300)throw Error('BATCH_HISTORY_INVALID');
+  const {stateDigest}=await import('../lib/teacher-setup-import.js');
+  if(digest!==await stateDigest(pending.setup?{rows:pending.rows,setup:pending.setup}:pending.rows))throw Error('BATCH_HISTORY_INVALID');
+  pendingRows+=pending.rows.length;
+ }
+ if(!pendingRows||pendingRows>30000)throw Error('BATCH_HISTORY_INVALID');
+ return {batchId:trace.batchId,confirmedRows:receipts.reduce((n,r)=>n+r.total,0),confirmedReceipts:receipts.length,pendingRows};
+}
+async function retainedHistorySummary(history,owner){
+ if(!Array.isArray(history)||history.length>N36_HISTORY_LIMIT||new TextEncoder().encode(JSON.stringify(history)).length>N36_HISTORY_BYTES)throw Error('BATCH_HISTORY_FULL');
+ const ids=new Set(),rows=[];
+ for(const entry of history){if(entry?.status!=='unresolved'||entry.ownerId!==owner||ids.has(entry.trace?.batchId))throw Error('BATCH_HISTORY_INVALID');ids.add(entry.trace.batchId);rows.push(await retainedTraceSummary(entry.trace,owner));}
+ return rows;
+}
+async function preservePendingForFreshSource(){
+ if(automaticWriting||extensionBusy||directDraining)return;
+ let offer=pendingArchiveOffer;
+ if(!offer){try{const trace=store.state.device?.n36NamesBatch,binding=extensionOwnerBinding(),session=captureReceiverSession(cloud);if(!trace?.pending||trace.ownerId!==store.getActiveWorkspace().authUserId)return;offer={trace:JSON.stringify(trace),yearId:trace.yearId,termId:trace.termId,assertCurrent(){session();if(!receiverDocumentLive||extensionOwnerBinding()!==binding)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');}};}catch{return;}}
+ pendingArchiveOffer=null;automaticWriting=true;
+ try{
+  offer.assertCurrent();store.assertClassImportAccess();
+  const binding=extensionOwnerBinding(),assertSession=captureReceiverSession(cloud),owner=store.getActiveWorkspace().authUserId;
+  const year=JSON.stringify(store.getYear(store.activeYear().id)),term=JSON.stringify(store.getTerm(store.activeTerm().id));
+  const guard=current=>{offer.assertCurrent();assertSession();store.assertClassImportAccess();if(extensionOwnerBinding()!==binding||JSON.stringify(store.getYear(store.activeYear().id))!==year||JSON.stringify(store.getTerm(store.activeTerm().id))!==term)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');if(current){persistedSelection({year:offer.yearId,term:offer.termId},current);if(JSON.stringify(current.years.find(y=>y.id===offer.yearId))!==year||JSON.stringify(current.terms.find(t=>t.id===offer.termId))!==term)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');}};
+  const current=await readExtensionState(['device','years','terms']);guard(current);
+  const device=current.device.find(d=>d.id==='device'),prior=device?.n36NamesBatch,history=device?.n36NamesBatchHistory??[];
+  if(prior?.ownerId!==owner||JSON.stringify(prior)!==offer.trace)throw Error('BATCH_HISTORY_CHANGED');
+  await retainedHistorySummary(history,owner);await retainedTraceSummary(prior,owner);guard();
+  if(history.length>=N36_HISTORY_LIMIT||history.some(e=>e.trace.batchId===prior.batchId))throw Error('BATCH_HISTORY_FULL');
+  const retained=[...history,{status:'unresolved',ownerId:owner,retainedAt:Date.now(),trace:structuredClone(prior)}];
+  await retainedHistorySummary(retained,owner);guard();
+  const db=await import('../lib/db.js'),historyProof=JSON.stringify(history);
+  const committed=await db.applyBatch({device:{},years:{},terms:{}},{prepare(snapshot){
+   guard(snapshot);const live=snapshot.device.find(d=>d.id==='device');
+   if(JSON.stringify(live?.n36NamesBatch)!==offer.trace||JSON.stringify(live?.n36NamesBatchHistory??[])!==historyProof)throw Error('BATCH_HISTORY_CHANGED');
+   return {device:{put:[{...live,n36NamesBatch:null,n36NamesBatchHistory:retained}]}};
+  }});
+  if(automaticBatch)automaticBatch.retired=true;automaticBatch=null;directRequests.clear();clearProfileRecovery();
+  guard();const readback=await readExtensionState(['device','years','terms']);guard(readback);
+  if(readback.device.find(d=>d.id==='device')?.n36NamesBatch!==null||JSON.stringify(readback.device.find(d=>d.id==='device')?.n36NamesBatchHistory)!==JSON.stringify(retained))throw Error('NAMES_RECEIPT_UNKNOWN');
+  store.state.device={...store.state.device,n36NamesBatch:committed.device.put[0].n36NamesBatch,n36NamesBatchHistory:committed.device.put[0].n36NamesBatchHistory};
+  automaticWriting=false;await resumeSavedExtensionBatch();
+  extensionMessage='حُفظ الأثر السابق غير محسوم محليًا قبل تهيئة استقبال تشغيل مصدر جديد. لم تُعد قراءة صفوفه أو استيرادها، ولم يُرسل إقرار للإضافة القديمة. التشغيل الجديد يحتاج إجراءً صريحًا منفصلًا منك من المصدر؛ لا تُعد تحميل الإضافة لتغيير نسختها.';repaint();
+ }catch(error){extensionMessage=['BATCH_HISTORY_FULL','BATCH_HISTORY_INVALID'].includes(error.message)?'تعذّر حفظ أثر سابق آخر: السجل المحلي ممتلئ أو غير قابل للتحقق. بقي الأثر المعلّق دون تغيير؛ لم يُهيّأ تشغيل جديد.':'لم يتأكد حفظ الأثر السابق محليًا؛ بقيت نتيجته غير محسومة. لم يُهيّأ تشغيل مصدر جديد ولم يُفترض فقد الأثر أو حفظ صفوفه.';repaint();}
+ finally{automaticWriting=false;void drainDirectRequests();}
+}
 async function readExtensionProgress(){
  // AI N36: keep the extension's exact public shape; safe detail is app-only.
  return (await readExtensionProgressResult()).progress;
 }
 async function readExtensionProgressResult(){
- let binding,assertSession,stage='context-unverified';
+ let binding,assertSession,stage='context-unverified',historyRows=[],archive=null;
  const unresolved=()=>({checkpoint:'unresolved',relation:'unresolved',confirmedRows:0,confirmedReceipts:0,pendingRows:0,pendingSavedRows:0});
  const assertCurrent=()=>{assertSession();if(!receiverDocumentLive||extensionOwnerBinding()!==binding)throw Error('OWNER');};
- const result=(progress,readState)=>({progress,readState,assertCurrent});
+ const result=(progress,readState)=>({progress,readState,assertCurrent,history:historyRows,archive});
  try{
   if(!receiverDocumentLive)throw Error('DOCUMENT');
   binding=extensionOwnerBinding();assertSession=captureReceiverSession(cloud);
   assertCurrent();stage='read-incomplete';
   const current=await readExtensionState();assertCurrent();stage='trace-unverified';
   const p=current.device.find(d=>d.id==='device')?.n36NamesBatch,owner=store.getActiveWorkspace().authUserId;
+  historyRows=await retainedHistorySummary(current.device.find(d=>d.id==='device')?.n36NamesBatchHistory??[],owner);assertCurrent();
   if(!p||p.ownerId!==owner)return result({checkpoint:'none',relation:'unresolved',confirmedRows:0,confirmedReceipts:0,pendingRows:0,pendingSavedRows:0},'no-eligible-trace');
   const {previewStudentRows}=await import('../lib/student-import.js');assertSession();if(!receiverDocumentLive||extensionOwnerBinding()!==binding)throw Error('OWNER');
   const owned=(name,row)=>row.ownerId===owner||row.ownerId==null&&row.syncCreatePending&&current.outbox.some(e=>e.ownerId===owner&&e.store===name&&e.recordId===row.id&&e.op==='create'&&({students:['name'],enrollments:['studentId','sectionId','status'],sections:['yearId','grade','label']}[name]??[]).every(k=>JSON.stringify(e.localPatch?.[k])===JSON.stringify(row[k])));
@@ -293,6 +350,7 @@ async function readExtensionProgressResult(){
   let relation='same';try{persistedSelection({year:p.yearId,term:p.termId},current);}catch(error){relation=error.message==='BATCH_PERSISTED_TERM_CHANGED'?'original-term':'unresolved';}
   const bound=n=>Math.min(30000,Math.max(0,Math.trunc(n)));
   assertCurrent();
+  if(p.pending&&relation==='same'&&pendingRows)archive={trace:JSON.stringify(p),yearId:p.yearId,termId:p.termId,assertCurrent};
   return result({checkpoint:p.pending?(pendingSavedRows?'rows-before-receipt':'pending'):'receipts',relation,confirmedRows:bound(receipts.reduce((n,r)=>n+r.total,0)),confirmedReceipts:bound(receipts.length),pendingRows:bound(pendingRows),pendingSavedRows:bound(pendingSavedRows)},'verified-trace');
  }catch{
   // Context loss wins over a storage/integrity failure; never paint old counts.
@@ -303,15 +361,16 @@ async function readExtensionProgressResult(){
 async function resumeSavedExtensionBatch(){
  if(automaticWriting||extensionBusy)return;
  const result=await readExtensionProgressResult(),progress=result.progress;
- let readState=result.readState;
+ let readState=result.readState;retainedProgress=[];pendingArchiveOffer=null;
  try{result.assertCurrent();}catch{readState='context-unverified';}
+ if(readState==='verified-trace'||readState==='no-eligible-trace'){retainedProgress=result.history;pendingArchiveOffer=result.archive;}
  const messages={
   'no-eligible-trace':'اكتملت القراءة المحلية لهذا الحساب ولم تجد أثرًا مؤهلًا لعرض التقدم. هذا لا يعني أن عدد الصفوف المستوردة صفر، ولا يثبت حفظ الدفعة السابقة أو فشلها.',
   'context-unverified':'تعذّر التحقق من سياق الحساب أو الجلسة أو صلاحية هذه الصفحة؛ لا يمكن عرض تقدم محلي موثوق. تحقق من الحساب والجلسة ثم استخدم القراءة المحلية.',
   'read-incomplete':'لم تكتمل قراءة التخزين المحلي؛ لا يمكن الاستنتاج أن الأثر أو البيانات غير موجودة. يمكنك إعادة القراءة المحلية فقط.',
   'trace-unverified':'تعذّر التحقق من الأثر المحلي؛ لا يمكن عرض أعداد موثوقة منه. نتيجة الدفعة السابقة ما زالت غير محسومة.'
  };
- extensionMessage=(messages[readState]??
+ extensionMessage='التشغيل الحالي — '+(messages[readState]??
   `إيصالات محلية مؤكدة: ${progress.confirmedReceipts} (${progress.confirmedRows} صفًا). من الصفوف المعلقة أمكن إثبات ${progress.pendingSavedRows} من ${progress.pendingRows} في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه.`+(progress.relation==='original-term'?' اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.':''))+
   (readState==='verified-trace'&&progress.checkpoint==='receipts'&&progress.pendingRows===0?' الإيصالات المعروضة مؤكدة محليًا؛ المزامنة تُتابع من التطبيق. لا تحسم هذه القراءة نتيجة تشغيل تاريخي آخر.':' لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة.')+' إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.'+(readState==='verified-trace'&&progress.pendingRows&&!profileRecovery?' لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.':'');
  repaint();
@@ -338,7 +397,7 @@ async function continueKnownProfileBatch(){
  }catch(error){extensionMessage='لم يتأكد استكمال الدفعة المحددة ('+safeBatchFailure(error).code+'). بقي الأثر المحلي محفوظًا؛ لا تبدأ جمعًا جديدًا.';}
  finally{if(recovery.batch){delete recovery.batch.recoveryProfile;delete recovery.batch.recoveryTrace;delete recovery.batch.recoveryOutcome;delete recovery.batch.recoverySetup;}repaint();}
 }
-window.addEventListener('pagehide',()=>{receiverDocumentLive=false;clearProfileRecovery();if(automaticBatch)automaticBatch.retired=true;});
+window.addEventListener('pagehide',()=>{receiverDocumentLive=false;pendingArchiveOffer=null;retainedProgress=[];clearProfileRecovery();if(automaticBatch)automaticBatch.retired=true;});
 function automaticGuard(batch){
  const deny=reason=>{const e=Error('BATCH_OWNER_OR_SESSION_CHANGED');e.receiverReason=reason;throw e;};
  if(automaticBatch!==batch||!receiverDocumentLive||batch.document!==document||batch.retired)deny('NO_GRANT');
@@ -584,7 +643,7 @@ async function saveAutomaticNames(result,recovery=null){
  }finally{automaticWriting=false;batch.route=null;void drainDirectRequests();}
 }
 function clearExtensionPreview() { extensionPreview = extensionOwner = null; clearTimeout(extensionTimer); }
-store.onWorkspaceDeactivation(()=>{clearImportClock();clearExtensionPreview();extensionMessage='';automaticBatch=null;clearProfileRecovery();directRequests.clear();});
+store.onWorkspaceDeactivation(()=>{clearImportClock();clearExtensionPreview();extensionMessage='';automaticBatch=null;pendingArchiveOffer=null;retainedProgress=[];clearProfileRecovery();directRequests.clear();});
 cloud.subscribe(() => {
   extensionMessage='';
   const hadClock=!!importClock;
@@ -606,6 +665,8 @@ function directExtensionEntry() {
     ${extensionPreview ? html`<p role="status">${extensionPreview.envelope.source === 'noor' ? 'نور — عمود ظاهر مختار؛ صفحات وأعمدة أخرى غير مجمّعة' : 'مدرستي — الأسماء التي راجعتها في الإضافة فقط'} · ${extensionPreview.envelope.rows.length} اسمًا. اختر الفصل والمادة أدناه.</p><button class="btn btn--primary" data-act="n36-extension-review" ${!hub.existing || hub.kind === 'new' ? 'disabled' : ''}>مراجعة أسماء الإضافة</button><button class="btn btn--quiet" data-act="n36-extension-cancel">إلغاء ومسح النقل</button>` : ''}
     <button class="btn btn--quiet" data-act="n36-batch-resume">قراءة التقدم المحلي لهذا الحساب</button>
     ${profileRecovery ? html`<button class="btn btn--quiet" data-act="n36-profile-continue">استكمال ${profileRecovery.result.envelope.rows.length} صفًا للدفعة ${profileRecovery.digest.slice(0,12)} بعد التحقق دون جمع جديد</button>` : ''}
+    ${store.state.device?.n36NamesBatch?.pending&&store.state.device.n36NamesBatch.ownerId===store.getActiveWorkspace()?.authUserId ? html`<button class="btn btn--quiet" data-act="n36-preserve-pending" ${automaticWriting||extensionBusy?'disabled':''}>حفظ الأثر السابق غير محسوم محليًا وتهيئة استقبال تشغيل مصدر جديد</button><p>هذا إجراء مستقل عن القراءة: يحفظ الإيصالات والأثر المعلّق كما هما على هذا الجهاز، ولا يعيد استيرادهما ولا يبدأ جمعًا جديدًا.</p>` : ''}
+    ${retainedProgress.map(r=>html`<p data-n36-retained>سابق غير محسوم — إيصالات محلية: ${r.confirmedReceipts} (${r.confirmedRows} صفًا)؛ معلّق: ${r.pendingRows}. محفوظ على هذا الجهاز فقط؛ لا يثبت حفظ المعلّق أو اكتمال السحابة، ولا يُعاد استيراده.</p>`)}
     <p role="status" data-n36-handoff-status>${extensionBusy ? 'جار استلام المعاينة المؤقتة…' : extensionMessage}</p>
   </section>`;
 }
@@ -1297,6 +1358,7 @@ export const koshoofCenter = {
   },
   actions: {
     ...classImport.actions,
+    async 'n36-preserve-pending'(){await preservePendingForFreshSource();},
     async 'n36-profile-continue'(){await continueKnownProfileBatch();},
     async 'n36-batch-resume'(){await resumeSavedExtensionBatch();
     },

@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "b212349f-aeab-49f1-9044-786665c0c432",
+  "parentSha": "cb62390f15ec9ea6fda3c79254d9803bd428713d",
+  "baseline": true,
+  "cases": [
+    {
+      "mode": "fresh",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "status": "OBSERVED"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

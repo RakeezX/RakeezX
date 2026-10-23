@@ -1,0 +1,222 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "b212349f-aeab-49f1-9044-786665c0c432",
+  "parentSha": "cb62390f15ec9ea6fda3c79254d9803bd428713d",
+  "baseline": false,
+  "cases": [
+    {
+      "mode": "fresh",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "localOnlyAtomicPreservation": true,
+      "firstFresh": {
+        "receiptAggregateVersion": 1,
+        "id": "064e64271032f8e1f020fc19e7634f6a0165c05f5cfe1cbe668845eaecc0d4a6",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 119
+          },
+          "sourceGuard": {
+            "count": 76,
+            "ms": 4207
+          },
+          "descriptor": {
+            "count": 156,
+            "ms": 1364
+          },
+          "appGuard": {
+            "count": 78,
+            "ms": 996
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 663
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 302,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 217,
+        "existing": 85,
+        "fields": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "conflict",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 10
+          }
+        ],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "partial",
+        "coverageReasons": [
+          "missing-pages"
+        ],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": true,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "currentMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 10 (302 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 0 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. الإيصالات المعروضة مؤكدة محليًا؛ المزامنة تُتابع من التطبيق. لا تحسم هذه القراءة نتيجة تشغيل تاريخي آخر. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "historyMessage": "سابق غير محسوم — إيصالات محلية: 2 (56 صفًا)؛ معلّق: 29. محفوظ على هذا الجهاز فقط؛ لا يثبت حفظ المعلّق أو اكتمال السحابة، ولا يُعاد استيراده.",
+      "secondFresh": {
+        "receiptAggregateVersion": 1,
+        "id": "8b241e7c249c7baf0a0bcb392f77e96af0ea6ec36972b42d26b33304e587fe73",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 135
+          },
+          "sourceGuard": {
+            "count": 76,
+            "ms": 3957
+          },
+          "descriptor": {
+            "count": 156,
+            "ms": 1311
+          },
+          "appGuard": {
+            "count": 78,
+            "ms": 912
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 518
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 302,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 0,
+        "existing": 302,
+        "fields": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "conflict",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 10
+          }
+        ],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "partial",
+        "coverageReasons": [
+          "missing-pages"
+        ],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": true,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "readonlyAndReopen": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

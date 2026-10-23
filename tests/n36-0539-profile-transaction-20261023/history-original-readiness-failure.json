@@ -1,0 +1,122 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "b212349f-aeab-49f1-9044-786665c0c432",
+  "parentSha": "cb62390f15ec9ea6fda3c79254d9803bd428713d",
+  "baseline": false,
+  "cases": [
+    {
+      "mode": "fresh",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "localOnlyAtomicPreservation": true,
+      "firstFresh": {
+        "receiptAggregateVersion": 1,
+        "id": "07c730372fd400413cc8c36c3074d888669f3ac320c88fd5599fa489f9caaa7e",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 125
+          },
+          "sourceGuard": {
+            "count": 76,
+            "ms": 4429
+          },
+          "descriptor": {
+            "count": 156,
+            "ms": 1461
+          },
+          "appGuard": {
+            "count": 78,
+            "ms": 992
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 610
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 302,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 217,
+        "existing": 85,
+        "fields": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "conflict",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 10
+          }
+        ],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "partial",
+        "coverageReasons": [
+          "missing-pages"
+        ],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": true,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "currentMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 10 (302 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 0 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. الإيصالات المعروضة مؤكدة محليًا؛ المزامنة تُتابع من التطبيق. لا تحسم هذه القراءة نتيجة تشغيل تاريخي آخر. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.",
+      "historyMessage": "سابق غير محسوم — إيصالات محلية: 2 (56 صفًا)؛ معلّق: 29. محفوظ على هذا الجهاز فقط؛ لا يثبت حفظ المعلّق أو اكتمال السحابة، ولا يُعاد استيراده.",
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/history.mjs:66:395\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/history.mjs:27:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}
