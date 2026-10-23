@@ -45,7 +45,7 @@ export async function reconcileSuccessor({stamp,certificates,ports}){
  if(![priorSource,successorSource].includes(native.source))deny('reconcile_unknown_source');
  const metadata=await ports.readMetadata();
  const candidates=[];
- for(const pin of [priorSource,successorSource])try{candidates.push(qualifyConfigurationDelta({current:metadata,certificates,expectedPin:pin}));}catch{}
+ for(const pin of [priorSource,successorSource])try{candidates.push(ports.qualifyObservedMetadata(metadata,pin));}catch{}
  if(candidates.length!==1)deny('reconcile_configuration');
  return {...stamp,status:'READ_ONLY_RECONCILED',provider:{...native,...candidates[0]},newProviderWrites:0,markersPreserved:true,automaticRetryAllowed:false,taskId};
 }

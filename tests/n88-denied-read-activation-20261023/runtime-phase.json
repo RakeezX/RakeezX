@@ -1,0 +1,24 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "actualCommittedProducerPhase": true,
+  "phase": {
+    "status": "PASS",
+    "producerTask": "continuous-n44-one-approved-closed-page-push-20261019",
+    "producerSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+    "producerRun": "fc43c561-a04a-458b-b3d1-09077848d2f9",
+    "revision": "5e0cb77db683535e06f8da21fc8ca41bcbe285f6",
+    "sourceCandidate": "35c66a4f9a86b67f75187190803b534f1c3c5cfa",
+    "certificateSha256": "037276349103fb4538e00da9a01e5c0b43f0269b504dc6f5057b169725965f6a",
+    "expectedBeforeComparison": true,
+    "exactN44Keyset": true,
+    "actualPolicyDeltaVerified": true,
+    "finalApprovalDisarmed": true,
+    "resourceReleaseVerified": true,
+    "historicalWholeAggregate": "NOT_PROVEN",
+    "wholeWorkerCompletionRequired": false
+  },
+  "historicalWholeAggregate": "NOT_PROVEN; unchanged original evidence preserved",
+  "n88ProviderOperations": 0,
+  "n44PrivateAccess": false
+}

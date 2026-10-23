@@ -7,7 +7,9 @@ import {spawnSync,execFileSync} from 'node:child_process';
 import {createInheritedVerifier} from '../read-service-20261023/inherited-custody.mjs';
 import {classifyCliFailure} from '../read-service-20261023/history-mirror.mjs';
 import {taskId,custodianSession,projectId,priorSource,successorSource,hash,canonical,qualifyAuthority,qualifyConfigurationDelta} from './transition-guards.mjs';
-import {loadCommittedPhaseChain} from './committed-phase.mjs';
+import {loadRuntimePhase} from './runtime-phase.mjs';
+import {qualifyRuntimeConfiguration,requireWholeTransitionEqual} from './runtime-configuration.mjs';
+import {originalRuntimeExpectations} from './runtime-expectations.mjs';
 import {runSuccessorTransition,reconcileSuccessor} from './activation-transition.mjs';
 const original='C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018',runtime='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/';
 const root=fileURLToPath(new URL('../../../../',import.meta.url)),directory=fileURLToPath(new URL('.',import.meta.url)),evidence=path.join(root,'tests/n88-denied-read-activation-20261023');
@@ -36,7 +38,7 @@ export async function runOriginalCustodian(action,candidate){
  const card=await json(runtime+'queue/'+taskId+'.json');qualifyAuthority(card,{runId:run,candidateSha:candidate,sessionId:session});
  const git=args=>execFileSync('git',args,{cwd:root,encoding:'utf8',maxBuffer:2097152,stdio:['ignore','pipe','pipe']});
  if(git(['rev-parse','HEAD']).trim()!==candidate||path.resolve(card.worktreePath)!==path.resolve(root)||card.baseSha!=='08b8ab626180786f4f36255702f8384a42f06b07')deny('candidate');
- const sourcePaths=['transition-guards.mjs','committed-phase.mjs','activation-transition.mjs','original-custodian.mjs','manifest.json','shared-phase-binding.json'].map(p=>'drafts/n88-student-portal/activation/denied-read-20261023/'+p);
+ const sourcePaths=['transition-guards.mjs','committed-phase.mjs','activation-transition.mjs','original-custodian.mjs','runtime-phase.mjs','runtime-configuration.mjs','runtime-expectations.mjs','runtime-dependencies.mjs','manifest.json','shared-phase-binding.json'].map(p=>'drafts/n88-student-portal/activation/denied-read-20261023/'+p);
  sourcePaths.push('drafts/n88-student-portal/activation/read-service-20261023/inherited-custody.mjs','drafts/n88-student-portal/activation/read-service-20261023/history-mirror.mjs');
  for(const p of sourcePaths){if((await readFile(path.join(root,p),'utf8')).replaceAll('\r\n','\n')!==git(['show',candidate+':'+p]).replaceAll('\r\n','\n'))deny('committed_source');}
  const manifest=await json(path.join(directory,'manifest.json'));
@@ -47,11 +49,14 @@ export async function runOriginalCustodian(action,candidate){
  const priorReceiptPath='tests/n88-read-service-20261023/history-correction-inherited-1593971e-7927-4c32-a307-e751d0b2c869.json';
  const priorBytes=git(['show',card.baseSha+':'+priorReceiptPath]),priorReceipt=JSON.parse(priorBytes);
  if((await readFile(path.join(root,priorReceiptPath),'utf8')).replaceAll('\r\n','\n')!==priorBytes.replaceAll('\r\n','\n')||priorReceipt.status!=='PASS'||priorReceipt.routineCount!==78||priorReceipt.old76Unchanged!==true||priorReceipt.priorHistoryUnchanged!==true||priorReceipt.sqlSha256!=='8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b'||priorReceipt.provider.source!==priorSource)deny('preserved_service_history');
+ sourcePaths.push('tests/n88-denied-read-activation-20261023/runtime-dependencies.json');
+ if((await readFile(path.join(root,sourcePaths.at(-1)),'utf8')).replaceAll('\r\n','\n')!==git(['show',candidate+':'+sourcePaths.at(-1)]).replaceAll('\r\n','\n'))deny('dependency_proof_bytes');
+ const dependencyProof=await json(path.join(root,sourcePaths.at(-1)));
  const stamp={taskId,runId:run,sessionId:session,candidateSha:candidate,baseSha:card.baseSha,observedAt:new Date().toISOString(),source:successorSource,priorSource};
  const binding=await json(path.join(directory,'shared-phase-binding.json'));
  if(binding.taskId!==taskId||binding.baselineDigest!=='d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af')deny('phase_binding');
- let certificates=await loadCommittedPhaseChain(binding.certificates);
- const verifyCommittedPhase=async()=>{const fresh=await loadCommittedPhaseChain(binding.certificates);assert.deepEqual(fresh,certificates);};
+ const runtimePhase=await loadRuntimePhase(binding),certificates=[runtimePhase.phase];
+ const verifyCommittedPhase=async()=>{const fresh=await loadRuntimePhase(binding);assert.deepEqual(fresh,runtimePhase);};
  const verifyExclusivePhase=async()=>{
   const active=await json(runtime+'queue/'+taskId+'.json'),workflow=await json(runtime+'workflow-v5.json');qualifyAuthority(active,{runId:run,candidateSha:candidate,sessionId:session});
   const checkpoint=await json(active.attempt.checkpointPath);
@@ -60,7 +65,8 @@ export async function runOriginalCustodian(action,candidate){
  };
  await verifyExclusivePhase(); // no private/provider access before exact phase binding + leases
  const verifyIsolation=await createInheritedVerifier({phase,originalRoot:original,owned});await verifyIsolation();
- const load=async()=>{await verifyIsolation();const b=dpapi(await readFile(path.join(phase,'recovery.dpapi')),false);try{return JSON.parse(b.toString());}finally{b.fill(0);}};
+ let expectations=null,wholeSnapshot=null;
+ const load=async()=>{await verifyIsolation();const b=dpapi(await readFile(path.join(phase,'recovery.dpapi')),false);try{const state=JSON.parse(b.toString());const publicBytes=await readFile(path.join(root,'drafts/n44-push/activation/public-provider-config.json'));expectations=originalRuntimeExpectations(state,{ca:await readFile(path.join(root,'drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt'),'utf8'),publicConfig:JSON.parse(publicBytes.toString()),publicConfigBytesDigest:hash(publicBytes)});return state;}finally{b.fill(0);}};
  const save=async s=>{await verifyIsolation();const b=Buffer.from(JSON.stringify(s));try{await writeFile(path.join(phase,'recovery.dpapi'),dpapi(b,true));}finally{b.fill(0);}};
  const marker=path.join(phase,'denied-read-20261023-native-attempt.json');
  const expectedMap=await json(path.join(root,'drafts/n88-student-portal/activation/bundle/edge/import_map.json'));
@@ -80,7 +86,8 @@ export async function runOriginalCustodian(action,candidate){
   });
   return {status:found[0].status,version:found[0].version,verifyJwt:false,source,downloadedBytesExact:true,importMapExact:true,importMapDigest:hash(JSON.stringify(expectedMap)),observedAt:new Date().toISOString()};
  };
- const ports={verifyCommittedPhase,verifyExclusivePhase,load,save,readMetadata,readNative,readNativeIdentity:()=>readNative(null),readQualifiedMetadata:async pin=>qualifyConfigurationDelta({current:await readMetadata(),certificates,expectedPin:pin}),uploadMarkerExists:async()=>{try{await lstat(marker);return true;}catch(e){if(e.code==='ENOENT')return false;throw e;}},reserveUpload:async r=>{await verifyIsolation();await writeFile(marker,JSON.stringify(r)+'\n',{flag:'wx'});},reservePin:async r=>{await verifyIsolation();await writeFile(path.join(phase,'denied-read-20261023-pin-attempt.json'),JSON.stringify(r)+'\n',{flag:'wx'});},
+ const qualifyObservedMetadata=(rows,pin)=>{if(!expectations)deny('expected_before_comparison');if(wholeSnapshot)requireWholeTransitionEqual(wholeSnapshot,rows,pin);else wholeSnapshot=rows;return {...qualifyRuntimeConfiguration({current:rows,expectedRuntime:expectations.expected,n44ExpectedMap:runtimePhase.expectedMap,dependencyProof,expectedPin:pin}),runtimeProvenance:expectations.provenance,expectedBeforeComparison:true,n44Phase:runtimePhase.phase};};
+ const ports={qualifyObservedMetadata,verifyCommittedPhase,verifyExclusivePhase,load,save,readMetadata,readNative,readNativeIdentity:()=>readNative(null),readQualifiedMetadata:async pin=>qualifyObservedMetadata(await readMetadata(),pin),uploadMarkerExists:async()=>{try{await lstat(marker);return true;}catch(e){if(e.code==='ENOENT')return false;throw e;}},reserveUpload:async r=>{await verifyIsolation();await writeFile(marker,JSON.stringify(r)+'\n',{flag:'wx'});},reservePin:async r=>{await verifyIsolation();await writeFile(path.join(phase,'denied-read-20261023-pin-attempt.json'),JSON.stringify(r)+'\n',{flag:'wx'});},
   uploadExactSuccessor:()=>withPublicWorkdir('upload',async dir=>{
    const bytes=Buffer.from((await readFile(path.join(directory,'native66-successor.inactive.mjs'),'utf8')).replaceAll('\r\n','\n'));if(hash(bytes)!==successorSource)deny('successor_bytes');
    const fdir=path.join(dir,'supabase/functions/n88-student-portal');await mkdir(fdir,{recursive:true});await writeFile(path.join(fdir,'index.mjs'),bytes,{flag:'wx'});
@@ -91,8 +98,9 @@ export async function runOriginalCustodian(action,candidate){
    await verifyIsolation();const p=path.join(phase,'denied-read-20261023-public-pin.env');
    try{await writeFile(p,'N88_SERVICE_SOURCE_SHA='+successorSource+'\n',{flag:'wx'});await verifyExclusivePhase();await official(['secrets','set','--project-ref',projectId,'--env-file',p]);}finally{await unlink(p).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   }};
+ if(action==='reconcile')await load();
  const outcome=action==='activate'?await runSuccessorTransition({stamp,certificates,ports}):await reconcileSuccessor({stamp,certificates,ports});
- outcome.catalogHistoryReference='tests/n88-read-service-20261023/history-correction-inherited-1593971e-7927-4c32-a307-e751d0b2c869.json';outcome.configurationPhaseBindings=binding.certificates;outcome.oldDeniedResourcesUntouched=true;
+ outcome.catalogHistoryReference='tests/n88-read-service-20261023/history-correction-inherited-1593971e-7927-4c32-a307-e751d0b2c869.json';outcome.configurationPhaseBindings=binding;outcome.oldDeniedResourcesUntouched=true;
  await writeFile(path.join(evidence,action+'-'+run+'.json'),JSON.stringify(outcome,null,2)+'\n',{flag:'wx'});return outcome;
 }
 if(process.argv[1]&&pathToFileURL(path.resolve(process.argv[1])).href===import.meta.url){try{console.log(JSON.stringify(await runOriginalCustodian(process.argv[2],process.argv[3])));}catch(e){console.error(JSON.stringify({status:'BLOCKED',code:/^n88_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n88_denied_custodian_private_failure'}));process.exitCode=1;}}
