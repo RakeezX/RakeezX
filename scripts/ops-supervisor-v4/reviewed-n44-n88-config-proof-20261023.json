@@ -1,0 +1,271 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261023-RENEWED-ONE-DEVICE-TWO-HOURS",
+      "budgetMinutes": 20,
+      "idleMinutes": 10,
+      "allowedPaths": [
+        "src/app.js",
+        "src/lib/notification-push-*.js",
+        "src/views/notification-settings.js",
+        "src/styles/notifications.css",
+        "sw.js",
+        "drafts/n44-push/**",
+        "supabase/functions/n44-notifications/**",
+        "tests/n44-device-1019*.mjs",
+        "tests/n44-device-1019*.json",
+        "tests/fixtures/n44-device-1019/**",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md",
+        "tests/n44-device-20261023/**",
+        "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "origin": "https://rakeezx.com",
+        "authorityEvidence": "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_AUTHORITY_0929.md",
+        "publication": true,
+        "maxActualDeviceRegistrations": 1,
+        "maxProviderSendAttemptsTotalAcrossBothCards": 1,
+        "periodicCron": false,
+        "globalAutonomousDelivery": false,
+        "newAuthUsers": 0,
+        "newRoles": 0,
+        "newMigrations": 0,
+        "managedAuthChange": false,
+        "RlsChange": false,
+        "realStudentMutations": 0,
+        "newPaidService": false,
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "existingSyntheticTeacherNormalUiOnly": true,
+        "maxAdditionalSyntheticOperationalSources": 1,
+        "maxUniquePhysicalDevices": 1,
+        "maxConcurrentActiveRegistrations": 1,
+        "maxRegistrationRecoveryAttemptsOnQualifiedChangedSource": 1,
+        "recoveryReviewSha256": "7c1ce09412c031eadb1fb48b4357af512a6a88d52aa8a1b7ceea84ee6d293943",
+        "authorityStartsAt": "2026-10-23T06:29:00.000Z",
+        "authorityExpiresAt": "2026-10-23T08:29:00.000Z",
+        "productId": "N44",
+        "liveAuthorizationRef": "PO-20261023-RENEWED-ONE-DEVICE-TWO-HOURS",
+        "namedOperations": [
+          "reconcile original one-device attempt and cleanup",
+          "qualify exact changed two-hour hard stop preserving consumed budget",
+          "activate pinned disabled-recovery source in original N44 function",
+          "one source-bound recovery registration if unconsumed",
+          "one total closed-page provider-send if unconsumed",
+          "owner-safe cleanup and sendingOFF/cronempty readback"
+        ],
+        "configurationDeltaProof": {
+          "readOnlyOriginalCustodian": true,
+          "providerWrites": 0,
+          "privateValuesReturned": false,
+          "exactAllowedKeys": [
+            "N44_ONE_DEVICE_TEST_JSON",
+            "N44_DELIVERY_ENABLED"
+          ],
+          "requiredHistoricalAggregate": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
+        }
+      },
+      "releaseAuthority": "Direct human23October09:29Saudi answered YES to explicit two-hour same-owner/workspace/physical-device scope: qualify/activate prepared corrected package, renew current normal consent and hard stop only within this window, one recovery registration and ONE total send if existing ledger proves allowance, exact cleanup with general delivery/cron OFF. User also says all three tickets high priority and finish them. Original custodian only; no new Auth users/roles/RLS/schema/migrations or refusal bypass. Original publisher owns Product Git/frontend delivery.",
+      "id": "continuous-n44-one-approved-closed-page-push-20261019",
+      "dependsOn": [
+        "continuous-n44-single-device-optin-ready-20261019",
+        "continuous-n44-publish-qualified-delayed-ack-20261019",
+        "continuous-n44-register503-existing-service-repair-20261019"
+      ],
+      "objective": "NEW MATERIAL READ-ONLY CROSS-SERVICE PROOF, NOT A REGISTRATION/SEND RETRY. Preserve d9bba5b7 and the exact original private custodian. The live N44 disarm in run39c4090a executed device-custodian.mjs action disarm: verifyConfig({N44_ONE_DEVICE_TEST_JSON:'null',N44_DELIVERY_ENABLED:'false'}), then d.disabled=true and persist. The existing code appears to retain d.approval rather than rewriting it. N88's original aggregate excludes only N88_SERVICE_SOURCE_SHA and includes these shared project flags; its old expected digest is347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186 and current observed digest wasd1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af. This gives a concrete testable hypothesis; do not assert N44 caused drift until exact equality proves it.\n\nThrough ONLY the original protected N44 custodian channel, qualify a bounded read-only configuration-delta action. Load own already-retained d.approval, immutable journals and existing original metadata; list current provider configuration DIGESTS once through the existing sanctioned channel with private output suppressed. No secret values, owner/workspace/device IDs, credentials or private state exported or handed to N88/root. Do not read N88 private custody. Reconstruct ONLY the exact pre-disarm N44_ONE_DEVICE_TEST_JSON digest using the original serialization applied by this same helper and the genuinely retained approval; use recorded exact old deliveryfalse evidence for N44_DELIVERY_ENABLED if needed. No inferred values, guessed historical maps, mutation, candidate enumeration or brute force. Keep immutable old marker/approval/expiry/budget/state unchanged.\n\nIn memory normalize the whole current metadata map identically to N88 (name/digest sorted, exclude ONLY N88_SERVICE_SOURCE_SHA). Require actual current N44_ONE_DEVICE_TEST_JSON equals hash('null'), delivery equals hash('false'), own historical approval binding matches its original immutable record and completed disarm proof. Substitute only the independently evidenced OLD digest(s) for these exact authorized fields. A certificate is valid ONLY if the resulting whole-map hash exactly equals347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186. This proves all other entries remained equal without exporting their values. Otherwise preserve FAIL and no certificate; do not adopt any new baseline or reset a marker.\n\nEmit only a deidentified immutable certificate with task/run/candidate/session binding, SHA hashes of public disarm and original journal proofs, current aggregate, reconstructed original aggregate, finite changed KEY NAME(S) and their digests, current metadata-shape/keyset digest, no plaintext values or identities. Store under tests/n44-device-20261023/configuration-delta-certificate.json and document in the existing outcome. Tests must reject altered key/digest/extra field, wrong aggregate, absent historical approval and missing disarm authority; prove no persist/config-write/upload/send path called. Preserve prior actual FAIL/NOT_RUN and all registration/cleanup/OS limits; return BLOCKED for whole N44 with the useful certificate committed, not LOCAL_READY/closed. Original N88 custodian may READ this committed public certificate, never private material. This is a named read-only prerequisite authorized by the user's service-identity/completion request, and does not extend the two-hour send window. Acquire/release existing shared phase leases only for actual metadata read; no browser, registration, send, activation, SQL/Auth/RLS, source pin or cleanup retry.\n\nResume SAME original N44 custodian session01a14fcd-032c-7ec0-8b0c-0e0395862c61, actual preserved worktree HEAD f17b1672d64c2372eef0b0cc4e372f73d3d3f29a. Original stopped f48bd23c run has no final result; exact exited checkpoint/old real BLOCKED result and commits are preserved, not relabelled. Latest user23October09:29Saudi explicitly approved the concrete scope in docs/automation-evidence/20261023/N44_RENEWED_DEVICE_AUTHORITY_0929.md: validity starts06:29Z ends08:29Z TODAY. It supersedes the old PO temporary hold for this exact action only. All three outcomes high priority; useful parallelism only. No new scheduler/executor.\n\nReuse qualified INACTIVE package candidate6ae14530/source-stage7140d967, docs/automation-evidence/20261022/N44_DISABLED_SOURCE_PREPARATION.md and disabled-recovery README/manifest from current published main. Those files may not exist in old worktree; inspect exact commits and reconcile only needed N44 package files, preserve existing f17/0eb39f95 changes and original custody. Do not rebuild old bcf backend over native44. Recorded native44 source SHA0e1a86d8e64fbfdeb294044a9809cd9f33a7ee44ffc2a48b14687716e1141fe7, inactive corrected SHA18afb81db82b76929278ffe7f024b84c68b546d23ff814d2aeb5c46ea1834513. Reuse31 local cases and previous single-snapshot35-query/crypto/SQL proof unchanged.\n\nFirst reconcile original saved journals, failed/retired IDs, c142 cleanup ACKs, f48 interrupted partial work and source-bound recovery marker using ONLY existing protected original-custodian channel; never print/export secrets/private rows or transfer custody. Last public evidence is register200/disabled,0 sender invocations, target unarmed, revoked ACK, consentfalse/quiet22-07 ACK and local subscription absent. This is historical. If a send/recovery marker is consumed or uncertain, do NOT reset or retry. New runId/window cannot renew consumed allowance. Prior diagnostic probe is consumed and NOT renewed. Prior browser Allow already answered; do not ask again unnecessarily. A previously refused delete/browser operation remains refused; DO NOT retry deleting old synthetic lesson or recreate it through another method. Any such cleanup limitation remains documented.\n\nCurrent narrow authority permits qualifying the changed expiry/hard-stop handling before using a fixture; keep total authority-wide send budget and tombstones across dates, reject old/expired/foreign approval and unknown COMMIT. Renew only this user's consent/window to END08:29Z, not an arbitrary extension. Prepare exact source44-compatible patch composition retaining one snapshot and the corrected disabled predicate; no stale full bundle rebuild. Original service resources/function identity and config only, fresh source/config nonsecret identity readback and exact needed existing-function update/pin via original protected sanctioned path. One guarded qualified service activation, inspect ambiguous provider outcome before any retry. No repeated migrations/native huge suites/newroles/Auth/RLS/secret or credentials change. General delivery and cron remain OFF outside the single authorized target.\n\nUse existing designated synthetic teacher workspace and SAME physical device, ordinary permitted programmatic browser UI only under phase lease, no foreground window/OS mouse/keyboard/personal tab interference, no cookie/token inspection. If designated session/device is no longer available, preserve useful service preparation and name the exact missing input; do not make an alternate account or use real teacher/student data. Reuse existing eligible synthetic source; only one fabricated operational source if already covered by original authority and necessary, preserve N88 fake roster/codes and acquire shared browser/live phase lease only for actual action. Source revalidation includes consent/Auth/owner/session/expiry/encryption/eligibility/quiet setting and true committed registered ACK.\n\nAt most ONE normal recovery registration on qualified changed native source, with durable source-bound recovery marker before operation. Timeout/unknown consumes it. Do not send before registered ACK. Only if original persistent authority-wide one-send allowance is proven available, bind the single target and make ONE committed-permit provider-send ATTEMPT total; any unknown result consumes it. Close only own designated test pages, never unrelated user tabs; if other Rakeez pages prevent closed-page condition obtain user's closure. Provider200/201 is not OS arrival. Record actual SW/provider evidence separately and request user's one OS-arrival observation if tool cannot observe, no resend. Release browser lease during human wait. Then owner-safe revoke/consentfalse/subscription cleanup and sendingOFF/emptycron readback; preserve unknown cleanup/refusals honestly. Cleanup is authorized even after window expires, new registration/send is not.\n\nPreserve existing actual requiredChecks, add narrowly affected expiry/budget tests and actual source identity/service evidence. Return BLOCKED with saved candidate if input/time/real rejection remains, never FAIL to PASS. Only original publisher integrates Product source/frontend and records served proof. Source-only/local/HTTP200/accepted is not whole N44 closure. No new worker, direct Git main push, blanket review, attempt reset, cancelled old operation retry or sensitive scope expansion.",
+      "requiredChecks": [
+        "n44_one_authorized_device_registration_single_push_with_pages_closed",
+        "n44_device_test_final_disposition_and_no_extra_delivery",
+        "n44_exact_shared_configuration_delta_certificate"
+      ],
+      "acceptance": [
+        "Exactly one approved current-device actual push attempt, after pages closed, with explicit browser consent and truthful OS result.",
+        "Sending disabled/cron empty and own test registration/subscription disposition verified; no extra recipient/send or fabricated receipt."
+      ],
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "d9bba5b7eaee95c0181f9e2df21d85d89cc0b8e6",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_OUTCOME.md"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "tests/n44-device-20261023/configuration-delta.mjs",
+          "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n44-device-20261023/configuration-delta.mjs"
+        ],
+        "workerChecks": [
+          "n44_one_authorized_device_registration_single_push_with_pages_closed",
+          "n44_device_test_final_disposition_and_no_extra_delivery",
+          "n44_exact_shared_configuration_delta_certificate"
+        ],
+        "publisherChecks": []
+      }
+    },
+    {
+      "id": "continuous-n88-typed-read-service-activation-20261023",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n88-typed-read-original-service-activation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "MATERIAL ORIGINAL-BASELINE RECONSTRUCTION, NOT A LOOSER CONFIG GUARD. Preserve b0179613, all FAIL receipts and unchanged tests. Source inspection identified the exact N44 disarm on23October: N44_ONE_DEVICE_TEST_JSON changed to literal 'null', deliveryfalse, while original custodian retains the historical approval. Root has activated the original N44 custodian to prove this hypothesis privately and publish ONLY a committed deidentified certificate at its saved worktree tests/n44-device-20261023/configuration-delta-certificate.json. No N88 worker may access N44 private state. Do not claim causation yet.\n\nWhile that independent worker prepares proof, qualify a small certificate verifier locally; wait without service/browser leases for its committed public artifact, do not spawn/message/dispatch another worker or repeatedly call the provider. Use normal queue/result evidence to bind the exact original N44 task/session/run/candidate and verify clean committed certificate bytes, not an in-progress file. A finite wait for the other active lane is useful; if its result is BLOCKED with no valid certificate, report the exact mismatch and stop without repeating provider reads.\n\nThe ONLY permitted reconciliation remains exact reconstruction of the original whole non-pin aggregate347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186, from freshly read metadata using only certificate-proved prior digests of N44_ONE_DEVICE_TEST_JSON and, if independently necessary/proved, N44_DELIVERY_ENABLED. Every other entry is byte-for-byte covered by that original aggregate equality. Require current certificate aggregate/shape/keyset, known authorized disarm receipt, original custody binding and finite keys all match. No ignoring foreign prefixes, historical map invention, replacing unexplained values, service-only relaxation, unknown baseline adoption, config write or key rotation. Reject tampered/uncommitted/foreign/stale certificates and any actual metadata drift before/after the single allowed source-pin update. Preserve old FAIL because it correctly rejected unclassified drift; a new PASS may cite only the new exact proof.\n\nSpecific additional missing-fact pointer: the ignored but existing public project configuration at drafts/n44-push/activation/public-provider-config.json in this N88 worktree has projectxlrubcwjqktzzunrvuns, keyType publishable, disabledfalse, provenance 'Actual Supabase get_publishable_keys; legacy disabled anon excluded'. Do not print its public-key value; it may provide an independent N88_AUTH_API_KEY digest reference if its provenance and current fingerprint match. This alone does not resolve whole-config history and is never permission to access N44 private state.\n\nOnce and ONLY if exact reconstruction succeeds, continue the already-qualified compatible service/source pin/history/catalog/drainage/two fixed functions activation under the original untouched operation budgets. No benchmark repeat; preserve authentication, session/grade/privacy and actual speed NOT_RUN. If certificate cannot be proved, isolate that precise external missing fact without unchanged retry or a generic permission request.\n\nMATERIAL CONTINUATION AFTER ACTUAL CONFIGURATION GUARD FAILURE: preserve candidate1fb4ea642c52564f4209f7592a2a6d7bdd70f8e4 and same original custodian/session/worktree. The previous proof already accepted current native64 source, pin and import map; expected aggregate non-pin config347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186 failed. Root inspection of custody-preflight.mjs proves its aggregate includes ALL project secret-name/digest entries except N88_SERVICE_SOURCE_SHA, not just N88. N44 shares this project and has documented approved configuration operations; this is a concrete hypothesis, not proof of the drift cause. Do not repeat unchanged preflight or any completed transition/benchmark tests.\n\nFirst perform bounded READ-ONLY config provenance reconciliation through the SAME protected original custodian and existing sanctioned CLI metadata channel, with owned shared phase leases. No secret values printed/exported and no root/other-worker private-state access. Compare exact current name/digest metadata to available original private per-key baseline/history. If only an aggregate exists, inspect whether the original protected expected N88/platform configuration can be reconstructed from already-owned custody material without revealing it, and whether every other difference has exact approved public service-history evidence. Do not invent a historical map. Project-wide flags may be mutable by another authorized service; distinguish that fact from unknown mutations.\n\nQualify a narrow certificate only when all required N88 and platform security-sensitive values/keys, original source/pin/import-map/identity and every remaining config difference are explicitly accounted for by actual existing authorized evidence. Preserve the old FAIL/aggregate unchanged; append the material reconciliation with current whole-config digest, exact documented baseline provenance and task/run/candidate binding. Unknown, unrecorded, extra or missing key/value remains BLOCKED. No wholesale adoption, blanket exclusion of N44 keys, ignore-config switch, weakening N88 checks, setting rewrites or secret rotation. Local synthetic changed-key/unknown-key/certificate tamper/critical-key denials must protect any new reconciliation logic; reuse all unchanged proofs.\n\nOnly after that certificate is valid may the existing guarded preflight use its reconciled current baseline for this exact candidate/action; before/after config remains exact apart from the ONE specifically permitted source-pin update. Then continue the already-authorized compatible activation/catalog/history/drainage/typed SQL path, retaining unused operation budgets, old evidence and actual failure receipts. If provenance is unavailable, identify precisely which missing private historical map or named-key provenance prevents safe reconciliation; no new generic permission question or unproven reset. The user already authorized necessary completion, not unknown config changes. This bounded diagnostic is a material next action, not an unchanged retry.\n\nLatest PO23October09:29Saudi explicitly says YES, do all necessary work to finish N36/N88/N44, equal high priority and studied independent parallelism. Earlier initial request explicitly requires activation via the original service owner after checking authority. This card bounds that completion authority to this prepared exact N88 integration and required safe transition; it does not renew consumed old allowances or authorize unrelated data/Auth/RLS. Resume SAME original custodian session01a14fc3-b292-7390-9952-8549a286c80f with its original protected custody at .worktrees/continuous-n88-official-student-portal-activation-20261018, and use THIS new isolated candidate worktree for code. No root/other worker receives private material.\n\nPrepared candidate ddfa87956cd673abad634a492c9aff6bacba86b8, prior experiment9e95eb6d, package drafts/n88-student-portal/activation/read-roundtrip-20261023/ACTIVATION.md and manifest are the starting artifacts. Read them via exact Git commit and import only the qualified package/test/evidence paths as needed; no restart/benchmark creation. Existing local 14-to-2 fixed-cost comparison, staged source/native actual-service/wire/cancel/commit tests remain valid by unchanged hashes. Current staged native hash a0f3d3fb53070f3f28dde2660efba508e646eb3ffbefb543f589e9d72a36a70f, additive SQL hash 8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b; recorded native63 base6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09. Fresh actual service identity must match; recorded receipt is not current readback.\n\nCRITICAL PROVED COMPATIBILITY LIMIT: old native63 requires exact76 routine catalog, staged package exact78; simply applying SQL before/after current single-state binary causes a rejection window and binary-only rollback fails. Do NOT apply that naive sequence. Prepare the minimum fixed dual-catalog transition on the pinned source FIRST and qualify locally, reusing the current fixture. One compatible native artifact may recognize ONLY the two exact predetermined catalog fingerprints (unchanged76 versus unchanged76+exact2), choose old serial reader for old catalog and bounded batch for new, with per-connection verified mode and strict fixed operation allowlist. No wildcard/adoption/generic SQL, skipping catalog verification, broad catch/fallback on failure, permissions expansion or auth/revoke weakening. Unknown/mixed/drift catalog must fail closed. Preserve in-flight transaction behavior, connection release/commit ACK, owner filters, freshness, cancellation, bounds and current sessions/grades/privacy. Local tests must prove pre-addition and post-addition service reads, wrong/mixed identities denied and rollback/recovery leaves a valid compatible service. The staged two exact operations and old routines/ACLs stay unchanged. Do not rebuild unrelated service code. If a safe bounded transition cannot be qualified, retain candidate and BLOCKED with exact missing operation instead of knowingly disrupting service.\n\nOnly after qualified compatibility and fresh original-custodian gates: reconcile current source/pin/import-map/config fingerprints and append-only consumed operation history, exact old/new catalog and migration history. Original sanctioned provider path only; no new OAuth/DNS/ACL/policy workaround, browser token/credential extraction or secret in tools/logs. This NEW card's explicit scope permits at most ONE newly qualified compatible native upload, ONE existing exact public source-pin update, and ONE new append-only transactional migration containing ONLY the two fixed INVOKER functions named below. Those are new task-bound allowances for changed code, not reuse/reset of consumed historical permits. Prepare new migration via installed CLI supported path; old migrations immutable. Preserve same role grants and project. Before SQL, prove compatible upload/pin actually active and old-worker drainage/transition safe using supported original provider evidence; if unproved stop before DDL. Already applied exact function+history state is reused, never reapplied. Mixed or unknown history stops. Readback exact2 definitions/signatures/owner/ACL/config plus unchanged76 and migration history, downloaded native bytes/version/config and pin. Ambiguous operation outcome requires read-only reconciliation, never automatic second upload/apply/pin.\n\nNew functions ONLY n88_private.boundary_9e3f889e8b1e375a0a980496(text,text,text) and n88_private.boundary_3121e2df6802725969086adf(text,text,text), original package exact fixed bodies/limits/INVOKER/pg_catalog/backend-only EXECUTE. No tables/schema/roles/Auth/RLS/region/password changes, real teacher/student writes, new synthetic account or retired fixture reuse. No destructive rollback/drop or rewrite of applied migration; compatible native remains recovery path. Shared integration/live-mutation service leases serialize with N44; separate service/function/paths and no N44 state writes. Do not hold a lease awaiting user.\n\nCarrier protocol must match current observed original carrier and staged wire evidence; unchanged carrier/frontend has zero upload allowance, do not rebuild it merely for convenience. Integrate active source copies only after successful exact service prerequisites, with correct active imports, preserve guard source and finite modes. Record actual service evidence in docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md and tests/n88-read-service-20261023/. Only original publisher integrates Product Git/main and verifies source delivery. Generic frontend publication alone cannot certify service.\n\nFor actual hosted speed acceptance, NO real account/browser read is delegated to this worker and no new fixture/pair is granted. Preserve public finite diagnostics and ask root for PO's own comparable same-device initial login/read and same-tab return, warm/idle stated, after verified activation. Do not manufacture live timings from synthetic transport. Actual-session/grade/privacy/revocation behavior must remain protected by affected local integration tests and existing source; actual user acceptance remains NOT_RUN until supplied. LOCAL_READY only after all named service gates actually PASS; otherwise BLOCKED with exact candidate/session/operation and preserved preparation. No whole N88 closure from local or HTTP200; no routine review worker, recursive agent or new dispatcher.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/error-boundary-contract.json",
+        "drafts/n88-student-portal/activation/error-boundary-identities.json",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "drafts/n88-student-portal/activation/read-roundtrip-20261023/**",
+        "drafts/n88-student-portal/activation/read-service-20261023/**",
+        "drafts/n88-student-portal/activation/official-activation.mjs",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "drafts/n88-student-portal/activation/package-20261020.mjs",
+        "tests/n88-read-roundtrip-outcome-20261023/**",
+        "tests/n88-read-service-20261023/**",
+        "docs/automation-evidence/20261023/N88_READ_ROUNDTRIP_OUTCOME_20261023.md",
+        "docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/error-boundary-contract.json",
+        "drafts/n88-student-portal/activation/error-boundary-identities.json"
+      ],
+      "requiredChecks": [
+        "n88_exact_dual_catalog_transition_and_affected_guards",
+        "n88_original_service_identity_and_additive_history_readback",
+        "n88_changed_native_source_pin_and_carrier_parity",
+        "n88_preserved_session_privacy_and_truthful_performance_limits",
+        "n88_exact_configuration_provenance_reconciliation"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88",
+        "publication": true,
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "originalPrivateCustodianOnly": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "preparedCandidate": "ddfa87956cd673abad634a492c9aff6bacba86b8",
+        "exactAdditiveSqlSha256": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b",
+        "maxChangedNativeFunctionUploads": 1,
+        "maxPublicSourcePinUpdates": 1,
+        "maxNewAppendOnlyMigrations": 1,
+        "newFunctions": [
+          "boundary_9e3f889e8b1e375a0a980496",
+          "boundary_3121e2df6802725969086adf"
+        ],
+        "oldFunctionsAltered": 0,
+        "publicGrants": 0,
+        "newAuthUsers": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "maxChangedPrivateStaticUploads": 0,
+        "regionChanges": 0,
+        "AuthRLSChanges": 0,
+        "resetConsumedMarkers": false,
+        "appendOnlyAttemptHistory": true,
+        "namedOperations": [
+          "local exact dual-catalog compatibility qualification",
+          "original service/catalog/history read-only preflight",
+          "one changed compatible original-native upload and exact public pin",
+          "one new append-only exact two-function migration after compatible service proved active",
+          "exact source/catalog/history/provider readbacks"
+        ],
+        "authorityEvidence": "docs/automation-evidence/20261023/N88_TYPED_READ_ACTIVATION_AUTHORITY.md",
+        "configurationReconciliation": {
+          "readOnlyOriginalCustodian": true,
+          "secretValuesExported": false,
+          "unknownDriftAccepted": false,
+          "configWrites": 0,
+          "preserveOriginalFailure": true,
+          "onlyDocumentedPerKeyProvenance": true
+        },
+        "exactSharedConfigurationCertificate": {
+          "allowedProducerTask": "continuous-n44-one-approved-closed-page-push-20261019",
+          "originalProducerSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+          "privateCrossCustodyAccess": false,
+          "wholeHistoricalAggregateMustMatch": true,
+          "unknownDriftAccepted": false
+        }
+      },
+      "releaseAuthority": "Latest user23October explicitly authorizes all necessary work to finish the three tickets; scoped interpretation is the exact original-service transition and two prepared fixed read functions only. No old permission is reused. Same original custodian performs named service prerequisite, original controller/publisher alone integrates Product source. Preserve actual refusal, private custody and sensitive data limits.",
+      "acceptance": [
+        "Qualified fixed old/new catalog transition; mixed/changed denied and existing session/owner/grade/privacy semantics preserved.",
+        "Exact service/native/pin and additive history verified, no duplicate apply/upload or general query allowance.",
+        "No hosted speed claim until actual comparable user journey; whole N88 stays open."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "b01796137f3995a175080927bd3e3c21a71249b5",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/error-boundary-contract.json",
+          "drafts/n88-student-portal/activation/error-boundary-identities.json",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/ACTIVATION.md",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/manifest.json",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/native63-candidate.inactive.mjs",
+          "tests/n88-read-roundtrip-outcome-20261023/staged.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/error-boundary-contract.json",
+          "drafts/n88-student-portal/activation/error-boundary-identities.json",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "tests/n88-read-service-20261023/transition.mjs",
+          "docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md",
+          "drafts/n88-student-portal/activation/read-service-20261023/custody-preflight.mjs",
+          "tests/n88-read-service-20261023/config-provenance.mjs"
+        ],
+        "newPaths": [],
+        "workerChecks": [
+          "n88_exact_dual_catalog_transition_and_affected_guards",
+          "n88_original_service_identity_and_additive_history_readback",
+          "n88_changed_native_source_pin_and_carrier_parity",
+          "n88_preserved_session_privacy_and_truthful_performance_limits",
+          "n88_exact_configuration_provenance_reconciliation"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
