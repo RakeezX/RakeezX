@@ -1,5 +1,5 @@
-import {n88TypedReadTask,buildN88TypedReadEvidence,verifiedN88TypedReadPublication} from './n88-typed-read-publication.mjs';
 #!/usr/bin/env node
+import {n88TypedReadTask,buildN88TypedReadEvidence,verifiedN88TypedReadPublication} from './n88-typed-read-publication.mjs';
 import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
 import fs from 'node:fs';
