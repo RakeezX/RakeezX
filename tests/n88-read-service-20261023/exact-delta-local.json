@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticDataOnly": true,
+  "positiveHistoricalReconstruction": "NOT_RUN pending actual committed original certificate",
+  "negativeCases": 15,
+  "protects": [
+    "fixed historical aggregate",
+    "finite exact keys",
+    "unknown/missing/critical drift",
+    "tampered shape/digest/keyset",
+    "foreign/stale/uncommitted/unproved binding"
+  ],
+  "providerOperations": 0
+}

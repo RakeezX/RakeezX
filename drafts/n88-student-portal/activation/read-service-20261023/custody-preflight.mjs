@@ -1,5 +1,6 @@
 /** AI: original custodian only; read-only preflight. No upload/pin/DDL implementation here. */
 import assert from 'node:assert/strict';import path from 'node:path';import {fileURLToPath} from 'node:url';import {readFile,writeFile,mkdir,readdir,rm} from 'node:fs/promises';import {execFileSync} from 'node:child_process';import {hash} from './prepare.mjs';
+import {loadSharedCertificate,verifySharedCertificate} from './shared-certificate.mjs';
 const task='continuous-n88-typed-read-service-activation-20261023',session='01a14fc3-b292-7390-9952-8549a286c80f',project='xlrubcwjqktzzunrvuns',original='C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018',runtime='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/';
 const deny=code=>{throw Error('n88_typed_'+code);};
 const json=async p=>JSON.parse((await readFile(p,'utf8')).replace(/^\uFEFF/,''));
@@ -11,7 +12,7 @@ export async function guardCustodyContext(candidate){
  if(card.liveAuthorizationRef!=='PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88'||a.originalPrivateCustodianOnly!==session||a.maxChangedNativeFunctionUploads!==1||a.maxPublicSourcePinUpdates!==1||a.maxNewAppendOnlyMigrations!==1||a.realAccountReads!==0||a.realStudentTeacherWrites!==0||a.resetConsumedMarkers!==false||a.appendOnlyAttemptHistory!==true)deny('bounded_authority');
  for(const name of ['integration','live-mutation']){const l=await json(runtime+'leases/'+name+'.json');if(l.taskId!==task||l.owner?.token!==run||l.owner.type!=='worker'||l.resource!==name||l.activationId!==card.activationId)deny('lease_'+name);}
  if(!/^[a-f0-9]{40}$/.test(candidate??'')||execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim()!==candidate)deny('candidate');
- for(const file of ['drafts/n88-student-portal/official-activation.mjs','drafts/n88-student-portal/activation/read-service-20261023/custody-preflight.mjs','drafts/n88-student-portal/activation/read-service-20261023/config-provenance.mjs']){
+ for(const file of ['drafts/n88-student-portal/official-activation.mjs',...['custody-preflight.mjs','config-provenance.mjs','shared-certificate.mjs','exact-delta.mjs','committed-certificate.mjs'].map(f=>'drafts/n88-student-portal/activation/read-service-20261023/'+f)]){
   if((await readFile(path.join(root,file),'utf8')).replaceAll('\r\n','\n')!==execFileSync('git',['show',candidate+':'+file],{cwd:root,encoding:'utf8',maxBuffer:2097152}).replaceAll('\r\n','\n'))deny('custody_gate_source_drift');
  }
  const stageDir=path.join(root,'drafts/n88-student-portal/activation/read-service-20261023'),manifest=await json(path.join(stageDir,'manifest.json'));
@@ -20,10 +21,11 @@ export async function guardCustodyContext(candidate){
  const stamp={taskId:task,runId:run,candidateSha:candidate,sessionId:session,source:manifest.native,prior:manifest.priorNative,observedAt:new Date().toISOString(),providerWrites:0};
  return {root,evidence,run,manifest,stamp,card};
 }
-export async function runCustodyPreflight({candidate,load,official,reconcile=false}){
- const {root,evidence,run,manifest,stamp}=await guardCustodyContext(candidate);
- const receiptFile=path.join(evidence,'custodian-preflight-'+(reconcile?'reconciled-':'')+run+'.json');
- let expectedVersion=63;
+export async function runCustodyPreflight({candidate,load,official,reconcile=false,sharedCertificate=false}){
+ const {root,evidence,run,manifest,stamp,card}=await guardCustodyContext(candidate);
+ const receiptFile=path.join(evidence,'custodian-preflight-'+(sharedCertificate?'exact-delta-':reconcile?'reconciled-':'')+run+'.json');
+ const shared=sharedCertificate?await loadSharedCertificate(card):null;
+ let expectedVersion=sharedCertificate?64:63;
  if(reconcile){
   const prior=await json(path.join(evidence,'custodian-preflight-'+run+'.json')),observed=await json(path.join(evidence,'provider-metadata-reconciliation.json'));
   if(prior.code!=='n88_typed_fresh_function_identity'||prior.providerWrites!==0||observed.cliExit!==0||observed.selected?.length!==1||observed.selected[0].version!==64||observed.selected[0].verifyJwt!==false||observed.selected[0].status!=='ACTIVE'||observed.selected[0].importMap!==true)deny('metadata_reconciliation');
@@ -47,8 +49,18 @@ export async function runCustodyPreflight({candidate,load,official,reconcile=fal
   if(entries.some(r=>typeof r.name!=='string'||!/^[a-f0-9]{64}$/i.test(r.digest??''))||new Set(entries.map(r=>r.name)).size!==entries.length)deny('config_fingerprints');
   const pin=entries.filter(r=>r.name==='N88_SERVICE_SOURCE_SHA');if(pin.length!==1||pin[0].digest.toLowerCase()!==hash(manifest.priorNative))deny('pin_preimage');
   const previous=await json(path.join(root,'tests/n88-student-read-phase-latency-20261021/native-pin.json'));
-  const otherConfigDigest=hash(JSON.stringify(entries.filter(r=>r.name!=='N88_SERVICE_SOURCE_SHA')));if(otherConfigDigest!==previous.provider.otherConfigDigest||importMapDigest!==previous.provider.importMapDigest)deny('config_drift');
-  const result={...stamp,status:'PASS',custody,recordedHistoricalVersion:63,metadataReconciliation:reconcile,provider:{source:manifest.priorNative,sourceExact,version:expectedVersion,verifyJwt:false,importMapDigest,pinDigest:pin[0].digest.toLowerCase(),otherConfigDigest},remaining:['exact catalog/history and carrier preflight','compatible upload/pin plus supported old-worker drainage evidence before DDL']};
+  const otherConfigDigest=hash(JSON.stringify(entries.filter(r=>r.name!=='N88_SERVICE_SOURCE_SHA')));
+  let configurationReconciliation;
+  if(shared){
+   configurationReconciliation=verifySharedCertificate(entries,shared);
+   const publicBytes=await readFile(path.join(root,'drafts/n44-push/activation/public-provider-config.json'));
+   if(hash(publicBytes)!=='f38b4fee5713499f9bb1b63ba1843afe0a234bc8b17f98b238ab9911aa1fbd5a')deny('publishable_reference_bytes');
+   const publicReference=JSON.parse(publicBytes.toString());
+   if(publicReference.project!==project||publicReference.keyType!=='publishable'||publicReference.disabled!==false||publicReference.source!=='Actual Supabase get_publishable_keys; legacy disabled anon excluded'||typeof publicReference.authPublicKey!=='string'||entries.find(r=>r.name==='N88_AUTH_API_KEY')?.digest!==hash(publicReference.authPublicKey))deny('publishable_reference');
+   configurationReconciliation.independentN88AuthApiKeyMatches=true;
+  }else if(otherConfigDigest!==previous.provider.otherConfigDigest)deny('config_drift');
+  if(importMapDigest!==previous.provider.importMapDigest)deny('config_drift');
+  const result={...stamp,status:'PASS',custody,recordedHistoricalVersion:63,metadataReconciliation:reconcile,configurationReconciliation,provider:{source:manifest.priorNative,sourceExact,version:expectedVersion,verifyJwt:false,importMapDigest,pinDigest:pin[0].digest.toLowerCase(),otherConfigDigest},remaining:['exact catalog/history and carrier preflight','compatible upload/pin plus supported old-worker drainage evidence before DDL']};
   await writeFile(receiptFile,JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
  }catch(e){const code=/^n88_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n88_typed_preflight_private_diagnostics_suppressed';await writeFile(receiptFile,JSON.stringify({...stamp,status:'FAIL',code,providerWrites:0,uploads:0,pinUpdates:0,migrations:0},null,2)+'\n',{flag:'wx'});throw Error(code);}
 }

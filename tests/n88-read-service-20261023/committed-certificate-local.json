@@ -1,0 +1,13 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "checks": [
+    "missing denied",
+    "untracked denied",
+    "exact committed blob accepted",
+    "stale revision denied",
+    "modified certificate denied"
+  ],
+  "ownedGitFixtureRemoved": true,
+  "providerOperations": 0
+}

@@ -1,0 +1,9 @@
+{
+  "aiAuthored": true,
+  "status": "FAIL",
+  "scope": "owned synthetic Git fixture only",
+  "cause": "git show revision:path performed ambiguous filename stat under a long Windows fixture path and returned Filename too long; original helper suppressed it as missing.",
+  "correction": "Use explicit trailing -- to disambiguate Git revision from filesystem paths; no global Git/Windows configuration changed.",
+  "ownedFixturesRemoved": true,
+  "providerOperations": 0
+}
