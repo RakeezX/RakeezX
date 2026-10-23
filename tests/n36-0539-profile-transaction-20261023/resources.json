@@ -1,0 +1,10 @@
+{
+  "ports": [
+    49973,
+    49974
+  ],
+  "listenerCount": 0,
+  "serverFinally": "closed",
+  "isolatedBrowserFinally": "owned contexts/browser closed",
+  "sharedLease": "not required: approved synthetic isolated helper"
+}

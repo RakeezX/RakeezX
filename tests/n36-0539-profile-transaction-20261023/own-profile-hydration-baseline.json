@@ -1,0 +1,115 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "ea53b34e-ed33-4ee6-b0e9-659a62fc8a2e",
+  "baseSha": "5f4b1b87f0743251e5650da7490f5b1a0704db36",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "third-handoff-sync-profile",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "854ff668ed03e6490ccc201f65cc8e8c335270628e3b61779eb5862a642cc815",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 124
+          },
+          "sourceGuard": {
+            "count": 30,
+            "ms": 2172
+          },
+          "descriptor": {
+            "count": 64,
+            "ms": 793
+          },
+          "appGuard": {
+            "count": 32,
+            "ms": 484
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 746
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "unresolved",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "profile",
+        "failureStep": "transaction",
+        "failureJobPhase": "receipt",
+        "code": "SETUP_PROFILE_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "partial",
+        "coverageReasons": [
+          "missing-pages"
+        ],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 28,
+          "total": 28,
+          "failure": {
+            "phase": "profile",
+            "step": "transaction",
+            "code": "SETUP_PROFILE_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "unresolved",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ],
+      "durable": {
+        "students": 56,
+        "receipts": [],
+        "pending": [
+          28
+        ]
+      },
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/runtime.mjs:37:8\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/runtime.mjs:25:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

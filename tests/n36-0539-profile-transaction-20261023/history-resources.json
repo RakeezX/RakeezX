@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "57bd17af-553d-49da-a031-dd2cfab52854",
+  "checkedAt": "2026-10-23T11:00:13.2604153+03:00",
+  "ownedLoopbackPort": 49977,
+  "listenerAbsent": true,
+  "browser": "Fresh canonical isolated contexts; owned finally cleanup recorded in history-final.json",
+  "previousPort": {
+    "port": 49975,
+    "error": "listen EACCES: permission denied 127.0.0.1:49975",
+    "observed": "Existing connection owned by PID4448; left untouched",
+    "correction": "Task-owned server assigned unique port49977 only"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "baseSha": "5f4b1b87f0743251e5650da7490f5b1a0704db36",
+  "selected": [
+    "candidate",
+    "store-checks",
+    "recovery-success",
+    "recovery-digest",
+    "recovery-profile",
+    "recovery-session",
+    "recovery-term",
+    "recovery-roster",
+    "recovery-receipt-rollback",
+    "recovery-reload",
+    "recovery-old-batch",
+    "recovery-foreign-batch"
+  ],
+  "cases": 19,
+  "source": [
+    {
+      "file": "src/store.js",
+      "sha256": "2976de70dc957deae6f60db99dc7231748dbf4a73a5020566d5c6e6c299b8e6e"
+    },
+    {
+      "file": "src/views/class-import-center.js",
+      "sha256": "ac40246b4cff96a33d244d696c149c56a6cbfe2ff648a994751745f94105cd33"
+    }
+  ],
+  "extension": {
+    "version": "0.5.39",
+    "unchanged": true,
+    "archive": {
+      "file": "rakeez-teacher-import-helper-0.5.39.zip",
+      "sha256": "2537e2b7ddfa08265f2de24caf5e5d560f57c9498c877699b7067a0c5d0d55cc",
+      "bytes": 150824
+    }
+  },
+  "shell": "No new dependency; existing store/receiver paths; sw.js unchanged",
+  "actualUserPending": {
+    "status": "BLOCKED",
+    "reason": "Legacy .39 durable pending lacks original request nonce/document/session/source grant. No actual binding inspection or replay is authorized. Only an already-known unexpired request in its original live grant can use the explicit action; reload cannot recreate that authority."
+  },
+  "publication": "NOT_RUN; independent publisher"
+}

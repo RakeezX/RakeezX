@@ -1,0 +1,88 @@
+{
+  "status": "PASS",
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "57bd17af-553d-49da-a031-dd2cfab52854",
+  "baseSha": "5f4b1b87f0743251e5650da7490f5b1a0704db36",
+  "parentSha": "cb62390f15ec9ea6fda3c79254d9803bd428713d",
+  "reused": {
+    "file": "certified.json",
+    "sha256": "29b3a58d0d94197870a36105787e11a18e8c924718b5f0f0c155517f0440e66e",
+    "cases": 19,
+    "scope": "Unchanged store transaction and strict original-request recovery evidence; new history path separately exercised"
+  },
+  "baseline": "Existing supported Start denied APP_BATCH_UNRESOLVED without discarding trace; new explicit preservation qualifies a separate fresh run",
+  "selected": [
+    {
+      "file": "history-final.json",
+      "mode": "owner",
+      "status": "PASS"
+    },
+    {
+      "file": "history-final.json",
+      "mode": "direct",
+      "status": "PASS"
+    },
+    {
+      "file": "history-final.json",
+      "mode": "fresh",
+      "status": "PASS"
+    },
+    {
+      "file": "history-guards.json",
+      "mode": "session",
+      "status": "PASS"
+    },
+    {
+      "file": "history-guards.json",
+      "mode": "term",
+      "status": "PASS"
+    },
+    {
+      "file": "history-guards.json",
+      "mode": "rollback",
+      "status": "PASS"
+    },
+    {
+      "file": "history-guards.json",
+      "mode": "full",
+      "status": "PASS"
+    },
+    {
+      "file": "history-guards.json",
+      "mode": "bytes",
+      "status": "PASS"
+    }
+  ],
+  "source": [
+    {
+      "file": "src/views/class-import-center.js",
+      "sha256": "103e95523b1462825551e85b70a53eb75fba2f41b7906b8a0cbd54faf055995d"
+    },
+    {
+      "file": "tests/n36-0539-profile-transaction-20261023/history.mjs",
+      "sha256": "930f3f1f385ddf16127f0caab6d4d49ba948fe5b264865e2cb9ceaafa6ce02ef"
+    },
+    {
+      "file": "tests/n36-0539-profile-transaction-20261023/history-certify.mjs",
+      "sha256": "23afe31f6eee63df6f47b3135f3d04b5212c73ef93e01977d21fa74cefd237b4"
+    }
+  ],
+  "history": {
+    "storage": "device only; no outbox writes",
+    "maxEntries": 4,
+    "maxUtf8Bytes": 2000000,
+    "unresolvedTrace": "exact JSON retained; never replayed or relabelled saved",
+    "fresh": "302/10; repeat added0/existing302; prior56/2+pending29 retained across reload"
+  },
+  "package": {
+    "version": "0.5.39",
+    "unchanged": true,
+    "sha256": "2537e2b7ddfa08265f2de24caf5e5d560f57c9498c877699b7067a0c5d0d55cc"
+  },
+  "actualAccountRecovery": {
+    "status": "NOT_RUN",
+    "reason": "No live account/source authority or proof of current original unexpired nonce; actual pending29 is not claimed repaired"
+  },
+  "production": "NOT_RUN; independent publisher",
+  "poAcceptance": "NOT_RUN; N36 OPEN"
+}

@@ -1,0 +1,59 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "b212349f-aeab-49f1-9044-786665c0c432",
+  "parentSha": "cb62390f15ec9ea6fda3c79254d9803bd428713d",
+  "baseline": false,
+  "cases": [
+    {
+      "mode": "owner",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "status": "FAIL",
+      "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-0539-profile-transaction-continuation-20261023\\tests\\n36-0539-profile-transaction-20261023\\history.mjs:55:72\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/history.mjs:27:62"
+    },
+    {
+      "mode": "session",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "deniedMessage": "لم يتأكد حفظ الأثر السابق محليًا؛ بقيت نتيجته غير محسومة. لم يُهيّأ تشغيل مصدر جديد ولم يُفترض فقد الأثر أو حفظ صفوفه.",
+      "retainedAfterDenial": true,
+      "status": "PASS"
+    },
+    {
+      "mode": "term",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "deniedMessage": "لم يتأكد حفظ الأثر السابق محليًا؛ بقيت نتيجته غير محسومة. لم يُهيّأ تشغيل مصدر جديد ولم يُفترض فقد الأثر أو حفظ صفوفه.",
+      "retainedAfterDenial": true,
+      "status": "PASS"
+    },
+    {
+      "mode": "rollback",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "deniedMessage": "لم يتأكد حفظ الأثر السابق محليًا؛ بقيت نتيجته غير محسومة. لم يُهيّأ تشغيل مصدر جديد ولم يُفترض فقد الأثر أو حفظ صفوفه.",
+      "retainedAfterDenial": true,
+      "status": "PASS"
+    },
+    {
+      "mode": "full",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "deniedMessage": "تعذّر حفظ أثر سابق آخر: السجل المحلي ممتلئ أو غير قابل للتحقق. بقي الأثر المعلّق دون تغيير؛ لم يُهيّأ تشغيل جديد.",
+      "retainedAfterDenial": true,
+      "status": "PASS"
+    },
+    {
+      "mode": "bytes",
+      "preparationWithoutPreservation": "APP_BATCH_UNRESOLVED; no trace or receipt was discarded",
+      "initialMessage": "التشغيل الحالي — إيصالات محلية مؤكدة: 2 (56 صفًا). من الصفوف المعلقة أمكن إثبات 0 من 29 في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه. لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد. لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.",
+      "deniedMessage": "تعذّر حفظ أثر سابق آخر: السجل المحلي ممتلئ أو غير قابل للتحقق. بقي الأثر المعلّق دون تغيير؛ لم يُهيّأ تشغيل جديد.",
+      "retainedAfterDenial": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

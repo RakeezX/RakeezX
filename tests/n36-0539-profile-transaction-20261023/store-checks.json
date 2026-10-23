@@ -1,0 +1,114 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "ea53b34e-ed33-4ee6-b0e9-659a62fc8a2e",
+  "cases": [
+    {
+      "mode": "ack-noop",
+      "proof": {
+        "error": null,
+        "verified": 2,
+        "beforeRevision": 2,
+        "afterRevision": 2,
+        "extraOutbox": 0,
+        "phonePreserved": true,
+        "storageRollback": false
+      },
+      "status": "PASS"
+    },
+    {
+      "mode": "unrelated-edit",
+      "proof": {
+        "error": null,
+        "verified": 2,
+        "beforeRevision": 1,
+        "afterRevision": 1,
+        "extraOutbox": 1,
+        "phonePreserved": true,
+        "storageRollback": false
+      },
+      "status": "PASS"
+    },
+    {
+      "mode": "own-defaults",
+      "proof": {
+        "error": null,
+        "verified": 2,
+        "beforeRevision": 1,
+        "afterRevision": 1,
+        "extraOutbox": 0,
+        "phonePreserved": true,
+        "storageRollback": false
+      },
+      "status": "PASS"
+    },
+    {
+      "mode": "same-field",
+      "proof": {
+        "error": "SETUP_PROFILE_CHANGED",
+        "verified": 1,
+        "beforeRevision": 1,
+        "afterRevision": 1,
+        "extraOutbox": 0,
+        "phonePreserved": true,
+        "storageRollback": false
+      },
+      "status": "PASS"
+    },
+    {
+      "mode": "foreign",
+      "proof": {
+        "error": "SETUP_PROFILE_OWNER",
+        "verified": 1,
+        "beforeRevision": 1,
+        "afterRevision": 1,
+        "extraOutbox": 0,
+        "phonePreserved": true,
+        "storageRollback": false
+      },
+      "status": "PASS"
+    },
+    {
+      "mode": "session",
+      "proof": {
+        "error": "SETUP_PROFILE_OWNER",
+        "verified": 0,
+        "beforeRevision": 1,
+        "afterRevision": 1,
+        "extraOutbox": 0,
+        "phonePreserved": true,
+        "storageRollback": false
+      },
+      "status": "PASS"
+    },
+    {
+      "mode": "term",
+      "proof": {
+        "error": "BATCH_PERSISTED_TERM_CHANGED",
+        "verified": 1,
+        "beforeRevision": 1,
+        "afterRevision": 1,
+        "extraOutbox": 0,
+        "phonePreserved": true,
+        "storageRollback": false
+      },
+      "status": "PASS"
+    },
+    {
+      "mode": "rollback",
+      "proof": {
+        "error": "QuotaExceededError",
+        "verified": 1,
+        "beforeRevision": 1,
+        "afterRevision": 1,
+        "extraOutbox": 0,
+        "phonePreserved": true,
+        "storageRollback": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}
