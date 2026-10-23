@@ -32,7 +32,7 @@ async function official(args){
  finally{r.stdout?.fill(0);r.stderr?.fill(0);}
 }
 export async function runOriginalCustodian(action,candidate){
- if(!['activate','reconcile'].includes(action))deny('action');
+ if(!['activate','activate-version-bound','reconcile'].includes(action))deny('action');
  const run=process.env.N88_DENIED_READ_RUN_ID,session=process.env.N88_DENIED_READ_SESSION_ID;
  if(path.resolve(process.cwd())!==path.resolve(original)||session!==custodianSession)deny('original_context');
  const card=await json(runtime+'queue/'+taskId+'.json');qualifyAuthority(card,{runId:run,candidateSha:candidate,sessionId:session});
@@ -99,7 +99,9 @@ export async function runOriginalCustodian(action,candidate){
    try{await writeFile(p,'N88_SERVICE_SOURCE_SHA='+successorSource+'\n',{flag:'wx'});await verifyExclusivePhase();await official(['secrets','set','--project-ref',projectId,'--env-file',p]);}finally{await unlink(p).catch(e=>{if(e.code!=='ENOENT')throw e;});}
   }};
  if(action==='reconcile')await load();
- const outcome=action==='activate'?await runSuccessorTransition({stamp,certificates,ports}):await reconcileSuccessor({stamp,certificates,ports});
+ let versionProof;
+ if(action==='activate-version-bound'){const name='tests/n88-denied-read-activation-20261023/reconcile-'+run+'.json',bytes=git(['show',candidate+':'+name]);if((await readFile(path.join(root,name),'utf8')).replaceAll('\r\n','\n')!==bytes.replaceAll('\r\n','\n'))deny('reconciliation_bytes');versionProof=JSON.parse(bytes);const failed=await json(path.join(evidence,'activate-'+run+'.json'));if(failed.code!=='n88_denied_transition_preflight'||failed.uploadInvoked!==false||failed.pinInvoked!==false||failed.beforeNativeVersion!==72||versionProof.runId!==run||versionProof.baseSha!==card.baseSha)deny('version_correction_prerequisite');}
+ const outcome=action!=='reconcile'?await runSuccessorTransition({stamp,certificates,ports,versionProof}):await reconcileSuccessor({stamp,certificates,ports});
  outcome.catalogHistoryReference='tests/n88-read-service-20261023/history-correction-inherited-1593971e-7927-4c32-a307-e751d0b2c869.json';outcome.configurationPhaseBindings=binding;outcome.oldDeniedResourcesUntouched=true;
  await writeFile(path.join(evidence,action+'-'+run+'.json'),JSON.stringify(outcome,null,2)+'\n',{flag:'wx'});return outcome;
 }

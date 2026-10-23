@@ -1,7 +1,7 @@
 /** AI: one-use successor sequence through original custodian ports; no automatic retry. */
 import {taskId,priorSource,successorSource,qualifyReservation,qualifyNativePreflight,qualifyConfigurationDelta} from './transition-guards.mjs';
 const deny=c=>{throw Error('n88_denied_activation_'+c);};
-export async function runSuccessorTransition({stamp,certificates,ports}){
+export async function runSuccessorTransition({stamp,certificates,ports,versionProof}){
  let uploadInvoked=false,pinInvoked=false,before=null,after=null,configuration=null,state=null;
  const readConfig=async expectedPin=>{
   await ports.verifyCommittedPhase();await ports.verifyExclusivePhase();
@@ -16,7 +16,7 @@ export async function runSuccessorTransition({stamp,certificates,ports}){
   qualifyReservation({state,history:state.sourceCorrections??[],markerExists:await ports.uploadMarkerExists()});
   configuration=await readConfig(priorSource);
   before=await ports.readNative(priorSource);
-  qualifyNativePreflight({native:before,configuration});
+  qualifyNativePreflight({native:before,configuration,versionProof});
   await ports.verifyExclusivePhase();await ports.verifyCommittedPhase();
   const record={...stamp,purpose:'qualified request-local failed-read session preservation',priorSource,source:successorSource,uploadAttempted:true,pinAttempted:false};
   await ports.reserveUpload(record); // exclusive wx marker precedes the invocation

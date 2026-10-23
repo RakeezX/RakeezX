@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "actualReadonlyReceiptBound": true,
+  "checks": [
+    "observed version72 only with exact original bytes/map/pin/runtime and whole snapshot proof",
+    "different version/source/bytes/foreign custody denied"
+  ],
+  "providerWrites": 0,
+  "oldFailurePreserved": true
+}
