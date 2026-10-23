@@ -65,3 +65,27 @@ export async function runMigrationActivation({candidate,load,save,official,sqlFi
   await writeFile(receiptFile,JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
  }catch(e){const code=/^n88_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n88_typed_migration_private_diagnostics_suppressed';await writeFile(receiptFile,JSON.stringify({...stamp,status:'FAIL',code,drainage,migrationInvoked:invoked,cliAcknowledgment:acknowledgment,invocationFailure,automaticRetryAllowed:false},null,2)+'\n',{flag:'wx'});throw Error(code);}
 }
+
+/** Saved-run recovery is read-only; it cannot renew any operation reservation. */
+export async function runMigrationReconciliation({candidate,load,official,sqlFile}){
+ const {root,evidence,run,manifest,stamp}=await guardCustodyContext(candidate),priorRun='c4fe03b0-3995-497f-bb84-245077a08f47';
+ const json=async p=>JSON.parse(await readFile(p,'utf8'));
+ const failed=await json(path.join(evidence,'migration-outcome-'+priorRun+'.json')),native=await json(path.join(evidence,'native-pin-'+priorRun+'.json'));
+ if(failed.status!=='FAIL'||failed.migrationInvoked!==true||failed.automaticRetryAllowed!==false||native.status!=='PASS'||native.source!==manifest.native)deny('reconciliation_prerequisite');
+ const state=await load();
+ if(state.directSource!==manifest.native||state.typedReadActivation?.runId!==priorRun||!state.typedReadActivation.pinVerified||state.typedReadActivation.migrationAttempted!==true)deny('reconciliation_custody');
+ const actual=canonicalCatalog((await sqlFile(boundaryCatalogSql))?.rows),old=await json(path.join(root,'drafts/n88-student-portal/activation/read-service-20261023/error-boundary-identities.json')),next=await json(path.join(root,'drafts/n88-student-portal/activation/read-service-20261023/typed-identities.json'));
+ const mode=JSON.stringify(actual)===JSON.stringify(old)?'serial':JSON.stringify(actual)===JSON.stringify(next)?'batch':'UNKNOWN';
+ const history=await sqlFile("select version,name,encode(sha256(convert_to(coalesce(array_to_string(statements,E'\\n'),''),'UTF8')),'hex') as statements_digest from supabase_migrations.schema_migrations where name like 'n88%' or version='20261023070851' order by version");
+ if(!Array.isArray(history?.rows))deny('reconciliation_history_shape');
+ const baseline=await json(path.join(evidence,'catalog-history-field-order-'+priorRun+'.json'));
+ const added=history.rows.filter(r=>r.version===migrationVersion||r.name===migrationName);
+ const oldHistoryUnchanged=JSON.stringify(history.rows.filter(r=>r.version!==migrationVersion&&r.name!==migrationName))===JSON.stringify(baseline.migrationHistory);
+ const disposition=mode==='serial'&&added.length===0&&oldHistoryUnchanged?'NOT_APPLIED':mode==='batch'&&added.length===1&&oldHistoryUnchanged?'APPLIED_REQUIRES_EXACT_HISTORY_COMPLETION':'UNKNOWN_OR_MIXED';
+ const configRaw=await official(['secrets','list','--project-ref',project,'--output','json']),entries=canonicalMetadata((Array.isArray(configRaw)?configRaw:configRaw?.rows)?.map(r=>({name:r.name,digest:(r.value??r.digest)?.toLowerCase()})));
+ const configUnchanged=nonPinDigest(entries)===native.provider.otherConfigDigest&&hash(JSON.stringify(entries.map(r=>r.name)))===native.provider.keysetDigest&&entries.find(r=>r.name==='N88_SERVICE_SOURCE_SHA')?.digest===hash(manifest.native);
+ const functionsRaw=await official(['functions','list','--project-ref',project,'--output','json']),functions=Array.isArray(functionsRaw)?functionsRaw:functionsRaw?.functions,found=functions?.filter(f=>f.slug==='n88-student-portal'||f.name==='n88-student-portal');
+ const sameNativeIdentity=found?.length===1&&found[0].version===native.provider.version&&found[0].status==='ACTIVE'&&found[0].verify_jwt===false;
+ const result={...stamp,status:'BLOCKED',priorExecutionRunId:priorRun,priorMigrationFailure:failed.code,originalCliFailure:failed.invocationFailure,mode,routineCount:actual.length,catalogFingerprint:hash(JSON.stringify(actual)),migrationDisposition:disposition,addedHistoryRows:added,oldHistoryUnchanged,currentHistoryDigest:hash(JSON.stringify(history.rows)),configurationUnchanged:configUnchanged,sameNativeMetadataIdentity:sameNativeIdentity,nativeSourceReadbackReusedFromSameVersion:native.provider.source,actualNativeUploadsAcrossRuns:1,actualPinUpdatesAcrossRuns:1,migrationInvocationsAcrossRuns:1,newMutationOperations:0,privateStateWrites:0,automaticRetryAllowed:false,activeSourceIntegrationAllowed:false,actualUserSpeed:'NOT_RUN'};
+ await writeFile(path.join(evidence,'post-interruption-reconcile-'+run+'.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
+}

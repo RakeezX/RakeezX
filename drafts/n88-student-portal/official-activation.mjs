@@ -7,7 +7,7 @@ import {runCustodyPreflight} from './activation/read-service-20261023/custody-pr
 import {runConfigProvenance} from './activation/read-service-20261023/config-provenance.mjs';
 import {runCatalogPreflight} from './activation/read-service-20261023/catalog-preflight.mjs';
 import {runNativeActivation} from './activation/read-service-20261023/native-activation.mjs';
-import {runMigrationActivation} from './activation/read-service-20261023/migration-activation.mjs';
+import {runMigrationActivation,runMigrationReconciliation} from './activation/read-service-20261023/migration-activation.mjs';
 import {runLatencyStaticPhase} from '../../tests/n88-student-read-phase-latency-20261021/static-gate.mjs';
 import {LATENCY,runLatencyNativePhase,digest as latencyDigest} from '../../tests/n88-student-read-phase-latency-20261021/native-gate.mjs';
 import {MOBILE503,runMobile503Phase,digest as mobile503Digest} from '../../tests/n88-mobile-class-source-503-20261021/native-gate.mjs';
@@ -59,6 +59,7 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(action==='--typed-read-reconcile-migration')return runMigrationReconciliation({candidate:value,load,official,sqlFile});
  if(action==='--typed-read-apply-fixed-migration')return runMigrationActivation({candidate:value,load,save,official,sqlFile,phase});
  if(action==='--typed-read-activate-compatible')return runNativeActivation({candidate:value,load,save,official,phase});
  if(action==='--typed-read-catalog-field-order')return runCatalogPreflight({candidate:value,load,sqlFile,reconcile:true});
