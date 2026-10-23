@@ -56,6 +56,7 @@ async function sqlFile(text){
 }
 async function execute(action,value){
  if(action==='--typed-read-preflight')return runCustodyPreflight({candidate:value,load,official});
+ if(action==='--typed-read-reconcile-preflight')return runCustodyPreflight({candidate:value,load,official,reconcile:true});
  if(['--mobile503-preflight','--mobile503-upload','--mobile503-pin','--mobile503-complete'].includes(action)){
   const c=MOBILE503,taskRoot=fileURLToPath(new URL('../../',import.meta.url));
   if(path.resolve(root)!==path.resolve(c.originalRoot)||path.resolve(taskRoot)!==path.resolve(c.taskRoot))fail('n88_mobile503_original_context');
