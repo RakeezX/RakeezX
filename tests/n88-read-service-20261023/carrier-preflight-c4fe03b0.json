@@ -1,0 +1,83 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "c4fe03b0-3995-497f-bb84-245077a08f47",
+  "rawProviderReadback": {
+    "observedAt": "2026-10-23T08:24:16.357Z",
+    "sourceSha256": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+    "sourceLength": 214437,
+    "sourceExact": false,
+    "settings": {
+      "placement": {},
+      "compatibility_date": "2026-10-01",
+      "compatibility_flags": [],
+      "usage_model": "standard",
+      "tags": [],
+      "tail_consumers": [],
+      "logpush": false,
+      "annotations": {
+        "workers/triggered_by": "upload"
+      },
+      "bindings": [
+        {
+          "name": "N88_EDGE_URL",
+          "type": "plain_text",
+          "text": "https://xlrubcwjqktzzunrvuns.supabase.co/functions/v1/n88-student-portal"
+        },
+        {
+          "name": "N88_ENABLED",
+          "type": "plain_text",
+          "text": "true"
+        },
+        {
+          "name": "N88_INGRESS_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "N88_PUBLIC_ORIGIN",
+          "type": "plain_text",
+          "text": "https://rakeezx.com"
+        }
+      ]
+    },
+    "subdomain": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "routes": [
+      {
+        "id": "346d924c9746479a89e6e211a41bba14",
+        "pattern": "rakeezx.com/student",
+        "script": "rakeez-n88-private-ingress",
+        "request_limit_fail_open": false
+      },
+      {
+        "id": "1bcc93cfb56b42469bdad21724b63a1d",
+        "pattern": "rakeezx.com/n88-private/*",
+        "script": "rakeez-n88-private-ingress",
+        "request_limit_fail_open": false
+      },
+      {
+        "id": "c27599645c3c492f9b25eca0107e3dc9",
+        "pattern": "rakeezx.com/api/n88/*",
+        "script": "rakeez-n88-private-ingress",
+        "request_limit_fail_open": false
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "0af9e9d6-b7b6-4c32-8c55-13bffbc506c4",
+        "percentage": 100
+      }
+    ],
+    "providerWrites": 0
+  },
+  "qualification": {
+    "status": "PASS",
+    "actualSourceMatchesQualifiedWireArtifact": true,
+    "sourceSha256": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+    "proof": "tests/n88-read-roundtrip-outcome-20261023/compatibility.json",
+    "oldReferenceComparisonPreserved": "raw sourceExact=false compares obsolete a230; current source exactly matches both current local carrier artifacts and qualified staged wire evidence",
+    "providerWrites": 0
+  }
+}

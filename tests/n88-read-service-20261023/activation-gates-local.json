@@ -1,0 +1,14 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "checks": [
+    "qualified receipt combination",
+    "foreign runs deny",
+    "unclassified config deny",
+    "stale config deny",
+    "already-added catalog/history deny",
+    "carrier bytes mismatch deny"
+  ],
+  "providerOperations": 0
+}
