@@ -1,0 +1,57 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "4575c6a7-2cb8-459e-a779-8de667c5fea2",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "fixed_76_78_and_aborted_partial_migration",
+      "status": "PASS",
+      "evidence": "Actual old76 accepted as serial, new calls rejected before dispatch. Aborted full migration restores old76; one-of-two mixed catalog denies and invalidates connection capability; rollback restores serial. No live rollback/drop."
+    },
+    {
+      "name": "pre_addition_native_and_source_service_reads",
+      "status": "PASS",
+      "evidence": "Dual native uses old serial reader through actual verified PG repository; list, code issuance, claim and published grade/work read succeed in synthetic fixture."
+    },
+    {
+      "name": "per_connection_inflight_and_post_addition_read",
+      "status": "PASS",
+      "evidence": "Connection verified before DDL remains serial and COMMITs safely; newly verified connections use batch. Same pre-existing student cookie and exact grades/work survive transition; source/native results equal."
+    },
+    {
+      "name": "catalog_drift_no_fallback_and_recovery",
+      "status": "PASS",
+      "evidence": "Changed exact function config fails closed, invalidates capability and never falls back to serial; exact transaction rollback restores batch. All old identities remain unchanged."
+    },
+    {
+      "name": "commit_ack_privacy_revocation_and_retired_mode",
+      "status": "PASS",
+      "evidence": "Failed/unknown COMMIT cannot disclose success and destroys connection. Hidden grade/work fields remain hidden; bad/missing cookie and revocation deny. Retained query and mode capabilities fail after transaction. Existing cancellation/bounds/foreign-owner proofs reused."
+    }
+  ],
+  "providerOperations": 0,
+  "realAccountReads": 0,
+  "cleanup": {
+    "ownedNativePgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "reusedProofs": [
+    {
+      "file": "tests/n88-read-roundtrip-outcome-20261023/staged-result.json",
+      "sha256": "6a042862e7de46765b27acf9533216cf8a439a11a79b01ed0c2e96870b21836f"
+    },
+    {
+      "file": "tests/n88-read-roundtrip-outcome-20261023/compatibility.json",
+      "sha256": "9a0c126764cc43d6447dd3764da816870f8cd32019a1a69f7feb412d74c284e4"
+    },
+    {
+      "file": "tests/n88-read-roundtrip-outcome-20261023/result.json",
+      "sha256": "63469a8965816d44457ff4b1366e399e223afb120aa4d3d4c7289f657604a59f"
+    }
+  ],
+  "native": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "catalogFingerprints": {
+    "serial": "fafa68c0efd3a80749a773780ed77760c196cae499e491c767e1aa62b02eec88",
+    "batch": "1bb069d92641e56a5d363dbed46edd87fa2204dc3dfab6af69517538bdb512b1"
+  }
+}

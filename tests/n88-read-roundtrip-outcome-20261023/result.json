@@ -1,0 +1,67 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "8693cc32-ba12-47fe-a7d4-941f12950d87",
+  "baseSha": "4ee4608c3a043f8ff27fd1c90d0ba652bc7e558b",
+  "sourceSha256": "49d1f2ab320bb6a15f87d6ca0a890a3163076d61850d56e2b9bada688caf04d8",
+  "status": "PASS",
+  "scope": "Fabricated owned native PG17; direct SQL experiment before testing unchanged real service boundary. No hosted or UI performance claim.",
+  "measurements": [
+    {
+      "name": "baseline",
+      "queryCount": 14,
+      "wallMs": 485.53,
+      "injectedTransportMs": 350,
+      "payloadBytes": 6518,
+      "nulls": 0
+    },
+    {
+      "name": "experimentalBatch",
+      "queryCount": 2,
+      "wallMs": 89.83,
+      "injectedTransportMs": 50,
+      "payloadBytes": 6518,
+      "nulls": 0
+    }
+  ],
+  "guards": [
+    "full and terms/teachings admission reads match including empty tables and deterministic table/id order",
+    "foreign owner excluded; next request observes current name/revision; bigint >2^53 remains exact text",
+    "2000 accepted; 2001 fails closed at unchanged lock; valid child/parent fixture dependencies retained",
+    "cumulative row aggregate and single UTF8 payload >2MB produce null-sentinel rejection; no unbounded JSON aggregate",
+    "actual verified repository: existing reader COMMIT ACK succeeds; new batch rejected before SQL, rolls back, destroys lease and returns no success"
+  ],
+  "cleanup": {
+    "ownedNativePgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "projectionEqual": true,
+  "payloadEqual": true,
+  "boundary": {
+    "baselineAccepted": true,
+    "experimentalBatchRejected": true,
+    "error": "n88_database_unavailable",
+    "batchDriverCalls": 0
+  },
+  "reusedMeasurement": "initial-harness-failure.json; only missing explicit repository options corrected; no timing/canonical-bound-negative replay",
+  "localStatus": "LOCAL_VALIDATED",
+  "activation": "BLOCKED: new fixed typed operation/identity requires separately authorized original-service custodian integration; no hosted service allowance on this card",
+  "sourceBinding": {
+    "observedOriginMain": "1e61149876636a7382a50f31dfe20e1da09641d2",
+    "affectedSourcesEqualObservedMain": true,
+    "lfSha256": {
+      "drafts/n88-student-portal/integrated-service.mjs": "49d1f2ab320bb6a15f87d6ca0a890a3163076d61850d56e2b9bada688caf04d8",
+      "drafts/n88-student-portal/postgres-repository.mjs": "cac60b27ab569e2d28440829fd8dea5074f607ac7528e8890a0f21a76de3bd92",
+      "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
+      "drafts/n88-student-portal/student-projection.mjs": "0169150ada144b6c6217ae2168ac30eb2580f72e5bc7b62fc3fd1c87d65dc9ad",
+      "drafts/n88-student-portal/activation/private-error-boundary.mjs": "c17ed676799033cda3b4bd2d39ee185d298c256d62c8878fb595b8a69cf96f99",
+      "drafts/n88-student-portal/activation/error-boundary-contract.json": "eb93ab6817f5103819b42678c5c3b3c351c044c60fd7121394441f344919a5da",
+      "drafts/n88-student-portal/activation/error-boundary-identities.json": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4"
+    },
+    "recordedProviderReceipt": "tests/n88-student-read-phase-latency-20261021/native-complete.json",
+    "recordedNativeVersion": 63,
+    "recordedNativeSource": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "recordedBundleMatches": true,
+    "freshHostedRead": false
+  },
+  "evidenceLabelCorrection": "Cumulative overflow fixture spans student rows, not separate tables; initial cross-table wording corrected without relabeling historical failure or rerunning checks."
+}

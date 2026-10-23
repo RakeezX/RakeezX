@@ -1,0 +1,1357 @@
+{
+  "version": 1,
+  "encoding": "bound-base64-pg-text-v1",
+  "controls": [
+    "begin isolation level read committed",
+    "commit",
+    "release savepoint n88_member_recovery",
+    "rollback to savepoint n88_member_recovery",
+    "savepoint n88_member_recovery",
+    "select pg_advisory_xact_lock(1312307256, 88)",
+    "select set_config('statement_timeout',$1,true),set_config('lock_timeout',$2,true),set_config('idle_in_transaction_session_timeout',$3,true),set_config('search_path','pg_catalog',true),set_config('TimeZone','UTC',true),set_config('DateStyle','ISO, YMD',true),set_config('synchronous_commit','on',true)"
+  ],
+  "sources": [
+    {
+      "file": "drafts/n88-student-portal/canonical-adapter.mjs",
+      "sha256": "8adcb9958f559b26d9d090bccab7d070308b8b649eff97ebbe49fdc00b87b458"
+    },
+    {
+      "file": "drafts/n88-student-portal/class-credentials.mjs",
+      "sha256": "97d4c4bb6580a53ae49d20cf95dc48620c8e59ad91b665fb23f811b833f516ad"
+    },
+    {
+      "file": "drafts/n88-student-portal/auth-verifier.mjs",
+      "sha256": "3f50b305d2754bb676afdbfe6051ed892e0019875c5fe1985dff61d7a2ef60c1"
+    },
+    {
+      "file": "drafts/n88-student-portal/web-entry.mjs",
+      "sha256": "fe079ed58f6b066d3b23048a51f5c96e0ea318ca7eca0caa9e825cd4a071bef5"
+    },
+    {
+      "file": "drafts/n88-student-portal/integrated-service.mjs",
+      "sha256": "2190d7b615fb09a546d62e083f063eb3b230ba24a64667cd3da3f1045c649ac2"
+    },
+    {
+      "file": "drafts/n88-student-portal/code-recovery.mjs",
+      "sha256": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55"
+    },
+    {
+      "file": "drafts/n88-student-portal/task-guidance.mjs",
+      "sha256": "a3b929b13ce02d05a211cf9eb078cf3f3403a3ec6db04a7271f3c878741de88a"
+    },
+    {
+      "file": "drafts/n88-student-portal/postgres-repository.mjs",
+      "sha256": "239bb6c146eaf61e9e9598e6e69a74e79e5a43cf4ad4d6922a62c72715069443"
+    }
+  ],
+  "operations": [
+    {
+      "sql": "delete from n88_private.class_credential_receipts where row_key=$1",
+      "name": "boundary_7df61daf6fc50a8d06ed8a29",
+      "parameters": [
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.contexts where namespace=$1",
+      "name": "boundary_3d90c7fa0fac5598b1e1bb6c",
+      "parameters": [
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.credentials where id=$1",
+      "name": "boundary_3212e88aaa7d7eb7950a7158",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.guess_budgets where key=$1",
+      "name": "boundary_0886008cf6c0da2968564042",
+      "parameters": [
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.memberships where owner_id=$1 and class_id=$2 and student_id=$3 and enrollment_id=$4",
+      "name": "boundary_8ab6a6674ff3f98609cccf79",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.numeric_attempts where row_key=$1",
+      "name": "boundary_541e1603c6f1fd9d4bfd9638",
+      "parameters": [
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.numeric_credentials where row_key=$1",
+      "name": "boundary_bf3541bec260c19aeaf147e0",
+      "parameters": [
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.numeric_rates where row_key=$1",
+      "name": "boundary_f824c60ac8562824f8a15aeb",
+      "parameters": [
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.numeric_sessions where row_key=$1",
+      "name": "boundary_82d5bc8d4ddbfb141c068308",
+      "parameters": [
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.publications where id=$1",
+      "name": "boundary_7405cad4b228853c8a7a5267",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "delete from n88_private.sessions where id=$1",
+      "name": "boundary_d556945d2d95f6add8f9ccb4",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "DELETE"
+    },
+    {
+      "sql": "insert into n88_private.class_credential_receipts(row_key,payload) values($1,$2::jsonb)",
+      "name": "boundary_5bd93436112ac6e1081b19e5",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.class_credential_receipts(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      "name": "boundary_3cfa500ea5d8a72f35432655",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.class_visibility(owner_id,class_id,term_id,payload) values($1::uuid,$2,$3,$4::jsonb) on conflict(owner_id,class_id,term_id) do update set payload=excluded.payload",
+      "name": "boundary_98693bf59f6ec88385d1a2e8",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.code_recovery(row_key,payload) values($1,$2::jsonb) on conflict(key_version,nonce) do nothing",
+      "name": "boundary_ac418692d93da9a37ef4d438",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.contexts (namespace,owner_id,active) values ($1,$2,$3)",
+      "name": "boundary_857bc5c5bf5d0480e3feddef",
+      "parameters": [
+        "text",
+        "uuid",
+        "boolean"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.credentials (id,namespace,owner_id,student_id,version,verifier,entry_verifier,revoked_at) values ($1,$2,$3,$4,$5,$6,$7,$8)",
+      "name": "boundary_8505c9e47aa85eab7abcbe9a",
+      "parameters": [
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.guess_budgets (key,count,until_at) values ($1,$2,$3)",
+      "name": "boundary_ec7d0eb73f55bc0a5eb0503e",
+      "parameters": [
+        "text",
+        "integer",
+        "timestamp with time zone"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.memberships (owner_id,class_id,student_id,enrollment_id,revision,status,end_date,student_active,class_active,label,canonical_stamp,active) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+      "name": "boundary_39534a0df755e773bcc021c2",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "date",
+        "boolean",
+        "boolean",
+        "text",
+        "text",
+        "boolean"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_attempts(row_key,payload) values($1,$2::jsonb)",
+      "name": "boundary_2a8e33366f34f64e735098e6",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_attempts(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      "name": "boundary_529c57f7292a540a297bb56a",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_credentials(row_key,payload) values($1,$2::jsonb)",
+      "name": "boundary_9e91362aab78847b4a47db61",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_credentials(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      "name": "boundary_b594ab1d10c68ceac544f2f4",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb)",
+      "name": "boundary_576116ad97aa1134011b5787",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_rates(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      "name": "boundary_54df59eab3551edda375b0b3",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_sessions(row_key,payload) values($1,$2::jsonb)",
+      "name": "boundary_0ea5712c847150d0ad160f76",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.numeric_sessions(row_key,payload) values($1,$2::jsonb) on conflict(row_key) do update set payload=excluded.payload",
+      "name": "boundary_a71168a3808c25e88da242ab",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.publications (id,owner_id,class_id,student_id,enrollment_id,source_teaching_id,source_item_id,title,instruction,deadline,status,published) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+      "name": "boundary_944e29878190b042600a43aa",
+      "parameters": [
+        "uuid",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "date",
+        "text",
+        "boolean"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.sessions (id,credential_id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier,token_hash,expires_at,revoked_at,canonical_stamp) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+      "name": "boundary_7f808429affeb651ad77cae5",
+      "parameters": [
+        "uuid",
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone",
+        "timestamp with time zone",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "insert into n88_private.task_guidance(owner_id,class_id,term_id,teaching_id,subitem_id,payload) values($1::uuid,$2,$3,$4,$5,$6::jsonb) on conflict(owner_id,class_id,term_id,teaching_id,subitem_id) do update set payload=excluded.payload",
+      "name": "boundary_0f039dccf91dfe6f4bc30ece",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "INSERT"
+    },
+    {
+      "sql": "rollback",
+      "name": "boundary_da25480fb483e6ce3d30f1a1",
+      "parameters": [],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "ROLLBACK"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,item_id,name,value,\"order\",start_date,due_date,late_points from rakeezx.score_subitems where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_ad2e84fec89ba9c5b1fd5f20",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_0e8834ccf4cac5f256e9a2ad",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status from rakeezx.years where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_e42d2de24a5b2a9d458219d0",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status,name from rakeezx.students where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_7700d235b1326b49506b1222",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,item_id,value,manual_value,derived_value from rakeezx.scores where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_4f1ae4e620baf4b52e65c866",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,section_id,status,start_date,end_date from rakeezx.enrollments where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_38603fea89bb426312fb13d0",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,subitem_id,checked,completion_state from rakeezx.score_subitem_completions where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_2c10f3346e981b9ed2dc8305",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,kind,delta from rakeezx.logs where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_7eaf0e6ad46189c16f430c17",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,session_id,status from rakeezx.attendance where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_4b08189b1399c922f5d61eb4",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,date,status from rakeezx.sessions where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_c1e4d457aa8a6c7bd31e5277",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,name,max,\"order\",auto,per_point,penalty,score_mode,portability_group_id from rakeezx.items where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_c365a70fb8ff3318f2e1f14c",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,archived_at,grade,label,name from rakeezx.sections where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_b75844e451c72d86ecce7361",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x) bounded",
+      "name": "boundary_218f1146d50bdae36e06ce85",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select id,credential_id,namespace,owner_id,class_id,student_id,enrollment_id,version::text as version,membership_revision::text as membership_revision,entry_verifier,token_hash,(extract(epoch from expires_at)*1000)::text as expires_at,(extract(epoch from revoked_at)*1000)::text as revoked_at,canonical_stamp from n88_private.sessions limit $1) t) bounded",
+      "name": "boundary_7212828c13ad9de67788e95a",
+      "parameters": [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "bounded_row",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select id,namespace,owner_id,student_id,version::text as version,verifier,entry_verifier,(extract(epoch from revoked_at)*1000)::text as revoked_at from n88_private.credentials limit $1) t) bounded",
+      "name": "boundary_b03c8ea8391678ae71b8031e",
+      "parameters": [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "bounded_row",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select id,owner_id,class_id,student_id,enrollment_id,source_teaching_id,source_item_id,title,instruction,deadline::text as deadline,status,published from n88_private.publications limit $1) t) bounded",
+      "name": "boundary_529c1bf7ab8f896422e93ff3",
+      "parameters": [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "bounded_row",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select key,count::text as count,(extract(epoch from until_at)*1000)::text as until_at from n88_private.guess_budgets limit $1) t) bounded",
+      "name": "boundary_c17a55bfb4d6e130fbbe3e4d",
+      "parameters": [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "bounded_row",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select namespace,owner_id,active from n88_private.contexts limit $1) t) bounded",
+      "name": "boundary_6445f4cd91ac31e4400b91b5",
+      "parameters": [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "bounded_row",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$2 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as bounded_row from (select row_to_json(t)::text as payload from (select owner_id,class_id,student_id,enrollment_id,revision::text as revision,status,end_date::text as end_date,student_active,class_active,label,canonical_stamp,active from n88_private.memberships limit $1) t) bounded",
+      "name": "boundary_d77d8b0fcafaf2d6444a9283",
+      "parameters": [
+        "bigint",
+        "integer",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "bounded_row",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload\n      from (select row_to_json(x)::text as payload from (\n        select e.owner_id,e.id as enrollment_id,e.section_id,e.student_id,e.revision::text as revision,\n          e.status,e.end_date::text as end_date,e.deleted_at is null as enrollment_present,\n          s.status='active' and s.deleted_at is null as student_active,left(s.name,300) as label,\n          c.status='active' and c.deleted_at is null and y.status='active' and y.deleted_at is null as class_active,\n          s.revision::text as student_revision,c.revision::text as section_revision,y.revision::text as year_revision\n        from rakeezx.enrollments e join rakeezx.students s on s.owner_id=e.owner_id and s.id=e.student_id\n        join rakeezx.sections c on c.owner_id=e.owner_id and c.id=e.section_id\n        join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id\n        where e.owner_id=any($1::uuid[]) order by e.owner_id,e.id limit $2\n      ) x) bounded",
+      "name": "boundary_5c9fc4857874ea5002e6604f",
+      "parameters": [
+        "uuid[]",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (rows unbounded preceding)<=$3 then payload else null end as payload\n      from (select row_to_json(x)::text as payload from (\n        select i.owner_id,i.id as item_id,left(i.name,160) as title,t.id as teaching_id,t.section_id,\n          i.revision::text as item_revision,t.revision::text as teaching_revision,term.revision::text as term_revision\n        from rakeezx.items i join rakeezx.teachings t on t.owner_id=i.owner_id and t.id=i.teaching_id\n        join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id\n        join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id\n        where i.owner_id=any($1::uuid[]) and i.deleted_at is null and t.deleted_at is null\n          and term.deleted_at is null and term.status='active' and term.year_id=c.year_id\n          and i.auto is null order by i.owner_id,i.id limit $2\n      ) x) bounded",
+      "name": "boundary_7dfce5786c5f02dcc6e78f35",
+      "parameters": [
+        "uuid[]",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.class_credential_receipts limit $1",
+      "name": "boundary_7241eedcf190b772374229ea",
+      "parameters": [
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_attempts limit $1",
+      "name": "boundary_663dba1cb7b909fd24ac94e2",
+      "parameters": [
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_credentials limit $1",
+      "name": "boundary_fada095ce38b422ccf61f489",
+      "parameters": [
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_rates limit $1",
+      "name": "boundary_017a62b1b935f2eb760ae1e8",
+      "parameters": [
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select case when octet_length(payload::text)<=$2 and sum(octet_length(payload::text)) over (rows unbounded preceding)<=$2 then payload else null end as payload from n88_private.numeric_sessions limit $1",
+      "name": "boundary_e9d8defc0078b184176ffedf",
+      "parameters": [
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select n88_private.consume_ingress($1::uuid,$2::bigint) as accepted",
+      "name": "boundary_f47daacda1442e346327b60d",
+      "parameters": [
+        "uuid",
+        "bigint"
+      ],
+      "output": [
+        {
+          "name": "accepted",
+          "type": "boolean",
+          "oid": 16
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select n88_private.lock_canonical_sources($1::uuid,$2::integer)",
+      "name": "boundary_fd19cd46f568a4ae38795f6d",
+      "parameters": [
+        "uuid",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "lock_canonical_sources",
+          "type": "void",
+          "oid": 2278
+        }
+      ],
+      "effect": false,
+      "voidResult": true,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select n88_private.lock_projection_sources($1::uuid,$2::integer)",
+      "name": "boundary_522656818781827547d463af",
+      "parameters": [
+        "uuid",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "lock_projection_sources",
+          "type": "void",
+          "oid": 2278
+        }
+      ],
+      "effect": false,
+      "voidResult": true,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select payload from n88_private.class_visibility where owner_id=$1::uuid and class_id=$2 and term_id=$3",
+      "name": "boundary_b44d6bc61d9a2d54becc9173",
+      "parameters": [
+        "uuid",
+        "text",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select payload from n88_private.code_recovery where credential_id=$1::uuid order by generation desc limit 1",
+      "name": "boundary_36aea132fd3436ff82bed847",
+      "parameters": [
+        "uuid"
+      ],
+      "output": [
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "oid": 3802
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select subitem_id,teaching_id,case when sum(octet_length(payload::text)) over(order by teaching_id,subitem_id rows unbounded preceding)<=2097152 then payload::text else null end as bounded_payload from n88_private.task_guidance where owner_id=$1::uuid and class_id=$2 and term_id=$3 and ($4::text is null or teaching_id=$4) order by teaching_id,subitem_id limit 2001",
+      "name": "boundary_c0c8bf88c9afd629c6d80e9f",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "subitem_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "teaching_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "bounded_payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select t.id,t.section_id,t.revision::text as teaching_revision,\n      term.revision::text as term_revision from rakeezx.teachings t\n      join rakeezx.terms term on term.owner_id=t.owner_id and term.id=t.term_id\n      join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id\n      join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id\n      where t.owner_id=$1::uuid and t.id=$2 and t.deleted_at is null\n        and term.deleted_at is null and term.status='active' and term.year_id=c.year_id\n        and c.deleted_at is null and c.status='active' and y.deleted_at is null and y.status='active'",
+      "name": "boundary_15ce9f3bf91799d8d16c15e4",
+      "parameters": [
+        "uuid",
+        "text"
+      ],
+      "output": [
+        {
+          "name": "id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "section_id",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "teaching_revision",
+          "type": "text",
+          "oid": 25
+        },
+        {
+          "name": "term_revision",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select user_id,session_id from n88_private.lock_current_session($1::uuid,$2::uuid)",
+      "name": "boundary_988735ac2a1a18389fa0bd91",
+      "parameters": [
+        "uuid",
+        "uuid"
+      ],
+      "output": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "oid": 2950
+        },
+        {
+          "name": "session_id",
+          "type": "uuid",
+          "oid": 2950
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "update n88_private.class_credential_receipts set payload=$2::jsonb where row_key=$1",
+      "name": "boundary_fbd717658ec0391f83b6ca1e",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.contexts set owner_id=$2,active=$3 where namespace=$1",
+      "name": "boundary_e132519164f58f14ceaa901e",
+      "parameters": [
+        "text",
+        "uuid",
+        "boolean"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.credentials set namespace=$2,owner_id=$3,student_id=$4,version=$5,verifier=$6,entry_verifier=$7,revoked_at=$8 where id=$1",
+      "name": "boundary_08056655f7c73fdf53693a15",
+      "parameters": [
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.guess_budgets set count=$2,until_at=$3 where key=$1",
+      "name": "boundary_2743c40170e1429751d7cce8",
+      "parameters": [
+        "text",
+        "integer",
+        "timestamp with time zone"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.memberships set revision=$5,status=$6,end_date=$7,student_active=$8,class_active=$9,label=$10,canonical_stamp=$11,active=$12 where owner_id=$1 and class_id=$2 and student_id=$3 and enrollment_id=$4",
+      "name": "boundary_dc3c6d47e9eefd6fefb577c1",
+      "parameters": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "text",
+        "date",
+        "boolean",
+        "boolean",
+        "text",
+        "text",
+        "boolean"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.numeric_attempts set payload=$2::jsonb where row_key=$1",
+      "name": "boundary_8926885bfe3455b81ae48704",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.numeric_credentials set payload=$2::jsonb where row_key=$1",
+      "name": "boundary_f8de722d3598965d1cab8cd6",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.numeric_rates set payload=$2::jsonb where row_key=$1",
+      "name": "boundary_81d29f136a65d7b7fb3e22b7",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.numeric_sessions set payload=$2::jsonb where row_key=$1",
+      "name": "boundary_8c4937430e36c8e787e93929",
+      "parameters": [
+        "text",
+        "jsonb"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.publications set owner_id=$2,class_id=$3,student_id=$4,enrollment_id=$5,source_teaching_id=$6,source_item_id=$7,title=$8,instruction=$9,deadline=$10,status=$11,published=$12 where id=$1",
+      "name": "boundary_fa9d3af42f20a68890242235",
+      "parameters": [
+        "uuid",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "date",
+        "text",
+        "boolean"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "update n88_private.sessions set credential_id=$2,namespace=$3,owner_id=$4,class_id=$5,student_id=$6,enrollment_id=$7,version=$8,membership_revision=$9,entry_verifier=$10,token_hash=$11,expires_at=$12,revoked_at=$13,canonical_stamp=$14 where id=$1",
+      "name": "boundary_a0e680634378c9709f443e76",
+      "parameters": [
+        "uuid",
+        "uuid",
+        "text",
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "bigint",
+        "bigint",
+        "text",
+        "text",
+        "timestamp with time zone",
+        "timestamp with time zone",
+        "text"
+      ],
+      "output": [],
+      "effect": true,
+      "voidResult": false,
+      "command": "UPDATE"
+    },
+    {
+      "sql": "select table_index,case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (order by table_index,id rows unbounded preceding)<=$3 then payload else null end as payload from (select 0 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status from rakeezx.years where owner_id=$1::uuid order by id limit $2) x union all select 1 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x union all select 2 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,archived_at,grade,label,name from rakeezx.sections where owner_id=$1::uuid order by id limit $2) x union all select 3 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status,name from rakeezx.students where owner_id=$1::uuid order by id limit $2) x union all select 4 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,section_id,status,start_date,end_date from rakeezx.enrollments where owner_id=$1::uuid order by id limit $2) x union all select 5 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x union all select 6 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,name,max,\"order\",auto,per_point,penalty,score_mode,portability_group_id from rakeezx.items where owner_id=$1::uuid order by id limit $2) x union all select 7 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,item_id,value,manual_value,derived_value from rakeezx.scores where owner_id=$1::uuid order by id limit $2) x union all select 8 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,item_id,name,value,\"order\",start_date,due_date,late_points from rakeezx.score_subitems where owner_id=$1::uuid order by id limit $2) x union all select 9 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,subitem_id,checked,completion_state from rakeezx.score_subitem_completions where owner_id=$1::uuid order by id limit $2) x union all select 10 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,date,status from rakeezx.sessions where owner_id=$1::uuid order by id limit $2) x union all select 11 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,session_id,status from rakeezx.attendance where owner_id=$1::uuid order by id limit $2) x union all select 12 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,kind,delta from rakeezx.logs where owner_id=$1::uuid order by id limit $2) x) bounded order by table_index,id",
+      "name": "boundary_9e3f889e8b1e375a0a980496",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "table_index",
+          "type": "integer",
+          "oid": 23
+        },
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select table_index,case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (order by table_index,id rows unbounded preceding)<=$3 then payload else null end as payload from (select 0 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x union all select 1 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x) bounded order by table_index,id",
+      "name": "boundary_3121e2df6802725969086adf",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "table_index",
+          "type": "integer",
+          "oid": 23
+        },
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    }
+  ],
+  "migration": {
+    "path": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
+    "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+  },
+  "inactiveReadRoundtrip": {
+    "enabled": false,
+    "parentMigration": {
+      "path": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
+      "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+    },
+    "additiveCandidate": {
+      "path": "drafts/n88-student-portal/activation/read-roundtrip-20261023/additive-boundary.inactive.sql",
+      "sha256": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b"
+    },
+    "originalOperationCount": 76
+  }
+}

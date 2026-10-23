@@ -1,0 +1,35 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "fbc57f79-e4dc-461c-bca6-912edcd6ba5a",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "all_76_old_operations_finite_dispatch_accepted",
+      "status": "PASS",
+      "evidence": "Every unchanged SQL entry maps to its unchanged fixed typed function. Dispatcher-only test does not execute side effects; exact native catalog/body/ACL preservation is separately proven."
+    },
+    {
+      "name": "old_native_catalog_cutover_requires_coordination",
+      "status": "PASS",
+      "evidence": "Actual old boundary accepts preimage but fails closed after additive functions; staged boundary accepts new catalog. No seamless rolling coexistence claim; original custodian needs explicit coordinated cutover authority."
+    },
+    {
+      "name": "actual_signed_native_carrier_client_projection_compatibility",
+      "status": "PASS",
+      "evidence": "Candidate native Web Request signature/nonce/ingress -> actual verified repository -> unchanged local carrier -> actual client succeeds with private validated projection and finite phases; missing cookie denies. All fetches injected in-process, no real network or TLS/browser claim."
+    }
+  ],
+  "manifestSha256": "80deb4166208469ab8888ed6bb4c00becef00c72a2f2465d6f70a071a890f471",
+  "cleanup": {
+    "ownedNativePgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "reusedChecks": {
+    "path": "tests/n88-read-roundtrip-outcome-20261023/compatibility-initial-client-assertion-failure.json",
+    "sha256": "1a528313666bf320d67c758940addd93bf4a93ef31a20e87d8eda9f5c6b561b4",
+    "reason": "Correct client assertion to actual getDiagnostic API; reuse finite dispatch and old/new native catalog checks."
+  },
+  "localCarrierSha256": "a2d840e6b4b35f1be968f332773a78640a45b4529a54d3ae98c92fba3f47da50",
+  "nativeCandidateSha256": "a0f3d3fb53070f3f28dde2660efba508e646eb3ffbefb543f589e9d72a36a70f",
+  "localStatus": "LOCAL_VALIDATED"
+}

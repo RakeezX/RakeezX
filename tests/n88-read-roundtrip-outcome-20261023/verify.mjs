@@ -1,0 +1,35 @@
+/** AI-authored. Read-only exact package verification; no PG/browser/network. */
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
+import {dir,base,digest} from '../../drafts/n88-student-portal/activation/read-roundtrip-20261023/prepare.mjs';
+const read=async f=>(await readFile(f,'utf8')).replaceAll('\r\n','\n');
+const json=async f=>JSON.parse(await read(f));
+const manifest=await json(dir+'manifest.json'),staged=await json('tests/n88-read-roundtrip-outcome-20261023/staged-result.json'),compatibility=await json('tests/n88-read-roundtrip-outcome-20261023/compatibility.json');
+assert.equal(staged.status,'PASS');assert.equal(compatibility.status,'PASS');
+assert.equal(staged.manifestSha256,digest(await read(dir+'manifest.json')));assert.equal(compatibility.manifestSha256,staged.manifestSha256);
+assert(staged.cleanup.ownedNativePgStoppedAndRemoved&&compatibility.cleanup.ownedNativePgStoppedAndRemoved);
+assert.equal(staged.cleanup.integrationLease,'RELEASED integration');assert.equal(compatibility.cleanup.integrationLease,'RELEASED integration');
+for(const [path,hash]of Object.entries(manifest.inputs))assert.equal(digest(await read(path)),hash,path);
+for(const [path,hash]of Object.entries(manifest.outputs))assert.equal(digest(await read(dir+path)),hash,path);
+const old=await json(base+'activation/error-boundary-contract.json'),candidate=await json(dir+'error-boundary-contract.json');
+assert.deepEqual(candidate.operations.slice(0,old.operations.length),old.operations);assert.deepEqual(candidate.controls,old.controls);assert.equal(candidate.operations.length,old.operations.length+2);assert.deepEqual(candidate.migration,old.migration);
+assert.equal(digest(await read(old.migration.path)),old.migration.sha256);
+assert.equal(await read(dir+'private-error-boundary.mjs'),await read(base+'activation/private-error-boundary.mjs'));
+const active=await read(base+'integrated-service.mjs'),source=await read(dir+'integrated-service.mjs');
+const before=active.slice(0,active.indexOf('export async function readCanonical')),after=active.slice(active.indexOf('const fieldsOff='));
+const restoredImports=source.replaceAll("from '../../","from './");
+assert.equal(restoredImports.slice(0,restoredImports.indexOf('export async function readCanonical')),before);assert.equal(restoredImports.slice(restoredImports.indexOf('const fieldsOff=')),after);
+const reader=source.slice(source.indexOf('export async function readCanonical')+7,source.indexOf('const fieldsOff=')).trim();
+const native=await read(base+'activation/bundle/edge/index.mjs');assert.equal(digest(native),manifest.recordedProvider.source);
+const identities=await json(dir+'error-boundary-identities.json');
+const replacements=[reader+'\n','var error_boundary_contract_default = '+JSON.stringify(candidate,null,2)+';','var error_boundary_identities_default = '+JSON.stringify(identities,null,2)+';'];
+let reconstructed=native;
+for(let i=manifest.nativeTransformSpans.length-1;i>=0;i--){const span=manifest.nativeTransformSpans[i];assert.equal(digest(native.slice(span.start,span.end)),span.preimageSha256);assert.equal(digest(replacements[i]),span.replacementSha256);reconstructed=reconstructed.slice(0,span.start)+replacements[i]+reconstructed.slice(span.end);}
+assert.equal(reconstructed,await read(dir+'native63-candidate.inactive.mjs'));
+const ddl=await read(dir+'additive-boundary.inactive.sql');assert.equal((ddl.match(/create function /g)||[]).length,2);assert(!/create or replace|security definer/i.test(ddl));assert.equal((ddl.match(/grant execute on function /g)||[]).length,2);
+const changed=execFileSync('git',['diff','9e95eb6d50eb1c1356d0a1fa306348520724c3e7','--name-only'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
+assert(changed.every(f=>f.startsWith(dir)||f.startsWith('tests/n88-read-roundtrip-outcome-20261023/')||f==='docs/automation-evidence/20261023/N88_READ_ROUNDTRIP_OUTCOME_20261023.md'));
+const qualificationSourceSha256={};for(const f of [dir+'prepare.mjs',dir+'ACTIVATION.md','tests/n88-read-roundtrip-outcome-20261023/staged.mjs','tests/n88-read-roundtrip-outcome-20261023/compatibility.mjs','tests/n88-read-roundtrip-outcome-20261023/verify.mjs'])qualificationSourceSha256[f]=digest(await read(f));
+await writeFile('tests/n88-read-roundtrip-outcome-20261023/verification.json',JSON.stringify({taskId:manifest.taskId,runId:manifest.runId,status:'PASS',manifestSha256:staged.manifestSha256,nativeCandidateSha256:manifest.outputs['native63-candidate.inactive.mjs'],oldOperationCount:old.operations.length,newOperationCount:2,activeSourcesUnchanged:true,originalMeasurementReused:true,exactThreeSpanNativeReconstruction:true,allOwnedResourcesReleased:true,qualificationSourceSha256,activationAuthorized:false,providerOperations:0},null,2)+'\n');
+console.log('PASS exact inactive manifest, source/identity/artifact bindings, retained evidence and cleanup');

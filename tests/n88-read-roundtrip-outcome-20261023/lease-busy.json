@@ -1,0 +1,48 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "8693cc32-ba12-47fe-a7d4-941f12950d87",
+  "baseSha": "4ee4608c3a043f8ff27fd1c90d0ba652bc7e558b",
+  "sourceSha256": "49d1f2ab320bb6a15f87d6ca0a890a3163076d61850d56e2b9bada688caf04d8",
+  "status": "FAIL",
+  "scope": "Fabricated owned native PG17; direct SQL experiment before testing unchanged real service boundary. No hosted or UI performance claim.",
+  "measurements": [
+    {
+      "name": "baseline",
+      "queryCount": 14,
+      "wallMs": 485.53,
+      "injectedTransportMs": 350,
+      "payloadBytes": 6518,
+      "nulls": 0
+    },
+    {
+      "name": "experimentalBatch",
+      "queryCount": 2,
+      "wallMs": 89.83,
+      "injectedTransportMs": 50,
+      "payloadBytes": 6518,
+      "nulls": 0
+    }
+  ],
+  "guards": [
+    "full and terms/teachings admission reads match including empty tables and deterministic table/id order",
+    "foreign owner excluded; next request observes current name/revision; bigint >2^53 remains exact text",
+    "2000 accepted; 2001 fails closed at unchanged lock; valid child/parent fixture dependencies retained",
+    "cross-table aggregate and single UTF8 payload >2MB produce null-sentinel rejection; no unbounded JSON aggregate"
+  ],
+  "cleanup": {},
+  "projectionEqual": true,
+  "payloadEqual": true,
+  "boundary": {
+    "baselineAccepted": true,
+    "experimentalBatchRejected": true,
+    "error": "n88_database_unavailable",
+    "batchDriverCalls": 0
+  },
+  "reusedMeasurement": "initial-harness-failure.json; only missing explicit repository options corrected; no measurement/negative replay",
+  "failure": {
+    "name": "Error",
+    "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-read-roundtrip-outcome-20261023.json -WaitSeconds 0 -OwnerToken 8693cc32-ba12-47fe-a7d4-941f12950d87",
+    "code": null,
+    "stack": "Error: Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-read-roundtrip-outcome-20261023.json -WaitSeconds 0 -OwnerToken 8693cc32-ba12-47fe-a7d4-941f12950d87\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-read-roundtrip-outcome-20261023/tests/n88-read-roundtrip-outcome-20261023/outcome.mjs:52:21)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-read-roundtrip-outcome-20261023/tests/n88-read-roundtrip-outcome-20261023/outcome.mjs:71:15"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "fbc57f79-e4dc-461c-bca6-912edcd6ba5a",
+  "status": "FAIL",
+  "checks": [
+    {
+      "name": "all_76_old_operations_finite_dispatch_accepted",
+      "status": "PASS",
+      "evidence": "Every unchanged SQL entry maps to its unchanged fixed typed function. Dispatcher-only test does not execute side effects; exact native catalog/body/ACL preservation is separately proven."
+    },
+    {
+      "name": "old_native_catalog_cutover_requires_coordination",
+      "status": "PASS",
+      "evidence": "Actual old boundary accepts preimage but fails closed after additive functions; staged boundary accepts new catalog. No seamless rolling coexistence claim; original custodian needs explicit coordinated cutover authority."
+    }
+  ],
+  "manifestSha256": "80deb4166208469ab8888ed6bb4c00becef00c72a2f2465d6f70a071a890f471",
+  "cleanup": {
+    "ownedNativePgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "failure": {
+    "stage": "signed web entry and unchanged carrier/client",
+    "name": "AssertionError",
+    "message": "The expression evaluated to a falsy value:\n\n  assert(client.readPhases)\n",
+    "code": "ERR_ASSERTION",
+    "stack": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(client.readPhases)\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-read-roundtrip-outcome-20261023/tests/n88-read-roundtrip-outcome-20261023/compatibility.mjs:64:131\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  }
+}
