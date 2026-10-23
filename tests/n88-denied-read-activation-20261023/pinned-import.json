@@ -1,0 +1,59 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-denied-read-original-service-20261023",
+  "runId": "c0517e1d-9924-46ff-a881-aef0c4538cff",
+  "status": "PASS",
+  "qualifiedCandidate": "d27da1b34cb667be04d49efe354ee6ea811174ed",
+  "controllerBase": "08b8ab626180786f4f36255702f8384a42f06b07",
+  "scopedCherryPick": "49ae896e",
+  "verified": [
+    {
+      "path": "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md",
+      "gitBlobSha256": "bb58377e5af7ae74a54ebaf1aa58a398209fec20734b4ae2c82c0199e7b53c00"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/denied-read-20261023/custodian-handoff.json",
+      "gitBlobSha256": "2b54e05b094e766e492672882f07e38948b1c943f00ebbf1e708f122903d3d73"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/denied-read-20261023/manifest.json",
+      "gitBlobSha256": "dab762361286d90ebc549250023b2c920d1095f7e8ed01308dd2231b71422260"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/denied-read-20261023/native66-successor.inactive.mjs",
+      "gitBlobSha256": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/denied-read-20261023/prepare.mjs",
+      "gitBlobSha256": "aa6fb3b64bd22b98e4c6081e45c319c127de42ea5a2d89da0b928edd1c08d760"
+    },
+    {
+      "path": "drafts/n88-student-portal/integrated-service.mjs",
+      "gitBlobSha256": "cfebe9e911ec4f2de963b81d6f2b47095d8157f952fec1e11cccfdb071a46c30"
+    },
+    {
+      "path": "tests/n88-denied-read-20261023/failure-boundary.mjs",
+      "gitBlobSha256": "f4af669567cf0c0fd243d2cf4c693ed642bff5f181da4a5147ab765aad39aca9"
+    },
+    {
+      "path": "tests/n88-denied-read-20261023/green.json",
+      "gitBlobSha256": "e2391821b45bcffbad64a876bf8ef27265de3159a7a540dbcb080457b48ef4ed"
+    },
+    {
+      "path": "tests/n88-denied-read-20261023/red.json",
+      "gitBlobSha256": "1c9e6d2d3dcc7c83e505d1b6c4c868e44d0eaa22088c8bf8d29ee295f863b136"
+    },
+    {
+      "path": "tests/n88-denied-read-20261023/session-recovery.json",
+      "gitBlobSha256": "2e566aea2e1465aeb58704d907608c83f37e27771a9e0f5a6d5655d1d7eb7e03"
+    },
+    {
+      "path": "tests/n88-denied-read-20261023/session-recovery.mjs",
+      "gitBlobSha256": "36a6c75e941ee2d3370e22389105325dae7f9951879924dc594705143e2ed243"
+    }
+  ],
+  "providerOperations": 0,
+  "proofsReusedWithoutRerun": true,
+  "actualHiddenLiveCause": "UNKNOWN",
+  "actualUserAcceptance": "NOT_RUN"
+}

@@ -1,0 +1,14 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "providerOperations": 0,
+  "privateCustodyAccess": false,
+  "checks": [
+    "exact certificate reconstruction; uncommitted/active/foreign/tampered/unknown key and critical drift denied",
+    "fixed original baseline cannot be adopted or replaced",
+    "old consumed history retained; duplicate reservation/unknown outcome blocks replay",
+    "exact authority and source/native/map/freshness prerequisites"
+  ],
+  "actualCertificateVerified": false
+}
