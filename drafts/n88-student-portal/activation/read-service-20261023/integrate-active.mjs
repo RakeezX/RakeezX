@@ -1,0 +1,25 @@
+/** AI: local source integration only after actual service prerequisites. No provider ports. */
+import {readFile,writeFile} from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {hash} from './prepare.mjs';
+const root=fileURLToPath(new URL('../../../../',import.meta.url)),stage=fileURLToPath(new URL('.',import.meta.url)),run='c4fe03b0-3995-497f-bb84-245077a08f47';
+const json=async p=>JSON.parse(await readFile(p,'utf8'));
+const outcome=await json(path.join(root,'tests/n88-read-service-20261023/migration-outcome-'+run+'.json')),manifest=await json(path.join(stage,'manifest.json'));
+if(outcome.status!=='PASS'||outcome.runId!==run||outcome.routineCount!==78||!outcome.old76Unchanged||!outcome.priorHistoryUnchanged||outcome.sqlSha256!==manifest.sql||outcome.provider.source!==manifest.native||outcome.migrationInvocations!==1)throw Error('n88_actual_service_prerequisites_required');
+const prior=await json(path.join(root,'drafts/n88-student-portal/activation/read-roundtrip-20261023/manifest.json'));
+const targets=['drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/postgres-repository.mjs','drafts/n88-student-portal/activation/private-error-boundary.mjs','drafts/n88-student-portal/activation/bundle/edge/index.mjs'];
+for(const p of targets)if(hash((await readFile(path.join(root,p),'utf8')).replaceAll('\r\n','\n'))!==prior.inputs[p])throw Error('n88_active_preimage_drift');
+const integrated=(await readFile(path.join(stage,'integrated-service.mjs'),'utf8')).replaceAll('\r\n','\n').replaceAll("from '../../","from './");
+const repository=(await readFile(path.join(stage,'postgres-repository.mjs'),'utf8')).replaceAll('\r\n','\n').replace("from './private-error-boundary.mjs'","from './activation/private-error-boundary.mjs'").replace("from '../../web-protocol.mjs'","from './web-protocol.mjs'");
+const boundary=(await readFile(path.join(stage,'private-error-boundary.mjs'),'utf8')).replaceAll('\r\n','\n').replace("from './typed-read-operations.json'","from './read-service-20261023/typed-read-operations.json'").replace("from './typed-identities.json'","from './read-service-20261023/typed-identities.json'");
+const native=(await readFile(path.join(stage,'native63-compatible.inactive.mjs'),'utf8')).replaceAll('\r\n','\n');if(hash(native)!==manifest.native)throw Error('n88_native_identity');
+const outputs=Object.fromEntries(targets.map((p,i)=>[p,[integrated,repository,boundary,native][i]]));
+for(const [p,text]of Object.entries(outputs))await writeFile(path.join(root,p),text);
+const activePath=path.join(root,'drafts/n88-student-portal/activation/manifest.json'),active=await json(activePath);
+active.outputs['edge/index.mjs']=manifest.native;
+for(const p of targets.slice(0,3))if(p in active.sources)active.sources[p]=hash(outputs[p]);
+active.typedReadService20261023={taskId:outcome.taskId,runId:run,native:manifest.native,nativeVersion:outcome.provider.version,catalogFingerprint:outcome.catalogFingerprint,routineCounts:[76,78],migration:outcome.migration,receipt:'tests/n88-read-service-20261023/migration-outcome-'+run+'.json',hostedUserSpeedAcceptance:'NOT_RUN',productAcceptance:'OPEN',nativeUploads:1,pinUpdates:1,migrationApplications:1,carrierUploads:0};
+await writeFile(activePath,JSON.stringify(active,null,2)+'\n');
+await writeFile(path.join(root,'tests/n88-read-service-20261023/active-integration.json'),JSON.stringify({aiAuthored:true,status:'PASS',sourceIntegrationAfterActualService:true,activeImportsRebasedOnly:true,nativeSha256:hash(native),sourceHashes:Object.fromEntries(Object.entries(outputs).map(([p,t])=>[p,hash(t)])),newProviderOperations:0,actualUserSpeed:'NOT_RUN'},null,2)+'\n');
+console.log('PASS: active source/imports and exact served native integrated after service receipt.');

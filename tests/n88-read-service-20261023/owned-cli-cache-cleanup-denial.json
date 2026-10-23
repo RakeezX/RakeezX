@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "runId": "5956e8fa-4884-4d0c-a8e9-5f6e4cfef70f",
+  "action": "Delete only owned migration-workdir/supabase/.temp/linked-project.json and its empty directory after exact path/timestamp checks",
+  "status": "NOT_RUN",
+  "denial": "rejected: blocked by policy",
+  "filePreserved": true,
+  "alternateRouteAttempted": false,
+  "fileContentsReadOrExported": false,
+  "sharedPhaseLeasesReleased": true
+}

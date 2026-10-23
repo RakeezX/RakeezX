@@ -1,0 +1,15 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "c4fe03b0-3995-497f-bb84-245077a08f47",
+  "candidateSha": "ff615d6618e123b57a9f45eef2f26231e171ea09",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "prior": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "observedAt": "2026-10-23T08:20:05.563Z",
+  "providerWrites": 0,
+  "status": "FAIL",
+  "code": "n88_typed_actual_catalog_drift",
+  "uploads": 0,
+  "pinUpdates": 0,
+  "migrations": 0
+}
