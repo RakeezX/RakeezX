@@ -111,6 +111,12 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
   const taskIds = new Set();
   for (const update of payload.cardUpdates) {
     const { card, expected, materialReason } = update;
+    if (update.sourceCardFile !== undefined) {
+      const source = payload.files.find(f => f.repoPath === update.sourceCardFile);
+      insist(payload.requireNoActiveWorkers === true && !allowed.length && source && source.repoPath.startsWith('scripts/ops-supervisor-v4/') && source.repoPath.endsWith('.json') && SHA256.test(source.expectedCanonicalSha256 ?? '') && !source.partialInstallationRecovery, 'Per-card source requires an exact existing idle source');
+      const wrapper = JSON.parse(source.content);
+      insist(wrapper.activationId === payload.activationId && wrapper.tasks?.length === 1 && same(wrapper.tasks[0], card), 'Per-card source differs from its exact card');
+    }
     insist(card && expected && ID.test(card.id ?? '') && card.activationId === payload.activationId, 'Invalid activated source card');
     insist(!taskIds.has(card.id) && !allowed.includes(card.id), 'Duplicate or active card update'); taskIds.add(card.id);
     insist(Object.keys(card).every(key => !RUNTIME_KEYS.has(key)), 'Source card contains runtime state: ' + card.id);
@@ -680,7 +686,8 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     insist(catalog.currentActivationId === payload.activationId && Array.isArray(catalog.tasks), 'Catalog activation changed');
     for (const update of payload.cardUpdates) {
       const state = exactInactive(update); queueBefore.set(update.card.id, state);
-      const sourceSpec = payload.files.find(file => file.repoPath === payload.sourceCardFile);
+      const updateSourceFile = update.sourceCardFile ?? payload.sourceCardFile;
+      const sourceSpec = payload.files.find(file => file.repoPath === updateSourceFile);
       let bindingHash=sourceSpec.expectedCanonicalSha256,bindingFollowups=catalog.followupSources??[];
       // A committed/installed source may precede catalog activation when an exact guarded reload refuses.
       // Rebind only this original N88 pilot and the immutable owned partial receipt/payload.
@@ -701,8 +708,8 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         insist(pr.installedPaths?.includes(payload.sourceCardFile)&&pf&&pf.sha256===sourceSpec.expectedCanonicalSha256&&sha256(Buffer.from(pf.content))===pf.sha256&&pp.cardUpdates?.length===1&&same(pp.cardUpdates[0].expected,update.expected)&&same(pp.cardUpdates[0].card,update.card),'Partial source/card identity differs');
         git(['merge-base','--is-ancestor',pr.commit,'origin/main'],ops);bindingHash=pf.expectedCanonicalSha256;
       }
-      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, bindingHash, bindingFollowups);
-      sourceBindings.set(update.card.id, binding);
+      const binding = catalogSourceBinding(catalog.tasks, state.task, update, updateSourceFile, bindingHash, bindingFollowups);
+      sourceBindings.set(update.card.id, { ...binding, sourceCardFile: updateSourceFile });
       const baselineChecks = binding.baseline.requiredChecks ?? [];
       const preservesChecks = baselineChecks.every(check => update.card.requiredChecks.includes(check));
       const n36PublisherGateSplit = update.card.id === 'continuous-n36-available-partial-class-import-no-total-cap-20261017'
@@ -730,7 +737,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       const original = read(canonicalFile); insist(sha256(original) === file.expectedCanonicalSha256, 'Canonical hash differs from review: ' + file.repoPath);
       const remoteEntry = gitRaw(['ls-tree', '-z', remoteHead, '--', file.repoPath]);
       const remoteBytes = remoteEntry ? Buffer.from(gitRaw(['show', remoteHead + ':' + file.repoPath]), 'utf8') : null;
-      const approvedBinding = file.repoPath === payload.sourceCardFile ? [...sourceBindings.values()].find(binding => binding.kind === 'approved-note') : null;
+      const approvedBinding = [...sourceBindings.values()].find(binding => binding.sourceCardFile === file.repoPath && binding.kind === 'approved-note') ?? null;
       insist(reviewedSourcePreimageMatches(remoteBytes, read(opFile), original, file, approvedBinding?.approvedNoteSha256 ?? null), 'Remote main preimage differs from canonical review: ' + file.repoPath);
       opsPreimageHashes.set(file.repoPath, sha256(read(opFile)));
       if (original !== null) { const backup = path.join(evidenceRoot, 'before-files', file.repoPath); fs.mkdirSync(path.dirname(backup), { recursive: true }); fs.writeFileSync(backup, original, { flag: 'wx' }); }
@@ -786,7 +793,8 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       for(const p of pendingCompanions){catalog.tasks.push(Object.fromEntries(Object.entries(p.card).filter(([k])=>!RUNTIME_KEYS.has(k))));fs.writeFileSync(path.join(evidenceRoot,p.card.id+'.preserved-pending.json'),p.raw,{flag:'wx'});}
       receipt.preservedPendingCompanions=pendingCompanions.map(p=>({id:p.card.id,queueSha256:sha256(p.raw),queueChanged:false,sourceCardChanged:false}));
       catalog.updatedAt = at;
-      catalog.followupSources = [...(catalog.followupSources ?? []), { commit, sourceFile: path.join(root, payload.sourceCardFile), sourceSha256: payload.files.find(f => f.repoPath === payload.sourceCardFile).sha256, updatedTaskIds: plan.taskIds, at, maintenanceToken: token }];
+      const groupedSources = [...new Set(payload.cardUpdates.map(update => update.sourceCardFile ?? payload.sourceCardFile))];
+      catalog.followupSources = [...(catalog.followupSources ?? []), ...groupedSources.map(sourceFile => ({ commit, sourceFile: path.join(root, sourceFile), sourceSha256: payload.files.find(f => f.repoPath === sourceFile).sha256, updatedTaskIds: payload.cardUpdates.filter(update => (update.sourceCardFile ?? payload.sourceCardFile) === sourceFile).map(update => update.card.id), at, maintenanceToken: token }))];
       replaceGuarded(catalogPath, bytes(catalog), sha256(beforeCatalog)); receipt.catalogUpdated = true; record('CATALOG_UPDATED');
       for (const update of payload.cardUpdates) {
         insist(pausedIdle(), 'Pause lost during activation');

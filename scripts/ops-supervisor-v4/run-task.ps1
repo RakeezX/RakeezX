@@ -9,8 +9,23 @@ function Save-Checkpoint {
   $checkpoint.heartbeatAt = [DateTime]::UtcNow.ToString('o')
   $temporary = "$($spec.checkpointPath).$PID.tmp"
   [System.IO.File]::WriteAllText($temporary, ($checkpoint | ConvertTo-Json -Depth 8), $utf8)
-  if ([System.IO.File]::Exists($spec.checkpointPath)) { [System.IO.File]::Replace($temporary, $spec.checkpointPath, [NullString]::Value) }
-  else { [System.IO.File]::Move($temporary, $spec.checkpointPath) }
+  # AI: a bounded sharing collision must not abort the owned worker. Keep atomic replacement.
+  try {
+    for ($checkpointRetry = 0; ; $checkpointRetry++) {
+      try {
+        if ([System.IO.File]::Exists($spec.checkpointPath)) { [System.IO.File]::Replace($temporary, $spec.checkpointPath, [NullString]::Value) }
+        else { [System.IO.File]::Move($temporary, $spec.checkpointPath) }
+        break
+      } catch {
+        $checkpointFailure = $_.Exception.GetBaseException()
+        $checkpointNativeCode = $checkpointFailure.HResult -band 0xffff
+        if ($checkpointRetry -ge 10 -or $checkpointNativeCode -notin @(32, 33, 1175)) { throw }
+        Start-Sleep -Milliseconds 50
+      }
+    }
+  } finally {
+    if ([System.IO.File]::Exists($temporary)) { [System.IO.File]::Delete($temporary) }
+  }
 }
 function Quote-Argument([string]$Value) {
   # CommandLineToArgvW quoting, including literal quotes and trailing backslashes.
