@@ -1,4 +1,9 @@
 /* Compact N94 cells retain the established state palette and focus treatment. */
+/* AI N09: keep focused entry fields clear of the sticky RTL student column. */
+.grades-01c .tablewrap {
+  scroll-padding-inline-start: calc(var(--grade-sticky-width, 0px) + 8px);
+  scroll-padding-inline-end: 8px;
+}
 /* AI N120: automatic score digits cannot move the adjacent +/- controls. */
 .graderow__auto:has(.n84-inline) > .badge {
   min-inline-size: 8ch;
