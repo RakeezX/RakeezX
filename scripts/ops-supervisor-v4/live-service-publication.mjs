@@ -1,3 +1,4 @@
+import {n88DeniedReadTask,buildN88DeniedReadEvidence,verifiedN88DeniedReadPublication} from './n88-denied-read-publication.mjs';
 import {n88TypedReadTask,buildN88TypedReadEvidence,verifiedN88TypedReadPublication} from './n88-typed-read-publication.mjs';
 // AI: real nonsending backend proof, separate from visible frontend asset changes.
 import { createHash } from 'node:crypto';
@@ -26,6 +27,7 @@ const fixedScope=t=>(correction(t)||t?.id==='continuous-n44-finish-bounded-servi
 // Only the guarded maintainer calls this with immutable git-show bytes at the saved candidate.
 // Runtime/credentials/provider writes are deliberately absent from this module.
 export function buildLiveServiceEvidence(task,receipt,readCandidateFile){
+ if(n88DeniedReadTask(task))return buildN88DeniedReadEvidence(task,receipt,readCandidateFile);
  if(n88TypedReadTask(task))return buildN88TypedReadEvidence(task,receipt,readCandidateFile);
  if(n44QualifiedTask(task))return buildN44QualifiedEvidence(task,receipt,readCandidateFile);
  if(n88AssetTask(task))return buildN88AssetEvidence(task,receipt,readCandidateFile);
@@ -46,6 +48,7 @@ export function buildLiveServiceEvidence(task,receipt,readCandidateFile){
 }
 
 export function verifiedLiveServicePublication(task,receipt,report=()=>{}){
+ if(n88DeniedReadTask(task))return verifiedN88DeniedReadPublication(task,receipt);
  if(n88TypedReadTask(task))return verifiedN88TypedReadPublication(task,receipt);
  if(n44QualifiedTask(task))return verifiedN44QualifiedPublication(task,receipt);
  if(n88AssetTask(task))return verifiedN88AssetPublication(task,receipt);
