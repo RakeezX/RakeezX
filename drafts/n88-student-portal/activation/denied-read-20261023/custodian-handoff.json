@@ -1,0 +1,38 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-actual-denied-student-read-20261023",
+  "runId": "a6f80c84-cdb8-485e-ab3b-42c312d44abf",
+  "state": "PREPARED_ONLY_NOT_AUTHORIZED_FOR_SERVICE_EXECUTION",
+  "originalCustodianSession": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "projectRef": "xlrubcwjqktzzunrvuns",
+  "functionName": "n88-student-portal",
+  "originalVersion": 66,
+  "expectedCurrentNativeSha256": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "successorPath": "drafts/n88-student-portal/activation/denied-read-20261023/native66-successor.inactive.mjs",
+  "successorSha256": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+  "requiredTransition": {
+    "nativeUploads": 1,
+    "sourcePinUpdates": 1,
+    "readback": true,
+    "newMigrations": 0,
+    "carrierUploads": 0,
+    "authChanges": 0,
+    "catalogChanges": 0
+  },
+  "preconditions": [
+    "Original controller resumes original custodian under a new exact bounded transition authority; consumed allowances preserved",
+    "Serialize service phase with N44 and acquire original owned leases",
+    "Verify native66 source/map/config/source pin remain exact; deny unexplained drift",
+    "Reuse applied20261023070851 and exact78/unchanged old76 evidence until a relevant change; do not apply SQL again",
+    "Verify staged successor syntax, two-span identity and focused local proofs before any upload",
+    "Read back exact successor bytes and matching source pin; generic frontend publication is insufficient"
+  ],
+  "actualLiveCause": "UNKNOWN: reproduced transient read failures previously return401 and erase cookie; not attributed to PO request",
+  "actualUserAcceptance": "NOT_RUN",
+  "thisRun": {
+    "providerOperations": 0,
+    "privateCustodyAccess": false,
+    "temporaryFunctionDeployment": false,
+    "cleanupDisarm": "No new live resources; earlier disposition not reverified"
+  }
+}

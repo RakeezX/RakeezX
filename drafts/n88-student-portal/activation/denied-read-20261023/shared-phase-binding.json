@@ -1,0 +1,29 @@
+{
+  "taskId": "continuous-n88-denied-read-original-service-20261023",
+  "mode": "exact-runtime-v1",
+  "baselineDigest": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af",
+  "historicalBaselineClaimed": false,
+  "revision": "5e0cb77db683535e06f8da21fc8ca41bcbe285f6",
+  "producerRun": "fc43c561-a04a-458b-b3d1-09077848d2f9",
+  "sourceCandidate": "35c66a4f9a86b67f75187190803b534f1c3c5cfa",
+  "certificate": {
+    "path": "drafts/n44-push/activation/device-closed-page/fc43c561-a04a-458b-b3d1-09077848d2f9/final-configuration-certificate.json",
+    "sha256": "037276349103fb4538e00da9a01e5c0b43f0269b504dc6f5057b169725965f6a"
+  },
+  "previousMap": {
+    "path": "drafts/n44-push/activation/device-closed-page/fc43c561-a04a-458b-b3d1-09077848d2f9/current-n44-map-certificate.json",
+    "sha256": "114e86439e0b96ef338b5f7d4f9fa3d39993be53c69a57e381ff066509512165"
+  },
+  "release": {
+    "path": "tests/n44-device-20261023/current-resource-release.json",
+    "sha256": "65f161ddf8de842884927d815c6dd3871e8debe2a1990e767be74a0f011515a6"
+  },
+  "outcome": {
+    "path": "tests/n44-device-20261023/authenticated-reader-outcome.json",
+    "sha256": "ea2445aae67e1cc69c8ef21d4edf817e6f6503d1a174abfa80838260669d39a4"
+  },
+  "nativeReadback": {
+    "path": "tests/n44-device-20261023/current-policy-native-readback.json",
+    "sha256": "df2b96d7aa4f93abf2a5b040a37bc092e0a99504a30231ec31778c5c45f590eb"
+  }
+}

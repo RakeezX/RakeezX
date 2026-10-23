@@ -1,0 +1,26 @@
+{
+  "aiAuthored": true,
+  "status": "FAIL",
+  "providerOperations": 0,
+  "realAccountReads": 0,
+  "sourceSha256": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "cases": [],
+  "observed": {
+    "status": 401,
+    "cookieRetired": true,
+    "clientKind": "session",
+    "diagnostic": {
+      "action": "read",
+      "phase": "manual",
+      "outcome": "denied",
+      "httpStatusClass": "4xx",
+      "elapsedMs": 0,
+      "visibility": "visible",
+      "retirementReason": "visible"
+    }
+  },
+  "failure": {
+    "name": "AssertionError",
+    "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'session'\n- 'unavailable'\n"
+  }
+}

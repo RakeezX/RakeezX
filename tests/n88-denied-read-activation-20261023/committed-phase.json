@@ -1,0 +1,17 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "providerOperations": 0,
+  "aclWrites": 0,
+  "checks": [
+    "completed/released configuration phase accepted without whole-worker completion",
+    "foreign/incomplete/unreleased/expected-current-only proof denied",
+    "committed unchanged ancestor artifact accepted during independent commits",
+    "uncommitted/tampered/stale/missing bytes denied",
+    "non-original execution context blocked before custody/provider access",
+    "active integration blocked before writes without actual service receipt"
+  ],
+  "ownedFixtureRemoved": true,
+  "actualProducerCertificateVerified": false
+}

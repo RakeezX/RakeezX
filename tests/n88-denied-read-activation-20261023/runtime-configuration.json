@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "providerOperations": 0,
+  "checks": [
+    "every omitted/changed consumed key denied",
+    "exact recovery versions and unexpected dependency denied",
+    "exact whole keyset rejects PG/new keys",
+    "stale N44 expected policy denied",
+    "every non-pin entry including opaque entries must remain unchanged across operation",
+    "opaque unread values are observation only with no historical verification claim"
+  ],
+  "historicWholeAggregate": "NOT_PROVEN"
+}

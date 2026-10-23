@@ -1,0 +1,223 @@
+{
+  "taskId": "continuous-n88-denied-read-original-service-20261023",
+  "runId": "4d6fee1d-79f7-49a1-8be6-ad55dc4ac36d",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "candidateSha": "1e31ff0379a35183b276f67f5c51d37259e0b364",
+  "baseSha": "08b8ab626180786f4f36255702f8384a42f06b07",
+  "observedAt": "2026-10-23T16:59:04.836Z",
+  "source": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+  "priorSource": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "status": "PASS",
+  "provider": {
+    "status": "PASS",
+    "version": 74,
+    "verifyJwt": false,
+    "source": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+    "downloadedBytesExact": true,
+    "importMapExact": true,
+    "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+    "observedAt": "2026-10-23T16:59:51.776Z",
+    "pinDigest": "7f760e5969b6980e108f2eca6ea2e510dfa721e733a42e52017518f4895d79cd",
+    "currentNonPinDigest": "ef30c892d5c4d789ad08356e09b63849f1f6f85e8f124af7ec4b4b2e823427ec",
+    "keysetDigest": "6087c1195ab1e6ffeed00ff8e975cdd7f3d1b59e3b437b1c32ac006261cac28e",
+    "runtimeExpectedKeys": [
+      "N88_AUTH_API_KEY",
+      "N88_AUTH_URL",
+      "N88_DATABASE_CA_CERT",
+      "N88_DATABASE_URL",
+      "N88_ENABLED",
+      "N88_HMAC_KEY",
+      "N88_INGRESS_KEY",
+      "N88_NUMERIC_KEY",
+      "N88_PILOT_BINDING",
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED",
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256",
+      "N88_PUBLIC_ORIGIN",
+      "N88_READINESS_ENABLED",
+      "N88_RECOVERY_ACTIVE_VERSION",
+      "N88_RECOVERY_KEY_n88_1792356057764",
+      "N88_RECOVERY_VERSIONS",
+      "N88_RESERVATION_KEY",
+      "N88_ROLLOUT_MODE",
+      "N88_SERVICE_REVISION",
+      "N88_SERVICE_SOURCE_SHA"
+    ],
+    "n44ExpectedKeys": [
+      "N44_AUTH_API_KEY",
+      "N44_AUTH_URL",
+      "N44_CRYPTO_JSON",
+      "N44_DATABASE_CA_CERT",
+      "N44_DATABASE_URL",
+      "N44_DELIVERY_ENABLED",
+      "N44_ENABLED",
+      "N44_INGRESS_KEY",
+      "N44_ONE_DEVICE_TEST_JSON",
+      "N44_PROVIDER_ORIGINS_JSON",
+      "N44_PUBLIC_ORIGIN",
+      "N44_RATE_KEY",
+      "N44_READINESS_ENABLED",
+      "N44_SCHEDULER_KEY",
+      "N44_SERVICE_REVISION",
+      "N44_SERVICE_SOURCE_SHA",
+      "N44_SESSION_POLICY_JSON"
+    ],
+    "opaqueUnreadKeys": [
+      "CLOUDFLARE_ACCOUNT_ID",
+      "CLOUDFLARE_EMAIL_API_TOKEN",
+      "SUPABASE_ANON_KEY",
+      "SUPABASE_DB_URL",
+      "SUPABASE_JWKS",
+      "SUPABASE_PUBLISHABLE_KEYS",
+      "SUPABASE_SECRET_KEYS",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "SUPABASE_URL",
+      "SUPPORT_NOTIFICATION_SCHEDULER_SECRET"
+    ],
+    "historicalWholeAggregate": "NOT_PROVEN; preserved separately",
+    "opaqueHistoricalValuesVerified": false,
+    "unknownRuntimeDriftAccepted": false,
+    "runtimeProvenance": [
+      {
+        "name": "N88_AUTH_API_KEY",
+        "source": "pinned original official publishable project-key provenance"
+      },
+      {
+        "name": "N88_AUTH_URL",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_DATABASE_CA_CERT",
+        "source": "original pinned public CA"
+      },
+      {
+        "name": "N88_DATABASE_URL",
+        "source": "original protected password plus original installed restricted direct URL"
+      },
+      {
+        "name": "N88_ENABLED",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_HMAC_KEY",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_INGRESS_KEY",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_NUMERIC_KEY",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_PILOT_BINDING",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_PUBLIC_ORIGIN",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_READINESS_ENABLED",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_RECOVERY_ACTIVE_VERSION",
+        "source": "original acknowledged protected single recovery version/key"
+      },
+      {
+        "name": "N88_RECOVERY_KEY_n88_1792356057764",
+        "source": "original acknowledged protected single recovery version/key"
+      },
+      {
+        "name": "N88_RECOVERY_VERSIONS",
+        "source": "original acknowledged protected single recovery version/key"
+      },
+      {
+        "name": "N88_RESERVATION_KEY",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_ROLLOUT_MODE",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_SERVICE_REVISION",
+        "source": "original install source/protected keys and acknowledged final public release"
+      },
+      {
+        "name": "N88_SERVICE_SOURCE_SHA",
+        "source": "original protected current native source history"
+      }
+    ],
+    "expectedBeforeComparison": true,
+    "n44Phase": {
+      "status": "PASS",
+      "producerTask": "continuous-n44-one-approved-closed-page-push-20261019",
+      "producerSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "producerRun": "fc43c561-a04a-458b-b3d1-09077848d2f9",
+      "revision": "5e0cb77db683535e06f8da21fc8ca41bcbe285f6",
+      "sourceCandidate": "35c66a4f9a86b67f75187190803b534f1c3c5cfa",
+      "certificateSha256": "037276349103fb4538e00da9a01e5c0b43f0269b504dc6f5057b169725965f6a",
+      "expectedBeforeComparison": true,
+      "exactN44Keyset": true,
+      "actualPolicyDeltaVerified": true,
+      "finalApprovalDisarmed": true,
+      "resourceReleaseVerified": true,
+      "historicalWholeAggregate": "NOT_PROVEN",
+      "wholeWorkerCompletionRequired": false
+    }
+  },
+  "uploadedVersion": 73,
+  "pinVersionAdvance": 1,
+  "uploadInvoked": true,
+  "pinInvoked": true,
+  "nativeUploads": 1,
+  "pinUpdates": 1,
+  "providerWrites": 2,
+  "oldHistoriesPreserved": true,
+  "catalogHistoryEvidenceReused": true,
+  "migrations": 0,
+  "carrierUploads": 0,
+  "realAccountReads": 0,
+  "actualUserAcceptance": "NOT_RUN",
+  "catalogHistoryReference": "tests/n88-read-service-20261023/history-correction-inherited-1593971e-7927-4c32-a307-e751d0b2c869.json",
+  "configurationPhaseBindings": {
+    "taskId": "continuous-n88-denied-read-original-service-20261023",
+    "mode": "exact-runtime-v1",
+    "baselineDigest": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af",
+    "historicalBaselineClaimed": false,
+    "revision": "5e0cb77db683535e06f8da21fc8ca41bcbe285f6",
+    "producerRun": "fc43c561-a04a-458b-b3d1-09077848d2f9",
+    "sourceCandidate": "35c66a4f9a86b67f75187190803b534f1c3c5cfa",
+    "certificate": {
+      "path": "drafts/n44-push/activation/device-closed-page/fc43c561-a04a-458b-b3d1-09077848d2f9/final-configuration-certificate.json",
+      "sha256": "037276349103fb4538e00da9a01e5c0b43f0269b504dc6f5057b169725965f6a"
+    },
+    "previousMap": {
+      "path": "drafts/n44-push/activation/device-closed-page/fc43c561-a04a-458b-b3d1-09077848d2f9/current-n44-map-certificate.json",
+      "sha256": "114e86439e0b96ef338b5f7d4f9fa3d39993be53c69a57e381ff066509512165"
+    },
+    "release": {
+      "path": "tests/n44-device-20261023/current-resource-release.json",
+      "sha256": "65f161ddf8de842884927d815c6dd3871e8debe2a1990e767be74a0f011515a6"
+    },
+    "outcome": {
+      "path": "tests/n44-device-20261023/authenticated-reader-outcome.json",
+      "sha256": "ea2445aae67e1cc69c8ef21d4edf817e6f6503d1a174abfa80838260669d39a4"
+    },
+    "nativeReadback": {
+      "path": "tests/n44-device-20261023/current-policy-native-readback.json",
+      "sha256": "df2b96d7aa4f93abf2a5b040a37bc092e0a99504a30231ec31778c5c45f590eb"
+    }
+  },
+  "oldDeniedResourcesUntouched": true
+}

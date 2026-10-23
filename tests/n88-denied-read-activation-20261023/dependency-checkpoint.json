@@ -1,0 +1,32 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-denied-read-original-service-20261023",
+  "runId": "c0517e1d-9924-46ff-a881-aef0c4538cff",
+  "observedAt": "2026-10-23T15:52:10.112Z",
+  "status": "BLOCKED",
+  "reason": "N44_SHARED_CONFIGURATION_PRODUCER_STILL_ACTIVE",
+  "producer": {
+    "taskId": "continuous-n44-one-approved-closed-page-push-20261019",
+    "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+    "runId": "0041da26-caed-4117-a6d8-c89e11a096ba",
+    "status": "running",
+    "lastRecordedCandidateSha": "104f3d1192a21713b0e3c8f9ff4eda6a0f960274",
+    "resultState": null,
+    "resultCandidateSha": null
+  },
+  "requiredPublicEvidence": "Completed original N44 producer result plus clean committed per-key configuration delta certificates and exact authorized operation/readback references sufficient to reconstruct the unchanged N88 non-pin baseline.",
+  "baselineNonPinDigest": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af",
+  "freshProviderConfigRead": false,
+  "configDriftCauseClaimed": false,
+  "providerOperations": 0,
+  "privateCustodyAccess": false,
+  "leasesAcquired": 0,
+  "newNativeUploads": 0,
+  "newSourcePinUpdates": 0,
+  "migrations": 0,
+  "carrierUploads": 0,
+  "realAccountReads": 0,
+  "finiteWaitWithoutLeases": true,
+  "privateCrossCustodyAccess": false,
+  "actualUserAcceptance": "NOT_RUN"
+}

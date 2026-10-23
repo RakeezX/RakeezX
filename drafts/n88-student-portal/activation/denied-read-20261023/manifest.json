@@ -1,0 +1,18 @@
+{
+  "aiAuthored": true,
+  "baseSha": "84a0e4cf197adaeeb3925a5400b6280d5ff14cfa",
+  "originalNative66Sha256": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "successorSha256": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+  "integratedSourceSha256": "cfebe9e911ec4f2de963b81d6f2b47095d8157f952fec1e11cccfdb071a46c30",
+  "onlyNativeSpans": [
+    "add request-local read transaction error boundary",
+    "wrap integrated student handler construction"
+  ],
+  "unchangedSourceHashes": {
+    "drafts/n88-student-portal/postgres-repository.mjs": "ee11051db7af7412cc76dd747c69921c525bfdd4f6bc058d04ff3629f3aa63fe",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "0f0809796bc40f66c05202bb6f125194b35e9fe62586c766ce1ff7057aa42906",
+    "drafts/n88-student-portal/activation/read-service-20261023/typed-read-operations.json": "ad5445a843afbfe464869fa6789b518d0f80fcb5518cd611c93442da768e9ccf",
+    "drafts/n88-student-portal/activation/read-service-20261023/typed-identities.json": "1c9e9f0419bb2450acfab84996c9a6afc2566f07cb62398d2ae59a704f1dec04"
+  },
+  "liveOperations": 0
+}

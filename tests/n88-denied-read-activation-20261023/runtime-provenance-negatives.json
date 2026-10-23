@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "checks": [
+    "forged map/provenance, stale policy and unknown N44 key denied",
+    "original recovery/key/admission and pinned public-key provenance required"
+  ],
+  "providerOperations": 0,
+  "privateCustodyAccess": false
+}
