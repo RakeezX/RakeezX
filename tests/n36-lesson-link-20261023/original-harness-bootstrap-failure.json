@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n36-lesson-link-school-department-outcome-20261023",
+  "runId": "2e3dee0a-bade-41d6-96e5-5173af64ed5c",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "conflict",
+      "status": "FAIL",
+      "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-lesson-link-school-department-outcome-20261023\\tests\\n36-lesson-link-20261023\\runtime.mjs:26:163\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-lesson-link-school-department-outcome-20261023/tests/n36-lesson-link-20261023/runtime.mjs:21:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

@@ -82,10 +82,14 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
     // AI: classify only absent optional response proof, after every explicit
     // school/teacher/SchoolId check, including the established metadata reader.
     // No timetable is parsed or admitted without its own matching school.
-    if(kind==='timetable'&&(!runContext.schoolName||schools.length!==1))fail('SCHOOL_CONTEXT_UNCONFIRMED',runContext.schoolName&&schools.length===0?'response-school-absent':null);
+    if(kind==='timetable'){
+     const proof=schools.length===0?readSourceReportPage('lesson-school-proof',runContext,{document:doc,url:u.href}):{ok:true,bound:false};
+     if(!proof.ok)fail(proof.code);
+     if(!runContext.schoolName||schools.length!==1&&!proof.bound)fail('SCHOOL_CONTEXT_UNCONFIRMED',runContext.schoolName&&schools.length===0?'response-school-absent':null);
+    }
     let value=kind==='metadata'?identity:kind==='timetable'?readSourceReportPage(kind,runContext,{document:doc,url:u.href}):globalThis.rakeezSetupPageReader?.(kind,runContext,{document:doc,url:u.href});
     if(!value)fail('SETUP_READER_UNAVAILABLE');
-    if(!value.ok){if(['SOURCE_PENDING','EMPTY_SOURCE','UNSUPPORTED_SOURCE_SCHEMA'].includes(value.code))return {ok:true,tables:[],links:[],warnings:[{category:kind,code:'SETUP_FIELDS_UNAVAILABLE'}],skipped:[]};fail(value.code);}
+    if(!value.ok){if(['SOURCE_PENDING','EMPTY_SOURCE','UNSUPPORTED_SOURCE_SCHEMA',...(kind==='timetable'?['UNRESOLVED_DAY_HEADER','UNRESOLVED_PERIOD_HEADERS','UNRESOLVED_WEEKDAY','AMBIGUOUS_PERIOD','UNRESOLVED_TIMETABLE']:[])].includes(value.code))return {ok:true,tables:[],links:[],warnings:[{category:kind,code:'SETUP_FIELDS_UNAVAILABLE'}],skipped:[]};fail(value.code);}
     const accepted=kind==='metadata'?['teacher','school','principal','department']:[kind];
     value={...value,runContext:null,links:[],skipped:[],tables:value.tables.filter(t=>accepted.includes(t.category))};
     for(const t of value.tables){if(t.category==='teacher'&&expected.length&&!expected.includes(t.text.split('\t')[1]))fail('TEACHER_CONTEXT_CHANGED');if(t.category==='school'&&runContext.schoolName&&t.text.split('\t')[1]!==runContext.schoolName)fail('SCHOOL_CONTEXT_CHANGED');}
@@ -123,6 +127,59 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
   rawText.set(x,value);return value;
  };
  const text=n=>{if(!texts.has(n))texts.set(n,raw(n).trim().replace(/\s+/g,' '));return texts.get(n);};
+ // AI: inert ManageLecture evidence only, never a route to fetch/click. Require
+ // a complete tuple on each anchor inside one explicitly headed timetable cell.
+ const lessonLink=a=>{
+  if(!visible(a)||a.closest('nav,header,footer,form,[disabled],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttributeNames().some(k=>/^on/i.test(k))||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get')throw Error('UNSAFE_LESSON_LINK');
+  let u;try{u=new URL(a.getAttribute('href'),location.href);}catch{throw Error('UNSAFE_LESSON_LINK');}
+  if(u.origin!==location.origin||u.username||u.password||u.hash||u.pathname!=='/SchoolSchedule/Schedule/ManageLecture')throw Error('UNSAFE_LESSON_LINK');
+  const values={},allowed=['SchoolId','lectureId','dateTicks','subjectId','classroomId'];
+  for(const [k,v] of u.searchParams){if(!allowed.includes(k)||Object.hasOwn(values,k))throw Error('UNSAFE_LESSON_LINK');values[k]=v;}
+  if(Object.keys(values).length!==5||!/^[a-f0-9]{32}$/i.test(values.SchoolId)||!['lectureId','subjectId','classroomId'].every(k=>/^[1-9][0-9]{0,9}$/.test(values[k]))||! /^[1-9][0-9]{0,18}$/.test(values.dateTicks))throw Error('UNSAFE_LESSON_LINK');
+  if(values.SchoolId.toLowerCase()!==runContext?.schoolId?.toLowerCase())throw Error('SCHOOL_CONTEXT_CHANGED');
+  return JSON.stringify(allowed.map(k=>k==='SchoolId'?values[k].toLowerCase():values[k]));
+ };
+ const pairedLesson=cell=>{
+  const anchors=Array.from(cell.querySelectorAll('a[href]'));
+  if(anchors.length!==2||anchors.some(a=>a.querySelector('a,input,button,script,style,iframe,svg,img')))throw Error('AMBIGUOUS_LESSON_LINKS');
+  const tuples=anchors.map(lessonLink);if(tuples[0]!==tuples[1])throw Error('AMBIGUOUS_LESSON_LINKS');
+  // Supplied shape: subject then classroom, paired by their shared cell + tuple.
+  // No classification of arbitrary adjacent links or inference from label spelling.
+  const subject=text(anchors[0]),classroom=text(anchors[1]);
+  if(!subject||!classroom||text(cell).replace(/\s/g,'')!==(subject+classroom).replace(/\s/g,''))throw Error('AMBIGUOUS_LESSON_LINKS');
+  return {subject,classroom};
+ };
+ if(mode==='lesson-school-proof'){
+  let bound=false;const identities=new Map();
+  const bind=(tuple,lesson)=>{
+   const ids=JSON.parse(tuple);
+   for(const [kind,id,label] of [['subject',ids[3],lesson.subject],['classroom',ids[4],lesson.classroom]]){
+    for(const [key,value] of [[kind+'-id:'+id,label],[kind+'-label:'+label,id]]){
+     if(identities.has(key)&&identities.get(key)!==value)throw Error('AMBIGUOUS_LESSON_LINKS');identities.set(key,value);
+    }
+   }
+  };
+  // An inert response cannot prove stylesheet-defined visibility. Keep the old
+  // explicit school-label requirement in that case rather than apply remote CSS.
+  if(document.querySelector('base[href],style,link[rel=stylesheet]'))return {ok:true,bound:false};
+  try{for(const table of document.querySelectorAll('table')){
+   if(!visible(table)||table.closest('nav,header,footer,form')||table.parentElement?.closest('table')||table.querySelector('table'))continue;
+   const rows=Array.from(table.rows),head=rows[0];if(!head)continue;
+   const titles=Array.from(head.cells).map(text);
+   if(!['','اليوم'].includes(titles[0])||!titles.slice(1).some(v=>v.startsWith('الحصة ')))continue;
+   for(const row of rows.slice(1))for(const cell of Array.from(row.cells).slice(1)){
+    const anchors=Array.from(cell.querySelectorAll('a[href]'));if(!anchors.length)continue;
+    const cards=cell.querySelectorAll('.schedule-card');
+    if(cards.length===1&&anchors.length===1&&cards[0].parentElement===anchors[0]){
+     const titles=cards[0].querySelectorAll(':scope > .title > h2'),classes=cards[0].querySelectorAll(':scope > small');
+     if(titles.length!==1||classes.length!==1||!visible(titles[0])||!visible(classes[0]))throw Error('AMBIGUOUS_LESSON_LINKS');
+     bind(lessonLink(anchors[0]),{subject:text(titles[0]),classroom:text(classes[0])});
+    }else bind(lessonLink(anchors[0]),pairedLesson(cell));
+    bound=true;
+   }
+  }}catch(e){return {ok:false,code:e.message};}
+  return {ok:true,bound};
+ }
  // Negative active-role guard complements the existing origin/school/session guard, including at export.
  // Role badges only: a principal's metadata name never establishes the current user's role.
  if(mode==='guard'){
@@ -214,6 +271,8 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
        const titleNodes=Array.from(card.querySelectorAll(':scope > .title > h2')).filter(visible),classNodes=Array.from(card.querySelectorAll(':scope > small')).filter(visible);
        if(titleNodes.length!==1)return diagnostic('AMBIGUOUS_LESSON_SUBJECT');if(classNodes.length!==1)return diagnostic('AMBIGUOUS_LESSON_CLASS');
        subject=text(titleNodes[0]);classroom=text(classNodes[0]);
+      }else if(cell.querySelector('a[href]')){
+       try{({classroom,subject}=pairedLesson(cell));}catch(e){return diagnostic(e.message);}
       }else{
        const lines=Array.from(cell.querySelectorAll('p,div,span')).filter(visible).map(text);
        const labelled=label=>[...new Set(lines.filter(v=>v.startsWith(label+': ')).map(v=>v.slice(label.length+2)))];

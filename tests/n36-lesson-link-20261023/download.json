@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-lesson-link-school-department-outcome-20261023",
+  "runId": "2e3dee0a-bade-41d6-96e5-5173af64ed5c",
+  "baseSha": "a068e8db4d3793c067a07b400bfd3f146ef8dc91",
+  "name": "n36_0540_actual_app_download",
+  "archiveSha256": "8f675098e6da7b87cbff45b79532f37e50e6f2f19043a5e13b1a9a6390a50ce2",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper; actual app DOM/download handler over HTTP; fresh isolated context.",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.40",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "origin": "http://127.0.0.1:49974"
+  }
+}

@@ -510,17 +510,16 @@ async function saveAvailableSetup(batch,categories){
    result[changed?'saved':'existing']++;result.details.push({field:c.category,reason:changed?'saved':'current',count:1});
   }
  }
- // Explicit labelled source always wins. A precise school-title suffix only
- // fills an empty department, recognizes current, and reports deliberate conflicts.
+ // AI: PO 23 October authorizes a unique known school suffix to replace an old
+ // department through the same owner/session-bound profile transaction.
  // The raw validated school stays in the source envelope/binding, never normalized there.
  if(!setup.some(c=>c.category==='department')){
   const value=(await sourceSchoolIdentity(setup.find(c=>c.category==='school')?.rows[0]?.name)).department;
   if(value){
    result.missing=result.missing.filter(f=>f!=='department');result.details=result.details.filter(d=>d.field!=='department');
    let reason='current';
-   if(!store.state.profile.educationDepartment){automaticGuard(batch);await store.importSetupProfile({educationDepartment:value},{verifyCurrent});result.saved++;reason='saved';}
+   if(store.state.profile.educationDepartment!==value){automaticGuard(batch);await store.importSetupProfile({educationDepartment:value},{verifyCurrent,sourceWins:true});result.saved++;reason='saved';}
    else if(store.state.profile.educationDepartment===value)result.existing++;
-   else{result.unresolved++;reason='conflict';}
    result.details.push({field:'department',reason,count:1});
   }
  }
@@ -528,7 +527,9 @@ async function saveAvailableSetup(batch,categories){
  if(department){
   const {resolveVisibleEducationDepartment}=await import('../lib/education-department-directory.js');
   const resolved=resolveVisibleEducationDepartment(department.rows[0].name);
-  if(resolved.status!=='recognized'){result.unresolved++;result.details.push({field:'department',reason:resolved.status,count:1});}
+  const suffix=(await sourceSchoolIdentity(setup.find(c=>c.category==='school')?.rows[0]?.name)).department;
+  if(resolved.status==='recognized'&&suffix&&suffix!==resolved.value){result.unresolved++;result.details.push({field:'department',reason:'conflict',count:1});}
+  else if(resolved.status!=='recognized'){result.unresolved++;result.details.push({field:'department',reason:resolved.status,count:1});}
   else if(store.state.profile.educationDepartment===resolved.value){result.existing++;result.details.push({field:'department',reason:'current',count:1});}
   else{await store.importSetupProfile({educationDepartment:resolved.value},{verifyCurrent,sourceWins:true});result.saved++;result.details.push({field:'department',reason:'saved',count:1});}
  }
@@ -656,7 +657,7 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>استورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.39.zip" download>تنزيل إضافة ركيز 0.5.39</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.40.zip" download>تنزيل إضافة ركيز 0.5.40</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>

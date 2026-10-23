@@ -1,0 +1,533 @@
+{
+  "taskId": "continuous-n36-lesson-link-school-department-outcome-20261023",
+  "runId": "2e3dee0a-bade-41d6-96e5-5173af64ed5c",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "owner",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "d27fc00e56add2e7c7db3bae01f8c7b1b4966dd9a892a532763ef1f7f4f6c644",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 130
+          },
+          "sourceGuard": {
+            "count": 24,
+            "ms": 1330
+          },
+          "descriptor": {
+            "count": 52,
+            "ms": 517
+          },
+          "appGuard": {
+            "count": 26,
+            "ms": 327
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 469
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 2,
+          "total": 2,
+          "failure": {
+            "phase": "profile",
+            "step": "transaction",
+            "code": "SETUP_PROFILE_OWNER"
+          },
+          "progress": {
+            "checkpoint": "rows-before-receipt",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 2,
+            "pendingSavedRows": 2
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763102594,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": []
+      },
+      "injection": {
+        "armed": true,
+        "transactions": [
+          [
+            "device",
+            "sections",
+            "years",
+            "terms",
+            "students",
+            "enrollments"
+          ],
+          [
+            "sections",
+            "teachings",
+            "subjects",
+            "students",
+            "enrollments",
+            "years",
+            "terms",
+            "device",
+            "outbox"
+          ],
+          [
+            "students",
+            "enrollments",
+            "sections",
+            "teachings",
+            "outbox",
+            "years",
+            "terms",
+            "device",
+            "subjects"
+          ],
+          [
+            "profile",
+            "outbox",
+            "device",
+            "years",
+            "terms"
+          ],
+          [
+            "profile",
+            "outbox",
+            "device",
+            "years",
+            "terms"
+          ]
+        ],
+        "fault": true
+      },
+      "departmentAndOutboxUnchanged": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "session",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "2b41177a2354e08d1dde0a6318275c1b45b45c77875b247bb9f17c1499cdd281",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 124
+          },
+          "sourceGuard": {
+            "count": 24,
+            "ms": 1314
+          },
+          "descriptor": {
+            "count": 52,
+            "ms": 436
+          },
+          "appGuard": {
+            "count": 26,
+            "ms": 341
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 492
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 2,
+          "total": 2,
+          "failure": {
+            "phase": "profile",
+            "step": "transaction",
+            "code": "SETUP_PROFILE_OWNER"
+          },
+          "progress": {
+            "checkpoint": "rows-before-receipt",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 2,
+            "pendingSavedRows": 2
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763106236,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": []
+      },
+      "injection": {
+        "armed": true,
+        "transactions": [
+          [
+            "device",
+            "sections",
+            "years",
+            "terms",
+            "students",
+            "enrollments"
+          ],
+          [
+            "sections",
+            "teachings",
+            "subjects",
+            "students",
+            "enrollments",
+            "years",
+            "terms",
+            "device",
+            "outbox"
+          ],
+          [
+            "students",
+            "enrollments",
+            "sections",
+            "teachings",
+            "outbox",
+            "years",
+            "terms",
+            "device",
+            "subjects"
+          ],
+          [
+            "profile",
+            "outbox",
+            "device",
+            "years",
+            "terms"
+          ],
+          [
+            "profile",
+            "outbox",
+            "device",
+            "years",
+            "terms"
+          ]
+        ],
+        "fault": true
+      },
+      "departmentAndOutboxUnchanged": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "atomic",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "ef42f2b2777415abd508f95d5cabb37573e7bfaa1bec856447ff0bcbe4959a4e",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 138
+          },
+          "sourceGuard": {
+            "count": 24,
+            "ms": 1366
+          },
+          "descriptor": {
+            "count": 52,
+            "ms": 473
+          },
+          "appGuard": {
+            "count": 26,
+            "ms": 286
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 492
+          }
+        },
+        "phase": "receipt",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 2,
+          "total": 2,
+          "failure": {
+            "phase": "profile",
+            "step": "transaction",
+            "code": "WRITE_FAILED"
+          },
+          "progress": {
+            "checkpoint": "rows-before-receipt",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 2,
+            "pendingSavedRows": 2
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763109584,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": []
+      },
+      "injection": {
+        "armed": true,
+        "transactions": [
+          [
+            "device",
+            "sections",
+            "years",
+            "terms",
+            "students",
+            "enrollments"
+          ],
+          [
+            "sections",
+            "teachings",
+            "subjects",
+            "students",
+            "enrollments",
+            "years",
+            "terms",
+            "device",
+            "outbox"
+          ],
+          [
+            "students",
+            "enrollments",
+            "sections",
+            "teachings",
+            "outbox",
+            "years",
+            "terms",
+            "device",
+            "subjects"
+          ],
+          [
+            "profile",
+            "outbox",
+            "device",
+            "years",
+            "terms"
+          ],
+          [
+            "profile",
+            "outbox",
+            "device",
+            "years",
+            "terms"
+          ]
+        ],
+        "fault": true
+      },
+      "departmentAndOutboxUnchanged": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

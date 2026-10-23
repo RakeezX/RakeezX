@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "baseSha": "a068e8db4d3793c067a07b400bfd3f146ef8dc91",
+  "version": "0.5.40",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.40.zip",
+    "sha256": "8f675098e6da7b87cbff45b79532f37e50e6f2f19043a5e13b1a9a6390a50ce2",
+    "bytes": 152271
+  },
+  "files": 29,
+  "previousArchivesAndReceipts": "unchanged",
+  "permissionsAndCSP": "unchanged",
+  "buildAndPublication": "NOT_RUN; independent publisher",
+  "actualPortalLayoutAndProductAcceptance": "OPEN"
+}

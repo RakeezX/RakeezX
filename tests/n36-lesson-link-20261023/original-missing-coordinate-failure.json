@@ -1,0 +1,203 @@
+{
+  "taskId": "continuous-n36-lesson-link-school-department-outcome-20261023",
+  "runId": "2e3dee0a-bade-41d6-96e5-5173af64ed5c",
+  "cases": [
+    {
+      "variant": "pair",
+      "status": "PASS",
+      "code": null,
+      "tables": [
+        {
+          "category": "timetable",
+          "text": "اليوم\tالحصة\tالفصل\tالمادة\nالأحد\t1\tخامس 1\tالمهارات الرقمية"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "variant": "card",
+      "status": "PASS",
+      "code": null,
+      "tables": [
+        {
+          "category": "timetable",
+          "text": "اليوم\tالحصة\tالفصل\tالمادة\nالأحد\t1\tخامس 1\tالمهارات الرقمية"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "variant": "foreign",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_CHANGED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "mixed",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_CHANGED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "duplicate-key",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "case-duplicate",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "bad-id",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "foreign-origin",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "bad-path",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "fragment",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "tuple",
+      "status": "PASS",
+      "code": "AMBIGUOUS_LESSON_LINKS",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "hidden",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "hidden-anchor",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "event",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "download",
+      "status": "PASS",
+      "code": "UNSAFE_LESSON_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "form",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "nav-only",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "nav-decoy",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "extra-anchor",
+      "status": "PASS",
+      "code": "AMBIGUOUS_LESSON_LINKS",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "school-name",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_CHANGED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "multiple-school",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_CHANGED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "teacher",
+      "status": "PASS",
+      "code": "TEACHER_CONTEXT_CHANGED",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "login",
+      "status": "PASS",
+      "code": "LOGIN_OR_LOGOUT",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "role",
+      "status": "PASS",
+      "code": "NON_TEACHER_ROLE",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "base",
+      "status": "PASS",
+      "code": "UNSAFE_SETUP_LINK",
+      "tables": [],
+      "warnings": []
+    },
+    {
+      "variant": "css-hidden",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+      "tables": [],
+      "warnings": []
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: no-weekday{\"ok\":false,\"code\":\"UNRESOLVED_WEEKDAY\",\"incomplete\":true}\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-lesson-link-school-department-outcome-20261023/tests/n36-lesson-link-20261023/guards.mjs:34:40\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-lesson-link-school-department-outcome-20261023/tests/n36-lesson-link-20261023/guards.mjs:21:62",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

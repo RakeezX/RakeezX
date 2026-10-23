@@ -1,0 +1,194 @@
+{
+  "taskId": "continuous-n36-lesson-link-school-department-outcome-20261023",
+  "runId": "2e3dee0a-bade-41d6-96e5-5173af64ed5c",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "atomic",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "d6884473e77478dc0754ba2c94c52611a5ffdf0a93fb7216f44da0ec3c1e75eb",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 129
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1459
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 527
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 337
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 468
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 4,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [],
+            "details": [
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 1,
+        "slots": 1,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763074901,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "injection": {},
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-lesson-link-school-department-outcome-20261023/tests/n36-lesson-link-20261023/department.mjs:60:22\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-lesson-link-school-department-outcome-20261023/tests/n36-lesson-link-20261023/department.mjs:21:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

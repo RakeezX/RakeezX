@@ -1,0 +1,925 @@
+{
+  "taskId": "continuous-n36-lesson-link-school-department-outcome-20261023",
+  "runId": "2e3dee0a-bade-41d6-96e5-5173af64ed5c",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "suffix",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "ce31dfd53e9b6a62bedb3bcfbed2be36ee8ddee336a47f469f2bd9e058e114ff",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 124
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1507
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 511
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 324
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 478
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 4,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [],
+            "details": [
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 1,
+        "slots": 1,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792762998753,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "department": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+      "status": "PASS"
+    },
+    {
+      "scenario": "ambiguous",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "14a1629939efc115c0ba6bf8285b4627b13159293a0247c7062bb61ae8d140d8",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 120
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1381
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 485
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 320
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 466
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 3,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 1,
+        "slots": 1,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763002193,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "مدرسة اصطناعية بالرياض بمكة المكرمة",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "department": "الإدارة العامة للتعليم بمنطقة الرياض",
+      "status": "PASS"
+    },
+    {
+      "scenario": "unknown",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "20b28a51617c83e6fb249a476dc0bd52700585da32c749cd426ced8617a7a907",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 135
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1250
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 436
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 272
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 375
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 3,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [
+              "department"
+            ],
+            "details": [
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 1,
+        "slots": 1,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763005585,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "مدرسة اصطناعية بغير معروف",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "department": "الإدارة العامة للتعليم بمنطقة الرياض",
+      "status": "PASS"
+    },
+    {
+      "scenario": "label-conflict",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "c5e71d61d38bd7225e7c89c93676b40636b077aa04b225342750e0a9f33cf9d5",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 143
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1250
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 435
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 274
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 399
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "conflict",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 3,
+            "existing": 2,
+            "unresolved": 1,
+            "missing": [],
+            "details": [
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "conflict",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 1,
+        "slots": 1,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763008914,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "department": "الإدارة العامة للتعليم بمنطقة الرياض",
+      "status": "PASS"
+    },
+    {
+      "scenario": "label-explicit",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "3e0d6a08f7d12f0d4cdf040808cac1133854c0934f98f2aeb4ced1c6f18e4f55",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 107
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1322
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 438
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 310
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 413
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 4,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [],
+            "details": [
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 1,
+        "slots": 1,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792763012319,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "مدرسة اصطناعية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "department": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}
