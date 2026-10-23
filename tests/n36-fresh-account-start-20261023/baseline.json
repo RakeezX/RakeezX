@@ -1,0 +1,126 @@
+{
+  "taskId": "continuous-n36-fresh-account-academic-start-20261023",
+  "runId": "1fa756aa-86c0-4594-9345-0a2c4d38d462",
+  "baseSha": "6d9e4effb6d46943085a7a015f07bc11495de440",
+  "baseline": true,
+  "storeHash": "8036b09143ef862d98ef0ade346fda9ea4c83ccf98513369ffa69aaa14f156c3",
+  "cases": [
+    {
+      "scenario": "fresh",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "trace": [
+        "provisioned",
+        "auth-start",
+        "auth-end"
+      ],
+      "selection": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:1",
+        "device": {
+          "id": "device",
+          "updatedAt": 1792714841854,
+          "deleted": false,
+          "theme": "light",
+          "activeYearId": null,
+          "activeTermId": null,
+          "activeTimeProfileId": null,
+          "reportPrincipalName": "",
+          "lastSyncAt": null,
+          "schemaVersion": 8,
+          "deviceId": "c2cbfbac-40ce-4c21-99ef-3c5c19f3334a",
+          "accountProvisioningReceipt": {
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "contractVersion": 1,
+            "foundationHash": "fresh-foundation"
+          }
+        }
+      },
+      "view": {
+        "id": "54be8bc25ba7e3726a4e6021248dec30abe589c54696a9ef5c7870407591360e",
+        "timings": {
+          "home": {
+            "count": 0,
+            "ms": 0
+          },
+          "sourceGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "descriptor": {
+            "count": 0,
+            "ms": 0
+          },
+          "appGuard": {
+            "count": 0,
+            "ms": 0
+          },
+          "fetchPending": {
+            "count": 0,
+            "ms": 0
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "worker-ack",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "binding",
+        "code": "APP_ACADEMIC_SELECTION_REQUIRED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 0,
+        "observed": 0,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "unknown",
+        "needsReview": false,
+        "schoolBindingState": "none",
+        "readProofPresent": false
+      },
+      "metrics": {
+        "styleCalls": 0,
+        "pendingReadProofs": 0,
+        "wallMs": 572,
+        "modeledMs": 572,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 1,
+            "wallMs": 5,
+            "modeledMs": 5
+          },
+          "app-guard": {
+            "count": 1,
+            "wallMs": 16,
+            "modeledMs": 16
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 23,
+            "modeledMs": 23
+          }
+        }
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      ],
+      "outcomes": [],
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

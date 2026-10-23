@@ -204,6 +204,7 @@ export function assertLeaseWritable(device) {
 export async function renewOfflineLease() {
   updateLeaseContext();
   const workspace = activeWorkspace;
+  const session = cloud.session;
   const result = await runtimeOfflineLease().renew(async (owner) => {
     const verified = await cloud.verifyCurrentAuthIdentity(owner);
     const registry = createWorkspaceRegistry();
@@ -218,11 +219,64 @@ export async function renewOfflineLease() {
   }, {
     isCurrent: () => activeWorkspace === workspace && leaseOwner() === workspace.authUserId,
   });
+  await completeProvisionedDeviceSelection(workspace, session);
   // Establish real score support while online, even before the first subitem
   // edit. Failure does not revoke an otherwise valid ordinary offline lease.
   try { await getScoreFoundationCapability({ workspace }); } catch {}
   notify({ syncReady: false });
   return result;
+}
+
+// AI N36: first boot may load before its first writable lease. Complete only
+// the untouched provisioned device, never rerun foundation creation/restore or
+// infer an import grant from the UI's fallback. The normal default remains the
+// first term by academic index, as in ensureFoundation below.
+async function completeProvisionedDeviceSelection(workspace, session) {
+  if (!state.ready || workspace?.workspaceKind !== 'account-provisioned' ||
+      state.device?.activeYearId != null || state.device?.activeTermId != null) return;
+  const names = ['device', 'profile', ...COLLECTIONS, 'outbox'];
+  const expected = Object.fromEntries(names.map(name => [name,
+    JSON.stringify(name === 'device' ? [state.device] : name === 'profile' ? [state.profile] : state[name] ?? [])]));
+  const guard = () => {
+    if (activeWorkspace !== workspace || cloud.session !== session ||
+        leaseOwner() !== workspace.authUserId) throw leaseWriteError();
+    assertClassImportAccess();
+  };
+  guard();
+  const committed = await rawDB.applyBatch(Object.fromEntries(names.map(name => [name, {}])), {
+    productWrite: true,
+    prepare(current) {
+      guard();
+      // A concurrent selection, academic edit or first Product write wins.
+      for (const name of names) {
+        const rows = name === 'profile' ? [{ ...DEFAULT_PROFILE, ...current.profile[0] }] : current[name];
+        if (JSON.stringify(rows) !== expected[name]) return {};
+      }
+      const device = current.device[0], receipt = device?.accountProvisioningReceipt;
+      if (receipt?.ownerId !== workspace.authUserId || receipt.contractVersion !== 1 ||
+          device.n36NamesBatch || device.studentLifecycleResume || device.n77DeleteIntent) return {};
+      const foundation = new Set(['profile', 'years', 'terms', 'calendars', 'calendarDays', 'subjects', 'timeProfiles']);
+      if (names.some(name => name !== 'device' && !foundation.has(name) && current[name].length)) return {};
+      if ([...foundation].some(name => current[name].some(row => row.deleted ||
+          row.ownerId != null && row.ownerId !== workspace.authUserId || row.serverRevision !== 1))) return {};
+      if (current.years.length !== 1 || current.terms.length !== TERMS_PER_YEAR ||
+          current.calendars.length !== 1 || current.subjects.length !== 1 ||
+          current.timeProfiles.length !== DEFAULT_TIME_PROFILES.length) return {};
+      const year = current.years[0];
+      const terms = current.terms.filter(term => term.yearId === year.id).sort((a, b) => a.index - b.index);
+      if (year.status === 'archived' || !year.calendarPresetId ||
+          terms.length !== TERMS_PER_YEAR || terms.some((term, i) => term.index !== termIndexes()[i]) ||
+          terms[0].status === 'closed') return {};
+      return { device: { put: [{ ...device, activeYearId: year.id,
+        activeTermId: terms[0].id, updatedAt: now() }] } };
+    },
+  });
+  guard();
+  if (committed.device?.put?.length) {
+    state.device = committed.device.put[0];
+    notify({ syncReady: false });
+    broadcast([{ store: 'device', id: 'device' }]);
+  }
 }
 // Recheck after asynchronous DB open and inside the durable transaction.
 rawDB.setProductWriteGuard(assertLeaseWritable);

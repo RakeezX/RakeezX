@@ -1,0 +1,113 @@
+{
+  "taskId": "continuous-n36-fresh-account-academic-start-20261023",
+  "runId": "1fa756aa-86c0-4594-9345-0a2c4d38d462",
+  "baseSha": "6d9e4effb6d46943085a7a015f07bc11495de440",
+  "status": "PASS",
+  "evidence": [
+    {
+      "file": "baseline.json",
+      "scenario": "fresh",
+      "status": "PASS",
+      "sha256": "08e6d1d1a3ad31bb0a0476aeb13ac0abb8d35d24609347316d538e0175635657"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "fresh",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "nondefault",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "refused",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "selection-race",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "owner-race",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "session-race",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "lease-race",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "transaction-abort",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "term-drift",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "first-certification.json",
+      "scenario": "unknown",
+      "status": "PASS",
+      "sha256": "d1f0a5d463cd22a0710f07b9c4daed85c49173bedda698eb97e82f11e4934a6f"
+    },
+    {
+      "file": "corrected-boot-cases.json",
+      "scenario": "already-ready",
+      "status": "PASS",
+      "sha256": "afded79f09aae68ba568918ee56d2136173a62ae44bee1440e17312aff4aea06"
+    },
+    {
+      "file": "corrected-boot-cases.json",
+      "scenario": "mature",
+      "status": "PASS",
+      "sha256": "afded79f09aae68ba568918ee56d2136173a62ae44bee1440e17312aff4aea06"
+    },
+    {
+      "file": "corrected-boot-cases.json",
+      "scenario": "ambiguous",
+      "status": "PASS",
+      "sha256": "afded79f09aae68ba568918ee56d2136173a62ae44bee1440e17312aff4aea06"
+    },
+    {
+      "file": "corrected-boot-cases.json",
+      "scenario": "foreign",
+      "status": "PASS",
+      "sha256": "afded79f09aae68ba568918ee56d2136173a62ae44bee1440e17312aff4aea06"
+    },
+    {
+      "file": "corrected-boot-cases.json",
+      "scenario": "rendered",
+      "status": "PASS",
+      "sha256": "afded79f09aae68ba568918ee56d2136173a62ae44bee1440e17312aff4aea06"
+    }
+  ],
+  "applicationFiles": {
+    "src/store.js": "80b3ccdbd5a8767604f0713b2465b44fedc58ea27c049cfa0619478e24e95e18",
+    "src/app.js": "657dc7938e5705cfa8d7a8f7723566f17a03490f4d0e03e25a1a5813b25a8783",
+    "src/lib/account-provisioning.js": "c63c422f628fa7515ab5c171ee514377fb9c217d407c307846e6136db21c75a1",
+    "src/views/class-import-center.js": "555cb0ab09545c35e6b3216c98c4d4d69ab7fb14f57d1750b8f829f95c556344",
+    "extensions/rakeez-teacher-import-helper/manifest.json": "e134600e4317705abece4ec1ccc311e251d40bc6be4f5c885c352115828d0870"
+  },
+  "scope": "Only store post-renewal provisioned-device selection; synthetic HTTP app/IndexedDB/extension .37. No service or live account operation.",
+  "production": "NOT_RUN; independent publisher"
+}

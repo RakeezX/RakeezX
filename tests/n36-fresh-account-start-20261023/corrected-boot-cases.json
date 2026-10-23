@@ -1,0 +1,61 @@
+{
+  "taskId": "continuous-n36-fresh-account-academic-start-20261023",
+  "runId": "1fa756aa-86c0-4594-9345-0a2c4d38d462",
+  "baseSha": "6d9e4effb6d46943085a7a015f07bc11495de440",
+  "baseline": false,
+  "storeHash": "80b3ccdbd5a8767604f0713b2465b44fedc58ea27c049cfa0619478e24e95e18",
+  "cases": [
+    {
+      "scenario": "already-ready",
+      "preReadiness": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:1"
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "mature",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "ambiguous",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "foreign",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "rendered",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "device"
+      ],
+      "renderedDefaultsAndReload": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

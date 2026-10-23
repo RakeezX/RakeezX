@@ -1,0 +1,551 @@
+{
+  "taskId": "continuous-n36-fresh-account-academic-start-20261023",
+  "runId": "1fa756aa-86c0-4594-9345-0a2c4d38d462",
+  "baseSha": "6d9e4effb6d46943085a7a015f07bc11495de440",
+  "baseline": false,
+  "storeHash": "80b3ccdbd5a8767604f0713b2465b44fedc58ea27c049cfa0619478e24e95e18",
+  "cases": [
+    {
+      "scenario": "fresh",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "device"
+      ],
+      "trace": [
+        "provisioned",
+        "auth-start",
+        "auth-end"
+      ],
+      "selection": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:1",
+        "device": {
+          "id": "device",
+          "updatedAt": 1792715178540,
+          "deleted": false,
+          "theme": "light",
+          "activeYearId": "y:1448-1449",
+          "activeTermId": "tm:y:1448-1449:1",
+          "activeTimeProfileId": null,
+          "reportPrincipalName": "",
+          "lastSyncAt": null,
+          "schemaVersion": 8,
+          "deviceId": "da6dea75-b197-4a65-9abe-ec3aaeba2499",
+          "accountProvisioningReceipt": {
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "contractVersion": 1,
+            "foundationHash": "fresh-foundation"
+          }
+        }
+      },
+      "view": {
+        "id": "728679c9e05d82fd936fb797a72fa71ebda1b0f01ea02826c7bb1e94dfdf5b7c",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 116
+          },
+          "sourceGuard": {
+            "count": 22,
+            "ms": 1583
+          },
+          "descriptor": {
+            "count": 48,
+            "ms": 587
+          },
+          "appGuard": {
+            "count": 24,
+            "ms": 389
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 461
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "principal",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "metrics": {
+        "styleCalls": 0,
+        "pendingReadProofs": 0,
+        "wallMs": 2814,
+        "modeledMs": 2814,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 50,
+            "wallMs": 588,
+            "modeledMs": 587
+          },
+          "app-guard": {
+            "count": 60,
+            "wallMs": 931,
+            "modeledMs": 931
+          },
+          "script-load": {
+            "count": 48,
+            "wallMs": 1128,
+            "modeledMs": 1128
+          },
+          "source-home": {
+            "count": 4,
+            "wallMs": 41,
+            "modeledMs": 41
+          },
+          "descriptor-post-read": {
+            "count": 48,
+            "wallMs": 567,
+            "modeledMs": 567
+          },
+          "source-read-proof": {
+            "count": 44,
+            "wallMs": 394,
+            "modeledMs": 394
+          },
+          "report-guard": {
+            "count": 44,
+            "wallMs": 573,
+            "modeledMs": 573
+          },
+          "report-fetch": {
+            "count": 8,
+            "wallMs": 234,
+            "modeledMs": 234
+          },
+          "cleanup": {
+            "count": 2,
+            "wallMs": 31,
+            "modeledMs": 31
+          }
+        }
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 3,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [
+              "principal",
+              "department"
+            ],
+            "details": [
+              {
+                "field": "principal",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "repeatStartNoDuplicates": true,
+      "reloadReceipt": {
+        "batchId": "57bdbabc1ea8a672132af18e1ec5c92d3e4bc87e58ecd38f9f42b4a5e2db1bf7",
+        "ownerId": "a7300000-0000-4000-8000-000000000001",
+        "receipts": {
+          "851df59ff86e77412b1b95b26a17844aa1e3f9bdb7229849d48ce20f52e1e84c": {
+            "status": "existing",
+            "added": 0,
+            "existing": 2,
+            "remaining": 0,
+            "total": 2,
+            "setup": {
+              "saved": 0,
+              "existing": 5,
+              "unresolved": 0,
+              "missing": [
+                "principal",
+                "department"
+              ],
+              "details": [
+                {
+                  "field": "principal",
+                  "reason": "missing",
+                  "count": 1
+                },
+                {
+                  "field": "department",
+                  "reason": "missing",
+                  "count": 1
+                },
+                {
+                  "field": "teacher",
+                  "reason": "current",
+                  "count": 1
+                },
+                {
+                  "field": "school",
+                  "reason": "current",
+                  "count": 1
+                },
+                {
+                  "field": "classes",
+                  "reason": "current",
+                  "count": 1
+                },
+                {
+                  "field": "timetable",
+                  "reason": "current",
+                  "count": 1
+                }
+              ]
+            }
+          }
+        },
+        "pending": null,
+        "yearId": "y:1448-1449",
+        "termId": "tm:y:1448-1449:1",
+        "receiptTargets": {
+          "851df59ff86e77412b1b95b26a17844aa1e3f9bdb7229849d48ce20f52e1e84c": {
+            "خامس1": "sec:f3d2a2b0-3f41-4ae6-8bf6-90632fc43373"
+          }
+        }
+      },
+      "renderedAfterReload": [
+        "y:1448-1449",
+        "tm:y:1448-1449:1"
+      ],
+      "status": "PASS"
+    },
+    {
+      "scenario": "already-ready",
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ null\n- 'y:1448-1449'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:23:63\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:502:9)\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:17:62"
+    },
+    {
+      "scenario": "nondefault",
+      "preReadiness": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:2"
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "refused",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "denied": true,
+      "status": "PASS"
+    },
+    {
+      "scenario": "mature",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "sections"
+      ],
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(row.initialWrites.every(name=>name==='device'))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:51:296\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:17:62"
+    },
+    {
+      "scenario": "ambiguous",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "terms"
+      ],
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(row.initialWrites.every(name=>name==='device'))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:51:296\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:17:62"
+    },
+    {
+      "scenario": "foreign",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "terms"
+      ],
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(row.initialWrites.every(name=>name==='device'))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:51:296\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-account-academic-start-20261023/tests/n36-fresh-account-start-20261023/runtime.mjs:17:62"
+    },
+    {
+      "scenario": "selection-race",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "device"
+      ],
+      "status": "PASS"
+    },
+    {
+      "scenario": "owner-race",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "session-race",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "lease-race",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "transaction-abort",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "term-drift",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "device"
+      ],
+      "trace": [
+        "provisioned",
+        "auth-start",
+        "auth-end"
+      ],
+      "selection": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:1",
+        "device": {
+          "id": "device",
+          "updatedAt": 1792715196759,
+          "deleted": false,
+          "theme": "light",
+          "activeYearId": "y:1448-1449",
+          "activeTermId": "tm:y:1448-1449:1",
+          "activeTimeProfileId": null,
+          "reportPrincipalName": "",
+          "lastSyncAt": null,
+          "schemaVersion": 8,
+          "deviceId": "1f5457b2-346c-41eb-b33f-ea9a330564ba",
+          "accountProvisioningReceipt": {
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "contractVersion": 1,
+            "foundationHash": "fresh-foundation"
+          }
+        }
+      },
+      "unknownReceipt": true,
+      "repeatStartPreservedNonce": true,
+      "status": "PASS",
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 2,
+          "total": 2,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_PERSISTED_TERM_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "none",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "unknown",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "device"
+      ],
+      "trace": [
+        "provisioned",
+        "auth-start",
+        "auth-end"
+      ],
+      "selection": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:1",
+        "device": {
+          "id": "device",
+          "updatedAt": 1792715200176,
+          "deleted": false,
+          "theme": "light",
+          "activeYearId": "y:1448-1449",
+          "activeTermId": "tm:y:1448-1449:1",
+          "activeTimeProfileId": null,
+          "reportPrincipalName": "",
+          "lastSyncAt": null,
+          "schemaVersion": 8,
+          "deviceId": "0aee926c-ad92-412e-8340-554b36bc639b",
+          "accountProvisioningReceipt": {
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "contractVersion": 1,
+            "foundationHash": "fresh-foundation"
+          }
+        }
+      },
+      "unknownReceipt": true,
+      "repeatStartPreservedNonce": true,
+      "status": "PASS",
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 2,
+          "total": 2,
+          "failure": {
+            "phase": "batch",
+            "step": "transaction",
+            "code": "WRITE_FAILED"
+          },
+          "progress": {
+            "checkpoint": "rows-before-receipt",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 2,
+            "pendingSavedRows": 2
+          }
+        }
+      ]
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}
