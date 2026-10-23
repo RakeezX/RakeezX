@@ -1,21 +1,36 @@
 {
   "version": 1,
   "authority": "po-20261023-focus-n36-n88",
-  "updatedAt": "2026-10-22T22:10:03.318Z",
+  "updatedAt": "2026-10-23T00:16:10.551Z",
   "problems": [
+    {
+      "key": "n36-fresh-account-start",
+      "productId": "N36",
+      "issueNumber": null,
+      "title": "[P0] بدء الاستيراد في حساب جديد كليًا",
+      "gate": "ready_to_admit",
+      "taskIds": [
+        "continuous-n36-fresh-account-academic-start-20261023"
+      ],
+      "currentTaskIds": [
+        "continuous-n36-fresh-account-academic-start-20261023"
+      ],
+      "nextAction": "إعادة إنتاج مسار التهيئة الأول ورفض اختيار السنة/الفصل قبل قراءة مدرستي ثم إصلاح السبب المثبت فقط.",
+      "evidenceNeeded": "تشخيص المستخدم مستلم؛ لا إعادة إنشاء الحساب أو الاستيراد الآن."
+    },
     {
       "key": "n36-unresolved-batch",
       "productId": "N36",
       "issueNumber": 1,
       "title": "[P0] حسم الدفعة السابقة",
-      "gate": "ready_to_admit",
+      "gate": "waiting_evidence",
       "taskIds": [
         "continuous-n36-1109-persisted-term-receipt-recovery-20261021",
         "continuous-n36-1150-ownerless-year-term-selection-20261021",
         "continuous-n36-local-readback-distinction-20261023"
       ],
-      "nextAction": "وصل نص القراءة من PO؛ إصلاح خلط غياب الأثر بفشل القراءة داخل التطبيق دون إعادة الدفعة أو تغيير الإضافة. انتظار نتيجة الإصلاح لا إعادة طلب الزر القديم.",
-      "evidenceNeeded": "المدخل السابق مستلم. النتيجة الأصلية غير محسومة؛ لا قراءة حساب آلية ولا إعادة استيراد.",
+      "nextAction": "إصلاح تصنيف القراءة نُشر وظهرت نتيجته؛ الحساب الأصلي للدفعة التاريخية غير مثبت. لا يوقف إصلاح تجربة الحساب الجديد المستقلة.",
+      "evidenceNeeded": "سياق الدفعة التاريخية فقط إن توفر؛ لا تكرار الزر في الحساب الجديد.",
       "priorityBand": "P0",
       "currentTaskIds": [
         "continuous-n36-local-readback-distinction-20261023"
