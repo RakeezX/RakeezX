@@ -1,0 +1,16 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "filesystemProbes": 0,
+  "aclWrites": 0,
+  "checks": [
+    "exact parent and inherited child descriptors",
+    "null/world/foreign/unexpected allow and deny rejected",
+    "missing inheritance/owner rights rejected",
+    "reparse and malformed descriptor rejected",
+    "changed parent/child descriptor rejected",
+    "TOCTOU identity mismatch rejected"
+  ],
+  "readOnlyApiReference": "https://learn.microsoft.com/en-us/dotnet/api/system.io.directory.getaccesscontrol?view=netframework-4.8.1"
+}

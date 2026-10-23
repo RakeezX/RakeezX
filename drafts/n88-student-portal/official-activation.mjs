@@ -10,6 +10,8 @@ import {runNativeActivation} from './activation/read-service-20261023/native-act
 import {runMigrationActivation,runMigrationReconciliation} from './activation/read-service-20261023/migration-activation.mjs';
 import {classifyCliFailure} from './activation/read-service-20261023/history-mirror.mjs';
 import {runHistoryCorrection} from './activation/read-service-20261023/history-correction.mjs';
+import {createInheritedVerifier} from './activation/read-service-20261023/inherited-custody.mjs';
+import {guardCustodyContext} from './activation/read-service-20261023/custody-preflight.mjs';
 import {runLatencyStaticPhase} from '../../tests/n88-student-read-phase-latency-20261021/static-gate.mjs';
 import {LATENCY,runLatencyNativePhase,digest as latencyDigest} from '../../tests/n88-student-read-phase-latency-20261021/native-gate.mjs';
 import {MOBILE503,runMobile503Phase,digest as mobile503Digest} from '../../tests/n88-mobile-class-source-503-20261021/native-gate.mjs';
@@ -65,21 +67,20 @@ async function officialClassified(args){
   return {ok:true,exitCode:0,data:parsed?.data??parsed?.result??parsed};
  }finally{r.stdout.fill(0);r.stderr.fill(0);}
 }
-async function protectFreshHistoryDirectory(directory){
- if(path.dirname(path.resolve(directory))!==phase||!path.basename(directory).startsWith('typed-read-authentic-history-'))fail('n88_typed_fresh_directory_scope');
- const script="$ErrorActionPreference='Stop';$p=[Console]::In.ReadToEnd();$sid=[Security.Principal.WindowsIdentity]::GetCurrent().User;$acl=New-Object Security.AccessControl.DirectorySecurity;$acl.SetAccessRuleProtection($true,$false);$acl.SetOwner($sid);foreach($id in @($sid.Value,'S-1-5-18','S-1-5-32-544')){$identity=New-Object Security.Principal.SecurityIdentifier($id);$rule=New-Object Security.AccessControl.FileSystemAccessRule($identity,'FullControl','ContainerInherit,ObjectInherit','None','Allow');$acl.AddAccessRule($rule)};Set-Acl -LiteralPath $p -AclObject $acl;$check=Get-Acl -LiteralPath $p;foreach($rule in $check.Access){$id=$rule.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value;if($id -notin @($sid.Value,'S-1-5-18','S-1-5-32-544')){throw 'fresh directory not private'}}";
- const r=spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{input:directory,windowsHide:true,timeout:15000,maxBuffer:65536});
- const category=r.status!==0?classifyCliFailure({status:r.status,error:r.error,stdout:r.stdout.toString(),stderr:r.stderr.toString()}).category:null;
- r.stdout.fill(0);r.stderr.fill(0);if(r.status!==0)fail('n88_typed_fresh_directory_protection_'+category.toLowerCase());
-}
 async function sqlFile(text){
  await owned();const file=path.join(phase,'owned-input.sql');
  try{await writeFile(file,text,{flag:'wx'});return await official(['db','query','--linked','--project-ref',project,'--file',file,'--output','json']);}
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
- if(action==='--typed-read-correct-history-sid-identity')return runHistoryCorrection({candidate:value,load,save,official,officialClassified,sqlFile,phase,protectFreshHistoryDirectory,preparationCorrection:true});
- if(action==='--typed-read-correct-history-directory')return runHistoryCorrection({candidate:value,load,save,official,officialClassified,sqlFile,phase,protectFreshHistoryDirectory});
+ if(action==='--typed-read-inherited-custody-proof'){
+  const c=await guardCustodyContext(value);let result;
+  try{const verify=await createInheritedVerifier({phase,originalRoot:root,owned});result={...c.stamp,status:'PASS',...(await verify()),providerOperations:0,newDirectories:0};}
+  catch(e){result={...c.stamp,status:'BLOCKED',code:/^n88_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n88_inherited_custody_private_failure',providerOperations:0,aclWrites:0,newDirectories:0};}
+  await writeFile(path.join(c.evidence,'inherited-custody-proof-'+c.run+'.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
+ }
+ if(action==='--typed-read-correct-history-inherited')return runHistoryCorrection({candidate:value,load,save,official,officialClassified,sqlFile,phase,createInheritedVerifier:()=>createInheritedVerifier({phase,originalRoot:root,owned})});
+ if(['--typed-read-correct-history-sid-identity','--typed-read-correct-history-directory'].includes(action))fail('n88_retired_acl_preparation_route');
  if(action==='--typed-read-reconcile-migration')return runMigrationReconciliation({candidate:value,load,official,sqlFile});
  if(action==='--typed-read-apply-fixed-migration')return runMigrationActivation({candidate:value,load,save,official,sqlFile,phase});
  if(action==='--typed-read-activate-compatible')return runNativeActivation({candidate:value,load,save,official,phase});
