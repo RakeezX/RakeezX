@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-typed-read-service-activation-20261023",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "priority": -5600,
+      "scopeKey": "n88-typed-read-original-service-activation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 65,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "Latest PO23October09:29Saudi explicitly says YES, do all necessary work to finish N36/N88/N44, equal high priority and studied independent parallelism. Earlier initial request explicitly requires activation via the original service owner after checking authority. This card bounds that completion authority to this prepared exact N88 integration and required safe transition; it does not renew consumed old allowances or authorize unrelated data/Auth/RLS. Resume SAME original custodian session01a14fc3-b292-7390-9952-8549a286c80f with its original protected custody at .worktrees/continuous-n88-official-student-portal-activation-20261018, and use THIS new isolated candidate worktree for code. No root/other worker receives private material.\n\nPrepared candidate ddfa87956cd673abad634a492c9aff6bacba86b8, prior experiment9e95eb6d, package drafts/n88-student-portal/activation/read-roundtrip-20261023/ACTIVATION.md and manifest are the starting artifacts. Read them via exact Git commit and import only the qualified package/test/evidence paths as needed; no restart/benchmark creation. Existing local 14-to-2 fixed-cost comparison, staged source/native actual-service/wire/cancel/commit tests remain valid by unchanged hashes. Current staged native hash a0f3d3fb53070f3f28dde2660efba508e646eb3ffbefb543f589e9d72a36a70f, additive SQL hash 8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b; recorded native63 base6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09. Fresh actual service identity must match; recorded receipt is not current readback.\n\nCRITICAL PROVED COMPATIBILITY LIMIT: old native63 requires exact76 routine catalog, staged package exact78; simply applying SQL before/after current single-state binary causes a rejection window and binary-only rollback fails. Do NOT apply that naive sequence. Prepare the minimum fixed dual-catalog transition on the pinned source FIRST and qualify locally, reusing the current fixture. One compatible native artifact may recognize ONLY the two exact predetermined catalog fingerprints (unchanged76 versus unchanged76+exact2), choose old serial reader for old catalog and bounded batch for new, with per-connection verified mode and strict fixed operation allowlist. No wildcard/adoption/generic SQL, skipping catalog verification, broad catch/fallback on failure, permissions expansion or auth/revoke weakening. Unknown/mixed/drift catalog must fail closed. Preserve in-flight transaction behavior, connection release/commit ACK, owner filters, freshness, cancellation, bounds and current sessions/grades/privacy. Local tests must prove pre-addition and post-addition service reads, wrong/mixed identities denied and rollback/recovery leaves a valid compatible service. The staged two exact operations and old routines/ACLs stay unchanged. Do not rebuild unrelated service code. If a safe bounded transition cannot be qualified, retain candidate and BLOCKED with exact missing operation instead of knowingly disrupting service.\n\nOnly after qualified compatibility and fresh original-custodian gates: reconcile current source/pin/import-map/config fingerprints and append-only consumed operation history, exact old/new catalog and migration history. Original sanctioned provider path only; no new OAuth/DNS/ACL/policy workaround, browser token/credential extraction or secret in tools/logs. This NEW card's explicit scope permits at most ONE newly qualified compatible native upload, ONE existing exact public source-pin update, and ONE new append-only transactional migration containing ONLY the two fixed INVOKER functions named below. Those are new task-bound allowances for changed code, not reuse/reset of consumed historical permits. Prepare new migration via installed CLI supported path; old migrations immutable. Preserve same role grants and project. Before SQL, prove compatible upload/pin actually active and old-worker drainage/transition safe using supported original provider evidence; if unproved stop before DDL. Already applied exact function+history state is reused, never reapplied. Mixed or unknown history stops. Readback exact2 definitions/signatures/owner/ACL/config plus unchanged76 and migration history, downloaded native bytes/version/config and pin. Ambiguous operation outcome requires read-only reconciliation, never automatic second upload/apply/pin.\n\nNew functions ONLY n88_private.boundary_9e3f889e8b1e375a0a980496(text,text,text) and n88_private.boundary_3121e2df6802725969086adf(text,text,text), original package exact fixed bodies/limits/INVOKER/pg_catalog/backend-only EXECUTE. No tables/schema/roles/Auth/RLS/region/password changes, real teacher/student writes, new synthetic account or retired fixture reuse. No destructive rollback/drop or rewrite of applied migration; compatible native remains recovery path. Shared integration/live-mutation service leases serialize with N44; separate service/function/paths and no N44 state writes. Do not hold a lease awaiting user.\n\nCarrier protocol must match current observed original carrier and staged wire evidence; unchanged carrier/frontend has zero upload allowance, do not rebuild it merely for convenience. Integrate active source copies only after successful exact service prerequisites, with correct active imports, preserve guard source and finite modes. Record actual service evidence in docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md and tests/n88-read-service-20261023/. Only original publisher integrates Product Git/main and verifies source delivery. Generic frontend publication alone cannot certify service.\n\nFor actual hosted speed acceptance, NO real account/browser read is delegated to this worker and no new fixture/pair is granted. Preserve public finite diagnostics and ask root for PO's own comparable same-device initial login/read and same-tab return, warm/idle stated, after verified activation. Do not manufacture live timings from synthetic transport. Actual-session/grade/privacy/revocation behavior must remain protected by affected local integration tests and existing source; actual user acceptance remains NOT_RUN until supplied. LOCAL_READY only after all named service gates actually PASS; otherwise BLOCKED with exact candidate/session/operation and preserved preparation. No whole N88 closure from local or HTTP200; no routine review worker, recursive agent or new dispatcher.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/error-boundary-contract.json",
+        "drafts/n88-student-portal/activation/error-boundary-identities.json",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "drafts/n88-student-portal/activation/read-roundtrip-20261023/**",
+        "drafts/n88-student-portal/activation/read-service-20261023/**",
+        "drafts/n88-student-portal/activation/official-activation.mjs",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "drafts/n88-student-portal/activation/package-20261020.mjs",
+        "tests/n88-read-roundtrip-outcome-20261023/**",
+        "tests/n88-read-service-20261023/**",
+        "docs/automation-evidence/20261023/N88_READ_ROUNDTRIP_OUTCOME_20261023.md",
+        "docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/error-boundary-contract.json",
+        "drafts/n88-student-portal/activation/error-boundary-identities.json"
+      ],
+      "requiredChecks": [
+        "n88_exact_dual_catalog_transition_and_affected_guards",
+        "n88_original_service_identity_and_additive_history_readback",
+        "n88_changed_native_source_pin_and_carrier_parity",
+        "n88_preserved_session_privacy_and_truthful_performance_limits"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88",
+        "publication": true,
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "originalPrivateCustodianOnly": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "preparedCandidate": "ddfa87956cd673abad634a492c9aff6bacba86b8",
+        "exactAdditiveSqlSha256": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b",
+        "maxChangedNativeFunctionUploads": 1,
+        "maxPublicSourcePinUpdates": 1,
+        "maxNewAppendOnlyMigrations": 1,
+        "newFunctions": [
+          "boundary_9e3f889e8b1e375a0a980496",
+          "boundary_3121e2df6802725969086adf"
+        ],
+        "oldFunctionsAltered": 0,
+        "publicGrants": 0,
+        "newAuthUsers": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "maxChangedPrivateStaticUploads": 0,
+        "regionChanges": 0,
+        "AuthRLSChanges": 0,
+        "resetConsumedMarkers": false,
+        "appendOnlyAttemptHistory": true,
+        "namedOperations": [
+          "local exact dual-catalog compatibility qualification",
+          "original service/catalog/history read-only preflight",
+          "one changed compatible original-native upload and exact public pin",
+          "one new append-only exact two-function migration after compatible service proved active",
+          "exact source/catalog/history/provider readbacks"
+        ],
+        "authorityEvidence": "docs/automation-evidence/20261023/N88_TYPED_READ_ACTIVATION_AUTHORITY.md"
+      },
+      "releaseAuthority": "Latest user23October explicitly authorizes all necessary work to finish the three tickets; scoped interpretation is the exact original-service transition and two prepared fixed read functions only. No old permission is reused. Same original custodian performs named service prerequisite, original controller/publisher alone integrates Product source. Preserve actual refusal, private custody and sensitive data limits.",
+      "acceptance": [
+        "Qualified fixed old/new catalog transition; mixed/changed denied and existing session/owner/grade/privacy semantics preserved.",
+        "Exact service/native/pin and additive history verified, no duplicate apply/upload or general query allowance.",
+        "No hosted speed claim until actual comparable user journey; whole N88 stays open."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "ddfa87956cd673abad634a492c9aff6bacba86b8",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/error-boundary-contract.json",
+          "drafts/n88-student-portal/activation/error-boundary-identities.json",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/ACTIVATION.md",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/manifest.json",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/native63-candidate.inactive.mjs",
+          "tests/n88-read-roundtrip-outcome-20261023/staged.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/error-boundary-contract.json",
+          "drafts/n88-student-portal/activation/error-boundary-identities.json",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "drafts/n88-student-portal/activation/read-service-20261023/transition.mjs",
+          "tests/n88-read-service-20261023/transition.mjs",
+          "docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/read-service-20261023/transition.mjs",
+          "tests/n88-read-service-20261023/transition.mjs",
+          "docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n88_exact_dual_catalog_transition_and_affected_guards",
+          "n88_original_service_identity_and_additive_history_readback",
+          "n88_changed_native_source_pin_and_carrier_parity",
+          "n88_preserved_session_privacy_and_truthful_performance_limits"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

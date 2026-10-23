@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-0539-profile-transaction-continuation-20261023",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "sessionId": "01a16772-d4c7-7673-a726-99cdbfcb3a13",
+      "priority": -5600,
+      "scopeKey": "n36-0539-profile-transaction-continuation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 50,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n36-0538-school-proof-outcome-20261023"
+      ],
+      "objective": "NEW actual PO test of installed0.5.39 (not acceptance): source collection302rows/10classes/7pages; current run confirmed56rows/2receipts, added0 existing56 pending29 pendingSaved0; app same-account readonly progress2/56 and0of29. Failure SETUP_PROFILE_CHANGED phaseprofile steptransaction in receipt; receiverCheckpoint pending relation same. School field saved; teacher/principal current; department conflict; classes current10. Timetable response-school-absent, deliberately no timetable/derived subjects. Roster coverage partial reasons student-data-unverified/missing-pages. Latest user already provided actual local progress; DO NOT ask to repeat read or Start. Preserve pending29 and existing receipts/students. No old303 inference.\n\nContinue same .39 worker session 01a16772-d4c7-7673-a726-99cdbfcb3a13, preserving candidateb41c4385/publication88e6157a and previous worktree/evidence. This new isolated current-main continuation addresses newly observed profile transaction/pending result, not another .39 rebuild or claim that optional-source problem is solved. Read only current N36 row, exact store.importSetupProfile (src/store.js near1405), class-import-center saveAvailableSetup/saveAutomaticNames/batchCheckpoint and relevant Sync profile hydration paths. Actual code compares every property of in-memory previous profile against hydrated durable profile in a transaction. Repeated per-handoff metadata imports and concurrent ordinary Sync/ACK/updated metadata may produce a false conflict; this is a hypothesis until reproduced. Preserve real edits, owner/session/lease/year/term guards. Never just remove profile compare or catch all errors.\n\nReproduce exact .39 seam in EXISTING actual mounted app/store/IndexedDB/serialized extension harness with fabricated current-account profile and at least2 acknowledged handoffs then pending third. Model relevant real source Sync/ACK hydration or legacy defaults/metadata only after reading actual code, not arbitrary mock exceptions. Distinguish harmless persistence/ACK metadata drift from meaningful user/remote profile edits. If proved, implement smallest conditional profile write: validate current persisted target fields/ownership and current source authority, preserve unrelated concurrent values, atomically enqueue only actual changed fields, return authoritative persisted/no-op state. Keep different selected educationDepartment and calendar untouched. A no-op setup shouldn't manufacture writes/outbox or repeated metadata imports. Existing field conflicts remain truthful; no fallback overwrite by suffix.\n\nRequired useful outcome includes safe continuation of THIS current known saved pending batch without new source collection or duplicate students/classes/materials. Inspect persisted rows/setup/digest/targets and existing receipt protocol; prove same owner/session/year/term and exact batch/digest plus current roster and setup under transaction before any continuation acknowledgment. Do not erase/replace pending or count rows as saved just to clear it. Retain genuine unknown/late-ACK/foreign-old-batch denials. Existing local-progress button MUST remain read-only. If bounded explicit recovery action is necessary, it must target the exact durable current batch and be truthful about uncertainty; no generic replay of historic unknown batch, no implicit auto retry after app load, no delete/reset/newaccount. Actual user's existing29 may require an exact additional nonpersonal confirmation to establish pending identity; record the precise missing condition if not safely recoverable, but complete all local preparation and prevent future recurrence. Do not instruct a new Start while pending.\n\nExercise affected store transaction with real local IDB: baseline failure retained, own profile change and legitimate Sync ACK metadata, concurrent same-field edit deny, foreign owner/session/term deny, no-op/noextraoutbox, existing department conflict/calendar preserved, storage/rollback or unknown result retains pending, current known durable continuation/reload and exact prior56/2 plus29 pending synthetic scenario with no duplicate data. Reuse .39 school/permission/ZIP/pagination proofs when unchanged. Existing source completeness and absent timetable proof remain separate unresolved conditions, no guessed material or silent coveragefull.\n\nPrefer app-only fix; current installed extension holds a pending job and MUST NOT be reloaded merely to get a new label. No new extension version unless a proved protocol/runtime defect requires it and pending preservation is demonstrated. Never overwrite .39 archive. If source changes extension, qualification must explicitly preserve old pending job and true receipt before any recommended upgrade. Original publisher integrates and verifies affected store/receiver source; worker no Product push/deploy. No live portal/browser/account reads or writes, credentials, refused source/result-reader retry, SQL/Auth/RLS/schema/scoring/delete/restore/calendar switch, queue or global policy edits. Source school read remains unavailable; finish this known store failure not speculative portal work. Return exact schema and meaningful candidate/checks, BLOCKED for real external missing identity not invented success. N36 remains OPEN.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/views/class-import-center.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/n36-extension-protocol.js",
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "sw.js",
+        "tests/n36-complete-import-outcome-20261023/**",
+        "tests/n36-0539-profile-transaction-20261023/**",
+        "docs/automation-evidence/20261023/N36_0539_PROFILE_TRANSACTION_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "src/store.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_0539_profile_transaction_failure_reproduced",
+        "n36_profile_atomicity_sync_drift_and_real_edit_guards",
+        "n36_exact_pending_batch_continuation_and_no_duplicate_receipts",
+        "n36_affected_ui_reload_and_package_scope"
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-actual-0539-pending-profile-failure",
+        "publication": true,
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "realSchoolRead": false,
+        "providerServiceOperations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Latest PO explicitly requests finish N36 and supplies current .39 profile transaction/pending failure. Grounded local correction and qualified original-publisher frontend release authorized; no actual pending batch replay or live account/source manipulation by worker. Preserve user data/unknown outcomes and existing calendar hold.",
+      "acceptance": [
+        "Reproduce actual profile-phase failure before fixing; distinguish harmless ACK metadata from real edit.",
+        "Preserve current pending29, confirmed56/2 and historical data; safe exact continuation or precise missing authority/identity, no new Start.",
+        "Owner/session/term/Sync/outbox/rollback protections and real conflict retained.",
+        "Served source via publisher, no whole N36 acceptance or timetable proof invented."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "88e6157aa3756d0cdda82847ad7e61ebc8f0e4dd",
+        "requiredSourcePaths": [
+          "src/store.js",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "src/lib/n36-extension-protocol.js",
+          "tests/n36-complete-import-outcome-20261023/school-proof-runtime.mjs"
+        ],
+        "editPaths": [
+          "src/store.js",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "src/lib/n36-extension-protocol.js",
+          "tests/n36-0539-profile-transaction-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_0539_PROFILE_TRANSACTION_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n36-0539-profile-transaction-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_0539_PROFILE_TRANSACTION_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n36_0539_profile_transaction_failure_reproduced",
+          "n36_profile_atomicity_sync_drift_and_real_edit_guards",
+          "n36_exact_pending_batch_continuation_and_no_duplicate_receipts",
+          "n36_affected_ui_reload_and_package_scope"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

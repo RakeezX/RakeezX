@@ -2,6 +2,7 @@
 import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
 import fs from 'node:fs';
+import {verifyN44InterruptedResume} from './n44-interrupted-resume.mjs';
 import {verifiedN44SourceStageSplit,n44QualifiedTask} from './n44-qualified-source-evidence.mjs';
 import {verifyPristineN123DependencyCorrection} from './pending-n123-dependency.mjs';
 import {verifyPristineN36Verification,n36PristineSelectorSourceChain} from './pending-n36-verification.mjs';
@@ -586,6 +587,19 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     }
     const resultPath = path.join(rt, 'attempts', update.card.id, run, 'result.json'); noLinks(resultPath);
     insist(equalPath(task.resultPath ?? task.attempt?.outputPath, resultPath), 'Unexpected result path: ' + task.id);
+    if (update.interruptedAttemptRecovery) {
+      insist(!fs.existsSync(resultPath), 'Interrupted attempt now has a real result; review it');
+      const cpPath=path.join(rt,'attempts',task.id,run,'checkpoint.json');noLinks(cpPath);
+      const priorPath=path.join(rt,'attempts',task.id,'75a32838-5a23-441f-99d1-5ae9f9af8502','result.json');noLinks(priorPath);
+      const proof=verifyN44InterruptedResume(task,update,fs.readFileSync(cpPath),fs.readFileSync(priorPath),raw);
+      const observed=inventory(task.lastWorkerReap.owners.map(o=>o.pid));
+      insist(task.lastWorkerReap.owners.every(o=>!observed.some(p=>p.pid===o.pid&&utcTicks(p.createdAt)===utcTicks(o.createdAt))),'Interrupted owner process is still alive');
+      insist(equalPath(task.worktreePath,path.join(root,'.worktrees',task.id)),'Interrupted worktree differs');noLinks(task.worktreePath);
+      insist(git(['rev-parse','HEAD'],task.worktreePath)===proof.candidateSha,'Interrupted saved HEAD changed');
+      git(['merge-base','--is-ancestor',proof.previousCandidateSha,proof.candidateSha],task.worktreePath);
+      insist(!git(['status','--porcelain=v1','--untracked-files=no'],task.worktreePath),'Interrupted worktree has tracked edits');
+      return {file,raw,task,resultSha256:null,candidateSha:proof.candidateSha,interruptedCheckpoint:proof};
+    }
     const resultBytes = fs.readFileSync(resultPath), result = parse(resultBytes);
     let historicalContext = null;
     if (update.card.completionMode === HISTORICAL_RUNTIME_MODE) {
