@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import {assertVerifiedBoundary,privateQuery} from './activation/private-error-boundary.mjs';
+import {assertVerifiedBoundary,privateQuery,verifiedBoundaryMode} from './activation/private-error-boundary.mjs';
 import {createReadPhaseTiming} from './web-protocol.mjs';
 /** AI: INACTIVE trusted-server pilot port. No driver/network/Auth/config defaults.
  * All writers must use this SAME global transaction lock. Small, bounded snapshots
@@ -181,7 +181,7 @@ export function createPostgresRepository({ acquire, limits, timing, synchronize 
         fence(); uuid(ownerId); if(owners.has(ownerId)) return;
         await measure('sync',()=>synchronize(state,{query},ownerId)); fence(); snapshot(state,limits); owners.add(ownerId);
       };
-      const value=await action(state,Object.freeze({query,synchronizeOwner,beforeCommit,measure})); fence();
+      const value=await action(state,Object.freeze({query,synchronizeOwner,beforeCommit,measure,canonicalReadMode:()=>{fence();return verifiedBoundaryMode(c);}})); fence();
       // Neither the callback's retained references nor its result can alter the flush.
       const final=snapshot(structuredClone(state),limits), result=structuredClone(value);
       transitions(original,final); fence();

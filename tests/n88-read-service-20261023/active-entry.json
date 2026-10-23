@@ -1,0 +1,14 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "fabricatedOnly": true,
+  "providerOperations": 0,
+  "checks": [
+    "active import graph loads",
+    "active guarded serial and batch list dispatch preserve finite owner-bound wire",
+    "unknown SQL/mode/catalog denied",
+    "active source and native hashes match integrated qualified artifacts"
+  ],
+  "reused": "transition.json and staged-result.json retain actual PG17/service/session/grade/privacy/cancel/COMMIT proofs unchanged",
+  "hostedSpeedAcceptance": "NOT_RUN"
+}

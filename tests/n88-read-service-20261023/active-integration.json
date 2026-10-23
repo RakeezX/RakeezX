@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "sourceIntegrationAfterActualService": true,
+  "activeImportsRebasedOnly": true,
+  "nativeSha256": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "sourceHashes": {
+    "drafts/n88-student-portal/integrated-service.mjs": "9a215e6701e7ea0fcf57fbe91aea0cc628db0012f3a3938a2fcb307e745ffd9c",
+    "drafts/n88-student-portal/postgres-repository.mjs": "ee11051db7af7412cc76dd747c69921c525bfdd4f6bc058d04ff3629f3aa63fe",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "0f0809796bc40f66c05202bb6f125194b35e9fe62586c766ce1ff7057aa42906",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390"
+  },
+  "newProviderOperations": 0,
+  "actualUserSpeed": "NOT_RUN"
+}

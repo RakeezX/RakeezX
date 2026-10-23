@@ -1,0 +1,19 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "1593971e-7927-4c32-a307-e751d0b2c869",
+  "originalReceiptPreserved": "history-correction-inherited-1593971e-7927-4c32-a307-e751d0b2c869.json",
+  "clarification": "providerWrites0 was inherited from the preflight stamp; acknowledged application and exact immutable history/catalog readback establish one migration write in this run.",
+  "actualMigrationApplicationsThisRun": 1,
+  "originalFailedMigrationInvocationsAcrossTask": 1,
+  "correctedMigrationInvocationsAcrossTask": 1,
+  "totalAppliedNewMigrationsAcrossTask": 1,
+  "nativeUploadsAcrossTask": 1,
+  "sourcePinUpdatesAcrossTask": 1,
+  "newNativeUploadsThisRun": 0,
+  "newPinUpdatesThisRun": 0,
+  "aclWritesThisRun": 0,
+  "carrierUploadsAcrossTask": 0,
+  "realAccountReadsAcrossTask": 0,
+  "operationRepeatedForBookkeeping": false
+}

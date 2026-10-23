@@ -1,0 +1,1 @@
+{"aiAuthored":true,"status":"FAIL","phase":"local integration receipt lookup","cause":"old receipt prefix retained after run binding update","code":"ENOENT","writesBeforeFailure":0,"correction":"bind exact committed history-correction-inherited receipt prefix; no provider retry"}

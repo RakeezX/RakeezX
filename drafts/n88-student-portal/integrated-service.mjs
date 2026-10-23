@@ -23,7 +23,7 @@ const columns={years:'id,owner_id,revision,deleted_at,status',terms:'id,owner_id
   scoreSubitemCompletions:'id,owner_id,revision,deleted_at,student_id,subitem_id,checked,completion_state',
   sessions:'id,owner_id,revision,deleted_at,teaching_id,date,status',attendance:'id,owner_id,revision,deleted_at,student_id,teaching_id,session_id,status',
   logs:'id,owner_id,revision,deleted_at,student_id,teaching_id,kind,delta'};
-export async function readCanonical(ports,ownerId,listScopeOnly=false) {
+async function readCanonicalSerial(ports,ownerId,listScopeOnly=false) {
   // Admission reads only terms/teachings: keep the canonical owner/row/bound
   // fence, without locking unrelated score/attendance/log projection families.
   // Full student, visibility and guidance reads still require the projection lock.
@@ -45,6 +45,25 @@ export async function readCanonical(ports,ownerId,listScopeOnly=false) {
       for(const k of numeric)if(row[k]!=null)row[k]=Number(row[k]);
       return row;
     });
+  }
+  return canonical;
+}
+export async function readCanonical(ports,ownerId,listScopeOnly=false) {
+  const mode=ports.canonicalReadMode();
+  if(mode==='serial')return readCanonicalSerial(ports,ownerId,listScopeOnly);
+  if(mode!=='batch')throw Error('n88_database_unavailable');
+
+  await ports.query(listScopeOnly ? 'select n88_private.lock_canonical_sources($1::uuid,$2::integer)' : 'select n88_private.lock_projection_sources($1::uuid,$2::integer)',[ownerId,2000]);
+  const names=listScopeOnly ? ['terms','teachings'] : CANONICAL_PROJECTION_REQUIREMENTS.tables;
+  const canonical=Object.fromEntries(names.map(t=>[t,[]]));let bytes=0;
+  const result=await ports.query(listScopeOnly ? "select table_index,case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (order by table_index,id rows unbounded preceding)<=$3 then payload else null end as payload from (select 0 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x union all select 1 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x) bounded order by table_index,id" : "select table_index,case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (order by table_index,id rows unbounded preceding)<=$3 then payload else null end as payload from (select 0 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status from rakeezx.years where owner_id=$1::uuid order by id limit $2) x union all select 1 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x union all select 2 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,archived_at,grade,label,name from rakeezx.sections where owner_id=$1::uuid order by id limit $2) x union all select 3 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status,name from rakeezx.students where owner_id=$1::uuid order by id limit $2) x union all select 4 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,section_id,status,start_date,end_date from rakeezx.enrollments where owner_id=$1::uuid order by id limit $2) x union all select 5 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x union all select 6 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,name,max,\"order\",auto,per_point,penalty,score_mode,portability_group_id from rakeezx.items where owner_id=$1::uuid order by id limit $2) x union all select 7 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,item_id,value,manual_value,derived_value from rakeezx.scores where owner_id=$1::uuid order by id limit $2) x union all select 8 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,item_id,name,value,\"order\",start_date,due_date,late_points from rakeezx.score_subitems where owner_id=$1::uuid order by id limit $2) x union all select 9 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,subitem_id,checked,completion_state from rakeezx.score_subitem_completions where owner_id=$1::uuid order by id limit $2) x union all select 10 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,date,status from rakeezx.sessions where owner_id=$1::uuid order by id limit $2) x union all select 11 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,session_id,status from rakeezx.attendance where owner_id=$1::uuid order by id limit $2) x union all select 12 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,kind,delta from rakeezx.logs where owner_id=$1::uuid order by id limit $2) x) bounded order by table_index,id",[ownerId,2001,2*1024*1024]);
+  for(const {table_index,payload} of result.rows) {
+    const rows=canonical[names[table_index]];
+    if(!Number.isInteger(table_index)||!rows||rows.length>=2000||typeof payload!=='string'||(bytes+=Buffer.byteLength(payload))>2*1024*1024)throw Error('n88_projection_bound');
+    const row=Object.fromEntries(Object.entries(JSON.parse(payload)).map(([k,v])=>[camel(k),v]));
+    row.deleted=row.deletedAt!==null;
+    for(const k of numeric)if(row[k]!=null)row[k]=Number(row[k]);
+    rows.push(row);
   }
   return canonical;
 }
