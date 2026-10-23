@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n36-0538-school-proof-outcome-20261023",
+  "runId": "3718ec40-311b-4386-bf4c-19fc5d96efc9",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "fresh",
+      "status": "FAIL",
+      "error": "TypeError: vm.SourceTextModule is not a constructor\n    at module (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0538-school-proof-outcome-20261023/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:47:477)\n    at backgroundFixture (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0538-school-proof-outcome-20261023/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:48:14)\n    at makeWorker (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0538-school-proof-outcome-20261023/tests/n36-complete-import-outcome-20261023/school-proof-runtime.mjs:33:45)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0538-school-proof-outcome-20261023/tests/n36-complete-import-outcome-20261023/school-proof-runtime.mjs:35:293\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0538-school-proof-outcome-20261023/tests/n36-complete-import-outcome-20261023/school-proof-runtime.mjs:21:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

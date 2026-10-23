@@ -1,0 +1,1502 @@
+{
+  "taskId": "continuous-n36-0538-school-proof-outcome-20261023",
+  "runId": "3718ec40-311b-4386-bf4c-19fc5d96efc9",
+  "baseSha": "4ee4608c3a043f8ff27fd1c90d0ba652bc7e558b",
+  "version": "0.5.38",
+  "archiveIdentity": {
+    "inventoryVersion": "0.5.37",
+    "currentRuntime": true,
+    "network": false
+  },
+  "runtimeFingerprint": "a2b06158ad2f243b13248ffe917b3abc9a190767766142e0572b56aec7d1733e",
+  "model": {
+    "tiles": 20,
+    "styleCostMs": 0,
+    "scriptDelayMs": 0,
+    "holdMs": 0,
+    "inlineCounters": true,
+    "clock": "anchored wall elapsed plus cumulative actual computed-style calls times fixed cost; no phase-directed jumps; browser GET abort timer remains native 8s"
+  },
+  "harnessCorrection": "Chrome storage/session get no longer awaits source.evaluate; style counters returned with the same reader result, with no extra source evaluation. Descriptors/app checks never schedule a counter probe. Prior harness artifacts preserved.",
+  "boundary": "Current local source runtime; actual popup/CSS, serialized source readers, ESM background/collector, actual receiver ownership guards and IndexedDB. Synthetic Chrome/account service; loopback protocol substitution only.",
+  "cases": [
+    {
+      "mode": "response-conflict-before",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 138
+          },
+          "sourceGuard": {
+            "count": 16,
+            "ms": 1133
+          },
+          "descriptor": {
+            "count": 36,
+            "ms": 473
+          },
+          "appGuard": {
+            "count": 18,
+            "ms": 247
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 492
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 12007,
+        "pendingReadProofs": 0,
+        "wallMs": 1946,
+        "modeledMs": 1946,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 19,
+            "wallMs": 261,
+            "modeledMs": 261
+          },
+          "app-guard": {
+            "count": 20,
+            "wallMs": 262,
+            "modeledMs": 262
+          },
+          "script-load": {
+            "count": 18,
+            "wallMs": 376,
+            "modeledMs": 376
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 45,
+            "modeledMs": 45
+          },
+          "descriptor-post-read": {
+            "count": 18,
+            "wallMs": 213,
+            "modeledMs": 214
+          },
+          "source-read-proof": {
+            "count": 16,
+            "wallMs": 173,
+            "modeledMs": 173
+          },
+          "report-guard": {
+            "count": 16,
+            "wallMs": 196,
+            "modeledMs": 196
+          },
+          "report-fetch": {
+            "count": 4,
+            "wallMs": 164,
+            "modeledMs": 164
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 15,
+            "modeledMs": 15
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [
+        {
+          "wallMs": 8,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 3,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 5,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 5,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 1,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "response-multiple-conflict-before",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 135
+          },
+          "sourceGuard": {
+            "count": 16,
+            "ms": 1132
+          },
+          "descriptor": {
+            "count": 36,
+            "ms": 450
+          },
+          "appGuard": {
+            "count": 18,
+            "ms": 268
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 532
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 12007,
+        "pendingReadProofs": 0,
+        "wallMs": 2005,
+        "modeledMs": 2005,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 19,
+            "wallMs": 245,
+            "modeledMs": 245
+          },
+          "app-guard": {
+            "count": 20,
+            "wallMs": 284,
+            "modeledMs": 284
+          },
+          "script-load": {
+            "count": 18,
+            "wallMs": 373,
+            "modeledMs": 373
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 36,
+            "modeledMs": 36
+          },
+          "descriptor-post-read": {
+            "count": 18,
+            "wallMs": 207,
+            "modeledMs": 207
+          },
+          "source-read-proof": {
+            "count": 16,
+            "wallMs": 177,
+            "modeledMs": 177
+          },
+          "report-guard": {
+            "count": 16,
+            "wallMs": 219,
+            "modeledMs": 219
+          },
+          "report-fetch": {
+            "count": 4,
+            "wallMs": 192,
+            "modeledMs": 192
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 15,
+            "modeledMs": 15
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [
+        {
+          "wallMs": 8,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 7,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 5,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 1,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "response-missing-response-teacher-before",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 134
+          },
+          "sourceGuard": {
+            "count": 16,
+            "ms": 1100
+          },
+          "descriptor": {
+            "count": 36,
+            "ms": 489
+          },
+          "appGuard": {
+            "count": 18,
+            "ms": 245
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 483
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 12007,
+        "pendingReadProofs": 0,
+        "wallMs": 1888,
+        "modeledMs": 1888,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 19,
+            "wallMs": 263,
+            "modeledMs": 264
+          },
+          "app-guard": {
+            "count": 20,
+            "wallMs": 262,
+            "modeledMs": 262
+          },
+          "script-load": {
+            "count": 18,
+            "wallMs": 359,
+            "modeledMs": 359
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 40,
+            "modeledMs": 40
+          },
+          "descriptor-post-read": {
+            "count": 18,
+            "wallMs": 224,
+            "modeledMs": 224
+          },
+          "source-read-proof": {
+            "count": 16,
+            "wallMs": 164,
+            "modeledMs": 164
+          },
+          "report-guard": {
+            "count": 16,
+            "wallMs": 173,
+            "modeledMs": 173
+          },
+          "report-fetch": {
+            "count": 4,
+            "wallMs": 149,
+            "modeledMs": 149
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 14,
+            "modeledMs": 14
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [
+        {
+          "wallMs": 7,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 5,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 1,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "response-missing-response-schoolid-before",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 134
+          },
+          "sourceGuard": {
+            "count": 16,
+            "ms": 1249
+          },
+          "descriptor": {
+            "count": 36,
+            "ms": 435
+          },
+          "appGuard": {
+            "count": 18,
+            "ms": 259
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 708
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 12007,
+        "pendingReadProofs": 0,
+        "wallMs": 2305,
+        "modeledMs": 2305,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 19,
+            "wallMs": 240,
+            "modeledMs": 240
+          },
+          "app-guard": {
+            "count": 20,
+            "wallMs": 299,
+            "modeledMs": 299
+          },
+          "script-load": {
+            "count": 18,
+            "wallMs": 419,
+            "modeledMs": 419
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 36,
+            "modeledMs": 36
+          },
+          "descriptor-post-read": {
+            "count": 18,
+            "wallMs": 197,
+            "modeledMs": 197
+          },
+          "source-read-proof": {
+            "count": 16,
+            "wallMs": 208,
+            "modeledMs": 208
+          },
+          "report-guard": {
+            "count": 16,
+            "wallMs": 269,
+            "modeledMs": 269
+          },
+          "report-fetch": {
+            "count": 4,
+            "wallMs": 294,
+            "modeledMs": 294
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 7,
+            "modeledMs": 7
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": false,
+      "networkPending": [
+        {
+          "wallMs": 17,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 7,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 12,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 16,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 5,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 1,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "pending-school-drift-before",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "noTimetableGETAfterDrift": true,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 156
+          },
+          "sourceGuard": {
+            "count": 16,
+            "ms": 1237
+          },
+          "descriptor": {
+            "count": 35,
+            "ms": 475
+          },
+          "appGuard": {
+            "count": 17,
+            "ms": 250
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 513
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 10463,
+        "pendingReadProofs": 0,
+        "wallMs": 2128,
+        "modeledMs": 2128,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 19,
+            "wallMs": 283,
+            "modeledMs": 283
+          },
+          "app-guard": {
+            "count": 19,
+            "wallMs": 286,
+            "modeledMs": 286
+          },
+          "script-load": {
+            "count": 18,
+            "wallMs": 441,
+            "modeledMs": 442
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 49,
+            "modeledMs": 49
+          },
+          "descriptor-post-read": {
+            "count": 17,
+            "wallMs": 188,
+            "modeledMs": 188
+          },
+          "source-read-proof": {
+            "count": 16,
+            "wallMs": 167,
+            "modeledMs": 167
+          },
+          "report-guard": {
+            "count": 15,
+            "wallMs": 245,
+            "modeledMs": 245
+          },
+          "report-fetch": {
+            "count": 4,
+            "wallMs": 173,
+            "modeledMs": 173
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 14,
+            "modeledMs": 14
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": true,
+      "networkPending": [
+        {
+          "wallMs": 8,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 6,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 5,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 4,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 0,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "pending-teacher-drift-before",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "noTimetableGETAfterDrift": true,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 127
+          },
+          "sourceGuard": {
+            "count": 16,
+            "ms": 1102
+          },
+          "descriptor": {
+            "count": 35,
+            "ms": 442
+          },
+          "appGuard": {
+            "count": 17,
+            "ms": 245
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 495
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 10461,
+        "pendingReadProofs": 0,
+        "wallMs": 1970,
+        "modeledMs": 1970,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 19,
+            "wallMs": 258,
+            "modeledMs": 258
+          },
+          "app-guard": {
+            "count": 19,
+            "wallMs": 275,
+            "modeledMs": 275
+          },
+          "script-load": {
+            "count": 18,
+            "wallMs": 384,
+            "modeledMs": 384
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 37,
+            "modeledMs": 37
+          },
+          "descriptor-post-read": {
+            "count": 17,
+            "wallMs": 182,
+            "modeledMs": 182
+          },
+          "source-read-proof": {
+            "count": 16,
+            "wallMs": 152,
+            "modeledMs": 152
+          },
+          "report-guard": {
+            "count": 15,
+            "wallMs": 206,
+            "modeledMs": 206
+          },
+          "report-fetch": {
+            "count": 4,
+            "wallMs": 197,
+            "modeledMs": 197
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 18,
+            "modeledMs": 18
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": true,
+      "networkPending": [
+        {
+          "wallMs": 13,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 5,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 5,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 4,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 0,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "pending-document-drift-before",
+      "status": "PASS",
+      "documentTargetDenials": 3,
+      "noTimetableGETAfterDrift": true,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "SOURCE_BINDING_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 119
+          },
+          "sourceGuard": {
+            "count": 15,
+            "ms": 1024
+          },
+          "descriptor": {
+            "count": 34,
+            "ms": 432
+          },
+          "appGuard": {
+            "count": 17,
+            "ms": 233
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 402
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 10149,
+        "pendingReadProofs": 0,
+        "wallMs": 1780,
+        "modeledMs": 1780,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 18,
+            "wallMs": 233,
+            "modeledMs": 233
+          },
+          "app-guard": {
+            "count": 19,
+            "wallMs": 255,
+            "modeledMs": 255
+          },
+          "script-load": {
+            "count": 17,
+            "wallMs": 340,
+            "modeledMs": 340
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 32,
+            "modeledMs": 32
+          },
+          "descriptor-post-read": {
+            "count": 17,
+            "wallMs": 196,
+            "modeledMs": 196
+          },
+          "source-read-proof": {
+            "count": 15,
+            "wallMs": 167,
+            "modeledMs": 167
+          },
+          "report-guard": {
+            "count": 15,
+            "wallMs": 163,
+            "modeledMs": 163
+          },
+          "report-fetch": {
+            "count": 4,
+            "wallMs": 138,
+            "modeledMs": 138
+          },
+          "cleanup": {
+            "count": 2,
+            "wallMs": 26,
+            "modeledMs": 26
+          }
+        }
+      },
+      "lateMutation": false,
+      "drifted": true,
+      "networkPending": [
+        {
+          "wallMs": 7,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 4,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 0,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "pending-owner-drift-late",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "noTimetableGETAfterDrift": true,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "APP_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 138
+          },
+          "sourceGuard": {
+            "count": 21,
+            "ms": 1459
+          },
+          "descriptor": {
+            "count": 46,
+            "ms": 595
+          },
+          "appGuard": {
+            "count": 23,
+            "ms": 362
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 1721
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 15388,
+        "pendingReadProofs": 1,
+        "wallMs": 3459,
+        "modeledMs": 3459,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 24,
+            "wallMs": 322,
+            "modeledMs": 322
+          },
+          "app-guard": {
+            "count": 25,
+            "wallMs": 375,
+            "modeledMs": 375
+          },
+          "script-load": {
+            "count": 23,
+            "wallMs": 483,
+            "modeledMs": 483
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 44,
+            "modeledMs": 44
+          },
+          "descriptor-post-read": {
+            "count": 23,
+            "wallMs": 264,
+            "modeledMs": 264
+          },
+          "source-read-proof": {
+            "count": 21,
+            "wallMs": 196,
+            "modeledMs": 196
+          },
+          "report-guard": {
+            "count": 21,
+            "wallMs": 267,
+            "modeledMs": 267
+          },
+          "report-fetch": {
+            "count": 5,
+            "wallMs": 1296,
+            "modeledMs": 1296
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 13,
+            "modeledMs": 13
+          }
+        }
+      },
+      "lateMutation": true,
+      "drifted": true,
+      "networkPending": [
+        {
+          "wallMs": 7,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 8,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 5,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 1073,
+          "styleCalls": 303
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 6,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 1,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    },
+    {
+      "mode": "pending-session-drift-late",
+      "status": "PASS",
+      "documentTargetDenials": 0,
+      "noTimetableGETAfterDrift": true,
+      "boundedGETOptions": true,
+      "handlerReads": 0,
+      "view": {
+        "phase": "stopped",
+        "code": "APP_CHANGED",
+        "startPhase": "accepted",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "added": 0,
+        "existing": 0,
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "setupPartial": false,
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "schoolBindingState": "bound",
+        "readProofPresent": true,
+        "schoolIdPresent": true,
+        "schoolBadgePresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 137
+          },
+          "sourceGuard": {
+            "count": 21,
+            "ms": 1510
+          },
+          "descriptor": {
+            "count": 46,
+            "ms": 602
+          },
+          "appGuard": {
+            "count": 23,
+            "ms": 343
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 1713
+          }
+        }
+      },
+      "metrics": {
+        "styleCalls": 15388,
+        "pendingReadProofs": 1,
+        "wallMs": 3465,
+        "modeledMs": 3465,
+        "counters": {
+          "descriptor-pre-read": {
+            "count": 24,
+            "wallMs": 320,
+            "modeledMs": 320
+          },
+          "app-guard": {
+            "count": 25,
+            "wallMs": 360,
+            "modeledMs": 360
+          },
+          "script-load": {
+            "count": 23,
+            "wallMs": 484,
+            "modeledMs": 484
+          },
+          "source-home": {
+            "count": 2,
+            "wallMs": 44,
+            "modeledMs": 44
+          },
+          "descriptor-post-read": {
+            "count": 23,
+            "wallMs": 278,
+            "modeledMs": 279
+          },
+          "source-read-proof": {
+            "count": 21,
+            "wallMs": 225,
+            "modeledMs": 225
+          },
+          "report-guard": {
+            "count": 21,
+            "wallMs": 277,
+            "modeledMs": 277
+          },
+          "report-fetch": {
+            "count": 5,
+            "wallMs": 1302,
+            "modeledMs": 1302
+          },
+          "cleanup": {
+            "count": 1,
+            "wallMs": 13,
+            "modeledMs": 13
+          }
+        }
+      },
+      "lateMutation": true,
+      "drifted": true,
+      "networkPending": [
+        {
+          "wallMs": 10,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 4,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 3,
+          "styleCalls": 0
+        },
+        {
+          "wallMs": 1083,
+          "styleCalls": 303
+        }
+      ],
+      "fetches": [
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "metadata",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "classes",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "timetable",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        },
+        {
+          "kind": "students",
+          "schoolBinding": "bound",
+          "readProof": true,
+          "rowOffset": 0
+        }
+      ],
+      "requests": 6,
+      "navigation": 0,
+      "deliveries": 0,
+      "timetableGETs": 1,
+      "unsafeGETs": 0,
+      "rosterCheckpoint": {
+        "staged": 2,
+        "observed": 2,
+        "bound": true
+      },
+      "mutatedAfterRejection": false,
+      "setupReadCounts": [],
+      "receipts": []
+    }
+  ],
+  "status": "PASS",
+  "resources": {
+    "origin": "http://127.0.0.1:49964",
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "not required: active synthetic loopback-only helper"
+  }
+}

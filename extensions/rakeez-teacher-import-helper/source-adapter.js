@@ -69,7 +69,6 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    const expected=JSON.parse(runContext.readProof).teacher;
    if(expected.length&&teachers.some(n=>!expected.includes(n)))fail('TEACHER_CONTEXT_CHANGED');
    if(schools.length>1||runContext.schoolName&&schools.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
-   if(kind==='timetable'&&(!runContext.schoolName||schools.length!==1))fail('SCHOOL_CONTEXT_UNCONFIRMED');
    for(const a of doc.querySelectorAll('a[href]')){const v=new URL(a.getAttribute('href'),u.href);for(const [key,id] of v.searchParams)if(key.toLowerCase()==='schoolid'&&id.toLowerCase()!==runContext.schoolId.toLowerCase())fail('SCHOOL_CONTEXT_CHANGED');}
    if(menu&&doc.querySelector('base[href]'))fail('UNSAFE_ROSTER_LINK');
    if(setup){
@@ -80,6 +79,10 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
     identity.tables=identity.tables.filter(t=>t.category!=='school'||t.text.split('\t')[1]?.trim());
     if(identity.warnings.some(w=>['teacher','school'].includes(w.category)))fail(identity.warnings.some(w=>w.category==='school')?'SCHOOL_CONTEXT_CHANGED':'TEACHER_CONTEXT_CHANGED');
     for(const t of identity.tables){if(t.category==='teacher'&&expected.length&&!expected.includes(t.text.split('\t')[1]))fail('TEACHER_CONTEXT_CHANGED');if(t.category==='school'){const name=t.text.split('\t')[1];if(runContext.schoolName&&name!==runContext.schoolName||schools.some(n=>n!==name))fail('SCHOOL_CONTEXT_CHANGED');if(!schools.includes(name))schools.push(name);}}
+    // AI: classify only absent optional response proof, after every explicit
+    // school/teacher/SchoolId check, including the established metadata reader.
+    // No timetable is parsed or admitted without its own matching school.
+    if(kind==='timetable'&&(!runContext.schoolName||schools.length!==1))fail('SCHOOL_CONTEXT_UNCONFIRMED',runContext.schoolName&&schools.length===0?'response-school-absent':null);
     let value=kind==='metadata'?identity:kind==='timetable'?readSourceReportPage(kind,runContext,{document:doc,url:u.href}):globalThis.rakeezSetupPageReader?.(kind,runContext,{document:doc,url:u.href});
     if(!value)fail('SETUP_READER_UNAVAILABLE');
     if(!value.ok){if(['SOURCE_PENDING','EMPTY_SOURCE','UNSUPPORTED_SOURCE_SCHEMA'].includes(value.code))return {ok:true,tables:[],links:[],warnings:[{category:kind,code:'SETUP_FIELDS_UNAVAILABLE'}],skipped:[]};fail(value.code);}

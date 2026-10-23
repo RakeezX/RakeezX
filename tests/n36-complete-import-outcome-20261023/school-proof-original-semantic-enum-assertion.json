@@ -1,0 +1,110 @@
+{
+  "taskId": "continuous-n36-0538-school-proof-outcome-20261023",
+  "runId": "3718ec40-311b-4386-bf4c-19fc5d96efc9",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "fresh",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "09dd0a4ffb38181da20000752ef8d534a2e6ca186107870c60dc72f5e4046ff4",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 131
+          },
+          "sourceGuard": {
+            "count": 24,
+            "ms": 1578
+          },
+          "descriptor": {
+            "count": 52,
+            "ms": 668
+          },
+          "appGuard": {
+            "count": 26,
+            "ms": 388
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 726
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "unknown",
+        "coverageReasons": [],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 0,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagment/Actions/MyStudents",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule"
+      ],
+      "outcomes": [],
+      "durable": {
+        "students": 0,
+        "sections": 0,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "teacherName": "معلم اصطناعي",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "principalName": "",
+            "canonicalId": "profile",
+            "serverRevision": 1,
+            "deleted": false
+          }
+        ],
+        "receipts": []
+      },
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'semantic-dashboard'\n- 'teacher-dashboard'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0538-school-proof-outcome-20261023/tests/n36-complete-import-outcome-20261023/school-proof-runtime.mjs:53:310\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0538-school-proof-outcome-20261023/tests/n36-complete-import-outcome-20261023/school-proof-runtime.mjs:21:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

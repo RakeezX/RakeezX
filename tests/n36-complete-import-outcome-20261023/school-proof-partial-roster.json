@@ -1,0 +1,317 @@
+{
+  "taskId": "continuous-n36-0538-school-proof-outcome-20261023",
+  "runId": "3718ec40-311b-4386-bf4c-19fc5d96efc9",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "gap",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "2f864c3a00e759aaefcd62aa1da521e7bf8d6fb31bdd1ee65fa7c74f6339d89b",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 116
+          },
+          "sourceGuard": {
+            "count": 27,
+            "ms": 1924
+          },
+          "descriptor": {
+            "count": 58,
+            "ms": 724
+          },
+          "appGuard": {
+            "count": 29,
+            "ms": 427
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 542
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "partial",
+        "coverageReasons": [
+          "missing-pages"
+        ],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 3,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792737479671,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "finalDurable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 0,
+        "slots": 0,
+        "receipts": [
+          2
+        ]
+      },
+      "popup": "ركيز المعلم - الاستيراد من مدرستي\nنسخ التشخيص\n\nافتح مدرستي وحساب ركيز، ثم ابدأ. يمكنك إغلاق الإضافة؛ أبقِ التبويبين مفتوحين.\n\nابدأ الاستيراد\nإيقاف\n\nحُفظ المتاح محليًا في ركيز؛ المزامنة السحابية تُتابع من التطبيق. التغطية جزئية؛ قد تنقص أسماء. صفحات كشف غير مكتملة. صفحات مثبتة: 1؛ صفوف مستبعدة: 0.\n\nمؤكد محليًا لهذا التشغيل: 2 صفًا في 1 إيصال\nجديد: 2 — موجود: 0 — معلق: 0.\n\nحقول الإعداد جزئية؛ تعذّرت قراءة: الجدول الدراسي. تغطية الطلاب تُحدّد من صفحات كشف الطلاب، بصورة مستقلة عن حقول الإعداد. لم تتضمن استجابة الجدول إثباتًا صريحًا للمدرسة؛ لم يُستورد الجدول أو ارتباط مواده بالفصول منها.\n\nتفاصيل النتيجة",
+      "diagnostic": {
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "valid": null,
+        "staged": 2,
+        "observed": 2,
+        "excluded": 0,
+        "classes": 1,
+        "processedPages": 1,
+        "currentPage": null,
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 116
+          },
+          "sourceGuard": {
+            "count": 27,
+            "ms": 1924
+          },
+          "descriptor": {
+            "count": 58,
+            "ms": 724
+          },
+          "appGuard": {
+            "count": 29,
+            "ms": 427
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 542
+          }
+        },
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "navigationPlannedKind": "none",
+        "navigationPlannedRoute": "none",
+        "navigationObservedRoute": "none",
+        "navigationRelation": "none",
+        "navigationQuery": "none",
+        "navigationDocument": "none",
+        "navigationStatus": "none",
+        "jobPhase": "complete",
+        "stage": "saved",
+        "startPhase": "accepted",
+        "coverage": "partial",
+        "terminal": "unproven",
+        "endpoint": "none",
+        "hasNext": false,
+        "disabledNext": null,
+        "transfer": "idle",
+        "receipt": "saved",
+        "failure": "none",
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "fieldResults": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "setupPhase": "receipt",
+        "setupFields": [],
+        "receiverCapability": "source-profile-quiet-v1",
+        "coverageReasons": [
+          "missing-pages"
+        ]
+      },
+      "receiver": "انتقل إلى المحتوى\nالرئيسية\nالفصول\nالجدول\nالتقارير\nالتقويم\nالإعدادات\nم ا\nمعلم اصطناعي\nاستيراد وتصدير الكشوف\nاستيراد\nتصدير\nاستيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم\n\nاستورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.\n\nتنزيل إضافة ركيز 0.5.39\nطريقة التثبيت\nقراءة التقدم المحلي لهذا الحساب\n\nإيصالات محلية مؤكدة: 1 (2 صفًا). من الصفوف المعلقة يوجد حاليًا 0 من 0 في الكشف المحلي. الإيصالات المعروضة مؤكدة محليًا؛ المزامنة تُتابع من التطبيق. لا تحسم هذه القراءة نتيجة تشغيل تاريخي آخر. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.\n\nاستيراد كشف طلاب\nاختر الكشف من جهازك\n\nملفات CSV أو Excel (XLSX).",
+      "renderedProfileAfterReload": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

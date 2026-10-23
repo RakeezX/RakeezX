@@ -1,0 +1,2142 @@
+{
+  "taskId": "continuous-n36-0538-school-proof-outcome-20261023",
+  "runId": "3718ec40-311b-4386-bf4c-19fc5d96efc9",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "same",
+      "historicalRun": {
+        "receiptAggregateVersion": 1,
+        "id": "942c5dc3dc97c88b3b338a5e25d5c1d59fccd6374cb1b138ec7e8c33c1f751cd",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 113
+          },
+          "sourceGuard": {
+            "count": 26,
+            "ms": 1627
+          },
+          "descriptor": {
+            "count": 56,
+            "ms": 678
+          },
+          "appGuard": {
+            "count": 28,
+            "ms": 396
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 524
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "timetable",
+            "reason": "saved",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "historicalDisk": {
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792737462158,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "device": [
+          {
+            "id": "device",
+            "updatedAt": 1792737459339,
+            "deleted": false,
+            "theme": "light",
+            "activeYearId": "y:1448-1449",
+            "activeTermId": "tm:y:1448-1449:1",
+            "activeTimeProfileId": null,
+            "reportPrincipalName": "",
+            "lastSyncAt": null,
+            "schemaVersion": 8,
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "accountProvisioningReceipt": {
+              "ownerId": "a7300000-0000-4000-8000-000000000001",
+              "contractVersion": 1,
+              "foundationHash": "fresh-foundation"
+            },
+            "n36NamesBatch": {
+              "batchId": "f34cd50cf08c8e01b73647f5de491b2be8b6780f8427d51254d8cd98721c67cd",
+              "ownerId": "a7300000-0000-4000-8000-000000000001",
+              "receipts": {
+                "8af8fbc64276f2b90c869af983a1d57022ea856d43c1da3b1dcbd7b7f27dfd6f": {
+                  "status": "saved",
+                  "added": 2,
+                  "existing": 0,
+                  "remaining": 0,
+                  "total": 2,
+                  "setup": {
+                    "saved": 3,
+                    "existing": 3,
+                    "unresolved": 0,
+                    "missing": [],
+                    "details": [
+                      {
+                        "field": "teacher",
+                        "reason": "current",
+                        "count": 1
+                      },
+                      {
+                        "field": "school",
+                        "reason": "saved",
+                        "count": 1
+                      },
+                      {
+                        "field": "principal",
+                        "reason": "saved",
+                        "count": 1
+                      },
+                      {
+                        "field": "department",
+                        "reason": "current",
+                        "count": 1
+                      },
+                      {
+                        "field": "classes",
+                        "reason": "current",
+                        "count": 1
+                      },
+                      {
+                        "field": "timetable",
+                        "reason": "saved",
+                        "count": 1
+                      }
+                    ]
+                  }
+                }
+              },
+              "pending": null,
+              "yearId": "y:1448-1449",
+              "termId": "tm:y:1448-1449:1",
+              "receiptTargets": {
+                "8af8fbc64276f2b90c869af983a1d57022ea856d43c1da3b1dcbd7b7f27dfd6f": {
+                  "خامس1": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0"
+                }
+              }
+            }
+          }
+        ],
+        "timeProfiles": [
+          {
+            "id": "time-profile:default:hybrid",
+            "name": "التوقيت المدمج",
+            "order": 3,
+            "periods": [
+              {
+                "period": 1,
+                "start": "07:00",
+                "end": "07:30"
+              },
+              {
+                "period": 2,
+                "start": "07:30",
+                "end": "08:00"
+              },
+              {
+                "period": 3,
+                "start": "08:00",
+                "end": "08:30"
+              },
+              {
+                "period": 4,
+                "start": "08:30",
+                "end": "09:00"
+              },
+              {
+                "period": 5,
+                "start": "09:00",
+                "end": "09:30"
+              },
+              {
+                "period": 6,
+                "start": "09:30",
+                "end": "10:00"
+              },
+              {
+                "period": 7,
+                "start": "10:00",
+                "end": "10:30"
+              },
+              {
+                "period": 8,
+                "start": "10:30",
+                "end": "11:00"
+              }
+            ],
+            "overrides": {
+              "config": {
+                "type": "hybrid",
+                "gap": 0,
+                "assembly": {
+                  "enabled": false
+                },
+                "firstPeriodStart": "07:00",
+                "periodDuration": 30,
+                "count": 8,
+                "recess": {
+                  "enabled": false
+                }
+              },
+              "remote": [
+                {
+                  "period": 1,
+                  "start": "07:00",
+                  "end": "07:30"
+                },
+                {
+                  "period": 2,
+                  "start": "07:30",
+                  "end": "08:00"
+                },
+                {
+                  "period": 3,
+                  "start": "08:00",
+                  "end": "08:30"
+                },
+                {
+                  "period": 4,
+                  "start": "08:30",
+                  "end": "09:00"
+                },
+                {
+                  "period": 5,
+                  "start": "09:00",
+                  "end": "09:30"
+                },
+                {
+                  "period": 6,
+                  "start": "09:30",
+                  "end": "10:00"
+                },
+                {
+                  "period": 7,
+                  "start": "10:00",
+                  "end": "10:30"
+                },
+                {
+                  "period": 8,
+                  "start": "10:30",
+                  "end": "11:00"
+                }
+              ]
+            },
+            "activeFrom": null,
+            "activeTo": null,
+            "canonicalId": "time-profile:default:hybrid",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "time-profile:default:ramadan",
+            "name": "توقيت رمضان",
+            "order": 2,
+            "periods": [
+              {
+                "period": 1,
+                "start": "09:00",
+                "end": "09:35"
+              },
+              {
+                "period": 2,
+                "start": "09:35",
+                "end": "10:10"
+              },
+              {
+                "period": 3,
+                "start": "10:10",
+                "end": "10:45"
+              },
+              {
+                "period": 4,
+                "start": "10:45",
+                "end": "11:20"
+              },
+              {
+                "period": 5,
+                "start": "11:20",
+                "end": "11:55"
+              },
+              {
+                "period": 6,
+                "start": "11:55",
+                "end": "12:30"
+              }
+            ],
+            "overrides": {
+              "config": {
+                "type": "ramadan",
+                "gap": 0,
+                "assembly": {
+                  "enabled": false
+                },
+                "firstPeriodStart": "09:00",
+                "periodDuration": 35,
+                "count": 6,
+                "recess": {
+                  "enabled": false
+                }
+              }
+            },
+            "activeFrom": null,
+            "activeTo": null,
+            "canonicalId": "time-profile:default:ramadan",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "time-profile:default:summer",
+            "name": "التوقيت الصيفي",
+            "order": 0,
+            "periods": [
+              {
+                "period": 1,
+                "start": "07:00",
+                "end": "07:45"
+              },
+              {
+                "period": 2,
+                "start": "07:45",
+                "end": "08:30"
+              },
+              {
+                "period": 3,
+                "start": "08:55",
+                "end": "09:40",
+                "grades": [
+                  4
+                ]
+              },
+              {
+                "period": 3,
+                "start": "08:30",
+                "end": "09:15"
+              },
+              {
+                "period": 4,
+                "start": "09:40",
+                "end": "10:25"
+              },
+              {
+                "period": 5,
+                "start": "10:25",
+                "end": "11:10"
+              },
+              {
+                "period": 6,
+                "start": "11:10",
+                "end": "11:55"
+              },
+              {
+                "period": 7,
+                "start": "11:55",
+                "end": "12:40"
+              }
+            ],
+            "overrides": {
+              "config": {
+                "type": "summer",
+                "gap": 0,
+                "assembly": {
+                  "enabled": true,
+                  "start": "06:45",
+                  "duration": 15
+                },
+                "firstPeriodStart": "07:00",
+                "periodDuration": 45,
+                "count": 7,
+                "recess": {
+                  "enabled": true,
+                  "duration": 20,
+                  "transition": 5,
+                  "rules": [
+                    {
+                      "grades": [
+                        4
+                      ],
+                      "afterPeriod": 2
+                    },
+                    {
+                      "grades": [
+                        5,
+                        6
+                      ],
+                      "afterPeriod": 3
+                    }
+                  ]
+                }
+              }
+            },
+            "activeFrom": null,
+            "activeTo": null,
+            "canonicalId": "time-profile:default:summer",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "time-profile:default:winter",
+            "name": "التوقيت الشتوي",
+            "order": 1,
+            "periods": [
+              {
+                "period": 1,
+                "start": "07:30",
+                "end": "08:15"
+              },
+              {
+                "period": 2,
+                "start": "08:15",
+                "end": "09:00"
+              },
+              {
+                "period": 3,
+                "start": "09:20",
+                "end": "10:05",
+                "grades": [
+                  4
+                ]
+              },
+              {
+                "period": 3,
+                "start": "09:00",
+                "end": "09:45"
+              },
+              {
+                "period": 4,
+                "start": "10:05",
+                "end": "10:50"
+              },
+              {
+                "period": 5,
+                "start": "10:50",
+                "end": "11:35"
+              },
+              {
+                "period": 6,
+                "start": "11:35",
+                "end": "12:20"
+              },
+              {
+                "period": 7,
+                "start": "12:20",
+                "end": "13:05"
+              }
+            ],
+            "overrides": {
+              "config": {
+                "type": "winter",
+                "gap": 0,
+                "assembly": {
+                  "enabled": true,
+                  "start": "07:15",
+                  "duration": 15
+                },
+                "firstPeriodStart": "07:30",
+                "periodDuration": 45,
+                "count": 7,
+                "recess": {
+                  "enabled": true,
+                  "duration": 20,
+                  "transition": 0,
+                  "rules": [
+                    {
+                      "grades": [
+                        4
+                      ],
+                      "afterPeriod": 2
+                    },
+                    {
+                      "grades": [
+                        5,
+                        6
+                      ],
+                      "afterPeriod": 3
+                    }
+                  ]
+                }
+              }
+            },
+            "activeFrom": null,
+            "activeTo": null,
+            "canonicalId": "time-profile:default:winter",
+            "serverRevision": 1,
+            "deleted": false
+          }
+        ],
+        "meta": [],
+        "years": [
+          {
+            "id": "y:1448-1449",
+            "label": "1448–1449 هـ",
+            "hijriStart": 1448,
+            "hijriEnd": 1449,
+            "order": 1448,
+            "status": "active",
+            "calendarPresetId": "sa-general-1448-1449",
+            "canonicalId": "y:1448-1449",
+            "serverRevision": 1,
+            "deleted": false
+          }
+        ],
+        "terms": [
+          {
+            "id": "tm:y:1448-1449:1",
+            "yearId": "y:1448-1449",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "index": 1,
+            "name": "الفصل الدراسي الأول",
+            "startDate": "2026-08-23",
+            "endDate": "2027-01-07",
+            "status": "active",
+            "canonicalId": "tm:y:1448-1449:1",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "tm:y:1448-1449:2",
+            "yearId": "y:1448-1449",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "index": 2,
+            "name": "الفصل الدراسي الثاني",
+            "startDate": "2027-01-17",
+            "endDate": "2027-06-24",
+            "status": "upcoming",
+            "canonicalId": "tm:y:1448-1449:2",
+            "serverRevision": 1,
+            "deleted": false
+          }
+        ],
+        "subjects": [
+          {
+            "id": "sub:digital-skills",
+            "name": "المهارات الرقمية",
+            "slug": "digital-skills",
+            "canonicalId": "sub:digital-skills",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "sub:math",
+            "updatedAt": 1792737462183,
+            "deleted": false,
+            "name": "الرياضيات",
+            "slug": "math",
+            "canonicalId": "sub:math",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          }
+        ],
+        "sections": [
+          {
+            "id": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "updatedAt": 1792737462043,
+            "deleted": false,
+            "yearId": "y:1448-1449",
+            "grade": 5,
+            "label": "1",
+            "name": "خامس1",
+            "color": "#0d9488",
+            "order": 0,
+            "status": "active",
+            "archivedAt": null,
+            "archiveDate": null,
+            "canonicalId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          }
+        ],
+        "teachings": [
+          {
+            "id": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "updatedAt": 1792737462199,
+            "deleted": false,
+            "sectionId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "subjectId": "sub:math",
+            "termId": "tm:y:1448-1449:1",
+            "order": 0,
+            "canonicalId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          }
+        ],
+        "students": [
+          {
+            "id": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+            "updatedAt": 1792737462078,
+            "deleted": false,
+            "name": "طالب اصطناعي b",
+            "note": "",
+            "status": "active",
+            "canonicalId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          },
+          {
+            "id": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+            "updatedAt": 1792737462078,
+            "deleted": false,
+            "name": "طالب اصطناعي a",
+            "note": "",
+            "status": "active",
+            "canonicalId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          }
+        ],
+        "enrollments": [
+          {
+            "id": "en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "updatedAt": 1792737462078,
+            "deleted": false,
+            "studentId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+            "sectionId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "rollNo": 2,
+            "startDate": "2026-10-23",
+            "endDate": null,
+            "status": "active",
+            "transferNote": "",
+            "canonicalId": "en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          },
+          {
+            "id": "en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "updatedAt": 1792737462078,
+            "deleted": false,
+            "studentId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+            "sectionId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "rollNo": 1,
+            "startDate": "2026-10-23",
+            "endDate": null,
+            "status": "active",
+            "transferNote": "",
+            "canonicalId": "en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          }
+        ],
+        "items": [
+          {
+            "id": "0259e5f3-a69e-4ed8-a7ca-ac4944bcf288",
+            "updatedAt": 1792737462199,
+            "deleted": false,
+            "teachingId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "name": "الاختبار النهائي",
+            "max": 40,
+            "order": 4,
+            "auto": null,
+            "scoreMode": "direct",
+            "distributionMode": null,
+            "portabilityGroupId": null,
+            "distributionOriginId": null,
+            "distributionVersion": 1,
+            "perPoint": 1,
+            "penalty": 1,
+            "unitId": null,
+            "lessonId": null,
+            "canonicalId": "0259e5f3-a69e-4ed8-a7ca-ac4944bcf288",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          },
+          {
+            "id": "20b653e2-921f-42b1-9602-04c4750d36bc",
+            "updatedAt": 1792737462199,
+            "deleted": false,
+            "teachingId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "name": "المشاركة والتفاعل",
+            "max": 10,
+            "order": 0,
+            "auto": "participation",
+            "scoreMode": "direct",
+            "distributionMode": null,
+            "portabilityGroupId": null,
+            "distributionOriginId": null,
+            "distributionVersion": 1,
+            "perPoint": 1,
+            "penalty": 1,
+            "unitId": null,
+            "lessonId": null,
+            "canonicalId": "20b653e2-921f-42b1-9602-04c4750d36bc",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          },
+          {
+            "id": "31e9f88d-52da-43a8-bba6-afcab55a3c0b",
+            "updatedAt": 1792737462199,
+            "deleted": false,
+            "teachingId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "name": "الأنشطة والمشاريع",
+            "max": 20,
+            "order": 2,
+            "auto": null,
+            "scoreMode": "direct",
+            "distributionMode": null,
+            "portabilityGroupId": null,
+            "distributionOriginId": null,
+            "distributionVersion": 1,
+            "perPoint": 1,
+            "penalty": 1,
+            "unitId": null,
+            "lessonId": null,
+            "canonicalId": "31e9f88d-52da-43a8-bba6-afcab55a3c0b",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          },
+          {
+            "id": "8db0f836-de4f-4e2e-94fd-f8fdcfe94d8d",
+            "updatedAt": 1792737462199,
+            "deleted": false,
+            "teachingId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "name": "الواجبات",
+            "max": 10,
+            "order": 1,
+            "auto": null,
+            "scoreMode": "direct",
+            "distributionMode": null,
+            "portabilityGroupId": null,
+            "distributionOriginId": null,
+            "distributionVersion": 1,
+            "perPoint": 1,
+            "penalty": 1,
+            "unitId": null,
+            "lessonId": null,
+            "canonicalId": "8db0f836-de4f-4e2e-94fd-f8fdcfe94d8d",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          },
+          {
+            "id": "c9d59973-ec3d-49f6-a67a-a8163d1ed452",
+            "updatedAt": 1792737462199,
+            "deleted": false,
+            "teachingId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "name": "الاختبارات القصيرة",
+            "max": 20,
+            "order": 3,
+            "auto": null,
+            "scoreMode": "direct",
+            "distributionMode": null,
+            "portabilityGroupId": null,
+            "distributionOriginId": null,
+            "distributionVersion": 1,
+            "perPoint": 1,
+            "penalty": 1,
+            "unitId": null,
+            "lessonId": null,
+            "canonicalId": "c9d59973-ec3d-49f6-a67a-a8163d1ed452",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          }
+        ],
+        "scoreSubitems": [],
+        "scoreSubitemCompletions": [],
+        "scores": [],
+        "slots": [
+          {
+            "id": "sl:cd8aaf37-d375-412c-8aa9-0942e15f2016",
+            "updatedAt": 1792737462228,
+            "deleted": false,
+            "teachingId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "weekday": 0,
+            "period": 1,
+            "kind": "teaching",
+            "termId": null,
+            "canonicalId": "sl:cd8aaf37-d375-412c-8aa9-0942e15f2016",
+            "serverRevision": 0,
+            "syncCreatePending": true
+          }
+        ],
+        "sessions": [],
+        "sessionRosterSnapshots": [],
+        "attendance": [],
+        "logs": [],
+        "calendars": [
+          {
+            "id": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "yearId": "y:1448-1449",
+            "source": "preset:sa-general-1448-1449",
+            "label": "التقويم المعتمد · 1448–1449 هـ · جميع مناطق المملكة",
+            "canonicalId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "serverRevision": 1,
+            "deleted": false
+          }
+        ],
+        "calendarDays": [
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-23",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-09-23",
+            "kind": "national",
+            "label": "إجازة اليوم الوطني",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-23",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-24",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-09-24",
+            "kind": "national",
+            "label": "إجازة اليوم الوطني",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-24",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-25",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-09-25",
+            "kind": "national",
+            "label": "إجازة اليوم الوطني",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-25",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-26",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-09-26",
+            "kind": "national",
+            "label": "إجازة اليوم الوطني",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-09-26",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-10-25",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-10-25",
+            "kind": "holiday",
+            "label": "إجازة نهاية أسبوع مطولة",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-10-25",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-20",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-20",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-20",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-21",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-21",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-21",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-22",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-22",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-22",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-23",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-23",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-23",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-24",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-24",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-24",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-25",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-25",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-25",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-26",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-26",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-26",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-27",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-27",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-27",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-28",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-28",
+            "kind": "holiday",
+            "label": "إجازة الخريف",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-28",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-29",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2026-11-29",
+            "kind": "holiday",
+            "label": "إجازة نهاية أسبوع مطولة",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2026-11-29",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-08",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-08",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-08",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-09",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-09",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-09",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-10",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-10",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-10",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-11",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-11",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-11",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-12",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-12",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-12",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-13",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-13",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-13",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-14",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-14",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-14",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-15",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-15",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-15",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-16",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-01-16",
+            "kind": "holiday",
+            "label": "إجازة منتصف العام",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-01-16",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-19",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-02-19",
+            "kind": "founding",
+            "label": "إجازة يوم التأسيس",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-19",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-20",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-02-20",
+            "kind": "founding",
+            "label": "إجازة يوم التأسيس",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-20",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-21",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-02-21",
+            "kind": "founding",
+            "label": "إجازة يوم التأسيس",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-21",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-22",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-02-22",
+            "kind": "founding",
+            "label": "إجازة يوم التأسيس",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-22",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-26",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-02-26",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-26",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-27",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-02-27",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-27",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-28",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-02-28",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-02-28",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-01",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-01",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-01",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-02",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-02",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-02",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-03",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-03",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-03",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-04",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-04",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-04",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-05",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-05",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-05",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-06",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-06",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-06",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-07",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-07",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-07",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-08",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-08",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-08",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-09",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-09",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-09",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-10",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-10",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-10",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-11",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-11",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-11",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-12",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-12",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-12",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-13",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-03-13",
+            "kind": "holiday",
+            "label": "إجازة عيد الفطر",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-03-13",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-04-11",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-04-11",
+            "kind": "holiday",
+            "label": "إجازة نهاية أسبوع مطولة",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-04-11",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-07",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-07",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-07",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-08",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-08",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-08",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-09",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-09",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-09",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-10",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-10",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-10",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-11",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-11",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-11",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-12",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-12",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-12",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-13",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-13",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-13",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-14",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-14",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-14",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-15",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-15",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-15",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-16",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-16",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-16",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-17",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-17",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-17",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-18",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-18",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-18",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-19",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-19",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-19",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-20",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-20",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-20",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-21",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-21",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-21",
+            "serverRevision": 1,
+            "deleted": false
+          },
+          {
+            "id": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-22",
+            "calendarId": "cal:y:1448-1449:preset:sa-general-1448-1449",
+            "date": "2027-05-22",
+            "kind": "holiday",
+            "label": "إجازة عيد الأضحى",
+            "canonicalId": "cd:cal:y:1448-1449:preset:sa-general-1448-1449:2027-05-22",
+            "serverRevision": 1,
+            "deleted": false
+          }
+        ],
+        "units": [],
+        "lessons": [],
+        "notes": [],
+        "classRules": [],
+        "classGoals": [],
+        "classCharterSelections": [],
+        "groupArrangements": [],
+        "closedTermReports": [],
+        "assignments": [],
+        "submissions": [],
+        "outbox": [
+          {
+            "id": "v2:0925e7d9-d03a-4009-9225-e17846b2f96b",
+            "protocol": "v2",
+            "mutationId": "0925e7d9-d03a-4009-9225-e17846b2f96b",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "enrollments",
+            "entity": "enrollments",
+            "recordId": "en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "serverRecordId": "en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "canonicalId": "en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "logicalRecordKey": "enrollments:en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "op": "create",
+            "baseRevision": 0,
+            "patch": {
+              "student_id": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+              "section_id": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "start_date": "2026-10-23",
+              "end_date": null,
+              "status": "active",
+              "roll_no": 1,
+              "transfer_note": ""
+            },
+            "localPatch": {
+              "id": "en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "updatedAt": 1792737462078,
+              "deleted": false,
+              "studentId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+              "sectionId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "rollNo": 1,
+              "startDate": "2026-10-23",
+              "endDate": null,
+              "status": "active",
+              "transferNote": "",
+              "canonicalId": "en:c04d16db-6d62-4f07-81a5-ceae282f0b2b:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "serverRevision": 0,
+              "syncCreatePending": true
+            },
+            "fields": [
+              "end_date",
+              "roll_no",
+              "section_id",
+              "start_date",
+              "status",
+              "student_id",
+              "transfer_note"
+            ],
+            "groups": [],
+            "dependencies": [
+              {
+                "store": "students",
+                "recordId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+                "requiresServerRevision": true
+              },
+              {
+                "store": "sections",
+                "recordId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+                "requiresServerRevision": true
+              }
+            ],
+            "sequence": 1792737462086000,
+            "clientUpdatedAt": 1792737462078,
+            "queuedAt": 1792737462078,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:1e3bccc1-6482-41b9-b8e8-b54b212285a8",
+            "protocol": "v2",
+            "mutationId": "1e3bccc1-6482-41b9-b8e8-b54b212285a8",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "sections",
+            "entity": "sections",
+            "recordId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "serverRecordId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "canonicalId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "logicalRecordKey": "sections:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "op": "create",
+            "baseRevision": 0,
+            "patch": {
+              "year_id": "y:1448-1449",
+              "grade": 5,
+              "label": "1",
+              "name": "خامس1",
+              "color": "#0d9488",
+              "order": 0,
+              "status": "active",
+              "archived_at": null,
+              "archive_date": null
+            },
+            "localPatch": {
+              "yearId": "y:1448-1449",
+              "grade": 5,
+              "label": "1",
+              "name": "خامس1",
+              "color": "#0d9488",
+              "order": 0,
+              "status": "active",
+              "archivedAt": null,
+              "archiveDate": null
+            },
+            "fields": [
+              "archive_date",
+              "archived_at",
+              "color",
+              "grade",
+              "label",
+              "name",
+              "order",
+              "status",
+              "year_id"
+            ],
+            "groups": [],
+            "dependencies": [
+              {
+                "store": "years",
+                "recordId": "y:1448-1449",
+                "requiresServerRevision": true
+              }
+            ],
+            "sequence": 1792737462045000,
+            "clientUpdatedAt": 1792737462043,
+            "queuedAt": 1792737462043,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:1ea3ee5f-0a2b-49e8-b10e-ea4d558f11f2",
+            "protocol": "v2",
+            "mutationId": "1ea3ee5f-0a2b-49e8-b10e-ea4d558f11f2",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "students",
+            "entity": "students",
+            "recordId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+            "serverRecordId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+            "canonicalId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+            "logicalRecordKey": "students:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+            "op": "create",
+            "baseRevision": 0,
+            "patch": {
+              "name": "طالب اصطناعي b",
+              "note": "",
+              "status": "active"
+            },
+            "localPatch": {
+              "id": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+              "updatedAt": 1792737462078,
+              "deleted": false,
+              "name": "طالب اصطناعي b",
+              "note": "",
+              "status": "active",
+              "canonicalId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+              "serverRevision": 0,
+              "syncCreatePending": true
+            },
+            "fields": [
+              "name",
+              "note",
+              "status"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792737462085001,
+            "clientUpdatedAt": 1792737462078,
+            "queuedAt": 1792737462078,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:31f2fd53-ea07-4a7f-a952-a2f1678d6a75",
+            "protocol": "v2",
+            "mutationId": "31f2fd53-ea07-4a7f-a952-a2f1678d6a75",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "profile",
+            "entity": "profile",
+            "recordId": "profile",
+            "serverRecordId": "profile",
+            "canonicalId": "profile",
+            "logicalRecordKey": "profile:profile",
+            "op": "patch",
+            "baseRevision": 1,
+            "patch": {
+              "school_name": "ابن الجوزي الابتدائية"
+            },
+            "localPatch": {
+              "schoolName": "ابن الجوزي الابتدائية"
+            },
+            "fields": [
+              "school_name"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792737462137000,
+            "clientUpdatedAt": 1792737462137,
+            "queuedAt": 1792737462137,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:5ff7a92e-6cc0-4952-b5a3-6a6c44432650",
+            "protocol": "v2",
+            "mutationId": "5ff7a92e-6cc0-4952-b5a3-6a6c44432650",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "subjects",
+            "entity": "subjects",
+            "recordId": "sub:math",
+            "serverRecordId": "sub:math",
+            "canonicalId": "sub:math",
+            "logicalRecordKey": "subjects:sub:math",
+            "op": "create",
+            "baseRevision": 0,
+            "patch": {
+              "name": "الرياضيات",
+              "slug": "math"
+            },
+            "localPatch": {
+              "name": "الرياضيات",
+              "slug": "math"
+            },
+            "fields": [
+              "name",
+              "slug"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792737462183000,
+            "clientUpdatedAt": 1792737462183,
+            "queuedAt": 1792737462183,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:83e69f22-8ae6-412e-b3a6-b6c4e72f7436",
+            "protocol": "v2",
+            "mutationId": "83e69f22-8ae6-412e-b3a6-b6c4e72f7436",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "teachings",
+            "entity": "teachings",
+            "recordId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "serverRecordId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "canonicalId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "logicalRecordKey": "teachings:tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+            "op": "command",
+            "command": "teaching:create",
+            "baseRevision": 0,
+            "patch": {
+              "sectionId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "subjectId": "sub:math",
+              "termId": "tm:y:1448-1449:1",
+              "order": 0,
+              "itemIds": [
+                "20b653e2-921f-42b1-9602-04c4750d36bc",
+                "8db0f836-de4f-4e2e-94fd-f8fdcfe94d8d",
+                "31e9f88d-52da-43a8-bba6-afcab55a3c0b",
+                "c9d59973-ec3d-49f6-a67a-a8163d1ed452",
+                "0259e5f3-a69e-4ed8-a7ca-ac4944bcf288"
+              ]
+            },
+            "localPatch": {},
+            "fields": [
+              "itemIds",
+              "order",
+              "sectionId",
+              "subjectId",
+              "termId"
+            ],
+            "groups": [],
+            "dependencies": [
+              {
+                "store": "sections",
+                "recordId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+                "requiresServerRevision": true
+              },
+              {
+                "store": "subjects",
+                "recordId": "sub:math",
+                "requiresServerRevision": true
+              },
+              {
+                "store": "terms",
+                "recordId": "tm:y:1448-1449:1",
+                "requiresServerRevision": true
+              }
+            ],
+            "sequence": 1792737462200000,
+            "clientUpdatedAt": 1792737462199,
+            "queuedAt": 1792737462199,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:956555fe-205d-42a0-9947-40870ebca3ac",
+            "protocol": "v2",
+            "mutationId": "956555fe-205d-42a0-9947-40870ebca3ac",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "slots",
+            "entity": "slots",
+            "recordId": "sl:cd8aaf37-d375-412c-8aa9-0942e15f2016",
+            "serverRecordId": "sl:cd8aaf37-d375-412c-8aa9-0942e15f2016",
+            "canonicalId": "sl:cd8aaf37-d375-412c-8aa9-0942e15f2016",
+            "logicalRecordKey": "slots:sl:cd8aaf37-d375-412c-8aa9-0942e15f2016",
+            "op": "create",
+            "baseRevision": 0,
+            "patch": {
+              "teaching_id": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+              "weekday": 0,
+              "period": 1,
+              "kind": "teaching",
+              "term_id": null
+            },
+            "localPatch": {
+              "teachingId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+              "weekday": 0,
+              "period": 1,
+              "kind": "teaching",
+              "termId": null
+            },
+            "fields": [
+              "kind",
+              "period",
+              "teaching_id",
+              "term_id",
+              "weekday"
+            ],
+            "groups": [],
+            "dependencies": [
+              {
+                "store": "teachings",
+                "recordId": "tch:08fa8c89-1175-4c37-bb9b-76932e593f9b",
+                "requiresServerRevision": true
+              }
+            ],
+            "sequence": 1792737462228000,
+            "clientUpdatedAt": 1792737462228,
+            "queuedAt": 1792737462228,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:a00a153b-8c04-4341-a27c-e7344ffe235f",
+            "protocol": "v2",
+            "mutationId": "a00a153b-8c04-4341-a27c-e7344ffe235f",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "enrollments",
+            "entity": "enrollments",
+            "recordId": "en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "serverRecordId": "en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "canonicalId": "en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "logicalRecordKey": "enrollments:en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+            "op": "create",
+            "baseRevision": 0,
+            "patch": {
+              "student_id": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+              "section_id": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "start_date": "2026-10-23",
+              "end_date": null,
+              "status": "active",
+              "roll_no": 2,
+              "transfer_note": ""
+            },
+            "localPatch": {
+              "id": "en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "updatedAt": 1792737462078,
+              "deleted": false,
+              "studentId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+              "sectionId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "rollNo": 2,
+              "startDate": "2026-10-23",
+              "endDate": null,
+              "status": "active",
+              "transferNote": "",
+              "canonicalId": "en:b5925b7d-3aa1-42c9-a2fa-45d30c8f4618:sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+              "serverRevision": 0,
+              "syncCreatePending": true
+            },
+            "fields": [
+              "end_date",
+              "roll_no",
+              "section_id",
+              "start_date",
+              "status",
+              "student_id",
+              "transfer_note"
+            ],
+            "groups": [],
+            "dependencies": [
+              {
+                "store": "students",
+                "recordId": "b5925b7d-3aa1-42c9-a2fa-45d30c8f4618",
+                "requiresServerRevision": true
+              },
+              {
+                "store": "sections",
+                "recordId": "sec:0e919ced-df9c-4abf-9f20-5a4bb88dc4c0",
+                "requiresServerRevision": true
+              }
+            ],
+            "sequence": 1792737462086001,
+            "clientUpdatedAt": 1792737462078,
+            "queuedAt": 1792737462078,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:ca60fcb9-7b7b-41a9-8fdc-ece06bb828b4",
+            "protocol": "v2",
+            "mutationId": "ca60fcb9-7b7b-41a9-8fdc-ece06bb828b4",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "profile",
+            "entity": "profile",
+            "recordId": "profile",
+            "serverRecordId": "profile",
+            "canonicalId": "profile",
+            "logicalRecordKey": "profile:profile",
+            "op": "patch",
+            "baseRevision": 1,
+            "patch": {
+              "report_principal_name": "مدير اصطناعي"
+            },
+            "localPatch": {
+              "principalName": "مدير اصطناعي",
+              "reportPrincipalName": "مدير اصطناعي"
+            },
+            "fields": [
+              "report_principal_name"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792737462158000,
+            "clientUpdatedAt": 1792737462158,
+            "queuedAt": 1792737462158,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          },
+          {
+            "id": "v2:df5ae3c2-ba64-4d7d-b01f-7c969a172ec5",
+            "protocol": "v2",
+            "mutationId": "df5ae3c2-ba64-4d7d-b01f-7c969a172ec5",
+            "deviceId": "5a1c363d-44dd-455e-958f-a355318bbafa",
+            "store": "students",
+            "entity": "students",
+            "recordId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+            "serverRecordId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+            "canonicalId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+            "logicalRecordKey": "students:c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+            "op": "create",
+            "baseRevision": 0,
+            "patch": {
+              "name": "طالب اصطناعي a",
+              "note": "",
+              "status": "active"
+            },
+            "localPatch": {
+              "id": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+              "updatedAt": 1792737462078,
+              "deleted": false,
+              "name": "طالب اصطناعي a",
+              "note": "",
+              "status": "active",
+              "canonicalId": "c04d16db-6d62-4f07-81a5-ceae282f0b2b",
+              "serverRevision": 0,
+              "syncCreatePending": true
+            },
+            "fields": [
+              "name",
+              "note",
+              "status"
+            ],
+            "groups": [],
+            "dependencies": [],
+            "sequence": 1792737462085000,
+            "clientUpdatedAt": 1792737462078,
+            "queuedAt": 1792737462078,
+            "state": "pending",
+            "attemptCount": 0,
+            "envelopeLocked": false,
+            "lastError": null,
+            "blockedReason": null,
+            "ownerId": "a7300000-0000-4000-8000-000000000001"
+          }
+        ]
+      },
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "1020bd6c14a1238e9f4cab224a93f28a8c6bacbd3fbc75b604eedef67aba6e2e",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 87
+          },
+          "sourceGuard": {
+            "count": 16,
+            "ms": 1101
+          },
+          "descriptor": {
+            "count": 36,
+            "ms": 444
+          },
+          "appGuard": {
+            "count": 18,
+            "ms": 277
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 436
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "coverageReasons": [],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 0,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 3,
+            "existing": 3,
+            "unresolved": 0,
+            "missing": [],
+            "details": [
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "timetable",
+                "reason": "saved",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 1,
+        "slots": 1,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792737462158,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "historicalReceiptsPreserved": true,
+      "status": "OBSERVED"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

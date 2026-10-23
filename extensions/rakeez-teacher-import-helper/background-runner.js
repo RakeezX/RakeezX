@@ -143,7 +143,7 @@ export function createBackgroundRunner({transport}){
   await current(j);if(r.length!==1||r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   await source(j,'read-proof');await appGuard(j);
   if(!r[0].result?.ok){const e=Error(r[0]?.result?.code??'REPORT_FETCH_FAILED');e.incomplete=r[0]?.result?.incomplete;
-   if(setupKind&&r[0].result?.setupKind===setupKind&&['route-shape','live-link-absent','live-link-unsafe','live-link-event','live-link-context','live-link-download','live-link-method','live-link-duplicate','response-base'].includes(r[0].result?.setupRejectReason)){e.setupKind=setupKind;e.setupRejectReason=r[0].result.setupRejectReason;}throw e;}
+   if(setupKind&&r[0].result?.setupKind===setupKind&&['route-shape','live-link-absent','live-link-unsafe','live-link-event','live-link-context','live-link-download','live-link-method','live-link-duplicate','response-base','response-school-absent'].includes(r[0].result?.setupRejectReason)){e.setupKind=setupKind;e.setupRejectReason=r[0].result.setupRejectReason;}throw e;}
   return r[0].result;
  }
  async function readNext(j){
@@ -168,7 +168,9 @@ export function createBackgroundRunner({transport}){
    try{return {...n,page:await fetchPage(j,n,n.kind)};}catch(e){
     // AI: only a classified optional setup rejection may recover. All document,
     // teacher, owner/session/batch and roster failures retain their original stop.
-    if(e.message!=='UNSAFE_SETUP_LINK'||e.setupKind!==n.kind||!e.setupRejectReason||!j.context.schoolId||!j.context.readProof)throw e;
+    const absentSchool=n.kind==='timetable'&&e.message==='SCHOOL_CONTEXT_UNCONFIRMED'&&e.setupRejectReason==='response-school-absent'&&j.context.schoolBinding==='bound'&&!!j.context.schoolName;
+    const unsafeLink=e.message==='UNSAFE_SETUP_LINK'&&e.setupRejectReason!=='response-school-absent';
+    if((!unsafeLink&&!absentSchool)||e.setupKind!==n.kind||!e.setupRejectReason||!j.context.schoolId||!j.context.readProof)throw e;
     await source(j,'read-proof');await appGuard(j);
     (j.setupRejections??=[]).push({setupKind:n.kind,setupRejectReason:e.setupRejectReason});
     return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SETUP_FIELDS_UNAVAILABLE'}],skipped:[]}};

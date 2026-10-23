@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-0538-school-proof-outcome-20261023",
+  "runId": "3718ec40-311b-4386-bf4c-19fc5d96efc9",
+  "baseSha": "1dbcc42f8eb64487223ad5d5bec88dcfe8d8674f",
+  "name": "n36_0539_actual_app_download",
+  "archiveSha256": "2537e2b7ddfa08265f2de24caf5e5d560f57c9498c877699b7067a0c5d0d55cc",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper; actual app DOM/download handler over HTTP; fresh isolated context.",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.39",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "origin": "http://127.0.0.1:49967"
+  }
+}

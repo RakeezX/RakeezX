@@ -1,0 +1,177 @@
+{
+  "baseSha": "1dbcc42f8eb64487223ad5d5bec88dcfe8d8674f",
+  "selection": {
+    "school-proof-partial-roster": [
+      "gap"
+    ],
+    "school-proof-horizontal": [
+      "populated"
+    ],
+    "school-proof-horizontal-identity": [
+      "response-missing-horizontal-school-conflict-before",
+      "response-missing-horizontal-teacher-conflict-before"
+    ],
+    "school-proof-missing": [
+      "fresh",
+      "populated"
+    ],
+    "school-proof-missing-ui": [
+      "populated"
+    ],
+    "school-proof-populated-completion": [
+      "populated"
+    ],
+    "school-proof-explicit-dl": [
+      "populated"
+    ],
+    "school-proof-semantic-restart": [
+      "restart"
+    ],
+    "school-proof-identity": [
+      "response-conflict-before",
+      "response-multiple-conflict-before",
+      "response-missing-response-teacher-before",
+      "response-missing-response-schoolid-before",
+      "pending-school-drift-before",
+      "pending-teacher-drift-before",
+      "pending-document-drift-before",
+      "pending-owner-drift-late",
+      "pending-session-drift-late"
+    ],
+    "school-proof-roster": [
+      "roster-missing-before",
+      "roster-conflict-before"
+    ],
+    "school-proof-entry": [
+      "foreign",
+      "owner-race",
+      "term-drift",
+      "unknown"
+    ]
+  },
+  "cases": 25,
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "33c9e4faade5f003579b030cd6a790d02562fc076a592fc1f960d06da4955bae"
+    },
+    {
+      "file": "archive-popup-0.5.23.html",
+      "sha256": "12943e38d5f18a2e89b5b17d42d87a2c42cb0d46ef16730b15bd4fbfb6dbf7cb"
+    },
+    {
+      "file": "archive-run-controller-0.5.23.js",
+      "sha256": "7556f315523ce8ec9dbf9b8964482a6ade75245495d655a5197ccb5c7ae9c0e3"
+    },
+    {
+      "file": "background-collector.js",
+      "sha256": "81b4df887d9f89bc0a350931d43275184d441199857e0002645b273e6e49c1d2"
+    },
+    {
+      "file": "background-runner.js",
+      "sha256": "20e949242a86d861f98dbc041aa312fa0b54175ecbbf4ed41be1da0fc9596dd7"
+    },
+    {
+      "file": "categories-popup.js",
+      "sha256": "85417c917501948fae76931c68532b39eba59ed1aaafcba366bd39edf93485d9"
+    },
+    {
+      "file": "categories.js",
+      "sha256": "fcd0b93335a605b1aba6b84651b11188528b9a556648d75bc3cf4a04a182acda"
+    },
+    {
+      "file": "class-order.js",
+      "sha256": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87"
+    },
+    {
+      "file": "core.js",
+      "sha256": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907"
+    },
+    {
+      "file": "diagnostics-bootstrap.js",
+      "sha256": "95a30fdfaf96041de7201025723d8d42a29b6332193531470aeb9c1b829b941b"
+    },
+    {
+      "file": "handoff-protocol.js",
+      "sha256": "62e2ed5daca4035c9a44196bd337cf595dfd1325c649fdb2e9e25f4554231a00"
+    },
+    {
+      "file": "handoff-worker.js",
+      "sha256": "7d23e75da8b93bd3de1dadf29ec1ded7dff85ff7857dd18c2e170a3837ee7d33"
+    },
+    {
+      "file": "lib/rakeez-datetime-values.js",
+      "sha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7"
+    },
+    {
+      "file": "lib/rakeez-datetime.css",
+      "sha256": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0"
+    },
+    {
+      "file": "lib/rakeez-datetime.js",
+      "sha256": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2"
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "1a469267dd9db14e88a9c5c42eea7808487cd0572c128c349dbd98a94177ae21"
+    },
+    {
+      "file": "navigation.js",
+      "sha256": "fdcbb7e3a797e21f1d7e639a8ffa54be9a8631aaf39418a0dee36b46fc93e3ab"
+    },
+    {
+      "file": "popup.css",
+      "sha256": "b99c915c3ac99351c389d38b0bb47affe808585d512d3799554b3891c35f7e51"
+    },
+    {
+      "file": "popup.html",
+      "sha256": "d5c683ce69f4a0b73b451d287627d342bd2f3ef404d0badfa2fd19e9d2008e88"
+    },
+    {
+      "file": "popup.js",
+      "sha256": "0e1a555d42fac03776026d457632cf7979e3a751259685dc82e942317cf75bdc"
+    },
+    {
+      "file": "route-diagnostics.js",
+      "sha256": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a"
+    },
+    {
+      "file": "run-controller.js",
+      "sha256": "6c92204a0a64d0b6bd7d74bb85b951609b98823066f6d3e457c4112b56de3156"
+    },
+    {
+      "file": "selection.js",
+      "sha256": "0b050e14a97c9728f2c2f2d00a655ddf6a36a349907f6a85c558b5db57758f71"
+    },
+    {
+      "file": "source-adapter.js",
+      "sha256": "8d9b0bf98c2cd87a13a5611ab9fbdbf8f5b4aef3c54202fcc8de5824a2453449"
+    },
+    {
+      "file": "source-roster.js",
+      "sha256": "100b135a71e91a0d355db7c7ff4d538164075d13d510332f0ca5aeca8888b2fc"
+    },
+    {
+      "file": "vendor/flatpickr/LICENSE.md",
+      "sha256": "5fd57afc3905651175947ae44818e91ffcf5b605e4c88fac42d9700243bd9095"
+    },
+    {
+      "file": "vendor/flatpickr/ar.js",
+      "sha256": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b"
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.css",
+      "sha256": "1b34a42552c96f10e4dfaaa4a367276b03868aacff63c1ac42ffe331352bc754"
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.js",
+      "sha256": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1"
+    }
+  ],
+  "reusedEvidence": "N36_COMPLETE_IMPORT_OUTCOME.md; unchanged owner/schema/pagination/department/calendar/late-ACK contracts",
+  "metadataOnlyAfterProof": [
+    "manifest.json",
+    "README.md",
+    "app download label/href"
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "taskId": "continuous-n36-0538-school-proof-outcome-20261023",
+  "runId": "3718ec40-311b-4386-bf4c-19fc5d96efc9",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "fresh",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "e22149366bce410454002c71b25bb585cd18b24028eb98bff33b029c16891864",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 119
+          },
+          "sourceGuard": {
+            "count": 24,
+            "ms": 1668
+          },
+          "descriptor": {
+            "count": 52,
+            "ms": 679
+          },
+          "appGuard": {
+            "count": 26,
+            "ms": 384
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 679
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "code": "SCHOOL_CONTEXT_UNCONFIRMED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "unknown",
+        "coverageReasons": [],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 0,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagment/Actions/MyStudents",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule"
+      ],
+      "outcomes": [],
+      "durable": {
+        "students": 0,
+        "sections": 0,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "teacherName": "معلم اصطناعي",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "principalName": "",
+            "canonicalId": "profile",
+            "serverRevision": 1,
+            "deleted": false
+          }
+        ],
+        "receipts": []
+      },
+      "status": "OBSERVED"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

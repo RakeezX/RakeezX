@@ -1,0 +1,11 @@
+{
+  "ports": [
+    49963,
+    49964,
+    49966,
+    49967
+  ],
+  "listenerCount": 0,
+  "sharedBrowserLease": "not required: canonical isolated synthetic helper",
+  "cleanup": "owned server/browser/context finally blocks completed"
+}
