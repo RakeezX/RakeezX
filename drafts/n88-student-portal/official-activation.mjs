@@ -57,6 +57,7 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(action==='--typed-read-catalog-field-order')return runCatalogPreflight({candidate:value,load,sqlFile,reconcile:true});
  if(action==='--typed-read-catalog-preflight')return runCatalogPreflight({candidate:value,load,sqlFile});
  if(action==='--typed-read-exact-config-preflight')return runCustodyPreflight({candidate:value,load,official,sharedCertificate:true});
  if(action==='--typed-read-config-provenance')return runConfigProvenance({candidate:value,load,official});

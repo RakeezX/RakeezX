@@ -1,0 +1,8 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "onlyObjectFieldOrderNormalized": true,
+  "allSevenValuesAndRowOrderExact": true,
+  "extraMissingFieldsDenied": true,
+  "providerOperations": 0
+}
