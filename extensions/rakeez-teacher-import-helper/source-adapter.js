@@ -149,6 +149,29 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
   if(!subject||!classroom||text(cell).replace(/\s/g,'')!==(subject+classroom).replace(/\s/g,''))throw Error('AMBIGUOUS_LESSON_LINKS');
   return {subject,classroom};
  };
+ // AI: rendered transport is a separate, worker-owned checkpoint chain. It
+ // never lends computed visibility to an inert GET response. Rows are held by
+ // the worker until the canonical home teacher proof is obtained again.
+ if(mode==='rendered-timetable'){
+  const fail=code=>({ok:false,code});
+  if(source||!runContext?.readProof||runContext.schoolBinding!=='bound'||!runContext.schoolName||location.href!==runContext.expectedScheduleURL)return fail('SOURCE_CONTEXT_CHANGED');
+  let home,expected;try{home=new URL(runContext.sourceURL);expected=JSON.parse(runContext.readProof);}catch{return fail('TEACHER_CONTEXT_CHANGED');}
+  const schedule=new URL(location.href);
+  if(home.origin!==schedule.origin||schedule.pathname!=='/SchoolSchedule/Schedule/TeacherSchedule'||schedule.hash||[...schedule.searchParams].length!==1||schedule.searchParams.get('SchoolId')?.toLowerCase()!==runContext.schoolId?.toLowerCase())return fail('SCHOOL_CONTEXT_CHANGED');
+  if(document.querySelector('base[href]'))return fail('UNSAFE_SETUP_LINK');
+  const guard=readSourceReportPage('guard');if(!guard.ok)return guard;
+  if(document.readyState!=='complete'||Array.from(document.querySelectorAll('[aria-busy=true],[role=progressbar]')).some(visible))return {ok:false,code:'SOURCE_PENDING',retry:true};
+  const field=n=>n&&visible(n)&&!n.querySelector('script,style,iframe,input,table,a,button')?text(n):'';
+  const labels=Array.from(document.querySelectorAll('p,span,small,div,b,strong,label,dt')).map(field);
+  const schools=[...new Set([...Array.from(document.querySelectorAll('.school-name')).map(field),...labels.flatMap(v=>/^اسم المدرسة: .{2,80}$/.test(v)?[v.slice(13)]:[]),...Array.from(document.querySelectorAll('dt,p,span,label,th,td')).flatMap(n=>{if(!['اسم المدرسة','اسم المدرسة:'].includes(field(n)))return [];if(['TH','TD'].includes(n.tagName)&&!(n.parentElement?.tagName==='TR'&&n.parentElement.cells.length===2&&n.parentElement.cells[0]===n&&n.nextElementSibling?.tagName==='TD'))return [];return [field(n.nextElementSibling)];})].filter(Boolean))];
+  if(schools.some(v=>v!==runContext.schoolName))return fail('SCHOOL_CONTEXT_CHANGED');
+  const teachers=[...labels.flatMap(v=>/^اسم المعلم(?:ة)?: .{2,80}$/.test(v)?[v.replace(/^اسم المعلم(?:ة)?: /,'')]:[]),...Array.from(document.querySelectorAll('dt,p,span,label,th,td')).flatMap(n=>{if(!/^اسم المعلم(?:ة)?:?$/.test(field(n)))return [];if(['TH','TD'].includes(n.tagName)&&!(n.parentElement?.tagName==='TR'&&n.parentElement.cells.length===2&&n.parentElement.cells[0]===n&&n.nextElementSibling?.tagName==='TD'))return [];return [field(n.nextElementSibling)].filter(Boolean);})];
+  if(teachers.some(v=>!Array.isArray(expected.teacher)||!expected.teacher.includes(v)))return fail('TEACHER_CONTEXT_CHANGED');
+  for(const a of document.querySelectorAll('a[href]')){let u;try{u=new URL(a.getAttribute('href'),location.href);}catch{return fail('UNSAFE_LESSON_LINK');}for(const [k,v] of u.searchParams)if(k.toLowerCase()==='schoolid'&&v.toLowerCase()!==runContext.schoolId.toLowerCase())return fail('SCHOOL_CONTEXT_CHANGED');}
+  const proof=readSourceReportPage('lesson-school-proof',runContext);if(!proof.ok)return proof;if(!proof.bound)return fail('SCHOOL_CONTEXT_UNCONFIRMED');
+  const parsed=readSourceReportPage('timetable',runContext);if(!parsed.ok)return parsed;
+  return {...parsed,runContext:null,links:[],skipped:[],tables:parsed.tables.filter(t=>t.category==='timetable')};
+ }
  if(mode==='lesson-school-proof'){
   let bound=false;const identities=new Map();
   const bind=(tuple,lesson)=>{
@@ -161,7 +184,7 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
   };
   // An inert response cannot prove stylesheet-defined visibility. Keep the old
   // explicit school-label requirement in that case rather than apply remote CSS.
-  if(document.querySelector('base[href],style,link[rel=stylesheet]'))return {ok:true,bound:false};
+  if(document.querySelector('base[href]')||source&&document.querySelector('style,link[rel=stylesheet]'))return {ok:true,bound:false};
   try{for(const table of document.querySelectorAll('table')){
    if(!visible(table)||table.closest('nav,header,footer,form')||table.parentElement?.closest('table')||table.querySelector('table'))continue;
    const rows=Array.from(table.rows),head=rows[0];if(!head)continue;

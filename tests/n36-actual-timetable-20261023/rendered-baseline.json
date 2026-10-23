@@ -1,0 +1,197 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "52da0f25-3635-4831-8a38-3d1d0d09cd23",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "conflict",
+      "rawSchoolProvenancePreserved": true,
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "0dec4b647d7b9768413dd5b21143b09057739187839f8ed746cec172b8b3814c",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 146
+          },
+          "sourceGuard": {
+            "count": 27,
+            "ms": 1797
+          },
+          "descriptor": {
+            "count": 58,
+            "ms": 714
+          },
+          "appGuard": {
+            "count": 29,
+            "ms": 420
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 561
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 2,
+        "confirmedReceipts": 1,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 2,
+        "existing": 0,
+        "fields": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "current",
+            "count": 1
+          }
+        ],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "complete",
+        "coverageReasons": [],
+        "terminal": "explicit-next",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/MyStudents"
+      ],
+      "outcomes": [
+        {
+          "status": "saved",
+          "added": 2,
+          "existing": 0,
+          "remaining": 0,
+          "total": 2,
+          "setup": {
+            "saved": 3,
+            "existing": 2,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 2,
+        "sections": 1,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "updatedAt": 1792768919452,
+            "deleted": false,
+            "teacherName": "معلم اصطناعي",
+            "schoolName": "ابن الجوزي الابتدائية",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة مكة المكرمة",
+            "reportPrincipalName": "مدير اصطناعي",
+            "principalName": "مدير اصطناعي",
+            "activeTimeProfileId": null,
+            "canonicalId": "profile",
+            "serverRevision": 1
+          }
+        ],
+        "receipts": [
+          2
+        ]
+      },
+      "status": "OBSERVED"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "sharedBrowserFinally": true
+  }
+}

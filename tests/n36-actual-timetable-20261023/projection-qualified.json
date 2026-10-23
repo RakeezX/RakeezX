@@ -1,0 +1,180 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "52da0f25-3635-4831-8a38-3d1d0d09cd23",
+  "scope": "synthetic projection only; no new live body read",
+  "cases": [
+    {
+      "name": "delayed-finish",
+      "status": "PASS",
+      "reason": "DOCUMENT_READY"
+    },
+    {
+      "name": "backlog",
+      "status": "PASS",
+      "reason": "DOCUMENT_READY"
+    },
+    {
+      "name": "absent",
+      "status": "PASS",
+      "reason": "DOCUMENT_TIMEOUT"
+    },
+    {
+      "name": "ambiguous",
+      "status": "PASS",
+      "reason": "DOCUMENT_AMBIGUOUS"
+    },
+    {
+      "name": "redirect",
+      "status": "PASS",
+      "reason": "DOCUMENT_MISMATCH"
+    },
+    {
+      "name": "zero",
+      "status": "PASS",
+      "reason": "TARGET_ABSENT",
+      "tables": 0,
+      "candidates": 0,
+      "styles": 1
+    },
+    {
+      "name": "one",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 1
+    },
+    {
+      "name": "foreign-remap",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 1
+    },
+    {
+      "name": "without-table-class",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 1
+    },
+    {
+      "name": "multiple",
+      "status": "PASS",
+      "reason": "TARGET_AMBIGUOUS",
+      "tables": 4,
+      "candidates": 2,
+      "styles": 2
+    },
+    {
+      "name": "nested",
+      "status": "PASS",
+      "reason": "TARGET_ABSENT",
+      "tables": 3,
+      "candidates": 0,
+      "styles": 1
+    },
+    {
+      "name": "quoted-attribute",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 1
+    },
+    {
+      "name": "unquoted",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 1
+    },
+    {
+      "name": "full-document",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 2
+    },
+    {
+      "name": "hidden",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 2
+    },
+    {
+      "name": "nav-only",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 1
+    },
+    {
+      "name": "malformed",
+      "status": "PASS",
+      "reason": "TARGET_UNRESOLVED",
+      "tables": 1,
+      "candidates": 1,
+      "styles": 0
+    },
+    {
+      "name": "absent-target",
+      "status": "PASS",
+      "reason": "TARGET_ABSENT",
+      "tables": 1,
+      "candidates": 0,
+      "styles": 1
+    },
+    {
+      "name": "no-execution",
+      "status": "PASS",
+      "reason": "PROJECTED",
+      "tables": 2,
+      "candidates": 1,
+      "styles": 1
+    },
+    {
+      "name": "body-bound",
+      "status": "PASS",
+      "reason": "BODY_LIMIT"
+    },
+    {
+      "name": "body-shape",
+      "status": "PASS",
+      "reason": "BODY_SHAPE"
+    },
+    {
+      "name": "parser-unavailable",
+      "status": "PASS",
+      "reason": "PARSER_UNAVAILABLE"
+    },
+    {
+      "name": "base64",
+      "status": "PASS",
+      "reason": "PROJECTED"
+    },
+    {
+      "name": "encoding-invalid",
+      "status": "PASS",
+      "reason": "ENCODING_INVALID"
+    }
+  ],
+  "supportedCuaRuntime": {
+    "DOMParser": "undefined",
+    "TextDecoder": "function",
+    "Buffer": "function",
+    "newLiveRead": "NOT_RUN; required parser unavailable in documented tool scope"
+  },
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "sharedBrowserFinally": true
+  }
+}

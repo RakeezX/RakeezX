@@ -1,0 +1,26 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "52da0f25-3635-4831-8a38-3d1d0d09cd23",
+  "baseSha": "7fa9b61259df3036caf8e6eda6bf03196d7d4d2e",
+  "localStatus": "PASS",
+  "workerRejectionScenarios": 19,
+  "projectionScenarios": 24,
+  "redFirst": true,
+  "storeIdempotenceReopenAndRestart": "PASS",
+  "partialRosterWarning": "PASS",
+  "files": [
+    {
+      "file": "extensions/rakeez-teacher-import-helper/background-runner.js",
+      "sha256": "3206cdf488882a0a3d7a692ed6c881ed35e25dfd5cd7636fd61cfcc2122bbb88"
+    },
+    {
+      "file": "extensions/rakeez-teacher-import-helper/source-adapter.js",
+      "sha256": "6699117e7bfaed49a9b4ff27f1dfba7f5996966dd9624ec8cef93fd0f7b6e607"
+    }
+  ],
+  "previousZipStoreProtocolAndOfflineShell": "UNCHANGED",
+  "newPackage": "NOT_RUN",
+  "actualCurrentRenderedSourceParity": "NOT_RUN; authorized teacher/timetable tab absent",
+  "passiveResponseRead": "NOT_RUN; new allowance unspent, supported command-scope parser unavailable",
+  "releaseState": "BLOCKED"
+}

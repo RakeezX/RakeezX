@@ -1,0 +1,16 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "52da0f25-3635-4831-8a38-3d1d0d09cd23",
+  "priorReadMarker": "passive-observation.json",
+  "priorRunId": "91d0d908-8d14-4069-acf5-2fc6c4175ce3",
+  "priorConsumedReads": 1,
+  "oldMarkerModified": false,
+  "newAuthority": {"maxNewBodyReads": 1, "reserved": 0, "executed": 0, "state": "PREFLIGHT_BLOCKED_NOT_SPENT"},
+  "projectionQualification": "projection-qualified.json: 24 synthetic structural/body/event scenarios PASS",
+  "supportedToolScopePreflight": {"DOMParser": "undefined", "TextDecoder": "function", "Buffer": "function", "missingCapability": "No documented inert HTML structural-parser API in the exercised CUA command scope; local browser DOMParser qualification does not make that parser available in the supported passive-response scope."},
+  "networkCommandsThisRun": 0,
+  "newLiveResponseBodies": 0,
+  "renderedParityAttempt": {"originalNamedTabPresent": false, "availableMadrasatiPath": "/Dashboards/Schools", "availableTabContentRead": false, "availableTabClaimed": false, "sourceNavigationPerformed": false, "schoolSelectionPerformed": false, "result": "Exact authorized teacher/timetable tab unavailable; gateway scope not substituted."},
+  "toolDenial": null,
+  "cleanup": {"browserLease": "RELEASED browser", "userTabsChanged": false, "serviceOperations": 0, "extensionOperations": 0, "realImports": 0}
+}
