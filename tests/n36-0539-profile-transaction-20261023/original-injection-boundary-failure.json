@@ -1,0 +1,610 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "ea53b34e-ed33-4ee6-b0e9-659a62fc8a2e",
+  "baseSha": "5f4b1b87f0743251e5650da7490f5b1a0704db36",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "third-handoff-sync-profile",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "b225ae939f3ae517dfd72c55abe26adf00fec9d8c34ce25a249bf251d645d054",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 114
+          },
+          "sourceGuard": {
+            "count": 76,
+            "ms": 5418
+          },
+          "descriptor": {
+            "count": 156,
+            "ms": 1875
+          },
+          "appGuard": {
+            "count": 78,
+            "ms": 1092
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 745
+          }
+        },
+        "phase": "complete",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 302,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 246,
+        "existing": 56,
+        "fields": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "saved",
+            "count": 8
+          }
+        ],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "partial",
+        "coverageReasons": [
+          "missing-pages"
+        ],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "outcomes": [
+        {
+          "status": "existing",
+          "added": 0,
+          "existing": 28,
+          "remaining": 0,
+          "total": 28,
+          "setup": {
+            "saved": 11,
+            "existing": 3,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "saved",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 2
+              },
+              {
+                "field": "classes",
+                "reason": "saved",
+                "count": 8
+              }
+            ]
+          }
+        },
+        {
+          "status": "existing",
+          "added": 0,
+          "existing": 28,
+          "remaining": 0,
+          "total": 28,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 29,
+          "existing": 0,
+          "remaining": 0,
+          "total": 29,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 31,
+          "existing": 0,
+          "remaining": 0,
+          "total": 31,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 31,
+          "existing": 0,
+          "remaining": 0,
+          "total": 31,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 31,
+          "existing": 0,
+          "remaining": 0,
+          "total": 31,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 31,
+          "existing": 0,
+          "remaining": 0,
+          "total": 31,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 31,
+          "existing": 0,
+          "remaining": 0,
+          "total": 31,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 31,
+          "existing": 0,
+          "remaining": 0,
+          "total": 31,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "status": "saved",
+          "added": 31,
+          "existing": 0,
+          "remaining": 0,
+          "total": 31,
+          "setup": {
+            "saved": 0,
+            "existing": 14,
+            "unresolved": 0,
+            "missing": [
+              "timetable"
+            ],
+            "details": [
+              {
+                "field": "timetable",
+                "reason": "missing",
+                "count": 1
+              },
+              {
+                "field": "teacher",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "school",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "principal",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "department",
+                "reason": "current",
+                "count": 1
+              },
+              {
+                "field": "classes",
+                "reason": "current",
+                "count": 10
+              }
+            ]
+          }
+        }
+      ],
+      "durable": {
+        "students": 302,
+        "receipts": [
+          28,
+          28,
+          29,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31
+        ],
+        "pending": []
+      },
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/runtime.mjs:37:8\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:502:9)\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/runtime.mjs:25:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

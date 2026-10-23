@@ -155,6 +155,8 @@ function extensionOwnerBinding() {
 // AI: explicit extension Start grants one document/session-bound names batch.
 let automaticBatch=null, automaticWriting=false,receiverReason='NO_GRANT',directDraining=false,receiverDocumentLive=true;
 const directRequests=new Map();
+let profileRecovery=null,profileRecoveryTimer=null; // AI: only a still-live, claimed current-document request; never durable replay authority.
+function clearProfileRecovery(){clearTimeout(profileRecoveryTimer);profileRecoveryTimer=null;profileRecovery=null;}
 export async function prepareExtensionBatch({resume=false}={}){
  const year=store.activeYear(),term=store.activeTerm(),owner=store.getActiveWorkspace()?.authUserId;
  if(!year||!term||term.yearId!==year.id||[year,term].some(row=>row.ownerId!=null&&row.ownerId!==owner))throw Error('APP_ACADEMIC_SELECTION_REQUIRED');
@@ -310,15 +312,37 @@ async function resumeSavedExtensionBatch(){
   'trace-unverified':'تعذّر التحقق من الأثر المحلي؛ لا يمكن عرض أعداد موثوقة منه. نتيجة الدفعة السابقة ما زالت غير محسومة.'
  };
  extensionMessage=(messages[readState]??
-  `إيصالات محلية مؤكدة: ${progress.confirmedReceipts} (${progress.confirmedRows} صفًا). من الصفوف المعلقة يوجد حاليًا ${progress.pendingSavedRows} من ${progress.pendingRows} في الكشف المحلي.`+(progress.relation==='original-term'?' اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.':''))+
-  (readState==='verified-trace'&&progress.checkpoint==='receipts'&&progress.pendingRows===0?' الإيصالات المعروضة مؤكدة محليًا؛ المزامنة تُتابع من التطبيق. لا تحسم هذه القراءة نتيجة تشغيل تاريخي آخر.':' لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة.')+' إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.';
+  `إيصالات محلية مؤكدة: ${progress.confirmedReceipts} (${progress.confirmedRows} صفًا). من الصفوف المعلقة أمكن إثبات ${progress.pendingSavedRows} من ${progress.pendingRows} في الكشف المحلي؛ عدم احتساب صف هنا لا يثبت غيابه.`+(progress.relation==='original-term'?' اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.':''))+
+  (readState==='verified-trace'&&progress.checkpoint==='receipts'&&progress.pendingRows===0?' الإيصالات المعروضة مؤكدة محليًا؛ المزامنة تُتابع من التطبيق. لا تحسم هذه القراءة نتيجة تشغيل تاريخي آخر.':' لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة.')+' إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.'+(readState==='verified-trace'&&progress.pendingRows&&!profileRecovery?' لا يتوفر ربط النقل الأصلي المؤهل للاستكمال في هذه الصفحة؛ لا تُعد تحميل الإضافة ولا تبدأ جمعًا جديدًا.':'');
  repaint();
 }
-window.addEventListener('pagehide',()=>{receiverDocumentLive=false;if(automaticBatch)automaticBatch.retired=true;});
+// AI: this grant is deliberately not reconstructed from legacy durable pending rows.
+// .39 did not persist request nonce/document/source authority; those rows alone
+// cannot authorize replay or replace the original extension's receipt.
+async function continueKnownProfileBatch(){
+ const recovery=profileRecovery;if(!recovery||automaticWriting||extensionBusy)return;
+ clearProfileRecovery();
+ try{
+  automaticGuard(recovery.batch);
+  if(automaticBatch!==recovery.batch||Date.now()>=recovery.result.envelope.expiresAt)throw Error('NAMES_RECEIPT_UNKNOWN');
+  const current=await readExtensionState(['device','years','terms','sections','students','enrollments','profile']);
+  automaticPersistedGuard(recovery.batch,current);
+  const profile=current.profile.find(p=>p.id==='profile');
+  if(profile?.ownerId&&profile.ownerId!==store.getActiveWorkspace().authUserId||profile?.deleted)throw Error('SETUP_PROFILE_OWNER');
+  for(const [key,value] of Object.entries(recovery.profile))if((profile?.[key]??'')!==value||(store.state.profile[key]??'')!==value)throw Error('SETUP_PROFILE_CHANGED');
+  // Freeze current profile targets through each setup transaction as well.
+  recovery.batch.recoveryProfile=recovery.profile;recovery.batch.recoveryTrace=recovery;
+  const outcome=await saveAutomaticNames(recovery.result,recovery);
+  await reportHandoffOutcome(recovery.request,outcome);
+  extensionMessage='تم استكمال الدفعة المحددة محليًا وإرسال نتيجتها للإضافة؛ لم يُجمع المصدر مجددًا. تحقق من نتيجة الإضافة؛ المزامنة تُتابع من التطبيق.';
+ }catch(error){extensionMessage='لم يتأكد استكمال الدفعة المحددة ('+safeBatchFailure(error).code+'). بقي الأثر المحلي محفوظًا؛ لا تبدأ جمعًا جديدًا.';}
+ finally{if(recovery.batch){delete recovery.batch.recoveryProfile;delete recovery.batch.recoveryTrace;delete recovery.batch.recoveryOutcome;delete recovery.batch.recoverySetup;}repaint();}
+}
+window.addEventListener('pagehide',()=>{receiverDocumentLive=false;clearProfileRecovery();if(automaticBatch)automaticBatch.retired=true;});
 function automaticGuard(batch){
  const deny=reason=>{const e=Error('BATCH_OWNER_OR_SESSION_CHANGED');e.receiverReason=reason;throw e;};
  if(automaticBatch!==batch||!receiverDocumentLive||batch.document!==document||batch.retired)deny('NO_GRANT');
- if(Date.now()>=batch.expires)deny('EXPIRED');
+ if(Date.now()>=batch.expires||batch.recoveryTrace&&Date.now()>=batch.recoveryTrace.result.envelope.expiresAt)deny('EXPIRED');
  try{if(extensionOwnerBinding()!==batch.binding)deny('OWNER_OR_LEASE');}catch{deny('OWNER_OR_LEASE');}
  try{batch.assertSession();}catch{deny('AUTH_SESSION');}
  if(store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||JSON.stringify(store.getYear(batch.year))!==batch.yearState||JSON.stringify(store.getTerm(batch.term))!==batch.termState)deny('ACADEMIC_CONTEXT');
@@ -335,6 +359,11 @@ function automaticPersistedGuard(batch,current){
  const device=current.device?.find(d=>d.id==='device');
  persistedSelection(batch,current);
  const saved=device?.n36NamesBatch;
+ if(batch.recoveryProfile&&current.profile){const raw=current.profile.find(p=>p.id==='profile');if(raw?.ownerId&&raw.ownerId!==store.getActiveWorkspace().authUserId||raw?.deleted||Object.entries(batch.recoveryProfile).some(([k,v])=>(raw?.[k]??'')!==v))throw Error('SETUP_PROFILE_CHANGED');}
+ if(batch.recoverySetup&&current.subjects&&JSON.stringify({subjects:current.subjects,teachings:current.teachings,slots:current.slots})!==batch.recoverySetup)throw Error('NAMES_RECEIPT_UNKNOWN');
+ const trace=batch.recoveryTrace;
+ if(trace){if(saved?.pending&&Object.keys(saved.pending).length!==1)throw Error('NAMES_RECEIPT_UNKNOWN');const receipts={...saved?.receipts},targets={...saved?.receiptTargets};delete receipts[trace.digest];delete targets[trace.digest];if(JSON.stringify(receipts)!==trace.receipts||JSON.stringify(targets)!==trace.targets)throw Error('NAMES_RECEIPT_UNKNOWN');}
+ if(trace&&(saved?.batchId!==trace.batchId||JSON.stringify(saved.pending?.[trace.digest])!==trace.pending&&!(batch.recoveryOutcome&&JSON.stringify(saved.receipts?.[trace.digest])===JSON.stringify(batch.recoveryOutcome))))throw Error('NAMES_RECEIPT_UNKNOWN');
  if(saved&&(saved.ownerId!==store.getActiveWorkspace().authUserId||saved.pending&&saved.batchId!==batch.id))throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
  if(current.years&&JSON.stringify(current.years.find(y=>y.id===batch.year))!==batch.yearState||
  current.terms&&JSON.stringify(current.terms.find(t=>t.id===batch.term))!==batch.termState)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');
@@ -347,7 +376,7 @@ function automaticPersistedGuard(batch,current){
 async function batchCheckpoint(batch,change){
  automaticGuard(batch);automaticPersistedGuard(batch,await readExtensionState());
  const db=await import('../lib/db.js');
- const committed=await db.applyBatch({device:{},sections:{},years:{},terms:{},students:{},enrollments:{}},{prepare(current){
+ const committed=await db.applyBatch({device:{},sections:{},years:{},terms:{},students:{},enrollments:{},...(batch.recoveryTrace?{profile:{},subjects:{},teachings:{},slots:{}}:{})},{prepare(current){
   automaticPersistedGuard(batch,current);
   const device=current.device.find(d=>d.id==='device');if(!device)throw Error('BATCH_DEVICE');
   const prior=device.n36NamesBatch;
@@ -406,13 +435,21 @@ async function saveAvailableSetup(batch,categories){
  const result={saved:0,existing:0,unresolved:0,missing:['teacher','school','principal','department','classes','timetable'].filter(k=>!setup.some(c=>c.category===k)),details:[]};
  for(const field of result.missing)result.details.push({field,reason:'missing',count:1});
  const verifyCurrent=current=>current?automaticPersistedGuard(batch,current):automaticGuard(batch);
+ // AI: qualify scalar setup together, enqueue only actual changed fields, and
+ // classify no-op fields from the same durable transaction snapshot.
+ const scalars=[];
  for(const c of setup.filter(c=>['teacher','school','principal'].includes(c.category))){
   automaticGuard(batch);
   const fields={teacher:['teacherName'],school:['schoolName'],principal:['principalName','reportPrincipalName']}[c.category],value=c.category==='school'?(await sourceSchoolIdentity(c.rows[0].name)).displayName:c.rows[0].name;
-  const changed=fields.some(k=>store.state.profile[k]!==value),changes=Object.fromEntries(fields.map(k=>[k,value]));
-  await store.importSetupProfile(changes,{verifyCurrent,sourceWins:true});
-  if(changed){result.saved++;result.details.push({field:c.category,reason:'saved',count:1});}
-  else{result.existing++;result.details.push({field:c.category,reason:'current',count:1});}
+  scalars.push({category:c.category,fields,value});
+ }
+ if(scalars.length){
+  const changes=Object.fromEntries(scalars.flatMap(c=>c.fields.map(k=>[k,c.value])));let prior;
+  const profile=await store.importSetupProfile(changes,{verifyCurrent(current){verifyCurrent(current);if(current?.profile)prior=current.profile.find(p=>p.id==='profile');},sourceWins:true});
+  for(const c of scalars){
+   const changed=c.fields.some(k=>(prior?.[k]??'')!==profile[k]);
+   result[changed?'saved':'existing']++;result.details.push({field:c.category,reason:changed?'saved':'current',count:1});
+  }
  }
  // Explicit labelled source always wins. A precise school-title suffix only
  // fills an empty department, recognizes current, and reports deliberate conflicts.
@@ -475,7 +512,7 @@ async function saveAvailableSetup(batch,categories){
  const grouped=new Map();for(const d of result.details){const key=d.field+'|'+d.reason;grouped.set(key,{...d,count:(grouped.get(key)?.count??0)+d.count});}result.details=[...grouped.values()];
  return result;
 }
-async function saveAutomaticNames(result){
+async function saveAutomaticNames(result,recovery=null){
  const batch=automaticBatch;
  if(!batch||result.envelope.batchId!==batch.id)throw Error('BATCH_NOT_INITIATED');
  if(result.envelope.version===3&&result.envelope.setup.length){
@@ -489,6 +526,7 @@ async function saveAutomaticNames(result){
   // A counts-only receipt can outlive a deleted destination. Requalify the
   // actual current identities/rosters on retry instead of acknowledging it.
   await batchCheckpoint(batch,p=>{
+   if(recovery){if(p.batchId!==recovery.batchId||digest!==recovery.digest||JSON.stringify(p.pending?.[digest])!==recovery.pending||p.receipts?.[digest])throw Error('NAMES_RECEIPT_UNKNOWN');}
    return {...p,batchId:batch.id,pending:{...p.pending,[digest]:{rows,complete:envelope.complete,...(envelope.version===3?{setup:envelope.setup}:{} )}},yearId:batch.year,termId:batch.term};
   });
   const {previewStudentRows}=await import('../lib/student-import.js');
@@ -528,6 +566,7 @@ async function saveAutomaticNames(result){
   }
   const setup=envelope.version===3?await saveAvailableSetup(batch,envelope.setup):null;
   const outcome={status:added?'saved':'existing',added,existing,remaining:0,total:rows.length,...(setup?{setup}:{})};
+  if(recovery){const setupState=await readExtensionState(['subjects','teachings','slots']);batch.recoverySetup=JSON.stringify(setupState);batch.recoveryOutcome=outcome;}
   await batchCheckpoint(batch,p=>{
    const pending={...p.pending};delete pending[digest];
    const targets=Object.fromEntries([...(batch.sectionTargets??[])].map(([name,section])=>[name,section.id]));
@@ -545,7 +584,7 @@ async function saveAutomaticNames(result){
  }finally{automaticWriting=false;batch.route=null;void drainDirectRequests();}
 }
 function clearExtensionPreview() { extensionPreview = extensionOwner = null; clearTimeout(extensionTimer); }
-store.onWorkspaceDeactivation(()=>{clearImportClock();clearExtensionPreview();extensionMessage='';automaticBatch=null;directRequests.clear();});
+store.onWorkspaceDeactivation(()=>{clearImportClock();clearExtensionPreview();extensionMessage='';automaticBatch=null;clearProfileRecovery();directRequests.clear();});
 cloud.subscribe(() => {
   extensionMessage='';
   const hadClock=!!importClock;
@@ -566,6 +605,7 @@ function directExtensionEntry() {
     </ol></details>
     ${extensionPreview ? html`<p role="status">${extensionPreview.envelope.source === 'noor' ? 'نور — عمود ظاهر مختار؛ صفحات وأعمدة أخرى غير مجمّعة' : 'مدرستي — الأسماء التي راجعتها في الإضافة فقط'} · ${extensionPreview.envelope.rows.length} اسمًا. اختر الفصل والمادة أدناه.</p><button class="btn btn--primary" data-act="n36-extension-review" ${!hub.existing || hub.kind === 'new' ? 'disabled' : ''}>مراجعة أسماء الإضافة</button><button class="btn btn--quiet" data-act="n36-extension-cancel">إلغاء ومسح النقل</button>` : ''}
     <button class="btn btn--quiet" data-act="n36-batch-resume">قراءة التقدم المحلي لهذا الحساب</button>
+    ${profileRecovery ? html`<button class="btn btn--quiet" data-act="n36-profile-continue">استكمال ${profileRecovery.result.envelope.rows.length} صفًا للدفعة ${profileRecovery.digest.slice(0,12)} بعد التحقق دون جمع جديد</button>` : ''}
     <p role="status" data-n36-handoff-status>${extensionBusy ? 'جار استلام المعاينة المؤقتة…' : extensionMessage}</p>
   </section>`;
 }
@@ -579,8 +619,21 @@ async function receiveExtension(directRequest=null) {
     const result=await claimHandoff(request);
     if(!directRequest&&location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
     if(result.envelope.version>=2){
+      clearProfileRecovery();
+      const profileBefore=structuredClone(store.state.profile);
       try{const outcome=await saveAutomaticNames(result);await reportHandoffOutcome(request,outcome);}
-      catch(error){const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+safeBatchFailure(error).code+').'+reason+(store.state.device?.n36NamesBatch?.pending?' التقدم المسجل محفوظ في هذا الحساب؛ استخدم قراءة التقدم المحلي دون إعادة جمع أو كتابة.':' لم يتأكد تسجيل أثر محلي؛ نتيجة الإضافة غير محسومة. لا تعد الجمع أو الكتابة لهذه الدفعة.');await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length,failure:safeBatchFailure(error),progress:await readExtensionProgress()});if(directRequest)toast(extensionMessage,'danger');}
+      catch(error){
+       if(directRequest&&error.code==='SETUP_PROFILE_CHANGED'&&error.message==='SETUP_PROFILE_SAVE'){try{
+        const rows=result.envelope.rows,setup=result.envelope.setup;
+        const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({rows,setup}))))].map(n=>n.toString(16).padStart(2,'0')).join('');
+        const current=await readExtensionState(['device','years','terms','profile']);
+        const pending=current.device.find(d=>d.id==='device')?.n36NamesBatch;
+        const raw=current.profile.find(p=>p.id==='profile'),keys=['teacherName','schoolName','principalName','reportPrincipalName','educationDepartment'];
+        if(pending?.batchId===automaticBatch?.id&&Object.keys(pending.pending??{}).length===1&&JSON.stringify(pending.pending?.[digest])===JSON.stringify({rows,complete:result.envelope.complete,setup})&&!pending.receipts?.[digest]&&keys.every(k=>(raw?.[k]??'')===(profileBefore[k]??'')))profileRecovery={batch:automaticBatch,batchId:automaticBatch.id,digest,pending:JSON.stringify(pending.pending[digest]),receipts:JSON.stringify(pending.receipts??{}),targets:JSON.stringify(pending.receiptTargets??{}),profile:Object.fromEntries(keys.map(k=>[k,raw?.[k]??''])),request:{...directRequest},result};
+        if(profileRecovery){clearTimeout(profileRecoveryTimer);profileRecoveryTimer=setTimeout(()=>{clearProfileRecovery();repaint();},Math.max(0,result.envelope.expiresAt-Date.now()));}
+       }catch{clearProfileRecovery();}
+       }
+       const reason=error.message==='CLASS_MAPPING_REQUIRED'?' تسمية الصف غير محددة أو ينقصها تحديد المرحلة الدراسية؛ اختر الفصل الصحيح أدناه.':/CLASS_.*AMBIGUOUS/.test(error.message)?' توجد مطابقة ملتبسة أو فصل مؤرشف؛ راجع الفصل الصحيح دون إنشاء نسخة.':'';extensionMessage='لم يتأكد حفظ هذه الدفعة ('+safeBatchFailure(error).code+').'+reason+(store.state.device?.n36NamesBatch?.pending?' التقدم المسجل محفوظ في هذا الحساب؛ استخدم قراءة التقدم المحلي دون إعادة جمع أو كتابة.':' لم يتأكد تسجيل أثر محلي؛ نتيجة الإضافة غير محسومة. لا تعد الجمع أو الكتابة لهذه الدفعة.');await reportHandoffOutcome(request,{status:'unknown',added:0,existing:0,remaining:result.envelope.rows.length,total:result.envelope.rows.length,failure:safeBatchFailure(error),progress:await readExtensionProgress()});if(directRequest)toast(extensionMessage,'danger');}
       return;
     }
     extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
@@ -1244,6 +1297,7 @@ export const koshoofCenter = {
   },
   actions: {
     ...classImport.actions,
+    async 'n36-profile-continue'(){await continueKnownProfileBatch();},
     async 'n36-batch-resume'(){await resumeSavedExtensionBatch();
     },
     'roster-page'(el){transfer.page=Number(el.dataset.page);repaint();},

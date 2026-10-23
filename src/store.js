@@ -1379,6 +1379,7 @@ export async function importSetupProfile(changes, { verifyCurrent, sourceWins = 
   const guard=current=>{
     if(activeWorkspace!==workspace||cloud.session!==session)throw Error('SETUP_PROFILE_OWNER');
     assertClassImportAccess();
+    if(state.profile?.ownerId&&state.profile.ownerId!==workspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
     verifyCurrent?.(current);
   };
   if(state.profile?.ownerId&&state.profile.ownerId!==workspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
@@ -1391,20 +1392,24 @@ export async function importSetupProfile(changes, { verifyCurrent, sourceWins = 
   }
   const previous=structuredClone(state.profile);
   if(Object.entries(changes).some(([k,v])=>typeof v!=='string'||!v.trim()||v.length>80||!sourceWins&&state.profile[k]&&state.profile[k]!==v))throw Error('SETUP_PROFILE_CONFLICT');
-  let phase='transaction';
+  let phase='transaction',persistedProfile;
   try {
-    // SINGLETON: compare the same hydrated shape as init/refresh, then prepare
-    // the profile and its owner-bound outbox atomically. No optimistic render
-    // may replace the snapshot while verifyCurrent is still checking it.
+    // SINGLETON: qualify requested targets against the captured values, then
+    // merge the latest durable profile and its owner-bound outbox atomically.
+    // Metadata/default hydration cannot stand in for a user edit.
     const committed=await db.applyBatch({profile:{},outbox:{},device:{},years:{},terms:{}},{prepare(current){
       guard(current);
       const raw=current.profile.find(p=>p.id==='profile');
       const hydrated={...DEFAULT_PROFILE,...raw};
       if(raw?.ownerId&&raw.ownerId!==workspace.authUserId)throw Error('SETUP_PROFILE_OWNER');
-      const keys=[...new Set([...Object.keys(hydrated),...Object.keys(previous)])];
-      if(keys.some(k=>JSON.stringify(hydrated[k])!==JSON.stringify(previous[k])))throw Error('SETUP_PROFILE_CHANGED');
-      const next=syncV2Record('profile',{...hydrated,...changes,updatedAt:now()},{pendingCreate:!raw});
+      // AI: Sync ACK revisions/default hydration are not edits to source targets.
+      // Compare only requested fields, preserve all other current durable values,
+      // and never let sourceWins overwrite a newer conflicting target edit.
+      if(raw?.deleted||raw&&raw.id!=='profile'||raw?.canonicalId&&raw.canonicalId!=='profile')throw Error('SETUP_PROFILE_CHANGED');
+      if(Object.keys(changes).some(k=>[hydrated[k],state.profile[k]].some(v=>(v??'')!==(previous[k]??'')&&v!==changes[k])))throw Error('SETUP_PROFILE_CHANGED');
       const changed=Object.keys(changes).filter(k=>hydrated[k]!==changes[k]);
+      const next=changed.length?syncV2Record('profile',{...hydrated,...changes,updatedAt:now()},{pendingCreate:!raw}):hydrated;
+      persistedProfile=next;
       const entry=changed.length?outboxEntry('profile',next,raw?changed:null,'put',raw??null):null;
       const device=current.device.find(d=>d.id==='device');
       const legacy=sourceWins&&device&&['teacherName','schoolName','principalName'].some(k=>Object.hasOwn(changes,k)&&Object.hasOwn(device,k));
@@ -1417,7 +1422,7 @@ export async function importSetupProfile(changes, { verifyCurrent, sourceWins = 
     const profile=committed.profile?.put[0];
     if(committed.device?.put[0])state.device={...state.device,...committed.device.put[0]};
     if(sourceWins)for(const k of ['teacherName','schoolName','principalName'])if(Object.hasOwn(changes,k))delete state.device[k];
-    if(profile)state.profile=profile;
+    state.profile=persistedProfile;
     if(profile||committed.device?.put[0]){broadcast([...(profile?[{store:'profile',id:'profile'}]:[]),...(committed.device?.put[0]?[{store:'device',id:'device'}]:[])]);notify();}
     return state.profile;
   } catch(cause) {

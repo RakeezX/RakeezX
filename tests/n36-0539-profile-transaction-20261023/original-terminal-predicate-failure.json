@@ -1,0 +1,124 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "ea53b34e-ed33-4ee6-b0e9-659a62fc8a2e",
+  "baseSha": "5f4b1b87f0743251e5650da7490f5b1a0704db36",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "third-handoff-sync-profile",
+      "priorView": {
+        "receiptAggregateVersion": 1,
+        "id": "8d76ff366931509b8d8817e88fdaf81738b6b4963a0d5fc443e29d495daa08c7",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 130
+          },
+          "sourceGuard": {
+            "count": 36,
+            "ms": 2650
+          },
+          "descriptor": {
+            "count": 76,
+            "ms": 949
+          },
+          "appGuard": {
+            "count": 38,
+            "ms": 572
+          },
+          "fetchPending": {
+            "count": 6,
+            "ms": 811
+          }
+        },
+        "phase": "prepare",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "receipts",
+        "receiverRelation": "same",
+        "confirmedRows": 56,
+        "confirmedReceipts": 2,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "code": null,
+        "added": 0,
+        "existing": 56,
+        "fields": [
+          {
+            "field": "timetable",
+            "reason": "missing",
+            "count": 1
+          },
+          {
+            "field": "teacher",
+            "reason": "current",
+            "count": 1
+          },
+          {
+            "field": "school",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "principal",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "department",
+            "reason": "saved",
+            "count": 1
+          },
+          {
+            "field": "classes",
+            "reason": "saved",
+            "count": 8
+          }
+        ],
+        "staged": 302,
+        "observed": 302,
+        "coverage": "partial",
+        "coverageReasons": [
+          "missing-pages"
+        ],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 1,
+        "excluded": 0,
+        "classes": 10,
+        "setupPartial": true,
+        "setupUnavailable": [
+          "timetable"
+        ],
+        "setupKind": "timetable",
+        "setupRejectReason": "response-school-absent",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 3,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "drift": {
+        "beforeRevision": 1,
+        "afterRevision": 2,
+        "sameTeacher": true,
+        "sameSchool": true,
+        "memoryRevision": 1
+      },
+      "status": "FAIL",
+      "error": "Error: Worker fixture deadline: {\"receiptAggregateVersion\":1,\"id\":\"8d76ff366931509b8d8817e88fdaf81738b6b4963a0d5fc443e29d495daa08c7\",\"timings\":{\"home\":{\"count\":2,\"ms\":130},\"sourceGuard\":{\"count\":42,\"ms\":3064},\"descriptor\":{\"count\":88,\"ms\":1077},\"appGuard\":{\"count\":44,\"ms\":666},\"fetchPending\":{\"count\":6,\"ms\":811}},\"phase\":\"receipt\",\"startPhase\":\"accepted\",\"receiverCheckpoint\":\"rows-before-receipt\",\"receiverRelation\":\"same\",\"confirmedRows\":56,\"confirmedReceipts\":2,\"pendingRows\":29,\"pendingSavedRows\":29,\"failurePhase\":\"profile\",\"failureStep\":\"transaction\",\"failureJobPhase\":\"receipt\",\"code\":\"SETUP_PROFILE_CHANGED\",\"added\":0,\"existing\":56,\"fields\":[{\"field\":\"timetable\",\"reason\":\"missing\",\"count\":1},{\"field\":\"teacher\",\"reason\":\"current\",\"count\":1},{\"field\":\"school\",\"reason\":\"saved\",\"count\":1},{\"field\":\"principal\",\"reason\":\"saved\",\"count\":1},{\"field\":\"department\",\"reason\":\"saved\",\"count\":1},{\"field\":\"classes\",\"reason\":\"saved\",\"count\":8}],\"staged\":302,\"observed\":302,\"coverage\":\"partial\",\"coverageReasons\":[\"missing-pages\"],\"terminal\":\"unproven\",\"hasNext\":false,\"processedPages\":1,\"excluded\":0,\"classes\":10,\"setupPartial\":true,\"setupUnavailable\":[\"timetable\"],\"setupKind\":\"timetable\",\"setupRejectReason\":\"response-school-absent\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false,\"entryKind\":\"teacher-dashboard\",\"roleProofKind\":\"semantic-dashboard\",\"proofNavMarkers\":2,\"proofActionMarkers\":3,\"proofReadLinks\":2,\"schoolBindingState\":\"bound\",\"schoolBadgePresent\":false,\"schoolIdPresent\":true,\"readProofPresent\":true}\n    at Object.wait (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:54:260)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/runtime.mjs:36:1\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/runtime.mjs:25:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

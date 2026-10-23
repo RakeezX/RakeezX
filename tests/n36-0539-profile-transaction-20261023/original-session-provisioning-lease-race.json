@@ -1,0 +1,17 @@
+{
+  "taskId": "continuous-n36-0539-profile-transaction-continuation-20261023",
+  "runId": "ea53b34e-ed33-4ee6-b0e9-659a62fc8a2e",
+  "baseSha": "5f4b1b87f0743251e5650da7490f5b1a0704db36",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "third-handoff-sync-profile",
+      "status": "FAIL",
+      "error": "page.evaluate: Error: يلزم التحقق من الحساب لاستئناف التعديل. يمكنك العرض والتصدير وتنزيل نسخة احتياطية.\n    at leaseWriteError (http://127.0.0.1:49973/src/lib/offline-lease.js:32:52)\n    at Object.assertWritable (http://127.0.0.1:49973/src/lib/offline-lease.js:115:36)\n    at assertLeaseWritable (http://127.0.0.1:49973/src/store.js:192:25)\n    at patch (http://127.0.0.1:49973/src/store.js:1294:31)\n    at Module.patchProfile (http://127.0.0.1:49973/src/store.js:1373:56)\n    at eval (eval at evaluate (:311:30), <anonymous>:1:60)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-0539-profile-transaction-continuation-20261023\\tests\\n36-0539-profile-transaction-20261023\\runtime.mjs:28:11\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-0539-profile-transaction-continuation-20261023/tests/n36-0539-profile-transaction-20261023/runtime.mjs:25:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}
