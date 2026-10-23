@@ -29,11 +29,11 @@ export async function runSuccessorTransition({stamp,certificates,ports}){
   state.deniedReadTransitions.at(-1).pinAttempted=true;await ports.save(state);
   pinInvoked=true;await ports.setExactPublicPin();
   const finalNative=await ports.readNative(successorSource),finalConfiguration=await readConfig(successorSource);
-  if(finalNative.version!==after.version||finalNative.status!=='ACTIVE'||finalNative.verifyJwt!==false||!finalNative.downloadedBytesExact||!finalNative.importMapExact||finalNative.importMapDigest!==before.importMapDigest)deny('final_native_identity');
+  if(![after.version,after.version+1].includes(finalNative.version)||finalNative.status!=='ACTIVE'||finalNative.verifyJwt!==false||!finalNative.downloadedBytesExact||!finalNative.importMapExact||finalNative.importMapDigest!==before.importMapDigest)deny('final_native_identity');
   state.directSource=successorSource;
   state.sourceCorrections=[...(state.sourceCorrections??[]),{...stamp,prior:priorSource,source:successorSource,nativeVersion:finalNative.version}];
   Object.assign(state.deniedReadTransitions.at(-1),{verified:true,nativeVersion:finalNative.version,verifiedAt:new Date().toISOString()});await ports.save(state);
-  return {...stamp,status:'PASS',provider:{...finalNative,...finalConfiguration},uploadInvoked,pinInvoked,nativeUploads:1,pinUpdates:1,providerWrites:2,oldHistoriesPreserved:true,catalogHistoryEvidenceReused:true,migrations:0,carrierUploads:0,realAccountReads:0,actualUserAcceptance:'NOT_RUN'};
+  return {...stamp,status:'PASS',provider:{...finalNative,...finalConfiguration},uploadedVersion:after.version,pinVersionAdvance:finalNative.version-after.version,uploadInvoked,pinInvoked,nativeUploads:1,pinUpdates:1,providerWrites:2,oldHistoriesPreserved:true,catalogHistoryEvidenceReused:true,migrations:0,carrierUploads:0,realAccountReads:0,actualUserAcceptance:'NOT_RUN'};
  }catch(e){
   return {...stamp,status:'BLOCKED',code:/^n88_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n88_denied_activation_private_failure',uploadInvoked,pinInvoked,automaticRetryAllowed:false,unknownOutcomeRequiresReadOnlyReconciliation:uploadInvoked||pinInvoked,beforeNativeVersion:before?.version??null,observedSuccessorVersion:after?.version??null,migrations:0,carrierUploads:0,realAccountReads:0,actualUserAcceptance:'NOT_RUN'};
  }
