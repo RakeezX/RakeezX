@@ -4,6 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import {runCustodyPreflight} from './activation/read-service-20261023/custody-preflight.mjs';
+import {runConfigProvenance} from './activation/read-service-20261023/config-provenance.mjs';
 import {runLatencyStaticPhase} from '../../tests/n88-student-read-phase-latency-20261021/static-gate.mjs';
 import {LATENCY,runLatencyNativePhase,digest as latencyDigest} from '../../tests/n88-student-read-phase-latency-20261021/native-gate.mjs';
 import {MOBILE503,runMobile503Phase,digest as mobile503Digest} from '../../tests/n88-mobile-class-source-503-20261021/native-gate.mjs';
@@ -55,6 +56,7 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(action==='--typed-read-config-provenance')return runConfigProvenance({candidate:value,load,official});
  if(action==='--typed-read-preflight')return runCustodyPreflight({candidate:value,load,official});
  if(action==='--typed-read-reconcile-preflight')return runCustodyPreflight({candidate:value,load,official,reconcile:true});
  if(['--mobile503-preflight','--mobile503-upload','--mobile503-pin','--mobile503-complete'].includes(action)){

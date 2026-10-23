@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';import path from 'node:path';import {fil
 const task='continuous-n88-typed-read-service-activation-20261023',session='01a14fc3-b292-7390-9952-8549a286c80f',project='xlrubcwjqktzzunrvuns',original='C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018',runtime='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/';
 const deny=code=>{throw Error('n88_typed_'+code);};
 const json=async p=>JSON.parse((await readFile(p,'utf8')).replace(/^\uFEFF/,''));
-export async function runCustodyPreflight({candidate,load,official,reconcile=false}){
+export async function guardCustodyContext(candidate){
  const root=fileURLToPath(new URL('../../../../',import.meta.url)),evidence=path.join(root,'tests/n88-read-service-20261023'),run=process.env.N88_TYPED_READ_RUN_ID;
  if(path.resolve(process.cwd())!==path.resolve(original)||process.env.N88_TYPED_READ_SESSION_ID!==session)deny('original_context');
  const card=await json(runtime+'queue/'+task+'.json'),workflow=await json(runtime+'workflow-v5.json'),a=card.preparationAuthority;
@@ -11,10 +11,17 @@ export async function runCustodyPreflight({candidate,load,official,reconcile=fal
  if(card.liveAuthorizationRef!=='PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88'||a.originalPrivateCustodianOnly!==session||a.maxChangedNativeFunctionUploads!==1||a.maxPublicSourcePinUpdates!==1||a.maxNewAppendOnlyMigrations!==1||a.realAccountReads!==0||a.realStudentTeacherWrites!==0||a.resetConsumedMarkers!==false||a.appendOnlyAttemptHistory!==true)deny('bounded_authority');
  for(const name of ['integration','live-mutation']){const l=await json(runtime+'leases/'+name+'.json');if(l.taskId!==task||l.owner?.token!==run||l.owner.type!=='worker'||l.resource!==name||l.activationId!==card.activationId)deny('lease_'+name);}
  if(!/^[a-f0-9]{40}$/.test(candidate??'')||execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim()!==candidate)deny('candidate');
+ for(const file of ['drafts/n88-student-portal/official-activation.mjs','drafts/n88-student-portal/activation/read-service-20261023/custody-preflight.mjs','drafts/n88-student-portal/activation/read-service-20261023/config-provenance.mjs']){
+  if((await readFile(path.join(root,file),'utf8')).replaceAll('\r\n','\n')!==execFileSync('git',['show',candidate+':'+file],{cwd:root,encoding:'utf8',maxBuffer:2097152}).replaceAll('\r\n','\n'))deny('custody_gate_source_drift');
+ }
  const stageDir=path.join(root,'drafts/n88-student-portal/activation/read-service-20261023'),manifest=await json(path.join(stageDir,'manifest.json'));
  for(const [file,h]of Object.entries(manifest.outputs))if(hash((await readFile(path.join(stageDir,file),'utf8')).replaceAll('\r\n','\n'))!==h)deny('qualified_source_drift');
  if((await json(path.join(evidence,'transition.json'))).status!=='PASS')deny('local_transition');
  const stamp={taskId:task,runId:run,candidateSha:candidate,sessionId:session,source:manifest.native,prior:manifest.priorNative,observedAt:new Date().toISOString(),providerWrites:0};
+ return {root,evidence,run,manifest,stamp,card};
+}
+export async function runCustodyPreflight({candidate,load,official,reconcile=false}){
+ const {root,evidence,run,manifest,stamp}=await guardCustodyContext(candidate);
  const receiptFile=path.join(evidence,'custodian-preflight-'+(reconcile?'reconciled-':'')+run+'.json');
  let expectedVersion=63;
  if(reconcile){

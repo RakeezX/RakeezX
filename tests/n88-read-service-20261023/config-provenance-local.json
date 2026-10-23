@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "checks": [
+    "exact historical aggregate required",
+    "changed key unresolved including N44",
+    "unknown and missing key denied",
+    "critical value drift denied",
+    "tampered historical map or aggregate denied",
+    "invalid and duplicate metadata denied",
+    "no certificate issuance or baseline adoption"
+  ],
+  "providerOperations": 0,
+  "syntheticDataOnly": true
+}
