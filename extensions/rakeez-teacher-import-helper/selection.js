@@ -173,6 +173,7 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   };
   const metadata=(scope,selectedCard=false)=>{
     const result=[];const school=labelValues(scope,['اسم المدرسة']);
+    for(const value of labelValues(scope,['إدارة التعليم','الإدارة التعليمية','إدارة التعليم التابعة لها المدرسة']))result.push({category:'department',text:'إدارة التعليم\t'+value});
     if(!school.length){const named=Array.from(scope.querySelectorAll('.school-name')).filter(visible).map(roleText).filter(validValue);if(new Set(named).size===1)school.push(named[0]);}
     if(selectedCard&&!school.length){const titles=Array.from(scope.querySelectorAll('h2,h3,h4,h5')).filter(visible).map(roleText).filter(v=>validValue(v)&&!/^مرحبا بك /.test(v));if(new Set(titles).size===1)school.push(titles[0]);}
     for(const [category,values] of [['school',school],['principal',[...new Set([...labelValues(scope,['قادة المدرسة','مدير المدرسة','قائد المدرسة','اسم المدير']),...dashboardLeaders(scope)])]]])for(const value of values)result.push({category,text:(category==='school'?'اسم المدرسة':'اسم المدير')+'\t'+value});

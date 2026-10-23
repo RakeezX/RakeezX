@@ -1,0 +1,21 @@
+{
+  "taskId": "continuous-n36-complete-import-outcome-20261023",
+  "runId": "1c4adc60-4742-456c-9257-71deac65f21a",
+  "baseline": true,
+  "cases": [
+    {
+      "scenario": "fresh",
+      "status": "FAIL",
+      "error": "Error: Worker fixture deadline: {\"id\":\"0a64d46d0e64cb8427dcc4a4132ef0ae66aa5b7efdf1e47870bdb3b8642cd6d2\",\"timings\":{\"home\":{\"count\":0,\"ms\":0},\"sourceGuard\":{\"count\":0,\"ms\":0},\"descriptor\":{\"count\":0,\"ms\":0},\"appGuard\":{\"count\":1,\"ms\":1},\"fetchPending\":{\"count\":0,\"ms\":0}},\"phase\":\"stopped\",\"startPhase\":\"worker-ack\",\"receiverCheckpoint\":\"none\",\"receiverRelation\":\"unresolved\",\"confirmedRows\":0,\"confirmedReceipts\":0,\"pendingRows\":0,\"pendingSavedRows\":0,\"failurePhase\":\"none\",\"failureStep\":\"none\",\"failureJobPhase\":\"binding\",\"code\":\"APP_CHANGED\",\"added\":0,\"existing\":0,\"fields\":[],\"staged\":0,\"observed\":0,\"coverage\":\"unknown\",\"setupPartial\":false,\"setupUnavailable\":[],\"setupKind\":\"none\",\"setupRejectReason\":\"none\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false,\"schoolBindingState\":\"none\",\"readProofPresent\":false}\n    at Object.wait (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:54:260)\n    at async run (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-complete-import-outcome-20261023/runtime.mjs:32:108)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-complete-import-outcome-20261023/runtime.mjs:33:11\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-complete-import-outcome-20261023/runtime.mjs:17:62"
+    },
+    {
+      "scenario": "populated",
+      "status": "FAIL",
+      "error": "Error: Worker fixture deadline: {\"id\":\"9475bb708eac098874d1b6d6d82dddbf59a382fc8467ec63888bf4033c05c9c6\",\"timings\":{\"home\":{\"count\":0,\"ms\":0},\"sourceGuard\":{\"count\":0,\"ms\":0},\"descriptor\":{\"count\":0,\"ms\":0},\"appGuard\":{\"count\":1,\"ms\":1},\"fetchPending\":{\"count\":0,\"ms\":0}},\"phase\":\"stopped\",\"startPhase\":\"worker-ack\",\"receiverCheckpoint\":\"none\",\"receiverRelation\":\"unresolved\",\"confirmedRows\":0,\"confirmedReceipts\":0,\"pendingRows\":0,\"pendingSavedRows\":0,\"failurePhase\":\"none\",\"failureStep\":\"none\",\"failureJobPhase\":\"binding\",\"code\":\"APP_CHANGED\",\"added\":0,\"existing\":0,\"fields\":[],\"staged\":0,\"observed\":0,\"coverage\":\"unknown\",\"setupPartial\":false,\"setupUnavailable\":[],\"setupKind\":\"none\",\"setupRejectReason\":\"none\",\"receiverCapability\":\"source-profile-quiet-v1\",\"needsReview\":false,\"schoolBindingState\":\"none\",\"readProofPresent\":false}\n    at Object.wait (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-0746-bounded-source-guard-cost-20261021/worker-fixture.mjs:54:260)\n    at async run (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-complete-import-outcome-20261023/runtime.mjs:32:108)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-complete-import-outcome-20261023/runtime.mjs:33:11\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-complete-import-outcome-20261023/tests/n36-complete-import-outcome-20261023/runtime.mjs:17:62"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

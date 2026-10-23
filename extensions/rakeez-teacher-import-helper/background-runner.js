@@ -38,7 +38,16 @@ export function createBackgroundRunner({transport}){
  async function timed(j,key,fn){const started=Date.now();try{return await fn();}finally{const r=(j.timings??={})[key]??={count:0,ms:0};r.count=Math.min(10000,r.count+1);r.ms=Math.min(3600000,r.ms+Math.max(0,Date.now()-started));}}
  const load=async()=>{const v=(await chrome.storage.session.get(JOB))[JOB];return v?decode(v):null;};
  const authority=j=>({jobId:j.id,windowId:j.windowId});
- const view=j=>({id:j.id,timings:timingView(j),phase:j.phase,startPhase:j.startPhase??'worker-ack',receiverCheckpoint:j.receiverProgress?.checkpoint??'none',receiverRelation:j.receiverProgress?.relation??'unresolved',confirmedRows:j.receiverProgress?.confirmedRows??0,confirmedReceipts:j.receiverProgress?.confirmedReceipts??0,pendingRows:j.receiverProgress?.pendingRows??0,pendingSavedRows:j.receiverProgress?.pendingSavedRows??0,failurePhase:j.receiverFailure?.phase??'none',failureStep:j.receiverFailure?.step??j.failureStep??'none',failureJobPhase:j.receiverFailure?'receipt':j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',setupPartial:!!j.setupRejections?.length,setupUnavailable:[...new Set((j.setupRejections??[]).map(r=>r.setupKind))],setupKind:j.setupRejections?.at(-1)?.setupKind??'none',setupRejectReason:j.setupRejections?.at(-1)?.setupRejectReason??'none',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
+ // AI: exact successful nonces checkpoint atomically with the cursor. Replayed wakes cannot add twice.
+ const acknowledged=j=>Object.values(j.acknowledged??{});
+ // AI: .37 retained exact successful added/existing sums but discarded nonce
+ // counts. Read-only compatibility may recover the sum, never invent receipts.
+ const storedView=v=>{
+  if(!v||v.receiptAggregateVersion===1||v.phase!=='complete'||!Number.isSafeInteger(v.added)||v.added<0||!Number.isSafeInteger(v.existing)||v.existing<0)return v;
+  const total=v.added+v.existing;if(!Number.isSafeInteger(total)||total<1||total>30000)return v;
+  return {...v,confirmedRows:total,confirmedReceipts:null,receiverCheckpoint:'receipts',receiverRelation:'same'};
+ };
+ const view=j=>({receiptAggregateVersion:1,id:j.id,timings:timingView(j),phase:j.phase,startPhase:j.startPhase??'worker-ack',receiverCheckpoint:j.receiverProgress?.checkpoint??(acknowledged(j).length?'receipts':'none'),receiverRelation:j.receiverProgress?.relation??(acknowledged(j).length?'same':'unresolved'),confirmedRows:j.receiverProgress?.confirmedRows??acknowledged(j).reduce((n,r)=>n+r.total,0),confirmedReceipts:j.receiverProgress?.confirmedReceipts??acknowledged(j).length,pendingRows:j.receiverProgress?.pendingRows??0,pendingSavedRows:j.receiverProgress?.pendingSavedRows??0,failurePhase:j.receiverFailure?.phase??'none',failureStep:j.receiverFailure?.step??j.failureStep??'none',failureJobPhase:j.receiverFailure?'receipt':j.failureJobPhase??'none',code:j.code??null,added:j.added,existing:j.existing,fields:j.fields??[],staged:j.sourceRows.length,observed:j.studentRowsSeen,coverage:j.coverage?.coverage??'unknown',coverageReasons:j.coverage?.reasons??[],terminal:j.coverage?.terminal??'unproven',hasNext:j.coverage?.hasNextReport??false,processedPages:j.coverage?.processedReportPages??0,excluded:j.excluded,classes:sourceClasses(j.sourceRows).length,setupPartial:!!j.setupRejections?.length,setupUnavailable:[...new Set((j.setupRejections??[]).map(r=>r.setupKind))],setupKind:j.setupRejections?.at(-1)?.setupKind??'none',setupRejectReason:j.setupRejections?.at(-1)?.setupRejectReason??'none',receiverCapability:j.batchId?'source-profile-quiet-v1':'unknown',needsReview:!!j.needsReview,...j.navigationDiagnostic,...j.proofDiagnostic,schoolBindingState:j.code==='SCHOOL_CONTEXT_UNCONFIRMED'?'unconfirmed':j.code==='SCHOOL_CONTEXT_CHANGED'?'changed':j.context?.schoolBinding??'none',readProofPresent:!!j.context?.readProof});
  async function current(j){const v=await load();if(!v||v.id!==j.id)throw Error('CANCELLED');if(Date.now()>=j.expiresAt||j.expires&&Date.now()>=j.expires||!j.expires&&Date.now()>=j.createdAt+RUN_LIMITS.milliseconds)throw Error('REVIEW_EXPIRED');if(j.pending&&Date.now()>=j.pending.envelope.expiresAt)throw Error('RECEIPT_UNKNOWN');}
  async function save(j){return mutate(async()=>{await current(j);await chrome.storage.session.set({[JOB]:encode(j),[VIEW]:view(j)});await chrome.alarms.create(ALARM,{when:Math.min(j.expiresAt,j.expires??Infinity,j.navigation?.readDeadline??j.navigation?.deadline??Infinity,Date.now()+30000)});});}
  async function finish(j,phase,code=null,error=null){return mutate(async()=>{
@@ -278,6 +287,9 @@ export function createBackgroundRunner({transport}){
      if(r.status==='pending')break;
      if(noteUnknown(j,r)){await save(j);break;}
      if(!['saved','existing'].includes(r.status)||r.total!==j.pending.envelope.rows.length||!r.setup?.details?.length)throw Error('RECEIPT_UNKNOWN');
+     if(!Number.isSafeInteger(r.added)||r.added<0||!Number.isSafeInteger(r.existing)||r.existing<0||r.added+r.existing!==r.total)throw Error('RECEIPT_UNKNOWN');
+     j.acknowledged??={};if(j.acknowledged[j.pending.actionId])throw Error('RECEIPT_UNKNOWN');
+     j.acknowledged[j.pending.actionId]={total:r.total,added:r.added,existing:r.existing};
      j.receiverProgress=null;j.receiverFailure=null;j.added+=r.added;j.existing+=r.existing;j.needsReview ||= r.setup.unresolved>0;const ranks={missing:0,current:1,saved:2,conflict:3,unsupported:3,ambiguous:3,unrecognized:3},fields=new Map((j.fields??[]).map(d=>[d.field,d]));
      for(const d of r.setup.details)if(!fields.has(d.field)||ranks[d.reason]>=ranks[fields.get(d.field).reason])fields.set(d.field,d);j.fields=[...fields.values()];j.code=null;
      j.offset+=r.total;const group=sourceClasses(j.sourceRows)[j.classIndex];if(j.offset===group.count){j.classIndex++;j.offset=0;}
@@ -295,7 +307,7 @@ export function createBackgroundRunner({transport}){
   running=run().finally(()=>{running=null;if(wakeRequested){wakeRequested=false;queueMicrotask(()=>wake().catch(()=>{}));}});return running;
  }
  async function message(m,sender){
-  if(m.type==='n36-job-status'&&Object.keys(m).join()==='type')return {ok:true,view:(await chrome.storage.session.get(VIEW))[VIEW]??null};
+  if(m.type==='n36-job-status'&&Object.keys(m).join()==='type')return {ok:true,view:storedView((await chrome.storage.session.get(VIEW))[VIEW]??null)};
   if(m.type==='n36-job-cancel'&&Object.keys(m).sort().join()==='jobId,type'){
    const j=await load();if(j?.id===m.jobId)await finish(j,'cancelled','CANCELLED');return {ok:true};
   }

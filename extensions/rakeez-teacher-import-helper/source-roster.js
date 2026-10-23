@@ -35,8 +35,18 @@ export function sourceCoverage({series,warnings=[],pendingReportPages=0,reviewWi
  const failed=warnings.some(w=>w.category==='students'&&!(w.optional&&proved))||[...series.values()].some(s=>s.gap)||knownIncomplete;
  const complete=proved&&!failed;
  const coverage=complete?'complete':failed?'partial':pendingReportPages>0&&reviewWindow?'paused':'unknown';
- return {complete,coverage,hasNextReport:pendingReportPages>0,pendingReportPages,
- processedReportPages:[...series.values()].reduce((n,s)=>n+(s.pages?.size??0),0),reviewWindow};
+ // AI: structural reasons only; neither source content nor arbitrary warning text.
+ const reasonFor={INVALID_ROWS_EXCLUDED:'excluded-rows',DUPLICATE_STUDENT_IDENTITY:'ambiguous-rows',AMBIGUOUS_CLASSROOM:'ambiguous-rows',PAGINATION_MISSING_NEXT:'missing-pages',PAGINATION_REPEAT_OR_CHANGED:'page-gap',PAGINATION_UNVERIFIED:'terminal-unverified',PAGINATION_TERMINAL_UNVERIFIED:'terminal-unverified',SOURCE_MEMORY_BUDGET:'pending-pages'};
+ const reasons=new Set();
+ for(const w of warnings)if(w.category==='students'&&!(w.optional&&proved))reasons.add(reasonFor[w.code]??'student-data-unverified');
+ if([...series.values()].some(s=>s.gap))reasons.add('page-gap');
+ if(knownIncomplete)reasons.add('missing-pages');
+ if(pendingReportPages>0)reasons.add('pending-pages');
+ if(!complete&&!reasons.size)reasons.add('terminal-unverified');
+ const terminals=[...series.values()].map(s=>s.terminal?s.terminalEvidence:null);
+ const terminal=terminals.length&&terminals.every(t=>['explicit-next','observed-anchor'].includes(t))?(terminals.every(t=>t==='observed-anchor')?'observed-anchor':'explicit-next'):'unproven';
+ return {complete,coverage,terminal,hasNextReport:pendingReportPages>0,pendingReportPages,
+ processedReportPages:[...series.values()].reduce((n,s)=>n+(s.pages?.size??0),0),reasons:[...reasons],reviewWindow};
 }
 export function coverageMessage(info){
  if(info.complete)return 'ثبت اكتمال تسلسل صفحات الكشف ونهايته؛ راجع كل فصل ودفعة ثم أكّد داخل ركيز. قد تبقى بيانات اختيارية لا تضيف صفحات طلاب.';

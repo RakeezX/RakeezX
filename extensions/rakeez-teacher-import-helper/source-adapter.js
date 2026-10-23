@@ -21,13 +21,13 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
     const styles=new WeakMap();const style=n=>{if(!styles.has(n))styles.set(n,getComputedStyle(n));return styles.get(n);};
     const anchors=Array.from(globalThis.document.querySelectorAll('a[href]')).filter(a=>{for(let n=a;n;n=n.parentElement){const c=style(n);if(n.hidden||n.getAttribute('aria-hidden')==='true'||c.display==='none'||c.visibility!=='visible'||Number(c.opacity)===0)return false;}return a.getClientRects().length>0;}).filter(a=>{try{return new URL(a.getAttribute('href'),binding).href===u.href;}catch{return false;}});
     if(!anchors.length)fail(setup?'UNSAFE_SETUP_LINK':'UNSAFE_ROSTER_LINK',setup?'live-link-absent':null);
-    // AI: only the one observed timetable GET may carry an inert onclick name.
+    // AI: only the one observed exact timetable GET may carry inert event names.
     // Never read its value, invoke a handler, click, or navigate. Every check is
     // repeated around the bounded fetch/stream; mixed duplicate anchors fail.
     const eventNames=a=>a.getAttributeNames().filter(k=>/^on/i.test(k));
     let reason=null;
     if(kind==='timetable'&&anchors.length>1&&anchors.some(a=>eventNames(a).length))reason='live-link-duplicate';
-    else if(anchors.some(a=>eventNames(a).some(k=>kind!=='timetable'||k.toLowerCase()!=='onclick')))reason='live-link-event';
+    else if(anchors.some(a=>eventNames(a).length&&!(kind==='timetable'&&/^\/SchoolSchedule\/Schedule\/TeacherSchedule\/?$/i.test(u.pathname)&&[...u.searchParams].length===1&&u.searchParams.get('SchoolId')?.toLowerCase()===runContext.schoolId.toLowerCase())))reason='live-link-event';
     else if(anchors.some(a=>a.closest('form,[inert],[disabled],[aria-disabled=true],.disabled')))reason='live-link-context';
     else if(anchors.some(a=>a.hasAttribute('download')))reason='live-link-download';
     else if(anchors.some(a=>a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get'))reason='live-link-method';

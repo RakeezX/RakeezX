@@ -311,7 +311,7 @@ async function resumeSavedExtensionBatch(){
  };
  extensionMessage=(messages[readState]??
   `إيصالات محلية مؤكدة: ${progress.confirmedReceipts} (${progress.confirmedRows} صفًا). من الصفوف المعلقة يوجد حاليًا ${progress.pendingSavedRows} من ${progress.pendingRows} في الكشف المحلي.`+(progress.relation==='original-term'?' اختر السنة والفصل الدراسي الأصليين في ركيز لمراجعة الكشف؛ لا تبدأ جمعًا جديدًا.':''))+
-  ' نتيجة الإضافة غير المحسومة لم تتغير. إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.';
+  (readState==='verified-trace'&&progress.checkpoint==='receipts'&&progress.pendingRows===0?' الإيصالات المعروضة مؤكدة محليًا؛ المزامنة تُتابع من التطبيق. لا تحسم هذه القراءة نتيجة تشغيل تاريخي آخر.':' لا تحسم هذه القراءة وحدها نتيجة نقل غير محسومة.')+' إجراء القراءة هذا لا يكتب أي صف ولا يعيد الاستيراد.';
  repaint();
 }
 window.addEventListener('pagehide',()=>{receiverDocumentLive=false;if(automaticBatch)automaticBatch.retired=true;});
@@ -401,25 +401,32 @@ async function ensureSourceSection(batch,classroom){
 // AI: a single owner-bound setup batch, through existing store creation paths.
 // Conflicts remain untouched; counts never imply remote acknowledgement.
 async function saveAvailableSetup(batch,categories){
- const {validateBundle}=await import('../lib/teacher-setup-import.js');
+ const {validateBundle,sourceSchoolIdentity}=await import('../lib/teacher-setup-import.js');
  const setup=categories.length?validateBundle({schema:'rakeez-private-teacher-setup',version:1,categories}).categories:[];
  const result={saved:0,existing:0,unresolved:0,missing:['teacher','school','principal','department','classes','timetable'].filter(k=>!setup.some(c=>c.category===k)),details:[]};
  for(const field of result.missing)result.details.push({field,reason:'missing',count:1});
  const verifyCurrent=current=>current?automaticPersistedGuard(batch,current):automaticGuard(batch);
  for(const c of setup.filter(c=>['teacher','school','principal'].includes(c.category))){
   automaticGuard(batch);
-  const fields={teacher:['teacherName'],school:['schoolName'],principal:['principalName','reportPrincipalName']}[c.category],value=c.rows[0].name;
+  const fields={teacher:['teacherName'],school:['schoolName'],principal:['principalName','reportPrincipalName']}[c.category],value=c.category==='school'?(await sourceSchoolIdentity(c.rows[0].name)).displayName:c.rows[0].name;
   const changed=fields.some(k=>store.state.profile[k]!==value),changes=Object.fromEntries(fields.map(k=>[k,value]));
   await store.importSetupProfile(changes,{verifyCurrent,sourceWins:true});
   if(changed){result.saved++;result.details.push({field:c.category,reason:'saved',count:1});}
   else{result.existing++;result.details.push({field:c.category,reason:'current',count:1});}
  }
  // Explicit labelled source always wins. A precise school-title suffix only
- // fills an empty department; it never changes calendar or personal role.
+ // fills an empty department, recognizes current, and reports deliberate conflicts.
+ // The raw validated school stays in the source envelope/binding, never normalized there.
  if(!setup.some(c=>c.category==='department')){
-  const {sourceSchoolDepartmentFallback}=await import('../lib/teacher-setup-import.js');
-  const value=await sourceSchoolDepartmentFallback(setup.find(c=>c.category==='school')?.rows[0]?.name,store.state.profile.educationDepartment);
-  if(value&&!store.state.profile.educationDepartment){automaticGuard(batch);await store.importSetupProfile({educationDepartment:value},{verifyCurrent});result.saved++;result.missing=result.missing.filter(f=>f!=='department');result.details=result.details.filter(d=>d.field!=='department');result.details.push({field:'department',reason:'saved',count:1});}
+  const value=(await sourceSchoolIdentity(setup.find(c=>c.category==='school')?.rows[0]?.name)).department;
+  if(value){
+   result.missing=result.missing.filter(f=>f!=='department');result.details=result.details.filter(d=>d.field!=='department');
+   let reason='current';
+   if(!store.state.profile.educationDepartment){automaticGuard(batch);await store.importSetupProfile({educationDepartment:value},{verifyCurrent});result.saved++;reason='saved';}
+   else if(store.state.profile.educationDepartment===value)result.existing++;
+   else{result.unresolved++;reason='conflict';}
+   result.details.push({field:'department',reason,count:1});
+  }
  }
  const department=setup.find(c=>c.category==='department');
  if(department){
@@ -551,7 +558,7 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
     <p>استورد من مدرستي بضغطة واحدة الفصول والمواد والطلاب والجدول، وبيانات المعلم والمدير والمدرسة المتاحة.</p>
-    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.37.zip" download>تنزيل إضافة ركيز 0.5.37</a>
+    <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.38.zip" download>تنزيل إضافة ركيز 0.5.38</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
       <li>من صفحة إضافات Chrome، فعّل وضع المطوّر واختر «تحميل إضافة غير مضغوطة»، ثم اختر المجلد.</li>

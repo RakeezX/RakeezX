@@ -1,0 +1,47 @@
+{
+  "taskId": "continuous-n36-complete-import-outcome-20261023",
+  "runId": "1c4adc60-4742-456c-9257-71deac65f21a",
+  "baseSha": "4ee4608c3a043f8ff27fd1c90d0ba652bc7e558b",
+  "checks": [
+    {
+      "name": "n36_actual_partial_baseline_and_causal_corrections",
+      "status": "PASS",
+      "evidence": "tests\\n36-complete-import-outcome-20261023\\baseline.json and candidate.json: .37 zero counters / live-link-event reproduced; supported fresh 302 rows, 10 receipts, 10 classes/teachings/slots, complete and duplicate-free repeat."
+    },
+    {
+      "name": "n36_teacher_school_department_semantics_and_context_safety",
+      "status": "PASS",
+      "evidence": "tests\\n36-complete-import-outcome-20261023\\display-permissions.json: raw envelope binding; normalized school display; empty/current/conflict/labelled precedence; stored and rendered settings after reload. Directory boundary assertions in package.mjs."
+    },
+    {
+      "name": "n36_supported_timetable_subjects_and_class_associations",
+      "status": "PASS",
+      "evidence": "tests\\n36-complete-import-outcome-20261023\\populated-final.json: names-only partial account completes to 2 preserved students / 1 class / 1 teaching / 1 slot. Fresh ten-class journey and explicit class data pass; missing source subject remains absent."
+    },
+    {
+      "name": "n36_receipts_counts_and_coverage_truth_after_reopen",
+      "status": "PASS",
+      "evidence": "tests\\n36-complete-import-outcome-20261023\\legacy-and-final-receipts.json, final-coverage-restart.json, coverage-bounded.json: exact nonce aggregates/restart/reopen; old .37 cached 302 with receipt count unavailable; complete/missing-page/excluded/ambiguous/unproved-terminal reasons; safe diagnostics."
+    },
+    {
+      "name": "n36_fresh_and_existing_account_end_to_end_idempotence",
+      "status": "PASS",
+      "evidence": "tests\\n36-complete-import-outcome-20261023\\candidate.json fresh and populated-final.json: actual provisioned account UI/store/IndexedDB, both grounded entry paths, reload, popup reopen and controlled repeat; students/classes/teachings/slots preserved; scores/calendar unchanged."
+    },
+    {
+      "name": "n36_exact_package_and_affected_negative_guards",
+      "status": "PASS",
+      "evidence": "tests\\n36-complete-import-outcome-20261023\\package.json: 35 selected bounded cases; exact 29-file source/ZIP/manifest parity. download.json SHA256 3142254eb9cc5b86565dd7a9462ead3de4a99212119521c31733caaa5e3b55ee; negative link/identity/owner/term/unknown/access/late-receipt guards. Syntax/diff checks; resource-cleanup.json zero owned listeners."
+    },
+    {
+      "name": "actual_account_source_cloud_acceptance",
+      "status": "NOT_RUN",
+      "evidence": "No live source/account authority. Actual event name, response-school/subject shape, reason for real partial coverage and cloud convergence remain unknown; historic .35 distinct."
+    },
+    {
+      "name": "publisher_integration_and_production",
+      "status": "NOT_RUN",
+      "evidence": "Independent controller/publisher owns Git integration, build, provider and served Production verification; no push/deploy performed."
+    }
+  ]
+}

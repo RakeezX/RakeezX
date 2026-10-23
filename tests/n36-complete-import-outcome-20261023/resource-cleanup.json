@@ -1,0 +1,12 @@
+{
+  "taskId": "continuous-n36-complete-import-outcome-20261023",
+  "runId": "1c4adc60-4742-456c-9257-71deac65f21a",
+  "ownedPorts": [
+    49953,
+    49954,
+    49956,
+    49957
+  ],
+  "ownedServerListeners": 0,
+  "cleanup": "All isolated helper contexts/browsers and task-owned servers closed in finally. No shared lease required for active synthetic loopback phase."
+}

@@ -25,6 +25,7 @@ export function consumePage(job,next){
     if(series.total!==null&&p.total!==null&&series.total!==p.total||series.pages.has(p.current)){series.gap=true;job.warnings.push({category:'students',code:'PAGINATION_REPEAT_OR_CHANGED'});}
     if(p.total!==null)series.total=p.total;
     series.pages.add(p.current);series.last=Math.max(series.last,p.current);series.terminal ||= p.terminal&&p.current===p.total;
+    if(p.terminal&&p.current===p.total&&['explicit-next','observed-anchor'].includes(page.diagnostic?.pager?.terminalEvidence))series.terminalEvidence=page.diagnostic.pager.terminalEvidence;
    }
    for(const skipped of page.skipped??[]){job.skipped.push(skipped.kind);}
    for(const table of page.tables){

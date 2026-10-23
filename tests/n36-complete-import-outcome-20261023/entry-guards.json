@@ -1,0 +1,155 @@
+{
+  "taskId": "continuous-n36-complete-import-outcome-20261023",
+  "runId": "1c4adc60-4742-456c-9257-71deac65f21a",
+  "baseSha": "6d9e4effb6d46943085a7a015f07bc11495de440",
+  "baseline": false,
+  "storeHash": "80b3ccdbd5a8767604f0713b2465b44fedc58ea27c049cfa0619478e24e95e18",
+  "cases": [
+    {
+      "scenario": "foreign",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "owner-race",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "term-drift",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "device"
+      ],
+      "trace": [
+        "provisioned",
+        "auth-start",
+        "auth-end"
+      ],
+      "selection": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:1",
+        "device": {
+          "id": "device",
+          "updatedAt": 1792717244665,
+          "deleted": false,
+          "theme": "light",
+          "activeYearId": "y:1448-1449",
+          "activeTermId": "tm:y:1448-1449:1",
+          "activeTimeProfileId": null,
+          "reportPrincipalName": "",
+          "lastSyncAt": null,
+          "schemaVersion": 8,
+          "deviceId": "db4f8453-482d-48ec-a8ed-7cd89ebef9d4",
+          "accountProvisioningReceipt": {
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "contractVersion": 1,
+            "foundationHash": "fresh-foundation"
+          }
+        }
+      },
+      "unknownReceipt": true,
+      "repeatStartPreservedNonce": true,
+      "status": "PASS",
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 2,
+          "total": 2,
+          "failure": {
+            "phase": "batch",
+            "step": "validation",
+            "code": "BATCH_PERSISTED_TERM_CHANGED"
+          },
+          "progress": {
+            "checkpoint": "none",
+            "relation": "unresolved",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 0,
+            "pendingSavedRows": 0
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "unknown",
+      "preReadiness": {
+        "year": null,
+        "term": null
+      },
+      "initialWrites": [
+        "device"
+      ],
+      "trace": [
+        "provisioned",
+        "auth-start",
+        "auth-end"
+      ],
+      "selection": {
+        "year": "y:1448-1449",
+        "term": "tm:y:1448-1449:1",
+        "device": {
+          "id": "device",
+          "updatedAt": 1792717247945,
+          "deleted": false,
+          "theme": "light",
+          "activeYearId": "y:1448-1449",
+          "activeTermId": "tm:y:1448-1449:1",
+          "activeTimeProfileId": null,
+          "reportPrincipalName": "",
+          "lastSyncAt": null,
+          "schemaVersion": 8,
+          "deviceId": "e1476fd1-d728-4fdb-b51e-35eaaafdd18e",
+          "accountProvisioningReceipt": {
+            "ownerId": "a7300000-0000-4000-8000-000000000001",
+            "contractVersion": 1,
+            "foundationHash": "fresh-foundation"
+          }
+        }
+      },
+      "unknownReceipt": true,
+      "repeatStartPreservedNonce": true,
+      "status": "PASS",
+      "outcomes": [
+        {
+          "status": "unknown",
+          "added": 0,
+          "existing": 0,
+          "remaining": 2,
+          "total": 2,
+          "failure": {
+            "phase": "batch",
+            "step": "transaction",
+            "code": "WRITE_FAILED"
+          },
+          "progress": {
+            "checkpoint": "rows-before-receipt",
+            "relation": "same",
+            "confirmedRows": 0,
+            "confirmedReceipts": 0,
+            "pendingRows": 2,
+            "pendingSavedRows": 2
+          }
+        }
+      ]
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

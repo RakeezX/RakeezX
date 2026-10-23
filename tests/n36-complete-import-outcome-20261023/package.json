@@ -1,0 +1,74 @@
+{
+  "status": "PASS",
+  "baseSha": "4ee4608c3a043f8ff27fd1c90d0ba652bc7e558b",
+  "version": "0.5.38",
+  "selectedCases": 35,
+  "selection": {
+    "legacy-and-final-receipts": [
+      "legacy",
+      "restart"
+    ],
+    "populated-final": [
+      "populated"
+    ],
+    "candidate": [
+      "fresh"
+    ],
+    "display-permissions": [
+      "permissions",
+      "same",
+      "conflict",
+      "label"
+    ],
+    "final-coverage-restart": [
+      "gap",
+      "unknown",
+      "no-subject"
+    ],
+    "coverage-bounded": [
+      "excluded",
+      "ambiguous"
+    ],
+    "negative-links": [
+      "nonget-before",
+      "download-before",
+      "disabled-before",
+      "form-before",
+      "duplicate-before",
+      "different-before",
+      "base-before",
+      "contract-before"
+    ],
+    "negative-identity": [
+      "event-before",
+      "response-missing-before",
+      "response-conflict-before",
+      "response-teacher-before",
+      "response-schoolid-before",
+      "pending-school-drift-before",
+      "pending-teacher-drift-before",
+      "pending-document-drift-before"
+    ],
+    "pending-owner-session": [
+      "pending-owner-drift-late",
+      "pending-session-drift-late"
+    ],
+    "entry-guards": [
+      "foreign",
+      "owner-race",
+      "term-drift",
+      "unknown"
+    ]
+  },
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.38.zip",
+    "sha256": "3142254eb9cc5b86565dd7a9462ead3de4a99212119521c31733caaa5e3b55ee",
+    "bytes": 150336
+  },
+  "files": 29,
+  "permissionsAndCSP": "unchanged",
+  "receiverAnd300RowBound": "unchanged",
+  "shellDependencies": "no new dependency; existing lazy directory import reused; sw.js unchanged",
+  "production": "NOT_RUN; independent publisher",
+  "actualAccountAcceptance": "NOT_RUN; actual source event/response unknown; no historical nonce/cloud reconciliation"
+}

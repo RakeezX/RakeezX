@@ -68,7 +68,8 @@ summary { cursor: pointer; padding-block: 12px; }
 
 .automatic-mode #run-status {display:block!important}
 
-.automatic-mode #run-counts,.automatic-mode #run-skipped {display:none}
+.automatic-mode #run-skipped {display:none}
+.automatic-mode #run-counts {grid-column:1/-1;overflow-wrap:anywhere;white-space:pre-line;}
 
 /* AI: compact shared popup/page; copy stays physically at the top left in RTL. */
 html {width:445px;min-width:0;max-width:100%;}
