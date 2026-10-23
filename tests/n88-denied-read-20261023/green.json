@@ -1,0 +1,24 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "providerOperations": 0,
+  "realAccountReads": 0,
+  "sourceSha256": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+  "cases": [
+    "native: acquisition failure is503, no cookie retirement, no private errors"
+  ],
+  "observed": {
+    "status": 503,
+    "cookieRetired": false,
+    "clientKind": "unavailable",
+    "diagnostic": {
+      "action": "read",
+      "phase": "manual",
+      "outcome": "unavailable",
+      "httpStatusClass": "5xx",
+      "elapsedMs": 0,
+      "visibility": "visible",
+      "retirementReason": "visible"
+    }
+  }
+}

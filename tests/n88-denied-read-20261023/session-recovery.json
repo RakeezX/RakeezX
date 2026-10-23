@@ -1,0 +1,19 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "checks": [
+    "native: projection failure503/no cookie or data; same cookie recovers exact grades/work",
+    "native: before failure503/no cookie or data; same cookie recovers exact grades/work",
+    "native: unknown failure503/no cookie or data; same cookie recovers exact grades/work",
+    "source: projection failure503/no cookie or data; same cookie recovers exact grades/work",
+    "source: before failure503/no cookie or data; same cookie recovers exact grades/work",
+    "source: unknown failure503/no cookie or data; same cookie recovers exact grades/work",
+    "source/native missing, bad and revoked sessions still401; original membership/owner/SQL fences unchanged"
+  ],
+  "providerOperations": 0,
+  "realAccountReads": 0,
+  "cleanup": {
+    "ownedPgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  }
+}
