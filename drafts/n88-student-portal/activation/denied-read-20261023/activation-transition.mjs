@@ -4,7 +4,7 @@ const deny=c=>{throw Error('n88_denied_activation_'+c);};
 export async function runSuccessorTransition({stamp,certificates,ports}){
  let uploadInvoked=false,pinInvoked=false,before=null,after=null,configuration=null,state=null;
  const readConfig=async expectedPin=>{
-  await ports.verifyExclusivePhase();
+  await ports.verifyCommittedPhase();await ports.verifyExclusivePhase();
   const proof=await ports.readQualifiedMetadata(expectedPin,certificates);
   if(configuration&&(proof.currentNonPinDigest!==configuration.currentNonPinDigest||proof.keysetDigest!==configuration.keysetDigest))deny('concurrent_configuration_change');
   return proof;
