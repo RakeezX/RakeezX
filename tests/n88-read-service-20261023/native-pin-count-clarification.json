@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "runId": "c4fe03b0-3995-497f-bb84-245077a08f47",
+  "receipt": "native-pin-c4fe03b0-3995-497f-bb84-245077a08f47.json",
+  "originalReceiptPreserved": true,
+  "correction": "Original receipt inherited providerWrites:0 from its preflight stamp despite explicit nativeUploads:1 and pinUpdates:1. Actual provider write operations are 2. This is a bookkeeping correction, not another operation.",
+  "actualNativeUploads": 1,
+  "actualPinUpdates": 1,
+  "actualMigrationApplicationsAtReceipt": 0,
+  "actualProviderWritesAtReceipt": 2
+}

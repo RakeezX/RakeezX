@@ -68,7 +68,7 @@ export async function runNativeActivation({candidate,load,save,official,phase}){
   const actual=await readNative(manifest.native),config=await readConfig(manifest.native);
   const verifiedAt=new Date().toISOString();state.directSource=manifest.native;state.sourceCorrections=[...(state.sourceCorrections??[]),{...stamp,prior:manifest.priorNative,source:manifest.native,nativeVersion:actual.version}];
   state.typedReadActivation={...state.typedReadActivation,pinVerified:true,nativeVersion:actual.version,verifiedAt};await save(state);
-  const result={...stamp,status:'PASS',provider:{...actual,...config},uploadAcknowledgedAt:state.typedReadActivation.uploadAcknowledgedAt,verifiedAt,nativeUploads:1,pinUpdates:1,migrations:0,carrierUploads:0,drainage:'NOT_RUN; no DDL before supported gate',realAccountReads:0};
+  const result={...stamp,status:'PASS',providerWrites:2,provider:{...actual,...config},uploadAcknowledgedAt:state.typedReadActivation.uploadAcknowledgedAt,verifiedAt,nativeUploads:1,pinUpdates:1,migrations:0,carrierUploads:0,drainage:'NOT_RUN; no DDL before supported gate',realAccountReads:0};
   await writeFile(receipt,JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
  }catch(e){const code=/^n88_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n88_typed_activation_private_diagnostics_suppressed';await writeFile(receipt,JSON.stringify({...stamp,status:'FAIL',code,uploadInvoked,pinInvoked,migrations:0,unknownOutcomeRequiresReadOnlyReconciliation:true},null,2)+'\n',{flag:'wx'});throw Error(code);}
 }
