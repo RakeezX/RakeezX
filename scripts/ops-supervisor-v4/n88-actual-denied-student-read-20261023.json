@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-actual-denied-student-read-20261023",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5900,
+      "scopeKey": "n88-actual-student-claim-read-client",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261023-EXISTING-TEST-STUDENT-READ-FAILURE",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "ACTUAL USER ACCEPTANCE FAILED AFTER VERIFIED TYPED-SERVICE DEPLOYMENT. Latest PO has an existing normal-Chrome teacher trial account with existing trial students, an open class student-workspace tab and separate actual student portal tab. They tried an existing code once: checking code then session unavailable/expired. They subsequently supplied the BUILT-IN safe diagnostic, WITHOUT a new attempt: {action:read,phase:manual,outcome:denied,httpStatusClass:4xx,elapsedMs:5500,visibility:visible,retirementReason:visible}. This proves a read request was denied after5.5seconds; it does NOT identify exact status/cause or prove claim succeeded. Do not infer invalidcode, newreaderregression, completecloud or liveperformanceimprovement. No more code/permission questions: user already supplied necessary symptom and safe trace and granted completion in trial account.\n\nThis is a distinct postpublication failure follow-up, not reactivation of completed source work. Preserve original N88 session/candidates/measurements and native66; no replay. Original typed-service candidate489fea34, published394c6fff, native66 sourcef14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390, appliedmigration20261023070851_n88_fixed_typed_read_transition, exact78catalog/old76unchanged. Read original immutable public evidence in docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md and tests/n88-read-service-20261023/active-entry.json, active-integration.json and published receipts as needed. Existing14to2 comparison is reused; do NOT create a benchmark, repeat migration/upload/pin, retiredfixture or read protected original custody. Original private custodian session01a14fc3-b292-7390-9952-8549a286c80f retains service ownership.\n\nFirst trace actual served student client from claim to read, response classification, session cookie/origin/path/credentials, pending/reopen semantics and service error boundary. Current src/views/student-portal-login.js shows this text for session errors401/403/410 independent of underlying cause; the safe trace saysread. Reproduce a concrete defect red-first with actual published client/entry/service code and synthetic identities. Preserve exact typed SQL guard and session/owner/revocation/membership/grade/privacy/cancellation/COMMIT semantics. Keep actual server denial distinct from transport timeout. Do not cosmetically change message and call it fixed or treat HTTP200 as valid private read. Correct ordinary local source/configuration wiring within scope when causal evidence establishes defect. Before choosing UI-only delivery, verify actual private student carrier served path; changing public frontend files alone might not update that carrier.\n\nBrowser access is limited to the PO's already-open NORMAL Chrome teacher trial-class workspace and actual student portal. Refresh METADATA inventory to identify both without emitting URLs containing keys/codes or personal titles. Only original shared live-browser phase lease through controller. Do not touch IncognitoN36 or other personal tabs, close/navigate/reload either currentN88tab, copy codes, use clipboard, read cookies/storage/credentials, inspect hidden application memory, or recreate refused operations. A bounded visible-UI structural/safe-diagnostic inspection is permitted; never output names, marks, student IDs or codevalues. User already supplied current safe diagnostic; reuse it rather than probing raw responses. No automated codeclaim, issue/reissuecode, endsession, authuser or gradewrite is authorized in this preparation card. If a live missing phase remains after source reproduction, report the exact necessary finite observation rather than generic permissions. Root coordinates a single explicit user trial only after useful qualified delivery. N44 may need a later closed-page test; preserve these tabs during diagnosis and do not claim its pagesclosed acceptance.\n\nImplement and test feasible causal correction in isolated worktree. Default live service operationsZERO for this NEW worker; do not impersonate custodian or broaden SQL. If actual fix requires private carrier/native/config, prepare exact changed source, affected focused tests, required single operation and its original custodian handoff artifact; BLOCKED only on that precise remaining prerequisite after preparation. Root will route original custodian through original controller, no newexecutor. Existing service operations remain serialized withN44; service identity/native66 pin/78catalog checks reused until an actual relevant change. If source fix is independently frontend-deliverable, existing publisher owns integration/deploy with served-path proof. Actual same-account successful login, grades/session persistence and comparable return remain acceptance gates; do not close umbrellaN88 from local PASS.\n",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/lib/student-portal-runtime.js",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/denied-read-20261023/**",
+        "tests/n88-denied-read-20261023/**",
+        "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js"
+      ],
+      "requiredChecks": [
+        "n88_actual_read_denial_cause_reproduced",
+        "n88_claim_read_origin_session_and_failure_semantics",
+        "n88_owner_privacy_revocation_membership_grade_and_commit_preserved",
+        "n88_actual_served_student_carrier_or_exact_custodian_handoff"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261023-EXISTING-TEST-STUDENT-READ-FAILURE",
+        "publication": true,
+        "namedBrowserReadOnly": "existing normal Chrome teacher trial workspace and student portal visible safe UI only",
+        "realAccountWrites": 0,
+        "credentialExtraction": false,
+        "serviceOperations": 0,
+        "newMigrations": 0,
+        "nativeUploads": 0,
+        "privateCustodyAccess": false,
+        "parallelN44ServiceChanges": false
+      },
+      "releaseAuthority": "PO explicitly requests completion and provided existing trial account/session and actual denied-read diagnostic. Scope permits causal local fix and safe visible inspection; original publisher only and private service prerequisite only via original custodian with exact follow-up.",
+      "acceptance": [
+        "Actual denied read explained by source-grounded reproduction, no guessed expiry.",
+        "Corrected real served path and affected session/privacy semantics.",
+        "Actual same trial student login/read/return works before Product closure."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "97739b2ce423e3ebad7a65cf4edccfaa2e0a9a47",
+        "requiredSourcePaths": [
+          "src/views/student-portal-login.js",
+          "src/lib/student-portal-unified-client.js",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "tests/n88-read-service-20261023/active-entry.json"
+        ],
+        "editPaths": [
+          "src/views/student-portal-login.js",
+          "src/lib/student-portal-unified-client.js",
+          "tests/n88-denied-read-20261023/reproduce.mjs",
+          "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n88-denied-read-20261023/reproduce.mjs",
+          "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n88_actual_read_denial_cause_reproduced",
+          "n88_claim_read_origin_session_and_failure_semantics",
+          "n88_owner_privacy_revocation_membership_grade_and_commit_preserved",
+          "n88_actual_served_student_carrier_or_exact_custodian_handoff"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
