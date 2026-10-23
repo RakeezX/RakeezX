@@ -14,6 +14,7 @@ assert.equal(qualifyPhaseEnvelope(c,binding,true).configurationPhaseCompleted,tr
 // No whole-worker-finished bit is required: the independently completed phase is the boundary.
 for(const mutate of [x=>x.configurationPhaseCompleted=false,x=>x.sharedMutationLeaseReleased=false,x=>x.ownedStagingCleaned=false,x=>x.originalCustodianSession='foreign',x=>x.runId='foreign',x=>x.status='EXPECTED_CURRENT_MAP_PASS',x=>x.sourceCandidateSha='foreign',x=>x.metadataKeysetDigest='0'.repeat(64),x=>x.operationProofs=[],x=>x.operationProofs[0].path='../private.json',x=>x.operationProofs[0].path='drafts/n44-push/activation/owned-custody.tmp/state.json']){const changed=structuredClone(c);mutate(changed);assert.throws(()=>qualifyPhaseEnvelope(changed,binding,true));}
 assert.throws(()=>qualifyPhaseEnvelope(c,binding,false));
+assert.throws(()=>qualifyPhaseEnvelope({...c,expectedCurrentMapStatus:'PASS',historicalChainStatus:'NOT_PROVEN'},binding,true),/historical_predecessors_missing/);
 await assert.rejects(()=>runOriginalCustodian('activate','1'.repeat(40)),/original_context/);
 const beforeBundle=await readFile('drafts/n88-student-portal/activation/bundle/edge/index.mjs');
 await assert.rejects(()=>integrateVerifiedSuccessor(randomUUID()),e=>e.code==='ENOENT');
