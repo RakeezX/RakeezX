@@ -1,3 +1,4 @@
+import {n88TypedReadTask,buildN88TypedReadEvidence,verifiedN88TypedReadPublication} from './n88-typed-read-publication.mjs';
 #!/usr/bin/env node
 import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
@@ -259,13 +260,13 @@ export function verifiedLiveServiceDeclarationRepair(task,result,update){
   return card.completionMode==='reconcile_live_service_publication'
     &&task.status==='blocked'&&result.state==='LOCAL_READY'&&update.expected.resultState==='LOCAL_READY'
     &&task.lastFailure==='Publisher returned incomplete or mismatched deployment proof'
-    &&!task.servicePublicationEvidence&&(p?.kind==='reviewed-nonsending-service-evidence-v1'||n88MobileNativeTask(task)&&p?.kind==='reviewed-n88-mobile-native-publication-v1')
+    &&!task.servicePublicationEvidence&&(n88TypedReadTask(task)&&p?.kind==='reviewed-n88-typed-read-publication-v1'||p?.kind==='reviewed-nonsending-service-evidence-v1'||n88MobileNativeTask(task)&&p?.kind==='reviewed-n88-mobile-native-publication-v1')
     &&d?.status==='deployed'&&d.publishedSha===p.publishedSha&&sha256(bytes(d))===p.priorReceiptSha256
     &&SHA256.test(p.reviewedFixtureSha256??'')&&p.reason?.length>=50
     &&same(card.requiredChecks,task.requiredChecks)&&same(card.allowedPaths,task.allowedPaths)
     &&Object.entries(card).every(([key,value])=>['objective','completionMode','verificationRepair','servicePublicationEvidence'].includes(key)||same(value,task[key]))
     &&task.requiredChecks?.every(n=>result.checks?.some(c=>c.name===n&&c.status==='PASS'))
-    &&result.checks?.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&(['hosted_auth_fixture_and_closed_client_os_delivery','frontend_publication_and_served_source'].includes(c.name)||n44QualifiedTask(task)&&c.name==='n44_register503_actual_cause_and_qualified_existing_service_correction'))
+    &&result.checks?.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&(n88TypedReadTask(task)&&c.name==='n88_actual_hosted_user_speed_acceptance'||['hosted_auth_fixture_and_closed_client_os_delivery','frontend_publication_and_served_source'].includes(c.name)||n44QualifiedTask(task)&&c.name==='n44_register503_actual_cause_and_qualified_existing_service_correction'))
     &&result.blockerType==='none'&&!result.blocker&&verifiedLiveServicePublication(declared,d)&&verifiedDeployment(declared,d);
 }
 
