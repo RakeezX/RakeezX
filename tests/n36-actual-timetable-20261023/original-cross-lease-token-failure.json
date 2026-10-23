@@ -1,0 +1,11 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "52da0f25-3635-4831-8a38-3d1d0d09cd23",
+  "baseline": true,
+  "cases": [],
+  "error": "Error: Command failed: powershell.exe -NoProfile -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name browser -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-actual-timetable-dom-20261023.json -OwnerToken 52da0f25-3635-4831-8a38-3d1d0d09cd23 -WaitSeconds 0\nRequested lease token does not match the current owner\r\nAt C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\resource-lease.ps1:79 char:56\r\n+ ... er.token) { throw 'Requested lease token does not match the current o ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : OperationStopped: (Requested lease...e current owner:String) [], RuntimeException\r\n    + FullyQualifiedErrorId : Requested lease token does not match the current owner\r\n \r\n\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-timetable-dom-20261023/tests/n36-actual-timetable-20261023/shared-browser.mjs:5:52)\n    at withSharedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-timetable-dom-20261023/tests/n36-actual-timetable-20261023/shared-browser.mjs:7:6)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-timetable-dom-20261023/tests/n36-actual-timetable-20261023/runtime-cross.mjs:21:141\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "resources": {
+    "serverClosed": true,
+    "sharedBrowserFinally": true
+  }
+}

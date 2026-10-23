@@ -1,0 +1,128 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "913a4635-8664-40fb-8e43-2fb6a46aeec9",
+  "transport": "supported CUA visible same-tab rendered document; no extension execution or response-body read",
+  "entry": {
+    "originalPath": "/Dashboards/Schools",
+    "uniqueExistingSourceTab": true,
+    "exactOrigin": "https://schools.madrasati.sa",
+    "visibleReadEntryCount": 1,
+    "entryRouteKind": "ChangeUserTypeToTeacherFromParent",
+    "entryQueryKeys": [
+      "Name"
+    ],
+    "normalizedNameMatchesKnownFullSchool": true,
+    "visibleTeacherRole": true,
+    "opaqueEntryTargetVersusPriorCanonicalTeacherRoute": "SAME; not equated to SchoolId",
+    "freshCanonicalTeacherRoute": "SAME",
+    "freshTeacherMarkerCount": 1,
+    "freshSchoolIdCount": 1,
+    "canonicalSemanticControlCounts": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "rendered": {
+    "visibleTargetTables": 1,
+    "tableClasses": [
+      "table",
+      "table-sm",
+      "table-bordered"
+    ],
+    "headers": "blank corner; explicit periods 1..8; Sunday..Thursday",
+    "dayRows": 5,
+    "cellsPerRow": 9,
+    "spanValues": [
+      1
+    ],
+    "lessonAnchors": 20,
+    "emptyNonLessonCells": 20,
+    "nonemptyNonLessonCells": 0,
+    "shape": "td.day-cell.text-center > div.cs-lesson-card > a > div.schedule-card.done > div.title > i + h2; direct small class label",
+    "lessonQueryKeys": [
+      "SchoolId",
+      "lectureId",
+      "dateTicks",
+      "subjectId",
+      "classroomId"
+    ],
+    "lessonSchoolVersusFreshHomeSchool": "ALL SAME",
+    "foreignSchoolLinks": 0,
+    "duplicateTuples": 0,
+    "hiddenLessonAnchors": 0,
+    "navOrFormLessonAnchors": 0,
+    "baseElements": 0,
+    "styleElements": 6,
+    "stylesheetLinks": 22,
+    "login": false,
+    "subjectIdToDifferentLabels": 0,
+    "classroomIdToDifferentLabels": 0,
+    "classroomLabelToDifferentIds": 0,
+    "subjectLabelToDifferentIdsGlobally": 4,
+    "subjectLabelWithinClassroomToDifferentIds": 0
+  },
+  "selectedObservedRecords": [
+    {
+      "weekday": 0,
+      "period": 1,
+      "subject": "المهارات الرقمية",
+      "classroom": "خامس 5",
+      "SchoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "lectureId": "1",
+      "dateTicks": "638900000000000000",
+      "subjectId": "11",
+      "classroomId": "21"
+    },
+    {
+      "weekday": 1,
+      "period": 2,
+      "subject": "المهارات الرقمية",
+      "classroom": "سادس 6",
+      "SchoolId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "lectureId": "2",
+      "dateTicks": "638900000000000000",
+      "subjectId": "12",
+      "classroomId": "22"
+    }
+  ],
+  "returnProof": {
+    "firstWholeCheckpointEquality": false,
+    "firstDifferenceDetails": "not retained; preserved as failed comparison",
+    "laterWholeCheckpointEquality": true,
+    "subsequentImmediateDifferenceFields": [
+      "controls",
+      "markers"
+    ],
+    "subsequentNonSemanticIdentityFields": "ALL SAME",
+    "finalFreshWholeCheckpointEquality": true,
+    "secondFreshHomeCheckpointEquality": true,
+    "finalTeacherMarkers": 1,
+    "finalSchoolIds": 1,
+    "finalSemanticControlCounts": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "provenance": {
+    "structureAndLabels": "actual rendered DOM observed through documented read-only APIs",
+    "identifiers": "all persistent IDs consistently fabricated; opaque entry alias and source identities never exported",
+    "fixture": "selected two observed associations only; other source data, styles and app/roster fixtures fabricated; no full portal capture",
+    "responseEquivalence": "NOT CLAIMED; chosen transport is rendered document",
+    "passiveCorrectedAllowance": "UNSPENT; prior consumed run marker unchanged"
+  },
+  "resources": {
+    "originalTabRestored": true,
+    "browserLeaseReleased": true,
+    "networkObservationIssued": false,
+    "extensionStarted": false,
+    "realImport": false,
+    "serviceOrFixtureProvisioning": false,
+    "cleanup": "no service resources created; no disarm/delete required"
+  }
+}

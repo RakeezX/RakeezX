@@ -177,7 +177,11 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
   const bind=(tuple,lesson)=>{
    const ids=JSON.parse(tuple);
    for(const [kind,id,label] of [['subject',ids[3],lesson.subject],['classroom',ids[4],lesson.classroom]]){
-    for(const [key,value] of [[kind+'-id:'+id,label],[kind+'-label:'+label,id]]){
+    // AI: Madrasati may assign different subject IDs to the same subject name
+    // in different classrooms. Keep ID->label global; bind the reverse subject
+    // relation within its explicit classroom tuple, never by name alone.
+    const labelScope=kind==='subject'?'|classroom:'+ids[4]:'';
+    for(const [key,value] of [[kind+'-id:'+id,label],[kind+'-label:'+label+labelScope,id]]){
      if(identities.has(key)&&identities.get(key)!==value)throw Error('AMBIGUOUS_LESSON_LINKS');identities.set(key,value);
     }
    }

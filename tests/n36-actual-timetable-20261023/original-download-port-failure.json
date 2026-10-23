@@ -1,0 +1,10 @@
+{
+  "status": "FAIL",
+  "operation": "task-owned loopback server listen",
+  "code": "EACCES",
+  "address": "127.0.0.1",
+  "port": 49976,
+  "browserLaunched": false,
+  "leaseAcquired": false,
+  "correction": "use OS-allocated unique loopback port with explicit origin restriction; no security policy/config change"
+}

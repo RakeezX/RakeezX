@@ -90,15 +90,16 @@ export function createBackgroundRunner({transport}){
   j.sourceDocument=probe.documentId;j.sourceURL=probe.result;
   const target={tabId:j.tabId,documentIds:[j.sourceDocument]};
   await chrome.scripting.executeScript({target,world:'ISOLATED',files:['route-diagnostics.js']});
-  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,mode==='read-proof'?{...j.context,readJobId:j.id}:j.context]});
+  const proofMode=['read-proof','read-proof-settle'].includes(mode);
+  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,proofMode?{...j.context,readJobId:j.id}:j.context]});
   await current(j);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   if(r[0].result?.proofDiagnostic)j.proofDiagnostic={...j.proofDiagnostic,...r[0].result.proofDiagnostic};
   if(!r[0].result?.ok){const e=Error(r[0].result?.code??'SOURCE_UNAVAILABLE');e.retry=r[0].result?.retry;e.incomplete=r[0].result?.incomplete;throw e;}
   if(mode==='home'&&j.context?.kind==='selected-teacher-card'&&r[0].result.runContext?.kind==='selected-teacher-card'&&['roleTargetId','href','schoolName'].some(k=>j.context[k]!==r[0].result.runContext[k]))throw Error('SCHOOL_CONTEXT_CHANGED');
   j.sourceDocument=r[0].documentId;
-  if(mode==='read-proof'){if(j.context.readProof&&j.context.readProof!==r[0].result.proof)throw Error('TEACHER_CONTEXT_CHANGED');j.context={...j.context,readProof:r[0].result.proof};}
-  if(['guard','read-proof'].includes(mode)){
+  if(proofMode){if(j.context.readProof&&j.context.readProof!==r[0].result.proof)throw Error('TEACHER_CONTEXT_CHANGED');j.context={...j.context,readProof:r[0].result.proof};}
+  if(['guard','read-proof','read-proof-settle'].includes(mode)){
    const g=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readSourceReportPage,args:['guard']});
    await current(j);if(g.length!==1||g[0].documentId!==j.sourceDocument||!g[0].result?.ok)throw Error(g[0]?.result?.code??'SOURCE_BINDING_CHANGED');
   }
@@ -212,9 +213,10 @@ export function createBackgroundRunner({transport}){
   if(v.documentId===n.documentId||n.readDocument&&v.documentId!==n.readDocument)throw Error('SOURCE_BINDING_CHANGED');
   if(tab.status!=='complete')return false;
   j.sourceURL=v.result;j.sourceDocument=v.documentId;
+  if(!n.readDocument){n.readDocument=v.documentId;await save(j);}
   if(n.rendered==='return'){
    if(j.sourceURL!==chain.homeURL||j.context.readProof!==chain.homeProof)throw Error('TEACHER_CONTEXT_CHANGED');
-   await source(j,'read-proof');await appGuard(j);
+   try{await source(j,'read-proof-settle');}catch(e){if(e.retry&&e.message==='SOURCE_PENDING'){await new Promise(resolve=>setTimeout(resolve,250));return true;}throw e;}await appGuard(j);
    if(Date.now()>=chain.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
    if(chain.failure)throw Error(chain.failure);
    if(!chain.quarantined?.ok)throw Error('SOURCE_UNAVAILABLE');
@@ -222,7 +224,6 @@ export function createBackgroundRunner({transport}){
   }
   // Save the new document before reading: a reload while asleep is a stale
   // document, not a fresh authorization. The deadline never resets on restart.
-  if(!n.readDocument){n.readDocument=v.documentId;await save(j);}
   const result=await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['rendered-timetable',{...j.context,sourceURL:chain.homeURL,expectedScheduleURL:n.target}]});await current(j);
   if(result.length!==1||result[0].frameId!==0||result[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   const post=await descriptor(j);if(post.result!==n.target)throw Error('SOURCE_CONTEXT_CHANGED');await appGuard(j);

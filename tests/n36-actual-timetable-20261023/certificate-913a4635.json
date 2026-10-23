@@ -1,0 +1,38 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "913a4635-8664-40fb-8e43-2fb6a46aeec9",
+  "baseSha": "7fa9b61259df3036caf8e6eda6bf03196d7d4d2e",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "n36_actual_timetable_dom_cause_reproduced",
+      "status": "PASS",
+      "evidence": "actual-source-parity-913a4635.json; rendered-baseline.json preserves .40 missing-school result; cross-class-baseline.json rejects observed cross-class IDs on immutable 068bd4c5 with no saved rows"
+    },
+    {
+      "name": "n36_real_structure_subject_class_day_period_mapping",
+      "status": "PASS",
+      "evidence": "cross-class-candidate.json: two actual observed label/coordinate associations with fabricated IDs through real worker/app/store; chosen rendered source parity recorded"
+    },
+    {
+      "name": "n36_source_identity_visibility_and_stale_context_guards",
+      "status": "PASS",
+      "evidence": "scoped-source-guards.json 10/10; cross-class-stale-return.json; cross-class-restart.json; recorded prior 19 worker negatives reused in unchanged scopes; original failed aggregate retained"
+    },
+    {
+      "name": "n36_idempotent_receipts_department_and_partial_coverage_preserved",
+      "status": "PASS",
+      "evidence": "cross-class-candidate/delayed-home/restart.json replay/reopen; reused rendered-delayed-partial.json and unchanged .40 department/atomicity evidence; store/protocol/SW and historical archives unchanged; real 302/10/0 remains PO evidence"
+    },
+    {
+      "name": "n36_changed_package_and_actual_source_parity",
+      "status": "PASS",
+      "evidence": "actual-source-parity-913a4635.json; certified-runtime-913a4635.json; package.json 29-file .41 exact parity; actual-app download.json and inspected screenshot"
+    }
+  ],
+  "sourceReadDisposition": "original authorized tab restored; owned browser lease released; no passive corrected body read consumed",
+  "localResources": "owned fresh contexts/browser/server closed in finally",
+  "serviceDisposition": "none provisioned; no service cleanup/disarm required",
+  "publication": "NOT_RUN; independent publisher",
+  "productAcceptance": "OPEN; explicit actual PO import required"
+}

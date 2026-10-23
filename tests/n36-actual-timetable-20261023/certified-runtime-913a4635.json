@@ -1,0 +1,35 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "913a4635-8664-40fb-8e43-2fb6a46aeec9",
+  "baseSha": "7fa9b61259df3036caf8e6eda6bf03196d7d4d2e",
+  "priorCandidate": "068bd4c5db8c5cdf56dd7599328157d890b04d75",
+  "files": [
+    {
+      "file": "background-runner.js",
+      "sha256": "aac7a72ee04f7b4b2fba56f69832eaf9d881645b68bf2c803a4a027ebee522b2"
+    },
+    {
+      "file": "selection.js",
+      "sha256": "38a596b067824104076f3a1c51186442480d42c08dd5dd4123b1a2669aed8634"
+    },
+    {
+      "file": "source-adapter.js",
+      "sha256": "6d5826ceb18ec780fa9d142703116eedd2ea865ca4d353aeef82d5bc66d7e2d5"
+    }
+  ],
+  "qualification": [
+    "actual-source-parity-913a4635",
+    "cross-class-baseline",
+    "cross-class-candidate",
+    "cross-class-delayed-home",
+    "cross-class-stale-return",
+    "cross-class-restart",
+    "scoped-source-guards"
+  ],
+  "unchangedEvidence": "local-certificate.json and underlying .40/068 evidence; scopes described in outcome",
+  "metadataOnlyAfterProof": [
+    "manifest.json",
+    "README.md",
+    "download label/href"
+  ]
+}

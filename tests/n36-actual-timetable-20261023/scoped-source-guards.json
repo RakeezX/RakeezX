@@ -1,0 +1,61 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "913a4635-8664-40fb-8e43-2fb6a46aeec9",
+  "cases": [
+    {
+      "name": "cross-class",
+      "status": "PASS",
+      "code": null
+    },
+    {
+      "name": "same-class-subject-conflict",
+      "status": "PASS",
+      "code": "AMBIGUOUS_LESSON_LINKS"
+    },
+    {
+      "name": "subject-id-label-conflict",
+      "status": "PASS",
+      "code": "AMBIGUOUS_LESSON_LINKS"
+    },
+    {
+      "name": "class-label-id-conflict",
+      "status": "PASS",
+      "code": "AMBIGUOUS_LESSON_LINKS"
+    },
+    {
+      "name": "inert-css",
+      "status": "PASS",
+      "code": null
+    },
+    {
+      "name": "semantic-pending",
+      "status": "PASS",
+      "code": "SOURCE_PENDING"
+    },
+    {
+      "name": "teacher-during-pending",
+      "status": "PASS",
+      "code": "TEACHER_CONTEXT_CHANGED"
+    },
+    {
+      "name": "role-during-pending",
+      "status": "PASS",
+      "code": "NON_TEACHER_ROLE"
+    },
+    {
+      "name": "school-during-pending",
+      "status": "PASS",
+      "code": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "name": "login-during-pending",
+      "status": "PASS",
+      "code": "LOGIN_OR_LOGOUT"
+    }
+  ],
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "sharedBrowserFinally": true
+  }
+}

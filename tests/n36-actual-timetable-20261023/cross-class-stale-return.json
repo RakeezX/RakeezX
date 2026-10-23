@@ -1,0 +1,114 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "913a4635-8664-40fb-8e43-2fb6a46aeec9",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "conflict",
+      "canonicalControlsDelayed": true,
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "1aebffbc722688e7714535107ba1996e3cf7a9e83f24ae4c5f34e71c8e3dcd09",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 141
+          },
+          "sourceGuard": {
+            "count": 23,
+            "ms": 1594
+          },
+          "descriptor": {
+            "count": 51,
+            "ms": 648
+          },
+          "appGuard": {
+            "count": 32,
+            "ms": 508
+          },
+          "fetchPending": {
+            "count": 5,
+            "ms": 556
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "source-navigation-settle",
+        "failureJobPhase": "navigation",
+        "code": "SOURCE_BINDING_CHANGED",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 4,
+        "observed": 4,
+        "coverage": "unknown",
+        "coverageReasons": [],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 0,
+        "excluded": 0,
+        "classes": 2,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "teacher-dashboard",
+        "roleProofKind": "semantic-dashboard",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 2,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": false,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/SchoolManagment/Actions/MyStudents",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      ],
+      "outcomes": [],
+      "durable": {
+        "students": 0,
+        "sections": 0,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "teacherName": "معلم اصطناعي",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "principalName": "",
+            "canonicalId": "profile",
+            "serverRevision": 1,
+            "deleted": false,
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض"
+          }
+        ],
+        "receipts": []
+      },
+      "noRowsBeforeStaleReturnProof": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "sharedBrowserFinally": true
+  }
+}
