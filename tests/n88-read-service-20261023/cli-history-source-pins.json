@@ -1,0 +1,30 @@
+{
+  "aiAuthored": true,
+  "cliVersion": "2.120.0",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/supabase/cli/v2.120.0/apps/cli/src/commands/migration/up/up.handler.ts",
+      "sha256": "969b61b481ecb9b8aec50098330bf63387a18c779c29454ef68b87c1535eb459"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/supabase/cli/v2.120.0/apps/cli/src/command-internal/migration-history.ts",
+      "sha256": "1e490ed3e3a868b776fcd91297fb0bc9cdee47e5c675e413905fb4c7fdec2697"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/supabase/cli/v2.120.0/apps/cli/src/command-internal/migration-fetch-run.ts",
+      "sha256": "e9036e5a76406b56ff503e771c625702bb9e9d341b6b5345311f2d9f16070ab7"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/supabase/cli/v2.120.0/apps/cli/src/command-internal/db-push-core.ts",
+      "sha256": "1d9ecfcf77c45c56d6a56e91b719e853ba04d35b2fc9947ea186af07308454b1"
+    }
+  ],
+  "verifiedBehavior": [
+    "missing-local checked before apply",
+    "fetch reads immutable statements and serializes join semicolon-newline plus final terminator",
+    "dry-run reports pending without applying",
+    "no include-all/history repair/reset"
+  ],
+  "priorExit1Cause": "UNKNOWN; source defect independently proved",
+  "providerOperations": 0
+}

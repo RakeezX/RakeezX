@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "fbc57f79-e4dc-461c-bca6-912edcd6ba5a",
+  "status": "FAIL",
+  "checks": [],
+  "cleanup": {
+    "ownedNativePgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "timingComparison": "REUSED tests/n88-read-roundtrip-outcome-20261023/result.json; no new timing benchmark",
+  "failure": {
+    "stage": "install candidate only in fabricated PG",
+    "name": "ReferenceError",
+    "message": "inputs is not defined",
+    "code": null,
+    "stack": "ReferenceError: inputs is not defined\n    at finish (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-read-roundtrip-outcome-20261023/drafts/n88-student-portal/activation/read-roundtrip-20261023/prepare.mjs:82:292)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-read-roundtrip-outcome-20261023/tests/n88-read-roundtrip-outcome-20261023/staged.mjs:32:17"
+  }
+}

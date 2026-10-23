@@ -1,3 +1,5 @@
+import typedReads from './read-service-20261023/typed-read-operations.json' with {type:'json'};
+import typedIdentities from './read-service-20261023/typed-identities.json' with {type:'json'};
 /** AI-authored. Finite trusted operations, native typed results, bound ASCII wire.
  * No caller-supplied SQL reaches PostgreSQL; no JSON result conversion is added.
  */
@@ -5,9 +7,10 @@ import {Buffer} from 'node:buffer';
 import contract from './error-boundary-contract.json' with {type:'json'};
 import identities from './error-boundary-identities.json' with {type:'json'};
 const fail=()=>{throw Error('n88_database_unavailable');};
-const verified=new WeakSet();
+const verified=new WeakMap();
 const operations=new Map(contract.operations.map(o=>[o.sql,o]));
 const controls=new Set(contract.controls);
+const typedOperations=new Map([...contract.operations,...typedReads].map(o=>[o.sql,o]));
 export const boundaryCatalogSql=`select p.proname as name,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,
     pg_get_function_identity_arguments(p.oid) as arguments,p.prosecdef as definer,
     r.rolname as owner,p.proconfig as config,
@@ -18,9 +21,13 @@ export const boundaryCatalogSql=`select p.proname as name,encode(sha256(convert_
 export async function assertVerifiedBoundary(client) {
   verified.delete(client);
   const r=await client.query(boundaryCatalogSql);
-  if(identities.length!==operations.size || JSON.stringify(r.rows)!==JSON.stringify(identities))fail();
-  verified.add(client);
+  if(identities.length!==76||operations.size!==76||typedIdentities.length!==78||typedOperations.size!==78)fail();
+  const rows=JSON.stringify(r.rows);
+  if(rows===JSON.stringify(identities))verified.set(client,'serial');
+  else if(rows===JSON.stringify(typedIdentities))verified.set(client,'batch');
+  else fail();
 }
+export function verifiedBoundaryMode(client){const mode=verified.get(client);if(!mode)fail();return mode;}
 function pgText(value) {
   if(value===null)return null;
   if(typeof value==='string' || typeof value==='bigint' || typeof value==='boolean')return String(value);
@@ -38,7 +45,7 @@ export async function privateQuery(client,sql,values=[]) {
     } else if(values.length)fail();
     return client.query(sql,values);
   }
-  const op=operations.get(sql);
+  const op=(verifiedBoundaryMode(client)==='batch'?typedOperations:operations).get(sql);
   if(!op || values.length!==op.parameters.length)fail();
   const wire=values.map(encodeBoundaryParameter);
   const result=await client.query(`select * from n88_private.${op.name}(${wire.map((_,i)=>'$'+(i+1)+'::text').join(',')})`,wire);

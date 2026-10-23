@@ -1,0 +1,529 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "1593971e-7927-4c32-a307-e751d0b2c869",
+  "candidateSha": "30a9d92302e3a376a7ec3cfc62cb00dbe98df936",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "prior": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "observedAt": "2026-10-23T14:04:54.386Z",
+  "providerWrites": 0,
+  "status": "PASS",
+  "provider": {
+    "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+    "version": 66,
+    "verifyJwt": false,
+    "unchangedImmutableVersionSourceProofReused": true,
+    "otherConfigDigest": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af",
+    "keysetDigest": "6087c1195ab1e6ffeed00ff8e975cdd7f3d1b59e3b437b1c32ac006261cac28e",
+    "pinDigest": "d69ac9b90c73d1fe82810e8b3ce07514f87144070ee338863b662fae4a760940",
+    "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8"
+  },
+  "drainage": {
+    "method": "documented global successful deployment plus maximum hosted worker wall-clock lifetime",
+    "maximumHostedWorkerLifetimeSeconds": 400,
+    "minimumElapsedSinceVerifiedNewSourceAndPinSeconds": 410,
+    "actualElapsedSeconds": 20102,
+    "basis": [
+      "https://supabase.com/docs/guides/functions/deploy#step-4-verify-successful-deployment",
+      "https://supabase.com/docs/guides/functions/limits"
+    ],
+    "directWorkerInventoryObserved": false
+  },
+  "configurationUnchanged": true,
+  "catalogFingerprint": "1bb069d92641e56a5d363dbed46edd87fa2204dc3dfab6af69517538bdb512b1",
+  "routineCount": 78,
+  "old76Unchanged": true,
+  "newFunctions": [
+    {
+      "name": "boundary_3121e2df6802725969086adf",
+      "definition": "85c759eddc12f862b88fea693762db33e1bb22b0b49fbfcfbca5d4a86fb82cb5",
+      "arguments": "p1 text, p2 text, p3 text",
+      "definer": false,
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_backend:EXECUTE",
+        "postgres:EXECUTE"
+      ]
+    },
+    {
+      "name": "boundary_9e3f889e8b1e375a0a980496",
+      "definition": "db26298dae922e9ae1e606a63d70b496439055a5133253247c74e8ac57ce0a08",
+      "arguments": "p1 text, p2 text, p3 text",
+      "definer": false,
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_backend:EXECUTE",
+        "postgres:EXECUTE"
+      ]
+    }
+  ],
+  "migration": {
+    "version": "20261023070851",
+    "name": "n88_fixed_typed_read_transition",
+    "statements_digest": "fa55c8535bd2e9ba226650feed5d62bc9a92a154b84aa8b6a29e69173a007cfe",
+    "source_digest": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b"
+  },
+  "priorHistoryUnchanged": true,
+  "fullHistoryBeforeDigest": "7e75d7cef06daa3c410860182640bb6b0fcd7c31e21aef26e1cc5da74fc8b93b",
+  "fullHistoryAfterDigest": "18d0d1d3ee19231bc526ca2aaab2c2e93a5f33138b39b77a0953d225a9e437ae",
+  "sqlSha256": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b",
+  "correctedInvocationAcknowledged": true,
+  "classification": null,
+  "correctedMigrationInvocations": 1,
+  "totalMigrationInvocationsAcrossRuns": 2,
+  "appliedNewMigrations": 1,
+  "nativeUploads": 1,
+  "pinUpdates": 1,
+  "realAccountReads": 0,
+  "actualUserSpeed": "NOT_RUN",
+  "inheritedIsolation": {
+    "parentProtected": true,
+    "exactCurrentUserOnly": true,
+    "inheritanceVerified": true,
+    "childVerified": true,
+    "reparseDenied": true,
+    "aclWrites": 0
+  },
+  "historyMirror": {
+    "status": "PASS",
+    "remoteCount": 67,
+    "localCount": 68,
+    "skippedAppliedVersions": [
+      "0001",
+      "0002",
+      "0003",
+      "0004",
+      "0007",
+      "0008",
+      "0009",
+      "0010",
+      "0011",
+      "0012",
+      "0013",
+      "0014",
+      "0015",
+      "0016",
+      "0017",
+      "0018",
+      "0019",
+      "0020",
+      "0021",
+      "0022",
+      "0023",
+      "0024",
+      "0025",
+      "0026",
+      "0027",
+      "0028",
+      "0029",
+      "0030",
+      "0031",
+      "0032",
+      "0033",
+      "0034",
+      "20260924003436",
+      "20260924173929",
+      "20260926115629",
+      "20260930094421",
+      "20260930234353",
+      "20261004022154",
+      "20261005052506",
+      "20261005052526",
+      "20261005052550",
+      "20261007230123",
+      "20261012130249",
+      "20261012140116",
+      "20261012235209",
+      "20261013020136",
+      "20261013045630",
+      "20261013054114",
+      "20261013075936",
+      "20261013105436",
+      "20261013122332",
+      "20261014001558",
+      "20261014174527",
+      "20261015082719",
+      "20261018194329",
+      "20261018200406",
+      "20261018200508",
+      "20261018203630",
+      "20261018203704",
+      "20261018203805",
+      "20261018203837",
+      "20261018203858",
+      "20261018203919",
+      "20261018203939",
+      "20261019095922",
+      "20261020084214",
+      "20261020090836"
+    ],
+    "historicalSources": [
+      {
+        "version": "0001",
+        "sha256": "0ea15719311a11c08012bb9b2e50f5ef733f0fde238f51bf24723f36bf6531c2",
+        "statementCount": 27
+      },
+      {
+        "version": "0002",
+        "sha256": "3d5c46a22349ead0c66f4e0d45181c327795fbd2f5eaa46a56afbf24950e411e",
+        "statementCount": 317
+      },
+      {
+        "version": "0003",
+        "sha256": "662711cc5ed1a269a45af11d547ad00577fcee2490beb5894cecf84f12f03a77",
+        "statementCount": 2
+      },
+      {
+        "version": "0004",
+        "sha256": "45b7d9622c080da3c1f6defc31bf9189cc76fe1b3b3a59ea3ee7ab4ae2ce88f5",
+        "statementCount": 22
+      },
+      {
+        "version": "0007",
+        "sha256": "72ff9ffa0d45f32e5bd64746399e1bf8f7eb89ec1d3a8eeb9a1291f64bcf804a",
+        "statementCount": 5
+      },
+      {
+        "version": "0008",
+        "sha256": "ec2db79ed31f1b4130556ad143a1eccab5a0bd070a06d1620c756ac647c6a833",
+        "statementCount": 8
+      },
+      {
+        "version": "0009",
+        "sha256": "cb11d178bed82364c908d0809656d4f59854d21541e9285db7debb47df267e2a",
+        "statementCount": 5
+      },
+      {
+        "version": "0010",
+        "sha256": "0d37f97862b0f29948799cc71325b6c19aafce98174502b990e61f251ea80774",
+        "statementCount": 3
+      },
+      {
+        "version": "0011",
+        "sha256": "8e1c3f30a23857ac7591f278f39e6d1526102a710bcd1816e1977fddc8023de0",
+        "statementCount": 14
+      },
+      {
+        "version": "0012",
+        "sha256": "e954e68f472db331884e59e6c73a6f37dede9a6e78025e18d77074e4adecd9a9",
+        "statementCount": 32
+      },
+      {
+        "version": "0013",
+        "sha256": "1db05cdca3fb1a541190b6d3fada2490b9c61f786d3764432ca3e8f1e078e851",
+        "statementCount": 7
+      },
+      {
+        "version": "0014",
+        "sha256": "c53bcbdc896f24a5b5d3ce949143ae8499d4913cc7097ac54da833671ffdb6ba",
+        "statementCount": 10
+      },
+      {
+        "version": "0015",
+        "sha256": "01510910768b394d0598da382eced79f1da2d75c34fa85f2c2c5e409ed1dd121",
+        "statementCount": 7
+      },
+      {
+        "version": "0016",
+        "sha256": "69e78c076c72770063b27bb1027808e3d94d9e243743fb4d23bf08f91c2702da",
+        "statementCount": 7
+      },
+      {
+        "version": "0017",
+        "sha256": "03fd7bf7d75d264d9227702b04d22562f717147b5ecb5ad63a4307b23ee7997e",
+        "statementCount": 7
+      },
+      {
+        "version": "0018",
+        "sha256": "ec08424d0df744d6776a5ccf46159bb18dd672ce41ce81ad5e59ade81722811b",
+        "statementCount": 4
+      },
+      {
+        "version": "0019",
+        "sha256": "2469539779774821f649ebe738f7f2839802971d0299364c14bd39213e190102",
+        "statementCount": 29
+      },
+      {
+        "version": "0020",
+        "sha256": "da78ecf53bca8d9be83931e875b2b096cb7b5d3d628a087c3a549a1380164084",
+        "statementCount": 15
+      },
+      {
+        "version": "0021",
+        "sha256": "4255af1c37136b64ef8d64a25f594c3b8ccda2fd8a4e80f9549021d527964e63",
+        "statementCount": 39
+      },
+      {
+        "version": "0022",
+        "sha256": "1bdd74d2e418a1cb8e1f85618ba4d91aec4099bf6a2e98cf2466fea7c4122b46",
+        "statementCount": 28
+      },
+      {
+        "version": "0023",
+        "sha256": "0e322de7be41841a52809e6906657bd085a2af60473e91dd1b43db893bd5929c",
+        "statementCount": 28
+      },
+      {
+        "version": "0024",
+        "sha256": "29eb2e4b67158fe9681b80bbd0ebdb9c0fa14669ed6b3aed01b61fd459f5004d",
+        "statementCount": 53
+      },
+      {
+        "version": "0025",
+        "sha256": "bb1105e0dc93000b9fd8a0f0fe9a4b57ba127ef9ff4ac89d269cca612d72378f",
+        "statementCount": 47
+      },
+      {
+        "version": "0026",
+        "sha256": "3e5c62699b885ff63d2dedd1d32fb78ca6f9bb71b76bcb47fd2cc46ac728a432",
+        "statementCount": 12
+      },
+      {
+        "version": "0027",
+        "sha256": "b745579ef751ce8912129a041033e8443dbf8f45e6c7f443b562dcd3ba943194",
+        "statementCount": 26
+      },
+      {
+        "version": "0028",
+        "sha256": "b68758d4afd54ec35e3cba4dc9d3e88e95476d87d5223566c7c227bc214115fa",
+        "statementCount": 4
+      },
+      {
+        "version": "0029",
+        "sha256": "901e72997df69ab6d72e482636ff118b0a30e8a331e55baa309f973454f11431",
+        "statementCount": 28
+      },
+      {
+        "version": "0030",
+        "sha256": "55e9b0670ef9593515f62d56956efe514b3cbccfd7cdb6981b823c2b7f565298",
+        "statementCount": 12
+      },
+      {
+        "version": "0031",
+        "sha256": "b807e6d1bed8fcf656de546488bc8f949c97d12ab85069aa0b61b81aa704ff62",
+        "statementCount": 43
+      },
+      {
+        "version": "0032",
+        "sha256": "444027a030895d5743c4826add8a2e9b3e6ee7115394b4d9aaefd630800295cc",
+        "statementCount": 28
+      },
+      {
+        "version": "0033",
+        "sha256": "8dc069f411e50deec146d531ae6f7c0a7cea2ad08755b9df415ed4c0db8b57e1",
+        "statementCount": 99
+      },
+      {
+        "version": "0034",
+        "sha256": "c8065828ae9352da52e535f2d1ce5d66ddb086675300845f0b037dfbbca2a582",
+        "statementCount": 2
+      },
+      {
+        "version": "20260924003436",
+        "sha256": "548a639cef11e30ba1f0904bab6188de3f708aab77ed541346930b847560ee6b",
+        "statementCount": 32
+      },
+      {
+        "version": "20260924173929",
+        "sha256": "2138dd813828acd3b7861014fb331a367d72c91cf34a484f77a009c8b69eb648",
+        "statementCount": 6
+      },
+      {
+        "version": "20260926115629",
+        "sha256": "6ac5f3cd93ec6c9348b520d4e3d89269d56e173aa5f4d9d886d0278670b1e8c6",
+        "statementCount": 14
+      },
+      {
+        "version": "20260930094421",
+        "sha256": "faf43f3bc8c25ccb185a596dbdae623144de732d0733b5c641a2b02d8652ef89",
+        "statementCount": 5
+      },
+      {
+        "version": "20260930234353",
+        "sha256": "10f55b74c942d2ee78e23899227a90790a2b2680220f895506866a9d861a3897",
+        "statementCount": 4
+      },
+      {
+        "version": "20261004022154",
+        "sha256": "ab4352024c3a14bf2bae2dddda2fd79679808615c02f3d03c48b5ac1a37015e4",
+        "statementCount": 1
+      },
+      {
+        "version": "20261005052506",
+        "sha256": "1e87792d34a98c91964ad557aa8ea1f69d6f2b848b26747f6952b55bca9dc518",
+        "statementCount": 1
+      },
+      {
+        "version": "20261005052526",
+        "sha256": "77666ac241fd76b196678ef843ed631b6e3045966178a7f6a5cc1c761b2270c1",
+        "statementCount": 1
+      },
+      {
+        "version": "20261005052550",
+        "sha256": "ab426b74a413fdd52a68cde7c220d40954b3e73cfca1c97c74b3104174c07a30",
+        "statementCount": 1
+      },
+      {
+        "version": "20261007230123",
+        "sha256": "d933e6d348d0e7594f99da7efd903fc1a3ccf672649fa1929dc333a5e9d58438",
+        "statementCount": 1
+      },
+      {
+        "version": "20261012130249",
+        "sha256": "3254b92a5259d480279fe1ae5004605b3f56b2ea92a26dd1fb2dab6edfc3e171",
+        "statementCount": 1
+      },
+      {
+        "version": "20261012140116",
+        "sha256": "9a2a4a762508936957dc228de6f031f7da314680ac707032e0da99215dd9b6d8",
+        "statementCount": 1
+      },
+      {
+        "version": "20261012235209",
+        "sha256": "d09476ded6e09b49e2ef2092474274558bbedc90591dec6aaa5951ed572ed161",
+        "statementCount": 1
+      },
+      {
+        "version": "20261013020136",
+        "sha256": "7b741383c7ad31ab27eedd3eaabc9824e7a6f6a3f8bbbd8a006f05b1fe2bab00",
+        "statementCount": 1
+      },
+      {
+        "version": "20261013045630",
+        "sha256": "76a78f032e5d6ad4f7ef6172f2b8122b3035adf3d9d61d1c0c0b51b820606fbd",
+        "statementCount": 1
+      },
+      {
+        "version": "20261013054114",
+        "sha256": "b7e89851cf8705ba85242ace53b584adf255853a814f1d15d2843210822cd6b2",
+        "statementCount": 1
+      },
+      {
+        "version": "20261013075936",
+        "sha256": "8f591e4d551e9abd04ce1072c3bea5cc96880b1051f44cd408a5f3b335f7873e",
+        "statementCount": 1
+      },
+      {
+        "version": "20261013105436",
+        "sha256": "1d76b30cc040eca1ebdd1c2a1f70419dcb1c3a9e7c38f91c78fa0be962cc32ca",
+        "statementCount": 1
+      },
+      {
+        "version": "20261013122332",
+        "sha256": "8cadce7009319e6097282c2805dcfe8516e5e05d86f52306a2babb228cf52fd2",
+        "statementCount": 1
+      },
+      {
+        "version": "20261014001558",
+        "sha256": "cd44e46d7acae31b376c79f3e48d8a7862b9587002e97db0714cbaac6a166d5d",
+        "statementCount": 1
+      },
+      {
+        "version": "20261014174527",
+        "sha256": "c32eb81c293e4d0d80d8c386a09b095c882ee6604f5747ca035e85e215e29f00",
+        "statementCount": 1
+      },
+      {
+        "version": "20261015082719",
+        "sha256": "bf5842655f6938a5170058c41c03d736d9c8a4e432adad5f46c35453b0e52011",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018194329",
+        "sha256": "d3579fab200f013db63c734f184ae4c741d57c91ebdf98a146b6f294a1173cbd",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018200406",
+        "sha256": "21026baa1ceb32af47869dffd71ef6839788dc7dc0bc39571250a9660b85349a",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018200508",
+        "sha256": "888bb76e64fe5fce879ee701d68f92c40b71af5ef65c767da9dadf9a4b1eeda0",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018203630",
+        "sha256": "4428798ba4fbb8e9e2063ff1a05c42d233e5d511e8a1cd1101800578a04c7189",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018203704",
+        "sha256": "112792a1837c3ba0281cf9839cc0dcbac69a3a117d5346a109ceab3a6ba2a007",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018203805",
+        "sha256": "b5892c411c2f2289289a6cdd2fabfe7d26ae7c99bd169f518e40592d2d9ddce2",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018203837",
+        "sha256": "1ffd3976abc9f6ef257125f78bb188a33aed884edd285710064b8d1dbc4a1bbb",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018203858",
+        "sha256": "3694a570969243b8dbe55e28e1fd095b53ef83d0734103fa25c5402185706061",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018203919",
+        "sha256": "95576ce3f3e0025511506b996027a1f29b9e47eb293faafa7454dad3a0aacb17",
+        "statementCount": 1
+      },
+      {
+        "version": "20261018203939",
+        "sha256": "afce641ebf45088b59e2f8bc01fe69baa3dc1dd6eb3755abfa565fa0438d04d5",
+        "statementCount": 1
+      },
+      {
+        "version": "20261019095922",
+        "sha256": "3dafe213ce4b4ea2f93c2cb56030f01968ba0e34713fc6cce0facf446af3256a",
+        "statementCount": 1
+      },
+      {
+        "version": "20261020084214",
+        "sha256": "234300b066882dba969ca6ee730b8cd65884f674bd63f9eb75341b99058fd2ce",
+        "statementCount": 1
+      },
+      {
+        "version": "20261020090836",
+        "sha256": "cf9f1d40aa0d221c1be7e7de25082d28f12ac28316ea7492eee5d392f645919d",
+        "statementCount": 1
+      }
+    ],
+    "orderedHistoryDigest": "7e75d7cef06daa3c410860182640bb6b0fcd7c31e21aef26e1cc5da74fc8b93b",
+    "onlyPending": [
+      "20261023070851_n88_fixed_typed_read_transition.sql"
+    ],
+    "appliedHistoricalFiles": 0
+  },
+  "cliPlan": {
+    "status": "PASS",
+    "dryRun": true,
+    "onlyPending": [
+      "20261023070851_n88_fixed_typed_read_transition.sql"
+    ],
+    "seeds": 0,
+    "roles": 0,
+    "vaultUpdates": 0
+  },
+  "metadataHistoryCount": 67,
+  "missingHistoricalSourceVersions": [],
+  "originalAttemptMarkerPreserved": true,
+  "correctedInvocationCount": 1,
+  "privateHistoricalSqlExported": false,
+  "privateStagingRemoved": true,
+  "refusedOldCacheUntouched": true,
+  "newNativeUploads": 0,
+  "newPinUpdates": 0,
+  "newCarrierUploads": 0
+}

@@ -1,0 +1,39 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "fbc57f79-e4dc-461c-bca6-912edcd6ba5a",
+  "status": "FAIL",
+  "checks": [
+    {
+      "name": "old_operations_and_guard_bytes_preserved",
+      "status": "PASS",
+      "evidence": "76 exact old SQL/typed operations and all old catalog identities unchanged; two fixed INVOKER additions only; actual boundary and repository code unchanged apart from staged imports."
+    },
+    {
+      "name": "fixed_sql_catalog_drift_and_bound_parameter_rejections",
+      "status": "PASS",
+      "evidence": "Unknown/changed SQL blocked before driver; null owner, invalid UUID and changed bound parameters sanitized in fixed function; actual catalog drift invalidates verified capability, exact restoration required."
+    },
+    {
+      "name": "staged_reader_verified_repository_commit_ack",
+      "status": "PASS",
+      "evidence": "Full/admission batch dispatch through actual privateQuery, source locks, unchanged READ COMMITTED repository and acknowledged COMMIT; empty foreign owner arrays; deterministic order."
+    },
+    {
+      "name": "new_boundary_bounds_freshness_and_cross_table_bytes",
+      "status": "PASS",
+      "evidence": "Native verified repository preserves exact bigint text/current data, 2000 accepted/2001 rejected; actual student+item UTF8 aggregate >2MB rejects via sentinel; explicit decoder null rejected. Original single-row overflow proof reused."
+    }
+  ],
+  "cleanup": {
+    "ownedNativePgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "timingComparison": "REUSED tests/n88-read-roundtrip-outcome-20261023/result.json; no new timing benchmark",
+  "failure": {
+    "stage": "native artifact and application service",
+    "name": "AssertionError",
+    "message": "Expected values to be strictly equal:\n\n401 !== 200\n",
+    "code": "ERR_ASSERTION",
+    "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n401 !== 200\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-read-roundtrip-outcome-20261023/tests/n88-read-roundtrip-outcome-20261023/staged.mjs:105:135\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  }
+}

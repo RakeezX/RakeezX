@@ -1,0 +1,48 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "c4fe03b0-3995-497f-bb84-245077a08f47",
+  "candidateSha": "5e033d699ee2bf7c9491e112e0eb662277a55c71",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "prior": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "observedAt": "2026-10-23T08:17:47.994Z",
+  "providerWrites": 0,
+  "status": "PASS",
+  "custody": {
+    "originalCustodian": true,
+    "priorSourceMatches": true,
+    "historyCount": 8,
+    "historyDigest": "db845860b24e3eab44328f516c18651418f54a0a5de575d746b7b8f6d9db2528",
+    "newTaskHistoryEntries": 0
+  },
+  "recordedHistoricalVersion": 63,
+  "metadataReconciliation": false,
+  "configurationReconciliation": {
+    "status": "PASS",
+    "currentNonPinAggregate": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af",
+    "reconstructedHistoricalAggregate": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186",
+    "keysetDigest": "6087c1195ab1e6ffeed00ff8e975cdd7f3d1b59e3b437b1c32ac006261cac28e",
+    "changedKeys": [
+      "N44_ONE_DEVICE_TEST_JSON"
+    ],
+    "providerWrites": 0,
+    "producerRevision": "638931c283df8566bfefa7523b44444675c608da",
+    "producerRun": "09e92a39-ee54-4c2b-a7ee-dc1f96229125",
+    "certificateSha256": "61a2fdc3540ce40a26d18e1c49974022b3d82d949251bf7d4480a1a7aced5c25",
+    "privateJournalIndependentlyOpened": false,
+    "independentN88AuthApiKeyMatches": true
+  },
+  "provider": {
+    "source": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "sourceExact": true,
+    "version": 64,
+    "verifyJwt": false,
+    "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+    "pinDigest": "b811e19cd906094e46b8492ebf42aa669330f50e61d254fe861649a92539678d",
+    "otherConfigDigest": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af"
+  },
+  "remaining": [
+    "exact catalog/history and carrier preflight",
+    "compatible upload/pin plus supported old-worker drainage evidence before DDL"
+  ]
+}

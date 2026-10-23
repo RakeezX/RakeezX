@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "runId": "a8967304-1ea1-4c79-8223-160eb7da934f",
+  "candidateSha": "fe38d0da2114bd3afe6aea0b43ab7f2cd3dd4f33",
+  "status": "FAIL",
+  "code": "n88_typed_provenance_metadata_shape",
+  "providerWrites": 0,
+  "secretValuesExported": false,
+  "leasesReleased": ["live-mutation", "integration"],
+  "harnessCorrection": "Metadata validator incorrectly excluded lowercase version suffixes used by original install source N88_RECOVERY_KEY_ plus recoveryVersion. Accept normal case-sensitive environment identifiers; retain exact names and SHA256 validation. No service setting changed."
+}

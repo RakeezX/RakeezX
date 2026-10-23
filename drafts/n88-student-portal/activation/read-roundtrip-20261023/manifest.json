@@ -1,0 +1,125 @@
+{
+  "aiAuthored": true,
+  "inactive": true,
+  "enabled": false,
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "fbc57f79-e4dc-461c-bca6-912edcd6ba5a",
+  "baseSha": "4ee4608c3a043f8ff27fd1c90d0ba652bc7e558b",
+  "priorCandidate": "9e95eb6d50eb1c1356d0a1fa306348520724c3e7",
+  "encoding": "UTF-8 LF",
+  "inputs": {
+    "drafts/n88-student-portal/integrated-service.mjs": "49d1f2ab320bb6a15f87d6ca0a890a3163076d61850d56e2b9bada688caf04d8",
+    "drafts/n88-student-portal/postgres-repository.mjs": "cac60b27ab569e2d28440829fd8dea5074f607ac7528e8890a0f21a76de3bd92",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "c17ed676799033cda3b4bd2d39ee185d298c256d62c8878fb595b8a69cf96f99",
+    "drafts/n88-student-portal/activation/error-boundary-contract.json": "eb93ab6817f5103819b42678c5c3b3c351c044c60fd7121394441f344919a5da",
+    "drafts/n88-student-portal/activation/error-boundary-identities.json": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "tests/n88-read-roundtrip-outcome-20261023/outcome.mjs": "8d3bc0a841a3bc3434c4a13614cbe191d830e1836f9755d1cc9d05f6e757aa63",
+    "tests/n88-read-roundtrip-outcome-20261023/result.json": "63469a8965816d44457ff4b1366e399e223afb120aa4d3d4c7289f657604a59f"
+  },
+  "outputs": {
+    "integrated-service.mjs": "16e096026c45372ef4cfdc56b3f3787ac2ecadbc1f0275385e6a64c3e5faef5d",
+    "postgres-repository.mjs": "01aeacea404e91a33e6011f0a34b55dde74ff20024a90c976b1ec88d76c29487",
+    "private-error-boundary.mjs": "c17ed676799033cda3b4bd2d39ee185d298c256d62c8878fb595b8a69cf96f99",
+    "additive-boundary.inactive.sql": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b",
+    "error-boundary-contract.json": "ec4d71de5d434b2959dac252aa6e339e97ae32ac9ff168556f3cfd0db46e63f9",
+    "error-boundary-identities.json": "1c9e9f0419bb2450acfab84996c9a6afc2566f07cb62398d2ae59a704f1dec04",
+    "native63-candidate.inactive.mjs": "a0f3d3fb53070f3f28dde2660efba508e646eb3ffbefb543f589e9d72a36a70f"
+  },
+  "oldOperationCount": 76,
+  "newOperations": [
+    {
+      "sql": "select table_index,case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (order by table_index,id rows unbounded preceding)<=$3 then payload else null end as payload from (select 0 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status from rakeezx.years where owner_id=$1::uuid order by id limit $2) x union all select 1 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x union all select 2 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,archived_at,grade,label,name from rakeezx.sections where owner_id=$1::uuid order by id limit $2) x union all select 3 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,status,name from rakeezx.students where owner_id=$1::uuid order by id limit $2) x union all select 4 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,section_id,status,start_date,end_date from rakeezx.enrollments where owner_id=$1::uuid order by id limit $2) x union all select 5 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x union all select 6 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,name,max,\"order\",auto,per_point,penalty,score_mode,portability_group_id from rakeezx.items where owner_id=$1::uuid order by id limit $2) x union all select 7 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,item_id,value,manual_value,derived_value from rakeezx.scores where owner_id=$1::uuid order by id limit $2) x union all select 8 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,item_id,name,value,\"order\",start_date,due_date,late_points from rakeezx.score_subitems where owner_id=$1::uuid order by id limit $2) x union all select 9 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,subitem_id,checked,completion_state from rakeezx.score_subitem_completions where owner_id=$1::uuid order by id limit $2) x union all select 10 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,teaching_id,date,status from rakeezx.sessions where owner_id=$1::uuid order by id limit $2) x union all select 11 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,session_id,status from rakeezx.attendance where owner_id=$1::uuid order by id limit $2) x union all select 12 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,student_id,teaching_id,kind,delta from rakeezx.logs where owner_id=$1::uuid order by id limit $2) x) bounded order by table_index,id",
+      "name": "boundary_9e3f889e8b1e375a0a980496",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "table_index",
+          "type": "integer",
+          "oid": 23
+        },
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    },
+    {
+      "sql": "select table_index,case when octet_length(payload)<=$3 and sum(octet_length(payload)) over (order by table_index,id rows unbounded preceding)<=$3 then payload else null end as payload from (select 0 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,year_id,status,start_date,end_date from rakeezx.terms where owner_id=$1::uuid order by id limit $2) x union all select 1 as table_index,x.id,row_to_json(x)::text as payload from (select id,owner_id,revision::text as revision,deleted_at,section_id,term_id,subject_id from rakeezx.teachings where owner_id=$1::uuid order by id limit $2) x) bounded order by table_index,id",
+      "name": "boundary_3121e2df6802725969086adf",
+      "parameters": [
+        "uuid",
+        "bigint",
+        "integer"
+      ],
+      "output": [
+        {
+          "name": "table_index",
+          "type": "integer",
+          "oid": 23
+        },
+        {
+          "name": "payload",
+          "type": "text",
+          "oid": 25
+        }
+      ],
+      "effect": false,
+      "voidResult": false,
+      "command": "SELECT"
+    }
+  ],
+  "recordedProvider": {
+    "receipt": "tests/n88-student-read-phase-latency-20261021/native-complete.json",
+    "source": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+    "version": 63,
+    "freshReadback": false
+  },
+  "nativeTransformSpans": [
+    {
+      "start": 81012,
+      "end": 82450,
+      "preimageSha256": "b6c75a98994fb58386c78c838ae85ec96f129086baaee953dd0580c7533cf487",
+      "replacementSha256": "439cebb9d236ea8eba799d1e2851cd68854776316a13012f08c7de8745457300"
+    },
+    {
+      "start": 94990,
+      "end": 136497,
+      "preimageSha256": "8746cb5da18382112d642947465b51e0027a6bbda123cbb1384eeee02160f276",
+      "replacementSha256": "0e32f5d23e3e8c98b38fef6f04f8218824b9f9193526cc7ab5b3fdd4a5d9fadf"
+    },
+    {
+      "start": 136570,
+      "end": 163444,
+      "preimageSha256": "1156431ba3701528d182a0a9c214dde89409def8defd352a6f1c5617c87bf639",
+      "replacementSha256": "da6a96f682a90783b2356fcf1a5e562d75424e728caba18d9c76e4e79a0181fe"
+    }
+  ],
+  "originalCustodian": {
+    "taskId": "continuous-n88-official-student-portal-activation-20261018",
+    "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+    "publicCard": "artifacts/ops-supervisor-v4/queue/continuous-n88-official-student-portal-activation-20261018.json",
+    "worktree": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+    "latestSourceGateTask": "continuous-n88-student-read-phase-latency-20261021",
+    "latestSourceGateSession": "01a15e63-ff70-7d02-b264-2631fc585456"
+  },
+  "activation": {
+    "authorized": false,
+    "providerServiceOperations": 0,
+    "requiresSeparateSensitiveAuthority": true,
+    "additiveFunctions": 2,
+    "oldFunctionsAltered": 0,
+    "appliedMigrationsChanged": 0,
+    "activeSourcesChanged": 0,
+    "uploadsPerformed": 0,
+    "pinsUpdated": 0
+  }
+}

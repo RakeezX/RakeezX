@@ -1,0 +1,59 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "preparedRunId": "4575c6a7-2cb8-459e-a779-8de667c5fea2",
+  "baseSha": "5f4b1b87f0743251e5650da7490f5b1a0704db36",
+  "priorPackage": "ddfa87956cd673abad634a492c9aff6bacba86b8",
+  "priorNative": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "native": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "sql": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b",
+  "oldCatalogFingerprint": "fafa68c0efd3a80749a773780ed77760c196cae499e491c767e1aa62b02eec88",
+  "newCatalogFingerprint": "1bb069d92641e56a5d363dbed46edd87fa2204dc3dfab6af69517538bdb512b1",
+  "modes": [
+    "serial",
+    "batch"
+  ],
+  "unknownCatalog": "DENY",
+  "operationCounts": [
+    76,
+    78
+  ],
+  "spans": [
+    {
+      "label": "fixed reader selector",
+      "preimage": "b6c75a98994fb58386c78c838ae85ec96f129086baaee953dd0580c7533cf487",
+      "replacement": "4f0e0faf24a7ac53086b59066daf431d52123945ca95f2daa561af9411784c20"
+    },
+    {
+      "label": "verified per-connection mode",
+      "preimage": "0329afefbbf3999e557709cc1cabdde231ddda403ee64599e11bc344f6cbd241",
+      "replacement": "e697b8ca7bf644effd4e2870fd106c3d1ebe4a4f622daaf713c2cc6e42809f41"
+    },
+    {
+      "label": "strict two catalog selector",
+      "preimage": "e95ac3ccea1b43e0a59740c6ef7d0fbff918cb289d5e49531df71f8315ded172",
+      "replacement": "8d3cd71165952b82a34504b3954f15f3bba2710f1fa382f958106330fbbd1b8a"
+    },
+    {
+      "label": "fixed typed operation dispatch",
+      "preimage": "4a26b7fa7496d6cc7b076a299aabbad048e34d37f571a99929bbd8e1cea952d4",
+      "replacement": "d4351172b7fde06aba3d595a7e2a65ad17a2f543f829376ffffb1990e79e9792"
+    },
+    {
+      "label": "fenced mode capability",
+      "preimage": "b15ede6b172447c4a6363fbf631987addc38619628f85cece73d494a7f6f5763",
+      "replacement": "91da45bdf08c911e3444b80d4a94eaffa981094938b6a5f313c91ffaecfa554a"
+    }
+  ],
+  "outputs": {
+    "private-error-boundary.mjs": "46b5e29a095788f3dd211d6ce8c99fac17dbcb7e85fec243de7ff69f403d303f",
+    "postgres-repository.mjs": "9a69055b1f52f3f6e4b6a39576ec3dda119ca8d4fdda5bf48da8d53115a71838",
+    "integrated-service.mjs": "fa21b7a957a0489737761c4e455999b2c3856293e6509ab20eabb1defc0c5f5e",
+    "typed-read-operations.json": "ad5445a843afbfe464869fa6789b518d0f80fcb5518cd611c93442da768e9ccf",
+    "typed-identities.json": "1c9e9f0419bb2450acfab84996c9a6afc2566f07cb62398d2ae59a704f1dec04",
+    "error-boundary-contract.json": "eb93ab6817f5103819b42678c5c3b3c351c044c60fd7121394441f344919a5da",
+    "error-boundary-identities.json": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4",
+    "native63-compatible.inactive.mjs": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390"
+  },
+  "serviceOperations": 0
+}

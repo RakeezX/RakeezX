@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "c4fe03b0-3995-497f-bb84-245077a08f47",
+  "candidateSha": "d614cc9641f36b67c010e1e69b2224a0eef32470",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "prior": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "observedAt": "2026-10-23T08:29:15.840Z",
+  "providerWrites": 0,
+  "status": "PASS",
+  "provider": {
+    "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+    "sourceExact": true,
+    "version": 66,
+    "verifyJwt": false,
+    "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+    "updatedAt": 1792744169961,
+    "otherConfigDigest": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af",
+    "pinDigest": "d69ac9b90c73d1fe82810e8b3ce07514f87144070ee338863b662fae4a760940",
+    "keysetDigest": "6087c1195ab1e6ffeed00ff8e975cdd7f3d1b59e3b437b1c32ac006261cac28e"
+  },
+  "uploadAcknowledgedAt": "2026-10-23T08:29:30.877Z",
+  "verifiedAt": "2026-10-23T08:29:52.694Z",
+  "nativeUploads": 1,
+  "pinUpdates": 1,
+  "migrations": 0,
+  "carrierUploads": 0,
+  "drainage": "NOT_RUN; no DDL before supported gate",
+  "realAccountReads": 0
+}

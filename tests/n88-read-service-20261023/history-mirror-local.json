@@ -1,0 +1,14 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "checks": [
+    "complete exact authentic mirror",
+    "missing/extra/out-of-order/drifted source deny",
+    "wrong SQL and applied target deny",
+    "empty source and traversal deny",
+    "only-one CLI dry-run plan",
+    "allowlisted private-safe failure classification"
+  ],
+  "providerOperations": 0
+}

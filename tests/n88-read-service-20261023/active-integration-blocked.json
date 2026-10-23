@@ -1,0 +1,8 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "expectedDenial": "n88_actual_service_prerequisites_required",
+  "actualServicePrerequisite": "FAIL / migration NOT_APPLIED",
+  "activeSourceBundleManifestUnchanged": true,
+  "providerOperations": 0
+}

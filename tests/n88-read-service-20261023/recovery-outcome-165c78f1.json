@@ -1,0 +1,29 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "165c78f1-dfbd-4cf2-955b-3bbf59b16f7a",
+  "preservedExecutionRunId": "4575c6a7-2cb8-459e-a779-8de667c5fea2",
+  "preservedCandidateSha": "801f41a3afb75b0d09556c32da6857c66c3170ff",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "state": "BLOCKED",
+  "code": "n88_typed_config_drift",
+  "observedNativeMetadataVersion": 64,
+  "expectedNonPinConfigurationDigest": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186",
+  "actualNonPinConfigurationDigest": null,
+  "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+  "inference": "Executed guard order proves source, parsed import-map equality and public pin passed before config_drift. Unchanged local import-map digest equals prior reference, identifying the other-config comparison; actual scalar was not retained.",
+  "localTransitionProof": "transition.json",
+  "localProofReusedWithoutRerun": true,
+  "nativeUploads": 0,
+  "pinUpdates": 0,
+  "migrationApplications": 0,
+  "realAccountReads": 0,
+  "recoveryProviderOperations": 0,
+  "remaining": {
+    "catalogAndHistoryReadback": "NOT_RUN",
+    "carrierParity": "NOT_RUN",
+    "compatibleActivationAndDrainage": "NOT_RUN",
+    "hostedUserSpeedAcceptance": "NOT_RUN"
+  },
+  "retryCondition": "Material authorized reconciliation of current non-pin configuration against the recorded reference, preserving exact custody and append-only unused operation history."
+}

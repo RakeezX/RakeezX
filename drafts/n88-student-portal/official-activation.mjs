@@ -3,6 +3,15 @@
  * CLI args/output never carry a password, verifier or secret value.
  */
 import assert from 'node:assert/strict';
+import {runCustodyPreflight} from './activation/read-service-20261023/custody-preflight.mjs';
+import {runConfigProvenance} from './activation/read-service-20261023/config-provenance.mjs';
+import {runCatalogPreflight} from './activation/read-service-20261023/catalog-preflight.mjs';
+import {runNativeActivation} from './activation/read-service-20261023/native-activation.mjs';
+import {runMigrationActivation,runMigrationReconciliation} from './activation/read-service-20261023/migration-activation.mjs';
+import {classifyCliFailure} from './activation/read-service-20261023/history-mirror.mjs';
+import {runHistoryCorrection} from './activation/read-service-20261023/history-correction.mjs';
+import {createInheritedVerifier} from './activation/read-service-20261023/inherited-custody.mjs';
+import {guardCustodyContext} from './activation/read-service-20261023/custody-preflight.mjs';
 import {runLatencyStaticPhase} from '../../tests/n88-student-read-phase-latency-20261021/static-gate.mjs';
 import {LATENCY,runLatencyNativePhase,digest as latencyDigest} from '../../tests/n88-student-read-phase-latency-20261021/native-gate.mjs';
 import {MOBILE503,runMobile503Phase,digest as mobile503Digest} from '../../tests/n88-mobile-class-source-503-20261021/native-gate.mjs';
@@ -44,9 +53,19 @@ async function save(state){await owned();const b=Buffer.from(JSON.stringify(stat
 async function official(args){
  const r=spawnSync(process.execPath,[cli,...args],{windowsHide:true,timeout:30000,maxBuffer:1048576});
  // Even failure diagnostics may contain provider SQL detail. Never emit them.
- const status=r.status,raw=r.stdout.toString();r.stdout.fill(0);r.stderr.fill(0);
- if(status!==0)fail('n88_official_cli_failed_'+(status??'timeout'));
+ const status=r.status,raw=r.stdout.toString(),failure=status!==0?classifyCliFailure({status,error:r.error,stdout:raw,stderr:r.stderr.toString()}):null;r.stdout.fill(0);r.stderr.fill(0);
+ if(status!==0)fail('n88_official_cli_'+failure.category.toLowerCase()+'_'+(status??'timeout'));
  try{return JSON.parse(raw);}catch{return null;}
+}
+async function officialClassified(args){
+ const pair=args.slice(0,2).join(' '),workdir=args[args.indexOf('--workdir')+1];
+ if(!['migration fetch','db push','migration up'].includes(pair)||!args.includes(project)||!args.includes('--linked')||!workdir||path.dirname(path.resolve(workdir))!==phase||!path.basename(workdir).startsWith('typed-read-authentic-history-')||args.includes('--include-all')||args.includes('--db-url'))fail('n88_typed_classified_cli_scope');
+ const r=spawnSync(process.execPath,[cli,...args],{windowsHide:true,timeout:60000,maxBuffer:4194304});
+ try{
+  if(r.status!==0)return {ok:false,...classifyCliFailure({status:r.status,error:r.error,stdout:r.stdout.toString(),stderr:r.stderr.toString()})};
+  let parsed=null;try{parsed=JSON.parse(r.stdout.toString());}catch{}
+  return {ok:true,exitCode:0,data:parsed?.data??parsed?.result??parsed};
+ }finally{r.stdout.fill(0);r.stderr.fill(0);}
 }
 async function sqlFile(text){
  await owned();const file=path.join(phase,'owned-input.sql');
@@ -54,6 +73,23 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(action==='--typed-read-inherited-custody-proof'){
+  const c=await guardCustodyContext(value);let result;
+  try{const verify=await createInheritedVerifier({phase,originalRoot:root,owned});result={...c.stamp,status:'PASS',...(await verify()),providerOperations:0,newDirectories:0};}
+  catch(e){result={...c.stamp,status:'BLOCKED',code:/^n88_[a-zA-Z0-9_]+$/.test(e.message)?e.message:'n88_inherited_custody_private_failure',providerOperations:0,aclWrites:0,newDirectories:0};}
+  await writeFile(path.join(c.evidence,'inherited-custody-proof-'+c.run+'.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
+ }
+ if(action==='--typed-read-correct-history-inherited')return runHistoryCorrection({candidate:value,load,save,official,officialClassified,sqlFile,phase,createInheritedVerifier:()=>createInheritedVerifier({phase,originalRoot:root,owned})});
+ if(['--typed-read-correct-history-sid-identity','--typed-read-correct-history-directory'].includes(action))fail('n88_retired_acl_preparation_route');
+ if(action==='--typed-read-reconcile-migration')return runMigrationReconciliation({candidate:value,load,official,sqlFile});
+ if(action==='--typed-read-apply-fixed-migration')return runMigrationActivation({candidate:value,load,save,official,sqlFile,phase});
+ if(action==='--typed-read-activate-compatible')return runNativeActivation({candidate:value,load,save,official,phase});
+ if(action==='--typed-read-catalog-field-order')return runCatalogPreflight({candidate:value,load,sqlFile,reconcile:true});
+ if(action==='--typed-read-catalog-preflight')return runCatalogPreflight({candidate:value,load,sqlFile});
+ if(action==='--typed-read-exact-config-preflight')return runCustodyPreflight({candidate:value,load,official,sharedCertificate:true});
+ if(action==='--typed-read-config-provenance')return runConfigProvenance({candidate:value,load,official});
+ if(action==='--typed-read-preflight')return runCustodyPreflight({candidate:value,load,official});
+ if(action==='--typed-read-reconcile-preflight')return runCustodyPreflight({candidate:value,load,official,reconcile:true});
  if(['--mobile503-preflight','--mobile503-upload','--mobile503-pin','--mobile503-complete'].includes(action)){
   const c=MOBILE503,taskRoot=fileURLToPath(new URL('../../',import.meta.url));
   if(path.resolve(root)!==path.resolve(c.originalRoot)||path.resolve(taskRoot)!==path.resolve(c.taskRoot))fail('n88_mobile503_original_context');

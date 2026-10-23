@@ -1,0 +1,22 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "fbc57f79-e4dc-461c-bca6-912edcd6ba5a",
+  "status": "PASS",
+  "manifestSha256": "80deb4166208469ab8888ed6bb4c00becef00c72a2f2465d6f70a071a890f471",
+  "nativeCandidateSha256": "a0f3d3fb53070f3f28dde2660efba508e646eb3ffbefb543f589e9d72a36a70f",
+  "oldOperationCount": 76,
+  "newOperationCount": 2,
+  "activeSourcesUnchanged": true,
+  "originalMeasurementReused": true,
+  "exactThreeSpanNativeReconstruction": true,
+  "allOwnedResourcesReleased": true,
+  "qualificationSourceSha256": {
+    "drafts/n88-student-portal/activation/read-roundtrip-20261023/prepare.mjs": "76f69eadcdacef80e59ed67e2f4b76196d5af63329e2f4c3ee86872a8c475ebc",
+    "drafts/n88-student-portal/activation/read-roundtrip-20261023/ACTIVATION.md": "60d555c748b55ccdda5680e87a6e0baebc55117093ad91aed36a3d4141535e35",
+    "tests/n88-read-roundtrip-outcome-20261023/staged.mjs": "c93d7713e77db20d56cb99db52b5b2428edf318e792fb7c9d33872fc61d7f24b",
+    "tests/n88-read-roundtrip-outcome-20261023/compatibility.mjs": "f117c7417af52b3be178531522ce388ec83f842878347be2a9495dc591918d63",
+    "tests/n88-read-roundtrip-outcome-20261023/verify.mjs": "4f0abe50e056093c37ef757e000e0d7dd43cb524bcc82c0cb9fd7f50e8af7ffe"
+  },
+  "activationAuthorized": false,
+  "providerOperations": 0
+}

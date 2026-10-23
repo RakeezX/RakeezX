@@ -1,0 +1,82 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "c4fe03b0-3995-497f-bb84-245077a08f47",
+  "candidateSha": "6606ce74a843f53196de0b4304db31fb0f64326e",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "prior": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "observedAt": "2026-10-23T08:22:16.982Z",
+  "providerWrites": 0,
+  "status": "PASS",
+  "mode": "serial",
+  "routineCount": 76,
+  "catalogFingerprint": "fafa68c0efd3a80749a773780ed77760c196cae499e491c767e1aa62b02eec88",
+  "objectFieldOrderNormalized": true,
+  "diagnostics": {
+    "responseKeys": [
+      "boundary",
+      "rows",
+      "warning"
+    ],
+    "rowCount": 76,
+    "firstRowFields": [
+      "acl",
+      "arguments",
+      "config",
+      "definer",
+      "definition",
+      "name",
+      "owner"
+    ]
+  },
+  "oldCatalogUnchanged": true,
+  "newFunctionsPresent": false,
+  "migrationHistory": [
+    {
+      "name": "n88_exact_activation_staged_20261018034356",
+      "statements_digest": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c",
+      "version": "20261018194329"
+    },
+    {
+      "name": "n88_guard_membership_inherit_staged_20261018195100",
+      "statements_digest": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de",
+      "version": "20261018203630"
+    },
+    {
+      "name": "n88_integrated_class_staged_20261018102843",
+      "statements_digest": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c",
+      "version": "20261018203704"
+    },
+    {
+      "name": "n88_six_digit_staged_20261018110713",
+      "statements_digest": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
+      "version": "20261018203805"
+    },
+    {
+      "name": "n88_shared_network_budget_staged_20261018114113",
+      "statements_digest": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd",
+      "version": "20261018203837"
+    },
+    {
+      "name": "n88_code_recovery_staged_20261018115648",
+      "statements_digest": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5",
+      "version": "20261018203858"
+    },
+    {
+      "name": "n88_task_guidance_staged_20261018125611",
+      "statements_digest": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060",
+      "version": "20261018203919"
+    },
+    {
+      "name": "n88_private_error_boundary_staged_20261018185300",
+      "statements_digest": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76",
+      "version": "20261018203939"
+    }
+  ],
+  "migrationHistoryDigest": "764aae828d14c2ba3180399c92d23bce192ce6618629ba7022527f138b2d4ca1",
+  "exactPreparedMigrationPreviouslyApplied": false,
+  "remaining": [
+    "unchanged current carrier parity",
+    "compatible native activation/pin and supported old-worker drainage before DDL"
+  ]
+}

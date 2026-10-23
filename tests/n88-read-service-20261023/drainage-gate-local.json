@@ -1,0 +1,12 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "syntheticOnly": true,
+  "checks": [
+    "no early DDL eligibility",
+    "410-second conservative boundary",
+    "unknown source/ACK/pin/version deny"
+  ],
+  "basis": "Documented global successful deployment and maximum hosted worker lifetime; not direct worker inventory",
+  "providerOperations": 0
+}

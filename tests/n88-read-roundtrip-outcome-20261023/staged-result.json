@@ -1,0 +1,56 @@
+{
+  "taskId": "continuous-n88-read-roundtrip-outcome-20261023",
+  "runId": "fbc57f79-e4dc-461c-bca6-912edcd6ba5a",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "old_operations_and_guard_bytes_preserved",
+      "status": "PASS",
+      "evidence": "76 exact old SQL/typed operations and all old catalog identities unchanged; two fixed INVOKER additions only; actual boundary and repository code unchanged apart from staged imports."
+    },
+    {
+      "name": "fixed_sql_catalog_drift_and_bound_parameter_rejections",
+      "status": "PASS",
+      "evidence": "Unknown/changed SQL blocked before driver; null owner, invalid UUID and changed bound parameters sanitized in fixed function; actual catalog drift invalidates verified capability, exact restoration required."
+    },
+    {
+      "name": "staged_reader_verified_repository_commit_ack",
+      "status": "PASS",
+      "evidence": "Full/admission batch dispatch through actual privateQuery, source locks, unchanged READ COMMITTED repository and acknowledged COMMIT; empty foreign owner arrays; deterministic order."
+    },
+    {
+      "name": "new_boundary_bounds_freshness_and_cross_table_bytes",
+      "status": "PASS",
+      "evidence": "Native verified repository preserves exact bigint text/current data, 2000 accepted/2001 rejected; actual student+item UTF8 aggregate >2MB rejects via sentinel; explicit decoder null rejected. Original single-row overflow proof reused."
+    },
+    {
+      "name": "native63_and_staged_source_actual_service_parity",
+      "status": "PASS",
+      "evidence": "Transformed native63 body + staged source + old reader on extended boundary produce equal validated projection. Actual list/issue/claim/visibility/revoke handlers, valid foreign credential/session parents, membership retirement/restore and unknown COMMIT deny preserve privacy. No browser/TLS/provider claim."
+    },
+    {
+      "name": "late_capability_timeout_and_actual_cancellation",
+      "status": "PASS",
+      "evidence": "Post-COMMIT retained port cannot query; delayed callback past test deadline cannot issue late SQL; actual source lock wait cancelled on owned backend returns no success/COMMIT and destroys connection. Production timing unchanged."
+    },
+    {
+      "name": "inactive_manifest_and_active_source_immutability",
+      "status": "PASS",
+      "evidence": "Exact recorded native63 receipt/source, source/SQL/identity/output hashes and public original custodian card/session bound; all active inputs and previous measurement bytes unchanged. No hosted operations."
+    }
+  ],
+  "cleanup": {
+    "ownedNativePgStoppedAndRemoved": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "timingComparison": "REUSED tests/n88-read-roundtrip-outcome-20261023/result.json; no new timing benchmark",
+  "reusedStagedChecks": {
+    "path": "tests/n88-read-roundtrip-outcome-20261023/staged-native-entry-fixture-failure.json",
+    "sha256": "d7216d54346e4920c6f953a0d34de80f4c3d62c66f056b6152cfa1ebf8773568",
+    "reason": "Correct invalid fixture requestId/namespace; preserve completed boundary/repository/bounds checks; staged artifact hashes must match."
+  },
+  "manifestSha256": "80deb4166208469ab8888ed6bb4c00becef00c72a2f2465d6f70a071a890f471",
+  "nativeCandidateSha256": "a0f3d3fb53070f3f28dde2660efba508e646eb3ffbefb543f589e9d72a36a70f",
+  "localStatus": "LOCAL_VALIDATED",
+  "externalBlocker": "New additive service functions and native upload/pin/readback require separate exact sensitive authority and original custodian; zero live authority in this card."
+}

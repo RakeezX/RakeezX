@@ -1,0 +1,19 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "1593971e-7927-4c32-a307-e751d0b2c869",
+  "candidateSha": "30a9d92302e3a376a7ec3cfc62cb00dbe98df936",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "prior": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "observedAt": "2026-10-23T14:04:32.239Z",
+  "providerWrites": 0,
+  "status": "PASS",
+  "parentProtected": true,
+  "exactCurrentUserOnly": true,
+  "inheritanceVerified": true,
+  "childVerified": false,
+  "reparseDenied": true,
+  "aclWrites": 0,
+  "providerOperations": 0,
+  "newDirectories": 0
+}
