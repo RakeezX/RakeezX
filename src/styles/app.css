@@ -118,6 +118,8 @@
   --info:      #2563eb;
   --info-soft: #dbeafe;
   --info-border:#93c5fd;
+  /* Ink paired with solid semantic fills; soft surfaces keep normal text. */
+  --status-ink: #fff;
 
   /* أسماء دلالية مشتركة للأسطح والحدود */
   --surface-page: var(--bg);
@@ -163,6 +165,7 @@
     --warn:      #fbbf24;  --warn-soft:   #34250a; --warn-border: #854d0e;
     --danger:    #f87171;  --danger-soft: #3a1414; --danger-border: #7f1d1d;
     --info:      #93c5fd;  --info-soft:   #11224a; --info-border: #1e3a8a;
+    --status-ink: #0a0d10;
 
     --present: #4ade80; --present-soft: #10301c;
     --absent:  #f87171; --absent-soft:  #3a1414;
@@ -201,6 +204,7 @@
   --warn:      #fbbf24;  --warn-soft:   #34250a; --warn-border: #854d0e;
   --danger:    #f87171;  --danger-soft: #3a1414; --danger-border: #7f1d1d;
   --info:      #93c5fd;  --info-soft:   #11224a; --info-border: #1e3a8a;
+  --status-ink: #0a0d10;
 
   --present: #4ade80; --present-soft: #10301c;
   --absent:  #f87171; --absent-soft:  #3a1414;
@@ -649,9 +653,9 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .btn--quiet:hover { background: var(--bg-sunk); color: var(--text); }
 
 .btn--danger { background: var(--danger-soft); color: var(--danger); }
-.btn--danger:hover { background: var(--danger); color: #fff; }
+.btn--danger:hover { background: var(--danger); color: var(--status-ink); }
 .btn--info { background: var(--info-soft); color: var(--info); border-color: var(--info-border); }
-.btn--info:hover { background: var(--info); color: #fff; }
+.btn--info:hover { background: var(--info); color: var(--status-ink); }
 
 .btn--block { width: 100%; }
 .btn--sm { min-height: 34px; padding-inline: var(--sp-3); font-size: 13.5px; border-radius: var(--r-sm); }
@@ -1038,9 +1042,9 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   transition: opacity .2s var(--ease), transform .2s var(--ease);
 }
 .toast.is-on { opacity: 1; transform: none; visibility: visible; }
-.toast.is-danger { background: var(--danger); color: #fff; }
-.toast.is-warn { background: var(--warn); color: #fff; }
-.toast.is-info { background: var(--info); color: #fff; }
+.toast.is-danger { background: var(--danger); color: var(--status-ink); }
+.toast.is-warn { background: var(--warn); color: var(--status-ink); }
+.toast.is-info { background: var(--info); color: var(--status-ink); }
 
 /* ---------- 14. المساعدات ---------- */
 .stack   { display: flex; flex-direction: column; }

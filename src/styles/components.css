@@ -119,14 +119,10 @@
   transition: background .12s var(--ease), color .12s var(--ease), transform .08s var(--ease);
 }
 .segbtn:active { transform: scale(.9); }
-.segbtn.is-on[data-color="present"] { background: var(--present); color: #fff; }
-.segbtn.is-on[data-color="late"]    { background: var(--late);    color: #fff; }
-.segbtn.is-on[data-color="excused"] { background: var(--excused); color: #fff; }
-.segbtn.is-on[data-color="absent"]  { background: var(--absent);  color: #fff; }
-:root[data-theme="dark"] .segbtn.is-on { color: #0a0d10; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .segbtn.is-on { color: #0a0d10; }
-}
+.segbtn.is-on[data-color="present"] { background: var(--present); color: var(--status-ink); }
+.segbtn.is-on[data-color="late"]    { background: var(--late);    color: var(--status-ink); }
+.segbtn.is-on[data-color="excused"] { background: var(--excused); color: var(--status-ink); }
+.segbtn.is-on[data-color="absent"]  { background: var(--absent);  color: var(--status-ink); }
 
 @media (max-width: 520px) {
   .attendance-session-tabs {
@@ -7890,10 +7886,11 @@
 .attendance-01c__status-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; inline-size:100%; }
 .attendance-01c__status { display:grid; place-items:center; inline-size:100%; block-size:44px; min-block-size:44px; border:1px solid var(--att-line); border-radius:11px; background:var(--bg-sunk); color:var(--text-2); font-size:12px; font-weight:700; }
 .attendance-01c__status.is-on { border-color:transparent; }
-.attendance-01c__status[data-color="present"].is-on { color:var(--present); background:var(--present-soft); }
-.attendance-01c__status[data-color="late"].is-on { color:var(--late); background:var(--late-soft); }
-.attendance-01c__status[data-color="excused"].is-on { color:var(--excused); background:var(--excused-soft); }
-.attendance-01c__status[data-color="absent"].is-on { color:var(--absent); background:var(--absent-soft); }
+/* These selected controls use soft fills, so pair them with normal text ink. */
+.attendance-01c__status[data-color="present"].is-on { color:var(--text); background:var(--present-soft); }
+.attendance-01c__status[data-color="late"].is-on { color:var(--text); background:var(--late-soft); }
+.attendance-01c__status[data-color="excused"].is-on { color:var(--text); background:var(--excused-soft); }
+.attendance-01c__status[data-color="absent"].is-on { color:var(--text); background:var(--absent-soft); }
 .attendance-01c__status:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
 @media (max-width:900px) {
   .attendance-01c__context-top { flex-direction:column; }
