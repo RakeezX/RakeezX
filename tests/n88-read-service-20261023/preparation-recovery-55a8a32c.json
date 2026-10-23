@@ -1,0 +1,26 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "55a8a32c-8036-45da-a5b6-abf0f4094f7c",
+  "preservedCandidateSha": "3ddd004158227f2d95ff2fa699206e8476860636",
+  "status": "BLOCKED",
+  "blocker": "Original-custodian fresh staging protection has no verified successful result; authentic history fetch and exact CLI planning cannot proceed safely.",
+  "savedFailure": "n88_typed_fresh_directory_protection_unknown_private_failure",
+  "readOnlyLocalProbe": {
+    "pathLength": 280,
+    "nodeExists": true,
+    "childAclProbeException": "System.Management.Automation.CommandNotFoundException",
+    "childAclProbeCategory": "ObjectNotFound",
+    "causeEstablished": false
+  },
+  "newProviderReads": 0,
+  "newProviderWrites": 0,
+  "correctedMigrationInvocations": 0,
+  "historicalSqlFetched": false,
+  "rawDiagnosticsExported": false,
+  "refusedOldCacheUntouched": true,
+  "newAclOrPolicyChanges": 0,
+  "unchangedEvidenceReused": true,
+  "actualHostedSpeedAcceptance": "NOT_RUN",
+  "retryCondition": "Concrete locally verified fresh-directory preparation repair; stop on an actual policy or permission denial; preserve all consumed markers."
+}
