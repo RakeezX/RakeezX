@@ -12,10 +12,11 @@ import {hash} from './prepare.mjs';
 const project='xlrubcwjqktzzunrvuns',originalRun='c4fe03b0-3995-497f-bb84-245077a08f47';
 const fail=c=>{throw Error('n88_typed_history_correction_'+c);};
 const historySql="select version,coalesce(name,'') as name,cardinality(statements) as statement_count,encode(sha256(convert_to(coalesce(array_to_string(statements,E';\\n'),'')||E';\\n','UTF8')),'hex') as source_digest,encode(sha256(convert_to(coalesce(array_to_string(statements,E'\\n'),''),'UTF8')),'hex') as statements_digest from supabase_migrations.schema_migrations order by version";
-export async function runHistoryCorrection({candidate,load,save,official,officialClassified,sqlFile,phase,protectFreshHistoryDirectory}){
+export async function runHistoryCorrection({candidate,load,save,official,officialClassified,sqlFile,phase,protectFreshHistoryDirectory,preparationCorrection=false}){
  const {root,evidence,run,manifest,stamp,card}=await guardCustodyContext(candidate),a=card.preparationAuthority.migrationDirectoryCorrection;
  if(a?.originalAttemptConsumed!==true||a.previousDisposition!=='NOT_APPLIED'||a.maxCorrectedCliInvocations!==1||a.maxTotalAppliedNewMigrations!==1||a.exactExistingVersion!==fixedMigration.version||a.sqlHashUnchanged!==true||a.completeAuthenticHistoryRequired!==true||a.noHistoryRepair!==true||a.noNativeOrPinRetry!==true||a.realDenialStops!==true||a.privateHistoricalSqlExport!==false||manifest.sql!==fixedMigration.digest)fail('authority');
  const json=async p=>JSON.parse(await readFile(p,'utf8'));
+ if(preparationCorrection){const first=await json(path.join(evidence,'history-correction-'+run+'.json'));if(first.code!=='n88_typed_fresh_directory_protection_failed'||first.correctedInvocationCount!==0||first.privateHistoricalSqlExported!==false)fail('preparation_correction_prerequisite');}
  const notApplied=await json(path.join(evidence,'post-interruption-reconcile-5956e8fa-4884-4d0c-a8e9-5f6e4cfef70f.json')),native=await json(path.join(evidence,'native-pin-'+originalRun+'.json')),oldHistory=await json(path.join(evidence,'catalog-history-field-order-'+originalRun+'.json'));
  if(notApplied.migrationDisposition!=='NOT_APPLIED'||notApplied.migrationInvocationsAcrossRuns!==1||native.status!=='PASS'||native.source!==manifest.native)fail('preserved_disposition');
  const drainage=qualifyDrainage(native),state=await load();
@@ -30,7 +31,7 @@ export async function runHistoryCorrection({candidate,load,save,official,officia
   if(nonPinDigest(entries)!==native.provider.otherConfigDigest||hash(JSON.stringify(entries.map(r=>r.name)))!==native.provider.keysetDigest||entries.find(r=>r.name==='N88_SERVICE_SOURCE_SHA')?.digest!==hash(manifest.native))fail('configuration_identity');
   return {source:manifest.native,version:66,verifyJwt:false,unchangedImmutableVersionSourceProofReused:true,otherConfigDigest:nonPinDigest(entries),keysetDigest:native.provider.keysetDigest,pinDigest:hash(manifest.native),importMapDigest:native.provider.importMapDigest};
  };
- const privateStage=path.join(phase,'typed-read-authentic-history-'+run+'.tmp'),owner={taskId:stamp.taskId,runId:run,candidateSha:candidate,purpose:'private authentic migration history mirror only'},filename=fixedMigration.version+'_'+fixedMigration.name+'.sql';
+ const suffix=preparationCorrection?'-sid-identity-fix':'',privateStage=path.join(phase,'typed-read-authentic-history-'+run+suffix+'.tmp'),owner={taskId:stamp.taskId,runId:run,candidateSha:candidate,purpose:'private authentic migration history mirror only'},filename=fixedMigration.version+'_'+fixedMigration.name+'.sql';
  let created=false,cleanup=false,correctedInvoked=false,mirror=null,plan=null,classification=null,provider=null,historyBefore=null,result=null,missingHistoricalSourceVersions=[];
  try{
   provider=await verifyService();assert.deepEqual(await readCatalog(),oldCatalog);historyBefore=await readHistory();
@@ -84,5 +85,5 @@ export async function runHistoryCorrection({candidate,load,save,official,officia
   }
  }
  result={...result,historyMirror:mirror,cliPlan:plan,metadataHistoryCount:historyBefore?.length??null,missingHistoricalSourceVersions,originalAttemptMarkerPreserved:true,correctedInvocationCount:correctedInvoked?1:0,privateHistoricalSqlExported:false,privateStagingRemoved:cleanup,refusedOldCacheUntouched:true,newNativeUploads:0,newPinUpdates:0,newCarrierUploads:0};
- await writeFile(path.join(evidence,'history-correction-'+run+'.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
+ await writeFile(path.join(evidence,'history-correction'+suffix+'-'+run+'.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});return result;
 }

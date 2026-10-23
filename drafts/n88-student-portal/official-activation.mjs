@@ -67,9 +67,10 @@ async function officialClassified(args){
 }
 async function protectFreshHistoryDirectory(directory){
  if(path.dirname(path.resolve(directory))!==phase||!path.basename(directory).startsWith('typed-read-authentic-history-'))fail('n88_typed_fresh_directory_scope');
- const script="$p=[Console]::In.ReadToEnd();$sid=[Security.Principal.WindowsIdentity]::GetCurrent().User;$acl=New-Object Security.AccessControl.DirectorySecurity;$acl.SetAccessRuleProtection($true,$false);$acl.SetOwner($sid);foreach($id in @($sid.Value,'S-1-5-18','S-1-5-32-544')){$rule=New-Object Security.AccessControl.FileSystemAccessRule($id,'FullControl','ContainerInherit,ObjectInherit','None','Allow');$acl.AddAccessRule($rule)};Set-Acl -LiteralPath $p -AclObject $acl;$check=Get-Acl -LiteralPath $p;foreach($rule in $check.Access){$id=$rule.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value;if($id -notin @($sid.Value,'S-1-5-18','S-1-5-32-544')){throw 'fresh directory not private'}}";
+ const script="$ErrorActionPreference='Stop';$p=[Console]::In.ReadToEnd();$sid=[Security.Principal.WindowsIdentity]::GetCurrent().User;$acl=New-Object Security.AccessControl.DirectorySecurity;$acl.SetAccessRuleProtection($true,$false);$acl.SetOwner($sid);foreach($id in @($sid.Value,'S-1-5-18','S-1-5-32-544')){$identity=New-Object Security.Principal.SecurityIdentifier($id);$rule=New-Object Security.AccessControl.FileSystemAccessRule($identity,'FullControl','ContainerInherit,ObjectInherit','None','Allow');$acl.AddAccessRule($rule)};Set-Acl -LiteralPath $p -AclObject $acl;$check=Get-Acl -LiteralPath $p;foreach($rule in $check.Access){$id=$rule.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value;if($id -notin @($sid.Value,'S-1-5-18','S-1-5-32-544')){throw 'fresh directory not private'}}";
  const r=spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{input:directory,windowsHide:true,timeout:15000,maxBuffer:65536});
- r.stdout.fill(0);r.stderr.fill(0);if(r.status!==0)fail('n88_typed_fresh_directory_protection_failed');
+ const category=r.status!==0?classifyCliFailure({status:r.status,error:r.error,stdout:r.stdout.toString(),stderr:r.stderr.toString()}).category:null;
+ r.stdout.fill(0);r.stderr.fill(0);if(r.status!==0)fail('n88_typed_fresh_directory_protection_'+category.toLowerCase());
 }
 async function sqlFile(text){
  await owned();const file=path.join(phase,'owned-input.sql');
@@ -77,6 +78,7 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(action==='--typed-read-correct-history-sid-identity')return runHistoryCorrection({candidate:value,load,save,official,officialClassified,sqlFile,phase,protectFreshHistoryDirectory,preparationCorrection:true});
  if(action==='--typed-read-correct-history-directory')return runHistoryCorrection({candidate:value,load,save,official,officialClassified,sqlFile,phase,protectFreshHistoryDirectory});
  if(action==='--typed-read-reconcile-migration')return runMigrationReconciliation({candidate:value,load,official,sqlFile});
  if(action==='--typed-read-apply-fixed-migration')return runMigrationActivation({candidate:value,load,save,official,sqlFile,phase});
