@@ -2,6 +2,7 @@
 import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
 import fs from 'node:fs';
+import {verifyOwnedPostPushRecovery} from './owned-postpush-recovery.mjs';
 import {verifyN44InterruptedResume} from './n44-interrupted-resume.mjs';
 import {verifiedN44SourceStageSplit,n44QualifiedTask} from './n44-qualified-source-evidence.mjs';
 import {verifyPristineN123DependencyCorrection} from './pending-n123-dependency.mjs';
@@ -731,6 +732,19 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     const remoteHead = git(['ls-remote', '--heads', 'origin', 'refs/heads/main']).split(/\s+/)[0]; insist(GIT_SHA.test(remoteHead), 'Cannot observe remote main');
     git(['cat-file', '-e', remoteHead + '^{commit}']); git(['merge', '--ff-only', remoteHead]);
     receipt.baseSha = git(['rev-parse', 'HEAD']); insist(receipt.baseSha === remoteHead, 'Ops checkout has unpublished commits; this helper will not include them');
+    let ownedPostPushRecovery = null;
+    if (payload.postPushInstallationRecovery) {
+      const ref = payload.postPushInstallationRecovery;
+      for (const [name, folder] of [['receiptPath', 'maintenance'], ['payloadPath', 'intake-evidence']]) {
+        const target = path.resolve(ref[name] ?? ''), expectedRoot = path.resolve(rt, folder) + path.sep;
+        insist(target.toLowerCase().startsWith(expectedRoot.toLowerCase()), 'Post-push proof outside original runtime evidence');
+        noLinks(target); insist(fs.statSync(target).isFile() && fs.statSync(target).size < 2000000, 'Invalid post-push proof');
+      }
+      ownedPostPushRecovery = verifyOwnedPostPushRecovery(payload, fs.readFileSync(ref.receiptPath), fs.readFileSync(ref.payloadPath));
+      git(['merge-base', '--is-ancestor', ownedPostPushRecovery.commit, 'origin/main']);
+      for (const file of payload.files) insist(reviewedPreimageMatches(Buffer.from(gitRaw(['show', ownedPostPushRecovery.commit + ':' + file.repoPath])), Buffer.from(file.content)), 'Original pushed bytes differ');
+      receipt.recoveredPostPush = ownedPostPushRecovery;
+    }
     insist(!dirtyPaths().length, 'Ops checkout changed while preparing');
     for (const file of payload.files) {
       const canonicalFile = path.join(root, file.repoPath), opFile = path.join(ops, file.repoPath); noLinks(canonicalFile); noLinks(opFile);
@@ -738,7 +752,8 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       const remoteEntry = gitRaw(['ls-tree', '-z', remoteHead, '--', file.repoPath]);
       const remoteBytes = remoteEntry ? Buffer.from(gitRaw(['show', remoteHead + ':' + file.repoPath]), 'utf8') : null;
       const approvedBinding = [...sourceBindings.values()].find(binding => binding.sourceCardFile === file.repoPath && binding.kind === 'approved-note') ?? null;
-      insist(reviewedSourcePreimageMatches(remoteBytes, read(opFile), original, file, approvedBinding?.approvedNoteSha256 ?? null), 'Remote main preimage differs from canonical review: ' + file.repoPath);
+      const alreadyPushedExact = ownedPostPushRecovery && reviewedPreimageMatches(remoteBytes, Buffer.from(file.content)) && reviewedPreimageMatches(read(opFile), Buffer.from(file.content));
+      insist(alreadyPushedExact || reviewedSourcePreimageMatches(remoteBytes, read(opFile), original, file, approvedBinding?.approvedNoteSha256 ?? null), 'Remote main preimage differs from canonical review: ' + file.repoPath);
       opsPreimageHashes.set(file.repoPath, sha256(read(opFile)));
       if (original !== null) { const backup = path.join(evidenceRoot, 'before-files', file.repoPath); fs.mkdirSync(path.dirname(backup), { recursive: true }); fs.writeFileSync(backup, original, { flag: 'wx' }); }
     }
