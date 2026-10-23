@@ -1,0 +1,372 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261024-QUALIFIED-N44-FINITE-DIAGNOSTIC",
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "supabase/functions/n44-notifications/**",
+        "tests/n44-device-1019*.mjs",
+        "tests/n44-device-1019*.json",
+        "tests/fixtures/n44-device-1019/**",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md",
+        "tests/n44-device-20261023/**",
+        "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_OUTCOME.md",
+        "src/lib/notification-push-gateway.js"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "origin": "https://rakeezx.com",
+        "authorityEvidence": "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_AUTHORITY_0929.md",
+        "publication": false,
+        "maxActualDeviceRegistrations": 1,
+        "maxProviderSendAttemptsTotalAcrossBothCards": 1,
+        "periodicCron": false,
+        "globalAutonomousDelivery": false,
+        "newAuthUsers": 0,
+        "newRoles": 0,
+        "newMigrations": 0,
+        "managedAuthChange": false,
+        "RlsChange": false,
+        "realStudentMutations": 0,
+        "newPaidService": false,
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "existingSyntheticTeacherNormalUiOnly": true,
+        "maxAdditionalSyntheticOperationalSources": 1,
+        "maxUniquePhysicalDevices": 1,
+        "maxConcurrentActiveRegistrations": 1,
+        "maxRegistrationRecoveryAttemptsOnQualifiedChangedSource": 1,
+        "recoveryReviewSha256": "7c1ce09412c031eadb1fb48b4357af512a6a88d52aa8a1b7ceea84ee6d293943",
+        "authorityStartsAt": "2026-10-23T23:36:37.207Z",
+        "authorityExpiresAt": "2026-10-24T01:36:37.207Z",
+        "productId": "N44",
+        "liveAuthorizationRef": "PO-20261024-QUALIFIED-N44-FINITE-DIAGNOSTIC",
+        "namedOperations": [
+          "reconcile original one-device attempt and cleanup",
+          "qualify exact changed two-hour hard stop preserving consumed budget",
+          "activate pinned disabled-recovery source in original N44 function",
+          "one source-bound recovery registration if unconsumed",
+          "one total closed-page provider-send if unconsumed",
+          "owner-safe cleanup and sendingOFF/cronempty readback"
+        ],
+        "configurationDeltaProof": {
+          "readOnlyOriginalCustodian": true,
+          "providerWrites": 0,
+          "privateValuesReturned": false,
+          "exactAllowedKeys": [
+            "N44_ONE_DEVICE_TEST_JSON",
+            "N44_DELIVERY_ENABLED"
+          ],
+          "requiredHistoricalAggregate": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
+        },
+        "currentPhase": "approved-finite-diagnostic-and-conditional-current-device-outcome",
+        "newTargetUserAuthorization": "PO23October current reply identifies normal Chrome Rakeez test account; incognito reserved for N36",
+        "newLiveWindowGranted": true,
+        "providerWritesThisPhase": "only exact qualified activation/one-device approval and owner cleanup",
+        "registrationsThisPhase": 1,
+        "sendsThisPhase": 1,
+        "cleanupMutationsThisPhase": "only exact old/current owner-bound registrations and consent",
+        "oldAuthorityPreservedExpired": true,
+        "maxNewNativeActivations": 1,
+        "maxFreshCurrentTargetRegistrations": 1,
+        "preserveConsumedRecovery": true,
+        "originalKnownOwnerCleanup": {
+          "authority": "PO-20261023-CURRENT-TEST-TAB-COMPLETE-N44",
+          "kind": "original-service-operator-exact-known-test-registration-disposal",
+          "currentBrowserImpersonation": false,
+          "existingVerifiedTypedOperationsOnly": true,
+          "newSqlShapes": 0,
+          "newRoles": 0,
+          "newCatalogRoutines": 0,
+          "maxOldCleanupTransactions": 1,
+          "immutableRecoveryBindingRequired": true,
+          "unknownCommitReadOnlyReconciliation": true,
+          "unrelatedOwnerMutations": 0,
+          "sessionTransportCorrection": {
+            "kind": "existing-allowlisted-same-project-session-transport",
+            "originalFailureReceipt": "drafts/n44-push/activation/device-closed-page/644f8392-8ef7-4aae-b004-07fba4edbd72/operator-cleanup.json",
+            "originalDatabaseTransactions": 0,
+            "maxCorrectedWorkflowConnectionAttempts": 1,
+            "maxTotalOldCleanupWriteTransactions": 1,
+            "originalReservationPreserved": true,
+            "appendOnlyCorrectionMarker": true,
+            "newProviderConfigWrites": 0,
+            "newSqlShapes": 0,
+            "strictOriginalIdentityAndTlsRequired": true
+          },
+          "guardDiagnosis": {
+            "maxMetadataOnlyConnections": 1,
+            "existingFixedGuardQueriesOnly": true,
+            "privateRowsBeforeGuard": false,
+            "noLiveSecurityPostureChanges": true,
+            "maxCausallyCorrectedWorkflows": 1,
+            "requiresLocalRedFirstCause": true,
+            "maxTotalOldCleanupWriteTransactions": 1,
+            "preserveAllConsumedMarkers": true,
+            "noUnchangedRetry": true
+          },
+          "hostedDirectDisposal": {
+            "originalNativeOnly": true,
+            "existingSignedSchedulerEntryOnly": true,
+            "noNewRoute": true,
+            "noNewSqlShapes": true,
+            "exactImmutableOldTargetOnly": true,
+            "defaultDisabled": true,
+            "maxNecessaryChangedNativeUploadsThisWindow": 1,
+            "maxPublicSourcePinUpdatesThisWindow": 1,
+            "maxTotalOldDisposalWriteTransactions": 1,
+            "maxTotalSendsAllAuthorities": 1,
+            "fullExistingTlsIdentityAndPrivateGuards": true,
+            "noLocalPoolerRetry": true,
+            "noProviderSslOrNetworkChange": true,
+            "expiresAt": "2026-10-24T01:36:37.207Z"
+          }
+        },
+        "newWindowEvidence": {
+          "source": "PO explicit yes to reviewed60535ea bounded continuation",
+          "receivedBetween": [
+            "2026-10-23T15:11:32.172Z",
+            "2026-10-23T15:11:59Z"
+          ],
+          "previousWindowPreserved": true,
+          "priorSendAttemptsReset": false,
+          "originalHostOnly": true,
+          "closeCurrentTrialTeacherAndStudentPages": true,
+          "restorePagesAfter": true
+        },
+        "freshPolicyAdmission": {
+          "kind": "original-custodian-readonly-auth-config-and-n44-admission-repair",
+          "apiMethod": "GET",
+          "apiPath": "/v1/projects/xlrubcwjqktzzunrvuns/config/auth",
+          "exactRelevantFields": [
+            "sessions_timebox",
+            "sessions_inactivity_timeout",
+            "sessions_single_per_user"
+          ],
+          "maxNewN44PolicyAdmissions": 1,
+          "maxN44PolicyConfigWrites": 1,
+          "managedAuthWrites": 0,
+          "newNativeUploads": 0,
+          "newSourcePinWrites": 0,
+          "actualObservationRequired": true,
+          "newApprovalIdRequired": true,
+          "rawApiResponseExport": false,
+          "sourcePolicyGuardUnchanged": true,
+          "windowExpiresAt": "2026-10-23T17:11:32.172Z",
+          "supportedOfficialConfigPull": true,
+          "maxActualOfficialConfigPulls": 1,
+          "allowReadOnlyEffectiveProjectConfiguration": true,
+          "localEphemeralStagingOnly": true,
+          "rawOutputExport": false,
+          "expectedDigestProvenanceBeforeProviderComparison": true
+        },
+        "causalPoolReproduction": {
+          "actualNativeRuntimeRequired": true,
+          "syntheticOnly": true,
+          "providerOperations": 0,
+          "newNativeUploads": 0,
+          "newSourcePinWrites": 0,
+          "policyWrites": 0,
+          "unchangedLiveInspectionRetries": 0,
+          "sendAttempts": 0,
+          "originalFailuresPreserved": true
+        },
+        "finiteConnectionDiagnosticPreparation": {
+          "reversibleLocalOnly": true,
+          "originalTrustedCapabilityOnly": true,
+          "rawErrorExport": false,
+          "providerOperations": 0,
+          "newNativeUploads": 0,
+          "newSourcePinWrites": 0,
+          "policyWrites": 0,
+          "realDataReads": 0,
+          "registrationAttempts": 0,
+          "sendAttempts": 0,
+          "autoWindowRenewal": false,
+          "automaticPublication": false
+        },
+        "finiteDiagnosticActivation": {
+          "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-results-and-n44-authority.json",
+          "startsAt": "2026-10-23T23:36:37.207Z",
+          "expiresAt": "2026-10-24T01:36:37.207Z",
+          "maxNewNativeUploads": 1,
+          "maxNewSourcePinUpdates": 1,
+          "maxExistingPolicySourceRebindings": 1,
+          "genuineAdmissionUnchanged": true,
+          "maxSignedDiagnosticObservations": 1,
+          "preserveConsumedMarkers": true,
+          "maxTotalSendsAllAuthorities": 1,
+          "stopOnFailedObservation": true
+        }
+      },
+      "releaseAuthority": "Latest PO explicit request to finish N44 now with full necessary authority on identified existing normal-Chrome test account/device; bounded new window and one total send, exact owner cleanup, no broad delivery/cron. Original custodian and publisher only.",
+      "id": "continuous-n44-one-approved-closed-page-push-20261019",
+      "dependsOn": [
+        "continuous-n44-single-device-optin-ready-20261019",
+        "continuous-n44-publish-qualified-delayed-ack-20261019",
+        "continuous-n44-register503-existing-service-repair-20261019"
+      ],
+      "objective": "EXECUTE PO EXPLICIT APPROVAL OF QUALIFIED0e6011b, SAME ORIGINAL SESSION/CUSTODY. Conservative new window 2026-10-23T23:36:37.207Z through 2026-10-24T01:36:37.207Z, hard stop. PO explicitly approved one original native diagnostic upload and matching source pin, genuine existing policy SOURCE-ONLY rebinding preserving original approvalID/admission timestamps, exact readback, ONE separately reserved signed immutable-old-target diagnostic inspection. First qualify ONLY the compiled date/start delta from saved inactive package and reuse49 unchanged cases; preserve original expiry/history and consumed activation/policy markers. This is a NEW distinct task-window-bound reservation, not resetting old allowances. Acquire original shared integration/live/browser leases only when needed; do not read N88 private custody or mutate its service/config. Exact current N88 committed proof cbdfb4d/6102c47 native74 may supply the independently verified shared-phase source; do not assert the lost historical aggregate or adopt unknown configuration as a baseline. Use the same exact runtime/expected-map/concurrency provenance principles already qualified. No migration, new SQL, roles, Auth settings, TLS weakening, new route, general logging or speculative transport fix.\n If the one diagnostic still fails connection/guard, save ONLY finite category, disarm and STOP this live attempt without replay. If it succeeds, perform already-authorized exact old-registration disposition within its ORIGINAL total-write budget; renew current device consent through normal UI and one fresh current normal-Chrome trial registration if unused, preserve total one-device/one-active-registration bounds. After saving available N88 safe trace, temporarily close ONLY designated normal-Chrome Rakeez trial teacher/student pages, send ONE TOTAL across all authorities only if original journal proves unused, clean exact subscription/consent, disable delivery/cron and restore those pages in finally. Incognito N36 untouched. HTTP200/provider acceptance is not OS arrival; ask root for actual user arrival only after a send. If any COMMIT/send is unknown, use allowed read-only reconciliation, never repeat. No additional upload for a guessed fix. Expiry never extended automatically. Record exact bytes/version/pin/config deltas and all attempt dispositions and cleanup; return real runner schema and remaining blocker truthfully.\nPrevious exact source card and full bounds preserved in current ops Git history; retain all consumed markers and original failures. Latest scope below supersedes only incompatible preparation-only instructions, never data/privacy/SQL safeguards. Evidence: artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-results-and-n44-authority.json.\n",
+      "requiredChecks": [
+        "n44_one_authorized_device_registration_single_push_with_pages_closed",
+        "n44_device_test_final_disposition_and_no_extra_delivery",
+        "n44_exact_shared_configuration_delta_certificate",
+        "n44_current_normal_chrome_test_target_and_exact_next_operation",
+        "n44_exact_original_owner_operator_cleanup_guards_and_disposition",
+        "n44_exact_operator_session_transport_and_reservation_reconciliation",
+        "n44_guard_subphase_diagnosis_and_causal_fix_only",
+        "n44_exact_original_hosted_disposal_and_final_single_device_outcome"
+      ],
+      "acceptance": [
+        "Exactly one approved current-device actual push attempt, after pages closed, with explicit browser consent and truthful OS result.",
+        "Sending disabled/cron empty and own test registration/subscription disposition verified; no extra recipient/send or fabricated receipt."
+      ],
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "50f62da037ea4cc42a6bc0cdb4076969740df06e",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_OUTCOME.md",
+          "drafts/n44-push/postgres-repository.mjs",
+          "drafts/n44-push/registration.mjs",
+          "drafts/n44-push/activation/private-error-boundary.mjs",
+          "drafts/n44-push/activation/error-boundary-identities.json"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_OUTCOME.md"
+        ],
+        "newPaths": [],
+        "workerChecks": [
+          "n44_one_authorized_device_registration_single_push_with_pages_closed",
+          "n44_device_test_final_disposition_and_no_extra_delivery",
+          "n44_exact_shared_configuration_delta_certificate",
+          "n44_current_normal_chrome_test_target_and_exact_next_operation",
+          "n44_exact_original_owner_operator_cleanup_guards_and_disposition",
+          "n44_exact_operator_session_transport_and_reservation_reconciliation",
+          "n44_guard_subphase_diagnosis_and_causal_fix_only",
+          "n44_exact_original_hosted_disposal_and_final_single_device_outcome"
+        ],
+        "publisherChecks": []
+      }
+    },
+    {
+      "id": "continuous-n88-actual-denied-student-read-20261023",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5900,
+      "scopeKey": "n88-actual-student-claim-read-client",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261023-EXISTING-TEST-STUDENT-READ-FAILURE",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "NEW ACTUAL POST-DELIVERY FAILURE; PREPARE EXACT NEXT DIAGNOSTIC WITHOUT LIVE REPLAY. PO tested successor0.5.41/N88 native74 after published6102c47: code accepted, read unavailable5xx at5500ms and5250ms. This proves prior401/cookie-retirement defect is corrected in this observed journey, but successful workspace/grades read remains FAILED. It does NOT identify connection, identity, typed SQL, projection or COMMIT cause. No third user retry, code export or claim success. Resume SAME saved session/worktree and preserve its candidate; qualified correction already integrated/published through original custodian cbdfb4d8cd91f6e7588e0512b64f692935d2462d. Read public exact committed native/source/manifest from that candidate as the CURRENT baseline, not stale native66. Do not replay migration/upload/pin/carrier or enter protected original-custodian state.\n Useful independent next step: determine a minimal finite stage/category diagnostic that can distinguish acquisition versus guarded identity/catalog versus typed-read/projection versus transaction/COMMIT failures for THIS integrated read. Inspect exact native74 original error/phase boundaries and actual request composition. Reproduce the observed safe unavailable behavior synthetically and preserve correct cookie/session recovery, owner/membership/grades/bounds/cancel/lock/transaction/COMMIT fences. Reuse unchanged typed-reader, benchmark and existing PG17 evidence; no broad suite or new measuring tool. Prepare a tiny inactive qualified diagnostic successor ONLY if ordinary already-authorized nonmutating existing evidence cannot determine cause. Keep diagnostics confined to an existing trusted original operator boundary or an equivalently narrowly proven safe boundary; no raw errors/codes/messages/SQL/URLs/tokens/cookies/records/logs/hidden personal state, no extra access or broad response expansion. Unknown stays unknown. Do not infer a transport fix from the ~5s timings. Preserve true auth denial versus unavailable separation. If a definite causal defect is reproduced, qualify only that correction and prepare exact original-custodian handoff; no activation under this preparation.\n ZERO provider calls, native uploads/pins, SQL/Auth/schema operations, real-account/browser reads/writes or sends. N44 independently owns the newly approved live window; do not acquire its service leases or alter shared configuration. All previous N88 live allowances consumed; prepare a concrete exact candidate/manifest/negative tests and required next operation, not a vague permission request. Return BLOCKED with LOCAL-QUALIFIED diagnostic/correction or precise existing evidence channel, keeping wholeN88 OPEN.\nPrevious exact source card and full bounds preserved in current ops Git history; retain all consumed markers and original failures. Latest scope below supersedes only incompatible preparation-only instructions, never data/privacy/SQL safeguards. Evidence: artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-results-and-n44-authority.json.\n",
+      "allowedPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/lib/student-portal-runtime.js",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/denied-read-20261023/**",
+        "tests/n88-denied-read-20261023/**",
+        "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js"
+      ],
+      "requiredChecks": [
+        "n88_actual_read_denial_cause_reproduced",
+        "n88_claim_read_origin_session_and_failure_semantics",
+        "n88_owner_privacy_revocation_membership_grade_and_commit_preserved",
+        "n88_actual_served_student_carrier_or_exact_custodian_handoff"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261023-EXISTING-TEST-STUDENT-READ-FAILURE",
+        "publication": true,
+        "namedBrowserReadOnly": "existing normal Chrome teacher trial workspace and student portal visible safe UI only",
+        "realAccountWrites": 0,
+        "credentialExtraction": false,
+        "serviceOperations": 0,
+        "newMigrations": 0,
+        "nativeUploads": 0,
+        "privateCustodyAccess": false,
+        "parallelN44ServiceChanges": false,
+        "postDeliveryUnavailablePreparation": {
+          "syntheticOnly": true,
+          "providerOperations": 0,
+          "browserOperations": 0,
+          "realAccountReads": 0,
+          "serviceUploads": 0,
+          "sqlOperations": 0,
+          "publication": false,
+          "currentPublicCandidate": "cbdfb4d8cd91f6e7588e0512b64f692935d2462d",
+          "actualFailure": "read unavailable5xx 5500ms/5250ms after accepted code"
+        }
+      },
+      "releaseAuthority": "PO explicitly requests completion and provided existing trial account/session and actual denied-read diagnostic. Scope permits causal local fix and safe visible inspection; original publisher only and private service prerequisite only via original custodian with exact follow-up.",
+      "acceptance": [
+        "Actual denied read explained by source-grounded reproduction, no guessed expiry.",
+        "Corrected real served path and affected session/privacy semantics.",
+        "Actual same trial student login/read/return works before Product closure."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "97739b2ce423e3ebad7a65cf4edccfaa2e0a9a47",
+        "requiredSourcePaths": [
+          "src/views/student-portal-login.js",
+          "src/lib/student-portal-unified-client.js",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "tests/n88-read-service-20261023/active-entry.json"
+        ],
+        "editPaths": [
+          "src/views/student-portal-login.js",
+          "src/lib/student-portal-unified-client.js",
+          "tests/n88-denied-read-20261023/reproduce.mjs",
+          "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n88-denied-read-20261023/reproduce.mjs",
+          "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n88_actual_read_denial_cause_reproduced",
+          "n88_claim_read_origin_session_and_failure_semantics",
+          "n88_owner_privacy_revocation_membership_grade_and_commit_preserved",
+          "n88_actual_served_student_carrier_or_exact_custodian_handoff"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

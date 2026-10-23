@@ -11,7 +11,7 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261023-QUALIFIED-N44-RENEWAL-1811",
+      "liveAuthorizationRef": "PO-20261024-QUALIFIED-N44-FINITE-DIAGNOSTIC",
       "budgetMinutes": 45,
       "idleMinutes": 10,
       "allowedPaths": [
@@ -53,10 +53,10 @@
         "maxConcurrentActiveRegistrations": 1,
         "maxRegistrationRecoveryAttemptsOnQualifiedChangedSource": 1,
         "recoveryReviewSha256": "7c1ce09412c031eadb1fb48b4357af512a6a88d52aa8a1b7ceea84ee6d293943",
-        "authorityStartsAt": "2026-10-23T15:11:32.172Z",
-        "authorityExpiresAt": "2026-10-23T17:11:32.172Z",
+        "authorityStartsAt": "2026-10-23T23:36:37.207Z",
+        "authorityExpiresAt": "2026-10-24T01:36:37.207Z",
         "productId": "N44",
-        "liveAuthorizationRef": "PO-20261023-QUALIFIED-N44-RENEWAL-1811",
+        "liveAuthorizationRef": "PO-20261024-QUALIFIED-N44-FINITE-DIAGNOSTIC",
         "namedOperations": [
           "reconcile original one-device attempt and cleanup",
           "qualify exact changed two-hour hard stop preserving consumed budget",
@@ -75,7 +75,7 @@
           ],
           "requiredHistoricalAggregate": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
         },
-        "currentPhase": "current-designated-test-tab-one-bounded-outcome",
+        "currentPhase": "approved-finite-diagnostic-and-conditional-current-device-outcome",
         "newTargetUserAuthorization": "PO23October current reply identifies normal Chrome Rakeez test account; incognito reserved for N36",
         "newLiveWindowGranted": true,
         "providerWritesThisPhase": "only exact qualified activation/one-device approval and owner cleanup",
@@ -135,7 +135,7 @@
             "fullExistingTlsIdentityAndPrivateGuards": true,
             "noLocalPoolerRetry": true,
             "noProviderSslOrNetworkChange": true,
-            "expiresAt": "2026-10-23T17:11:32.172Z"
+            "expiresAt": "2026-10-24T01:36:37.207Z"
           }
         },
         "newWindowEvidence": {
@@ -200,6 +200,19 @@
           "sendAttempts": 0,
           "autoWindowRenewal": false,
           "automaticPublication": false
+        },
+        "finiteDiagnosticActivation": {
+          "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-results-and-n44-authority.json",
+          "startsAt": "2026-10-23T23:36:37.207Z",
+          "expiresAt": "2026-10-24T01:36:37.207Z",
+          "maxNewNativeUploads": 1,
+          "maxNewSourcePinUpdates": 1,
+          "maxExistingPolicySourceRebindings": 1,
+          "genuineAdmissionUnchanged": true,
+          "maxSignedDiagnosticObservations": 1,
+          "preserveConsumedMarkers": true,
+          "maxTotalSendsAllAuthorities": 1,
+          "stopOnFailedObservation": true
         }
       },
       "releaseAuthority": "Latest PO explicit request to finish N44 now with full necessary authority on identified existing normal-Chrome test account/device; bounded new window and one total send, exact owner cleanup, no broad delivery/cron. Original custodian and publisher only.",
@@ -209,7 +222,7 @@
         "continuous-n44-publish-qualified-delayed-ack-20261019",
         "continuous-n44-register503-existing-service-repair-20261019"
       ],
-      "objective": "N44 PREPARE THE EXACT MISSING FINITE DIAGNOSTIC, NOT A GUESSED TRANSPORT FIX. Resume saved candidate9815e8ffea7792d07af4b980e703d90db4ac5555 and SAME original session01a14fcd/custody/worktree. Actual fc43c561 hosted Client readinessPASS but signed exact old-target inspection returned unavailable/phaseconnect before authoritative disposition. Your b4495dcb actual pg.Client/Pool synthetic comparison passes connection/identity/TLS/catalog/reuse/rollback/COMMIT/discard recovery; hosted failure not reproduced. Preserve separate local Deno Client teardown limitation, all original failures and fixture corrections. No Product transport change is justified; do not switch driver/TLS/role/pool sizing/timeouts/SQL on speculation or repeat the live request.\n\nThere is still useful reversible source preparation under PO's existing full completion instruction: the current fixed phaseconnect erases the finite driver rejection category needed to distinguish timeout, DNS, TLS, refused/closed connection, database-login rejection or an unclassified driver failure. Prepare the SMALLEST diagnostic successor that retains a bounded finite category ONLY at the original authenticated/signed operator old-target capability boundary (or an equivalently narrow existing trusted boundary with proof). Reuse runtime-failure's own-property/WeakMap design. Never return a raw code/message/stack, URL, certificate, SQL, cookie, identity, credential or error object; no log enablement, provider telemetry, new route, unrestricted diagnostics or arbitrary caller input. Public/untrusted/ordinary unauthorized requests retain original response and never acquire a connection. Preserve the ordinary private API shape except the explicitly bounded trusted diagnostic field; if it cannot be confined safely, report that concrete design limit instead of broadening it.\n\nUse only known finite driver error codes/exact fixed message matches inside the protected process and map to a small documented category allowlist; unknown errors stay generic. Do not retain getters, inspect arbitrary deep errors, serialize exception text, reveal private attributes or weaken the existing rollback/retry fence. Distinguish actual pool.connect failure from identity/private-session/source/query failures; preserve inner phase tags. No account/registration/send information is added to diagnostics. This is preparation for diagnosis of an OBSERVED live failure, not a claim that a service defect is fixed or a license to infer its cause.\n\nQualify through actual saved native/signed Web Request composition plus affected privacy/phase/owner/source guards: permitted category survives only the exact trusted capability; untrusted input and expired/wrong capability remain rejected; generic/private errors and getters cannot leak; identity/source/query phases are not mislabeled; one-use disposal and COMMIT protections unchanged. Reuse b4495dcb real connection/recovery and all unchanged policy/catalog/registration/security evidence. No repeat benchmark/full suite. Prepare exact native before/after byte/source/import-map manifest and candidate commit. Leave the active service and original native bundle unchanged; staged successor must be a separate inactive artifact. Prepare only the existing date-bound packaging mechanism so a future explicit new window can replace the two approved expiry constants after PO provides it; do NOT choose/extend a live window now or create a generic unlimited expiry control.\n\nZERO provider calls, uploads, sourcepin/policy/config writes, Authreads, realdatabase/target reads, browseroperations, registration or sends in THIS preparation. Original one native/policy/officialread markers remain consumed. All service/sharedconfiguration evidence remains unchanged, including sourceccac4 and final committed5e0cb77 certificate; N88 may finish its separate serialized transition. Do not touch another worker's source or private state. Current send window ends2026-10-23T17:11:32.172Z and may expire while preparing; do not extend it automatically. No live diagnostic is yet authorized after the consumed activation. Root will present the concrete candidate and exact one-upload/pin plus bounded observation/current-device continuation to PO for fresh approval if necessary; do not ask vague permissions yourself.\n\nReturn BLOCKED with a concrete LOCAL-QUALIFIED staged candidate, actual scoped checks and the precise additional live operation needed, or the exact unresolved diagnostic design limitation. Do not return LOCAL_READY for automatic source/service publication, claim a fix, transform historicalFAIL intoPASS, reset any budget, run retired fixtures or bypass a real tool refusal. Keep original user-required end goal explicit: known-old disposition, one fresh current testdevice registration, ONE TOTAL closed-page provider send, actual OS arrival and cleanup. No cause, arrival or wholeProduct closure is inferred from this preparation.\n\nPrior detailed objectives and bounds are retained in immutable source-card commit831534a818a48ee936e8903e12016843598a4606 and earlier evidence, plus the existing structured authority object. Read only concrete needed references, not the entire historical prompt chain. This concise current objective supersedes earlier permission to perform live operations during this diagnostic preparation.\n",
+      "objective": "EXECUTE PO EXPLICIT APPROVAL OF QUALIFIED0e6011b, SAME ORIGINAL SESSION/CUSTODY. Conservative new window 2026-10-23T23:36:37.207Z through 2026-10-24T01:36:37.207Z, hard stop. PO explicitly approved one original native diagnostic upload and matching source pin, genuine existing policy SOURCE-ONLY rebinding preserving original approvalID/admission timestamps, exact readback, ONE separately reserved signed immutable-old-target diagnostic inspection. First qualify ONLY the compiled date/start delta from saved inactive package and reuse49 unchanged cases; preserve original expiry/history and consumed activation/policy markers. This is a NEW distinct task-window-bound reservation, not resetting old allowances. Acquire original shared integration/live/browser leases only when needed; do not read N88 private custody or mutate its service/config. Exact current N88 committed proof cbdfb4d/6102c47 native74 may supply the independently verified shared-phase source; do not assert the lost historical aggregate or adopt unknown configuration as a baseline. Use the same exact runtime/expected-map/concurrency provenance principles already qualified. No migration, new SQL, roles, Auth settings, TLS weakening, new route, general logging or speculative transport fix.\n If the one diagnostic still fails connection/guard, save ONLY finite category, disarm and STOP this live attempt without replay. If it succeeds, perform already-authorized exact old-registration disposition within its ORIGINAL total-write budget; renew current device consent through normal UI and one fresh current normal-Chrome trial registration if unused, preserve total one-device/one-active-registration bounds. After saving available N88 safe trace, temporarily close ONLY designated normal-Chrome Rakeez trial teacher/student pages, send ONE TOTAL across all authorities only if original journal proves unused, clean exact subscription/consent, disable delivery/cron and restore those pages in finally. Incognito N36 untouched. HTTP200/provider acceptance is not OS arrival; ask root for actual user arrival only after a send. If any COMMIT/send is unknown, use allowed read-only reconciliation, never repeat. No additional upload for a guessed fix. Expiry never extended automatically. Record exact bytes/version/pin/config deltas and all attempt dispositions and cleanup; return real runner schema and remaining blocker truthfully.\nPrevious exact source card and full bounds preserved in current ops Git history; retain all consumed markers and original failures. Latest scope below supersedes only incompatible preparation-only instructions, never data/privacy/SQL safeguards. Evidence: artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-results-and-n44-authority.json.\n",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
