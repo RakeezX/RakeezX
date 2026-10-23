@@ -7,6 +7,8 @@ const h=s=>hash(s),historical=[{name:'N88_HMAC_KEY',digest:h('fabricated-critica
 const expectedDigest=nonPinDigest(historical),criticalExpected=historical.slice(0,2);
 const compare=(current,hist=historical,digest=expectedDigest)=>compareHistorical({current,historical:hist,expectedDigest:digest,criticalExpected});
 const same=compare(historical);assert.equal(same.eligibleForCertificate,true);assert.equal(same.certificateIssued,false);
+const versioned=[...historical,{name:'N88_RECOVERY_KEY_v1',digest:h('fabricated-versioned')}];
+assert.equal(compareHistorical({current:versioned,historical:versioned,expectedDigest:nonPinDigest(versioned),criticalExpected}).eligibleForCertificate,true);
 const changed=historical.map(r=>r.name==='N44_ENABLED'?{...r,digest:h('true')}:r);
 assert.equal(compare(changed).eligibleForCertificate,false);assert.deepEqual(compare(changed).unresolved,['N44_ENABLED']);
 assert.equal(compare([...historical,{name:'N44_UNKNOWN',digest:h('extra')}]).eligibleForCertificate,false);

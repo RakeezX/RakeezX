@@ -4,7 +4,7 @@ import {readFile,writeFile,readdir} from 'node:fs/promises';
 import {hash} from './prepare.mjs';
 import {guardCustodyContext} from './custody-preflight.mjs';
 const project='xlrubcwjqktzzunrvuns';
-const shape=rows=>Array.isArray(rows)&&rows.length>0&&rows.every(r=>typeof r?.name==='string'&&/^[A-Z][A-Z0-9_]*$/.test(r.name)&&/^[a-f0-9]{64}$/.test(r.digest))&&new Set(rows.map(r=>r.name)).size===rows.length;
+const shape=rows=>Array.isArray(rows)&&rows.length>0&&rows.every(r=>typeof r?.name==='string'&&/^[A-Za-z_][A-Za-z0-9_]*$/.test(r.name)&&/^[a-f0-9]{64}$/.test(r.digest))&&new Set(rows.map(r=>r.name)).size===rows.length;
 export function canonicalMetadata(rows){
  if(!shape(rows))throw Error('n88_typed_provenance_metadata_shape');
  return rows.map(r=>({name:r.name,digest:r.digest})).sort((a,b)=>a.name.localeCompare(b.name));
@@ -26,7 +26,7 @@ function findHistoricalMaps(value,expectedDigest,out=[],depth=0){
  if(shape(value)&&nonPinDigest(value)===expectedDigest)out.push(canonicalMetadata(value));
  if(!Array.isArray(value)){
   const entries=Object.entries(value);
-  if(entries.length&&entries.every(([k,v])=>/^[A-Z][A-Z0-9_]*$/.test(k)&&typeof v==='string'&&/^[a-f0-9]{64}$/.test(v))){
+  if(entries.length&&entries.every(([k,v])=>/^[A-Za-z_][A-Za-z0-9_]*$/.test(k)&&typeof v==='string'&&/^[a-f0-9]{64}$/.test(v))){
    const map=entries.map(([name,digest])=>({name,digest}));if(nonPinDigest(map)===expectedDigest)out.push(map);
   }
  }
