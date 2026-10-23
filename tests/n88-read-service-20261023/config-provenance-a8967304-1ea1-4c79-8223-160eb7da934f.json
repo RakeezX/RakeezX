@@ -1,0 +1,212 @@
+{
+  "taskId": "continuous-n88-typed-read-service-activation-20261023",
+  "runId": "a8967304-1ea1-4c79-8223-160eb7da934f",
+  "candidateSha": "82e7574c4f9b01e2e2bca5c13d3366e6dd30d388",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "source": "f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390",
+  "prior": "6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09",
+  "observedAt": "2026-10-23T07:47:41.980Z",
+  "providerWrites": 0,
+  "status": "BLOCKED",
+  "code": "n88_typed_historical_per_key_map_missing",
+  "currentWholeConfigDigest": "2aa4db48b8d3f68541f191989b2f60578d3d0557e1ee5d54e08359bb4becac77",
+  "currentNonPinConfigDigest": "d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af",
+  "expectedHistoricalNonPinDigest": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186",
+  "metadataEntries": 47,
+  "baselineSearch": {
+    "protectedRecoveryStateAndHistory": true,
+    "ownedConfigurationHistorySidecars": 0,
+    "exactHistoricalMaps": 0
+  },
+  "reconstructed": [
+    {
+      "name": "N88_AUTH_URL",
+      "provenance": "original fixed project",
+      "matches": true
+    },
+    {
+      "name": "N88_DATABASE_CA_CERT",
+      "provenance": "original installed CA file",
+      "matches": true
+    },
+    {
+      "name": "N88_DATABASE_URL",
+      "provenance": "original protected password + original install-direct URL",
+      "matches": true
+    },
+    {
+      "name": "N88_ENABLED",
+      "provenance": "original protected acknowledged final public release",
+      "matches": true
+    },
+    {
+      "name": "N88_HMAC_KEY",
+      "provenance": "original protected custody.hmac",
+      "matches": true
+    },
+    {
+      "name": "N88_INGRESS_KEY",
+      "provenance": "original protected custody.ingress",
+      "matches": true
+    },
+    {
+      "name": "N88_NUMERIC_KEY",
+      "provenance": "original protected custody.numeric",
+      "matches": true
+    },
+    {
+      "name": "N88_PILOT_BINDING",
+      "provenance": "original protected acknowledged final public release",
+      "matches": true
+    },
+    {
+      "name": "N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED",
+      "provenance": "original protected acknowledged final public release",
+      "matches": true
+    },
+    {
+      "name": "N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256",
+      "provenance": "original protected acknowledged final public release",
+      "matches": true
+    },
+    {
+      "name": "N88_PUBLIC_ORIGIN",
+      "provenance": "original fixed install source",
+      "matches": true
+    },
+    {
+      "name": "N88_READINESS_ENABLED",
+      "provenance": "original protected acknowledged final public release",
+      "matches": true
+    },
+    {
+      "name": "N88_RECOVERY_ACTIVE_VERSION",
+      "provenance": "original protected recovery version",
+      "matches": true
+    },
+    {
+      "name": "N88_RECOVERY_KEY_n88_1792356057764",
+      "provenance": "original protected recovery key",
+      "matches": true
+    },
+    {
+      "name": "N88_RECOVERY_VERSIONS",
+      "provenance": "original protected single-version install",
+      "matches": true
+    },
+    {
+      "name": "N88_RESERVATION_KEY",
+      "provenance": "original protected custody.reservation",
+      "matches": true
+    },
+    {
+      "name": "N88_ROLLOUT_MODE",
+      "provenance": "original protected acknowledged final public release",
+      "matches": true
+    },
+    {
+      "name": "N88_SERVICE_REVISION",
+      "provenance": "original fixed install source",
+      "matches": true
+    },
+    {
+      "name": "N88_SERVICE_SOURCE_SHA",
+      "provenance": "original protected current source history",
+      "matches": true
+    }
+  ],
+  "unreconstructed": [
+    "CLOUDFLARE_ACCOUNT_ID",
+    "CLOUDFLARE_EMAIL_API_TOKEN",
+    "N44_AUTH_API_KEY",
+    "N44_AUTH_URL",
+    "N44_CRYPTO_JSON",
+    "N44_DATABASE_CA_CERT",
+    "N44_DATABASE_URL",
+    "N44_DELIVERY_ENABLED",
+    "N44_ENABLED",
+    "N44_INGRESS_KEY",
+    "N44_ONE_DEVICE_TEST_JSON",
+    "N44_PROVIDER_ORIGINS_JSON",
+    "N44_PUBLIC_ORIGIN",
+    "N44_RATE_KEY",
+    "N44_READINESS_ENABLED",
+    "N44_SCHEDULER_KEY",
+    "N44_SERVICE_REVISION",
+    "N44_SERVICE_SOURCE_SHA",
+    "N44_SESSION_POLICY_JSON",
+    "N88_AUTH_API_KEY",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_DB_URL",
+    "SUPABASE_JWKS",
+    "SUPABASE_PUBLISHABLE_KEYS",
+    "SUPABASE_SECRET_KEYS",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL",
+    "SUPPORT_NOTIFICATION_SCHEDULER_SECRET"
+  ],
+  "comparison": {
+    "baselineValid": false,
+    "criticalFailures": [],
+    "unresolved": [
+      "CLOUDFLARE_ACCOUNT_ID",
+      "CLOUDFLARE_EMAIL_API_TOKEN",
+      "N44_AUTH_API_KEY",
+      "N44_AUTH_URL",
+      "N44_CRYPTO_JSON",
+      "N44_DATABASE_CA_CERT",
+      "N44_DATABASE_URL",
+      "N44_DELIVERY_ENABLED",
+      "N44_ENABLED",
+      "N44_INGRESS_KEY",
+      "N44_ONE_DEVICE_TEST_JSON",
+      "N44_PROVIDER_ORIGINS_JSON",
+      "N44_PUBLIC_ORIGIN",
+      "N44_RATE_KEY",
+      "N44_READINESS_ENABLED",
+      "N44_SCHEDULER_KEY",
+      "N44_SERVICE_REVISION",
+      "N44_SERVICE_SOURCE_SHA",
+      "N44_SESSION_POLICY_JSON",
+      "N88_AUTH_API_KEY",
+      "N88_AUTH_URL",
+      "N88_DATABASE_CA_CERT",
+      "N88_DATABASE_URL",
+      "N88_ENABLED",
+      "N88_HMAC_KEY",
+      "N88_INGRESS_KEY",
+      "N88_NUMERIC_KEY",
+      "N88_PILOT_BINDING",
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_CONFIRMED",
+      "N88_PUBLIC_HOSTED_ACCEPTANCE_SHA256",
+      "N88_PUBLIC_ORIGIN",
+      "N88_READINESS_ENABLED",
+      "N88_RECOVERY_ACTIVE_VERSION",
+      "N88_RECOVERY_KEY_n88_1792356057764",
+      "N88_RECOVERY_VERSIONS",
+      "N88_RESERVATION_KEY",
+      "N88_ROLLOUT_MODE",
+      "N88_SERVICE_REVISION",
+      "SUPABASE_ANON_KEY",
+      "SUPABASE_DB_URL",
+      "SUPABASE_JWKS",
+      "SUPABASE_PUBLISHABLE_KEYS",
+      "SUPABASE_SECRET_KEYS",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "SUPABASE_URL",
+      "SUPPORT_NOTIFICATION_SCHEDULER_SECRET"
+    ],
+    "missing": [],
+    "certificateIssued": false,
+    "eligibleForCertificate": false
+  },
+  "certificateIssued": false,
+  "baselineAdopted": false,
+  "configWrites": 0,
+  "uploads": 0,
+  "pinUpdates": 0,
+  "migrations": 0,
+  "secretValuesExported": false,
+  "otherWorkerPrivateMaterialRead": false,
+  "remaining": "Exact historical per-key metadata with platform security-sensitive provenance and individually documented authorized differences; current state or N44 hypothesis alone cannot replace it."
+}
