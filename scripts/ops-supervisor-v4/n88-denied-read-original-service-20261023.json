@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-denied-read-original-service-20261023",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "priority": -6000,
+      "scopeKey": "n88-original-service-denied-read-recovery",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261023-QUALIFIED-N88-READ-SESSION-PRESERVATION",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "ORIGINAL N88 CUSTODIAN: APPLY THE PINNED NEW CAUSAL CORRECTION, KEEP THE OLD DELIVERY AND ALL CONSUMED BUDGETS. PO repeatedly explicitly authorizes all necessary work to finishN88, provided an existing trial account/student and actual failed journey, and supplied safe read/manual/denied/4xx/5500ms diagnostic. Root routed a separate public-source preparation worker; it committed qualifiedd27da1b34cb667be04d49efe354ee6ea811174ed. Its card allowedZERO service operations, so it correctly handed off rather than impersonating you. This NEW exact bounded transition is authorized here under the existing latest PO completion instruction. It is not repetition of an old upload or replenishment of its allowances. Original controller admitted this source using the already-established exactsessionId mechanism; only you own private original custody. Existing native66 source publication remains truthful and awaitingPO; no CLOSED ticket revived.\n\nRead the pinned handoff and manifest directly from candidate d27da1b and preserve its tests/evidence. Reuse unchanged comparison14to2 and nativePG17/session/owner/privacy/grade/COMMIT proofs; don't build a new benchmark or repeat earlier migration. Original private custody remains .worktrees/continuous-n88-official-student-portal-activation-20261018; work in the NEW controller-assigned isolatedworktree, import ONLY qualifiedd27da1b via normal scoped cherry-pick/reconciliation, preserve controller-assigned base and unrelated work. Do not reset prior worktree/candidate or access N44 private state. Existing public producer worktree .worktrees/continuous-n88-actual-denied-student-read-20261023 is now inactive; use committed bytes, not mutable files.\n\nProved defect: recorded native66 transforms repository/projection/COMMIT failures into401 plus session-cookie deletion. Corrected request-local boundary returns503/no private payload/no Set-Cookie only on thrown read transaction, while completed auth/membership/revocation denial remains401. Actual signed native entry + recorded Cloudflare carrier + client reproduce red then green; PG17 source/native tests prove failed/unknown COMMIT or projection failure preserves cookie and next guarded read returns exact same grades/work; invalid/revoked session remains rejected. This is a genuine source defect consistent with PO symptom, but the hidden cause of that PARTICULAR live request remainsUNKNOWN. Do not equate a503classification repair or localPGpass with user acceptance. Current private carrier need not change: its existing client already handles503 as unavailable/retry. Zero carrieruploads in this card.\n\nExact prepared successor: drafts/n88-student-portal/activation/denied-read-20261023/native66-successor.inactive.mjs SHA256d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c. Prior native66 SHA256f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390. Two native spans only, manifest proves every unrelated part byte-identical. Native providerfunction n88-student-portal in original projectxlrubcwjqktzzunrvuns. MaxONE changednativeupload plusONE matching N88_SERVICE_SOURCE_SHA update for THIS new qualified successor, with append-only task/run/candidate/purpose reservation and no replay if provider outcome uncertain. Preserve all previous migration/upload/pin markers. No new SQL/catalog/functions/roles/Auth/RLS/users/region/transport changes, no real account read/write, no new diagnostic logging/headers or secret export. No appliedmigration replay:20261023070851 already applied, exact78catalog/old76/history unchanged. No retiredfixture, deniedcache cleanup or ACL mutation. An actual tool/policydenial stops, never alternate tool bypass.\n\nUse original service/live-mutation phase leases; N44 is currently exercising a separately approved exact native/config continuation in sameproject. Serialize, do not interrupt or edit its files. Before provideractivity verify current N88 native66/pin/import-map/sourceidentity and whole expected non-pin configuration through original private custodian. Do NOT adopt an unexplained current aggregate. N44 now has legitimate new native/config operations, so reuse its newly committed public exact changed-key certificates/source/readback to reconstruct the original N88 baseline ONLY for individually proved N44changes; reject unknown keys/values. No N44 private custody access, no prefix exclusions. If N44 still active or certificate not committed, continue independent local preparation and wait without leases for its completed public evidence; don't repeat network checks. Original N88 sensitive keys/identity must remain exact; never change them except the one specifically permittedsourcepin. Reuse unchangedcatalog/history evidence unless a relevant event requires fresh metadata-onlyvalidation. Keep historical failures unchanged.\n\nAfter exactpreflight and localactivation/reservationguards qualified, use original supported custodian upload and pin channels once for the exactsuccessor. Verify provider version/status, downloaded bytes+importmap, pin/currentkeyset and nonpinconfig equality, no competingnative or changedhistory. No publicfrontenddeploy can substitute for these prerequisites. If any step outcome unknown, reconcile exactproviderstate read-only without replay. Preserve permissionrejects and markgate NOT_RUN honestly. Write compact committed nonsecret activation receipt under tests/n88-denied-read-activation-20261023/ with task/run/session/candidate/base/nativeversion/source/readback/config/counter/history references; no cookies/student/code/privateURL or rawlogs. Original account trials are not performed by this worker.\n\nOnce verified, integrate matching source and actualnative evidence through existingpublisher. Include exact preparedsuccessor and integration source as verificationpaths; do not claim only publicasset publication provesnative. If source-only service proof needs the existing guarded publication-evidence reconciliation, preserve actualreceipt/candidate and identify that exact binding rather than re-uploading/redeploying service. Do not remove acceptance checks or invent live frontendasset change. WholeN88 staysOPEN until PO single existing-account login/read and return works withgrades/session; root coordinates that after actualverifiedactivation. If it stillfails, nextinput is a finite deidentified actual server decision category, not broadlogs or copiedcredentials. End with actual finishedoperations and precise remainingcondition, not a routine handoff while authorized work remains.\n",
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/activation/denied-read-20261023/**",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "tests/n88-denied-read-20261023/**",
+        "tests/n88-denied-read-activation-20261023/**",
+        "docs/automation-evidence/20261023/N88_ACTUAL_DENIED_READ_OUTCOME.md",
+        "docs/automation-evidence/20261023/N88_DENIED_READ_SERVICE_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/activation/denied-read-20261023/native66-successor.inactive.mjs",
+        "drafts/n88-student-portal/activation/denied-read-20261023/manifest.json"
+      ],
+      "requiredChecks": [
+        "n88_pinned_denied_read_correction_and_reused_session_guards",
+        "n88_original_custodian_exact_native_pin_and_config_preflight",
+        "n88_once_only_new_successor_transition_and_actual_readback",
+        "n88_no_replayed_migration_or_carrier_and_truthful_actual_acceptance"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261023-QUALIFIED-N88-READ-SESSION-PRESERVATION",
+        "publication": true,
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "originalPrivateCustodianOnly": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "qualifiedCandidate": "d27da1b34cb667be04d49efe354ee6ea811174ed",
+        "successorSha256": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+        "maxChangedNativeFunctionUploads": 1,
+        "maxPublicSourcePinUpdates": 1,
+        "maxChangedPrivateStaticUploads": 0,
+        "newMigrations": 0,
+        "sqlAuthSchemaChanges": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "appendOnlyAttemptHistory": true,
+        "resetConsumedMarkers": false,
+        "namedOperations": [
+          "original-custodian exact source/config metadata preflight",
+          "one pinned qualified successor native upload",
+          "one matching public source pin",
+          "exact provider download/config/served-source readback"
+        ]
+      },
+      "releaseAuthority": "Latest PO explicitly directs all necessary completion of N88; this activated card confines that existing authority to the newly reproduced and qualified d27da1b native read-session defect. Original private custodian and original controller/publisher only; no old consumed operation repeated.",
+      "acceptance": [
+        "Actual successor native and source pin verified under original service identity.",
+        "No old operations replayed; sessions/privacy/grades/typed SQL contract preserved.",
+        "User actual read and return remain separate acceptance, no live speed claim."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "d27da1b34cb667be04d49efe354ee6ea811174ed",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/activation/denied-read-20261023/custodian-handoff.json",
+          "drafts/n88-student-portal/activation/denied-read-20261023/native66-successor.inactive.mjs",
+          "tests/n88-denied-read-20261023/session-recovery.json"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "drafts/n88-student-portal/activation/denied-read-20261023/activate.mjs",
+          "tests/n88-denied-read-activation-20261023/activation.json",
+          "docs/automation-evidence/20261023/N88_DENIED_READ_SERVICE_OUTCOME.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/denied-read-20261023/activate.mjs",
+          "tests/n88-denied-read-activation-20261023/activation.json",
+          "docs/automation-evidence/20261023/N88_DENIED_READ_SERVICE_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n88_pinned_denied_read_correction_and_reused_session_guards",
+          "n88_original_custodian_exact_native_pin_and_config_preflight",
+          "n88_once_only_new_successor_transition_and_actual_readback",
+          "n88_no_replayed_migration_or_carrier_and_truthful_actual_acceptance"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
