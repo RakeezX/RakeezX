@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-read-roundtrip-outcome-20261023",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5400,
+      "scopeKey": "n88-read-roundtrip-outcome-20261023",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "NEW PO23October user continuation explicitly requests preparing the finite typed service integration while retaining zero live provider authority. Resume exact saved session 01a16653-2ddf-7141-85ab-b321c9b7b917 and candidate 9e95eb6d50eb1c1356d0a1fa306348520724c3e7. This supersedes the previous local scope limit ONLY for inert source preparation below; the external activation blocker remains real. Reuse the existing 14-to-2 native comparison and outcome.mjs, do not create a new benchmark or repeat unchanged timing.\n\nPrepare a concrete INACTIVE integration package in drafts/n88-student-portal/activation/read-roundtrip-20261023/ using the exact existing private-error-boundary.mjs, error-boundary-contract.json, error-boundary-identities.json and recorded original native63 source identity. Implement bounded fixed SQL/typed outputs and candidate boundary contract/catalog identities as source transforms or explicit staged files; qualify in disposable fabricated native PG through actual verified boundary and repository. Reuse existing experimental query, bounds and helpers. All old operations must remain exact and accepted; new operations must be fixed and minimal, no generic SQL, guard disabling, permission broadening or SECURITY DEFINER shortcut. Prepare any additive SQL only as inactive candidate SQL in this directory, NEVER modify an applied migration, active migration folder, current boundary contract/identities, live service pin or carrier. This request authorizes local synthetic preparation, not application to hosted service. Do not replace the active reader alone.\n\nThe useful new result must prove the staged reader + staged finite boundary work together through actual repository COMMIT ACK while preserving owner filtering, revoke/membership/visibility, ordering, bigint text, 2000+1 per-table/2MB aggregate/null-sentinel bounds, freshness, locks, transaction isolation, late fences, cancellation and unknown COMMIT failure. Reuse unaffected retained checks; run materially affected boundary acceptance/rejection and repository tests. Preserve before-boundary-rejection evidence and qualify unknown/changed SQL, catalog drift and cross-owner rejection. Do not modify baseline fixture to hide a failure or claim live 5.5-6.5s improvement.\n\nBind package to exact recorded original service source; inspect public source/receipts only, no private custodian material or provider probing. Produce exact activation instructions for original service custodian including required new additive function/catalog operation, compatibility qualification, one source artifact upload/pin/readback scope as actually needed, migration-history/idempotence checks and comparable actual login/return acceptance. Identify original service owner session/task from retained public cards, but only controller dispatches it after explicit sensitive authority. No automatic renewal of old migration/upload/fixture allowances.\n\nKeep integrated-service.mjs and all active service sources unchanged; an inactive prepared integration must return BLOCKED external with LOCAL_VALIDATED summary and exact candidate/base/evidence, not LOCAL_READY service deployment. Preserve old measurements and named checks; record those as reused when unchanged. No Product main push/deploy, queue write, real account/browser/student data, provider service operation, SQL/Auth/RLS live change, send or new paid worker. Sol6.1/Medium/Standard. Read latest user intake docs/automation-evidence/20261023/N36_N88_N44_USER_CONTINUATION_0925.md from canonical repo if absent in saved checkout. Existing original controller/publisher only.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "tests/n88-read-roundtrip-outcome-20261023/**",
+        "docs/automation-evidence/20261023/N88_READ_ROUNDTRIP_OUTCOME_20261023.md",
+        "drafts/n88-student-portal/activation/read-roundtrip-20261023/**"
+      ],
+      "verificationPaths": [],
+      "requiredChecks": [
+        "n88_read_roundtrip_baseline_and_identical_projection",
+        "n88_read_bounds_owner_freshness_and_transaction_guards",
+        "n88_read_measured_local_cost_and_deployment_boundary",
+        "n88_staged_typed_boundary_repository_integration",
+        "n88_exact_inactive_service_activation_manifest"
+      ],
+      "acceptance": [
+        "Measured same-request old/new comparison, not duplicate instrumentation or a guessed hosted cause.",
+        "Identical owner-bound projection, fewer roundtrips, unchanged bounds/fences; or precise reason correction is invalid.",
+        "Exact candidate and original-service integration need preserved; no invented hosted deployment."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-explicit-inactive-typed-service-integration-preparation",
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0,
+        "additionalPermissions": 0,
+        "inactiveIntegrationPreparation": true
+      },
+      "releaseAuthority": "PO23October explicitly authorizes preparing the concrete typed integration and resuming the exact saved experiment. Local fabricated qualification/inactive source only. No live provider, migration, Auth/RLS, source pin, private carrier or upload authority; original custodian required after exact separate authorization. Return BLOCKED with preserved candidate until then.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "4ee4608c3a043f8ff27fd1c90d0ba652bc7e558b",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/canonical-adapter.mjs",
+          "drafts/n88-student-portal/student-projection.mjs",
+          "tests/n88-student-read-phase-latency-20261021/measurement.json",
+          "docs/automation-evidence/20261021/N88_STUDENT_READ_PHASE_LATENCY.md"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "tests/n88-read-roundtrip-outcome-20261023/outcome.mjs",
+          "docs/automation-evidence/20261023/N88_READ_ROUNDTRIP_OUTCOME_20261023.md"
+        ],
+        "newPaths": [
+          "tests/n88-read-roundtrip-outcome-20261023/outcome.mjs",
+          "docs/automation-evidence/20261023/N88_READ_ROUNDTRIP_OUTCOME_20261023.md"
+        ],
+        "workerChecks": [
+          "n88_read_roundtrip_baseline_and_identical_projection",
+          "n88_read_bounds_owner_freshness_and_transaction_guards",
+          "n88_read_measured_local_cost_and_deployment_boundary",
+          "n88_staged_typed_boundary_repository_integration",
+          "n88_exact_inactive_service_activation_manifest"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

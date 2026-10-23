@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-0538-school-proof-outcome-20261023",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n36-0538-school-proof-outcome",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n36-complete-import-outcome-20261023"
+      ],
+      "objective": "NEW actual PO evidence on installed extensionVersion 0.5.38: SCHOOL_CONTEXT_UNCONFIRMED during collect; staged=302 observed=302 classes=10; schoolBindingState=bound schoolIdPresent=true readProofPresent=true schoolBadgePresent=false; teacher-dashboard semantic proof 2 nav/3 action/2 read links; setupKind/rejectReason none; transfer error; receiverCheckpoint none; confirmed 0/0 pending0. Actual Rakeez readback independently shows10 local receipts302 rows0 pending. These old receipts do NOT prove this stopped run saved. Read docs/automation-evidence/20261023/N36_N88_N44_USER_CONTINUATION_0925.md and existing N36_COMPLETE_IMPORT_OUTCOME.md. Published .38 candidate dfa3f6ec2afa318bb6bf076053b3e8760ff4db05 / publication1e61149876636a7382a50f31dfe20e1da09641d2 and original saved session01a1663b-a503-73f1-a2ac-2e5fb1232b6b remain intact. This is the specific newly reported acceptance gap, not redoing .38 or reopening a CLOSED item.\n\nReproduce this collect failure locally against exact .38 using existing actual popup/serialized adapter/background/receiver/store harness and fabricated source. Investigate the known seam source-adapter timetable explicit school check and background-runner fetchPageRead/readNext/partialPage. Missing optional response proof may currently escape as fatal SCHOOL_CONTEXT_UNCONFIRMED despite independently bound roster; identify the actual causal branch rather than assuming all same codes are alike. No fabricated layout may be presented as the user's exact DOM. No live browser/portal reads, refused result reader, auto extension control or source discovery retry. Use existing source-grounded metadata school-reader paths. If absent response proof is the cause, preserve explicit response-school gate: do NOT import unproved timetable or infer school from requested SchoolId/URL alone. Independently bound roster may proceed only if source/teacher/document/owner/session/term remain verified and the narrow optional unproved-setup case is safely isolated, with truthful setup outcome and coverage. Foreign/conflicting/multiple school or teacher and roster identity failures MUST remain fatal; no broad catch/ignore. For known supported explicit school layouts, correct only proved extraction omissions. No new school proof by guess.\n\nComplete supported .38 outcome after narrow fix: school display ابن الجوزي الابتدائية with raw full identity retained; canonical department from existing explicit/unambiguous source rules with calendar/different selection preserved; source-derived class subjects and timetable when proven; durable exact current-run receipts/reopen/idempotent completion into the existing partially populated account. No default subject. If source timetable proof truly absent, tell the user exactly which optional data remains unavailable without denying already independently proven roster or claiming total completeness. Zero current-run receipts must not be misrepresented as absence of historical local receipts. Preserve receipt ownership/schema/unknown nonce/late ACK and roster pagination completeness.\n\nReuse .38 passing unrelated evidence, no full rebuild/test matrix. Preserve red baseline then affected positive/negative rendered local checks including absent optional school vs conflicting/foreign/multiple school, roster/owner/session drift, unknown receipt and populated-account repeat/reopen. Extend the existing harness rather than create new platform. If and only if a grounded defect is reproduced and correction qualified, generate next version0.5.39 (verify current manifest first), new archive with exact source/ZIP/manifest/download parity, no permission/CSP changes, old archives immutable. Original publisher delivers/verifies served assets. No same .38 republish or speculative patch. If no justified fix is possible, save exact missing nonpersonal source fact and BLOCKED rather than fabricate success. No whole N36 closure or real cloud/installed .39 acceptance.\n\nNo personal browser, live school/account, real data write, SQL/Auth/RLS, source route inventing, calendar switching, score/delete/restore, refused tool retries, queue edits or direct Git main/provider delivery. Keep one source owner. Budget follows bounded affected work; Sol6.1/Medium/Standard.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "src/lib/teacher-setup-import.js",
+        "sw.js",
+        "tests/n36-complete-import-outcome-20261023/**",
+        "docs/automation-evidence/20261023/N36_0538_SCHOOL_PROOF_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "extensions/rakeez-teacher-import-helper/background-runner.js",
+        "extensions/rakeez-teacher-import-helper/manifest.json",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_0538_exact_collect_failure_reproduced",
+        "n36_optional_setup_and_school_identity_guards",
+        "n36_current_receipts_partial_account_reopen_idempotence",
+        "n36_0539_exact_package_if_qualified"
+      ],
+      "acceptance": [
+        "Grounded .38 failure preserved and narrow fix qualified, or precise external proof limitation.",
+        "Roster identity remains independent of unproved optional setup; conflicts remain fatal.",
+        "No guessed subject, school, calendar or receipts; durable populated-account continuation verified.",
+        "Only new qualified version through original publisher; N36 remains open pending actual acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-N36-complete-outcome-request-and-actual-results",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "PO23October explicitly reports remaining import defects, requests school display/department correction and all necessary work to complete the existing N36 outcome. Existing routine code/extension packaging/frontend publication via the original controller/publisher is authorized after grounded reproduction and affected protection checks. No live school/account access, changed data access, service/SQL operation, expired nonce/fixture renewal or tool-refusal bypass.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "97292cdd950df00c677c6d0229e49e0a89dbe52e",
+        "requiredSourcePaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "extensions/rakeez-teacher-import-helper/manifest.json",
+          "tests/n36-complete-import-outcome-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_COMPLETE_IMPORT_OUTCOME.md"
+        ],
+        "editPaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "extensions/rakeez-teacher-import-helper/manifest.json",
+          "src/views/class-import-center.js",
+          "tests/n36-complete-import-outcome-20261023/school-proof.mjs",
+          "docs/automation-evidence/20261023/N36_0538_SCHOOL_PROOF_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n36-complete-import-outcome-20261023/school-proof.mjs",
+          "docs/automation-evidence/20261023/N36_0538_SCHOOL_PROOF_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n36_0538_exact_collect_failure_reproduced",
+          "n36_optional_setup_and_school_identity_guards",
+          "n36_current_receipts_partial_account_reopen_idempotence",
+          "n36_0539_exact_package_if_qualified"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
