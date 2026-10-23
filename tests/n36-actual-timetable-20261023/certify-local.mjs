@@ -1,0 +1,16 @@
+// AI: certify this bounded local result without erasing failed/unused live gates.
+import assert from 'node:assert/strict';import fs from 'node:fs/promises';import {execFileSync} from 'node:child_process';import {createHash} from 'node:crypto';
+const folder='tests/n36-actual-timetable-20261023/',baseSha='7fa9b61259df3036caf8e6eda6bf03196d7d4d2e';
+const read=async name=>JSON.parse(await fs.readFile(folder+name+'.json','utf8'));
+const baseline=await read('rendered-baseline');assert.equal(baseline.cases[0].view.setupRejectReason,'response-school-absent');assert.equal(baseline.cases[0].durable.slots,0);
+for(const name of ['rendered-candidate','rendered-restart','rendered-delayed-partial']){const r=await read(name);assert.equal(r.resources.serverClosed,true);assert.equal(r.resources.sharedBrowserFinally,true);assert.equal(r.cases[0].status,'PASS');if(name==='rendered-restart')assert.equal(r.cases[0].restartBeforeReturnProof,true);if(name==='rendered-delayed-partial'){assert.equal(r.cases[0].delayedRead,true);assert.equal(r.cases[0].view.coverage,'partial');}}
+const guards=[];for(const name of ['worker-identity-guards','worker-source-guards','worker-link-guards']){const r=await read(name);assert.equal(r.resources.serverClosed,true);for(const c of r.cases)if(c.status==='PASS'){assert.equal(c.noRowsOrSetupAdmitted,true);guards.push(c.scenario);}}
+assert.equal(new Set(guards).size,19);assert.equal((await read('original-worker-profile-owner-injection')).cases.some(c=>c.status==='FAIL'),true);
+const projection=await read('projection-qualified');assert.equal(projection.status,'PASS');assert.equal(projection.cases.length,24);assert.ok(projection.cases.every(c=>c.status==='PASS'));
+const observation=await read('observation-52da0f25');assert.equal(observation.newLiveResponseBodies,0);assert.equal(observation.oldMarkerModified,false);assert.equal(observation.renderedParityAttempt.availableTabContentRead,false);
+assert.equal((await read('passive-observation')).responseAllowance.consumedBodyReads,1);
+execFileSync('git',['diff','--exit-code',baseSha,'--','assets/extensions','extensions/rakeez-teacher-import-helper/manifest.json','src/views/class-import-center.js','src/lib/teacher-setup-import.js','src/lib/n36-extension-protocol.js','src/store.js','sw.js']);
+const files=['extensions/rakeez-teacher-import-helper/background-runner.js','extensions/rakeez-teacher-import-helper/source-adapter.js'];
+const hashes=await Promise.all(files.map(async file=>({file,sha256:createHash('sha256').update(await fs.readFile(file)).digest('hex')})));for(const file of files)execFileSync(process.execPath,['--check',file]);execFileSync('git',['diff','--check']);
+const result={taskId:'continuous-n36-actual-timetable-dom-20261023',runId:'52da0f25-3635-4831-8a38-3d1d0d09cd23',baseSha,localStatus:'PASS',workerRejectionScenarios:19,projectionScenarios:24,redFirst:true,storeIdempotenceReopenAndRestart:'PASS',partialRosterWarning:'PASS',files:hashes,previousZipStoreProtocolAndOfflineShell:'UNCHANGED',newPackage:'NOT_RUN',actualCurrentRenderedSourceParity:'NOT_RUN; authorized teacher/timetable tab absent',passiveResponseRead:'NOT_RUN; new allowance unspent, supported command-scope parser unavailable',releaseState:'BLOCKED'};
+await fs.writeFile(folder+'local-certificate.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

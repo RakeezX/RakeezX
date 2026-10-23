@@ -1,0 +1,110 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "52da0f25-3635-4831-8a38-3d1d0d09cd23",
+  "baseline": false,
+  "cases": [
+    {
+      "scenario": "conflict",
+      "view": {
+        "receiptAggregateVersion": 1,
+        "id": "82dccea437900f1316b6d11257e5f1342ffccfd283ce8218ab434f17c99853d5",
+        "timings": {
+          "home": {
+            "count": 2,
+            "ms": 131
+          },
+          "sourceGuard": {
+            "count": 18,
+            "ms": 1210
+          },
+          "descriptor": {
+            "count": 40,
+            "ms": 474
+          },
+          "appGuard": {
+            "count": 22,
+            "ms": 310
+          },
+          "fetchPending": {
+            "count": 4,
+            "ms": 433
+          }
+        },
+        "phase": "stopped",
+        "startPhase": "accepted",
+        "receiverCheckpoint": "none",
+        "receiverRelation": "unresolved",
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "pendingSavedRows": 0,
+        "failurePhase": "none",
+        "failureStep": "source-navigation-settle",
+        "failureJobPhase": "navigation",
+        "code": "BACKGROUND_UNAVAILABLE",
+        "added": 0,
+        "existing": 0,
+        "fields": [],
+        "staged": 2,
+        "observed": 2,
+        "coverage": "unknown",
+        "coverageReasons": [],
+        "terminal": "unproven",
+        "hasNext": false,
+        "processedPages": 0,
+        "excluded": 0,
+        "classes": 1,
+        "setupPartial": false,
+        "setupUnavailable": [],
+        "setupKind": "none",
+        "setupRejectReason": "none",
+        "receiverCapability": "source-profile-quiet-v1",
+        "needsReview": false,
+        "entryKind": "unresolved-entry",
+        "roleProofKind": "active-role",
+        "proofNavMarkers": 2,
+        "proofActionMarkers": 2,
+        "proofReadLinks": 1,
+        "schoolBindingState": "bound",
+        "schoolBadgePresent": true,
+        "schoolIdPresent": true,
+        "readProofPresent": true
+      },
+      "requests": [
+        "/SchoolManagment/Actions/Teacher/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "/TeachersReports/Statistics/MyInfo/observed",
+        "/TeachersReports/Statistics/Teacher/observed",
+        "/SchoolSchedule/Schedule/TeacherSchedule",
+        "/SchoolSchedule/Schedule/TeacherSchedule"
+      ],
+      "outcomes": [],
+      "durable": {
+        "students": 0,
+        "sections": 0,
+        "teachings": 0,
+        "slots": 0,
+        "profile": [
+          {
+            "id": "profile",
+            "teacherName": "معلم اصطناعي",
+            "phone": "0500000001",
+            "teacherForm": "masculine",
+            "principalName": "",
+            "canonicalId": "profile",
+            "serverRevision": 1,
+            "deleted": false,
+            "educationDepartment": "الإدارة العامة للتعليم بمنطقة الرياض"
+          }
+        ],
+        "receipts": []
+      },
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'stopped'\n- 'complete'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-timetable-dom-20261023/tests/n36-actual-timetable-20261023/runtime.mjs:54:9\n    at async withSharedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-timetable-dom-20261023/tests/n36-actual-timetable-20261023/shared-browser.mjs:7:314)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-actual-timetable-dom-20261023/tests/n36-actual-timetable-20261023/runtime.mjs:21:135"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "sharedBrowserFinally": true
+  }
+}

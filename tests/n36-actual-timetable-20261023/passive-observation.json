@@ -1,0 +1,36 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "91d0d908-8d14-4069-acf5-2fc6c4175ce3",
+  "transport": "supported CUA named-tab cdp capability only",
+  "commands": ["Network.enable", "Network.getResponseBody", "Network.disable"],
+  "events": ["Network.requestWillBeSent", "Network.responseReceived", "Network.loadingFinished"],
+  "firstObservation": {
+    "bodyReads": 0,
+    "error": "Exact document response not uniquely captured",
+    "cause": "Harness stopped when the first event batch had hasMore=false instead of waiting for the matching response/loadingFinished.",
+    "passiveObservationDisabled": true,
+    "originalTabRestored": true
+  },
+  "correctedObservation": {
+    "bodyReads": 1,
+    "documentRelation": "unique exact target GET Document request/response; current visible top URL SAME; request/response frame and loader SAME; matching loadingFinished observed",
+    "pathKind": "teacher-schedule",
+    "method": "GET",
+    "statusCode": 200,
+    "redirectRelation": "no redirectResponse on matched request; response URL SAME as expected target",
+    "headersInspected": false,
+    "structuralProjection": "FAIL",
+    "error": "Expected response timetable table not unique",
+    "cause": "The local regex projection did not yield exactly one table with a class containing table-sm. The throw discarded the local raw body before CSS/table facts were projected. Zero versus multiple matches was not retained; neither absence nor multiplicity is established.",
+    "cssPresence": "NOT_ESTABLISHED",
+    "basePresence": "NOT_ESTABLISHED",
+    "sourceResponseCorpus": "NOT_OBTAINED",
+    "rawResponseExported": false,
+    "passiveObservationDisabled": true,
+    "originalTabRestored": true
+  },
+  "responseAllowance": {"allowedBodyReads": 1, "consumedBodyReads": 1, "remainingBodyReads": 0},
+  "collectorEquivalence": "NOT_ESTABLISHED: navigation response only; collector uses fetch GET, credentials same-origin, redirect error and cache no-store with no explicit headers. Navigation has a different request destination/mode and potentially negotiation/cache behavior; headers were not inspected.",
+  "toolDenial": null,
+  "cleanup": {"browserLease": "RELEASED browser", "userTabClosed": false, "serviceOperations": 0, "extensionOperations": 0, "fixtureIdentitiesProvisioned": 0}
+}

@@ -1,0 +1,133 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "91d0d908-8d14-4069-acf5-2fc6c4175ce3",
+  "scope": "LOCAL DESIGN ONLY; no Product transport, real account, app/store certification or response equivalence",
+  "cases": [
+    {
+      "scenario": "matching",
+      "status": "PASS",
+      "admitted": true,
+      "code": null
+    },
+    {
+      "scenario": "teacher-switch",
+      "status": "PASS",
+      "admitted": false,
+      "code": "TEACHER_CONTEXT_CHANGED"
+    },
+    {
+      "scenario": "school-switch",
+      "status": "PASS",
+      "admitted": false,
+      "code": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "scenario": "role-switch",
+      "status": "PASS",
+      "admitted": false,
+      "code": "NON_TEACHER_ROLE"
+    },
+    {
+      "scenario": "login-return",
+      "status": "PASS",
+      "admitted": false,
+      "code": "LOGIN_OR_LOGOUT"
+    },
+    {
+      "scenario": "owner-switch",
+      "status": "PASS",
+      "admitted": false,
+      "code": "APP_CONTEXT_CHANGED"
+    },
+    {
+      "scenario": "session-switch",
+      "status": "PASS",
+      "admitted": false,
+      "code": "APP_CONTEXT_CHANGED"
+    },
+    {
+      "scenario": "redirect",
+      "status": "PASS",
+      "admitted": false,
+      "code": "SOURCE_BINDING_CHANGED"
+    },
+    {
+      "scenario": "base",
+      "status": "PASS",
+      "admitted": false,
+      "code": "page.evaluate: TypeError: Failed to fetch dynamically imported module: https://foreign.invalid/tests/n36-actual-timetable-20261023/checkpoint-design.mjs"
+    },
+    {
+      "scenario": "foreign",
+      "status": "PASS",
+      "admitted": false,
+      "code": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "scenario": "mixed",
+      "status": "PASS",
+      "admitted": false,
+      "code": "SCHOOL_CONTEXT_CHANGED"
+    },
+    {
+      "scenario": "duplicate-key",
+      "status": "PASS",
+      "admitted": false,
+      "code": "UNSAFE_LESSON_LINK"
+    },
+    {
+      "scenario": "hidden",
+      "status": "PASS",
+      "admitted": false,
+      "code": "UNSAFE_LESSON_LINK"
+    },
+    {
+      "scenario": "nav-only",
+      "status": "PASS",
+      "admitted": false,
+      "code": "UNSAFE_LESSON_LINK"
+    },
+    {
+      "scenario": "missing-period",
+      "status": "PASS",
+      "admitted": false,
+      "code": "SOURCE_PENDING"
+    },
+    {
+      "scenario": "missing-day",
+      "status": "PASS",
+      "admitted": false,
+      "code": "UNRESOLVED_WEEKDAY"
+    },
+    {
+      "scenario": "login",
+      "status": "PASS",
+      "admitted": false,
+      "code": "LOGIN_OR_LOGOUT"
+    },
+    {
+      "scenario": "role",
+      "status": "PASS",
+      "admitted": false,
+      "code": "NON_TEACHER_ROLE"
+    },
+    {
+      "scenario": "stale-document",
+      "status": "PASS",
+      "admitted": false,
+      "code": "SOURCE_BINDING_CHANGED"
+    },
+    {
+      "scenario": "timeout",
+      "status": "PASS",
+      "admitted": false,
+      "code": "CHECKPOINT_TIMEOUT"
+    }
+  ],
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "browserClosed": true,
+    "leaseRelease": "RELEASED browser"
+  }
+}

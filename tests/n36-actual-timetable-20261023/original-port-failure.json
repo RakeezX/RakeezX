@@ -1,0 +1,8 @@
+{
+  "taskId": "continuous-n36-actual-timetable-dom-20261023",
+  "runId": "370692a5-ce70-4d20-965e-ba09b56c10e4",
+  "operation": "Node loopback listener before any browser launch",
+  "result": "listen EACCES: permission denied 127.0.0.1:49976",
+  "exitCode": 1,
+  "correction": "Use OS-assigned ephemeral port with server error handler and existing ownership-matched finally cleanup; no policy, ACL or browser-security changes. No source operation was denied."
+}

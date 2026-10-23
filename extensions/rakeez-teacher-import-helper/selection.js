@@ -254,12 +254,20 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   const welcomeCandidates=dashboard?Array.from(body.querySelectorAll('p,span,h1,h2,h3')).filter(visible).filter(n=>!Array.from(n.children).some(child=>/^مرحبا بك /.test(roleText(child)))).map(roleText).filter(v=>/^مرحبا بك /.test(v)):[];
   const welcomeNames=[...new Set(welcomeCandidates.map(v=>v.slice('مرحبا بك '.length)).filter(v=>validValue(v)&&!/[0-9٠-٩]/.test(v)))];
   const currentTeacherProof=()=>JSON.stringify({url:location.href,school:shownSchool,schoolId:observedSchoolIds[0],semantic:semanticRoleProof?{navMarkers,actionMarkers,controls:controls.filter(n=>['قائمة الطلاب','سجلات المتابعة اليومية','الجدول الدراسي','سجلات متابعة الفصول','تقارير المعلم'].includes(roleText(n))).map(n=>[n.tagName,roleText(n),n.tagName==='A'?new URL(n.href).pathname+new URL(n.href).search:'']).sort()}:null,roles:[...new Set(activeTeacher)].sort(),greetings,teacher:[...new Set([...labelValues(body,['اسم المعلم','اسم المعلمة']),...welcomeNames])].sort()});
-  if(mode==='read-proof'){
+  if(mode==='read-proof'||mode==='read-proof-settle'){
     if(!entryPath||document.readyState!=='complete'||document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
     if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
     if(!runContext?.schoolId||observedSchoolIds.length!==1)return roleFail('SCHOOL_CONTEXT_UNCONFIRMED');
-    if(!activeTeacher.length&&greetings.length!==1&&!semanticRoleProof)return roleFail('UNCONFIRMED_TEACHER_ROLE');
     if(observedSchoolIds[0]!==runContext.schoolId.toLowerCase()||shownSchool&&runContext.schoolName&&shownSchool!==runContext.schoolName)return roleFail('SCHOOL_CONTEXT_CHANGED');
+    // AI: only the owned canonical return may wait for animated semantic
+    // controls. Every non-semantic identity field must already match. Never
+    // retry an observed teacher/school/role/login change as a loading state.
+    if(mode==='read-proof-settle'&&runContext.readProof){
+      try{const expected=JSON.parse(runContext.readProof),current=JSON.parse(currentTeacherProof()),semantic=expected.semantic;delete expected.semantic;delete current.semantic;
+        if(semantic&&JSON.stringify(expected)===JSON.stringify(current)&&runContext.readProof!==currentTeacherProof())return {...roleFail('SOURCE_PENDING'),retry:true};
+      }catch{return roleFail('TEACHER_CONTEXT_CHANGED');}
+    }
+    if(!activeTeacher.length&&greetings.length!==1&&!semanticRoleProof)return roleFail('UNCONFIRMED_TEACHER_ROLE');
     if((!shownSchool||!activeTeacher.length&&greetings.length!==1)&&!runContext.readProof)return roleFail('UNCONFIRMED_TEACHER_ROLE');
     const proof=currentTeacherProof();
     if(runContext.readProof&&runContext.readProof!==proof)return roleFail('TEACHER_CONTEXT_CHANGED');

@@ -90,15 +90,16 @@ export function createBackgroundRunner({transport}){
   j.sourceDocument=probe.documentId;j.sourceURL=probe.result;
   const target={tabId:j.tabId,documentIds:[j.sourceDocument]};
   await chrome.scripting.executeScript({target,world:'ISOLATED',files:['route-diagnostics.js']});
-  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,mode==='read-proof'?{...j.context,readJobId:j.id}:j.context]});
+  const proofMode=['read-proof','read-proof-settle'].includes(mode);
+  const r=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readAutomaticTeacherPage,args:[mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(j.sourceURL).pathname)?'roster-guard':['students','timetable'].includes(mode)?'guard':mode,null,proofMode?{...j.context,readJobId:j.id}:j.context]});
   await current(j);
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   if(r[0].result?.proofDiagnostic)j.proofDiagnostic={...j.proofDiagnostic,...r[0].result.proofDiagnostic};
   if(!r[0].result?.ok){const e=Error(r[0].result?.code??'SOURCE_UNAVAILABLE');e.retry=r[0].result?.retry;e.incomplete=r[0].result?.incomplete;throw e;}
   if(mode==='home'&&j.context?.kind==='selected-teacher-card'&&r[0].result.runContext?.kind==='selected-teacher-card'&&['roleTargetId','href','schoolName'].some(k=>j.context[k]!==r[0].result.runContext[k]))throw Error('SCHOOL_CONTEXT_CHANGED');
   j.sourceDocument=r[0].documentId;
-  if(mode==='read-proof'){if(j.context.readProof&&j.context.readProof!==r[0].result.proof)throw Error('TEACHER_CONTEXT_CHANGED');j.context={...j.context,readProof:r[0].result.proof};}
-  if(['guard','read-proof'].includes(mode)){
+  if(proofMode){if(j.context.readProof&&j.context.readProof!==r[0].result.proof)throw Error('TEACHER_CONTEXT_CHANGED');j.context={...j.context,readProof:r[0].result.proof};}
+  if(['guard','read-proof','read-proof-settle'].includes(mode)){
    const g=await chrome.scripting.executeScript({target,world:'ISOLATED',func:readSourceReportPage,args:['guard']});
    await current(j);if(g.length!==1||g[0].documentId!==j.sourceDocument||!g[0].result?.ok)throw Error(g[0]?.result?.code??'SOURCE_BINDING_CHANGED');
   }
@@ -172,6 +173,14 @@ export function createBackgroundRunner({transport}){
     const unsafeLink=e.message==='UNSAFE_SETUP_LINK'&&e.setupRejectReason!=='response-school-absent';
     if((!unsafeLink&&!absentSchool)||e.setupKind!==n.kind||!e.setupRejectReason||!j.context.schoolId||!j.context.readProof)throw e;
     await source(j,'read-proof');await appGuard(j);
+    // AI: CSS visibility cannot be proved by the inert response. Only this
+    // optional rejection may use the exact observed rendered timetable route.
+    // The canonical home identity is checked before departure and after return.
+    if(absentSchool&&/^\/SchoolSchedule\/Schedule\/TeacherSchedule$/.test(new URL(target).pathname)&&/^\/SchoolManagment\/Actions\/Teacher\/[^/]+\/?$/.test(new URL(j.sourceURL).pathname)){
+     j.renderedTimetable={homeURL:j.sourceURL,homeProof:j.context.readProof,deadline:Date.now()+30000,quarantined:null,failure:null};
+     j.navigation={from:j.sourceURL,documentId:j.sourceDocument,target,kind:'timetable',rendered:'outbound',issued:true,deadline:j.renderedTimetable.deadline};j.phase='navigation';await save(j);
+     await source(j,'read-proof');await appGuard(j);await chrome.tabs.update(j.tabId,{url:target});return null;
+    }
     (j.setupRejections??=[]).push({setupKind:n.kind,setupRejectReason:e.setupRejectReason});
     return {...n,page:{tables:[],links:[],warnings:[{category:n.kind,code:'SETUP_FIELDS_UNAVAILABLE'}],skipped:[]}};
    }
@@ -189,8 +198,46 @@ export function createBackgroundRunner({transport}){
   const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.rosterCause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(next.path,j.origin).pathname);
   return {tables:[],links:[],warnings:[{category:next.kind,code:e.message,optional}],skipped:[]};
  }
+ // AI: no rows escape this persisted quarantine until the exact home route,
+ // new document and original teacher/school/role proof have all been checked.
+ // Restart may continue an issued transition, never replay an uncertain one.
+ async function settleRenderedTimetable(j){
+  const n=j.navigation,chain=j.renderedTimetable;
+  if(!chain||!n?.issued||!['outbound','return'].includes(n.rendered)||Date.now()>=chain.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
+  await appGuard(j);const tab=await chrome.tabs.get(j.tabId);
+  const r=await chrome.scripting.executeScript({target:{tabId:j.tabId,frameIds:[0]},world:'ISOLATED',func:()=>location.href});await current(j);
+  if(r.length!==1||r[0].frameId!==0||!r[0].documentId||typeof r[0].result!=='string')throw Error('SOURCE_BINDING_CHANGED');
+  const v=r[0];if(v.result===n.from&&v.documentId===n.documentId){if(tab.status==='loading')return false;throw Error('NAVIGATION_UNCONFIRMED');}
+  if(v.result!==n.target)throw Error('SOURCE_CONTEXT_CHANGED');
+  sourceRoute(j,v.result);
+  if(v.documentId===n.documentId||n.readDocument&&v.documentId!==n.readDocument)throw Error('SOURCE_BINDING_CHANGED');
+  if(tab.status!=='complete')return false;
+  j.sourceURL=v.result;j.sourceDocument=v.documentId;
+  if(!n.readDocument){n.readDocument=v.documentId;await save(j);}
+  if(n.rendered==='return'){
+   if(j.sourceURL!==chain.homeURL||j.context.readProof!==chain.homeProof)throw Error('TEACHER_CONTEXT_CHANGED');
+   try{await source(j,'read-proof-settle');}catch(e){if(e.retry&&e.message==='SOURCE_PENDING'){await new Promise(resolve=>setTimeout(resolve,250));return true;}throw e;}await appGuard(j);
+   if(Date.now()>=chain.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
+   if(chain.failure)throw Error(chain.failure);
+   if(!chain.quarantined?.ok)throw Error('SOURCE_UNAVAILABLE');
+   j.next={...j.next,page:chain.quarantined};delete j.renderedTimetable;j.navigation=null;j.phase='collect';await save(j);return true;
+  }
+  // Save the new document before reading: a reload while asleep is a stale
+  // document, not a fresh authorization. The deadline never resets on restart.
+  const result=await chrome.scripting.executeScript({target:{tabId:j.tabId,documentIds:[j.sourceDocument]},world:'ISOLATED',func:readSourceReportPage,args:['rendered-timetable',{...j.context,sourceURL:chain.homeURL,expectedScheduleURL:n.target}]});await current(j);
+  if(result.length!==1||result[0].frameId!==0||result[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
+  const post=await descriptor(j);if(post.result!==n.target)throw Error('SOURCE_CONTEXT_CHANGED');await appGuard(j);
+  if(Date.now()>=chain.deadline)throw Error('TEACHER_TRANSITION_UNRESOLVED');
+  const page=result[0].result;
+  if(!page?.ok&&page?.retry){await new Promise(resolve=>setTimeout(resolve,250));return true;}
+  chain.quarantined=page?.ok?page:null;chain.failure=page?.ok?null:(/^[A-Z_]+$/.test(page?.code??'')?page.code:'SOURCE_UNAVAILABLE');
+  j.navigation={from:j.sourceURL,documentId:j.sourceDocument,target:chain.homeURL,kind:'timetable',rendered:'return',issued:true,deadline:chain.deadline};await save(j);
+  const bound=await descriptor(j);if(bound.result!==j.sourceURL)throw Error('SOURCE_CONTEXT_CHANGED');await appGuard(j);
+  await chrome.tabs.update(j.tabId,{url:chain.homeURL});return true;
+ }
  async function settleNavigation(j){
   try{
+  if(j.navigation?.rendered)return await settleRenderedTimetable(j);
   await appGuard(j);const n=j.navigation,tab=await chrome.tabs.get(j.tabId);
   // Read back the top document ONLY during this exact owned navigation window.
   // Do not clear the old binding until destination, frame and deadline are verified.
