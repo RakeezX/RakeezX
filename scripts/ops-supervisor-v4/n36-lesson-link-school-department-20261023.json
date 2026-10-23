@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-lesson-link-school-department-outcome-20261023",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n36-lesson-link-school-department-outcome",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "MATERIAL NEW SOURCE EVIDENCE FROM PO: installed0.5.39 actually saved302/10,pending0 with old56/2+29 trace preserved (candidate97db6bc/published61c45a5); do not redo/fix that delivered behavior. User now confirms actual timetable cells visibly contain subject link 'المهارات الرقمية' and class link 'خامس 5', both same-origin /SchoolSchedule/Schedule/ManageLecture with SAME SchoolId, lectureId=1,dateTicks,subjectId=34212,classroomId=203793. The full actual SchoolId need not be copied into fixtures/evidence. Use fabricated IDs preserving structural equality. Link is evidence to parse inertly, NOT authorization to navigate ManageLecture or edit a lesson. User explicitly instructs department from school name; if unsafe remove rather than invent complexity. Existing title-suffix resolver can prove unique known department. Latest request supersedes prior conservative choice preservation ONLY for exact unique known source suffix: apply correct canonical department even if old selection differs, with source provenance and ordinary guarded transaction; do not change calendar/region/year/term, do not overwrite on ambiguous/unknown suffix. Explicit labelled evidence takes precedence and contradictions reject. Do not add a separate approval workflow. Do not remove supported department import if this bounded source can work safely.\n\nStart from current integrated main containing published61c45a5, preserve old sessions/candidates/evidence and installed0.5.39 data. Reproduce two affected seams in existing real extension/store harness: source-adapter currently rejects timetable when response school label is absent even when lesson anchors explicitly carry the already-bound SchoolId; and existing suffix fallback emits conflict for deliberate old department. Qualify the smallest safe correction using validated visible lesson anchors as explicit response school binding when label is absent. Matching IDs must come from real relevant timetable lesson/card nodes, strict same-origin/path/unique query keys and bounded expected ID grammar; never use arbitrary navigation link, request URL alone or hidden/unsafe/injected links as proof. Explicit mismatching name/SchoolId/teacher, multiple schools, login/logout, role change, base redirect and stale context continue to reject BEFORE accepting rows. Do not weaken proof into a general 'no label means okay'. Preserve full raw school source identity, normalized display school name and unique directory mapping.\n\nParse subject/class labels from the supplied paired-anchor shape only when each lesson cell/card is unambiguous and its school/subject/classroom tuple agrees; preserve existing supported schedule-card variant. Pairing by DOM cell and validated tuple, not arbitrary adjacency or name guessing. Keep existing explicit weekday/period headers; lectureId/dateTicks alone are NOT invented schedule coordinates. Missing/ambiguous weekday/period means truthful partial timetable. Resolve class-to-subject linkage idempotently using verified existing source classroom identity; no default subject/duplicate class/subject, no relabel of unrelated class. If actual surrounding layout is still unknown, qualify exact supported seam and clearly delimit what remains rather than inventing a fixture that claims full portal acceptance.\n\nNo live Madrasati/browser/account or extension control in this card. Root inventory did not expose Incognito; no workaround for earlier refused source/control/result readers. User snippet is new provided evidence sufficient for local affected reproduction. Reuse existing harness and all unchanged .39 recovery/receipt/source safeguards. Focus tests on matching link school proof with absent label, foreign/mixed/duplicate/hidden/nav-only unsafe anchors, paired subject/class and duplicate replay, explicit suffix update with calendar untouched and ambiguous/contradictory suffix reject, exact owner/session/atomicity. Preserve current roster coveragepartial/student-data-unverified/missing-pages independently;302 receipts are not complete-source or cloud proof. No old batch replay/deletion or comparison302vs303.\n\nOnly after reproduced defect and focused PASS build a NEW extension version/package if source changes require it; never overwrite .39 ZIP. Keep package paths/version/UI coherent, preserve latest successful run and old retained history. Existing publisher integrates and verifies served assets and frontend changes; local checks are not Production. Return LOCAL_READY with actual limits for publisher, N36 remains OPEN until actual resulting timetable/subject/department user acceptance. No unrelated tests or work.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/n36-extension-protocol.js",
+        "sw.js",
+        "tests/n36-complete-import-outcome-20261023/**",
+        "tests/n36-lesson-link-20261023/**",
+        "docs/automation-evidence/20261023/N36_LESSON_LINK_AND_DEPARTMENT_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_absent_label_matching_lesson_school_proof_reproduced",
+        "n36_lesson_link_identity_and_unsafe_source_denials",
+        "n36_subject_class_pairing_idempotence_and_timetable_coordinates",
+        "n36_unique_department_suffix_update_calendar_and_owner_guards",
+        "n36_affected_package_and_previous_receipts_preserved"
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-explicit-school-suffix-and-actual-lesson-links",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0
+      },
+      "releaseAuthority": "PO explicitly asks source-derived department and supplies real timetable link structure, authorizes completion. Reproduced local source correction and original-publisher delivery allowed; no live source automation or denied-reader retry.",
+      "acceptance": [
+        "Source school binding from exact relevant lesson links remains strict.",
+        "Verified subject/class association and existing schedule coordinates; no default material.",
+        "Unique school-suffix department can replace deliberately different value per latest PO, calendar unchanged.",
+        "Preserve302/10 current and unresolved prior history; whole acceptance separate."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "532ffe67cfa729f62c7d436f3ae0047e5ba3efad",
+        "requiredSourcePaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js"
+        ],
+        "editPaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "tests/n36-lesson-link-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_LESSON_LINK_AND_DEPARTMENT_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n36-lesson-link-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_LESSON_LINK_AND_DEPARTMENT_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n36_absent_label_matching_lesson_school_proof_reproduced",
+          "n36_lesson_link_identity_and_unsafe_source_denials",
+          "n36_subject_class_pairing_idempotence_and_timetable_coordinates",
+          "n36_unique_department_suffix_update_calendar_and_owner_guards",
+          "n36_affected_package_and_previous_receipts_preserved"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
