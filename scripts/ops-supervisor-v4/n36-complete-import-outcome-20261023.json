@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-complete-import-outcome-20261023",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -5500,
+      "scopeKey": "n36-complete-import-outcome",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n36-fresh-account-academic-start-20261023"
+      ],
+      "objective": "Own the connected N36 current-version import outcome, not a diagnostic-only microtask. New actual PO evidence: .37 completes and user sees imported students/classes/teacher/principal/school; app durable readback is 10 local receipts totaling 302 rows, no pending rows. Extension simultaneously shows zero confirmed rows/receipts and coverage partial. Timetable rejected BEFORE its GET as live-link-event; actual event name and timetable response are unknown. Department missing; classes have no subject; school includes a location suffix the PO explicitly wants separated. Fresh-account Start is now user-observed successful after e4a60549; preserve that delivered fix, do not redo it. Historic .35 outcome is separate. Read docs/automation-evidence/20261023/N36_COMPLETE_IMPORT_INPUT.md for the full bounded acceptance and factual limits.\n\nFirst reproduce the relevant current baseline in the actual existing popup/serialized reader/worker/collector/receiver/store/IndexedDB harness on owned loopback HTTP with fabricated source/account data, reusing the .37 and fresh-boot helpers. No new test platform or hand-drawn lookalike UI. These are linked seams with one release candidate:\n(1) Timetable: source-adapter currently permits onclick only, but the same observed visible timetable GET can be selected with a different event-attribute name and then rejected as live-link-event. The new actual code proves this gate, NOT which event or its content. Review the non-executing GET trust boundary and reproduce with instrumented inert event attributes. A correction may make presence of irrelevant nonexecuted attributes consistent with exact observed same-origin route/SchoolId GET only when supported by a written threat argument and negative tests; do not merely delete the check for PASS. Never read handler values/properties, invoke/click/evaluate them, construct hidden endpoints or navigate for this optional GET. Keep all teacher/document/owner/session/school bindings before/during/after fetch, exact URL/query, visibility, ambiguous duplicate/context/form/disabled/download/non-GET/redirect/response-base/size/timeout denials. Do not relax response-school proof: unknown actual response or missing school evidence remains a precise separate limitation; inspect existing source-grounded evidence only, do not resurrect the blocked school-contract attempt unchanged. A supported timetable response must reach stored slots and teaching links rather than stop after fetching HTML.\n(2) School/department: PO explicitly requests display school 'ابن الجوزي الابتدائية' from observed 'ابن الجوزي الابتدائية بمكة المكرمة', and department from the clear suffix. Retain the raw full source-school identity for binding; normalize the destination display/profile only after validation. Generalize only exact unambiguous known directory locative suffixes, never arbitrary city substrings or removal of intrinsic school-name text. Use existing canonical directory ('الإدارة العامة للتعليم بمنطقة مكة المكرمة'), no new list or calendar-region change. Read selected school-card labelled department before its early return when available; explicit source label has precedence. Existing suffix fallback already exists but skips nonempty destination departments: reproduce empty/same/different cases rather than assuming suffix parsing is absent. If department already matches, report current, not missing. Preserve a different existing deliberate department and report a clear conflict unless explicit authoritative source label resolves it; no silent calendar or account-role change. Keep teacher/principal as already successful. Check actual stored/display result after reload, not pure helper only.\n(3) Subject/class setup: current classes may contain names only, and no timetable means no observed subject assignment. Establish the actual source-derived class-to-subject association from supported explicit class data or validated timetable, and confirm the existing current-term teaching creation is used idempotently. Do not invent a default subject, use the account's default subject as evidence, rename student identities, alter grades or hide the 'no subject' state. Exercise both initial import and later setup completion into classes already containing students. Missing source subject stays honestly unresolved; supported explicit subject must appear on class cards, with correct slots and preserved students. No blanket recreate/delete.\n(4) Receipt truth: background-runner resets receiverProgress to null on successful receipts while view() publishes zero defaults. Derive success aggregates from exact acknowledged receipts without double counting restart/wake/replay, preserve unknown outcomes and distinguish newly added/existing/total. Reopening popup after complete must agree with the actual receiver evidence. Fix app's unconditional 'unresolved extension result unchanged' wording so completed local receipts are not portrayed as an unresolved current import; do not claim to have reconciled a historical unknown nonce or cloud Sync. Do not change the six-field public local-progress schema or ACK ownership.\n(5) Coverage: preserve separation of roster completeness and optional setup. 302 vs old303 is NOT proof of one missing student. sourceCoverage uses student warnings/page gaps/terminal proof; expose the real bounded nonpersonal reason/counts from that state, not default unknown fields or a fabricated full result. Reproduce complete, genuinely missing-page, excluded/ambiguous-row and unknown-terminal cases relevant to this loop; no weakening of pagination proof. Fix a proved collector/reader defect within this scope; otherwise clearly state the missing structural fact. A partial message is not the success criterion for a known complete supported fixture.\n\nAcceptance is the actual rendered journey from a genuinely fresh provisioned account (reuse e4a60549 bootstrap without manual academic prefill) and a populated partial-import account: source -> explicit Start -> bound teacher metadata -> correct school display/department -> class subject links -> timetable -> names -> exact local receipts -> receiver/class UI -> receiver reload + popup reopen -> no duplicates on one controlled SYNTHETIC repeat. Use one representative multi-class run including 302 fabricated rows/10 handoffs only where it proves this exact count regression; avoid rerunning the historical giant matrix or a single-class >999 fixture. Test both existing supported dashboard/teacher entry paths with source-grounded shapes; do not invent live layouts or hidden return endpoints just to make both green. Preserve original failures; correct harness bugs within scope rather than stopping at a path mismatch.\n\nRun the smallest negative set protecting the changed boundary (foreign owner, school/teacher drift, wrong term, late/unknown receipt, retry/wake, unrelated unsafe links, conflicting preexisting setup, no handler execution, source/extension permissions). Package only after the entire locally testable outcome passes; reuse unchanged evidence. If extension runtime changes, generate one next version from the current exact manifest (normally0.5.38), exact manifest/source/ZIP parity and updated app download via existing packaging/release conventions; no overwriting old archives or merely relabelling .37. Permissions/CSP unchanged. Receiver protocol and 300-row per-handoff bound unchanged. sw.js only for an actually needed shell dependency, not cache-policy redesign. The original publisher owns integration/provider/served verification. The worker's result must separately state full supported-synthetic outcome, actual-account evidence still missing, and any exact blocked source condition; no whole-N36 closure or claims of real-cloud acceptance. Do not end after changing only a message while the supported journey still fails. If a genuine external/source constraint blocks an objective, retain the useful candidate and give its exact condition, not an unchanged retry or speculative rewrite.\n\nNo personal/incognito browser control, live Madrasati read, credentials/student names, real account inspection/mutations, SQL/Auth/RLS/schema/lease-policy/scoring/delete/restore, new tool permissions, or previously rejected operations. General PO 'all tools' is not a security bypass. No GitHub issue-write retry. No Product main push or direct deploy, no queue edits, no extra paid workers. Sol6.1/Medium/Standard; return the original schema with truthful checks and exact identities.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "src/lib/teacher-setup-import.js",
+        "sw.js",
+        "tests/n36-complete-import-outcome-20261023/**",
+        "docs/automation-evidence/20261023/N36_COMPLETE_IMPORT_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "extensions/rakeez-teacher-import-helper/selection.js",
+        "extensions/rakeez-teacher-import-helper/background-runner.js",
+        "extensions/rakeez-teacher-import-helper/background-collector.js",
+        "extensions/rakeez-teacher-import-helper/source-roster.js",
+        "extensions/rakeez-teacher-import-helper/run-controller.js",
+        "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+        "extensions/rakeez-teacher-import-helper/manifest.json",
+        "src/views/class-import-center.js",
+        "src/lib/teacher-setup-import.js"
+      ],
+      "requiredChecks": [
+        "n36_actual_partial_baseline_and_causal_corrections",
+        "n36_teacher_school_department_semantics_and_context_safety",
+        "n36_supported_timetable_subjects_and_class_associations",
+        "n36_receipts_counts_and_coverage_truth_after_reopen",
+        "n36_fresh_and_existing_account_end_to_end_idempotence",
+        "n36_exact_package_and_affected_negative_guards"
+      ],
+      "acceptance": [
+        "Current actual intake is recorded as 302 locally acknowledged rows, not zero, not cloud-confirmed, not 303 expected; old batch remains distinct.",
+        "Raw source school identity preserved while the requested name display and canonical department handling are correct, with explicit labels/current/conflicts and no calendar changes.",
+        "Supported timetable GET succeeds without handler evaluation and without reduced identity/source guard; actual slots and class-subject links persist, rather than just a successful fetch.",
+        "Popup and app show consistent exact acknowledged/pending counts and truthful coverage reasons after reopen, with ambiguous/unknown outcomes preserved.",
+        "Actual synthetic fresh and populated-account journeys pass through the final UI and reload; no duplicate students/classes/teachings/slots in the bounded synthetic repeat.",
+        "One coherent verified source/ZIP candidate using existing release path, no actual account success/umbrella closure invented."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-N36-complete-outcome-request-and-actual-results",
+        "publication": true,
+        "realSchoolRead": false,
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "PO23October explicitly reports remaining import defects, requests school display/department correction and all necessary work to complete the existing N36 outcome. Existing routine code/extension packaging/frontend publication via the original controller/publisher is authorized after grounded reproduction and affected protection checks. No live school/account access, changed data access, service/SQL operation, expired nonce/fixture renewal or tool-refusal bypass.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "e4a60549bf7936de27e4ab4bc7864e4b19366d16",
+        "requiredSourcePaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "extensions/rakeez-teacher-import-helper/selection.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "extensions/rakeez-teacher-import-helper/background-collector.js",
+          "extensions/rakeez-teacher-import-helper/source-roster.js",
+          "extensions/rakeez-teacher-import-helper/run-controller.js",
+          "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+          "extensions/rakeez-teacher-import-helper/manifest.json",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "src/lib/education-department-directory.js",
+          "tests/n36-1255-visible-timetable-get-20261021/runtime.mjs",
+          "tests/n36-fresh-account-start-20261023/runtime.mjs"
+        ],
+        "editPaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "extensions/rakeez-teacher-import-helper/selection.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "extensions/rakeez-teacher-import-helper/background-collector.js",
+          "extensions/rakeez-teacher-import-helper/source-roster.js",
+          "extensions/rakeez-teacher-import-helper/run-controller.js",
+          "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+          "extensions/rakeez-teacher-import-helper/manifest.json",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "sw.js",
+          "tests/n36-complete-import-outcome-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_COMPLETE_IMPORT_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n36-complete-import-outcome-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_COMPLETE_IMPORT_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n36_actual_partial_baseline_and_causal_corrections",
+          "n36_teacher_school_department_semantics_and_context_safety",
+          "n36_supported_timetable_subjects_and_class_associations",
+          "n36_receipts_counts_and_coverage_truth_after_reopen",
+          "n36_fresh_and_existing_account_end_to_end_idempotence",
+          "n36_exact_package_and_affected_negative_guards"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

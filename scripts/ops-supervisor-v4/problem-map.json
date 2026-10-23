@@ -1,22 +1,37 @@
 {
   "version": 1,
   "authority": "po-20261023-focus-n36-n88",
-  "updatedAt": "2026-10-23T00:16:10.551Z",
+  "updatedAt": "2026-10-23T00:47:28.004Z",
   "problems": [
+    {
+      "key": "n36-complete-import-outcome",
+      "productId": "N36",
+      "issueNumber": null,
+      "title": "[P0] استكمال رحلة الاستيراد بعد حفظ302 صفًا",
+      "gate": "ready_to_admit",
+      "taskIds": [
+        "continuous-n36-complete-import-outcome-20261023"
+      ],
+      "currentTaskIds": [
+        "continuous-n36-complete-import-outcome-20261023"
+      ],
+      "nextAction": "إصلاح مترابط للجدول والمواد وبيانات المدرسة وصدق الإيصالات/التغطية؛ فحص كامل ثم الناشر، لا إعادة التجربة الحالية قبل المرشح.",
+      "evidenceNeeded": "وصل التشخيص وإيصالات10/302؛ لا حاجة لإعادة زر القراءة أو إنشاء حساب. إثبات السحابة وشكل رد الجدول الفعلي غير مدعيين."
+    },
     {
       "key": "n36-fresh-account-start",
       "productId": "N36",
       "issueNumber": null,
       "title": "[P0] بدء الاستيراد في حساب جديد كليًا",
-      "gate": "ready_to_admit",
+      "gate": "needs_triage",
       "taskIds": [
         "continuous-n36-fresh-account-academic-start-20261023"
       ],
       "currentTaskIds": [
         "continuous-n36-fresh-account-academic-start-20261023"
       ],
-      "nextAction": "إعادة إنتاج مسار التهيئة الأول ورفض اختيار السنة/الفصل قبل قراءة مدرستي ثم إصلاح السبب المثبت فقط.",
-      "evidenceNeeded": "تشخيص المستخدم مستلم؛ لا إعادة إنشاء الحساب أو الاستيراد الآن."
+      "nextAction": "PO يؤكد بدء التجربة وحفظ الطلاب بعد الإصلاح المنشور؛ هذه المرحلة منجزة ضمن N36، ولا تعاد. الاستكمال في n36-complete-import-outcome.",
+      "evidenceNeeded": "لا مدخل مفقود لهذه المرحلة؛ لا إغلاق N36 بالكامل."
     },
     {
       "key": "n36-unresolved-batch",
@@ -49,8 +64,9 @@
       "currentTaskIds": [
         "continuous-n36-school-response-contract-20261022"
       ],
-      "nextAction": "P0: استئناف cccab38e فقط بدليل بنيوي مسموح يحسم هوية المدرسة أو علامة رد مفقودة؛ لا تخمين أو إعادة مراجعة المصدر نفسه.",
-      "priorityBand": "P0"
+      "nextAction": "وصل السبب الفعلي live-link-event قبل قراءة الجدول؛ يعالج في مسار الاستكمال الجديد. شرط إثبات مدرسة الرد يبقى منفصلًا بلا دليل جديد لإلغائه.",
+      "priorityBand": "P0",
+      "evidenceNeeded": "لا إعادة مراجعة المصدر للرد الغائب؛ إن وصل الرد بعد الإصلاح يحسم وفق الحماية القائمة."
     },
     {
       "key": "n88-student-latency",
