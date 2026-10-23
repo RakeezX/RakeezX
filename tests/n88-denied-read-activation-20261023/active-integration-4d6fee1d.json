@@ -1,0 +1,13 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "receipt": "tests/n88-denied-read-activation-20261023/activate-version-bound-4d6fee1d-79f7-49a1-8be6-ad55dc4ac36d.json",
+  "nativeSha256": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+  "sourceSha256": "cfebe9e911ec4f2de963b81d6f2b47095d8157f952fec1e11cccfdb071a46c30",
+  "providerOperations": 0,
+  "actualUserAcceptance": "NOT_RUN",
+  "actualNativeVersion": 74,
+  "oldFailuresPreserved": true,
+  "historicalWholeAggregate": "NOT_PROVEN; not reclassified",
+  "sourcePublication": "NOT_RUN; sole publisher owns integration and served evidence"
+}

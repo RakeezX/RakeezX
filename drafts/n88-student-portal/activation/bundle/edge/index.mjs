@@ -1457,6 +1457,23 @@ async function readCanonical(ports,ownerId,listScopeOnly=false) {
 var fieldsOff = () => Object.fromEntries(VISIBILITY_FIELDS.map((f) => [f, false]));
 var bindingKeys = ["ownerId", "sessionId", "leaseId", "teachingId", "classId", "termId", "contextRevision"];
 var classListResponseMode = (mode, protocol) => mode === "public" && protocol === void 0 ? "pilot" : mode;
+/** AI: a failed private read transaction is not an authentication verdict.
+ * Keep the HttpOnly session on infrastructure/projection/COMMIT failure; retry
+ * still revalidates every original guard. Per-request state cannot cross users.
+ */
+function createStudentReadBoundary(createHandler,options) {
+  const normal=createHandler(options);
+  return async request=>{
+    if(request.method!=='GET'||!['/student/read','/api/n88/student/read'].includes(request.path))return normal(request);
+    let repositoryFailed=false;
+    const repository={...options.repository,transaction:async action=>{
+      try{return await options.repository.transaction(action);}
+      catch{repositoryFailed=true;throw Error('n88_student_read_unavailable');}
+    }};
+    const result=await createHandler({...options,repository})(request);
+    return repositoryFailed ? {status:503,body:{error:'unavailable'},headers:PRIVATE_HEADERS} : result;
+  };
+}
 function createIntegratedService(options, adapter, baseRepository) {
   const rollout = options.rollout ?? createRolloutGuard();
   const repository = withCredentialRepository(baseRepository);
@@ -1486,7 +1503,7 @@ function createIntegratedService(options, adapter, baseRepository) {
     const r = await ports.query("select payload from n88_private.class_visibility where owner_id=$1::uuid and class_id=$2 and term_id=$3", [ownerId, classId, termId]);
     return r.rows[0]?.payload || { revision: 0, fields: fieldsOff(), members: [] };
   }
-  const student = credentials.createStudentHandler({ repository, verifyIngress: adapter.verifyIngress, origin: options.origin, project: async (db, m, ports) => {
+  const student = createStudentReadBoundary(credentials.createStudentHandler,{ repository, verifyIngress: adapter.verifyIngress, origin: options.origin, project: async (db, m, ports) => {
     const measure = ports.measure ?? (async (_name, action) => action());
     const canonical = await measure("canonical", () => readCanonical(ports, m.ownerId));
     const terms = canonical.terms.filter((t) => !t.deleted && t.status === "active" && canonical.teachings.some((x) => !x.deleted && x.sectionId === m.classId && x.termId === t.id));
