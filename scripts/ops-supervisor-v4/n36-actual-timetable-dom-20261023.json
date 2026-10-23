@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-actual-timetable-dom-20261023",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -5700,
+      "scopeKey": "n36-actual-open-timetable-dom",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "NEW ACTUAL PO RESULT AND NEWLY AVAILABLE INPUT. PO loaded0.5.40 and reports302existing rows/10receipts/0pending, department SAVED, school/principal/teacher/classes current, complete/saved/failurenone. Timetable remains missing with response-school-absent, no timetable/subject-class imports; roster coverage remains partial,7provedpages/unproven. Do NOT repeat .40 package/build or department fixes. Prior476aabf published1055a3fe verified; this card fixes ONLY the still-reproduced actual timetable gap.\n\nPO explicitly requested inspection of named already-open Incognito Madrasati and now enabled the browser connector in Incognito. Root metadata-only inventory atabout14:27Z sees Chrome Home browser5 (ID may change), Madrasati usertab2005440129, current teacher dashboard path /SchoolManagment/Actions/Teacher/[bound school], and Incognito Rakeez usertab2005440128. Normal Chrome Rakeez tab2005440122 belongs to N44: DO NOT touch it. Use current supported browser inventory and user.claimTab when browser docs require it; getTab agent-created namespace previously did not list usertabs. IDs are hints, refresh exact origin/path/title before binding; no CDP, profile clone, OS foreground, clipboard or extra browser. Read computer-use skill and actual returned tool docs. Acquire shared live-browser phase lease only for this limited read; if held, continue independent source work then use original lease arbitration, never touch another owner.\n\nExact live scope: inspect visible timetable UI and its DOM structure in THAT Madrasati tab, optionally follow the actually rendered same-origin school timetable READ link. User specifically wants this page inspected. No class rosters, school writes, ManageLecture navigation/actions, extension start/control/reinstall/result-reader, Rakeez reads/writes, credentials/cookies/storage/devtools/private runtime state or injected network calls. Old denied extension-control and already-open-result readers remain forbidden; this is distinct read-only normal timetable source UI expressly requested now. No fetching all pages or background collection. Do not emit full page body, names or raw school/class/teacher IDs; return bounded structural projection: tag/class/ancestor/header/visibility facts, query-key shape and SAME/DIFFERENT relations, material/class labels only as needed, never students. Preserve URL/tab; restore original authorized tab to its original harmless page after inspection if navigated, then release lease. If actual source action is denied, stop that operation and do not recreate via another tool/helper.\n\nInspect the exact cause BEFORE another release. .40 helper source-adapter.js refuses lesson school binding whenever inert response includes base[href], style or stylesheet link, since visibility cannot be proved there; that is a hypothesis, not established portal cause. Actual timetable may have a different container/header/layout. Inspect relevant bounded nodes and CSS visibility through documented read-only DOM APIs; do not strip all CSS, execute portal scripts in fixtures, remove security gates or invent a compatible surrounding page. Identify relevant timetable cell/card and paired subject/class ManageLecture links, explicit day/period headers and existing bound school context. PO supplied matching links labelled المهارات الرقمية and خامس5 with exact five query keys SchoolId,lectureId,dateTicks,subjectId,classroomId. No raw identifiers in evidence; remap consistently to fabricated IDs when creating minimal structural fixture. Source metadata must distinguish actual observed DOM from fabricated/redacted reproduction. If read only proves rendered page but collector receives a different response, don't equate them without evidence; inspect existing collector GET route/response contract in code and prove the seam safely. A stylesheet in a full HTML response must not automatically be assumed irrelevant, and hidden/nav-only mixed-school links remain rejected. If a secure rendered-read collection route is needed, retain exact school/teacher/role/route/document checkpoints and do not recreate refused automation.\n\nReproduce current0.5.40 rejection using the newly observed minimal structure and actual adapter/harness. Apply narrow safe source change only when cause reproduced; prove validated matching lesson links bind exactschool, pair subject/class consistently and map explicit weekday/period, no subject defaults or guessed coordinates. Preserve explicit conflicting school/name/teacher, role/login, base/redirect, foreign/mixed/duplicate/hidden/nav-only nodes, unsafe paths/keys, stale document and missing coordinates rejections. Do not globally weaken CSS or school proof. Existing partial roster coverage warning stays truthful; no new roster collection or302vs303 inference. Department .40 success and preserved historical56/2+29 remain intact; no batch replay/receipt reset.\n\nReuse .40 harness and unchanged guards; focus real source reproduction, affected parsing/store idempotence/reopen and essential identity/atomicity checks. Build a NEW version only after observed reproduced defect and affected PASS, leave .39/.40 ZIP bytes unchanged. Existing publisher alone integrates/publishes/verifies. No real user extraction/save automation; final actual import remains explicit user's action. Report exact observed source facts, correction and limits; don't close whole N36 from this subfix.\n",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "src/views/class-import-center.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/n36-extension-protocol.js",
+        "sw.js",
+        "tests/n36-complete-import-outcome-20261023/**",
+        "tests/n36-lesson-link-20261023/**",
+        "tests/n36-actual-timetable-20261023/**",
+        "docs/automation-evidence/20261023/N36_ACTUAL_TIMETABLE_DOM_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_actual_timetable_dom_cause_reproduced",
+        "n36_real_structure_subject_class_day_period_mapping",
+        "n36_source_identity_visibility_and_stale_context_guards",
+        "n36_idempotent_receipts_department_and_partial_coverage_preserved",
+        "n36_changed_package_and_actual_source_parity"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N36",
+        "liveAuthorizationRef": "PO-20261023-N36-READ-OPEN-INCOGNITO-TIMETABLE",
+        "publication": true,
+        "namedBrowserReadOnly": "already-open PO-approved Madrasati Incognito timetable tab",
+        "realSchoolRead": true,
+        "realRosterReads": 0,
+        "schoolWrites": 0,
+        "realAccountWrites": 0,
+        "extensionControl": 0,
+        "resultReader": 0,
+        "providerServiceOperations": 0,
+        "personalOtherTabs": false
+      },
+      "releaseAuthority": "Latest PO explicitly authorizes narrow read-only inspection of open Incognito Madrasati and enabled connector; actual .40 result reproduces missing timetable. Safe local correction plus original publisher delivery only. No denied extension/result operations.",
+      "acceptance": [
+        "Actual timetable structure read or exact blocker recorded without personal data.",
+        "Reproduce .40 gap, correct safe relevant source binding and actual schedule association.",
+        "Maintain302/10/0 receipts and updated department; source/cloud completeness separate.",
+        "Whole N36 acceptance requires actual PO import outcome."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "394c6fff9dc3281838d0728f5d0335736a3111a1",
+        "requiredSourcePaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "tests/n36-lesson-link-20261023/runtime.mjs"
+        ],
+        "editPaths": [
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "src/views/class-import-center.js",
+          "tests/n36-actual-timetable-20261023/source.mjs",
+          "docs/automation-evidence/20261023/N36_ACTUAL_TIMETABLE_DOM_OUTCOME.md"
+        ],
+        "newPaths": [
+          "tests/n36-actual-timetable-20261023/source.mjs",
+          "docs/automation-evidence/20261023/N36_ACTUAL_TIMETABLE_DOM_OUTCOME.md"
+        ],
+        "workerChecks": [
+          "n36_actual_timetable_dom_cause_reproduced",
+          "n36_real_structure_subject_class_day_period_mapping",
+          "n36_source_identity_visibility_and_stale_context_guards",
+          "n36_idempotent_receipts_department_and_partial_coverage_preserved",
+          "n36_changed_package_and_actual_source_parity"
+        ],
+        "publisherChecks": []
+      },
+      "liveAuthorizationRef": "PO-20261023-N36-READ-OPEN-INCOGNITO-TIMETABLE"
+    }
+  ]
+}
