@@ -36,11 +36,12 @@ export function reconstructExactChanges(current,certificates,expectedKeyset){
  }
  return restored;
 }
-export function qualifyConfigurationDelta({current,certificates,expectedBaseline=baselineDigest,expectedKeyset=baselineKeysetDigest}){
+export function qualifyConfigurationDelta({current,certificates,expectedBaseline=baselineDigest,expectedKeyset=baselineKeysetDigest,expectedPin=priorSource}){
  if(expectedBaseline!==baselineDigest||expectedKeyset!==baselineKeysetDigest)fail('baseline_adoption');
+ if(![priorSource,successorSource].includes(expectedPin)||canonical(current).find(r=>r.name==='N88_SERVICE_SOURCE_SHA')?.digest!==hash(expectedPin))fail('source_pin');
  const restored=reconstructExactChanges(current,certificates,baselineKeysetDigest);
  if(nonPinDigest(restored)!==baselineDigest)fail('unexplained_configuration');
- return {status:'PASS',baselineDigest,currentNonPinDigest:nonPinDigest(current),keysetDigest:baselineKeysetDigest,certificateCount:certificates.length,changedKeys:[...new Set(certificates.flatMap(c=>c.changes.map(r=>r.name)))],unknownChangesAccepted:false};
+ return {status:'PASS',baselineDigest,pinDigest:hash(expectedPin),currentNonPinDigest:nonPinDigest(current),keysetDigest:baselineKeysetDigest,certificateCount:certificates.length,changedKeys:[...new Set(certificates.flatMap(c=>c.changes.map(r=>r.name)))],unknownChangesAccepted:false};
 }
 export function qualifyAuthority(card,{runId,candidateSha,sessionId}){
  const a=card?.preparationAuthority;
@@ -52,6 +53,6 @@ export function qualifyReservation({state,history,markerExists,source=successorS
  return true;
 }
 export function qualifyNativePreflight({native,configuration,now=Date.now()}){
- if(native?.status!=='ACTIVE'||native.version!==66||native.verifyJwt!==false||native.source!==priorSource||native.downloadedBytesExact!==true||native.importMapExact!==true||configuration?.status!=='PASS'||!Number.isFinite(Date.parse(native.observedAt))||now<Date.parse(native.observedAt)||now-Date.parse(native.observedAt)>20*60*1000)fail('preflight');
+ if(native?.status!=='ACTIVE'||native.version!==66||native.verifyJwt!==false||native.source!==priorSource||native.downloadedBytesExact!==true||native.importMapExact!==true||native.importMapDigest!=='24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8'||configuration?.status!=='PASS'||configuration.pinDigest!==hash(priorSource)||!Number.isFinite(Date.parse(native.observedAt))||now<Date.parse(native.observedAt)||now-Date.parse(native.observedAt)>20*60*1000)fail('preflight');
  return true;
 }
