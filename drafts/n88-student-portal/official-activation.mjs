@@ -8,6 +8,8 @@ import {runConfigProvenance} from './activation/read-service-20261023/config-pro
 import {runCatalogPreflight} from './activation/read-service-20261023/catalog-preflight.mjs';
 import {runNativeActivation} from './activation/read-service-20261023/native-activation.mjs';
 import {runMigrationActivation,runMigrationReconciliation} from './activation/read-service-20261023/migration-activation.mjs';
+import {classifyCliFailure} from './activation/read-service-20261023/history-mirror.mjs';
+import {runHistoryCorrection} from './activation/read-service-20261023/history-correction.mjs';
 import {runLatencyStaticPhase} from '../../tests/n88-student-read-phase-latency-20261021/static-gate.mjs';
 import {LATENCY,runLatencyNativePhase,digest as latencyDigest} from '../../tests/n88-student-read-phase-latency-20261021/native-gate.mjs';
 import {MOBILE503,runMobile503Phase,digest as mobile503Digest} from '../../tests/n88-mobile-class-source-503-20261021/native-gate.mjs';
@@ -49,9 +51,25 @@ async function save(state){await owned();const b=Buffer.from(JSON.stringify(stat
 async function official(args){
  const r=spawnSync(process.execPath,[cli,...args],{windowsHide:true,timeout:30000,maxBuffer:1048576});
  // Even failure diagnostics may contain provider SQL detail. Never emit them.
- const status=r.status,raw=r.stdout.toString();r.stdout.fill(0);r.stderr.fill(0);
- if(status!==0)fail('n88_official_cli_failed_'+(status??'timeout'));
+ const status=r.status,raw=r.stdout.toString(),failure=status!==0?classifyCliFailure({status,error:r.error,stdout:raw,stderr:r.stderr.toString()}):null;r.stdout.fill(0);r.stderr.fill(0);
+ if(status!==0)fail('n88_official_cli_'+failure.category.toLowerCase()+'_'+(status??'timeout'));
  try{return JSON.parse(raw);}catch{return null;}
+}
+async function officialClassified(args){
+ const pair=args.slice(0,2).join(' '),workdir=args[args.indexOf('--workdir')+1];
+ if(!['migration fetch','db push','migration up'].includes(pair)||!args.includes(project)||!args.includes('--linked')||!workdir||path.dirname(path.resolve(workdir))!==phase||!path.basename(workdir).startsWith('typed-read-authentic-history-')||args.includes('--include-all')||args.includes('--db-url'))fail('n88_typed_classified_cli_scope');
+ const r=spawnSync(process.execPath,[cli,...args],{windowsHide:true,timeout:60000,maxBuffer:4194304});
+ try{
+  if(r.status!==0)return {ok:false,...classifyCliFailure({status:r.status,error:r.error,stdout:r.stdout.toString(),stderr:r.stderr.toString()})};
+  let parsed=null;try{parsed=JSON.parse(r.stdout.toString());}catch{}
+  return {ok:true,exitCode:0,data:parsed?.data??parsed?.result??parsed};
+ }finally{r.stdout.fill(0);r.stderr.fill(0);}
+}
+async function protectFreshHistoryDirectory(directory){
+ if(path.dirname(path.resolve(directory))!==phase||!path.basename(directory).startsWith('typed-read-authentic-history-'))fail('n88_typed_fresh_directory_scope');
+ const script="$p=[Console]::In.ReadToEnd();$sid=[Security.Principal.WindowsIdentity]::GetCurrent().User;$acl=New-Object Security.AccessControl.DirectorySecurity;$acl.SetAccessRuleProtection($true,$false);$acl.SetOwner($sid);foreach($id in @($sid.Value,'S-1-5-18','S-1-5-32-544')){$rule=New-Object Security.AccessControl.FileSystemAccessRule($id,'FullControl','ContainerInherit,ObjectInherit','None','Allow');$acl.AddAccessRule($rule)};Set-Acl -LiteralPath $p -AclObject $acl;$check=Get-Acl -LiteralPath $p;foreach($rule in $check.Access){$id=$rule.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value;if($id -notin @($sid.Value,'S-1-5-18','S-1-5-32-544')){throw 'fresh directory not private'}}";
+ const r=spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{input:directory,windowsHide:true,timeout:15000,maxBuffer:65536});
+ r.stdout.fill(0);r.stderr.fill(0);if(r.status!==0)fail('n88_typed_fresh_directory_protection_failed');
 }
 async function sqlFile(text){
  await owned();const file=path.join(phase,'owned-input.sql');
@@ -59,6 +77,7 @@ async function sqlFile(text){
  finally{await unlink(file).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 }
 async function execute(action,value){
+ if(action==='--typed-read-correct-history-directory')return runHistoryCorrection({candidate:value,load,save,official,officialClassified,sqlFile,phase,protectFreshHistoryDirectory});
  if(action==='--typed-read-reconcile-migration')return runMigrationReconciliation({candidate:value,load,official,sqlFile});
  if(action==='--typed-read-apply-fixed-migration')return runMigrationActivation({candidate:value,load,save,official,sqlFile,phase});
  if(action==='--typed-read-activate-compatible')return runNativeActivation({candidate:value,load,save,official,phase});
