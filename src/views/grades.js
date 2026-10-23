@@ -361,6 +361,13 @@ const gradesView = {
     },
 
     'select-score'(el) {
+      // AI N09: native focus scrolling does not account for the RTL sticky roster.
+      const tablewrap = el.closest('.tablewrap');
+      if (tablewrap) {
+        const sticky = tablewrap.querySelector('.gtable__sticky');
+        tablewrap.style.setProperty('--grade-sticky-width', `${sticky?.getBoundingClientRect().width ?? 0}px`);
+        el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
       if (el.value.trim()) el.select();
     },
 

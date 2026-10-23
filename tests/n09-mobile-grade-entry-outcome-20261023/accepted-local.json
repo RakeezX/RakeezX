@@ -1,0 +1,105 @@
+{
+  "phase": "accepted-local",
+  "widths": [
+    {
+      "width": 360,
+      "geometry": {
+        "documentWidth": 345,
+        "viewport": 360,
+        "wrapWidth": 323,
+        "tableWidth": 586,
+        "stickyWidth": 186.15625,
+        "direction": "rtl",
+        "inputFont": "16px"
+      },
+      "restoredCheckpoint": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "zero": 0,
+        "blank": null
+      },
+      "persistence": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "durableOwnedCommands": 11,
+        "zero": true,
+        "blank": true,
+        "reopen": true,
+        "reload": true
+      }
+    },
+    {
+      "width": 390,
+      "geometry": {
+        "documentWidth": 375,
+        "viewport": 390,
+        "wrapWidth": 345,
+        "tableWidth": 586,
+        "stickyWidth": 186.15625,
+        "direction": "rtl",
+        "inputFont": "16px"
+      },
+      "restoredCheckpoint": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "zero": 0,
+        "blank": null
+      },
+      "persistence": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "durableOwnedCommands": 16,
+        "zero": true,
+        "blank": true,
+        "reopen": true,
+        "reload": true
+      }
+    },
+    {
+      "width": 1280,
+      "geometry": {
+        "documentWidth": 1265,
+        "viewport": 1280,
+        "wrapWidth": 919,
+        "tableWidth": 919,
+        "stickyWidth": 291.6875,
+        "direction": "rtl",
+        "inputFont": "16px"
+      },
+      "restoredCheckpoint": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "zero": 0,
+        "blank": null
+      },
+      "persistence": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "durableOwnedCommands": 21,
+        "zero": true,
+        "blank": true,
+        "reopen": true,
+        "reload": true
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "n09_grade_mobile_actual_journey",
+      "status": "PASS"
+    },
+    {
+      "name": "n09_grade_focus_values_and_reopen",
+      "status": "PASS"
+    },
+    {
+      "name": "n09_grade_desktop_rtl_semantics",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "ownedServerClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "phase": "verified",
+  "widths": [
+    {
+      "width": 360,
+      "geometry": {
+        "documentWidth": 345,
+        "viewport": 360,
+        "wrapWidth": 323,
+        "tableWidth": 586,
+        "stickyWidth": 186.15625,
+        "direction": "rtl",
+        "inputFont": "16px"
+      }
+    }
+  ],
+  "checks": [],
+  "errors": [],
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n10 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-mobile-grade-entry-outcome-20261023/tests/n09-mobile-grade-entry-outcome-20261023/journey.mjs:103:14\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-mobile-grade-entry-outcome-20261023/tests/n09-mobile-grade-entry-outcome-20261023/journey.mjs:16:3",
+  "cleanup": {
+    "ownedServerClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

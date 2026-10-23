@@ -1,0 +1,57 @@
+{
+  "phase": "final",
+  "widths": [
+    {
+      "width": 360,
+      "geometry": {
+        "documentWidth": 345,
+        "viewport": 360,
+        "wrapWidth": 323,
+        "tableWidth": 586,
+        "stickyWidth": 186.15625,
+        "direction": "rtl",
+        "inputFont": "16px"
+      },
+      "restoredCheckpoint": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "zero": 0,
+        "blank": null
+      },
+      "persistence": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "durableOwnedCommands": 11,
+        "zero": true,
+        "blank": true,
+        "reopen": true,
+        "reload": true
+      }
+    },
+    {
+      "width": 390,
+      "geometry": {
+        "documentWidth": 375,
+        "viewport": 390,
+        "wrapWidth": 345,
+        "tableWidth": 586,
+        "stickyWidth": 186.15625,
+        "direction": "rtl",
+        "inputFont": "16px"
+      },
+      "restoredCheckpoint": {
+        "owner": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "database": "rakeezx-user-b96af46d42709524be9a61be3ec0b4cd",
+        "zero": 0,
+        "blank": 0
+      }
+    }
+  ],
+  "checks": [],
+  "errors": [],
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== null\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-mobile-grade-entry-outcome-20261023/tests/n09-mobile-grade-entry-outcome-20261023/journey.mjs:114:14\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n09-mobile-grade-entry-outcome-20261023/tests/n09-mobile-grade-entry-outcome-20261023/journey.mjs:16:3",
+  "cleanup": {
+    "ownedServerClosed": true,
+    "isolatedBrowserFinally": true
+  }
+}

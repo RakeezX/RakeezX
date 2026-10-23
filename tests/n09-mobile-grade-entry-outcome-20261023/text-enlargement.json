@@ -1,0 +1,26 @@
+{
+  "results": [
+    {
+      "width": 360,
+      "status": "PASS",
+      "viewport": 360,
+      "documentWidth": 345,
+      "inputFont": "20px"
+    },
+    {
+      "width": 390,
+      "status": "PASS",
+      "viewport": 390,
+      "documentWidth": 375,
+      "inputFont": "20px"
+    },
+    {
+      "width": 1280,
+      "status": "PASS",
+      "viewport": 1280,
+      "documentWidth": 1265,
+      "inputFont": "20px"
+    }
+  ],
+  "cleanup": true
+}
