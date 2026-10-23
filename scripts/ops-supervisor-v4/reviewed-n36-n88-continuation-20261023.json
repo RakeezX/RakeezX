@@ -1,0 +1,232 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-typed-read-service-activation-20261023",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n88-typed-read-original-service-activation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 55,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "MATERIAL CONTINUATION AFTER ACTUAL CONFIGURATION GUARD FAILURE: preserve candidate1fb4ea642c52564f4209f7592a2a6d7bdd70f8e4 and same original custodian/session/worktree. The previous proof already accepted current native64 source, pin and import map; expected aggregate non-pin config347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186 failed. Root inspection of custody-preflight.mjs proves its aggregate includes ALL project secret-name/digest entries except N88_SERVICE_SOURCE_SHA, not just N88. N44 shares this project and has documented approved configuration operations; this is a concrete hypothesis, not proof of the drift cause. Do not repeat unchanged preflight or any completed transition/benchmark tests.\n\nFirst perform bounded READ-ONLY config provenance reconciliation through the SAME protected original custodian and existing sanctioned CLI metadata channel, with owned shared phase leases. No secret values printed/exported and no root/other-worker private-state access. Compare exact current name/digest metadata to available original private per-key baseline/history. If only an aggregate exists, inspect whether the original protected expected N88/platform configuration can be reconstructed from already-owned custody material without revealing it, and whether every other difference has exact approved public service-history evidence. Do not invent a historical map. Project-wide flags may be mutable by another authorized service; distinguish that fact from unknown mutations.\n\nQualify a narrow certificate only when all required N88 and platform security-sensitive values/keys, original source/pin/import-map/identity and every remaining config difference are explicitly accounted for by actual existing authorized evidence. Preserve the old FAIL/aggregate unchanged; append the material reconciliation with current whole-config digest, exact documented baseline provenance and task/run/candidate binding. Unknown, unrecorded, extra or missing key/value remains BLOCKED. No wholesale adoption, blanket exclusion of N44 keys, ignore-config switch, weakening N88 checks, setting rewrites or secret rotation. Local synthetic changed-key/unknown-key/certificate tamper/critical-key denials must protect any new reconciliation logic; reuse all unchanged proofs.\n\nOnly after that certificate is valid may the existing guarded preflight use its reconciled current baseline for this exact candidate/action; before/after config remains exact apart from the ONE specifically permitted source-pin update. Then continue the already-authorized compatible activation/catalog/history/drainage/typed SQL path, retaining unused operation budgets, old evidence and actual failure receipts. If provenance is unavailable, identify precisely which missing private historical map or named-key provenance prevents safe reconciliation; no new generic permission question or unproven reset. The user already authorized necessary completion, not unknown config changes. This bounded diagnostic is a material next action, not an unchanged retry.\n\nLatest PO23October09:29Saudi explicitly says YES, do all necessary work to finish N36/N88/N44, equal high priority and studied independent parallelism. Earlier initial request explicitly requires activation via the original service owner after checking authority. This card bounds that completion authority to this prepared exact N88 integration and required safe transition; it does not renew consumed old allowances or authorize unrelated data/Auth/RLS. Resume SAME original custodian session01a14fc3-b292-7390-9952-8549a286c80f with its original protected custody at .worktrees/continuous-n88-official-student-portal-activation-20261018, and use THIS new isolated candidate worktree for code. No root/other worker receives private material.\n\nPrepared candidate ddfa87956cd673abad634a492c9aff6bacba86b8, prior experiment9e95eb6d, package drafts/n88-student-portal/activation/read-roundtrip-20261023/ACTIVATION.md and manifest are the starting artifacts. Read them via exact Git commit and import only the qualified package/test/evidence paths as needed; no restart/benchmark creation. Existing local 14-to-2 fixed-cost comparison, staged source/native actual-service/wire/cancel/commit tests remain valid by unchanged hashes. Current staged native hash a0f3d3fb53070f3f28dde2660efba508e646eb3ffbefb543f589e9d72a36a70f, additive SQL hash 8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b; recorded native63 base6ebb7e07e838a14662e03b9a8908ade05d8768ed00f306b54f2d8f98d0931d09. Fresh actual service identity must match; recorded receipt is not current readback.\n\nCRITICAL PROVED COMPATIBILITY LIMIT: old native63 requires exact76 routine catalog, staged package exact78; simply applying SQL before/after current single-state binary causes a rejection window and binary-only rollback fails. Do NOT apply that naive sequence. Prepare the minimum fixed dual-catalog transition on the pinned source FIRST and qualify locally, reusing the current fixture. One compatible native artifact may recognize ONLY the two exact predetermined catalog fingerprints (unchanged76 versus unchanged76+exact2), choose old serial reader for old catalog and bounded batch for new, with per-connection verified mode and strict fixed operation allowlist. No wildcard/adoption/generic SQL, skipping catalog verification, broad catch/fallback on failure, permissions expansion or auth/revoke weakening. Unknown/mixed/drift catalog must fail closed. Preserve in-flight transaction behavior, connection release/commit ACK, owner filters, freshness, cancellation, bounds and current sessions/grades/privacy. Local tests must prove pre-addition and post-addition service reads, wrong/mixed identities denied and rollback/recovery leaves a valid compatible service. The staged two exact operations and old routines/ACLs stay unchanged. Do not rebuild unrelated service code. If a safe bounded transition cannot be qualified, retain candidate and BLOCKED with exact missing operation instead of knowingly disrupting service.\n\nOnly after qualified compatibility and fresh original-custodian gates: reconcile current source/pin/import-map/config fingerprints and append-only consumed operation history, exact old/new catalog and migration history. Original sanctioned provider path only; no new OAuth/DNS/ACL/policy workaround, browser token/credential extraction or secret in tools/logs. This NEW card's explicit scope permits at most ONE newly qualified compatible native upload, ONE existing exact public source-pin update, and ONE new append-only transactional migration containing ONLY the two fixed INVOKER functions named below. Those are new task-bound allowances for changed code, not reuse/reset of consumed historical permits. Prepare new migration via installed CLI supported path; old migrations immutable. Preserve same role grants and project. Before SQL, prove compatible upload/pin actually active and old-worker drainage/transition safe using supported original provider evidence; if unproved stop before DDL. Already applied exact function+history state is reused, never reapplied. Mixed or unknown history stops. Readback exact2 definitions/signatures/owner/ACL/config plus unchanged76 and migration history, downloaded native bytes/version/config and pin. Ambiguous operation outcome requires read-only reconciliation, never automatic second upload/apply/pin.\n\nNew functions ONLY n88_private.boundary_9e3f889e8b1e375a0a980496(text,text,text) and n88_private.boundary_3121e2df6802725969086adf(text,text,text), original package exact fixed bodies/limits/INVOKER/pg_catalog/backend-only EXECUTE. No tables/schema/roles/Auth/RLS/region/password changes, real teacher/student writes, new synthetic account or retired fixture reuse. No destructive rollback/drop or rewrite of applied migration; compatible native remains recovery path. Shared integration/live-mutation service leases serialize with N44; separate service/function/paths and no N44 state writes. Do not hold a lease awaiting user.\n\nCarrier protocol must match current observed original carrier and staged wire evidence; unchanged carrier/frontend has zero upload allowance, do not rebuild it merely for convenience. Integrate active source copies only after successful exact service prerequisites, with correct active imports, preserve guard source and finite modes. Record actual service evidence in docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md and tests/n88-read-service-20261023/. Only original publisher integrates Product Git/main and verifies source delivery. Generic frontend publication alone cannot certify service.\n\nFor actual hosted speed acceptance, NO real account/browser read is delegated to this worker and no new fixture/pair is granted. Preserve public finite diagnostics and ask root for PO's own comparable same-device initial login/read and same-tab return, warm/idle stated, after verified activation. Do not manufacture live timings from synthetic transport. Actual-session/grade/privacy/revocation behavior must remain protected by affected local integration tests and existing source; actual user acceptance remains NOT_RUN until supplied. LOCAL_READY only after all named service gates actually PASS; otherwise BLOCKED with exact candidate/session/operation and preserved preparation. No whole N88 closure from local or HTTP200; no routine review worker, recursive agent or new dispatcher.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/error-boundary-contract.json",
+        "drafts/n88-student-portal/activation/error-boundary-identities.json",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "drafts/n88-student-portal/activation/read-roundtrip-20261023/**",
+        "drafts/n88-student-portal/activation/read-service-20261023/**",
+        "drafts/n88-student-portal/activation/official-activation.mjs",
+        "drafts/n88-student-portal/official-activation.mjs",
+        "drafts/n88-student-portal/activation/package-20261020.mjs",
+        "tests/n88-read-roundtrip-outcome-20261023/**",
+        "tests/n88-read-service-20261023/**",
+        "docs/automation-evidence/20261023/N88_READ_ROUNDTRIP_OUTCOME_20261023.md",
+        "docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/error-boundary-contract.json",
+        "drafts/n88-student-portal/activation/error-boundary-identities.json"
+      ],
+      "requiredChecks": [
+        "n88_exact_dual_catalog_transition_and_affected_guards",
+        "n88_original_service_identity_and_additive_history_readback",
+        "n88_changed_native_source_pin_and_carrier_parity",
+        "n88_preserved_session_privacy_and_truthful_performance_limits",
+        "n88_exact_configuration_provenance_reconciliation"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261023-THREE-OUTCOMES-COMPLETE-BOUNDED-N88",
+        "publication": true,
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "originalPrivateCustodianOnly": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "preparedCandidate": "ddfa87956cd673abad634a492c9aff6bacba86b8",
+        "exactAdditiveSqlSha256": "8e85df7c297b8c99bedd150a6fd28d3e9d8e1c9f0367ef465a7946edd970a96b",
+        "maxChangedNativeFunctionUploads": 1,
+        "maxPublicSourcePinUpdates": 1,
+        "maxNewAppendOnlyMigrations": 1,
+        "newFunctions": [
+          "boundary_9e3f889e8b1e375a0a980496",
+          "boundary_3121e2df6802725969086adf"
+        ],
+        "oldFunctionsAltered": 0,
+        "publicGrants": 0,
+        "newAuthUsers": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "maxChangedPrivateStaticUploads": 0,
+        "regionChanges": 0,
+        "AuthRLSChanges": 0,
+        "resetConsumedMarkers": false,
+        "appendOnlyAttemptHistory": true,
+        "namedOperations": [
+          "local exact dual-catalog compatibility qualification",
+          "original service/catalog/history read-only preflight",
+          "one changed compatible original-native upload and exact public pin",
+          "one new append-only exact two-function migration after compatible service proved active",
+          "exact source/catalog/history/provider readbacks"
+        ],
+        "authorityEvidence": "docs/automation-evidence/20261023/N88_TYPED_READ_ACTIVATION_AUTHORITY.md",
+        "configurationReconciliation": {
+          "readOnlyOriginalCustodian": true,
+          "secretValuesExported": false,
+          "unknownDriftAccepted": false,
+          "configWrites": 0,
+          "preserveOriginalFailure": true,
+          "onlyDocumentedPerKeyProvenance": true
+        }
+      },
+      "releaseAuthority": "Latest user23October explicitly authorizes all necessary work to finish the three tickets; scoped interpretation is the exact original-service transition and two prepared fixed read functions only. No old permission is reused. Same original custodian performs named service prerequisite, original controller/publisher alone integrates Product source. Preserve actual refusal, private custody and sensitive data limits.",
+      "acceptance": [
+        "Qualified fixed old/new catalog transition; mixed/changed denied and existing session/owner/grade/privacy semantics preserved.",
+        "Exact service/native/pin and additive history verified, no duplicate apply/upload or general query allowance.",
+        "No hosted speed claim until actual comparable user journey; whole N88 stays open."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "1fb4ea642c52564f4209f7592a2a6d7bdd70f8e4",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/error-boundary-contract.json",
+          "drafts/n88-student-portal/activation/error-boundary-identities.json",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/ACTIVATION.md",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/manifest.json",
+          "drafts/n88-student-portal/activation/read-roundtrip-20261023/native63-candidate.inactive.mjs",
+          "tests/n88-read-roundtrip-outcome-20261023/staged.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/error-boundary-contract.json",
+          "drafts/n88-student-portal/activation/error-boundary-identities.json",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "tests/n88-read-service-20261023/transition.mjs",
+          "docs/automation-evidence/20261023/N88_TYPED_READ_SERVICE_OUTCOME.md",
+          "drafts/n88-student-portal/activation/read-service-20261023/custody-preflight.mjs",
+          "tests/n88-read-service-20261023/config-provenance.mjs"
+        ],
+        "newPaths": [
+          "tests/n88-read-service-20261023/config-provenance.mjs"
+        ],
+        "workerChecks": [
+          "n88_exact_dual_catalog_transition_and_affected_guards",
+          "n88_original_service_identity_and_additive_history_readback",
+          "n88_changed_native_source_pin_and_carrier_parity",
+          "n88_preserved_session_privacy_and_truthful_performance_limits",
+          "n88_exact_configuration_provenance_reconciliation"
+        ],
+        "publisherChecks": []
+      }
+    },
+    {
+      "id": "continuous-n36-0539-profile-transaction-continuation-20261023",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n36-0539-profile-transaction-continuation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n36-0538-school-proof-outcome-20261023"
+      ],
+      "objective": "MATERIAL CONTINUATION: retain cb62390f15ec9ea6fda3c79254d9803bd428713d and all19 qualified cases; do not redo unchanged tests. All original four required checks PASS. Actual pending29/live/Production was an additional NOT_RUN check: preserve that outcome, not PASS, but it does not forbid original-publisher delivery of the authorized reproduced frontend fix. User at10:15Saudi confirmed both original tabs remain unchanged; this is not proof that the receipt nonce is still live and must not extend expiry. No automation of the refused reader or actual account.\n\nBefore asking user to reload or start again, close one concrete continuation gap: batchCheckpoint currently replaces n36NamesBatch when batch.id changes, initializing a fresh receipts object. Reproduce locally whether an explicit fresh supported source run would discard the old unresolved29 trace and56/2 receipts. Qualify a minimal owner-bound LOCAL-ONLY preservation of unresolved prior trace/receipts before a user-initiated fresh source batch, with atomic device write and explicit current versus previous-unknown status. Never silently discard/overwrite a pending trace, invent an old receipt, extend expired nonce, or replay any stored old rows/setup. Do not sync pending personal rows or history to the cloud, build a general archive manager, alter source identity guards, or auto-start any run. If bounded retained history is full, fail safely without deleting unresolved entries. Preserve existing old traces byte-for-byte apart from necessary safe local envelope metadata. An ordinary explicit new source collection after verified frontend publication is distinct from replaying an old unknown batch; no such actual run may be automated by worker.\n\nTest the supported same-account partial destination with actual app fixture: old56/2+pending29 remains readable and untouched in retained local history while a distinct explicit fresh source batch imports current supported302/10 without duplicate students/classes/subjects; prior unknown is never relabelled saved/cloud-complete and read-progress stays read-only. Test owner/session/term changes, archive-storage rollback, repeat fresh start with unresolved history, honest current/history UI and reopen persistence. Reuse unaffected source and strict request-recovery guards. No actual school/browser/service data access. No extension rebuild unless an independently reproduced unavoidable affected defect requires it.\n\nThen deliver the qualified frontend correction via the existing publisher. Return LOCAL_READY only if required affected checks pass, preserving actual account/live recovery/PO acceptance as explicitly NOT_RUN and whole N36 open. The worker does not need to prove publisher-owned Production before returning its local result. No false claim that the current .39 pending has been repaired; the eventual user action must be stated with the exact retained-history and fresh-source semantics after publication, not a guessed late ACK. If this local preservation cannot be implemented safely within scope, state its exact technical reason rather than request already-granted publication authority.\n\nNEW actual PO test of installed0.5.39 (not acceptance): source collection302rows/10classes/7pages; current run confirmed56rows/2receipts, added0 existing56 pending29 pendingSaved0; app same-account readonly progress2/56 and0of29. Failure SETUP_PROFILE_CHANGED phaseprofile steptransaction in receipt; receiverCheckpoint pending relation same. School field saved; teacher/principal current; department conflict; classes current10. Timetable response-school-absent, deliberately no timetable/derived subjects. Roster coverage partial reasons student-data-unverified/missing-pages. Latest user already provided actual local progress; DO NOT ask to repeat read or Start. Preserve pending29 and existing receipts/students. No old303 inference.\n\nContinue same .39 worker session 01a16772-d4c7-7673-a726-99cdbfcb3a13, preserving candidateb41c4385/publication88e6157a and previous worktree/evidence. This new isolated current-main continuation addresses newly observed profile transaction/pending result, not another .39 rebuild or claim that optional-source problem is solved. Read only current N36 row, exact store.importSetupProfile (src/store.js near1405), class-import-center saveAvailableSetup/saveAutomaticNames/batchCheckpoint and relevant Sync profile hydration paths. Actual code compares every property of in-memory previous profile against hydrated durable profile in a transaction. Repeated per-handoff metadata imports and concurrent ordinary Sync/ACK/updated metadata may produce a false conflict; this is a hypothesis until reproduced. Preserve real edits, owner/session/lease/year/term guards. Never just remove profile compare or catch all errors.\n\nReproduce exact .39 seam in EXISTING actual mounted app/store/IndexedDB/serialized extension harness with fabricated current-account profile and at least2 acknowledged handoffs then pending third. Model relevant real source Sync/ACK hydration or legacy defaults/metadata only after reading actual code, not arbitrary mock exceptions. Distinguish harmless persistence/ACK metadata drift from meaningful user/remote profile edits. If proved, implement smallest conditional profile write: validate current persisted target fields/ownership and current source authority, preserve unrelated concurrent values, atomically enqueue only actual changed fields, return authoritative persisted/no-op state. Keep different selected educationDepartment and calendar untouched. A no-op setup shouldn't manufacture writes/outbox or repeated metadata imports. Existing field conflicts remain truthful; no fallback overwrite by suffix.\n\nRequired useful outcome includes safe continuation of THIS current known saved pending batch without new source collection or duplicate students/classes/materials. Inspect persisted rows/setup/digest/targets and existing receipt protocol; prove same owner/session/year/term and exact batch/digest plus current roster and setup under transaction before any continuation acknowledgment. Do not erase/replace pending or count rows as saved just to clear it. Retain genuine unknown/late-ACK/foreign-old-batch denials. Existing local-progress button MUST remain read-only. If bounded explicit recovery action is necessary, it must target the exact durable current batch and be truthful about uncertainty; no generic replay of historic unknown batch, no implicit auto retry after app load, no delete/reset/newaccount. Actual user's existing29 may require an exact additional nonpersonal confirmation to establish pending identity; record the precise missing condition if not safely recoverable, but complete all local preparation and prevent future recurrence. Do not instruct a new Start while pending.\n\nExercise affected store transaction with real local IDB: baseline failure retained, own profile change and legitimate Sync ACK metadata, concurrent same-field edit deny, foreign owner/session/term deny, no-op/noextraoutbox, existing department conflict/calendar preserved, storage/rollback or unknown result retains pending, current known durable continuation/reload and exact prior56/2 plus29 pending synthetic scenario with no duplicate data. Reuse .39 school/permission/ZIP/pagination proofs when unchanged. Existing source completeness and absent timetable proof remain separate unresolved conditions, no guessed material or silent coveragefull.\n\nPrefer app-only fix; current installed extension holds a pending job and MUST NOT be reloaded merely to get a new label. No new extension version unless a proved protocol/runtime defect requires it and pending preservation is demonstrated. Never overwrite .39 archive. If source changes extension, qualification must explicitly preserve old pending job and true receipt before any recommended upgrade. Original publisher integrates and verifies affected store/receiver source; worker no Product push/deploy. No live portal/browser/account reads or writes, credentials, refused source/result-reader retry, SQL/Auth/RLS/schema/scoring/delete/restore/calendar switch, queue or global policy edits. Source school read remains unavailable; finish this known store failure not speculative portal work. Return exact schema and meaningful candidate/checks, BLOCKED for real external missing identity not invented success. N36 remains OPEN.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/views/class-import-center.js",
+        "src/lib/teacher-setup-import.js",
+        "src/lib/n36-extension-protocol.js",
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "sw.js",
+        "tests/n36-complete-import-outcome-20261023/**",
+        "tests/n36-0539-profile-transaction-20261023/**",
+        "docs/automation-evidence/20261023/N36_0539_PROFILE_TRANSACTION_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "src/store.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_0539_profile_transaction_failure_reproduced",
+        "n36_profile_atomicity_sync_drift_and_real_edit_guards",
+        "n36_exact_pending_batch_continuation_and_no_duplicate_receipts",
+        "n36_affected_ui_reload_and_package_scope",
+        "n36_fresh_source_preserves_unresolved_history_and_no_duplicates"
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261023-actual-0539-pending-profile-failure",
+        "publication": true,
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "realSchoolRead": false,
+        "providerServiceOperations": 0,
+        "additionalPermissions": 0
+      },
+      "releaseAuthority": "Latest PO explicitly requests finish N36 and supplies current .39 profile transaction/pending failure. Grounded local correction and qualified original-publisher frontend release authorized; no actual pending batch replay or live account/source manipulation by worker. Preserve user data/unknown outcomes and existing calendar hold.",
+      "acceptance": [
+        "Reproduce actual profile-phase failure before fixing; distinguish harmless ACK metadata from real edit.",
+        "Preserve current pending29, confirmed56/2 and historical data; safe exact continuation or precise missing authority/identity, no new Start.",
+        "Owner/session/term/Sync/outbox/rollback protections and real conflict retained.",
+        "Served source via publisher, no whole N36 acceptance or timetable proof invented."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "cb62390f15ec9ea6fda3c79254d9803bd428713d",
+        "requiredSourcePaths": [
+          "src/store.js",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "src/lib/n36-extension-protocol.js",
+          "tests/n36-complete-import-outcome-20261023/school-proof-runtime.mjs"
+        ],
+        "editPaths": [
+          "src/store.js",
+          "src/views/class-import-center.js",
+          "src/lib/teacher-setup-import.js",
+          "src/lib/n36-extension-protocol.js",
+          "tests/n36-0539-profile-transaction-20261023/runtime.mjs",
+          "docs/automation-evidence/20261023/N36_0539_PROFILE_TRANSACTION_OUTCOME.md"
+        ],
+        "newPaths": [],
+        "workerChecks": [
+          "n36_0539_profile_transaction_failure_reproduced",
+          "n36_profile_atomicity_sync_drift_and_real_edit_guards",
+          "n36_exact_pending_batch_continuation_and_no_duplicate_receipts",
+          "n36_affected_ui_reload_and_package_scope",
+          "n36_fresh_source_preserves_unresolved_history_and_no_duplicates"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
