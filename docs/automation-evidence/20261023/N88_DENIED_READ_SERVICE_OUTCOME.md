@@ -1,0 +1,27 @@
+# N88 denied-read successor — original custodian checkpoint
+
+AI task `continuous-n88-denied-read-original-service-20261023`, run `c0517e1d-9924-46ff-a881-aef0c4538cff`, original session `01a14fc3-b292-7390-9952-8549a286c80f`; controller base `08b8ab626180786f4f36255702f8384a42f06b07`.
+
+## Preserved qualified correction
+
+The original custodian imported only qualified commit `d27da1b34cb667be04d49efe354ee6ea811174ed` through a normal scoped cherry-pick (`49ae896e`). The assigned base and unrelated work were preserved. `tests/n88-denied-read-activation-20261023/pinned-import.json` binds every imported package/test/evidence file to exact committed producer bytes. LF normalization handles checkout line endings without changing deployment bytes.
+
+The staged successor remains SHA256 `d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c`, with exactly the two qualified native spans. `prepare.mjs --check` and syntax checks passed. The original native66 bundle remains unchanged at `f14daf224dc27b1163d43ce39ada2fdf596acd3abb4af30579404ad4f5de6390`; no successor service integration or upload is claimed.
+
+The producer's red/green actual signed native entry/carrier/client evidence and PG17 source/native session recovery proofs are reused unchanged. Projection and failed/unknown COMMIT exceptions become503 with no private response or Set-Cookie, and a later guarded read can recover the same grades/work. Completed bad/revoked-session denial remains401. This demonstrates a source defect consistent with PO's trace, not the hidden cause of that particular live request. Original14-to2 comparison, SQL/catalog/session/owner/privacy/grade/COMMIT proofs and failures remain preserved; no benchmark, browser, account trial or retired fixture was repeated.
+
+## Local transition guards
+
+`transition-guards.mjs` qualifies only the exact new task authority, original session/project, pinned prior/successor hashes and one-upload/one-pin bounds. It rejects previous task reservations, an existing/unknown marker, changed custody state, missing already-applied migration receipt, stale/wrong native version, wrong downloaded source/import map and wrong source pin. The existing migration/upload/pin histories are never cleared.
+
+Its pure configuration reconstruction accepts only individually attested named N44 changes, reverses an exact ordered certificate chain, and requires equality with the fixed prior whole N88 non-pin aggregate `d1d4f974cc19ca49187f253766d90545a5002020c560ca1da64429e8e49a41af` and original keyset digest. It provides no prefix exclusion, unknown-key adoption, certificate issuance or baseline reset. A caller must first authenticate actual committed public producer/result/operation bytes; synthetic booleans do not supply that evidence. The core reconstruction helper alone grants no service authority.
+
+Focused fabricated tests pass for certificate reconstruction, foreign/uncommitted/active/tampered proofs, changed critical keys, unknown keys, duplicate changes, wrong aggregates/keyset, attempted baseline adoption, duplicate reservation and exact authority/source/pin/map/freshness guards. `transition-guards.json` explicitly records actualCertificateVerified=false. No actual configuration reconciliation PASS is claimed.
+
+## Concrete external dependency before provider activity
+
+The card requires the N44 lane to finish and publish exact committed configuration-change evidence before N88 reads/adopts any current shared-project metadata. N88 performed independent local preparation and a finite wait without service/browser leases. At `2026-10-23T15:52:10.112Z`, normal queue/result evidence still reported original N44 task `continuous-n44-one-approved-closed-page-push-20261019`, session `01a14fcd-032c-7ec0-8b0c-0e0395862c61`, run `0041da26-caed-4117-a6d8-c89e11a096ba` as running, last recorded candidate `104f3d1192a21713b0e3c8f9ff4eda6a0f960274`, with no final result. The observed committed native60 readback is not a completed current per-key configuration certificate. No private N44 state was opened and no cause of aggregate drift is asserted.
+
+`dependency-checkpoint.json` records the exact missing prerequisite: the completed original N44 result, clean committed per-key delta certificates and authorized operation/readback references that account for all current shared-project changes and reconstruct the unchanged N88 baseline. Until that exists, original-custodian native66/pin/map/config provider preflight and successor activation/readback remain NOT_RUN. N88 made zero provider calls, private custody reads, lease acquisitions, uploads, pin changes, migrations, carrier operations or real-account reads in this run. Both newly authorized successor operations remain unused; every previous consumed marker remains unchanged.
+
+Outcome is BLOCKED on this material external dependency. Resume this exact candidate/session after the producer finishes with valid public provenance; bind the actual committed artifact format and bytes before exact original-custodian preflight and any one-use reservation. Unknown/missing differences remain a blocker. No unchanged network retry, private cross-custody access, extra permission question, ACL mutation or denied-cache operation is appropriate. No new resources were created or require cleanup/disarm. Earlier denied resources remain untouched. Existing native66 delivery remains awaiting PO; actual same-account login/read/return and hosted speed acceptance are NOT_RUN, and whole N88 remains OPEN.
