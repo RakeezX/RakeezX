@@ -1,0 +1,113 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "existing affected Push owner/cleanup/action guards",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--test",
+        "--test-name-pattern=payload|explicit_consent|owner/workspace|cleanup failures|action independently",
+        "tests/n44-push-preparation.test.mjs"
+      ],
+      "output": "✔ n44_push_payload_expiry_dedupe_and_safe_action_contract (5.5729ms)\n✔ n44_push_explicit_consent_owner_context_revoke_with_fake_gateway (1.9173ms)\n✔ owner/workspace/device/session switches at each async boundary and logout reject stale work (2.2693ms)\n✔ cleanup failures stay retryable, private and block later subscription (1.2319ms)\n✔ action independently authorized and re-derived with current owner, expiry and destination (0.7341ms)\nℹ tests 5\nℹ suites 0\nℹ pass 5\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 131.0064\n"
+    },
+    {
+      "name": "existing score receipt/recovery guard",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--test",
+        "--test-name-pattern=score domain outbox retries",
+        "tests/score-foundation-local.test.mjs"
+      ],
+      "output": "✔ score domain outbox retries the same command and adopts one canonical projection (55.8806ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 317.7992\n"
+    },
+    {
+      "name": "three unchanged gateway ACK/cleanup/context tests isolated from unused crypto imports",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {createPushGateway} from \"file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-confirmed-command-ack-projection-20261024/src/lib/notification-push-gateway.js\";\nconst context={ownerId:'synthetic-A',workspaceId:'db-A',deviceId:'device-A'};\nconst scope={workspaceId:context.workspaceId,deviceId:context.deviceId};\nconst first='11111111-1111-4111-8111-111111111111',newer='22222222-2222-4222-8222-222222222222';\nfunction fixture() {\n const values=new Map(),calls=[];let register='registered',revoke='revoked';\n const storage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};\n const remote={...scope,active:true,sessionRevision:'synthetic-session',consentRevision:'synthetic-revision',sessionExpiresAt:Date.now()+3600000,pushConsent:true};\n const gateway=createPushGateway({context,authorization:'Bearer FABRICATED',preferences:()=>({}),storage,randomUUID:()=>first,bindConsent:async()=>true,\n  fetch:async(path,init)=>{assert.ok(path.startsWith('/api/n44/'));assert.equal(init.credentials,'omit');assert.equal(init.redirect,'error');assert.equal(init.cache,'no-store');\n   const body=JSON.parse(init.body);calls.push({path,body});\n   return Response.json(path.endsWith('/read')?{status:'current',protocol:'n44-browser-v2',context:remote}:\n    path.endsWith('/update')?{status:'updated',context:remote}:path.endsWith('/register')?{status:register,registrationId:first,expiresAt:remote.sessionExpiresAt}:{status:revoke});\n  }});\n return {gateway,values,calls,remote,setRegister:v=>register=v,setRevoke:v=>revoke=v};\n}\ntest('original cleanup identity cannot revoke or erase a newer tab registration',async()=>{\n const f=fixture();await f.gateway.read();assert.equal(await f.gateway.register(context,{toJSON:()=>({endpoint:'https://synthetic.invalid/push',keys:{}})}),true);\n const [key]=f.values.keys();f.values.set(key,JSON.stringify({registrationId:newer,...scope}));\n assert.equal(await f.gateway.remove(),true);\n assert.equal(f.calls.at(-1).body.registrationId,first);\n assert.equal(JSON.parse(f.values.get(key)).registrationId,newer);\n});\ntest('HTTP 200 with failed server ACK never becomes register/revoke success; cleanup survives failed ACK',async()=>{\n const f=fixture();await f.gateway.read();f.setRegister('rejected');f.setRevoke('rejected');\n assert.equal(await f.gateway.register(context,{toJSON:()=>({endpoint:'https://synthetic.invalid/push',keys:{}})}),false);\n assert.equal(await f.gateway.remove(),false);assert.equal(f.values.size,1);\n f.setRevoke('revoked');assert.equal(await f.gateway.remove(),true);assert.equal(f.values.size,0);\n});\ntest('backend revision and expired context fail closed before permission eligibility',async()=>{\n const f=fixture();f.remote.sessionExpiresAt=Date.now()-1;await assert.rejects(f.gateway.read());\n const g=createPushGateway({context,authorization:'Bearer FABRICATED',preferences:()=>({}),storage:{getItem:()=>null},fetch:async()=>Response.json({status:'absent'})});\n await assert.rejects(g.read());\n});\n"
+      ],
+      "output": "✔ original cleanup identity cannot revoke or erase a newer tab registration (34.3084ms)\n✔ HTTP 200 with failed server ACK never becomes register/revoke success; cleanup survives failed ACK (1.7936ms)\n✔ backend revision and expired context fail closed before permission eligibility (1.2212ms)\nℹ tests 3\nℹ suites 0\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 45.8783\n"
+    },
+    {
+      "name": "syntax src/app.js",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--check",
+        "src/app.js"
+      ],
+      "output": ""
+    },
+    {
+      "name": "syntax src/store.js",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--check",
+        "src/store.js"
+      ],
+      "output": ""
+    },
+    {
+      "name": "syntax src/lib/sync.js",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--check",
+        "src/lib/sync.js"
+      ],
+      "output": ""
+    },
+    {
+      "name": "syntax src/lib/notification-push-runtime.js",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--check",
+        "src/lib/notification-push-runtime.js"
+      ],
+      "output": ""
+    },
+    {
+      "name": "syntax tests/n44-confirmed-projection-20261024/app.mjs",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--check",
+        "tests/n44-confirmed-projection-20261024/app.mjs"
+      ],
+      "output": ""
+    },
+    {
+      "name": "syntax tests/n44-confirmed-projection-20261024/engine.mjs",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--check",
+        "tests/n44-confirmed-projection-20261024/engine.mjs"
+      ],
+      "output": ""
+    },
+    {
+      "name": "syntax tests/n44-confirmed-projection-20261024/runtime.mjs",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--check",
+        "tests/n44-confirmed-projection-20261024/runtime.mjs"
+      ],
+      "output": ""
+    }
+  ],
+  "priorVerification": {
+    "command": "node --test --test-name-pattern=\"completion/manual/final|timeout|receipt|projection boundary\" tests/score-foundation-local.test.mjs",
+    "status": "PASS",
+    "cases": 2
+  }
+}

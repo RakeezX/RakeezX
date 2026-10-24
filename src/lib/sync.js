@@ -654,8 +654,10 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     // AI-authored N107: publish durable ACK revisions before unrelated trailing
     // failures. This is local reconciliation, never whole-run success.
     if (madeProgress && acknowledgedContext.workspace === store.getActiveWorkspace() &&
-        acknowledgedContext.session === cloud.session && cloudOwnershipAccess('pull').allowed)
+        acknowledgedContext.session === cloud.session && cloudOwnershipAccess('pull').allowed) {
       await store.refreshSyncedState();
+      store.publishConfirmedSources({ ...acknowledgedContext, reason: 'canonical-command-ack' });
+    }
     if (pushed.ownershipBlocked) {
       stopOwnershipBlockedScheduling({ reason: pushed.blockReason });
       return false;
@@ -694,6 +696,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     }
     phase = 'local_refresh';
     await store.refreshSyncedState();
+    store.publishConfirmedSources({ ...acknowledgedContext, reason: 'canonical-read' });
     const v2Status = await v2Engine.status();
     const lastSyncedAt = Date.now();
     await store.patchDevice({ lastSyncAt: lastSyncedAt }, { notify: false, queue: false });

@@ -21,6 +21,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   configuration = PUSH_CONFIGURATION, fetch, storage = win?.localStorage, changed = () => {} }) {
   let generation = 0, binding = null, client = null, gateway = null, ready = false, status = 'disabled', preparing = false;
   let stamps = new Map(), projecting = false, cleanup = Promise.resolve();
+  let queuedProjection = null;
   let preparingBinding = null, preparingGeneration = 0, refreshQueued = false;
   let eligibility = { reason: 'idle', configuration: 'not_observed' };
   const mark = (reason, flags = {}) => { eligibility = { ...eligibility, ...flags, reason }; };
@@ -48,7 +49,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   };
   function invalidate() {
     const old = client, originalGateway = gateway;
-    ++generation; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
+    ++generation; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
     let clearing;
     try { clearing = configuration.enabled ? originalGateway?.retire() ?? browser.clearConsent(null) : Promise.resolve(true); } catch { clearing = browser.clearConsent(null); }
     cleanup = Promise.all([cleanup, Promise.resolve(clearing).catch(() => false)]).then(results => results[1] === false ? {status:'cleanup_pending'} : results[0]);
@@ -117,7 +118,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
           workerConsent.expiresAt >= r.registration.expiresAt && browser.permission() === 'granted') {
         const restored = await c.restore(existing);
         if (!valid()) return;
-        if (restored.status === 'subscribed') { ready = true; status = 'subscribed'; mark('ready'); return; }
+        if (restored.status === 'subscribed') { ready = true; status = 'subscribed'; mark('ready'); await projectConfirmed({ workspace: b.workspace, session: b.session }); return; }
         if (restored.status === 'cleanup_pending') { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
       }
       // No new subscription or permission request on load. Retired identities
@@ -135,6 +136,30 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     }
   }
   const usable = () => gateway?.expiresAt() > Date.now() && ready && matches(binding) && browser.permission() === 'granted' && status === 'subscribed';
+  // AI N44: bootstrap and adopted canonical state are distinct from a pushed ACK.
+  // Only confirmed IDs are hints; no local event payload becomes server truth.
+  async function projectConfirmed(checkpoint) {
+    if (!usable() || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return;
+    if (projecting) { queuedProjection = checkpoint; return; }
+    projecting = true; const g = gateway, b = binding;
+    try {
+      const sources = await store.confirmedNotificationSources([...stamps.keys()].map(key => {
+        const [kind, id] = JSON.parse(key); return { kind, id };
+      }));
+      for (const { kind, id } of sources) {
+        if (!usable() || binding !== b) break;
+        const key = JSON.stringify([kind, id]);
+        const next = await g.project(kind, id, stamps.get(key) ?? null);
+        if (binding !== b || !usable()) break;
+        stamps.set(key, next);
+      }
+    } catch { /* no fabricated projection ACK and no unchanged failure retry */ }
+    finally {
+      projecting = false;
+      const queued = queuedProjection; queuedProjection = null;
+      if (queued) await projectConfirmed(queued);
+    }
+  }
   async function authorize(raw) {
     const c = client, b = binding, event = normalizePushPayload(raw, Date.now());
     if (!usable() || !event || !readNotificationCategories(current(), storage)[event.kind]) return false;
@@ -171,7 +196,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     async optIn() {
       if (!ready || !matches(binding)) return { status: 'unavailable' };
       const c = client, result = await c.optIn();
-      if (client === c && matches(binding)) { status = result.status; changed(); }
+      if (client === c && matches(binding)) {
+        status = result.status; changed();
+        if (result.status === 'subscribed') await projectConfirmed({ workspace: binding.workspace, session: binding.session });
+      }
       return result;
     },
     async disable() {
@@ -183,23 +211,9 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       changed(); return { status };
     },
     async preferencesChanged() { if (!gateway) return; await this.disable(); await refresh(); },
-    // Called only by the normal Sync post-ACK hook, never from store/render changes.
-    async afterSyncAck(checkpoint) {
-      if (!usable() || projecting || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return;
-      projecting = true; const g = gateway, b = binding;
-      try {
-        const sources = new Map(stamps);
-        for (const s of store.state.sessions ?? []) sources.set(JSON.stringify(['lesson', s.id]), stamps.get(JSON.stringify(['lesson', s.id])) ?? null);
-        for (const s of store.state.scoreSubitems ?? []) sources.set(JSON.stringify(['due', s.id]), stamps.get(JSON.stringify(['due', s.id])) ?? null);
-        for (const [key, stamp] of sources) {
-          if (!usable() || binding !== b) break;
-          const [kind, id] = JSON.parse(key); const next = await g.project(kind, id, stamp);
-          if (binding !== b) break;
-          stamps.set(key, next);
-        }
-      } catch { /* stale CAS needs a fresh context; never fabricate a projection ACK */ }
-      finally { projecting = false; }
-    },
+    // Retained API for genuine ACK hooks; canonical reads use no ACK counter.
+    afterSyncAck: projectConfirmed,
+    projectConfirmedSources: projectConfirmed,
     dispose() { disposed = true; invalidate(); if (permissionState) permissionState.onchange = null; win?.removeEventListener?.('focus', refresh); win?.navigator.serviceWorker?.removeEventListener('message', onMessage); return cleanup; },
   });
 }

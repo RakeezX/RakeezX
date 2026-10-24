@@ -60,6 +60,7 @@ store.onWorkspaceDeactivation(() => notificationPush.invalidate());
 cloud.subscribe(() => { void notificationPush.refresh(); });
 store.subscribe(() => { void notificationPush.refresh(); });
 subscribeAcknowledged(checkpoint => notificationPush.afterSyncAck(checkpoint));
+store.subscribeConfirmedSources(checkpoint => notificationPush.projectConfirmedSources(checkpoint));
 window.addEventListener('storage', event => {
   if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) notificationPush.invalidate();
   // AI N110: observing a lease writes a per-tab clock witness. Never feed

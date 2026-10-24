@@ -1,0 +1,98 @@
+{
+  "taskId": "continuous-n44-confirmed-command-ack-projection-20261024",
+  "runId": "6ba4eff8-3925-4c3b-899d-a0df22ac4dc2",
+  "baseSha": "2afc3eb4ee11a982ba7991ec7630a7ccea18ada5",
+  "checks": [
+    {
+      "name": "baseline causal reproduction and corrected opt-in/direct canonical rename",
+      "status": "PASS",
+      "evidence": "Original app/store/runtime misses both; patched real handler and V2 adoption project due source."
+    },
+    {
+      "name": "ordinary notification adapter recognizes the current synthetic due source",
+      "status": "PASS",
+      "evidence": "Current-day fixture, valid parent/child and actual owner context."
+    },
+    {
+      "name": "no-change actual Sync read projects without pushed ACK",
+      "status": "PASS",
+      "evidence": "{\"ok\":true,\"ackDelta\":0,\"reads\":1}"
+    },
+    {
+      "name": "actual configured subitem create/update ACK projection with grade preserved",
+      "status": "PASS",
+      "evidence": "Normal store configuration, durable outbox, actual full Sync engine/receipt adoption; no projection while optimistic. Grade remains 4."
+    },
+    {
+      "name": "direct canonical ACK is independent of unrelated failed outbox",
+      "status": "PASS",
+      "evidence": "Failed unrelated row retained across committed direct rename and projection; no whole-Sync success inferred."
+    },
+    {
+      "name": "actual notification DOM/delegated opt-in/source CSS",
+      "status": "PASS",
+      "evidence": "390px real application render; synthetic native ports only."
+    },
+    {
+      "name": "lost unknown rejected direct receipts never project",
+      "status": "PASS",
+      "evidence": "Actual queue/dispatch/receipt rejection leaves source fenced; no projection request."
+    },
+    {
+      "name": "unrelated failed outbox separation and pending-delete/local-only/grade guards",
+      "status": "PASS",
+      "evidence": "{\"independent\":true,\"deletionFenced\":true,\"localFenced\":true,\"unknownDeleteFenced\":true,\"gradesUnchanged\":true,\"sourceRevisionUnchanged\":true}"
+    },
+    {
+      "name": "duplicate canonical notification retains revision CAS",
+      "status": "PASS",
+      "evidence": "All duplicate source requests carry acknowledged CAS stamp; synthetic service source count unchanged."
+    },
+    {
+      "name": "foreign workspace/session checkpoints cannot cross-bind",
+      "status": "PASS",
+      "evidence": "Same fields with a different mounted workspace/session identity are refused."
+    },
+    {
+      "name": "actual parent-child deletion and canonical missing-source cleanup",
+      "status": "PASS",
+      "evidence": "Normal deleteItem cascade/outbox/engine ACK, pending deletion fenced; previously acknowledged absent source retains cleanup key only."
+    },
+    {
+      "name": "current-device restore projects existing canonical source",
+      "status": "PASS",
+      "evidence": "Actual restore registration ACK and worker-consent binding; no user edit or fabricated Sync ACK."
+    },
+    {
+      "name": "HTTP200 unknown projection never becomes confirmed materialization",
+      "status": "PASS",
+      "evidence": "Unknown response stops pass; later explicit checkpoint retains null CAS, no fabricated source stamp."
+    },
+    {
+      "name": "actual ownership guard refuses foreign-owner projection",
+      "status": "PASS",
+      "evidence": "Mounted store plus actual ownership guard; no guard disabled."
+    },
+    {
+      "name": "late canonical direct receipt cannot notify a replacement session",
+      "status": "PASS",
+      "evidence": "Real deferred command/receipt path; checkpoint identity fenced after Auth session replacement."
+    },
+    {
+      "name": "dispose cleanup and late notification fence",
+      "status": "PASS",
+      "evidence": "Disposed runtime produces zero new projection requests; owned native mock unsubscribed."
+    }
+  ],
+  "baseline": {
+    "bootstrapMissing": true,
+    "durableRenameMissing": true,
+    "source": "2afc3eb4ee11a982ba7991ec7630a7ccea18ada5"
+  },
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true,
+    "phase": "canonical isolated local helper; no shared lease"
+  },
+  "status": "PASS"
+}

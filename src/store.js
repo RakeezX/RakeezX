@@ -128,6 +128,68 @@ export const THEME_BOOT_STORAGE_KEY = 'rakeezx-theme';
 
 const listeners = new Set();
 
+// AI N44: separate durable adoption/read signals from optimistic render events.
+const confirmedSourceListeners = new Set();
+export function subscribeConfirmedSources(fn) {
+  confirmedSourceListeners.add(fn);
+  return () => confirmedSourceListeners.delete(fn);
+}
+export function publishConfirmedSources(checkpoint) {
+  if (checkpoint.workspace !== activeWorkspace || checkpoint.session !== cloud.session ||
+      activeWorkspace?.type !== 'account' || !getOfflineLeaseStatus().editable ||
+      !runtimeSyncOwnershipGuard.cloudAccess({ operation: 'read', authenticatedUserId: cloud.user?.id }).allowed) return;
+  for (const observer of confirmedSourceListeners) {
+    try { Promise.resolve(observer(Object.freeze({ ...checkpoint }))).catch(() => {}); } catch { /* isolated observer */ }
+  }
+}
+
+// IDs are hints only: the service still reads the owned typed source and CAS.
+// Pending deletion/edits (including parents) must never seed initial projection.
+export async function confirmedNotificationSources(previousSources = []) {
+  const workspace = activeWorkspace, session = cloud.session;
+  const pending = (await db.getAll('outbox')).filter(row => row.state !== 'superseded');
+  if (workspace !== activeWorkspace || session !== cloud.session || workspace?.type !== 'account' ||
+      !state.ready || !session || cloud.user?.id !== workspace.authUserId || !getOfflineLeaseStatus().editable ||
+      runtimeSyncOwnershipGuard.getWorkspace().databaseName !== workspace.databaseName ||
+      !runtimeSyncOwnershipGuard.cloudAccess({ operation: 'read', authenticatedUserId: cloud.user?.id }).allowed) return [];
+  // Canonical codecs omit owner_id inside the already owner-bound database.
+  const confirmed = row => row && (row.ownerId == null || row.ownerId === workspace.authUserId) &&
+    Number.isSafeInteger(row.serverRevision) && row.serverRevision > 0 && !row.syncCreatePending && !isLocalOnlyRecord(row);
+  const previouslyProjected = new Set(previousSources.map(({ kind, id }) => JSON.stringify([kind, id])));
+  const result = [];
+  for (const [kind, name] of [['lesson', 'sessions'], ['due', 'scoreSubitems']]) {
+    for (const source of state[name]) {
+      const item = kind === 'due' ? state.items.find(row => row.id === source.itemId) : null;
+      const teaching = state.teachings.find(row => row.id === (item?.teachingId ?? source.teachingId));
+      const term = state.terms.find(row => row.id === teaching?.termId);
+      const graph = [[name, source], ...(item ? [['items', item]] : []), ['teachings', teaching], ['terms', term],
+        ['years', state.years.find(row => row.id === term?.yearId)],
+        ['sections', state.sections.find(row => row.id === teaching?.sectionId)],
+        ['subjects', state.subjects.find(row => row.id === teaching?.subjectId)]];
+      const known = previouslyProjected.has(JSON.stringify([kind, source.id]));
+      if ((kind === 'due' && !item) || !graph.every(([, row]) => confirmed(row) &&
+          (!row.deleted || known || row.serverCanonical?.deleted === true))) continue;
+      if (pending.some(command => graph.some(([store, row]) =>
+        command.store === store && command.recordId === row.id ||
+        command.patch?.itemId === row.id || command.patch?.teachingId === row.id || command.patch?.targetId === row.id ||
+        command.dependencies?.some(dep => dep.store === store && dep.recordId === row.id)) ||
+        ['score:distribution_apply', 'restore:apply'].includes(command.command))) continue;
+      result.push({ kind, id: source.id });
+    }
+  }
+  // Preserve cleanup for a previously projected source physically removed by a
+  // canonical refresh. An unresolved source-domain operation fences this case;
+  // unrelated notes/grades never make an absent source an initial candidate.
+  const sourceStores = new Set(['sessions', 'scoreSubitems', 'items', 'teachings', 'terms', 'years', 'sections', 'subjects']);
+  if (!pending.some(row => sourceStores.has(row.store) || String(row.command ?? '').startsWith('lifecycle:'))) {
+    for (const { kind, id } of previousSources) {
+      const name = kind === 'lesson' ? 'sessions' : kind === 'due' ? 'scoreSubitems' : null;
+      if (name && !state[name].some(row => row.id === id)) result.push({ kind, id });
+    }
+  }
+  return result;
+}
+
 export function subscribe(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);
@@ -4680,6 +4742,7 @@ export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds,
 }
 
 async function applyReviewedCommand(command, recordId, patch, verifyCurrent = () => {}, backgroundImportPlanId = null) {
+  const checkpoint = { workspace: activeWorkspace, session: cloud.session, reason: 'canonical-command-ack' };
   const engine = createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,
     currentAuthenticatedUserId: () => cloud.user?.id ?? null, captureMutationContext: cloud.captureOwnedMutationContext });
   verifyCurrent();
@@ -4707,6 +4770,7 @@ async function applyReviewedCommand(command, recordId, patch, verifyCurrent = ()
     changes.push(...(await db.getAll(store)).map(row => ({ store, id: row.id })));
   }
   await absorb(changes); broadcast(changes);
+  publishConfirmedSources(checkpoint);
 }
 
 export function reviewNamesImport(teachingId, input) {

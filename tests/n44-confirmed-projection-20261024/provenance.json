@@ -1,0 +1,80 @@
+{
+  "taskId": "continuous-n44-confirmed-command-ack-projection-20261024",
+  "runId": "6ba4eff8-3925-4c3b-899d-a0df22ac4dc2",
+  "baseSha": "2afc3eb4ee11a982ba7991ec7630a7ccea18ada5",
+  "sourceHashes": {
+    "src/app.js": "af6a33ba4a9715832184bcd28b3c8602e753f9cba469f0a8af4804c7bc1d379f",
+    "src/store.js": "290bc6cdf2b263b59957f12d13c948620e36be527a23ebdcc75fc6b742ee82a8",
+    "src/lib/sync.js": "b6780328c960bc42b6d74254a068fd35a1d55c3c6a2e0665b06cdbe929e11b18",
+    "src/lib/notification-push-runtime.js": "77618cc79905134ce1d33366e0c02c67428e56391f158301844a8a0e2b56ca60",
+    "src/lib/sync-v2.js": "b70facb1d4cac5fda678a781657d81ef939cb490760c80572f093eb16006bd42",
+    "src/lib/cloud.js": "44cd8f8bd875844152cd79f7a84436aaa5a09dff693c4f532f27c89bf73bb4a2",
+    "src/lib/db.js": "c72011471d26cc655d183e6b5e178f0b0534505805b777a02a54650c248674a0",
+    "src/lib/sync-ownership.js": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
+    "src/lib/offline-lease.js": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86",
+    "src/lib/notification-events.js": "e673fea9da1ee873cef980464b19b2094faa3c309e21e31653dfe0711a4f94c8",
+    "src/lib/notification-state.js": "d3c0d36ab1e40900586a9964f1ff0919e5317df52289afa7ac898ce67f0a4f35",
+    "src/lib/notification-push-client.js": "04a8ad9b44ffb23d1de7524d70916ee2f91edfa8db239b0698f0aaf1603ae9c8",
+    "src/lib/notification-push-browser.js": "7c526515bbf724fa06d9ff4b85babb4b3cd047540e6a6713f4795762547e3151",
+    "src/lib/notification-push-gateway.js": "76bbef85a8db000cfbb01dc826cf1978808639ab0f3442618460d4b6178817b1",
+    "src/lib/score-foundation.js": "d759fbec5a53638f2e05873df76db734430c8aafdc8b069bcdbbd23708e9af48",
+    "src/models.js": "af9e624621e21686a86599b75eead8289af526072906efbe79e58a84d7b4a5fe",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "tests/n44-fixture.mjs": "dfbeda8e0b72535cc76240d3d856414e956ff007476abcc632f92db1ab1b4704",
+    "tests/helpers/served-demo-readiness.mjs": "4657d8ea394e1c4630b9e90bba4ce4429debd6cdb49f11ae698544834b08200c",
+    "scripts/ops-supervisor-v4/isolated-local-browser.mjs": "b37368dc099f1777fd6cf200ddc04c861f26d78f28cbb1d1c5a03d279674c424",
+    "tests/n44-confirmed-projection-20261024/app.mjs": "cb48891360c8c8e49d25a5794915a1a3a53be58661d2774970d4afc3375b8ac4",
+    "tests/n44-confirmed-projection-20261024/engine.mjs": "dec6bc9b4ae7e0b67eeb7e8baab19e0fd73fe772a67d9ee31a9c5969076f365a",
+    "tests/n44-confirmed-projection-20261024/runtime.mjs": "f00ac0bb840f3bc7a0cfbcfa854275fac0776fcc1bf8086ea143a4194bb5e674"
+  },
+  "checks": [
+    {
+      "name": "n44_direct_receipt_and_no_change_sync_projection",
+      "status": "PASS",
+      "evidence": "app.json: causal baseline + actual direct command, configured child create/update, no-change read, opt-in/restore; real V2 adoption."
+    },
+    {
+      "name": "n44_projection_owner_recovery_and_grade_guards",
+      "status": "PASS",
+      "evidence": "app.json: unknown/lost/rejected, actual owner/session/dispose/late receipt, parent-child deletion, CAS, grade4 preserved. Existing affected units and exact19 due dependency hashes PASS."
+    },
+    {
+      "name": "n44_actual_app_projection_and_candidate_scope",
+      "status": "PASS",
+      "evidence": "16 real app HTTP DOM/handler/CSS cases; owned isolated browser/server closed; syntax/diff/card scope/dependency hashes PASS. Publisher served proof remains separate."
+    }
+  ],
+  "reuse": [
+    {
+      "file": "tests/n44-device-20261024/eligibility-browser.json",
+      "commit": "22b8d649e1394b20e04cc03bbc62dcf8913ddfc2",
+      "sha256": "442fd4932c38934026fe8cc3a2b5236baca73c18ad95c2f9c8c41190c72a5e28",
+      "scope": "Historical13 lifecycle cases retained;16 current app cases cover changed runtime seam."
+    },
+    {
+      "file": "tests/n44-device-20261024/completion-0214.json",
+      "commit": "22b8d649e1394b20e04cc03bbc62dcf8913ddfc2",
+      "sha256": "4ea48cc43f40e00ae948a7ef8ac084a572fc69752e7b50df59d6c2b5492f8ae5",
+      "scope": "Historical35 authority/service cases retained; no service or authority changes/operations."
+    },
+    {
+      "file": "tests/n44-device-20261024/due-source-projection.json",
+      "commit": "22b8d649e1394b20e04cc03bbc62dcf8913ddfc2",
+      "sha256": "0c227665d3f1952fa89e2e91993e7d7bc5c0df60c0e35d08bfea50b261ba15ff",
+      "scope": "Historical19 frontend/canonical due guards reused after all three exact dependency hashes match."
+    }
+  ],
+  "immutableOutcome": {
+    "commit": "22b8d649e1394b20e04cc03bbc62dcf8913ddfc2",
+    "file": "docs/automation-evidence/20261024/N44_CURRENT_ELIGIBILITY_OUTCOME.md",
+    "sha256": "22313af0d8d4b596ec3098de3e0e268fa9b53ad75c327e6f21700069cd8224bf"
+  },
+  "operations": {
+    "realAccount": 0,
+    "service": 0,
+    "registrations": 0,
+    "sends": 0,
+    "deployment": 0
+  },
+  "postPublication": "Original publisher owns integration/deploy/served changed files; original custodian owns service/device/unknown cleanup reconciliation; N44 OPEN."
+}
