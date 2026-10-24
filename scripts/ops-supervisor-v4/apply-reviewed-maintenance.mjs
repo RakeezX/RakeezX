@@ -135,6 +135,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
   if (payload.cardUpdates.length) {
     const file = payload.files.find(x => x.repoPath === payload.sourceCardFile);
     insist(file && file.repoPath.startsWith('scripts/ops-supervisor-v4/') && file.repoPath.endsWith('.json'), 'Reviewed source card wrapper is missing');
+    for(const u of payload.cardUpdates.filter(u=>u.card.completionMode==='wait_for_verified_n44_frontend_prerequisite')){const f=payload.files.find(f=>f.repoPath===u.card.frontendPrerequisite?.sourceFile);insist(f&&f.content===u.card.frontendPrerequisite.sourceContent&&f.sha256===u.card.frontendPrerequisite.sourceSha256,'N44 frontend prerequisite source must be installed in this exact reviewed window');}
     const wrapper = JSON.parse(file.content);
     insist(wrapper.activationId === payload.activationId && Array.isArray(wrapper.tasks) && wrapper.tasks.length === taskIds.size + sourceWrapperCompanions(payload).length, 'Source wrapper activation or task count mismatch');
     for (const update of payload.cardUpdates) insist(wrapper.tasks.filter(c => c.id === update.card.id).length === 1 && same(wrapper.tasks.find(c => c.id === update.card.id), update.card), 'Source wrapper differs from card payload: ' + update.card.id);
@@ -282,6 +283,22 @@ export function reviewedNameRepairCheckOutcomes(task,result) {
     ));
 }
 
+
+// AI: wait for a separately qualified frontend prerequisite; retain every real journey gate.
+export function verifiedN44FrontendPrerequisiteStage(task,result,update){try{
+ const c=update.card,p=c.frontendPrerequisite,e=update.expected;
+ if(task.id!=='continuous-n44-one-approved-closed-page-push-20261019'||task.productId!=='N44'||task.sessionId!=='01a14fcd-032c-7ec0-8b0c-0e0395862c61'||task.status!=='blocked'||c.completionMode!=='wait_for_verified_n44_frontend_prerequisite'||result.state!=='LOCAL_READY'||e.resultState!=='LOCAL_READY'||result.blockerType!=='none'||result.blocker||task.deliveryReceipt)return false;
+ const pending=['n44_one_authorized_device_registration_single_push_with_pages_closed','n44_exact_operator_session_transport_and_reservation_reconciliation','n44_exact_original_hosted_disposal_and_final_single_device_outcome'];
+ if(!task.lastFailure?.startsWith('Candidate validation: Required affected checks have not passed:')||task.implementationFailures<1||!pending.every(n=>result.checks?.some(x=>x.name===n&&x.status==='NOT_RUN'))||!result.checks?.some(x=>x.status==='PASS')||!result.checks.every(x=>x.status==='PASS'||x.status==='NOT_RUN'&&pending.includes(x.name)))return false;
+ if(!same(c.requiredChecks,task.requiredChecks)||!same(c.allowedPaths,task.allowedPaths)||!Object.entries(c).every(([k,v])=>['objective','completionMode','dependsOn','frontendPrerequisite'].includes(k)||same(v,task[k])))return false;
+ const id='continuous-n44-deliver-qualified-optin-ui-20261024';
+ if(p?.taskId!==id||p.sourceFile!=='scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json'||!SHA256.test(p.sourceSha256??'')||typeof p.sourceContent!=='string'||sha256(Buffer.from(p.sourceContent))!==p.sourceSha256||p.originalCandidateSha!==result.candidateSha||!same(c.dependsOn,[...new Set([...(task.dependsOn??[]),id])]))return false;
+ const w=JSON.parse(p.sourceContent),s=w.tasks?.[0];
+ if(w.version!==1||w.activationId!==task.activationId||w.tasks.length!==1||s.id!==id||s.productId!=='N44'||s.scopeKey!=='n44-qualified-optin-ui-publication'||s.liveMutation!==false||s.liveAuthorizationRef||s.preparationAuthority?.providerServiceOperations!==0||s.preparationAuthority.realAccountReads!==0||s.preparationAuthority.registrations!==0||s.preparationAuthority.sends!==0||s.preparationAuthority.originalQualifiedCandidate!==result.candidateSha)return false;
+ if(!same(s.verificationPaths,['src/lib/notification-push-runtime.js','src/views/notification-settings.js'])||!s.allowedPaths?.every(x=>['src/lib/notification-push-runtime.js','src/views/notification-settings.js'].includes(x)||x.startsWith('tests/n44-device-20261024/eligibility-')||x==='tests/n44-device-20261024/ui-publication-provenance.json'||x==='docs/automation-evidence/20261024/N44_OPTIN_UI_DELIVERY.md'))return false;
+ return same(s.requiredChecks,['n44_ui_refresh_lifecycle_and_guarded_optin','n44_ui_actual_app_dom_styles_and_disposal','n44_ui_candidate_scope_and_provenance'])&&result.candidateSha===e.candidateSha&&result.baseSha===e.baseSha;
+ }catch{return false;}}
+
 export function verifyInactiveIdentity(task, result, update, activationId, historicalContext = null) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
@@ -339,7 +356,7 @@ export function verifyInactiveIdentity(task, result, update, activationId, histo
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
   const historicalSupersession = update.card.completionMode === HISTORICAL_RUNTIME_MODE && verifyHistoricalRuntimeSupersession(task, result, update, historicalContext);
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedStageContinuation(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedStageContinuation(task,result,update) || verifiedN44FrontendPrerequisiteStage(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {

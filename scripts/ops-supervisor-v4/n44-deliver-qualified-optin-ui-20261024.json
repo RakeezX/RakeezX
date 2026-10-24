@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-deliver-qualified-optin-ui-20261024",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -5605,
+      "scopeKey": "n44-qualified-optin-ui-publication",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "baseSha": "f034a0e8c06be5b756b84def3cb746c53e0003a9",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX/.worktrees/continuous-n44-deliver-qualified-optin-ui-20261024",
+      "objective": "DELIVER ONLY THE ALREADY QUALIFIED N44 FRONTEND SLICE, THROUGH SOLE PUBLISHER. Existing original-custodian candidatefedbfe15ee79f4f0a00594ea4b8720830327256c preserves public UI artifact80194d4801a7a00750ad128079fbdffcc56d3029. It fixes dropped changed-binding refresh and adds fixed finite readiness state. Its actual app DOM/handlers/source CSS checks PASS in tests/n44-device-20261024/eligibility-browser.json and eligibility-evidence.json; source docs docs/automation-evidence/20261024/N44_CURRENT_ELIGIBILITY_OUTCOME.md. Reuse the unchanged evidence after comparing exact source/dependency hashes; do not rebuild the feature, rerun unchanged UI or run service/browser/account operations. Original private device task remains BLOCKED on prepublication journey, not a reason to manufacture PASS. Its old cleanup/admission service proof and all true FAIL/NOT_RUN records remain untouched.\n In THIS fresh isolated PUBLIC worktree port ONLY src/lib/notification-push-runtime.js, src/views/notification-settings.js from the immutable qualified candidate, inspect exact actual current-main affected diff/dependencies, and preserve all other Product changes. Do not copy the private worktree, backend, custody code/state, service package, histories or unrelated screenshots. Include only necessary public synthetic affected UI evidence/tests, never custody-phase.mjs/private producer fields. Existing runtime state has no credentials in diagnostic; preserve source/owner/lease/schema/expiry/SW guards. If current-main dependencies changed materially, run only the original affected actual-app test in canonical isolated local context; otherwise bind reused evidence to exact ported bytes and do syntax/scoped diff. No new tests mirroring implementation or broad suite.\n Make an AI candidate commit and return LOCAL_READY with ALL current prepublication checks accurately passing. Current device registration/closed-page send/OS arrival are explicitly POST-publication parent gates, NOT checks to claimPASS here; preserve them NOT_RUN in evidence/limitations. Do not name the Product finished, turn original FAIL intoPASS or await a PM handoff. Original sole publisher integrates/deploys/verifies the actual changed app. Parent private device task depends on this task's verified delivery and will resume automatically; no messages to another task or manual Product executor. ZERO provider service, native/pin/policy/SQL/Auth/account/browser/registration/send operations. No push/deploy/main write by this worker.",
+      "allowedPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/views/notification-settings.js",
+        "tests/n44-device-20261024/eligibility-browser.mjs",
+        "tests/n44-device-20261024/eligibility-browser.json",
+        "tests/n44-device-20261024/eligibility-evidence.mjs",
+        "tests/n44-device-20261024/eligibility-evidence.json",
+        "tests/n44-device-20261024/ui-publication-provenance.json",
+        "docs/automation-evidence/20261024/N44_OPTIN_UI_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/views/notification-settings.js"
+      ],
+      "requiredChecks": [
+        "n44_ui_refresh_lifecycle_and_guarded_optin",
+        "n44_ui_actual_app_dom_styles_and_disposal",
+        "n44_ui_candidate_scope_and_provenance"
+      ],
+      "postDeliveryChecks": [
+        "parent_n44_current_registration_closed_page_send_and_os_arrival"
+      ],
+      "acceptance": [
+        "Port exact two qualified frontend files onto current main without private/backend changes.",
+        "Affected UI/guard and exact source/dependency evidence pass truthfully; unchanged evidence reused.",
+        "Sole publisher verifies served changed app; whole N44 actual device/arrival remains a parent post-delivery gate."
+      ],
+      "releaseAuthority": "Direct PO full necessary outcome delegation; this new narrow frontend publication prerequisite is required by an actual newly reproduced opt-in lifecycle defect. Sole publisher owns Product integration and served proof.",
+      "preparationAuthority": {
+        "kind": "qualified_frontend_slice_only",
+        "publication": true,
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "registrations": 0,
+        "sends": 0,
+        "originalQualifiedCandidate": "fedbfe15ee79f4f0a00594ea4b8720830327256c"
+      }
+    }
+  ]
+}
