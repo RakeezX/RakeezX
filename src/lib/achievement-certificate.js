@@ -1,28 +1,47 @@
 import { html, icon, openSheet, toast, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
-import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, TITLE_FONT_FAMILY, certificateText, defaultCertificateText, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
+import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, HEADER_FONT_FAMILY, certificateText, defaultCertificateText, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
 import { getMinistryLogo, loadMinistryLogo } from './ministry-brand.js';
 import { certificatePdfFromJpeg } from './certificate-pdf.js';
 
 const styleUrl = new URL('../styles/achievement-certificate.css', import.meta.url).href;
 const brandedCanvases = new WeakSet();
-const titleFontUrl = new URL('../../assets/fonts/layla-diwani/LaylaDiwaniRegular.ttf', import.meta.url).href;
-let titleFontReady;
+const headerFontUrl = new URL('../../assets/fonts/noto-naskh-arabic/NotoNaskhArabic-Bold.ttf', import.meta.url).href;
+const titleArtworkUrls = {
+  ornate: new URL('../../assets/certificates/title-thuluth-gold.png', import.meta.url).href,
+  school: new URL('../../assets/certificates/title-thuluth-green.png', import.meta.url).href,
+};
+let headerFontReady;
+let titleArtworksReady;
+let titleArtworks;
 
-function prepareTitleFont() {
-  if (titleFontReady) return titleFontReady;
+function prepareHeaderFont() {
+  if (headerFontReady) return headerFontReady;
   if (!globalThis.document?.fonts || typeof FontFace === 'undefined') return Promise.reject(new Error('Certificate font loading is unavailable'));
-  const font = new FontFace(TITLE_FONT_FAMILY, `url(${titleFontUrl})`, { weight: '400', style: 'normal' });
-  titleFontReady = font.load().then(loaded => {
+  const font = new FontFace(HEADER_FONT_FAMILY, `url(${headerFontUrl})`, { weight: '700', style: 'normal' });
+  headerFontReady = font.load().then(loaded => {
     document.fonts.add(loaded);
     return loaded;
-  }).catch(error => { titleFontReady = null; throw error; });
-  return titleFontReady;
+  }).catch(error => { headerFontReady = null; throw error; });
+  return headerFontReady;
+}
+
+function prepareTitleArtworks() {
+  if (titleArtworksReady) return titleArtworksReady;
+  titleArtworksReady = Promise.all(Object.entries(titleArtworkUrls).map(async ([design, url]) => {
+    const image = new Image();
+    image.src = url;
+    await image.decode();
+    if (image.naturalWidth !== 2655 || image.naturalHeight !== 479) throw new Error('Unexpected certificate title artwork');
+    return [design, image];
+  })).then(entries => { titleArtworks = Object.fromEntries(entries); return titleArtworks; })
+    .catch(error => { titleArtworksReady = null; titleArtworks = null; throw error; });
+  return titleArtworksReady;
 }
 
 export async function prepareCertificateAssets() {
-  const [, logo] = await Promise.all([globalThis.document?.fonts?.ready, loadMinistryLogo(), prepareTitleFont()]);
+  const [, logo] = await Promise.all([globalThis.document?.fonts?.ready, loadMinistryLogo(), prepareHeaderFont(), prepareTitleArtworks()]);
   return logo;
 }
 
@@ -149,8 +168,9 @@ export async function downloadCertificates(entries, { format = 'pdf', isCurrent 
 export function drawAchievementCertificate(canvas, card, options = {}) {
   brandedCanvases.delete(canvas);
   const ministryLogo = options.ministryLogo ?? getMinistryLogo();
+  const titleArtwork = options.titleArtwork ?? titleArtworks?.[options.design === 'school' ? 'school' : 'ornate'];
   if (canvas?.ownerDocument && !ministryLogo) throw new Error('Ministry logo is not ready');
-  const result = drawCertificateDesign(canvas, card, { ...options, ministryLogo });
+  const result = drawCertificateDesign(canvas, card, { ...options, ministryLogo, titleArtwork });
   if (ministryLogo) brandedCanvases.add(canvas);
   return result;
 }
@@ -169,7 +189,7 @@ export function certificateIssueDate(iso = todayISO()) {
 
 export function certificateDescription(card, options = {}) {
   const meta = certificateMetadata(options);
-  return ['شهادة تقدير', 'وزارة التعليم', card.name, meta.schoolName, meta.educationDepartment,
+  return ['شهادة شكر وتقدير', 'وزارة التعليم', card.name, meta.schoolName, meta.educationDepartment,
     meta.className, meta.subjectName,
     certificateText(card.text),
     meta.teacherName, meta.principalName, meta.dateLabel,

@@ -10,14 +10,13 @@ export const CERTIFICATE_MEDALS = Object.freeze([
 ]);
 
 export const CERTIFICATE_TEXT_LIMIT = 600;
-export const TITLE_FONT_FAMILY = 'Rakeez Certificate Title';
+export const HEADER_FONT_FAMILY = 'Rakeez Certificate Header';
 
 const WIDTH = 1485;
 const HEIGHT = 1050;
 const CENTER = WIDTH / 2;
 const FONT = '"Tajawal", sans-serif';
-const HEADER_FONT = '"Thmanyah Sans", sans-serif';
-const TITLE_FONT = `"${TITLE_FONT_FAMILY}", "LaylaDiwani", serif`;
+const HEADER_FONT = `"${HEADER_FONT_FAMILY}", "Noto Naskh Arabic", serif`;
 const INK = '#243e35';
 const GOLD = '#a77b2e';
 const MUTED = '#767768';
@@ -455,6 +454,19 @@ function headerIdentity(ctx, value, x, school, size, color) {
   lines.forEach((text, index) => label(ctx, text, x, firstBaseline + index * lineHeight, size, 700, color, width, HEADER_FONT));
 }
 
+/** The complete approved Thuluth phrase stays identical on every device/export. */
+function titleArtwork(ctx, image) {
+  const width = image?.naturalWidth || image?.width;
+  const height = image?.naturalHeight || image?.height;
+  if (!(width > 0 && height > 0)) throw new Error('Certificate title artwork is unavailable');
+  const scale = Math.min(900 / width, 142 / height);
+  const drawnWidth = width * scale;
+  const drawnHeight = height * scale;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(image, CENTER - drawnWidth / 2, 282 - drawnHeight / 2, drawnWidth, drawnHeight);
+}
+
 /** Paint only certificate identity and the teacher's explicit appreciation text. */
 export function drawCertificateDesign(canvas, card = {}, options = {}) {
   const meta = certificateMetadata(options);
@@ -476,12 +488,12 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
 
   // Give both institutions equal visual weight, with a palette chosen for each
   // certificate. Physical placement follows the Arabic reading order.
-  const headerColor = school ? '#f3e3ba' : '#806027';
-  headerIdentity(ctx, meta.educationDepartment, CENTER + 312.5, school, 26, headerColor);
-  headerIdentity(ctx, meta.schoolName || 'رَكيز المعلم', CENTER - 312.5, school, 26, headerColor);
+  const headerColor = school ? '#fff0ce' : '#705126';
+  headerIdentity(ctx, meta.educationDepartment, CENTER + 312.5, school, 32, headerColor);
+  headerIdentity(ctx, meta.schoolName || 'رَكيز المعلم', CENTER - 312.5, school, 32, headerColor);
 
   medal(ctx, school ? WIDTH - 191 : 191, 292, school);
-  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 321, 900, 110, 82, 400, school ? '#244c3a' : '#946c24', TITLE_FONT);
+  titleArtwork(ctx, options.titleArtwork);
   flourish(ctx, 361, school);
   label(ctx, 'تمنح هذه الشهادة بكل تقدير إلى الطالب', CENTER, 404, 24, 500, MUTED);
   recipient(ctx, name);

@@ -1,8 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { certificateCard, certificatePng, certificatePdf, isCertificateReady, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateIssueDate, certificateFilename } from '../src/lib/achievement-certificate.js';
 import { certificatePdfFromJpeg } from '../src/lib/certificate-pdf.js';
-import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata, TITLE_FONT_FAMILY } from '../src/lib/certificate-designs.js';
+import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata, HEADER_FONT_FAMILY } from '../src/lib/certificate-designs.js';
+
+const titleArtwork = { naturalWidth: 2655, naturalHeight: 479 };
 
 const approvedText = 'تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد';
 
@@ -29,7 +33,7 @@ test('certificates use only the student name and teacher text, with no achieveme
   assert.deepEqual(Object.keys(card), ['name', 'text', 'demo']);
   assert.equal(isCertificateReady(card), true);
   const canvas = recordingCanvas();
-  drawAchievementCertificate(canvas, card);
+  drawAchievementCertificate(canvas, card, { titleArtwork });
   assert.equal(canvas.width / canvas.height, 297 / 210);
   const output = canvas.texts.join(' ') + certificateDescription(card);
   assert.match(output, /طلب العلم/);
@@ -54,13 +58,15 @@ test('approved default text is exact for every subject and editable text remains
   for (const body of [text, longToken]) {
     for (const design of CERTIFICATE_DESIGNS) {
       const canvas = recordingCanvas();
-      drawAchievementCertificate(canvas, certificateCard({ studentName: 'طالب تجريبي', text: body }), { design: design.id });
+      drawAchievementCertificate(canvas, certificateCard({ studentName: 'طالب تجريبي', text: body }), { design: design.id, titleArtwork });
       assert.ok(canvas.texts.join('').replace(/\s/g, '').includes(body.replace(/\s/g, '')), 'The complete accepted text must be painted');
     }
   }
 });
 
 test('both designs display bounded identity, the original Ministry logo, the fixed medal and the complete edited text', () => {
+  const approvedTitle = readFileSync(new URL('../assets/certificates/title-thuluth-gold.png', import.meta.url));
+  assert.equal(createHash('sha256').update(approvedTitle).digest('hex'), '7f92dafc19aa5bcd8f69798db558f02a13c0dc5b4d8efde3d7c601d6caeb3531', 'Keep the exact Thuluth model selected by the PO');
   const card = certificateCard({ studentName: '\u202eعبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي', text: 'تقديرًا لمثابرتك وإبداعك.\nنعتز بجهدك ونحتفي بإنجازك.', demo: true });
   const raw = { schoolName: 'مدرسة\u202e تجريبية', teacherName: 'معلم تجريبي', principalName: 'مدير تجريبي',
     educationDepartment: 'إدارة تعليم تجريبية', className: 'الخامس 1', subjectName: 'المهارات الرقمية',
@@ -68,23 +74,28 @@ test('both designs display bounded identity, the original Ministry logo, the fix
   for (const design of CERTIFICATE_DESIGNS) {
     const canvas = recordingCanvas();
     const ministryLogo = { naturalWidth: 866, naturalHeight: 659 };
-    const options = { ...raw, design: design.id, medal: 'laurel', ministryLogo };
+    const options = { ...raw, design: design.id, medal: 'laurel', ministryLogo, titleArtwork };
     drawAchievementCertificate(canvas, card, options);
     const logoDraws = canvas.images.filter(([image]) => image === ministryLogo);
     assert.equal(logoDraws.length, 1, 'Each design must embed the provided original logo');
     const [, x, y, width, height] = logoDraws[0];
     assert.ok(x >= 0 && y >= 0 && width > 0 && height > 0);
     assert.ok(Math.abs(x + width / 2 - canvas.width / 4) < 1e-8, 'The Ministry logo must be horizontally centered in the certificate');
-    const title = canvas.lettering.find(entry => entry.text === 'شهادة شكر وتقدير');
-    assert.ok(title?.font.includes(TITLE_FONT_FAMILY), 'The title must use the dedicated Arabic display font');
+    const titleDraws = canvas.images.filter(([image]) => image === titleArtwork);
+    assert.equal(titleDraws.length, 1, 'Paint the approved complete Thuluth phrase once');
+    const [, titleX, titleY, titleWidth, titleHeight] = titleDraws[0];
+    assert.ok(Math.abs(titleX + titleWidth / 2 - canvas.width / 4) < 1e-8);
+    assert.ok(Math.abs(titleWidth / titleHeight - 2655 / 479) < 1e-10, 'Preserve the approved lettering proportions');
+    assert.ok(titleY >= 205 && titleY + titleHeight < 361, 'Keep the title clear of the logo and flourish');
     const department = canvas.lettering.find(entry => entry.text === raw.educationDepartment);
     const school = canvas.lettering.find(entry => entry.text === 'مدرسة تجريبية');
     assert.ok(department.x > x + width, 'Education department belongs to the right of the centered logo');
     assert.ok(school.x < x, 'School belongs to the left of the centered logo');
     assert.equal(school.font, department.font, 'The header labels use coordinated typography');
-    assert.ok(school.font.includes('"Thmanyah Sans"'), 'The header uses the available Rakeez brand font');
+    assert.ok(school.font.includes(HEADER_FONT_FAMILY), 'The header uses the self-hosted Noto Naskh Bold');
+    assert.match(school.font, /^700 32px /);
     assert.equal(school.color, department.color, 'The header labels use the same theme color');
-    assert.equal(school.color, design.id === 'ornate' ? '#806027' : '#f3e3ba');
+    assert.equal(school.color, design.id === 'ornate' ? '#705126' : '#fff0ce');
     assert.ok(Math.abs(width / height - ministryLogo.naturalWidth / ministryLogo.naturalHeight) < 1e-10, 'The logo must retain its original aspect ratio');
     const output = canvas.texts.join(' ') + certificateDescription(card, options);
     for (const expected of ['آل مبدي العتيبي', 'مدرسة', 'معلم تجريبي', 'مدير تجريبي', 'الخامس 1', '2026', 'بيانات تجريبية', 'نعتز بجهدك']) assert.ok(output.includes(expected));

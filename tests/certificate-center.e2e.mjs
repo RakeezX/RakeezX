@@ -32,6 +32,18 @@ async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
   return canvas.evaluate(node => node.__ministryLogoDraws.length);
 }
 
+async function expectPaintedThuluth(canvas, theme = 'gold') {
+  const proof = await canvas.evaluate(node => node.__certificateTitleDraws?.at(-1));
+  expect(proof?.decoded).toBe(true);
+  expect(proof.src).toContain(`/assets/certificates/title-thuluth-${theme}.png`);
+  expect([proof.naturalWidth, proof.naturalHeight]).toEqual([2655, 479]);
+  expect((proof.x + proof.width / 2) * proof.scaleX).toBeCloseTo(proof.canvasWidth / 2, 6);
+  expect(proof.width / proof.height).toBeCloseTo(2655 / 479, 8);
+  expect(proof.y).toBeGreaterThanOrEqual(205);
+  expect(proof.y + proof.height).toBeLessThan(361);
+  expect(await canvas.evaluate(node => node.__certificateHeaderFont)).toContain('Rakeez Certificate Header');
+}
+
 test('certificate center downloads a separate named PNG and A4 PDF for every selected student', async ({ page, context, baseURL }, testInfo) => {
   // Full-size PNG/JPEG idle encoding can take about 6.7s per file in Chromium.
   // Cover sequential files and two intentionally paused encodes without retries.
@@ -54,11 +66,19 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
           scaleX: this.getTransform().a, canvasWidth: this.canvas.width,
         });
       }
+      if (image instanceof HTMLImageElement && image.src.includes('/assets/certificates/title-thuluth-')) {
+        const [x, y, width, height] = args.slice(-4);
+        (this.canvas.__certificateTitleDraws ??= []).push({
+          src: image.src, decoded: image.complete && image.naturalWidth > 0,
+          naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight,
+          x, y, width, height, scaleX: this.getTransform().a, canvasWidth: this.canvas.width,
+        });
+      }
       return result;
     };
     const fillText = CanvasRenderingContext2D.prototype.fillText;
     CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
-      if (text === 'شهادة شكر وتقدير') this.canvas.__certificateTitleFont = this.font;
+      if (this.font.includes('Rakeez Certificate Header')) this.canvas.__certificateHeaderFont = this.font;
       return fillText.call(this, text, ...args);
     };
     window.print = () => { window.top.__certificatePrintCount = (window.top.__certificatePrintCount || 0) + 1; };
@@ -198,9 +218,9 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[0]));
   await expect(canvas).not.toHaveAttribute('aria-label', /بنود بدرجة كاملة|مشاركات إيجابية/);
   await expectPaintedMinistryLogo(canvas);
-  expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
-  expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
-  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/layla-diwani/LaylaDiwaniRegular.ttf')))).toBe(true);
+  await expectPaintedThuluth(canvas);
+  expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Header' && face.status === 'loaded'))).toBe(true);
+  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/noto-naskh-arabic/NotoNaskhArabic-Bold.ttf')))).toBe(true);
   const previewWidth = await canvas.evaluate(node => {
     const parent = node.closest('.certificate-center__preview');
     const style = getComputedStyle(parent);
@@ -236,12 +256,14 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
   const beforeSchool = await canvas.evaluate(node => node.__ministryLogoDraws.length);
   await workspace.locator('[data-center-design="school"]').click();
   const beforeOrnate = await expectPaintedMinistryLogo(canvas, beforeSchool);
+  await expectPaintedThuluth(canvas, 'green');
   await expect(print).toBeEnabled();
   await expect(workspace.locator('[data-center-design="school"]')).toHaveAttribute('aria-pressed', 'true');
   await canvas.screenshot({ path: testInfo.outputPath('certificate-school-preview.png') });
   await fs.writeFile(testInfo.outputPath('certificate-school-output.png'), Buffer.from(await canvas.evaluate(node => node.toDataURL('image/png').split(',')[1]), 'base64'));
   await workspace.locator('[data-center-design="ornate"]').click();
   await expectPaintedMinistryLogo(canvas, beforeOrnate);
+  await expectPaintedThuluth(canvas);
   await canvas.screenshot({ path: testInfo.outputPath('certificate-ornate-preview.png') });
   await fs.writeFile(testInfo.outputPath('certificate-ornate-output.png'), Buffer.from(await canvas.evaluate(node => node.toDataURL('image/png').split(',')[1]), 'base64'));
   await workspace.locator('.certificate-center__metadata > summary').click();
@@ -392,15 +414,16 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
   expect(errors).toEqual([]);
 });
 
-test('certificate page keeps exports unavailable and explains a failed Ministry logo load', async ({ page, context, baseURL }) => {
+for (const failedAsset of ['/assets/brand/ministry-of-education', '/assets/certificates/title-thuluth-gold.png']) {
+test(`certificate page keeps exports unavailable after failed asset ${failedAsset}`, async ({ page, context, baseURL }) => {
   const origin = new URL(baseURL).origin;
-  let failedLogoRequests = 0;
+  let failedAssetRequests = 0;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await context.route('**/*', route => {
     const url = new URL(route.request().url());
-    if (url.pathname.includes('/assets/brand/ministry-of-education')) {
-      failedLogoRequests += 1;
+    if (url.pathname.includes(failedAsset)) {
+      failedAssetRequests += 1;
       return route.abort('failed');
     }
     return url.origin === origin ? route.continue() : route.abort('blockedbyclient');
@@ -420,9 +443,10 @@ test('certificate page keeps exports unavailable and explains a failed Ministry 
   await expect(workspace.locator('[data-center-status]')).toContainText(/شعار/);
   await expect(workspace.locator('[data-center-print]')).toBeDisabled();
   await expect(workspace.locator('[data-center-download]')).toBeDisabled();
-  expect(failedLogoRequests).toBeGreaterThan(0);
+  expect(failedAssetRequests).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
+}
 
 test('certificate identity follows current Rakeez data while explicit edits stay local to the open certificates', async ({ page, context, baseURL }) => {
   const origin = new URL(baseURL).origin;

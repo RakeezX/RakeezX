@@ -32,6 +32,18 @@ async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
   return canvas.evaluate(node => node.__ministryLogoDraws.length);
 }
 
+async function expectPaintedThuluth(canvas, theme = 'gold') {
+  const proof = await canvas.evaluate(node => node.__certificateTitleDraws?.at(-1));
+  expect(proof?.decoded).toBe(true);
+  expect(proof.src).toContain(`/assets/certificates/title-thuluth-${theme}.png`);
+  expect([proof.naturalWidth, proof.naturalHeight]).toEqual([2655, 479]);
+  expect((proof.x + proof.width / 2) * proof.scaleX).toBeCloseTo(proof.canvasWidth / 2, 6);
+  expect(proof.width / proof.height).toBeCloseTo(2655 / 479, 8);
+  expect(proof.y).toBeGreaterThanOrEqual(205);
+  expect(proof.y + proof.height).toBeLessThan(361);
+  expect(await canvas.evaluate(node => node.__certificateHeaderFont)).toContain('Rakeez Certificate Header');
+}
+
 test('certificate edits appreciation text and directly exports the current image without a review checkbox', async ({ page, context, baseURL }, testInfo) => {
   const origin = new URL(baseURL).origin;
   const errors = [];
@@ -54,11 +66,19 @@ test('certificate edits appreciation text and directly exports the current image
           scaleX: this.getTransform().a, canvasWidth: this.canvas.width,
         });
       }
+      if (image instanceof HTMLImageElement && image.src.includes('/assets/certificates/title-thuluth-')) {
+        const [x, y, width, height] = args.slice(-4);
+        (this.canvas.__certificateTitleDraws ??= []).push({
+          src: image.src, decoded: image.complete && image.naturalWidth > 0,
+          naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight,
+          x, y, width, height, scaleX: this.getTransform().a, canvasWidth: this.canvas.width,
+        });
+      }
       return result;
     };
     const fillText = CanvasRenderingContext2D.prototype.fillText;
     CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
-      if (text === 'شهادة شكر وتقدير') this.canvas.__certificateTitleFont = this.font;
+      if (this.font.includes('Rakeez Certificate Header')) this.canvas.__certificateHeaderFont = this.font;
       return fillText.call(this, text, ...args);
     };
     // Observe the application's actual isolated print document without opening an OS dialog.
@@ -122,9 +142,9 @@ test('certificate edits appreciation text and directly exports the current image
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
   await expect(sheet.locator('[data-certificate-pdf]')).toBeEnabled();
   await expectPaintedMinistryLogo(canvas);
-  expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
-  expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
-  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/layla-diwani/LaylaDiwaniRegular.ttf')))).toBe(true);
+  await expectPaintedThuluth(canvas);
+  expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Header' && face.status === 'loaded'))).toBe(true);
+  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/noto-naskh-arabic/NotoNaskhArabic-Bold.ttf')))).toBe(true);
   await message.fill('');
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();
@@ -159,9 +179,11 @@ test('certificate edits appreciation text and directly exports the current image
   const beforeSchool = await canvas.evaluate(node => node.__ministryLogoDraws.length);
   await editor.locator('[data-certificate-design][value="school"]').check();
   const beforeOrnate = await expectPaintedMinistryLogo(canvas, beforeSchool);
+  await expectPaintedThuluth(canvas, 'green');
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await editor.locator('[data-certificate-design][value="ornate"]').check();
   await expectPaintedMinistryLogo(canvas, beforeOrnate);
+  await expectPaintedThuluth(canvas);
   const expectedImage = await canvas.evaluate(node => node.toDataURL('image/png'));
   const outgoing = [];
   const observe = request => outgoing.push(request.url());

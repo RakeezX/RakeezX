@@ -1,0 +1,10 @@
+Noto Naskh Arabic Bold — certificate institution headings
+
+Unmodified official Noto project distribution.
+Font: https://raw.githubusercontent.com/notofonts/noto-fonts/main/hinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Bold.ttf
+License: https://raw.githubusercontent.com/notofonts/noto-fonts/main/LICENSE
+SIL Open Font License 1.1; see OFL.txt and embedded copyright records.
+Native Bold, registered under CSS alias Rakeez Certificate Header, weight 700.
+Retrieved 2026-10-25 (Asia/Riyadh); no third-party runtime font requests.
+Font SHA-256: 7432f2350487d9f784b47a24526d9fc48f2712bb6c2ff602898b104b0c26ee80
+License SHA-256: 0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb

@@ -1,0 +1,11 @@
+Certificate title artwork — approved Thuluth model 3, 2026-10-25 (Asia/Riyadh).
+
+Exact fixed phrase: شهادة شكر وتقدير
+Rendered on the authorized Windows device using installed DecoType Thuluth.
+Browser platform-font proof: DecoTypeThuluth, weight 700, no fallback.
+Original accepted gold artwork is preserved byte for byte (2655 x 479 RGBA).
+Green artwork applies #244c3a to the same complete phrase alpha mask.
+These are complete fixed-phrase images, not font binaries or a glyph atlas.
+Output-use reference: https://learn.microsoft.com/en-us/typography/fonts/font-faq
+Gold SHA-256: 7f92dafc19aa5bcd8f69798db558f02a13c0dc5b4d8efde3d7c601d6caeb3531
+Green SHA-256: 4f85ed3a785dc80c2f887b0cbe2768476710c4e39402bd16f63ef16e3116e43a
