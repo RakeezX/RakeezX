@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-issuance-phase-public-dependency-20261024",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -6050,
+      "scopeKey": "n88-issuance-finite-public-metadata",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "objective": "SOURCEONLY PUBLIC DELIVERY, ORIGINAL CUSTODIAN DOESNATIVE/ACCOUNT. Exact05621c12db294399eb7ebce2486810f9fee857fc qualified actualnative/realPG78 and finite issuance phase diagnostic. Actual imported503source1800ms and durabletrialissue-missing5037181ms remainunexplained. Candidate includes drafts/n88-student-portal/activation/issuance-diagnostic-20261024/public-enum.patch + public-dependency.json and actualnative/PG qualification evidence. Reuseexistingproofs, no newbenchmark/realaccount/PG/custody/rawsecret/oldcleanup action. Historical parentFAIL/NOT_RUN unchanged.\n\nNEWisolatedworktree atCURRENTmain, integrateONLY publicdelta6c9f34539702819ae84c12fd720524d8239f581c->05621c12db294399eb7ebce2486810f9fee857fc in declaredTHREEfiles, preferablyprovidedexactpublic-enum.patch. Oldparentfiles differfrom currentmain: DO NOToverwriteentirefiles/cherry-pickwholebranch. Preservealreadyserved validation-family metadata, source/binding/privacy guards, classdeadline/UNKNOWNdurability/403Authfix9521 andall unrelatedcurrentbehavior. Nativeclass-credentials/newinactivebundle/officialactivation remainoriginalcustodian only; zero native/pin/carrier/config writes.\n\nFocused actualmergedmodule/app checks provefixedallowlistedissuance failure phases reachsupport, unknown/rawSQL/body/IDs/counts/secretvalues stripped, foreignowner/signature/contextswap detailretired, validACKanddeadline/cancelunchanged. Critical: a diagnosticphase/rollbacklabel alone MUSTNOTauto-resolve currentUNKNOWN, clearrequesthint orpermitreplacementmutation. Onlyexistingauthoritative receipt/CASreconciliation maydoit; after503anddocumentreopen, failedwrite remainsunconfirmed andoldidpreserved. No changing403/503toPASS, fakeACKfixture or mirror. Reuseunchangednative crypto/SQL/COMMIT guardsbyhash, nofullsuite/newPGfixture.\n\nOriginalsolepublisher integrates/builds/servesandverifiescurrentassets. DoNOTmanualpush/deploy. ReturnonlyTHISsourcephasechecks/candidate/base/worktree/provenance. WholeN88OPEN, actualsource/issuancecauseunknown, no privateorstudentloginclaim. Exactactualservedreceipt/hashes are prerequisite for original05621 native+one permittedreceipt review/guardedcurrentintent. DoNOTconsumeanylive operation inthischild.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/support.js",
+        "tests/n88-issuance-public-20261024/**",
+        "docs/automation-evidence/20261024/N88_ISSUANCE_PHASE_PUBLIC_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/support.js"
+      ],
+      "requiredChecks": [
+        "n88_issuance_public_exact_current_delta",
+        "n88_issuance_public_finite_privacy_and_owner",
+        "n88_issuance_public_unknown_ack_and_deadline_unchanged"
+      ],
+      "acceptance": [
+        "Only current-main public issuance enum delta, newer validation/recovery/Auth behavior preserved.",
+        "Merged actual modules preserve finite privacy, owner fences, honest UNKNOWN/ACK and deadlines with no real operation.",
+        "Sole publisher actual served proof available for same original N88 custodian; whole-ticket acceptance unclaimed."
+      ],
+      "preparationAuthority": {
+        "kind": "qualified_public_issuance_phase_dependency",
+        "originalTaskId": "continuous-n88-current-teacher-connection-actual-cause-20261020",
+        "qualifiedCandidate": "05621c12db294399eb7ebce2486810f9fee857fc",
+        "deltaBase": "6c9f34539702819ae84c12fd720524d8239f581c",
+        "nativeUploads": 0,
+        "sourcePinUpdates": 0,
+        "realAccountActions": 0,
+        "newPgClusters": 0,
+        "deniedCleanupRetries": 0
+      },
+      "releaseAuthority": "Latest PO actual creation503 report and full necessary completion delegation authorize sole-publisher delivery of this qualified finite public metadata dependency. No native/account/SQL operation and no claim that metadata delivery fixes issuance.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "5c486712946de4e4f02129e5443008e15b3407d2",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/cloudflare-entry.mjs",
+          "src/lib/student-portal-runtime.js",
+          "src/lib/support.js"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/cloudflare-entry.mjs",
+          "src/lib/student-portal-runtime.js",
+          "src/lib/support.js",
+          "tests/n88-issuance-public-20261024/contract.mjs",
+          "tests/n88-issuance-public-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_ISSUANCE_PHASE_PUBLIC_DELIVERY.md"
+        ],
+        "newPaths": [
+          "tests/n88-issuance-public-20261024/contract.mjs",
+          "tests/n88-issuance-public-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_ISSUANCE_PHASE_PUBLIC_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n88_issuance_public_exact_current_delta",
+          "n88_issuance_public_finite_privacy_and_owner",
+          "n88_issuance_public_unknown_ack_and_deadline_unchanged"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "publish_qualified_issuance_phase_dependency",
+      "baseSha": "5c486712946de4e4f02129e5443008e15b3407d2",
+      "worktreePath": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-issuance-phase-public-dependency-20261024",
+      "postDeliveryChecks": [
+        "production_publication"
+      ]
+    }
+  ]
+}
