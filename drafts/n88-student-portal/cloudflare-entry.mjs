@@ -19,6 +19,7 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
         'Content-Security-Policy':"default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"}});
     }
     const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),19000);
+    const cancel=()=>abort.abort();request.signal?.addEventListener('abort',cancel,{once:true});if(request.signal?.aborted)cancel();
     let stage='configuration',responseRegion=null;
     const unavailable=()=>new Response('{"error":"unavailable"}',{status:503,headers:{...PRIVATE_WEB_HEADERS,'x-n88-transport-stage':stage,...(responseRegion?{'x-n88-service-region':responseRegion}:{})}});
     try {
@@ -77,7 +78,7 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       // Finite operational phase only; never reflect arbitrary upstream values.
       if(reply.status===503&&['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-validate','projection','issuance-synchronize','issuance-roster','issuance-receipt','issuance-members','issuance-savepoint','issuance-recovery','issuance-member-result','issuance-member-release','issuance-member-rollback','issuance-flush','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'].includes(reply.body?.stage))out.set('x-n88-service-stage',reply.body.stage);
       return new Response(JSON.stringify(reply.body),{status:reply.status,headers:out});
-    }catch{return unavailable();}finally{clearTimeout(timer);abort.abort();}
+    }catch{return unavailable();}finally{request.signal?.removeEventListener('abort',cancel);clearTimeout(timer);abort.abort();}
   };
 }
 export default {fetch:createCloudflareEntry()};

@@ -27,7 +27,7 @@ function validStudent(s) {
 export const classListRegion = value => ['ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','us-east-1','us-west-1','us-west-2','eu-central-1','eu-central-2','eu-west-1','eu-west-2','eu-west-3','sa-east-1'].includes(value) ? value : 'unknown';
 export function createClassPortalClient({ request, getContext = () => null, getReceiptScope = () => '', storage, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000), onListDiagnostic = () => {}, onMutationDiagnostic = () => {} } = {}) {
   if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000 || !Number.isInteger(readTimeoutMs) || readTimeoutMs < 1 || readTimeoutMs > 30000) deny('invalid_configuration');
-  let roster = null, rosterKey = null, pending = null, readSequence = 0;
+  let roster = null, rosterKey = null, pending = null, readSequence = 0, terminalCapabilityKey=null,lastConfirmedRoster=null,lastConfirmedKey=null;
   const readContext = () => { try { return getContext(); } catch { return null; } };
   const consumed = new Set();
   const localStorage=()=>storage??globalThis.localStorage;
@@ -132,7 +132,35 @@ export function createClassPortalClient({ request, getContext = () => null, getR
     pending = work;
     return work.finally(() => { roster = null; if (pending === work) pending = null; });
   }
+  // AI: separate bounded closure journal; original UNKNOWN hints remain unchanged until matching ACK.
+  function resolutionJournal(c){
+    const raw=localStorage().getItem(c.hintKey+':terminal-v1');if(raw===null)return [];
+    if(typeof raw!=='string'||raw.length>HINT_BYTES)deny('review_required');
+    const rows=JSON.parse(raw);if(!Array.isArray(rows)||rows.length>HINT_LIMIT||rows.some(x=>!exact(x,['hint','attempted','readAttempted','state'])||!commandId(x.hint?.requestId)||typeof x.attempted!=='boolean'||typeof x.readAttempted!=='boolean'||!['unknown','closed','committed'].includes(x.state)))deny('review_required');return rows;
+  }
+  function saveResolution(c,rows){current(c);const raw=JSON.stringify(rows);if(raw.length>HINT_BYTES||rows.length>HINT_LIMIT)deny('review_required');localStorage().setItem(c.hintKey+':terminal-v1',raw);if(localStorage().getItem(c.hintKey+':terminal-v1')!==raw)deny('review_required');}
+  function resolutionInput(teachingId){
+    const c=context(teachingId);if(terminalCapabilityKey!==c.key)deny('review_required');const saved=hints(c);if(saved.blocked||saved.rows.length!==1)deny('review_required');
+    const hint=saved.rows[0];if(hint.action!=='issue-missing'||Date.now()-hint.createdAt>HINT_AGE)deny('review_required');
+    const rows=resolutionJournal(c),record=rows.find(x=>x.hint.requestId===hint.requestId);
+    if(record&&JSON.stringify(record.hint)!==JSON.stringify(hint))deny('review_required');
+    return {c,hint,rows,record};
+  }
+  function resolutionState(teachingId){try{const {record}=resolutionInput(teachingId);return {eligible:!record,canRecover:!!record&&record.state==='unknown'&&!record.readAttempted,state:record?.state??'unknown'};}catch{return {eligible:false,canRecover:false,state:'not-run'};}}
+  async function resolveUnknown(teachingId,readOnly=false){
+    if(pending)deny('busy');const {c,hint,rows,record}=resolutionInput(teachingId);
+    if(readOnly?(!record||record.state!=='unknown'||record.readAttempted):!!record)deny('review_required');
+    const entry=record??{hint:structuredClone(hint),attempted:true,readAttempted:false,state:'unknown'};
+    if(readOnly)entry.readAttempted=true;else rows.push(entry);
+    saveResolution(c,rows);readSequence++;
+    const body={requestId:hint.requestId,expectedRosterRevision:hint.expectedRosterRevision,expectedCredentialRevision:hint.expectedCredentialRevision,resolutionVersion:1,resolution:readOnly?'status':'close'};
+    const work=call('revoke',teachingId,body,d=>exact(d,['resolutionVersion','state','created','skipped','failed'])&&d.resolutionVersion===1&&['closed','committed','unknown'].includes(d.state)&&['created','skipped','failed'].every(k=>Number.isSafeInteger(d[k])&&d[k]>=0&&d[k]<=2000)&&(d.state==='committed'||d.created+d.skipped+d.failed===0),c);pending=work;
+    try{const result=await work;current(c);entry.state=result.state;saveResolution(c,rows);if(result.state!=='unknown'&&!settle(c,[hint]))deny('review_required');if(result.state==='closed'&&lastConfirmedKey===c.key&&lastConfirmedRoster?.rosterRevision===hint.expectedRosterRevision&&lastConfirmedRoster?.credentialRevision===hint.expectedCredentialRevision){roster=structuredClone(lastConfirmedRoster);rosterKey=c.key;}return result;}finally{if(pending===work)pending=null;}
+  }
   return Object.freeze({
+    resolutionState,
+    closeUnknown:teachingId=>resolveUnknown(teachingId,false),
+    recoverClosure:teachingId=>resolveUnknown(teachingId,true),
     async listGuidance(teachingId) {
       if(pending) deny('busy');
       return call('guidance-list',teachingId,{},validGuidanceList);
@@ -151,16 +179,18 @@ export function createClassPortalClient({ request, getContext = () => null, getR
       roster = null;
       const saved=hints(c),wanted=saved.rows.filter(x=>x.action==='issue-missing'&&Date.now()-x.createdAt<=HINT_AGE);
       const requests=wanted.map(x=>({requestId:x.requestId,expectedRosterRevision:x.expectedRosterRevision,expectedCredentialRevision:x.expectedCredentialRevision}));
-      const metadata=d=>!requests.length&&exact(d,['classId','rosterRevision','policyRevision','students','visibility']) || exact(d,['classId','rosterRevision','policyRevision','students','visibility','credentialRevision','reconciliation'])&&rosterRevision(d.credentialRevision)&&Array.isArray(d.reconciliation)&&d.reconciliation.length===requests.length&&d.reconciliation.every(x=>exact(x,['state','created','skipped','failed'])&&['committed','unknown'].includes(x.state)&&['created','skipped','failed'].every(k=>Number.isSafeInteger(x[k])&&x[k]>=0&&x[k]<=2000)&&(x.state==='committed'||x.created+x.skipped+x.failed===0));
-      const data = await call('list', teachingId, {reconciliationVersion:1,reconcile:requests}, d => metadata(d) && d.classId === c.binding.classId && rosterRevision(d.rosterRevision) && revision(d.policyRevision) && validPortalFields(d.visibility) && Array.isArray(d.students) && d.students.length <= 2000 && d.students.every(validStudent) && new Set(d.students.map(s => s.studentId)).size === d.students.length && new Set(d.students.map(s => s.enrollmentId)).size === d.students.length, c);
+      const metadataBase=d=>!requests.length&&exact(d,['classId','rosterRevision','policyRevision','students','visibility']) || exact(d,['classId','rosterRevision','policyRevision','students','visibility','credentialRevision','reconciliation'])&&rosterRevision(d.credentialRevision)&&Array.isArray(d.reconciliation)&&d.reconciliation.length===requests.length&&d.reconciliation.every(x=>exact(x,['state','created','skipped','failed'])&&['committed','unknown'].includes(x.state)&&['created','skipped','failed'].every(k=>Number.isSafeInteger(x[k])&&x[k]>=0&&x[k]<=2000)&&(x.state==='committed'||x.created+x.skipped+x.failed===0));
+      const metadata=d=>{const {terminalResolution,...base}=d??{};return (terminalResolution===undefined||terminalResolution==='n88-terminal-no-issuance-v1')&&metadataBase(base);};
+      const data = await call('list', teachingId, {terminalResolutionVersion:1,reconciliationVersion:1,reconcile:requests}, d => metadata(d) && d.classId === c.binding.classId && rosterRevision(d.rosterRevision) && revision(d.policyRevision) && validPortalFields(d.visibility) && Array.isArray(d.students) && d.students.length <= 2000 && d.students.every(validStudent) && new Set(d.students.map(s => s.studentId)).size === d.students.length && new Set(d.students.map(s => s.enrollmentId)).size === d.students.length, c);
       if (sequence !== readSequence) deny('review_required');
+      terminalCapabilityKey=data.terminalResolution==='n88-terminal-no-issuance-v1'?c.key:null;
       const confirmed=wanted.filter((x,i)=>data.reconciliation?.[i].state==='committed');
       if(confirmed.length)settle(c,confirmed);
       // Preserve the existing UI's UNKNOWN warning for unqueryable, expired,
       // malformed or storage-blocked hints. This local warning is no server ACK.
       const remaining=hints(c);
       if(remaining.blocked||remaining.rows.some(x=>!wanted.some(y=>y.requestId===x.requestId))||remaining.rows.some(x=>confirmed.some(y=>y.requestId===x.requestId)))data.reconciliation=[...(data.reconciliation??[]),unknownReceipt()];
-      roster = {...data,students:data.students.map(({credential,...s})=>s)}; rosterKey = c.key; return data;
+      roster = {...data,students:data.students.map(({credential,...s})=>s)}; rosterKey = c.key;lastConfirmedRoster=structuredClone(roster);lastConfirmedKey=c.key;return data;
     },
     issueMissingClassCodes(teachingId, body) {
       const { r } = snapshot(teachingId);
