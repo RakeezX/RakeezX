@@ -22,6 +22,8 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   let generation = 0, binding = null, client = null, gateway = null, ready = false, status = 'disabled', preparing = false;
   let stamps = new Map(), projecting = false, cleanup = Promise.resolve();
   let queuedProjection = null;
+  // Retain only the original cleanup capability, never a usable/new consent binding.
+  let pendingDisable = null, disabling = null, preferenceStop = null;
   let preparingBinding = null, preparingGeneration = 0, refreshQueued = false;
   let eligibility = { reason: 'idle', configuration: 'not_observed' };
   const mark = (reason, flags = {}) => { eligibility = { ...eligibility, ...flags, reason }; };
@@ -42,6 +44,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       leaseMatches: !!b && leaseRevision() === b.leaseRevision, consentMatches: !!b && consentRevision(b.context) === b.consentRevision };
   };
   const matches = b => !!b && (b.serviceExpiresAt ?? Infinity) > Date.now() && Object.values(bindingChecks(b)).every(Boolean);
+  const ownsCleanup = b => {
+    const checks = bindingChecks(b);
+    return !disposed && checks.contextMatches && checks.sessionMatches && checks.workspaceMatches && checks.leaseMatches;
+  };
   const preferences = () => {
     const c = current(), timing = readNotificationTiming(c, storage);
     return { ...readNotificationCategories(c, storage), lessonMinutes: timing.lessonMinutes, dueDays: timing.dueDays,
@@ -68,6 +74,8 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     if (preparing) { if (preparingBinding && (preparingGeneration !== generation || !matches(preparingBinding))) refreshQueued = true; return; }
     if (!configuration.enabled) { mark('disabled'); return; }
     if (!current()) { mark('account_unavailable'); return; }
+    // An unresolved explicit stop cannot be bypassed by focus/refresh or opt-in.
+    if (pendingDisable) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
     if (binding) return;
     preparing = true; const token = generation;
     const b = { context: current(), session: cloud.session, workspace: store.getActiveWorkspace(), leaseRevision: leaseRevision() };
@@ -192,25 +200,49 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   }
   return Object.freeze({
     refresh, invalidate,
-    snapshot: () => ({ available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), status, eligibility: { ...eligibility } }),
+    snapshot: () => ({ available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility } }),
     async optIn() {
       if (!ready || !matches(binding)) return { status: 'unavailable' };
       const c = client, result = await c.optIn();
       if (client === c && matches(binding)) {
-        status = result.status; changed();
+        status = result.status; if (status === 'subscribed') preferenceStop = null; changed();
         if (result.status === 'subscribed') await projectConfirmed({ workspace: binding.workspace, session: binding.session });
       }
       return result;
     },
     async disable() {
-      const g = gateway, selectedPreferences = preferences();
-      invalidate(); status = 'cleanup_pending';
-      const result = await cleanup;
-      try { if (result?.status !== 'revoked') return result; await g.update(false, { cleanup: true, selectedPreferences }); status = 'revoked'; }
-      catch { status = 'cleanup_pending'; }
-      changed(); return { status };
+      if (pendingDisable ? !ownsCleanup(pendingDisable.binding) : !binding || !matches(binding)) return { status: 'unavailable' };
+      if (!pendingDisable) {
+        pendingDisable = { gateway, binding, preferences: preferences() };
+        invalidate(); status = 'cleanup_pending'; mark('cleanup_pending'); changed();
+      } else pendingDisable.preferences = preferences();
+      if (disabling) return disabling;
+      const stop = pendingDisable;
+      disabling = (async () => {
+        try {
+          await cleanup;
+          if (!ownsCleanup(stop.binding)) return { status: 'unavailable' };
+          if (!await stop.gateway.retire() || (await drain()).status !== 'revoked') return { status: 'cleanup_pending' };
+          if (!ownsCleanup(stop.binding)) return { status: 'unavailable' };
+          const selectedPreferences = stop.preferences;
+          await stop.gateway.update(false, { cleanup: true, selectedPreferences });
+          if (!ownsCleanup(stop.binding)) return { status: 'unavailable' };
+          if (selectedPreferences !== stop.preferences) return { status: 'cleanup_pending' };
+          pendingDisable = null; cleanup = Promise.resolve({ status: 'revoked' }); status = 'revoked';
+          await refresh(); return { status: 'revoked' };
+        } catch { return { status: 'cleanup_pending' }; }
+        finally { disabling = null; changed(); }
+      })();
+      return disabling;
     },
-    async preferencesChanged() { if (!gateway) return; await this.disable(); await refresh(); },
+    async preferencesChanged() {
+      if (pendingDisable && ownsCleanup(pendingDisable.binding)) pendingDisable.preferences = preferences();
+      if (!gateway && !pendingDisable || pendingDisable && !ownsCleanup(pendingDisable.binding)) return;
+      // Existing context/update revokes subscriptions. Explain this deliberate
+      // stop and require a fresh gesture; never silently register or revive an ID.
+      if (status === 'subscribed' || pendingDisable) preferenceStop = pendingDisable?.binding ?? binding;
+      await this.disable();
+    },
     // Retained API for genuine ACK hooks; canonical reads use no ACK counter.
     afterSyncAck: projectConfirmed,
     projectConfirmedSources: projectConfirmed,

@@ -1,0 +1,130 @@
+{
+  "taskId": "continuous-n44-projection-and-preference-recovery-isolated-20261024",
+  "runId": "307de1f7-0481-4f93-b3ca-8b3d69c5bae1",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "observedOriginMain": "5a4b201b560e899520f8f11e7bbd55c0d35cb90e",
+  "sourceHashes": {
+    "drafts/n44-push/backend.mjs": {
+      "sha256": "5e4aefcddaa486dda0976429ff2caf47c07641f75bc226552fd035d381ca84d7",
+      "normalizedSha256": "5e4aefcddaa486dda0976429ff2caf47c07641f75bc226552fd035d381ca84d7",
+      "baseNormalizedSha256": "b77809ac01cfc6fb72a0a3bcb6d622c6ec78b6888691e5400ded93c437ff60b6"
+    },
+    "src/lib/notification-push-gateway.js": {
+      "sha256": "5e207e3bfdc64383ceb765b789cf30dcba3350b13dedab1355e0843cef6ac353",
+      "normalizedSha256": "5e207e3bfdc64383ceb765b789cf30dcba3350b13dedab1355e0843cef6ac353",
+      "baseNormalizedSha256": "76bbef85a8db000cfbb01dc826cf1978808639ab0f3442618460d4b6178817b1"
+    },
+    "src/lib/notification-push-runtime.js": {
+      "sha256": "95d1a678e3c770a2ff7ecc75e016171ac7efd28ce9f0da855f6a7ed653f20a45",
+      "normalizedSha256": "95d1a678e3c770a2ff7ecc75e016171ac7efd28ce9f0da855f6a7ed653f20a45",
+      "baseNormalizedSha256": "77618cc79905134ce1d33366e0c02c67428e56391f158301844a8a0e2b56ca60"
+    },
+    "src/views/notification-settings.js": {
+      "sha256": "9f60c2c16dba8d45c39d20d42dcf82f59c3a168262efd9b9f3d52c21ae1b7e34",
+      "normalizedSha256": "9f60c2c16dba8d45c39d20d42dcf82f59c3a168262efd9b9f3d52c21ae1b7e34",
+      "baseNormalizedSha256": "ada14e6d8db57ec237bc5b6cfc459f4fae6298a91a0dab8cbb89c733ab906038"
+    }
+  },
+  "unchangedDependencies": {
+    "src/lib/notification-push-client.js": "04a8ad9b44ffb23d1de7524d70916ee2f91edfa8db239b0698f0aaf1603ae9c8",
+    "src/lib/notification-push-browser.js": "7c526515bbf724fa06d9ff4b85babb4b3cd047540e6a6713f4795762547e3151",
+    "src/lib/notification-events.js": "e673fea9da1ee873cef980464b19b2094faa3c309e21e31653dfe0711a4f94c8",
+    "src/lib/notification-state.js": "d3c0d36ab1e40900586a9964f1ff0919e5317df52289afa7ac898ce67f0a4f35",
+    "src/lib/offline-lease.js": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86",
+    "src/store.js": "105be40603e4d97b922a9f76e188725d26853cf3c28af53e0e199b9d63c12256",
+    "src/app.js": "af6a33ba4a9715832184bcd28b3c8602e753f9cba469f0a8af4804c7bc1d379f",
+    "src/lib/sync.js": "b6780328c960bc42b6d74254a068fd35a1d55c3c6a2e0665b06cdbe929e11b18",
+    "sw.js": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/auth-verifier.mjs": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/session-policy.mjs": "475274a6947fa63972c469c7e713be589b3eb9680b7ba0a9183d78e36afbbb4e",
+    "drafts/n44-push/one-device-test.mjs": "a1ead456eabade6cf4b7595867d8a56471f01b864ae7606ab6175f38dee8d9a0"
+  },
+  "reusedOriginalCapsule": [
+    {
+      "commit": "afe9328672621c075ad977c3f4d9596364d07157",
+      "file": "tests/n44-device-20261024/new-owner-capsule.json",
+      "normalizedSha256": "fb6f0e7e59713bc5d4c1a0876c0b72232ac75c3ea76a18cc3dd066dbd6d579ff"
+    },
+    {
+      "commit": "afe9328672621c075ad977c3f4d9596364d07157",
+      "file": "drafts/n44-push/activation/new-owner-capsule-9bf1346b-a235-4411-86f1-24a4dfcf5c98/manifest.json",
+      "normalizedSha256": "971679c27f8b845965a74f6ef194d0104168662afeff466ee65bf7edc22849e0"
+    },
+    {
+      "commit": "afe9328672621c075ad977c3f4d9596364d07157",
+      "file": "docs/automation-evidence/20261024/N44_CURRENT_ELIGIBILITY_OUTCOME.md",
+      "normalizedSha256": "16126f523716a5e5891a5555973b9ba914f0142c7a82838b1245adcec3357f72"
+    }
+  ],
+  "checks": [
+    {
+      "name": "n44_zero_event_projection_cas_recovery",
+      "status": "PASS",
+      "evidence": "tests/n44-function-recovery-20261024/backend-before.json + backend.json: real PostgreSQL17.6/backend/Auth locks/source revisions/outer COMMIT loss; app.json: actual runtime null/UNKNOWN CAS retention."
+    },
+    {
+      "name": "n44_cleanup_pending_actual_settings_retry",
+      "status": "PASS",
+      "evidence": "tests/n44-function-recovery-20261024/app-before.json + app.json: actual HTTP application DOM/handlers/CSS, owned failed revoke/update/lost ACK retry; foreign owner refuses. gateway.test.mjs actual15s timeout PASS."
+    },
+    {
+      "name": "n44_preference_edit_consent_and_subscription_stability",
+      "status": "PASS",
+      "evidence": "tests/n44-function-recovery-20261024/app.json: all four real preference handlers explicitly stop, preserve latest choices, no automatic opt-in/registration; fresh gesture creates new identity. Existing5 client +5 delivery/quiet/canonical/UNKNOWN guards PASS."
+    },
+    {
+      "name": "scope_syntax_and_owned_cleanup",
+      "status": "PASS",
+      "evidence": "10 syntax checks; diff/scope and unchanged dependency hashes PASS. Browser/server closed; native PG PID absent and port rebound. No build/live/service/publish operation."
+    }
+  ],
+  "observedUnitRuns": [
+    {
+      "command": "node --test tests/n44-function-recovery-20261024/gateway.test.mjs",
+      "status": "PASS",
+      "tests": 4,
+      "evidence": "Includes actual15000ms response abort; committed stop read-only reconciliation; unchanged CAS retry; new consent/session/registration/preference rejection."
+    },
+    {
+      "command": "node --test --test-name-pattern='payload|explicit_consent|owner/workspace|cleanup failures|action independently' tests/n44-push-preparation.test.mjs",
+      "status": "PASS",
+      "tests": 5
+    },
+    {
+      "command": "node --test --test-name-pattern='disabled by default|due category|revocation/expiry/preference|uncertain exceptions|cleanup/revoke: commit' tests/n44-server-preactivation.test.mjs",
+      "status": "PASS",
+      "tests": 5
+    }
+  ],
+  "syntax": [
+    "drafts/n44-push/backend.mjs",
+    "src/lib/notification-push-gateway.js",
+    "src/lib/notification-push-runtime.js",
+    "src/views/notification-settings.js",
+    "tests/n44-function-recovery-20261024/app.mjs",
+    "tests/n44-function-recovery-20261024/backend-cases.mjs",
+    "tests/n44-function-recovery-20261024/backend.mjs",
+    "tests/n44-function-recovery-20261024/dependency-loader.mjs",
+    "tests/n44-function-recovery-20261024/finalize.mjs",
+    "tests/n44-function-recovery-20261024/gateway.test.mjs"
+  ],
+  "historicalFailures": [
+    "Before repair, real source defects reproduced in app-before.json and backend-before.json; these are expected defect observations, not acceptance passes.",
+    "Initial UI harness read transitional subscribed/unsubscribed render before the full handler/projection completed. Replaced asynchronous import readiness predicates with synchronous same-document runtime snapshots, exact stop responses and existing bounded projection-quiescence helper pattern. Guards were not changed.",
+    "Initial private-service test import lacked task-local pinned SDK; installed unchanged private package/lock in this test scope only. Test-only module resolver first recursed, then used Windows path instead of module URL; both corrected before any PG start.",
+    "First task-local initdb exceeded native Windows path length; no server started, owned failed directory retained. Short unique pg directory then passed PID/birth/data-directory/port ownership and shutdown proofs.",
+    "Lost HTTP ACK fixture initially omitted existing context CAS, allowing transport-level retry to commit twice. Corrected fixture to reject stale expectedRevision before mutation; actual app UNKNOWN/readback now passes.",
+    "Outer-COMMIT proof refined to inject loss on authenticated projection transaction after its actual commit, excluding separate rate-debit commit; persisted changed stamp and withheld ACK both proven."
+  ],
+  "operations": {
+    "realAccount": 0,
+    "service": 0,
+    "realSource": 0,
+    "realRegistration": 0,
+    "sends": 0,
+    "publish": 0
+  },
+  "limits": "Source-only candidate. Original custodian must integrate exact backend delta into native composition and verify hosted parity before a separately authorized live journey. Original UNKNOWN/FAIL/NOT_RUN, capsule and send budget unchanged."
+}

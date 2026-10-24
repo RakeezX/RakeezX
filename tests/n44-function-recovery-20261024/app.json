@@ -1,0 +1,55 @@
+{
+  "baseline": false,
+  "checks": [
+    {
+      "name": "owned failed revoke retry via actual settings DOM",
+      "status": "PASS",
+      "evidence": "Visible enabled retry completes original cleanup, consent false and unsubscribe; no new registration."
+    },
+    {
+      "name": "explicit preference stop/re-opt-in [data-act=\"notification-minutes\"][data-minutes=\"30\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    },
+    {
+      "name": "explicit preference stop/re-opt-in [data-act=\"notification-day\"][data-day=\"1\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    },
+    {
+      "name": "explicit preference stop/re-opt-in [data-act=\"notification-category\"][data-kind=\"due\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    },
+    {
+      "name": "explicit preference stop/re-opt-in [data-act=\"notification-push-quiet\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    },
+    {
+      "name": "owner switch refuses stale settings handler and direct cleanup retry",
+      "status": "PASS",
+      "evidence": "Original cleanup association retained; foreign binding cannot use retry, consent update or registration."
+    },
+    {
+      "name": "failed context update retry and source CSS",
+      "status": "PASS",
+      "evidence": "Failed response preserves retry and latest preferences; actual 390px application DOM visible without horizontal overflow."
+    },
+    {
+      "name": "actual runtime lost committed stop ACK and explicit readback retry",
+      "status": "PASS",
+      "evidence": "Network response lost after synthetic commit; opt-in/focus blocked while UNKNOWN; owned retry only reads committed consent false/quiet preferences, no replay/registration."
+    },
+    {
+      "name": "actual runtime canonical ACK after empty projection and UNKNOWN stamp retention",
+      "status": "PASS",
+      "evidence": "Real store rename/receipt/handler; runtime carries null after empty, retains last acknowledged stamp after UNKNOWN, repeats without duplicate synthetic events. Backend computation separately qualified in native PG."
+    }
+  ],
+  "cleanup": {
+    "browserClosed": true,
+    "serverClosed": true
+  },
+  "status": "PASS"
+}
