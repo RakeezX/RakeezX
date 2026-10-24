@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-qualified-receipt-source-delivery-20261024",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -6020,
+      "scopeKey": "n36-qualified-receipt-source-publication",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 20,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "EXACT QUALIFIED PRODUCT SOURCE DELIVERY; SAFER RETENTION, NO RETRY/BYPASS OF REFUSED DELETION. Original taskcontinuous-n36-fresh-batch-sync-receipt-20261024/savedhead211c14ff8b2ca8e31fa24979aaf43bd9e28d3159/lastbdd40724-991b-4d8a-8323-276273d97812 staysBLOCKED with residual_directory_removalFAIL unchanged. The actualcodecandidatec69b62d8942d2f6000015687f1d1d0c99f0e6096 hasTHREE requiredProductchecksPASS, real currentapp/source/provisioning/normalSync proof: blanketwholeJSONacademic/section/teaching metadata guards incorrectlyrefusedcanonicalACK; corrected semanticfences import302/10receipts, reload/dedup and17genuineeditnegatives; exact172/6+29UNKNOWN andexplicitarchive then201existing+101new proof. Underlying directory removal was SELF-ADDED unsuccessful action, not a requiredProductacceptance gate; controllerall-checks-PASS gate correctlyprevents claiming originalwholeattemptready. DoNOTrelaxthatvalidator, erase/relabel anyFAIL, rerun Producttests ordelete viaanotherworker/tool. This separate SOURCEPUBLICATION stage cancompleteWITHOUT performing refusedoperation, while originalblockedcleanuprecord remainspreserved.\n\nIn NEWisolatedtaskworktree integrateONLY src/views/class-import-center.js qualifieddelta from parentbasee7e021e528981718c361873de4d1109e5c915f19 throughc69b62d8942d2f6000015687f1d1d0c99f0e6096. Comparecurrentmain first, narrowpatch notwholeoldworktree. ExactnormalizedcodeSHA0a58efb987ebfae40674329b92392f90a2a87d0d43bb48f3390bd374e60fe7ff; sourcebodymustmatchqualifiedbytes unlessactualcurrent-mainmerge requiresnewaffectedverification. No newimplementation or lookalikefixture. Reuse exactoriginal certified.json/receipt-boundary/negative/effective-nativeSQL/provenance evidence bysource+dependencyhashes; THREEactualrequiredProductgroups remainPASS and originalfilesystemdeletionFAIL remainsreported asFAIL inlinkedparentdocument, nevercounted asyourPASS. Yourownstage attemptsZERO deletions, createsZEROcluster/browser/server/fixture, hasnoresourcecleanupactiontofail. No new test suite, install/build/dependency/Preview loop. Syntax/diff/current-main/importparity only forunchangedcode.\n\nSAFER DISPOSITION: explicitly RETAIN originalstopped synthetic directory .worktrees/continuous-n36-fresh-batch-sync-receipt-20261024/tests/n36-fresh-batch-receipt-20261024/runtime-e34a1189-b21f-4669-b7eb-51a95d259637 in place, NEVERwrite/move/delete itscontents, changeACL/policy orlaunchsamefixture. ParentlogrecordsPGshutdown09:37:42Z; verify no originalowned PG process/port/lease remains usingrecordedowner/PID/birth/marker metadata andboundedread-only currentinventory, no kill/rebind/delete. Ifanyliveorunknownownerremains, STOPthisstage; don'tcallretentionsafe. Recordretentionmanifest ONLYinownprovenance/doc withfactualinactiveartifactstate and preserveddeniedactionFAIL, nodeletionclaim. Excluderetainedfiles fromsource/build/package/publication, no rawPGdata/secret/profile/studentcontent read/export. This is safealternativecompletion ofpublicsource action, not fulfillment ofrefuseddelete or closureofparentFAIL.\n\nOneAPP-ONLY file: .42 extension/ZIP/sourceproof immutable; preserve in-flightUNKNOWNtrace172/6+29, canonicalidentityadoption staysUNKNOWN withoutreceipt, realclass/year/term/teacher/name/owner/lease/archive/deletion changes refused. No oldrequestreplay or silentpendingclear. Existingexplicitarchive retains historical+currenttrace thena separatelyexplicitnewSourceStart dedupsactualrows, no acknowledgementofoldUNKNOWNafterreload. Exactusernextstep onlyafteractualsolepublisherreceipt+servedhashverified: refreshRakeez receiver, readonlyprogress, ifoldgrantretired explicitarchiveexistingbutton, ONEnewStart fromsameTeacherPage with.42. No localclaimactualuserresult/fullN36closure. No account/Madrasatibrowser/control/resultreader, realdata/code/grade/SQL/Auth/provideroperation or manualpush/deploy. Return originalrunnerJSON withownsourcechecks, summarylinksparentfailedremoval andretentiontruthfully; solepublisherpublishes andverifieschangedservedfile. Originalsourceparent anddenialremainunchanged.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "tests/n36-receipt-source-delivery-20261024/provenance.json",
+        "docs/automation-evidence/20261024/N36_RECEIPT_SOURCE_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_receipt_source_exact_qualified_parity",
+        "n36_required_safety_evidence_and_retained_fixture_disposition",
+        "n36_current_main_and_explicit_unknown_recovery_contract"
+      ],
+      "acceptance": [
+        "Exact already-qualified one-file source integration and evidence parity; original removal failure retained, no new denied operation.",
+        "Read-only proof retained synthetic fixture has no active owned process/port/lease and never enters publication; otherwise BLOCKED.",
+        "Sole publisher exact served verification before one later actual user trial, UNKNOWN history retained and no wholeN36 closure."
+      ],
+      "preparationAuthority": {
+        "kind": "qualified_source_only_publication_and_stopped_fixture_retention",
+        "originalTaskId": "continuous-n36-fresh-batch-sync-receipt-20261024",
+        "originalRunId": "bdd40724-991b-4d8a-8323-276273d97812",
+        "originalQualifiedCandidate": "c69b62d8942d2f6000015687f1d1d0c99f0e6096",
+        "originalHead": "211c14ff8b2ca8e31fa24979aaf43bd9e28d3159",
+        "qualifiedNormalizedSourceSha256": "0a58efb987ebfae40674329b92392f90a2a87d0d43bb48f3390bd374e60fe7ff",
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0,
+        "newTestClusters": 0,
+        "deniedDeletionAttempts": 0,
+        "originalDeletionFailureRemainsFail": true
+      },
+      "releaseAuthority": "Standing PO frontend repair delivery and latest actual N36 result authorize sole-publisher release of already qualified code. Use safer stopped-artifact retention, never delete the denied directory, remove original FAIL or claim parent cleanup/wholeN36 completion.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "5d92e2ccab6489b22c47d6f46c6ef1c67b131355",
+        "requiredSourcePaths": [
+          "src/views/class-import-center.js"
+        ],
+        "editPaths": [
+          "src/views/class-import-center.js",
+          "tests/n36-receipt-source-delivery-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N36_RECEIPT_SOURCE_DELIVERY.md"
+        ],
+        "newPaths": [
+          "tests/n36-receipt-source-delivery-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N36_RECEIPT_SOURCE_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n36_receipt_source_exact_qualified_parity",
+          "n36_required_safety_evidence_and_retained_fixture_disposition",
+          "n36_current_main_and_explicit_unknown_recovery_contract"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "publish_exact_qualified_receipt_source_with_safe_artifact_retention",
+      "baseSha": "5d92e2ccab6489b22c47d6f46c6ef1c67b131355",
+      "worktreePath": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-qualified-receipt-source-delivery-20261024",
+      "postDeliveryChecks": [
+        "production_publication"
+      ]
+    }
+  ]
+}
