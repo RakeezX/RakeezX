@@ -14,10 +14,10 @@
       "liveMutation": false,
       "model": "gpt-6.1-sol",
       "effort": "medium",
-      "budgetMinutes": 20,
-      "idleMinutes": 8,
+      "budgetMinutes": 12,
+      "idleMinutes": 6,
       "dependsOn": [],
-      "objective": "SOURCEONLY PUBLIC DELIVERY, ORIGINAL CUSTODIAN DOESNATIVE/ACCOUNT. Exact05621c12db294399eb7ebce2486810f9fee857fc qualified actualnative/realPG78 and finite issuance phase diagnostic. Actual imported503source1800ms and durabletrialissue-missing5037181ms remainunexplained. Candidate includes drafts/n88-student-portal/activation/issuance-diagnostic-20261024/public-enum.patch + public-dependency.json and actualnative/PG qualification evidence. Reuseexistingproofs, no newbenchmark/realaccount/PG/custody/rawsecret/oldcleanup action. Historical parentFAIL/NOT_RUN unchanged.\n\nNEWisolatedworktree atCURRENTmain, integrateONLY publicdelta6c9f34539702819ae84c12fd720524d8239f581c->05621c12db294399eb7ebce2486810f9fee857fc in declaredTHREEfiles, preferablyprovidedexactpublic-enum.patch. Oldparentfiles differfrom currentmain: DO NOToverwriteentirefiles/cherry-pickwholebranch. Preservealreadyserved validation-family metadata, source/binding/privacy guards, classdeadline/UNKNOWNdurability/403Authfix9521 andall unrelatedcurrentbehavior. Nativeclass-credentials/newinactivebundle/officialactivation remainoriginalcustodian only; zero native/pin/carrier/config writes.\n\nFocused actualmergedmodule/app checks provefixedallowlistedissuance failure phases reachsupport, unknown/rawSQL/body/IDs/counts/secretvalues stripped, foreignowner/signature/contextswap detailretired, validACKanddeadline/cancelunchanged. Critical: a diagnosticphase/rollbacklabel alone MUSTNOTauto-resolve currentUNKNOWN, clearrequesthint orpermitreplacementmutation. Onlyexistingauthoritative receipt/CASreconciliation maydoit; after503anddocumentreopen, failedwrite remainsunconfirmed andoldidpreserved. No changing403/503toPASS, fakeACKfixture or mirror. Reuseunchangednative crypto/SQL/COMMIT guardsbyhash, nofullsuite/newPGfixture.\n\nOriginalsolepublisher integrates/builds/servesandverifiescurrentassets. DoNOTmanualpush/deploy. ReturnonlyTHISsourcephasechecks/candidate/base/worktree/provenance. WholeN88OPEN, actualsource/issuancecauseunknown, no privateorstudentloginclaim. Exactactualservedreceipt/hashes are prerequisite for original05621 native+one permittedreceipt review/guardedcurrentintent. DoNOTconsumeanylive operation inthischild.",
+      "objective": "RESUME SAVED650ae968c8e38c2d78309813b305160024d189d9/92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0 in SAME saved session/worktree. All THREE required checks already PASS with actual DOM provenance; reuse unchanged proofs, no rerun/all-phase suite. Only unfinished meaningful same-owner context-swap supplement was NOT_RUN because N44 owned integration. After actual owner lease release, acquire existing phase lease and finish that single supplement. No new browser/live/PG or native operation, no new audit. Preserve NOT_RUN history; new actual result appends. Return LOCAL_READY when actual affected checks qualify for original sole publisher, never manually integrate or deploy. Keep old failures/hosted503 UNKNOWN open.\n\nSOURCEONLY PUBLIC DELIVERY, ORIGINAL CUSTODIAN DOESNATIVE/ACCOUNT. Exact05621c12db294399eb7ebce2486810f9fee857fc qualified actualnative/realPG78 and finite issuance phase diagnostic. Actual imported503source1800ms and durabletrialissue-missing5037181ms remainunexplained. Candidate includes drafts/n88-student-portal/activation/issuance-diagnostic-20261024/public-enum.patch + public-dependency.json and actualnative/PG qualification evidence. Reuseexistingproofs, no newbenchmark/realaccount/PG/custody/rawsecret/oldcleanup action. Historical parentFAIL/NOT_RUN unchanged.\n\nNEWisolatedworktree atCURRENTmain, integrateONLY publicdelta6c9f34539702819ae84c12fd720524d8239f581c->05621c12db294399eb7ebce2486810f9fee857fc in declaredTHREEfiles, preferablyprovidedexactpublic-enum.patch. Oldparentfiles differfrom currentmain: DO NOToverwriteentirefiles/cherry-pickwholebranch. Preservealreadyserved validation-family metadata, source/binding/privacy guards, classdeadline/UNKNOWNdurability/403Authfix9521 andall unrelatedcurrentbehavior. Nativeclass-credentials/newinactivebundle/officialactivation remainoriginalcustodian only; zero native/pin/carrier/config writes.\n\nFocused actualmergedmodule/app checks provefixedallowlistedissuance failure phases reachsupport, unknown/rawSQL/body/IDs/counts/secretvalues stripped, foreignowner/signature/contextswap detailretired, validACKanddeadline/cancelunchanged. Critical: a diagnosticphase/rollbacklabel alone MUSTNOTauto-resolve currentUNKNOWN, clearrequesthint orpermitreplacementmutation. Onlyexistingauthoritative receipt/CASreconciliation maydoit; after503anddocumentreopen, failedwrite remainsunconfirmed andoldidpreserved. No changing403/503toPASS, fakeACKfixture or mirror. Reuseunchangednative crypto/SQL/COMMIT guardsbyhash, nofullsuite/newPGfixture.\n\nOriginalsolepublisher integrates/builds/servesandverifiescurrentassets. DoNOTmanualpush/deploy. ReturnonlyTHISsourcephasechecks/candidate/base/worktree/provenance. WholeN88OPEN, actualsource/issuancecauseunknown, no privateorstudentloginclaim. Exactactualservedreceipt/hashes are prerequisite for original05621 native+one permittedreceipt review/guardedcurrentintent. DoNOTconsumeanylive operation inthischild.",
       "allowedPaths": [
         "drafts/n88-student-portal/cloudflare-entry.mjs",
         "src/lib/student-portal-runtime.js",
@@ -83,11 +83,16 @@
         ]
       },
       "completionMode": "publish_qualified_issuance_phase_dependency",
-      "baseSha": "5c486712946de4e4f02129e5443008e15b3407d2",
-      "worktreePath": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-issuance-phase-public-dependency-20261024",
       "postDeliveryChecks": [
         "production_publication"
-      ]
+      ],
+      "priorObjectiveEvidence": {
+        "sourceFile": "scripts/ops-supervisor-v4/n88-issuance-phase-public-dependency-20261024.json",
+        "sourceSha256": "7f0d546a19f5b98189a96fe6a44b5c8b4dc9b3f6079776451e258a187ef77c69",
+        "savedCandidate": "650ae968c8e38c2d78309813b305160024d189d9",
+        "savedRunId": "92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0",
+        "failuresAndDenialsImmutable": true
+      }
     }
   ]
 }

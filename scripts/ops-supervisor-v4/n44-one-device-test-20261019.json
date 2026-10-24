@@ -11,7 +11,7 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261024-DURABLE-TRIAL-N44-ONE-PUSH",
+      "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-TRIAL-CLEANUP-REPAIR",
       "budgetMinutes": 40,
       "idleMinutes": 10,
       "allowedPaths": [
@@ -29,11 +29,23 @@
         "src/views/notification-settings.js",
         "src/styles/notifications.css",
         "tests/n44-device-20261024/**",
-        "docs/automation-evidence/20261024/N44_CURRENT_ELIGIBILITY_OUTCOME.md"
+        "docs/automation-evidence/20261024/N44_CURRENT_ELIGIBILITY_OUTCOME.md",
+        "supabase/migrations/20261024150000_n44_atomic_item_cleanup.sql",
+        "tests/n44-atomic-current-cleanup-20261024/**",
+        "docs/automation-evidence/20261024/N44_ATOMIC_CURRENT_ITEM_CLEANUP.md",
+        "src/store.js",
+        "src/lib/sync-v2.js",
+        "src/lib/cloud.js",
+        "src/views/items.js"
       ],
       "verificationPaths": [
         "src/lib/notification-push-runtime.js",
-        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md"
+        "docs/automation-evidence/20261019/N44_ONE_DEVICE_TEST.md",
+        "supabase/migrations/20261024150000_n44_atomic_item_cleanup.sql",
+        "src/store.js",
+        "src/lib/sync-v2.js",
+        "src/lib/cloud.js",
+        "src/views/items.js"
       ],
       "preparationAuthority": {
         "kind": "scoped_preview_and_fixture_ops",
@@ -62,7 +74,7 @@
         "authorityStartsAt": "2026-10-24T02:14:27.943Z",
         "authorityExpiresAt": "2026-10-24T04:14:27.944Z",
         "productId": "N44",
-        "liveAuthorizationRef": "PO-20261024-DURABLE-TRIAL-N44-ONE-PUSH",
+        "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-TRIAL-CLEANUP-REPAIR",
         "namedOperations": [
           "reconcile original one-device attempt and cleanup",
           "qualify exact changed two-hour hard stop preserving consumed budget",
@@ -418,6 +430,21 @@
           "scoreWrites": 0,
           "studentCodeOperations": 0,
           "providerAuthRlsSchemaChanges": 0
+        },
+        "atomicCurrentSourceCleanup": {
+          "evidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-n44-subitem-cleanup-source-cause.json",
+          "maxExactHostedDefinitionIdentityReads": 1,
+          "maxAdditiveFunctionOnlyMigrationApplications": 1,
+          "maxCurrentOwnerReconciliations": 1,
+          "maxCorrectedCurrentCleanupIntentsAfterNoEffectAndServedFix": 1,
+          "providerAuthRlsGrantTableShapeChanges": 0,
+          "appliedMigrationEdits": 0,
+          "nativeUploads": 0,
+          "pinUpdates": 0,
+          "registrations": 0,
+          "optins": 0,
+          "sends": 0,
+          "oldOwnerOperations": 0
         }
       },
       "releaseAuthority": "Latest direct PO full outcome delegation authorizes necessary qualified affected notification frontend delivery through the sole publisher and named original-custodian service prerequisites. No general delivery/cron activation, old-disposal replay, tool denial bypass or consumed budget reset.",
@@ -427,9 +454,10 @@
         "continuous-n44-publish-qualified-delayed-ack-20261019",
         "continuous-n44-register503-existing-service-repair-20261019",
         "continuous-n44-deliver-qualified-optin-ui-20261024",
-        "continuous-n44-confirmed-command-ack-projection-20261024"
+        "continuous-n44-confirmed-command-ack-projection-20261024",
+        "continuous-n88-issuance-phase-public-dependency-20261024"
       ],
-      "objective": "CONTINUE CURRENT DURABLE OWNER ACTUAL SINGLE PUSH from exact 49660209e6db7d51c5a22f632e454444f5e09358/b59185ea-d8b8-48e6-b836-5445c5e8d912, original custody/session only. Your last proof established distinct current durable normalChrome owner, current Auth4039521/SW update, all47keys matching N88native8612/version105, approvalnull/deliveryoff/globalSend0; ZERO source/register/native/pin/send consumed in that run. Reuse unchanged proofs; all currentDurableTrialOutcome allocations and global ONE TOTAL provider send remain unchanged. Old owners' source2/3 cleanup UNKNOWN/quiet restoration/consumed reservations remain immutable/separate, never transfer or reset. No new account/student/code/grade operation.\n\nMATERIAL NEW OS OBSERVER CAPABILITY EVIDENCE: artifacts/ops-supervisor-v4/intake-evidence/po-20261024-native-toast-observer-capability.json. Bundled computer-use skill @oai/sky via mcp__node_repl js imported successfully and actual sky.list_windows() succeeded; zero notification candidates BEFORE any send is normal, future capture UNPROVEN. Read C:/Users/Abody/.codex/plugins/cache/openai-bundled/computer-use/26.1021.31345/skills/computer-use/SKILL.md and its documented guidance/API. This is a new OS-only read, NOT an alternate way to execute N88's refused browser read. Use only documented readonly list_windows/get_window_state on genuinely returned notification-specific Windows (e.g. actual Shell toast roles); no focus/keyboard/settings/registry/database/eventlog/hidden APIs or browser windows, no personal notifications export. If API actually unavailable/denied, stop honestly; never bypass via another technique.\n\nQualify bounded passive observation before spending send: exact SW title 'رَكيز المعلم', body 'لديك تذكير جديد. افتح التطبيق لعرضه.'; site rakeezx.com if shown, actual notification roles/window, current unique interval and global sole send0->1 required. No extra test alert/provider send. Arm a bounded async passive native toast observer BEFORE authorized sole provider request, observe up to45s using documented API. Keep raw UIA only transiently and emit/store only Rakeez-match boolean, timestamp, finite native-window role/id and before/after no-active-Rakeez-page proof; never other notifications/body/screenshots. API existence is NOT arrival proof: after send need actual matched OS toast, otherwise NOT_PROVEN/no resend. Tool success can establish supported proof channel so this specific blocker needn't wait for generic permission/human presence. Do not claim future capture proven now.\n\nProceed actual current outcome through original live host and leases: certify current active SW bytes; choose a fresh <=2h current durable target interval under full PO authority; only if needed use existing qualified expiry-only native transform + bounded source pin/policy rebind with genuine policy identity/admission and byte parity. Preserve actual newest N88 successor/47-key map, no old native restore. Your unused exact max1 expiry prerequisite/pin/rebind remains unexpanded. Current owner due/quiet prefs saved, atmostone genuine current due source group(parent/subitem) if needed with canonical Sync ACK, zero score writes/approved date adapter; one optin/registerACK under lifetime<=3 and private immutable historical counters; actualeligibleevent before budget reservation; actual config/consent/source/owner proof, global sends0 first. Unknown write=>readonly reconcile, no duplicate. No general sending/cron.\n\nIMPORTANT NORMAL USER TAB LIFECYCLE: original normal current trial USER-created tabs only. N88 is blocked because your session claimed2005440348. Canonical cua docs: user-created tabs NOT marked are released from browser-session control and left open at owning turn end; old handoff marks clear on resume. No documented explicit release API, don't invent one. Preserve current N88 pending-state evidence and private original URLs. For closed-PAGE proof you may navigate authorized NORMAL Rakeez USER tabs to about:blank to unload actual Rakeez documents (no Rakeez active clients), then restore SAME original user-tab IDs after test, rather than physically closing and replacing with agent-owned tabs. State exact no-active-Rakeez-document condition truthfully; don't claim tabs physically closed if blanked. Incognito/personal browsing untouched. Do NOT use close/recreate/forced transfer to evade tool denial. At final turn do NOT mark routine restored user tabs for handoff; allow documented default end-turn cleanup to release original user-tab control. Provide explicit cleanup evidence for N88 owner-release; leases alone don't release connector tabs.\n\nWith all guards and passive observer armed, ONE total targeted push. Actual OS arrival proof required, HTTP200/provider acceptance/SWcount alone not enough; no resend on timeout. Then finally current owner normal revoke/consentfalse/unsub/SWclear, current source normal cleanupACK (no oldowner deletes), restore current original quiet/prefs, disarm approval/delivery/scheduler and verify actual config preserving N88, restore authorized original normal user-tab URLs/no routinehandoff marks, release owned resources. Preserve failures/unknowns and don't claim oldcleanup fixed. Continue actual concrete authorized steps; runner JSON reports actual arrival or precise blocker, not local PASS as whole acceptance.",
+      "objective": "FINISH PROVEN CURRENT SOURCE CLEANUP DEFECT, not another registration/expiry/send attempt. Resume exact original session/worktree b2e411d585d21f19b38af4a1ad2fd98152e746cc/c074ed6b-4399-467c-9034-0c13edd5e088. All three lifetime actual registrations are revoked, last source parent/subitem SyncACK and registration succeeded; no provider send happened. Current expiry native/pin/policy/source/optin allocations CONSUMED, DO NOT replay or replenish. Last native source13f5d81b60a6d1ff687bccb72e1561a0e6758d15 is legitimate N44 successor; preserve every N88 pin and all47keys, approvalnull/deliveryoff/scheduleroff. Global send0 remains unspent but this phase permits ZERO sends/optins/registrations/native/pins. Other unqualified document remains untouched; root requested precise normal-vs-Incognito information, not permission. Do not navigate/blank it, invent profile identity or use another browser surface. Existing normal user tab left unmarked/ended now frees original control per documented lifecycle. Release shared leases except actual phases.\n\nMATERIAL SOURCE CAUSE: artifacts/ops-supervisor-v4/intake-evidence/po-20261024-n44-subitem-cleanup-source-cause.json. Actual current cleanup403/42501 repeated independently of old owner. Source deleteItem->lifecycle:delete_item->N77wrapper->0015 updates scores/items without atomic score-domain context or child/completion tombstones. N94 guard explicitly rejects ANY update of a subitems parent without that context, including deleted_at. RPC authenticated EXECUTE metadata never disproves internal trigger42501. This is a concrete source conflict, not automatic proof hosted definitions match. No existing current completion/configuration/copy/whole-teaching RPC safely deletes only this parent; don't convert mode, copy distributions or delete a teaching to evade it.\n\nFirst qualify narrow RED/GREEN using actual original migration chain and existing stopped-checkpoint-safe PG harness (no new tool/SDK/benchmark). Source parent subitems+one child, no students or scores must reproduce exact42501 with zero changes/receipt. Then implement smallest ADDITIVE function-only migration supabase/migrations/20261024150000_n44_atomic_item_cleanup.sql; never edit an applied migration or relax trigger/Auth/RLS/grants. Correct delete_item lifecycle transaction must derive auth owner, preserve original lifecycle and score-parent lock order, immutable mutation/content idempotency, owner-only scope and whole parent/subitems/completions/scores atomic tombstones/revision/history, actual commit/receipt. SET internal flag alone is NOT sufficient. No physical delete/restore/revive or changed scoring rules. Existing legacy delete_item has NO expectedRevision/CAS; never claim it does or pretend client timestamp is CAS. If additional expected-scope/revision guard is required, make explicit typed contract/affected client wiring with proper legacy refusal, not silently broadened delete. Preserve current leases/cancellation/owner guards and pending/outbox data. Fix local-delete UI wording only as needed to distinguish local absence from cloud ACK; no unrelated Auth403 or broad UI work.\n\nAffected qualification: synthetic children/score/completion tombstones, foreign owner, exact mutation replay/content collision, concurrent configuration lock behavior, before-ACK rollback and lost COMMIT ACK uncertainty; unchanged sender/crypto/native proofs reused. Stop owned PG, prove PID/birth/port inactive, retain short-path checkpoint outside delivery. Never repeat old denied recursive cleanup.\n\nService gate under user's full necessary completion authority and original contract: at mostONE original-custodian exact hosted identity read of ONLY lifecycle function chain and two score guards OR use safely captured finite error family already preserved. No generic catalog/readiness/EXECUTE requery, lost-response-body reread, live deletion probe, protected custody export or typedSQL guard expansion. Use only existing permitted original service/provider owner channel; follow Supabase skill when applicable. If no supported channel, preserve that exact limitation and finish reviewable qualified source; no new diagnostic-native/carrier workaround.\n\nOnly if exact hosted source conflict/parity and local red/green qualify, the specifically authorized original service custodian may apply this ONE reviewed ADDITIVE FUNCTION-ONLY migration via original provider delivery path and verify exact definition/version. This authorization follows PO full necessary repair delegation for current trial cleanup; do not invent a separate PO quote or claim already applied. Zero Auth/RLS/grant/role/table-schema changes, no old migration rerun, no direct data SQL. If identity/affected qualification fails, no application. Generic frontend publisher cannot perform this step. Current public/client delta still goes through sole publisher and actual served proof, never direct main/Pages push. Do not merge unrelated private worktree history; qualify exact current-main delivery delta or identify a necessary source-only child for sole publisher.\n\nActual current UNKNOWN cleanup remains UNKNOWN until existing authoritative reconciliation. At mostONE current-owner read-only reconciliation using existing exact operation identity, saved source scope and canonical receipt. This is not old-owner source2/3 cleanup. If already committed, record true ACK and do not repeat. A fresh corrected current cleanup intent is permitted at mostONCE ONLY after authoritative prior NoEffect, matching current own source/zero unintended scores, actually served fixed contract and canonical supported normal UI/Sync; never blind replay old unknown command, clear hints or auto-release blocked outbox. If NoEffect can't be proved, keep the current cleanup UNKNOWN and don't mutate it. Retain all old owner unknowns and previous FAIL/NOT_RUN. No extra source creation or restoring deleted source.\n\nReturn exact qualified source/service/delivery and actual cleanup result. N44 OS arrival still NOT_PROVEN and no further registration allocation exists in this phase. Whole notification feature remains OPEN. N88 original may concurrently work disjoint core files; serialize shared integration/live/config through existing leases; do not edit its files/certificate or take its active browser tab. Don't stop at local tests when a specifically authorized supported next service/delivery action is ready.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -474,7 +502,7 @@
         ],
         "publisherChecks": []
       },
-      "completionMode": "finish_durable_current_owner_single_closed_page_push",
+      "completionMode": "repair_proven_current_subitem_cleanup_contract",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
@@ -484,9 +512,9 @@
       },
       "priorObjectiveEvidence": {
         "sourceFile": "scripts/ops-supervisor-v4/n44-one-device-test-20261019.json",
-        "sourceSha256": "5318720e318592c8e0240e3d264d8f19bc97a401633be1d2f13777e3469ea138",
-        "savedCandidate": "49660209e6db7d51c5a22f632e454444f5e09358",
-        "savedRunId": "b59185ea-d8b8-48e6-b836-5445c5e8d912",
+        "sourceSha256": "b2d207b0cd19de314d804ba8a54129db65c9d087c337cc5b3d59be05ab28d30a",
+        "savedCandidate": "b2e411d585d21f19b38af4a1ad2fd98152e746cc",
+        "savedRunId": "c074ed6b-4399-467c-9034-0c13edd5e088",
         "failuresAndDenialsImmutable": true
       }
     }
