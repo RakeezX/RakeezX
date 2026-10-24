@@ -1,0 +1,242 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-issuance-phase-public-dependency-20261024",
+  "runId": "92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0",
+  "baseSha": "5c486712946de4e4f02129e5443008e15b3407d2",
+  "qualifiedCandidate": "05621c12db294399eb7ebce2486810f9fee857fc",
+  "deltaBase": "6c9f34539702819ae84c12fd720524d8239f581c",
+  "status": "BLOCKED",
+  "checks": [
+    {
+      "name": "n88_issuance_public_exact_current_delta",
+      "status": "PASS",
+      "evidence": "All three before/after SHA256 values equal qualified public-dependency.json; exactly one enum line per file; protected client/view/owner/native/receipt/offline code unchanged."
+    },
+    {
+      "name": "n88_issuance_public_finite_privacy_and_owner",
+      "status": "PASS",
+      "evidence": "19 fixed stages carrier -> actual runtime failure DOM -> support sanitizer; arbitrary stage/SQL/body/IDs/counts/secrets absent from support. Bad JWT/owner/signature/source denied without phase. Actual store owner change retires DOM/details and dispatches no request."
+    },
+    {
+      "name": "n88_issuance_public_unknown_ack_and_deadline_unchanged",
+      "status": "PASS",
+      "evidence": "Actual native valid list ACK/COMMIT and rendered ready roster; hung failure-body deadline cancels and retry frees lane. Real app batch503 with rollback/flush/commit labels retains original durable command after document reload/list200 UNKNOWN; replacement clicks dispatch zero further mutations. No fake success ACK."
+    },
+    {
+      "name": "n88_same_owner_context_swap_supplement",
+      "status": "NOT_RUN",
+      "evidence": "Added after the successful affected qualification; integration acquisition refused while N44 owned the phase. No server/browser started in this supplemental attempt."
+    }
+  ],
+  "sources": {
+    "drafts/n88-student-portal/cloudflare-entry.mjs": {
+      "before": "e16a7bde02be3167480ff3426038f4482e27e8d399fcf8499eda6525fc1094f1",
+      "after": "c3cf39e1a29076a724d71162aec44c3b3d12d6853590699febb617a744ae666f"
+    },
+    "src/lib/student-portal-runtime.js": {
+      "before": "b22aaa138948ff6ab619364391715c8f9a8dbc1cbdac165e76736d5790f7d80e",
+      "after": "f2617f2a3590b0edc35bd1a1b1e643919466a8e484ad5f347cc3b40a92349d40"
+    },
+    "src/lib/support.js": {
+      "before": "5f10cfb1bd1e2c279258bf1a27090a12e091badea56aac8ac663311d734497cf",
+      "after": "645e81edb2a86f47a3c8b0445dfe560dc7a84e738d33f3cd74451eec8386b027"
+    }
+  },
+  "reused": {
+    "src/lib/student-portal-class-client.js": {
+      "sha256": "225d44fd088267e4e005f5e5c95d2cb7d6d7b79b0e0efd4edfe8df146858453b",
+      "disposition": "Unchanged base safeguards"
+    },
+    "src/views/student-portal-class.js": {
+      "sha256": "e27dc1812d4250654e068b5bc18076a2a0f311643372c2981d7cc6e053588da5",
+      "disposition": "Unchanged base safeguards"
+    },
+    "src/lib/sync-ownership.js": {
+      "sha256": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
+      "disposition": "Unchanged base safeguards"
+    },
+    "drafts/n88-student-portal/class-credentials.mjs": {
+      "sha256": "80c59baeba5ea6b2bc34cf94b1e0e14255e81b347ba7ebced291313b8e889fdb",
+      "disposition": "Unchanged base safeguards"
+    },
+    "drafts/n88-student-portal/receipt-reconciliation.mjs": {
+      "sha256": "d88f0b94be9aaf187d3cf76271515a4be50fd72436afdf7da8789ac8d6a9e271",
+      "disposition": "Unchanged base safeguards"
+    },
+    "drafts/n88-student-portal/postgres-repository.mjs": {
+      "sha256": "ee11051db7af7412cc76dd747c69921c525bfdd4f6bc058d04ff3629f3aa63fe",
+      "disposition": "Unchanged base safeguards"
+    },
+    "sw.js": {
+      "sha256": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9",
+      "disposition": "Unchanged base safeguards"
+    },
+    "tests/n88-five-correlation-20261024/durable-native-qualified.json": {
+      "sha256": "2a1568aa22a004ec7510a3a4fee61ea5f2deedbb6df6aae2d562444afdfb18bc",
+      "disposition": "Immutable original native/real-PG qualification; no new PG fixture"
+    },
+    "tests/n88-five-correlation-20261024/durable-native-diagnostic-v2.json": {
+      "sha256": "df7600c13e9d113351499a900aaea345ba30af317853a6033e8da892c98f1032",
+      "disposition": "Immutable original qualification; not rerun"
+    },
+    "tests/n88-five-correlation-20261024/durable-live-channel.json": {
+      "sha256": "20f0ec6cae8cccd7810e5c169a4fae5456ad4eccbc3a6ffe183c5b1916f373db",
+      "disposition": "Immutable original qualification; not rerun"
+    },
+    "drafts/n88-student-portal/activation/issuance-diagnostic-20261024/candidate-binding.json": {
+      "sha256": "b69b470c9f9fe91e7670fb4d88764e1b3bcc121525cda739f893b528b64bc3e9",
+      "disposition": "Immutable original native/real-PG qualification; no new PG fixture"
+    },
+    "drafts/n88-student-portal/activation/issuance-diagnostic-20261024/manifest.json": {
+      "sha256": "d5e082a7e24c83d37a62d1badcdaf0ad9f9d226b24fca0ef9bd6a4fd39109bf2",
+      "disposition": "Immutable original native/real-PG qualification; no new PG fixture"
+    },
+    "drafts/n88-student-portal/activation/issuance-diagnostic-20261024/native.inactive.mjs": {
+      "sha256": "429faaa7e08303a9808732a1cd6a357ce84a072b1a2dedf30746f89d11e8a4e4",
+      "disposition": "Immutable original native/real-PG qualification; no new PG fixture"
+    },
+    "drafts/n88-student-portal/activation/issuance-diagnostic-20261024/public-enum.patch": {
+      "sha256": "cfbcd0c90e136a23dd402d15297318e9735f0bed125355f8f4216cbb629beb3f",
+      "disposition": "Immutable original native/real-PG qualification; no new PG fixture"
+    }
+  },
+  "providerOperations": 0,
+  "publicServedProof": "NOT_RUN: independent publisher only",
+  "wholeN88": "OPEN; actual source/issuance causes UNKNOWN; historical FAIL/NOT_RUN unchanged",
+  "qualifiedBinding": {
+    "aiAuthored": true,
+    "qualifiedTemplateCandidate": "fb1827ac87f95dc2529f6d0ecf4bb165cbbf85fb",
+    "runId": "28043d0e-459a-4da9-ab66-e425201ba225",
+    "native": "429faaa7e08303a9808732a1cd6a357ce84a072b1a2dedf30746f89d11e8a4e4",
+    "evidence": {
+      "tests/n88-five-correlation-20261024/durable-native-qualified.json": "2a1568aa22a004ec7510a3a4fee61ea5f2deedbb6df6aae2d562444afdfb18bc",
+      "tests/n88-five-correlation-20261024/durable-native-diagnostic-v2.json": "df7600c13e9d113351499a900aaea345ba30af317853a6033e8da892c98f1032",
+      "tests/n88-five-correlation-20261024/durable-live-channel.json": "20f0ec6cae8cccd7810e5c169a4fae5456ad4eccbc3a6ffe183c5b1916f373db"
+    },
+    "publicPatchReverseCheck": "PASS",
+    "browserAndIntegrationLeaseStatus": "FREE at completion",
+    "providerWrites": 0,
+    "currentUnknownReviewPerformed": false,
+    "liveNoCommitProved": false,
+    "conditionalDiagnosticReserved": false,
+    "causalCorrectionReserved": false,
+    "oldCleanupDenialsPreserved": true,
+    "deployable": false
+  },
+  "nativeSynthetic": "Actual qualified native + current carrier + existing synthetic query/provider ports; no fabricated success ACK or PG claim. Failure metadata injection tests public transport only.",
+  "failure": {
+    "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-issuance-phase-public-dependency-20261024.json -WaitSeconds 0 -OwnerToken 92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0",
+    "stack": [
+      "Error: Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-issuance-phase-public-dependency-20261024.json -WaitSeconds 0 -OwnerToken 92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0",
+      "    at genericNodeError (node:internal/errors:985:15)",
+      "    at wrappedFn (node:internal/errors:539:14)",
+      "    at checkExecSyncError (node:child_process:942:11)",
+      "    at execFileSync (node:child_process:978:15)",
+      "    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-issuance-phase-public-dependency-20261024/tests/n88-issuance-public-20261024/contract.mjs:18:21)"
+    ]
+  },
+  "cleanup": "Owned HTTP server, isolated contexts/browser closed; no PG/provider/live operation",
+  "earlierAffectedQualification": {
+    "status": "PASS",
+    "checks": [
+      {
+        "name": "n88_issuance_public_exact_current_delta",
+        "status": "PASS",
+        "evidence": "All three before/after SHA256 values equal qualified public-dependency.json; exactly one enum line per file; protected client/view/owner/native/receipt/offline code unchanged."
+      },
+      {
+        "name": "n88_issuance_public_finite_privacy_and_owner",
+        "status": "PASS",
+        "evidence": "19 fixed stages carrier -> actual runtime failure DOM -> support sanitizer; arbitrary stage/SQL/body/IDs/counts/secrets absent from support. Bad JWT/owner/signature/source denied without phase. Actual store owner change retires DOM/details and dispatches no request."
+      },
+      {
+        "name": "n88_issuance_public_unknown_ack_and_deadline_unchanged",
+        "status": "PASS",
+        "evidence": "Actual native valid list ACK/COMMIT and rendered ready roster; hung failure-body deadline cancels and retry frees lane. Real app batch503 with rollback/flush/commit labels retains original durable command after document reload/list200 UNKNOWN; replacement clicks dispatch zero further mutations. No fake success ACK."
+      },
+      {
+        "name": "n88_same_owner_context_swap_supplement",
+        "status": "NOT_RUN",
+        "evidence": "Added after the successful affected qualification; integration acquisition refused while N44 owned the phase. No server/browser started in this supplemental attempt."
+      }
+    ],
+    "cleanup": "Owned HTTP server, isolated contexts/browser closed; no PG/provider/live operation",
+    "runnerEventItem": "item_25",
+    "stdoutSha256": "6739f9b41df4ab76658fa8efbcb9df5f6fdf2591096d6310ae8a2c0c91ff645d",
+    "scope": "Same unchanged Product bytes; supplementary same-owner context check added afterward"
+  },
+  "recordedHarnessFailures": [
+    {
+      "runnerEventItem": "item_17",
+      "failure": {
+        "message": "page.waitForFunction: Timeout 6500ms exceeded.",
+        "stack": [
+          "page.waitForFunction: Timeout 6500ms exceeded.",
+          "    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-issuance-phase-public-dependency-20261024\\tests\\n88-issuance-public-20261024\\contract.mjs:87:86",
+          "    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)",
+          "    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-issuance-phase-public-dependency-20261024/tests/n88-issuance-public-20261024/contract.mjs:76:2"
+        ]
+      }
+    },
+    {
+      "runnerEventItem": "item_20",
+      "failure": {
+        "message": "locator.waitFor: Timeout 6500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/\u0638\u2020\u0637\u06be\u0638\u0679\u0637\u00ac\u0637\u00a9 \u0637\u00a7\u0638\u201e\u0637\u00b9\u0638\u2026\u0638\u201e\u0638\u0679\u0637\u00a9 \u0637\u061b\u0638\u0679\u0637\u00b1 \u0638\u2026\u0637\u00a4\u0638\u0192\u0637\u00af\u0637\u00a9/) to be visible\u001b[22m\n",
+        "stack": [
+          "locator.waitFor: Timeout 6500ms exceeded.",
+          "Call log:",
+          "\u001b[2m  - waiting for getByText(/\u0638\u2020\u0637\u06be\u0638\u0679\u0637\u00ac\u0637\u00a9 \u0637\u00a7\u0638\u201e\u0637\u00b9\u0638\u2026\u0638\u201e\u0638\u0679\u0637\u00a9 \u0637\u061b\u0638\u0679\u0637\u00b1 \u0638\u2026\u0637\u00a4\u0638\u0192\u0637\u00af\u0637\u00a9/) to be visible\u001b[22m",
+          "",
+          "    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-issuance-phase-public-dependency-20261024\\tests\\n88-issuance-public-20261024\\contract.mjs:99:149",
+          "    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)"
+        ]
+      }
+    },
+    {
+      "runnerEventItem": "item_23",
+      "failure": {
+        "message": "Unexpected end of JSON input",
+        "stack": [
+          "SyntaxError: Unexpected end of JSON input",
+          "    at JSON.parse (<anonymous>)",
+          "    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-issuance-phase-public-dependency-20261024/tests/n88-issuance-public-20261024/contract.mjs:102:85",
+          "    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)",
+          "    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-issuance-phase-public-dependency-20261024/tests/n88-issuance-public-20261024/contract.mjs:76:2"
+        ]
+      }
+    },
+    {
+      "runnerEventItem": "item_28",
+      "failure": {
+        "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-issuance-phase-public-dependency-20261024.json -WaitSeconds 0 -OwnerToken 92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0",
+        "stack": [
+          "Error: Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-issuance-phase-public-dependency-20261024.json -WaitSeconds 0 -OwnerToken 92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0",
+          "    at genericNodeError (node:internal/errors:985:15)",
+          "    at wrappedFn (node:internal/errors:539:14)",
+          "    at checkExecSyncError (node:child_process:942:11)",
+          "    at execFileSync (node:child_process:978:15)",
+          "    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-issuance-phase-public-dependency-20261024/tests/n88-issuance-public-20261024/contract.mjs:18:21)"
+        ]
+      }
+    }
+  ],
+  "blocker": {
+    "type": "external",
+    "resource": "integration",
+    "owner": {
+      "version": 2,
+      "resource": "integration",
+      "taskId": "continuous-n44-one-approved-closed-page-push-20261019",
+      "activationId": "po-20261012-continuous",
+      "owner": {
+        "type": "worker",
+        "pid": 33968,
+        "createdAt": "2026-10-24T14:09:57.1237290Z",
+        "token": "c074ed6b-4399-467c-9034-0c13edd5e088"
+      },
+      "at": "2026-10-24T14:17:12.3467324Z"
+    },
+    "retryCondition": "After this owner releases integration, resume the saved candidate and run the supplementary actual-app same-owner context-swap check; no live operation or new fixture."
+  },
+  "syntaxAndWhitespace": "PASS: node --check on all three Product modules and contract; git diff --check after removing Markdown trailing spaces"
+}
