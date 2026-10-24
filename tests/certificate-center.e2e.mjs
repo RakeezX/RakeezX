@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
-test('certificate center reviews multiple students and exports one isolated A4 page per chosen student', async ({ page, context, baseURL }, testInfo) => {
+test('certificate center applies editable appreciation text to any chosen students and exports their isolated A4 pages', async ({ page, context, baseURL }, testInfo) => {
   const origin = new URL(baseURL).origin;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -26,11 +26,11 @@ test('certificate center reviews multiple students and exports one isolated A4 p
     const identity = { schoolName: 'مدرسة الحساب التجريبي', educationDepartment: 'إدارة التعليم من الحساب', teacherName: 'معلم من بيانات الحساب', reportPrincipalName: 'مدير من بيانات الحساب' };
     await store.patchProfile(identity);
     const names = ['عبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي', 'محمد أحمد التجريبي', 'خالد علي التجريبي'];
-    const cleared = store.state.scores.filter(score => score.studentId === students[3].id).map(score => ({ ...score, ...common, deleted: true }));
+    const fixtureIds = new Set(students.map(student => student.id));
     await store.save({
       students: students.slice(0, 3).map((student, index) => ({ ...student, name: names[index], ...common })),
-      items: [{ id: 'demo:certificate-center:item', teachingId: teaching.id, name: 'تقييم تجريبي', max: 10, order: 99, ...common }],
-      scores: [...cleared, ...students.slice(0, 3).map(student => ({ id: `sc:${student.id}:demo:certificate-center:item`, studentId: student.id, itemId: 'demo:certificate-center:item', value: 10, ...common }))],
+      scores: store.state.scores.filter(score => fixtureIds.has(score.studentId)).map(score => ({ ...score, ...common, deleted: true })),
+      logs: store.state.logs.filter(log => fixtureIds.has(log.studentId)).map(log => ({ ...log, ...common, deleted: true })),
     });
     const chosen = new Set(students.slice(0, 3).map(student => student.id));
     const ordered = store.students(teaching.id).filter(student => chosen.has(student.id));
@@ -48,6 +48,7 @@ test('certificate center reviews multiple students and exports one isolated A4 p
   const canvas = sheet.locator('[data-center-canvas]');
   const consent = sheet.locator('[data-center-confirm]');
   const print = sheet.locator('[data-center-print]');
+  const message = sheet.locator('[data-center-text]');
   await sheet.locator('[data-center-teaching]').selectOption(fixture.teachingId);
   const stateBefore = await page.evaluate(async () => JSON.stringify((await import('/src/store.js')).state));
   await expect(sheet.locator('[data-center-names]')).toHaveCount(0);
@@ -55,19 +56,24 @@ test('certificate center reviews multiple students and exports one isolated A4 p
   for (const key of ['schoolName', 'educationDepartment', 'teacherName', 'principalName']) {
     await expect(sheet.locator(`[data-center-meta="${key}"]`)).toHaveValue(fixture.identity[key]);
   }
-  await expect(sheet.locator('[data-center-evidence]:checked')).toHaveCount(0);
+  await expect(sheet.locator('[data-center-evidence]')).toHaveCount(0);
+  await expect(message).toHaveValue(/وذلك نظير تميّزه.*في مادة المهارات الرقمية/);
+  const defaultText = await message.inputValue();
   await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
   await expect(print).toBeDisabled();
-  await sheet.locator('[data-center-evidence="scores"]').check();
   await sheet.locator(`[data-center-student="${fixture.noEvidenceId}"]`).check();
-  await expect(sheet.locator('[data-center-status]')).toContainText('بلا إنجاز');
-  await expect(consent).toBeDisabled();
+  await expect(consent).toBeEnabled();
   await sheet.locator('[data-center-all]').click();
-  await expect(sheet.locator(`[data-center-student="${fixture.noEvidenceId}"]`)).not.toBeChecked();
+  await expect(sheet.locator(`[data-center-student="${fixture.noEvidenceId}"]`)).toBeChecked();
   await sheet.locator('[data-center-clear]').click();
   for (const id of fixture.ids) await sheet.locator(`[data-center-student="${id}"]`).check();
   await expect(sheet.locator('[data-center-position]')).toHaveText('الشهادة 1 من 3');
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[0]));
+  await expect(canvas).not.toHaveAttribute('aria-label', /بنود بدرجة كاملة|مشاركات إيجابية/);
+  await page.screenshot({ path: testInfo.outputPath('certificate-center-default.png'), fullPage: false });
+  await message.fill('نعتز بجهدك ومثابرتك، ونسأل الله لك التوفيق والسداد. '.repeat(14).slice(0, 600));
+  await canvas.screenshot({ path: testInfo.outputPath('certificate-long-text.png') });
+  await message.fill(defaultText);
   await sheet.locator('[data-center-tab="design"]').click();
   await sheet.locator('.certificate-center__metadata > summary').click();
   for (const [key, value] of Object.entries({ schoolName: 'مدرسة ركيز التجريبية', educationDepartment: 'إدارة التعليم — نموذج تجريبي', teacherName: 'عبدالله المعلم', principalName: 'أحمد المدير' })) {
@@ -88,11 +94,21 @@ test('certificate center reviews multiple students and exports one isolated A4 p
   await page.screenshot({ path: testInfo.outputPath('certificate-center-designs.png'), fullPage: false });
   await sheet.locator('[data-center-tab="students"]').click();
   await consent.check();
+  await message.fill('');
+  await expect(consent).not.toBeChecked();
+  await expect(consent).toBeDisabled();
+  await expect(print).toBeDisabled();
+  const customText = 'وذلك تقديرًا لمثابرته وإبداعه في مادة المهارات الرقمية.\nنعتز بجهده، ونسأل الله له دوام التوفيق والسداد.';
+  await message.fill(customText);
+  await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
+  await consent.check();
   await sheet.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[1]));
+  await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
   await expect(consent).toBeChecked();
   await sheet.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[2]));
+  await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
   await expect(sheet.locator('[data-center-next]')).toBeDisabled();
   await sheet.locator('[data-center-prev]').click();
   await sheet.locator('[data-center-prev]').click();
@@ -152,6 +168,7 @@ test('certificate center reviews multiple students and exports one isolated A4 p
     await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
     await expect(consent).not.toBeChecked();
     await expect(print).toBeDisabled();
+    await expect(message).toHaveValue(customText);
   }
   expect(await page.evaluate(async () => JSON.stringify((await import('/src/store.js')).state))).toBe(stateBefore);
   await sheet.locator('[data-sheet-close]').last().click();

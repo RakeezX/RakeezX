@@ -9,6 +9,8 @@ export const CERTIFICATE_MEDALS = Object.freeze([
   Object.freeze({ id: 'star', label: 'تميّز' }),
 ]);
 
+export const CERTIFICATE_TEXT_LIMIT = 600;
+
 const WIDTH = 1485;
 const HEIGHT = 1050;
 const CENTER = WIDTH / 2;
@@ -22,6 +24,21 @@ function plain(value, limit) {
   return Array.from(String(value)
     .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069]/g, ' ')
     .replace(/\s+/g, ' ').trim()).slice(0, limit).join('');
+}
+
+/** Teacher-written copy stays plain text; intentional line breaks are retained. */
+export function certificateText(value) {
+  if (typeof value !== 'string') return '';
+  const normalized = value.replace(/\r\n?|\u2028|\u2029/g, '\n')
+    .replace(/[\u0000-\u0009\u000b-\u001f\u007f-\u009f\u061c\u200b-\u200f\u202a-\u202e\u2066-\u2069]/g, ' ')
+    .split('\n').map(part => part.replace(/\s+/g, ' ').trim()).join('\n')
+    .replace(/\n{3,}/g, '\n\n').trim();
+  return Array.from(normalized).slice(0, CERTIFICATE_TEXT_LIMIT).join('').trim();
+}
+
+export function defaultCertificateText(subjectName = '') {
+  const subject = plain(subjectName, 100);
+  return `وذلك نظير تميّزه الملحوظ وتفوّقه الدراسي ومثابرته${subject ? ` في مادة ${subject}` : ''} خلال الفترة الدراسية، سائلين الله له دوام التوفيق والسداد.`;
 }
 
 /** Do not pass a full profile to the painter: keep certificate identity deliberately narrow. */
@@ -59,27 +76,28 @@ function fitted(ctx, value, x, y, width, size, minSize = 16, weight = 700, color
   label(ctx, text, x, y, used, weight, color, width);
 }
 
-function wrapped(ctx, value, x, y, width, size, lineHeight, color = MUTED, maxLines = 2) {
-  const words = String(value).split(/\s+/).filter(Boolean);
-  let lines = [];
-  let used = size;
-  for (; used >= 14; used -= 1) {
-    ctx.font = `500 ${used}px ${FONT}`;
-    lines = [];
+function textLines(ctx, value, width) {
+  const lines = [];
+  const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ar', { granularity: 'grapheme' }) : null;
+  for (const paragraph of value.split('\n')) {
+    if (!paragraph) { lines.push(''); continue; }
     let current = '';
-    for (const word of words) {
+    for (const word of paragraph.split(/\s+/).filter(Boolean)) {
       const candidate = current ? `${current} ${word}` : word;
-      if (current && ctx.measureText(candidate).width > width) {
-        lines.push(current);
-        current = word;
-      } else current = candidate;
+      if (ctx.measureText(candidate).width <= width) { current = candidate; continue; }
+      if (current) { lines.push(current); current = ''; }
+      if (ctx.measureText(word).width <= width) { current = word; continue; }
+      // Split an unusually long token by grapheme, never in the middle of an
+      // Arabic combining mark or emoji sequence, and keep every character.
+      const parts = segmenter ? [...segmenter.segment(word)].map(part => part.segment) : Array.from(word);
+      for (const part of parts) {
+        if (current && ctx.measureText(current + part).width > width) { lines.push(current); current = ''; }
+        current += part;
+      }
     }
     if (current) lines.push(current);
-    if (lines.length <= maxLines) break;
   }
-  if (lines.length > maxLines) lines = [...lines.slice(0, maxLines - 1), lines.slice(maxLines - 1).join(' ')];
-  lines.forEach((line, index) => label(ctx, line, x, y + index * lineHeight, Math.max(14, used), 500, color, width));
-  return lines.length;
+  return lines;
 }
 
 function line(ctx, x1, y1, x2, y2, color = GOLD, width = 1) {
@@ -332,7 +350,7 @@ function flourish(ctx, y, school) {
 }
 
 function recipient(ctx, name) {
-  const value = name || 'لصاحب هذا الإنجاز';
+  const value = name || 'اسم الطالب';
   ctx.font = `800 58px ${FONT}`;
   if (ctx.measureText(value).width <= 1050 || !value.includes(' ')) {
     fitted(ctx, value, CENTER, 510, 1050, 58, 28, 800);
@@ -351,20 +369,34 @@ function recipient(ctx, name) {
   fitted(ctx, words.slice(split).join(' '), CENTER, 533, 1070, 45, 25, 800);
 }
 
-function evidence(ctx, facts, school) {
-  if (!facts.length) {
-    label(ctx, 'اختر إنجازًا موثّقًا لإكمال الشهادة', CENTER, 679, 26, 500, MUTED);
+function appreciation(ctx, text) {
+  if (!text) {
+    label(ctx, 'اكتب نص الشهادة لمعاينته هنا', CENTER, 689, 25, 500, MUTED);
     return;
   }
-  label(ctx, 'تقديرًا للجهد والإنجاز الموثّق في سجل التعلّم', CENTER, 620, 23, 500, MUTED);
-  if (facts.length > 1) line(ctx, CENTER, 650, CENTER, 756, school ? '#d7dfd6' : '#dfd0aa', 1);
-  facts.forEach((fact, index) => {
-    const x = facts.length === 1 ? CENTER : CENTER + (index === 0 ? 270 : -270);
-    const width = facts.length === 1 ? 970 : 464;
-    const heading = `${fact.count}  ·  ${fact.title}`;
-    fitted(ctx, heading, x, 679, width, 31, 19, 700, school ? '#28543f' : '#997125');
-    wrapped(ctx, fact.scope, x, 715, width, 19, 26, MUTED, 2);
-  });
+  const width = 1050;
+  const top = 610;
+  const height = 150;
+  const layout = value => {
+    let lines = [];
+    let size = 29;
+    for (; size >= 12; size -= 1) {
+      ctx.font = `500 ${size}px ${FONT}`;
+      lines = textLines(ctx, value, width);
+      if (lines.length * size * 1.45 <= height) return { lines, size };
+    }
+    return { lines, size: 12 };
+  };
+  let fittedText = layout(text);
+  // Keep the author's line breaks when they fit. Excessive hard breaks are
+  // reflowed instead of dropping copy or letting it overlap the signatures.
+  if (fittedText.lines.length * fittedText.size * 1.45 > height) {
+    fittedText = layout(text.replace(/\n+/g, ' '));
+  }
+  const size = Math.min(fittedText.size, height / (fittedText.lines.length * 1.45));
+  const lineHeight = size * 1.45;
+  const firstBaseline = top + (height - fittedText.lines.length * lineHeight) / 2 + lineHeight * 0.76;
+  fittedText.lines.forEach((value, index) => label(ctx, value, CENTER, firstBaseline + index * lineHeight, size, 500, INK, width));
 }
 
 function signatures(ctx, meta) {
@@ -380,14 +412,11 @@ function signatures(ctx, meta) {
   });
 }
 
-/** Paint only certificate fields and the allowlisted achievementCard evidence. */
+/** Paint only certificate identity and the teacher's explicit appreciation text. */
 export function drawCertificateDesign(canvas, card = {}, options = {}) {
   const meta = certificateMetadata(options);
   const name = plain(card.name, 240);
-  const facts = (Array.isArray(card.evidence) ? card.evidence : [])
-    .filter(fact => fact && (fact.key === 'participation' || fact.key === 'scores'))
-    .slice(0, 2)
-    .map(fact => ({ count: plain(fact.count, 14), title: plain(fact.title, 100), scope: plain(fact.scope, 240) }));
+  const text = certificateText(card.text);
   const demo = card.demo === true;
   const school = meta.design === 'school';
   canvas.width = WIDTH * 2;
@@ -409,12 +438,12 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
   label(ctx, 'للجهد قيمة، وللإنجاز تقدير', CENTER, 245, 20, 500, school ? '#8b8a71' : '#9a8558');
   fitted(ctx, 'شهادة شكر وتقدير', CENTER, 330, 930, 78, 54, 800, school ? '#244c3a' : '#9e792f');
   flourish(ctx, 372, school);
-  label(ctx, name ? 'تُمنح هذه الشهادة بكل تقدير إلى' : 'نحتفي بصاحب هذا الإنجاز', CENTER, 427, 24, 500, MUTED);
+  label(ctx, 'تُمنح هذه الشهادة بكل تقدير إلى', CENTER, 427, 24, 500, MUTED);
   recipient(ctx, name);
 
   const contextLine = [meta.className, meta.subjectName].filter(Boolean).join('  ·  ');
   if (contextLine) fitted(ctx, contextLine, CENTER, 569, 1050, 23, 16, 600, school ? '#5c7860' : '#9b8553');
-  evidence(ctx, facts, school);
+  appreciation(ctx, text);
   label(ctx, 'شكرًا لكل خطوة نحو التعلّم، ومزيدًا من النجاح', CENTER, 800, 22, 500, INK);
   signatures(ctx, meta);
 

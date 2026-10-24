@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
-test('certificate keeps explicit choices local, previews responsively and exports the reviewed image only', async ({ page, context, baseURL }, testInfo) => {
+test('certificate edits appreciation text without achievement records and exports only the reviewed image', async ({ page, context, baseURL }, testInfo) => {
   const origin = new URL(baseURL).origin;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -40,9 +40,8 @@ test('certificate keeps explicit choices local, previews responsively and export
     const name = 'عبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي';
     await store.save({
       students: [{ ...student, name, ...common }],
-      items: [{ id: 'demo:certificate:item', teachingId: teaching.id, name: 'تقييم تجريبي موثّق', max: 10, order: 99, ...common }],
-      scores: [{ id: `sc:${student.id}:demo:certificate:item`, studentId: student.id, itemId: 'demo:certificate:item', value: 10, ...common }],
-      logs: [{ id: 'demo:certificate:log', studentId: student.id, teachingId: teaching.id, kind: 'participation', delta: 1, date: '2026-10-20', ...common }],
+      scores: store.state.scores.filter(score => score.studentId === student.id).map(score => ({ ...score, ...common, deleted: true })),
+      logs: store.state.logs.filter(log => log.studentId === student.id).map(log => ({ ...log, ...common, deleted: true })),
     });
     return { studentId: student.id, teachingId: teaching.id, name, identity: { ...identity, principalName: identity.reportPrincipalName } };
   });
@@ -56,6 +55,7 @@ test('certificate keeps explicit choices local, previews responsively and export
   const editor = sheet.locator('.certificate-editor');
   const canvas = sheet.locator('[data-certificate-canvas]');
   const consent = sheet.locator('[data-certificate-confirm]');
+  const message = sheet.locator('[data-certificate-text]');
   await expect(editor).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   await expect(editor.locator('[data-certificate-name]')).toHaveCount(0);
@@ -65,12 +65,20 @@ test('certificate keeps explicit choices local, previews responsively and export
     await expect(editor.locator(`[data-certificate-meta="${key}"]`)).toHaveValue(fixture.identity[key]);
     await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.identity[key]));
   }
-  await expect(editor.locator('[data-certificate-field]:checked')).toHaveCount(0);
+  await expect(editor.locator('[data-certificate-field]')).toHaveCount(0);
+  await expect(message).toHaveValue(/وذلك نظير تميّزه.*في مادة المهارات الرقمية/);
+  await expect(consent).toBeEnabled();
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();
-  await expect(editor.locator('[data-certificate-field="attendance"]')).toHaveCount(0);
-  await editor.locator('[data-certificate-field="participation"]').check();
-  await editor.locator('[data-certificate-field="scores"]').check();
+  await consent.check();
+  await message.fill('');
+  await expect(consent).not.toBeChecked();
+  await expect(consent).toBeDisabled();
+  await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
+  const customText = 'وذلك تقديرًا لمثابرته وإبداعه في مادة المهارات الرقمية.\nنعتز بجهده، ونسأل الله له دوام التوفيق والسداد.';
+  await message.fill(customText);
+  await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
+  await expect(canvas).not.toHaveAttribute('aria-label', /بنود بدرجة كاملة|مشاركات إيجابية/);
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.name));
   await expect(canvas).toHaveAttribute('aria-label', /بيانات تجريبية/);
   await consent.check();

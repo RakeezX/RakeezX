@@ -499,11 +499,7 @@ export default {
       const profile = store.state.profile ?? {};
       const presentation = getAccountPresentation(profile.teacherForm);
       await openAchievementCertificate({
-        studentId: s.id,
-        items: tch ? store.items(tch.id) : [],
-        gradeCtx: store.studentContext(s.id, tch?.id),
-        history: store.studentHistory(s.id),
-      }, { studentName: s.name, demo: markDemoSharedText([]).length > 0, metadata: {
+        studentName: s.name, demo: markDemoSharedText([]).length > 0, metadata: {
         schoolName: profile.schoolName,
         educationDepartment: profile.educationDepartment,
         teacherName: profile.teacherName,

@@ -1,22 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { achievementCard } from '../src/lib/student-achievements.js';
-import { certificateCard, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate } from '../src/lib/achievement-certificate.js';
-import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, certificateMetadata } from '../src/lib/certificate-designs.js';
-
-const input = {
-  studentId: 'private-student-id',
-  history: {
-    logs: [
-      { record: { studentId: 'private-student-id', kind: 'participation', delta: 1, note: 'private-note' } },
-      { record: { studentId: 'other-student', kind: 'participation', delta: 1 } },
-    ],
-    attendance: [{ record: { studentId: 'private-student-id', status: 'present', date: 'private-date' } }],
-  },
-  items: [{ id: 'private-item-id', max: 10 }],
-  gradeCtx: { scoresByItem: { 'private-item-id': { studentId: 'private-student-id', value: 10 } } },
-  credentials: 'private-credential',
-};
+import { certificateCard, certificatePng, isCertificateReady, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate } from '../src/lib/achievement-certificate.js';
+import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata } from '../src/lib/certificate-designs.js';
 
 function recordingCanvas() {
   const texts = [];
@@ -24,31 +9,51 @@ function recordingCanvas() {
     createLinearGradient() { return { addColorStop() {} }; },
     createRadialGradient() { return { addColorStop() {} }; },
     fillText(value) { texts.push(String(value)); },
-    measureText(value) { return { width: String(value).length * 23 }; },
+    measureText(value) { return { width: Array.from(String(value)).length * Number((this.font || '24px').match(/([\d.]+)px/)[1]) * 0.55 }; },
   }, { get(target, key) { return key in target ? target[key] : () => {}; } });
-  return { texts, getContext: () => context, toDataURL: () => 'data:image/png;base64,c2VsZWN0ZWQtaW1hZ2U=' };
+  return { texts, getContext: () => context, toDataURL: () => 'data:image/png;base64,c2VsZWN0ZWQtaW1hZ2U=', toBlob: callback => callback(new Blob(['certificate'], { type: 'image/png' })) };
 }
 
-test('certificate projection always includes the student name and only selected positive evidence', () => {
+test('certificates use only the student name and teacher text, with no achievement requirement', () => {
+  const input = { studentName: 'اسم الطالب', text: defaultCertificateText('المهارات الرقمية'), demo: true,
+    studentId: 'private-student', evidence: [{ key: 'scores', title: 'private-score', count: 1 }], credentials: 'private-credential' };
   const before = structuredClone(input);
-  const card = certificateCard(input, { selected: ['participation', 'scores', 'attendance'], demo: true, studentName: 'اسم الطالب', includeName: false });
+  const card = certificateCard(input);
   assert.equal(card.name, 'اسم الطالب');
+  assert.deepEqual(Object.keys(card), ['name', 'text', 'demo']);
+  assert.equal(isCertificateReady(card), true);
   const canvas = recordingCanvas();
   drawAchievementCertificate(canvas, card);
   assert.equal(canvas.width / canvas.height, 297 / 210);
-  assert.equal(card.evidence.length, 2);
-  assert.ok(card.evidence.every(fact => fact.count === 1));
   const output = canvas.texts.join(' ') + certificateDescription(card);
-  assert.match(output, /مشاركات إيجابية/);
-  assert.match(output, /بنود بدرجة كاملة/);
+  assert.match(output, /تفوق|تفوّق/);
+  assert.match(output, /المهارات الرقمية/);
   assert.match(output, /بيانات تجريبية/);
   assert.match(output, /اسم الطالب/);
-  assert.doesNotMatch(output, /private-|other-student|حضور/);
+  assert.doesNotMatch(output, /private-|بنود بدرجة كاملة|مشاركات إيجابية|إنجازًا موثّقًا/);
   assert.deepEqual(input, before);
 });
 
-test('both designs display only bounded certificate identity and preserve the chosen evidence', () => {
-  const card = achievementCard(input, { selected: ['participation'], includeName: true, studentName: 'طالب تجريبي', demo: true });
+test('suggested text follows the subject and editable text remains bounded plain text', () => {
+  assert.match(defaultCertificateText('الرياضيات'), /في مادة الرياضيات/);
+  assert.doesNotMatch(defaultCertificateText(), /في مادة/);
+  assert.equal(certificateText(''), '');
+  assert.equal(certificateText(' \u202e \u0000 '), '');
+  assert.equal(certificateText('سطر أول\r\nسطر ثانٍ'), 'سطر أول\nسطر ثانٍ');
+  assert.equal(Array.from(certificateText('س'.repeat(800))).length, CERTIFICATE_TEXT_LIMIT);
+  const text = certificateText(('نعتز بجهدك ومثابرتك، ونسأل الله لك التوفيق والسداد. '.repeat(14)));
+  const longToken = certificateText('تقدير '.repeat(8) + 'أ'.repeat(180) + '\n' + 'نعتز بإنجازك '.repeat(20));
+  for (const body of [text, longToken]) {
+    for (const design of CERTIFICATE_DESIGNS) {
+      const canvas = recordingCanvas();
+      drawAchievementCertificate(canvas, certificateCard({ studentName: 'طالب تجريبي', text: body }), { design: design.id });
+      assert.ok(canvas.texts.join('').replace(/\s/g, '').includes(body.replace(/\s/g, '')), 'The complete accepted text must be painted');
+    }
+  }
+});
+
+test('both designs display bounded identity, the fixed medal and the complete edited text', () => {
+  const card = certificateCard({ studentName: '\u202eعبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي', text: 'تقديرًا لمثابرتك وإبداعك.\nنعتز بجهدك ونحتفي بإنجازك.', demo: true });
   const raw = { schoolName: 'مدرسة\u202e تجريبية', teacherName: 'معلم تجريبي', principalName: 'مدير تجريبي',
     educationDepartment: 'إدارة تعليم تجريبية', className: 'الخامس 1', subjectName: 'المهارات الرقمية',
     dateLabel: certificateIssueDate('2026-10-24'), token: 'private-token', email: 'private-email' };
@@ -57,7 +62,7 @@ test('both designs display only bounded certificate identity and preserve the ch
     const options = { ...raw, design: design.id, medal: 'laurel' };
     drawAchievementCertificate(canvas, card, options);
     const output = canvas.texts.join(' ') + certificateDescription(card, options);
-    for (const expected of ['طالب تجريبي', 'مدرسة', 'معلم تجريبي', 'مدير تجريبي', 'الخامس 1', '2026', 'بيانات تجريبية']) assert.ok(output.includes(expected));
+    for (const expected of ['آل مبدي العتيبي', 'مدرسة', 'معلم تجريبي', 'مدير تجريبي', 'الخامس 1', '2026', 'بيانات تجريبية', 'نعتز بجهدك']) assert.ok(output.includes(expected));
     assert.doesNotMatch(output, /private-|\u202e/);
     assert.equal(canvas.width, 2970);
     assert.equal(canvas.height, 2100);
@@ -71,12 +76,14 @@ test('both designs display only bounded certificate identity and preserve the ch
   assert.equal(metadata.token, undefined);
 });
 
-test('batch print requires evidence for every selected page and exports exactly one raster per page', () => {
-  const card = achievementCard(input, { selected: ['scores'], includeName: true, studentName: '<script>private-name</script>' });
+test('batch print requires reviewed names and text, with one isolated raster per student', () => {
+  const card = certificateCard({ studentName: '<script>private-name</script>', text: 'تقديرًا لتميّزك ومثابرتك.' });
   const entries = Array.from({ length: 3 }, () => ({ canvas: recordingCanvas(), card }));
   assert.throws(() => certificateBatchPrintHtml([], true));
   assert.throws(() => certificateBatchPrintHtml(entries, false));
-  assert.throws(() => certificateBatchPrintHtml([...entries, { canvas: recordingCanvas(), card: achievementCard(input) }], true));
+  for (const incomplete of [certificateCard({ studentName: 'طالب' }), certificateCard({ text: 'عبارة تقدير' })]) {
+    assert.throws(() => certificateBatchPrintHtml([...entries, { canvas: recordingCanvas(), card: incomplete }], true));
+  }
   const output = certificateBatchPrintHtml(entries, true);
   assert.equal((output.match(/<img /g) || []).length, 3);
   assert.equal((output.match(/<div class="certificate-page"/g) || []).length, 3);
@@ -84,22 +91,17 @@ test('batch print requires evidence for every selected page and exports exactly 
   assert.doesNotMatch(output, /<script|private-|student-profile|https?:\/\//);
 });
 
-test('long selected Arabic name is rendered without control characters', () => {
-  const name = '\u202eعبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي';
-  const card = achievementCard(input, { selected: ['scores'], includeName: true, studentName: name });
+test('PNG and print accept the reviewed custom text without scores and reject empty or unreviewed output', async () => {
   const canvas = recordingCanvas();
-  drawAchievementCertificate(canvas, card);
-  assert.ok(canvas.texts.some(value => value.includes('عبدالله')));
-  assert.match(certificateDescription(card), /آل مبدي العتيبي/);
-  assert.doesNotMatch(canvas.texts.join(''), /\u202e/);
-});
-
-test('printing requires explicit review and evidence, then contains the certificate image alone', () => {
-  const canvas = recordingCanvas();
-  const empty = achievementCard(input);
-  const card = achievementCard(input, { selected: ['scores'], includeName: true, studentName: '<script>private-name</script>' });
+  const empty = certificateCard({ studentName: 'طالب', text: '   ' });
+  const card = certificateCard({ studentName: '<script>private-name</script>', text: '<b>تقديرًا لمثابرتك</b>' });
   assert.throws(() => certificatePrintHtml(canvas, empty, true));
-  for (const confirmation of [false, undefined, 'true', 1]) assert.throws(() => certificatePrintHtml(canvas, card, confirmation));
+  await assert.rejects(certificatePng(canvas, empty, true));
+  for (const confirmation of [false, undefined, 'true', 1]) {
+    assert.throws(() => certificatePrintHtml(canvas, card, confirmation));
+    await assert.rejects(certificatePng(canvas, card, confirmation));
+  }
+  assert.equal((await certificatePng(canvas, card, true)).type, 'image/png');
   const html = certificatePrintHtml(canvas, card, true);
   assert.match(html, /@page\{size:A4 landscape;margin:0\}/);
   assert.equal((html.match(/<img /g) || []).length, 1);

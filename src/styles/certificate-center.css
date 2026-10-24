@@ -10,10 +10,9 @@
 .certificate-center__tabs button { flex: 1; padding: 10px 6px; border: 0; border-radius: 8px; background: transparent; color: var(--text-2); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .certificate-center__tabs button[aria-pressed=true] { background: var(--surface, #fff); color: var(--brand); box-shadow: 0 1px 5px #183e3812; }
 .certificate-center__section { padding: 18px; border: 1px solid var(--border, #e1e6df); border-radius: 16px; background: var(--surface, #fff); }
-.certificate-center__evidence { margin: 0 0 12px; padding: 12px; border: 1px solid var(--border, #e1e6df); border-radius: 10px; display: grid; gap: 10px; }
-.certificate-center__evidence legend { padding: 0 5px; font-size: 12px; font-weight: 700; }
-.certificate-center__evidence label { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 8px; font-size: 13px; cursor: pointer; }
-.certificate-center__evidence small { grid-column: 2; color: var(--text-3, #718078); font-size: 11px; }
+.certificate-center__message { display: grid; gap: 7px; }
+.certificate-center__text { min-height: 152px; height: auto; resize: vertical; font: inherit; font-size: 13px; line-height: 1.95; color: var(--text, #243c35); background: var(--bg, #f3f5f1); border-radius: 10px; padding: 12px; direction: rtl; }
+.certificate-center__message small { color: var(--text-3, #718078); font-size: 11px; line-height: 1.7; }
 .certificate-center input[type=checkbox] { accent-color: var(--primary, #186451); width: 16px; height: 16px; flex-shrink: 0; }
 .certificate-center__selection { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin: 10px 0; font-size: 12px; color: var(--text-3, #718078); }
 .certificate-center__selection > div { display: flex; gap: 2px; }
@@ -23,9 +22,6 @@
 .certificate-center__student.is-selected { background: var(--primary-soft, #edf5ef); }
 .certificate-center__student > span:first-of-type { flex: 1; min-width: 0; display: grid; gap: 3px; }
 .certificate-center__student strong { font-size: 13px; overflow-wrap: anywhere; font-weight: 650; }
-.certificate-center__student small { font-size: 10px; color: var(--text-3, #718078); line-height: 1.6; overflow-wrap: anywhere; }
-.certificate-center__eligibility { flex: 0 0 auto; font-size: 9px; border-radius: 12px; padding: 3px 6px; background: #f6eee3; color: #8b622d; }
-.certificate-center__eligibility.is-eligible { background: #e6f1e9; color: #285d40; }
 .certificate-center__empty { text-align: center; padding: 18px 8px; color: var(--text-3, #718078); font-size: 13px; }
 .certificate-center__designs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
 .certificate-center__design { min-width: 0; padding: 6px; border: 1.5px solid var(--border, #dbe2d9); border-radius: 10px; color: inherit; background: var(--surface, #fff); cursor: pointer; font: inherit; }
