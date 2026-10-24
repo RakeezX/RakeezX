@@ -1,0 +1,33 @@
+✔ pending_sync_permission_failure_and_reopen_auth: real guarded store entry retains exact denied envelope (79.3701ms)
+✔ permission403_preserves_session_without_refresh_or_replay, including reopen and pending state (76.0537ms)
+✔ true401 refresh then 200 (2.7548ms)
+✔ true401 refresh then 403 (1.6046ms)
+✔ true401 refresh then 401 (1.8765ms)
+✔ invalid Auth refresh 400 still clears session (1.3978ms)
+✔ invalid Auth refresh 401 still clears session (1.4023ms)
+✔ invalid Auth refresh 403 still clears session (1.0211ms)
+✔ concurrent true401 requests share one refresh (1.7483ms)
+✔ owner during request fences stale request (0.7115ms)
+✔ cancel during request fences stale request (0.5171ms)
+✔ cross-tab during request fences stale request (0.5758ms)
+✔ owner during refresh fences stale request (0.8923ms)
+✔ cancel during refresh fences stale request (0.9612ms)
+✔ cross-tab during refresh fences stale request (1.1424ms)
+✔ owner during retry fences stale request (1.1118ms)
+✔ cancel during retry fences stale request (0.8563ms)
+✔ cross-tab during retry fences stale request (2.2197ms)
+✔ owner during failure-body fences stale request (0.3763ms)
+✔ cancel during failure-body fences stale request (0.3146ms)
+✔ cross-tab during failure-body fences stale request (0.3855ms)
+✔ new same-owner token arriving during retry cannot be cleared by stale401 (0.7189ms)
+✔ caller assertAccess remains authoritative (0.3512ms)
+✔ already refreshed same-owner token is reused after late401 without another refresh (0.4126ms)
+✔ transient refresh503 preserves Auth and does not replay mutation (0.6118ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 406.603
