@@ -181,11 +181,11 @@
     {
       "runnerEventItem": "item_20",
       "failure": {
-        "message": "locator.waitFor: Timeout 6500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/\u0638\u2020\u0637\u06be\u0638\u0679\u0637\u00ac\u0637\u00a9 \u0637\u00a7\u0638\u201e\u0637\u00b9\u0638\u2026\u0638\u201e\u0638\u0679\u0637\u00a9 \u0637\u061b\u0638\u0679\u0637\u00b1 \u0638\u2026\u0637\u00a4\u0638\u0192\u0637\u00af\u0637\u00a9/) to be visible\u001b[22m\n",
+        "message": "locator.waitFor: Timeout 6500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/ظ†طھظٹط¬ط© ط§ظ„ط¹ظ…ظ„ظٹط© ط؛ظٹط± ظ…ط¤ظƒط¯ط©/) to be visible\u001b[22m\n",
         "stack": [
           "locator.waitFor: Timeout 6500ms exceeded.",
           "Call log:",
-          "\u001b[2m  - waiting for getByText(/\u0638\u2020\u0637\u06be\u0638\u0679\u0637\u00ac\u0637\u00a9 \u0637\u00a7\u0638\u201e\u0637\u00b9\u0638\u2026\u0638\u201e\u0638\u0679\u0637\u00a9 \u0637\u061b\u0638\u0679\u0637\u00b1 \u0638\u2026\u0637\u00a4\u0638\u0192\u0637\u00af\u0637\u00a9/) to be visible\u001b[22m",
+          "\u001b[2m  - waiting for getByText(/ظ†طھظٹط¬ط© ط§ظ„ط¹ظ…ظ„ظٹط© ط؛ظٹط± ظ…ط¤ظƒط¯ط©/) to be visible\u001b[22m",
           "",
           "    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-issuance-phase-public-dependency-20261024\\tests\\n88-issuance-public-20261024\\contract.mjs:99:149",
           "    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)"
@@ -238,5 +238,53 @@
     },
     "retryCondition": "After this owner releases integration, resume the saved candidate and run the supplementary actual-app same-owner context-swap check; no live operation or new fixture."
   },
-  "syntaxAndWhitespace": "PASS: node --check on all three Product modules and contract; git diff --check after removing Markdown trailing spaces"
+  "syntaxAndWhitespace": "PASS: node --check on all three Product modules and contract; git diff --check after removing Markdown trailing spaces",
+  "continuations": [
+    {
+      "aiAuthored": true,
+      "runId": "ed35dd1f-970f-4f5f-a920-51857a4fffe6",
+      "savedCandidate": "650ae968c8e38c2d78309813b305160024d189d9",
+      "priorProvenanceSha256": "56bed1114bf6d4dcd3e6d8648a6ee2fe390075135f92c3e1cadf1fecd7475780",
+      "status": "FAIL",
+      "check": "n88_same_owner_context_swap_supplement",
+      "providerOperations": 0,
+      "nativeOperations": 0,
+      "pgClusters": 0,
+      "mutationRequests": 0,
+      "failure": {
+        "message": "Expected values to be strictly equal:\n\n4 !== 3\n"
+      },
+      "cleanup": {
+        "ownedHttpServerClosed": true,
+        "ownedBrowserClosed": true
+      }
+    },
+    {
+      "aiAuthored": true,
+      "runId": "ed35dd1f-970f-4f5f-a920-51857a4fffe6",
+      "savedCandidate": "650ae968c8e38c2d78309813b305160024d189d9",
+      "priorProvenanceSha256": "d4b7ae6ad1f84358a75defdb88263eba346d8370daac61f04726bc7fcae141f6",
+      "status": "PASS",
+      "check": "n88_same_owner_context_swap_supplement",
+      "providerOperations": 0,
+      "nativeOperations": 0,
+      "pgClusters": 0,
+      "mutationRequests": 0,
+      "bindingFence": {
+        "sameOwner": true,
+        "sameSession": true,
+        "sameWorkspace": true,
+        "keyChanged": true,
+        "revisionChanged": true
+      },
+      "evidence": "Actual runtime/store/classBinding/ownership guard and CSS over isolated loopback HTTP: same owner/session/workspace, changed source revision/key retires opened issuance-flush details. New generic503 remains503/stage none in DOM and support. Two list reads, zero mutation/native/PG/provider operations.",
+      "leaseRelease": "RELEASED integration",
+      "cleanup": {
+        "ownedHttpServerClosed": true,
+        "ownedBrowserClosed": true
+      }
+    }
+  ],
+  "currentRunId": "ed35dd1f-970f-4f5f-a920-51857a4fffe6",
+  "currentState": "LOCAL_READY"
 }

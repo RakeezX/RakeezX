@@ -7,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createServer} from 'node:http';
 import {fixture} from '../fixtures/n88-student-projection/canonical.mjs';
-import {A,B,SESSION} from '../fixtures/n88-existing-host/provider.mjs';
+import {A,B,SESSION,providerFixture} from '../fixtures/n88-existing-host/provider.mjs';
 import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
 const taskId='continuous-n88-issuance-phase-public-dependency-20261024',runId='92b4cb1b-e074-4fb3-83ae-8bd1442ef7e0';
 const base='5c486712946de4e4f02129e5443008e15b3407d2',parent='05621c12db294399eb7ebce2486810f9fee857fc';
@@ -18,6 +18,7 @@ const object=p=>git('show',parent+':'+p),hash=b=>createHash('sha256').update(b).
 const lease=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',root+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-WaitSeconds','0','-OwnerToken',runId],{windowsHide:true,encoding:'utf8',timeout:20000}).trim();
 const issuance=['issuance-synchronize','issuance-roster','issuance-receipt','issuance-members','issuance-savepoint','issuance-recovery','issuance-member-result','issuance-member-release','issuance-member-rollback','issuance-flush'];
 const inherited=['synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'];
+if(process.argv.includes('--context-only')){await contextSwapSupplement();}else{
 const report={aiAuthored:true,taskId,runId,baseSha:base,qualifiedCandidate:parent,deltaBase:'6c9f34539702819ae84c12fd720524d8239f581c',status:'FAIL',checks:[],sources:{},reused:{},providerOperations:0,publicServedProof:'NOT_RUN: independent publisher only',wholeN88:'OPEN; actual source/issuance causes UNKNOWN; historical FAIL/NOT_RUN unchanged'};
 let server,owned=false,service,requests=0,mutations=0;const jobs=new Set();
 try{
@@ -113,3 +114,64 @@ try{
 }catch(e){report.failure={message:e.message,...(e.stdout?{stdout:String(e.stdout).slice(0,2000)}:{}),stack:e.stack?.split('\n').map(s=>s.length>500?s.slice(0,500):s).slice(0,6)};process.exitCode=1;}
 finally{if(server?.listening){server.closeAllConnections();await new Promise(ok=>server.close(ok));}await Promise.allSettled([...jobs]);if(owned)report.leaseRelease=lease('release');report.cleanup='Owned HTTP server, isolated contexts/browser closed; no PG/provider/live operation';let previous;try{previous=JSON.parse(await fs.readFile(dir+'provenance.json','utf8'));}catch{}if(previous?.earlierAffectedQualification)report.earlierAffectedQualification=previous.earlierAffectedQualification;if(previous?.recordedHarnessFailures)report.recordedHarnessFailures=previous.recordedHarnessFailures;if(previous)report.previousHarnessFailures=[...(previous.previousHarnessFailures||[previous.previousHarnessFailure].filter(Boolean)),...(previous.status==='FAIL'?[previous.failure]:[])];await fs.writeFile(dir+'provenance.json',JSON.stringify(report,null,2)+'\n');}
 console.log(JSON.stringify({status:report.status,checks:report.checks,failure:report.failure,cleanup:report.cleanup}));
+
+}
+// AI: resume only the previously NOT_RUN context swap. No native/PG/service work.
+async function contextSwapSupplement(){
+ const currentRunId='ed35dd1f-970f-4f5f-a920-51857a4fffe6';
+ const savedCandidate='650ae968c8e38c2d78309813b305160024d189d9';
+ const previousText=await fs.readFile(dir+'provenance.json','utf8'),previous=JSON.parse(previousText);
+ const result={aiAuthored:true,runId:currentRunId,savedCandidate,priorProvenanceSha256:hash(previousText),status:'FAIL',check:'n88_same_owner_context_swap_supplement',providerOperations:0,nativeOperations:0,pgClusters:0,mutationRequests:0};
+ const phase=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',root+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-WaitSeconds','0','-OwnerToken',currentRunId],{windowsHide:true,encoding:'utf8',timeout:20000}).trim();
+ let http,phaseOwned=false,listCalls=0;const pending=new Set();
+ try{
+  // Source and dependency identity checks permit reuse; no prior journey reruns.
+  for(const [file,source] of Object.entries(previous.sources))assert.equal(hash((await fs.readFile(file,'utf8')).replaceAll('\r\n','\n')),source.after);
+  for(const [file,proof] of Object.entries(previous.reused))if(proof.disposition==='Unchanged base safeguards')assert.equal(hash((await fs.readFile(file,'utf8')).replaceAll('\r\n','\n')),proof.sha256);
+  assert.equal(previous.earlierAffectedQualification.status,'PASS');const required=['n88_issuance_public_exact_current_delta','n88_issuance_public_finite_privacy_and_owner','n88_issuance_public_unknown_ack_and_deadline_unchanged'];const reusedChecks=previous.earlierAffectedQualification.checks.filter(c=>required.includes(c.name));assert.deepEqual(reusedChecks.map(c=>c.name).sort(),required.sort());assert(reusedChecks.every(c=>c.status==='PASS'));
+  assert.equal((await fs.readFile(taskFile,'utf8')).includes(currentRunId),true);
+  assert.match(phase('acquire'),/ACQUIRED|ALREADY OWNED/);phaseOwned=true;
+  const canonical=fixture().canonical;for(const rows of Object.values(canonical))for(const row of rows)row.ownerId=A;
+  const token=providerFixture().token();
+  const entry=`import {bootstrap} from '/tests/fixtures/n88-integrated-class/bootstrap.js';import {mountClassService,classBinding,studentPortalDiagnostic} from '/src/lib/student-portal-runtime.js';import {sanitizeSupportDiagnostics} from '/src/lib/support.js';await bootstrap();const binding=w=>classBinding({cloud:n88Fixture.cloud,store:n88Fixture.store,teachingId:'teaching'},w);window.binding=binding;window.diag=studentPortalDiagnostic;window.safeSupport=sanitizeSupportDiagnostics;window.handle=mountClassService(document.querySelector('main'),{getBinding:binding,subscribe:fn=>n88Fixture.store.subscribe(fn)});`;
+  http=createServer((req,res)=>{const job=(async()=>{try{
+   res.setHeader('cache-control','no-store');const u=new URL(req.url,'http://127.0.0.1');
+   const end=(body,type)=>{res.setHeader('content-type',type);res.end(body);};
+   if(u.pathname==='/')return end('<!doctype html><html dir="rtl"><meta charset="utf-8"><link rel="stylesheet" href="/src/styles/app.css"><link rel="stylesheet" href="/src/styles/student-portal-class.css"><main></main><script type="module" src="/context-entry.mjs"></script>','text/html');
+   if(u.pathname==='/context-entry.mjs')return end(entry,'text/javascript');
+   if(u.pathname==='/review/context')return end(JSON.stringify({canonical,ownerId:A,token}),'application/json');
+   if(u.pathname.startsWith('/api/n88/')){
+    for await(const chunk of req){};
+    if(u.pathname!=='/api/n88/teacher/class/list'){result.mutationRequests++;res.statusCode=401;return end('{"error":"denied"}','application/json');}
+    listCalls++;res.statusCode=503;if(listCalls===1)res.setHeader('x-n88-service-stage','issuance-flush');
+    return end('{"error":"unavailable"}','application/json');
+   }
+   assert(u.pathname.startsWith('/src/')||u.pathname.startsWith('/tests/fixtures/'));const file=path.resolve('.'+u.pathname);assert(file.startsWith(process.cwd()+path.sep));end(await fs.readFile(file),file.endsWith('.css')?'text/css':'text/javascript');
+  }catch(e){result.serverFailure=e.message;res.statusCode=500;res.end();}})();pending.add(job);void job.finally(()=>pending.delete(job));});
+  await new Promise((ok,fail)=>{http.once('error',fail);http.listen(0,'127.0.0.1',ok);});
+  const origin='http://127.0.0.1:'+http.address().port;
+  await withIsolatedLocalBrowser({taskFile,runId:currentRunId,url:origin,timeoutMs:30000},async({createContext})=>{
+   const context=await createContext({viewport:{width:390,height:900}}),page=await context.newPage(),errors=[];page.setDefaultTimeout(6500);page.on('pageerror',e=>errors.push(e.message));
+   await page.goto(origin);await page.locator('[data-n88-entry-state="connection"]').waitFor();
+   await page.locator('[data-n88-failure-details] summary').click();await page.waitForFunction(()=>document.querySelector('[data-n88-failure-text]')?.textContent.length>0);
+   const first=JSON.parse(await page.locator('[data-n88-failure-text]').textContent());assert.equal(first.stage,'issuance-flush');assert.equal(first.httpStatus,503);
+   assert.equal(await page.evaluate(()=>!!document.querySelector('link[href="/src/styles/student-portal-class.css"]').sheet),true);
+   await page.evaluate(()=>{window.beforeBinding=binding(false);window.oldDetails=document.querySelector('[data-n88-failure-details]');const teaching=n88Fixture.store.state.teachings.find(t=>t.id==='teaching');teaching.revision=(teaching.revision??1)+1;dispatchEvent(new Event('focus'));});
+   await page.waitForFunction(()=>!oldDetails.isConnected);await page.locator('[data-n88-entry-state="connection"]').waitFor();await page.waitForFunction(()=>diag()?.phase==='http'&&diag()?.stage==='none');
+   const fence=await page.evaluate(()=>{const after=binding(false);return {sameOwner:beforeBinding.context.ownerId===after.context.ownerId,sameSession:beforeBinding.context.sessionId===after.context.sessionId,sameWorkspace:beforeBinding.context.leaseId===after.context.leaseId,keyChanged:beforeBinding.key!==after.key,revisionChanged:beforeBinding.context.contextRevision!==after.context.contextRevision};});
+   assert(Object.values(fence).every(Boolean));result.bindingFence=fence;
+   await page.locator('[data-n88-failure-details] summary').click();await page.waitForFunction(()=>document.querySelector('[data-n88-failure-text]')?.textContent.length>0);
+   const current=JSON.parse(await page.locator('[data-n88-failure-text]').textContent());assert.equal(current.httpStatus,503);assert.equal(current.stage,'none');assert(!JSON.stringify(current).includes('issuance-flush'));
+   const support=await page.evaluate(()=>safeSupport({n88Portal:diag()}));assert.equal(support.n88Portal.stage,'none');assert.equal(support.n88Portal.httpStatus,503);
+   assert.equal(listCalls,2);assert.equal(result.mutationRequests,0);assert.deepEqual(errors,[]);await context.close();
+  });
+  result.status='PASS';result.evidence='Actual runtime/store/classBinding/ownership guard and CSS over isolated loopback HTTP: same owner/session/workspace, changed source revision/key retires opened issuance-flush details. New generic503 remains503/stage none in DOM and support. Two list reads, zero mutation/native/PG/provider operations.';
+ }catch(e){process.exitCode=1;result.failure={message:e.message,stdout:e.stdout?String(e.stdout):undefined};}
+ finally{
+  if(http?.listening){http.closeAllConnections();await new Promise(ok=>http.close(ok));}await Promise.allSettled([...pending]);
+  if(phaseOwned)result.leaseRelease=phase('release');result.cleanup={ownedHttpServerClosed:!http?.listening,ownedBrowserClosed:true};
+  previous.continuations??=[];previous.continuations.push(result);previous.currentRunId=currentRunId;previous.currentState=result.status==='PASS'?'LOCAL_READY':'BLOCKED';
+  await fs.writeFile(dir+'provenance.json',JSON.stringify(previous,null,2)+'\n');
+ }
+ console.log(JSON.stringify(result));
+}
