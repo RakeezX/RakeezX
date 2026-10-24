@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-deliver-qualified-reconciliation-ui-20261024",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5700,
+      "scopeKey": "n88-qualified-reconciliation-ui-delivery",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 25,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "baseSha": "7383f98ffb673b115e8564d0f33c3425df44907a",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX/.worktrees/continuous-n88-deliver-qualified-reconciliation-ui-20261024",
+      "objective": "DELIVER THE QUALIFIED N88 RECONCILIATION SOURCE/FRONTEND PREREQUISITE, NOT WHOLE PRODUCT ACCEPTANCE. Original source-custodian candidateb44f494966e51296461b09b4a15bd90c6d2bd942, implementation a7c3cc1492aa418ad4bd8273b45cc8f74cba33c2 over baseline d8e7d4910687c9bca4342b9bee16756af0e0c8f8. Actual native86 source3ea409d01644b01ec01631e70b08f57c60818e4f545ca1c63af4cd5ae07c9255 is ALREADY uploaded/pinned/read back. Original operator probe session_required proves admission only, not valid-session read. Source, PG17 actual28 and rendered app receipt/CAS/owner/COMMIT proofs are saved and PASS; past failure cause and historical3 commands remainUNKNOWN. Original required13 acceptance checks include old historicalFAIL/postpublication gates; preserve these on the parent instead of reporting falsePASS to publish this slice.\n In this fresh isolated PUBLIC worktree integrate ONLY the qualified receipt-reconciliation source change and two frontend files onto CURRENT main. Use the implementation DIFF d8e7d491..a7c3cc149, not a whole-file copy that overwrites later main diagnostics or unrelated changes from an old worktree. Preserve current timing/list diagnostics, grade/read guards and every newer main feature. Port public actual native/source/evidence audit artifacts only from the exact qualified candidate. No protected custody files, live-operation scripts, secrets, raw records/codes or unrelated histories. The listed backend sources are audit/parity integration of the ALREADY active native; no provider operation is permitted. Keep actual bundle bytes exactly3ea409d... and original receipts immutable. Update/merge current activation manifest only for this bounded receipt source integration, retain unrelated declarations/history. Record original and integrated source hashes separately and explain any necessary current-main merge; never rewrite a historical receipt to pretend a new service activation happened.\n Reuse existing unchanged PG/UI proofs only after source/dependency parity. A material current-main merge gets ONLY the affected existing actual source/native28/receipt/UI tests; do not run broad suites or create a new benchmark. Preserve typed exact78/old76, owner/class/version/idempotency/rollback/COMMIT/lostACK/privacy/context guards. Actual app DOM/handlers/source CSS required for any changed rendered behavior, canonical isolated loopback helper only; never handwritten lookalike or real trial browser here. Source-only assertions do not replace actual UI evidence. No service upload/pin, SQL/Auth/schema/role, new account/fixture/browser or student mutation, private carrier change or tool-denial workaround. Retain policy-rejected N44 directories untouched.\n Return LOCAL_READY with accurate passing SOURCE-PUBLICATION checks only; real trial reconciliation/fresh current-intent batch/student entry-return are post-publication parent gates. Preserve theseNOT_RUN and oldFAIL explicitly in documentation; do not mark wholeN88 closed or demand impossible historical never-commit proof to publish a safe supported capability. Sole original publisher integrates/deploys/verifies changed app; no push/main/frontend deployment by this worker. Original parent is waiting on this exact dependency and will resume without another PM/permission handoff.",
+      "allowedPaths": [
+        "src/lib/student-portal-class-client.js",
+        "src/views/student-portal-class.js",
+        "drafts/n88-student-portal/receipt-reconciliation.mjs",
+        "drafts/n88-student-portal/class-credentials.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+        "drafts/n88-student-portal/activation/manifest.json",
+        "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/reconciliation-manifest.json",
+        "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/native74-reconciliation.inactive.mjs",
+        "tests/n88-actual-current-cause-20261020/reconciliation-delivery-binding.json",
+        "tests/n88-actual-current-cause-20261020/diagnostic-activation-834d5c3c-1a17-4b12-a9fb-96ed46c2483f.json",
+        "tests/n88-actual-current-cause-20261020/reconciliation-28.json",
+        "tests/n88-actual-current-cause-20261020/reconciliation-pg.json",
+        "tests/n88-actual-current-cause-20261020/reconciliation-ui.json",
+        "tests/n88-actual-current-cause-20261020/reconciliation-diagnostic.json",
+        "tests/n88-actual-current-cause-20261020/reconciliation-28.mjs",
+        "tests/n88-actual-current-cause-20261020/reconciliation-pg.mjs",
+        "tests/n88-actual-current-cause-20261020/reconciliation-fixture.mjs",
+        "tests/n88-actual-current-cause-20261020/reconciliation-ui.mjs",
+        "tests/n88-actual-current-cause-20261020/reconciliation-diagnostic.mjs",
+        "tests/n88-actual-current-cause-20261020/ui-publication-provenance.json",
+        "docs/automation-evidence/20261024/N88_RECONCILIATION_UI_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-class-client.js",
+        "src/views/student-portal-class.js"
+      ],
+      "requiredChecks": [
+        "n88_reconciliation_port_and_receipt_guards",
+        "n88_current_ui_and_backend_native_parity",
+        "n88_candidate_scope_and_service_evidence"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "acceptance": [
+        "Integrate qualified receipt/CAS frontend and already deployed native-source audit without replacing newer main logic.",
+        "Affected actual owner/receipt/PG/UI and source/native parity checks pass truthfully; actual live86 proof retained unchanged.",
+        "Sole publisher verifies served changed app; whole N88 and actual trial gates remain open on original parent."
+      ],
+      "releaseAuthority": "Direct PO full necessary completion authority covers this qualified safe frontend prerequisite and source audit through sole publisher; no new live service/data action in this slice.",
+      "preparationAuthority": {
+        "kind": "qualified_public_source_slice_only",
+        "publication": true,
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "originalQualifiedCandidate": "b44f494966e51296461b09b4a15bd90c6d2bd942",
+        "actualNativeVersion": 86,
+        "actualNativeSha256": "3ea409d01644b01ec01631e70b08f57c60818e4f545ca1c63af4cd5ae07c9255"
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "7383f98ffb673b115e8564d0f33c3425df44907a",
+        "requiredSourcePaths": [
+          "src/lib/student-portal-class-client.js",
+          "src/views/student-portal-class.js",
+          "src/styles/student-portal-class.css",
+          "drafts/n88-student-portal/class-credentials.mjs",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs"
+        ],
+        "editPaths": [
+          "src/lib/student-portal-class-client.js",
+          "src/views/student-portal-class.js",
+          "drafts/n88-student-portal/receipt-reconciliation.mjs",
+          "drafts/n88-student-portal/class-credentials.mjs",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+          "drafts/n88-student-portal/activation/manifest.json",
+          "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/reconciliation-manifest.json",
+          "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/native74-reconciliation.inactive.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-delivery-binding.json",
+          "tests/n88-actual-current-cause-20261020/diagnostic-activation-834d5c3c-1a17-4b12-a9fb-96ed46c2483f.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-28.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-pg.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-ui.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-diagnostic.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-28.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-pg.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-fixture.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-ui.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-diagnostic.mjs",
+          "tests/n88-actual-current-cause-20261020/ui-publication-provenance.json",
+          "docs/automation-evidence/20261024/N88_RECONCILIATION_UI_DELIVERY.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/receipt-reconciliation.mjs",
+          "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/reconciliation-manifest.json",
+          "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/native74-reconciliation.inactive.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-delivery-binding.json",
+          "tests/n88-actual-current-cause-20261020/diagnostic-activation-834d5c3c-1a17-4b12-a9fb-96ed46c2483f.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-28.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-pg.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-ui.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-diagnostic.json",
+          "tests/n88-actual-current-cause-20261020/reconciliation-28.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-pg.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-fixture.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-ui.mjs",
+          "tests/n88-actual-current-cause-20261020/reconciliation-diagnostic.mjs",
+          "tests/n88-actual-current-cause-20261020/ui-publication-provenance.json",
+          "docs/automation-evidence/20261024/N88_RECONCILIATION_UI_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n88_reconciliation_port_and_receipt_guards",
+          "n88_current_ui_and_backend_native_parity",
+          "n88_candidate_scope_and_service_evidence"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
