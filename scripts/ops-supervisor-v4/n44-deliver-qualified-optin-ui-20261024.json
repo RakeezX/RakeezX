@@ -40,7 +40,7 @@
         "n44_ui_candidate_scope_and_provenance"
       ],
       "postDeliveryChecks": [
-        "parent_n44_current_registration_closed_page_send_and_os_arrival"
+        "production_publication"
       ],
       "acceptance": [
         "Port exact two qualified frontend files onto current main without private/backend changes.",
@@ -56,6 +56,46 @@
         "registrations": 0,
         "sends": 0,
         "originalQualifiedCandidate": "fedbfe15ee79f4f0a00594ea4b8720830327256c"
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "f034a0e8c06be5b756b84def3cb746c53e0003a9",
+        "requiredSourcePaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/views/notification-settings.js",
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-browser.js",
+          "src/lib/notification-push-client.js",
+          "src/styles/notifications.css",
+          "src/app.js",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs"
+        ],
+        "editPaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/views/notification-settings.js",
+          "tests/n44-device-20261024/eligibility-browser.mjs",
+          "tests/n44-device-20261024/eligibility-browser.json",
+          "tests/n44-device-20261024/eligibility-evidence.mjs",
+          "tests/n44-device-20261024/eligibility-evidence.json",
+          "tests/n44-device-20261024/ui-publication-provenance.json",
+          "docs/automation-evidence/20261024/N44_OPTIN_UI_DELIVERY.md"
+        ],
+        "newPaths": [
+          "tests/n44-device-20261024/eligibility-browser.mjs",
+          "tests/n44-device-20261024/eligibility-browser.json",
+          "tests/n44-device-20261024/eligibility-evidence.mjs",
+          "tests/n44-device-20261024/eligibility-evidence.json",
+          "tests/n44-device-20261024/ui-publication-provenance.json",
+          "docs/automation-evidence/20261024/N44_OPTIN_UI_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n44_ui_refresh_lifecycle_and_guarded_optin",
+          "n44_ui_actual_app_dom_styles_and_disposal",
+          "n44_ui_candidate_scope_and_provenance"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
       }
     }
   ]
