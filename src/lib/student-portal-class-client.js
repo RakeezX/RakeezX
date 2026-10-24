@@ -24,8 +24,8 @@ export function createClassPortalClient({ request, getContext = () => null, time
   let roster = null, rosterKey = null, pending = null, readSequence = 0;
   const readContext = () => { try { return getContext(); } catch { return null; } };
   const consumed = new Set();
-  // Same-page uncertain commands retain their original complete identity after
-  // review. Only an explicit identical intent can replay it; never auto-retry.
+  // Keep bounded uncertain identities for read-only receipt reconciliation.
+  // New commands always use a fresh identity; never replay an uncertain intent.
   const unknown = new Map(), guidanceUnknown = new Map();
   const intentKey=(c,action,body)=>JSON.stringify([c.key,action,Object.entries(body).filter(([k])=>!['requestId','expectedRosterRevision'].includes(k)).sort(([a],[b])=>a.localeCompare(b))]);
   function context(teachingId) {
@@ -74,12 +74,13 @@ export function createClassPortalClient({ request, getContext = () => null, time
     const { c, r } = snapshot(teachingId);
     if (!id(body.requestId)) deny('review_required');
     if (pending) deny('busy');
-    const intent=intentKey(c,action,body),prior=unknown.get(intent);
-    const command=prior??{ ...body, expectedRosterRevision: r.rosterRevision };
-    if(consumed.has(command.requestId)&&!prior)deny('review_required');
+    if(unknown.size>=8)deny('review_required');
+    if(action==='issue-missing'&&!rosterRevision(r.credentialRevision))deny('review_required');
+    const command={ ...body, expectedRosterRevision: r.rosterRevision,...(action==='issue-missing'?{expectedCredentialRevision:r.credentialRevision}:{}) };
+    if(consumed.has(command.requestId))deny('review_required');
     consumed.add(command.requestId); readSequence++;
-    const work = call(action, teachingId, command, data=>validate(data,command), c).then(result=>{unknown.delete(intent);return result;},error=>{
-      if(classContextKey(readContext())===c.key)unknown.set(intent,structuredClone(command));
+    const work = call(action, teachingId, command, data=>validate(data,command), c).then(result=>{unknown.delete(command.requestId);return result;},error=>{
+      if(classContextKey(readContext())===c.key)unknown.set(command.requestId,{key:c.key,action,command:structuredClone(command)});
       throw error;
     });
     pending = work;
@@ -101,8 +102,12 @@ export function createClassPortalClient({ request, getContext = () => null, time
       if (pending) deny('busy');
       const c = context(teachingId), sequence = ++readSequence;
       roster = null;
-      const data = await call('list', teachingId, {}, d => exact(d, ['classId','rosterRevision','policyRevision','students','visibility']) && d.classId === c.binding.classId && rosterRevision(d.rosterRevision) && revision(d.policyRevision) && validPortalFields(d.visibility) && Array.isArray(d.students) && d.students.length <= 2000 && d.students.every(validStudent) && new Set(d.students.map(s => s.studentId)).size === d.students.length && new Set(d.students.map(s => s.enrollmentId)).size === d.students.length, c);
+      const wanted=[...unknown.values()].filter(x=>x.key===c.key&&x.action==='issue-missing').slice(0,8);
+      const requests=wanted.map(x=>({requestId:x.command.requestId,expectedRosterRevision:x.command.expectedRosterRevision,expectedCredentialRevision:x.command.expectedCredentialRevision}));
+      const metadata=d=>exact(d,['classId','rosterRevision','policyRevision','students','visibility']) || exact(d,['classId','rosterRevision','policyRevision','students','visibility','credentialRevision','reconciliation'])&&rosterRevision(d.credentialRevision)&&Array.isArray(d.reconciliation)&&d.reconciliation.length===requests.length&&d.reconciliation.every(x=>exact(x,['state','created','skipped','failed'])&&['committed','unknown'].includes(x.state)&&['created','skipped','failed'].every(k=>Number.isSafeInteger(x[k])&&x[k]>=0&&x[k]<=2000)&&(x.state==='committed'||x.created+x.skipped+x.failed===0));
+      const data = await call('list', teachingId, {reconciliationVersion:1,reconcile:requests}, d => metadata(d) && d.classId === c.binding.classId && rosterRevision(d.rosterRevision) && revision(d.policyRevision) && validPortalFields(d.visibility) && Array.isArray(d.students) && d.students.length <= 2000 && d.students.every(validStudent) && new Set(d.students.map(s => s.studentId)).size === d.students.length && new Set(d.students.map(s => s.enrollmentId)).size === d.students.length, c);
       if (sequence !== readSequence) deny('review_required');
+      data.reconciliation?.forEach((x,i)=>{if(x.state==='committed')unknown.delete(wanted[i].command.requestId);});
       roster = {...data,students:data.students.map(({credential,...s})=>s)}; rosterKey = c.key; return data;
     },
     issueMissingClassCodes(teachingId, body) {

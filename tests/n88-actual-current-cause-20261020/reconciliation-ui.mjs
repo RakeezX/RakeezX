@@ -1,0 +1,24 @@
+/** AI: real application component/handlers/CSS over owned HTTP; fabricated native-backed fixture. */
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {readFile,writeFile} from 'node:fs/promises';
+import path from 'node:path';
+import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
+import {prepare,requestForFixture,context} from './reconciliation-fixture.mjs';
+const fixture=prepare();let batchCalls=0,browser,server;
+const entry=`import {createClassPortalClient} from '/src/lib/student-portal-class-client.js';import {mountClassPortal} from '/src/views/student-portal-class.js';let binding=${JSON.stringify({...context,validUntil:0})};binding.validUntil=Date.now()+120000;let notify;window.fixture={off(){binding={...binding,enabled:false};notify();}};const getContext=()=>binding;const client=createClassPortalClient({getContext,request:(u,i)=>fetch(u,i)});mountClassPortal(document.querySelector('#class-portal'),{client,getContext,subscribe:f=>{notify=f;return()=>{};},classLabel:()=> 'Fabricated'});`;
+const report={aiAuthored:true,status:'FAIL',providerOperations:0,renderedUI:true,cleanup:{}};
+try{
+ server=createServer(async(req,res)=>{try{res.setHeader('Cache-Control','no-store');if(req.url.startsWith('/api/n88/teacher/class/')){let body='';for await(const b of req){body+=b;if(body.length>12000)throw Error('bound');}if(req.url.endsWith('/issue-missing')){batchCalls++;fixture.loseAck();}const r=await requestForFixture(fixture,req.url,{body});res.writeHead(r.ok?200:503,{'Content-Type':'application/json'});res.end(JSON.stringify(await r.json()));return;}if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end((await readFile('tests/fixtures/n88-class-management/index.html','utf8')).replace('/tests/fixtures/n88-class-management/entry.js','/fixture-entry.js'));return;}if(req.url==='/fixture-entry.js'){res.setHeader('Content-Type','text/javascript');res.end(entry);return;}const relative=req.url.split('?')[0];if(!relative.startsWith('/src/')||relative.includes('..')){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',relative.endsWith('.css')?'text/css':'text/javascript');res.end(await readFile(path.resolve('.'+relative)));}catch{res.writeHead(400);res.end();}});
+ await new Promise(ok=>server.listen(0,'127.0.0.1',ok));const origin='http://127.0.0.1:'+server.address().port;
+ await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-deliver-qualified-reconciliation-ui-20261024.json',runId:'0e8bcadf-3894-4f8c-8053-a83e6d6736e6',url:origin},async({createContext})=>{const ctx=await createContext();const page=await ctx.newPage();await page.goto(origin);
+ await page.locator('.n88-class-roster > li').nth(27).waitFor();assert.equal(await page.locator('.n88-class-roster > li').count(),28);
+ await page.getByRole('button',{name:'إنشاء الرموز الناقصة',exact:true}).click();await page.getByText('نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير. الإعدادات المعروضة من آخر قراءة مؤكدة.',{exact:true}).waitFor();
+ assert.equal(batchCalls,1);await page.getByRole('button',{name:'مراجعة القائمة',exact:true}).click();await page.getByText('تأكد إقرار العملية السابقة من السجل؛ عُرضت الحالة الحالية دون إعادة إنشائها.',{exact:true}).waitFor();
+ assert.equal(batchCalls,1);assert.equal(await page.locator('[data-code]').count(),0);assert.equal(await page.getByRole('button',{name:'إنشاء الرموز الناقصة',exact:true}).isDisabled(),true);
+ const styled=await page.locator('.n88-class-roster').evaluate(e=>({display:getComputedStyle(e).display,source:!!document.querySelector('link[href="/src/styles/student-portal-class.css"]')}));assert.equal(styled.source,true);
+ await page.evaluate(()=>window.fixture.off());await page.getByText('مساحة الطلاب غير مفعّلة حاليًا.',{exact:true}).waitFor();assert.equal(await page.locator('[data-action="batch"]').count(),0);
+ report.status='PASS';report.checks=['actual DOM/handlers/source CSS over fresh loopback HTTP context','28 pupils; lost native ACK -> normal review -> committed receipt message without reissuing','active credentials preserved; no code disclosure in receipt metadata','actual class context owner invalidation removes batch controls'];report.batchCalls=batchCalls;
+ });
+}catch(e){report.failure={name:e.name,message:e.message};process.exitCode=1;console.error(e.name+': '+e.message);}
+finally{await browser?.close();if(server){server.closeAllConnections();await new Promise(ok=>server.close(ok));}report.cleanup={ownedBrowserClosed:true,ownedServerClosed:true};const file='tests/n88-actual-current-cause-20261020/ui-publication-provenance.json';const prior=JSON.parse(await readFile(file,'utf8'));prior.currentRenderedUI=report;await writeFile(file,JSON.stringify(prior,null,2)+'\n');}

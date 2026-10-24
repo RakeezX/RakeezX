@@ -1,0 +1,38 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "taskId": "continuous-n88-current-teacher-connection-actual-cause-20261020",
+  "runId": "834d5c3c-1a17-4b12-a9fb-96ed46c2483f",
+  "operationCandidate": "5f4d6a7d6f3ef810c91b8d07792bec6a5dc38d86",
+  "receipt": "tests/n88-actual-current-cause-20261020/diagnostic-activation-834d5c3c-1a17-4b12-a9fb-96ed46c2483f.json",
+  "receiptSha256": "3f89600e7b5248a59b244d0a12f58de4e77cf92391a7609876778084c9fa996a",
+  "nativeVersion": 86,
+  "nativeSource": "3ea409d01644b01ec01631e70b08f57c60818e4f545ca1c63af4cd5ae07c9255",
+  "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+  "configuration": {
+    "nonPinDigest": "c199734b5feb6f23107524f827da4480bbc8398261361ff55084c6608b374a7b",
+    "keysetDigest": "6087c1195ab1e6ffeed00ff8e975cdd7f3d1b59e3b437b1c32ac006261cac28e",
+    "historicalAggregate": "NOT_PROVEN"
+  },
+  "verificationPaths": [
+    "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/native74-reconciliation.inactive.mjs",
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs",
+    "drafts/n88-student-portal/activation/manifest.json",
+    "drafts/n88-student-portal/integrated-service.mjs",
+    "drafts/n88-student-portal/class-credentials.mjs",
+    "drafts/n88-student-portal/receipt-reconciliation.mjs",
+    "src/lib/student-portal-class-client.js",
+    "src/views/student-portal-class.js",
+    "tests/n88-actual-current-cause-20261020/diagnostic-activation-834d5c3c-1a17-4b12-a9fb-96ed46c2483f.json"
+  ],
+  "providerWrites": 2,
+  "readinessRepeated": false,
+  "realTrialBatchInvocations": 0,
+  "diagnosticAllowance": "CONSUMED; never re-upload or repin",
+  "correctiveAllowance": "UNUSED; no concrete hidden live cause established",
+  "freshCurrentIntentBatch": "UNUSED; requires freshly served corrected teacher UI and current-state CAS",
+  "frontendPublication": "NOT_RUN; sole publisher owns Product Git/served evidence",
+  "actualUserAcceptance": "NOT_RUN",
+  "oldDeniedResourcesUntouched": true,
+  "cleanup": "owned staging and pin file cleaned; integration/live-mutation leases released"
+}

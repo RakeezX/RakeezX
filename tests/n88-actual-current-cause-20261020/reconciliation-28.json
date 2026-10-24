@@ -1,0 +1,34 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "nativeBaseline": "cbdfb4d8cd91f6e7588e0512b64f692935d2462d",
+  "teacherClientRevision": "changed actual source",
+  "students": 28,
+  "outcomes": [
+    {
+      "mode": "ack",
+      "clientOutcome": "ACK",
+      "durableCredentials": 28,
+      "durableReceipts": 1,
+      "ownerDenial": true
+    },
+    {
+      "mode": "rollback",
+      "clientOutcome": "UNKNOWN",
+      "durableCredentials": 0,
+      "durableReceipts": 0,
+      "ownerDenial": true
+    },
+    {
+      "mode": "lost-ack",
+      "clientOutcome": "UNKNOWN",
+      "durableCredentials": 28,
+      "durableReceipts": 1,
+      "ownerDenial": true
+    }
+  ],
+  "scope": "actual native credential operations and teacher client through existing fabricated repository; not full signed native/PG integration",
+  "liveAttemptsReplayed": 0,
+  "providerOperations": 0,
+  "actualPriorAttempts": "UNKNOWN"
+}

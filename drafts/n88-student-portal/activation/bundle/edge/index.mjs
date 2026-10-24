@@ -887,6 +887,24 @@ var result = (status, body) => ({ status, body, headers: { ...PRIVATE_HEADERS } 
 var denied = () => result(401, { error: "unavailable" });
 var replay = (receipt) => receipt.results.map((r) => r.status === "created" ? { ...r, status: "uncertain", recovery: "refresh_current_roster" } : { ...r });
 var summary = (rows) => Object.fromEntries(["created", "skipped", "failed", "uncertain"].map((s) => [s, rows.filter((r) => r.status === s).length]));
+/** AI: bounded metadata from the existing transaction snapshot; no query or authority grant. */
+const n88ReceiptDigest=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex');
+const n88ReceiptHex=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
+const n88ReceiptCommand=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{16,100}$/.test(v);
+function credentialStateRevision(db,members){
+ return n88ReceiptDigest(members.map(m=>[m.studentId,m.enrollmentId,...db.numericCredentials.filter(c=>c.ownerId===m.ownerId&&c.studentId===m.studentId).map(c=>[c.version,c.revokedAt===null]).sort((a,b)=>a[0]-b[0])]).sort((a,b)=>a[0].localeCompare(b[0])));
+}
+function reconcileIssuanceReceipts(db,scope,members,requests){
+ if(!scope?.current||members.some(m=>m.ownerId!==scope.ownerId||m.classId!==scope.classId)||!Array.isArray(requests)||requests.length>8||requests.some(r=>!r||Object.keys(r).sort().join(',')!=='expectedCredentialRevision,expectedRosterRevision,requestId'||!n88ReceiptCommand(r.requestId)||!n88ReceiptHex(r.expectedRosterRevision)||!n88ReceiptHex(r.expectedCredentialRevision))||new Set(requests.map(r=>r.requestId)).size!==requests.length)throw Error('n88_receipt_read_denied');
+ return requests.map(r=>{
+  const matches=db.classReceipts.filter(x=>x.ownerId===scope.ownerId&&x.requestId===r.requestId);
+  if(matches.length!==1)return {state:'unknown',created:0,skipped:0,failed:0};
+  const receipt=matches[0],binding=n88ReceiptDigest(['batch',scope.teachingId,r.expectedRosterRevision,null,null,null,null,r.expectedCredentialRevision]);
+  if(receipt.binding!==binding||!Array.isArray(receipt.results)||receipt.results.length>2000||receipt.results.some(x=>!members.some(m=>m.studentId===x.studentId&&m.enrollmentId===x.enrollmentId)||!['created','skipped','failed'].includes(x.status)))return {state:'unknown',created:0,skipped:0,failed:0};
+  return {state:'committed',...Object.fromEntries(['created','skipped','failed'].map(k=>[k,receipt.results.filter(x=>x.status===k).length]))};
+ });
+}
+
 function createClassCredentialOperations({ repository, verifyTeacher, verifyIngress, origin, resolveClass, issueMember, rotateMember, revokeMember, rollout = createRolloutGuard() }) {
   if (!repository?.transaction || [verifyTeacher, verifyIngress, resolveClass, issueMember, rotateMember, revokeMember].some((f) => typeof f !== "function") || new URL(origin).origin !== origin || !origin.startsWith("https://")) fail();
   return Object.freeze({ forRequest(request) {
@@ -916,7 +934,8 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
             hasActiveCredential: live(db, m)
           })) });
           if (!requestId(input.requestId)) return denied();
-          const binding = hash3([action, scope.teachingId, input.expectedRosterRevision ?? null, input.studentId ?? null, input.enrollmentId ?? null, input.revision ?? null, input.credentialVersion ?? null]);
+          if(input.expectedCredentialRevision!==undefined&&!/^[a-f0-9]{64}$/.test(input.expectedCredentialRevision))return denied();
+          const binding = hash3([action, scope.teachingId, input.expectedRosterRevision ?? null, input.studentId ?? null, input.enrollmentId ?? null, input.revision ?? null, input.credentialVersion ?? null,...(input.expectedCredentialRevision===undefined?[]:[input.expectedCredentialRevision])]);
           const prior = db.classReceipts.find((r) => r.ownerId === auth.ownerId && r.requestId === input.requestId);
           if (prior) {
             if (!prior.results.every((r) => members.some((m) => m.studentId === r.studentId && m.enrollmentId === r.enrollmentId))) return denied();
@@ -925,7 +944,7 @@ function createClassCredentialOperations({ repository, verifyTeacher, verifyIngr
             return result(200, { requestId: input.requestId, replayed: true, results: rows2, counts: summary(rows2) });
           }
           if (db.classReceipts.length >= 1e4) fail();
-          if (action === "batch" && input.expectedRosterRevision !== rosterRevision) return result(409, { error: "roster_changed" });
+          if (action === "batch" && (input.expectedRosterRevision !== rosterRevision || input.expectedCredentialRevision!==undefined&&input.expectedCredentialRevision!==credentialStateRevision(db,members))) return result(409, { error: "roster_changed" });
           let selected = members;
           if (action !== "batch") {
             selected = members.filter((m) => m.studentId === input.studentId && m.enrollmentId === input.enrollmentId && m.revision === input.revision);
@@ -1461,17 +1480,28 @@ var classListResponseMode = (mode, protocol) => mode === "public" && protocol ==
  * Keep the HttpOnly session on infrastructure/projection/COMMIT failure; retry
  * still revalidates every original guard. Per-request state cannot cross users.
  */
+// AI: process-local tags only; never retain requests, identities, errors or payloads.
+const n88ReadFailureTags=new WeakMap();
+const n88ReadFailureCategories=Object.freeze(['acquire','guard','transaction','projection','commit','unknown','admission_denied','session_required','denied']);
+function n88TagReadFailure(value,stage){n88ReadFailureTags.set(value,n88ReadFailureCategories.includes(stage)?stage:'unknown');return value;}
+function n88ReadCategory(stage){
+ if(stage==='acquire'||stage==='guard')return stage;
+ if(stage==='projection-commit'||stage==='projection-commitguards')return 'commit';
+ if(['begin','snapshot','projection-finalize','projection-membership-flush'].includes(stage))return 'transaction';
+ if(stage==='operation'||['synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate'].includes(stage))return 'projection';
+ return 'unknown';
+}
 function createStudentReadBoundary(createHandler,options) {
   const normal=createHandler(options);
   return async request=>{
     if(request.method!=='GET'||!['/student/read','/api/n88/student/read'].includes(request.path))return normal(request);
-    let repositoryFailed=false;
+    let repositoryFailed=false, failureCategory='unknown';
     const repository={...options.repository,transaction:async action=>{
       try{return await options.repository.transaction(action);}
-      catch{repositoryFailed=true;throw Error('n88_student_read_unavailable');}
+      catch(error){repositoryFailed=true;failureCategory=n88ReadFailureTags.get(error)||'unknown';throw Error('n88_student_read_unavailable');}
     }};
     const result=await createHandler({...options,repository})(request);
-    return repositoryFailed ? {status:503,body:{error:'unavailable'},headers:PRIVATE_HEADERS} : result;
+    return repositoryFailed ? n88TagReadFailure({status:503,body:{error:'unavailable'},headers:PRIVATE_HEADERS},failureCategory) : result;
   };
 }
 function createIntegratedService(options, adapter, baseRepository) {
@@ -1570,6 +1600,7 @@ function createIntegratedService(options, adapter, baseRepository) {
             const c = ownedCredential(db, m), r2 = c ? await recovery.read(ports, c) : { status: "inactive", credential: null };
             return { recoveryStatus: r2.status, credential: r2.credential, studentId: m.studentId, enrollmentId: m.enrollmentId, revision: m.revision, label: m.label, hasActiveCode: cs.some((c2) => c2.revokedAt === null), credentialVersion: Math.max(0, ...cs.map((c2) => c2.version)) };
           })) };
+          if(action==="list"&&body.reconciliationVersion!==undefined){if(body.reconciliationVersion!==1)return deny2();data2.credentialRevision=credentialStateRevision(db,members);data2.reconciliation=reconcileIssuanceReceipts(db,s,members,body.reconcile??[]);}
           const responseMode = action === "list" ? classListResponseMode(rollout.mode, body.uiProtocol) : rollout.mode;
           return { status: 200, body: { ack: true, binding, requestId: body.requestId ?? null, data: data2, rollout: responseMode }, headers: PRIVATE_HEADERS };
         });
@@ -4244,7 +4275,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       fence();
       return r;
     };
-    let timer, acquireTimer;
+    let timer, acquireTimer, diagnosticStage=null;
     const work = (async () => {
       const lease = Promise.resolve().then(() => acquire(measure));
       lease.then((client) => {
@@ -4257,7 +4288,9 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       clearTimeout(acquireTimer);
       fence();
       must(c && typeof c.query === "function" && typeof c.release === "function");
+      diagnosticStage="guard";
       await measure("boundary", () => assertVerifiedBoundary(c));
+      diagnosticStage=null;
       fence();
       stage = "begin";
       await query("begin isolation level read committed");
@@ -4363,7 +4396,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       return await Promise.race([work, new Promise((_, reject) => {
         timer = setTimeout(() => reject(unavailable()), Math.max(1, deadline - Date.now()));
       })]);
-    } catch {
+    } catch (cause) {
       live2 = false;
       if (c && begun && !committed && !destroyed) {
         let cleanupTimer;
@@ -4378,7 +4411,7 @@ function createPostgresRepository({ acquire, limits, timing, synchronize = async
       }
       const error = unavailable();
       error.safeStage = stage;
-      throw error;
+      throw n88TagReadFailure(error,n88ReadFailureTags.get(cause)||diagnosticStage||n88ReadCategory(stage));
     } finally {
       live2 = false;
       clearTimeout(timer);
@@ -4727,7 +4760,9 @@ function createWebEntry(options) {
       const e = envelopes.get(r);
       if (!e || e.signal.aborted || Math.abs(Math.floor(now() / 1e3) - Number(e.time)) > 15) return null;
       const result2 = await query("select n88_private.consume_ingress($1::uuid,$2::bigint) as accepted", [e.nonce, Number(e.time) + 16]);
-      return result2.rows.length === 1 && result2.rows[0].accepted === true ? { clientKey: e.source } : null;
+      const admitted=result2.rows.length===1&&result2.rows[0].accepted===true;
+      if(!admitted)n88ReadFailureTags.set(r,"admission_denied");
+      return admitted?{clientKey:e.source}:null;
     }
   };
   const service = composeService(options, adapter);
@@ -4755,6 +4790,13 @@ function createWebEntry(options) {
         if (bytes.length > 4096) return privateResponse(413);
         const expected = await mac(options.ingressKey, signingText({ origin: options.origin, path, method, headers: h, bodyHash: await sha(bytes), time: time2, nonce, source }));
         if (!timingSafeEqual3(Buffer12.from(expected, "hex"), Buffer12.from(signature, "hex"))) return privateResponse(401);
+        // Only original operator key, domain-separated and bound to this complete signed envelope.
+        let operatorReadFailure=false;
+        const proof=wire.get('x-n88-operator-read-failure');
+        if(path==='/api/n88/student/read'&&method==='GET'&&/^[a-f0-9]{64}$/.test(proof||'')){
+          const expectedProof=await mac(options.secretKey,JSON.stringify(['n88-operator-read-failure-v1',time2,nonce,source,signature]));
+          operatorReadFailure=timingSafeEqual3(Buffer12.from(expectedProof,'hex'),Buffer12.from(proof,'hex'));
+        }
         let body = {};
         if (bytes.length) body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
         if (!body || Array.isArray(body) || typeof body !== "object" || method === "GET" && bytes.length) return privateResponse(400);
@@ -4763,7 +4805,7 @@ function createWebEntry(options) {
         try {
           const selected = method === "POST" && path === "/api/n88/teacher/class/list" ? listService : service;
           const result2 = await selected(r);
-          return Response.json({ status: result2.status, body: result2.body, cookie: result2.headers?.["Set-Cookie"] || null, ...(wire.get("x-n88-read-phase-version") === "1" && path === "/api/n88/student/read" && method === "GET" && result2.status === 200 && validateReadPhases(result2.readPhases) ? {readPhases: result2.readPhases} : {}) }, { headers: PRIVATE_WEB_HEADERS });
+          return Response.json({ ...(operatorReadFailure&&[401,503].includes(result2.status)?{readFailureStage:n88ReadFailureTags.get(r)||n88ReadFailureTags.get(result2)||(result2.status===401?(!cookie2?'session_required':'denied'):'unknown')}:{}), status: result2.status, body: result2.body, cookie: result2.headers?.["Set-Cookie"] || null, ...(wire.get("x-n88-read-phase-version") === "1" && path === "/api/n88/student/read" && method === "GET" && result2.status === 200 && validateReadPhases(result2.readPhases) ? {readPhases: result2.readPhases} : {}) }, { headers: PRIVATE_WEB_HEADERS });
         } finally {
           envelopes.delete(r);
         }
@@ -4866,14 +4908,15 @@ function createExistingHost(readEnv) {
   const acquire = async (measure = async (_name, action) => action()) => {
     if (waiting >= 8) throw Error("n88_pool_capacity");
     waiting++;
-    let client;
+    let client, acquisitionStage="acquire";
     try {
       client = await measure("pool", () => pool.connect());
+      acquisitionStage="guard";
       await measure("boundary", async () => { await assertRestrictedTransport(client); await assertPrivateDatabaseSession(client); });
       return client;
     } catch {
       client?.release(Error("n88_database_unavailable"));
-      throw Error("n88_database_unavailable");
+      throw n88TagReadFailure(Error("n88_database_unavailable"),acquisitionStage);
     } finally {
       waiting--;
     }
