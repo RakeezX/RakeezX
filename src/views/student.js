@@ -15,6 +15,7 @@ import { studentAvatar } from '../lib/avatar.js';
 import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
 import { demoOutputMarker, markDemoSharedText } from '../lib/report-print.js';
 import { studentAchievements, achievementCard, drawAchievementCard, achievementPng } from '../lib/student-achievements.js';
+import { openAchievementCertificate } from '../lib/achievement-certificate.js';
 const achievementsStyleUrl = new URL('../styles/student-achievements.css', import.meta.url).href;
 
 /** الإسناد المعروض: المطلوب في الرابط، أو أول إسناد لشعبة الطالب الحالية. */
@@ -194,10 +195,11 @@ export default {
         : ''}
 
       <section class="section student-profile-section student-achievements noprint" aria-labelledby="student-achievements-title">
-        <div class="section__head">
+        <div class="section__head wrap">
           <h2 class="section__title" id="student-achievements-title">إنجازات من السجل</h2>
           <span class="badge">للمعلم · للقراءة فقط</span>
           <button class="btn btn--quiet" data-act="share-achievement">${icon('board')} بطاقة إنجاز</button>
+          <button class="btn btn--quiet" data-act="achievement-certificate">${icon('star')} شهادة تقدير</button>
         </div>
         <p class="student-achievements__intro">نحتفي بإنجازات موثّقة من السجلات المتاحة، دون نقاط إضافية أو ترتيب بين الطلاب. المشاركة والحضور يشملان كل السجل؛ الدرجات تخص الإسناد المعروض.</p>
         ${achievements.length ? html`
@@ -489,6 +491,18 @@ export default {
   },
 
   actions: {
+    async 'achievement-certificate'(el, ev, params) {
+      const s = store.getStudent(params.id);
+      if (!s) return;
+      const tch = resolveTeaching(s, params.teaching);
+      await openAchievementCertificate({
+        studentId: s.id,
+        items: tch ? store.items(tch.id) : [],
+        gradeCtx: store.studentContext(s.id, tch?.id),
+        history: store.studentHistory(s.id),
+      }, { studentName: s.name, demo: markDemoSharedText([]).length > 0 });
+    },
+
     async 'share-achievement'(el, ev, params) {
       const s = store.getStudent(params.id);
       if (!s) return;

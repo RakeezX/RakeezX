@@ -1,0 +1,93 @@
+/* Fullscreen read-only document viewer, using the existing Rakeez sheet shell. */
+.sheet-backdrop.document-preview-backdrop {
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
+}
+.sheet.document-preview-sheet {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  max-inline-size: none;
+  width: 100%;
+  max-width: none;
+  height: var(--visible-viewport-height, 100dvh);
+  max-height: var(--visible-viewport-height, 100dvh);
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+.document-preview-sheet .sheet__head {
+  flex: none;
+  margin: 0;
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));
+}
+.document-preview-sheet .sheet__head > div { min-width: 0; }
+.document-preview-sheet .sheet__title { overflow-wrap: anywhere; }
+.document-preview-sheet .sheet__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.document-preview__toolbar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+  border-block-end: 1px solid var(--border);
+  background: var(--bg-elev);
+}
+.document-preview__toolbar .iconbtn,
+.document-preview__toolbar .btn,
+.document-preview-sheet .sheet__head .iconbtn {
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+.document-preview__toolbar :disabled { opacity: .4; cursor: default; }
+.document-preview__percent {
+  min-width: 54px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--text-2);
+}
+.document-preview__viewport {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--bg);
+  padding: 20px 20px max(20px, env(safe-area-inset-bottom));
+  /* Physical LTR scroll geometry keeps both edges reachable after zoom in RTL. */
+  direction: ltr;
+  scrollbar-gutter: stable;
+}
+.document-preview__viewport:focus-visible { outline: 2px solid var(--brand); outline-offset: -3px; }
+.document-preview__stage {
+  display: flex;
+  min-width: 100%;
+  min-height: 100%;
+  width: max-content;
+}
+.document-preview__page {
+  flex: none;
+  margin: auto;
+  background: #fff;
+  box-shadow: var(--shadow-2, 0 8px 28px #0002);
+}
+.document-preview__canvas { display: block; max-width: none; max-height: none; }
+@media (max-width: 520px) {
+  .document-preview__toolbar { gap: 4px; }
+  .document-preview__toolbar .btn { padding-inline: 10px; font-size: 13px; }
+  .document-preview__viewport { padding: 12px 12px max(12px, env(safe-area-inset-bottom)); }
+}

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const IMPORT_SPECIFIER = /(?:import(?:\s+[\s\S]*?\s+from\s+|\s*)|import\s*\()(['"])([^'"]+)\1/g;
+const IMPORT_SPECIFIER = /(?:^\s*import\s+(?:[\w*{},$\s]+?\s+from\s+)?|\bimport\s*\(\s*)(['"])([^'"]+)\1/gm;
 
 async function executableGraph(entry) {
   const visited = new Set();
@@ -42,6 +42,6 @@ test('service worker precaches the complete executable route graph', async () =>
   assert.ok(visited.size >= 59, 'route graph unexpectedly shrank; review router/module coverage');
 
   const routedViews = dependencies.get('src/router.js') ?? [];
-  assert.equal(routedViews.length, 33, 'every router entry must remain part of the audited graph');
+  assert.equal(routedViews.length, 38, 'every router entry must remain part of the audited graph');
   for (const view of routedViews) assert.ok(cachedModules.has(view), `${view} is not precached`);
 });
