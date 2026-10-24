@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-failure-capture-client-delivery-20261024",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5950,
+      "scopeKey": "n88-qualified-failure-capture-client-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 25,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "baseSha": "438ceffaf6aeab121c10f7a6e466aa41024a14a4",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX/.worktrees/continuous-n88-failure-capture-client-delivery-20261024",
+      "allowedPaths": [
+        "src/lib/student-portal-unified-client.js",
+        "drafts/n88-student-portal/client/binding-proof.js",
+        "drafts/n88-student-portal/client/student-entry.js",
+        "tests/n88-failure-capture-client-delivery-20261024/client.mjs",
+        "tests/n88-failure-capture-client-delivery-20261024/client.json",
+        "tests/n88-failure-capture-client-delivery-20261024/app.mjs",
+        "tests/n88-failure-capture-client-delivery-20261024/app.json",
+        "tests/n88-failure-capture-client-delivery-20261024/provenance.json",
+        "docs/automation-evidence/20261024/N88_FAILURE_CAPTURE_CLIENT_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-unified-client.js",
+        "drafts/n88-student-portal/client/binding-proof.js",
+        "drafts/n88-student-portal/client/student-entry.js"
+      ],
+      "requiredChecks": [
+        "n88_finite_failure_capture_before_error_handler",
+        "n88_actual_student_error_path_retirement_and_privacy",
+        "n88_qualified_capture_source_current_main_parity"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "Full direct PO necessary service-stability completion; source-only public capture prerequisite via sole publisher, zero provider or account operations.",
+      "preparationAuthority": {
+        "kind": "qualified_public_source_slice_only",
+        "publication": true,
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "originalQualifiedCandidate": "169ba140ecbd8e8823427c9e6ad7f26941ebbfac",
+        "qualifiedDependencyHashes": {
+          "src/lib/student-portal-unified-client.js": "14e3c39335602f15dee4a1816724a78700a36cc90d1856f61816e8fd6c50718a",
+          "drafts/n88-student-portal/client/binding-proof.js": "6e9582ff6f24e0d2ed959910bc214b920ea9e1bebf7657c7ee5f60f6cd4bbab6",
+          "drafts/n88-student-portal/client/student-entry.js": "9c7768a245e06d11f8be9abf62d1397f43451cbd4cc9ef6e292572532177b732"
+        },
+        "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-new-normal-five-student-service-result.json"
+      },
+      "acceptance": [
+        "Normal error remains503/unavailable with no false profile/binding, while an explicitly selected finite proof can be captured before error handling.",
+        "Strict finite metadata, current browser/expiry/retirement and ordinary non-opt-in behavior remain protected in actual student client/app checks.",
+        "Sole publisher verifies exact public source dependency; private carrier packaging and actual correlated read remain original-custodian gates, no hosted-fix or wholeN88 claim."
+      ],
+      "objective": "PUBLISH ONLY THE ALREADY QUALIFIED FAILURE-CAPTURE CLIENT SOURCE, NOT A GUESSED SERVICE FIX. Parent original candidate169ba140ecbd8e8823427c9e6ad7f26941ebbfac/run710e6023 proves generated native/current carrier/localPG78 failure correlation and actual student HTTP/app503 handler PASS. The server observer is still INACTIVE, no live allowance consumed. Existing served client accepted successful binding receipts only, so the selected failure receipt was discarded before ordinary error handling. Exact minimal three-source dependency/hash is failure-correlation-public-dependency.json in that candidate; new native evidence and finite-guards are under tests/n88-five-correlation-20261024/. Old wrong-signature expectation failure retained, transport401 unchanged. Actual user student503 and issuanceUNKNOWN stayOPEN. Previous class UI candidate360353bc/published438ceff is delivered and MUST remain intact.\n\nFresh ISOLATED PUBLIC worktree on current main. Integrate ONLY the declared source dependency from immutable169ba140. Prefer narrow diff of these files from independently observed base98a4e76a46d6b921a17aa9909ce521f2597ca432 through169ba140 onto current main; compare current source first and preserve later behavior, never copy whole old worktree/backend. The new observer module is qualified shared client source, not private custody. Preserve existing automatic-return, visibility/cancel/deadline, code normalization, owner retirement, ordinary error/401/503 handling and new class count/order/mutation support. No server/native/carrier/SQL/Auth/RLS/env/fixture/session read or protected custody file here.\n\nProve the actual app's ordinary503 path makes ONE request, captures only exact allowlisted selected metadata BEFORE error handler, clears owned fragment/DOM metadata on retirement and renders no profile or successful binding. Unknown nonce ACK does not retry; wrong source/browser/expiry/replay/malformed or extra/private fields do not become trusted proof. Parent finite observer native/PG/crypto tests may be REUSED only by exact source/dependency parity; no rerun of native service tests/provider. Port only needed client/app cases to own declared test files and canonical isolated-local-browser helper fresh loopback/no credentials/profiles/SW/remote. Actual client/handlers/source CSS, no lookalike. A harmless callback is not a committed binding receipt; sourceChecked belongs to original custody verification of actual pin/readback, never x-n88-source (IP pseudonym). Keep all prior UNKNOWN/FAIL evidence unchanged. Any genuine current-main source merge gets affected local checks, no broad suite/new benchmark.\n\nPublic raw source availability is distinct from the original private /student compiled asset. The source publisher verifies declared three repository asset bytes and normal import path; do NOT claim it delivered an unchanged private carrier's embedded JS or authenticated read. Original custodian will bundle the exact qualified entry/observer if needed into its ALREADY authorized ONE combined diagnostic carrier transition with unchanged other private assets/routes/headers; no carrier upload by this child. Record exact public source and private-packaging boundary/provenance, no old permit reuse or new startup route. Root read-only public static preparation confirmed existing unified-client and draft student-entry URLs200/application-javascript, not student-profile read evidence. If actual public module serving/import parity has an issue, correct only the declared dependency or report exact required path, don't disable private/noindex guards.\n\nReturn LOCAL_READY when THREE publication checks trulyPASS. Sole original publisher alone builds/integrates/deploys/verifies Product main, no push/deploy by worker. No extension rebuild, no N36/N44 change, new account, code/grade/publication action or cookie/token/body export. Original parent concurrently prepares generated native/carrier under activation/ only and will not edit these three files. WholeN88 service stability and nonempty/current ownership/issuance remain OPEN after this source delivery.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "438ceffaf6aeab121c10f7a6e466aa41024a14a4",
+        "requiredSourcePaths": [
+          "src/lib/student-portal-unified-client.js",
+          "drafts/n88-student-portal/client/student-entry.js",
+          "src/views/student-portal-login.js",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs"
+        ],
+        "editPaths": [
+          "src/lib/student-portal-unified-client.js",
+          "drafts/n88-student-portal/client/binding-proof.js",
+          "drafts/n88-student-portal/client/student-entry.js",
+          "tests/n88-failure-capture-client-delivery-20261024/client.mjs",
+          "tests/n88-failure-capture-client-delivery-20261024/client.json",
+          "tests/n88-failure-capture-client-delivery-20261024/app.mjs",
+          "tests/n88-failure-capture-client-delivery-20261024/app.json",
+          "tests/n88-failure-capture-client-delivery-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_FAILURE_CAPTURE_CLIENT_DELIVERY.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/client/binding-proof.js",
+          "tests/n88-failure-capture-client-delivery-20261024/client.mjs",
+          "tests/n88-failure-capture-client-delivery-20261024/client.json",
+          "tests/n88-failure-capture-client-delivery-20261024/app.mjs",
+          "tests/n88-failure-capture-client-delivery-20261024/app.json",
+          "tests/n88-failure-capture-client-delivery-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_FAILURE_CAPTURE_CLIENT_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n88_finite_failure_capture_before_error_handler",
+          "n88_actual_student_error_path_retirement_and_privacy",
+          "n88_qualified_capture_source_current_main_parity"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}

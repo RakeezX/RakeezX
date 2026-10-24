@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-fresh-academic-recurrence-20261024",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -6000,
+      "scopeKey": "n36-fresh-academic-recurrence",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "PO24October new real regression: entirely NEW empty Rakeez account in Incognito, extension0.5.41, APP_ACADEMIC_SELECTION_REQUIRED at binding/worker-ack, ALL source counters/staged/receipts ZERO. Not the old302run or its historical UNKNOWN trace. Previous candidate6d114069e2a85c04e83d975905916aa686bebc06 publishede4a60549bf7936de27e4ab4bc7864e4b19366d16 already adds completeProvisionedDeviceSelection in store.js; do not repeat that fix or assume current failure same cause. FIRST read its exact evidence/tests and current main source; compare original boundary and inspect each restrictive completion guard, actual provisioning descriptor/receipt/revision, renewal timing and persisted selection. Reuse existing real-app fixture/provisioner without manually filling pointers/demo data. Reproduce the new gap with normal provision -> boot -> verified lease -> actual extension Start, including ordinary account setup/profile/Sync timing before first import; distinguish new gap from loaded-app version mismatch. Public static exact-source metadata fetch permitted but no authenticated account/browser/service reads, profiles/cookies or forbidden historical result reader/control. No speculative code if not reproduced. Identify concrete guard/state/callback causing refusal with finite synthetic evidence, then smallest causal source correction in declared files. Preserve legitimate ambiguity/mature-account refusal, valid user-selected year/term, academic/calendar records and temporary calendar-switch hold, owner/workspace/session/writable lease, unknown prior receipt and durable commit guards. Do not weaken selection proof, rely on rendered fallback as authority, re-provision account, create years/classes/subjects, clear DB or pending traces, modify lease/Auth/security policy or extension protocol/version/ZIP. If normal first-account initialization cannot safely choose, provide actual explicit year/term selection in existing app import flow using existing controls and guarded durable save, not dead-end extension copy or fabricated defaults; first prove necessity and existing product policy. Test actual DOM/handlers with canonical isolated loopback browser, nativeIndexedDB freshcontext no remote/SW; focused initial guarded persistence, Start small synthetic import/receipt/reload/dedup and owner/term/readiness negatives. Reuse unchanged0.5.41 timetable/source matrix. Preserve failures and report limits. Sole controller dispatch and publisher delivery; no direct push/provider/queue or browser operations. Existing N88 source writers and N44 scopes are disjoint. Return exact runnerJSON; no claim actual user acceptance/fullN36close.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/app.js",
+        "src/lib/account-provisioning.js",
+        "src/views/class-import-center.js",
+        "tests/n36-fresh-recurrence-20261024/**",
+        "docs/automation-evidence/20261024/N36_FRESH_ACADEMIC_RECURRENCE.md"
+      ],
+      "verificationPaths": [
+        "src/store.js",
+        "src/app.js",
+        "src/lib/account-provisioning.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_current_fresh_boot_binding_cause",
+        "n36_current_fresh_selection_receipt_reload",
+        "n36_current_owner_readiness_selection_drift_guards"
+      ],
+      "acceptance": [
+        "New recurrence reproduced against current main or exact honest evidence blocker, not old baseline retest mislabeled.",
+        "Smallest causal correction, durable coherent first import with existing choices/owner/lease/calendar/UNKNOWN guards intact.",
+        "Affected actual-app synthetic proof and original publisher exact served verification; real new-account acceptance remains explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261024-current-new-account-academic-regression",
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0,
+        "syntheticOnly": true
+      },
+      "releaseAuthority": "Latest PO requests immediate permanent causal repair for new0.5.41 account regression; standing routine affected frontend delivery via original publisher only, no live account/Auth/schema/calendar/extension changes.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "438ceffaf6aeab121c10f7a6e466aa41024a14a4",
+        "requiredSourcePaths": [
+          "src/store.js",
+          "src/app.js",
+          "src/lib/account-provisioning.js",
+          "src/views/class-import-center.js",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs",
+          "tests/n36-receiver-fixture.mjs"
+        ],
+        "editPaths": [
+          "src/store.js",
+          "src/app.js",
+          "src/lib/account-provisioning.js",
+          "src/views/class-import-center.js",
+          "tests/n36-fresh-recurrence-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N36_FRESH_ACADEMIC_RECURRENCE.md"
+        ],
+        "newPaths": [
+          "tests/n36-fresh-recurrence-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N36_FRESH_ACADEMIC_RECURRENCE.md"
+        ],
+        "workerChecks": [
+          "n36_current_fresh_boot_binding_cause",
+          "n36_current_fresh_selection_receipt_reload",
+          "n36_current_owner_readiness_selection_drift_guards"
+        ],
+        "publisherChecks": []
+      },
+      "completionMode": "reproduce_current_new_account_first_start_and_fix_only_cause",
+      "baseSha": "438ceffaf6aeab121c10f7a6e466aa41024a14a4"
+    }
+  ]
+}
