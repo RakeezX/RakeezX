@@ -127,6 +127,15 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     if(disposed)return;
     if(value===null){root.removeAttribute('data-n88-list-response');return;}
     try{current(false);root.setAttribute('data-n88-list-response',JSON.stringify(value));}catch{root.removeAttribute('data-n88-list-response');}
+  },onMutationDiagnostic:value=>{
+    root.querySelector('[data-n88-mutation-details]')?.remove();
+    if(disposed||!value)return;
+    try{current(false);}catch{return;}
+    const snapshot=Object.freeze({...value,stage:failureSnapshot(ownDiagnostic)?.stage||'none'});
+    const details=root.ownerDocument.createElement('details');details.dataset.n88MutationDetails='';
+    const summary=root.ownerDocument.createElement('summary');summary.textContent='تفاصيل دعم العملية (ليست قراءة القائمة)';
+    const text=root.ownerDocument.createElement('pre');details.append(summary,text);entryShell(root).append(details);
+    details.addEventListener('toggle',()=>{try{current(false);text.textContent=details.open?JSON.stringify(snapshot,null,2):'';}catch{details.remove();}});
   },request:(path,init)=>{
     // List/guidance share the same authoritative short DB lock. Serialize this
     // owner's browser requests before dispatch, retaining all binding/lease checks.
@@ -152,7 +161,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     record('http',response.status,performance.now()-started,'none',stage);
     if(!response.ok)failure=[401,403].includes(response.status)?'denied':'connection';
     const region=path==='/api/n88/teacher/class/list'?classListRegion(response.headers?.get('x-n88-service-region')):'unknown';
-    current(false);return {ok:response.ok,headers:new Headers({'x-n88-service-region':region}),async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
+    current(false);return {ok:response.ok,status:response.status,headers:new Headers({'x-n88-service-region':region}),async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
       // Server admission follows verified Auth/session/current source ownership.
       // Strip its rollout metadata before the existing exact ACK validator.
       if(path.endsWith('/list')){

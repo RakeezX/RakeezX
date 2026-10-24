@@ -1,0 +1,14 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "providerOperations": 0,
+  "renderedUI": false,
+  "checks": [
+    "finite mutation failure distinct from successful list",
+    "unknown receipt remains unknown without replay",
+    "owner switch rejects old snapshot; invocation-to-microtask retirement prevents dispatch",
+    "no IDs/credentials/error bodies in finite metadata"
+  ],
+  "initialHarnessFailure": "assert.rejects could not catch the deliberately synchronous review_required preflight; corrected to assert.throws",
+  "requestCount": 3
+}

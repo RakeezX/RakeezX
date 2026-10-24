@@ -1,0 +1,23 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "providerOperations": 0,
+  "renderedUI": true,
+  "initialHarnessFailure": {
+    "actual": "block",
+    "expected": "grid",
+    "reason": "CSS assertion initially targeted the ul; existing source CSS applies grid to each li. Corrected selector only; Product source unchanged."
+  },
+  "checks": [
+    "actual mounted runtime/client/handlers/CSS over fresh loopback HTTP",
+    "five mixed active/inactive rows: distinct total/active counts",
+    "Arabic numeric order; duplicate-label ties preserve active/inactive identity; actual revoke handler sends original student/enrollment",
+    "uncertain mutation and successful list diagnostics remain separate; no command replay",
+    "owner switch removes prior roster and mutation metadata",
+    "empty is confirmed zero; unavailable never claims zero"
+  ],
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true
+  }
+}

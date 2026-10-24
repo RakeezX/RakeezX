@@ -1,0 +1,149 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-current-five-ui-delivery-20261024",
+  "runId": "b249f900-9cd7-499a-8902-e09f387def2c",
+  "status": "PASS",
+  "cardBaseSha": "5d216959e5fe334b73b7fa276f6987a1f444b6b1",
+  "baseSha": "cf5f000697a53deba7a85f06586e1ef841a6e240",
+  "observedRemoteMainSha": "cf5f000697a53deba7a85f06586e1ef841a6e240",
+  "qualifiedCodeCandidate": "2b15de2a5e8f13a4109815164fcd3f9358bd1a93",
+  "qualifiedEvidenceCandidate": "fb63adcb8ffcee21e4f34c2536d65a3fb16ef61d",
+  "patchBase": "ceec3a1c4c128c4601b62044528e5c08581aaaf0",
+  "source": {
+    "src/lib/student-portal-class-client.js": {
+      "sha256": "1ddbe8e44fe4e3fb0efea936e40b5d368a479e3436336457f80b31baae9e7bca",
+      "exactQualifiedBytes": true,
+      "currentMainPreimageUnchanged": true
+    },
+    "src/lib/student-portal-runtime.js": {
+      "sha256": "1880b56192bee8ba41b0c6f12fef9b62ed210312d1f8abe6e4eb6293234b3de2",
+      "exactQualifiedBytes": true,
+      "currentMainPreimageUnchanged": true
+    },
+    "src/views/student-portal-class.js": {
+      "sha256": "e27dc1812d4250654e068b5bc18076a2a0f311643372c2981d7cc6e053588da5",
+      "exactQualifiedBytes": true,
+      "currentMainPreimageUnchanged": true
+    }
+  },
+  "dependencies": {
+    "src/lib/db.js": {
+      "gitNormalizedSha256": "c72011471d26cc655d183e6b5e178f0b0534505805b777a02a54650c248674a0",
+      "qualifiedParentSha256": "c72011471d26cc655d183e6b5e178f0b0534505805b777a02a54650c248674a0",
+      "qualifiedParentParity": true
+    },
+    "src/lib/dom.js": {
+      "gitNormalizedSha256": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480",
+      "qualifiedParentSha256": "8b26581da0652916d48211fa55abfc6ac8fa927c3d659a3afc5a3ca649966657",
+      "qualifiedParentParity": false
+    },
+    "src/lib/offline-lease.js": {
+      "gitNormalizedSha256": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86",
+      "qualifiedParentSha256": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86",
+      "qualifiedParentParity": true
+    },
+    "src/lib/rakeez-datetime-values.js": {
+      "gitNormalizedSha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "qualifiedParentSha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "qualifiedParentParity": true
+    },
+    "src/lib/student-portal-class-client.js": {
+      "gitNormalizedSha256": "1ddbe8e44fe4e3fb0efea936e40b5d368a479e3436336457f80b31baae9e7bca",
+      "qualifiedParentSha256": "1ddbe8e44fe4e3fb0efea936e40b5d368a479e3436336457f80b31baae9e7bca",
+      "qualifiedParentParity": true
+    },
+    "src/lib/student-portal-runtime.js": {
+      "gitNormalizedSha256": "1880b56192bee8ba41b0c6f12fef9b62ed210312d1f8abe6e4eb6293234b3de2",
+      "qualifiedParentSha256": "1880b56192bee8ba41b0c6f12fef9b62ed210312d1f8abe6e4eb6293234b3de2",
+      "qualifiedParentParity": true
+    },
+    "src/lib/student-portal-task-guidance-client.js": {
+      "gitNormalizedSha256": "de210ff07a7e0b782b1854b0b5d900c695d1727ba0eb46ad043af514fbe504bf",
+      "qualifiedParentSha256": "de210ff07a7e0b782b1854b0b5d900c695d1727ba0eb46ad043af514fbe504bf",
+      "qualifiedParentParity": true
+    },
+    "src/lib/sync-ownership.js": {
+      "gitNormalizedSha256": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
+      "qualifiedParentSha256": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
+      "qualifiedParentParity": true
+    },
+    "src/lib/visible-numerals.js": {
+      "gitNormalizedSha256": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575",
+      "qualifiedParentSha256": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575",
+      "qualifiedParentParity": true
+    },
+    "src/lib/visible-viewport.js": {
+      "gitNormalizedSha256": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
+      "qualifiedParentSha256": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
+      "qualifiedParentParity": true
+    },
+    "src/lib/workspaces.js": {
+      "gitNormalizedSha256": "834d8546970a94dfd912bab56ca8082f7d0bd890529fc565e2d36d41cc91ee1e",
+      "qualifiedParentSha256": "834d8546970a94dfd912bab56ca8082f7d0bd890529fc565e2d36d41cc91ee1e",
+      "qualifiedParentParity": true
+    },
+    "src/styles/app.css": {
+      "gitNormalizedSha256": "2be93eb79d5695c33c4745e4ad14cc8bcabd7c52342b523590ef902e4d5221a7",
+      "qualifiedParentSha256": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270",
+      "qualifiedParentParity": false
+    },
+    "src/styles/student-portal-class.css": {
+      "gitNormalizedSha256": "fc47d8d41fe443b392443fa009fde618af76ff62611d2440f97861ff791df217",
+      "qualifiedParentSha256": "5606758b91b5bebd8595540f29dc95d5cffe4622d97299714e32f15919a28e23",
+      "qualifiedParentParity": false
+    },
+    "src/views/student-portal-class.js": {
+      "gitNormalizedSha256": "e27dc1812d4250654e068b5bc18076a2a0f311643372c2981d7cc6e053588da5",
+      "qualifiedParentSha256": "e27dc1812d4250654e068b5bc18076a2a0f311643372c2981d7cc6e053588da5",
+      "qualifiedParentParity": true
+    },
+    "tests/fixtures/n88-class-management/index.html": {
+      "gitNormalizedSha256": "0407ffde5a3d263075245ad6df7e07aa6d1ef3b1c9fd675985383f4beea9798c",
+      "qualifiedParentSha256": "0407ffde5a3d263075245ad6df7e07aa6d1ef3b1c9fd675985383f4beea9798c",
+      "qualifiedParentParity": true
+    }
+  },
+  "qualifications": {
+    "src/lib/dom.js": "Current-main renderRegions additions; imported html implementation unchanged. Actual mounted component on current main passed.",
+    "src/styles/app.css": "Current-main text/status contrast tokens preserved; actual HTTP fixture loads current stylesheet.",
+    "src/styles/student-portal-class.css": "Current-main list support styles and quiet-loading progress preserved; actual source CSS row grid and UI assertions passed."
+  },
+  "originalEvidence": {
+    "client": {
+      "commit": "fb63adcb8ffcee21e4f34c2536d65a3fb16ef61d",
+      "path": "tests/n88-actual-current-cause-20261020/current-five-client.json",
+      "sha256": "221c831df97d7fa3880d5db57b782260dfb9d2ec303f5b70339e29575bb6ff58",
+      "status": "PASS",
+      "preserved": true
+    },
+    "ui": {
+      "commit": "fb63adcb8ffcee21e4f34c2536d65a3fb16ef61d",
+      "path": "tests/n88-actual-current-cause-20261020/current-five-ui.json",
+      "sha256": "dfa0beff1dd2b4dcc92c1ecbe67e2a0bf872b4d29b883e43e3e555b78c516cb8",
+      "status": "PASS",
+      "preserved": true
+    }
+  },
+  "initialProvenanceCheck": "An overbroad equality assertion first detected current-main dom.js differences. Qualification now explicitly distinguishes the three exact source hashes from current-main dependencies; affected actual client/rendered tests ran on the current dependencies, rather than reusing old rendered evidence as proof of changed CSS.",
+  "syntax": "node --check PASS on all three changed sources",
+  "diffCheck": "git diff --check PASS",
+  "patchApplication": "Only three-file diff applied; all source hashes exactly qualified; no Product merge needed.",
+  "testPorting": "Original client and mounted runtime/component/CSS HTTP fixture cases; canonical isolated helper; added duplicate identity/revoke dispatch, computed source CSS and invocation-to-dispatch owner retirement checks.",
+  "browserPhase": {
+    "helper": "scripts/ops-supervisor-v4/isolated-local-browser.mjs",
+    "origin": "http://127.0.0.1:52488",
+    "sharedLeaseRequired": false,
+    "reason": "Eligible active local non-live synthetic phase",
+    "freshContext": true,
+    "serviceWorkers": "blocked",
+    "externalRequests": "blocked",
+    "cleanup": "Owned contexts/browser and server closed in finally"
+  },
+  "providerOperations": 0,
+  "realAccountReads": 0,
+  "realDataWrites": 0,
+  "workerPublicationPerformed": false,
+  "hostedStabilityAccepted": false,
+  "umbrellaN88Accepted": false,
+  "historicalParentFailures": "Original thirteen FAIL/NOT_RUN gates unchanged on parent; service cause/issuance remain UNKNOWN; no live observation replay."
+}

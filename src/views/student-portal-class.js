@@ -3,6 +3,9 @@ import { html } from '../lib/dom.js';
 import { classContextKey, PORTAL_FIELDS } from '../lib/student-portal-class-client.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const labels = { name:'اسم الطالب', class:'الفصل', grades:'الدرجات', required:'المهام المطلوبة', completed:'المهام المكتملة', scheduled:'المهام المجدولة' };
+// Display-only ordering: credentials remain attached to their stable identities.
+const rosterCollator = new Intl.Collator('ar', { numeric:true, sensitivity:'base' });
+const displayRoster = students => students.slice().sort((a,b) => rosterCollator.compare(a.label,b.label) || (a.studentId < b.studentId ? -1 : a.studentId > b.studentId ? 1 : 0));
 /** AI: per-source drafts stay fenced to the exact class/session/source snapshot. */
 export function mountTaskGuidance(root,{client,getContext,subscribe}) {
  let disposed=false,busy=false,saving=false,sequence=0,bound=null,tasks=[],selected=null,message='',drafts=new Map(),opened=false,readError=false,uncertain=new Set(),suspended=false,queued=false,wakeTimer,operationSequence=0,loaded=false;
@@ -68,7 +71,7 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
  return {refresh,contextChanged:changed,dispose(){disposed=true;sequence++;clearTimeout(wakeTimer);drafts.clear();unsub?.();win.removeEventListener('pagehide',hide);win.removeEventListener('pageshow',wake);win.removeEventListener('focus',wake);root.ownerDocument.removeEventListener('visibilitychange',wake);root.removeEventListener('toggle',toggle,true);root.removeEventListener('input',input);root.removeEventListener('change',change);root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.replaceChildren();}};
 }
 export function mountClassPortal(root, { client, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), share = typeof navigator.share==='function' ? data=>navigator.share(data) : null, requestId = () => crypto.randomUUID() } = {}) {
-  let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer, wakeTimer, readWork = null, mutating = false, queued = false, suspended = false, retry = false, draft = null, draftRevision = null, settingsOpen = false;
+  let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer, wakeTimer, readWork = null, mutating = false, queued = false, suspended = false, retry = false, draft = null, draftRevision = null, settingsOpen = false, uncertainMutation = false;
   root.classList.add('n88-class'); root.dir = 'rtl';
   const panel=root.ownerDocument.createElement('div'),guidanceRoot=root.ownerDocument.createElement('div');root.append(panel,guidanceRoot);
   const guidance=mountTaskGuidance(guidanceRoot,{client,getContext,subscribe});
@@ -85,8 +88,9 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     settingsOpen = panel.querySelector('.n88-class-settings')?.open ?? settingsOpen;
     root.setAttribute('aria-busy', String(busy));
     panel.innerHTML = `<section aria-label="مساحة طلاب الفصل">
-      <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'رموز الدخول · '+esc(roster.students.length) : 'رموز دخول الطلاب'}</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable || !roster.credentialRevision || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0) ? 'disabled' : ''}>إنشاء الرموز الناقصة</button>` : ''}</div>
+      <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'الطلاب: '+esc(roster.students.length)+' · الرموز الفعّالة: '+esc(roster.students.filter(s=>s.hasActiveCode===true).length)+(busy||retry?' · آخر حالة مؤكدة':'') : 'الطلاب والرموز الفعّالة: لم تُؤكّد القائمة بعد'}</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable || !roster.credentialRevision || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0) ? 'disabled' : ''}>إنشاء الرموز الناقصة</button>` : ''}</div>
       <div class="n88-class-status"><p role="status" aria-live="polite">${esc(message || (ready ? (busy && !roster ? 'جارٍ قراءة القائمة…' : '') : 'مساحة الطلاب غير مفعّلة حاليًا.'))}</p>${retry && ready ? `<button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>مراجعة القائمة</button>` : ''}</div>
+      ${uncertainMutation?'<p data-n88-uncertain role="status">نتيجة عملية سابقة غير مؤكدة. عدّاد الرموز من آخر قائمة مؤكدة، ولا يثبت مصير تلك العملية.</p>':''}
       ${roster ? `<ul class="n88-class-roster" aria-label="طلاب ${esc(classLabel())}">${!roster.students.length?'<li class="n88-roster-empty">لا يوجد طلاب في هذا الفصل.</li>':''}${roster.students.map((s, index) => `<li><div class="n88-class-student"><strong>${esc(s.label)}</strong>${s.credential ? `<div data-code><input readonly autocomplete="off" dir="ltr" aria-label="رمز ${esc(s.label)}" value="${esc(s.credential)}"></div>` : `<span>${s.recoveryStatus==='legacy' ? 'رمز قديم غير مسترجع' : s.hasActiveCode ? 'الرمز مخفي؛ راجع القائمة لإظهاره' : 'بلا رمز فعّال'}</span>`}</div><div class="n88-class-actions">${s.credential ? `<button class="btn" data-action="copy-student" data-index="${index}" aria-label="نسخ رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>نسخ</button><button class="btn" data-action="share-student" data-index="${index}" aria-label="مشاركة رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>مشاركة</button>` : ''}<details class="n88-student-more"><summary aria-label="إجراءات ${esc(s.label)}" data-index="${index}">المزيد</summary><div class="n88-student-more-panel"><button class="btn" data-action="review-rotate" data-index="${index}" aria-label="تغيير رمز ${esc(s.label)}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" aria-label="إلغاء وصول ${esc(s.label)}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></details></div></li>`).join('')}</ul>
       <details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${PORTAL_FIELDS.filter(f=>roster.visibility[f]).length} من ${PORTAL_FIELDS.length}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر الحقول ثم احفظها</legend><div class="n88-class-fields">${PORTAL_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${(draft ?? roster.visibility)[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}
       ${selected && writable ? `<section class="card" data-confirm aria-label="تأكيد العملية"><h3>${esc(selected.student.label)}</h3><p>${selected.action === 'rotate' ? 'تغيير الرمز يُبطل الرمز السابق وجميع جلساته. سلّم البديل لهذا الطالب وحده بعد التحقق من هويته.' : 'إلغاء الوصول يُبطل الرمز الحالي وجميع جلساته، ولن يستطيع الطالب الدخول به.'}</p><div class="n88-class-actions"><button class="btn" data-action="confirm">${selected.action === 'rotate' ? 'تأكيد تغيير الرمز' : 'تأكيد إلغاء الوصول'}</button><button class="btn" data-action="cancel">تراجع</button></div></section>` : ''}
@@ -97,7 +101,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   // AI: invalidate synchronously, coalesce only reads; never queue a mutation.
   function invalidate(nextKey = key()) {
     guidance.contextChanged(); generation++; clearSecrets(); roster = null; selected = null; outcomes = []; retry = false;
-    if (nextKey !== boundKey) { draft = null; draftRevision = null; settingsOpen = false; }
+    if (nextKey !== boundKey) { draft = null; draftRevision = null; settingsOpen = false; uncertainMutation = false; }
     boundKey = nextKey; clearTimeout(expiryTimer);
   }
   function scheduleRead() {
@@ -126,9 +130,11 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
       try {
         const result = await client.listClass(context().teachingId);
         if (valid(g, k)) {
-          roster = result;
+          roster = {...result,students:displayRoster(result.students)};
+          if(result.reconciliation?.some(x=>x.state==='unknown'))uncertainMutation=true;
+          else if(result.reconciliation?.length&&result.reconciliation.every(x=>x.state==='committed'))uncertainMutation=false;
           if (draft && draftRevision !== result.policyRevision) { draft = null; draftRevision = null; message = 'تغيّرت إعدادات الحقول؛ راجع اختيارك من جديد.'; }
-          else message = result.reconciliation?.some(x=>x.state==='committed') ? 'تأكد إقرار العملية السابقة من السجل؛ عُرضت الحالة الحالية دون إعادة إنشائها.' : result.reconciliation?.some(x=>x.state==='unknown') ? 'تعذّر تحديد بعض النتائج السابقة. القائمة تعرض الحالة الحالية فقط.' : '';
+          else message = result.reconciliation?.some(x=>x.state==='unknown') ? 'تعذّر تحديد بعض النتائج السابقة. القائمة تعرض الحالة الحالية فقط؛ نجاح القراءة لا يؤكد الإنشاء.' : result.reconciliation?.some(x=>x.state==='committed') ? 'تأكد إقرار العملية السابقة من السجل؛ عُرضت الحالة الحالية دون إعادة إنشائها.' : '';
         }
       } catch { if (valid(g, k)) { clearSecrets(); retry = true; message = 'تعذّرت قراءة القائمة. البيانات المعروضة من آخر قراءة مؤكدة؛ راجعها للمتابعة.'; } }
       finally {
@@ -157,7 +163,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
       if(valid(refreshGeneration,k)&&roster){message=outcomeMessage;outcomes=outcomeLines;draw();}
     } catch {
       if (!valid(g, k)) return;
-      clearSecrets(); queued = false; retry = true; message = 'نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير. الإعدادات المعروضة من آخر قراءة مؤكدة.';
+      clearSecrets(); queued = false; retry = true; uncertainMutation = true; message = 'نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير. الإعدادات المعروضة من آخر قراءة مؤكدة.';
     } finally { mutating = false; busy = !!readWork; if (!disposed) { if (key() !== boundKey) invalidate(); draw(); if (queued) { queued = false; scheduleRead(); } } }
   }
   const keydown = e => { if(e.key==='Escape'){const menu=e.target.closest('.n88-student-more[open]');if(menu){menu.open=false;menu.querySelector('summary').focus();e.preventDefault();}} };

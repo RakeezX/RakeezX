@@ -19,7 +19,7 @@ function validStudent(s) {
 }
 // Finite same-origin carrier attestation only; never preserve arbitrary header text.
 export const classListRegion = value => ['ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','us-east-1','us-west-1','us-west-2','eu-central-1','eu-central-2','eu-west-1','eu-west-2','eu-west-3','sa-east-1'].includes(value) ? value : 'unknown';
-export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000), onListDiagnostic = () => {} } = {}) {
+export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000), onListDiagnostic = () => {}, onMutationDiagnostic = () => {} } = {}) {
   if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000 || !Number.isInteger(readTimeoutMs) || readTimeoutMs < 1 || readTimeoutMs > 30000) deny('invalid_configuration');
   let roster = null, rosterKey = null, pending = null, readSequence = 0;
   const readContext = () => { try { return getContext(); } catch { return null; } };
@@ -36,7 +36,10 @@ export function createClassPortalClient({ request, getContext = () => null, time
   }
   function current(c) { if (classContextKey(readContext()) !== c.key) deny('stale_context'); }
   async function call(action, teachingId, body, validate, c = context(teachingId)) {
-    let timer, timedOut=false,region='unknown',outcome='failure'; const controller = new AbortController(),started=performance.now(),sequence=readSequence;
+    let timer, timedOut=false,region='unknown',outcome='failure',httpStatus=0,code='none'; const controller = new AbortController(),started=performance.now(),sequence=readSequence;
+    const mutation=['issue-missing','rotate','revoke','visibility','guidance-save'].includes(action);
+    const mutationDiagnostic=value=>{try{onMutationDiagnostic(value);}catch{/* Observer cannot change command disposition. */}};
+    if(mutation)mutationDiagnostic(null);
     const diagnostic=value=>{try{onListDiagnostic(value);}catch{/* Diagnostic observers never change a request result. */}};
     if(action==='list')diagnostic(null);
     try {
@@ -44,7 +47,7 @@ export function createClassPortalClient({ request, getContext = () => null, time
         Promise.resolve().then(async () => { current(c); const response = await request('/api/n88/teacher/class/' + action, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', signal: controller.signal,
           headers: { 'Content-Type': 'application/json', 'X-N88-CSRF': '1' }, body: JSON.stringify({ ...body, teachingId, binding: c.binding }) }),
           ok = response?.ok === true;
-          current(c);if(action==='list'&&!controller.signal.aborted)region=classListRegion(response?.headers?.get('x-n88-service-region'));
+          current(c);if(!controller.signal.aborted){httpStatus=Number.isInteger(response?.status)&&response.status>=100&&response.status<=599?response.status:0;if(action==='list')region=classListRegion(response?.headers?.get('x-n88-service-region'));}
           return { ok, ack: ok ? await response.json() : null }; }),
         new Promise((_, reject) => { timer = setTimeout(() => { timedOut=true; controller.abort(); reject(new Error('timeout')); }, ['list','guidance-list'].includes(action)?readTimeoutMs:timeoutMs); }),
       ]);
@@ -56,9 +59,10 @@ export function createClassPortalClient({ request, getContext = () => null, time
     } catch (e) {
       current(c);
       // Never expose transport errors/bodies, which may contain credentials or personal data.
-      deny(timedOut?'timeout':['rejected','invalid_ack'].includes(e?.code) ? e.code : 'uncertain');
+      code=timedOut?'timeout':['rejected','invalid_ack'].includes(e?.code) ? e.code : 'uncertain';deny(code);
     } finally {
       clearTimeout(timer); controller.abort();
+      if(mutation&&sequence===readSequence&&classContextKey(readContext())===c.key)mutationDiagnostic(Object.freeze({schema:'n88-mutation-response-v1',action,outcome:outcome==='success'?'acknowledged':'unconfirmed',httpStatus,code,elapsedMs:Math.min(30000,Math.max(0,Math.round(performance.now()-started)))}));
       if(action==='list'&&sequence===readSequence&&classContextKey(readContext())===c.key){
         const elapsed=performance.now()-started;
         diagnostic(Object.freeze({region,elapsedMs:Number.isFinite(elapsed)?Math.min(30000,Math.max(0,Math.round(elapsed))):null,outcome}));
