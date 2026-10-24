@@ -11,7 +11,7 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-TRIAL-CLEANUP-REPAIR",
+      "liveAuthorizationRef": "PO-20261024-RECOVERED-CURRENT-ONE-PUSH",
       "budgetMinutes": 40,
       "idleMinutes": 10,
       "allowedPaths": [
@@ -36,7 +36,10 @@
         "src/store.js",
         "src/lib/sync-v2.js",
         "src/lib/cloud.js",
-        "src/views/items.js"
+        "src/views/items.js",
+        "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+        "tests/n44-current-closed-page-followup-20261024/**",
+        "docs/automation-evidence/20261024/N44_RECOVERED_CURRENT_CLOSED_PAGE_OUTCOME.md"
       ],
       "verificationPaths": [
         "src/lib/notification-push-runtime.js",
@@ -45,7 +48,8 @@
         "src/store.js",
         "src/lib/sync-v2.js",
         "src/lib/cloud.js",
-        "src/views/items.js"
+        "src/views/items.js",
+        "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql"
       ],
       "preparationAuthority": {
         "kind": "scoped_preview_and_fixture_ops",
@@ -74,7 +78,7 @@
         "authorityStartsAt": "2026-10-24T02:14:27.943Z",
         "authorityExpiresAt": "2026-10-24T04:14:27.944Z",
         "productId": "N44",
-        "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-TRIAL-CLEANUP-REPAIR",
+        "liveAuthorizationRef": "PO-20261024-RECOVERED-CURRENT-ONE-PUSH",
         "namedOperations": [
           "reconcile original one-device attempt and cleanup",
           "qualify exact changed two-hour hard stop preserving consumed budget",
@@ -445,6 +449,28 @@
           "optins": 0,
           "sends": 0,
           "oldOwnerOperations": 0
+        },
+        "recoveredCurrentClosedPageOutcome": {
+          "evidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-trial-sync-recovered.json",
+          "trialPermission": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-trial-sync-red.json",
+          "maxCurrentOwnerMetadataQueries": 1,
+          "priorRegistrationCountRequired": 3,
+          "allPriorRegistrationsMustBeRevoked": true,
+          "maxAdditionalActualRegistrations": 1,
+          "maxActualRegistrationsLifetime": 4,
+          "maxAdditionalOptinAttempts": 1,
+          "maxFreshDueSourceGroups": 1,
+          "maxTotalProviderSendAttemptsAcrossAllOwnersAndCards": 1,
+          "maxFreshSourceCleanupIntents": 1,
+          "maxSameIntentCleanupSyncDispatches": 1,
+          "newNativeUploads": 0,
+          "newSourcePins": 0,
+          "newMigrations": 0,
+          "newAccounts": 0,
+          "gradesOrStudentWrites": 0,
+          "maxIntervalMs": 7200000,
+          "closedPagePreflightBeforeAnyReservation": true,
+          "previousCountersAndOldUnknownImmutable": true
         }
       },
       "releaseAuthority": "Latest direct PO full outcome delegation authorizes necessary qualified affected notification frontend delivery through the sole publisher and named original-custodian service prerequisites. No general delivery/cron activation, old-disposal replay, tool denial bypass or consumed budget reset.",
@@ -457,7 +483,7 @@
         "continuous-n44-confirmed-command-ack-projection-20261024",
         "continuous-n88-issuance-phase-public-dependency-20261024"
       ],
-      "objective": "FINISH PROVEN CURRENT SOURCE CLEANUP DEFECT, not another registration/expiry/send attempt. Resume exact original session/worktree b2e411d585d21f19b38af4a1ad2fd98152e746cc/c074ed6b-4399-467c-9034-0c13edd5e088. All three lifetime actual registrations are revoked, last source parent/subitem SyncACK and registration succeeded; no provider send happened. Current expiry native/pin/policy/source/optin allocations CONSUMED, DO NOT replay or replenish. Last native source13f5d81b60a6d1ff687bccb72e1561a0e6758d15 is legitimate N44 successor; preserve every N88 pin and all47keys, approvalnull/deliveryoff/scheduleroff. Global send0 remains unspent but this phase permits ZERO sends/optins/registrations/native/pins. Other unqualified document remains untouched; root requested precise normal-vs-Incognito information, not permission. Do not navigate/blank it, invent profile identity or use another browser surface. Existing normal user tab left unmarked/ended now frees original control per documented lifecycle. Release shared leases except actual phases.\n\nMATERIAL SOURCE CAUSE: artifacts/ops-supervisor-v4/intake-evidence/po-20261024-n44-subitem-cleanup-source-cause.json. Actual current cleanup403/42501 repeated independently of old owner. Source deleteItem->lifecycle:delete_item->N77wrapper->0015 updates scores/items without atomic score-domain context or child/completion tombstones. N94 guard explicitly rejects ANY update of a subitems parent without that context, including deleted_at. RPC authenticated EXECUTE metadata never disproves internal trigger42501. This is a concrete source conflict, not automatic proof hosted definitions match. No existing current completion/configuration/copy/whole-teaching RPC safely deletes only this parent; don't convert mode, copy distributions or delete a teaching to evade it.\n\nFirst qualify narrow RED/GREEN using actual original migration chain and existing stopped-checkpoint-safe PG harness (no new tool/SDK/benchmark). Source parent subitems+one child, no students or scores must reproduce exact42501 with zero changes/receipt. Then implement smallest ADDITIVE function-only migration supabase/migrations/20261024150000_n44_atomic_item_cleanup.sql; never edit an applied migration or relax trigger/Auth/RLS/grants. Correct delete_item lifecycle transaction must derive auth owner, preserve original lifecycle and score-parent lock order, immutable mutation/content idempotency, owner-only scope and whole parent/subitems/completions/scores atomic tombstones/revision/history, actual commit/receipt. SET internal flag alone is NOT sufficient. No physical delete/restore/revive or changed scoring rules. Existing legacy delete_item has NO expectedRevision/CAS; never claim it does or pretend client timestamp is CAS. If additional expected-scope/revision guard is required, make explicit typed contract/affected client wiring with proper legacy refusal, not silently broadened delete. Preserve current leases/cancellation/owner guards and pending/outbox data. Fix local-delete UI wording only as needed to distinguish local absence from cloud ACK; no unrelated Auth403 or broad UI work.\n\nAffected qualification: synthetic children/score/completion tombstones, foreign owner, exact mutation replay/content collision, concurrent configuration lock behavior, before-ACK rollback and lost COMMIT ACK uncertainty; unchanged sender/crypto/native proofs reused. Stop owned PG, prove PID/birth/port inactive, retain short-path checkpoint outside delivery. Never repeat old denied recursive cleanup.\n\nService gate under user's full necessary completion authority and original contract: at mostONE original-custodian exact hosted identity read of ONLY lifecycle function chain and two score guards OR use safely captured finite error family already preserved. No generic catalog/readiness/EXECUTE requery, lost-response-body reread, live deletion probe, protected custody export or typedSQL guard expansion. Use only existing permitted original service/provider owner channel; follow Supabase skill when applicable. If no supported channel, preserve that exact limitation and finish reviewable qualified source; no new diagnostic-native/carrier workaround.\n\nOnly if exact hosted source conflict/parity and local red/green qualify, the specifically authorized original service custodian may apply this ONE reviewed ADDITIVE FUNCTION-ONLY migration via original provider delivery path and verify exact definition/version. This authorization follows PO full necessary repair delegation for current trial cleanup; do not invent a separate PO quote or claim already applied. Zero Auth/RLS/grant/role/table-schema changes, no old migration rerun, no direct data SQL. If identity/affected qualification fails, no application. Generic frontend publisher cannot perform this step. Current public/client delta still goes through sole publisher and actual served proof, never direct main/Pages push. Do not merge unrelated private worktree history; qualify exact current-main delivery delta or identify a necessary source-only child for sole publisher.\n\nActual current UNKNOWN cleanup remains UNKNOWN until existing authoritative reconciliation. At mostONE current-owner read-only reconciliation using existing exact operation identity, saved source scope and canonical receipt. This is not old-owner source2/3 cleanup. If already committed, record true ACK and do not repeat. A fresh corrected current cleanup intent is permitted at mostONCE ONLY after authoritative prior NoEffect, matching current own source/zero unintended scores, actually served fixed contract and canonical supported normal UI/Sync; never blind replay old unknown command, clear hints or auto-release blocked outbox. If NoEffect can't be proved, keep the current cleanup UNKNOWN and don't mutate it. Retain all old owner unknowns and previous FAIL/NOT_RUN. No extra source creation or restoring deleted source.\n\nReturn exact qualified source/service/delivery and actual cleanup result. N44 OS arrival still NOT_PROVEN and no further registration allocation exists in this phase. Whole notification feature remains OPEN. N88 original may concurrently work disjoint core files; serialize shared integration/live/config through existing leases; do not edit its files/certificate or take its active browser tab. Don't stop at local tests when a specifically authorized supported next service/delivery action is ready.",
+      "objective": "FINISH ACTUAL CURRENT CLOSED-PAGE ARRIVAL AFTER REAL CLEANUP FIX. Same original custodian/session/worktree 8b7ddbc741cb903242a3575bcfa2a5e0e1aa7b9c/8aad7ab4-d662-4fd7-b3d3-c46f43751b59. Actual atomic deletion correction APPLIED ONCE with verified definition, provider migrationVERSION20261024151136, name n44_atomic_item_cleanup; 12 affected real-PG checks passed. DO NOT APPLY AGAIN, no SQL/function/native/pin promotion in this phase. Root inspected actual current Sync source: lifecycle dispatch preserves immutable mutationId/device/target/clientUpdatedAt; attempts only change attempt metadata; corrected service checks exact stored request envelope under same lock and returns immutable receipt. This differs from a fresh delete command and doesn't require inventing prior NoEffect.\n\nNEW ACTUAL USER RESULT artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-trial-sync-recovered.json: SAME current normal trial now reports متزامن, successful18:34Saudi. User did not specify automatic versus manual recovery; don't claim which. Earlier current source cleanup failed403/42501 at14:56; old owner sources2/3 remain separate UNKNOWN. Current-source cleanup may now have genuine original SyncACK, not a fresh deletion. Do not repeat old delete or ask for another Syncclick. At mostONE original-custodian read-only exact current-owner fixture/immutable receipt metadata query is allowed if necessary to match this recovery: use protected known owner/source/command IDs, return ONLY matching-receipt/tombstone booleans/counts, no names/grades/row dump/broad restore/catalog. Existing original provider identity/owner scope must match. This is a precisely scoped receipt/source-metadata read, no data SQL mutation and no typedSQL guard change. Existing supported UI Sync/receipt evidence may suffice; don't invent current matching if unavailable.\n\nSOURCE HISTORY SAFETY FIRST: local qualified alias supabase/migrations/20261024150000_n44_atomic_item_cleanup.sql was applied by provider as VERSION20261024151136. Record exact already-applied bytes at supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql (rename local unpublished alias; do not change SQL bytes/applied history). Never publish150000 as a new pending migration or run CLI/apply again. Verify recorded service version/name/hash and keep provider identity private. No new migration or modification of already-applied content. Prepare exact source-only sole-publisher dependency if necessary for this record/evidence; do not directly push main or publish unrelated private branch. Reuse12 current qualified checks with exact hash; no unchanged PG/crypto/benchmark rerun. N71 previous-backup must not resurrect tombstoned parent/children/completions/scores; no Restore/Undo operation added or actual restore.\n\nREGISTRATION COUNTERS: three lifetime actual registrations all revoked. Current device inactive, consentfalse, SW binding/subscription absent; current native13f5d81b60a6d1ff687bccb72e1561a0e6758d15, all47keys and N88 successor preserved, approvalnull/deliveryoff/globalSEND0. Current old expiry/native/pin/optin/source allocations stay CONSUMED. Latest full necessary outcome delegation plus genuine cleanup repair and latest ALL-TRIAL authorization supports ONE NEW explicitly named fourth registration slot, not reset/reuse of any prior reservation. Append a distinct scope/reservation only after preconditions below. Lifetime<=4, freshoptin<=1, actualproviderSENDS<=1 TOTAL across all owners/cards. Failed reservation remains consumed. No new subscription/account or oldowner cleanup. This phase doesn't replenish N88 diagnostic/grade/issuance or prior native budgets.\n\nCRITICAL CHANGE IN ORDER: CLOSED-PAGE CAPABILITY MUST BE QUALIFIED BEFORE ANY new source/optin/register reservation. Latest direct user explicitly says ALL currently open normal and Incognito RAKEEZ accounts are trial and grants use; no repeated permission question or guessing personal account. Read only supported visible/current Rakeez document scope needed, no credentials/hidden state/denied N36 result/source reader. Positively authorized Chrome Rakeez trial pages may be TEMPORARILY unloaded to about:blank and restored at SAME user-tab IDs, including other Rakeez trial profile if needed under latest permission. Preserve N36 local302/10 receipts/old trace and N88 durable pending hints; no import/source/extension/Madrasati operation, no code-generation/review/grade change. Never touch non-Rakeez personal pages or Madrasati. Don't use another surface/actor or close/recreate tabs to bypass any connector denial. If a required existing tab cannot be controlled safely, STOP BEFORE new reservation; no fourth attempt wasted.\n\nPerform one bounded no-send closed-page REHEARSAL while current device inactive: save private original URLs/normal context, ensure no unsaved/live source operation, unload authorized relevant Rakeez trial documents to about:blank, positively verify actual no active Rakeez document in scope, then restore SAME original tab IDs/URLs. If provider cannot establish this, no optin/source. Routine restored application may perform its normal own reads; do not turn those into extra N88 receipt probes or report networkzero. N88 old manual review is already CONSUMED; do not invoke its ReviewList or inspect its result/hidden pending state. No handoff mark on routine restored user tabs at end; documented cleanup only, no claimed control transfer. No foreground/OS input. Keep imported data and history intact.\n\nOS PROOF CHANNEL BEFORE RESERVATION: existing @oai/sky documented readonly native-window observer qualified in prior run, with six synthetic privacy checks; reuse exact proof. Bounded dry-arm/list readiness with no test alert is allowed; no notifications sent to qualify. Capture only actual returned notification-specific window with fixed Rakeez title/body/site when present; no browser window reads/focus/keyboard/settings/personal notification export. API existence/baseline no-toast is readiness, not arrival. Any real tool denial/unavailable=>stop before reservation, no alternate mechanism.\n\nOnly after current recovery matched and rehearsal+observer gates pass, use ONE fresh current-owner due-source group via genuine UI/approved date adapter with canonical SyncACK and zero grade/student writes, never retired sourcec074 or oldsources2/3. Current original prefs must be freshly saved; restore those, not old account values. Use a plain test label like اختبار تذكير الجهاز, no technical run ID in product UI. Fresh scope interval<=2h AND within EXISTING actual compiled native/policy hardstop; choose genuine current operator interval, never extend old expiry/modify native/pin. If current hardstop cannot cover completion+cleanup, stop BEFORE reservation. Preserve all47keys, N88 legitimate successor and immutable policy admission/source identity. Normal one-target approval/clear under existing unspent one-send scope only; no generic delivery/cron.\n\nWith exact current owner/device/source/SW script update/parity, nonempty eligible canonical event, fresh ordinary consent and distinct registrationACK, fourth slot<=1; no second optin. Then unload precisely rehearsed Rakeez documents, prove closed-PAGE condition (do not claim physical tabclose when blanked). Arm bounded45s native observer BEFORE sole targetedprovider request. Require immutable ledger actualSENDS0/no prior journal, append reservation BEFORE request. ONE TOTAL attempt; never resend even timeout/no-toast. Actual matched OS-toast proof needed, HTTP200/provideraccept/SWgetNotifications count alone insufficient. Keep original facts/context/when proof separate.\n\nFINALLY current-owner revoke/consentfalse/unsub/SWclear, restore current original prefs, exactly ONE normal fresh-source cleanup via fixed genuine lifecycle handler and canonicalACK; if transportunknown, at mostONE same-immutable-ID canonical Sync retry after actual qualified identity/envelope proof, not new delete or changed payload. If exact idempotent recovery can't be established, preserveUNKNOWN. No oldowner/source delete, no broad queue reset. Actual final approvalnull/deliveryoff/scheduleroff +47-key readback preserving N88, restore original user tabs, leave unmarked, release every owned resource. N88 may qualify its disjoint terminal-fence contract concurrently; shared integration/service/browser phases use existing leases, don't edit its files or steal its tab. No actual send receipt/cleanup/history may be guessed. WholeN44 oldunknowns remain open if unrecoverable even if currentOSarrival succeeds. Continue supported concrete outcome, not another local-ready-only report; record precise source-only delivery dependency if needed, never publish mismatched migration alias.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -502,7 +528,7 @@
         ],
         "publisherChecks": []
       },
-      "completionMode": "repair_proven_current_subitem_cleanup_contract",
+      "completionMode": "finish_preflighted_current_closed_page_outcome_after_cleanup_fix",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
@@ -512,9 +538,9 @@
       },
       "priorObjectiveEvidence": {
         "sourceFile": "scripts/ops-supervisor-v4/n44-one-device-test-20261019.json",
-        "sourceSha256": "b2d207b0cd19de314d804ba8a54129db65c9d087c337cc5b3d59be05ab28d30a",
-        "savedCandidate": "b2e411d585d21f19b38af4a1ad2fd98152e746cc",
-        "savedRunId": "c074ed6b-4399-467c-9034-0c13edd5e088",
+        "sourceSha256": "4a225d221ce7a4e5ce0289f713f712a02a2a49ec0d53451234c599f58db4e651",
+        "savedCandidate": "8b7ddbc741cb903242a3575bcfa2a5e0e1aa7b9c",
+        "savedRunId": "8aad7ab4-d662-4fd7-b3d3-c46f43751b59",
         "failuresAndDenialsImmutable": true
       }
     }
