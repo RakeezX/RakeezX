@@ -80,7 +80,16 @@ export function createBackgroundRunner({transport}){
   if(r.length!==1||r[0].frameId!==0||!r[0].documentId||typeof r[0].result!=='string'||j.sourceDocument&&r[0].documentId!==j.sourceDocument)throw Error('SOURCE_BINDING_CHANGED');
   return r[0];
  }
- async function source(j,mode='guard'){return timed(j,mode==='home'?'home':'sourceGuard',()=>sourceRead(j,mode));}
+ async function source(j,mode='guard'){return timed(j,mode==='home'?'home':'sourceGuard',async()=>{
+  // AI: reuse the bounded settle cadence for a same-document busy marker.
+  // No cursor/save/read is advanced while pending. Every attempt rechecks
+  // receiver authority, exact route and document; the deadline never extends.
+  const deadline=Math.min(j.expiresAt,Date.now()+3000);
+  for(;;)try{return await sourceRead(j,mode);}catch(e){
+   if(!['guard','read-proof'].includes(mode)||!j.context?.readProof||e.message!=='SOURCE_PENDING'||!e.retry||Date.now()>=deadline)throw e;
+   await appGuard(j);await new Promise(resolve=>setTimeout(resolve,250));
+  }
+ });}
  async function sourceRead(j,mode='guard'){
   if(mode==='guard'&&j.context?.readProof)mode='read-proof';
   let step=j.phase==='binding'?'source-start':'source-pre-read';

@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "version": "0.5.42",
+  "cases": 76,
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.42.zip",
+    "sha256": "6e2bb0098ed32c091c49cc561da134f096ed97ec500747a22621d0334bbaecaa",
+    "bytes": 155283
+  },
+  "sourceHashes": {
+    "selection.js": "7cf0be7cd7248e62f3ca2a9e563fbe0bc11bfe3371f8ede45a812bfc34b440d1",
+    "background-runner.js": "8f03d7793b20a948c676649f98f8eb3215f638270a6c9560dffe9c87686f7eaf",
+    "source-adapter.js": "789feee4b102d5f4204380584276953514605b303d221647637d06a45ed8ddc4",
+    "diagnostics-bootstrap.js": "9f97d06da19c33cff0758675e2b5857f644ae027f16d3ec85f46872e2962e632",
+    "run-controller.js": "738ca291daba82ed2f0c57a67dbc67bd106b3a94029187b413e9214a1dc16821"
+  },
+  "files": 29,
+  "permissionAndCSPUnchanged": true,
+  "priorArchiveUnchanged": true,
+  "appLinkOnly": true,
+  "protectedAcademicReceiverRecoveryUnchanged": true,
+  "production": "NOT_RUN",
+  "officialAccountVerification": "NOT_RUN"
+}

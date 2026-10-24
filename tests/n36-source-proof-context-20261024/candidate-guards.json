@@ -1,0 +1,667 @@
+{
+  "taskId": "continuous-n36-source-proof-context-20261024",
+  "runId": "ace0c1d5-3605-4e94-a7bb-09ff8206ba23",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "baseline": false,
+  "boundary": "Fresh isolated loopback; actual popup/CSS, .41 baseline or candidate worker/source readers, actual receiver/store/IndexedDB with fake account service; source DOM is synthetic, not official captured DOM.",
+  "cases": [
+    {
+      "entry": "dashboard",
+      "mode": "teacher",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard",
+        "proofMismatch": "teacher"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "FAIL",
+      "failure": "page.waitForFunction: Timeout 30000ms exceeded."
+    },
+    {
+      "entry": "dashboard",
+      "mode": "teacher-absent",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard",
+        "proofMismatch": "teacher"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "school",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "school-absent",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard",
+        "proofMismatch": "school"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "schoolid",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "role",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "NON_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "login",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "LOGIN_OR_LOGOUT",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "query",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "UNSAFE_ROUTE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "path",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SOURCE_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "document",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SOURCE_BINDING_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "owner",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "APP_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "session",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "APP_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "busy-stuck",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SOURCE_PENDING",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "busy-teacher",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "UNCONFIRMED_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "busy-role",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "NON_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "primary-duplicate",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "UNCONFIRMED_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "primary-unsafe",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "UNCONFIRMED_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "semantic-lost",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "UNCONFIRMED_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "teacher",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard",
+        "proofMismatch": "teacher"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "FAIL",
+      "failure": "page.waitForFunction: Timeout 30000ms exceeded."
+    },
+    {
+      "entry": "teacher",
+      "mode": "teacher-absent",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard",
+        "proofMismatch": "teacher"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "school",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SCHOOL_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "school-absent",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard",
+        "proofMismatch": "school"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "schoolid",
+      "status": "FAIL",
+      "failure": "locator.waitFor: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('.boot') to be detached\u001b[22m\n\u001b[2m    5 × locator resolved to visible <div class=\"boot\" role=\"status\" aria-live=\"polite\" aria-label=\"جارٍ تجهيز مساحة عملك\">…</div>\u001b[22m\n"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "exempt: canonical local synthetic helper"
+  },
+  "status": "FAIL"
+}

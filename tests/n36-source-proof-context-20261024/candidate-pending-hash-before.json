@@ -1,0 +1,75 @@
+{
+  "taskId": "continuous-n36-source-proof-context-20261024",
+  "runId": "ace0c1d5-3605-4e94-a7bb-09ff8206ba23",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "baseline": false,
+  "boundary": "Fresh isolated loopback; actual popup/CSS, .41 baseline or candidate worker/source readers, actual receiver/store/IndexedDB with fake account service; source DOM is synthetic, not official captured DOM.",
+  "cases": [
+    {
+      "entry": "dashboard",
+      "mode": "pending-hash",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SOURCE_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "FAIL",
+      "failure": "{\"phase\":\"stopped\",\"code\":\"SOURCE_CONTEXT_CHANGED\",\"staged\":50,\"observed\":50,\"classes\":10,\"processedPages\":0,\"confirmedRows\":0,\"confirmedReceipts\":0,\"pendingRows\":0,\"failureStep\":\"none\",\"failureJobPhase\":\"collect\",\"schoolBindingState\":\"bound\",\"roleProofKind\":\"semantic-dashboard\"}\n+ actual - expected\n\n+ 'stopped'\n- 'complete'\n"
+    },
+    {
+      "entry": "teacher",
+      "mode": "pending-hash",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "requestsAtMutation": 2,
+      "view": {
+        "phase": "stopped",
+        "code": "SOURCE_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "FAIL",
+      "failure": "{\"phase\":\"stopped\",\"code\":\"SOURCE_CONTEXT_CHANGED\",\"staged\":50,\"observed\":50,\"classes\":10,\"processedPages\":0,\"confirmedRows\":0,\"confirmedReceipts\":0,\"pendingRows\":0,\"failureStep\":\"none\",\"failureJobPhase\":\"collect\",\"schoolBindingState\":\"bound\",\"roleProofKind\":\"semantic-dashboard\"}\n+ actual - expected\n\n+ 'stopped'\n- 'complete'\n"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "exempt: canonical local synthetic helper"
+  },
+  "status": "FAIL"
+}

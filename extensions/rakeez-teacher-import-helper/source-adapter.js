@@ -8,7 +8,11 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
   const setupRoute=kind==='metadata'?/^\/TeachersReports\/(?:Statistics\/)?MyInfo\/[A-Za-z0-9_-]{1,80}\/?$/i:kind==='classes'?/^\/TeachersReports\/(?:Statistics\/)?Teacher\/[A-Za-z0-9_-]{1,80}\/?$/i:/^\/(?:TeachersReports\/(?:Statistics\/)?TeacherSchedule\/[A-Za-z0-9_-]{1,80}|SchoolSchedule\/Schedule\/TeacherSchedule)\/?$/i;
   const menu=/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(u.pathname);
   const check=()=>{
-   if(globalThis.location.href!==runContext.sourceURL)fail('SOURCE_CONTEXT_CHANGED');
+   // AI: the worker binds this exact document and permits only fragment drift.
+   // Keep origin/path/query byte exact during the read, matching sourceRoute.
+   const currentSource=new URL(globalThis.location.href),boundSource=new URL(runContext.sourceURL);
+   currentSource.hash='';boundSource.hash='';
+   if(currentSource.href!==boundSource.href)fail('SOURCE_CONTEXT_CHANGED');
    globalThis.rakeezRoutePolicy(globalThis.location.origin,u.href,runContext);
    const match=/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/([a-f0-9]{32})\/?$/i.exec(u.pathname);
    if(!runContext.schoolId||(!setup&&!menu&&(!match||match[1].toLowerCase()!==runContext.schoolId.toLowerCase())))fail('SCHOOL_CONTEXT_CHANGED');

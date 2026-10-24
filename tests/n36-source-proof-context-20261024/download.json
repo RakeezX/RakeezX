@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n36-source-proof-context-20261024",
+  "runId": "ace0c1d5-3605-4e94-a7bb-09ff8206ba23",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "name": "n36_0542_actual_app_download",
+  "archiveSha256": "6e2bb0098ed32c091c49cc561da134f096ed97ec500747a22621d0334bbaecaa",
+  "publication": "NOT_RUN",
+  "fixture": "Existing synthetic owned-account helper; actual app DOM/download handler over HTTP; fresh isolated context.",
+  "renderedLabel": "تنزيل إضافة ركيز 0.5.42",
+  "actualDownloadHashMatched": true,
+  "navigationUnchanged": true,
+  "status": "PASS",
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "origin": "http://127.0.0.1:49965"
+  }
+}
