@@ -1,11 +1,10 @@
-import { html, icon, openSheet, toast, fmtNum } from './dom.js';
+import { html, icon, openSheet, toast, fmtNum, fmtDateFull } from './dom.js';
+import { todayISO } from '../models.js';
+import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
 import { achievementCard, achievementPng } from './student-achievements.js';
 import { openDocumentPreview } from './document-preview.js';
 
 const styleUrl = new URL('../styles/achievement-certificate.css', import.meta.url).href;
-const WIDTH = 2970;
-const HEIGHT = 2100;
-const COLORS = { paper: '#fffdf7', ink: '#183e38', gold: '#a47c38', muted: '#68776e', line: '#ded4bb' };
 
 function loadStyle() {
   if (document.querySelector('link[data-achievement-certificate-style]')) return;
@@ -16,166 +15,58 @@ function loadStyle() {
   document.head.append(link);
 }
 
-function text(ctx, value, x, y, size, weight = 500, color = COLORS.ink) {
-  ctx.font = `${weight} ${size}px "Tajawal", sans-serif`;
-  ctx.fillStyle = color;
-  ctx.fillText(String(value), x, y);
+/** Shared artwork, driven only by explicit certificate display projections. */
+export function drawAchievementCertificate(canvas, card, options = {}) {
+  return drawCertificateDesign(canvas, card, options);
 }
 
-function fitText(ctx, value, x, y, width, size, min = 22, weight = 700, color = COLORS.ink) {
-  let fitted = size;
-  for (; fitted > min; fitted -= 1) {
-    ctx.font = `${weight} ${fitted}px "Tajawal", sans-serif`;
-    if (ctx.measureText(String(value)).width <= width) break;
-  }
-  ctx.font = `${weight} ${fitted}px "Tajawal", sans-serif`;
-  ctx.fillStyle = color;
-  ctx.fillText(String(value), x, y, width);
+export function certificateIssueDate(iso = todayISO()) {
+  const gregorian = fmtDateFull(iso);
+  if (!gregorian) return '';
+  const [year, month, day] = iso.split('-').map(Number);
+  try {
+    const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-latn', {
+      day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+    }).format(new Date(Date.UTC(year, month - 1, day, 12)));
+    return `${hijri} · ${gregorian}`;
+  } catch { return gregorian; }
 }
 
-function wrappedText(ctx, value, x, y, width, size, lineHeight, color = COLORS.muted) {
-  ctx.font = `500 ${size}px "Tajawal", sans-serif`;
-  const lines = [];
-  let line = '';
-  for (const word of String(value).split(/\s+/)) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(candidate).width > width) {
-      lines.push(line);
-      line = word;
-    } else line = candidate;
-  }
-  if (line) lines.push(line);
-  lines.forEach((item, index) => text(ctx, item, x, y + index * lineHeight, size, 500, color));
-  return lines.length;
+export function certificateDescription(card, options = {}) {
+  const meta = certificateMetadata(options);
+  return ['شهادة تقدير', card.name, meta.schoolName, meta.educationDepartment,
+    meta.className, meta.subjectName,
+    ...card.evidence.map(fact => `${fact.title}: ${fact.count} — ${fact.scope}`),
+    meta.teacherName, meta.principalName, meta.dateLabel,
+    card.demo ? 'بيانات تجريبية' : ''].filter(Boolean).join('، ');
 }
 
-function star(ctx, x, y, radius) {
-  ctx.beginPath();
-  for (let point = 0; point < 10; point += 1) {
-    const angle = -Math.PI / 2 + point * Math.PI / 5;
-    const r = point % 2 ? radius * 0.46 : radius;
-    const px = x + Math.cos(angle) * r;
-    const py = y + Math.sin(angle) * r;
-    if (!point) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-  ctx.fill();
-}
-
-/** Paint only the explicit allowlisted achievementCard projection, never a profile or store. */
-export function drawAchievementCertificate(canvas, card) {
-  canvas.width = WIDTH;
-  canvas.height = HEIGHT;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas is unavailable');
-  ctx.scale(2, 2);
-  ctx.direction = 'rtl';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-  const w = WIDTH / 2;
-  const center = w / 2;
-
-  ctx.fillStyle = COLORS.paper;
-  ctx.fillRect(0, 0, w, HEIGHT / 2);
-  ctx.strokeStyle = COLORS.gold;
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(36, 36, w - 72, 978);
-  ctx.strokeStyle = COLORS.line;
-  ctx.lineWidth = 1;
-  ctx.strokeRect(48, 48, w - 96, 954);
-
-  // Quiet geometric corners, drawn locally; no external artwork or official seal.
-  for (const [x, y, directionX, directionY] of [[70, 70, 1, 1], [w - 70, 70, -1, 1], [70, 980, 1, -1], [w - 70, 980, -1, -1]]) {
-    ctx.strokeStyle = COLORS.gold;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(x, y + 52 * directionY);
-    ctx.lineTo(x, y);
-    ctx.lineTo(x + 52 * directionX, y);
-    ctx.stroke();
-    ctx.fillStyle = COLORS.gold;
-    star(ctx, x + 20 * directionX, y + 20 * directionY, 5);
-  }
-
-  text(ctx, 'رَكيز المعلم', center, 112, 25, 700);
-  ctx.fillStyle = '#f3ebd9';
-  ctx.beginPath();
-  ctx.arc(center, 192, 43, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = '#cfb784';
-  ctx.lineWidth = 1.4;
-  ctx.beginPath();
-  ctx.arc(center, 192, 35, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.fillStyle = COLORS.gold;
-  star(ctx, center, 191, 21);
-  text(ctx, 'شهادة تقدير', center, 314, 78, 800);
-  text(ctx, 'تقديرًا للمشاركة والإنجاز الموثّق', center, 369, 27, 500, COLORS.muted);
-
-  text(ctx, card.name ? 'تُهدى هذه الشهادة إلى' : 'نحتفي بالجهد والأثر الطيب', center, 437, 24, 500, COLORS.muted);
-  const name = card.name || 'لصاحب هذا الإنجاز';
-  ctx.font = '700 52px "Tajawal", sans-serif';
-  if (ctx.measureText(name).width > 1110 && name.includes(' ')) {
-    // Long Arabic names remain legible on two lines, inside the reserved name band.
-    const words = name.split(/\s+/);
-    let split = 1;
-    let best = Infinity;
-    for (let i = 1; i < words.length; i += 1) {
-      const difference = Math.abs(ctx.measureText(words.slice(0, i).join(' ')).width - ctx.measureText(words.slice(i).join(' ')).width);
-      if (difference < best) { best = difference; split = i; }
-    }
-    fitText(ctx, words.slice(0, split).join(' '), center, 490, 1120, 46, 22);
-    fitText(ctx, words.slice(split).join(' '), center, 544, 1120, 46, 22);
-  } else fitText(ctx, name, center, 518, 1120, 55, 22);
-
-  const facts = card.evidence;
-  const count = facts.length;
-  if (!count) {
-    text(ctx, 'اختر إنجازًا موثّقًا من الخيارات لتهيئة الشهادة', center, 678, 27, 500, COLORS.muted);
-  } else {
-    const panelWidth = count === 1 ? 750 : 555;
-    const gap = 34;
-    facts.forEach((fact, index) => {
-      const x = center + (count === 1 ? 0 : (index === 0 ? 1 : -1) * (panelWidth + gap) / 2);
-      ctx.fillStyle = '#f5f3ea';
-      ctx.fillRect(x - panelWidth / 2, 594, panelWidth, 191);
-      ctx.fillStyle = COLORS.gold;
-      ctx.fillRect(x + panelWidth / 2 - 3, 594, 3, 191);
-      fitText(ctx, fact.count, x, 650, panelWidth - 40, 43, 22, 800);
-      fitText(ctx, fact.title, x, 694, panelWidth - 40, 28, 20, 700);
-      wrappedText(ctx, fact.scope, x, 733, panelWidth - 58, 18, 25);
-    });
-  }
-
-  text(ctx, 'شكرًا لكل خطوة نحو التعلّم', center, 865, 29, 500);
-  ctx.strokeStyle = COLORS.line;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(center - 135, 903);
-  ctx.lineTo(center + 135, 903);
-  ctx.stroke();
-  text(ctx, card.demo ? 'بيانات تجريبية · رَكيز المعلم' : 'شهادة تقدير · رَكيز المعلم', center, 945, 21, 500, COLORS.muted);
-  return canvas;
-}
-
-export function certificateDescription(card) {
-  return ['شهادة تقدير', card.name, ...card.evidence.map(fact => `${fact.title}: ${fact.count} — ${fact.scope}`), card.demo ? 'بيانات تجريبية' : ''].filter(Boolean).join('، ');
-}
-
-/** An isolated print document contains only the reviewed certificate raster. */
-export function certificatePrintHtml(canvas, card, confirmed = false) {
-  if (confirmed !== true || !card.evidence.length) throw new Error('Review the selected certificate before printing');
+function reviewedRaster(canvas, card, confirmed) {
+  if (confirmed !== true || !card?.evidence?.length) throw new Error('Review the selected certificate before printing');
   const png = canvas.toDataURL('image/png');
-  if (!png.startsWith('data:image/png;base64,')) throw new Error('Certificate image is unavailable');
-  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>شهادة تقدير - ركيز المعلم</title><style>
-    @page{size:A4 landscape;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:297mm;height:210mm}img{display:block;width:297mm;height:210mm;object-fit:contain;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  </style></head><body><img alt="شهادة التقدير التي تمت مراجعتها" src="${png}"></body></html>`;
+  if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(png)) throw new Error('Certificate image is unavailable');
+  return png;
 }
 
-async function printCertificate(canvas, card, confirmed, isCurrent) {
-  const documentHtml = certificatePrintHtml(canvas, card, confirmed);
+function rasterDocument(images) {
+  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>شهادات تقدير - ركيز المعلم</title><style>
+    @page{size:A4 landscape;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:297mm}.certificate-page{width:297mm;height:209.8mm;overflow:hidden;break-inside:avoid;break-after:page}.certificate-page:last-child{break-after:auto}img{display:block;width:297mm;height:209.8mm;object-fit:contain;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  </style></head><body>${images.map(src => `<div class="certificate-page"><img alt="شهادة التقدير التي تمت مراجعتها" src="${src}"></div>`).join('')}</body></html>`;
+}
+
+/** Isolated print documents contain only the reviewed certificate rasters. */
+export function certificatePrintHtml(canvas, card, confirmed = false) {
+  return rasterDocument([reviewedRaster(canvas, card, confirmed)]);
+}
+
+export function certificateBatchPrintHtml(entries, confirmed = false) {
+  if (!Array.isArray(entries) || !entries.length || confirmed !== true) throw new Error('Review the selected certificates before printing');
+  return rasterDocument(entries.map(({ canvas, card }) => reviewedRaster(canvas, card, confirmed)));
+}
+
+async function printDocument(documentHtml, isCurrent) {
   const frame = document.createElement('iframe');
-  frame.title = 'طباعة شهادة التقدير';
+  frame.title = 'طباعة شهادات التقدير';
   frame.dataset.certificatePrint = '';
   frame.setAttribute('aria-hidden', 'true');
   frame.tabIndex = -1;
@@ -184,13 +75,13 @@ async function printCertificate(canvas, card, confirmed, isCurrent) {
   const cleanup = () => { clearTimeout(timer); frame.remove(); };
   try {
     const ready = new Promise((resolve, reject) => {
-      timer = setTimeout(() => reject(new Error('Print document timed out')), 10000);
+      timer = setTimeout(() => reject(new Error('Print document timed out')), 20000);
       frame.addEventListener('load', resolve, { once: true });
     });
     frame.srcdoc = documentHtml;
     document.body.append(frame);
     await ready;
-    await frame.contentDocument.querySelector('img').decode();
+    await Promise.all([...frame.contentDocument.images].map(img => img.decode()));
     clearTimeout(timer);
     if (!isCurrent()) { cleanup(); return false; }
     frame.contentWindow.addEventListener('afterprint', cleanup, { once: true });
@@ -198,15 +89,37 @@ async function printCertificate(canvas, card, confirmed, isCurrent) {
     frame.contentWindow.focus();
     frame.contentWindow.print();
     return true;
-  } catch (error) {
-    cleanup();
-    throw error;
+  } catch (error) { cleanup(); throw error; }
+}
+
+async function printCertificate(canvas, card, confirmed, isCurrent) {
+  return printDocument(certificatePrintHtml(canvas, card, confirmed), isCurrent);
+}
+
+/** Render sequentially with one reusable canvas; cancellation is checked between pages. */
+export async function printCertificateBatch(entries, confirmed = false, isCurrent = () => true) {
+  if (!Array.isArray(entries) || !entries.length || confirmed !== true || entries.some(entry => !entry.card?.evidence?.length)) {
+    throw new Error('Review every selected certificate before printing');
   }
+  const scratch = document.createElement('canvas');
+  const images = [];
+  try {
+    for (const entry of entries) {
+      if (!isCurrent()) return false;
+      const canvas = entry.canvas || drawAchievementCertificate(scratch, entry.card, entry.options);
+      images.push(reviewedRaster(canvas, entry.card, confirmed));
+      // Let the UI respond to cancellation or edits while preparing a whole class.
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    if (!isCurrent()) return false;
+    return await printDocument(rasterDocument(images), isCurrent);
+  } finally { scratch.width = scratch.height = 1; }
 }
 
 /** Read-only local editor. It never saves, dispatches, uploads or sends student data. */
-export function openAchievementCertificate(input, { studentName = '', demo = false } = {}) {
+export function openAchievementCertificate(input, { studentName = '', demo = false, metadata = {} } = {}) {
   loadStyle();
+  const initialOptions = certificateMetadata({ ...metadata, dateLabel: metadata.dateLabel || certificateIssueDate() });
   const available = achievementCard(input, { selected: ['participation', 'scores'] }).evidence;
   return openSheet({
     title: 'شهادة تقدير',
@@ -214,6 +127,14 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
     body: html`
       <div class="certificate-editor" dir="rtl">
         <aside class="certificate-editor__options">
+          <fieldset class="certificate-fields certificate-design-fields">
+            <legend>تصميم الشهادة</legend>
+            <div class="certificate-design-options">${CERTIFICATE_DESIGNS.map(design => html`<label class="certificate-design-choice"><input type="radio" name="certificate-design" data-certificate-design value="${design.id}" ${design.id === initialOptions.design ? 'checked' : ''}><canvas data-certificate-thumbnail="${design.id}" aria-hidden="true"></canvas><span>${design.label}</span></label>`)}</div>
+            <label class="field"><span class="field__label">رمز التقدير</span><select class="input" data-certificate-medal>${CERTIFICATE_MEDALS.map(medal => html`<option value="${medal.id}" ${medal.id === initialOptions.medal ? 'selected' : ''}>${medal.label}</option>`)}</select></label>
+          </fieldset>
+          <details class="certificate-identity"><summary>بيانات المدرسة والتوقيع</summary><p>تعديلات هذه الشهادة فقط.</p>
+            ${[['schoolName', 'المدرسة'], ['educationDepartment', 'إدارة التعليم'], ['teacherName', initialOptions.teacherLabel], ['principalName', initialOptions.principalLabel]].map(([key, label]) => html`<label class="field"><span class="field__label">${label} <small>اختياري</small></span><input class="input" data-certificate-meta="${key}" value="${initialOptions[key]}" maxlength="100" autocomplete="off"></label>`)}
+          </details>
           <fieldset class="certificate-fields">
             <legend>محتوى الشهادة</legend>
             <label class="certificate-choice"><input type="checkbox" data-certificate-name>
@@ -247,6 +168,7 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
       const expand = root.querySelector('[data-certificate-expand]');
       const status = root.querySelector('[data-certificate-status]');
       let card;
+      let options = initialOptions;
       let busy = false;
       let ready = false;
       let previewOpen = false;
@@ -256,8 +178,8 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
       };
       const redraw = () => {
         try {
-          drawAchievementCertificate(canvas, card);
-          canvas.setAttribute('aria-label', certificateDescription(card));
+          drawAchievementCertificate(canvas, card, options);
+          canvas.setAttribute('aria-label', certificateDescription(card, options));
           ready = true;
           confirm.disabled = !card.evidence.length;
           status.textContent = card.evidence.length ? 'المعاينة هي المحتوى الذي سيظهر في الصورة والطباعة.' : card.name ? 'اختر إنجازًا موثّقًا لإتاحة التصدير.' : 'اختر إنجازًا لتجهيز الشهادة. الاسم مخفي افتراضيًا.';
@@ -271,6 +193,11 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
       };
       const update = () => {
         confirm.checked = false;
+        options = certificateMetadata({ ...initialOptions,
+          ...Object.fromEntries([...root.querySelectorAll('[data-certificate-meta]')].map(field => [field.dataset.certificateMeta, field.value])),
+          design: root.querySelector('[data-certificate-design]:checked').value,
+          medal: root.querySelector('[data-certificate-medal]').value,
+        });
         card = achievementCard(input, {
           selected: [...root.querySelectorAll('[data-certificate-field]:checked')].map(field => field.dataset.certificateField),
           includeName: root.querySelector('[data-certificate-name]').checked,
@@ -279,7 +206,8 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
         });
         redraw();
       };
-      root.querySelectorAll('[data-certificate-name], [data-certificate-field]').forEach(field => field.addEventListener('change', update));
+      root.querySelectorAll('[data-certificate-name], [data-certificate-field], [data-certificate-design], [data-certificate-medal]').forEach(field => field.addEventListener('change', update));
+      root.querySelectorAll('[data-certificate-meta]').forEach(field => field.addEventListener('input', update));
       confirm.addEventListener('change', syncButtons);
       expand.addEventListener('click', async () => {
         if (previewOpen) return;
@@ -325,8 +253,16 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
       };
       download.addEventListener('click', () => exportCertificate('download'));
       print.addEventListener('click', () => exportCertificate('print'));
+      const drawThumbnails = () => root.querySelectorAll('[data-certificate-thumbnail]').forEach(thumbnail => {
+        const sample = document.createElement('canvas');
+        drawAchievementCertificate(sample, { name: '', demo: false, evidence: [] }, { design: thumbnail.dataset.certificateThumbnail });
+        thumbnail.width = 300; thumbnail.height = 212;
+        thumbnail.getContext('2d').drawImage(sample, 0, 0, 300, 212);
+        sample.width = sample.height = 1;
+      });
       update();
-      document.fonts?.ready.then(() => { if (root.isConnected) redraw(); });
+      drawThumbnails();
+      document.fonts?.ready.then(() => { if (root.isConnected) { redraw(); drawThumbnails(); } });
     },
   });
 }

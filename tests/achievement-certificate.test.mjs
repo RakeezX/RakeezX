@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { achievementCard } from '../src/lib/student-achievements.js';
-import { drawAchievementCertificate, certificateDescription, certificatePrintHtml } from '../src/lib/achievement-certificate.js';
+import { drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate } from '../src/lib/achievement-certificate.js';
+import { CERTIFICATE_DESIGNS, certificateMetadata } from '../src/lib/certificate-designs.js';
 
 const input = {
   studentId: 'private-student-id',
@@ -20,6 +21,8 @@ const input = {
 function recordingCanvas() {
   const texts = [];
   const context = new Proxy({
+    createLinearGradient() { return { addColorStop() {} }; },
+    createRadialGradient() { return { addColorStop() {} }; },
     fillText(value) { texts.push(String(value)); },
     measureText(value) { return { width: String(value).length * 23 }; },
   }, { get(target, key) { return key in target ? target[key] : () => {}; } });
@@ -40,6 +43,41 @@ test('certificate renderer and description receive only selected positive eviden
   assert.match(output, /بيانات تجريبية/);
   assert.doesNotMatch(output, /private-|other-student|اسم خاص|حضور/);
   assert.deepEqual(input, before);
+});
+
+test('both designs display only bounded certificate identity and preserve the chosen evidence', () => {
+  const card = achievementCard(input, { selected: ['participation'], includeName: true, studentName: 'طالب تجريبي', demo: true });
+  const raw = { schoolName: 'مدرسة\u202e تجريبية', teacherName: 'معلم تجريبي', principalName: 'مدير تجريبي',
+    educationDepartment: 'إدارة تعليم تجريبية', className: 'الخامس 1', subjectName: 'المهارات الرقمية',
+    dateLabel: certificateIssueDate('2026-10-24'), token: 'private-token', email: 'private-email' };
+  for (const design of CERTIFICATE_DESIGNS) {
+    const canvas = recordingCanvas();
+    const options = { ...raw, design: design.id, medal: 'laurel' };
+    drawAchievementCertificate(canvas, card, options);
+    const output = canvas.texts.join(' ') + certificateDescription(card, options);
+    for (const expected of ['طالب تجريبي', 'مدرسة', 'معلم تجريبي', 'مدير تجريبي', 'الخامس 1', '2026', 'بيانات تجريبية']) assert.ok(output.includes(expected));
+    assert.doesNotMatch(output, /private-|\u202e/);
+    assert.equal(canvas.width, 2970);
+    assert.equal(canvas.height, 2100);
+  }
+  const metadata = certificateMetadata({ ...raw, design: 'unknown', medal: 'unknown', schoolName: 'س'.repeat(1000) });
+  assert.equal(metadata.design, 'ornate');
+  assert.equal(metadata.medal, 'star');
+  assert.equal(metadata.schoolName.length, 140);
+  assert.equal(metadata.token, undefined);
+});
+
+test('batch print requires evidence for every selected page and exports exactly one raster per page', () => {
+  const card = achievementCard(input, { selected: ['scores'], includeName: true, studentName: '<script>private-name</script>' });
+  const entries = Array.from({ length: 3 }, () => ({ canvas: recordingCanvas(), card }));
+  assert.throws(() => certificateBatchPrintHtml([], true));
+  assert.throws(() => certificateBatchPrintHtml(entries, false));
+  assert.throws(() => certificateBatchPrintHtml([...entries, { canvas: recordingCanvas(), card: achievementCard(input) }], true));
+  const output = certificateBatchPrintHtml(entries, true);
+  assert.equal((output.match(/<img /g) || []).length, 3);
+  assert.equal((output.match(/<div class="certificate-page"/g) || []).length, 3);
+  assert.match(output, /break-after:page/);
+  assert.doesNotMatch(output, /<script|private-|student-profile|https?:\/\//);
 });
 
 test('long selected Arabic name is rendered without control characters', () => {

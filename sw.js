@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v76';
+const VERSION = 'rakeezx-v77';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -98,6 +98,9 @@ const SHELL = [
   './src/lib/sync-warning-policy.js',
   './src/lib/student-achievements.js',
   './src/lib/achievement-certificate.js',
+  './src/lib/certificate-designs.js',
+  './src/lib/certificate-center.js',
+  './src/styles/certificate-center.css',
   './src/lib/document-preview.js',
   './src/styles/achievement-certificate.css',
   './src/styles/document-preview.css',

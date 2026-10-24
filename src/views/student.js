@@ -13,7 +13,8 @@ import {
 } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
-import { demoOutputMarker, markDemoSharedText } from '../lib/report-print.js';
+import { demoOutputMarker, markDemoSharedText, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { getAccountPresentation } from '../lib/account-profile.js';
 import { studentAchievements, achievementCard, drawAchievementCard, achievementPng } from '../lib/student-achievements.js';
 import { openAchievementCertificate } from '../lib/achievement-certificate.js';
 const achievementsStyleUrl = new URL('../styles/student-achievements.css', import.meta.url).href;
@@ -495,12 +496,23 @@ export default {
       const s = store.getStudent(params.id);
       if (!s) return;
       const tch = resolveTeaching(s, params.teaching);
+      const profile = store.state.profile ?? {};
+      const presentation = getAccountPresentation(profile.teacherForm);
       await openAchievementCertificate({
         studentId: s.id,
         items: tch ? store.items(tch.id) : [],
         gradeCtx: store.studentContext(s.id, tch?.id),
         history: store.studentHistory(s.id),
-      }, { studentName: s.name, demo: markDemoSharedText([]).length > 0 });
+      }, { studentName: s.name, demo: markDemoSharedText([]).length > 0, metadata: {
+        schoolName: profile.schoolName,
+        educationDepartment: profile.educationDepartment,
+        teacherName: profile.teacherName,
+        principalName: resolvedReportPrincipalName(profile, store.state.device),
+        teacherLabel: presentation.teacherSubjectLabel,
+        principalLabel: presentation.schoolPrincipalLabel,
+        className: tch ? sectionLabel(store.getSection(tch.sectionId)) : '',
+        subjectName: tch ? store.getSubject(tch.subjectId)?.name : '',
+      } });
     },
 
     async 'share-achievement'(el, ev, params) {
