@@ -1,0 +1,50 @@
+{
+  "aiAuthored": true,
+  "baseline": "cbdfb4d8cd91f6e7588e0512b64f692935d2462d",
+  "baselineSha256": "d2a0c7c0930ecf71545c59150bae5b36fdd7ab3eb61c148317faf19ea4006c9c",
+  "priorInactiveSha256": "b0a945a5a60d7063ca23aba7078ab879fa1ab67cc891e48c18f80cfe72abb363",
+  "successorSha256": "3ea409d01644b01ec01631e70b08f57c60818e4f545ca1c63af4cd5ae07c9255",
+  "spans": [
+    {
+      "name": "receipt metadata helpers",
+      "before": "ef4b77d4992c3fb6c18269ec3ac3be091a2ad6f8e0a1f077f56de95695f4009d",
+      "after": "efe4ccece4d883b0f2e783e7852934ac9e14939540376e617d2cff2ce89f88b6"
+    },
+    {
+      "name": "credential CAS bound receipt",
+      "before": "6ce9f23c1fcd96a782b10786aff51658b2b5ee3cb9b02f6a96873952435276d2",
+      "after": "571a11c3b800dba78206b28bf5747d1681c71e8c0f09164e3d75bfba2c997834"
+    },
+    {
+      "name": "current credential CAS",
+      "before": "bf8c79605d579fc2d66994a0804eebb73ccca2dbc144f055ea4e13d132d19f15",
+      "after": "9a928debaead767fc67f02877e0a0da857ef5a81b3b1296435a6b376ac57b7d5"
+    },
+    {
+      "name": "opt in list reconciliation",
+      "before": "9eb914ba7bc4007180dc85529bb2df9eff32d3aaee5f11aed9e4a9533e007fa8",
+      "after": "b119aa6a00298d4e9c34b6a2d42ff5f9eaea7a3caa28e381fe0127c9aa103137"
+    },
+    {
+      "name": "fixed finite categories",
+      "before": "8c76907533e6584e655e3f320f2b8533b922cbb4105a2ec6156cbf692dda0e1f",
+      "after": "d624a4a46be1176ff956d6671415a152eb2a2b89e13ab645af8637119aede215"
+    },
+    {
+      "name": "nonexception admission fence",
+      "before": "84d0d85b25d7d11c2cfa38adbcd73542887f8f4e92a81e924b304a2cea248ecf",
+      "after": "2e6501901e3dc3603223f85c3011401a5ae9ede4469e2d708a9c665a325ed251"
+    },
+    {
+      "name": "operator result coverage",
+      "before": "40b665c05b2658a3f8330873c40c4eddc6f4c11bc4e1a81bf9abc2db5dc9bd31",
+      "after": "19a7d62554d8033a4bf4b9257fdcf492326ee4f77a588f751653ca7b7b05b82a"
+    }
+  ],
+  "receiptModel": "existing classReceipts; owner/current-class/correlated command binding only; max8 metadata summaries; no new SQL",
+  "oldClients": "opt-in projection; legacy response unchanged",
+  "environmentKeysAdded": 0,
+  "sqlChanges": 0,
+  "carrierUploads": 0,
+  "providerOperations": 0
+}

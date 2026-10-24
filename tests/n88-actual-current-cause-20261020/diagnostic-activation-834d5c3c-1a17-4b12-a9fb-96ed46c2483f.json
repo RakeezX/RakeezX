@@ -1,0 +1,37 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-current-teacher-connection-actual-cause-20261020",
+  "runId": "834d5c3c-1a17-4b12-a9fb-96ed46c2483f",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "candidateSha": "5f4d6a7d6f3ef810c91b8d07792bec6a5dc38d86",
+  "baseSha": "610aa754012d090131e26c59f50750365b6b8328",
+  "producerRevision": "fedbfe15ee79f4f0a00594ea4b8720830327256c",
+  "producerPhaseDigest": "72c8f56572c722273860c7cee1f5f06a599efbc56c753d0273ec25059e56c1b4",
+  "source": "3ea409d01644b01ec01631e70b08f57c60818e4f545ca1c63af4cd5ae07c9255",
+  "status": "PASS",
+  "beforeVersion": 84,
+  "uploadedVersion": 85,
+  "nativeVersion": 86,
+  "importMapDigest": "24ba16ed2214c582f8386253a2714917a669f74fd19b2d2e5ac339f6498b43c8",
+  "configuration": {
+    "nonPinDigest": "c199734b5feb6f23107524f827da4480bbc8398261361ff55084c6608b374a7b",
+    "keysetDigest": "6087c1195ab1e6ffeed00ff8e975cdd7f3d1b59e3b437b1c32ac006261cac28e",
+    "historicalAggregate": "NOT_PROVEN"
+  },
+  "observation": {
+    "httpStatus": 200,
+    "status": 401,
+    "stage": "session_required",
+    "validSessionProjection": "NOT_RUN",
+    "cookiesExported": false
+  },
+  "uploadInvoked": true,
+  "pinInvoked": true,
+  "operatorInvoked": true,
+  "nativeUploads": 1,
+  "pinUpdates": 1,
+  "readinessObservations": 0,
+  "sqlOperations": 0,
+  "carrierUploads": 0,
+  "actualUserAcceptance": "NOT_RUN"
+}

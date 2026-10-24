@@ -1,0 +1,17 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "providerOperations": 0,
+  "renderedUI": true,
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true
+  },
+  "checks": [
+    "actual DOM/handlers/source CSS over fresh loopback HTTP context",
+    "28 pupils; lost native ACK -> normal review -> committed receipt message without reissuing",
+    "active credentials preserved; no code disclosure in receipt metadata",
+    "actual class context owner invalidation removes batch controls"
+  ],
+  "batchCalls": 1
+}

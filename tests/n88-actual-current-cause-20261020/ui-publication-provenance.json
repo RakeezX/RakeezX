@@ -1,0 +1,240 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-deliver-qualified-reconciliation-ui-20261024",
+  "runId": "0e8bcadf-3894-4f8c-8053-a83e6d6736e6",
+  "baseSha": "7383f98ffb673b115e8564d0f33c3425df44907a",
+  "observedOriginMain": "a4f57ac0b13786610d56e9b84dc6ade08fde2fb2",
+  "qualifiedCandidate": "b44f494966e51296461b09b4a15bd90c6d2bd942",
+  "implementation": "a7c3cc1492aa418ad4bd8273b45cc8f74cba33c2",
+  "implementationBase": "d8e7d4910687c9bca4342b9bee16756af0e0c8f8",
+  "merge": "Implementation diff applied to four affected source files with git apply --3way; all clean and output identical to qualified source after LF normalization. Current main diagnostics retained. Origin/main movement since base is ops card metadata only.",
+  "dependencies": {
+    "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76",
+    "tests/fixtures/n88-integrated-class/seed.sql": "dc066df6168e5448fe7bcda13e3b001c9e6170b33679fa484f4e13bc8f125c04",
+    "tests/fixtures/n88-integrated-class/canonical-extension.sql": "8ace9fe7f76fe0a1d39607a5a83485ec681f5b748e2206cda9f83300f70ec657",
+    "tests/fixtures/n88-integrated-class/native-pg.mjs": "b7ef618d7546e26d3ae936297a0c381ab354f962a6618be295955d9d41a6fcdf",
+    "tests/fixtures/n88-class-credentials/fixture.mjs": "88f5b0b88cf2870fac800e917771d8d8e60e9efbf79c4829128fe239166c9d95",
+    "drafts/n88-student-portal/class-credentials.mjs": "80c59baeba5ea6b2bc34cf94b1e0e14255e81b347ba7ebced291313b8e889fdb",
+    "drafts/n88-student-portal/rollout-guard.mjs": "8dbba7aff362cb43426d6d4abe72abe0f04e99284c42de399623cb453d0e2604",
+    "drafts/n88-student-portal/service.mjs": "a8fc5c8179611e1c0588bbd3d77f1535084455a00285f9d30cd6eaba81c5c6c5",
+    "src/lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+    "drafts/n88-student-portal/receipt-reconciliation.mjs": "d88f0b94be9aaf187d3cf76271515a4be50fd72436afdf7da8789ac8d6a9e271",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "src/styles/student-portal-class.css": "fc47d8d41fe443b392443fa009fde618af76ff62611d2440f97861ff791df217",
+    "tests/fixtures/n88-class-management/index.html": "0407ffde5a3d263075245ad6df7e07aa6d1ef3b1c9fd675985383f4beea9798c",
+    "drafts/n88-student-portal/integrated-service.mjs": "24864fc5c6726992dc115c90d801827219ffc607af324c1a98d6867c3887c423",
+    "drafts/n88-student-portal/visibility-policy.mjs": "2ec1640819029af319bf0ccbefdddd29dd7566f43229937224470a2dd13c73e4",
+    "drafts/n88-student-portal/student-projection.mjs": "0169150ada144b6c6217ae2168ac30eb2580f72e5bc7b62fc3fd1c87d65dc9ad",
+    "src/lib/score-foundation.js": "d759fbec5a53638f2e05873df76db734430c8aafdc8b069bcdbbd23708e9af48",
+    "src/models.js": "af9e624621e21686a86599b75eead8289af526072906efbe79e58a84d7b4a5fe",
+    "drafts/n88-student-portal/canonical-grade-context.mjs": "1595f7588c9a683be570986bde907c2b6a3eb22ccdc3e00fa8cd43eb8c51152f",
+    "drafts/n88-student-portal/task-guidance.mjs": "a3b929b13ce02d05a211cf9eb078cf3f3403a3ec6db04a7271f3c878741de88a",
+    "drafts/n88-student-portal/code-recovery.mjs": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55",
+    "src/views/student-portal-class.js": "d67f9603a6fd3c9e249b3db829b244d40bd7a1731b72f6fc482d03e779181ae0",
+    "src/lib/student-portal-class-client.js": "35bec09a7c904fd7ceb4151ee03da034422cef0bb61d32ecca64e2b5765f97a6",
+    "src/lib/student-portal-task-guidance-client.js": "de210ff07a7e0b782b1854b0b5d900c695d1727ba0eb46ad043af514fbe504bf",
+    "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480",
+    "src/lib/visible-viewport.js": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
+    "src/lib/visible-numerals.js": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575"
+  },
+  "retainedMainDependencyDifferences": {
+    "drafts/n88-student-portal/numeric-credentials.mjs": {
+      "original": "1ccc5c54abab99f25a00e82f59c51776c96ed9ad662d2c252b4e771ef701b67a",
+      "integrated": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957"
+    },
+    "src/styles/student-portal-class.css": {
+      "original": "5606758b91b5bebd8595540f29dc95d5cffe4622d97299714e32f15919a28e23",
+      "integrated": "fc47d8d41fe443b392443fa009fde618af76ff62611d2440f97861ff791df217"
+    },
+    "src/lib/dom.js": {
+      "original": "8b26581da0652916d48211fa55abfc6ac8fa927c3d659a3afc5a3ca649966657",
+      "integrated": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480"
+    }
+  },
+  "evidenceReuse": {
+    "tests/n88-actual-current-cause-20261020/reconciliation-28.json": {
+      "sha256": "1e80b71e73f3207e3aead1d661eee40e64d8424b8efc9ee46387e435b2a2c4f1",
+      "qualification": "immutable qualified-candidate evidence; not rerun"
+    },
+    "tests/n88-actual-current-cause-20261020/reconciliation-pg.json": {
+      "sha256": "4ab719bbf44b26581ae079c2b49d8b3eade39cf218f0e21e165d1ecb689caeec",
+      "qualification": "immutable qualified-candidate evidence; not rerun"
+    },
+    "tests/n88-actual-current-cause-20261020/reconciliation-ui.json": {
+      "sha256": "958e681f09b4aadfa5078c06bd677f2e319e47c77c71cbb284b7a707f9f73cf5",
+      "qualification": "immutable qualified-candidate evidence; not rerun"
+    },
+    "tests/n88-actual-current-cause-20261020/reconciliation-diagnostic.json": {
+      "sha256": "d3ce256cb15df7b7911ef3db4ab879868ada1e3b06445c6d374f81d8da916ca8",
+      "qualification": "immutable qualified-candidate evidence; not rerun"
+    },
+    "tests/n88-actual-current-cause-20261020/diagnostic-activation-834d5c3c-1a17-4b12-a9fb-96ed46c2483f.json": {
+      "sha256": "3f89600e7b5248a59b244d0a12f58de4e77cf92391a7609876778084c9fa996a",
+      "qualification": "immutable qualified-candidate evidence; not rerun"
+    }
+  },
+  "providerOperations": 0,
+  "productAcceptance": "OPEN",
+  "frontendPublication": "NOT_RUN; independent publisher",
+  "postPublicationTrial": "NOT_RUN",
+  "historicalAttempts": "UNKNOWN",
+  "preservedParentChecks": [
+    {
+      "name": "n88_new_actual_failed_phase_specific_cause",
+      "status": "FAIL",
+      "evidence": "Historical causal FAIL retained. New single owned-class observation is http/rejected/source/503/6600ms. Local source graph narrows to resolver/canonical lock/read admission; exact hosted subcause UNKNOWN. Historical evidence reused from tests/n88-actual-current-cause-20261020/owned-class-conclusion-0298ead0.json; no new run claimed."
+    },
+    {
+      "name": "n88_causal_correction_owner_source_ack_guards",
+      "status": "PASS",
+      "evidence": "reconciliation-28.json, reconciliation-pg.json and reconciliation-ui.json: implemented receipt/CAS recovery and owner/class guards; actual hidden live cause remains UNKNOWN."
+    },
+    {
+      "name": "n88_exact_changed_runtime_service_delivery_or_unchanged_prerequisites",
+      "status": "PASS",
+      "evidence": "diagnostic-activation-834d5c3c-1a17-4b12-a9fb-96ed46c2483f.json: actual native85 upload, source pin and native86 exact source/map/runtime/non-pin readback. No new operation performed."
+    },
+    {
+      "name": "n88_timing_observer_allowlist_no_persistence",
+      "status": "PASS",
+      "evidence": "Unchanged six-field timing observer proof reused; reconciliation-diagnostic.json verifies new independently authenticated fixed operator categories with no public expansion or raw error/payload persistence."
+    },
+    {
+      "name": "n88_controlled_same_request_transport_timing",
+      "status": "FAIL",
+      "evidence": "Historical canceled/uncorrelated request failure preserved.20ms per query is an explicit synthetic assumption, not a provider benchmark. Historical evidence reused from tests/n88-actual-current-cause-20261020/owned-class-conclusion-0298ead0.json; no new run claimed."
+    },
+    {
+      "name": "n88_single_dashboard_observed_teacher_request_timing",
+      "status": "FAIL",
+      "evidence": "Historical dashboard failure preserved; no provider logs or polls. Historical evidence reused from tests/n88-actual-current-cause-20261020/owned-class-conclusion-0298ead0.json; no new run claimed."
+    },
+    {
+      "name": "n88_finite_list_phase_before_client_deadline",
+      "status": "PASS",
+      "evidence": "Affected composed virtual-clock cases return finite membership-flush/commitguard/commit stages; existing6000ms transaction budget unchanged. Historical evidence reused from tests/n88-actual-current-cause-20261020/owned-class-conclusion-0298ead0.json; no new run claimed."
+    },
+    {
+      "name": "n88_readonly_deadline_late_work_fence_and_mutation_budget_unchanged",
+      "status": "PASS",
+      "evidence": "After-deadline batch rolls back/destroys with0lateCOMMIT; lost durable ACK returns503 without retry; all source limits/timing and credential/delete ordering preserved. Historical evidence reused from tests/n88-actual-current-cause-20261020/owned-class-conclusion-0298ead0.json; no new run claimed."
+    },
+    {
+      "name": "n88_fresh_finite_gate_candidate_and_marker_identity",
+      "status": "PASS",
+      "evidence": "reconciliation-plan.json and committed actual activation receipt bind one-use task/run/candidate reservations; unknown ACK/drift/duplicate negatives passed. All diagnostic reservations now consumed."
+    },
+    {
+      "name": "n88_current_user_opened_context_post_promotion_observation",
+      "status": "NOT_RUN",
+      "evidence": "Corrected public frontend candidate a7c3cc1492aa418ad4bd8273b45cc8f74cba33c2 has no publisher/served proof in this saved result. Earlier observed503 receipts remain historical; no fresh user observation or replay."
+    },
+    {
+      "name": "n88_projection_membership_flush_query_amplification_and_fences",
+      "status": "PASS",
+      "evidence": "Baseline303single membership calls/331total; at assumed20ms fails6000ms fence after274rows. Candidate5batches/33total,303rows,660virtualms; stable second27calls/0writes,303updates5batches/640virtualms. Partial/missing ACK, late batch, guard failure and uncertain durable COMMIT remain503. Historical evidence reused from tests/n88-actual-current-cause-20261020/owned-class-conclusion-0298ead0.json; no new run claimed."
+    },
+    {
+      "name": "n88_projection_actual_service_source_pin_carrier_readback",
+      "status": "PASS",
+      "evidence": "Current native86 exact source/import-map/pin and non-pin configuration verified in actual activation receipt. Carrier upload allowance is0; its unchanged prior source/config proof is reused, not a new carrier deployment claim."
+    },
+    {
+      "name": "n88_existing_owned_class_normal_ui_observation",
+      "status": "NOT_RUN",
+      "evidence": "Previous finite28-row observation remains recorded in postdelivery-reconciliation-d034a4e5.json. Post-publication corrected-UI current-state/CAS observation and fresh batch are unperformed; no new browser read or command replay."
+    }
+  ],
+  "originalAndIntegratedSourceHashes": {
+    "src/lib/student-portal-class-client.js": {
+      "original": "35bec09a7c904fd7ceb4151ee03da034422cef0bb61d32ecca64e2b5765f97a6",
+      "integrated": "35bec09a7c904fd7ceb4151ee03da034422cef0bb61d32ecca64e2b5765f97a6"
+    },
+    "src/views/student-portal-class.js": {
+      "original": "d67f9603a6fd3c9e249b3db829b244d40bd7a1731b72f6fc482d03e779181ae0",
+      "integrated": "d67f9603a6fd3c9e249b3db829b244d40bd7a1731b72f6fc482d03e779181ae0"
+    },
+    "drafts/n88-student-portal/integrated-service.mjs": {
+      "original": "24864fc5c6726992dc115c90d801827219ffc607af324c1a98d6867c3887c423",
+      "integrated": "24864fc5c6726992dc115c90d801827219ffc607af324c1a98d6867c3887c423"
+    },
+    "drafts/n88-student-portal/class-credentials.mjs": {
+      "original": "80c59baeba5ea6b2bc34cf94b1e0e14255e81b347ba7ebced291313b8e889fdb",
+      "integrated": "80c59baeba5ea6b2bc34cf94b1e0e14255e81b347ba7ebced291313b8e889fdb"
+    }
+  },
+  "exactNativeBytes": {
+    "drafts/n88-student-portal/activation/bundle/edge/index.mjs": "3ea409d01644b01ec01631e70b08f57c60818e4f545ca1c63af4cd5ae07c9255",
+    "drafts/n88-student-portal/activation/denied-read-20261023/postdelivery-20261024/native74-reconciliation.inactive.mjs": "3ea409d01644b01ec01631e70b08f57c60818e4f545ca1c63af4cd5ae07c9255"
+  },
+  "reuseRationale": "PG17/native28 and diagnostic proofs exercise exact immutable bundled native, unchanged client, fixture and PG helper. Draft numeric student-read diagnostic flag is retained main parity work, outside teacher issuance/reconciliation. New main CSS requires current rendered UI check. Historical UI receipt preserved separately.",
+  "currentRenderedUI": {
+    "aiAuthored": true,
+    "status": "PASS",
+    "providerOperations": 0,
+    "renderedUI": true,
+    "cleanup": {
+      "ownedBrowserClosed": true,
+      "ownedServerClosed": true
+    },
+    "checks": [
+      "actual DOM/handlers/source CSS over fresh loopback HTTP context",
+      "28 pupils; lost native ACK -> normal review -> committed receipt message without reissuing",
+      "active credentials preserved; no code disclosure in receipt metadata",
+      "actual class context owner invalidation removes batch controls"
+    ],
+    "batchCalls": 1
+  },
+  "currentNative28": {
+    "aiAuthored": true,
+    "status": "PASS",
+    "nativeBaseline": "cbdfb4d8cd91f6e7588e0512b64f692935d2462d",
+    "teacherClientRevision": "changed actual source",
+    "students": 28,
+    "outcomes": [
+      {
+        "mode": "ack",
+        "clientOutcome": "ACK",
+        "durableCredentials": 28,
+        "durableReceipts": 1,
+        "ownerDenial": true
+      },
+      {
+        "mode": "rollback",
+        "clientOutcome": "UNKNOWN",
+        "durableCredentials": 0,
+        "durableReceipts": 0,
+        "ownerDenial": true
+      },
+      {
+        "mode": "lost-ack",
+        "clientOutcome": "UNKNOWN",
+        "durableCredentials": 28,
+        "durableReceipts": 1,
+        "ownerDenial": true
+      }
+    ],
+    "scope": "actual native credential operations and teacher client through existing fabricated repository; not full signed native/PG integration",
+    "liveAttemptsReplayed": 0,
+    "providerOperations": 0,
+    "actualPriorAttempts": "UNKNOWN"
+  },
+  "retainedMainDependencyReview": {
+    "drafts/n88-student-portal/numeric-credentials.mjs": "student GET diagnostic marker only; bundled native bytes immutable; no teacher command dependency change",
+    "src/styles/student-portal-class.css": "new support styles/progress animation retained; actual rendered UI passed",
+    "src/lib/dom.js": "N107 renderRegions addition retained; esc export used by this component unchanged; actual rendered UI passed"
+  },
+  "harnessCorrection": {
+    "initialFailure": "ERR_UNSUPPORTED_ESM_URL_SCHEME before browser/server start: Windows absolute module import needs file URL",
+    "correction": "Node import uses file:/// canonical helper; browser navigation remains loopback HTTP only",
+    "originalUiHarness": "retained application fixture/checks; switched browser ownership to canonical isolated helper and saved current result separately from immutable original UI receipt"
+  },
+  "sourcePublicationChecks": {
+    "allowedPathScope": "PASS: 22 exact allowed paths",
+    "syntax": "PASS: every changed JS/MJS parsed by node --check",
+    "manifestMerge": "PASS: only receipt source/output/activation fields changed; unrelated declarations retained",
+    "immutableReceipts": "PASS: all copied historical JSON evidence byte-identical",
+    "nativeByteParity": "PASS: bundle and inactive native match exact active86 SHA256",
+    "cleanup": "PASS: canonical owned contexts/browser and HTTP server closed; no live resources acquired"
+  }
+}

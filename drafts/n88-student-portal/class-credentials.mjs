@@ -1,3 +1,4 @@
+import {credentialStateRevision} from './receipt-reconciliation.mjs';
 /** AI-authored. Inactive composition ports for the EXISTING N88 transaction/service. */
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
@@ -47,7 +48,8 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
         if(action==='list') return result(200,{teachingId:scope.teachingId,rosterRevision,students:members.map(m=>({studentId:m.studentId,
           enrollmentId:m.enrollmentId,revision:m.revision,label:m.label,credentialVersion:version(db,m),hasActiveCredential:live(db,m)}))});
         if(!requestId(input.requestId)) return denied();
-        const binding=hash([action,scope.teachingId,input.expectedRosterRevision??null,input.studentId??null,input.enrollmentId??null,input.revision??null,input.credentialVersion??null]);
+        if(input.expectedCredentialRevision!==undefined&&!/^[a-f0-9]{64}$/.test(input.expectedCredentialRevision))return denied();
+        const binding=hash([action,scope.teachingId,input.expectedRosterRevision??null,input.studentId??null,input.enrollmentId??null,input.revision??null,input.credentialVersion??null,...(input.expectedCredentialRevision===undefined?[]:[input.expectedCredentialRevision])]);
         const prior=db.classReceipts.find(r=>r.ownerId===auth.ownerId && r.requestId===input.requestId);
         if(prior) {
           if(!prior.results.every(r=>members.some(m=>m.studentId===r.studentId&&m.enrollmentId===r.enrollmentId)))return denied();
@@ -55,7 +57,7 @@ export function createClassCredentialOperations({repository,verifyTeacher,verify
           const rows=replay(prior);return result(200,{requestId:input.requestId,replayed:true,results:rows,counts:summary(rows)});
         }
         if(db.classReceipts.length>=10000) fail(); // fail closed, never evict an idempotency boundary
-        if(action==='batch' && input.expectedRosterRevision!==rosterRevision) return result(409,{error:'roster_changed'});
+        if(action==='batch' && (input.expectedRosterRevision!==rosterRevision || input.expectedCredentialRevision!==undefined&&input.expectedCredentialRevision!==credentialStateRevision(db,members))) return result(409,{error:'roster_changed'});
         let selected=members;
         if(action!=='batch') {
           selected=members.filter(m=>m.studentId===input.studentId && m.enrollmentId===input.enrollmentId && m.revision===input.revision);

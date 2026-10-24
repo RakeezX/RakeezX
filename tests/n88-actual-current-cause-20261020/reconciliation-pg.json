@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "providerOperations": 0,
+  "syntheticStudents": 28,
+  "checks": [
+    "real PG17 exact78 native list/reconciliation on28 pupils",
+    "rollback0 credentials; durable lostCOMMIT ACK28 credentials and committed receipt recovered through guarded list",
+    "stale credential CAS409; fresh current intent skips28 active credentials without regeneration",
+    "foreign owner rejected; broken connections released"
+  ],
+  "cleanup": {
+    "ownedPgStoppedAndRemoved": true
+  }
+}

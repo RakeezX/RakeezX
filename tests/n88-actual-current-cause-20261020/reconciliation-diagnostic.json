@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "providerOperations": 0,
+  "sqlOperations": 0,
+  "browserOperations": 0,
+  "realAccountReads": 0,
+  "checks": [
+    "actual signed native composition distinguishes finite admission denial from no-cookie session rejection",
+    "operator-only fixed categories for thrown acquire/guard/transaction/projection/COMMIT; no public expansion",
+    "missing, ingress-only, foreign, nonce-mismatched, malformed or expired operator proof cannot export a category"
+  ],
+  "resourcesCreated": 0,
+  "validSessionProjection": "NOT_RUN; no-cookie request cannot certify grades"
+}
