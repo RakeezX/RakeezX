@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "currentEvidence": "app.json",
+  "historicalFailuresPreserved": [
+    {
+      "status": "FAIL",
+      "phase": "initial harness observations",
+      "evidence": "Initial observer assertions read before asynchronous projection completed; corrected to await bounded request quiescence. No Product guard bypass."
+    },
+    {
+      "status": "FAIL",
+      "phase": "first configured-child candidate",
+      "evidence": "Strict ownerId equality excluded canonical codec rows with omitted owner_id. Corrected to existing verified-owner-DB semantics plus positive revision/outbox/guard fences; current create/update scenario PASS."
+    },
+    {
+      "status": "FAIL",
+      "phase": "expanded cleanup harness",
+      "evidence": "Synthetic backend used applyLifecycleCommand instead of the existing cloud mock entry applySyncV2LifecycleCommand. Corrected only the synthetic adapter method; current actual cascade+ACK scenario PASS."
+    },
+    {
+      "status": "FAIL",
+      "phase": "optional full historical gateway module import",
+      "evidence": "ERR_MODULE_NOT_FOUND @noble/curves from unrelated provider-policy static import. Three unchanged gateway test bodies then ran with actual gateway module and no unused crypto import; no dependency/config/service changes."
+    }
+  ],
+  "scope": "Current required prepublication gates PASS; historical attempts retain their failures. No live proof attempted."
+}
