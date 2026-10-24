@@ -1,0 +1,22 @@
+{
+  "aiAuthored": true,
+  "baseline": false,
+  "providerOperations": 0,
+  "status": "FAIL",
+  "checks": [
+    "same command ID and original roster/credential versions reconciled after actual runtime remount + reload",
+    "list200/UNKNOWN and replacement click never dispatch another mutation",
+    "authoritative committed receipt clears uncertainty even when current data disagrees; current fields retained",
+    "actual account binding + real ownership guard and source CSS",
+    "actual pending handler remount + reload preserve pre-send hint; real lease denial dispatches no request"
+  ],
+  "failure": {
+    "message": "locator.waitFor: Timeout 6000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/تعذّر تأكيد النشر/) to be visible\u001b[22m\n",
+    "stack": "locator.waitFor: Timeout 6000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/تعذّر تأكيد النشر/) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-uncertain-receipt-recovery-isolated-20261024\\tests\\n88-uncertain-recovery-20261024\\ui.mjs:79:141\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-uncertain-receipt-recovery-isolated-20261024\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-uncertain-receipt-recovery-isolated-20261024/tests/n88-uncertain-recovery-20261024/ui.mjs:40:2"
+  },
+  "cleanup": {
+    "ownedServerClosed": true,
+    "ownedBrowserClosed": true,
+    "sharedBrowserLease": "not required: canonical isolated synthetic phase"
+  }
+}

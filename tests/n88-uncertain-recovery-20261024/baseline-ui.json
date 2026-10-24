@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "baseline": true,
+  "providerOperations": 0,
+  "status": "PASS",
+  "checks": [
+    "REPRODUCED: actual runtime remount and HTTP reload both lose uncertain request identity"
+  ],
+  "mutationCalls": 1,
+  "cleanup": {
+    "ownedServerClosed": true,
+    "ownedBrowserClosed": true,
+    "sharedBrowserLease": "not required: canonical isolated synthetic phase"
+  }
+}
