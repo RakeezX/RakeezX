@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-source-proof-context-20261024",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -6020,
+      "scopeKey": "n36-source-proof-context",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "LATEST USER FOLLOWUP: source Madrasati tab stayed on SAME page without navigation/account/school change; Start was from teacher page. Both existing supported dashboard and teacher-page entries must work. Read exact finite actual result/followup at artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-n36-academic-passed-context-failure.json. Reproduce both entries with actual automatic .41 background state sequence and asynchronous DOM changes without user navigation, not only hash test. Do not require user change entry to conceal one broken supported path.\n\nThe existing versioned ZIP download link in class-import-center.js may be updated ONLY to the qualified new package/version, preserving currentreceiver/academic/recovery code; no unrelated view rewrite.\n\nNEW ACTUAL PO RESULT AFTER VERIFIED ACADEMIC FIX697c20a9: user .41 nowstartaccepted, schoolbound/proofpresent/semanticdashboard2nav3action2readlinks, staged50/observed50/classes10, processedPages0, confirmed0/receipts0/pending0, home2/sourceGuard11/descriptor25/appGuard12/fetchPending2. FailureTEACHER_CONTEXT_CHANGED at source-pre-read/collect, not academicbinding anymore. Save exactfiniteevidence. No claim50saved or303loss, no automaticretry oldbatch/userStart. First read actual .41 selection/background/sourceadapter and existingguard tests. Read-only review found byte-equal JSON proof includes FULL location.href includinghash while background sourceRoute explicitly permitsfragmentchange; proof also includes semanticALLcontroltuples/duplicates/queries and greeting/teacher/rolefields. DOMorder already sorted. source-pre-read frombackground85-101 comparesselectionproof, distinct from fetchedteacherreportfailure. Reproduce actual extension/background after50staged with safe same-document fragment update, asynchronous/dashboard redraw/busy/control enrichment individually, no personaldata; distinguish realidentitydrift from volatilepresentation and identify which is demonstrably buggy. Test baseline currentcode and actualmounted synthetic source, do not assert actualusercause without evidence. Fix ONLY reproduced false context refusal with stable explicit identity/source binding and bounded already-existing settle mechanism ifneeded; never remove teacher/school/role/login/account/document/job/origin/query guards, broaden source routes, accept foreignsubject/school or compare absentidentity as proof. Realteacher/school/role/loginchange must fail beforefurtherread/save; fragments mayfollowexistingroutepolicy, realquery/path/documentchange staysfail. If actualsourceambiguity remains unproved, add only finite mismatchCATEGORY diagnostic(s) underexisting safeallowlist, no URLs/proofJSON/names/IDs/rawDOM or genericerror dump, explicitlyretainunprovenusercause. No speculativefix or releasewithoutreproduceddefect. No directrealbrowser, extensionstart/control, resultsummaryreader or refusalbypass; only canonical isolated-loopback freshsynthetic browser actual .41 worker/sourcehandlers withfakeaccountIndexedDB/receipts. Reuse unchanged20timetable/schooldisplay/department/302/10historicalproof and newf2d4ec3academicchecks; do not retest allorundoacademicfix. If extension source trulychanges use existingpackager/single proper versionincrement/manifest+runtimeversions+ZIP/sourceSHA metadata and exact actualartifactparity underoriginalpublisher, no manualreleasepath. No defaultmaterial/calendar/grades/SQL/Auth/provideractions, no existingdataremoval. OriginalactualemptyaccountacceptanceOPENuntilusertrial. Return originalrunnerJSON, notwholeN36closure.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/**",
+        "tests/n36-source-proof-context-20261024/**",
+        "docs/automation-evidence/20261024/N36_SOURCE_PROOF_CONTEXT.md",
+        "src/views/class-import-center.js"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/selection.js",
+        "extensions/rakeez-teacher-import-helper/background-runner.js",
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_current_pre_read_proof_drift_reproduction",
+        "n36_stable_identity_and_true_change_refusal",
+        "n36_actual_background_collection_receipt_and_package_parity"
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261024-actual-new-source-pre-read-failure",
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0
+      },
+      "releaseAuthority": "Direct PO immediate causal N36 repair and standing routine originalpublisher delivery. Synthetic/source-only, no realbrowser or denied extensioncontrol/resultreader.",
+      "acceptance": [
+        "Reproduce current pre-read context defect accurately; actualusercause remainsbounded by availableevidence.",
+        "Smallest stable proof correction preserves all trueidentity/role/school/session/document/route guards and durable localreceipts.",
+        "Exact extension package/source servedparity via originalpublisher ifchanged; no actualaccountclaim withoutuserresult."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+        "requiredSourcePaths": [
+          "extensions/rakeez-teacher-import-helper/selection.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "src/views/class-import-center.js",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs"
+        ],
+        "editPaths": [
+          "extensions/rakeez-teacher-import-helper/selection.js",
+          "extensions/rakeez-teacher-import-helper/background-runner.js",
+          "extensions/rakeez-teacher-import-helper/source-adapter.js",
+          "src/views/class-import-center.js",
+          "tests/n36-source-proof-context-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N36_SOURCE_PROOF_CONTEXT.md"
+        ],
+        "newPaths": [
+          "tests/n36-source-proof-context-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N36_SOURCE_PROOF_CONTEXT.md"
+        ],
+        "workerChecks": [
+          "n36_current_pre_read_proof_drift_reproduction",
+          "n36_stable_identity_and_true_change_refusal",
+          "n36_actual_background_collection_receipt_and_package_parity"
+        ],
+        "publisherChecks": []
+      },
+      "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+      "worktreePath": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-source-proof-context-20261024",
+      "completionMode": "source_proof_false_drift_causal_repair"
+    }
+  ]
+}
