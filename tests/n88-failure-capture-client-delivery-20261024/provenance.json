@@ -1,0 +1,38 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "qualifiedCandidate": "169ba140ecbd8e8823427c9e6ad7f26941ebbfac",
+  "publicationBase": "438ceffaf6aeab121c10f7a6e466aa41024a14a4",
+  "dependencyHashes": {
+    "src/lib/student-portal-unified-client.js": "14e3c39335602f15dee4a1816724a78700a36cc90d1856f61816e8fd6c50718a",
+    "drafts/n88-student-portal/client/binding-proof.js": "6e9582ff6f24e0d2ed959910bc214b920ea9e1bebf7657c7ee5f60f6cd4bbab6",
+    "drafts/n88-student-portal/client/student-entry.js": "9c7768a245e06d11f8be9abf62d1397f43451cbd4cc9ef6e292572532177b732"
+  },
+  "exactSourceParity": true,
+  "laterClassUI": "Preserved: no class UI files modified",
+  "reusedImmutableEvidence": [
+    {
+      "path": "tests/n88-five-correlation-20261024/finite-guards.json",
+      "sha256": "c26881a2c766e3eadedff16b39303ec7e2c8d4eebfd6c16dfe6f0f409ba40470"
+    },
+    {
+      "path": "tests/n88-five-correlation-20261024/native-correlation.json",
+      "sha256": "7a09fae1ff0da620129acfbae50e188b6f48a5531f2c8808844bc8fa05d435d0"
+    },
+    {
+      "path": "tests/n88-five-correlation-20261024/initial-envelope-expectation-failure.json",
+      "sha256": "b4b5c4602501e4dcc9ff3d9fe1bd0aff1314e41cf61bc2b892f21a78efeedf7c"
+    }
+  ],
+  "trustBoundary": "Browser metadata is finite capture only, not MAC/source/actor verification. Original custody validates actual pin/readback and cryptography; x-n88-source is not sourceChecked.",
+  "publicPrivateBoundary": "Publisher must verify these three public repository assets and normal import path. Private /student embedded bundle is unchanged here; original custodian owns its separately authorized combined carrier transition.",
+  "offlineShell": "Read-only sw.js check: neither draft student entry nor binding-proof is in teacher SHELL; /student API route is bypassed; no new teacher startup dependency or SW behavior.",
+  "preservedOpen": [
+    "actual user student503",
+    "issuanceUNKNOWN",
+    "historical wrong-signature FAIL",
+    "transport401",
+    "whole N88"
+  ],
+  "providerOperations": 0
+}

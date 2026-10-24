@@ -1,0 +1,96 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "taskId": "continuous-n88-failure-capture-client-delivery-20261024",
+  "runId": "923a2be4-4016-4b55-8d5e-ffe53c3571e0",
+  "renderedUI": true,
+  "checks": [
+    {
+      "scenario": "selected",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": true,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "ordinary",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "unknown",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "401",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": true,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "extra",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "wrong-browser",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "wrong-source",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "malformed",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "expired",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    },
+    {
+      "scenario": "late",
+      "status": "PASS",
+      "initialRequests": 1,
+      "captured": false,
+      "retired": true,
+      "privateProfileOrBinding": false
+    }
+  ],
+  "providerOperations": 0,
+  "scope": "Synthetic HTTP only; actual public source entry, not private carrier packaging or authenticated read",
+  "isolation": "Canonical isolated-local-browser: fresh disposable contexts, loopback origin only, SW blocked; no shared live-browser lease required",
+  "cleanup": {
+    "ownedHttpServerClosed": true,
+    "ownedBrowserClosed": true
+  }
+}
