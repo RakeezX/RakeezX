@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-validation-family-public-dependency-20261024",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -6050,
+      "scopeKey": "n88-public-validation-family-metadata",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "objective": "DELIVER ONLY QUALIFIED PUBLIC METADATA DEPENDENCY THROUGH SOLE PUBLISHER. Original continuous-n88-current-teacher-connection-actual-cause-20261020/candidatef3eaef6dc3e268bb91de98c3b99e4df4714ccfe3/runfe57dea1-d603-46bc-aff2-9a32ae13c07d qualified finite snapshot failure families with actual modules, authenticated source admission/foreignowner/badsignature/rollback/cancel/COMMITloss checks and real appDOM/CSS supportdisplay+ownerretirement. It remainsBLOCKED because actualnative/N44successor and publicserveddependency notverified, hostedfamilyUNKNOWN. HistoricalfailedcheckpointcleanupDENIAL remainsimmutable; doNOTtouch/delete oldfixtures or reinterpretparentFAIL. ZERO nativeupload/pin/carrier/browseraccount/SQL/Auth/schema/source/grade/message/send operations inthis child.\n\nNEWisolatedworktree at currentmain. Integrate ONLY the public delta bca2ab8a86eda286f6b26c7de93b7117812a7eb3 -> f3eaef6dc3e268bb91de98c3b99e4df4714ccfe3 in drafts/n88-student-portal/cloudflare-entry.mjs, src/lib/student-portal-runtime.js, src/lib/support.js. Parent public runtime and cloudflare entry differ from currentmain: DO NOToverwritewholeoldfiles or cherry-pick entireparentbranch. Preserve all newer currentmain request deadlines, finite error stages, durable UNKNOWN recovery/owner fences and source signatures. Merge just fixed validation-family enum propagation/display. Native-only postgres-repository/integrated-service/web-entry and nondeployable native.inactive.mjs stay originalcustodian's separate phase, not this public deploy. No sourcepin or secret dependency may change as incidental build effect.\n\nRead exact original safe delta/qualification manifests and synthetic UI proof only asneeded; no private custody or fullhistory. Reuse unchanged native validation evidence by hash. Because currentmain differs, perform focused verification of MERGED CURRENT public modules, not oldworktree source. Qualify current authenticated signed response -> allowlisted fixed family -> support capture/UI; unknown/forged/bad signature/foreignowner/newowner retire details; no value/ID/raw row/error text/count echo. Unchanged successful request, deadline/cancel and durable UNKNOWN receipt behavior must remain true. Use existing local JS/HTTP synthetic helpers ifneeded, no PGfixture/new suite/realaccount. Tests must useactual mergedmodules/DOM/handlers, no mirror or fixture that manufacturesunconditionalACK. No unrelatedbenchmark/Previewloop.\n\nFinite native metadata is backwardcompatible: before originalnativeactivation, absentfamily remainsnone/generic; publicrelease must notassertactualfamily or clearreal503. Onlyalready-approved enum, no newraw errorheaders/route/broadlogging. Ifcurrentmain merge materiallychanges nativecontract, stopwithexactdependency ratherthan weaken signature/bodyallowlist. Keep SQL/role/privateerrorboundaryguard andexistingfrontendoffline startup intact; support.js isexistingdependency, no unsolicitednewstartupmodule.\n\nReturn SOURCECURRENT checks only for this child with exact changedpublicpaths/candidate/base/worktree and qualificationmanifest linking parentfailures unchanged, no actualstudentlogin/cloud/arrival claim. Originalsolepublisher integrates/builds/delivers andchecksservedassets. Record exact per-file servedproof so originalcustodian cancontinue native+oneinstrumentedclassread. This is diagnostic prerequisite, NOTwholeN88CLOSED; actualfailurefamily and latertruecausalfix stillmustbeobserved. Do not manually push/deploy, doNOTwritequeue or startotherworkers.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/support.js",
+        "tests/n88-validation-public-20261024/**",
+        "docs/automation-evidence/20261024/N88_VALIDATION_FAMILY_PUBLIC_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "src/lib/student-portal-runtime.js",
+        "src/lib/support.js"
+      ],
+      "requiredChecks": [
+        "n88_validation_family_current_main_delta",
+        "n88_validation_family_public_failure_owner_privacy",
+        "n88_validation_family_unchanged_success_deadline_recovery"
+      ],
+      "acceptance": [
+        "Only fixed public metadata delta integrated on current main, newer safety/recovery code retained.",
+        "Focused current merged modules prove finite privacy, owner retirement, valid success/deadline/recovery; no private or live action.",
+        "Sole publisher actual served asset proof available for original N88 native/class-read continuation; no whole-ticket closure."
+      ],
+      "preparationAuthority": {
+        "kind": "qualified_finite_public_metadata_dependency",
+        "originalTaskId": "continuous-n88-current-teacher-connection-actual-cause-20261020",
+        "originalRunId": "fe57dea1-d603-46bc-aff2-9a32ae13c07d",
+        "qualifiedCandidate": "f3eaef6dc3e268bb91de98c3b99e4df4714ccfe3",
+        "qualifiedDeltaBase": "bca2ab8a86eda286f6b26c7de93b7117812a7eb3",
+        "nativeServiceOperations": 0,
+        "sourcePinOperations": 0,
+        "privateCarrierOperations": 0,
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "newPgClusters": 0,
+        "deniedCleanupRetries": 0
+      },
+      "releaseAuthority": "Standing and latest full PO delegation authorize sole-publisher delivery of narrowly qualified public support metadata prerequisite. No native/cloud account action by this source worker; this is not a causal fix or whole N88 acceptance.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "38d78c7acb51c22b2f845a0a3ce2deb7cecfae15",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/cloudflare-entry.mjs",
+          "src/lib/student-portal-runtime.js",
+          "src/lib/support.js"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/cloudflare-entry.mjs",
+          "src/lib/student-portal-runtime.js",
+          "src/lib/support.js",
+          "tests/n88-validation-public-20261024/contract.mjs",
+          "tests/n88-validation-public-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_VALIDATION_FAMILY_PUBLIC_DELIVERY.md"
+        ],
+        "newPaths": [
+          "tests/n88-validation-public-20261024/contract.mjs",
+          "tests/n88-validation-public-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_VALIDATION_FAMILY_PUBLIC_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n88_validation_family_current_main_delta",
+          "n88_validation_family_public_failure_owner_privacy",
+          "n88_validation_family_unchanged_success_deadline_recovery"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "publish_qualified_public_validation_metadata_dependency",
+      "baseSha": "38d78c7acb51c22b2f845a0a3ce2deb7cecfae15",
+      "worktreePath": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-validation-family-public-dependency-20261024",
+      "postDeliveryChecks": [
+        "production_publication"
+      ]
+    }
+  ]
+}
