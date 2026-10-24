@@ -233,7 +233,9 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   if(semanticDashboard)dashboards.push(body);
   const dashboard=semanticDashboard;
   // AI: structural role proof is confined to the complete, bound live dashboard.
-  const semanticRoleProof=!source&&dashboard&&document.readyState==='complete'&&!Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible)&&['قائمة الطلاب','الجدول الدراسي'].every(label=>matching(label).length===1&&safeRead(label).length===1&&!matching(label)[0].hasAttribute('onclick'));
+  const semanticControls=!source&&dashboard&&['قائمة الطلاب','الجدول الدراسي'].every(label=>matching(label).length===1&&safeRead(label).length===1&&!matching(label)[0].hasAttribute('onclick'));
+  const busy=Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible);
+  const semanticRoleProof=semanticControls&&document.readyState==='complete'&&!busy;
   const roleProofKind=activeTeacher.length?'active-role':greetings.length===1?'greeting':semanticRoleProof?'semantic-dashboard':'none';
   const proofDiagnostic={entryKind:cards.length?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',roleProofKind,proofNavMarkers:Math.min(navMarkers,2),proofActionMarkers:Math.min(actionMarkers,3),proofReadLinks:Math.min(readTargets.length,20),schoolBindingState:runContext?.schoolBinding??'none',schoolBadgePresent:labelValues(body,['اسم المدرسة']).length>0||Array.from(document.querySelectorAll('.school-name')).filter(visible).map(roleText).some(validValue),schoolIdPresent:observedSchoolIds.length===1,readProofPresent:!!runContext?.readProof};
   const entry={pageKind:cards.length||gatewayRejected?'teacher-gateway':dashboard?'teacher-dashboard':'unresolved-entry',readyState:document.readyState,roleMarkers:Math.min(roleValuesIn(body).length,10),schoolOptions:Math.min(cards.length,20),navMarkers,actionMarkers,safeReadLinks:Math.min(readTargets.length,20),iframeCount:Math.min(document.querySelectorAll('iframe').length,20),linkStats};
@@ -253,7 +255,16 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
   // AI: proof belongs to this live teacher document, never to a badge-less fetched menu.
   const welcomeCandidates=dashboard?Array.from(body.querySelectorAll('p,span,h1,h2,h3')).filter(visible).filter(n=>!Array.from(n.children).some(child=>/^مرحبا بك /.test(roleText(child)))).map(roleText).filter(v=>/^مرحبا بك /.test(v)):[];
   const welcomeNames=[...new Set(welcomeCandidates.map(v=>v.slice('مرحبا بك '.length)).filter(v=>validValue(v)&&!/[0-9٠-٩]/.test(v)))];
-  const currentTeacherProof=()=>JSON.stringify({url:location.href,school:shownSchool,schoolId:observedSchoolIds[0],semantic:semanticRoleProof?{navMarkers,actionMarkers,controls:controls.filter(n=>['قائمة الطلاب','سجلات المتابعة اليومية','الجدول الدراسي','سجلات متابعة الفصول','تقارير المعلم'].includes(roleText(n))).map(n=>[n.tagName,roleText(n),n.tagName==='A'?new URL(n.href).pathname+new URL(n.href).search:'']).sort()}:null,roles:[...new Set(activeTeacher)].sort(),greetings,teacher:[...new Set([...labelValues(body,['اسم المعلم','اسم المعلمة']),...welcomeNames])].sort()});
+  // AI: bind identity and exact read targets, not optional control multiplicity.
+  // Structural coherence/unique safe primary links are still required on every
+  // read. Fragments follow the existing same-document route policy; queries do not.
+  const currentTeacherProof=()=>JSON.stringify({url:location.origin+location.pathname+location.search,school:shownSchool,schoolId:observedSchoolIds[0],semantic:semanticControls?{readTargets:[...readTargets].sort()}:null,roles:[...new Set(activeTeacher)].sort(),greetings,teacher:[...new Set([...labelValues(body,['اسم المعلم','اسم المعلمة']),...welcomeNames])].sort()});
+  const mismatch=()=>{
+    try{const expected=JSON.parse(runContext.readProof),current=JSON.parse(currentTeacherProof());
+      for(const [key,category] of [['url','route'],['school','school'],['schoolId','school'],['roles','role'],['greetings','role'],['teacher','teacher'],['semantic','presentation']])if(JSON.stringify(expected[key])!==JSON.stringify(current[key]))return category;
+      return 'none';
+    }catch{return 'invalid-proof';}
+  };
   if(mode==='read-proof'||mode==='read-proof-settle'){
     if(!entryPath||document.readyState!=='complete'||document.querySelector('input[type=password],form[action*="Login" i]'))return roleFail('LOGIN_OR_LOGOUT');
     if(greetings.length>1)return roleFail('AMBIGUOUS_ROLE');
@@ -267,10 +278,17 @@ export function readAutomaticTeacherPage(mode='home',selectedSchool=null,runCont
         if(semantic&&JSON.stringify(expected)===JSON.stringify(current)&&runContext.readProof!==currentTeacherProof())return {...roleFail('SOURCE_PENDING'),retry:true};
       }catch{return roleFail('TEACHER_CONTEXT_CHANGED');}
     }
+    // A transient busy marker is not an identity change. Wait without reading
+    // only while positive teacher/school identity AND all structural read proof
+    // remain equal. Missing identity or a changed role never enters this wait.
+    if(busy&&runContext.readProof){
+      const current=JSON.parse(currentTeacherProof());
+      if(mismatch()==='none'&&current.teacher.length&&shownSchool&&semanticControls)return {...roleFail('SOURCE_PENDING'),retry:true};
+    }
     if(!activeTeacher.length&&greetings.length!==1&&!semanticRoleProof)return roleFail('UNCONFIRMED_TEACHER_ROLE');
     if((!shownSchool||!activeTeacher.length&&greetings.length!==1)&&!runContext.readProof)return roleFail('UNCONFIRMED_TEACHER_ROLE');
     const proof=currentTeacherProof();
-    if(runContext.readProof&&runContext.readProof!==proof)return roleFail('TEACHER_CONTEXT_CHANGED');
+    if(runContext.readProof&&runContext.readProof!==proof){proofDiagnostic.proofMismatch=mismatch();return roleFail('TEACHER_CONTEXT_CHANGED');}
     globalThis.rakeezTeacherReadGuard=()=>readAutomaticTeacherPage('read-proof',null,{...runContext,readProof:proof});
     globalThis.rakeezTeacherReadGuard.jobId=runContext.readJobId;
     globalThis.rakeezSetupPageReader=(kind,context,input)=>readAutomaticTeacherPage(kind,null,context,input);

@@ -1,0 +1,25 @@
+{
+  "source": "direct_user_actual_result_after_697c20a9",
+  "extensionVersion": "0.5.41",
+  "account": "same_new_empty_incognito_trial_account",
+  "startPhase": "accepted",
+  "staged": 50,
+  "observed": 50,
+  "classes": 10,
+  "processedPages": 0,
+  "confirmedRows": 0,
+  "confirmedReceipts": 0,
+  "pendingRows": 0,
+  "schoolBindingState": "bound",
+  "readProofPresent": true,
+  "roleProofKind": "semantic-dashboard",
+  "failure": "TEACHER_CONTEXT_CHANGED",
+  "failureStep": "source-pre-read",
+  "failureJobPhase": "collect",
+  "userFollowup": {
+    "sourcePageStayedUnchanged": true,
+    "startedFrom": "teacher_page",
+    "requirement": "Support both supported dashboard and teacher-page entries"
+  },
+  "interpretation": "Academic gate passed; source pre-read proof refusal now blocks before any confirmed receipt. Staged rows are not proof of save. Exact actual source difference unknown. No automatic retry."
+}

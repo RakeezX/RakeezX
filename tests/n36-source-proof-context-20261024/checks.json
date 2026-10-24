@@ -1,0 +1,76 @@
+{
+  "taskId": "continuous-n36-source-proof-context-20261024",
+  "runId": "ace0c1d5-3605-4e94-a7bb-09ff8206ba23",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "status": "PASS",
+  "selectedCases": 80,
+  "checks": [
+    {
+      "name": "n36_current_pre_read_proof_drift_reproduction",
+      "status": "PASS",
+      "evidence": "baseline.json: immutable .41 ZIP, 12 observations across both supported entries; after 50 staged/10 classes, hash/coherent secondary enrichment/duplicates reproduce exact source-pre-read collect TEACHER_CONTEXT_CHANGED with zero receipts. Identical redraw passes. Busy yields a distinct role refusal. Actual PO cause remains unproven."
+    },
+    {
+      "name": "n36_stable_identity_and_true_change_refusal",
+      "status": "PASS",
+      "evidence": "candidate.json + candidate-guards-{dashboard,teacher}.json + candidate-fetch-binding.json: 64 selected cases; true teacher/school/role/login/document/route/query/owner/session/job drift refuses; unsafe primary controls and permanent busy refuse; zero new source GET/receipt after valid drift checkpoints. Actual popup finite-category export/allowlist passes. Original invalid stale-document fake-transport probe remains FAIL and excluded, with valid descriptor/document negatives passing."
+    },
+    {
+      "name": "n36_actual_background_collection_receipt_and_package_parity",
+      "status": "PASS",
+      "evidence": "candidate-archive-0542.json: exact .42 ZIP worker/source, both entries, pending fragment and busy; 50 rows/10 saved receipts plus exact owner IndexedDB reopen. package.json: 29 source/ZIP hashes/sizes, unchanged CSP/permissions/.41 and protected app code; affected syntax PASS. download.json and inspected download-line.png: actual app DOM downloads ZIP SHA256 6e2bb0098ed32c091c49cc561da134f096ed97ec500747a22621d0334bbaecaa. Production/public served checks NOT_RUN."
+    }
+  ],
+  "evidence": [
+    {
+      "file": "baseline.json",
+      "sha256": "56c7f09173f1bbf9296ccf9023af2fc3b959f8aa4bda054def2e8ad39f714ea8"
+    },
+    {
+      "file": "candidate.json",
+      "sha256": "803d5c758084fc40a962f009dc8dfee135622894a331fd2654b13e0f8a1fa57e"
+    },
+    {
+      "file": "candidate-guards-dashboard.json",
+      "sha256": "1fa9f9aef5af775e81236230b5cd127d02a0c565e60930561b914c405288e059"
+    },
+    {
+      "file": "candidate-guards-teacher.json",
+      "sha256": "0111c3b7db67dc1cb97d95efdc44a03ae39870bd8c12aa7d61db0106e9862c7a"
+    },
+    {
+      "file": "candidate-fetch-binding.json",
+      "sha256": "5a11c6ceaf44bd52e19fe66139942b9fcd901898a51e5bff603430f95ab1da58"
+    },
+    {
+      "file": "candidate-archive-0542.json",
+      "sha256": "57525a64733590c2cbad0865e5269ff37762c7873e52a8269f1896df6f060911"
+    },
+    {
+      "file": "download.json",
+      "sha256": "014ec35b6d4dea7bcea55ec78438c7351c67230f0997096b768cfc46f8e2ee1b"
+    },
+    {
+      "file": "package.json",
+      "sha256": "e99fbc8e1b3edd693cc10908b1656c3a6dbf23c8c6226a0a650494f65676b128"
+    }
+  ],
+  "reused": [
+    {
+      "file": "tests/n36-actual-timetable-20261023/certificate-913a4635.json",
+      "sha256": "ad47110336647e0c954bbdf5dc7a0bbda2546cf36ef0e88670e1f8084974e2a8"
+    },
+    {
+      "file": "tests/n36-actual-timetable-20261023/certified-runtime-913a4635.json",
+      "sha256": "392377fde3f59ff20dc23e80a46fdb530646f19ba756bd9072b30ae4979d303c"
+    },
+    {
+      "file": "tests/n36-fresh-recurrence-20261024/certified.json",
+      "sha256": "20cd768e348a532d0855e1db1e431e2abfff0db32362f107187129857801a670"
+    }
+  ],
+  "originalFailuresPreserved": true,
+  "actualUserCause": "unproven",
+  "production": "NOT_RUN",
+  "productAcceptance": "OPEN"
+}

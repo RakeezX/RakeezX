@@ -1,0 +1,509 @@
+{
+  "taskId": "continuous-n36-source-proof-context-20261024",
+  "runId": "ace0c1d5-3605-4e94-a7bb-09ff8206ba23",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "baseline": true,
+  "boundary": "Fresh isolated loopback; actual popup/CSS, .41 baseline or candidate worker/source readers, actual receiver/store/IndexedDB with fake account service; source DOM is synthetic, not official captured DOM.",
+  "cases": [
+    {
+      "entry": "dashboard",
+      "mode": "none",
+      "view": {
+        "phase": "complete",
+        "code": null,
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 1,
+        "confirmedRows": 50,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        }
+      ],
+      "navigation": 0,
+      "changed": false,
+      "status": "FAIL",
+      "failure": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   {\n-     canonicalId: '00629a0b-8e6f-41fa-95fc-40840c90749a',\n-     deleted: false,\n-     id: '00629a0b-8e6f-41fa-95fc-40840c90749a',\n-     name: 'طالب اصطناعي bn',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675619\n-   },\n-   {\n-     canonicalId: '0074f125-1e45-4dbf-b634-11580f1251d4',\n-     deleted: false,\n-     id: '0074f125-1e45-4dbf-b634-11580f1251d4',\n-     name: 'طالب اصطناعي br',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672888\n-   },\n-   {\n-     canonicalId: '02c944be-f879-4123-bc8b-1dccee3ddd1c',\n-     deleted: false,\n-     id: '02c944be-f879-4123-bc8b-1dccee3ddd1c',\n-     name: 'طالب اصطناعي ag',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674230\n-   },\n-   {\n-     canonicalId: '054a3f1b-da6b-4a6b-9f4a-c1186c0c47c4',\n-     deleted: false,\n-     id: '054a3f1b-da6b-4a6b-9f4a-c1186c0c47c4',\n-     name: 'طالب اصطناعي bc',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675160\n-   },\n-   {\n-     canonicalId: '0587a32b-c996-4308-af6f-5b5ceee26283',\n-     deleted: false,\n-     id: '0587a32b-c996-4308-af6f-5b5ceee26283',\n-     name: 'طالب اصطناعي ar',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674705\n-   },\n-   {\n-     canonicalId: '07956d25-ffc7-40f0-8304-51a010fd641c',\n-     deleted: false,\n-     id: '07956d25-ffc7-40f0-8304-51a010fd641c',\n-     name: 'طالب اصطناعي aj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675619\n-   },\n-   {\n-     canonicalId: '097f6b35-edec-45b5-b8a4-7a56d7b4100b',\n-     deleted: false,\n-     id: '097f6b35-edec-45b5-b8a4-7a56d7b4100b',\n-     name: 'طالب اصطناعي bt',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673809\n-   },\n-   {\n-     canonicalId: '1ae2de08-e774-4917-98c5-8a18e0c834df',\n-     deleted: false,\n-     id: '1ae2de08-e774-4917-98c5-8a18e0c834df',\n-     name: 'طالب اصطناعي ba',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674230\n-   },\n-   {\n-     canonicalId: '1b591076-76bc-4abf-807a-4fadced55115',\n-     deleted: false,\n-     id: '1b591076-76bc-4abf-807a-4fadced55115',\n-     name: 'طالب اصطناعي al',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672118\n-   },\n-   {\n-     canonicalId: '20752d3d-5b5c-463f-aa4a-e4783a8bcae8',\n-     deleted: false,\n-     id: '20752d3d-5b5c-463f-aa4a-e4783a8bcae8',\n-     name: 'طالب اصطناعي ay',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673366\n-   },\n-   {\n-     canonicalId: '2add8850-4653-4ed1-9dad-27bdb00724b5',\n-     deleted: false,\n-     id: '2add8850-4653-4ed1-9dad-27bdb00724b5',\n-     name: 'طالب اصطناعي az',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673809\n-   },\n-   {\n-     canonicalId: '30bccff0-04bf-4f15-bf16-4ae2594af220',\n-     deleted: false,\n-     id: '30bccff0-04bf-4f15-bf16-4ae2594af220',\n-     name: 'طالب اصطناعي bi',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673366\n-   },\n-   {\n-     canonicalId: '35ec252a-8123-4d61-81b4-7fdc86a1da52',\n-     deleted: false,\n-     id: '35ec252a-8123-4d61-81b4-7fdc86a1da52',\n-     name: 'طالب اصطناعي bq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672497\n-   },\n-   {\n-     canonicalId: '37c04859-6c8d-436f-a4d1-9c4456935e07',\n-     deleted: false,\n-     id: '37c04859-6c8d-436f-a4d1-9c4456935e07',\n-     name: 'طالب اصطناعي bm',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675160\n-   },\n-   {\n-     canonicalId: '3f7da4e6-5f05-4629-a84f-1aa4dc1e06b3',\n-     deleted: false,\n-     id: '3f7da4e6-5f05-4629-a84f-1aa4dc1e06b3',\n-     name: 'طالب اصطناعي au',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831671547\n-   },\n-   {\n-     canonicalId: '4acbc0dd-f9a0-4ec1-ae70-c66bbe36c5b4',\n-     deleted: false,\n-     id: '4acbc0dd-f9a0-4ec1-ae70-c66bbe36c5b4',\n-     name: 'طالب اصطناعي ao',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673366\n-   },\n-   {\n-     canonicalId: '577a845b-8b9d-4b4a-8b83-a4d09eac3f58',\n-     deleted: false,\n-     id: '577a845b-8b9d-4b4a-8b83-a4d09eac3f58',\n-     name: 'طالب اصطناعي bo',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831671547\n-   },\n-   {\n-     canonicalId: '592bad5e-38ca-4f50-8862-78cc37c21028',\n-     deleted: false,\n-     id: '592bad5e-38ca-4f50-8862-78cc37c21028',\n-     name: 'طالب اصطناعي bl',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674705\n-   },\n-   {\n-     canonicalId: '5e592d50-030f-4a10-b3fc-4619fd6da345',\n-     deleted: false,\n-     id: '5e592d50-030f-4a10-b3fc-4619fd6da345',\n-     name: 'طالب اصطناعي ad',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672888\n-   },\n-   {\n-     canonicalId: '63e931b8-3afc-4f64-b6b2-3dbc8e33ac3f',\n-     deleted: false,\n-     id: '63e931b8-3afc-4f64-b6b2-3dbc8e33ac3f',\n-     name: 'طالب اصطناعي bw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675160\n-   },\n-   {\n-     canonicalId: '67bd7823-4087-445c-84eb-b3a2b42ba3b0',\n-     deleted: false,\n-     id: '67bd7823-4087-445c-84eb-b3a2b42ba3b0',\n-     name: 'طالب اصطناعي ah',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674705\n-   },\n-   {\n-     canonicalId: '77782d81-5f80-4b06-bad9-9698fa1d6006',\n-     deleted: false,\n-     id: '77782d81-5f80-4b06-bad9-9698fa1d6006',\n-     name: 'طالب اصطناعي bu',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674230\n-   },\n-   {\n-     canonicalId: '808e95d0-6a01-4eae-b6a7-fe1569ec0a7c',\n-     deleted: false,\n-     id: '808e95d0-6a01-4eae-b6a7-fe1569ec0a7c',\n-     name: 'طالب اصطناعي bg',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672497\n-   },\n-   {\n-     canonicalId: '8304733c-09a1-47e6-a1e9-838911582c5a',\n-     deleted: false,\n-     id: '8304733c-09a1-47e6-a1e9-838911582c5a',\n-     name: 'طالب اصطناعي ab',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672118\n-   },\n-   {\n-     canonicalId: '8d3fb347-1873-40b0-8ece-0959055965cb',\n-     deleted: false,\n-     id: '8d3fb347-1873-40b0-8ece-0959055965cb',\n-     name: 'طالب اصطناعي as',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675160\n-   },\n-   {\n-     canonicalId: '906bd748-6ba8-419a-97be-43d461ba4fce',\n-     deleted: false,\n-     id: '906bd748-6ba8-419a-97be-43d461ba4fce',\n-     name: 'طالب اصطناعي bh',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672888\n-   },\n-   {\n-     canonicalId: '947473c9-e168-40a5-a7e4-125b612daceb',\n-     deleted: false,\n-     id: '947473c9-e168-40a5-a7e4-125b612daceb',\n-     name: 'طالب اصطناعي bx',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675619\n-   },\n-   {\n-     canonicalId: '95d3d857-2d95-4d60-b109-505fb58f84b3',\n-     deleted: false,\n-     id: '95d3d857-2d95-4d60-b109-505fb58f84b3',\n-     name: 'طالب اصطناعي af',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673809\n-   },\n-   {\n-     canonicalId: '97298d91-8319-43a7-98d0-e26d95a70c5c',\n-     deleted: false,\n-     id: '97298d91-8319-43a7-98d0-e26d95a70c5c',\n-     name: 'طالب اصطناعي bk',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674230\n-   },\n-   {\n-     canonicalId: '9bbc1ba7-6695-4372-aa79-b18cc622d755',\n-     deleted: false,\n-     id: '9bbc1ba7-6695-4372-aa79-b18cc622d755',\n-     name: 'طالب اصطناعي ae',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673366\n-   },\n-   {\n-     canonicalId: '9c578ee9-ba42-45a7-ba70-b2610c8eaa4c',\n-     deleted: false,\n-     id: '9c578ee9-ba42-45a7-ba70-b2610c8eaa4c',\n-     name: 'طالب اصطناعي aa',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831671547\n-   },\n-   {\n-     canonicalId: '9c7f6371-8dcc-49de-a05f-cbe97afa17dd',\n-     deleted: false,\n-     id: '9c7f6371-8dcc-49de-a05f-cbe97afa17dd',\n-     name: 'طالب اصطناعي ax',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672888\n-   },\n-   {\n-     canonicalId: 'a007dba0-a849-4a0a-82bc-a372bf346bf4',\n-     deleted: false,\n-     id: 'a007dba0-a849-4a0a-82bc-a372bf346bf4',\n-     name: 'طالب اصطناعي an',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672888\n-   },\n-   {\n-     canonicalId: 'a0ed8699-4268-435e-9207-de158454d40c',\n-     deleted: false,\n-     id: 'a0ed8699-4268-435e-9207-de158454d40c',\n-     name: 'طالب اصطناعي at',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675619\n-   },\n-   {\n-     canonicalId: 'a5b9a682-4a60-4109-8249-3dcfd8ff87e3',\n-     deleted: false,\n-     id: 'a5b9a682-4a60-4109-8249-3dcfd8ff87e3',\n-     name: 'طالب اصطناعي ak',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831671547\n-   },\n-   {\n-     canonicalId: 'b400620a-ee7b-420a-b281-ad546d735200',\n-     deleted: false,\n-     id: 'b400620a-ee7b-420a-b281-ad546d735200',\n-     name: 'طالب اصطناعي ap',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673809\n-   },\n-   {\n-     canonicalId: 'bdb9bc76-c45d-4300-bdd6-c683ac4f9dcd',\n-     deleted: false,\n-     id: 'bdb9bc76-c45d-4300-bdd6-c683ac4f9dcd',\n-     name: 'طالب اصطناعي bv',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674705\n-   },\n-   {\n-     canonicalId: 'bf48167a-07c0-4dc3-a956-b79cffc0a755',\n-     deleted: false,\n-     id: 'bf48167a-07c0-4dc3-a956-b79cffc0a755',\n-     name: 'طالب اصطناعي aq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674230\n-   },\n-   {\n-     canonicalId: 'c2e126d6-4aee-4e4c-9cfc-4a2569c47499',\n-     deleted: false,\n-     id: 'c2e126d6-4aee-4e4c-9cfc-4a2569c47499',\n-     name: 'طالب اصطناعي am',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672497\n-   },\n-   {\n-     canonicalId: 'd40ba2d2-d3e7-4bd4-b8ce-a488933ca911',\n-     deleted: false,\n-     id: 'd40ba2d2-d3e7-4bd4-b8ce-a488933ca911',\n-     name: 'طالب اصطناعي be',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831671547\n-   },\n-   {\n-     canonicalId: 'd41e83c5-c21b-4ba4-9a3d-d8c2adcd8397',\n-     deleted: false,\n-     id: 'd41e83c5-c21b-4ba4-9a3d-d8c2adcd8397',\n-     name: 'طالب اصطناعي bd',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675619\n-   },\n-   {\n-     canonicalId: 'd5169a31-158e-4c58-9032-8266816836d7',\n-     deleted: false,\n-     id: 'd5169a31-158e-4c58-9032-8266816836d7',\n-     name: 'طالب اصطناعي aw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672497\n-   },\n-   {\n-     canonicalId: 'd588f4cb-7c52-4adf-95e0-88227d72bdeb',\n-     deleted: false,\n-     id: 'd588f4cb-7c52-4adf-95e0-88227d72bdeb',\n-     name: 'طالب اصطناعي bs',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673366\n-   },\n-   {\n-     canonicalId: 'd5b894bf-3b16-4343-a952-aa54943d454e',\n-     deleted: false,\n-     id: 'd5b894bf-3b16-4343-a952-aa54943d454e',\n-     name: 'طالب اصطناعي bj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831673809\n-   },\n-   {\n-     canonicalId: 'd9074d5c-f5f3-4de1-a127-2815164864ee',\n-     deleted: false,\n-     id: 'd9074d5c-f5f3-4de1-a127-2815164864ee',\n-     name: 'طالب اصطناعي bf',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672118\n-   },\n-   {\n-     canonicalId: 'dd5bdc16-f9af-4280-aa5b-748aacd418b3',\n-     deleted: false,\n-     id: 'dd5bdc16-f9af-4280-aa5b-748aacd418b3',\n-     name: 'طالب اصطناعي av',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672118\n-   },\n-   {\n-     canonicalId: 'e2cc0127-4eee-4f0d-bc47-5c3173e2e177',\n-     deleted: false,\n-     id: 'e2cc0127-4eee-4f0d-bc47-5c3173e2e177',\n-     name: 'طالب اصطناعي ai',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831675160\n-   },\n-   {\n-     canonicalId: 'edd68b68-a3bf-41cc-8e2d-9e38707f2eed',\n-     deleted: false,\n-     id: 'edd68b68-a3bf-41cc-8e2d-9e38707f2eed',\n-     name: 'طالب اصطناعي ac',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672497\n-   },\n-   {\n-     canonicalId: 'ef0cb1a7-1e2f-47b9-9997-6d95160985aa',\n-     deleted: false,\n-     id: 'ef0cb1a7-1e2f-47b9-9997-6d95160985aa',\n-     name: 'طالب اصطناعي bp',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831672118\n-   },\n-   {\n-     canonicalId: 'f4e41688-029e-44e9-af71-3d49a3c80706',\n-     deleted: false,\n-     id: 'f4e41688-029e-44e9-af71-3d49a3c80706',\n-     name: 'طالب اصطناعي bb',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831674705\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student1',\n-     name: 'Synthetic 1',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831667649\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student2',\n-     name: 'Synthetic 2',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831667649\n-   }\n- ]\n"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "hash",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "enrich",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "duplicate",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "redraw",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "complete",
+        "code": null,
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 1,
+        "confirmedRows": 50,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        }
+      ],
+      "navigation": 0,
+      "changed": true,
+      "status": "FAIL",
+      "failure": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   {\n-     canonicalId: '0209881b-ffd0-43be-8bb0-3371d2c248e4',\n-     deleted: false,\n-     id: '0209881b-ffd0-43be-8bb0-3371d2c248e4',\n-     name: 'طالب اصطناعي bg',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688540\n-   },\n-   {\n-     canonicalId: '0c3a4536-adf7-4e27-b8c5-c04829a25b3b',\n-     deleted: false,\n-     id: '0c3a4536-adf7-4e27-b8c5-c04829a25b3b',\n-     name: 'طالب اصطناعي al',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688016\n-   },\n-   {\n-     canonicalId: '0c984e52-8af8-410d-bc3c-d98b967245d7',\n-     deleted: false,\n-     id: '0c984e52-8af8-410d-bc3c-d98b967245d7',\n-     name: 'طالب اصطناعي ap',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689905\n-   },\n-   {\n-     canonicalId: '0ee486cd-0f28-489f-b647-e37713bb58ab',\n-     deleted: false,\n-     id: '0ee486cd-0f28-489f-b647-e37713bb58ab',\n-     name: 'طالب اصطناعي bq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688540\n-   },\n-   {\n-     canonicalId: '0f29b406-ee4a-4c9b-9212-554d1e9f2862',\n-     deleted: false,\n-     id: '0f29b406-ee4a-4c9b-9212-554d1e9f2862',\n-     name: 'طالب اصطناعي ah',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831694230\n-   },\n-   {\n-     canonicalId: '1045ae55-27d7-404a-a48e-3a4801751289',\n-     deleted: false,\n-     id: '1045ae55-27d7-404a-a48e-3a4801751289',\n-     name: 'طالب اصطناعي aw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688540\n-   },\n-   {\n-     canonicalId: '11dc9cb0-2354-467d-9bf7-2ab4abafdeb3',\n-     deleted: false,\n-     id: '11dc9cb0-2354-467d-9bf7-2ab4abafdeb3',\n-     name: 'طالب اصطناعي bm',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831696069\n-   },\n-   {\n-     canonicalId: '1226a922-d7f9-4521-8378-7ac560453f80',\n-     deleted: false,\n-     id: '1226a922-d7f9-4521-8378-7ac560453f80',\n-     name: 'طالب اصطناعي bv',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831694230\n-   },\n-   {\n-     canonicalId: '179a4cc1-0081-4adc-9f30-e5e96bc8c287',\n-     deleted: false,\n-     id: '179a4cc1-0081-4adc-9f30-e5e96bc8c287',\n-     name: 'طالب اصطناعي bs',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689445\n-   },\n-   {\n-     canonicalId: '21cca7d6-6e68-4e87-ae02-dd9c7445550f',\n-     deleted: false,\n-     id: '21cca7d6-6e68-4e87-ae02-dd9c7445550f',\n-     name: 'طالب اصطناعي aa',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831687436\n-   },\n-   {\n-     canonicalId: '220931b2-f246-4986-a7af-94d3f634627a',\n-     deleted: false,\n-     id: '220931b2-f246-4986-a7af-94d3f634627a',\n-     name: 'طالب اصطناعي am',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688540\n-   },\n-   {\n-     canonicalId: '231a5e8d-9402-4bd6-a029-bd66b62a55d8',\n-     deleted: false,\n-     id: '231a5e8d-9402-4bd6-a029-bd66b62a55d8',\n-     name: 'طالب اصطناعي bl',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831694230\n-   },\n-   {\n-     canonicalId: '233a4a82-0ba5-4d51-a306-6d65ca8c440d',\n-     deleted: false,\n-     id: '233a4a82-0ba5-4d51-a306-6d65ca8c440d',\n-     name: 'طالب اصطناعي af',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689905\n-   },\n-   {\n-     canonicalId: '265fff6e-6d4c-41dd-870d-4f476e53019a',\n-     deleted: false,\n-     id: '265fff6e-6d4c-41dd-870d-4f476e53019a',\n-     name: 'طالب اصطناعي ba',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831692377\n-   },\n-   {\n-     canonicalId: '26a2f445-9975-4e06-a070-347bcc2d66af',\n-     deleted: false,\n-     id: '26a2f445-9975-4e06-a070-347bcc2d66af',\n-     name: 'طالب اصطناعي ar',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831694230\n-   },\n-   {\n-     canonicalId: '2b909392-8566-4eae-9c27-88dfd9559cb2',\n-     deleted: false,\n-     id: '2b909392-8566-4eae-9c27-88dfd9559cb2',\n-     name: 'طالب اصطناعي an',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688991\n-   },\n-   {\n-     canonicalId: '38601706-87ad-4526-95aa-6b5a8cd1bcef',\n-     deleted: false,\n-     id: '38601706-87ad-4526-95aa-6b5a8cd1bcef',\n-     name: 'طالب اصطناعي bp',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688016\n-   },\n-   {\n-     canonicalId: '43b9e649-ee30-4466-a941-dcfe21fd7a10',\n-     deleted: false,\n-     id: '43b9e649-ee30-4466-a941-dcfe21fd7a10',\n-     name: 'طالب اصطناعي bx',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831697603\n-   },\n-   {\n-     canonicalId: '48e0ef19-e2f4-4a1d-babe-a53b1b72b421',\n-     deleted: false,\n-     id: '48e0ef19-e2f4-4a1d-babe-a53b1b72b421',\n-     name: 'طالب اصطناعي bj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689905\n-   },\n-   {\n-     canonicalId: '48e1855b-4414-46c1-b85b-288aab3ccec2',\n-     deleted: false,\n-     id: '48e1855b-4414-46c1-b85b-288aab3ccec2',\n-     name: 'طالب اصطناعي aq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831692377\n-   },\n-   {\n-     canonicalId: '49add351-6d32-4fcf-93b8-f948e77c6e43',\n-     deleted: false,\n-     id: '49add351-6d32-4fcf-93b8-f948e77c6e43',\n-     name: 'طالب اصطناعي ay',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689445\n-   },\n-   {\n-     canonicalId: '4bd5f1b8-ba51-4fcf-9eab-08b97e7405ae',\n-     deleted: false,\n-     id: '4bd5f1b8-ba51-4fcf-9eab-08b97e7405ae',\n-     name: 'طالب اصطناعي ae',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689445\n-   },\n-   {\n-     canonicalId: '4cbedce0-5632-4bc7-997f-81e0c8b9a47a',\n-     deleted: false,\n-     id: '4cbedce0-5632-4bc7-997f-81e0c8b9a47a',\n-     name: 'طالب اصطناعي ai',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831696069\n-   },\n-   {\n-     canonicalId: '50737767-cf35-4cee-b11d-89ee8fe3bb2f',\n-     deleted: false,\n-     id: '50737767-cf35-4cee-b11d-89ee8fe3bb2f',\n-     name: 'طالب اصطناعي at',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831697603\n-   },\n-   {\n-     canonicalId: '5836c7f5-e331-4c0b-bea1-f95a3b69dcf3',\n-     deleted: false,\n-     id: '5836c7f5-e331-4c0b-bea1-f95a3b69dcf3',\n-     name: 'طالب اصطناعي bo',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831687436\n-   },\n-   {\n-     canonicalId: '58be615e-a593-4290-a497-1cdedc49a6db',\n-     deleted: false,\n-     id: '58be615e-a593-4290-a497-1cdedc49a6db',\n-     name: 'طالب اصطناعي au',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831687436\n-   },\n-   {\n-     canonicalId: '5da22867-627a-4f4e-95d0-c0f40c6fec81',\n-     deleted: false,\n-     id: '5da22867-627a-4f4e-95d0-c0f40c6fec81',\n-     name: 'طالب اصطناعي av',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688016\n-   },\n-   {\n-     canonicalId: '5e7e18ec-4a74-4fd9-9093-07cb53702c50',\n-     deleted: false,\n-     id: '5e7e18ec-4a74-4fd9-9093-07cb53702c50',\n-     name: 'طالب اصطناعي bu',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831692377\n-   },\n-   {\n-     canonicalId: '63f34307-b050-4aec-89a4-0e4df549fee1',\n-     deleted: false,\n-     id: '63f34307-b050-4aec-89a4-0e4df549fee1',\n-     name: 'طالب اصطناعي bk',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831692377\n-   },\n-   {\n-     canonicalId: '75f002ab-3fbe-4e87-80f8-b888853c258c',\n-     deleted: false,\n-     id: '75f002ab-3fbe-4e87-80f8-b888853c258c',\n-     name: 'طالب اصطناعي bn',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831697603\n-   },\n-   {\n-     canonicalId: '77c0c2eb-d869-421d-9d2a-dde167b24ec8',\n-     deleted: false,\n-     id: '77c0c2eb-d869-421d-9d2a-dde167b24ec8',\n-     name: 'طالب اصطناعي bb',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831694230\n-   },\n-   {\n-     canonicalId: '84ab6063-2be7-46e9-bfb0-8d06f3709898',\n-     deleted: false,\n-     id: '84ab6063-2be7-46e9-bfb0-8d06f3709898',\n-     name: 'طالب اصطناعي ab',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688016\n-   },\n-   {\n-     canonicalId: '85c2b84f-f6aa-4ee4-b956-9b7d3a64807a',\n-     deleted: false,\n-     id: '85c2b84f-f6aa-4ee4-b956-9b7d3a64807a',\n-     name: 'طالب اصطناعي ag',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831692377\n-   },\n-   {\n-     canonicalId: '8bfc00a0-d61f-45f7-a86f-3605f0484acb',\n-     deleted: false,\n-     id: '8bfc00a0-d61f-45f7-a86f-3605f0484acb',\n-     name: 'طالب اصطناعي bh',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688991\n-   },\n-   {\n-     canonicalId: '9b48d1d9-13a7-4a0e-b6bd-0a1d62c237b8',\n-     deleted: false,\n-     id: '9b48d1d9-13a7-4a0e-b6bd-0a1d62c237b8',\n-     name: 'طالب اصطناعي bf',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688016\n-   },\n-   {\n-     canonicalId: '9e268a32-09c4-4c2b-bc5d-76a6d2fc88ca',\n-     deleted: false,\n-     id: '9e268a32-09c4-4c2b-bc5d-76a6d2fc88ca',\n-     name: 'طالب اصطناعي br',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688991\n-   },\n-   {\n-     canonicalId: 'aced6c41-c58d-4d99-bdb6-e008ddad5083',\n-     deleted: false,\n-     id: 'aced6c41-c58d-4d99-bdb6-e008ddad5083',\n-     name: 'طالب اصطناعي bc',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831696069\n-   },\n-   {\n-     canonicalId: 'b1ca59b4-91fa-4716-ab54-846880a3ac24',\n-     deleted: false,\n-     id: 'b1ca59b4-91fa-4716-ab54-846880a3ac24',\n-     name: 'طالب اصطناعي ak',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831687436\n-   },\n-   {\n-     canonicalId: 'bb4ca92d-5dfe-4d1b-8505-84ac6b054c29',\n-     deleted: false,\n-     id: 'bb4ca92d-5dfe-4d1b-8505-84ac6b054c29',\n-     name: 'طالب اصطناعي bd',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831697603\n-   },\n-   {\n-     canonicalId: 'bd3c8f92-9ddb-4105-84d0-757502215c8e',\n-     deleted: false,\n-     id: 'bd3c8f92-9ddb-4105-84d0-757502215c8e',\n-     name: 'طالب اصطناعي ad',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688991\n-   },\n-   {\n-     canonicalId: 'c5fcb802-39e8-4ec9-bd86-2e62030e8bdd',\n-     deleted: false,\n-     id: 'c5fcb802-39e8-4ec9-bd86-2e62030e8bdd',\n-     name: 'طالب اصطناعي ao',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689445\n-   },\n-   {\n-     canonicalId: 'c753ad24-45f7-4bad-89bb-56b7baac2726',\n-     deleted: false,\n-     id: 'c753ad24-45f7-4bad-89bb-56b7baac2726',\n-     name: 'طالب اصطناعي bi',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689445\n-   },\n-   {\n-     canonicalId: 'd21d33ed-af87-4279-832f-13ff81780d04',\n-     deleted: false,\n-     id: 'd21d33ed-af87-4279-832f-13ff81780d04',\n-     name: 'طالب اصطناعي as',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831696069\n-   },\n-   {\n-     canonicalId: 'd2bb1c36-c72b-45c0-bf59-93efd44a591a',\n-     deleted: false,\n-     id: 'd2bb1c36-c72b-45c0-bf59-93efd44a591a',\n-     name: 'طالب اصطناعي ax',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688991\n-   },\n-   {\n-     canonicalId: 'dbf78c4f-1c2c-4f99-b1fd-20faff8e11f4',\n-     deleted: false,\n-     id: 'dbf78c4f-1c2c-4f99-b1fd-20faff8e11f4',\n-     name: 'طالب اصطناعي bw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831696069\n-   },\n-   {\n-     canonicalId: 'e345706a-5c31-4860-b207-62cc913d6b80',\n-     deleted: false,\n-     id: 'e345706a-5c31-4860-b207-62cc913d6b80',\n-     name: 'طالب اصطناعي aj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831697603\n-   },\n-   {\n-     canonicalId: 'e348ce3f-092a-423a-b157-cdd097d25e10',\n-     deleted: false,\n-     id: 'e348ce3f-092a-423a-b157-cdd097d25e10',\n-     name: 'طالب اصطناعي ac',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831688540\n-   },\n-   {\n-     canonicalId: 'e6c28433-07d6-4db5-8dc9-1b7e50e8a2d9',\n-     deleted: false,\n-     id: 'e6c28433-07d6-4db5-8dc9-1b7e50e8a2d9',\n-     name: 'طالب اصطناعي bt',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689905\n-   },\n-   {\n-     canonicalId: 'e8ca60ac-d39d-4a56-a1c3-f62dbc00dfa3',\n-     deleted: false,\n-     id: 'e8ca60ac-d39d-4a56-a1c3-f62dbc00dfa3',\n-     name: 'طالب اصطناعي az',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831689905\n-   },\n-   {\n-     canonicalId: 'f776c81f-e89e-471e-8d09-0206f5261ad9',\n-     deleted: false,\n-     id: 'f776c81f-e89e-471e-8d09-0206f5261ad9',\n-     name: 'طالب اصطناعي be',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831687436\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student1',\n-     name: 'Synthetic 1',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831683549\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student2',\n-     name: 'Synthetic 2',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831683549\n-   }\n- ]\n"
+    },
+    {
+      "entry": "dashboard",
+      "mode": "busy",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "UNCONFIRMED_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "none",
+      "view": {
+        "phase": "complete",
+        "code": null,
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 1,
+        "confirmedRows": 50,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        }
+      ],
+      "navigation": 0,
+      "changed": false,
+      "status": "FAIL",
+      "failure": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   {\n-     canonicalId: '02980b1d-f129-4907-b12c-49af4989101e',\n-     deleted: false,\n-     id: '02980b1d-f129-4907-b12c-49af4989101e',\n-     name: 'طالب اصطناعي bn',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710693\n-   },\n-   {\n-     canonicalId: '03482c83-e462-4f6a-8f16-45642bc10912',\n-     deleted: false,\n-     id: '03482c83-e462-4f6a-8f16-45642bc10912',\n-     name: 'طالب اصطناعي ac',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707431\n-   },\n-   {\n-     canonicalId: '133f5d37-0f2d-4998-a13c-8069211b6a25',\n-     deleted: false,\n-     id: '133f5d37-0f2d-4998-a13c-8069211b6a25',\n-     name: 'طالب اصطناعي ay',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708248\n-   },\n-   {\n-     canonicalId: '186a8945-3f17-4b09-a23b-6b93d2486ced',\n-     deleted: false,\n-     id: '186a8945-3f17-4b09-a23b-6b93d2486ced',\n-     name: 'طالب اصطناعي al',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707076\n-   },\n-   {\n-     canonicalId: '215787e1-04fe-4501-8915-0248015bd86a',\n-     deleted: false,\n-     id: '215787e1-04fe-4501-8915-0248015bd86a',\n-     name: 'طالب اصطناعي aq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709182\n-   },\n-   {\n-     canonicalId: '2275ba90-59f2-40c3-b60c-618f53ad5194',\n-     deleted: false,\n-     id: '2275ba90-59f2-40c3-b60c-618f53ad5194',\n-     name: 'طالب اصطناعي ax',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707804\n-   },\n-   {\n-     canonicalId: '2359f745-5c6c-485b-8d19-a2ad086408d5',\n-     deleted: false,\n-     id: '2359f745-5c6c-485b-8d19-a2ad086408d5',\n-     name: 'طالب اصطناعي ak',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831706564\n-   },\n-   {\n-     canonicalId: '2715d3f0-a166-47d1-aeee-2d619fca88ff',\n-     deleted: false,\n-     id: '2715d3f0-a166-47d1-aeee-2d619fca88ff',\n-     name: 'طالب اصطناعي bo',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831706564\n-   },\n-   {\n-     canonicalId: '27dd58f0-65a9-4e80-92a0-1e25a65765f8',\n-     deleted: false,\n-     id: '27dd58f0-65a9-4e80-92a0-1e25a65765f8',\n-     name: 'طالب اصطناعي bx',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710693\n-   },\n-   {\n-     canonicalId: '2dccca44-592f-48c3-b876-38f0a49a2607',\n-     deleted: false,\n-     id: '2dccca44-592f-48c3-b876-38f0a49a2607',\n-     name: 'طالب اصطناعي ah',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709655\n-   },\n-   {\n-     canonicalId: '3792b45c-331c-4b8c-9c5f-9241b2b7cbc8',\n-     deleted: false,\n-     id: '3792b45c-331c-4b8c-9c5f-9241b2b7cbc8',\n-     name: 'طالب اصطناعي az',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708723\n-   },\n-   {\n-     canonicalId: '419774a4-9b2b-42a1-891b-e1329ee727a2',\n-     deleted: false,\n-     id: '419774a4-9b2b-42a1-891b-e1329ee727a2',\n-     name: 'طالب اصطناعي bu',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709182\n-   },\n-   {\n-     canonicalId: '4dec2cc8-f283-4566-a80e-917465a84490',\n-     deleted: false,\n-     id: '4dec2cc8-f283-4566-a80e-917465a84490',\n-     name: 'طالب اصطناعي ar',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709655\n-   },\n-   {\n-     canonicalId: '56b6a650-d189-4898-bfa0-d59077a4976b',\n-     deleted: false,\n-     id: '56b6a650-d189-4898-bfa0-d59077a4976b',\n-     name: 'طالب اصطناعي ai',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710160\n-   },\n-   {\n-     canonicalId: '5cc0dfaa-e717-4574-8a83-62cb016ebb71',\n-     deleted: false,\n-     id: '5cc0dfaa-e717-4574-8a83-62cb016ebb71',\n-     name: 'طالب اصطناعي bc',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710160\n-   },\n-   {\n-     canonicalId: '5d4eba74-ae0d-4c62-9234-78b08052b1a2',\n-     deleted: false,\n-     id: '5d4eba74-ae0d-4c62-9234-78b08052b1a2',\n-     name: 'طالب اصطناعي af',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708723\n-   },\n-   {\n-     canonicalId: '5e1b2e96-ae1c-4afc-863b-a9eaa0dbc0a3',\n-     deleted: false,\n-     id: '5e1b2e96-ae1c-4afc-863b-a9eaa0dbc0a3',\n-     name: 'طالب اصطناعي bt',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708723\n-   },\n-   {\n-     canonicalId: '658b6106-77c4-4ac1-aeb9-3afcbb18d4dc',\n-     deleted: false,\n-     id: '658b6106-77c4-4ac1-aeb9-3afcbb18d4dc',\n-     name: 'طالب اصطناعي ao',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708248\n-   },\n-   {\n-     canonicalId: '6af66aaf-70eb-4acf-b978-41469678a6fe',\n-     deleted: false,\n-     id: '6af66aaf-70eb-4acf-b978-41469678a6fe',\n-     name: 'طالب اصطناعي bi',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708248\n-   },\n-   {\n-     canonicalId: '6d7f56da-5798-4934-b3fc-6cb0dfd03166',\n-     deleted: false,\n-     id: '6d7f56da-5798-4934-b3fc-6cb0dfd03166',\n-     name: 'طالب اصطناعي ad',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707804\n-   },\n-   {\n-     canonicalId: '6eb9446b-176d-43a4-863b-e34973777b32',\n-     deleted: false,\n-     id: '6eb9446b-176d-43a4-863b-e34973777b32',\n-     name: 'طالب اصطناعي as',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710160\n-   },\n-   {\n-     canonicalId: '7651f7df-2b34-4c87-9a5c-0656e37cb0ab',\n-     deleted: false,\n-     id: '7651f7df-2b34-4c87-9a5c-0656e37cb0ab',\n-     name: 'طالب اصطناعي br',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707804\n-   },\n-   {\n-     canonicalId: '77362310-0c50-4a88-b20f-10ed59736968',\n-     deleted: false,\n-     id: '77362310-0c50-4a88-b20f-10ed59736968',\n-     name: 'طالب اصطناعي an',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707804\n-   },\n-   {\n-     canonicalId: '7d125b43-0e27-4b64-944a-846150b2a463',\n-     deleted: false,\n-     id: '7d125b43-0e27-4b64-944a-846150b2a463',\n-     name: 'طالب اصطناعي ap',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708723\n-   },\n-   {\n-     canonicalId: '86ad8584-7292-4cba-a648-e4ebc1185be7',\n-     deleted: false,\n-     id: '86ad8584-7292-4cba-a648-e4ebc1185be7',\n-     name: 'طالب اصطناعي aw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707431\n-   },\n-   {\n-     canonicalId: '8a7d4732-c590-4403-b0b7-12a9ccf3178f',\n-     deleted: false,\n-     id: '8a7d4732-c590-4403-b0b7-12a9ccf3178f',\n-     name: 'طالب اصطناعي bh',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707804\n-   },\n-   {\n-     canonicalId: '8ea28ab1-55cd-411b-bbe0-2dfc26a2049c',\n-     deleted: false,\n-     id: '8ea28ab1-55cd-411b-bbe0-2dfc26a2049c',\n-     name: 'طالب اصطناعي bl',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709655\n-   },\n-   {\n-     canonicalId: '90978bf6-a1e3-4ebc-9930-e4a1a2527db8',\n-     deleted: false,\n-     id: '90978bf6-a1e3-4ebc-9930-e4a1a2527db8',\n-     name: 'طالب اصطناعي bs',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708248\n-   },\n-   {\n-     canonicalId: 'a230e5a3-bbd2-420c-b8e6-3731436879d1',\n-     deleted: false,\n-     id: 'a230e5a3-bbd2-420c-b8e6-3731436879d1',\n-     name: 'طالب اصطناعي bp',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707076\n-   },\n-   {\n-     canonicalId: 'a4f6640a-0b0a-4fc5-966c-7977698a5b8a',\n-     deleted: false,\n-     id: 'a4f6640a-0b0a-4fc5-966c-7977698a5b8a',\n-     name: 'طالب اصطناعي ba',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709182\n-   },\n-   {\n-     canonicalId: 'a51602af-a14e-488e-81ea-2c90788dc681',\n-     deleted: false,\n-     id: 'a51602af-a14e-488e-81ea-2c90788dc681',\n-     name: 'طالب اصطناعي bq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707431\n-   },\n-   {\n-     canonicalId: 'a5e675a0-3f0b-4d8b-b4ef-5cde2493382f',\n-     deleted: false,\n-     id: 'a5e675a0-3f0b-4d8b-b4ef-5cde2493382f',\n-     name: 'طالب اصطناعي bk',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709182\n-   },\n-   {\n-     canonicalId: 'ab7d148b-3ad7-4d58-ac30-c8f756180987',\n-     deleted: false,\n-     id: 'ab7d148b-3ad7-4d58-ac30-c8f756180987',\n-     name: 'طالب اصطناعي au',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831706564\n-   },\n-   {\n-     canonicalId: 'be8d9db2-d1af-4e41-898c-a79c89ae80ec',\n-     deleted: false,\n-     id: 'be8d9db2-d1af-4e41-898c-a79c89ae80ec',\n-     name: 'طالب اصطناعي be',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831706564\n-   },\n-   {\n-     canonicalId: 'c4312e80-269a-4a7c-9a8f-bf24db86061e',\n-     deleted: false,\n-     id: 'c4312e80-269a-4a7c-9a8f-bf24db86061e',\n-     name: 'طالب اصطناعي bg',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707431\n-   },\n-   {\n-     canonicalId: 'd0f1117c-4fd1-4b39-93bf-748af518d63d',\n-     deleted: false,\n-     id: 'd0f1117c-4fd1-4b39-93bf-748af518d63d',\n-     name: 'طالب اصطناعي ae',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708248\n-   },\n-   {\n-     canonicalId: 'd80c2800-d2b4-489f-96d6-e54c8636e01c',\n-     deleted: false,\n-     id: 'd80c2800-d2b4-489f-96d6-e54c8636e01c',\n-     name: 'طالب اصطناعي bf',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707076\n-   },\n-   {\n-     canonicalId: 'dee6d958-ebea-4595-bf5f-7480d2449aaa',\n-     deleted: false,\n-     id: 'dee6d958-ebea-4595-bf5f-7480d2449aaa',\n-     name: 'طالب اصطناعي bv',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709655\n-   },\n-   {\n-     canonicalId: 'e0972887-dcd9-4fc6-a85a-35456af02690',\n-     deleted: false,\n-     id: 'e0972887-dcd9-4fc6-a85a-35456af02690',\n-     name: 'طالب اصطناعي ab',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707076\n-   },\n-   {\n-     canonicalId: 'e17f2cbc-e689-4a18-8478-5d19acf8d3b2',\n-     deleted: false,\n-     id: 'e17f2cbc-e689-4a18-8478-5d19acf8d3b2',\n-     name: 'طالب اصطناعي bj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831708723\n-   },\n-   {\n-     canonicalId: 'e34977ab-5ff6-4831-931b-2ec202ec5b8a',\n-     deleted: false,\n-     id: 'e34977ab-5ff6-4831-931b-2ec202ec5b8a',\n-     name: 'طالب اصطناعي bw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710160\n-   },\n-   {\n-     canonicalId: 'e37d45ff-43f6-4294-9ace-a93ef36851e4',\n-     deleted: false,\n-     id: 'e37d45ff-43f6-4294-9ace-a93ef36851e4',\n-     name: 'طالب اصطناعي aj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710693\n-   },\n-   {\n-     canonicalId: 'e71b1a2c-257a-4b67-ae1b-12f828e12a67',\n-     deleted: false,\n-     id: 'e71b1a2c-257a-4b67-ae1b-12f828e12a67',\n-     name: 'طالب اصطناعي ag',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709182\n-   },\n-   {\n-     canonicalId: 'e87453ab-6801-40ef-926e-f0163c3b6f42',\n-     deleted: false,\n-     id: 'e87453ab-6801-40ef-926e-f0163c3b6f42',\n-     name: 'طالب اصطناعي at',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710693\n-   },\n-   {\n-     canonicalId: 'e99a5feb-4482-4990-9090-95bdd60295a3',\n-     deleted: false,\n-     id: 'e99a5feb-4482-4990-9090-95bdd60295a3',\n-     name: 'طالب اصطناعي bd',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710693\n-   },\n-   {\n-     canonicalId: 'eeafbfad-5976-4ad2-aca6-f31e8dcb5be1',\n-     deleted: false,\n-     id: 'eeafbfad-5976-4ad2-aca6-f31e8dcb5be1',\n-     name: 'طالب اصطناعي bb',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831709655\n-   },\n-   {\n-     canonicalId: 'eeb035a4-a926-4dbf-9c7a-5f6cde127e53',\n-     deleted: false,\n-     id: 'eeb035a4-a926-4dbf-9c7a-5f6cde127e53',\n-     name: 'طالب اصطناعي av',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707076\n-   },\n-   {\n-     canonicalId: 'f10cc58c-6117-4dc3-8414-994f70408e4a',\n-     deleted: false,\n-     id: 'f10cc58c-6117-4dc3-8414-994f70408e4a',\n-     name: 'طالب اصطناعي bm',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831710160\n-   },\n-   {\n-     canonicalId: 'f888f8e4-9ca0-4849-9b12-46daae3aa2df',\n-     deleted: false,\n-     id: 'f888f8e4-9ca0-4849-9b12-46daae3aa2df',\n-     name: 'طالب اصطناعي am',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831707431\n-   },\n-   {\n-     canonicalId: 'f92976c7-98dc-4591-9f58-0397610ea843',\n-     deleted: false,\n-     id: 'f92976c7-98dc-4591-9f58-0397610ea843',\n-     name: 'طالب اصطناعي aa',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831706564\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student1',\n-     name: 'Synthetic 1',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831702837\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student2',\n-     name: 'Synthetic 2',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831702837\n-   }\n- ]\n"
+    },
+    {
+      "entry": "teacher",
+      "mode": "hash",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "enrich",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "duplicate",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "TEACHER_CONTEXT_CHANGED",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    },
+    {
+      "entry": "teacher",
+      "mode": "redraw",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "complete",
+        "code": null,
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 1,
+        "confirmedRows": 50,
+        "confirmedReceipts": 10,
+        "pendingRows": 0,
+        "failureStep": "none",
+        "failureJobPhase": "none",
+        "schoolBindingState": "bound",
+        "roleProofKind": "semantic-dashboard"
+      },
+      "receipts": [
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        },
+        {
+          "status": "saved",
+          "total": 5
+        }
+      ],
+      "navigation": 0,
+      "changed": true,
+      "status": "FAIL",
+      "failure": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   {\n-     canonicalId: '03d5966d-51c3-4c3f-bd69-0d9098ca554c',\n-     deleted: false,\n-     id: '03d5966d-51c3-4c3f-bd69-0d9098ca554c',\n-     name: 'طالب اصطناعي al',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723283\n-   },\n-   {\n-     canonicalId: '03fff9fb-d2dc-434e-a3b7-79391b79ce32',\n-     deleted: false,\n-     id: '03fff9fb-d2dc-434e-a3b7-79391b79ce32',\n-     name: 'طالب اصطناعي bh',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724293\n-   },\n-   {\n-     canonicalId: '17361257-569d-4ef0-a5e1-1ec4cb2f5570',\n-     deleted: false,\n-     id: '17361257-569d-4ef0-a5e1-1ec4cb2f5570',\n-     name: 'طالب اصطناعي bt',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725243\n-   },\n-   {\n-     canonicalId: '205224bf-6a4f-4c50-a5c2-4c46840badf5',\n-     deleted: false,\n-     id: '205224bf-6a4f-4c50-a5c2-4c46840badf5',\n-     name: 'طالب اصطناعي bd',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831727198\n-   },\n-   {\n-     canonicalId: '29c4ced3-9178-43ff-ad54-e9d35b61fec9',\n-     deleted: false,\n-     id: '29c4ced3-9178-43ff-ad54-e9d35b61fec9',\n-     name: 'طالب اصطناعي ar',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726229\n-   },\n-   {\n-     canonicalId: '309131c4-61a3-48ac-8773-e7b076196e55',\n-     deleted: false,\n-     id: '309131c4-61a3-48ac-8773-e7b076196e55',\n-     name: 'طالب اصطناعي bw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726707\n-   },\n-   {\n-     canonicalId: '3892e663-692a-4146-ada3-06bb11483679',\n-     deleted: false,\n-     id: '3892e663-692a-4146-ada3-06bb11483679',\n-     name: 'طالب اصطناعي ah',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726229\n-   },\n-   {\n-     canonicalId: '3b6856bc-c69c-4b5f-ac8f-a5807d990825',\n-     deleted: false,\n-     id: '3b6856bc-c69c-4b5f-ac8f-a5807d990825',\n-     name: 'طالب اصطناعي bs',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724786\n-   },\n-   {\n-     canonicalId: '4013df48-2689-401b-9860-aa64fdd542f9',\n-     deleted: false,\n-     id: '4013df48-2689-401b-9860-aa64fdd542f9',\n-     name: 'طالب اصطناعي ao',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724786\n-   },\n-   {\n-     canonicalId: '46edf0ef-c236-4006-be49-a30e9d110245',\n-     deleted: false,\n-     id: '46edf0ef-c236-4006-be49-a30e9d110245',\n-     name: 'طالب اصطناعي bv',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726229\n-   },\n-   {\n-     canonicalId: '47217535-d755-4fde-a76f-e471135ba9db',\n-     deleted: false,\n-     id: '47217535-d755-4fde-a76f-e471135ba9db',\n-     name: 'طالب اصطناعي an',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724293\n-   },\n-   {\n-     canonicalId: '49800dc7-e91d-45ec-9162-e4ebd773e6c4',\n-     deleted: false,\n-     id: '49800dc7-e91d-45ec-9162-e4ebd773e6c4',\n-     name: 'طالب اصطناعي bn',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831727198\n-   },\n-   {\n-     canonicalId: '4adc5fea-a593-468d-a6c5-98115152c536',\n-     deleted: false,\n-     id: '4adc5fea-a593-468d-a6c5-98115152c536',\n-     name: 'طالب اصطناعي bo',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831722724\n-   },\n-   {\n-     canonicalId: '4bb7263c-8450-4b65-93e7-b76d67b78b31',\n-     deleted: false,\n-     id: '4bb7263c-8450-4b65-93e7-b76d67b78b31',\n-     name: 'طالب اصطناعي ag',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725748\n-   },\n-   {\n-     canonicalId: '509e6e06-d959-4489-90c5-7f61255a27cd',\n-     deleted: false,\n-     id: '509e6e06-d959-4489-90c5-7f61255a27cd',\n-     name: 'طالب اصطناعي be',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831722724\n-   },\n-   {\n-     canonicalId: '511b1c26-21c9-47da-b1cc-b33a6cf7f591',\n-     deleted: false,\n-     id: '511b1c26-21c9-47da-b1cc-b33a6cf7f591',\n-     name: 'طالب اصطناعي ap',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725243\n-   },\n-   {\n-     canonicalId: '52fd155e-2ebb-4458-a228-66109ecc055d',\n-     deleted: false,\n-     id: '52fd155e-2ebb-4458-a228-66109ecc055d',\n-     name: 'طالب اصطناعي af',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725243\n-   },\n-   {\n-     canonicalId: '57beef1d-805d-49fd-920d-5be00c87e73f',\n-     deleted: false,\n-     id: '57beef1d-805d-49fd-920d-5be00c87e73f',\n-     name: 'طالب اصطناعي az',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725243\n-   },\n-   {\n-     canonicalId: '63e588d5-ea1c-4770-b039-8a443e5d04f7',\n-     deleted: false,\n-     id: '63e588d5-ea1c-4770-b039-8a443e5d04f7',\n-     name: 'طالب اصطناعي ab',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723283\n-   },\n-   {\n-     canonicalId: '64115909-f69a-4c58-9bc0-812f3a174b6b',\n-     deleted: false,\n-     id: '64115909-f69a-4c58-9bc0-812f3a174b6b',\n-     name: 'طالب اصطناعي bu',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725748\n-   },\n-   {\n-     canonicalId: '688bdf87-f527-4a9f-a2f2-555dfd326597',\n-     deleted: false,\n-     id: '688bdf87-f527-4a9f-a2f2-555dfd326597',\n-     name: 'طالب اصطناعي av',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723283\n-   },\n-   {\n-     canonicalId: '6b1983be-c390-433c-9f86-8c7bbe2e0f81',\n-     deleted: false,\n-     id: '6b1983be-c390-433c-9f86-8c7bbe2e0f81',\n-     name: 'طالب اصطناعي bx',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831727198\n-   },\n-   {\n-     canonicalId: '71f23d5c-36d2-4e1c-ae6f-fcac13255afc',\n-     deleted: false,\n-     id: '71f23d5c-36d2-4e1c-ae6f-fcac13255afc',\n-     name: 'طالب اصطناعي ac',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723844\n-   },\n-   {\n-     canonicalId: '7a2a8f14-e4f0-4b74-b9c2-f3be186bf905',\n-     deleted: false,\n-     id: '7a2a8f14-e4f0-4b74-b9c2-f3be186bf905',\n-     name: 'طالب اصطناعي at',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831727198\n-   },\n-   {\n-     canonicalId: '827c5124-9472-47e9-af44-277505df2619',\n-     deleted: false,\n-     id: '827c5124-9472-47e9-af44-277505df2619',\n-     name: 'طالب اصطناعي ay',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724786\n-   },\n-   {\n-     canonicalId: '86dcf95e-4766-4d34-b75e-4aea87089a82',\n-     deleted: false,\n-     id: '86dcf95e-4766-4d34-b75e-4aea87089a82',\n-     name: 'طالب اصطناعي aq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725748\n-   },\n-   {\n-     canonicalId: '8a113bd8-e8e1-42d2-8609-6cda7d08af85',\n-     deleted: false,\n-     id: '8a113bd8-e8e1-42d2-8609-6cda7d08af85',\n-     name: 'طالب اصطناعي bf',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723283\n-   },\n-   {\n-     canonicalId: '8d724901-11f4-4835-93b7-fcdd1b9248be',\n-     deleted: false,\n-     id: '8d724901-11f4-4835-93b7-fcdd1b9248be',\n-     name: 'طالب اصطناعي br',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724293\n-   },\n-   {\n-     canonicalId: '92a0927d-e9bc-4d14-a30c-e137221b1acd',\n-     deleted: false,\n-     id: '92a0927d-e9bc-4d14-a30c-e137221b1acd',\n-     name: 'طالب اصطناعي bg',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723844\n-   },\n-   {\n-     canonicalId: '948da81a-7b8d-45e9-87fa-9583367a3846',\n-     deleted: false,\n-     id: '948da81a-7b8d-45e9-87fa-9583367a3846',\n-     name: 'طالب اصطناعي au',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831722724\n-   },\n-   {\n-     canonicalId: '993c0e3e-42aa-4d32-9e68-1ccc973ef7d7',\n-     deleted: false,\n-     id: '993c0e3e-42aa-4d32-9e68-1ccc973ef7d7',\n-     name: 'طالب اصطناعي aa',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831722724\n-   },\n-   {\n-     canonicalId: '9c03e129-5356-447f-9bf4-152144ace7f0',\n-     deleted: false,\n-     id: '9c03e129-5356-447f-9bf4-152144ace7f0',\n-     name: 'طالب اصطناعي ba',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725748\n-   },\n-   {\n-     canonicalId: '9c1f43ad-9cc7-48f2-ba32-e756bf73315f',\n-     deleted: false,\n-     id: '9c1f43ad-9cc7-48f2-ba32-e756bf73315f',\n-     name: 'طالب اصطناعي aw',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723844\n-   },\n-   {\n-     canonicalId: 'a1978522-6c78-46d7-9a7f-fa3c4bd55ac7',\n-     deleted: false,\n-     id: 'a1978522-6c78-46d7-9a7f-fa3c4bd55ac7',\n-     name: 'طالب اصطناعي bb',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726229\n-   },\n-   {\n-     canonicalId: 'a1b656b5-577d-4992-aa5f-06fc6ca4d6cb',\n-     deleted: false,\n-     id: 'a1b656b5-577d-4992-aa5f-06fc6ca4d6cb',\n-     name: 'طالب اصطناعي bp',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723283\n-   },\n-   {\n-     canonicalId: 'a4f39839-1eaa-43dd-b024-6a06c8fc916e',\n-     deleted: false,\n-     id: 'a4f39839-1eaa-43dd-b024-6a06c8fc916e',\n-     name: 'طالب اصطناعي bl',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726229\n-   },\n-   {\n-     canonicalId: 'a644a219-76ab-4921-8c27-5ee483142dbb',\n-     deleted: false,\n-     id: 'a644a219-76ab-4921-8c27-5ee483142dbb',\n-     name: 'طالب اصطناعي bi',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724786\n-   },\n-   {\n-     canonicalId: 'a6940752-9190-434e-8d0c-6c9fcbd5a042',\n-     deleted: false,\n-     id: 'a6940752-9190-434e-8d0c-6c9fcbd5a042',\n-     name: 'طالب اصطناعي ai',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726707\n-   },\n-   {\n-     canonicalId: 'a6a391a8-22db-4255-8c8d-9240ac0b5491',\n-     deleted: false,\n-     id: 'a6a391a8-22db-4255-8c8d-9240ac0b5491',\n-     name: 'طالب اصطناعي bj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725243\n-   },\n-   {\n-     canonicalId: 'ae7a9d5a-9024-42e4-9a46-c791ec5e7dfa',\n-     deleted: false,\n-     id: 'ae7a9d5a-9024-42e4-9a46-c791ec5e7dfa',\n-     name: 'طالب اصطناعي ad',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724293\n-   },\n-   {\n-     canonicalId: 'becee35e-03a0-4a68-81d9-ff16eec7857a',\n-     deleted: false,\n-     id: 'becee35e-03a0-4a68-81d9-ff16eec7857a',\n-     name: 'طالب اصطناعي am',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723844\n-   },\n-   {\n-     canonicalId: 'c0bc657c-5115-4f43-a5b2-2419c2697824',\n-     deleted: false,\n-     id: 'c0bc657c-5115-4f43-a5b2-2419c2697824',\n-     name: 'طالب اصطناعي ae',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724786\n-   },\n-   {\n-     canonicalId: 'c2fdf979-3db4-4a9a-bacb-8f1abebeaf7f',\n-     deleted: false,\n-     id: 'c2fdf979-3db4-4a9a-bacb-8f1abebeaf7f',\n-     name: 'طالب اصطناعي as',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726707\n-   },\n-   {\n-     canonicalId: 'cd8065cf-64df-464e-8283-cd7271aedc26',\n-     deleted: false,\n-     id: 'cd8065cf-64df-464e-8283-cd7271aedc26',\n-     name: 'طالب اصطناعي bc',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726707\n-   },\n-   {\n-     canonicalId: 'cf48d7b0-6846-44dc-83f3-f7eba88a5299',\n-     deleted: false,\n-     id: 'cf48d7b0-6846-44dc-83f3-f7eba88a5299',\n-     name: 'طالب اصطناعي ak',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831722724\n-   },\n-   {\n-     canonicalId: 'd059d210-74a9-403a-910d-95bb794a0e8b',\n-     deleted: false,\n-     id: 'd059d210-74a9-403a-910d-95bb794a0e8b',\n-     name: 'طالب اصطناعي bm',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831726707\n-   },\n-   {\n-     canonicalId: 'd0b9a48f-128d-46ab-8b50-a8ef9b222fbb',\n-     deleted: false,\n-     id: 'd0b9a48f-128d-46ab-8b50-a8ef9b222fbb',\n-     name: 'طالب اصطناعي aj',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831727198\n-   },\n-   {\n-     canonicalId: 'd1399430-cfa4-496c-9fac-faf43737c27b',\n-     deleted: false,\n-     id: 'd1399430-cfa4-496c-9fac-faf43737c27b',\n-     name: 'طالب اصطناعي bq',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831723844\n-   },\n-   {\n-     canonicalId: 'e206f0bb-cb6e-4b4f-8bbe-a84a080eae79',\n-     deleted: false,\n-     id: 'e206f0bb-cb6e-4b4f-8bbe-a84a080eae79',\n-     name: 'طالب اصطناعي bk',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831725748\n-   },\n-   {\n-     canonicalId: 'e6126ed5-ec06-40d5-a7bc-891581e3c127',\n-     deleted: false,\n-     id: 'e6126ed5-ec06-40d5-a7bc-891581e3c127',\n-     name: 'طالب اصطناعي ax',\n-     note: '',\n-     serverRevision: 0,\n-     status: 'active',\n-     syncCreatePending: true,\n-     updatedAt: 1792831724293\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student1',\n-     name: 'Synthetic 1',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831718951\n-   },\n-   {\n-     deleted: false,\n-     id: 'n73-student2',\n-     name: 'Synthetic 2',\n-     note: '',\n-     ownerId: 'a7300000-0000-4000-8000-000000000001',\n-     serverRevision: 1,\n-     status: 'active',\n-     updatedAt: 1792831718951\n-   }\n- ]\n"
+    },
+    {
+      "entry": "teacher",
+      "mode": "busy",
+      "atMutation": {
+        "staged": 50,
+        "phase": "collect",
+        "receipts": 0
+      },
+      "view": {
+        "phase": "stopped",
+        "code": "UNCONFIRMED_TEACHER_ROLE",
+        "staged": 50,
+        "observed": 50,
+        "classes": 10,
+        "processedPages": 0,
+        "confirmedRows": 0,
+        "confirmedReceipts": 0,
+        "pendingRows": 0,
+        "failureStep": "source-pre-read",
+        "failureJobPhase": "collect",
+        "schoolBindingState": "bound",
+        "roleProofKind": "none"
+      },
+      "receipts": [],
+      "navigation": 0,
+      "changed": true,
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "serverClosed": true,
+    "isolatedBrowserFinally": true,
+    "sharedLease": "exempt: canonical local synthetic helper"
+  },
+  "status": "FAIL"
+}
