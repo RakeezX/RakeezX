@@ -60,13 +60,14 @@ export function projectUnifiedStudentData(data) {
 export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, timeoutMs = 15000, bindingProof=null } = {}) {
   if (typeof send !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 15000) throw fail();
   let generation = 0, retirement = 0, controller, disposed = false, lastDiagnostic = null, retireDiagnostic;
+  const contextListeners = new Set();
   const reasons = ['visible','hidden','pagehide','disposed','context','superseded','deadline'];
   const visibility = () => globalThis.document?.visibilityState === 'hidden' ? 'hidden' : 'visible';
   function cancelRequest(reason = 'superseded') {
     retireDiagnostic?.(reason); retireDiagnostic = null;
     generation++; controller?.abort(); controller = null;
   }
-  function invalidate(reason = 'context') { retirement++; bindingProof?.retire?.(); cancelRequest(reasons.includes(reason) ? reason : 'context'); if(lastDiagnostic?.readPhases)lastDiagnostic=null; }
+  function invalidate(reason = 'context') { retirement++; bindingProof?.retire?.(); cancelRequest(reasons.includes(reason) ? reason : 'context'); if(lastDiagnostic?.readPhases)lastDiagnostic=null; for(const listener of contextListeners)listener(); }
   async function call(action, body, phase = 'manual') {
     if (disposed) throw fail();
     cancelRequest(); lastDiagnostic=null; const checkpoint = generation;
@@ -141,7 +142,8 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       catch (error) { throw Object.assign(error, { claimState: 'accepted' }); }
     },
     captureContext:()=>retirement,isContextCurrent:context=>!disposed&&context===retirement,
+    subscribeContext(listener) { if(typeof listener!=='function')throw fail();contextListeners.add(listener);return ()=>contextListeners.delete(listener); },
     getDiagnostic: () => lastDiagnostic ? {...lastDiagnostic} : null,
-    read: ({phase = 'manual'} = {}) => call('read', undefined, phase), end: () => call('end', {}, 'end'), invalidate, dispose() { disposed = true; invalidate('disposed'); }
+    read: ({phase = 'manual'} = {}) => call('read', undefined, phase), end: () => call('end', {}, 'end'), invalidate, dispose() { disposed = true; invalidate('disposed');contextListeners.clear(); }
   });
 }

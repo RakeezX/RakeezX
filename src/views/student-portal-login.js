@@ -3,20 +3,23 @@ import { brandLockup } from '../lib/brand.js';
 import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData, parseStudentReadPhases } from '../lib/student-portal-unified-client.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const displayNumber = value => value === null ? 'لم تُرصد' : escape(value);
+// A display freshness bound, never a session lifetime or an authorization token.
+export const STUDENT_VIEW_FRESHNESS_MS = 5 * 60 * 1000;
 
 export function mountUnifiedStudentPortal(root, { client, readiness = { enabled: false } } = {}) {
   const doc = root.ownerDocument, win = doc.defaultView;
   let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = '',pendingCompletion=null,pendingForm=false,pendingMessage='';
   let returnRead = null, endingSession = false, retiredPage = false, screen = 'pending';
+  let freshnessTimer, settledAt = 0, settledTick = 0, settledContext, settledProjection = null, clearing = false;
   const previousDir = root.getAttribute('dir');
   root.classList.add('n88-unified'); root.dir = 'rtl';
   const style = doc.createElement('link'); style.rel = 'stylesheet';
   style.href = new URL('../styles/student-portal-login.css', import.meta.url).href; doc.head.append(style);
   const enabled = readiness?.enabled === true && !!client;
-  const paint = content => {
+  const paint = (content, focus = true) => {
     if (disposed) return;
     root.innerHTML = `<header>${brandLockup({ compact: true })}</header><main>${content}<details class="n88-student-support"><summary>تفاصيل الدعم الاختيارية</summary><p>يمكنك نسخ نتيجة طلب واحد دون بيانات الطالب. لا تُرسل تلقائيًا.</p><button type="button" data-copy-diagnostic>نسخ تفاصيل التحقق</button><p role="status" data-copy-status></p><textarea readonly hidden dir="ltr" aria-label="تفاصيل التحقق للنسخ اليدوي" data-copy-text></textarea></details></main>`;
-    root.querySelector('h1')?.focus();
+    if(focus)root.querySelector('h1')?.focus();
   };
   function entry(message = '') {
     screen = 'entry';
@@ -32,8 +35,12 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     paint(`<section class="n88-unified-entry"><h1 tabindex="-1">${end ? 'التحقق من الجلسة' : 'مساحة الطالب'}</h1><p role="status" aria-live="polite">${escape(message)}${cooling?' يرجى الانتظار قليلًا قبل المحاولة مجددًا.':''}</p><button class="btn btn--primary" data-session-retry ${cooling?'disabled':''}>${end ? 'التحقق مجددًا' : 'حاول مجددًا'}</button></section>`);
     if(cooling)timer=setTimeout(()=>recovery(message,end),Math.max(1,cooldownUntil-Date.now()));
   }
-  function show(raw) {
+  function show(raw, preserve = false) {
     const data = projectUnifiedStudentData(raw);
+    const open=preserve ? [...root.querySelectorAll('details[data-work-id][open]')].map(el=>el.getAttribute('data-work-id')) : [];
+    const scroll=preserve ? {x:win.scrollX,y:win.scrollY} : null;
+    const focus=preserve && root.contains(doc.activeElement) ? ['data-read','data-end'].find(key=>doc.activeElement.hasAttribute(key)) : null;
+    settledProjection = JSON.stringify(data); settledAt = Date.now(); settledTick = win.performance.now(); settledContext = client.captureContext?.();
     screen = 'private';
     const profile = data.profile;
     let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end>إنهاء الجلسة</button></div></div><div class="n88-unified-sections">`;
@@ -44,10 +51,31 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       if (!Object.hasOwn(data.work || {}, key)) continue;
       content += `<section data-section="${key}"><h2>${label}<span class="n88-unified-count" aria-label="عدد الأعمال">${data.work[key].length}</span></h2>${data.work[key].length ? data.work[key].map(item => {
         const detail = `${item.executionInstructions !== undefined ? `<h3>تعليمات التنفيذ</h3><p class="n88-guidance-text">${escape(item.executionInstructions)}</p>` : ''}${item.deliveryInstructions !== undefined ? `<h3>طريقة التسليم</h3><p class="n88-guidance-text">${escape(item.deliveryInstructions)}</p>` : ''}${item.instruction !== undefined ? `<p class="n88-unified-instruction">${escape(item.instruction)}</p>` : ''}${item.startDate ? `<p>يبدأ: <span dir="ltr">${escape(item.startDate)}</span></p>` : ''}${item.dueDate ? `<p>التسليم: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ''}${item.completionState !== undefined ? `<p>${escape({unrecorded:'لم يُرصد إنجاز',regular:'مكتمل',late:'مكتمل متأخر'}[item.completionState])}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}`;
-        return detail ? `<details class="n88-unified-work"><summary><span>${escape(item.title)}</span><span class="n88-unified-detail-hint">التفاصيل</span></summary><div class="n88-unified-detail">${detail}</div></details>` : `<article class="n88-unified-work"><h3>${escape(item.title)}</h3></article>`;
+        return detail ? `<details class="n88-unified-work" data-work-id="${escape(key+':'+item.id)}"><summary><span>${escape(item.title)}</span><span class="n88-unified-detail-hint">التفاصيل</span></summary><div class="n88-unified-detail">${detail}</div></details>` : `<article class="n88-unified-work"><h3>${escape(item.title)}</h3></article>`;
       }).join('') : '<p class="n88-unified-empty">لا توجد أعمال منشورة في هذا القسم.</p>'}</section>`;
     }
-    paint(content + '</div>');
+    paint(content + '</div><p role="status" data-refresh-status>يُحدّث العرض تلقائيًا كل خمس دقائق أثناء فتحه. يمكنك تحديثه الآن.</p>',!preserve);
+    if(preserve){for(const el of root.querySelectorAll('details[data-work-id]'))el.open=open.includes(el.getAttribute('data-work-id'));if(focus)root.querySelector('['+focus+']')?.focus({preventScroll:true});win.scrollTo(scroll.x,scroll.y);}
+    scheduleFreshness();
+  }
+  const displayAge = () => Math.max(Date.now()-settledAt,win.performance.now()-settledTick);
+  function scheduleFreshness() {
+    clearTimeout(freshnessTimer);
+    if(disposed || screen !== 'private')return;
+    freshnessTimer=setTimeout(() => {
+      if(doc.visibilityState==='hidden'){clear(false,'hidden');retiredPage=true;return;}
+      void refresh('return');
+    },Math.max(1,STUDENT_VIEW_FRESHNESS_MS-(displayAge())));
+  }
+  function currentView() {
+    if(client.isContextCurrent && !client.isContextCurrent(settledContext)){clear();return false;}
+    return screen==='private';
+  }
+  async function refresh(phase='manual') {
+    if(disposed || busy || doc.visibilityState==='hidden')return;
+    if(screen!=='private')return run(()=>client.read({phase}),false,false,true);
+    if(!currentView())return;
+    return run(()=>client.read({phase}),false,false,true,true);
   }
   function pending(ending = false) {
     screen = ending ? 'end-pending' : 'pending';
@@ -95,13 +123,16 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     form.querySelector('[role=status]').textContent=cooling?'يرجى الانتظار قليلًا قبل المحاولة مجددًا.':message;
     clearTimeout(timer);if(cooling)timer=setTimeout(()=>inlineEntry('يمكنك المحاولة مجددًا.'),Math.max(1,cooldownUntil-Date.now()));
   }
-  async function run(action, ending = false, sameForm = false, resuming = false) {
+  async function run(action, ending = false, sameForm = false, resuming = false, quiet = false) {
     if (disposed || busy || !enabled || doc.visibilityState === 'hidden' || Date.now() < cooldownUntil) return;
     returnRead = null;
     endingSession = ending;
     busy = true; const checkpoint = ++generation,context=client.captureContext?.();
     pendingForm=sameForm;pendingMessage=resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…';
-    if(sameForm)inlineEntry(pendingMessage);
+    clearTimeout(freshnessTimer);
+    if(!quiet){settledProjection=null;settledAt=0;settledContext=undefined;}
+    if(quiet){root.querySelector('[data-refresh-status]').textContent='جارٍ تحديث العرض…';root.querySelector('[data-read]').disabled=true;root.querySelector('[data-end]').disabled=true;}
+    else if(sameForm)inlineEntry(pendingMessage);
     else pending(ending);
     try {
       // A transport that ignores AbortSignal still cannot leave this view pending.
@@ -111,14 +142,14 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       if(client.isContextCurrent&&!client.isContextCurrent(context)){clear();return;}
       codeDraft='';
       if(doc.visibilityState==='hidden'){const field=root.querySelector('[data-claim] input');if(field)field.value='';}
-      pendingCompletion={checkpoint,context,data,ending,sameForm,resuming};
+      pendingCompletion={checkpoint,context,data,ending,sameForm,resuming,quiet,completedAt:Date.now()};
       adoptCompletion();
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === 'rate') cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1000;
       if(client.isContextCurrent&&!client.isContextCurrent(context)){clear();return;}
-      if(error?.viewDeadline)client.invalidate?.('deadline');
-      pendingCompletion={checkpoint,context:error?.viewDeadline ? client.captureContext?.() : context,errorKind:error?.kind||'unavailable',claimState:error?.claimState,ending,sameForm,resuming};
+      if(error?.viewDeadline){clear(false,'deadline');if(ending)endUncertain();return;}
+      pendingCompletion={checkpoint,context,errorKind:error?.kind||'unavailable',claimState:error?.claimState,ending,sameForm,resuming,quiet};
       adoptCompletion();
     } finally { if (checkpoint === generation&&!pendingCompletion) {busy = false;pendingForm=false;if(sameForm&&root.querySelector('[data-claim]')){const m=root.querySelector('#n88-message').textContent;inlineEntry(m,root.querySelector('input').getAttribute('aria-invalid')==='true');}} }
   }
@@ -127,8 +158,12 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     pendingCompletion=null;
     if(result.checkpoint!==generation)return;
     if(client.isContextCurrent&&!client.isContextCurrent(result.context)){clear();return;}
+    if(result.completedAt && Date.now()-result.completedAt>=STUDENT_VIEW_FRESHNESS_MS){clear();return;}
     busy=false;pendingForm=false;endingSession=false;
     if(result.errorKind){
+      settledProjection=null;settledAt=0;settledContext=undefined;
+      // A denied or failed revalidation never leaves a private projection visible.
+      if(result.quiet){clear(false,result.errorKind==='timeout'?'deadline':'context');return;}
       const rejected = !result.resuming && result.claimState === 'rejected' && result.errorKind === 'session';
       const message = rejected ? 'تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.'
         : result.errorKind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.'
@@ -141,7 +176,11 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       else if(result.sameForm && root.querySelector('[data-claim]'))inlineEntry(message,rejected);
       else if(result.sameForm && result.claimState !== 'rejected' && result.errorKind !== 'session') recovery(message);
       else entry(message);
-    }else{codeDraft='';if(result.ending){entry('انتهت الجلسة.');screen='end-ack';}else show(result.data);}
+    }else{codeDraft='';if(result.ending){entry('انتهت الجلسة.');screen='end-ack';}
+      else if(result.quiet && screen==='private' && JSON.stringify(projectUnifiedStudentData(result.data))===settledProjection){
+        settledAt=Date.now();settledTick=win.performance.now();settledContext=result.context;root.querySelector('[data-read]').disabled=false;root.querySelector('[data-end]').disabled=false;
+        root.querySelector('[data-refresh-status]').textContent='تم تحديث العرض. يُعاد التحقق خلال خمس دقائق.';scheduleFreshness();
+      }else show(result.data,result.quiet);}
   }
   const submit = event => {
     if (!event.target.matches('[data-claim]')) return;
@@ -174,16 +213,19 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     const copy = event.target.closest('[data-copy-diagnostic]');if(copy){void copyDiagnostic(copy);return;}
     if (event.target.closest('[data-session-retry]')) void run(() => client.read({phase:'manual'}),false,false,true);
     if (event.target.closest('[data-resume]')) void run(() => client.read({phase:'manual'}),false,false,true);
-    if (event.target.closest('[data-read]')) void run(() => client.read({phase:'manual'}),false,false,true);
+    if (event.target.closest('[data-read]')) void refresh();
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
   };
-  function clear(preserveDraft=false, reason='context') {
+  function clear(preserveDraft=false, reason='context', invalidateClient=true) {
+    if(clearing)return;clearing=true;
+    clearTimeout(freshnessTimer);settledProjection=null;settledAt=0;settledContext=undefined;
     returnRead = null;
     if(preserveDraft){const field=root.querySelector('[data-claim] input');if(field)codeDraft=normalizeStudentCode(field.value);}else codeDraft='';
-    generation++; busy = false;endingSession=false;pendingForm=false;pendingCompletion=null;pendingMessage=''; clearTimeout(timer); client?.invalidate?.(reason);
+    generation++; busy = false;endingSession=false;pendingForm=false;pendingCompletion=null;pendingMessage=''; clearTimeout(timer); if(invalidateClient)client?.invalidate?.(reason);
     // Retire private data/pending replies, retaining only this page's editable
     // unsubmitted draft. An existing entry keeps its DOM, selection and focus.
     if(preserveDraft&&root.querySelector('[data-claim]'))inlineEntry();else recovery('لم تُحسم حالة الجلسة. تحقّق مجددًا للمتابعة.');
+    clearing=false;
   }
   const hide = () => {
     const end = endingSession || screen === 'end-pending' || screen === 'end-uncertain', ack = screen === 'end-ack';
@@ -195,6 +237,11 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       const fallback=root.querySelector('[data-copy-text]');if(fallback){fallback.hidden=true;fallback.value='';}
       if(screen==='end-pending'||screen==='end-ack'||screen==='end-uncertain')return;
       if(busy&&pendingForm){codeDraft='';pending();return;}
+      if(screen==='entry')return; // Same document, unsubmitted draft: no network or remount.
+      if(screen==='private'&&!busy){
+        if(currentView()&&displayAge()<STUDENT_VIEW_FRESHNESS_MS)return;
+        clear(false,'hidden');retiredPage=true;return;
+      }
       if(returnRead)return; // Duplicate notifications cannot renew a retired context.
       const shouldRead = !endingSession && (root.querySelector('[data-end]') || busy);
       if (shouldRead) {clear(false,'hidden');pending();returnRead = { context: client?.captureContext?.() };}
@@ -204,10 +251,14 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       if (returning) {
         if(client.isContextCurrent && !client.isContextCurrent(returning.context)){clear();return;}
         void run(() => client.read({phase:'return'}), false, false, true);
-      } else adoptCompletion();
+      } else {
+        adoptCompletion();
+        if(screen==='private' && currentView() && displayAge()>=STUDENT_VIEW_FRESHNESS_MS)void refresh('return');
+      }
     }
   };
   const pageshow = () => { if(retiredPage && doc.visibilityState !== 'hidden'){retiredPage=false;void run(() => client.read({phase:'return'}),false,false,true);} };
+  const unsubscribeContext=client?.subscribeContext?.(()=>{if(!clearing&&!disposed)clear(false,'context',false);});
   root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
   win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
   // Never inspect the HttpOnly cookie or persist private state. One current read
@@ -216,9 +267,9 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   if(!enabled){entry();ready=Promise.resolve();}
   else if(doc.visibilityState === 'hidden'){retiredPage=true;recovery('أعد فتح الصفحة للتحقق من الجلسة.');ready=Promise.resolve();}
   else ready=run(() => client.read({phase:'initial'}),false,false,true);
-  return { ready, clear, refresh: () => run(() => client.read({phase:'manual'}),false,false,true), dispose() {
+  return { ready, clear, refresh, dispose() {
     if (disposed) return;
-    clear(false,'disposed'); disposed = true; clearTimeout(timer); client?.dispose?.(); root.replaceChildren(); style.remove();
+    unsubscribeContext?.();clear(false,'disposed'); disposed = true; clearTimeout(timer);clearTimeout(freshnessTimer); client?.dispose?.(); root.replaceChildren(); style.remove();
     root.classList.remove('n88-unified'); if (previousDir === null) root.removeAttribute('dir'); else root.setAttribute('dir', previousDir);
     root.removeEventListener('beforeinput', beforeInput); root.removeEventListener('paste', paste); root.removeEventListener('submit', submit); root.removeEventListener('input', input); root.removeEventListener('click', click);
     win.removeEventListener('pagehide', hide); win.removeEventListener('pageshow', pageshow); doc.removeEventListener('visibilitychange', visible);
