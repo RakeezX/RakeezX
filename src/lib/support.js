@@ -107,7 +107,7 @@ export function sanitizeSupportDiagnostics(input = {}) {
     diagnostics.n88Portal={phase:p.phase,httpStatus:p.httpStatus,elapsedMs:Math.round(p.elapsedMs/100)*100,sourceVersion:p.sourceVersion};
     if(p.sourceVersion==='n88-class-deadline-v1'){
       if(['none','timeout','rejected','invalid_ack','stale_context','unavailable','uncertain'].includes(p.code))diagnostics.n88Portal.code=p.code;
-      if(['none','configuration','key-configuration','envelope','upstream','upstream-body','upstream-http-5xx','reply','reply-shape','acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-validate','projection'].includes(p.stage))diagnostics.n88Portal.stage=p.stage;
+      if(['none','configuration','key-configuration','envelope','upstream','upstream-body','upstream-http-5xx','reply','reply-shape','acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-validate','projection','issuance-synchronize','issuance-roster','issuance-receipt','issuance-members','issuance-savepoint','issuance-recovery','issuance-member-result','issuance-member-release','issuance-member-rollback','issuance-flush','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'].includes(p.stage))diagnostics.n88Portal.stage=p.stage;
       if(p.httpStatus===503&&p.stage==='synchronize-validate'&&validationFamilies.includes(p.validationFamily))diagnostics.n88Portal.validationFamily=p.validationFamily;
     }
   }

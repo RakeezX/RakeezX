@@ -75,7 +75,7 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       if(phases)out.set(READ_PHASE_HEADER,JSON.stringify(reply.readPhases));
       if(responseRegion)out.set('x-n88-service-region',responseRegion);
       // Finite operational phase only; never reflect arbitrary upstream values.
-      if(reply.status===503&&['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-validate','projection'].includes(reply.body?.stage))out.set('x-n88-service-stage',reply.body.stage);
+      if(reply.status===503&&['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-validate','projection','issuance-synchronize','issuance-roster','issuance-receipt','issuance-members','issuance-savepoint','issuance-recovery','issuance-member-result','issuance-member-release','issuance-member-rollback','issuance-flush','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'].includes(reply.body?.stage))out.set('x-n88-service-stage',reply.body.stage);
       return new Response(JSON.stringify(reply.body),{status:reply.status,headers:out});
     }catch{return unavailable();}finally{clearTimeout(timer);abort.abort();}
   };
