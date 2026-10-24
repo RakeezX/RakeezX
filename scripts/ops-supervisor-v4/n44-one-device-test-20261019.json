@@ -11,7 +11,7 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261024-QUALIFIED-N44-FINITE-DIAGNOSTIC",
+      "liveAuthorizationRef": "PO-20261024-FULL-OUTCOME-BOUNDED-N44-COMPLETION",
       "budgetMinutes": 45,
       "idleMinutes": 10,
       "allowedPaths": [
@@ -59,10 +59,10 @@
         "maxConcurrentActiveRegistrations": 1,
         "maxRegistrationRecoveryAttemptsOnQualifiedChangedSource": 1,
         "recoveryReviewSha256": "7c1ce09412c031eadb1fb48b4357af512a6a88d52aa8a1b7ceea84ee6d293943",
-        "authorityStartsAt": "2026-10-23T23:36:37.207Z",
-        "authorityExpiresAt": "2026-10-24T01:36:37.207Z",
+        "authorityStartsAt": "2026-10-24T02:14:27.943Z",
+        "authorityExpiresAt": "2026-10-24T04:14:27.944Z",
         "productId": "N44",
-        "liveAuthorizationRef": "PO-20261024-QUALIFIED-N44-FINITE-DIAGNOSTIC",
+        "liveAuthorizationRef": "PO-20261024-FULL-OUTCOME-BOUNDED-N44-COMPLETION",
         "namedOperations": [
           "reconcile original one-device attempt and cleanup",
           "qualify exact changed two-hour hard stop preserving consumed budget",
@@ -245,6 +245,25 @@
           "maxTotalSendsAllAuthorities": 1,
           "oldCleanupConsumed": true,
           "expiresAt": "2026-10-24T01:36:37.207Z"
+        },
+        "delegatedCompletionPhase": {
+          "authority": "Latest direct PO full completion delegation, no repeat permission requests, followed by current browser/account access while PO sleeps",
+          "evidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-full-outcome-authority.json",
+          "operatorSelectedExecutionBound": true,
+          "userSpecifiedTheseTimestamps": false,
+          "startsAt": "2026-10-24T02:14:27.943Z",
+          "expiresAt": "2026-10-24T04:14:27.944Z",
+          "oldWindowExpiredAndNotExtended": true,
+          "oldMarkersPreserved": true,
+          "reason": "Materially corrected frontend is now independently served and verified; old attempt stopped without registration or send. This is one bounded completion phase under later full delegation, never an automatic renewal loop.",
+          "maxTotalSendsAcrossAllAuthorities": 1,
+          "maxFreshRegistrationIfUnused": 1,
+          "oldCleanupWriteBudgetConsumed": true,
+          "maxNecessaryExpiryOnlyNativeTransition": 1,
+          "maxNecessarySourcePinUpdates": 1,
+          "maxGenuinePolicySourceRebindings": 1,
+          "automaticRenewals": 0,
+          "periodicCron": false
         }
       },
       "releaseAuthority": "Latest direct PO full outcome delegation authorizes necessary qualified affected notification frontend delivery through the sole publisher and named original-custodian service prerequisites. No general delivery/cron activation, old-disposal replay, tool denial bypass or consumed budget reset.",
@@ -255,7 +274,7 @@
         "continuous-n44-register503-existing-service-repair-20261019",
         "continuous-n44-deliver-qualified-optin-ui-20261024"
       ],
-      "objective": "POST-DELIVERY CURRENT DEVICE JOURNEY ONLY. Wait for dependency continuous-n44-deliver-qualified-optin-ui-20261024 VERIFIED Production. Preserve saved candidatefedbfe15ee79f4f0a00594ea4b8720830327256c, same original session/custody/worktree and all historical failures. Do not edit the frontend or repeat its tests: the independent isolated PUBLIC source-slice worker ports the exact qualified two-file change and the sole publisher verifies it. Existing prepublication actual-registration/send gates remain NOT_RUN/FAIL until genuinely executed AFTER that dependency; never relabel themPASS for frontend publication. Source/UI implementation is complete, no new review or rewrite needed.\n After exact served changed-app proof, fresh owned browser lease may perform ONE normal changed-app observation in the SAME normal-Chrome trial account/device. The new finite readiness diagnostic and queued changed-binding refresh now let the original UI identify eligibility safely. Preserve missing/lost response and directory-deletion tool refusals; do not recover old response or delete retained fixture files by another mechanism. No Incognito N88/N36 interference. Read existing receipts/custody first, bind fresh source-accurate approval only as necessary with the same genuine policy; retire old unused approvals append-only. No old cleanup replay, quota reset, native/maintenance re-upload or readiness repeat. Shared config may have advanced under N88 original custodian; match its exact immutable phase and lease ownership, never adopt unknown values.\n If eligible within the STILL hard expiry2026-10-24T01:36:37.207Z and original journals show unused: renew current device consent through actual UI, ONE fresh current registration, temporarily close only already-authorized normal trial teacher/student Rakeez pages after safe N88 trace retention, ONE TOTAL provider-send, exact subscription/consent cleanup, approvalnull/deliveryOFF/schedulerOFF and reopen pages. Stop/reconcile on unknown COMMIT/send and real refusal. HTTP/provider/ServiceWorker events do not prove OS arrival; PO is asleep, root will retain arrival pending without more setup questions. If window expires, no send/automatic extension; finish safe disposition/evidence. Preserve every historicalFAIL/NOT_RUN and consumed marker; report actual final Product gates truthfully. WholeN44 staysOPEN until actual arrival and necessary result acceptance.\n",
+      "objective": "ONE NEW BOUNDED COMPLETION PHASE UNDER LATER DIRECT PO FULL DELEGATION. Read artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-full-outcome-authority.json and latest direct user instruction granting current trial browser/tab access and asking autonomous completion while asleep. The user explicitly says no further permission requests. Operator selected finite execution bound 2026-10-24T02:14:27.943Z through 2026-10-24T04:14:27.944Z; do NOT claim PO explicitly supplied these timestamps, extend the expired01:36:37Z approval, reset any counter or create recurring renewals. That earlier phase remains expired, zero registrations/sends, approvals retired and disarmed. Same original session/custody/worktree/candidates only. Original old-owner cleanup is completed and CONSUMED; never repeat it. Preserve all historical FAIL/NOT_RUN and genuine tool refusals.\n\nFrontend prerequisite is VERIFIED: candidate 50cb2220136fb4c76077118293e9a4cb41ed68d8, published fadff0444ef8b790db73d6433d3d6e58acaf5c75, verification 2026-10-24T02:02:27.220Z. Reuse exact served hashes and thirteen qualified actual-app cases; do not reimplement or repeat unchanged tests. Current saved expiry-disposition candidate fcb0c5a77c84373c069881c7335d2f80ce2493dd. This materially new verified dependency enables one current normal-Chrome trial-device completion; no Incognito N88/N36 interference.\n\nFirst reconcile original protected append-only journals/reservations, latest N88 service/configuration phase and current normal trial owner/device through supported actual UI with phase leases. Prior send allowance across ALL authorities remains ONE TOTAL, zero as last proven; current registration allowance ONE if still unused. Unknown send/COMMIT consumes or parks its reservation until read-only reconciliation, never retries. Preserve original old cleanup budget consumed and exact source/config equality; no global quota reset, arbitrary SQL, Auth/RLS/schema/migration, new account, secrets export, operator key sharing or retrospective policy timestamp fabrication.\n\nIf and only if the existing source's compiled expiry prevents the now-authorized phase, original service custodian may qualify ONE strictly expiry-only successor against the latest actually pinned N44 bytes (not old snapshot), preserving admission repair/typed guards/current N88 fields and exact nonpin maps. ONE newly reserved original-native upload/pin and necessary SOURCE-only policy rebind are permitted for this distinct phase; original genuine policy approval/admission identity/timestamps stay unchanged. All former native/upload/diagnostic/cleanup markers remain consumed. No readiness/diagnostic replay and no lost response-body recovery or policy-rejected directory deletion. If no source transition is needed, do none.\n\nAfter original guards and actual current opt-in eligibility pass, renew same current trial device consent via normal UI; register ONCE, and close only authorized trial Rakeez normal teacher/student pages after retaining N88 evidence and releasing its browser phase. Preserve/restore page URLs without exporting private code. Send ONE operational trial notification TOTAL only if the journal proves unused budget, within the finite phase. No general sending or cron. Plan recipient observation BEFORE spending the one send: use only already supported own ServiceWorker/notification evidence where available, without OS input, hidden browser credential/session access or fabricated receipt. Actual browser receipt/showNotification evidence is distinguishable from human/OS-visible arrival; provider200 alone is NOT arrival. If arrival cannot be observed while PO sleeps, record NOT_PROVEN honestly and never resend to improve evidence.\n\nFinally owner-safe unsubscribe/revoke current consent/registration, retire approval, verify approvalnull/deliveryOFF/schedulerOFF and unchanged shared configuration, restore authorized pages and release every owned lease. Preserve unknown disposition explicitly and do not overwrite user data. If an ordinary technical defect is reproduced, fix only its cause in authorized scope, verify affected boundaries and original publisher delivery before another materially changed phase; no unchanged retries. Stop at hard expiry with safe disposition, no automatic renewal. Return truthful runner JSON and exact candidate/source/publication/actual registration/send/recipient evidence. Whole N44 remains OPEN unless actual acceptance is demonstrated; do not remove failed historical gates to claim closure.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -300,7 +319,7 @@
         ],
         "publisherChecks": []
       },
-      "completionMode": "wait_for_verified_n44_frontend_prerequisite",
+      "completionMode": "delegated_current_device_completion",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
