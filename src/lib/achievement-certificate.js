@@ -1,6 +1,6 @@
 import { html, icon, openSheet, toast, fmtNum, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
-import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
+import { CERTIFICATE_DESIGNS, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
 import { achievementCard, achievementPng } from './student-achievements.js';
 import { openDocumentPreview } from './document-preview.js';
 
@@ -13,6 +13,11 @@ function loadStyle() {
   link.href = styleUrl;
   link.dataset.achievementCertificateStyle = '';
   document.head.append(link);
+}
+
+/** Certificates always identify the selected student; sharing cards retain their own choices. */
+export function certificateCard(input, { selected = [], studentName = '', demo = false } = {}) {
+  return achievementCard(input, { selected, studentName, demo, includeName: true });
 }
 
 /** Shared artwork, driven only by explicit certificate display projections. */
@@ -130,15 +135,12 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
           <fieldset class="certificate-fields certificate-design-fields">
             <legend>تصميم الشهادة</legend>
             <div class="certificate-design-options">${CERTIFICATE_DESIGNS.map(design => html`<label class="certificate-design-choice"><input type="radio" name="certificate-design" data-certificate-design value="${design.id}" ${design.id === initialOptions.design ? 'checked' : ''}><canvas data-certificate-thumbnail="${design.id}" aria-hidden="true"></canvas><span>${design.label}</span></label>`)}</div>
-            <label class="field"><span class="field__label">رمز التقدير</span><select class="input" data-certificate-medal>${CERTIFICATE_MEDALS.map(medal => html`<option value="${medal.id}" ${medal.id === initialOptions.medal ? 'selected' : ''}>${medal.label}</option>`)}</select></label>
           </fieldset>
-          <details class="certificate-identity"><summary>بيانات المدرسة والتوقيع</summary><p>تعديلات هذه الشهادة فقط.</p>
+          <details class="certificate-identity"><summary>بيانات المدرسة والتوقيع</summary><p>تُملأ تلقائيًا من بياناتك في ركيز. يمكنك تعديلها لهذه الشهادة فقط.</p>
             ${[['schoolName', 'المدرسة'], ['educationDepartment', 'إدارة التعليم'], ['teacherName', initialOptions.teacherLabel], ['principalName', initialOptions.principalLabel]].map(([key, label]) => html`<label class="field"><span class="field__label">${label} <small>اختياري</small></span><input class="input" data-certificate-meta="${key}" value="${initialOptions[key]}" maxlength="100" autocomplete="off"></label>`)}
           </details>
           <fieldset class="certificate-fields">
             <legend>محتوى الشهادة</legend>
-            <label class="certificate-choice"><input type="checkbox" data-certificate-name>
-              <span><strong>إظهار اسم الطالب</strong><small>اختياري · الاسم مخفي افتراضيًا</small></span></label>
             <p class="certificate-fields__hint">اختر إنجازًا موثّقًا واحدًا على الأقل</p>
             ${available.map(fact => html`<label class="certificate-choice"><input type="checkbox" data-certificate-field="${fact.key}">
               <span><strong>${fact.title} <b class="certificate-choice__count">${fmtNum(fact.count)}</b></strong><small>${fact.scope}</small></span></label>`)}
@@ -150,7 +152,7 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
           <div class="certificate-preview-heading"><span>معاينة الشهادة <small>A4 · أفقي</small></span>
             <button class="btn btn--ghost" data-certificate-expand type="button">معاينة موسّعة</button></div>
           <div class="certificate-paper"><canvas data-certificate-canvas role="img" aria-label="معاينة شهادة التقدير"></canvas></div>
-          <p class="certificate-status" data-certificate-status role="status">اختر إنجازًا لتجهيز الشهادة. الاسم مخفي افتراضيًا.</p>
+          <p class="certificate-status" data-certificate-status role="status">اختر إنجازًا موثّقًا لتجهيز الشهادة.</p>
         </section>
       </div>
       <label class="certificate-consent"><input type="checkbox" data-certificate-confirm disabled>
@@ -182,7 +184,7 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
           canvas.setAttribute('aria-label', certificateDescription(card, options));
           ready = true;
           confirm.disabled = !card.evidence.length;
-          status.textContent = card.evidence.length ? 'المعاينة هي المحتوى الذي سيظهر في الصورة والطباعة.' : card.name ? 'اختر إنجازًا موثّقًا لإتاحة التصدير.' : 'اختر إنجازًا لتجهيز الشهادة. الاسم مخفي افتراضيًا.';
+          status.textContent = card.evidence.length ? 'المعاينة هي المحتوى الذي سيظهر في الصورة والطباعة.' : 'اختر إنجازًا موثّقًا لإتاحة التصدير.';
         } catch {
           ready = false;
           confirm.disabled = true;
@@ -196,17 +198,15 @@ export function openAchievementCertificate(input, { studentName = '', demo = fal
         options = certificateMetadata({ ...initialOptions,
           ...Object.fromEntries([...root.querySelectorAll('[data-certificate-meta]')].map(field => [field.dataset.certificateMeta, field.value])),
           design: root.querySelector('[data-certificate-design]:checked').value,
-          medal: root.querySelector('[data-certificate-medal]').value,
         });
-        card = achievementCard(input, {
+        card = certificateCard(input, {
           selected: [...root.querySelectorAll('[data-certificate-field]:checked')].map(field => field.dataset.certificateField),
-          includeName: root.querySelector('[data-certificate-name]').checked,
           studentName,
           demo,
         });
         redraw();
       };
-      root.querySelectorAll('[data-certificate-name], [data-certificate-field], [data-certificate-design], [data-certificate-medal]').forEach(field => field.addEventListener('change', update));
+      root.querySelectorAll('[data-certificate-field], [data-certificate-design]').forEach(field => field.addEventListener('change', update));
       root.querySelectorAll('[data-certificate-meta]').forEach(field => field.addEventListener('input', update));
       confirm.addEventListener('change', syncButtons);
       expand.addEventListener('click', async () => {

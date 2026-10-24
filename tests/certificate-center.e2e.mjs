@@ -23,6 +23,8 @@ test('certificate center reviews multiple students and exports one isolated A4 p
     const teaching = store.teachings().find(item => store.students(item.id).length >= 4);
     const students = store.students(teaching.id).slice(0, 4);
     const common = { updatedAt: Date.now(), deleted: false };
+    const identity = { schoolName: 'مدرسة الحساب التجريبي', educationDepartment: 'إدارة التعليم من الحساب', teacherName: 'معلم من بيانات الحساب', reportPrincipalName: 'مدير من بيانات الحساب' };
+    await store.patchProfile(identity);
     const names = ['عبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي', 'محمد أحمد التجريبي', 'خالد علي التجريبي'];
     const cleared = store.state.scores.filter(score => score.studentId === students[3].id).map(score => ({ ...score, ...common, deleted: true }));
     await store.save({
@@ -32,12 +34,13 @@ test('certificate center reviews multiple students and exports one isolated A4 p
     });
     const chosen = new Set(students.slice(0, 3).map(student => student.id));
     const ordered = store.students(teaching.id).filter(student => chosen.has(student.id));
-    return { teachingId: teaching.id, ids: ordered.map(student => student.id), noEvidenceId: students[3].id, names: ordered.map(student => student.name) };
+    return { teachingId: teaching.id, ids: ordered.map(student => student.id), noEvidenceId: students[3].id, names: ordered.map(student => student.name), identity: { ...identity, principalName: identity.reportPrincipalName } };
   });
   await page.goto('/#/reports');
   await page.setViewportSize({ width: 1440, height: 1000 });
   const entry = page.locator('[data-act="certificate-center"]');
   await expect(entry).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('certificate-reports-spacing.png'), fullPage: false });
   await entry.click();
   const sheet = page.locator('.certificate-center-sheet');
   await expect(sheet).toBeVisible();
@@ -47,7 +50,11 @@ test('certificate center reviews multiple students and exports one isolated A4 p
   const print = sheet.locator('[data-center-print]');
   await sheet.locator('[data-center-teaching]').selectOption(fixture.teachingId);
   const stateBefore = await page.evaluate(async () => JSON.stringify((await import('/src/store.js')).state));
-  await expect(sheet.locator('[data-center-names]')).not.toBeChecked();
+  await expect(sheet.locator('[data-center-names]')).toHaveCount(0);
+  await expect(sheet.locator('[data-center-medal]')).toHaveCount(0);
+  for (const key of ['schoolName', 'educationDepartment', 'teacherName', 'principalName']) {
+    await expect(sheet.locator(`[data-center-meta="${key}"]`)).toHaveValue(fixture.identity[key]);
+  }
   await expect(sheet.locator('[data-center-evidence]:checked')).toHaveCount(0);
   await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
   await expect(print).toBeDisabled();
@@ -60,8 +67,6 @@ test('certificate center reviews multiple students and exports one isolated A4 p
   await sheet.locator('[data-center-clear]').click();
   for (const id of fixture.ids) await sheet.locator(`[data-center-student="${id}"]`).check();
   await expect(sheet.locator('[data-center-position]')).toHaveText('الشهادة 1 من 3');
-  await expect(canvas).not.toHaveAttribute('aria-label', new RegExp(fixture.names[0]));
-  await sheet.locator('[data-center-names]').check();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[0]));
   await sheet.locator('[data-center-tab="design"]').click();
   await sheet.locator('.certificate-center__metadata > summary').click();
@@ -74,11 +79,9 @@ test('certificate center reviews multiple students and exports one isolated A4 p
   await expect(consent).not.toBeChecked();
   await expect(print).toBeDisabled();
   await expect(sheet.locator('[data-center-design="school"]')).toHaveAttribute('aria-pressed', 'true');
-  await sheet.locator('[data-center-medal]').selectOption('laurel');
   await canvas.screenshot({ path: testInfo.outputPath('certificate-school-preview.png') });
   await fs.writeFile(testInfo.outputPath('certificate-school-output.png'), Buffer.from(await canvas.evaluate(node => node.toDataURL('image/png').split(',')[1]), 'base64'));
   await sheet.locator('[data-center-design="ornate"]').click();
-  await sheet.locator('[data-center-medal]').selectOption('star');
   await canvas.screenshot({ path: testInfo.outputPath('certificate-ornate-preview.png') });
   await fs.writeFile(testInfo.outputPath('certificate-ornate-output.png'), Buffer.from(await canvas.evaluate(node => node.toDataURL('image/png').split(',')[1]), 'base64'));
   await sheet.locator('.certificate-center__metadata > summary').click();

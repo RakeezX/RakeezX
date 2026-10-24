@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { achievementCard } from '../src/lib/student-achievements.js';
-import { drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate } from '../src/lib/achievement-certificate.js';
-import { CERTIFICATE_DESIGNS, certificateMetadata } from '../src/lib/certificate-designs.js';
+import { certificateCard, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate } from '../src/lib/achievement-certificate.js';
+import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, certificateMetadata } from '../src/lib/certificate-designs.js';
 
 const input = {
   studentId: 'private-student-id',
@@ -29,9 +29,10 @@ function recordingCanvas() {
   return { texts, getContext: () => context, toDataURL: () => 'data:image/png;base64,c2VsZWN0ZWQtaW1hZ2U=' };
 }
 
-test('certificate renderer and description receive only selected positive evidence and optional sanitized name', () => {
+test('certificate projection always includes the student name and only selected positive evidence', () => {
   const before = structuredClone(input);
-  const card = achievementCard(input, { selected: ['participation', 'scores', 'attendance'], demo: true, studentName: 'اسم خاص' });
+  const card = certificateCard(input, { selected: ['participation', 'scores', 'attendance'], demo: true, studentName: 'اسم الطالب', includeName: false });
+  assert.equal(card.name, 'اسم الطالب');
   const canvas = recordingCanvas();
   drawAchievementCertificate(canvas, card);
   assert.equal(canvas.width / canvas.height, 297 / 210);
@@ -41,7 +42,8 @@ test('certificate renderer and description receive only selected positive eviden
   assert.match(output, /مشاركات إيجابية/);
   assert.match(output, /بنود بدرجة كاملة/);
   assert.match(output, /بيانات تجريبية/);
-  assert.doesNotMatch(output, /private-|other-student|اسم خاص|حضور/);
+  assert.match(output, /اسم الطالب/);
+  assert.doesNotMatch(output, /private-|other-student|حضور/);
   assert.deepEqual(input, before);
 });
 
@@ -63,6 +65,8 @@ test('both designs display only bounded certificate identity and preserve the ch
   const metadata = certificateMetadata({ ...raw, design: 'unknown', medal: 'unknown', schoolName: 'س'.repeat(1000) });
   assert.equal(metadata.design, 'ornate');
   assert.equal(metadata.medal, 'star');
+  assert.equal(certificateMetadata({ medal: 'laurel' }).medal, 'star');
+  assert.deepEqual(CERTIFICATE_MEDALS.map(item => item.id), ['star']);
   assert.equal(metadata.schoolName.length, 140);
   assert.equal(metadata.token, undefined);
 });

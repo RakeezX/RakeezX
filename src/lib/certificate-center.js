@@ -1,8 +1,8 @@
 import { html, icon, openSheet, toast } from './dom.js';
 import * as store from '../store.js';
-import { achievementCard, achievementPng } from './student-achievements.js';
-import { drawAchievementCertificate, certificateDescription, certificateIssueDate, printCertificateBatch } from './achievement-certificate.js';
-import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS } from './certificate-designs.js';
+import { achievementPng } from './student-achievements.js';
+import { certificateCard, drawAchievementCertificate, certificateDescription, certificateIssueDate, printCertificateBatch } from './achievement-certificate.js';
+import { CERTIFICATE_DESIGNS } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
 import { resolvedReportPrincipalName, isDemoOutput } from './report-print.js';
 import { getAccountPresentation } from './account-profile.js';
@@ -52,7 +52,6 @@ export function openCertificateCenter({ teachingId } = {}) {
               <label><input type="checkbox" data-center-evidence="participation"> المشاركات الإيجابية <small>كل السجل المتاح</small></label>
               <label><input type="checkbox" data-center-evidence="scores"> بنود بدرجة كاملة <small>التقييمات اليدوية في الإسناد المختار</small></label>
             </fieldset>
-            <label class="certificate-center__name"><input type="checkbox" data-center-names> إظهار أسماء الطلاب في الشهادات</label>
             <label class="field certificate-center__search"><span class="field__label">بحث عن طالب</span><input class="input" type="search" data-center-search placeholder="ابحث بالاسم" autocomplete="off"></label>
             <div class="certificate-center__selection"><span data-center-count role="status">لم يُحدّد طلاب</span><div><button class="btn btn--quiet btn--sm" type="button" data-center-all>تحديد ذوي الإنجاز</button><button class="btn btn--ghost btn--sm" type="button" data-center-clear>مسح</button></div></div>
             <div class="certificate-center__roster" data-center-roster></div>
@@ -60,8 +59,7 @@ export function openCertificateCenter({ teachingId } = {}) {
           <section class="certificate-center__section" data-center-panel="design" hidden>
             <h3>تصميم الشهادة</h3>
             <div class="certificate-center__designs" role="group" aria-label="تصميم الشهادة">${CERTIFICATE_DESIGNS.map((design, index) => html`<button type="button" class="certificate-center__design ${index === 0 ? 'is-selected' : ''}" data-center-design="${design.id}" aria-pressed="${index === 0}"><canvas class="certificate-center__thumbnail" data-center-thumbnail="${design.id}" width="300" height="212" aria-hidden="true"></canvas><strong>${design.label}</strong></button>`)}</div>
-            <label class="field"><span class="field__label">رمز التقدير</span><select class="input" data-center-medal>${CERTIFICATE_MEDALS.map(medal => html`<option value="${medal.id}">${medal.label}</option>`)}</select></label>
-            <details class="certificate-center__metadata"><summary>بيانات المدرسة والتوقيع</summary><p>يمكن تعديلها لهذه الشهادات فقط. لا تُحفظ في الحساب.</p>
+            <details class="certificate-center__metadata"><summary>بيانات المدرسة والتوقيع</summary><p>تُملأ تلقائيًا من بياناتك في ركيز. يمكنك تعديلها لهذه الشهادات فقط.</p>
               ${[['schoolName', 'المدرسة'], ['educationDepartment', 'إدارة التعليم'], ['teacherName', presentation.teacherNameLabel], ['principalName', presentation.principalNameLabel]].map(([key, label]) => html`<label class="field"><span class="field__label">${label} <small>اختياري</small></span><input class="input" data-center-meta="${key}" value="${metadata[key]}" maxlength="100" autocomplete="off"></label>`)}
             </details>
             <p class="certificate-center__local">${icon('check')} تُجهّز على جهازك دون رفع أو إرسال</p>
@@ -85,9 +83,7 @@ export function openCertificateCenter({ teachingId } = {}) {
       const selected = new Set();
       let currentTeachingId = initialTeaching?.id ?? '';
       let evidence = [];
-      let includeName = false;
       let design = CERTIFICATE_DESIGNS[0]?.id;
-      let medal = CERTIFICATE_MEDALS[0]?.id;
       let query = '';
       let index = 0;
       let revision = 0;
@@ -97,15 +93,15 @@ export function openCertificateCenter({ teachingId } = {}) {
       let entries = [];
       const dateLabel = certificateIssueDate();
       const roster = () => currentTeachingId ? store.students(currentTeachingId) : [];
-      const cardFor = student => achievementCard({
+      const cardFor = student => certificateCard({
         studentId: student.id,
         items: store.items(currentTeachingId),
         gradeCtx: store.studentContext(student.id, currentTeachingId),
         history: store.studentHistory(student.id),
-      }, { selected: evidence, includeName, studentName: student.name, demo: isDemoOutput() });
+      }, { selected: evidence, studentName: student.name, demo: isDemoOutput() });
       const options = () => {
         const teaching = store.getTeaching(currentTeachingId);
-        return { ...metadata, design, medal, teacherLabel: presentation.teacherSubjectLabel,
+        return { ...metadata, design, teacherLabel: presentation.teacherSubjectLabel,
           principalLabel: presentation.schoolPrincipalLabel,
           className: store.sectionLabel(store.getSection(teaching?.sectionId)) || '',
           subjectName: store.getSubject(teaching?.subjectId)?.name || '', dateLabel };
@@ -154,10 +150,10 @@ export function openCertificateCenter({ teachingId } = {}) {
         } catch { $('[data-center-status]').textContent = 'تعذرت معاينة الشهادة في هذا المتصفح.'; }
         $('[data-center-position]').textContent = entries.length ? `الشهادة ${index + 1} من ${entries.length}` : 'اختر طلابًا للمعاينة';
         if (ready) $('[data-center-status]').textContent = state.missing ? 'تغيّر كشف الفصل. أعد اختيار الطلاب قبل التصدير.'
-          : !evidence.length ? 'اختر إنجازًا موثّقًا. الأسماء مخفية حتى تختار إظهارها.'
+          : !evidence.length ? 'اختر إنجازًا موثّقًا لإظهاره في الشهادات.'
           : !selected.size ? 'حدّد الطلاب الذين تريد تجهيز شهاداتهم.'
           : state.ineligible.length ? `${state.ineligible.length} من الطلاب المحددين بلا إنجاز من النوع المختار. أزل تحديدهم أو غيّر الإنجاز لإتاحة التصدير.`
-          : `راجِع الشهادات باستخدام السابق والتالي، ثم وافق على التصدير.${includeName ? '' : ' الأسماء مخفية باختيارك.'}`;
+          : 'راجِع الشهادات باستخدام السابق والتالي، ثم وافق على التصدير.';
         syncButtons();
       };
       root.addEventListener('change', event => {
@@ -165,8 +161,6 @@ export function openCertificateCenter({ teachingId } = {}) {
         if (target.matches('[data-center-teaching]')) { currentTeachingId = target.value; selected.clear(); index = 0; query = ''; $('[data-center-search]').value = ''; }
         else if (target.matches('[data-center-student]')) { target.checked ? selected.add(target.dataset.centerStudent) : selected.delete(target.dataset.centerStudent); index = 0; }
         else if (target.matches('[data-center-evidence]')) evidence = [...root.querySelectorAll('[data-center-evidence]:checked')].map(field => field.dataset.centerEvidence);
-        else if (target.matches('[data-center-names]')) includeName = target.checked;
-        else if (target.matches('[data-center-medal]')) medal = target.value;
         else if (target === confirm) { syncButtons(); return; }
         else return;
         renderRoster(); refresh();
@@ -239,7 +233,6 @@ export function openCertificateCenter({ teachingId } = {}) {
           try {
             drawAchievementCertificate(sample, { name: '', demo: false, evidence: [] }, {
               design: thumbnail.dataset.centerThumbnail,
-              medal: CERTIFICATE_MEDALS[0]?.id,
               schoolName: '', educationDepartment: '', teacherName: '', principalName: '',
               teacherLabel: '', principalLabel: '', className: '', subjectName: '', dateLabel: '',
             });

@@ -1,13 +1,12 @@
 /** Original certificate artwork. All data is an explicit, local display projection. */
 
 export const CERTIFICATE_DESIGNS = Object.freeze([
-  Object.freeze({ id: 'ornate', label: 'ذهبي مزخرف', description: 'زخارف ذهبية دقيقة على ورق عاجي' }),
+  Object.freeze({ id: 'ornate', label: 'ذهبي إسلامي', description: 'نجوم ثمانية وزخارف هندسية ذهبية على ورق عاجي' }),
   Object.freeze({ id: 'school', label: 'أخضر مدرسي', description: 'تصميم مدرسي أنيق بألوان ركيز' }),
 ]);
 
 export const CERTIFICATE_MEDALS = Object.freeze([
   Object.freeze({ id: 'star', label: 'تميّز' }),
-  Object.freeze({ id: 'laurel', label: 'إنجاز' }),
 ]);
 
 const WIDTH = 1485;
@@ -30,7 +29,7 @@ export function certificateMetadata(input = {}) {
   input = input && typeof input === 'object' ? input : {};
   return Object.freeze({
     design: CERTIFICATE_DESIGNS.some(item => item.id === input.design) ? input.design : 'ornate',
-    medal: CERTIFICATE_MEDALS.some(item => item.id === input.medal) ? input.medal : 'star',
+    medal: 'star',
     schoolName: plain(input.schoolName, 140),
     educationDepartment: plain(input.educationDepartment, 140),
     teacherName: plain(input.teacherName, 100),
@@ -106,67 +105,113 @@ function polygon(ctx, x, y, outer, inner, points, fill) {
   ctx.fill();
 }
 
-function leaf(ctx, x, y, angle, length, color) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(angle);
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.bezierCurveTo(length * 0.2, -length * 0.4, length * 0.8, -length * 0.35, length, 0);
-  ctx.bezierCurveTo(length * 0.8, length * 0.35, length * 0.2, length * 0.4, 0, 0);
-  ctx.fill();
-  ctx.restore();
+function eightPointStar(ctx, x, y, radius, fill = '#fff8e8', stroke = '#b18b42', width = 1.2) {
+  // The inner radius is the intersection of two squares rotated by 45 degrees.
+  polygon(ctx, x, y, radius, radius * Math.SQRT1_2 / Math.cos(Math.PI / 8), 8, fill);
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = width;
+  ctx.stroke();
 }
 
-/** A small botanical flourish, reflected at each corner. */
-function corner(ctx, x, y, directionX, directionY) {
+/** Original eight-point geometry and angular ribbons, reflected at all four corners. */
+function geometricCorner(ctx, x, y, directionX, directionY) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(directionX, directionY);
-  ctx.strokeStyle = '#aa843e';
-  ctx.lineWidth = 1.4;
-  for (const transpose of [false, true]) {
-    ctx.save();
-    if (transpose) { ctx.rotate(Math.PI / 2); ctx.scale(1, -1); }
+  ctx.lineJoin = 'miter';
+
+  // Parallel, bevelled corner bands connect the horizontal and vertical pattern.
+  for (const inset of [6, 17]) {
+    ctx.strokeStyle = inset === 6 ? '#b18b42' : '#d7bf81';
+    ctx.lineWidth = inset === 6 ? 2 : 1.1;
     ctx.beginPath();
-    ctx.moveTo(0, 138);
-    ctx.bezierCurveTo(0, 80, 26, 25, 126, 15);
-    ctx.bezierCurveTo(144, 12, 155, 19, 150, 30);
-    ctx.bezierCurveTo(144, 41, 130, 35, 135, 26);
+    ctx.moveTo(inset, 183);
+    ctx.lineTo(inset, 98);
+    ctx.lineTo(98, inset);
+    ctx.lineTo(183, inset);
     ctx.stroke();
-    for (let i = 0; i < 5; i += 1) {
-      const px = 19 + i * 20;
-      const py = 66 - i * 10;
-      leaf(ctx, px, py, -1.08, 25 - i, i % 2 ? '#cfb87a' : '#b89651');
-      leaf(ctx, px + 3, py + 1, 0.54, 21 - i, '#c8aa63');
-    }
+  }
+
+  for (const vertical of [false, true]) {
+    ctx.save();
+    if (vertical) { ctx.rotate(Math.PI / 2); ctx.scale(1, -1); }
+    ctx.strokeStyle = '#c1a25d';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(80, 31);
+    ctx.lineTo(97, 31);
+    ctx.lineTo(115, 13);
+    ctx.lineTo(133, 31);
+    ctx.lineTo(151, 31);
+    ctx.lineTo(165, 17);
+    ctx.lineTo(179, 31);
+    ctx.lineTo(190, 31);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(80, 31);
+    ctx.lineTo(97, 31);
+    ctx.lineTo(115, 49);
+    ctx.lineTo(133, 31);
+    ctx.lineTo(151, 31);
+    ctx.lineTo(165, 45);
+    ctx.lineTo(179, 31);
+    ctx.lineTo(190, 31);
+    ctx.stroke();
+    eightPointStar(ctx, 115, 31, 13, '#fbf3df', '#b99650', 1.1);
+    eightPointStar(ctx, 165, 31, 9, '#fffaf0', '#c1a46a', 0.9);
+    polygon(ctx, 115, 31, 4.5, 4.5, 4, '#bd9b53');
+    polygon(ctx, 165, 31, 2.5, 2.5, 4, '#c4aa70');
     ctx.restore();
   }
-  ctx.strokeStyle = '#c8af73';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.arc(25, 25, 21, 0, Math.PI * 2);
-  ctx.stroke();
-  polygon(ctx, 25, 25, 17, 7, 8, '#b58d3b');
-  ctx.fillStyle = '#fffaf0';
-  ctx.beginPath();
-  ctx.arc(25, 25, 4, 0, Math.PI * 2);
-  ctx.fill();
+
+  eightPointStar(ctx, 46, 46, 41, '#eee0bb', '#af873b', 1.7);
+  eightPointStar(ctx, 46, 46, 34, '#fffaf0', '#c5a764', 0.9);
+  // The two nested square ribbons are the central interlaced geometric knot.
+  for (const rotation of [0, Math.PI / 4]) {
+    ctx.save();
+    ctx.translate(46, 46);
+    ctx.rotate(rotation);
+    ctx.strokeStyle = '#b18d45';
+    ctx.lineWidth = 3.1;
+    ctx.strokeRect(-18.5, -18.5, 37, 37);
+    ctx.strokeStyle = '#fff8e7';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-18.5, -18.5, 37, 37);
+    ctx.restore();
+  }
+  eightPointStar(ctx, 46, 46, 10.5, '#bc9951', '#a9863f', 0.7);
+  polygon(ctx, 46, 46, 3.2, 3.2, 4, '#fff8e8');
   ctx.restore();
 }
 
-function guilloche(ctx, y, color) {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 0.65;
-  for (const phase of [0, Math.PI]) {
+/** Fine angular interlace around the four straight edges. */
+function angularBorder(ctx, x, y, length, rotation = 0) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  const count = Math.floor(length / 24);
+  const offset = (length - count * 24) / 2;
+  ctx.strokeStyle = '#b99a57';
+  ctx.lineWidth = 0.95;
+  for (const side of [-1, 1]) {
     ctx.beginPath();
-    for (let x = 215; x <= WIDTH - 215; x += 2) {
-      const py = y + Math.sin((x - 215) / 10 + phase) * 3.2;
-      if (x === 215) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+    ctx.moveTo(offset, 0);
+    for (let i = 0; i < count; i += 1) {
+      const at = offset + i * 24;
+      ctx.lineTo(at + 6, 4 * side);
+      ctx.lineTo(at + 12, 0);
+      ctx.lineTo(at + 18, -4 * side);
+      ctx.lineTo(at + 24, 0);
     }
     ctx.stroke();
   }
+  // Alternate crossings leave a small ivory gap, making the over-under weave legible.
+  for (let i = 1; i < count * 2; i += 2) {
+    const at = offset + i * 12;
+    line(ctx, at - 2.2, -1.47, at + 2.2, 1.47, '#fcf5e4', 2.5);
+    line(ctx, at - 2.2, -1.47, at + 2.2, 1.47, '#b99a57', 0.95);
+  }
+  ctx.restore();
 }
 
 function ornateBackground(ctx) {
@@ -183,12 +228,11 @@ function ornateBackground(ctx) {
   ctx.lineWidth = 1;
   ctx.strokeRect(37, 37, WIDTH - 74, HEIGHT - 74);
   ctx.strokeRect(49, 49, WIDTH - 98, HEIGHT - 98);
-  guilloche(ctx, 43, '#ba9d5c');
-  guilloche(ctx, HEIGHT - 43, '#ba9d5c');
-  for (const [x, y, dx, dy] of [[62, 62, 1, 1], [WIDTH - 62, 62, -1, 1], [62, HEIGHT - 62, 1, -1], [WIDTH - 62, HEIGHT - 62, -1, -1]]) corner(ctx, x, y, dx, dy);
-  for (const x of [43, WIDTH - 43]) {
-    for (let y = 245; y <= 805; y += 28) polygon(ctx, x, y, 3, 1.4, 4, '#ceb77d');
-  }
+  angularBorder(ctx, 255, 43, WIDTH - 510);
+  angularBorder(ctx, 255, HEIGHT - 43, WIDTH - 510);
+  angularBorder(ctx, 43, 255, HEIGHT - 510, Math.PI / 2);
+  angularBorder(ctx, WIDTH - 43, 255, HEIGHT - 510, Math.PI / 2);
+  for (const [x, y, dx, dy] of [[62, 62, 1, 1], [WIDTH - 62, 62, -1, 1], [62, HEIGHT - 62, 1, -1], [WIDTH - 62, HEIGHT - 62, -1, -1]]) geometricCorner(ctx, x, y, dx, dy);
 }
 
 function schoolBackground(ctx) {
@@ -236,8 +280,12 @@ function schoolBackground(ctx) {
   }
 }
 
-function medal(ctx, x, y, kind, school) {
+function medal(ctx, x, y, school) {
   ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(1.18, 1.18);
+  x = 0;
+  y = 0;
   // Ribbon ends are behind the rosette and never resemble an official seal.
   ctx.fillStyle = school ? '#315a46' : '#b79a53';
   for (const side of [-1, 1]) {
@@ -265,18 +313,8 @@ function medal(ctx, x, y, kind, school) {
   ctx.beginPath();
   ctx.arc(x, y, 45, 0, Math.PI * 2);
   ctx.stroke();
-  if (kind === 'laurel') {
-    for (const side of [-1, 1]) {
-      for (let i = 0; i < 5; i += 1) {
-        const angle = (0.1 + i * 0.27) * side;
-        const px = x + Math.sin(angle) * 34;
-        const py = y + 14 + Math.cos(angle) * 11 - i * 8;
-        leaf(ctx, px, py, side < 0 ? -2.3 : -0.84, 13, '#a5873d');
-      }
-    }
-    polygon(ctx, x, y - 17, 12, 5, 5, '#a98536');
-  } else polygon(ctx, x, y - 14, 20, 9, 5, '#a98536');
-  label(ctx, kind === 'laurel' ? 'إنجاز' : 'تميّز', x, y + 28, 21, 800, '#7b6129');
+  polygon(ctx, x, y - 14, 20, 9, 5, '#a98536');
+  label(ctx, 'تميّز', x, y + 28, 21, 800, '#7b6129');
   ctx.restore();
 }
 
@@ -367,9 +405,9 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
   fitted(ctx, meta.schoolName || 'رَكيز المعلم', CENTER, school ? 85 : 114, 960, 29, 20, 700, headerColor);
   fitted(ctx, meta.educationDepartment || 'نحتفي بالتعلّم، ونقدّر الإنجاز', CENTER, school ? 124 : 148, 960, 19, 15, 500, secondaryColor);
 
-  medal(ctx, school ? WIDTH - 191 : 191, 277, meta.medal, school);
+  medal(ctx, school ? WIDTH - 191 : 191, 292, school);
   label(ctx, 'للجهد قيمة، وللإنجاز تقدير', CENTER, 245, 20, 500, school ? '#8b8a71' : '#9a8558');
-  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 330, 1010, 78, 54, 800, school ? '#244c3a' : '#9e792f');
+  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 330, 930, 78, 54, 800, school ? '#244c3a' : '#9e792f');
   flourish(ctx, 372, school);
   label(ctx, name ? 'تُمنح هذه الشهادة بكل تقدير إلى' : 'نحتفي بصاحب هذا الإنجاز', CENTER, 427, 24, 500, MUTED);
   recipient(ctx, name);
@@ -385,11 +423,11 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
     label(ctx, demo ? 'بيانات تجريبية · رَكيز المعلم' : 'رَكيز المعلم | ركيزة المعلم الرقمية', CENTER, 1024, 16, 500, '#c5d5bd');
   } else {
     line(ctx, 290, 946, WIDTH - 290, 946, '#dfd1ad', 1);
-    fitted(ctx, meta.dateLabel || 'شهادة تقدير · رَكيز المعلم', CENTER, 970, 1100, 18, 14, 500, '#8e835f');
+    fitted(ctx, meta.dateLabel || 'شهادة تقدير · رَكيز المعلم', CENTER, 970, 960, 18, 14, 500, '#8e835f');
     label(ctx, demo ? 'بيانات تجريبية · رَكيز المعلم' : 'رَكيز المعلم | ركيزة المعلم الرقمية', CENTER, 993, 16, 500, '#9a8e6d');
   }
   if (demo) {
-    // A visible label survives export even when the name is hidden.
+    // A visible label survives every certificate export.
     ctx.save();
     ctx.fillStyle = school ? '#fffaf0' : '#f6eacf';
     ctx.fillRect(CENTER - 83, 188, 166, 28);

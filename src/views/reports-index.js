@@ -61,13 +61,39 @@ export default {
 
     return html`
       <div class="reports-index-page">
-        <section class="surface surface--flat report-hub" aria-labelledby="certificate-center-title">
-          <button type="button" class="report-destination" data-act="certificate-center" style="width:100%;text-align:start;font:inherit;cursor:pointer;background:none;border:0">
-            <span class="report-destination__icon" aria-hidden="true">${icon('star')}</span>
-            <span class="row__main"><span class="row__title" id="certificate-center-title">شهادات التقدير</span><span class="row__sub">تصاميم ركيز، اختيار عدة طلاب، وشهادة مستقلة لكل طالب في ملف PDF.</span></span>
-            <span class="row__chev">${icon('chev')}</span>
-          </button>
-        </section>
+        <div class="stack stack-4" data-report-destinations>
+          <section class="surface surface--flat report-hub" aria-labelledby="certificate-center-title">
+            <button type="button" class="report-destination" data-act="certificate-center" style="width:100%;text-align:start;font:inherit;cursor:pointer;background:none;border:0">
+              <span class="report-destination__icon" aria-hidden="true">${icon('star')}</span>
+              <span class="row__main"><span class="row__title" id="certificate-center-title">شهادات التقدير</span><span class="row__sub">تصاميم ركيز، اختيار عدة طلاب، وشهادة مستقلة لكل طالب في ملف PDF.</span></span>
+              <span class="row__chev">${icon('chev')}</span>
+            </button>
+          </section>
+          <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
+            <div class="report-hub__head">
+              <div>
+                <h2 class="report-hub__title" id="aggregate-reports-title">تقارير جميع الفصول</h2>
+                <p class="report-hub__desc">ثلاثة ملخصات للمتابعة، وتبقى تفاصيل كل فصل في تقاريره.</p>
+              </div>
+            </div>
+            <a class="report-destination" href="#/reports/execution">
+              <span class="report-destination__icon" aria-hidden="true">${icon('timetable')}</span>
+              <span class="row__main">
+                <span class="row__title" data-n70-destination>الحصص والحضور</span>
+                <span class="row__sub">تنفيذ الحصص، اكتمال الحضور، وتصفية النتائج بحسب التاريخ والفصل والحالة.</span>
+              </span>
+              <span class="row__chev">${icon('chev')}</span>
+            </a>
+            <a class="report-destination n70-destination" href="#/reports/grades">
+              <span class="report-destination__icon" aria-hidden="true">${icon('grades')}</span>
+              <span class="row__main"><span class="row__title" data-n70-destination>الدرجات</span><span class="row__sub">ملخص الدرجات عبر الفصول، مع الوصول إلى الكشوف التفصيلية.</span></span><span class="row__chev">${icon('chev')}</span>
+            </a>
+            <a class="report-destination n70-destination" href="#/reports/followup">
+              <span class="report-destination__icon" aria-hidden="true">${icon('student')}</span>
+              <span class="row__main"><span class="row__title" data-n70-destination>طلاب يحتاجون متابعة</span><span class="row__sub">الطالب وفصله وسبب المتابعة من سجلات ركيز الحالية.</span></span><span class="row__chev">${icon('chev')}</span>
+            </a>
+          </section>
+        </div>
         <section class="surface surface--flat report-hub" aria-labelledby="class-reports-title">
           <div class="report-hub__head">
             <div>
@@ -88,31 +114,6 @@ export default {
               </details>
             `)}
           </div>
-        </section>
-
-        <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
-          <div class="report-hub__head">
-            <div>
-              <h2 class="report-hub__title" id="aggregate-reports-title">تقارير جميع الفصول</h2>
-              <p class="report-hub__desc">ثلاثة ملخصات للمتابعة، وتبقى تفاصيل كل فصل في تقاريره.</p>
-            </div>
-          </div>
-          <a class="report-destination" href="#/reports/execution">
-            <span class="report-destination__icon" aria-hidden="true">${icon('timetable')}</span>
-            <span class="row__main">
-              <span class="row__title" data-n70-destination>الحصص والحضور</span>
-              <span class="row__sub">تنفيذ الحصص، اكتمال الحضور، وتصفية النتائج بحسب التاريخ والفصل والحالة.</span>
-            </span>
-            <span class="row__chev">${icon('chev')}</span>
-          </a>
-          <a class="report-destination n70-destination" href="#/reports/grades">
-            <span class="report-destination__icon" aria-hidden="true">${icon('grades')}</span>
-            <span class="row__main"><span class="row__title" data-n70-destination>الدرجات</span><span class="row__sub">ملخص الدرجات عبر الفصول، مع الوصول إلى الكشوف التفصيلية.</span></span><span class="row__chev">${icon('chev')}</span>
-          </a>
-          <a class="report-destination n70-destination" href="#/reports/followup">
-            <span class="report-destination__icon" aria-hidden="true">${icon('student')}</span>
-            <span class="row__main"><span class="row__title" data-n70-destination>طلاب يحتاجون متابعة</span><span class="row__sub">الطالب وفصله وسبب المتابعة من سجلات ركيز الحالية.</span></span><span class="row__chev">${icon('chev')}</span>
-          </a>
         </section>
       </div>
     `;

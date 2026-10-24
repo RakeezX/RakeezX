@@ -35,6 +35,8 @@ test('certificate keeps explicit choices local, previews responsively and export
     const enrollment = store.activeEnrollment(student.id);
     const teaching = store.teachings().find(item => item.sectionId === enrollment.sectionId);
     const common = { updatedAt: Date.now(), deleted: false };
+    const identity = { schoolName: 'مدرسة ركيز للاختبار', educationDepartment: 'إدارة التعليم التجريبية', teacherName: 'معلم الحساب التجريبي', reportPrincipalName: 'مدير الحساب التجريبي' };
+    await store.patchProfile(identity);
     const name = 'عبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي';
     await store.save({
       students: [{ ...student, name, ...common }],
@@ -42,7 +44,7 @@ test('certificate keeps explicit choices local, previews responsively and export
       scores: [{ id: `sc:${student.id}:demo:certificate:item`, studentId: student.id, itemId: 'demo:certificate:item', value: 10, ...common }],
       logs: [{ id: 'demo:certificate:log', studentId: student.id, teachingId: teaching.id, kind: 'participation', delta: 1, date: '2026-10-20', ...common }],
     });
-    return { studentId: student.id, teachingId: teaching.id, name };
+    return { studentId: student.id, teachingId: teaching.id, name, identity: { ...identity, principalName: identity.reportPrincipalName } };
   });
   await page.goto(`/#/student/${fixture.studentId}?teaching=${fixture.teachingId}`);
   const entry = page.locator('[data-act="achievement-certificate"]');
@@ -56,15 +58,19 @@ test('certificate keeps explicit choices local, previews responsively and export
   const consent = sheet.locator('[data-certificate-confirm]');
   await expect(editor).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
-  await expect(editor.locator('[data-certificate-name]')).not.toBeChecked();
+  await expect(editor.locator('[data-certificate-name]')).toHaveCount(0);
+  await expect(editor.locator('[data-certificate-medal]')).toHaveCount(0);
+  await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.name));
+  for (const key of ['schoolName', 'educationDepartment', 'teacherName', 'principalName']) {
+    await expect(editor.locator(`[data-certificate-meta="${key}"]`)).toHaveValue(fixture.identity[key]);
+    await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.identity[key]));
+  }
   await expect(editor.locator('[data-certificate-field]:checked')).toHaveCount(0);
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();
   await expect(editor.locator('[data-certificate-field="attendance"]')).toHaveCount(0);
   await editor.locator('[data-certificate-field="participation"]').check();
   await editor.locator('[data-certificate-field="scores"]').check();
-  await expect(canvas).not.toHaveAttribute('aria-label', new RegExp(fixture.name));
-  await editor.locator('[data-certificate-name]').check();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.name));
   await expect(canvas).toHaveAttribute('aria-label', /بيانات تجريبية/);
   await consent.check();
@@ -86,10 +92,10 @@ test('certificate keeps explicit choices local, previews responsively and export
   await expect(preview).toHaveCount(0);
   await expect(sheet.locator('[data-certificate-expand]')).toBeFocused();
   await expect(consent).toBeChecked();
-  await editor.locator('[data-certificate-name]').uncheck();
+  await editor.locator('[data-certificate-design][value="school"]').check();
   await expect(consent).not.toBeChecked();
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
-  await editor.locator('[data-certificate-name]').check();
+  await editor.locator('[data-certificate-design][value="ornate"]').check();
   await consent.check();
   const outgoing = [];
   const observe = request => outgoing.push(request.url());
@@ -151,7 +157,7 @@ test('certificate keeps explicit choices local, previews responsively and export
       await preview.getByRole('button', { name: 'ملاءمة للشاشة', exact: true }).click();
     }
     await page.keyboard.press('Escape');
-    await expect(editor.locator('[data-certificate-name]')).toBeChecked();
+    await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.name));
   }
   expect(await page.evaluate(async () => JSON.stringify((await import('/src/store.js')).state))).toBe(snapshot);
   await sheet.locator('[data-sheet-close]').last().click();
