@@ -62,7 +62,7 @@ store.subscribe(() => { void notificationPush.refresh(); });
 subscribeAcknowledged(checkpoint => notificationPush.afterSyncAck(checkpoint));
 store.subscribeConfirmedSources(checkpoint => notificationPush.projectConfirmedSources(checkpoint));
 window.addEventListener('storage', event => {
-  if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) notificationPush.invalidate();
+  if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) void notificationPush.refresh();
   // AI N110: observing a lease writes a per-tab clock witness. Never feed
   // those observations back into another lease observation through Push.
   if (event.key?.startsWith('rakeezx-n44-') || event.key?.startsWith(NOTIFICATION_CATEGORY_PREFIX) ||

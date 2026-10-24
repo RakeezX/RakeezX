@@ -82,6 +82,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   const shareText=s=>`مرحبًا ${s.label}،\nرمز دخولك: ${s.credential}\n${new URL('/student',root.ownerDocument.defaultView.location.origin).href}\nافتح صفحة الطالب وأدخل الرمز لعرض مساحتك الدراسية.`;
   function draw() {
     if (disposed) return;
+    const resolution=client?.resolutionState?.(context()?.teachingId);
     const ready = !!client && !!key(), writable = ready && !!roster && !busy && !retry;
     const focused = root.ownerDocument.activeElement;
     const focusAction = root.contains(focused) ? { action: focused.dataset.action, index: focused.dataset.index, name: focused.name } : null;
@@ -90,6 +91,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     panel.innerHTML = `<section aria-label="مساحة طلاب الفصل">
       <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'الطلاب: '+esc(roster.students.length)+' · الرموز الفعّالة: '+esc(roster.students.filter(s=>s.hasActiveCode===true).length)+(busy||retry?' · آخر حالة مؤكدة':'') : 'الطلاب والرموز الفعّالة: لم تُؤكّد القائمة بعد'}</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable || !roster.credentialRevision || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0) ? 'disabled' : ''}>إنشاء الرموز الناقصة</button>` : ''}</div>
       <div class="n88-class-status"><p role="status" aria-live="polite">${esc(message || (ready ? (busy && !roster ? 'جارٍ قراءة القائمة…' : '') : 'مساحة الطلاب غير مفعّلة حاليًا.'))}</p>${retry && ready ? `<button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>مراجعة القائمة</button>` : ''}</div>
+      ${resolution?.eligible?`<button class="btn" data-action="close-unknown" ${busy?'disabled':''}>إغلاق الطلب السابق دون إنشاء رموز</button><p>يسجّل إغلاقًا جديدًا يمنع تنفيذ الطلب المتأخر؛ لا يثبت أن المحاولة السابقة تراجعت.</p>`:''}${resolution?.canRecover?`<button class="btn" data-action="recover-closure" ${busy?'disabled':''}>مراجعة إقرار الإغلاق مرة واحدة</button>`:''}
       ${uncertainMutation?'<p data-n88-uncertain role="status">نتيجة عملية سابقة غير مؤكدة. عدّاد الرموز من آخر قائمة مؤكدة، ولا يثبت مصير تلك العملية.</p>':''}
       ${roster ? `<ul class="n88-class-roster" aria-label="طلاب ${esc(classLabel())}">${!roster.students.length?'<li class="n88-roster-empty">لا يوجد طلاب في هذا الفصل.</li>':''}${roster.students.map((s, index) => `<li><div class="n88-class-student"><strong>${esc(s.label)}</strong>${s.credential ? `<div data-code><input readonly autocomplete="off" dir="ltr" aria-label="رمز ${esc(s.label)}" value="${esc(s.credential)}"></div>` : `<span>${s.recoveryStatus==='legacy' ? 'رمز قديم غير مسترجع' : s.hasActiveCode ? 'الرمز مخفي؛ راجع القائمة لإظهاره' : 'بلا رمز فعّال'}</span>`}</div><div class="n88-class-actions">${s.credential ? `<button class="btn" data-action="copy-student" data-index="${index}" aria-label="نسخ رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>نسخ</button><button class="btn" data-action="share-student" data-index="${index}" aria-label="مشاركة رسالة ${esc(s.label)}" ${!writable ? 'disabled' : ''}>مشاركة</button>` : ''}<details class="n88-student-more"><summary aria-label="إجراءات ${esc(s.label)}" data-index="${index}">المزيد</summary><div class="n88-student-more-panel"><button class="btn" data-action="review-rotate" data-index="${index}" aria-label="تغيير رمز ${esc(s.label)}" ${!writable || s.credentialVersion < 1 ? 'disabled' : ''}>تغيير الرمز</button><button class="btn" data-action="review-revoke" data-index="${index}" aria-label="إلغاء وصول ${esc(s.label)}" ${!writable || !s.hasActiveCode ? 'disabled' : ''}>إلغاء الوصول</button></div></details></div></li>`).join('')}</ul>
       <details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${PORTAL_FIELDS.filter(f=>roster.visibility[f]).length} من ${PORTAL_FIELDS.length}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر الحقول ثم احفظها</legend><div class="n88-class-fields">${PORTAL_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${(draft ?? roster.visibility)[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}
@@ -172,6 +174,14 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     if (key() !== boundKey) { invalidate(); void refresh(); return; }
     const action = button.dataset.action;
     if (busy) return;
+    if(action==='close-unknown'||action==='recover-closure'){
+      const g=++generation,k=key();busy=true;mutating=true;clearSecrets();message='جارٍ التحقق من إقرار الإغلاق…';draw();
+      Promise.resolve().then(()=>action==='close-unknown'?client.closeUnknown(context().teachingId):client.recoverClosure(context().teachingId)).then(result=>{
+        if(!valid(g,k))return;
+        uncertainMutation=result.state==='unknown';retry=result.state==='unknown';
+        message=result.state==='closed'?'أُقرّ إغلاق الطلب السابق دون إنشاء رموز. لن ينفّذ لاحقًا؛ لم تُعد المحاولة السابقة.':result.state==='committed'?'العملية السابقة ملتزمة بالفعل؛ لم تُنشأ رموز جديدة. راجع الرموز الحالية لاستعادتها.':'إقرار الإغلاق غير مؤكد؛ لا تُعد الإغلاق أو الإنشاء.';
+      }).catch(()=>{if(valid(g,k)){uncertainMutation=true;retry=true;message='إقرار الإغلاق غير مؤكد؛ لا تُعد الإغلاق أو الإنشاء.';}}).finally(()=>{busy=false;mutating=false;if(!disposed){if(key()!==boundKey)invalidate();draw();}});return;
+    }
     if (action === 'refresh') { void refresh(); return; }
     if(retry)return;
     if (!roster) return;

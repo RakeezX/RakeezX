@@ -11,7 +11,7 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-TRIAL-CLEANUP-REPAIR",
+      "liveAuthorizationRef": "PO-20261024-QUALIFIED-CURRENT-SINGLE-PUSH-FOLLOWUP",
       "budgetMinutes": 40,
       "idleMinutes": 10,
       "allowedPaths": [
@@ -36,7 +36,11 @@
         "src/store.js",
         "src/lib/sync-v2.js",
         "src/lib/cloud.js",
-        "src/views/items.js"
+        "src/views/items.js",
+        "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+        "tests/n44-current-closed-page-followup-20261024/**",
+        "docs/automation-evidence/20261024/N44_RECOVERED_CURRENT_CLOSED_PAGE_OUTCOME.md",
+        "src/app.js"
       ],
       "verificationPaths": [
         "src/lib/notification-push-runtime.js",
@@ -45,7 +49,8 @@
         "src/store.js",
         "src/lib/sync-v2.js",
         "src/lib/cloud.js",
-        "src/views/items.js"
+        "src/views/items.js",
+        "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql"
       ],
       "preparationAuthority": {
         "kind": "scoped_preview_and_fixture_ops",
@@ -74,7 +79,7 @@
         "authorityStartsAt": "2026-10-24T02:14:27.943Z",
         "authorityExpiresAt": "2026-10-24T04:14:27.944Z",
         "productId": "N44",
-        "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-TRIAL-CLEANUP-REPAIR",
+        "liveAuthorizationRef": "PO-20261024-QUALIFIED-CURRENT-SINGLE-PUSH-FOLLOWUP",
         "namedOperations": [
           "reconcile original one-device attempt and cleanup",
           "qualify exact changed two-hour hard stop preserving consumed budget",
@@ -445,6 +450,50 @@
           "optins": 0,
           "sends": 0,
           "oldOwnerOperations": 0
+        },
+        "recoveredCurrentClosedPageOutcome": {
+          "evidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-trial-sync-recovered.json",
+          "trialPermission": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-trial-sync-red.json",
+          "maxCurrentOwnerMetadataQueries": 1,
+          "priorRegistrationCountRequired": 3,
+          "allPriorRegistrationsMustBeRevoked": true,
+          "maxAdditionalActualRegistrations": 1,
+          "maxActualRegistrationsLifetime": 4,
+          "maxAdditionalOptinAttempts": 1,
+          "maxFreshDueSourceGroups": 1,
+          "maxTotalProviderSendAttemptsAcrossAllOwnersAndCards": 1,
+          "maxFreshSourceCleanupIntents": 1,
+          "maxSameIntentCleanupSyncDispatches": 1,
+          "newNativeUploads": 0,
+          "newSourcePins": 0,
+          "newMigrations": 0,
+          "newAccounts": 0,
+          "gradesOrStudentWrites": 0,
+          "maxIntervalMs": 7200000,
+          "closedPagePreflightBeforeAnyReservation": true,
+          "previousCountersAndOldUnknownImmutable": true
+        },
+        "qualifiedFreshCurrentFollowupWindow": {
+          "version": 1,
+          "priorExpiredAt": "2026-10-24T15:49:15.430Z",
+          "currentCleanupCommitted": true,
+          "closedPageRehearsalQualified": true,
+          "originalCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+          "maxFreshNativeWindowPromotions": 1,
+          "maxSourcePinUpdates": 1,
+          "maxGenuineFreshScopePolicyAdmissions": 1,
+          "maxIntervalMs": 7200000,
+          "maxActualRegistrationsLifetime": 4,
+          "maxAdditionalRegistrations": 1,
+          "maxAdditionalOptinAttempts": 1,
+          "maxFreshDueSourceGroups": 1,
+          "maxTotalProviderSendsAcrossAllScopes": 1,
+          "priorActualSendsMustBeZero": true,
+          "oldPoliciesAdmissionsPermitsAndCountersImmutable": true,
+          "allPreparationsAndLeasesBeforeWindowMint": true,
+          "newMigrations": 0,
+          "authRlsSqlRoleChanges": 0,
+          "oldOwnerMutations": 0
         }
       },
       "releaseAuthority": "Latest direct PO full outcome delegation authorizes necessary qualified affected notification frontend delivery through the sole publisher and named original-custodian service prerequisites. No general delivery/cron activation, old-disposal replay, tool denial bypass or consumed budget reset.",
@@ -455,9 +504,11 @@
         "continuous-n44-register503-existing-service-repair-20261019",
         "continuous-n44-deliver-qualified-optin-ui-20261024",
         "continuous-n44-confirmed-command-ack-projection-20261024",
-        "continuous-n88-issuance-phase-public-dependency-20261024"
+        "continuous-n88-issuance-phase-public-dependency-20261024",
+        "continuous-n88-terminal-fence-public-dependency-20261024",
+        "continuous-n44-lifecycle-source-hook-public-dependency-20261024"
       ],
-      "objective": "FINISH PROVEN CURRENT SOURCE CLEANUP DEFECT, not another registration/expiry/send attempt. Resume exact original session/worktree b2e411d585d21f19b38af4a1ad2fd98152e746cc/c074ed6b-4399-467c-9034-0c13edd5e088. All three lifetime actual registrations are revoked, last source parent/subitem SyncACK and registration succeeded; no provider send happened. Current expiry native/pin/policy/source/optin allocations CONSUMED, DO NOT replay or replenish. Last native source13f5d81b60a6d1ff687bccb72e1561a0e6758d15 is legitimate N44 successor; preserve every N88 pin and all47keys, approvalnull/deliveryoff/scheduleroff. Global send0 remains unspent but this phase permits ZERO sends/optins/registrations/native/pins. Other unqualified document remains untouched; root requested precise normal-vs-Incognito information, not permission. Do not navigate/blank it, invent profile identity or use another browser surface. Existing normal user tab left unmarked/ended now frees original control per documented lifecycle. Release shared leases except actual phases.\n\nMATERIAL SOURCE CAUSE: artifacts/ops-supervisor-v4/intake-evidence/po-20261024-n44-subitem-cleanup-source-cause.json. Actual current cleanup403/42501 repeated independently of old owner. Source deleteItem->lifecycle:delete_item->N77wrapper->0015 updates scores/items without atomic score-domain context or child/completion tombstones. N94 guard explicitly rejects ANY update of a subitems parent without that context, including deleted_at. RPC authenticated EXECUTE metadata never disproves internal trigger42501. This is a concrete source conflict, not automatic proof hosted definitions match. No existing current completion/configuration/copy/whole-teaching RPC safely deletes only this parent; don't convert mode, copy distributions or delete a teaching to evade it.\n\nFirst qualify narrow RED/GREEN using actual original migration chain and existing stopped-checkpoint-safe PG harness (no new tool/SDK/benchmark). Source parent subitems+one child, no students or scores must reproduce exact42501 with zero changes/receipt. Then implement smallest ADDITIVE function-only migration supabase/migrations/20261024150000_n44_atomic_item_cleanup.sql; never edit an applied migration or relax trigger/Auth/RLS/grants. Correct delete_item lifecycle transaction must derive auth owner, preserve original lifecycle and score-parent lock order, immutable mutation/content idempotency, owner-only scope and whole parent/subitems/completions/scores atomic tombstones/revision/history, actual commit/receipt. SET internal flag alone is NOT sufficient. No physical delete/restore/revive or changed scoring rules. Existing legacy delete_item has NO expectedRevision/CAS; never claim it does or pretend client timestamp is CAS. If additional expected-scope/revision guard is required, make explicit typed contract/affected client wiring with proper legacy refusal, not silently broadened delete. Preserve current leases/cancellation/owner guards and pending/outbox data. Fix local-delete UI wording only as needed to distinguish local absence from cloud ACK; no unrelated Auth403 or broad UI work.\n\nAffected qualification: synthetic children/score/completion tombstones, foreign owner, exact mutation replay/content collision, concurrent configuration lock behavior, before-ACK rollback and lost COMMIT ACK uncertainty; unchanged sender/crypto/native proofs reused. Stop owned PG, prove PID/birth/port inactive, retain short-path checkpoint outside delivery. Never repeat old denied recursive cleanup.\n\nService gate under user's full necessary completion authority and original contract: at mostONE original-custodian exact hosted identity read of ONLY lifecycle function chain and two score guards OR use safely captured finite error family already preserved. No generic catalog/readiness/EXECUTE requery, lost-response-body reread, live deletion probe, protected custody export or typedSQL guard expansion. Use only existing permitted original service/provider owner channel; follow Supabase skill when applicable. If no supported channel, preserve that exact limitation and finish reviewable qualified source; no new diagnostic-native/carrier workaround.\n\nOnly if exact hosted source conflict/parity and local red/green qualify, the specifically authorized original service custodian may apply this ONE reviewed ADDITIVE FUNCTION-ONLY migration via original provider delivery path and verify exact definition/version. This authorization follows PO full necessary repair delegation for current trial cleanup; do not invent a separate PO quote or claim already applied. Zero Auth/RLS/grant/role/table-schema changes, no old migration rerun, no direct data SQL. If identity/affected qualification fails, no application. Generic frontend publisher cannot perform this step. Current public/client delta still goes through sole publisher and actual served proof, never direct main/Pages push. Do not merge unrelated private worktree history; qualify exact current-main delivery delta or identify a necessary source-only child for sole publisher.\n\nActual current UNKNOWN cleanup remains UNKNOWN until existing authoritative reconciliation. At mostONE current-owner read-only reconciliation using existing exact operation identity, saved source scope and canonical receipt. This is not old-owner source2/3 cleanup. If already committed, record true ACK and do not repeat. A fresh corrected current cleanup intent is permitted at mostONCE ONLY after authoritative prior NoEffect, matching current own source/zero unintended scores, actually served fixed contract and canonical supported normal UI/Sync; never blind replay old unknown command, clear hints or auto-release blocked outbox. If NoEffect can't be proved, keep the current cleanup UNKNOWN and don't mutate it. Retain all old owner unknowns and previous FAIL/NOT_RUN. No extra source creation or restoring deleted source.\n\nReturn exact qualified source/service/delivery and actual cleanup result. N44 OS arrival still NOT_PROVEN and no further registration allocation exists in this phase. Whole notification feature remains OPEN. N88 original may concurrently work disjoint core files; serialize shared integration/live/config through existing leases; do not edit its files/certificate or take its active browser tab. Don't stop at local tests when a specifically authorized supported next service/delivery action is ready.",
+      "objective": "COMPLETE THE ALREADY AUTHORIZED ONE ADDITIONAL ACTUAL N44 CLOSED-PAGE TEST, not another local qualification or routine PM handoff. Original saved candidate 5d200245de5ab01f5d5856aa318a755b1fb662a8; lifecycle/source-hook public dependency continuous-n44-lifecycle-source-hook-public-dependency-20261024 is ACTUALLY delivered and verified at 2026-10-24T20:10:01.668Z. Read its exact deliveryReceipt/published source proof and compare the three qualified source hashes to tests/n44-current-closed-page-followup-20261024/lifecycle-combined-public-manifest.json. Actual local qualification is finished: fourteen real full-App lifecycle cases, seven normal source-hook cases, real worker original/new registration fence; reuse unchanged evidence, do not re-run the matrix/native13/readiness pair. First-send cause remains unknown, first send UNCERTAIN, all four old registrations revoked. Do not claim second send occurred during preparation.\n\nN88 causal native121/dff104b1816444bd4f5fa04b7c6ec4c6a5a7aa9bd7b41c8ebb83484ae73c232b is already served. PO ACTUALLY created five normal current-trial credentials:5active/created5/existing0/failed0; acceptance issuance CONSUMED. No N88 issuance/review/closure/rotation by this worker. Root has now RECEIVED the actual student RETURN read SUCCESS2xx4750ms. Its evidence and UX complaint are preserved in intake-evidence/po-20261024-n88-actual-return-and-stable-view-request.json. That finite human test is finished; it is no longer a closed-page test dependency. N88 original may perform independent local-only UX work while your live phase owns normal profile/service. Save same original URLs/IDs and restore after the already-authorized temporary closure; do not erase session/codes/data. Do not touch incognito Madrasati/teacher data.\n\nLoad the ACTUALLY served new public code once through original permitted current-target setup, with SW upgrades finished BEFORE opt-in/scope. Reinitialize SAME documented passive observer in this actual live runtime and require first successful native scan BEFORE fresh consent/registration/scope. Previous native scan success in a different process is not live readiness. If unavailable, finish preparation and return precise human observation readiness need, without sending. No alternate OS technique, fake notification, unauthorized tab access or denial bypass. Root will ask the user to be watching, not another permission question.\n\nAfter readiness, use original qualified second-test capability and exact new append-only server-trusted allowance. One new normal UI consent/new ID/ACK5 at most, one fresh canonical source, one new sender request, zero target documents; then actual OS proof and complete cleanup/disarm/new independent certificate. No ordinary retry/second additional send. No optional region pin change, new SQL/Auth/schema or unchanged service upload. One native/pin transition only if actually required for this already-qualified second-test capability; preserve N88 component and all47 exact expected values. Finish each authorized necessary next step until actual outcome or precise external blocker.\n\nNEW DIRECT HUMAN AUTHORIZATION: exact userreply \"ما شفت جرب مره ثانية.\" recordedartifacts/ops-supervisor-v4/intake-evidence/po-20261024-one-additional-n44-test-after-unseen.json, SHA2564fcaaa0de1c60e2ae2071f989203c8c160e5b68a260f3e00a575a643aa61288a. Prepare and complete ONE additional controlled current-trial N44 test. This supersedes the prior single-test ceiling ONLY by one NEWdistinct test, not a replay/reset of oldrequest/event/ledger. FirstHTTP200/applicationuncertain and native_api_unavailable remainuncertain; usernotseeing doesNOTprovefirstNoDelivery. Count firstpossibleattempt1 + NEWmax1 =>combined targeted senderrequests<=2, never3. CurrentactualACKs4/allrevoked aftercleanup; newtest may require exactlyONE newnormalUIconsent+newregistrationID/actualACK<=5, no revivaloldID. No bulk/cron/newaccounts/grade/studentdata writes. Fullnecessarycompletion authority alreadyprovided; no new permissionquestion.\n\nREUSE currentcausalregistrationfix/source1b459a1110d351f4c5cb92ac5c81eb6cf2c42fe9, 20realPGactualbackendproofs and actualregisteredACK4. Prior disabled/fourthattempt/fifthcausalattempt markers consumed and immutable. Firstsourcegroup cleanup canonicalACK, consentfalse/currentregistrationretired/unsub/workerabsent/prefs+5items100points/tabsrestored, approvalnull/deliveryoff/all47 expected. HistoricaloldownerUNKNOWNs separate. Read only saved6a result/refusal/registration/source/projected-event/send/observer/currentfinalcertificate, not allarchive or successfulsuites.\n\nPREPARE FIRST, SEND LAST: inspect the original firstsend protectedreceipt/journal through existing readonly custody if supported, atmostONE exact targeted metadata read, outputONLYfixed stage/provider-status-class/counter/receipt-proof enums. No originalrequest/sourceupsert/response-body-read(-32000) replay, rawmessages/SQL/rows/headers/keys/cookies/DSN or newdiagnostic endpoint. Firstuncertainty neednotbe falselyresolved toperform expresslyauthorizedDISTINCTsecondtest; retainit and ensurefirstwillnotautoretry.\n\nFix ACTUAL normalSync hook failure before newtest: firstnormalhook tried RETIREDlocal subitemHTTP400 andblockednewsource; separatefreshprojection503 was uncertain, but exactreadonlyauthorizer laterpositivelyprovedcurrentevent andenabledfirstsend. Inspect actual current store/runtime/gateway source enumeration; filterretired/inactive-parent/source/foreignowner entries using genuine canonical owner/source semantics, preserve tombstones, and coalesce overlapping current-owner source-sync work as appropriate. Never silentlyclaimsuccess for rejectedoldentry, resurrectretiredsource, or automaticallyreplayUNKNOWNupserts. Qualify realapp/store/HTTP hooks with retiredold + validnewchild, ownerchange/cancel, definitivevsUNKNOWN and exactlycurrentcanonicalrevision. Do not use onlydirectgatewaymanual success as proofnormalhookcorrect. Minimal exactpublicsource patch/manifest for original solepublisher; deliver actualserved dependency BEFORE optin/test, avoidmid-testSWupgrade. No newbenchmark or unchanged20PGrerun.\n\nPerformancepreflight: projectprimaryregion confirmedap-south-1/ACTIVE_HEALTHY. N44cloudflareentry and fixedoperatortransport currentlylacktrustedx-region; official regional-invocation docs recommendtesting DB-local execution for DB-heavywork and warn fixedregionlackautomaticfailover. Reuse existing readiness/timing paths, maxONE default +ONE pinned readiness invocation (no account/message/credential action), captureONLYregion enum/source/status/elapsed; no newmeasurementtool or broadproviderlogs. If actualfacts/transportcontract support consistent DB-local placement, qualify exactcarrier/operator headerchange with existing signed-envelope/untrustedheader/replay/disabledguards; not a claimedhistoricalcause or measuredimprovement withoutactualdata. Do not addlatency by genericretry or extendtimeouts. Prepare precisepubliccarrier delta ifneeded.\n\nObservermustbe genuinelyreadyBEFOREspendingNEWsend: inspect/fix original passive ComputerUse/Sky observer initialization and exactsupportedAPI usage in actualexecutioncontext. Newtest may reinitialize SAME documented readonlyAPI under thisnewauthorization; do not retryFIRSTfailedobservation viaanothertechnique or useOSmouse/keyboard/personalnotifications/alternateunapprovedsurface. No fakeOSnotification, no fixture masqueradingdelivery. A metadatafunctionname check alone isn'tnative readiness. If native_api_unavailable persists, finish allpermittedpreparation and return precise readyforHUMANobservation condition; ROOT asks user tobewatchingwhenready, not freshsendpermission. Do notsendsecondtestwithoutqualifiedpassiveobserver OR actualcurrenthuman observationreadiness.\n\nSHAREDphaseorder: N88originalcausalnativepromotion FIRST; yourlocal sourcehook/observer/generation preparation parallel, but no new N44providerconfiguration/native/windowuntil N88produces actualserved causalcomponent/newindependentlyexpected sourcepin and releasesleases. Do not use itsinactivebranch or stale1f iflegitimatelyupdated. Consume actualproducerproof, preserveall47 and N88component; neveradopt observeddrift.\n\nThen bind ONE distinct second-test scope to SAMEcurrentnormal account/workspace/physicaldevice. Preferexistingboundsifviable; if newoperatorwindow necessary, thisNEWexplicituserrequest authorizes a genuinely NEWnamed<=90minute window selectedONLYwhenallprerequisitesready, source-bound genuinefresh3AuthDOMfields<=5min through already-open approvedpage. UserdidNOTspecifytimestamps. Preserve oldwindow/admission/reservation/source receipts/history; no automaticrenewal ofoldscope. MaxONEnewscope admission, maxONE native/pin transition ifactuallyneeded for newexpiry/explicitsecond-send capability; none if existingqualifiedcode supportsit. No source/schema/Auth/RLS/role/grant expansion.\n\nSecondsend budget must be server-trusted and exactnewscope/owner/workspace/device/registration/event/expiry: preserveoriginalspentoneSend marker, append oneexplicitadditionalallowance, NOT resetting/deleting oldnativebudget or globaljournal. Existing envelope/userbody cannotmintallowance. Existingbudgetschema only; if a smallprivate testcapabilitychange isneeded, qualify fullactualnative/backend/PG behavior beforepromotion: oldscope cannotresend; newexplicitoneadditionalscope canconsumeonce; forgedscope/counterreset/expired/mismatchedtarget/concurrency/ACKloss allsafe; totalbothrequests<=2. No more thanONEnewregistrationattempt/freshoptin andONEnewfreshduegroup through normalhandlers/canonicalACK/no gradewrites. NewIDonly, all4priorrevoked, livepolicycheckedatacceptance. No retries ifnewregistrationfails.\n\nAfter positivecurrentregistrationACK/source-eventcanonical/consent/eligibility/observerready and zeroactive targetprofileRakeezdocuments, perform ONEnewtargeted fixedsenderrequest with NEWimmutableattempt/event, notoriginalnonce/id. Noresend or thirdtest whateveroutcome. ActualmatchingOSproof/humanconfirmation needed, providerHTTP200/SWcount alone isn'tdelivery. Finallynormal revoke/consentfalse/unsub/worker-clear/sourcecleanupACK/preferences+sameURLs/IDsrestore/approvalnull deliveryoff scheduleroff/all47/append-onlycounter and NEW independentfinalcertificate always. Keep actualuncertainty if any. Sourcehistoryrecord for causalregistrationfix/clientfix via solepublisher may be prepared, no directmain/deploy. ReturntruthfulBLOCKED for missingparentacceptance; do notLOCAL_READYwithFAIL/NOT_RUN.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -502,7 +553,7 @@
         ],
         "publisherChecks": []
       },
-      "completionMode": "repair_proven_current_subitem_cleanup_contract",
+      "completionMode": "complete_new_named_current_scope_after_expired_window",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
@@ -512,10 +563,88 @@
       },
       "priorObjectiveEvidence": {
         "sourceFile": "scripts/ops-supervisor-v4/n44-one-device-test-20261019.json",
-        "sourceSha256": "b2d207b0cd19de314d804ba8a54129db65c9d087c337cc5b3d59be05ab28d30a",
-        "savedCandidate": "b2e411d585d21f19b38af4a1ad2fd98152e746cc",
-        "savedRunId": "c074ed6b-4399-467c-9034-0c13edd5e088",
+        "sourceSha256": "6f4766f752d4ba231a01ef005a3756ef67c06bab86f89cf920b852d9fd623452",
+        "savedCandidate": "3263e2799011d1f8ccabc3f68d02d04df081015e",
+        "savedRunId": "9482ec9a-df3e-4d6c-8c68-78460cecab3d",
         "failuresAndDenialsImmutable": true
+      },
+      "currentAdmissionRepair": {
+        "version": 1,
+        "mode": "local_qualified_current_source_only",
+        "legacySource": "ccac4ec6cdb2265ed7476c9a289e6f0cac406d45",
+        "qualifiedCurrentSource": "13f5d81b60a6d1ff687bccb72e1561a0e6758d15",
+        "noNewObservationClaim": true,
+        "oldReservationsImmutable": true,
+        "independentN88ConfigurationMustRemainUnchanged": true,
+        "localRepairPhaseProviderOperations": 0,
+        "continuationRequiresGenuineCurrentUserOpenedDashboardObservation": true
+      },
+      "actualN88TeacherHoldRelease": {
+        "evidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-diagnostic-intent-second-closure-requested.json",
+        "kind": "explicit_typed_committed_no_issuance_closure",
+        "acknowledged": true,
+        "secondClosureElapsedMs": 5927,
+        "bothCurrentIntentsClosed": true,
+        "wholeN88Acceptance": false
+      },
+      "currentRegistrationCausalRepairAuthority": {
+        "version": 1,
+        "authorityRef": "po-full-necessary-completion-with-current-trial-accounts",
+        "actualRefusalRunId": "ffac00a9-91f9-4f56-9ec3-1428ab91866a",
+        "actualRefusalRegisteredAck": false,
+        "oldFourthAttemptConsumed": true,
+        "maxNewCausalRuntimePromotions": 1,
+        "maxNewCausalSourcePins": 1,
+        "maxNewRegistrationAttempts": 1,
+        "maxNewActualRegisteredAcks": 1,
+        "maxActualRegisteredAcksLifetime": 4,
+        "actualAcksBefore": 3,
+        "maxTotalProviderSends": 1,
+        "providerSendsBefore": 0,
+        "newExpiryOrWindowMint": false,
+        "hardStop": "2026-10-24T19:29:56.557Z",
+        "noOldMarkerReset": true,
+        "requiresExactGuardPredicateAndActualNativeRedGreen": true
+      },
+      "poAuthorizedAdditionalTest": {
+        "version": 1,
+        "authorityFile": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-one-additional-n44-test-after-unseen.json",
+        "authoritySha256": "4fcaaa0de1c60e2ae2071f989203c8c160e5b68a260f3e00a575a643aa61288a",
+        "exactHumanText": "ما شفت جرب مره ثانية.",
+        "maxAdditionalSenderRequests": 1,
+        "maxCombinedSenderRequests": 2,
+        "firstUncertainPreserved": true,
+        "maxNewRegistrationAttempts": 1,
+        "maxNewActualRegisteredAcks": 1,
+        "maxLifetimeActualRegisteredAcks": 5,
+        "actualAcksBefore": 4,
+        "maxNewFreshSourceGroups": 1,
+        "maxNewNativePromotions": 1,
+        "maxNewSourcePins": 1,
+        "maxNewAdmissions": 1,
+        "maxNewOperatorWindowMs": 5400000,
+        "requiresQualifiedObserverOrCurrentHumanReady": true,
+        "noOldBudgetReset": true,
+        "noOldEventReplay": true,
+        "servicePhaseAfter": "original_N88_causal_native_served_and_released"
+      },
+      "currentSessionLifecycleQualification": {
+        "version": 1,
+        "sourceFinding": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-push-same-session-invalidation-source-finding.json",
+        "scope": "same_verified_auth_session_token_and_metadata_refresh",
+        "maxNewNativeOrLiveOperations": 0,
+        "noCloudAuthModuleChange": true,
+        "onlyConditionalAppStorageListenerPathAdded": true
+      },
+      "servedLifecycleSecondTestResume": {
+        "version": 1,
+        "qualifiedCandidate": "5d200245de5ab01f5d5856aa318a755b1fb662a8",
+        "publicDependencyId": "continuous-n44-lifecycle-source-hook-public-dependency-20261024",
+        "productionVerifiedAt": "2026-10-24T20:10:01.668Z",
+        "priorFirstSendRemainsUncertain": true,
+        "additionalSendAllowance": 1,
+        "actualSecondTestSpent": false,
+        "n88AcceptanceIssuanceConsumed": true
       }
     }
   ]

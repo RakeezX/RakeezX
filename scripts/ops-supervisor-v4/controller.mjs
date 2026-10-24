@@ -222,6 +222,39 @@ export function verifiedSourceOnlyPublication(task, receipt) {
       && servedExactly(evidence?.immutable, file) && servedExactly(evidence?.production, file));
 }
 
+// AI: exact already-applied function source record. This classifies the original
+// successful static delivery; it authorizes no SQL execution or device outcome.
+export function verifiedAppliedFunctionSourceRecord(task, receipt) {
+  const migration = 'supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql';
+  const document = 'docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md';
+  const sqlHash = '99b94b973de1858f916a7cbbebf9b8983736bc862a265d4748c692f2c668e4ec';
+  const authority = task?.preparationAuthority;
+  const exactScope = paths => Array.isArray(paths) && paths.length === 2
+    && new Set(paths).size === 2 && paths.includes(migration) && paths.includes(document);
+  const served = (part, file, expected = null) => part?.passed === true
+    && Array.isArray(part.assets) && part.assets.some(asset => asset.repoPath === file
+      && asset.urlPath === file && asset.statusCode === 200 && asset.verified === true
+      && asset.deleted === false && /^[a-f0-9]{64}$/.test(asset.expectedSha256 ?? '')
+      && (!expected || asset.expectedSha256 === expected)
+      && asset.expectedSha256 === asset.observedSha256);
+  return task?.id === 'continuous-n44-applied-atomic-cleanup-source-record-20261024'
+    && task.productId === 'N44' && task.activationId === 'po-20261012-continuous'
+    && task.executionMode === 'synthetic' && task.liveMutation === false && !task.liveAuthorizationRef
+    && authority?.kind === 'already_applied_qualified_function_source_record'
+    && authority.qualifiedParent === '3263e2799011d1f8ccabc3f68d02d04df081015e'
+    && authority.appliedVersion === '20261024151136' && authority.appliedSqlSha256 === sqlHash
+    && ['providerOperations','sqlExecutions','privateCustodyAccess','browserActions'].every(key => authority[key] === 0)
+    && exactScope(task.allowedPaths) && exactScope(task.verificationPaths)
+    && receipt?.status === 'deployed' && receipt.state === 'DEPLOYED_AWAITING_PO'
+    && receipt.productionDeployed === true && receipt.closed === false && receipt.poPersonallyTested === false
+    && receipt.build?.status === 'passed' && receipt.productSourceChangeObserved === false
+    && Array.isArray(receipt.changedAssets) && receipt.changedAssets.length === 0
+    && Array.isArray(receipt.sourceOnlyPaths) && receipt.sourceOnlyPaths.length === 0
+    && exactScope(receipt.changedPaths)
+    && ['immutable','production'].every(origin => served(receipt.evidence?.[origin], migration, sqlHash)
+      && served(receipt.evidence?.[origin], document));
+}
+
 export function verifiedDeployment(task, receipt, productionUrl = 'https://rakeezx.com') {
   const binding = receipt?.binding, provider = receipt?.provider, proof = receipt?.evidence;
   return receipt?.status === 'deployed' && receipt.taskId === task.id && receipt.ticketId === task.productId
@@ -231,7 +264,8 @@ export function verifiedDeployment(task, receipt, productionUrl = 'https://rakee
     && provider?.headSha === receipt.publishedSha && provider.status === 'completed' && provider.conclusion === 'success'
     && receipt.deploymentId === provider.deploymentId && Boolean(receipt.deploymentId)
     && (receipt.productSourceChangeObserved === true && Array.isArray(receipt.changedAssets) && receipt.changedAssets.length > 0
-      || verifiedSourceOnlyPublication(task, receipt) || verifiedLiveServicePublication(task, receipt))
+      || verifiedSourceOnlyPublication(task, receipt) || verifiedLiveServicePublication(task, receipt)
+      || verifiedAppliedFunctionSourceRecord(task, receipt))
     && proof?.production?.origin === new URL(productionUrl).origin && proof?.immutable?.origin === provider.previewUrl
     && [proof?.immutable, proof?.production].every(part => part?.passed === true && Array.isArray(part.assets) && part.assets.length > 0
       && part.assets.every(asset => asset.verified === true && (asset.deleted || /^[a-f0-9]{64}$/.test(asset.expectedSha256 ?? '')

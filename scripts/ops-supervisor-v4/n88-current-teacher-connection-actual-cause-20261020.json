@@ -12,16 +12,18 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "budgetMinutes": 35,
+      "budgetMinutes": 40,
       "idleMinutes": 10,
       "dependsOn": [
         "continuous-n88-synchronize-reviewed-frontend-delivery-20261020",
         "continuous-n88-projection-reviewed-frontend-delivery-20261020",
         "continuous-n88-deliver-qualified-reconciliation-ui-20261024",
         "continuous-n88-validation-family-public-dependency-20261024",
-        "continuous-n88-issuance-phase-public-dependency-20261024"
+        "continuous-n88-issuance-phase-public-dependency-20261024",
+        "continuous-n88-terminal-fence-public-dependency-20261024",
+        "continuous-n88-mutation-stage-public-dependency-20261024"
       ],
-      "objective": "CONTINUE THE EXACT QUALIFIED CANDIDATE 05621c12db294399eb7ebce2486810f9fee857fc/28043d0e-459a-4da9-ab66-e425201ba225; original session and custody only. Actual compiled native/real PG78 already passed list5->issue5->receipt/list/student claim-entry-return and imported302/ten-class source without optional grade items. REUSE unchanged evidence, no new PG/benchmark/audit/repeated denied cleanup. Hosted failures source5031800ms and issue5037181ms still UNKNOWN cause, no speculative fix.\n\nYour minimal issue-specific finite diagnostic and inactive native429faaa7e08303a9808732a1cd6a357ce84a072b1a2dedf30746f89d11e8a4e4 are qualified; no live allocation was consumed. NEW exact source-only dependency continuous-n88-issuance-phase-public-dependency-20261024 installs only your three one-line public enum deltas on current main via sole publisher. Await actual served publication, not merely child LOCAL_READY. Never publish/deploy these public files yourself. Preserve served Auth403 fix9521, prior validation-family/UNKNOWN/deadline/privacy behavior and all newer main changes. Rebase inactive native ONLY on freshly independently certified actual N44 successor/47-key map through existing original activation gate. Your currentDurableTrialCoreOutcome unused targeted diagnostic native/pin max1 and unused proved causal correction max1 remain exactly unchanged, all previous spent markers retained. No extra upload/read allowance.\n\nN44 owns normalChrome user-tab2005440348. The getTab refusal is REAL; no alternative surface/tool/session clone/forced takeover or browser read via OS APIs. NEW DOCUMENTED OWNER CLEANUP path: canonical cua documentation says original user-created tabs not marked are released from browser-session control and left open when owning turn ends; previous handoff marks clear when owner resumes. N44 continuation must leave routine restored user tabs unmarked at its finish. Wait for positive original-owner end-turn cleanup/release evidence, not merely filesystem lease absence. Only after legitimate reservation resolution may original authorized receipt review proceed. If still denied, stop without alternate route; record exact external ownership block.\n\nONE current saved UNKNOWN review remains unconsumed. No active-code count0/list success alone proves NoCommit; absent durable receipt remains UNKNOWN. Recover existing committed receipt/codes if available. Do not turn newly observed diagnostic label into NoCommit or clear pending request. No new intent unless genuine existing receipt/CAS reconciliation proves no credential effect. Diagnostic intent max1 only after all existing scope gates and NoEffect, separate acceptance intent max1 only after proved diagnostic rollback + actual served causal correction + NoEffect. Never replay original user issue, old28/three tries or other-owner unknowns. If genuine NoCommit cannot be established, no issuance; isolate concrete receipt-contract limitation in existing function and propose/qualify minimal proper recovery without generic SQL, schema, role or bypass. Do not silently weaken uncertainty or invent business success.\n\nContinue original currentDurableTrialCoreOutcome actual valid student entry/return/grade privacy comparison only when valid codes and original browser scope exist; current new normal fake pupils only, existing authorized reversible score/publication bounds unchanged. Incognito source probe/import/reload already consumed and latest manual source5031800ms recorded; NO another unchanged probe. Whole N88 remains OPEN until actual functionality, not diagnostic deployment. Shared live native/config and normal UI mutations serialized with N44; do useful source work without holding shared leases while waiting. Return actual runner result with unchanged FAIL/NOT_RUN/denials retained.",
+      "objective": "IMPLEMENT THE NEW DIRECT PO STABLE STUDENT VIEW REQUIREMENT, preserving ACTUAL hosted service success and exact saved session/candidate. Read finite intake artifacts/ops-supervisor-v4/intake-evidence/po-20261024-n88-causal-actual-five-created.json and po-20261024-n88-actual-return-and-stable-view-request.json. Actual normal trial now has5active credentials/created5/existing0/failed0, and actual student RETURN read succeeded2xx4750ms with total4500/pool750/boundary500/snapshot2000/sync250. Do NOT issue more credentials, repeat closures/reviews/diagnostics or replay any consumed allocation. Teacher issuance and student service read now ACTUALLY work in observed journey; wholeN88 still OPEN for UX/finaljourney/privacy/grades evidence, not an old503 investigation. Native source dff104b1816444bd4f5fa04b7c6ec4c6a5a7aa9bd7b41c8ebb83484ae73c232b/version121 actually served. No rerun of32causalnativePG/18promotionchecks, no reupload alreadydelivered code, no morelogs/regionpair/optionalcarrierpin. Regionpatch deferred, not blocker.\n\nSOURCE-CONFIRMED UX CAUSE: current-main src/views/student-portal-login.js visible() unconditionally clear(false,hidden)+pending()+returnRead on hiding settled student screen; return starts a full GET. User explicitly asks ordinary tab changes retain page/entry form/state and update via manualbutton or a nonshort interval; actual navigation/pageclose differs. Reproduce actual final full student-entry/browser composition RED, then minimal source/UI correction. Keep settled current same-document view, DOM details/scroll and unsubmitted login form on shortordinaryhide/return, no extraGET/remount/focusjump on every visibility/focus/pageshow duplicate. Maintain original initial authoritative read, explicit manualrefresh and atmostone bounded quiet revalidation when genuinely stale. Prefer a clear central freshness interval around5minutes only if consistent with verified session expiry/identity model; do not silently invent a long valid authorization or extend session. Distinguish background data refresh from destroying the displayed screen; coalesce manual/periodic/return triggers and never overlap/replay claim/end. Explain precise policy and its actual privacy limits.\n\nInspect original privacy/context/bindingproof/expiry contracts first. JWT/cookie/storage cannot become a new authorization source. Never inspect HttpOnly cookie or store private projection in localStorage/sessionStorage/IndexedDB/SW/browser cache. Same-document memory only; immediate purge on known owner/student/session/binding change, logout, end-pending/uncertain, expiry, real pagehide/dispose/navigation, service denial/revocation/invalidACK. Keep server-authoritative revocation/owner/membership guards and denial behavior. In-flight claim/end and stale completion fences remain; ordinaryhide must not expose a late reply for another generation/identity. Do not weaken freshness contract just to hide wait, cache grades as permanent truth, swallow deniedread or display oldstudent afternewclaim. If old contract demands hideclear, direct user's newrequest supersedes only ordinarysamepageUX; qualify a bounded memory/quiet refresh design with negative revocation/expiry/identity/error cases rather than removing allguards. No new backendSQL/Auth/RLS/schema/roles/locks/timeouts/sensitiveaccess.\n\nUse existing affected actualApp/browser tests and canonical isolated localhelper policy, fabricateddata only, no fresh benchmark/tool/paidreview. Required new cases: settled shorttabhide/return retains exact DOM/details/scroll and0GET; login draft retained0claim; manualrefresh oneGET; stalewindow onecoalescedquietGET; invalid/expired/revoked/contextchange clears; hidden pending read/claim/end completions cannot revive stale/student data; actualpagehide/dispose clears and pageshowrequires fresh authoritative read; abort/deadline/unknown end no replay; no private persistedcache. Retain all genuine FAIL evidence, do not mirror implementation or waive privacynegativecases. Reuse all unchanged service proofs. Add only exact necessary tests under existing tests/n88-current-terminal-fence-20261024/** and existing outcome doc. Prepare exact-current-main minimal source/asset dependency manifest for original solepublisher. No new startupdependency or unnecessaryCSS/API.\n\nPARALLEL PHASE OWNERSHIP: N44originalmay now be in oneadditionaldevice test. Your local synthetic work is independent; do not access its normal Chrome tab (prior ownership refusal remains), take sharedbrowser/providerlease, publish/upgrade publicSW/source or change service/pins whileN44livephaseactive. Finish localqualification and preparedelivery first, then original sourcehistory/publisher/qualifiedassetcustody path afterN44cleanup/releases. If actual private compiled student assets require one native/carrier/pin transition, prepare exact bundle/source reconciliation and qualify before it; this NEW userUXrelease permits maxONE such necessary existing-custodian transition AFTERN44finalcertificate, preserve all47/N44source+policy and current causal native logic unchanged. No new endpoint/SQL/sessions/accounts or second causal retry change. Public source-only delivery through solepublisher, neverdirectmain/deploy; don't publish wholeprivatebranch. Need actual servedstudentbundle/UI source evidence; local PASS cannot closeUX. Root requests ONE final same-session tabreturn/manualcheck only afteractualservedproof. Continue useful authorized work until actualdelivery or exact externalblocker.\n\nHISTORICAL ALLOCATIONS REMAIN SPENT: both explicit oldintentclosures/diagnosticissue/causalpromotion+pin/terminalpromotion+pin/logdiscovery+aggregate and original acceptanceissuance consumed. No firstrequest replays or newcreation. Five actualcurrentcodes remainactive. N44 firstsendUNCERTAIN, secondtestoneadditional separatelyauthorized, no actionsbythisworker.",
       "allowedPaths": [
         "drafts/n88-student-portal/activation/**",
         "drafts/n88-student-portal/private-error-boundary.mjs",
@@ -39,10 +41,24 @@
         "drafts/n88-student-portal/cloudflare-entry.mjs",
         "drafts/n88-student-portal/web-entry.mjs",
         "src/lib/student-portal-runtime.js",
-        "src/lib/support.js"
+        "src/lib/support.js",
+        "src/lib/student-portal-class-client.js",
+        "src/views/student-portal-class.js",
+        "tests/n88-current-terminal-fence-20261024/**",
+        "docs/automation-evidence/20261024/N88_CURRENT_TERMINAL_FENCE_OUTCOME.md",
+        "src/views/student-portal-login.js",
+        "src/lib/student-portal-unified-client.js"
       ],
       "verificationPaths": [
-        "src/lib/student-portal-runtime.js"
+        "src/lib/student-portal-runtime.js",
+        "drafts/n88-student-portal/class-credentials.mjs",
+        "drafts/n88-student-portal/receipt-reconciliation.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/web-entry.mjs",
+        "drafts/n88-student-portal/cloudflare-entry.mjs",
+        "src/lib/student-portal-class-client.js",
+        "src/views/student-portal-class.js",
+        "docs/automation-evidence/20261024/N88_CURRENT_TERMINAL_FENCE_OUTCOME.md"
       ],
       "requiredChecks": [
         "n88_new_actual_failed_phase_specific_cause",
@@ -86,7 +102,7 @@
         "cookieOrCodeExtraction": false,
         "resetConsumedMarkers": false,
         "sharedN44ReleaseRequired": true,
-        "liveAuthorizationRef": "PO-20261024-DURABLE-TRIAL-N88-CORE",
+        "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-UNKNOWN-FENCE",
         "newReadinessObservations": 0,
         "readinessAlreadyConsumed": true,
         "currentIncognitoTrialReconciliation": {
@@ -402,11 +418,31 @@
           "schemaAuthRoleChanges": 0,
           "priorMarkersImmutable": true,
           "oldUnknownNeverReplayed": true
+        },
+        "currentUnknownTerminalFence": {
+          "actualUserEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-n88-manual-receipt-review-reserved.json",
+          "maxNewQualifiedFenceNativeUploads": 1,
+          "maxNewFencePinUpdates": 1,
+          "maxTerminalFenceIntents": 2,
+          "maxFenceIntentsPerExactPendingRequest": 1,
+          "secondIntentOnlyIfSeparatePreviouslyAuthorizedDiagnosticIssuanceBecomesUnknown": true,
+          "maxFenceAckRecoveryReads": 2,
+          "maxFenceAckRecoveryReadsPerIntent": 1,
+          "priorOldReceiptReviewRemaining": 0,
+          "maxOrdinaryReceiptProbeRetries": 0,
+          "scope": "current durable normal trial fourth/1 FIVE fake pupils only; original user batch and if necessary its separately already-authorized later diagnostic batch",
+          "newAccounts": 0,
+          "newStudents": 0,
+          "newItems": 0,
+          "oldOwnerOrImportedRequestOperations": 0,
+          "schemaSqlRoleGrantChanges": 0,
+          "previousAllocationsAndMarkersImmutable": true,
+          "extraGenericDiagnostics": 0
         }
       },
-      "liveAuthorizationRef": "PO-20261024-DURABLE-TRIAL-N88-CORE",
+      "liveAuthorizationRef": "PO-20261024-NECESSARY-CURRENT-UNKNOWN-FENCE",
       "releaseAuthority": "Latest direct PO reviewed diagnostic approval and full completion delegation supersede the old readonly-only procedural release text. Exact named original-custodian service transitions and necessary causal fixes are authorized; Product Git main/frontend publication remains solely with the publisher. Privacy, owner, typed SQL, COMMIT and all consumed operation histories remain binding.",
-      "completionMode": "finish_current_durable_trial_source_and_issuance_outcomes",
+      "completionMode": "implement_exact_current_unknown_terminal_fence",
       "captureFrontendPrerequisite": {
         "taskId": "continuous-n88-failure-capture-client-delivery-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n88-failure-capture-client-delivery-20261024.json",
@@ -425,10 +461,79 @@
       },
       "priorObjectiveEvidence": {
         "sourceFile": "scripts/ops-supervisor-v4/n88-current-teacher-connection-actual-cause-20261020.json",
-        "sourceSha256": "6533719129f67b5d95cafd860651324ade87831e268729d13c2db332c68c1d0c",
-        "savedCandidate": "05621c12db294399eb7ebce2486810f9fee857fc",
-        "savedRunId": "28043d0e-459a-4da9-ab66-e425201ba225",
+        "sourceSha256": "4a4a2ea2d3a37124aa4dda05a84b0037bf7d2ef1e95045a224bc2748721b3baa",
+        "savedCandidate": "9e0248f239433e2330d6752f8e7b6bf998324947",
+        "savedRunId": "873699e5-b89d-449b-a001-dc0cdbf36e32",
         "failuresAndDenialsImmutable": true
+      },
+      "currentIndependentPolicyEvidence": {
+        "certificatePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-one-approved-closed-page-push-20261019\\tests\\n44-current-closed-page-followup-20261024\\independent-session-policy-certificate.json",
+        "sha256": "e7150e5b3d122724bf5387ffe9b501c3c6f5a080723133c8313d0b102e2eb298",
+        "taskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "runId": "5c96949b-e552-48fa-aa22-9cef90c4508c",
+        "nativeVersion": 98,
+        "expectedSessionPolicyDigest": "561d054648c8c4be853315c203e01bbd5b9d2937057d164dc0f63f766a0892ed",
+        "publicDependency": "continuous-n88-terminal-fence-public-dependency-20261024",
+        "publishedSha": "367c9d554955bf12556b8a941a693eaeb606ef83",
+        "readOnlyEvidence": true
+      },
+      "latestUserOutcomeEvidence": [
+        "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-terminal-closure-and-auth-dashboard-ready.json",
+        "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-current-after-closure-single-diagnostic-issue.json"
+      ],
+      "finiteCurrentFailureLogObservation": {
+        "kind": "existing_supabase_readonly_logs_analytics",
+        "maxKeyNameDiscoveryCalls": 1,
+        "maxAggregateCalls": 1,
+        "noPolling": true,
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "intervals": [
+          [
+            "2026-10-24T17:18:00Z",
+            "2026-10-24T17:23:00Z"
+          ],
+          [
+            "2026-10-24T17:42:00Z",
+            "2026-10-24T17:47:00Z"
+          ]
+        ],
+        "maxGroups": 20,
+        "noRawLogValues": true,
+        "noApplicationMutation": true,
+        "noBudgetReset": true
+      },
+      "preAdmissionContentionRepair": {
+        "version": 1,
+        "scope": "exact_trusted_canonical_source_55P03_before_any_user_effect",
+        "maxAdditionalInternalTransactions": 1,
+        "requiresConfirmedRollback": true,
+        "oneOriginalAbsoluteDeadline": true,
+        "sourceAndAuthGuardsUnchanged": true,
+        "noOldIntentReplay": true,
+        "noNewDiagnosticBudget": true,
+        "noAdditionalLogCalls": true
+      },
+      "latestIndependentN44Certificate": {
+        "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-one-approved-closed-page-push-20261019\\tests\\n44-current-closed-page-followup-20261024\\causal-current-final-certificate.json",
+        "sha256": "2036d42a450f580345544de6024cb4ca3a157dcd2e2840aaa2530ab35add3134",
+        "runId": "6a501522-53d1-4cc3-b256-bca6bcd95e4b",
+        "source": "1b459a1110d351f4c5cb92ac5c81eb6cf2c42fe9",
+        "nativeVersion": 109,
+        "expectedSessionPolicyDigest": "fc1d81a63409a686e0d349ba330a3e157b60c4729c00e8775d0d8a072992e248",
+        "peerRunComplete": true,
+        "servicePhasePriority": "N88_causal_promotion_before_second_N44_test"
+      },
+      "stableStudentViewAuthority": {
+        "version": 1,
+        "evidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261024-n88-actual-return-and-stable-view-request.json",
+        "actualCreationSucceeded": true,
+        "actualReturnReadSucceeded": true,
+        "additionalIssuances": 0,
+        "additionalDiagnosticReads": 0,
+        "ordinaryTabHideDistinctFromPageClose": true,
+        "privatePersistentCache": false,
+        "maxConditionalStudentAssetTransitions": 1,
+        "afterN44FinalCertificate": true
       }
     }
   ]
