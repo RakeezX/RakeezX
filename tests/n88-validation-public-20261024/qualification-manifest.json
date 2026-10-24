@@ -1,0 +1,71 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n88-validation-family-public-dependency-20261024",
+  "runId": "4b319ebd-0fa4-45c9-964e-1c8439e82d9b",
+  "baseSha": "38d78c7acb51c22b2f845a0a3ce2deb7cecfae15",
+  "parentCandidate": "f3eaef6dc3e268bb91de98c3b99e4df4714ccfe3",
+  "deltaBase": "bca2ab8a86eda286f6b26c7de93b7117812a7eb3",
+  "status": "SOURCECURRENT PASS",
+  "sources": {
+    "drafts/n88-student-portal/cloudflare-entry.mjs": {
+      "normalizedSourceSha256": "e16a7bde02be3167480ff3426038f4482e27e8d399fcf8499eda6525fc1094f1",
+      "servedProof": "NOT_RUN; sole publisher must bind deployed artifact and served bytes to this source"
+    },
+    "src/lib/student-portal-runtime.js": {
+      "normalizedSourceSha256": "b22aaa138948ff6ab619364391715c8f9a8dbc1cbdac165e76736d5790f7d80e",
+      "servedProof": "NOT_RUN; sole publisher must bind deployed artifact and served bytes to this source"
+    },
+    "src/lib/support.js": {
+      "normalizedSourceSha256": "5f10cfb1bd1e2c279258bf1a27090a12e091badea56aac8ac663311d734497cf",
+      "servedProof": "NOT_RUN; sole publisher must bind deployed artifact and served bytes to this source"
+    }
+  },
+  "protectedPathsUnchanged": [
+    "drafts/n88-student-portal/postgres-repository.mjs",
+    "drafts/n88-student-portal/integrated-service.mjs",
+    "drafts/n88-student-portal/web-entry.mjs",
+    "src/lib/student-portal-class-client.js",
+    "sw.js"
+  ],
+  "newStartupDependency": false,
+  "qualification": {
+    "tests/n88-five-correlation-20261024/validation-family-local.json": {
+      "sha256": "d2c0137b25cc02785519b6c639c9c20e723c78fe4d8f1419181bfdfbc5e10dd5",
+      "disposition": "REUSED immutable parent evidence; no native rerun or new live proof"
+    },
+    "tests/n88-five-correlation-20261024/validation-family-ui.json": {
+      "sha256": "fc7309435bb6450cd0a2af6082e48f3a8308575d678073f9d18e2b11bb0e9b49",
+      "disposition": "REUSED immutable parent evidence; no native rerun or new live proof"
+    },
+    "tests/n88-five-correlation-20261024/foreign-owner-only.json": {
+      "sha256": "1d0baf995405acc7bff7944d1fde0d1465b0789fb8d9e819c1cdaa1b591b331c",
+      "disposition": "REUSED immutable parent evidence; no native rerun or new live proof"
+    },
+    "drafts/n88-student-portal/activation/validation-family-20261024/qualification-manifest.json": {
+      "sha256": "db7bb7194245b05d2bcd158dba70a23390a2d876ae22f468103a75f2fcac3403",
+      "disposition": "Original retained unchanged"
+    },
+    "drafts/n88-student-portal/activation/validation-family-20261024/delta-manifest.json": {
+      "sha256": "ce6d105c4bfcb95c9c94c22f0068f41e1c2f477fa279a223cb47ef1bf34a484b",
+      "disposition": "Original retained unchanged"
+    },
+    "drafts/n88-student-portal/activation/validation-family-20261024/candidate-binding.json": {
+      "sha256": "97792d498eca0c193784724135080ef9ef6fa938c009be0d7f24f12bddce73d4",
+      "disposition": "Original retained unchanged"
+    },
+    "tests/n88-five-correlation-20261024/validation-family-harness-failures.json": {
+      "sha256": "5d5d32ebd5e1753e43d6873e2fe4ce4c1fef5fc89b944b94a20b65bad5addf67",
+      "disposition": "Original retained unchanged"
+    }
+  },
+  "nativeQualifiedArtifactSha256": "23ee1cb88197c5a3f34b88c7dd203d4f24c98c7894952439f52d1bf39033134e",
+  "parentDisposition": {
+    "state": "BLOCKED",
+    "hostedFamily": "UNKNOWN",
+    "nativeSuccessor": "NOT_VERIFIED",
+    "publicServedDependency": "NOT_VERIFIED",
+    "historicalCleanupDenial": "Immutable; no old fixture access/cleanup or reinterpretation of parent FAIL"
+  },
+  "localReportSha256": "df1667c31a24e3a8d93c71efbd548c24a99aa654b4a78227aa2f3bfe4f3da589",
+  "providerOperations": 0
+}
