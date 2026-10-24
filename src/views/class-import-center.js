@@ -177,7 +177,7 @@ export async function prepareExtensionBatch({resume=false}={}){
  if(prior?.pending)throw Error('BATCH_PENDING');
  const id=[...crypto.getRandomValues(new Uint8Array(32))].map(n=>n.toString(16).padStart(2,'0')).join('');
  receiverReason='READY';
- automaticBatch={id,binding,assertSession:captureReceiverSession(cloud),explicit:!resume,year:store.activeYear().id,term:store.activeTerm().id,yearState:JSON.stringify(store.getYear(store.activeYear().id)),termState:JSON.stringify(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000,document,retired:false};
+ automaticBatch={id,binding,assertSession:captureReceiverSession(cloud),explicit:!resume,year:store.activeYear().id,term:store.activeTerm().id,yearState:batchRecordProof(store.getYear(store.activeYear().id)),termState:batchRecordProof(store.getTerm(store.activeTerm().id)),expires:Date.now()+1800000,document,retired:false};
  const batch=automaticBatch;
  try{await qualifyExtensionSelection(batch);automaticGuard(batch);batch.qualified=true;}catch(error){if(automaticBatch===batch)automaticBatch=null;throw error;}
  return id;
@@ -286,8 +286,8 @@ async function preservePendingForFreshSource(){
  try{
   offer.assertCurrent();store.assertClassImportAccess();
   const binding=extensionOwnerBinding(),assertSession=captureReceiverSession(cloud),owner=store.getActiveWorkspace().authUserId;
-  const year=JSON.stringify(store.getYear(store.activeYear().id)),term=JSON.stringify(store.getTerm(store.activeTerm().id));
-  const guard=current=>{offer.assertCurrent();assertSession();store.assertClassImportAccess();if(extensionOwnerBinding()!==binding||JSON.stringify(store.getYear(store.activeYear().id))!==year||JSON.stringify(store.getTerm(store.activeTerm().id))!==term)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');if(current){persistedSelection({year:offer.yearId,term:offer.termId},current);if(JSON.stringify(current.years.find(y=>y.id===offer.yearId))!==year||JSON.stringify(current.terms.find(t=>t.id===offer.termId))!==term)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');}};
+  const year=batchRecordProof(store.getYear(store.activeYear().id)),term=batchRecordProof(store.getTerm(store.activeTerm().id));
+  const guard=current=>{offer.assertCurrent();assertSession();store.assertClassImportAccess();if(extensionOwnerBinding()!==binding||batchRecordProof(store.getYear(store.activeYear().id))!==year||batchRecordProof(store.getTerm(store.activeTerm().id))!==term)throw Error('BATCH_OWNER_OR_SESSION_CHANGED');if(current){persistedSelection({year:offer.yearId,term:offer.termId},current);if(batchRecordProof(current.years.find(y=>y.id===offer.yearId))!==year||batchRecordProof(current.terms.find(t=>t.id===offer.termId))!==term)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');}};
   const current=await readExtensionState(['device','years','terms']);guard(current);
   const device=current.device.find(d=>d.id==='device'),prior=device?.n36NamesBatch,history=device?.n36NamesBatchHistory??[];
   if(prior?.ownerId!==owner||JSON.stringify(prior)!==offer.trace)throw Error('BATCH_HISTORY_CHANGED');
@@ -328,7 +328,20 @@ async function readExtensionProgressResult(){
   historyRows=await retainedHistorySummary(current.device.find(d=>d.id==='device')?.n36NamesBatchHistory??[],owner);assertCurrent();
   if(!p||p.ownerId!==owner)return result({checkpoint:'none',relation:'unresolved',confirmedRows:0,confirmedReceipts:0,pendingRows:0,pendingSavedRows:0},'no-eligible-trace');
   const {previewStudentRows}=await import('../lib/student-import.js');assertSession();if(!receiverDocumentLive||extensionOwnerBinding()!==binding)throw Error('OWNER');
-  const owned=(name,row)=>row.ownerId===owner||row.ownerId==null&&row.syncCreatePending&&current.outbox.some(e=>e.ownerId===owner&&e.store===name&&e.recordId===row.id&&e.op==='create'&&({students:['name'],enrollments:['studentId','sectionId','status'],sections:['yearId','grade','label']}[name]??[]).every(k=>JSON.stringify(e.localPatch?.[k])===JSON.stringify(row[k])));
+  // Same bound account DB: an ACK removes the owner-bound create command.
+  // Readback may also qualify its durable, same-identity canonical snapshot;
+  // this grants counts only, never a receipt, replay or write authorization.
+  const owned=(name,row)=>{
+   if(row.ownerId!=null)return row.ownerId===owner;
+   const fields={students:['name','status'],enrollments:['studentId','sectionId','status'],sections:['yearId','grade','label','name','status']}[name];
+   if(!fields)return false;
+   if(row.syncCreatePending)return current.outbox.some(e=>e.ownerId===owner&&e.store===name&&e.recordId===row.id&&e.op==='create'&&fields.every(k=>JSON.stringify(e.localPatch?.[k])===JSON.stringify(row[k])));
+   const canonical=row.serverCanonical;
+   return current.device.find(d=>d.id==='device')?.accountProvisioningReceipt?.ownerId===owner&&
+    row.canonicalId===row.id&&canonical?.id===row.id&&canonical.canonicalId===row.id&&
+    Number.isSafeInteger(row.serverRevision)&&row.serverRevision>0&&canonical.serverRevision===row.serverRevision&&
+    !row.deleted&&!canonical.deleted&&fields.every(k=>JSON.stringify(canonical[k])===JSON.stringify(row[k]));
+  };
   let pendingRows=0,pendingSavedRows=0;
   if(!/^[a-f0-9]{64}$/.test(p.batchId))throw Error('BATCH');
   for(const [digest,pending] of Object.entries(p.pending??{})){
@@ -404,7 +417,15 @@ function automaticGuard(batch){
  if(Date.now()>=batch.expires||batch.recoveryTrace&&Date.now()>=batch.recoveryTrace.result.envelope.expiresAt)deny('EXPIRED');
  try{if(extensionOwnerBinding()!==batch.binding)deny('OWNER_OR_LEASE');}catch{deny('OWNER_OR_LEASE');}
  try{batch.assertSession();}catch{deny('AUTH_SESSION');}
- if(store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||JSON.stringify(store.getYear(batch.year))!==batch.yearState||JSON.stringify(store.getTerm(batch.term))!==batch.termState)deny('ACADEMIC_CONTEXT');
+ if(store.activeYear().id!==batch.year||store.activeTerm().id!==batch.term||batchRecordProof(store.getYear(batch.year))!==batch.yearState||batchRecordProof(store.getTerm(batch.term))!==batch.termState)deny('ACADEMIC_CONTEXT');
+}
+// AI: compare Product meaning, including every unknown field and identity. Sync
+// reconciliation changes these bookkeeping fields without editing the target.
+// An identity remap is deliberately NOT equivalent to same-ID acknowledgement.
+function batchRecordProof(row){
+ if(!row)return null;
+ const metadata=new Set(['updatedAt','serverRevision','fieldRevisions','serverCanonical','syncCreatePending']);
+ return JSON.stringify(Object.fromEntries(Object.entries(row).filter(([k,v])=>!metadata.has(k)&&!(k==='canonicalId'&&v===row.id)).sort(([a],[b])=>a.localeCompare(b))));
 }
 const namesRosterProof=rows=>JSON.stringify(rows.map(s=>[s.id,s.name,s.ownerId??null]).sort((a,b)=>a[0].localeCompare(b[0])));
 function durableNamesRoster(current,sectionId){
@@ -424,12 +445,12 @@ function automaticPersistedGuard(batch,current){
  if(trace){if(saved?.pending&&Object.keys(saved.pending).length!==1)throw Error('NAMES_RECEIPT_UNKNOWN');const receipts={...saved?.receipts},targets={...saved?.receiptTargets};delete receipts[trace.digest];delete targets[trace.digest];if(JSON.stringify(receipts)!==trace.receipts||JSON.stringify(targets)!==trace.targets)throw Error('NAMES_RECEIPT_UNKNOWN');}
  if(trace&&(saved?.batchId!==trace.batchId||JSON.stringify(saved.pending?.[trace.digest])!==trace.pending&&!(batch.recoveryOutcome&&JSON.stringify(saved.receipts?.[trace.digest])===JSON.stringify(batch.recoveryOutcome))))throw Error('NAMES_RECEIPT_UNKNOWN');
  if(saved&&(saved.ownerId!==store.getActiveWorkspace().authUserId||saved.pending&&saved.batchId!==batch.id))throw Error('BATCH_OWNER_OR_SESSION_CHANGED');
- if(current.years&&JSON.stringify(current.years.find(y=>y.id===batch.year))!==batch.yearState||
- current.terms&&JSON.stringify(current.terms.find(t=>t.id===batch.term))!==batch.termState)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');
+ if(current.years&&batchRecordProof(current.years.find(y=>y.id===batch.year))!==batch.yearState||
+ current.terms&&batchRecordProof(current.terms.find(t=>t.id===batch.term))!==batch.termState)throw Error('BATCH_PERSISTED_CONTEXT_CHANGED');
  if(current.students&&current.enrollments)for(const [sectionId,proof] of batch.rosterProofs??[]){if(namesRosterProof(durableNamesRoster(current,sectionId))!==proof)throw Error('NAMES_RECEIPT_UNKNOWN');}
  if(current.sections)for(const [classroom,expected] of batch.sectionTargets??[]){
   const found=sourceSection(classroom,{sections:current.sections,device:device??store.state.device,yearId:batch.year}).section;
-  if(!found||JSON.stringify(found)!==JSON.stringify(expected))throw Error('CLASS_CHANGED');
+  if(!found||batchRecordProof(found)!==batchRecordProof(expected))throw Error('CLASS_CHANGED');
  }
 }
 async function batchCheckpoint(batch,change){
@@ -597,6 +618,7 @@ async function saveAutomaticNames(result,recovery=null){
    const section=await ensureSourceSection(batch,classroom);
    if(section.deleted||section.status==='archived'||section.ownerId&&section.ownerId!==store.getActiveWorkspace().authUserId)throw Error('CLASS_OWNER_OR_ARCHIVED');
    const teachings=store.state.teachings.filter(t=>!t.deleted&&t.status!=='archived'&&t.sectionId===section.id&&t.termId===batch.term);
+   const subject=teachings.length?structuredClone(store.getSubject(teachings[0].subjectId)):null;
    const roster=store.sectionRoster(section.id),owner=store.getActiveWorkspace().authUserId;
    if(roster.some(r=>r.ownerId!=null&&r.ownerId!==owner)||store.state.enrollments.some(e=>!e.deleted&&e.sectionId===section.id&&e.ownerId!=null&&e.ownerId!==owner))throw Error('NAMES_OWNER');
    const preview=previewStudentRows(names,0,false,roster);
@@ -609,9 +631,10 @@ async function saveAutomaticNames(result,recovery=null){
     automaticPersistedGuard(batch,await readExtensionState());
     const saved=await store.importStudents(section.id,preview.names,{verifyCurrent(current){
      automaticPersistedGuard(batch,current);
-     if(teachings.length&&JSON.stringify(current.teachings.find(t=>t.id===teachings[0].id))!==JSON.stringify(teachings[0]))throw Error('CLASS_CHANGED');
+     if(teachings.length&&batchRecordProof(current.teachings.find(t=>t.id===teachings[0].id))!==batchRecordProof(teachings[0]))throw Error('CLASS_CHANGED');
+     if(subject&&batchRecordProof(current.subjects.find(s=>s.id===subject.id))!==batchRecordProof(subject))throw Error('CLASS_CHANGED');
      const target=current.sections.find(s=>s.id===section.id);
-     if(JSON.stringify(target)!==JSON.stringify(section))throw Error('CLASS_CHANGED');
+     if(batchRecordProof(target)!==batchRecordProof(section))throw Error('CLASS_CHANGED');
      const ids=new Set(current.enrollments.filter(e=>!e.deleted&&e.status==='active'&&e.sectionId===section.id).map(e=>e.studentId));
      const roster=current.students.filter(s=>!s.deleted&&ids.has(s.id));
      if(roster.some(s=>s.ownerId!=null&&s.ownerId!==owner)||current.enrollments.some(e=>e.sectionId===section.id&&!e.deleted&&e.ownerId!=null&&e.ownerId!==owner))throw Error('NAMES_OWNER');
@@ -704,8 +727,11 @@ async function receiveExtension(directRequest=null) {
   finally { extensionBusy=false;void drainDirectRequests();if(!directRequest&&location.hash===route)history.replaceState(null,'','#/classes/koshoof?import=1');repaint(); }
 }
 function safeBatchFailure(error){
+ // .42's finite wire vocabulary is immutable here. Keep the precise local
+ // transaction boundary while reporting destination drift in its existing category.
+ if(error.message==='CLASS_CHANGED')return {phase:'batch',step:['transaction','readback'].includes(error.phase)?error.phase:'validation',code:'BATCH_PERSISTED_CONTEXT_CHANGED'};
  const codes=['SETUP_PROFILE_CHANGED','SETUP_PROFILE_OWNER','OFFLINE_LEASE_LIMITED','DataError','DataCloneError','QuotaExceededError','AbortError','ConstraintError','CLASS_MAPPING_REQUIRED','CLASS_ARCHIVED_OR_AMBIGUOUS','BATCH_OWNER_OR_SESSION_CHANGED','BATCH_PERSISTED_TERM_CHANGED','BATCH_PERSISTED_CONTEXT_CHANGED'];
- return {phase:error.message==='SETUP_PROFILE_SAVE'?'profile':'batch',step:error.message==='NAMES_RECEIPT_UNKNOWN'?'readback':['transaction','readback'].includes(error.phase)?error.phase:'validation',code:codes.includes(error.code)?error.code:codes.includes(error.message)?error.message:'WRITE_FAILED'};
+ return {phase:error.message==='SETUP_PROFILE_SAVE'?'profile':'batch',step:error.message==='NAMES_RECEIPT_UNKNOWN'?'readback':['transaction','readback'].includes(error.phase)?error.phase:'validation',code:codes.includes(error.code)?error.code:codes.includes(error.message)?error.message:codes.includes(error.name)?error.name:'WRITE_FAILED'};
 }
 function setupBinding(teachingId) {
   store.assertClassOperationsAccess(teachingId);
