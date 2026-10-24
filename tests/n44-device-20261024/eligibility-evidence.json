@@ -1,0 +1,62 @@
+{
+  "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
+  "runId": "c5c31ece-d841-4dbd-802e-5cba29044561",
+  "status": "LOCAL_READY",
+  "source": {
+    "src/lib/notification-push-runtime.js": {
+      "sha256": "e74ab1daeb24e4e73183e7038b607e11e6932bf057fae5b95028705d5bc4105d",
+      "baselineSha256": "c8184096b0768ea1ad08da7afa85a518ef84dbc674cffcd9930a76865ed1b4b9",
+      "qualifiedBlob": "d74d97466157cf081dfe407f1be0595e6f1d6849"
+    },
+    "src/views/notification-settings.js": {
+      "sha256": "ada14e6d8db57ec237bc5b6cfc459f4fae6298a91a0dab8cbb89c733ab906038",
+      "baselineSha256": "c3bc76720bfc92598c89fdd03f9288b4fe8d4adeda314f754ae5a8e8670a9fed",
+      "qualifiedBlob": "3841f20c8e368285c86e46feb47bf25ad1a228dc"
+    }
+  },
+  "checks": [
+    {
+      "name": "n44_ui_refresh_lifecycle_and_guarded_optin",
+      "status": "PASS",
+      "evidence": "Original affected actual-app scenario rerun on current-base dependencies: changed-binding recovery, delegated click, negative configuration/lease/ownership/SW gates."
+    },
+    {
+      "name": "n44_ui_actual_app_dom_styles_and_disposal",
+      "status": "PASS",
+      "evidence": "13 actual app DOM/handler/source-CSS cases PASS over owned loopback HTTP; disposal and no automatic unchanged-failure retry covered; browser/server closed."
+    },
+    {
+      "name": "n44_ui_candidate_scope_and_provenance",
+      "status": "PASS",
+      "evidence": "Exact immutable qualified frontend bytes, full app dependency hashes equal base and observed origin/main, syntax and scoped diff checks PASS."
+    }
+  ],
+  "postPublicationGates": [
+    {
+      "name": "publisher integration and served changed-app verification",
+      "status": "NOT_RUN"
+    },
+    {
+      "name": "current actual device registration",
+      "status": "NOT_RUN"
+    },
+    {
+      "name": "closed-page send",
+      "status": "NOT_RUN"
+    },
+    {
+      "name": "OS arrival",
+      "status": "NOT_RUN"
+    }
+  ],
+  "historicalLimitations": "Original parent actual opt-in failure and all original FAIL/NOT_RUN records remain unchanged at the immutable qualified candidate. Local synthetic qualification does not resolve them or prove N44 acceptance.",
+  "operations": {
+    "provider": 0,
+    "realAccount": 0,
+    "registration": 0,
+    "send": 0,
+    "push": 0,
+    "deploy": 0
+  },
+  "solePublisherRequired": true
+}
