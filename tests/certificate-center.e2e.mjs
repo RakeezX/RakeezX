@@ -33,6 +33,9 @@ async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
 }
 
 test('certificate center downloads a separate named PNG and A4 PDF for every selected student', async ({ page, context, baseURL }, testInfo) => {
+  // Full-size PNG/JPEG idle encoding can take about 6.7s per file in Chromium.
+  // Cover sequential files and two intentionally paused encodes without retries.
+  test.setTimeout(90000);
   const origin = new URL(baseURL).origin;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -293,7 +296,7 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
     page.on('download', collect);
     await button.click();
     // Chromium's native A4 PNG encoder can dispatch its first download after about seven seconds.
-    await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(fixture.names.length);
+    await expect.poll(() => downloads.length, { timeout: 30000 }).toBe(fixture.names.length);
     await expect(button).toBeEnabled();
     page.off('download', collect);
     expect(downloads).toHaveLength(fixture.names.length);
@@ -334,7 +337,7 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
     window.__heldCertificateExports.splice(0).forEach(release => release());
   });
   // Cancellation is applied after the pending native PNG encode returns.
-  await expect(pngButton).toBeEnabled({ timeout: 10000 });
+  await expect(pngButton).toBeEnabled({ timeout: 15000 });
   await expect(exportStatus).toContainText('توقف التجهيز بعد 1 من 3');
   expect(stoppedDownloads).toHaveLength(1);
   page.off('download', collectStopped);
@@ -352,7 +355,7 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
     delete window.__holdCertificateAfter;
     window.__heldCertificateExports.splice(0).forEach(release => release());
   });
-  await expect(print).toBeEnabled();
+  await expect(print).toBeEnabled({ timeout: 15000 });
   await expect(exportStatus).toContainText('توقف التجهيز بعد 0 من 3');
   expect(staleDownloads).toHaveLength(0);
   page.off('download', collectStale);
