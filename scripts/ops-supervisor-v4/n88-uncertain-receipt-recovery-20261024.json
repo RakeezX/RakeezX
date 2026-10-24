@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-uncertain-receipt-recovery-20261024",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5900,
+      "scopeKey": "n88-class-uncertain-receipt-recovery",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "baseSha": "3b6dfe789297c98e4a6ff1b977e098796a633b37",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX/.worktrees/continuous-n88-failure-capture-client-delivery-20261024",
+      "allowedPaths": [
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-runtime.js",
+        "tests/n88-uncertain-recovery-20261024/**",
+        "docs/automation-evidence/20261024/N88_UNCERTAIN_RECEIPT_RECOVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-runtime.js"
+      ],
+      "requiredChecks": [
+        "n88_unknown_remount_reload_cause",
+        "n88_durable_owner_scoped_reconciliation",
+        "n88_no_replay_stale_owner_and_storage_faults"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "Latest direct PO whole-function review and repair plus standing routine delivery authority; only original publisher source delivery, no live provider/account/send/schema operation.",
+      "preparationAuthority": {
+        "kind": "PO-20261024-reviewed-local-function-defects",
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0
+      },
+      "acceptance": [
+        "Actual existing code reproduces each declared source defect before smallest repair, focused affected guards stay intact.",
+        "Original publisher verifies changed served frontend bytes; backend source readiness distinct from hosted native integration and actual acceptance.",
+        "No broad audit/new executor or paidbenchmark, preserve old UNKNOWN/FAIL/custody."
+      ],
+      "objective": "Read latest PO24October whole-function review and artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/FUNCTION_REVIEW_20261024.md plus actual current Product row. Latest new normal account5pupils issuanceUNKNOWN and student503. This is an independently identified SOURCE recovery gap, not hosted503 cause. Current client unknown/guidanceUnknown Map loses requestIDs on runtime remount/reload; list sends reconcile[] and cannot establish pastmutation. FIRST reproduce actual current classclient/runtime remount+reload with canonical isolated loopback browser/fabricatedresponses; preserve old published360353bc UI changes. Fix only durable finite uncertain-command receipt hints using existing account storage conventions, scoped to exact owner/workspace/class and command identity/version. No student names/codes/credentials/guidance bodies/session tokens in hints or diagnostics. Durable reserve before request where necessary; storage failure must not create untrackable mutation or false success. Bounded hint limits/expiry reflect uncertainty rather than pretending resolved. Reconcile via EXISTING typed read contract only, no new serveroperation/genericSQL. No automatic mutation replay or replacement when prior remainsUNKNOWN. Preserve exact same-ID receipt proof, current roster versions, owner/session retirement, stale replies and loadedsettings. Test pending/unknown after remount+reload, authoritative applied/notapplied/currentdata disagreement, blocked storage, malformed/foreignhints, owner/classswitch and list200whilemutationUNKNOWN. Use actual rendered handlers where affected; reuse unchanged relevant privacy/list/count/order evidence. No real browser/account/service/native/provider/grades/codes/publishflags/actions; source-only localrepair and solepublisherdelivery. This code must not overlap capturechild unifiedclient/studententry/bindingproof or originalservice activation. No new startup dependency unless declared offline shell scope first, prefer existing modules. Return runnerJSON and truthful limits: UNKNOWN history not automatically resolved by shippedclient,503wholeN88OPEN.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "3b6dfe789297c98e4a6ff1b977e098796a633b37",
+        "requiredSourcePaths": [
+          "src/lib/student-portal-class-client.js",
+          "src/lib/student-portal-runtime.js",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs"
+        ],
+        "editPaths": [
+          "src/lib/student-portal-class-client.js",
+          "src/lib/student-portal-runtime.js",
+          "tests/n88-uncertain-recovery-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N88_UNCERTAIN_RECEIPT_RECOVERY.md"
+        ],
+        "newPaths": [
+          "tests/n88-uncertain-recovery-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N88_UNCERTAIN_RECEIPT_RECOVERY.md"
+        ],
+        "workerChecks": [
+          "n88_unknown_remount_reload_cause",
+          "n88_durable_owner_scoped_reconciliation",
+          "n88_no_replay_stale_owner_and_storage_faults"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
