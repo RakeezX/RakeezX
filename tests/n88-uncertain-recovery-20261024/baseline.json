@@ -1,0 +1,11 @@
+{
+  "aiAuthored": true,
+  "status": "REPRODUCED",
+  "checks": [
+    "pending request not reserved durably before send; a fresh client reads reconcile[]",
+    "blocked storage does not prevent an untrackable mutation",
+    "guidance unknown retries replay same request ID"
+  ],
+  "sourceBase": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "providerOperations": 0
+}

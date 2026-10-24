@@ -7,6 +7,12 @@ const revision = v => Number.isSafeInteger(v) && v >= 0;
 const rosterRevision = v => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v);
 const exact = (v, keys) => v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === keys.length && keys.every(k => Object.hasOwn(v, k));
 const deny = code => { const e = new Error(code); e.code = code; throw e; };
+// AI: local receipt hints are never authorization or mutation payloads. Expiry
+// retires automatic receipt lookup, never resolves an uncertain command.
+const HINT_PREFIX='rakeezx-n88-uncertain-v1:', HINT_LIMIT=8, HINT_BYTES=8192, HINT_AGE=30*86400000;
+const hintActions=['issue-missing','rotate','revoke','visibility','guidance-save'];
+const unknownReceipt=()=>({state:'unknown',created:0,skipped:0,failed:0});
+const commandId=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{16,100}$/.test(v);
 export function classContextKey(context) {
   if (context?.enabled !== true || !bindingKeys.every(k => id(context[k])) || !Number.isFinite(context.validUntil) || context.validUntil <= Date.now()) return null;
   return JSON.stringify(bindingKeys.map(k => context[k]));
@@ -19,22 +25,61 @@ function validStudent(s) {
 }
 // Finite same-origin carrier attestation only; never preserve arbitrary header text.
 export const classListRegion = value => ['ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','us-east-1','us-west-1','us-west-2','eu-central-1','eu-central-2','eu-west-1','eu-west-2','eu-west-3','sa-east-1'].includes(value) ? value : 'unknown';
-export function createClassPortalClient({ request, getContext = () => null, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000), onListDiagnostic = () => {}, onMutationDiagnostic = () => {} } = {}) {
+export function createClassPortalClient({ request, getContext = () => null, getReceiptScope = () => '', storage, timeoutMs = 15000, readTimeoutMs = Math.min(timeoutMs,10000), onListDiagnostic = () => {}, onMutationDiagnostic = () => {} } = {}) {
   if (request !== undefined && typeof request !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000 || !Number.isInteger(readTimeoutMs) || readTimeoutMs < 1 || readTimeoutMs > 30000) deny('invalid_configuration');
   let roster = null, rosterKey = null, pending = null, readSequence = 0;
   const readContext = () => { try { return getContext(); } catch { return null; } };
   const consumed = new Set();
-  // Keep bounded uncertain identities for read-only receipt reconciliation.
-  // New commands always use a fresh identity; never replay an uncertain intent.
-  const unknown = new Map(), guidanceUnknown = new Map();
-  const intentKey=(c,action,body)=>JSON.stringify([c.key,action,Object.entries(body).filter(([k])=>!['requestId','expectedRosterRevision'].includes(k)).sort(([a],[b])=>a.localeCompare(b))]);
+  const localStorage=()=>storage??globalThis.localStorage;
+  function hints(c) {
+    try {
+      const raw=localStorage().getItem(c.hintKey);
+      if(raw===null)return {rows:[],blocked:false};
+      if(typeof raw!=='string'||raw.length>HINT_BYTES)return {rows:[],blocked:true};
+      const record=JSON.parse(raw);
+      if(!exact(record,['version','scope','rows'])||record.version!==1||record.scope!==c.hintScope||!Array.isArray(record.rows)||record.rows.length>HINT_LIMIT||new Set(record.rows.map(x=>x?.requestId)).size!==record.rows.length)return {rows:[],blocked:true};
+      const valid=record.rows.every(x=>exact(x,['version','action','requestId','expectedRosterRevision','expectedCredentialRevision','sourceStamp','expectedRevision','createdAt'])&&x.version===1&&hintActions.includes(x.action)&&commandId(x.requestId)&&Number.isSafeInteger(x.createdAt)&&x.createdAt>0&&x.createdAt<=Date.now()+120000&&(x.action==='guidance-save'?x.expectedRosterRevision===null&&rosterRevision(x.sourceStamp)&&revision(x.expectedRevision):rosterRevision(x.expectedRosterRevision)&&x.sourceStamp===null&&x.expectedRevision===null)&&(x.action==='issue-missing'?rosterRevision(x.expectedCredentialRevision):x.expectedCredentialRevision===null));
+      return {rows:valid?record.rows:[],blocked:!valid};
+    }catch{return {rows:[],blocked:true};}
+  }
+  function writeHints(c,rows) {
+    const raw=JSON.stringify({version:1,scope:c.hintScope,rows});
+    if(raw.length>HINT_BYTES)deny('review_required');
+    localStorage().setItem(c.hintKey,raw);
+    if(localStorage().getItem(c.hintKey)!==raw)deny('review_required');
+  }
+  function reserve(c,action,command) {
+    current(c);
+    const saved=hints(c);
+    // A read/list success cannot authorize a replacement for an UNKNOWN command.
+    // Other command types lack a typed receipt read; remain conservatively fenced.
+    if(saved.blocked||saved.rows.length||!commandId(command.requestId))deny('review_required');
+    if(action==='guidance-save'&&(!rosterRevision(command.guidance?.sourceStamp)||!revision(command.guidance?.revision)))deny('review_required');
+    const hint={version:1,action,requestId:command.requestId,expectedRosterRevision:command.expectedRosterRevision??null,expectedCredentialRevision:action==='issue-missing'?command.expectedCredentialRevision:null,sourceStamp:action==='guidance-save'?command.guidance.sourceStamp:null,expectedRevision:action==='guidance-save'?command.guidance.revision:null,createdAt:Date.now()};
+    try{writeHints(c,[hint]);}catch{deny('review_required');}
+    current(c);return hint;
+  }
+  function settle(c,confirmed) {
+    current(c);
+    const saved=hints(c);if(saved.blocked)return false;
+    const rows=saved.rows.filter(x=>!confirmed.some(y=>JSON.stringify(x)===JSON.stringify(y)));
+    try{writeHints(c,rows);return true;}catch{return false;}
+  }
   function context(teachingId) {
     const c = readContext(), key = classContextKey(c);
     if (!request || !key || c.teachingId !== teachingId) deny('unavailable');
     if (rosterKey !== key) roster = null;
-    return { key, binding: Object.fromEntries(bindingKeys.map(k => [k, c[k]])) };
+    let workspace;try{workspace=getReceiptScope();}catch{deny('unavailable');}
+    if(typeof workspace!=='string'||workspace.length>1200)deny('unavailable');
+    const hintScope=JSON.stringify([c.ownerId,c.leaseId,workspace,c.teachingId,c.classId,c.termId]);
+    return { key, hintScope, hintKey:HINT_PREFIX+encodeURIComponent(hintScope), binding: Object.fromEntries(bindingKeys.map(k => [k, c[k]])) };
   }
-  function current(c) { if (classContextKey(readContext()) !== c.key) deny('stale_context'); }
+  function current(c) {
+    if (classContextKey(readContext()) !== c.key) deny('stale_context');
+    let workspace;try{workspace=getReceiptScope();}catch{deny('stale_context');}
+    const b=c.binding;
+    if(JSON.stringify([b.ownerId,b.leaseId,workspace,b.teachingId,b.classId,b.termId])!==c.hintScope)deny('stale_context');
+  }
   async function call(action, teachingId, body, validate, c = context(teachingId)) {
     let timer, timedOut=false,region='unknown',outcome='failure',httpStatus=0,code='none'; const controller = new AbortController(),started=performance.now(),sequence=readSequence;
     const mutation=['issue-missing','rotate','revoke','visibility','guidance-save'].includes(action);
@@ -78,15 +123,12 @@ export function createClassPortalClient({ request, getContext = () => null, time
     const { c, r } = snapshot(teachingId);
     if (!id(body.requestId)) deny('review_required');
     if (pending) deny('busy');
-    if(unknown.size>=8)deny('review_required');
     if(action==='issue-missing'&&!rosterRevision(r.credentialRevision))deny('review_required');
     const command={ ...body, expectedRosterRevision: r.rosterRevision,...(action==='issue-missing'?{expectedCredentialRevision:r.credentialRevision}:{}) };
     if(consumed.has(command.requestId))deny('review_required');
+    const hint=reserve(c,action,command);
     consumed.add(command.requestId); readSequence++;
-    const work = call(action, teachingId, command, data=>validate(data,command), c).then(result=>{unknown.delete(command.requestId);return result;},error=>{
-      if(classContextKey(readContext())===c.key)unknown.set(command.requestId,{key:c.key,action,command:structuredClone(command)});
-      throw error;
-    });
+    const work = call(action, teachingId, command, data=>validate(data,command), c).then(result=>{if(result.uncertain!==true)settle(c,[hint]);return result;});
     pending = work;
     return work.finally(() => { roster = null; if (pending === work) pending = null; });
   }
@@ -97,21 +139,27 @@ export function createClassPortalClient({ request, getContext = () => null, time
     },
     async saveGuidance(teachingId,guidance) {
       if(pending) deny('busy');
-      const c=context(teachingId),intent=intentKey(c,'guidance-save',guidance),requestId=guidanceUnknown.get(intent)??crypto.randomUUID();
+      const c=context(teachingId),requestId=crypto.randomUUID(),hint=reserve(c,'guidance-save',{requestId,guidance});
+      readSequence++;
       const work=call('guidance-save',teachingId,{requestId,guidance},d=>validGuidanceAck(d,guidance),c);
       pending=work;
-      try{const result=await work;guidanceUnknown.delete(intent);return result;}catch(error){if(classContextKey(readContext())===c.key)guidanceUnknown.set(intent,requestId);throw error;}finally{if(pending===work)pending=null;}
+      try{const result=await work;settle(c,[hint]);return result;}finally{if(pending===work)pending=null;}
     },
     async listClass(teachingId) {
       if (pending) deny('busy');
       const c = context(teachingId), sequence = ++readSequence;
       roster = null;
-      const wanted=[...unknown.values()].filter(x=>x.key===c.key&&x.action==='issue-missing').slice(0,8);
-      const requests=wanted.map(x=>({requestId:x.command.requestId,expectedRosterRevision:x.command.expectedRosterRevision,expectedCredentialRevision:x.command.expectedCredentialRevision}));
-      const metadata=d=>exact(d,['classId','rosterRevision','policyRevision','students','visibility']) || exact(d,['classId','rosterRevision','policyRevision','students','visibility','credentialRevision','reconciliation'])&&rosterRevision(d.credentialRevision)&&Array.isArray(d.reconciliation)&&d.reconciliation.length===requests.length&&d.reconciliation.every(x=>exact(x,['state','created','skipped','failed'])&&['committed','unknown'].includes(x.state)&&['created','skipped','failed'].every(k=>Number.isSafeInteger(x[k])&&x[k]>=0&&x[k]<=2000)&&(x.state==='committed'||x.created+x.skipped+x.failed===0));
+      const saved=hints(c),wanted=saved.rows.filter(x=>x.action==='issue-missing'&&Date.now()-x.createdAt<=HINT_AGE);
+      const requests=wanted.map(x=>({requestId:x.requestId,expectedRosterRevision:x.expectedRosterRevision,expectedCredentialRevision:x.expectedCredentialRevision}));
+      const metadata=d=>!requests.length&&exact(d,['classId','rosterRevision','policyRevision','students','visibility']) || exact(d,['classId','rosterRevision','policyRevision','students','visibility','credentialRevision','reconciliation'])&&rosterRevision(d.credentialRevision)&&Array.isArray(d.reconciliation)&&d.reconciliation.length===requests.length&&d.reconciliation.every(x=>exact(x,['state','created','skipped','failed'])&&['committed','unknown'].includes(x.state)&&['created','skipped','failed'].every(k=>Number.isSafeInteger(x[k])&&x[k]>=0&&x[k]<=2000)&&(x.state==='committed'||x.created+x.skipped+x.failed===0));
       const data = await call('list', teachingId, {reconciliationVersion:1,reconcile:requests}, d => metadata(d) && d.classId === c.binding.classId && rosterRevision(d.rosterRevision) && revision(d.policyRevision) && validPortalFields(d.visibility) && Array.isArray(d.students) && d.students.length <= 2000 && d.students.every(validStudent) && new Set(d.students.map(s => s.studentId)).size === d.students.length && new Set(d.students.map(s => s.enrollmentId)).size === d.students.length, c);
       if (sequence !== readSequence) deny('review_required');
-      data.reconciliation?.forEach((x,i)=>{if(x.state==='committed')unknown.delete(wanted[i].command.requestId);});
+      const confirmed=wanted.filter((x,i)=>data.reconciliation?.[i].state==='committed');
+      if(confirmed.length)settle(c,confirmed);
+      // Preserve the existing UI's UNKNOWN warning for unqueryable, expired,
+      // malformed or storage-blocked hints. This local warning is no server ACK.
+      const remaining=hints(c);
+      if(remaining.blocked||remaining.rows.some(x=>!wanted.some(y=>y.requestId===x.requestId))||remaining.rows.some(x=>confirmed.some(y=>y.requestId===x.requestId)))data.reconciliation=[...(data.reconciliation??[]),unknownReceipt()];
       roster = {...data,students:data.students.map(({credential,...s})=>s)}; rosterKey = c.key; return data;
     },
     issueMissingClassCodes(teachingId, body) {

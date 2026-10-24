@@ -1,0 +1,95 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "providerOperations": 0,
+  "checks": [
+    {
+      "name": "pending reserve exists before request; fresh client reconciles original identity without replay",
+      "status": "PASS"
+    },
+    {
+      "name": "reload uses original versions; current roster/credential disagreement never resolves UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "name": "only exact authoritative committed receipt clears hint; current data is retained separately",
+      "status": "PASS"
+    },
+    {
+      "name": "existing typed server read proves only same owner/ID/teaching/original versions; absence never proves not-applied",
+      "status": "PASS"
+    },
+    {
+      "name": "absence/not-applied unsupported state and legacy200 do not clear uncertainty",
+      "status": "PASS"
+    },
+    {
+      "name": "blocked reads, writes and failed reserve readback dispatch no mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "cleanup storage failure retains UNKNOWN and blocks replacement without losing current fields",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed/foreign/oversized/versioned/future/duplicate/over-limit hints fail closed without leaking IDs into reads",
+      "status": "PASS"
+    },
+    {
+      "name": "expired hints retire lookup but never disappear or authorize replacement",
+      "status": "PASS"
+    },
+    {
+      "name": "at most eight valid hints are sent through existing typed read and settled without mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "owner, workspace, class and term scopes never adopt foreign hints; returning owner recovers original",
+      "status": "PASS"
+    },
+    {
+      "name": "retired owner/session replies cannot settle prior hints; verified same-owner new session may read only",
+      "status": "PASS"
+    },
+    {
+      "name": "invocation-to-dispatch retirement and workspace-scope changes send no stale command",
+      "status": "PASS"
+    },
+    {
+      "name": "stale list cannot clear hint or expose old roster after scope retirement",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong-ID ACK and partial issuance ACK never resolve hint",
+      "status": "PASS"
+    },
+    {
+      "name": "guidance UNKNOWN survives remount; same/different intent and list read never replay or replace",
+      "status": "PASS"
+    },
+    {
+      "name": "exact acknowledged guidance clears reservation without storing bodies; subsequent independent save allowed",
+      "status": "PASS"
+    },
+    {
+      "name": "visibility unknown persists without field payload; fresh list retains actual loaded settings and prevents replacement",
+      "status": "PASS"
+    },
+    {
+      "name": "selective rotate/revoke UNKNOWN persists without pupil/enrollment or credential payload",
+      "status": "PASS"
+    },
+    {
+      "name": "normal exact acknowledged issuance and visibility settle their reservations",
+      "status": "PASS"
+    },
+    {
+      "name": "finite diagnostics contain no persisted hint, owner, payload, request ID or secret",
+      "status": "PASS"
+    },
+    {
+      "name": "timeout retains reservation; later response cannot resolve or replay it",
+      "status": "PASS"
+    }
+  ]
+}

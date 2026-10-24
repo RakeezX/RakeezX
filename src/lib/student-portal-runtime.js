@@ -92,7 +92,7 @@ export function classBinding({cloud,store,teachingId,guard=runtimeSyncOwnershipG
   const {validUntil:deadline,...identity}=context;
   const stable=value=>Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])])):value;
   const snapshot=source.map(rows=>rows.slice().sort((a,b)=>String(a.id).localeCompare(String(b.id))).map(stable));
-  return {token:session.access_token,context,key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,identity,snapshot])};
+  return {token:session.access_token,context,receiptScope:JSON.stringify([w.id,w.databaseName,w.leaseGeneration]),key:JSON.stringify([w.id,w.databaseName,w.leaseGeneration,identity,snapshot])};
 }
 export function mountClassService(root,{readiness=PORTAL_READINESS,fetch:send=globalThis.fetch,getBinding,subscribe=()=>()=>{},classLabel,readTimeoutMs=10000}={}) {
   let active, key, disposed=false;
@@ -123,7 +123,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
   let disposed=false,handle=null,admitted=false,failure='connection';const entryStarted=performance.now(),lifetime=new AbortController();
   const current=write=>{try{const b=getBinding(write);if(disposed||b.key!==initial.key)throw bindingError('context');return b;}catch(e){failure=e.portalState||'context';throw e;}};
   const getContext=()=>{try{return current(false).context;}catch{return null;}};
-  const client=createClassPortalClient({getContext,readTimeoutMs,onListDiagnostic:value=>{
+  const client=createClassPortalClient({getContext,getReceiptScope:()=>current(false).receiptScope??'',readTimeoutMs,onListDiagnostic:value=>{
     if(disposed)return;
     if(value===null){root.removeAttribute('data-n88-list-response');return;}
     try{current(false);root.setAttribute('data-n88-list-response',JSON.stringify(value));}catch{root.removeAttribute('data-n88-list-response');}
