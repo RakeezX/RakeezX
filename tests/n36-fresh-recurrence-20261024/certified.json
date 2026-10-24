@@ -1,0 +1,136 @@
+{
+  "taskId": "continuous-n36-fresh-academic-recurrence-20261024",
+  "runId": "1ee94e6d-6fdf-4e7f-afec-36c16a8d1026",
+  "baseSha": "3b6dfe789297c98e4a6ff1b977e098796a633b37",
+  "storeHash": "105be40603e4d97b922a9f76e188725d26853cf3c28af53e0e199b9d63c12256",
+  "checks": [
+    {
+      "name": "n36_current_fresh_boot_binding_cause",
+      "status": "PASS",
+      "evidence": "baseline.json: current-main store, normal profile DOM -> native provisioning snapshot (profile 3/year 2) -> first verified lease -> actual .41 Start refuses at binding/worker-ack; all source/staged/receipt counters zero. Public anonymous store hash matches base."
+    },
+    {
+      "name": "n36_current_fresh_selection_receipt_reload",
+      "status": "PASS",
+      "evidence": "candidate.json; settled-sync-and-rendered.json; selection-sync-receipts.json: device-only guarded completion; two-row .41 import, saved receipt, reload and duplicate-free repeat; real profile Sync revision 4 settles; explicit term-2 UI selection survives renewal; actual calendar DOM inspected."
+    },
+    {
+      "name": "n36_current_owner_readiness_selection_drift_guards",
+      "status": "PASS",
+      "evidence": "12 initial refusal cases plus concurrent valid selection; term drift and final-receipt fault remain UNKNOWN with nonce/rows preserved. Exact selected observations and hashes below; original failures retained."
+    }
+  ],
+  "observations": [
+    {
+      "file": "baseline.json",
+      "scenario": "fresh",
+      "sha256": "d3dac3b401010a58bcb1f679f56eac9b4d7a8824d71e7062115bf28222f36369"
+    },
+    {
+      "file": "candidate.json",
+      "scenario": "fresh",
+      "sha256": "618cfecddabda42f6769302fe830c1080654ded658d123be996264e8969cb851"
+    },
+    {
+      "file": "original-sync-harness-failure.json",
+      "scenario": "refused",
+      "sha256": "179d1b1f6c69191cff568f3a373c1336d1cd12fd94ed34aa141a25046cbfa9ea"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "mature",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "ambiguous",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "foreign",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "selection-race",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "owner-race",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "session-race",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "lease-race",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "guards.json",
+      "scenario": "transaction-abort",
+      "sha256": "e3bfca1a68fe5b97754f7c4e9c5d0cadfde54d8f39ebc1d10b631d6e86984817"
+    },
+    {
+      "file": "academic-and-sync.json",
+      "scenario": "academic-edit",
+      "sha256": "896f9a36890e23b9257c41775410f3e0f2d515714b022f47f5a11685baec22f3"
+    },
+    {
+      "file": "academic-and-sync.json",
+      "scenario": "calendar-later",
+      "sha256": "896f9a36890e23b9257c41775410f3e0f2d515714b022f47f5a11685baec22f3"
+    },
+    {
+      "file": "academic-and-sync.json",
+      "scenario": "term-edit",
+      "sha256": "896f9a36890e23b9257c41775410f3e0f2d515714b022f47f5a11685baec22f3"
+    },
+    {
+      "file": "academic-and-sync.json",
+      "scenario": "prior-unknown",
+      "sha256": "896f9a36890e23b9257c41775410f3e0f2d515714b022f47f5a11685baec22f3"
+    },
+    {
+      "file": "selection-sync-receipts.json",
+      "scenario": "nondefault",
+      "sha256": "51d422e83b29136594cd909128f13ffbc5dcca88a49ded18c4be86bc680f0f49"
+    },
+    {
+      "file": "selection-sync-receipts.json",
+      "scenario": "term-drift",
+      "sha256": "51d422e83b29136594cd909128f13ffbc5dcca88a49ded18c4be86bc680f0f49"
+    },
+    {
+      "file": "selection-sync-receipts.json",
+      "scenario": "unknown",
+      "sha256": "51d422e83b29136594cd909128f13ffbc5dcca88a49ded18c4be86bc680f0f49"
+    },
+    {
+      "file": "settled-sync-and-rendered.json",
+      "scenario": "profile-sync",
+      "sha256": "7c0b947ea9e14c154f314bd89672416aa0fd5e17627c8bb580574e42013183de"
+    },
+    {
+      "file": "settled-sync-and-rendered.json",
+      "scenario": "rendered",
+      "sha256": "7c0b947ea9e14c154f314bd89672416aa0fd5e17627c8bb580574e42013183de"
+    }
+  ],
+  "reusedEvidence": [
+    {
+      "file": "tests/n36-actual-timetable-20261023/certificate-913a4635.json",
+      "sha256": "ad47110336647e0c954bbdf5dc7a0bbda2546cf36ef0e88670e1f8084974e2a8"
+    },
+    {
+      "file": "tests/n36-actual-timetable-20261023/certified-runtime-913a4635.json",
+      "sha256": "392377fde3f59ff20dc23e80a46fdb530646f19ba756bd9072b30ae4979d303c"
+    }
+  ],
+  "limits": "Synthetic local app/native IndexedDB/native PostgreSQL only. Actual user document/version/account and real new-account acceptance NOT READ/NOT RUN. Independent publisher served verification NOT RUN."
+}

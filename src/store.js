@@ -319,8 +319,22 @@ async function completeProvisionedDeviceSelection(workspace, session) {
           device.n36NamesBatch || device.studentLifecycleResume || device.n77DeleteIntent) return {};
       const foundation = new Set(['profile', 'years', 'terms', 'calendars', 'calendarDays', 'subjects', 'timeProfiles']);
       if (names.some(name => name !== 'device' && !foundation.has(name) && current[name].length)) return {};
+      // AI N36: profile completion is metadata, not academic use. Current
+      // provisioning completes it at revision 3, and selects the initial year
+      // calendar at revision 2 (only calendar_selection advances). Neither is
+      // a teaching edit. Keep all other academic revisions pristine; a later
+      // calendar switch/edit must still refuse automatic selection.
+      const initialRevision = (name, row) => {
+        if (name === 'profile') return Number.isSafeInteger(row.serverRevision) && row.serverRevision > 0;
+        if (name === 'years' && row.serverRevision === 2) {
+          return row.fieldRevisions?.calendar_selection === 2 &&
+            Object.entries(row.fieldRevisions).every(([field, revision]) =>
+              revision === (field === 'calendar_selection' ? 2 : 1));
+        }
+        return row.serverRevision === 1;
+      };
       if ([...foundation].some(name => current[name].some(row => row.deleted ||
-          row.ownerId != null && row.ownerId !== workspace.authUserId || row.serverRevision !== 1))) return {};
+          row.ownerId != null && row.ownerId !== workspace.authUserId || !initialRevision(name, row)))) return {};
       if (current.years.length !== 1 || current.terms.length !== TERMS_PER_YEAR ||
           current.calendars.length !== 1 || current.subjects.length !== 1 ||
           current.timeProfiles.length !== DEFAULT_TIME_PROFILES.length) return {};
