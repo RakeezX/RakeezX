@@ -1,4 +1,4 @@
-/** AI: universal student transport; no identity lookup or storage. Finite opt-in diagnostics only. */
+/** AI: universal student transport; no identity lookup or private projection storage. Finite opt-in diagnostics only. */
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
 
 export const normalizeStudentCode = value => typeof value === 'string' ? normalizeDateTimeDigits(value).replace(/ /g, '') : '';
@@ -57,19 +57,48 @@ export function projectUnifiedStudentData(data) {
   return result;
 }
 
+// Rejection-only same-origin retirement epoch. No identity or projection is stored.
+// p=pending mutation, s=neutral/acknowledged generation, u=uncertain. Never a commit receipt or access grant.
+const RETIREMENT_KEY = 'rakeez.n88.student-retirement.v1';
+const validEpoch = value => typeof value === 'string' && /^[psu]:[a-f0-9]{32}$/.test(value);
+function createRetirementObserver(onPeerChange) {
+  const win=globalThis.window;let storage,known=null,usable=false,closed=false,owned=null;
+  const epoch=phase=>phase+':'+globalThis.crypto.randomUUID().replaceAll('-','');
+  try { if(win){storage=win.localStorage;const initial=storage.getItem(RETIREMENT_KEY);if(initial===null){known=epoch('s');storage.setItem(RETIREMENT_KEY,known);}else known=validEpoch(initial)?initial:null;usable=validEpoch(known);} } catch {}
+  const sync=()=>{
+    if(closed||!storage)return false;
+    try{const raw=storage.getItem(RETIREMENT_KEY),current=validEpoch(raw)?raw:null,nextUsable=validEpoch(raw);if(current===known&&nextUsable===usable)return false;known=current;usable=nextUsable;onPeerChange();return true;}
+    catch{const changed=usable;usable=false;if(changed)onPeerChange();return changed;}
+  };
+  const event=e=>{if(e.key===RETIREMENT_KEY||e.key===null){const changed=sync();if(!changed)onPeerChange();}}; // Forged/malformed events can only purge.
+  win?.addEventListener('storage',event);
+  const publish=phase=>{try{const next=epoch(phase);storage.setItem(RETIREMENT_KEY,next);known=next;usable=true;return next;}catch{usable=false;return null;}};
+  return {
+    sync,
+    canRetain(){sync();return usable&&known?.startsWith('s:');},
+    begin(){sync();owned=storage?publish('p'):null;return owned;},
+    finish(token,acknowledged){if(!storage||token!==owned)return;try{if(token&&storage.getItem(RETIREMENT_KEY)===token)publish(acknowledged?'s':'u');else if(token)publish('u');}finally{owned=null;}},
+    abandon(){if(owned)publish('u');owned=null;},
+    dispose(){if(owned)publish('u');closed=true;win?.removeEventListener('storage',event);owned=null;storage=null;known=null;usable=false;}
+  };
+}
+
 export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, timeoutMs = 15000, bindingProof=null } = {}) {
   if (typeof send !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 15000) throw fail();
   let generation = 0, retirement = 0, controller, disposed = false, lastDiagnostic = null, retireDiagnostic;
   const contextListeners = new Set();
+  const peer=createRetirementObserver(()=>invalidate('context'));
   const reasons = ['visible','hidden','pagehide','disposed','context','superseded','deadline'];
   const visibility = () => globalThis.document?.visibilityState === 'hidden' ? 'hidden' : 'visible';
   function cancelRequest(reason = 'superseded') {
     retireDiagnostic?.(reason); retireDiagnostic = null;
     generation++; controller?.abort(); controller = null;
   }
-  function invalidate(reason = 'context') { retirement++; bindingProof?.retire?.(); cancelRequest(reasons.includes(reason) ? reason : 'context'); if(lastDiagnostic?.readPhases)lastDiagnostic=null; for(const listener of contextListeners)listener(); }
+  function invalidate(reason = 'context') { if(reason==='pagehide'||reason==='disposed')peer.abandon();retirement++; bindingProof?.retire?.(); cancelRequest(reasons.includes(reason) ? reason : 'context'); if(lastDiagnostic?.readPhases)lastDiagnostic=null; for(const listener of contextListeners)listener(); }
   async function call(action, body, phase = 'manual') {
     if (disposed) throw fail();
+    peer.sync();
+    let mutation=null,acknowledged=false;if(action==='claim'||action==='end')mutation=peer.begin();
     cancelRequest(); lastDiagnostic=null; const checkpoint = generation;
     const owned = controller = new AbortController(), started = performance.now();
     let timedOut = false, statusClass = 'none', recorded = false, readPhases=null;
@@ -98,7 +127,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
         ...(action === 'read' ? {} : { body: JSON.stringify(body) })
       });
       body = null;
-      if (checkpoint !== generation) throw fail('stale');
+      peer.sync();if (checkpoint !== generation) throw fail('stale');
       withinDeadline(); // A suspended tab may resume promise jobs before its timer.
       statusClass = response.status >= 200 && response.status < 300 ? '2xx' : response.status >= 400 && response.status < 500 ? '4xx' : response.status >= 500 && response.status < 600 ? '5xx' : 'other';
       await proof?.acceptFailure?.(response,()=>checkpoint===generation&&!owned.signal.aborted&&!disposed);
@@ -107,9 +136,9 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
         const retry = Number(response.headers?.get('Retry-After'));
         throw fail(response.status === 429 ? 'rate' : [401, 403, 410].includes(response.status) ? 'session' : 'unavailable', response.status === 429 ? Math.min(300, Math.max(1, Number.isFinite(retry) ? retry : 30)) : 0);
       }
-      if (action === 'end' || action === 'claim') { record('success'); return null; }
+      if (action === 'end' || action === 'claim') { acknowledged=true;record('success'); return null; }
       const data = await response.json();
-      if (checkpoint !== generation) throw fail('stale');
+      peer.sync();if (checkpoint !== generation) throw fail('stale');
       withinDeadline();
       const projected = projectUnifiedStudentData(data);
       await proof?.accept(response,()=>checkpoint===generation&&!owned.signal.aborted&&!disposed);
@@ -122,7 +151,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       const kind = checkpoint !== generation ? 'stale' : timedOut ? 'timeout' : ['rate', 'session'].includes(error?.kind) ? error.kind : 'unavailable';
       record(kind === 'session' ? 'denied' : kind, timedOut ? 'deadline' : 'visible');
       throw fail(kind, error?.retryAfter || 0);
-    } finally { clearTimeout(timeout); body = null; if (checkpoint === generation) { controller = null; retireDiagnostic = null; } }
+    } finally { if(action==='claim'||action==='end')peer.finish(mutation,acknowledged);clearTimeout(timeout); body = null; if (checkpoint === generation) { controller = null; retireDiagnostic = null; } }
   }
   return Object.freeze({
     async claim(value) {
@@ -141,9 +170,10 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       try { return await call('read'); }
       catch (error) { throw Object.assign(error, { claimState: 'accepted' }); }
     },
-    captureContext:()=>retirement,isContextCurrent:context=>!disposed&&context===retirement,
+    synchronizeContext:()=>peer.sync(),canRetainView:()=>peer.canRetain(),
+    captureContext:()=>{peer.sync();return retirement;},isContextCurrent:context=>{peer.sync();return !disposed&&context===retirement;},
     subscribeContext(listener) { if(typeof listener!=='function')throw fail();contextListeners.add(listener);return ()=>contextListeners.delete(listener); },
     getDiagnostic: () => lastDiagnostic ? {...lastDiagnostic} : null,
-    read: ({phase = 'manual'} = {}) => call('read', undefined, phase), end: () => call('end', {}, 'end'), invalidate, dispose() { disposed = true; invalidate('disposed');contextListeners.clear(); }
+    read: ({phase = 'manual'} = {}) => call('read', undefined, phase), end: () => call('end', {}, 'end'), invalidate, dispose() { disposed = true; invalidate('disposed');peer.dispose();contextListeners.clear(); }
   });
 }

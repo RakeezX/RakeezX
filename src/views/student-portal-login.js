@@ -125,9 +125,11 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   }
   async function run(action, ending = false, sameForm = false, resuming = false, quiet = false) {
     if (disposed || busy || !enabled || doc.visibilityState === 'hidden' || Date.now() < cooldownUntil) return;
+    const beforeContext=generation,context=client.captureContext?.();
+    if(beforeContext!==generation)return; // A newly discovered peer change rejects this stale UI command.
     returnRead = null;
     endingSession = ending;
-    busy = true; const checkpoint = ++generation,context=client.captureContext?.();
+    busy = true; const checkpoint = ++generation;
     pendingForm=sameForm;pendingMessage=resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…';
     clearTimeout(freshnessTimer);
     if(!quiet){settledProjection=null;settledAt=0;settledContext=undefined;}
@@ -233,13 +235,16 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if(end)endUncertain();else if(ack){entry('انتهت الجلسة.');screen='end-ack';}else pending();
   }; // Actual navigation/retirement aborts; ordinary tab hiding does not abort End.
   const visible = () => {
+    if(client.synchronizeContext?.())return;
     if(doc.visibilityState==='hidden'){
       const fallback=root.querySelector('[data-copy-text]');if(fallback){fallback.hidden=true;fallback.value='';}
       if(screen==='end-pending'||screen==='end-ack'||screen==='end-uncertain')return;
       if(busy&&pendingForm){codeDraft='';pending();return;}
       if(screen==='entry')return; // Same document, unsubmitted draft: no network or remount.
       if(screen==='private'&&!busy){
-        if(currentView()&&displayAge()<STUDENT_VIEW_FRESHNESS_MS)return;
+        if(!currentView())return;
+        const retain=client.canRetainView?.()!==false;if(screen!=='private')return;
+        if(retain&&displayAge()<STUDENT_VIEW_FRESHNESS_MS)return;
         clear(false,'hidden');retiredPage=true;return;
       }
       if(returnRead)return; // Duplicate notifications cannot renew a retired context.
@@ -257,10 +262,11 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       }
     }
   };
-  const pageshow = () => { if(retiredPage && doc.visibilityState !== 'hidden'){retiredPage=false;void run(() => client.read({phase:'return'}),false,false,true);} };
-  const unsubscribeContext=client?.subscribeContext?.(()=>{if(!clearing&&!disposed)clear(false,'context',false);});
+  const pageshow = () => visible();
+  const blur = () => {if(screen!=='private')return;const retain=client.canRetainView?.()!==false;if(screen!=='private')return;if(!retain){clear(false,'hidden');retiredPage=true;}};
+  const unsubscribeContext=client?.subscribeContext?.(()=>{if(!clearing&&!disposed){const wasEntry=screen==='entry';retiredPage=false;clear(false,'context',false);if(wasEntry)entry('تغيّرت الجلسة في صفحة أخرى. أدخل الرمز للمتابعة.');}});
   root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
-  win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
+  win.addEventListener('focus', visible);win.addEventListener('blur', blur);win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
   // Never inspect the HttpOnly cookie or persist private state. One current read
   // decides initial entry; pageshow/focus do not duplicate this bootstrap.
   let ready;
@@ -272,6 +278,6 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     unsubscribeContext?.();clear(false,'disposed'); disposed = true; clearTimeout(timer);clearTimeout(freshnessTimer); client?.dispose?.(); root.replaceChildren(); style.remove();
     root.classList.remove('n88-unified'); if (previousDir === null) root.removeAttribute('dir'); else root.setAttribute('dir', previousDir);
     root.removeEventListener('beforeinput', beforeInput); root.removeEventListener('paste', paste); root.removeEventListener('submit', submit); root.removeEventListener('input', input); root.removeEventListener('click', click);
-    win.removeEventListener('pagehide', hide); win.removeEventListener('pageshow', pageshow); doc.removeEventListener('visibilitychange', visible);
+    win.removeEventListener('focus', visible);win.removeEventListener('blur', blur);win.removeEventListener('pagehide', hide); win.removeEventListener('pageshow', pageshow); doc.removeEventListener('visibilitychange', visible);
   } };
 }
