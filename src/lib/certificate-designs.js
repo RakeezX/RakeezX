@@ -10,11 +10,13 @@ export const CERTIFICATE_MEDALS = Object.freeze([
 ]);
 
 export const CERTIFICATE_TEXT_LIMIT = 600;
+export const TITLE_FONT_FAMILY = 'Rakeez Certificate Title';
 
 const WIDTH = 1485;
 const HEIGHT = 1050;
 const CENTER = WIDTH / 2;
 const FONT = '"Tajawal", sans-serif';
+const TITLE_FONT = `"${TITLE_FONT_FAMILY}", "Amiri", serif`;
 const INK = '#243e35';
 const GOLD = '#a77b2e';
 const MUTED = '#767768';
@@ -58,21 +60,21 @@ export function certificateMetadata(input = {}) {
   });
 }
 
-function label(ctx, value, x, y, size, weight = 500, color = INK, width) {
-  ctx.font = `${weight} ${size}px ${FONT}`;
+function label(ctx, value, x, y, size, weight = 500, color = INK, width, family = FONT) {
+  ctx.font = `${weight} ${size}px ${family}`;
   ctx.fillStyle = color;
   if (width) ctx.fillText(String(value), x, y, width);
   else ctx.fillText(String(value), x, y);
 }
 
-function fitted(ctx, value, x, y, width, size, minSize = 16, weight = 700, color = INK) {
+function fitted(ctx, value, x, y, width, size, minSize = 16, weight = 700, color = INK, family = FONT) {
   const text = String(value);
   let used = size;
   for (; used > minSize; used -= 1) {
-    ctx.font = `${weight} ${used}px ${FONT}`;
+    ctx.font = `${weight} ${used}px ${family}`;
     if (ctx.measureText(text).width <= width) break;
   }
-  label(ctx, text, x, y, used, weight, color, width);
+  label(ctx, text, x, y, used, weight, color, width, family);
 }
 
 function textLines(ctx, value, width) {
@@ -352,7 +354,7 @@ function recipient(ctx, name) {
   const value = name || 'اسم الطالب';
   ctx.font = `800 58px ${FONT}`;
   if (ctx.measureText(value).width <= 1050 || !value.includes(' ')) {
-    fitted(ctx, value, CENTER, 510, 1050, 58, 28, 800);
+    fitted(ctx, value, CENTER, 484, 1050, 58, 28, 800);
     return;
   }
   // Balance a long Arabic name into two complete lines; no name is ellipsized.
@@ -364,36 +366,37 @@ function recipient(ctx, name) {
     const second = ctx.measureText(words.slice(i).join(' ')).width;
     if (Math.max(first, second) < best) { best = Math.max(first, second); split = i; }
   }
-  fitted(ctx, words.slice(0, split).join(' '), CENTER, 480, 1070, 45, 25, 800);
-  fitted(ctx, words.slice(split).join(' '), CENTER, 533, 1070, 45, 25, 800);
+  fitted(ctx, words.slice(0, split).join(' '), CENTER, 455, 1070, 45, 25, 800);
+  fitted(ctx, words.slice(split).join(' '), CENTER, 507, 1070, 45, 25, 800);
 }
 
 function appreciation(ctx, text) {
   if (!text) {
-    label(ctx, 'اكتب نص الشهادة لمعاينته هنا', CENTER, 689, 25, 500, MUTED);
+    label(ctx, 'اكتب نص الشهادة لمعاينته هنا', CENTER, 672, 25, 500, MUTED);
     return;
   }
   const width = 1050;
-  const top = 610;
-  const height = 150;
+  const top = 582;
+  const height = 170;
+  const leading = 1.38;
   const layout = value => {
     let lines = [];
     let size = 29;
     for (; size >= 12; size -= 1) {
       ctx.font = `500 ${size}px ${FONT}`;
       lines = textLines(ctx, value, width);
-      if (lines.length * size * 1.45 <= height) return { lines, size };
+      if (lines.length * size * leading <= height) return { lines, size };
     }
     return { lines, size: 12 };
   };
   let fittedText = layout(text);
   // Keep the author's line breaks when they fit. Excessive hard breaks are
   // reflowed instead of dropping copy or letting it overlap the signatures.
-  if (fittedText.lines.length * fittedText.size * 1.45 > height) {
+  if (fittedText.lines.length * fittedText.size * leading > height) {
     fittedText = layout(text.replace(/\n+/g, ' '));
   }
-  const size = Math.min(fittedText.size, height / (fittedText.lines.length * 1.45));
-  const lineHeight = size * 1.45;
+  const size = Math.min(fittedText.size, height / (fittedText.lines.length * leading));
+  const lineHeight = size * leading;
   const firstBaseline = top + (height - fittedText.lines.length * lineHeight) / 2 + lineHeight * 0.76;
   fittedText.lines.forEach((value, index) => label(ctx, value, CENTER, firstBaseline + index * lineHeight, size, 500, INK, width));
 }
@@ -405,9 +408,9 @@ function signatures(ctx, meta) {
   ].filter(entry => entry.name);
   if (entries.length === 1) entries[0].x = CENTER;
   entries.forEach(entry => {
-    label(ctx, entry.caption, entry.x, 851, 20, 500, MUTED);
-    fitted(ctx, entry.name, entry.x, 891, 450, 27, 17, 700);
-    line(ctx, entry.x - 145, 910, entry.x + 145, 910, '#c9bb98', 1);
+    label(ctx, entry.caption, entry.x, 813, 20, 500, MUTED);
+    fitted(ctx, entry.name, entry.x, 854, 450, 27, 17, 700);
+    line(ctx, entry.x - 145, 876, entry.x + 145, 876, '#c9bb98', 1);
   });
 }
 
@@ -418,7 +421,7 @@ function ministryMark(ctx, image, school) {
   if (!(sourceWidth > 0 && sourceHeight > 0)) throw new Error('Ministry logo is unavailable');
   const width = 168;
   const height = width * sourceHeight / sourceWidth;
-  const x = school ? WIDTH - 255 : WIDTH - 430;
+  const x = CENTER - width / 2;
   const y = school ? 24 : 66;
   ctx.save();
   if (school) {
@@ -432,6 +435,23 @@ function ministryMark(ctx, image, school) {
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(image, x, y, width, height);
   ctx.restore();
+}
+
+/** Balanced identity blocks leave the centered Ministry mark unobstructed. */
+function headerIdentity(ctx, value, x, school, size, color) {
+  if (!value) return;
+  const width = 350;
+  const top = school ? 38 : 78;
+  const height = 104;
+  let lines = [];
+  for (; size >= 16; size -= 1) {
+    ctx.font = `700 ${size}px ${FONT}`;
+    lines = textLines(ctx, value, width);
+    if (lines.length * size * 1.25 <= height) break;
+  }
+  const lineHeight = size * 1.25;
+  const firstBaseline = top + (height - lines.length * lineHeight) / 2 + lineHeight * 0.76;
+  lines.forEach((text, index) => label(ctx, text, x, firstBaseline + index * lineHeight, size, 700, color, width));
 }
 
 /** Paint only certificate identity and the teacher's explicit appreciation text. */
@@ -455,21 +475,18 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
 
   const headerColor = school ? '#fffdf2' : INK;
   const secondaryColor = school ? '#d6e3cf' : '#8c805f';
-  const headerWidth = school ? 880 : 560;
-  fitted(ctx, meta.schoolName || 'رَكيز المعلم', CENTER, school ? 85 : 114, headerWidth, 29, 20, 700, headerColor);
-  fitted(ctx, meta.educationDepartment || 'نحتفي بالتعلّم، ونقدّر الإنجاز', CENTER, school ? 124 : 148, headerWidth, 19, 15, 500, secondaryColor);
+  headerIdentity(ctx, meta.schoolName || 'رَكيز المعلم', CENTER + 312.5, school, 28, headerColor);
+  headerIdentity(ctx, meta.educationDepartment, CENTER - 312.5, school, 24, secondaryColor);
 
   medal(ctx, school ? WIDTH - 191 : 191, 292, school);
-  label(ctx, 'للجهد قيمة، وللإنجاز تقدير', CENTER, 245, 20, 500, school ? '#8b8a71' : '#9a8558');
-  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 330, 930, 78, 54, 800, school ? '#244c3a' : '#9e792f');
-  flourish(ctx, 372, school);
-  label(ctx, 'تُمنح هذه الشهادة بكل تقدير إلى', CENTER, 427, 24, 500, MUTED);
+  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 323, 900, 94, 70, 700, school ? '#244c3a' : '#9e792f', TITLE_FONT);
+  flourish(ctx, 361, school);
+  label(ctx, 'تُمنح هذه الشهادة بكل تقدير إلى', CENTER, 404, 24, 500, MUTED);
   recipient(ctx, name);
 
   const contextLine = [meta.className, meta.subjectName].filter(Boolean).join('  ·  ');
-  if (contextLine) fitted(ctx, contextLine, CENTER, 569, 1050, 23, 16, 600, school ? '#5c7860' : '#9b8553');
+  if (contextLine) fitted(ctx, contextLine, CENTER, 548, 1050, 23, 16, 600, school ? '#5c7860' : '#9b8553');
   appreciation(ctx, text);
-  label(ctx, 'شكرًا لكل خطوة نحو التعلّم، ومزيدًا من النجاح', CENTER, 800, 22, 500, INK);
   signatures(ctx, meta);
 
   if (school) {
@@ -484,8 +501,8 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
     // A visible label survives every certificate export.
     ctx.save();
     ctx.fillStyle = school ? '#fffaf0' : '#f6eacf';
-    ctx.fillRect(CENTER - 83, 188, 166, 28);
-    label(ctx, 'بيانات تجريبية', CENTER, 208, 16, 700, '#816328');
+    ctx.fillRect(CENTER - 83, 909, 166, 25);
+    label(ctx, 'بيانات تجريبية', CENTER, 927, 16, 700, '#816328');
     ctx.restore();
   }
   return canvas;

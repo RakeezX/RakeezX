@@ -1,6 +1,6 @@
 import { html, icon, toast } from './dom.js';
 import * as store from '../store.js';
-import { certificateCard, certificatePng, isCertificateReady, drawAchievementCertificate, certificateDescription, certificateIssueDate, printCertificateBatch, prepareCertificateAssets } from './achievement-certificate.js';
+import { certificateCard, certificatePng, certificateFilename, isCertificateReady, drawAchievementCertificate, certificateDescription, certificateIssueDate, printCertificateBatch, prepareCertificateAssets } from './achievement-certificate.js';
 import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
 import { resolvedReportPrincipalName, isDemoOutput } from './report-print.js';
@@ -153,7 +153,7 @@ export function createCertificateCenter({ teachingId } = {}) {
         $('[data-center-position]').textContent = entries.length ? `الشهادة ${index + 1} من ${entries.length}` : 'اختر طلابًا للمعاينة';
         if (!assetsReady) {
           $('[data-center-status]').textContent = assetsFailed
-            ? 'تعذّر تحميل شعار وزارة التعليم. أعد تحميل الصفحة للمحاولة مجددًا.'
+            ? 'تعذّر تحميل الشعار أو خط الشهادة. أعد تحميل الصفحة للمحاولة مجددًا.'
             : 'جارٍ تجهيز الشعار ومعاينة الشهادة…';
           $('[data-center-status]').hidden = false;
           syncButtons();
@@ -250,7 +250,9 @@ export function createCertificateCenter({ teachingId } = {}) {
               const blob = await certificatePng(output, card);
               if (!isCurrent()) return;
               url = URL.createObjectURL(blob);
-              const link = document.createElement('a'); link.href = url; link.download = 'rakeez-achievement-certificate.png'; link.click();
+              const link = document.createElement('a'); link.href = url;
+              link.download = certificateFilename({ studentName: card.name, className: snapshotOptions.className }) + '.png';
+              link.click();
               toast('تم تجهيز صورة الشهادة للتنزيل', 'ok');
             }
           } catch { toast('تعذّر تجهيز الشهادات — حاول مرة أخرى', 'danger'); }

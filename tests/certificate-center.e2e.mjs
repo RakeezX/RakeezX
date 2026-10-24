@@ -5,6 +5,7 @@ async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
   await expect.poll(() => canvas.evaluate(node => node.__ministryLogoDraws?.length ?? 0)).toBeGreaterThan(previousCount);
   const proof = await canvas.evaluate(node => node.__ministryLogoDraws.at(-1));
   expect(proof.decoded).toBe(true);
+  expect((proof.x + proof.width / 2) * proof.scaleX).toBeCloseTo(proof.canvasWidth / 2, 6);
   expect(proof.width / proof.height).toBeCloseTo(proof.naturalWidth / proof.naturalHeight, 8);
   return canvas.evaluate(node => node.__ministryLogoDraws.length);
 }
@@ -21,15 +22,21 @@ test('certificate center applies editable appreciation text to any chosen studen
     CanvasRenderingContext2D.prototype.drawImage = function (image, ...args) {
       const result = drawImage.call(this, image, ...args);
       if (image instanceof HTMLImageElement && image.src.includes('/assets/brand/ministry-of-education')) {
-        const [, , width, height] = args.slice(-4);
+        const [x, y, width, height] = args.slice(-4);
         (this.canvas.__ministryLogoDraws ??= []).push({
           decoded: image.complete && image.naturalWidth > 0, naturalWidth: image.naturalWidth,
-          naturalHeight: image.naturalHeight, width, height,
+          naturalHeight: image.naturalHeight, x, y, width, height,
+          scaleX: this.getTransform().a, canvasWidth: this.canvas.width,
         });
       }
       return result;
     };
-    window.print = () => { window.top.__certificateBatchProof = { isolated: window !== window.top, html: document.documentElement.outerHTML, images: document.images.length, text: document.body.innerText }; };
+    const fillText = CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
+      if (text === 'شهادة شكر وتقدير') this.canvas.__certificateTitleFont = this.font;
+      return fillText.call(this, text, ...args);
+    };
+    window.print = () => { window.top.__certificateBatchProof = { isolated: window !== window.top, title: document.title, parentTitle: window.top.document.title, html: document.documentElement.outerHTML, images: document.images.length, text: document.body.innerText }; };
   });
   await page.goto('/#/classes');
   await page.waitForFunction(async () => {
@@ -74,7 +81,7 @@ test('certificate center applies editable appreciation text to any chosen studen
     const chosen = new Set(students.slice(0, 3).map(student => student.id));
     const ordered = store.students(teaching.id).filter(student => chosen.has(student.id));
     return {
-      teachingId: teaching.id, emptyTeachingId: emptyTeaching.id,
+      teachingId: teaching.id, className: store.sectionLabel(store.getSection(teaching.sectionId)), emptyTeachingId: emptyTeaching.id,
       emptyStudentId: store.students(emptyTeaching.id)[0].id,
       ids: ordered.map(student => student.id), noEvidenceId: students[5].id, noEvidenceName: students[5].name,
       names: ordered.map(student => student.name), identity: { ...identity, principalName: identity.reportPrincipalName },
@@ -158,6 +165,8 @@ test('certificate center applies editable appreciation text to any chosen studen
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[0]));
   await expect(canvas).not.toHaveAttribute('aria-label', /بنود بدرجة كاملة|مشاركات إيجابية/);
   await expectPaintedMinistryLogo(canvas);
+  expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
+  expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
   const previewWidth = await canvas.evaluate(node => {
     const parent = node.closest('.certificate-center__preview');
     const style = getComputedStyle(parent);
@@ -239,6 +248,8 @@ test('certificate center applies editable appreciation text to any chosen studen
   const pendingDownload = page.waitForEvent('download');
   await workspace.locator('[data-center-download]').click();
   const download = await pendingDownload;
+  const safeClass = fixture.className.replace(/\s*[/\\]\s*/g, ' - ');
+  expect(download.suggestedFilename()).toBe(`شهادة شكر وتقدير - ${fixture.names[0]} - ${safeClass}.png`);
   const pngPath = testInfo.outputPath('certificate-center-current.png');
   await download.saveAs(pngPath);
   const png = await fs.readFile(pngPath);
@@ -246,16 +257,25 @@ test('certificate center applies editable appreciation text to any chosen studen
   expect(png.readUInt32BE(20)).toBe(2100);
   expect(png.toString('base64')).toBe(expectedImage.split(',')[1]);
   await expect(print).toBeEnabled();
+  const originalTitle = await page.title();
   await print.click();
   await page.waitForFunction(() => window.__certificateBatchProof);
   const proof = await page.evaluate(() => window.__certificateBatchProof);
   expect(proof.isolated).toBe(true);
+  const batchTitle = `شهادات شكر وتقدير - ${safeClass} - 3 طلاب`;
+  expect(proof.title).toBe(batchTitle);
+  expect(proof.parentTitle).toBe(batchTitle);
+  await expect(page).toHaveTitle(batchTitle);
   expect(proof.images).toBe(3);
   expect(proof.text).toBe('');
   expect(proof.html).not.toContain(fixture.ids[0]);
   expect(proof.html).not.toContain('certificate-center__roster');
   expect(proof.html).toContain(expectedImage);
-  await page.evaluate(() => document.querySelector('iframe[data-certificate-print]')?.contentWindow.dispatchEvent(new Event('afterprint')));
+  // A later page title must survive completion of an older print dialog.
+  await page.evaluate(() => { document.title = 'عنوان أحدث أثناء الطباعة';
+    document.querySelector('iframe[data-certificate-print]')?.contentWindow.dispatchEvent(new Event('afterprint')); });
+  await expect(page).toHaveTitle('عنوان أحدث أثناء الطباعة');
+  await page.evaluate(title => { document.title = title; }, originalTitle);
   await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
   await expect(print).toBeEnabled();
   await expect(workspace.locator('[data-center-download]')).toBeEnabled();

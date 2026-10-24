@@ -5,6 +5,7 @@ async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
   await expect.poll(() => canvas.evaluate(node => node.__ministryLogoDraws?.length ?? 0)).toBeGreaterThan(previousCount);
   const proof = await canvas.evaluate(node => node.__ministryLogoDraws.at(-1));
   expect(proof.decoded).toBe(true);
+  expect((proof.x + proof.width / 2) * proof.scaleX).toBeCloseTo(proof.canvasWidth / 2, 6);
   expect(proof.width / proof.height).toBeCloseTo(proof.naturalWidth / proof.naturalHeight, 8);
   return canvas.evaluate(node => node.__ministryLogoDraws.length);
 }
@@ -24,18 +25,25 @@ test('certificate edits appreciation text and directly exports the current image
     CanvasRenderingContext2D.prototype.drawImage = function (image, ...args) {
       const result = drawImage.call(this, image, ...args);
       if (image instanceof HTMLImageElement && image.src.includes('/assets/brand/ministry-of-education')) {
-        const [, , width, height] = args.slice(-4);
+        const [x, y, width, height] = args.slice(-4);
         (this.canvas.__ministryLogoDraws ??= []).push({
           decoded: image.complete && image.naturalWidth > 0, naturalWidth: image.naturalWidth,
-          naturalHeight: image.naturalHeight, width, height,
+          naturalHeight: image.naturalHeight, x, y, width, height,
+          scaleX: this.getTransform().a, canvasWidth: this.canvas.width,
         });
       }
       return result;
+    };
+    const fillText = CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
+      if (text === 'شهادة شكر وتقدير') this.canvas.__certificateTitleFont = this.font;
+      return fillText.call(this, text, ...args);
     };
     // Observe the application's actual isolated print document without opening an OS dialog.
     window.print = () => {
       window.top.__certificatePrintProof = {
         isolated: window !== window.top,
+        title: document.title, parentTitle: window.top.document.title,
         html: document.documentElement.outerHTML,
         images: document.images.length,
         text: document.body.innerText,
@@ -63,7 +71,7 @@ test('certificate edits appreciation text and directly exports the current image
       scores: store.state.scores.filter(score => score.studentId === student.id).map(score => ({ ...score, ...common, deleted: true })),
       logs: store.state.logs.filter(log => log.studentId === student.id).map(log => ({ ...log, ...common, deleted: true })),
     });
-    return { studentId: student.id, teachingId: teaching.id, name, identity: { ...identity, principalName: identity.reportPrincipalName } };
+    return { studentId: student.id, teachingId: teaching.id, name, className: store.sectionLabel(store.getSection(teaching.sectionId)), identity: { ...identity, principalName: identity.reportPrincipalName } };
   });
   await page.goto(`/#/student/${fixture.studentId}?teaching=${fixture.teachingId}`);
   const entry = page.locator('[data-act="achievement-certificate"]');
@@ -91,6 +99,8 @@ test('certificate edits appreciation text and directly exports the current image
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
   await expectPaintedMinistryLogo(canvas);
+  expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
+  expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
   await message.fill('');
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();
@@ -133,7 +143,8 @@ test('certificate edits appreciation text and directly exports the current image
   const pendingDownload = page.waitForEvent('download');
   await sheet.locator('[data-certificate-download]').click();
   const download = await pendingDownload;
-  expect(download.suggestedFilename()).toBe('rakeez-achievement-certificate.png');
+  const expectedFilename = `شهادة شكر وتقدير - ${fixture.name} - ${fixture.className.replace(/\s*[/\\]\s*/g, ' - ')}`;
+  expect(download.suggestedFilename()).toBe(expectedFilename + '.png');
   const imagePath = testInfo.outputPath('certificate-output.png');
   await download.saveAs(imagePath);
   const png = await fs.readFile(imagePath);
@@ -144,10 +155,14 @@ test('certificate edits appreciation text and directly exports the current image
   expect(outgoing).toEqual([]);
   page.off('request', observe);
 
+  const originalTitle = await page.title();
   await sheet.locator('[data-certificate-print]').click();
   await page.waitForFunction(() => window.__certificatePrintProof);
   const proof = await page.evaluate(() => window.__certificatePrintProof);
   expect(proof.isolated).toBe(true);
+  expect(proof.title).toBe(expectedFilename);
+  expect(proof.parentTitle).toBe(expectedFilename);
+  await expect(page).toHaveTitle(expectedFilename);
   expect(proof.images).toBe(1);
   expect(proof.text).toBe('');
   expect(proof.html).not.toContain('student-profile');
@@ -156,6 +171,7 @@ test('certificate edits appreciation text and directly exports the current image
   await fs.writeFile(testInfo.outputPath('certificate-print.html'), proof.html);
   await page.evaluate(() => document.querySelector('[data-certificate-print]') && document.querySelector('iframe[data-certificate-print]')?.contentWindow.dispatchEvent(new Event('afterprint')));
   await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
+  await expect(page).toHaveTitle(originalTitle);
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
   await expect(sheet).not.toContainText('من نافذة الطباعة');

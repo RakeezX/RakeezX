@@ -1,21 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { certificateCard, certificatePng, isCertificateReady, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate } from '../src/lib/achievement-certificate.js';
-import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata } from '../src/lib/certificate-designs.js';
+import { certificateCard, certificatePng, isCertificateReady, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate, certificateFilename } from '../src/lib/achievement-certificate.js';
+import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata, TITLE_FONT_FAMILY } from '../src/lib/certificate-designs.js';
 
 const approvedText = 'تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد';
 
 function recordingCanvas() {
   const texts = [];
   const images = [];
+  const lettering = [];
   const context = new Proxy({
     createLinearGradient() { return { addColorStop() {} }; },
     createRadialGradient() { return { addColorStop() {} }; },
-    fillText(value) { texts.push(String(value)); },
+    fillText(value, x, y) { texts.push(String(value)); lettering.push({ text: String(value), font: this.font, x, y }); },
     drawImage(...args) { images.push(args); },
     measureText(value) { return { width: Array.from(String(value)).length * Number((this.font || '24px').match(/([\d.]+)px/)[1]) * 0.55 }; },
   }, { get(target, key) { return key in target ? target[key] : () => {}; } });
-  return { texts, images, getContext: () => context, toDataURL: () => 'data:image/png;base64,c2VsZWN0ZWQtaW1hZ2U=', toBlob: callback => callback(new Blob(['certificate'], { type: 'image/png' })) };
+  return { texts, images, lettering, getContext: () => context, toDataURL: () => 'data:image/png;base64,c2VsZWN0ZWQtaW1hZ2U=', toBlob: callback => callback(new Blob(['certificate'], { type: 'image/png' })) };
 }
 
 test('certificates use only the student name and teacher text, with no achievement requirement', () => {
@@ -72,10 +73,13 @@ test('both designs display bounded identity, the original Ministry logo, the fix
     assert.equal(logoDraws.length, 1, 'Each design must embed the provided original logo');
     const [, x, y, width, height] = logoDraws[0];
     assert.ok(x >= 0 && y >= 0 && width > 0 && height > 0);
+    assert.ok(Math.abs(x + width / 2 - canvas.width / 4) < 1e-8, 'The Ministry logo must be horizontally centered in the certificate');
+    const title = canvas.lettering.find(entry => entry.text === 'شهادة شكر وتقدير');
+    assert.ok(title?.font.includes(TITLE_FONT_FAMILY), 'The title must use the dedicated Arabic display font');
     assert.ok(Math.abs(width / height - ministryLogo.naturalWidth / ministryLogo.naturalHeight) < 1e-10, 'The logo must retain its original aspect ratio');
     const output = canvas.texts.join(' ') + certificateDescription(card, options);
     for (const expected of ['آل مبدي العتيبي', 'مدرسة', 'معلم تجريبي', 'مدير تجريبي', 'الخامس 1', '2026', 'بيانات تجريبية', 'نعتز بجهدك']) assert.ok(output.includes(expected));
-    assert.doesNotMatch(output, /private-|\u202e/);
+    assert.doesNotMatch(output, /private-|\u202e|للجهد قيمة|شكرًا لكل خطوة/);
     assert.equal(canvas.width, 2970);
     assert.equal(canvas.height, 2100);
   }
@@ -114,7 +118,33 @@ test('PNG and print export custom text directly while rejecting empty name, text
   const html = certificatePrintHtml(canvas, card);
   assert.match(html, /@page\{size:A4 landscape;margin:0\}/);
   assert.equal((html.match(/<img /g) || []).length, 1);
-  assert.doesNotMatch(html, /<script|private-|student-profile|\/src\/|https?:\/\//);
+  assert.doesNotMatch(html, /<script|student-profile|\/src\/|https?:\/\//);
+  assert.doesNotMatch(html.match(/<body>([\s\S]*)<\/body>/)[1], /private-|تقديرًا لمثابرتك/);
   assert.match(html, /data:image\/png;base64,/);
   assert.throws(() => certificatePrintHtml({ toDataURL: () => 'data:,' }, card));
+});
+
+test('certificate filenames preserve Arabic identity, distinguish batches and remain safe to save', () => {
+  assert.equal(certificateFilename({ studentName: 'أحمد محمد', className: 'الرابع الابتدائي / 2' }),
+    'شهادة شكر وتقدير - أحمد محمد - الرابع الابتدائي - 2');
+  assert.equal(certificateFilename({ studentName: 'أحمد', className: 'الخامس / 1', studentCount: 3 }),
+    'شهادات شكر وتقدير - الخامس - 1 - 3 طلاب');
+  assert.equal(certificateFilename(), 'شهادة شكر وتقدير - طالب');
+  const unsafe = certificateFilename({ studentName: '  أحمد\u202e/علي<>:\"|?*  ', className: 'الخامس\\2. ' });
+  assert.doesNotMatch(unsafe, /[<>:\"/\\|?*\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069]/);
+  assert.match(unsafe, /أحمد - علي/);
+  assert.match(unsafe, /الخامس - 2$/);
+  const bounded = certificateFilename({ studentName: 'عبدالله '.repeat(80), className: 'فصل طويل '.repeat(60) });
+  assert.ok(Buffer.byteLength(bounded, 'utf8') <= 240);
+  assert.doesNotMatch(bounded, /\uFFFD|[. -]$/);
+  assert.ok(bounded.startsWith('شهادة شكر وتقدير - '));
+
+  const card = certificateCard({ studentName: 'طالب & مبدع', text: approvedText });
+  const document = certificatePrintHtml(recordingCanvas(), card, { className: 'الخامس / 2' });
+  assert.match(document, /<title>شهادة شكر وتقدير - طالب &amp; مبدع - الخامس - 2<\/title>/);
+  assert.doesNotMatch(document.match(/<body>([\s\S]*)<\/body>/)[1], /طالب|مبدع|الخامس/);
+  const entries = ['الخامس / 2', 'السادس / 1'].map(className => ({ canvas: recordingCanvas(), card, options: { className } }));
+  assert.match(certificateBatchPrintHtml(entries), /<title>شهادات شكر وتقدير - فصول متعددة - 2 طلاب<\/title>/);
+  entries[1].options.className = '';
+  assert.match(certificateBatchPrintHtml(entries), /<title>شهادات شكر وتقدير - 2 طلاب<\/title>/);
 });

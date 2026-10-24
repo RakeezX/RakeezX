@@ -1,14 +1,27 @@
 import { html, icon, openSheet, toast, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
-import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
+import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, TITLE_FONT_FAMILY, certificateText, defaultCertificateText, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
 import { getMinistryLogo, loadMinistryLogo } from './ministry-brand.js';
 
 const styleUrl = new URL('../styles/achievement-certificate.css', import.meta.url).href;
 const brandedCanvases = new WeakSet();
+const titleFontUrl = new URL('../../assets/fonts/amiri/Amiri-Bold.ttf', import.meta.url).href;
+let titleFontReady;
+
+function prepareTitleFont() {
+  if (titleFontReady) return titleFontReady;
+  if (!globalThis.document?.fonts || typeof FontFace === 'undefined') return Promise.reject(new Error('Certificate font loading is unavailable'));
+  const font = new FontFace(TITLE_FONT_FAMILY, `url(${titleFontUrl})`, { weight: '700', style: 'normal' });
+  titleFontReady = font.load().then(loaded => {
+    document.fonts.add(loaded);
+    return loaded;
+  }).catch(error => { titleFontReady = null; throw error; });
+  return titleFontReady;
+}
 
 export async function prepareCertificateAssets() {
-  const [, logo] = await Promise.all([globalThis.document?.fonts?.ready, loadMinistryLogo()]);
+  const [, logo] = await Promise.all([globalThis.document?.fonts?.ready, loadMinistryLogo(), prepareTitleFont()]);
   return logo;
 }
 
@@ -36,6 +49,41 @@ export function certificateCard({ studentName = '', text = '', demo = false } = 
 
 export function isCertificateReady(card) {
   return !!(card?.name?.trim() && certificateText(card.text));
+}
+
+const filenameEncoder = new TextEncoder();
+const filenamePart = value => String(value ?? '').normalize('NFC')
+  .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g, ' ')
+  .replace(/[\\/]+/g, ' - ').replace(/[<>:"|?*]/g, ' ')
+  .replace(/\s+/g, ' ').replace(/(?:\s*-\s*){2,}/g, ' - ')
+  .replace(/^[. -]+|[. -]+$/g, '');
+const boundedFilenamePart = (value, bytes) => {
+  let result = '', length = 0;
+  for (const character of filenamePart(value)) {
+    const size = filenameEncoder.encode(character).length;
+    if (length + size > bytes) break;
+    result += character; length += size;
+  }
+  return result.replace(/[. -]+$/g, '');
+};
+
+/** A cross-platform filename stem; the downloader or print dialog adds the extension. */
+export function certificateFilename({ studentName = '', className = '', studentCount = 1 } = {}) {
+  const multiple = Number.isSafeInteger(studentCount) && studentCount > 1;
+  const title = multiple ? 'شهادات شكر وتقدير' : 'شهادة شكر وتقدير';
+  const classroom = boundedFilenamePart(className, 80);
+  if (multiple) return [title, classroom, `${studentCount} طلاب`].filter(Boolean).join(' - ');
+  const fixed = [title, classroom].filter(Boolean).join(' - ') + ' - ';
+  const name = boundedFilenamePart(studentName, 240 - filenameEncoder.encode(fixed).length) || 'طالب';
+  return [title, name, classroom].filter(Boolean).join(' - ');
+}
+
+function batchFilename(entries) {
+  const classes = entries.map(entry => filenamePart(entry.options?.className));
+  const knownClasses = new Set(classes.filter(Boolean));
+  const className = knownClasses.size > 1 ? 'فصول متعددة'
+    : classes.every(Boolean) ? classes[0] : '';
+  return certificateFilename({ studentName: entries[0]?.card?.name, className, studentCount: entries.length });
 }
 
 export function certificatePng(canvas, card) {
@@ -84,31 +132,41 @@ function certificateRaster(canvas, card) {
   return png;
 }
 
-function rasterDocument(images) {
-  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>شهادات تقدير - ركيز المعلم</title><style>
+function rasterDocument(images, filename) {
+  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${String(html`${filename}`)}</title><style>
     @page{size:A4 landscape;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:297mm}.certificate-page{width:297mm;height:209.8mm;overflow:hidden;break-inside:avoid;break-after:page}.certificate-page:last-child{break-after:auto}img{display:block;width:297mm;height:209.8mm;object-fit:contain;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   </style></head><body>${images.map(src => `<div class="certificate-page"><img alt="شهادة تقدير" src="${src}"></div>`).join('')}</body></html>`;
 }
 
 /** Isolated print documents contain only the selected certificate rasters. */
-export function certificatePrintHtml(canvas, card) {
-  return rasterDocument([certificateRaster(canvas, card)]);
+export function certificatePrintHtml(canvas, card, options = {}) {
+  const filename = certificateFilename({ studentName: card?.name, className: options.className });
+  return rasterDocument([certificateRaster(canvas, card)], filename);
 }
 
 export function certificateBatchPrintHtml(entries) {
   if (!Array.isArray(entries) || !entries.length) throw new Error('Select at least one certificate to print');
-  return rasterDocument(entries.map(({ canvas, card }) => certificateRaster(canvas, card)));
+  return rasterDocument(entries.map(({ canvas, card }) => certificateRaster(canvas, card)), batchFilename(entries));
 }
 
-async function printDocument(documentHtml, isCurrent) {
+async function printDocument(documentHtml, isCurrent, filename) {
   const frame = document.createElement('iframe');
-  frame.title = 'طباعة شهادات التقدير';
+  frame.title = filename;
   frame.dataset.certificatePrint = '';
   frame.setAttribute('aria-hidden', 'true');
   frame.tabIndex = -1;
   frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:1123px;height:794px;border:0;pointer-events:none';
   let timer;
-  const cleanup = () => { clearTimeout(timer); frame.remove(); };
+  let originalTitle = null;
+  const cleanup = () => {
+    clearTimeout(timer);
+    window.removeEventListener('afterprint', cleanup);
+    frame.contentWindow?.removeEventListener('afterprint', cleanup);
+    // A route or another document operation may have replaced our temporary title.
+    if (originalTitle !== null && document.title === filename) document.title = originalTitle;
+    originalTitle = null;
+    frame.remove();
+  };
   try {
     const ready = new Promise((resolve, reject) => {
       timer = setTimeout(() => reject(new Error('Print document timed out')), 20000);
@@ -121,15 +179,19 @@ async function printDocument(documentHtml, isCurrent) {
     clearTimeout(timer);
     if (!isCurrent()) { cleanup(); return false; }
     frame.contentWindow.addEventListener('afterprint', cleanup, { once: true });
+    window.addEventListener('afterprint', cleanup, { once: true });
     timer = setTimeout(cleanup, 120000);
+    originalTitle = document.title;
+    document.title = filename;
     frame.contentWindow.focus();
     frame.contentWindow.print();
     return true;
   } catch (error) { cleanup(); throw error; }
 }
 
-async function printCertificate(canvas, card, isCurrent) {
-  return printDocument(certificatePrintHtml(canvas, card), isCurrent);
+async function printCertificate(canvas, card, isCurrent, options = {}) {
+  const filename = certificateFilename({ studentName: card.name, className: options.className });
+  return printDocument(certificatePrintHtml(canvas, card, options), isCurrent, filename);
 }
 
 /** Render sequentially with one reusable canvas; cancellation is checked between pages. */
@@ -150,7 +212,8 @@ export async function printCertificateBatch(entries, isCurrent = () => true) {
       await new Promise(resolve => setTimeout(resolve, 0));
     }
     if (!isCurrent()) return false;
-    return await printDocument(rasterDocument(images), isCurrent);
+    const filename = batchFilename(entries);
+    return await printDocument(rasterDocument(images, filename), isCurrent, filename);
   } finally { scratch.width = scratch.height = 1; }
 }
 
@@ -210,7 +273,7 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
       const redraw = () => {
         if (!assetsReady) {
           ready = false;
-          status.textContent = assetsFailed ? 'تعذّر تحميل شعار وزارة التعليم. أعد فتح الشهادة للمحاولة.' : 'جارٍ تجهيز الشهادة وشعار وزارة التعليم…';
+          status.textContent = assetsFailed ? 'تعذّر تحميل الشعار أو خط الشهادة. أعد فتح الشهادة للمحاولة.' : 'جارٍ تجهيز الشهادة وشعار وزارة التعليم…';
           status.hidden = false;
           syncButtons();
           return;
@@ -267,14 +330,14 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
           if (!isCurrent()) return;
           drawAchievementCertificate(canvas, selectedCard, selectedOptions);
           if (kind === 'print') {
-            await printCertificate(canvas, selectedCard, isCurrent);
+            await printCertificate(canvas, selectedCard, isCurrent, selectedOptions);
           } else {
             const blob = await certificatePng(canvas, selectedCard);
             if (!isCurrent()) return;
             url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'rakeez-achievement-certificate.png';
+            link.download = certificateFilename({ studentName: selectedCard.name, className: selectedOptions.className }) + '.png';
             link.click();
             toast('تم تجهيز صورة الشهادة للتنزيل', 'ok');
           }
