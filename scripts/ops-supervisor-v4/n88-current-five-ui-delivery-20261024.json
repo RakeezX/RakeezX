@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-current-five-ui-delivery-20261024",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5900,
+      "scopeKey": "n88-current-five-qualified-ui-delivery",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 25,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "baseSha": "5d216959e5fe334b73b7fa276f6987a1f444b6b1",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX/.worktrees/continuous-n88-current-five-ui-delivery-20261024",
+      "allowedPaths": [
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-runtime.js",
+        "src/views/student-portal-class.js",
+        "tests/n88-five-ui-delivery-20261024/client.mjs",
+        "tests/n88-five-ui-delivery-20261024/client.json",
+        "tests/n88-five-ui-delivery-20261024/ui.mjs",
+        "tests/n88-five-ui-delivery-20261024/ui.json",
+        "tests/n88-five-ui-delivery-20261024/provenance.json",
+        "docs/automation-evidence/20261024/N88_FIVE_UI_DELIVERY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-runtime.js",
+        "src/views/student-portal-class.js"
+      ],
+      "requiredChecks": [
+        "n88_five_counts_order_and_unknown_receipt_ui",
+        "n88_finite_mutation_diagnostic_and_owner_guards",
+        "n88_qualified_three_file_current_main_parity"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "Direct PO full completion delegation and latest affected UI request; sole original publisher delivers qualified public source only, no real-account or provider action.",
+      "preparationAuthority": {
+        "kind": "qualified_public_source_slice_only",
+        "publication": true,
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "realStudentTeacherWrites": 0,
+        "originalQualifiedCandidate": "fb63adcb8ffcee21e4f34c2536d65a3fb16ef61d",
+        "qualifiedCodeCandidate": "2b15de2a5e8f13a4109815164fcd3f9358bd1a93",
+        "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-new-normal-five-student-service-result.json"
+      },
+      "acceptance": [
+        "Total pupils and genuinely active codes are distinguished, unknown/unavailable never fabricated as zero or successful issuance.",
+        "Stable Arabic numeric display ordering preserves student/code/action identity, with separate finite list and mutation support and owner retirement.",
+        "Actual affected client/rendered evidence and exact source parity pass; sole publisher verifies served UI, actual503 and historicalUNKNOWN remain open."
+      ],
+      "objective": "DELIVER ONLY THE QUALIFIED THREE-FILE N88 CURRENT-FIVE UI SLICE, THROUGH ORIGINAL PUBLISHER. Actual PO new normal Fourth1/five trial pupils report: list success but uncertain issuance and student5xx; heading mislabeled pupil count as codes and response arrival order shuffled display. Original parent candidatefb63adcb8ffcee21e4f34c2536d65a3fb16ef61d, implementation2b15de2a5e8f13a4109815164fcd3f9358bd1a93, base observedceec3a1c4c128c4601b62044528e5c08581aaaf0. Exact three-file public dependency hashes are in drafts/n88-student-portal/current-five-delivery-dependency.json at candidatefb63adcb. Actual client and actual mounted runtime/client/component/CSS synthetic cases PASS in tests/n88-actual-current-cause-20261020/current-five-{client,ui}.mjs/json. Historical harness failures retained on parent. Real list200/1983ms and student503/no-profile are independently recorded; the service cause/issuance remain UNKNOWN. This child does NOT claim hosted stability or wholeN88 acceptance.\n\nFresh ISOLATED PUBLIC worktree: apply ONLY the three source-file DIFF ceec3a1c..2b15de2a onto CURRENT main, never whole old files/worktree or private binding/custody artifacts. Preserve newer current cancellation/list diagnostics/owner/grade/Sync/receipt behavior. Match the exact qualified dependency hashes or explain/qualify a genuinely necessary current-main merge. Use existing tests and real-component fixture pattern, port the bounded client/UI cases into declared own test directory, no new standalone measurement tool or lookalike UI. Reuse unchanged successful evidence when exact source/dependency parity proves it; run only source-sensitive actual UI/client guards after a material merge. Local synthetic checks via canonical isolated-local-browser helper, no liveAuthorizationRef, credentials/profiles/SW/remote. No shared live browser needed. Never claim local source asserts as rendered UI.\n\nProve mixed active/inactive five rows, unknown kept after successful list/no replay, confirmed empty versus unavailable, deterministic Arabic numeric ordering/stable identity ties and unchanged row actions, distinct finite mutation versus list support, old owner retirement/pre-dispatch fence and no IDs/codes/errors/tokens in diagnostics. Sort a copied display array; do not persist roster order. Counters must not claim issuance or rollback. Preserve actual unknown commands and grades/publication semantics. Scope ONLY three source files plus own tests/doc; no student-entry/unified-client/native/carrier/backend/operator/private file writes or real account access. Parent is separately writing diagnostic-native/client paths, not these three files. No provider/SQL/Auth/schema/role, new account/code/grade/fixture, N36 operation or old refused tool workaround.\n\nReturn LOCAL_READY with these THREE publication checks when trulyPASS; historical13 parentFAIL/NOT_RUN stay intact and do not gate shipping this already safe UI. Sole original publisher integrates/deploys/verifies changed served files. No main push/deploy yourself, no other ticket/audit. Evidence compact and privacy-safe, exact code/dependency/candidate/base/provenance. Do not close umbrella N88 or callHTTP200 issuance. Original parent continues actual503 diagnostic in its original custody.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "5d216959e5fe334b73b7fa276f6987a1f444b6b1",
+        "requiredSourcePaths": [
+          "src/lib/student-portal-class-client.js",
+          "src/lib/student-portal-runtime.js",
+          "src/views/student-portal-class.js",
+          "src/styles/student-portal-class.css",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs"
+        ],
+        "editPaths": [
+          "src/lib/student-portal-class-client.js",
+          "src/lib/student-portal-runtime.js",
+          "src/views/student-portal-class.js",
+          "tests/n88-five-ui-delivery-20261024/client.mjs",
+          "tests/n88-five-ui-delivery-20261024/client.json",
+          "tests/n88-five-ui-delivery-20261024/ui.mjs",
+          "tests/n88-five-ui-delivery-20261024/ui.json",
+          "tests/n88-five-ui-delivery-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_FIVE_UI_DELIVERY.md"
+        ],
+        "newPaths": [
+          "tests/n88-five-ui-delivery-20261024/client.mjs",
+          "tests/n88-five-ui-delivery-20261024/client.json",
+          "tests/n88-five-ui-delivery-20261024/ui.mjs",
+          "tests/n88-five-ui-delivery-20261024/ui.json",
+          "tests/n88-five-ui-delivery-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N88_FIVE_UI_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n88_five_counts_order_and_unknown_receipt_ui",
+          "n88_finite_mutation_diagnostic_and_owner_guards",
+          "n88_qualified_three_file_current_main_parity"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
