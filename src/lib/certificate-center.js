@@ -5,6 +5,9 @@ import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCe
 import { openDocumentPreview } from './document-preview.js';
 import { resolvedReportPrincipalName, isDemoOutput } from './report-print.js';
 import { getAccountPresentation } from './account-profile.js';
+import { hasFullMarks, sortCertificateTeachings } from './certificate-selection.js';
+
+const HONORS_HINT = 'يحدّد أصحاب الدرجة الكاملة في جميع البنود بعد اكتمال رصدها. ويمكنك تعديل الاختيار يدويًا.';
 
 function loadStyle() {
   if (document.querySelector('link[data-certificate-center-style]')) return;
@@ -18,7 +21,7 @@ function loadStyle() {
 /** A local, transient certificate workspace. No profile, roster or evidence writes. */
 export function openCertificateCenter({ teachingId } = {}) {
   loadStyle();
-  const teachings = store.teachings();
+  const teachings = sortCertificateTeachings(store.teachings(), store);
   const initialTeaching = teachings.find(teaching => teaching.id === teachingId) ?? teachings[0];
   const initialText = defaultCertificateText();
   const profile = store.state.profile ?? {};
@@ -52,7 +55,8 @@ export function openCertificateCenter({ teachingId } = {}) {
               <small id="certificate-center-text-hint">عبارة تقدير جاهزة يمكنك تعديلها، وتُطبّق على جميع الطلاب المحددين.</small>
             </label>
             <label class="field certificate-center__search"><span class="field__label">بحث عن طالب</span><input class="input" type="search" data-center-search placeholder="ابحث بالاسم" autocomplete="off"></label>
-            <div class="certificate-center__selection"><span data-center-count role="status">لم يُحدّد طلاب</span><div><button class="btn btn--quiet btn--sm" type="button" data-center-all>تحديد الجميع</button><button class="btn btn--ghost btn--sm" type="button" data-center-clear>مسح</button></div></div>
+            <div class="certificate-center__selection"><span data-center-count role="status">لم يُحدّد طلاب</span><div><button class="btn btn--quiet btn--sm" type="button" data-center-honors aria-describedby="certificate-center-honors-hint">أبطال التميّز</button><button class="btn btn--ghost btn--sm" type="button" data-center-clear>مسح</button></div></div>
+            <p class="certificate-center__honors-hint" id="certificate-center-honors-hint" role="status">${HONORS_HINT}</p>
             <div class="certificate-center__roster" data-center-roster></div>
           </section>
           <section class="certificate-center__section" data-center-panel="design" hidden>
@@ -88,6 +92,7 @@ export function openCertificateCenter({ teachingId } = {}) {
       let previewOpen = false;
       let ready = false;
       let entries = [];
+      let honorsApplied = false;
       const dateLabel = certificateIssueDate();
       const roster = () => currentTeachingId ? store.students(currentTeachingId) : [];
       const cardFor = student => certificateCard({
@@ -113,13 +118,16 @@ export function openCertificateCenter({ teachingId } = {}) {
         $('[data-center-expand]').disabled = !ready || !entries.length || busy || previewOpen;
         $('[data-center-prev]').disabled = busy || index <= 0;
         $('[data-center-next]').disabled = busy || index >= entries.length - 1;
-        $('[data-center-all]').disabled = busy || !roster().length;
+        $('[data-center-honors]').disabled = busy || !roster().length;
       };
       const renderRoster = () => {
         const focusedStudentId = root.contains(document.activeElement) ? document.activeElement?.dataset?.centerStudent : null;
         const current = roster();
         const visible = current.filter(student => String(student.name).toLocaleLowerCase('ar').includes(query));
         $('[data-center-count]').textContent = selected.size ? `${selected.size} طالبًا محددًا` : 'لم يُحدّد طلاب';
+        $('#certificate-center-honors-hint').textContent = honorsApplied && !selected.size
+          ? 'لا يوجد طلاب مكتملة درجاتهم بالدرجة الكاملة في الفصل والمادة المختارين. يمكنك اختيار الطلاب يدويًا.'
+          : HONORS_HINT;
         $('[data-center-roster]').innerHTML = String(html`${visible.map(student => html`<label class="certificate-center__student ${selected.has(student.id) ? 'is-selected' : ''}"><input type="checkbox" data-center-student="${student.id}" ${selected.has(student.id) ? 'checked' : ''}><span><strong>${student.name}</strong></span></label>`)}${!visible.length ? html`<p class="certificate-center__empty">${current.length ? 'لا يوجد طالب بهذا الاسم.' : 'لا يوجد طلاب في الفصل المختار.'}</p>` : ''}`);
         if (focusedStudentId) [...root.querySelectorAll('[data-center-student]')]
           .find(field => field.dataset.centerStudent === focusedStudentId)?.focus({ preventScroll: true });
@@ -148,9 +156,9 @@ export function openCertificateCenter({ teachingId } = {}) {
       root.addEventListener('change', event => {
         const target = event.target;
         if (target.matches('[data-center-teaching]')) {
-          currentTeachingId = target.value; selected.clear(); index = 0; query = ''; $('[data-center-search]').value = '';
+          currentTeachingId = target.value; selected.clear(); honorsApplied = false; index = 0; query = ''; $('[data-center-search]').value = '';
         }
-        else if (target.matches('[data-center-student]')) { target.checked ? selected.add(target.dataset.centerStudent) : selected.delete(target.dataset.centerStudent); index = 0; }
+        else if (target.matches('[data-center-student]')) { target.checked ? selected.add(target.dataset.centerStudent) : selected.delete(target.dataset.centerStudent); honorsApplied = false; index = 0; }
         else return;
         renderRoster(); refresh();
       });
@@ -167,8 +175,16 @@ export function openCertificateCenter({ teachingId } = {}) {
           root.querySelectorAll('[data-center-panel]').forEach(panel => { panel.hidden = panel.dataset.centerPanel !== button.dataset.centerTab; });
           root.querySelectorAll('[data-center-tab]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
         }
-        else if (button.matches('[data-center-all]')) { selected.clear(); for (const student of roster()) selected.add(student.id); index = 0; renderRoster(); refresh(); }
-        else if (button.matches('[data-center-clear]')) { selected.clear(); index = 0; renderRoster(); refresh(); }
+        else if (button.matches('[data-center-honors]')) {
+          const context = store.teachingContext(currentTeachingId);
+          selected.clear();
+          for (const student of roster()) {
+            if (hasFullMarks(context.items, context.ctx[student.id], student.id)) selected.add(student.id);
+          }
+          honorsApplied = true; index = 0; query = ''; $('[data-center-search]').value = '';
+          renderRoster(); refresh();
+        }
+        else if (button.matches('[data-center-clear]')) { selected.clear(); honorsApplied = false; index = 0; renderRoster(); refresh(); }
         else if (button.matches('[data-center-design]')) {
           design = button.dataset.centerDesign;
           root.querySelectorAll('[data-center-design]').forEach(item => { const active = item === button; item.classList.toggle('is-selected', active); item.setAttribute('aria-pressed', String(active)); });
