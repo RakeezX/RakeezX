@@ -1,0 +1,110 @@
+{
+  "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
+  "runId": "c5c31ece-d841-4dbd-802e-5cba29044561",
+  "checks": [
+    {
+      "name": "actual authenticated UI recovers one queued same-owner session refresh after delayed configuration",
+      "status": "PASS"
+    },
+    {
+      "name": "actual delegated opt-in handler requires real gesture; synthetic denied permission creates no subscription",
+      "status": "PASS"
+    },
+    {
+      "name": "actual UI fixed finite reason disabled with no automatic same-input retry",
+      "status": "PASS"
+    },
+    {
+      "name": "actual UI fixed finite reason invalid with no automatic same-input retry",
+      "status": "PASS"
+    },
+    {
+      "name": "actual UI fixed finite reason private with no automatic same-input retry",
+      "status": "PASS"
+    },
+    {
+      "name": "actual UI fixed finite reason expired with no automatic same-input retry",
+      "status": "PASS"
+    },
+    {
+      "name": "actual UI fixed finite reason unavailable with no automatic same-input retry",
+      "status": "PASS"
+    },
+    {
+      "name": "actual UI preserves Service Worker eligibility gate",
+      "status": "PASS"
+    },
+    {
+      "name": "refresh requested during unchanged failed config does not enqueue another request",
+      "status": "PASS"
+    },
+    {
+      "name": "queued changed-binding refresh cannot restart a disposed runtime",
+      "status": "PASS"
+    },
+    {
+      "name": "actual expired lease invalidates readiness and exposes no opt-in",
+      "status": "PASS"
+    },
+    {
+      "name": "actual ownership guard invalidation exposes no opt-in or permission side effect",
+      "status": "PASS"
+    },
+    {
+      "name": "actual notification DOM and source CSS render without narrow-screen overflow",
+      "status": "PASS"
+    }
+  ],
+  "actualDeviceRegistrations": 0,
+  "actualPermissionPrompts": 0,
+  "actualProviderSendAttempts": 0,
+  "cleanup": {
+    "ownedBrowserClosed": true,
+    "ownedServerClosed": true,
+    "browserPhase": "canonical isolated local helper; no shared lease required"
+  },
+  "origin": "http://127.0.0.1:50708",
+  "delayedCheckpoint": {
+    "configCalls": 2,
+    "snapshot": {
+      "available": false,
+      "status": "unavailable",
+      "eligibility": {
+        "reason": "checking_service_worker",
+        "configuration": "ready",
+        "contextMatches": true,
+        "sessionMatches": true,
+        "workspaceMatches": true,
+        "leaseMatches": true,
+        "consentMatches": true,
+        "generationMatches": true,
+        "browserSupported": true,
+        "workerReady": false
+      }
+    },
+    "editable": true,
+    "contextPresent": true
+  },
+  "recoveredCheckpoint": {
+    "snapshot": {
+      "available": true,
+      "status": "unsubscribed",
+      "eligibility": {
+        "reason": "ready",
+        "configuration": "ready",
+        "contextMatches": true,
+        "sessionMatches": true,
+        "workspaceMatches": true,
+        "leaseMatches": true,
+        "consentMatches": true,
+        "generationMatches": true,
+        "browserSupported": true,
+        "workerReady": true
+      }
+    },
+    "ownerMatches": true,
+    "receiptMatches": true,
+    "databaseMatchesGuard": true
+  },
+  "status": "PASS"
+}

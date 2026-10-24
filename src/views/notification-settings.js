@@ -10,6 +10,23 @@ import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificat
 
 let cleanup = () => {};
 const dayLabels = { 3: 'قبل 3 أيام', 2: 'قبل يومين', 1: 'قبل يوم', 0: 'يوم التسليم' };
+const eligibilityText = {
+  "idle": "تذكيرات الجهاز غير جاهزة حاليًا.",
+  "disabled": "تذكيرات الجهاز غير متاحة حاليًا.",
+  "account_unavailable": "يتطلب تفعيل التذكيرات اتصالًا صالحًا بمساحة الحساب.",
+  "checking_configuration": "جارٍ التحقق من جاهزية تذكيرات الجهاز.",
+  "checking_context": "جارٍ التحقق من جاهزية تذكيرات الجهاز.",
+  "checking_service_worker": "جارٍ التحقق من جاهزية تذكيرات الجهاز.",
+  "configuration_disabled": "تذكيرات الجهاز غير متاحة لهذه المساحة حاليًا.",
+  "configuration_invalid": "تعذر التحقق من إعداد تذكيرات الجهاز.",
+  "request_unavailable": "تعذر تحميل إعداد تذكيرات الجهاز.",
+  "binding_changed": "تغير اتصال الحساب أثناء التحقق من الجاهزية.",
+  "browser_unsupported": "المتصفح لا يدعم تذكيرات الجهاز.",
+  "context_unavailable": "تعذر التحقق من سياق تذكيرات الجهاز.",
+  "service_worker_unavailable": "خدمة تذكيرات الجهاز في المتصفح غير جاهزة.",
+  "cleanup_pending": "تعذر إكمال إيقاف سابق لتذكيرات الجهاز.",
+  "ready": "تذكيرات الجهاز غير جاهزة حاليًا."
+};
 const view = {
   title: () => 'الإشعارات',
   render() {
@@ -19,6 +36,7 @@ const view = {
     const timing = readNotificationTiming(context);
     const push = getPushRuntime()?.snapshot();
     const quiet = readPushQuiet(context);
+    const eligibilityFlag = key => typeof push?.eligibility?.[key] === 'boolean' ? String(push.eligibility[key]) : 'not_observed';
     return html`<div class="n44-settings-page">
       <a class="btn btn--quiet n44-settings-back" href="#/settings">${icon('back')} الإعدادات</a>
       <div class="n44-settings" data-notification-scope="${scope ?? ''}">
@@ -28,6 +46,9 @@ const view = {
           <button type="button" class="btn btn--quiet" data-act="notification-push" data-scope="${scope}">${push.status === 'subscribed' ? 'إيقاف تذكيرات الجهاز' : push.status === 'cleanup_pending' ? 'إعادة محاولة الإيقاف' : 'تفعيل تذكيرات الجهاز'}</button>
           <p role="status">${push.status === 'subscribed' ? 'مفعّلة على هذا الجهاز' : push.status === 'unsubscribed' ? 'غير مفعّلة' : 'لم يكتمل التفعيل'}</p>
           <button type="button" class="btn btn--quiet" role="switch" aria-checked="${String(!!quiet)}" data-act="notification-push-quiet" data-scope="${scope}">هدوء من 10 مساءً إلى 7 صباحًا</button>
+        </section>` : push?.eligibility ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
+          <h2>تذكيرات الجهاز</h2>
+          <p role="status" data-n44-runtime-ready="${String(push.available === true)}" data-n44-push-eligibility="${Object.hasOwn(eligibilityText, push.eligibility.reason) ? push.eligibility.reason : 'idle'}" data-n44-context-match="${eligibilityFlag('contextMatches')}" data-n44-session-match="${eligibilityFlag('sessionMatches')}" data-n44-workspace-match="${eligibilityFlag('workspaceMatches')}" data-n44-lease-match="${eligibilityFlag('leaseMatches')}" data-n44-consent-match="${eligibilityFlag('consentMatches')}" data-n44-generation-match="${eligibilityFlag('generationMatches')}" data-n44-browser-supported="${eligibilityFlag('browserSupported')}" data-n44-worker-ready="${eligibilityFlag('workerReady')}" data-n44-config-category="${['ready', 'disabled', 'invalid', 'request_failed', 'not_observed'].includes(push.eligibility.configuration) ? push.eligibility.configuration : 'not_observed'}">${eligibilityText[push.eligibility.reason] ?? eligibilityText.idle}</p>
         </section>` : ''}
         <section class="n44-preference card card--pad" aria-labelledby="n44-lesson-heading">
           <div class="n44-preference-heading">
