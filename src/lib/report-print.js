@@ -1,10 +1,16 @@
 /** Shared, deliberately small print foundation for administration reports. */
 
-import { html, raw, fmtDateFull } from './dom.js';
+import { html, raw, fmtDateFull, toast } from './dom.js';
 import { todayISO } from '../models.js';
 import { getAccountPresentation } from './account-profile.js';
 import * as store from '../store.js';
 import { visibleLatinDigits } from './visible-numerals.js';
+import { MINISTRY_LOGO_URL } from './ministry-brand.js';
+
+/** The supplied Ministry artwork, kept at its original aspect ratio. */
+export function reportMinistryLogo() {
+  return html`<img class="printhead__ministry" data-report-ministry src="${MINISTRY_LOGO_URL}" alt="وزارة التعليم" width="866" height="659" loading="eager" decoding="async" style="display:block;width:92px;max-width:100%;height:auto;object-fit:contain;grid-column:1;grid-row:1;justify-self:start">`;
+}
 
 export const isDemoOutput = () => store.getActiveWorkspace()?.type === 'demo';
 
@@ -45,6 +51,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
   return html`
     <header class="printhead print-report__header" dir="rtl">
       <div class="printhead__top">
+        ${reportMinistryLogo()}
         <h2 class="printhead__title">${visibleLatinDigits(title)}</h2>
         <div class="printhead__brand"><a href="https://rakeezx.com/" target="_blank" rel="noopener noreferrer"><strong>رَكيز <em class="brand-wordmark-secondary">المعلم</em></strong></a></div>
         ${demoOutputMarker()}
@@ -66,6 +73,7 @@ export function reportPageSetup({ wide = false } = {}) {
     .printhead__timestamp { margin-top: 3px; color: #718287; font-size: 9px; text-align: left; }
     .print-report .printhead__brand a { color: inherit; text-decoration: none; }
     .print-report .printhead__title { min-width: 0; overflow-wrap: anywhere; }
+    .print-report .printhead__top { grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr); }
     .print-report .printhead__meta {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
       gap: 6px clamp(8px, 2vw, 24px); width: 100%;
@@ -103,7 +111,47 @@ export function reportFilename(title, date = todayISO()) {
   return `${safe || 'تقرير'} - ركيز المعلم - ${date}`;
 }
 
+/** Await the actual header images so an early print cannot omit the logo. */
+export async function prepareReportAssets(root = document) {
+  const images = [...root.querySelectorAll('img[data-report-ministry]')];
+  await Promise.all([document.fonts?.ready, ...images.map(async image => {
+    if (image.complete && image.naturalWidth > 0) return;
+    if (typeof image.decode === 'function') await image.decode();
+    else {
+      if (image.complete) throw new Error('Ministry logo is unavailable');
+      await new Promise((resolve, reject) => {
+        const loaded = () => { cleanup(); resolve(); };
+        const failed = () => { cleanup(); reject(new Error('Ministry logo is unavailable')); };
+        const cleanup = () => {
+          image.removeEventListener('load', loaded);
+          image.removeEventListener('error', failed);
+        };
+        image.addEventListener('load', loaded, { once: true });
+        image.addEventListener('error', failed, { once: true });
+      });
+    }
+    if (!image.naturalWidth) throw new Error('Ministry logo is unavailable');
+  })]);
+}
+
+let pendingReportPrint = null;
 export function printReport(title) {
+  if (pendingReportPrint) return pendingReportPrint;
+  pendingReportPrint = printPreparedReport(title).finally(() => { pendingReportPrint = null; });
+  return pendingReportPrint;
+}
+
+async function printPreparedReport(title) {
+  const root = document.querySelector('.print-report') ?? document.querySelector('.page') ?? document.body;
+  const route = location.hash;
+  const images = [...root.querySelectorAll('img[data-report-ministry]')];
+  try { await prepareReportAssets(root); }
+  catch {
+    if (!root.isConnected || location.hash !== route) return false;
+    toast('تعذّر تحميل شعار الوزارة. أعد المحاولة قبل الطباعة.', 'danger');
+    return false;
+  }
+  if (!root.isConnected || location.hash !== route || images.some(image => !image.isConnected)) return false;
   const originalTitle = document.title;
   const printTitle = reportFilename(title);
   const restore = () => {
@@ -113,7 +161,8 @@ export function printReport(title) {
   };
   document.title = printTitle;
   window.addEventListener('afterprint', restore, { once: true });
-  try { window.print(); } catch (error) { restore(); throw error; }
+  try { window.print(); return true; }
+  catch { restore(); toast('تعذّر فتح الطباعة. أعد المحاولة.', 'danger'); return false; }
 }
 
 export function reportFooter() {

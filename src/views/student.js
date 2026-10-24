@@ -13,7 +13,7 @@ import {
 } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
-import { demoOutputMarker, markDemoSharedText, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { demoOutputMarker, markDemoSharedText, resolvedReportPrincipalName, reportMinistryLogo, printReport } from '../lib/report-print.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
 import { studentAchievements, achievementCard, drawAchievementCard, achievementPng } from '../lib/student-achievements.js';
 import { openAchievementCertificate } from '../lib/achievement-certificate.js';
@@ -144,12 +144,17 @@ export default {
       <link rel="stylesheet" href="${achievementsStyleUrl}">
       <div class="printhead">
         ${demoOutputMarker()}
+        <div style="display:grid;grid-template-columns:92px minmax(0,1fr);align-items:center;gap:18px">
+        ${reportMinistryLogo()}
+        <div style="min-width:0">
         <div class="printhead__title">${s.name}</div>
         <div class="printhead__sub">
           ${section ? sectionLabel(section) : ''}
           ${tch ? '· ' + (store.getSubject(tch.subjectId)?.name ?? '') : ''}
           ${tch ? '· ' + (store.getTerm(tch.termId)?.name ?? '') : ''}
           ${store.state.profile?.schoolName ? ` · ${store.state.profile.schoolName}` : ''}
+        </div>
+        </div>
         </div>
       </div>
 
@@ -691,7 +696,7 @@ export default {
     },
 
     print() {
-      window.print();
+      return printReport('تقرير الطالب');
     },
 
     async 'add-note'(el, ev, params) {

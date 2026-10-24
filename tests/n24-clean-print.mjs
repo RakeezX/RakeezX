@@ -32,13 +32,13 @@ try {await withIsolatedLocalBrowser({taskFile,runId,url,engine,timeoutMs:120000}
     const safe=reportFilename('تقرير <>:"/\\|?* .','2026-10-14');
     if(/[<>:"/\\|?*]/.test(safe))throw Error('Reserved filename chars');
     window.print=()=>{throw Error('Synthetic dialog error');};
-    try { printReport('تقرير اختبار'); } catch(error) { if(error.message!=='Synthetic dialog error')throw error; }
+    if(await printReport('تقرير اختبار')!==false)throw Error('Failed dialog did not return false');
     if(document.title!==original)throw Error('Exception did not restore title');
-    window.print=()=>{};printReport('تقرير إلغاء');
+    window.print=()=>{};if(await printReport('تقرير إلغاء')!==true)throw Error('Prepared dialog did not print');
     if(document.title===original)throw Error('Async dialog title restored too early');
     window.dispatchEvent(new Event('afterprint'));
     if(document.title!==original)throw Error('Cancel did not restore title');
-    printReport('تقرير تعديل');document.title='عنوان مسار جديد';window.dispatchEvent(new Event('afterprint'));
+    if(await printReport('تقرير تعديل')!==true)throw Error('Prepared dialog did not print');document.title='عنوان مسار جديد';window.dispatchEvent(new Event('afterprint'));
     if(document.title!=='عنوان مسار جديد' || location.href!==route)throw Error('Route title clobbered');document.title=original;
   });
   await seed(page,{count:220,long:true,sessions:16,distinct:true});

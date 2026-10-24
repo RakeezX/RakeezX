@@ -1,6 +1,6 @@
-import { html, icon, openSheet, toast } from './dom.js';
+import { html, icon, toast } from './dom.js';
 import * as store from '../store.js';
-import { certificateCard, certificatePng, isCertificateReady, drawAchievementCertificate, certificateDescription, certificateIssueDate, printCertificateBatch } from './achievement-certificate.js';
+import { certificateCard, certificatePng, isCertificateReady, drawAchievementCertificate, certificateDescription, certificateIssueDate, printCertificateBatch, prepareCertificateAssets } from './achievement-certificate.js';
 import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
 import { resolvedReportPrincipalName, isDemoOutput } from './report-print.js';
@@ -19,7 +19,7 @@ function loadStyle() {
 }
 
 /** A local, transient certificate workspace. No profile, roster or evidence writes. */
-export function openCertificateCenter({ teachingId } = {}) {
+export function createCertificateCenter({ teachingId } = {}) {
   loadStyle();
   const teachings = sortCertificateTeachings(store.teachings(), store);
   const initialTeaching = teachings.find(teaching => teaching.id === teachingId) ?? teachings[0];
@@ -32,10 +32,20 @@ export function openCertificateCenter({ teachingId } = {}) {
     teacherName: profile.teacherName ?? '',
     principalName: resolvedReportPrincipalName(profile, store.state.device),
   };
-  return openSheet({
-    title: 'شهادات التقدير',
-    desc: 'اختر الفصل والطلاب، وخصّص نص الشهادة وتصميمها، ثم حمّلها أو اطبعها.',
+  const mounted = new WeakSet();
+  return {
     body: html`
+      <div class="certificate-page" dir="rtl">
+        <div class="certificate-page__toolbar">
+          <div class="certificate-page__workspace-actions">
+            <a class="btn btn--ghost" href="#/reports" data-center-back>العودة إلى التقارير</a>
+            <button type="button" class="btn btn--quiet" data-center-toggle-controls aria-expanded="true">${icon('settings')} <span>إخفاء الإعدادات</span></button>
+          </div>
+          <div class="certificate-page__exports">
+            <button type="button" class="btn btn--outline" data-center-download disabled>${icon('download')} صورة الشهادة المعروضة</button>
+            <button type="button" class="btn btn--primary" data-center-print disabled>${icon('print')} طباعة الشهادات / PDF</button>
+          </div>
+        </div>
       <div class="certificate-center" dir="rtl">
         <aside class="certificate-center__controls">
           <div class="certificate-center__tabs" role="group" aria-label="إعداد الشهادات">
@@ -50,10 +60,6 @@ export function openCertificateCenter({ teachingId } = {}) {
                 ${teachings.map(teaching => html`<option value="${teaching.id}" ${teaching.id === initialTeaching?.id ? 'selected' : ''}>${store.teachingLabel(teaching)}</option>`)}
               </select>
             </label>
-            <label class="field certificate-center__message"><span class="field__label">نص الشهادة</span>
-              <textarea class="input certificate-center__text" data-center-text rows="6" maxlength="${CERTIFICATE_TEXT_LIMIT}" aria-describedby="certificate-center-text-hint">${initialText}</textarea>
-              <small id="certificate-center-text-hint">عبارة تقدير جاهزة يمكنك تعديلها، وتُطبّق على جميع الطلاب المحددين.</small>
-            </label>
             <label class="field certificate-center__search"><span class="field__label">بحث عن طالب</span><input class="input" type="search" data-center-search placeholder="ابحث بالاسم" autocomplete="off"></label>
             <div class="certificate-center__selection"><span data-center-count role="status">لم يُحدّد طلاب</span><div><button class="btn btn--quiet btn--sm" type="button" data-center-honors aria-describedby="certificate-center-honors-hint">أبطال التميّز</button><button class="btn btn--ghost btn--sm" type="button" data-center-clear>مسح</button></div></div>
             <p class="certificate-center__honors-hint" id="certificate-center-honors-hint" role="status">${HONORS_HINT}</p>
@@ -62,6 +68,10 @@ export function openCertificateCenter({ teachingId } = {}) {
           <section class="certificate-center__section" data-center-panel="design" hidden>
             <h3>تصميم الشهادة</h3>
             <div class="certificate-center__designs" role="group" aria-label="تصميم الشهادة">${CERTIFICATE_DESIGNS.map((design, index) => html`<button type="button" class="certificate-center__design ${index === 0 ? 'is-selected' : ''}" data-center-design="${design.id}" aria-pressed="${index === 0}"><canvas class="certificate-center__thumbnail" data-center-thumbnail="${design.id}" width="300" height="212" aria-hidden="true"></canvas><strong>${design.label}</strong></button>`)}</div>
+            <label class="field certificate-center__message"><span class="field__label">نص الشهادة</span>
+              <textarea class="input certificate-center__text" data-center-text rows="6" maxlength="${CERTIFICATE_TEXT_LIMIT}" aria-describedby="certificate-center-text-hint">${initialText}</textarea>
+              <small id="certificate-center-text-hint">عبارة تقدير جاهزة يمكنك تعديلها، وتُطبّق على جميع الطلاب المحددين.</small>
+            </label>
             <details class="certificate-center__metadata"><summary>بيانات المدرسة والتوقيع</summary><p>تُملأ تلقائيًا من بياناتك في ركيز. يمكنك تعديلها لهذه الشهادات فقط.</p>
               ${[['schoolName', 'المدرسة'], ['educationDepartment', 'إدارة التعليم'], ['teacherName', presentation.teacherNameLabel], ['principalName', presentation.principalNameLabel]].map(([key, label]) => html`<label class="field"><span class="field__label">${label} <small>اختياري</small></span><input class="input" data-center-meta="${key}" value="${metadata[key]}" maxlength="100" autocomplete="off"></label>`)}
             </details>
@@ -70,15 +80,15 @@ export function openCertificateCenter({ teachingId } = {}) {
         </aside>
         <section class="certificate-center__preview" aria-label="معاينة الشهادات">
           <div class="certificate-center__preview-head"><div><h3>معاينة الشهادة</h3><span>A4 · أفقي</span></div><button type="button" class="btn btn--ghost btn--sm" data-center-expand disabled>معاينة موسّعة</button></div>
-          <div class="certificate-center__paper"><canvas data-center-canvas role="img" aria-label="معاينة شهادة التقدير"></canvas></div>
+          <div class="certificate-center__paper"><canvas data-center-canvas width="2970" height="2100" role="img" aria-label="معاينة شهادة التقدير"></canvas></div>
           <div class="certificate-center__navigation"><button type="button" class="btn btn--ghost btn--sm" data-center-prev disabled>السابق</button><span data-center-position>اختر طلابًا للمعاينة</span><button type="button" class="btn btn--ghost btn--sm" data-center-next disabled>التالي</button></div>
           <p class="certificate-center__status" data-center-status role="status" hidden></p>
         </section>
+      </div>
       </div>`,
-    foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button><button class="btn btn--outline" data-center-download disabled>${icon('download')} صورة الشهادة المعروضة</button><button class="btn btn--primary" data-center-print disabled>${icon('print')} طباعة الشهادات / PDF</button>`,
-    onMount(root) {
-      root.classList.add('certificate-center-backdrop');
-      root.querySelector('.sheet').classList.add('certificate-center-sheet');
+    mount(root) {
+      if (!root || mounted.has(root)) return;
+      mounted.add(root);
       const $ = selector => root.querySelector(selector);
       const canvas = $('[data-center-canvas]');
       const selected = new Set();
@@ -91,6 +101,8 @@ export function openCertificateCenter({ teachingId } = {}) {
       let busy = false;
       let previewOpen = false;
       let ready = false;
+      let assetsReady = false;
+      let assetsFailed = false;
       let entries = [];
       let honorsApplied = false;
       const dateLabel = certificateIssueDate();
@@ -138,13 +150,21 @@ export function openCertificateCenter({ teachingId } = {}) {
         entries = state.cards;
         index = Math.min(index, Math.max(0, entries.length - 1));
         ready = false;
+        $('[data-center-position]').textContent = entries.length ? `الشهادة ${index + 1} من ${entries.length}` : 'اختر طلابًا للمعاينة';
+        if (!assetsReady) {
+          $('[data-center-status]').textContent = assetsFailed
+            ? 'تعذّر تحميل شعار وزارة التعليم. أعد تحميل الصفحة للمحاولة مجددًا.'
+            : 'جارٍ تجهيز الشعار ومعاينة الشهادة…';
+          $('[data-center-status]').hidden = false;
+          syncButtons();
+          return;
+        }
         try {
           const card = entries[index]?.card ?? certificateCard({ text, demo: isDemoOutput() });
           drawAchievementCertificate(canvas, card, options());
           canvas.setAttribute('aria-label', certificateDescription(card, options()));
           ready = true;
         } catch { $('[data-center-status]').textContent = 'تعذرت معاينة الشهادة في هذا المتصفح.'; }
-        $('[data-center-position]').textContent = entries.length ? `الشهادة ${index + 1} من ${entries.length}` : 'اختر طلابًا للمعاينة';
         if (ready) $('[data-center-status]').textContent = state.missing ? 'تغيّر كشف الفصل. أعد اختيار الطلاب قبل التصدير.'
           : !selected.size ? 'حدّد الطلاب الذين تريد تجهيز شهاداتهم.'
           : !certificateText(text) ? 'اكتب نص الشهادة لإتاحة التصدير.'
@@ -171,7 +191,13 @@ export function openCertificateCenter({ teachingId } = {}) {
       root.addEventListener('click', async event => {
         const button = event.target.closest('button');
         if (!button || busy) return;
-        if (button.matches('[data-center-tab]')) {
+        if (button.matches('[data-center-toggle-controls]')) {
+          const hidden = root.classList.toggle('is-preview-only');
+          $('.certificate-center__controls').hidden = hidden;
+          button.setAttribute('aria-expanded', String(!hidden));
+          button.querySelector('span').textContent = hidden ? 'إظهار الإعدادات' : 'إخفاء الإعدادات';
+        }
+        else if (button.matches('[data-center-tab]')) {
           root.querySelectorAll('[data-center-panel]').forEach(panel => { panel.hidden = panel.dataset.centerPanel !== button.dataset.centerTab; });
           root.querySelectorAll('[data-center-tab]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
         }
@@ -208,7 +234,7 @@ export function openCertificateCenter({ teachingId } = {}) {
           let url;
           busy = true; syncButtons();
           try {
-            await document.fonts?.ready;
+            await prepareCertificateAssets();
             if (!isCurrent()) return;
             if (button.matches('[data-center-print]')) {
               // The print helper renders one scratch canvas at a time, avoiding
@@ -245,11 +271,16 @@ export function openCertificateCenter({ teachingId } = {}) {
           } finally { sample.width = 1; sample.height = 1; }
         }
       };
-      Promise.resolve(document.fonts?.ready).then(() => {
+      prepareCertificateAssets().then(() => {
         if (!root.isConnected) return;
+        assetsReady = true;
         refresh(false);
         try { renderThumbnails(); } catch { /* The live certificate preview remains available. */ }
+      }).catch(() => {
+        if (!root.isConnected) return;
+        assetsFailed = true;
+        refresh(false);
       });
     },
-  });
+  };
 }

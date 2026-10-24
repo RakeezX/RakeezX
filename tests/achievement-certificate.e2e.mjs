@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
+async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
+  await expect.poll(() => canvas.evaluate(node => node.__ministryLogoDraws?.length ?? 0)).toBeGreaterThan(previousCount);
+  const proof = await canvas.evaluate(node => node.__ministryLogoDraws.at(-1));
+  expect(proof.decoded).toBe(true);
+  expect(proof.width / proof.height).toBeCloseTo(proof.naturalWidth / proof.naturalHeight, 8);
+  return canvas.evaluate(node => node.__ministryLogoDraws.length);
+}
+
 test('certificate edits appreciation text and directly exports the current image without a review checkbox', async ({ page, context, baseURL }, testInfo) => {
   const origin = new URL(baseURL).origin;
   const errors = [];
@@ -12,6 +20,18 @@ test('certificate edits appreciation text and directly exports the current image
   await context.routeWebSocket('**/*', socket => socket.close());
   await context.addInitScript(() => {
     sessionStorage.setItem('rakeezx-demo-session-v1', 'active');
+    const drawImage = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function (image, ...args) {
+      const result = drawImage.call(this, image, ...args);
+      if (image instanceof HTMLImageElement && image.src.includes('/assets/brand/ministry-of-education')) {
+        const [, , width, height] = args.slice(-4);
+        (this.canvas.__ministryLogoDraws ??= []).push({
+          decoded: image.complete && image.naturalWidth > 0, naturalWidth: image.naturalWidth,
+          naturalHeight: image.naturalHeight, width, height,
+        });
+      }
+      return result;
+    };
     // Observe the application's actual isolated print document without opening an OS dialog.
     window.print = () => {
       window.top.__certificatePrintProof = {
@@ -70,6 +90,7 @@ test('certificate edits appreciation text and directly exports the current image
   await expect(sheet).not.toContainText('راجعت الشهادة وأوافق');
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
+  await expectPaintedMinistryLogo(canvas);
   await message.fill('');
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();
@@ -99,9 +120,12 @@ test('certificate edits appreciation text and directly exports the current image
   await expect(preview).toHaveCount(0);
   await expect(sheet.locator('[data-certificate-expand]')).toBeFocused();
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
+  const beforeSchool = await canvas.evaluate(node => node.__ministryLogoDraws.length);
   await editor.locator('[data-certificate-design][value="school"]').check();
+  const beforeOrnate = await expectPaintedMinistryLogo(canvas, beforeSchool);
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await editor.locator('[data-certificate-design][value="ornate"]').check();
+  await expectPaintedMinistryLogo(canvas, beforeOrnate);
   const expectedImage = await canvas.evaluate(node => node.toDataURL('image/png'));
   const outgoing = [];
   const observe = request => outgoing.push(request.url());

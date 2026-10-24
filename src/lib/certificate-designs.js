@@ -411,6 +411,29 @@ function signatures(ctx, meta) {
   });
 }
 
+function ministryMark(ctx, image, school) {
+  if (!image) return;
+  const sourceWidth = image.naturalWidth || image.width;
+  const sourceHeight = image.naturalHeight || image.height;
+  if (!(sourceWidth > 0 && sourceHeight > 0)) throw new Error('Ministry logo is unavailable');
+  const width = 168;
+  const height = width * sourceHeight / sourceWidth;
+  const x = school ? WIDTH - 255 : WIDTH - 430;
+  const y = school ? 24 : 66;
+  ctx.save();
+  if (school) {
+    // Preserve the original green/teal mark against the dark school header.
+    ctx.fillStyle = '#fffdf7';
+    ctx.beginPath();
+    ctx.roundRect(x - 13, y - 9, width + 26, height + 18, 10);
+    ctx.fill();
+  }
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(image, x, y, width, height);
+  ctx.restore();
+}
+
 /** Paint only certificate identity and the teacher's explicit appreciation text. */
 export function drawCertificateDesign(canvas, card = {}, options = {}) {
   const meta = certificateMetadata(options);
@@ -428,10 +451,13 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
   ctx.textBaseline = 'alphabetic';
   if (school) schoolBackground(ctx); else ornateBackground(ctx);
 
+  ministryMark(ctx, options.ministryLogo, school);
+
   const headerColor = school ? '#fffdf2' : INK;
   const secondaryColor = school ? '#d6e3cf' : '#8c805f';
-  fitted(ctx, meta.schoolName || 'رَكيز المعلم', CENTER, school ? 85 : 114, 960, 29, 20, 700, headerColor);
-  fitted(ctx, meta.educationDepartment || 'نحتفي بالتعلّم، ونقدّر الإنجاز', CENTER, school ? 124 : 148, 960, 19, 15, 500, secondaryColor);
+  const headerWidth = school ? 880 : 560;
+  fitted(ctx, meta.schoolName || 'رَكيز المعلم', CENTER, school ? 85 : 114, headerWidth, 29, 20, 700, headerColor);
+  fitted(ctx, meta.educationDepartment || 'نحتفي بالتعلّم، ونقدّر الإنجاز', CENTER, school ? 124 : 148, headerWidth, 19, 15, 500, secondaryColor);
 
   medal(ctx, school ? WIDTH - 191 : 191, 292, school);
   label(ctx, 'للجهد قيمة، وللإنجاز تقدير', CENTER, 245, 20, 500, school ? '#8b8a71' : '#9a8558');

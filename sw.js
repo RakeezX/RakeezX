@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v81';
+const VERSION = 'rakeezx-v82';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -101,6 +101,8 @@ const SHELL = [
   './src/lib/certificate-designs.js',
   './src/lib/certificate-center.js',
   './src/lib/certificate-selection.js',
+  './src/lib/ministry-brand.js',
+  './assets/brand/ministry-of-education.png',
   './src/styles/certificate-center.css',
   './src/lib/document-preview.js',
   './src/styles/achievement-certificate.css',
@@ -202,6 +204,7 @@ const SHELL = [
   './src/views/sessions.js',
   './src/views/reports.js',
   './src/views/reports-index.js',
+  './src/views/certificates.js',
   './src/views/cross-class-reports.js',
   './src/views/execution-report.js',
   './src/views/archive.js',

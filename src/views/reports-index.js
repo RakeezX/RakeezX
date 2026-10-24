@@ -4,7 +4,6 @@ import { html, icon, fmtPct } from '../lib/dom.js';
 import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
 import { studentTotal, sectionLabel, gradeLabel } from '../models.js';
-import { openCertificateCenter } from '../lib/certificate-center.js';
 
 
 const classCount = (count) => count === 1 ? 'فصل واحد' : count === 2 ? 'فصلان' : `${count} فصول`;
@@ -63,11 +62,11 @@ export default {
       <div class="reports-index-page">
         <div class="stack stack-4" data-report-destinations>
           <section class="surface surface--flat report-hub" aria-labelledby="certificate-center-title">
-            <button type="button" class="report-destination" data-act="certificate-center" style="width:100%;text-align:start;font:inherit;cursor:pointer;background:none;border:0">
+            <a class="report-destination" data-act="certificate-center" href="#/reports/certificates">
               <span class="report-destination__icon" aria-hidden="true">${icon('star')}</span>
               <span class="row__main"><span class="row__title" id="certificate-center-title">شهادات التقدير</span><span class="row__sub">تصاميم ركيز، اختيار عدة طلاب، وشهادة مستقلة لكل طالب في ملف PDF.</span></span>
               <span class="row__chev">${icon('chev')}</span>
-            </button>
+            </a>
           </section>
           <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
             <div class="report-hub__head">
@@ -117,8 +116,5 @@ export default {
         </section>
       </div>
     `;
-  },
-  actions: {
-    'certificate-center'() { return openCertificateCenter(); },
   },
 };

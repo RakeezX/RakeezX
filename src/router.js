@@ -26,6 +26,7 @@ const ROUTES = [
   { path: '/schedule/times',            load: () => import('./views/times.js') },
   { path: '/curriculum',                load: () => import('./views/curriculum.js') },
   { path: '/reports',                   load: () => import('./views/reports-index.js') },
+  { path: '/reports/certificates',       load: () => import('./views/certificates.js') },
   { path: '/reports/grades',            load: () => import('./views/cross-class-reports.js') },
   { path: '/reports/followup',          load: () => import('./views/cross-class-reports.js') },
   { path: '/reports/execution',         load: () => import('./views/execution-report.js') },

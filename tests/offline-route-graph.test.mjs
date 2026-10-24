@@ -42,6 +42,6 @@ test('service worker precaches the complete executable route graph', async () =>
   assert.ok(visited.size >= 59, 'route graph unexpectedly shrank; review router/module coverage');
 
   const routedViews = dependencies.get('src/router.js') ?? [];
-  assert.equal(routedViews.length, 38, 'every router entry must remain part of the audited graph');
+  assert.equal(routedViews.length, 39, 'every router entry must remain part of the audited graph');
   for (const view of routedViews) assert.ok(cachedModules.has(view), `${view} is not precached`);
 });

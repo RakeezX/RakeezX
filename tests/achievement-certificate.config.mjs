@@ -8,7 +8,7 @@ if (!(['127.0.0.1', 'localhost'].includes(target.hostname) || /^[a-f0-9]{8}\.rak
 
 export default defineConfig({
   testDir: '.',
-  testMatch: /(?:achievement-certificate|certificate-center|n87-achievements)\.e2e\.mjs$/,
+  testMatch: /(?:achievement-certificate|certificate-center|report-ministry-logo|n87-achievements)\.e2e\.mjs$/,
   fullyParallel: false,
   workers: 1,
   retries: 0,

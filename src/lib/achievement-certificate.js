@@ -2,8 +2,19 @@ import { html, icon, openSheet, toast, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
 import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
+import { getMinistryLogo, loadMinistryLogo } from './ministry-brand.js';
 
 const styleUrl = new URL('../styles/achievement-certificate.css', import.meta.url).href;
+const brandedCanvases = new WeakSet();
+
+export async function prepareCertificateAssets() {
+  const [, logo] = await Promise.all([globalThis.document?.fonts?.ready, loadMinistryLogo()]);
+  return logo;
+}
+
+function requireMinistryMark(canvas) {
+  if (canvas?.ownerDocument && !brandedCanvases.has(canvas)) throw new Error('Ministry logo is not ready');
+}
 
 function loadStyle() {
   if (document.querySelector('link[data-achievement-certificate-style]')) return;
@@ -29,13 +40,19 @@ export function isCertificateReady(card) {
 
 export function certificatePng(canvas, card) {
   if (!isCertificateReady(card)) return Promise.reject(new Error('Certificate name and text are required'));
+  try { requireMinistryMark(canvas); } catch (error) { return Promise.reject(error); }
   return new Promise((resolve, reject) => canvas.toBlob(blob =>
     blob ? resolve(blob) : reject(new Error('PNG unavailable')), 'image/png'));
 }
 
 /** Shared artwork, driven only by explicit certificate display projections. */
 export function drawAchievementCertificate(canvas, card, options = {}) {
-  return drawCertificateDesign(canvas, card, options);
+  brandedCanvases.delete(canvas);
+  const ministryLogo = options.ministryLogo ?? getMinistryLogo();
+  if (canvas?.ownerDocument && !ministryLogo) throw new Error('Ministry logo is not ready');
+  const result = drawCertificateDesign(canvas, card, { ...options, ministryLogo });
+  if (ministryLogo) brandedCanvases.add(canvas);
+  return result;
 }
 
 export function certificateIssueDate(iso = todayISO()) {
@@ -52,7 +69,7 @@ export function certificateIssueDate(iso = todayISO()) {
 
 export function certificateDescription(card, options = {}) {
   const meta = certificateMetadata(options);
-  return ['شهادة تقدير', card.name, meta.schoolName, meta.educationDepartment,
+  return ['شهادة تقدير', 'وزارة التعليم', card.name, meta.schoolName, meta.educationDepartment,
     meta.className, meta.subjectName,
     certificateText(card.text),
     meta.teacherName, meta.principalName, meta.dateLabel,
@@ -61,6 +78,7 @@ export function certificateDescription(card, options = {}) {
 
 function certificateRaster(canvas, card) {
   if (!isCertificateReady(card)) throw new Error('Certificate name and text are required');
+  requireMinistryMark(canvas);
   const png = canvas.toDataURL('image/png');
   if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(png)) throw new Error('Certificate image is unavailable');
   return png;
@@ -119,6 +137,8 @@ export async function printCertificateBatch(entries, isCurrent = () => true) {
   if (!Array.isArray(entries) || !entries.length || entries.some(entry => !isCertificateReady(entry.card))) {
     throw new Error('Each selected certificate requires a name and text');
   }
+  await prepareCertificateAssets();
+  if (!isCurrent()) return false;
   const scratch = document.createElement('canvas');
   const images = [];
   try {
@@ -181,11 +201,20 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
       let busy = false;
       let ready = false;
       let previewOpen = false;
+      let assetsReady = false;
+      let assetsFailed = false;
       const syncButtons = () => {
         download.disabled = print.disabled = busy || !ready || !isCertificateReady(card) || previewOpen;
         expand.disabled = !ready || busy || previewOpen;
       };
       const redraw = () => {
+        if (!assetsReady) {
+          ready = false;
+          status.textContent = assetsFailed ? 'تعذّر تحميل شعار وزارة التعليم. أعد فتح الشهادة للمحاولة.' : 'جارٍ تجهيز الشهادة وشعار وزارة التعليم…';
+          status.hidden = false;
+          syncButtons();
+          return;
+        }
         try {
           drawAchievementCertificate(canvas, card, options);
           canvas.setAttribute('aria-label', certificateDescription(card, options));
@@ -234,7 +263,7 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
         syncButtons();
         let url;
         try {
-          await document.fonts?.ready;
+          await prepareCertificateAssets();
           if (!isCurrent()) return;
           drawAchievementCertificate(canvas, selectedCard, selectedOptions);
           if (kind === 'print') {
@@ -267,8 +296,16 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
         sample.width = sample.height = 1;
       });
       update();
-      drawThumbnails();
-      document.fonts?.ready.then(() => { if (root.isConnected) { redraw(); drawThumbnails(); } });
+      prepareCertificateAssets().then(() => {
+        if (!root.isConnected) return;
+        assetsReady = true;
+        redraw();
+        drawThumbnails();
+      }).catch(() => {
+        if (!root.isConnected) return;
+        assetsFailed = true;
+        redraw();
+      });
     },
   });
 }

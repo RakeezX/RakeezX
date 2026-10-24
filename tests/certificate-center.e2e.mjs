@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
+async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
+  await expect.poll(() => canvas.evaluate(node => node.__ministryLogoDraws?.length ?? 0)).toBeGreaterThan(previousCount);
+  const proof = await canvas.evaluate(node => node.__ministryLogoDraws.at(-1));
+  expect(proof.decoded).toBe(true);
+  expect(proof.width / proof.height).toBeCloseTo(proof.naturalWidth / proof.naturalHeight, 8);
+  return canvas.evaluate(node => node.__ministryLogoDraws.length);
+}
+
 test('certificate center applies editable appreciation text to any chosen students and exports their isolated A4 pages', async ({ page, context, baseURL }, testInfo) => {
   const origin = new URL(baseURL).origin;
   const errors = [];
@@ -9,6 +17,18 @@ test('certificate center applies editable appreciation text to any chosen studen
   await context.routeWebSocket('**/*', socket => socket.close());
   await context.addInitScript(() => {
     sessionStorage.setItem('rakeezx-demo-session-v1', 'active');
+    const drawImage = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function (image, ...args) {
+      const result = drawImage.call(this, image, ...args);
+      if (image instanceof HTMLImageElement && image.src.includes('/assets/brand/ministry-of-education')) {
+        const [, , width, height] = args.slice(-4);
+        (this.canvas.__ministryLogoDraws ??= []).push({
+          decoded: image.complete && image.naturalWidth > 0, naturalWidth: image.naturalWidth,
+          naturalHeight: image.naturalHeight, width, height,
+        });
+      }
+      return result;
+    };
     window.print = () => { window.top.__certificateBatchProof = { isolated: window !== window.top, html: document.documentElement.outerHTML, images: document.images.length, text: document.body.innerText }; };
   });
   await page.goto('/#/classes');
@@ -68,122 +88,156 @@ test('certificate center applies editable appreciation text to any chosen studen
   await expect(entry).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('certificate-reports-spacing.png'), fullPage: false });
   await entry.click();
-  const sheet = page.locator('.certificate-center-sheet');
-  await expect(sheet).toBeVisible();
+  const workspace = page.locator('.certificate-page');
+  await expect(page).toHaveURL(/#\/reports\/certificates$/);
+  await expect(workspace).toBeVisible();
+  await expect(page.locator('.certificate-center-sheet')).toHaveCount(0);
+  await expect(workspace.locator('[data-sheet-close]')).toHaveCount(0);
   await page.evaluate(() => document.fonts.ready);
-  const canvas = sheet.locator('[data-center-canvas]');
-  const print = sheet.locator('[data-center-print]');
-  const message = sheet.locator('[data-center-text]');
-  const honors = sheet.locator('[data-center-honors]');
-  const honorsHint = sheet.locator('#certificate-center-honors-hint');
-  const search = sheet.locator('[data-center-search]');
+  const canvas = workspace.locator('[data-center-canvas]');
+  const print = workspace.locator('[data-center-print]');
+  const message = workspace.locator('[data-center-text]');
+  await expect(workspace.locator('[data-center-panel=students]')).toBeVisible();
+  await expect(workspace.locator('[data-center-panel=design]')).toBeHidden();
+  await expect(workspace.locator('[data-center-panel=design] [data-center-text]')).toHaveCount(1);
+  await expect(message).toBeHidden();
+  const honors = workspace.locator('[data-center-honors]');
+  const honorsHint = workspace.locator('#certificate-center-honors-hint');
+  const search = workspace.locator('[data-center-search]');
   const collator = new Intl.Collator('ar', { numeric: true, sensitivity: 'base' });
   const expectedChoices = [...fixture.choices].sort((a, b) => a.grade - b.grade
     || collator.compare(a.section, b.section) || collator.compare(a.subject, b.subject)
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)).map(item => item.id);
-  expect(await sheet.locator('[data-center-teaching] option').evaluateAll(options => options.map(option => option.value))).toEqual(expectedChoices);
+  expect(await workspace.locator('[data-center-teaching] option').evaluateAll(options => options.map(option => option.value))).toEqual(expectedChoices);
   await expect(honors).toHaveText('أبطال التميّز');
-  await expect(sheet.locator('[data-center-all]')).toHaveCount(0);
-  await sheet.locator('[data-center-teaching]').selectOption(fixture.teachingId);
+  await expect(workspace.locator('[data-center-all]')).toHaveCount(0);
+  await workspace.locator('[data-center-teaching]').selectOption(fixture.teachingId);
   const defaultHonorsHint = await honorsHint.innerText();
   await expect(honorsHint).toContainText('الدرجة الكاملة');
   await expect(honorsHint).toContainText('اكتمال رصدها');
   const stateBefore = await page.evaluate(async () => JSON.stringify((await import('/src/store.js')).state));
-  await expect(sheet.locator('[data-center-names]')).toHaveCount(0);
-  await expect(sheet.locator('[data-center-medal]')).toHaveCount(0);
+  await expect(workspace.locator('[data-center-names]')).toHaveCount(0);
+  await expect(workspace.locator('[data-center-medal]')).toHaveCount(0);
   for (const key of ['schoolName', 'educationDepartment', 'teacherName', 'principalName']) {
-    await expect(sheet.locator(`[data-center-meta="${key}"]`)).toHaveValue(fixture.identity[key]);
+    await expect(workspace.locator(`[data-center-meta="${key}"]`)).toHaveValue(fixture.identity[key]);
   }
-  await expect(sheet.locator('[data-center-evidence]')).toHaveCount(0);
+  await expect(workspace.locator('[data-center-evidence]')).toHaveCount(0);
   await expect(message).toHaveValue('تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد');
-  await expect(sheet.locator('[data-center-confirm]')).toHaveCount(0);
-  await expect(sheet).not.toContainText('راجعت شهادات الطلاب المحددين وأوافق');
+  await expect(workspace.locator('[data-center-confirm]')).toHaveCount(0);
+  await expect(workspace).not.toContainText('راجعت شهادات الطلاب المحددين وأوافق');
   const defaultText = await message.inputValue();
-  await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
+  await expect(workspace.locator('[data-center-student]:checked')).toHaveCount(0);
   await expect(print).toBeDisabled();
-  await expect(sheet.locator('[data-center-download]')).toBeDisabled();
-  await sheet.locator(`[data-center-student="${fixture.noEvidenceId}"]`).check();
+  await expect(workspace.locator('[data-center-download]')).toBeDisabled();
+  await workspace.locator(`[data-center-student="${fixture.noEvidenceId}"]`).check();
   await expect(print).toBeEnabled();
-  await expect(sheet.locator('[data-center-download]')).toBeEnabled();
+  await expect(workspace.locator('[data-center-download]')).toBeEnabled();
   await search.fill(fixture.noEvidenceName);
   await honors.click();
   await expect(search).toHaveValue('');
-  expect(await sheet.locator('[data-center-student]:checked').evaluateAll(fields => fields.map(field => field.dataset.centerStudent))).toEqual(fixture.ids);
-  await expect(sheet.locator(`[data-center-student="${fixture.noEvidenceId}"]`)).not.toBeChecked();
-  await sheet.locator('[data-center-clear]').click();
+  expect(await workspace.locator('[data-center-student]:checked').evaluateAll(fields => fields.map(field => field.dataset.centerStudent))).toEqual(fixture.ids);
+  await expect(workspace.locator(`[data-center-student="${fixture.noEvidenceId}"]`)).not.toBeChecked();
+  await workspace.locator('[data-center-clear]').click();
   await expect(honorsHint).toHaveText(defaultHonorsHint);
-  await sheet.locator('[data-center-teaching]').selectOption(fixture.emptyTeachingId);
+  await workspace.locator('[data-center-teaching]').selectOption(fixture.emptyTeachingId);
   await expect(honorsHint).toHaveText(defaultHonorsHint);
   await honors.click();
-  await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
+  await expect(workspace.locator('[data-center-student]:checked')).toHaveCount(0);
   await expect(print).toBeDisabled();
   await expect(honorsHint).toContainText('لا يوجد طلاب مكتملة درجاتهم بالدرجة الكاملة');
   await expect(honorsHint).toContainText('يمكنك اختيار الطلاب يدويًا');
-  await sheet.locator(`[data-center-student="${fixture.emptyStudentId}"]`).check();
+  await workspace.locator(`[data-center-student="${fixture.emptyStudentId}"]`).check();
   await expect(print).toBeEnabled();
   await expect(honorsHint).toHaveText(defaultHonorsHint);
-  await sheet.locator('[data-center-teaching]').selectOption(fixture.teachingId);
-  await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
+  await workspace.locator('[data-center-teaching]').selectOption(fixture.teachingId);
+  await expect(workspace.locator('[data-center-student]:checked')).toHaveCount(0);
   await expect(honorsHint).toHaveText(defaultHonorsHint);
   await honors.click();
-  expect(await sheet.locator('[data-center-student]:checked').evaluateAll(fields => fields.map(field => field.dataset.centerStudent))).toEqual(fixture.ids);
-  await expect(sheet.locator('[data-center-position]')).toHaveText('الشهادة 1 من 3');
+  expect(await workspace.locator('[data-center-student]:checked').evaluateAll(fields => fields.map(field => field.dataset.centerStudent))).toEqual(fixture.ids);
+  await expect(workspace.locator('[data-center-position]')).toHaveText('الشهادة 1 من 3');
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[0]));
   await expect(canvas).not.toHaveAttribute('aria-label', /بنود بدرجة كاملة|مشاركات إيجابية/);
+  await expectPaintedMinistryLogo(canvas);
+  const previewWidth = await canvas.evaluate(node => {
+    const parent = node.closest('.certificate-center__preview');
+    const style = getComputedStyle(parent);
+    return { actual: node.getBoundingClientRect().width, available: parent.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) };
+  });
+  expect(previewWidth.actual).toBeGreaterThanOrEqual(previewWidth.available - 4);
+  const toggleControls = workspace.locator('[data-center-toggle-controls]');
+  await expect(toggleControls).toHaveAttribute('aria-expanded', 'true');
+  await expect(toggleControls).toContainText('إخفاء الإعدادات');
+  await toggleControls.click();
+  await expect(toggleControls).toHaveAttribute('aria-expanded', 'false');
+  await expect(toggleControls).toContainText('إظهار الإعدادات');
+  await expect(workspace.locator('.certificate-center__controls')).toBeHidden();
+  await expect.poll(() => canvas.evaluate(node => node.getBoundingClientRect().width)).toBeGreaterThan(previewWidth.actual);
+  await toggleControls.click();
+  await expect(toggleControls).toHaveAttribute('aria-expanded', 'true');
+  await expect(toggleControls).toContainText('إخفاء الإعدادات');
+  await expect(workspace.locator('.certificate-center__controls')).toBeVisible();
+  expect(await workspace.locator('[data-center-student]:checked').evaluateAll(fields => fields.map(field => field.dataset.centerStudent))).toEqual(fixture.ids);
+  await expect(message).toHaveValue(defaultText);
   await page.screenshot({ path: testInfo.outputPath('certificate-center-default.png'), fullPage: false });
+  await workspace.locator('[data-center-tab=design]').click();
+  await expect(message).toBeVisible();
+  await expect(workspace.locator('[data-center-panel=students]')).toBeHidden();
   await message.fill('نعتز بجهدك ومثابرتك، ونسأل الله لك التوفيق والسداد. '.repeat(14).slice(0, 600));
   await canvas.screenshot({ path: testInfo.outputPath('certificate-long-text.png') });
   await message.fill(defaultText);
-  await sheet.locator('[data-center-tab="design"]').click();
-  await sheet.locator('.certificate-center__metadata > summary').click();
+  await workspace.locator('.certificate-center__metadata > summary').click();
   for (const [key, value] of Object.entries({ schoolName: 'مدرسة ركيز التجريبية', educationDepartment: 'إدارة التعليم — نموذج تجريبي', teacherName: 'عبدالله المعلم', principalName: 'أحمد المدير' })) {
-    await sheet.locator(`[data-center-meta="${key}"]`).fill(value);
+    await workspace.locator(`[data-center-meta="${key}"]`).fill(value);
   }
   await expect(canvas).toHaveAttribute('aria-label', /مدرسة ركيز التجريبية/);
-  await sheet.locator('[data-center-design="school"]').click();
+  const beforeSchool = await canvas.evaluate(node => node.__ministryLogoDraws.length);
+  await workspace.locator('[data-center-design="school"]').click();
+  const beforeOrnate = await expectPaintedMinistryLogo(canvas, beforeSchool);
   await expect(print).toBeEnabled();
-  await expect(sheet.locator('[data-center-design="school"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(workspace.locator('[data-center-design="school"]')).toHaveAttribute('aria-pressed', 'true');
   await canvas.screenshot({ path: testInfo.outputPath('certificate-school-preview.png') });
   await fs.writeFile(testInfo.outputPath('certificate-school-output.png'), Buffer.from(await canvas.evaluate(node => node.toDataURL('image/png').split(',')[1]), 'base64'));
-  await sheet.locator('[data-center-design="ornate"]').click();
+  await workspace.locator('[data-center-design="ornate"]').click();
+  await expectPaintedMinistryLogo(canvas, beforeOrnate);
   await canvas.screenshot({ path: testInfo.outputPath('certificate-ornate-preview.png') });
   await fs.writeFile(testInfo.outputPath('certificate-ornate-output.png'), Buffer.from(await canvas.evaluate(node => node.toDataURL('image/png').split(',')[1]), 'base64'));
-  await sheet.locator('.certificate-center__metadata > summary').click();
+  await workspace.locator('.certificate-center__metadata > summary').click();
   await page.screenshot({ path: testInfo.outputPath('certificate-center-designs.png'), fullPage: false });
-  await sheet.locator('[data-center-tab="students"]').click();
   await message.fill('');
   await expect(print).toBeDisabled();
-  await expect(sheet.locator('[data-center-download]')).toBeDisabled();
+  await expect(workspace.locator('[data-center-download]')).toBeDisabled();
   const customText = 'وذلك تقديرًا لمثابرته وإبداعه في مادة المهارات الرقمية.\nنعتز بجهده، ونسأل الله له دوام التوفيق والسداد.';
   await message.fill(customText);
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
   await expect(print).toBeEnabled();
-  await expect(sheet.locator('[data-center-download]')).toBeEnabled();
-  await sheet.locator('[data-center-next]').click();
+  await expect(workspace.locator('[data-center-download]')).toBeEnabled();
+  await workspace.locator('[data-center-tab=students]').click();
+  await expect(message).toBeHidden();
+  await workspace.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[1]));
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
   await expect(print).toBeEnabled();
-  await sheet.locator('[data-center-next]').click();
+  await workspace.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[2]));
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
-  await expect(sheet.locator('[data-center-next]')).toBeDisabled();
-  await sheet.locator('[data-center-prev]').click();
-  await sheet.locator('[data-center-prev]').click();
-  await sheet.locator('[data-center-expand]').click();
+  await expect(workspace.locator('[data-center-next]')).toBeDisabled();
+  await workspace.locator('[data-center-prev]').click();
+  await workspace.locator('[data-center-prev]').click();
+  await workspace.locator('[data-center-expand]').click();
   const expanded = page.locator('.document-preview-sheet');
   await expect(expanded).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(expanded).toHaveCount(0);
-  await expect(sheet.locator('[data-center-expand]')).toBeFocused();
+  await expect(workspace.locator('[data-center-expand]')).toBeFocused();
   await expect(print).toBeEnabled();
-  await sheet.locator('.sheet__body').evaluate(node => { node.scrollTop = 0; });
+  await workspace.locator('[data-center-back]').scrollIntoViewIfNeeded();
   await page.screenshot({ path: testInfo.outputPath('certificate-center-desktop.png'), fullPage: false });
   const outgoing = [];
   const observe = request => outgoing.push(request.url());
   const expectedImage = await canvas.evaluate(node => node.toDataURL('image/png'));
   page.on('request', observe);
   const pendingDownload = page.waitForEvent('download');
-  await sheet.locator('[data-center-download]').click();
+  await workspace.locator('[data-center-download]').click();
   const download = await pendingDownload;
   const pngPath = testInfo.outputPath('certificate-center-current.png');
   await download.saveAs(pngPath);
@@ -204,8 +258,8 @@ test('certificate center applies editable appreciation text to any chosen studen
   await page.evaluate(() => document.querySelector('iframe[data-certificate-print]')?.contentWindow.dispatchEvent(new Event('afterprint')));
   await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
   await expect(print).toBeEnabled();
-  await expect(sheet.locator('[data-center-download]')).toBeEnabled();
-  await expect(sheet).not.toContainText('من نافذة الطباعة');
+  await expect(workspace.locator('[data-center-download]')).toBeEnabled();
+  await expect(workspace).not.toContainText('من نافذة الطباعة');
   expect(outgoing).toEqual([]);
   page.off('request', observe);
   const printPage = await context.newPage();
@@ -218,21 +272,60 @@ test('certificate center applies editable appreciation text to any chosen studen
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    expect(await sheet.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+    expect(await workspace.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
     await canvas.scrollIntoViewIfNeeded();
     await page.screenshot({ path: testInfo.outputPath(`certificate-center-mobile-${width}.png`), fullPage: false });
   }
-  const choices = await sheet.locator('[data-center-teaching] option').evaluateAll(options => options.map(option => option.value));
+  const choices = await workspace.locator('[data-center-teaching] option').evaluateAll(options => options.map(option => option.value));
   const otherTeaching = choices.find(id => id !== fixture.teachingId);
   if (otherTeaching) {
-    await sheet.locator('[data-center-teaching]').selectOption(otherTeaching);
-    await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
+    await workspace.locator('[data-center-teaching]').selectOption(otherTeaching);
+    await expect(workspace.locator('[data-center-student]:checked')).toHaveCount(0);
     await expect(print).toBeDisabled();
-    await expect(sheet.locator('[data-center-download]')).toBeDisabled();
+    await expect(workspace.locator('[data-center-download]')).toBeDisabled();
     await expect(message).toHaveValue(customText);
   }
   expect(await page.evaluate(async () => JSON.stringify((await import('/src/store.js')).state))).toBe(stateBefore);
-  await sheet.locator('[data-sheet-close]').last().click();
-  await expect(entry).toBeFocused();
+  await workspace.locator('[data-center-back]').click();
+  await expect(page).toHaveURL(/#\/reports$/);
+  await expect(entry).toBeVisible();
+  // This is a real route: it must also open directly after a fresh document load.
+  await page.goto('/#/reports/certificates');
+  await expect(workspace).toBeVisible();
+  await expect(workspace.locator('[data-center-student]:checked')).toHaveCount(0);
+  await expect(workspace.locator('[data-center-print]')).toBeDisabled();
+  await expect(workspace.locator('[data-center-back]')).toHaveAttribute('href', '#/reports');
+  expect(errors).toEqual([]);
+});
+
+test('certificate page keeps exports unavailable and explains a failed Ministry logo load', async ({ page, context, baseURL }) => {
+  const origin = new URL(baseURL).origin;
+  let failedLogoRequests = 0;
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await context.route('**/*', route => {
+    const url = new URL(route.request().url());
+    if (url.pathname.includes('/assets/brand/ministry-of-education')) {
+      failedLogoRequests += 1;
+      return route.abort('failed');
+    }
+    return url.origin === origin ? route.continue() : route.abort('blockedbyclient');
+  });
+  await context.routeWebSocket('**/*', socket => socket.close());
+  await context.addInitScript(() => sessionStorage.setItem('rakeezx-demo-session-v1', 'active'));
+  await page.goto('/#/reports/certificates');
+  await page.waitForFunction(async () => {
+    const store = await import('/src/store.js');
+    return store.state.ready && store.getActiveWorkspace()?.type === 'demo';
+  });
+  await page.locator('.boot').waitFor({ state: 'detached' });
+  const workspace = page.locator('.certificate-page');
+  await expect(workspace).toBeVisible();
+  await workspace.locator('[data-center-student]').first().check();
+  await expect(workspace.locator('[data-center-status]')).toBeVisible();
+  await expect(workspace.locator('[data-center-status]')).toContainText(/شعار/);
+  await expect(workspace.locator('[data-center-print]')).toBeDisabled();
+  await expect(workspace.locator('[data-center-download]')).toBeDisabled();
+  expect(failedLogoRequests).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });

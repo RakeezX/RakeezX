@@ -7,13 +7,15 @@ const approvedText = 'تقديرًا لجهوده المتميزة، واجته�
 
 function recordingCanvas() {
   const texts = [];
+  const images = [];
   const context = new Proxy({
     createLinearGradient() { return { addColorStop() {} }; },
     createRadialGradient() { return { addColorStop() {} }; },
     fillText(value) { texts.push(String(value)); },
+    drawImage(...args) { images.push(args); },
     measureText(value) { return { width: Array.from(String(value)).length * Number((this.font || '24px').match(/([\d.]+)px/)[1]) * 0.55 }; },
   }, { get(target, key) { return key in target ? target[key] : () => {}; } });
-  return { texts, getContext: () => context, toDataURL: () => 'data:image/png;base64,c2VsZWN0ZWQtaW1hZ2U=', toBlob: callback => callback(new Blob(['certificate'], { type: 'image/png' })) };
+  return { texts, images, getContext: () => context, toDataURL: () => 'data:image/png;base64,c2VsZWN0ZWQtaW1hZ2U=', toBlob: callback => callback(new Blob(['certificate'], { type: 'image/png' })) };
 }
 
 test('certificates use only the student name and teacher text, with no achievement requirement', () => {
@@ -56,15 +58,21 @@ test('approved default text is exact for every subject and editable text remains
   }
 });
 
-test('both designs display bounded identity, the fixed medal and the complete edited text', () => {
+test('both designs display bounded identity, the original Ministry logo, the fixed medal and the complete edited text', () => {
   const card = certificateCard({ studentName: '\u202eعبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي', text: 'تقديرًا لمثابرتك وإبداعك.\nنعتز بجهدك ونحتفي بإنجازك.', demo: true });
   const raw = { schoolName: 'مدرسة\u202e تجريبية', teacherName: 'معلم تجريبي', principalName: 'مدير تجريبي',
     educationDepartment: 'إدارة تعليم تجريبية', className: 'الخامس 1', subjectName: 'المهارات الرقمية',
     dateLabel: certificateIssueDate('2026-10-24'), token: 'private-token', email: 'private-email' };
   for (const design of CERTIFICATE_DESIGNS) {
     const canvas = recordingCanvas();
-    const options = { ...raw, design: design.id, medal: 'laurel' };
+    const ministryLogo = { naturalWidth: 866, naturalHeight: 659 };
+    const options = { ...raw, design: design.id, medal: 'laurel', ministryLogo };
     drawAchievementCertificate(canvas, card, options);
+    const logoDraws = canvas.images.filter(([image]) => image === ministryLogo);
+    assert.equal(logoDraws.length, 1, 'Each design must embed the provided original logo');
+    const [, x, y, width, height] = logoDraws[0];
+    assert.ok(x >= 0 && y >= 0 && width > 0 && height > 0);
+    assert.ok(Math.abs(width / height - ministryLogo.naturalWidth / ministryLogo.naturalHeight) < 1e-10, 'The logo must retain its original aspect ratio');
     const output = canvas.texts.join(' ') + certificateDescription(card, options);
     for (const expected of ['آل مبدي العتيبي', 'مدرسة', 'معلم تجريبي', 'مدير تجريبي', 'الخامس 1', '2026', 'بيانات تجريبية', 'نعتز بجهدك']) assert.ok(output.includes(expected));
     assert.doesNotMatch(output, /private-|\u202e/);
