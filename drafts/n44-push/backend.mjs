@@ -161,12 +161,13 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
     const q=ports.query,source=await readSource(q,auth.ownerId,body.kind,body.sourceId,context.preferences);
     const old=await q('select distinct source_stamp from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5',[auth.ownerId,body.workspaceId,body.deviceId,body.kind,body.sourceId]);
     if(old.rows.length && old.rows.some(r=>r.source_stamp!==body.expectedStamp))return {status:'stale',sourceStamp:old.rows.length===1?old.rows[0].source_stamp:null};
-    if(!old.rows.length&&body.expectedStamp!==null)return {status:'stale'};
+    if(!old.rows.length&&body.expectedStamp!==null)return {status:'stale',sourceStamp:null};
     await q('delete from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5',[auth.ownerId,body.workspaceId,body.deviceId,body.kind,body.sourceId]);
+    let inserted=0;
     for(const e of source?.events??[]){if(e.expiresAt<=now())continue;
-     const {dueAt,...payload}=e;await q('insert into n44_push_draft.events values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',[auth.ownerId,body.workspaceId,body.deviceId,e.id,body.kind,body.sourceId,source.stamp,dueAt,e.expiresAt,payload]);}
+     const {dueAt,...payload}=e;await q('insert into n44_push_draft.events values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',[auth.ownerId,body.workspaceId,body.deviceId,e.id,body.kind,body.sourceId,source.stamp,dueAt,e.expiresAt,payload]);inserted++;}
     const count=await q('select event_id from n44_push_draft.events where owner_id=$1 limit 101',[auth.ownerId]);if(count.rows.length>100)fail();
-    return {status:'updated',sourceStamp:source?.stamp??null};
+    return {status:'updated',sourceStamp:inserted?source.stamp:null};
    }
    return {status:'rejected'};
   },signal);

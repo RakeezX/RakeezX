@@ -1,0 +1,92 @@
+{
+  "taskId": "continuous-n44-projection-and-preference-recovery-isolated-20261024",
+  "runId": "307de1f7-0481-4f93-b3ca-8b3d69c5bae1",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "startedAt": "2026-10-24T09:00:28.693Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-89376147",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-89376147\\data",
+  "checks": [
+    {
+      "name": "expired zero-event canonical edit recovers",
+      "status": "PASS",
+      "evidence": "Actual PG canonical revision + current-date due; zero rows ACK null; next projection creates exactly one event."
+    },
+    {
+      "name": "retained old stamp null CAS recovery bounded/idempotent",
+      "status": "PASS",
+      "evidence": "Actual gateway/backend/PG; one stale + one retry, exactly one event, no send."
+    },
+    {
+      "name": "current canonical removal and re-eligibility",
+      "status": "PASS",
+      "evidence": "Actual child revisions delete old events; null CAS correctly admits newly eligible canonical source."
+    },
+    {
+      "name": "UNKNOWN COMMIT never becomes projection ACK",
+      "status": "PASS",
+      "evidence": "Driver executes outer authenticated projection COMMIT then throws; changed canonical stamp persisted once, teacher rejects, no fabricated ACK."
+    },
+    {
+      "name": "foreign device, cancellation and expired session fences",
+      "status": "PASS",
+      "evidence": "Actual backend/helper/PG owner/session locks refuse without changing event rows."
+    },
+    {
+      "name": "general delivery remains OFF",
+      "status": "PASS",
+      "evidence": "No sender invocation or scheduler activation in any scenario."
+    },
+    {
+      "name": "n44_owned_runtime_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Owned PID/birth/-D/marker/port and data_directory verified; final exact PID absent and port rebound; stopped checkpoint retained. Hosted Auth/sender/device NOT_RUN."
+    }
+  ],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-89376147"
+  },
+  "port": 63393,
+  "ownership": {
+    "pid": 33928,
+    "birth": "2026-10-24T09:00:41.9999340Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-89376147\\data",
+    "port": 63393,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 33928,
+      "birth": "2026-10-24T09:00:41.9999340Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-89376147\\data",
+      "port": 63393,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    30848,
+    21928
+  ],
+  "schemaSha256": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+  "sourceHashes": {
+    "drafts/n44-push/backend.mjs": "5e4aefcddaa486dda0976429ff2caf47c07641f75bc226552fd035d381ca84d7",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/auth-verifier.mjs": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+    "src/lib/notification-push-gateway.js": "5e207e3bfdc64383ceb765b789cf30dcba3350b13dedab1355e0843cef6ac353",
+    "tests/n44-function-recovery-20261024/backend.mjs": "9d4f2bf90e6fb37d81e5fa40005d36c967d3b14d7009f02c6943e46a605b18b6",
+    "tests/n44-function-recovery-20261024/backend-cases.mjs": "06679621ec684bb39cce4e9d580d97ad1ae2c38bdabdd414eb32c2544cd5f13a"
+  },
+  "finishedAt": "2026-10-24T09:00:49.831Z",
+  "status": "PASS"
+}

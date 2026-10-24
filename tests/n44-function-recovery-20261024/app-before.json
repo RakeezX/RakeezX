@@ -1,0 +1,35 @@
+{
+  "baseline": true,
+  "checks": [
+    {
+      "name": "reproduced inaccessible cleanup retry",
+      "status": "PASS",
+      "evidence": "Actual disable fails revoke; available=false; actual settings DOM has no retry."
+    },
+    {
+      "name": "reproduced silent stop [data-act=\"notification-minutes\"][data-minutes=\"30\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    },
+    {
+      "name": "reproduced silent stop [data-act=\"notification-day\"][data-day=\"1\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    },
+    {
+      "name": "reproduced silent stop [data-act=\"notification-category\"][data-kind=\"due\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    },
+    {
+      "name": "reproduced silent stop [data-act=\"notification-push-quiet\"]",
+      "status": "PASS",
+      "evidence": "Actual delegated handler; consent false; no implicit registration; selected preferences applied."
+    }
+  ],
+  "cleanup": {
+    "browserClosed": true,
+    "serverClosed": true
+  },
+  "status": "PASS"
+}

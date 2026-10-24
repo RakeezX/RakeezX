@@ -41,10 +41,11 @@ const view = {
       <a class="btn btn--quiet n44-settings-back" href="#/settings">${icon('back')} الإعدادات</a>
       <div class="n44-settings" data-notification-scope="${scope ?? ''}">
       ${context ? html`
-        ${push?.available ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
+        ${push?.preferenceStopped && push.status !== 'cleanup_pending' ? html`<p role="status">أُوقفت تذكيرات الجهاز بعد تعديل التفضيلات. أعد تفعيلها لتطبيق التفضيلات الجديدة.</p>` : ''}
+        ${push?.available || push?.cleanupAvailable ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
           <h2>تذكيرات الجهاز</h2>
-          <button type="button" class="btn btn--quiet" data-act="notification-push" data-scope="${scope}">${push.status === 'subscribed' ? 'إيقاف تذكيرات الجهاز' : push.status === 'cleanup_pending' ? 'إعادة محاولة الإيقاف' : 'تفعيل تذكيرات الجهاز'}</button>
-          <p role="status">${push.status === 'subscribed' ? 'مفعّلة على هذا الجهاز' : push.status === 'unsubscribed' ? 'غير مفعّلة' : 'لم يكتمل التفعيل'}</p>
+          <button type="button" class="btn btn--quiet" data-act="notification-push" data-scope="${scope}" ${push.cleanupBusy ? 'disabled' : ''}>${push.status === 'subscribed' ? 'إيقاف تذكيرات الجهاز' : push.status === 'cleanup_pending' ? 'إعادة محاولة الإيقاف' : 'تفعيل تذكيرات الجهاز'}</button>
+          <p role="status">${push.status === 'subscribed' ? 'مفعّلة على هذا الجهاز' : push.status === 'cleanup_pending' ? 'لم يكتمل الإيقاف. أعد المحاولة.' : push.status === 'unsubscribed' ? 'غير مفعّلة' : 'لم يكتمل التفعيل'}</p>
           <button type="button" class="btn btn--quiet" role="switch" aria-checked="${String(!!quiet)}" data-act="notification-push-quiet" data-scope="${scope}">هدوء من 10 مساءً إلى 7 صباحًا</button>
         </section>` : push?.eligibility ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
           <h2>تذكيرات الجهاز</h2>
@@ -106,9 +107,9 @@ const view = {
     async 'notification-push'(el) {
       if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;
       const runtime = getPushRuntime();
-      if (!runtime?.snapshot().available) return;
+      if (!runtime?.snapshot().available && !runtime?.snapshot().cleanupAvailable) return;
       const result = await (['subscribed', 'cleanup_pending'].includes(runtime.snapshot().status) ? runtime.disable() : runtime.optIn());
-      if (!['subscribed', 'revoked'].includes(result?.status)) toast('تعذر تفعيل تذكيرات الجهاز', 'warn');
+      if (!['subscribed', 'revoked'].includes(result?.status)) toast(result?.status === 'cleanup_pending' ? 'لم يكتمل إيقاف تذكيرات الجهاز. أعد المحاولة.' : 'تعذر تفعيل تذكيرات الجهاز', 'warn');
       repaint();
     },
     async 'notification-push-quiet'(el) {

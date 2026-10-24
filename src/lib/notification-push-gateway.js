@@ -6,8 +6,11 @@ export const N44_RESPONSE_DEADLINE_MS = 15000;
 export function createPushGateway({ fetch: send = globalThis.fetch, authorization, context, preferences,
   storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => authorization, bindConsent = async () => false, clearConsent = async () => true }) {
   const scope = { workspaceId: context.workspaceId, deviceId: context.deviceId };
+  const sourceStamp = value => value === null || typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
   const key = 'rakeezx-n44-registration:' + JSON.stringify([context.ownerId, ...Object.values(scope)]);
   let remote = null, expectedRevision = null, receipt = null;
+  let uncertainStop = null;
+  const preferenceKey = p => JSON.stringify([p?.lesson, p?.due, p?.lessonMinutes, p?.dueDays, p?.timezone, p?.quiet === null ? null : [p?.quiet?.start, p?.quiet?.end]]);
   let cleanupIdentity;
   try { cleanupIdentity = JSON.parse(storage.getItem(key) || 'null'); } catch { cleanupIdentity = 'invalid'; }
   const request = async (path, body, cleanup = false) => {
@@ -31,9 +34,33 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
       receipt = r.registration ?? null; contextChanged(remote); return r;
     },
     async update(pushConsent, { cleanup = false, selectedPreferences = preferences() } = {}) {
-      const r = await request('context/update', { ...scope, expectedRevision, preferences: selectedPreferences, pushConsent }, cleanup);
-      if (r.status !== 'updated' || r.context?.pushConsent !== pushConsent || !r.context?.consentRevision || r.context.sessionRevision !== remote?.sessionRevision && remote !== null) throw Error('stale');
-      remote = r.context; expectedRevision = remote.consentRevision; contextChanged(remote); return r;
+      if (cleanup && !pushConsent && uncertainStop) {
+        // A lost stop ACK is UNKNOWN, not permission to replay a context write
+        // against a later consent. Read back only the exact committed stop.
+        const observed = await request('context/read', scope, true), ctx = observed.context;
+        if (observed.protocol !== N44_PROTOCOL || observed.status !== 'current' || observed.registration ||
+            !ctx?.active || ctx.workspaceId !== scope.workspaceId || ctx.deviceId !== scope.deviceId ||
+            ctx.sessionRevision !== uncertainStop.sessionRevision || ctx.sessionExpiresAt <= Date.now() || !ctx.consentRevision) throw Error('unknown');
+        if (ctx.consentRevision !== uncertainStop.expectedRevision) {
+          if (ctx.pushConsent !== false || preferenceKey(ctx.preferences) !== preferenceKey(uncertainStop.preferences)) throw Error('unknown');
+          remote = ctx; expectedRevision = ctx.consentRevision; contextChanged(remote); uncertainStop = null;
+          // Later local edits need a separate explicit cleanup retry.
+          if (preferenceKey(ctx.preferences) !== preferenceKey(selectedPreferences)) throw Error('stale');
+          return { status: 'updated', context: ctx };
+        }
+        // No committed revision change: the user's explicit retry keeps the
+        // original CAS. A concurrent change is still refused by the server.
+        uncertainStop = null;
+      }
+      const attempted = { sessionRevision: remote?.sessionRevision, expectedRevision, preferences: selectedPreferences };
+      try {
+        const r = await request('context/update', { ...scope, expectedRevision, preferences: selectedPreferences, pushConsent }, cleanup);
+        if (r.status !== 'updated' || r.context?.pushConsent !== pushConsent || !r.context?.consentRevision || r.context.sessionRevision !== remote?.sessionRevision && remote !== null) throw Error('stale');
+        remote = r.context; expectedRevision = remote.consentRevision; contextChanged(remote); return r;
+      } catch (error) {
+        if (cleanup && !pushConsent) uncertainStop = attempted;
+        throw error;
+      }
     },
     async register(_snapshot, subscription) {
       await this.update(true);
@@ -89,8 +116,8 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
     expiresAt: () => Math.min(remote?.sessionExpiresAt ?? 0, receipt?.expiresAt ?? Infinity),
     async project(kind, sourceId, expectedStamp) {
       let r = await request('events/update', { ...scope, kind, sourceId, expectedStamp });
-      if (r.status === 'stale' && /^[a-f0-9]{64}$/.test(r.sourceStamp)) r = await request('events/update', { ...scope, kind, sourceId, expectedStamp: r.sourceStamp });
-      if (r.status !== 'updated') throw Error('stale'); return r.sourceStamp;
+      if (r.status === 'stale' && sourceStamp(r.sourceStamp)) r = await request('events/update', { ...scope, kind, sourceId, expectedStamp: r.sourceStamp });
+      if (r.status !== 'updated' || !sourceStamp(r.sourceStamp)) throw Error('stale'); return r.sourceStamp;
     },
   });
 }

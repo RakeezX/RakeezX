@@ -1,0 +1,66 @@
+{
+  "taskId": "continuous-n44-projection-and-preference-recovery-isolated-20261024",
+  "runId": "307de1f7-0481-4f93-b3ca-8b3d69c5bae1",
+  "baseSha": "aa761cc6583385d0a5215c49324f68d20b0f8ba0",
+  "startedAt": "2026-10-24T08:51:22.976Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-4070fe2c",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-4070fe2c\\data",
+  "checks": [
+    {
+      "name": "reproduced zero-event CAS dead end",
+      "status": "PASS",
+      "evidence": "Actual canonical expired due -> zero inserts/non-null stamp -> canonical revision edit -> stale without stamp; outer COMMIT observed."
+    },
+    {
+      "name": "n44_owned_runtime_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Owned PID/birth/-D/marker/port and data_directory verified; final exact PID absent and port rebound; stopped checkpoint retained. Inactive source bindings verified; hosted Auth/sender/device NOT_RUN."
+    }
+  ],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-4070fe2c"
+  },
+  "port": 49523,
+  "ownership": {
+    "pid": 33836,
+    "birth": "2026-10-24T08:51:35.0660170Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-4070fe2c\\data",
+    "port": 49523,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 33836,
+      "birth": "2026-10-24T08:51:35.0660170Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-projection-and-preference-recovery-isolated-20261024\\tests\\n44-function-recovery-20261024\\pg-4070fe2c\\data",
+      "port": 49523,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    24428,
+    18128
+  ],
+  "schemaSha256": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+  "sourceHashes": {
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/registration.mjs": "1f76a9f45e6b6fb21c8c5c81964898de4668258f85beac5549194a06c4fde525",
+    "drafts/n44-push/delivery.mjs": "1eebbc4ef28faf93101c6b2342dac12eb501631e6713c4d5754b8de38bd491bb",
+    "tests/n44-runtime-gateway.mjs": "8346039d9e35a59b6546965750f35f8d5939e4a13759853f79ed60195f89c421",
+    "tests/fixtures/n44-runtime-gateway/cases.mjs": "e9b57fee5116d6b00092abbe468f5bcf8e4cb92d38e6cf740e673d4cdf4a4500"
+  },
+  "finishedAt": "2026-10-24T08:51:42.609Z",
+  "status": "PASS"
+}
