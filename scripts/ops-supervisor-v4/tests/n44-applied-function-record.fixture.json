@@ -1,0 +1,250 @@
+{
+  "kind": "actual-public-source-record-receipt-only-no-credentials",
+  "task": {
+    "id": "continuous-n44-applied-atomic-cleanup-source-record-20261024",
+    "productId": "N44",
+    "activationId": "po-20261012-continuous",
+    "executionMode": "synthetic",
+    "liveMutation": false,
+    "preparationAuthority": {
+      "kind": "already_applied_qualified_function_source_record",
+      "qualifiedParent": "3263e2799011d1f8ccabc3f68d02d04df081015e",
+      "appliedVersion": "20261024151136",
+      "appliedSqlSha256": "99b94b973de1858f916a7cbbebf9b8983736bc862a265d4748c692f2c668e4ec",
+      "providerOperations": 0,
+      "sqlExecutions": 0,
+      "privateCustodyAccess": 0,
+      "browserActions": 0
+    },
+    "allowedPaths": [
+      "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+      "docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md"
+    ],
+    "verificationPaths": [
+      "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+      "docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md"
+    ],
+    "candidateSha": "2c16489da96fcb9054c3e0ec6f811ffd476d6198",
+    "baseSha": "50ada074a82df5b8d493d6a7ba1cd5b4f255d9a7"
+  },
+  "receipt": {
+    "version": 1,
+    "ticketId": "N44",
+    "taskId": "continuous-n44-applied-atomic-cleanup-source-record-20261024",
+    "candidateSha": "2c16489da96fcb9054c3e0ec6f811ffd476d6198",
+    "baseSha": "50ada074a82df5b8d493d6a7ba1cd5b4f255d9a7",
+    "publishedSha": "01739ea58016753cc2fb70394afbfd2f52e8ee31",
+    "productionUrl": "https://rakeezx.com",
+    "at": "2026-10-24T16:00:47.744Z",
+    "status": "deployed",
+    "retryable": false,
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-24T16:00:47.744Z",
+    "repository": "RakeezX/RakeezX",
+    "targetBranch": "main",
+    "deploymentId": "4d84ca16-3feb-470f-ba9f-4b91d609945b",
+    "previewUrl": "https://4d84ca16.rakeezx.pages.dev",
+    "providerStatus": "SUCCESS",
+    "provider": {
+      "checkRunId": "120917998547",
+      "headSha": "01739ea58016753cc2fb70394afbfd2f52e8ee31",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-24T15:59:34Z",
+      "completedAt": "2026-10-24T15:59:34Z",
+      "headBranch": null,
+      "deploymentId": "4d84ca16-3feb-470f-ba9f-4b91d609945b",
+      "previewUrl": "https://4d84ca16.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/4d84ca16-3feb-470f-ba9f-4b91d609945b"
+    },
+    "currentMainSha": "01739ea58016753cc2fb70394afbfd2f52e8ee31",
+    "binding": {
+      "candidateSha": "2c16489da96fcb9054c3e0ec6f811ffd476d6198",
+      "declaredBaseSha": "50ada074a82df5b8d493d6a7ba1cd5b4f255d9a7",
+      "mainAtPreparation": "50ada074a82df5b8d493d6a7ba1cd5b4f255d9a7",
+      "integrationSha": "2c16489da96fcb9054c3e0ec6f811ffd476d6198",
+      "publishedSha": "01739ea58016753cc2fb70394afbfd2f52e8ee31",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "candidate-fast-forward"
+    },
+    "build": {
+      "status": "passed",
+      "startedAt": "2026-10-24T15:58:59.766Z",
+      "completedAt": "2026-10-24T15:59:07.609Z",
+      "integrationSha": "2c16489da96fcb9054c3e0ec6f811ffd476d6198",
+      "publishedSha": "01739ea58016753cc2fb70394afbfd2f52e8ee31",
+      "kind": "standard-build",
+      "validationTier": "STANDARD",
+      "reusedVerifiedBuildSha": null,
+      "generatedPathsChanged": [
+        "src/generated/build-meta.generated.js"
+      ],
+      "commands": [
+        {
+          "command": "node.exe",
+          "args": [
+            "scripts/generate-build-meta.mjs"
+          ]
+        },
+        {
+          "command": "node.exe",
+          "args": [
+            "node_modules/vite/bin/vite.js",
+            "build"
+          ]
+        }
+      ]
+    },
+    "changedPaths": [
+      "docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md",
+      "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql"
+    ],
+    "sourceOnlyPaths": [],
+    "changedAssets": [],
+    "productSourceChangeObserved": false,
+    "evidence": {
+      "immutable": {
+        "origin": "https://4d84ca16.rakeezx.pages.dev",
+        "checkedAt": "2026-10-24T16:00:42.764Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "observedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "bytes": 5711,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9",
+            "observedSha256": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9",
+            "bytes": 21916,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "8ca92b9013823b2cb476c71d167a4fb0a6aa7cb1c5c0755e84cd37520da38571",
+            "observedSha256": "8ca92b9013823b2cb476c71d167a4fb0a6aa7cb1c5c0755e84cd37520da38571",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+            "urlPath": "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "99b94b973de1858f916a7cbbebf9b8983736bc862a265d4748c692f2c668e4ec",
+            "observedSha256": "99b94b973de1858f916a7cbbebf9b8983736bc862a265d4748c692f2c668e4ec",
+            "bytes": 11827,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md",
+            "urlPath": "docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "198ce93921bce2365fec711343b7d8e9db7e4134b89f378d6f1af81fb35d7e69",
+            "observedSha256": "198ce93921bce2365fec711343b7d8e9db7e4134b89f378d6f1af81fb35d7e69",
+            "bytes": 7032,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-24T16:00:43.154Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "observedSha256": "fa7581c43a385a25f53d952547285c457425a1936094a5fdac3ca49b8ef7a09e",
+            "bytes": 7016,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "normalizedBytes": 5711,
+            "removedProviderBytes": 1305,
+            "removedSha256": "2475dd1d79c4405f8081ab9a401ebfe589855523866033cfdeb7cdac6bf7aba2",
+            "providerTransforms": [
+              "cloudflare-jsd-v1",
+              "cloudflare-analytics-20261017"
+            ],
+            "providerAddedWhitespaceBytes": 1
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9",
+            "observedSha256": "784df5cb9b2ef33b4a35333544d846c1ae2dd7d5af5389225491756a749dfcd9",
+            "bytes": 21916,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "8ca92b9013823b2cb476c71d167a4fb0a6aa7cb1c5c0755e84cd37520da38571",
+            "observedSha256": "8ca92b9013823b2cb476c71d167a4fb0a6aa7cb1c5c0755e84cd37520da38571",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+            "urlPath": "supabase/migrations/20261024151136_n44_atomic_item_cleanup.sql",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "99b94b973de1858f916a7cbbebf9b8983736bc862a265d4748c692f2c668e4ec",
+            "observedSha256": "99b94b973de1858f916a7cbbebf9b8983736bc862a265d4748c692f2c668e4ec",
+            "bytes": 11827,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md",
+            "urlPath": "docs/automation-evidence/20261024/N44_APPLIED_ATOMIC_CLEANUP_SOURCE_RECORD.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "198ce93921bce2365fec711343b7d8e9db7e4134b89f378d6f1af81fb35d7e69",
+            "observedSha256": "198ce93921bce2365fec711343b7d8e9db7e4134b89f378d6f1af81fb35d7e69",
+            "bytes": 7032,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      }
+    },
+    "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n44-applied-atomic-cleanup-source-record-20261024\\integration-2c16489da96f-1-2bc95141",
+    "pushRecovered": false,
+    "poPersonallyTested": false,
+    "closed": false
+  }
+}
