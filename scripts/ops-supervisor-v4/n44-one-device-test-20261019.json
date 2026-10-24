@@ -311,6 +311,19 @@
           "newSources": 0,
           "serviceWrites": 0,
           "oldBudgetsPreserved": true
+        },
+        "normalHomeQualification": {
+          "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-full-outcome-authority.json",
+          "oldErrorIsClassServiceNotProvenAuth": true,
+          "normalOwnedRakeezTabOnly": true,
+          "maxHomeAndNotificationNavigation": 1,
+          "n88ClassSyncCalls": 0,
+          "otpLoginRequests": 0,
+          "sourceCreation": 0,
+          "registrations": 0,
+          "sends": 0,
+          "serviceWrites": 0,
+          "oldExpiredWindowPreserved": true
         }
       },
       "releaseAuthority": "Latest direct PO full outcome delegation authorizes necessary qualified affected notification frontend delivery through the sole publisher and named original-custodian service prerequisites. No general delivery/cron activation, old-disposal replay, tool denial bypass or consumed budget reset.",
@@ -322,7 +335,7 @@
         "continuous-n44-deliver-qualified-optin-ui-20261024",
         "continuous-n44-confirmed-command-ack-projection-20261024"
       ],
-      "objective": "ONE NORMAL EXISTING-SESSION READ-ONLY RETRY QUALIFICATION, NO DEVICE TEST. Saved43191d87d5c5d5fcaebcd4744189885b52e77f06 records a normal trial UI with Sign in/Retry; the sign-in modal asks for email verification and was cancelled without requesting a code. No observed read-only Retry was consumed. Before concluding human reauthentication is unavoidable, identify the EXACT visible Retry DOM data-action and inspect its existing source handler. Only if it performs ordinary existing Auth/session/profile validation/read (no email, signup, restore, provisioning, reset, Sync, data write or message) may you click it ONCE and wait for a bounded normal result. Do NOT blindly click an ambiguous Retry: initial restore/provision/calendar repair paths are specifically excluded, since original local/outbox/unknown-source data must remain intact. If it is not pure existing-session recovery, record its exact safe handler classification and stop; no need to ask another permission question.\n\nCurrent old source expiry04:14:27Z and all historical windows/budgets stay unchanged. This phase authorizes ZERO source creation/grade/portal writes, registrations, provider sends, native/pin/policy/config/SQL/Auth schema/migration/cron operations. Both old registrations remain consumed/revoked, old cleanup consumed, total sendsZERO; third allowances remain unused. No new live phase or automatic window extension. Do not inspect Incognito/Madrasati/extension or hidden app/cookie/token state. Same original normal tab/account/private target only; no account switch or session cloning. If retry recovers, prove exact same owner/workspace in original protected custody, leave the teacher ready and release lease. If still unavailable, preserve the actual reason as UNKNOWN unless finite supported UI proves it; the user already has an async factual sign-in request, do not send/ask for an OTP or claim credential expiry from UI alone. Original one-shot notification remains NOT_RUN. Release browser lease promptly so N88 can reconcile its separate Incognito target; no service lease held while waiting. Return truthful final JSON and public finite metadata only.",
+      "objective": "READ NORMAL RAKEEZ HOME/NOTIFICATION SCOPE, NOT THE FAILED N88 CLASS VIEW. Savedcb822578d4dd38bdf7d712fddcc6802f6f863349 proves the visible control is data-n88-retry -> reconcileEntry(true), which may class-sync. It is NOT a pure Auth retry, and human reauthentication necessity is NOT established. Earlier sign-in modal asking for a code does not prove the entire normal account session is gone. Current normal tab was left on a class-service route; that view's failure is distinct from main teacher Auth/workspace. Full PO explicitly permits normal trial tab navigation and completion; this is a materially different supported READ path, no repeats of the class button or sign-in.\n\nAfter fresh browser metadata and browser lease, claim only the same normal Rakeez trial tab. Read its ordinary Home/account navigation via existing UI/known same-origin Home, then notification settings if available. No personal/other-domain tab, OS input, account switching, cookie/Auth-state extraction, login/email/OTP request, restore/provision/reset/Sync/class-service action or mutation. Verify finite supported main teacher/workspace readiness and exact SAME original owner/workspace/device fingerprint in original custody if visible. Record current controls/disabled reasons and whether global account is actually unavailable versus only N88 class-service. Never infer credential expiry from the old subview. No class/roster/grade write, new source, registration/send, native/pin/policy/provider/SQL/Auth configuration operation. Old04:14:27Z live window is expired and NOT extended or reused. Both prior registrations revoked and budget consumed; sendZERO and third unused preserved.\n\nIf Home establishes the normal teacher ready, leave the tab on that safe ready page, not the failing class route if its on-entry can synchronize; record original URL privately for later. No current device test is permitted in this read-only phase. If true global sign-in is required, record supported exact state and keep the user's existing async sign-in input; do not request a code or ask new permission. If a different owner appears stop; no rebinding. Release browser lease promptly for N88; no shared service lease held. Return truthful original JSON/finite proof. Original source2 server cleanup remainsUNKNOWN; no deletion/retry or expired phase activation.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -367,7 +380,7 @@
         ],
         "publisherChecks": []
       },
-      "completionMode": "normal_existing_session_safe_retry_only",
+      "completionMode": "normal_home_and_notification_scope_read_only",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
