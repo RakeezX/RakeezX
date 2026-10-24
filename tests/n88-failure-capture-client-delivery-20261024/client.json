@@ -1,0 +1,15 @@
+{
+  "aiAuthored": true,
+  "status": "PASS",
+  "renderedUI": false,
+  "checks": [
+    "exact three-file qualified source hashes and base parity",
+    "strict finite field/schema/status/challenge guards",
+    "current request, connected root, finite expiry and retirement",
+    "unknown nonce ACK consumes reservation without automatic retry",
+    "503 capture before ordinary unavailable rejection; no error body read or successful binding",
+    "401 remains session denial; code digit normalization preserved"
+  ],
+  "trust": "Capture does not attest source/MAC/owner; immutable original-custody evidence reused by exact dependency parity",
+  "providerOperations": 0
+}
