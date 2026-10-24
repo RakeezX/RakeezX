@@ -24,14 +24,21 @@ export function createCertificateCenter({ teachingId } = {}) {
   const teachings = sortCertificateTeachings(store.teachings(), store);
   const initialTeaching = teachings.find(teaching => teaching.id === teachingId) ?? teachings[0];
   const initialText = defaultCertificateText();
-  const profile = store.state.profile ?? {};
-  const presentation = getAccountPresentation(profile.teacherForm);
-  const metadata = {
-    schoolName: profile.schoolName ?? '',
-    educationDepartment: profile.educationDepartment ?? '',
-    teacherName: profile.teacherName ?? '',
-    principalName: resolvedReportPrincipalName(profile, store.state.device),
+  const identityDefaults = () => {
+    const profile = store.state.profile ?? {};
+    return {
+      schoolName: profile.schoolName ?? '',
+      educationDepartment: profile.educationDepartment ?? '',
+      teacherName: profile.teacherName ?? '',
+      principalName: resolvedReportPrincipalName(profile, store.state.device),
+    };
   };
+  let presentation = getAccountPresentation(store.state.profile?.teacherForm);
+  const metadata = identityDefaults();
+  const editedMetadata = new Set();
+  const currentIdentity = () => Object.fromEntries(Object.entries(identityDefaults())
+    .map(([key, value]) => [key, editedMetadata.has(key) ? metadata[key] : value]));
+  let refreshMountedIdentity = null;
   const mounted = new WeakSet();
   return {
     body: html`
@@ -42,9 +49,8 @@ export function createCertificateCenter({ teachingId } = {}) {
             <button type="button" class="btn btn--quiet" data-center-toggle-controls aria-expanded="true">${icon('settings')} <span>إخفاء الإعدادات</span></button>
           </div>
           <div class="certificate-page__exports">
-            <button type="button" class="btn btn--outline" data-center-download disabled>${icon('download')} تنزيل الصور</button>
-            <button type="button" class="btn btn--primary" data-center-print disabled>${icon('download')} تنزيل PDF</button>
-            <button type="button" class="btn btn--ghost" data-center-cancel hidden>إيقاف المتبقي</button>
+            <button type="button" class="btn btn--outline" data-center-download disabled><span class="certificate-export-icon" aria-hidden="true">${icon('download')}</span> تنزيل الصور</button>
+            <button type="button" class="btn btn--primary" data-center-print disabled><span class="certificate-export-icon" aria-hidden="true">${icon('download')}</span> تنزيل PDF</button>
           </div>
         </div>
       <div class="certificate-center" dir="rtl">
@@ -74,7 +80,7 @@ export function createCertificateCenter({ teachingId } = {}) {
               <small id="certificate-center-text-hint">عبارة تقدير جاهزة يمكنك تعديلها، وتُطبّق على جميع الطلاب المحددين.</small>
             </label>
             <details class="certificate-center__metadata"><summary>بيانات المدرسة والتوقيع</summary><p>تُملأ تلقائيًا من بياناتك في ركيز. يمكنك تعديلها لهذه الشهادات فقط.</p>
-              ${[['schoolName', 'المدرسة'], ['educationDepartment', 'إدارة التعليم'], ['teacherName', presentation.teacherNameLabel], ['principalName', presentation.principalNameLabel]].map(([key, label]) => html`<label class="field"><span class="field__label">${label} <small>اختياري</small></span><input class="input" data-center-meta="${key}" value="${metadata[key]}" maxlength="100" autocomplete="off"></label>`)}
+              ${[['schoolName', 'المدرسة'], ['educationDepartment', 'إدارة التعليم'], ['teacherName', presentation.teacherNameLabel], ['principalName', presentation.principalNameLabel]].map(([key, label]) => html`<label class="field"><span class="field__label"><span data-center-meta-label="${key}">${label}</span> <small>اختياري</small></span><input class="input" data-center-meta="${key}" value="${metadata[key]}" maxlength="100" autocomplete="off"></label>`)}
             </details>
             <p class="certificate-center__local">${icon('check')} تُجهّز على جهازك دون رفع أو إرسال</p>
           </section>
@@ -85,10 +91,14 @@ export function createCertificateCenter({ teachingId } = {}) {
           <div class="certificate-center__navigation"><button type="button" class="btn btn--ghost btn--sm" data-center-prev disabled>السابق</button><span data-center-position>اختر طلابًا للمعاينة</span><button type="button" class="btn btn--ghost btn--sm" data-center-next disabled>التالي</button></div>
           <p class="certificate-center__status" data-center-status role="status" hidden></p>
           <p class="certificate-center__local" data-center-export-hint hidden>لكل طالب ملف مستقل باسمه. اسمح بتنزيل عدة ملفات إذا طلب المتصفح ذلك.</p>
-          <p class="certificate-center__status" data-center-export-status role="status" hidden></p>
+          <div class="certificate-center__export-progress">
+            <p class="certificate-center__status" data-center-export-status role="status" hidden></p>
+            <button type="button" class="btn btn--ghost btn--sm" data-center-cancel hidden>إيقاف المتبقي</button>
+          </div>
         </section>
       </div>
       </div>`,
+    refreshIdentity() { refreshMountedIdentity?.(); },
     mount(root) {
       if (!root || mounted.has(root)) return;
       mounted.add(root);
@@ -103,6 +113,7 @@ export function createCertificateCenter({ teachingId } = {}) {
       let index = 0;
       let revision = 0;
       let busy = false;
+      let exportFormat = null;
       let exportCancelled = false;
       let previewOpen = false;
       let ready = false;
@@ -117,8 +128,9 @@ export function createCertificateCenter({ teachingId } = {}) {
       });
       const options = () => {
         const teaching = store.getTeaching(currentTeachingId);
-        return { ...metadata, design, teacherLabel: presentation.teacherSubjectLabel,
-          principalLabel: presentation.schoolPrincipalLabel,
+        const currentPresentation = getAccountPresentation(store.state.profile?.teacherForm);
+        return { ...currentIdentity(), design, teacherLabel: currentPresentation.teacherSubjectLabel,
+          principalLabel: currentPresentation.schoolPrincipalLabel,
           className: store.sectionLabel(store.getSection(teaching?.sectionId)) || '',
           subjectName: store.getSubject(teaching?.subjectId)?.name || '', dateLabel };
       };
@@ -132,6 +144,8 @@ export function createCertificateCenter({ teachingId } = {}) {
       const syncButtons = () => {
         const valid = ready && selectionState().valid;
         $('[data-center-print]').disabled = $('[data-center-download]').disabled = !valid || busy || previewOpen;
+        $('[data-center-print]').setAttribute('aria-busy', String(busy && exportFormat === 'pdf'));
+        $('[data-center-download]').setAttribute('aria-busy', String(busy && exportFormat === 'png'));
         $('[data-center-expand]').disabled = !ready || !entries.length || busy || previewOpen;
         $('[data-center-prev]').disabled = busy || index <= 0;
         $('[data-center-next]').disabled = busy || index >= entries.length - 1;
@@ -182,6 +196,22 @@ export function createCertificateCenter({ teachingId } = {}) {
         $('[data-center-status]').hidden = !$('[data-center-status]').textContent;
         syncButtons();
       };
+      refreshMountedIdentity = () => {
+        if (!root.isConnected) return;
+        const next = currentIdentity();
+        const nextPresentation = getAccountPresentation(store.state.profile?.teacherForm);
+        let changed = nextPresentation.teacherSubjectLabel !== presentation.teacherSubjectLabel;
+        for (const [key, value] of Object.entries(next)) {
+          if (metadata[key] !== value) changed = true;
+          metadata[key] = value;
+          const field = $(`[data-center-meta="${key}"]`);
+          if (field.value !== String(value)) field.value = value;
+        }
+        presentation = nextPresentation;
+        $('[data-center-meta-label="teacherName"]').textContent = presentation.teacherNameLabel;
+        $('[data-center-meta-label="principalName"]').textContent = presentation.principalNameLabel;
+        if (changed) refresh();
+      };
       root.addEventListener('change', event => {
         const target = event.target;
         if (target.matches('[data-center-teaching]')) {
@@ -195,7 +225,11 @@ export function createCertificateCenter({ teachingId } = {}) {
         const target = event.target;
         if (target.matches('[data-center-search]')) { query = target.value.trim().toLocaleLowerCase('ar'); renderRoster(); }
         else if (target.matches('[data-center-text]')) { text = target.value; refresh(); }
-        else if (target.matches('[data-center-meta]')) { metadata[target.dataset.centerMeta] = target.value; refresh(); }
+        else if (target.matches('[data-center-meta]')) {
+          editedMetadata.add(target.dataset.centerMeta);
+          metadata[target.dataset.centerMeta] = target.value;
+          refresh();
+        }
       });
       root.addEventListener('click', async event => {
         const button = event.target.closest('button');
@@ -250,11 +284,12 @@ export function createCertificateCenter({ teachingId } = {}) {
             && fingerprint === JSON.stringify({ cards: selectionState().cards.map(entry => entry.card), options: options() });
           let prepared = 0;
           exportCancelled = false;
+          exportFormat = button.matches('[data-center-print]') ? 'pdf' : 'png';
           busy = true; syncButtons();
           try {
             const files = outputEntries.map(({ card }) => ({ card, options: snapshotOptions }));
             const result = await downloadCertificates(files, {
-              format: button.matches('[data-center-print]') ? 'pdf' : 'png', isCurrent,
+              format: exportFormat, isCurrent,
               onProgress(progress) {
                 prepared = progress.prepared;
                 if (!root.isConnected) return;
@@ -276,9 +311,10 @@ export function createCertificateCenter({ teachingId } = {}) {
               toast('تعذّر تجهيز بقية الشهادات — حاول مرة أخرى', 'danger');
             }
           }
-          finally { busy = false; syncButtons(); }
+          finally { busy = false; exportFormat = null; syncButtons(); }
         }
       });
+      refreshMountedIdentity();
       renderRoster(); refresh();
       const renderThumbnails = () => {
         for (const thumbnail of root.querySelectorAll('[data-center-thumbnail]')) {

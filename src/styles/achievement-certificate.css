@@ -28,8 +28,17 @@
 .certificate-paper { padding: 18px; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; }
 .certificate-paper canvas { display: block; width: 100%; height: auto; aspect-ratio: 297 / 210; background: #fffdf7; box-shadow: 0 7px 24px #193c3220; }
 .certificate-status { margin: 10px 2px 0; color: var(--text-2); font-size: 12px; line-height: 1.8; }
+.certificate-export-status { min-height: 2.8em; margin: 10px 2px 0; color: var(--text-2); font-size: 12px; line-height: 1.4; }
+.certificate-export-icon { display: inline-flex; position: relative; flex: 0 0 18px; width: 18px; height: 18px; align-items: center; justify-content: center; }
+.certificate-export-icon svg { width: 18px; height: 18px; }
+.btn[aria-busy="true"] .certificate-export-icon svg { visibility: hidden; }
+.btn[aria-busy="true"] .certificate-export-icon::after { content: ''; position: absolute; inset: 1px; border: 2px solid currentColor; border-inline-end-color: transparent; border-radius: 50%; animation: certificate-export-spin .8s linear infinite; }
+@keyframes certificate-export-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn[aria-busy="true"] .certificate-export-icon::after { animation: none; } }
 .certificate-sheet .sheet__foot { flex-wrap: wrap; gap: 8px; }
-.certificate-sheet .sheet__foot .btn { min-height: 42px; }
+.certificate-sheet .sheet__foot .btn { min-height: 42px; white-space: nowrap; }
+.certificate-sheet .sheet__foot .btn:active:not([disabled]):not([aria-disabled="true"]) { transform: none; }
+.certificate-sheet .sheet__foot .btn[aria-busy="true"] { opacity: 1; cursor: progress; }
 @media (max-width: 760px) {
   .certificate-backdrop .certificate-sheet { width: min(100%, calc(100vw - 16px)); }
   .certificate-editor { grid-template-columns: 1fr; gap: 18px; }

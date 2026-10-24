@@ -7,13 +7,13 @@ import { certificatePdfFromJpeg } from './certificate-pdf.js';
 
 const styleUrl = new URL('../styles/achievement-certificate.css', import.meta.url).href;
 const brandedCanvases = new WeakSet();
-const titleFontUrl = new URL('../../assets/fonts/aref-ruqaa/ArefRuqaa-Bold.ttf', import.meta.url).href;
+const titleFontUrl = new URL('../../assets/fonts/layla-diwani/LaylaDiwaniRegular.ttf', import.meta.url).href;
 let titleFontReady;
 
 function prepareTitleFont() {
   if (titleFontReady) return titleFontReady;
   if (!globalThis.document?.fonts || typeof FontFace === 'undefined') return Promise.reject(new Error('Certificate font loading is unavailable'));
-  const font = new FontFace(TITLE_FONT_FAMILY, `url(${titleFontUrl})`, { weight: '700', style: 'normal' });
+  const font = new FontFace(TITLE_FONT_FAMILY, `url(${titleFontUrl})`, { weight: '400', style: 'normal' });
   titleFontReady = font.load().then(loaded => {
     document.fonts.add(loaded);
     return loaded;
@@ -270,12 +270,13 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
             <button class="btn btn--ghost" data-certificate-expand type="button">معاينة موسّعة</button></div>
           <div class="certificate-paper"><canvas data-certificate-canvas role="img" aria-label="معاينة شهادة التقدير"></canvas></div>
           <p class="certificate-status" data-certificate-status role="status" hidden></p>
+          <p class="certificate-export-status" data-certificate-export-status role="status"></p>
         </section>
       </div>`,
     foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>
       <button class="btn btn--ghost" data-certificate-print disabled>${icon('print')} طباعة</button>
-      <button class="btn btn--outline" data-certificate-download disabled>${icon('download')} تنزيل الصورة</button>
-      <button class="btn btn--primary" data-certificate-pdf disabled>${icon('download')} تنزيل PDF</button>`,
+      <button class="btn btn--outline" data-certificate-download disabled><span class="certificate-export-icon" aria-hidden="true">${icon('download')}</span> تنزيل الصورة</button>
+      <button class="btn btn--primary" data-certificate-pdf disabled><span class="certificate-export-icon" aria-hidden="true">${icon('download')}</span> تنزيل PDF</button>`,
     onMount(root) {
       root.classList.add('certificate-backdrop');
       root.querySelector('.sheet').classList.add('certificate-sheet');
@@ -285,15 +286,19 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
       const pdf = root.querySelector('[data-certificate-pdf]');
       const expand = root.querySelector('[data-certificate-expand]');
       const status = root.querySelector('[data-certificate-status]');
+      const exportStatus = root.querySelector('[data-certificate-export-status]');
       let card;
       let options = initialOptions;
       let busy = false;
+      let exportKind = null;
       let ready = false;
       let previewOpen = false;
       let assetsReady = false;
       let assetsFailed = false;
       const syncButtons = () => {
         download.disabled = pdf.disabled = print.disabled = busy || !ready || !isCertificateReady(card) || previewOpen;
+        download.setAttribute('aria-busy', String(busy && exportKind === 'download'));
+        pdf.setAttribute('aria-busy', String(busy && exportKind === 'pdf'));
         expand.disabled = !ready || busy || previewOpen;
       };
       const redraw = () => {
@@ -349,23 +354,29 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
         const selectedOptions = options;
         const isCurrent = () => root.isConnected && selectedCard === card && ready && isCertificateReady(card);
         busy = true;
+        exportKind = kind;
+        exportStatus.textContent = kind === 'print' ? 'جارٍ تجهيز الطباعة…' : kind === 'pdf' ? 'جارٍ تجهيز ملف PDF…' : 'جارٍ تجهيز صورة الشهادة…';
         syncButtons();
         try {
           await prepareCertificateAssets();
-          if (!isCurrent()) return;
+          if (!isCurrent()) { exportStatus.textContent = 'تغيّرت الشهادة. أعد التنزيل بالبيانات الحالية.'; return; }
           drawAchievementCertificate(canvas, selectedCard, selectedOptions);
           if (kind === 'print') {
-            await printCertificate(canvas, selectedCard, isCurrent, selectedOptions);
+            const opened = await printCertificate(canvas, selectedCard, isCurrent, selectedOptions);
+            exportStatus.textContent = opened ? 'فُتحت نافذة الطباعة.' : 'تغيّرت الشهادة. أعد الطباعة بالبيانات الحالية.';
           } else {
             const result = await downloadCertificates([{ canvas, card: selectedCard, options: selectedOptions }], {
               format: kind === 'pdf' ? 'pdf' : 'png', isCurrent,
             });
+            exportStatus.textContent = result.cancelled ? 'تغيّرت الشهادة. أعد التنزيل بالبيانات الحالية.' : 'تم تجهيز ملف الشهادة للتنزيل.';
             if (!result.cancelled) toast('تم تجهيز ملف الشهادة للتنزيل', 'ok');
           }
         } catch {
+          exportStatus.textContent = 'تعذّر تجهيز الشهادة. حاول مرة أخرى.';
           toast(kind === 'print' ? 'تعذّر فتح الطباعة — يمكنك تنزيل الصورة' : 'تعذّر تنزيل الشهادة — حاول مرة أخرى', 'danger');
         } finally {
           busy = false;
+          exportKind = null;
           syncButtons();
         }
       };

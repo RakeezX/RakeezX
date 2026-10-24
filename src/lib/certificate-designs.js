@@ -17,7 +17,7 @@ const HEIGHT = 1050;
 const CENTER = WIDTH / 2;
 const FONT = '"Tajawal", sans-serif';
 const HEADER_FONT = '"Thmanyah Sans", sans-serif';
-const TITLE_FONT = `"${TITLE_FONT_FAMILY}", "Aref Ruqaa", serif`;
+const TITLE_FONT = `"${TITLE_FONT_FAMILY}", "LaylaDiwani", serif`;
 const INK = '#243e35';
 const GOLD = '#a77b2e';
 const MUTED = '#767768';
@@ -481,9 +481,9 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
   headerIdentity(ctx, meta.schoolName || 'رَكيز المعلم', CENTER - 312.5, school, 26, headerColor);
 
   medal(ctx, school ? WIDTH - 191 : 191, 292, school);
-  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 321, 900, 98, 74, 700, school ? '#244c3a' : '#946c24', TITLE_FONT);
+  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 321, 900, 110, 82, 400, school ? '#244c3a' : '#946c24', TITLE_FONT);
   flourish(ctx, 361, school);
-  label(ctx, 'تُمنح هذه الشهادة بكل تقدير إلى', CENTER, 404, 24, 500, MUTED);
+  label(ctx, 'تمنح هذه الشهادة بكل تقدير إلى الطالب', CENTER, 404, 24, 500, MUTED);
   recipient(ctx, name);
 
   const contextLine = [meta.className, meta.subjectName].filter(Boolean).join('  ·  ');

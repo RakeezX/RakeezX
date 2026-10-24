@@ -200,7 +200,7 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
   await expectPaintedMinistryLogo(canvas);
   expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
   expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
-  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/aref-ruqaa/ArefRuqaa-Bold.ttf')))).toBe(true);
+  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/layla-diwani/LaylaDiwaniRegular.ttf')))).toBe(true);
   const previewWidth = await canvas.evaluate(node => {
     const parent = node.closest('.certificate-center__preview');
     const style = getComputedStyle(parent);
@@ -422,4 +422,122 @@ test('certificate page keeps exports unavailable and explains a failed Ministry 
   await expect(workspace.locator('[data-center-download]')).toBeDisabled();
   expect(failedLogoRequests).toBeGreaterThan(0);
   expect(errors).toEqual([]);
+});
+
+test('certificate identity follows current Rakeez data while explicit edits stay local to the open certificates', async ({ page, context, baseURL }) => {
+  const origin = new URL(baseURL).origin;
+  await context.route('**/*', route => new URL(route.request().url()).origin === origin ? route.continue() : route.abort('blockedbyclient'));
+  await context.routeWebSocket('**/*', socket => socket.close());
+  await context.addInitScript(() => sessionStorage.setItem('rakeezx-demo-session-v1', 'active'));
+  await page.goto('/#/reports/certificates');
+  await page.waitForFunction(async () => {
+    const store = await import('/src/store.js');
+    return store.state.ready && store.getActiveWorkspace()?.type === 'demo';
+  });
+  await page.locator('.boot').waitFor({ state: 'detached' });
+  const workspace = page.locator('.certificate-page');
+  await expect(workspace).toBeVisible();
+  const initial = await page.evaluate(async () => {
+    const store = await import('/src/store.js');
+    const { EDUCATION_DEPARTMENTS } = await import('/src/lib/education-department-directory.js');
+    if (store.getActiveWorkspace()?.type !== 'demo') throw new Error('Fresh synthetic Demo required');
+    const profile = { schoolName: 'مدرسة البيانات التلقائية', educationDepartment: EDUCATION_DEPARTMENTS[0],
+      teacherName: 'المعلم من ركيز', reportPrincipalName: 'المدير من ركيز' };
+    await store.patchProfile(profile);
+    return profile;
+  });
+  const field = key => workspace.locator(`[data-center-meta="${key}"]`);
+  for (const key of ['schoolName', 'educationDepartment', 'teacherName']) await expect(field(key)).toHaveValue(initial[key]);
+  await expect(field('principalName')).toHaveValue(initial.reportPrincipalName);
+  await workspace.locator('[data-center-student]').first().check();
+  await workspace.locator('[data-center-tab=design]').click();
+  await workspace.locator('.certificate-center__metadata > summary').click();
+  await field('teacherName').fill('توقيع خاص بهذه الشهادات');
+  await field('principalName').fill('');
+  const changed = await page.evaluate(async () => {
+    const store = await import('/src/store.js');
+    const { EDUCATION_DEPARTMENTS } = await import('/src/lib/education-department-directory.js');
+    if (store.getActiveWorkspace()?.type !== 'demo') throw new Error('Fresh synthetic Demo required');
+    const profile = { schoolName: 'مدرسة بعد تحديث بيانات ركيز', educationDepartment: EDUCATION_DEPARTMENTS[1],
+      teacherName: 'المعلم بعد التحديث', reportPrincipalName: 'المدير بعد التحديث' };
+    await store.patchProfile(profile);
+    return { profile, storedProfile: JSON.stringify(store.state.profile), device: JSON.stringify(store.state.device) };
+  });
+  await expect(field('schoolName')).toHaveValue(changed.profile.schoolName);
+  await expect(field('educationDepartment')).toHaveValue(changed.profile.educationDepartment);
+  await expect(field('teacherName')).toHaveValue('توقيع خاص بهذه الشهادات');
+  await expect(field('principalName')).toHaveValue('');
+  await expect(workspace.locator('[data-center-student]:checked')).toHaveCount(1);
+  await expect(workspace.locator('[data-center-panel=design]')).toBeVisible();
+  await expect(workspace.locator('[data-center-canvas]')).toHaveAttribute('aria-label', new RegExp(changed.profile.schoolName));
+  const source = await page.evaluate(async () => {
+    const store = await import('/src/store.js');
+    return { profile: JSON.stringify(store.state.profile), device: JSON.stringify(store.state.device) };
+  });
+  expect(source).toEqual({ profile: changed.storedProfile, device: changed.device });
+  await workspace.locator('[data-center-back]').click();
+  await page.locator('[data-act="certificate-center"]').click();
+  await expect(field('teacherName')).toHaveValue(changed.profile.teacherName);
+  await expect(field('principalName')).toHaveValue(changed.profile.reportPrincipalName);
+});
+
+test('certificate export controls stay in place during press and processing on desktop and mobile', async ({ page, context, baseURL }, testInfo) => {
+  const origin = new URL(baseURL).origin;
+  await context.route('**/*', route => new URL(route.request().url()).origin === origin ? route.continue() : route.abort('blockedbyclient'));
+  await context.routeWebSocket('**/*', socket => socket.close());
+  await context.addInitScript(() => {
+    sessionStorage.setItem('rakeezx-demo-session-v1', 'active');
+    window.__pendingCertificateEncodes = [];
+    // This layout check controls only the native encoder's completion; the
+    // separate-file test above verifies real PNG and PDF bytes independently.
+    HTMLCanvasElement.prototype.toBlob = function (callback) { window.__pendingCertificateEncodes.push(callback); };
+  });
+  const downloads = [];
+  page.on('download', download => downloads.push(download));
+  await page.goto('/#/reports/certificates');
+  await page.waitForFunction(async () => {
+    const store = await import('/src/store.js');
+    return store.state.ready && store.getActiveWorkspace()?.type === 'demo';
+  });
+  await page.locator('.boot').waitFor({ state: 'detached' });
+  const workspace = page.locator('.certificate-page');
+  const png = workspace.locator('[data-center-download]');
+  const pdf = workspace.locator('[data-center-print]');
+  await workspace.locator('[data-center-student]').first().check();
+  await expect(png).toBeEnabled();
+  const positions = () => workspace.locator('[data-center-download], [data-center-print]').evaluateAll(buttons => buttons.map(button => {
+    const rect = button.getBoundingClientRect();
+    return { x: rect.x + scrollX, y: rect.y + scrollY, width: rect.width, height: rect.height };
+  }));
+  const unchanged = (before, after) => before.forEach((rect, i) => {
+    for (const key of ['x', 'y', 'width', 'height']) expect(Math.abs(rect[key] - after[i][key])).toBeLessThan(1);
+  });
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    await png.scrollIntoViewIfNeeded();
+    const before = await positions();
+    const box = await png.boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    expect(await png.evaluate(button => getComputedStyle(button).transform)).toBe('none');
+    unchanged(before, await positions());
+    await page.mouse.up();
+    await page.waitForFunction(() => window.__pendingCertificateEncodes.length === 1);
+    await expect(png).toHaveAttribute('aria-busy', 'true');
+    await expect(png).toBeDisabled();
+    await expect(pdf).toBeDisabled();
+    unchanged(before, await positions());
+    await png.dispatchEvent('click');
+    await pdf.dispatchEvent('click');
+    expect(await page.evaluate(() => window.__pendingCertificateEncodes.length)).toBe(1);
+    expect(await workspace.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+    await workspace.locator('.certificate-page__exports').screenshot({ path: testInfo.outputPath(`certificate-export-busy-${width}.png`) });
+    await workspace.locator('[data-center-cancel]').click();
+    await page.evaluate(() => window.__pendingCertificateEncodes.splice(0).forEach(callback => callback(new Blob(['layout-only'], { type: 'image/png' }))));
+    await expect(png).toBeEnabled();
+    await expect(pdf).toBeEnabled();
+    unchanged(before, await positions());
+    await expect(png).toHaveAttribute('aria-busy', 'false');
+  }
+  expect(downloads).toHaveLength(0);
 });

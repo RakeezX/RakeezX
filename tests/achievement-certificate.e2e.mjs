@@ -124,7 +124,7 @@ test('certificate edits appreciation text and directly exports the current image
   await expectPaintedMinistryLogo(canvas);
   expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
   expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
-  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/aref-ruqaa/ArefRuqaa-Bold.ttf')))).toBe(true);
+  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/layla-diwani/LaylaDiwaniRegular.ttf')))).toBe(true);
   await message.fill('');
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();

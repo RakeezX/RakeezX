@@ -19,6 +19,10 @@ export default {
     if (!workspace || scope !== nextScope) {
       scope = nextScope;
       workspace = createCertificateCenter({ teachingId: params.teaching });
+    } else {
+      // Account/Sync repaints keep the editor DOM and its local overrides, while
+      // untouched identity fields follow the latest mounted Rakeez profile.
+      workspace.refreshIdentity();
     }
     return workspace.body;
   },
