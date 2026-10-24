@@ -20,8 +20,9 @@ export function supportedPushConfiguration(value, now = Date.now()) {
 export function createPushRuntime({ store, cloud, navigate, window: win = globalThis.window,
   configuration = PUSH_CONFIGURATION, fetch, storage = win?.localStorage, changed = () => {} }) {
   let generation = 0, binding = null, client = null, gateway = null, ready = false, status = 'disabled', preparing = false;
-  let stamps = new Map(), projecting = false, cleanup = Promise.resolve();
+  let stamps = new Map(), projecting = null, cleanup = Promise.resolve();
   let queuedProjection = null;
+  const projectionFailures = new Map();
   // Retain only the original cleanup capability, never a usable/new consent binding.
   let pendingDisable = null, disabling = null, preferenceStop = null;
   let preparingBinding = null, preparingGeneration = 0, refreshQueued = false;
@@ -37,13 +38,27 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   const leaseRevision = () => { try { return JSON.parse(storage.getItem(LEASE_STORAGE_PREFIX + store.getActiveWorkspace()?.id) || 'null')?.renewalId; } catch { return null; } };
   const revisionKey = c => 'rakeezx-n44-consent:' + JSON.stringify([c.ownerId, c.workspaceId, c.deviceId]);
   const consentRevision = c => { try { return storage.getItem(revisionKey(c)); } catch { return undefined; } };
+  const currentToken = () => { try { const value=JSON.parse(storage.getItem(cloud.AUTH_STORAGE_KEY)||'null'); return value?.user?.id===cloud.user?.id&&typeof value.access_token==='string'?value.access_token:null; } catch { return null; } };
+  // An UNTRUSTED hint can reject a changed credential or select a server recheck.
+  // It never establishes Auth, owner, or session continuity.
+  const sessionHint = (token,owner) => { try {
+    const parts=token.split('.');if(parts.length!==3||parts[1].length>8192||!/^[A-Za-z0-9_-]+$/.test(parts[1]))return null;
+    const value=JSON.parse(atob(parts[1].replaceAll('-','+').replaceAll('_','/')));
+    return value.sub===owner&&value.role==='authenticated'&&Number.isSafeInteger(value.exp)&&value.exp*1000>Date.now()&&/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(value.session_id??'')?value.session_id:null;
+  } catch { return null; } };
+  let renewing = null;
+  const cloudSessionContinues = b => !!b && (cloud.session?.access_token === b.acceptedToken || !!b.authSessionId && sessionHint(cloud.session?.access_token??'',b.context.ownerId) === b.authSessionId);
   const bindingChecks = b => {
     const c = current();
     return { contextMatches: !!b && !!c && c.ownerId === b.context.ownerId && c.workspaceId === b.context.workspaceId && c.deviceId === b.context.deviceId,
-      sessionMatches: !!b && cloud.session === b.session, workspaceMatches: !!b && store.getActiveWorkspace() === b.workspace,
+      sessionMatches: !!b && currentToken() === b.acceptedToken && cloudSessionContinues(b), workspaceMatches: !!b && store.getActiveWorkspace() === b.workspace,
       leaseMatches: !!b && leaseRevision() === b.leaseRevision, consentMatches: !!b && consentRevision(b.context) === b.consentRevision };
   };
   const matches = b => !!b && (b.serviceExpiresAt ?? Infinity) > Date.now() && Object.values(bindingChecks(b)).every(Boolean);
+  const continuation = b => {
+    const checks=bindingChecks(b);
+    return !!b&&b.serviceExpiresAt>Date.now()&&checks.contextMatches&&checks.workspaceMatches&&checks.leaseMatches&&checks.consentMatches&&cloudSessionContinues(b)&&!!b.authSessionId&&sessionHint(currentToken()??'',b.context.ownerId)===b.authSessionId;
+  };
   const ownsCleanup = b => {
     const checks = bindingChecks(b);
     return !disposed && checks.contextMatches && checks.sessionMatches && checks.workspaceMatches && checks.leaseMatches;
@@ -55,7 +70,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   };
   function invalidate() {
     const old = client, originalGateway = gateway;
-    ++generation; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
+    ++generation; renewing = null; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
     let clearing;
     try { clearing = configuration.enabled ? originalGateway?.retire() ?? browser.clearConsent(null) : Promise.resolve(true); } catch { clearing = browser.clearConsent(null); }
     cleanup = Promise.all([cleanup, Promise.resolve(clearing).catch(() => false)]).then(results => results[1] === false ? {status:'cleanup_pending'} : results[0]);
@@ -70,6 +85,27 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   }
   async function refresh() {
     if (disposed) return;
+    if (binding && currentToken() !== binding.acceptedToken && continuation(binding)) {
+      if (renewing) return renewing.promise;
+      const b=binding,g=gateway,candidate=currentToken(),receipt=g.registration(),revision=b.serverSessionRevision,consent=b.consentRevision,consentState=b.serverConsent;
+      const attempt={binding:b,candidate};renewing=attempt;
+      attempt.promise=(async()=>{
+        let replaced=false;
+        try {
+          await g.read({accept:r=>r.status==='current'&&r.context?.sessionId===b.authSessionId&&r.context.sessionRevision===revision&&r.context.consentRevision===consent&&r.context.pushConsent===consentState&&r.registration?.registrationId===receipt?.registrationId&&r.registration?.expiresAt===receipt?.expiresAt});
+          if(binding!==b||renewing!==attempt||currentToken()!==candidate||!continuation(b))throw Error('stale');
+          b.acceptedToken=candidate;b.cleanupToken=candidate;mark('ready');
+        } catch {
+          // Only a genuinely newer same-session credential may supersede this
+          // read. Never retry the unchanged failed credential.
+          replaced=binding===b&&currentToken()!==candidate&&continuation(b);
+          if(binding===b&&!replaced)invalidate();
+        }
+        finally { if(renewing===attempt)renewing=null;changed(); }
+        if(replaced&&binding===b)await refresh();
+      })();
+      return attempt.promise;
+    }
     if (binding && (!matches(binding) || status === 'subscribed' && browser.permission() !== 'granted')) invalidate();
     if (preparing) { if (preparingBinding && (preparingGeneration !== generation || !matches(preparingBinding))) refreshQueued = true; return; }
     if (!configuration.enabled) { mark('disabled'); return; }
@@ -78,17 +114,18 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     if (pendingDisable) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
     if (binding) return;
     preparing = true; const token = generation;
-    const b = { context: current(), session: cloud.session, workspace: store.getActiveWorkspace(), leaseRevision: leaseRevision() };
+    const b = { context: current(), session: cloud.session, acceptedToken: currentToken(), cleanupToken: currentToken(), workspace: store.getActiveWorkspace(), leaseRevision: leaseRevision() };
     try { b.consentRevision = consentRevision(b.context); } catch { preparing = false; mark('context_unavailable'); return; }
     preparingBinding = b; preparingGeneration = token; eligibility = { reason: 'checking_configuration', configuration: 'not_observed', ...bindingChecks(b), generationMatches: true, browserSupported: false, workerReady: false };
-    const valid = () => generation === token && matches(b);
-    const g = createPushGateway({ fetch, storage, context: b.context, authorization: 'Bearer ' + b.session.access_token, preferences, valid, invalidated: invalidate, bindConsent: r => browser.bind(r), clearConsent: id => browser.clearConsent(id),
+    const valid = () => generation === token && (matches(b)||renewing?.binding===b&&currentToken()===renewing.candidate&&continuation(b));
+    const g = createPushGateway({ fetch, storage, context: b.context, authorization: () => 'Bearer ' + currentToken(), preferences, valid, invalidated: invalidate, bindConsent: r => browser.bind(r), clearConsent: id => browser.clearConsent(id),
       cleanupAuthorization() {
         const c = current();
-        return c?.ownerId === b.context.ownerId && c?.workspaceId === b.context.workspaceId && c?.deviceId === b.context.deviceId
-          ? 'Bearer ' + cloud.session.access_token : 'Bearer ' + b.session.access_token;
+        return c?.ownerId === b.context.ownerId && c?.workspaceId === b.context.workspaceId && c?.deviceId === b.context.deviceId && (currentToken()===b.acceptedToken||continuation(b))
+          ? 'Bearer ' + currentToken() : 'Bearer ' + b.cleanupToken;
       },
       contextChanged(ctx) {
+        b.authSessionId=ctx?.sessionId??null;b.serverSessionRevision=ctx?.sessionRevision??null;b.serverConsent=ctx?.pushConsent;
         const revision = ctx?.consentRevision ?? '';
         storage.setItem(revisionKey(b.context), revision); b.consentRevision = revision;
       } });
@@ -146,27 +183,43 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   const usable = () => gateway?.expiresAt() > Date.now() && ready && matches(binding) && browser.permission() === 'granted' && status === 'subscribed';
   // AI N44: bootstrap and adopted canonical state are distinct from a pushed ACK.
   // Only confirmed IDs are hints; no local event payload becomes server truth.
-  async function projectConfirmed(checkpoint) {
-    if (!usable() || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return;
-    if (projecting) { queuedProjection = checkpoint; return; }
-    projecting = true; const g = gateway, b = binding;
-    try {
-      const sources = await store.confirmedNotificationSources([...stamps.keys()].map(key => {
-        const [kind, id] = JSON.parse(key); return { kind, id };
-      }));
-      for (const { kind, id } of sources) {
-        if (!usable() || binding !== b) break;
-        const key = JSON.stringify([kind, id]);
-        const next = await g.project(kind, id, stamps.get(key) ?? null);
-        if (binding !== b || !usable()) break;
-        stamps.set(key, next);
-      }
-    } catch { /* no fabricated projection ACK and no unchanged failure retry */ }
-    finally {
-      projecting = false;
-      const queued = queuedProjection; queuedProjection = null;
-      if (queued) await projectConfirmed(queued);
-    }
+  function projectConfirmed(checkpoint) {
+      if (!usable() || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return Promise.resolve();
+      // Overlapping ACK hooks share one current-owner pass. Never queue a replay
+      // of a write whose response was lost.
+      if (projecting) return projecting;
+      const g = gateway, b = binding;
+      const pass = (async () => {
+        const confirmed = await store.confirmedNotificationSources([...stamps.keys()].map(key => { const [kind,id]=JSON.parse(key); return {kind,id}; }));
+        const confirmedKeys = new Set(confirmed.map(s=>JSON.stringify([s.kind,s.id])));
+        const sources = activeProjectionSources(store,b.context).filter(s=>confirmedKeys.has(s.key));
+        const liveKeys = new Set(sources.map(s => s.key));
+        for (const key of stamps.keys()) if (!liveKeys.has(key)) stamps.delete(key);
+        for (const { key, kind, id, revision } of sources) {
+          if (!usable() || binding !== b) break;
+          const pendingKey = 'rakeezx-n44-projection-pending:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, key]);
+          try {
+            // Persist BEFORE the request. A crash, lost ACK or server failure
+            // leaves UNKNOWN across reload; no automatic upsert recovery.
+            if (storage.getItem(pendingKey) || projectionFailures.get(pendingKey) === revision) continue;
+            storage.setItem(pendingKey, 'unknown');
+            const next = await g.project(kind, id, stamps.get(key) ?? null);
+            storage.removeItem(pendingKey);
+            if (binding !== b || !usable()) break;
+            const currentSource = activeProjectionSources(store, b.context).find(s => s.key === key);
+            if (currentSource?.revision === revision) stamps.set(key, next);
+          } catch (error) {
+            if (error.projectionDisposition === 'rejected') {
+              storage.removeItem(pendingKey); projectionFailures.set(pendingKey, revision);
+              mark('projection_rejected');
+            } else mark('projection_unknown');
+            // Independent current sources may proceed; neither refusal nor
+            // uncertainty is an ACK for this source.
+          }
+        }
+      })();
+      projecting = pass;
+      return pass.finally(() => { if (projecting === pass) projecting = null; });
   }
   async function authorize(raw) {
     const c = client, b = binding, event = normalizePushPayload(raw, Date.now());
@@ -248,6 +301,20 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     projectConfirmedSources: projectConfirmed,
     dispose() { disposed = true; invalidate(); if (permissionState) permissionState.onchange = null; win?.removeEventListener?.('focus', refresh); win?.navigator.serviceWorker?.removeEventListener('message', onMessage); return cleanup; },
   });
+}
+// Same canonical ancestry requirements as the server source adapter. Tombstones
+// stay in the store; they are excluded only from outbound projection candidates.
+export function activeProjectionSources(store, context) {
+  const owned = r => r && !r.deleted && (r.ownerId == null || r.ownerId === context.ownerId);
+  const chain = id => {
+    const t = store.getTeaching(id), term = store.getTerm(t?.termId), year = store.getYear(term?.yearId);
+    const section = store.getSection(t?.sectionId), subject = store.getSubject(t?.subjectId);
+    return [t, term, year, section, subject].every(owned) && year.status === 'active' && section.status === 'active' && section.yearId === year.id && term.status !== 'closed' ? [t, term, year, section, subject] : null;
+  };
+  const result = [], add = (kind, row, ancestors) => result.push({kind,id:row.id,key:JSON.stringify([kind,row.id]),revision:JSON.stringify([row,...ancestors])});
+  for (const row of store.state.sessions ?? []) { const parents = chain(row.teachingId); if (owned(row) && parents && !['cancelled','cancelled_holiday'].includes(row.status)) add('lesson',row,parents); }
+  for (const row of store.state.scoreSubitems ?? []) { const item = store.state.items.find(i => i.id === row.itemId), parents = chain(item?.teachingId); if (owned(row) && owned(item) && item.scoreMode === 'subitems' && parents) add('due',row,[item,...parents]); }
+  return result;
 }
 export function readPushQuiet(context, storage = globalThis.localStorage) {
   if (!context) return null;

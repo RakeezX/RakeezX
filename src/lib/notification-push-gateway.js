@@ -4,7 +4,7 @@ export const N44_PROTOCOL = 'n44-browser-v2';
 // this client before aborting;10s could lose a successful consent CAS ACK.
 export const N44_RESPONSE_DEADLINE_MS = 15000;
 export function createPushGateway({ fetch: send = globalThis.fetch, authorization, context, preferences,
-  storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => authorization, bindConsent = async () => false, clearConsent = async () => true }) {
+  storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => typeof authorization === 'function' ? authorization() : authorization, bindConsent = async () => false, clearConsent = async () => true }) {
   const scope = { workspaceId: context.workspaceId, deviceId: context.deviceId };
   const sourceStamp = value => value === null || typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
   const key = 'rakeezx-n44-registration:' + JSON.stringify([context.ownerId, ...Object.values(scope)]);
@@ -18,17 +18,18 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), N44_RESPONSE_DEADLINE_MS);
     try {
       const response = await send('/api/n44/' + path, { method: 'POST', credentials: 'omit', redirect: 'error', cache: 'no-store',
-        headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });
-      if (!response.ok || (!cleanup && !valid())) throw Error('unavailable');
+        headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : typeof authorization === 'function' ? authorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });
+      if (!response.ok || (!cleanup && !valid())) { const error=Error('unavailable'); error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
       const raw = await response.text(); if (raw.length > 8192 || !cleanup && !valid()) throw Error('unavailable');
       return JSON.parse(raw);
     } finally { clearTimeout(timer); }
   };
   return Object.freeze({
     configuration: () => request('push/config', scope),
-    async read() {
+    async read({ accept = () => true } = {}) {
       const r = await request('context/read', scope);
       if (r.protocol !== N44_PROTOCOL || !['current', 'absent'].includes(r.status)) throw Error('unavailable');
+      if (!accept(r)) throw Error('stale');
       remote = r.context ?? null; expectedRevision = remote?.consentRevision ?? r.expectedRevision ?? null;
       if (remote && (!remote.active || remote.workspaceId !== scope.workspaceId || remote.deviceId !== scope.deviceId || remote.sessionExpiresAt <= Date.now())) throw Error('stale');
       receipt = r.registration ?? null; contextChanged(remote); return r;
@@ -117,7 +118,7 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
     async project(kind, sourceId, expectedStamp) {
       let r = await request('events/update', { ...scope, kind, sourceId, expectedStamp });
       if (r.status === 'stale' && sourceStamp(r.sourceStamp)) r = await request('events/update', { ...scope, kind, sourceId, expectedStamp: r.sourceStamp });
-      if (r.status !== 'updated' || !sourceStamp(r.sourceStamp)) throw Error('stale'); return r.sourceStamp;
+      if (r.status !== 'updated' || !sourceStamp(r.sourceStamp)) { const error=Error('stale'); error.projectionDisposition=['stale','rejected','disabled'].includes(r.status)?'rejected':'unknown'; throw error; } return r.sourceStamp;
     },
   });
 }
