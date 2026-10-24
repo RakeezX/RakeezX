@@ -136,9 +136,15 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     const file = payload.files.find(x => x.repoPath === payload.sourceCardFile);
     insist(file && file.repoPath.startsWith('scripts/ops-supervisor-v4/') && file.repoPath.endsWith('.json'), 'Reviewed source card wrapper is missing');
     for(const u of payload.cardUpdates.filter(u=>u.card.completionMode==='wait_for_verified_n44_frontend_prerequisite')){const f=payload.files.find(f=>f.repoPath===u.card.frontendPrerequisite?.sourceFile);insist(f&&f.content===u.card.frontendPrerequisite.sourceContent&&f.sha256===u.card.frontendPrerequisite.sourceSha256,'N44 frontend prerequisite source must be installed in this exact reviewed window');}
-    const wrapper = JSON.parse(file.content);
-    insist(wrapper.activationId === payload.activationId && Array.isArray(wrapper.tasks) && wrapper.tasks.length === taskIds.size + sourceWrapperCompanions(payload).length, 'Source wrapper activation or task count mismatch');
-    for (const update of payload.cardUpdates) insist(wrapper.tasks.filter(c => c.id === update.card.id).length === 1 && same(wrapper.tasks.find(c => c.id === update.card.id), update.card), 'Source wrapper differs from card payload: ' + update.card.id);
+    // Each declared source owns its own cards; catalog/install already group this way.
+    for (const source of new Set(payload.cardUpdates.map(u => u.sourceCardFile ?? payload.sourceCardFile))) {
+      const sourceFile = payload.files.find(f => f.repoPath === source);
+      insist(sourceFile && source.startsWith('scripts/ops-supervisor-v4/') && source.endsWith('.json'), 'Reviewed source card wrapper is missing');
+      const wrapper = JSON.parse(sourceFile.content), updates = payload.cardUpdates.filter(u => (u.sourceCardFile ?? payload.sourceCardFile) === source);
+      const companions = source === payload.sourceCardFile ? sourceWrapperCompanions(payload).length : 0;
+      insist(wrapper.activationId === payload.activationId && Array.isArray(wrapper.tasks) && wrapper.tasks.length === updates.length + companions, 'Source wrapper activation or task count mismatch');
+      for (const update of updates) insist(wrapper.tasks.filter(c => c.id === update.card.id).length === 1 && same(wrapper.tasks.find(c => c.id === update.card.id), update.card), 'Source wrapper differs from card payload: ' + update.card.id);
+    }
   }
   return { taskId: payload.taskId, files: payload.files.map(f => f.repoPath), taskIds: [...taskIds], allowActiveTaskIds: allowed, requireNoActiveWorkers, runtimeConfigUpdate, controllerReload };
 }
