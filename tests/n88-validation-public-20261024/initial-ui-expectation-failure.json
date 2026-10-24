@@ -1,0 +1,34 @@
+{
+  "taskId": "continuous-n88-validation-family-public-dependency-20261024",
+  "runId": "4b319ebd-0fa4-45c9-964e-1c8439e82d9b",
+  "status": "FAIL",
+  "scope": "SOURCECURRENT synthetic only",
+  "cases": [
+    "All three merged public enums exactly match qualified immutable vocabulary",
+    "bad JWT denies without family",
+    "foreign owner denies without family",
+    "bad ingress signature denies without family",
+    "denied source denies without family",
+    "Actual signed authenticated source -> current carrier finite family; malformed/forged/absent family remains generic503; real validated success ACK and COMMIT unchanged",
+    "Actual current DOM/handlers/store ownership guard/source CSS: classified",
+    "Actual current DOM/handlers/store ownership guard/source CSS: generic",
+    "Actual current DOM/handlers/store ownership guard/source CSS: forged",
+    "Actual current DOM/handlers/store ownership guard/source CSS: success",
+    "Hung failure-body read hits existing deadline, cancels and frees serialized lane; retry obtains real success",
+    "Actual current DOM/handlers/store ownership guard/source CSS: slowbody"
+  ],
+  "hostedFamily": "UNKNOWN",
+  "providerOperations": 0,
+  "failure": {
+    "message": "Expected values to be strictly equal:\n\ntrue !== false\n",
+    "stack": [
+      "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:",
+      "",
+      "true !== false",
+      "",
+      "    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-validation-family-public-dependency-20261024/tests/n88-validation-public-20261024/current-public.mjs:66:88"
+    ]
+  },
+  "lease": "RELEASED integration",
+  "cleanup": "Owned HTTP server and isolated contexts/browser closed"
+}

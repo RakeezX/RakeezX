@@ -1,3 +1,5 @@
+// AI: fixed schema labels only; no values/counts/identities or arbitrary error metadata.
+const validationFamilies=Object.freeze(["contexts.active","contexts.duplicate-key","contexts.fields","contexts.namespace","contexts.ownerId","contexts.row-bytes","contexts.row-count","credentials.duplicate-key","credentials.entryVerifier","credentials.fields","credentials.id","credentials.namespace","credentials.ownerId","credentials.revokedAt","credentials.row-bytes","credentials.row-count","credentials.studentId","credentials.verifier","credentials.version","memberships.canonicalStamp","memberships.classActive","memberships.classId","memberships.duplicate-key","memberships.endDate","memberships.enrollmentId","memberships.fields","memberships.label","memberships.ownerId","memberships.revision","memberships.row-bytes","memberships.row-count","memberships.status","memberships.studentActive","memberships.studentId","publications.classId","publications.deadline","publications.duplicate-key","publications.enrollmentId","publications.fields","publications.id","publications.instruction","publications.ownerId","publications.published","publications.row-bytes","publications.row-count","publications.source","publications.source.itemId","publications.source.teachingId","publications.status","publications.studentId","publications.title","rates.count","rates.duplicate-key","rates.fields","rates.key","rates.row-bytes","rates.row-count","rates.until","sessions.canonicalStamp","sessions.classId","sessions.credentialId","sessions.duplicate-key","sessions.enrollmentId","sessions.entryVerifier","sessions.expiresAt","sessions.fields","sessions.id","sessions.membershipRevision","sessions.namespace","sessions.ownerId","sessions.revokedAt","sessions.row-bytes","sessions.row-count","sessions.studentId","sessions.tokenHash","sessions.version","snapshot.aggregate-bytes","snapshot.fields","snapshot.row-count"]);
 /** AI: staged browser composition. No config from URLs/storage/globals; no fallback. */
 import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
 import { createClassPortalClient, classListRegion } from './student-portal-class-client.js';
@@ -8,15 +10,15 @@ let portalDiagnostic=null;
 export function studentPortalDiagnostic(){return portalDiagnostic?{...portalDiagnostic}:null;}
 const diagnosticCodes=['none','timeout','rejected','invalid_ack','stale_context','unavailable','uncertain'];
 const diagnosticStages=['none','configuration','key-configuration','envelope','upstream','upstream-body','upstream-http-5xx','reply','reply-shape','acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate','projection','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'];
-function checkpoint(phase,httpStatus=0,elapsedMs=0,code='none',stage='none'){
+function checkpoint(phase,httpStatus=0,elapsedMs=0,code='none',stage='none',validationFamily='none'){
  if(!['binding','queue','dispatch','http','response','admitted','failure'].includes(phase))return;
- portalDiagnostic={phase,httpStatus:Number.isInteger(httpStatus)&&httpStatus>=100&&httpStatus<=599?httpStatus:0,elapsedMs:Math.min(30000,Math.max(0,Math.round(elapsedMs/100)*100)),sourceVersion:'n88-class-deadline-v1',code:diagnosticCodes.includes(code)?code:'uncertain',stage:diagnosticStages.includes(stage)?stage:'none'};
+ portalDiagnostic={phase,httpStatus:Number.isInteger(httpStatus)&&httpStatus>=100&&httpStatus<=599?httpStatus:0,elapsedMs:Math.min(30000,Math.max(0,Math.round(elapsedMs/100)*100)),sourceVersion:'n88-class-deadline-v1',code:diagnosticCodes.includes(code)?code:'uncertain',stage:diagnosticStages.includes(stage)?stage:'none',...(httpStatus===503&&stage==='synchronize-validate'&&validationFamilies.includes(validationFamily)?{validationFamily}:{})};
  return portalDiagnostic;
 }
 function failureSnapshot(value){
  if(!value||!['binding','queue','dispatch','http','response','admitted','failure'].includes(value.phase)||!diagnosticCodes.includes(value.code)||!diagnosticStages.includes(value.stage)||value.sourceVersion!=='n88-class-deadline-v1')return null;
  if(!Number.isInteger(value.httpStatus)||(value.httpStatus!==0&&(value.httpStatus<100||value.httpStatus>599))||!Number.isFinite(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000)return null;
- return Object.freeze({phase:value.phase,code:value.code,stage:value.stage,httpStatus:value.httpStatus,elapsedMs:Math.round(value.elapsedMs/100)*100,sourceVersion:'n88-class-deadline-v1'});
+ return Object.freeze({phase:value.phase,code:value.code,stage:value.stage,httpStatus:value.httpStatus,elapsedMs:Math.round(value.elapsedMs/100)*100,sourceVersion:'n88-class-deadline-v1',...(value.httpStatus===503&&value.stage==='synchronize-validate'&&validationFamilies.includes(value.validationFamily)?{validationFamily:value.validationFamily}:{})});
 }
 // AI: serialize only this finite public attestation, never the attribute wholesale.
 function listResponseSnapshot(root){
@@ -158,7 +160,17 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     finally{signal.removeEventListener('abort',cancel);}
     if(signal.aborted)throw bindingError('context');
     const stage=response.headers?.get('x-n88-service-stage')||response.headers?.get('x-n88-transport-stage')||'none';
-    record('http',response.status,performance.now()-started,'none',stage);
+    let validationFamily='none';
+    // Existing failure body only, on this same owner-fenced response. No extra request or raw body retention.
+    if(path==='/api/n88/teacher/class/list'&&response.status===503&&stage==='synchronize-validate'){
+      // Keep metadata reads inside the existing cancellation/deadline fence, even
+      // when a failed transport ignores abort while delivering its body.
+      signal.addEventListener('abort',cancel,{once:true});
+      try{const metadata=await Promise.race([response.json(),cancelled]);if(metadata?.stage===stage&&validationFamilies.includes(metadata.validationFamily))validationFamily=metadata.validationFamily;}catch{}
+      finally{signal.removeEventListener('abort',cancel);}
+      if(signal.aborted)throw bindingError('context');current(false);
+    }
+    record('http',response.status,performance.now()-started,'none',stage,validationFamily);
     if(!response.ok)failure=[401,403].includes(response.status)?'denied':'connection';
     const region=path==='/api/n88/teacher/class/list'?classListRegion(response.headers?.get('x-n88-service-region')):'unknown';
     current(false);return {ok:response.ok,status:response.status,headers:new Headers({'x-n88-service-region':region}),async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
@@ -186,7 +198,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     const admittedClient={...client,listClass:async teachingId=>{current(false);if(firstList&&teachingId===initial.context.teachingId){const data=firstList;firstList=null;return data;}return client.listClass(teachingId);}};
     handle=mountClassPortal(content,{client:admittedClient,getContext,subscribe,classLabel});
     listResponseSupport(root,()=>{try{current(false);return true;}catch{return false;}});
-  }).catch(e=>{if(!disposed){const last=ownDiagnostic;record(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure),ownDiagnostic,()=>{try{current(false);return true;}catch{return false;}});}});
+  }).catch(e=>{if(!disposed){const last=ownDiagnostic;record(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage,last?.validationFamily);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure),ownDiagnostic,()=>{try{current(false);return true;}catch{return false;}});}});
   return {dispose(){disposed=true;lifetime.abort();handle?.dispose();root.removeAttribute('data-n88-list-response');root.replaceChildren();}};
 }
 const classEntryMessages={timeout:'لم تكتمل قراءة الفصل خلال المهلة. أعد المحاولة؛ لم نغيّر أي رمز أو إعداد.',loading:'جارٍ فتح مساحة طلاب الفصل…',disabled:'مساحة طلاب الفصل غير متاحة حاليًا.',account:'يلزم حساب معلم متصل لفتح مساحة الفصل.',owner:'تعذّر تأكيد سياق الحساب. أعد فتح الفصل من حساب مالكه.',source:'هذا الفصل غير متاح ضمن السياق الدراسي الحالي.',lease:'تعذّر تأكيد صلاحية المزامنة لهذا التبويب. أعد فتح الفصل في التبويب النشط.',session:'انتهت صلاحية الاتصال بالحساب. أعد الاتصال ثم حاول مجددًا.',context:'تغيّر سياق الاتصال. أعد المحاولة لفتح الفصل من جديد.',denied:'لم يسمح الخادم بفتح المساحة لهذا السياق. تحقق من الحساب والفصل ثم أعد المحاولة.',revision:'تحتاج مساحة الطلاب إلى تحديث التطبيق. حدّث الصفحة ثم أعد المحاولة.',connection:'تعذّر الاتصال بمساحة الطلاب. حاول مجددًا.'};

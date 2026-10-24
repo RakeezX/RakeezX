@@ -1,3 +1,5 @@
+// AI: fixed schema labels only; no values/counts/identities or arbitrary error metadata.
+const validationFamilies=Object.freeze(["contexts.active","contexts.duplicate-key","contexts.fields","contexts.namespace","contexts.ownerId","contexts.row-bytes","contexts.row-count","credentials.duplicate-key","credentials.entryVerifier","credentials.fields","credentials.id","credentials.namespace","credentials.ownerId","credentials.revokedAt","credentials.row-bytes","credentials.row-count","credentials.studentId","credentials.verifier","credentials.version","memberships.canonicalStamp","memberships.classActive","memberships.classId","memberships.duplicate-key","memberships.endDate","memberships.enrollmentId","memberships.fields","memberships.label","memberships.ownerId","memberships.revision","memberships.row-bytes","memberships.row-count","memberships.status","memberships.studentActive","memberships.studentId","publications.classId","publications.deadline","publications.duplicate-key","publications.enrollmentId","publications.fields","publications.id","publications.instruction","publications.ownerId","publications.published","publications.row-bytes","publications.row-count","publications.source","publications.source.itemId","publications.source.teachingId","publications.status","publications.studentId","publications.title","rates.count","rates.duplicate-key","rates.fields","rates.key","rates.row-bytes","rates.row-count","rates.until","sessions.canonicalStamp","sessions.classId","sessions.credentialId","sessions.duplicate-key","sessions.enrollmentId","sessions.entryVerifier","sessions.expiresAt","sessions.fields","sessions.id","sessions.membershipRevision","sessions.namespace","sessions.ownerId","sessions.revokedAt","sessions.row-bytes","sessions.row-count","sessions.studentId","sessions.tokenHash","sessions.version","snapshot.aggregate-bytes","snapshot.fields","snapshot.row-count"]);
 /** AI: INACTIVE module Worker for the EXISTING Cloudflare zone /api/n88/* route.
  * No Node host. No live route/config change. Default disabled before any fetch.
  * Provider cf metadata + CF-Connecting-IP at external ingress ONLY. Worker
@@ -68,11 +70,12 @@ export function createCloudflareEntry({fetch:send=globalThis.fetch,now=Date.now}
       const phases=hasPhases&&reply.status===200&&request.method==='GET'&&url.pathname==='/api/n88/student/read';
       if(!reply || Object.keys(reply).sort().join(',')!==(phases?'body,cookie,readPhases,status':'body,cookie,status') || phases&&!validateReadPhases(reply.readPhases) || ![200,400,401,409,413,429,503].includes(reply.status) ||
         reply.cookie!==null && (typeof reply.cookie!=='string' || reply.cookie.length>4096)){stage='reply-shape';return unavailable();}
+      if(reply.body&&Object.hasOwn(reply.body,'validationFamily')&&!(reply.status===503&&reply.body.stage==='synchronize-validate'&&validationFamilies.includes(reply.body.validationFamily))){const {validationFamily,...safe}=reply.body;reply.body=safe;}
       const out=new Headers(PRIVATE_WEB_HEADERS);if(reply.cookie)out.set('set-cookie',reply.cookie);
       if(phases)out.set(READ_PHASE_HEADER,JSON.stringify(reply.readPhases));
       if(responseRegion)out.set('x-n88-service-region',responseRegion);
       // Finite operational phase only; never reflect arbitrary upstream values.
-      if(reply.status===503&&['acquire','begin','snapshot','repository','teacher','source','synchronize','projection'].includes(reply.body?.stage))out.set('x-n88-service-stage',reply.body.stage);
+      if(reply.status===503&&['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-validate','projection'].includes(reply.body?.stage))out.set('x-n88-service-stage',reply.body.stage);
       return new Response(JSON.stringify(reply.body),{status:reply.status,headers:out});
     }catch{return unavailable();}finally{clearTimeout(timer);abort.abort();}
   };
