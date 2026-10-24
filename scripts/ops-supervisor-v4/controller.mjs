@@ -382,6 +382,26 @@ export const RESULT_SCHEMA = {
 
 export function workerPublicationInstruction(task) {
   const authority = task.preparationAuthority;
+  if (task.id === 'continuous-n88-current-teacher-connection-actual-cause-20261020'
+      && task.completionMode === 'read_only_private_database_admission_cause') {
+    return 'Read only the original restricted database transport/session/catalog technical metadata expressly bounded by this card. No student-data query, application GET, nonce write, native/carrier upload, pin/config/Auth/schema change or new account/session. Do not push or deploy. Preserve every consumed proof marker; any actual tool denial remains binding.';
+  }
+  const n44 = authority?.actualOutcomeContinuation;
+  if (task.completionMode === 'integrate_qualified_native_delta_and_one_actual_new_owner_push'
+      || task.liveAuthorizationRef === 'PO-20261024-CONTINUE-ACTUAL-OUTCOMES') {
+    const allowed = task.id === 'continuous-n44-one-approved-closed-page-push-20261019'
+      && task.productId === 'N44'
+      && task.completionMode === 'integrate_qualified_native_delta_and_one_actual_new_owner_push'
+      && task.liveAuthorizationRef === 'PO-20261024-CONTINUE-ACTUAL-OUTCOMES'
+      && authority.productId === 'N44' && authority.liveAuthorizationRef === task.liveAuthorizationRef
+      && n44?.version === 1 && n44.maxNativePromotions === 1 && n44.maxSourcePinUpdates === 1
+      && n44.maxTotalSends === 1 && n44.newOwnerRegistrationMax === 1 && n44.maxIntervalMs === 7200000
+      && n44.oldMarkersAndUnknownCleanupImmutable === true
+      && n44.qualifiedSourceCandidate === 'e36f486589379e03e42c2628a6b0b16f47282ad5'
+      && n44.sourcePublished === '61190ef4603daba714724c699f37c66077cbe94b'
+      && n44.backendSha256 === '5e4aefcddaa486dda0976429ff2caf47c07641f75bc226552fd035d381ca84d7';
+    return allowed ? 'Only the original N44 custodian may perform the ONE qualified native service prerequisite and its exact source-pin update named in actualOutcomeContinuation, after fresh leases, owner/device scope, source/package and provider readback gates. The existing bounded current-owner consent/registration and ONE TOTAL targeted notification allowance remain subject to the immutable global ledger, canonical due-source ACK, actual closed-page arrival and cleanup/disarm; no mass send or cron. This native prerequisite must precede LOCAL_READY. Do not push Product main or publish frontend Production: the independent publisher owns them. No SQL/Auth/schema expansion, N88 service/carrier write, old permit reset, or tool-denial bypass.' : 'Do not push or deploy: the independent controller publishes and verifies it.';
+  }
   if (task.liveAuthorizationRef && authority?.kind === 'scoped_preview_and_fixture_ops'
       && authority.productId === task.productId
       && authority.liveAuthorizationRef === task.liveAuthorizationRef) {
