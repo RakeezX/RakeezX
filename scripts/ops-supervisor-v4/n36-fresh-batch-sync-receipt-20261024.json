@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-fresh-batch-sync-receipt-20261024",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -6020,
+      "scopeKey": "n36-fresh-batch-sync-receipt",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "objective": "NEW ACTUAL .42 USERRESULT AFTER published12965e31574e2a7e33db9e79657bf76bfe5709e9 verified09:07:47.385Z: sourceproofMismatchNONE, acceptedStart,302staged/observed,10classes/7pages; 172NEW confirmedrows in6receipts,29pending ANDpendingSavedRows29, receiverrows-before-receipt/same, WRITE_FAILED phasebatch/transaction/jobreceipt. Setupteacher/school/department/classes9/timetable20saved, principalmissing. Source andacademicdefects passed; THIS is batchsave failure, no wholeN36success or29receiptclaim. Currenttabs intentionallykeptunchanged, no userfreshsource/reinit untilcausalrepairready. NEVERreplay uncertain29, clearpending/trace orclaim201confirmed from172+29. Preservehistorical oldUNKNOWN andnewtrace.\n\nFIRST read actualclass-import-center automaticPersistedGuard/batchCheckpoint/saveAutomaticNames andactualSync/V2 contracts. ConcreteSOURCE hypothesis: captured sectionTargets/teachings are compared with WHOLE JSON records (CLASS_CHANGED), so ordinary canonical SyncACK revision/updatedmetadata during a freshmultibatch import may be falselytreated as edit. CLASS_CHANGED iscurrentlymasked toWRITE_FAILED withtransactionstep. namesRosterProof alreadyusesid/name/owner, academicguards wholejsonmaydrift, do notassumewhich. No evidence ofa200studentlimit fromsource;172+29coincidence isNOTproofquota. Reproduce against currentmain actual .42 app/extension+newaccountnormalSQLprovisioning (profile3/year2 correctly), nativeIndexedDB andactualnormalSync/ACK path. Use302fabricatedstudents across10classes anddeliberate canonicalACK settlement betweenrows andreceipt; compare noSync, ACKmetadata-only, canonicalidentityadoption and genuineclass/teaching/year/term/name/owner edits separately. Reuse existing f2d4ec3 serverfixture/nativePG/V2 helpers and .42 sourcecollector parity, no inventedserverRevision1/all-existingfixturethatconcealsfreshwrites. Exactrawlocalerror finitecategory andtransaction boundary beforefix; ifhypothesiswrong retainfailure andfixonlyreproducedcause.\n\nSmallest semanticguard correction may ignoreonlyverifiedACKmetadata thatdoesnotchange destination/owner/name/status/academic/subjectmeaning; actual identityadoptionrequirescanonicalreceipt evidence, notblindidignore. Preserve realuseredits/archive/deletion/owner/session/lease/term switch, transactioncommit/readback, currentdata/nonce/UNKNOWN guards. Do not disableSync orfreezefalseprofiles tohide defect, weakenlease/security orchangeacademic/calendar/sourcepolicy. ActualnativeDBabort/COMMITackloss stillUNKNOWN, nofalse savedreceipt. Prove fresh302end-to-end10receipts/no duplicatewithnormalACKandpostreload, plus exact172/6+29rows-before-receipt fault scenario preservestrace and distinguishesconfirmed/present/unconfirmed. Safe explicitrecovery mayonlyuseexistingstill-live claimedrequest/document/nonce andreadback-qualifiedguardedreceipt; never recreateoldclaimafterreload/expiry. If reloadmustretirejob, preserveUNKNOWNviaexistingexplicitarchivebefore separatelyuser-startedfreshrun thatdedupsactualexistingrows; no auto reimport/reauth oldbatch. Document exactusernextstep afterpublication, no requestedlivebrowser attempthere.\n\nApp-onlyfixpreferred: .42extension/ZIP/sourceproof byteunchanged, no newextensionversion unless genuinelyrequired andcardrescopefirst. No realaccount/Madrasati browser/profile/control/resultreader, grade/code/calendar/SQL/Auth/service/provider/sourcewrite. Existing olddenials binding. Usecanonical isolatedsynthetichelper freshloopback/noSW/credentials withownedPGcleanup, no blankettests/rebuildunaffectedmatrix. Actual userpendingcase remainsOPENuntillaterexactuserproof. Return originalrunnerJSON and causalreport, originalpublisherdelivers.",
+      "allowedPaths": [
+        "src/views/class-import-center.js",
+        "src/store.js",
+        "src/lib/student-import.js",
+        "tests/n36-fresh-batch-receipt-20261024/**",
+        "docs/automation-evidence/20261024/N36_FRESH_BATCH_RECEIPT.md"
+      ],
+      "verificationPaths": [
+        "src/views/class-import-center.js",
+        "src/store.js",
+        "src/lib/student-import.js"
+      ],
+      "requiredChecks": [
+        "n36_fresh_multibatch_transaction_failure_cause",
+        "n36_canonical_ack_vs_real_edit_receipt_guards",
+        "n36_partial_unknown_preservation_and_explicit_recovery"
+      ],
+      "acceptance": [
+        "Fresh multibatch failure reproduced with exact finitecause, not an asserted ACK hypothesis.",
+        "Ordinary ACK retained without accepting genuine destination/owner/term edits; durable receipts and UNKNOWN guards remain truthful.",
+        "Exact newpartialtrace preserved, full syntheticfreshimport/reload/dedup qualified; actualuseracceptance explicit."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-20261024-actual0542freshreceiptfailure",
+        "realAccountReads": 0,
+        "realAccountWrites": 0,
+        "providerServiceOperations": 0,
+        "syntheticOnly": true
+      },
+      "releaseAuthority": "Latest PO requests immediate permanent causal repair for new0.5.41 account regression; standing routine affected frontend delivery via original publisher only, no live account/Auth/schema/calendar/extension changes.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "e7e021e528981718c361873de4d1109e5c915f19",
+        "requiredSourcePaths": [
+          "src/views/class-import-center.js",
+          "src/store.js",
+          "src/lib/student-import.js",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs",
+          "extensions/rakeez-teacher-import-helper/background-runner.js"
+        ],
+        "editPaths": [
+          "src/views/class-import-center.js",
+          "src/store.js",
+          "src/lib/student-import.js",
+          "tests/n36-fresh-batch-receipt-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N36_FRESH_BATCH_RECEIPT.md"
+        ],
+        "newPaths": [
+          "tests/n36-fresh-batch-receipt-20261024/runtime.mjs",
+          "docs/automation-evidence/20261024/N36_FRESH_BATCH_RECEIPT.md"
+        ],
+        "workerChecks": [
+          "n36_fresh_multibatch_transaction_failure_cause",
+          "n36_canonical_ack_vs_real_edit_receipt_guards",
+          "n36_partial_unknown_preservation_and_explicit_recovery"
+        ],
+        "publisherChecks": []
+      },
+      "completionMode": "reproduce_current_fresh_batch_transaction_and_preserve_unknown",
+      "baseSha": "e7e021e528981718c361873de4d1109e5c915f19",
+      "worktreePath": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-fresh-batch-sync-receipt-20261024"
+    }
+  ]
+}
