@@ -2,7 +2,7 @@
 const validationFamilies=Object.freeze(["contexts.active","contexts.duplicate-key","contexts.fields","contexts.namespace","contexts.ownerId","contexts.row-bytes","contexts.row-count","credentials.duplicate-key","credentials.entryVerifier","credentials.fields","credentials.id","credentials.namespace","credentials.ownerId","credentials.revokedAt","credentials.row-bytes","credentials.row-count","credentials.studentId","credentials.verifier","credentials.version","memberships.canonicalStamp","memberships.classActive","memberships.classId","memberships.duplicate-key","memberships.endDate","memberships.enrollmentId","memberships.fields","memberships.label","memberships.ownerId","memberships.revision","memberships.row-bytes","memberships.row-count","memberships.status","memberships.studentActive","memberships.studentId","publications.classId","publications.deadline","publications.duplicate-key","publications.enrollmentId","publications.fields","publications.id","publications.instruction","publications.ownerId","publications.published","publications.row-bytes","publications.row-count","publications.source","publications.source.itemId","publications.source.teachingId","publications.status","publications.studentId","publications.title","rates.count","rates.duplicate-key","rates.fields","rates.key","rates.row-bytes","rates.row-count","rates.until","sessions.canonicalStamp","sessions.classId","sessions.credentialId","sessions.duplicate-key","sessions.enrollmentId","sessions.entryVerifier","sessions.expiresAt","sessions.fields","sessions.id","sessions.membershipRevision","sessions.namespace","sessions.ownerId","sessions.revokedAt","sessions.row-bytes","sessions.row-count","sessions.studentId","sessions.tokenHash","sessions.version","snapshot.aggregate-bytes","snapshot.fields","snapshot.row-count"]);
 /** AI: staged browser composition. No config from URLs/storage/globals; no fallback. */
 import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
-import { createClassPortalClient, classListRegion } from './student-portal-class-client.js';
+import { createClassPortalClient, classListRegion, classResponseStage } from './student-portal-class-client.js';
 import { mountClassPortal } from '../views/student-portal-class.js';
 
 // Last operational checkpoint only: never IDs, token, request/response data or route URLs.
@@ -133,7 +133,8 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     root.querySelector('[data-n88-mutation-details]')?.remove();
     if(disposed||!value)return;
     try{current(false);}catch{return;}
-    const snapshot=Object.freeze({...value,stage:failureSnapshot(ownDiagnostic)?.stage||'none'});
+    const snapshot=Object.freeze({...value,stage:diagnosticStages.includes(value.stage)?value.stage:'none'});
+    record('http',snapshot.httpStatus,snapshot.elapsedMs,snapshot.code,snapshot.stage);
     const details=root.ownerDocument.createElement('details');details.dataset.n88MutationDetails='';
     const summary=root.ownerDocument.createElement('summary');summary.textContent='تفاصيل دعم العملية (ليست قراءة القائمة)';
     const text=root.ownerDocument.createElement('pre');details.append(summary,text);entryShell(root).append(details);
@@ -159,7 +160,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     try{response=await Promise.race([send(path,{...init,signal,body,headers:{...init.headers,Authorization:'Bearer '+b.token}}),cancelled]);}
     finally{signal.removeEventListener('abort',cancel);}
     if(signal.aborted)throw bindingError('context');
-    const stage=response.headers?.get('x-n88-service-stage')||response.headers?.get('x-n88-transport-stage')||'none';
+    const stage=classResponseStage(response.status,response.headers);
     let validationFamily='none';
     // Existing failure body only, on this same owner-fenced response. No extra request or raw body retention.
     if(path==='/api/n88/teacher/class/list'&&response.status===503&&stage==='synchronize-validate'){
@@ -173,7 +174,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     record('http',response.status,performance.now()-started,'none',stage,validationFamily);
     if(!response.ok)failure=[401,403].includes(response.status)?'denied':'connection';
     const region=path==='/api/n88/teacher/class/list'?classListRegion(response.headers?.get('x-n88-service-region')):'unknown';
-    current(false);return {ok:response.ok,status:response.status,headers:new Headers({'x-n88-service-region':region}),async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
+    current(false);return {ok:response.ok,status:response.status,headers:new Headers({'x-n88-service-region':region,'x-n88-service-stage':stage}),async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
       // Server admission follows verified Auth/session/current source ownership.
       // Strip its rollout metadata before the existing exact ACK validator.
       if(path.endsWith('/list')){
