@@ -36,9 +36,8 @@ export function certificateText(value) {
   return Array.from(normalized).slice(0, CERTIFICATE_TEXT_LIMIT).join('').trim();
 }
 
-export function defaultCertificateText(subjectName = '') {
-  const subject = plain(subjectName, 100);
-  return `وذلك نظير تميّزه الملحوظ وتفوّقه الدراسي ومثابرته${subject ? ` في مادة ${subject}` : ''} خلال الفترة الدراسية، سائلين الله له دوام التوفيق والسداد.`;
+export function defaultCertificateText() {
+  return 'تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد';
 }
 
 /** Do not pass a full profile to the painter: keep certificate identity deliberately narrow. */

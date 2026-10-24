@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
-test('certificate edits appreciation text without achievement records and exports only the reviewed image', async ({ page, context, baseURL }, testInfo) => {
+test('certificate edits appreciation text and directly exports the current image without a review checkbox', async ({ page, context, baseURL }, testInfo) => {
   const origin = new URL(baseURL).origin;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -54,7 +54,6 @@ test('certificate edits appreciation text without achievement records and export
   const sheet = page.locator('.certificate-sheet');
   const editor = sheet.locator('.certificate-editor');
   const canvas = sheet.locator('[data-certificate-canvas]');
-  const consent = sheet.locator('[data-certificate-confirm]');
   const message = sheet.locator('[data-certificate-text]');
   await expect(editor).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
@@ -66,22 +65,22 @@ test('certificate edits appreciation text without achievement records and export
     await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.identity[key]));
   }
   await expect(editor.locator('[data-certificate-field]')).toHaveCount(0);
-  await expect(message).toHaveValue(/وذلك نظير تميّزه.*في مادة المهارات الرقمية/);
-  await expect(consent).toBeEnabled();
+  await expect(message).toHaveValue('تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد');
+  await expect(sheet.locator('[data-certificate-confirm]')).toHaveCount(0);
+  await expect(sheet).not.toContainText('راجعت الشهادة وأوافق');
+  await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
+  await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
+  await message.fill('');
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();
-  await consent.check();
-  await message.fill('');
-  await expect(consent).not.toBeChecked();
-  await expect(consent).toBeDisabled();
-  await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   const customText = 'وذلك تقديرًا لمثابرته وإبداعه في مادة المهارات الرقمية.\nنعتز بجهده، ونسأل الله له دوام التوفيق والسداد.';
   await message.fill(customText);
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
   await expect(canvas).not.toHaveAttribute('aria-label', /بنود بدرجة كاملة|مشاركات إيجابية/);
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.name));
   await expect(canvas).toHaveAttribute('aria-label', /بيانات تجريبية/);
-  await consent.check();
+  await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
+  await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
   await page.screenshot({ path: testInfo.outputPath('certificate-desktop.png'), fullPage: false });
 
   await sheet.locator('[data-certificate-expand]').click();
@@ -99,12 +98,11 @@ test('certificate edits appreciation text without achievement records and export
   await page.keyboard.press('Escape');
   await expect(preview).toHaveCount(0);
   await expect(sheet.locator('[data-certificate-expand]')).toBeFocused();
-  await expect(consent).toBeChecked();
+  await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await editor.locator('[data-certificate-design][value="school"]').check();
-  await expect(consent).not.toBeChecked();
-  await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
+  await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await editor.locator('[data-certificate-design][value="ornate"]').check();
-  await consent.check();
+  const expectedImage = await canvas.evaluate(node => node.toDataURL('image/png'));
   const outgoing = [];
   const observe = request => outgoing.push(request.url());
   page.on('request', observe);
@@ -117,11 +115,11 @@ test('certificate edits appreciation text without achievement records and export
   const png = await fs.readFile(imagePath);
   expect(png.readUInt32BE(16)).toBe(2970);
   expect(png.readUInt32BE(20)).toBe(2100);
-  await expect(consent).not.toBeChecked();
+  expect(png.toString('base64')).toBe(expectedImage.split(',')[1]);
+  await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
   expect(outgoing).toEqual([]);
   page.off('request', observe);
 
-  await consent.check();
   await sheet.locator('[data-certificate-print]').click();
   await page.waitForFunction(() => window.__certificatePrintProof);
   const proof = await page.evaluate(() => window.__certificatePrintProof);
@@ -130,10 +128,13 @@ test('certificate edits appreciation text without achievement records and export
   expect(proof.text).toBe('');
   expect(proof.html).not.toContain('student-profile');
   expect(proof.html).not.toContain(fixture.studentId);
+  expect(proof.html).toContain(expectedImage);
   await fs.writeFile(testInfo.outputPath('certificate-print.html'), proof.html);
   await page.evaluate(() => document.querySelector('[data-certificate-print]') && document.querySelector('iframe[data-certificate-print]')?.contentWindow.dispatchEvent(new Event('afterprint')));
   await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
-  await expect(consent).not.toBeChecked();
+  await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
+  await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
+  await expect(sheet).not.toContainText('من نافذة الطباعة');
 
   // Render the exact application-generated print document to a real one-page PDF.
   const printPage = await context.newPage();

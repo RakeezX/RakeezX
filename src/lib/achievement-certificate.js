@@ -27,8 +27,8 @@ export function isCertificateReady(card) {
   return !!(card?.name?.trim() && certificateText(card.text));
 }
 
-export function certificatePng(canvas, card, confirmed = false) {
-  if (confirmed !== true || !isCertificateReady(card)) return Promise.reject(new Error('Review the certificate name and text before exporting'));
+export function certificatePng(canvas, card) {
+  if (!isCertificateReady(card)) return Promise.reject(new Error('Certificate name and text are required'));
   return new Promise((resolve, reject) => canvas.toBlob(blob =>
     blob ? resolve(blob) : reject(new Error('PNG unavailable')), 'image/png'));
 }
@@ -59,8 +59,8 @@ export function certificateDescription(card, options = {}) {
     card.demo ? 'بيانات تجريبية' : ''].filter(Boolean).join('، ');
 }
 
-function reviewedRaster(canvas, card, confirmed) {
-  if (confirmed !== true || !isCertificateReady(card)) throw new Error('Review the selected certificate before printing');
+function certificateRaster(canvas, card) {
+  if (!isCertificateReady(card)) throw new Error('Certificate name and text are required');
   const png = canvas.toDataURL('image/png');
   if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(png)) throw new Error('Certificate image is unavailable');
   return png;
@@ -69,17 +69,17 @@ function reviewedRaster(canvas, card, confirmed) {
 function rasterDocument(images) {
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>شهادات تقدير - ركيز المعلم</title><style>
     @page{size:A4 landscape;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:297mm}.certificate-page{width:297mm;height:209.8mm;overflow:hidden;break-inside:avoid;break-after:page}.certificate-page:last-child{break-after:auto}img{display:block;width:297mm;height:209.8mm;object-fit:contain;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  </style></head><body>${images.map(src => `<div class="certificate-page"><img alt="شهادة التقدير التي تمت مراجعتها" src="${src}"></div>`).join('')}</body></html>`;
+  </style></head><body>${images.map(src => `<div class="certificate-page"><img alt="شهادة تقدير" src="${src}"></div>`).join('')}</body></html>`;
 }
 
-/** Isolated print documents contain only the reviewed certificate rasters. */
-export function certificatePrintHtml(canvas, card, confirmed = false) {
-  return rasterDocument([reviewedRaster(canvas, card, confirmed)]);
+/** Isolated print documents contain only the selected certificate rasters. */
+export function certificatePrintHtml(canvas, card) {
+  return rasterDocument([certificateRaster(canvas, card)]);
 }
 
-export function certificateBatchPrintHtml(entries, confirmed = false) {
-  if (!Array.isArray(entries) || !entries.length || confirmed !== true) throw new Error('Review the selected certificates before printing');
-  return rasterDocument(entries.map(({ canvas, card }) => reviewedRaster(canvas, card, confirmed)));
+export function certificateBatchPrintHtml(entries) {
+  if (!Array.isArray(entries) || !entries.length) throw new Error('Select at least one certificate to print');
+  return rasterDocument(entries.map(({ canvas, card }) => certificateRaster(canvas, card)));
 }
 
 async function printDocument(documentHtml, isCurrent) {
@@ -110,14 +110,14 @@ async function printDocument(documentHtml, isCurrent) {
   } catch (error) { cleanup(); throw error; }
 }
 
-async function printCertificate(canvas, card, confirmed, isCurrent) {
-  return printDocument(certificatePrintHtml(canvas, card, confirmed), isCurrent);
+async function printCertificate(canvas, card, isCurrent) {
+  return printDocument(certificatePrintHtml(canvas, card), isCurrent);
 }
 
 /** Render sequentially with one reusable canvas; cancellation is checked between pages. */
-export async function printCertificateBatch(entries, confirmed = false, isCurrent = () => true) {
-  if (!Array.isArray(entries) || !entries.length || confirmed !== true || entries.some(entry => !isCertificateReady(entry.card))) {
-    throw new Error('Review every selected certificate before printing');
+export async function printCertificateBatch(entries, isCurrent = () => true) {
+  if (!Array.isArray(entries) || !entries.length || entries.some(entry => !isCertificateReady(entry.card))) {
+    throw new Error('Each selected certificate requires a name and text');
   }
   const scratch = document.createElement('canvas');
   const images = [];
@@ -125,7 +125,7 @@ export async function printCertificateBatch(entries, confirmed = false, isCurren
     for (const entry of entries) {
       if (!isCurrent()) return false;
       const canvas = entry.canvas || drawAchievementCertificate(scratch, entry.card, entry.options);
-      images.push(reviewedRaster(canvas, entry.card, confirmed));
+      images.push(certificateRaster(canvas, entry.card));
       // Let the UI respond to cancellation or edits while preparing a whole class.
       await new Promise(resolve => setTimeout(resolve, 0));
     }
@@ -138,10 +138,10 @@ export async function printCertificateBatch(entries, confirmed = false, isCurren
 export function openAchievementCertificate({ studentName = '', demo = false, metadata = {} } = {}) {
   loadStyle();
   const initialOptions = certificateMetadata({ ...metadata, dateLabel: metadata.dateLabel || certificateIssueDate() });
-  const initialText = defaultCertificateText(initialOptions.subjectName);
+  const initialText = defaultCertificateText();
   return openSheet({
     title: 'شهادة تقدير',
-    desc: 'خصّص عبارة التقدير والتصميم، ثم راجع الشهادة واحفظها أو اطبعها.',
+    desc: 'خصّص نص الشهادة وتصميمها، ثم احفظها أو اطبعها.',
     body: html`
       <div class="certificate-editor" dir="rtl">
         <aside class="certificate-editor__options">
@@ -162,11 +162,9 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
           <div class="certificate-preview-heading"><span>معاينة الشهادة <small>A4 · أفقي</small></span>
             <button class="btn btn--ghost" data-certificate-expand type="button">معاينة موسّعة</button></div>
           <div class="certificate-paper"><canvas data-certificate-canvas role="img" aria-label="معاينة شهادة التقدير"></canvas></div>
-          <p class="certificate-status" data-certificate-status role="status">راجع نص الشهادة قبل التصدير.</p>
+          <p class="certificate-status" data-certificate-status role="status" hidden></p>
         </section>
-      </div>
-      <label class="certificate-consent"><input type="checkbox" data-certificate-confirm disabled>
-        <span>راجعت الشهادة وأوافق على تصدير المحتوى المختار</span></label>`,
+      </div>`,
     foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>
       <button class="btn btn--outline" data-certificate-print disabled>${icon('print')} طباعة / PDF</button>
       <button class="btn btn--primary" data-certificate-download disabled>${icon('download')} تنزيل الصورة</button>`,
@@ -174,7 +172,6 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
       root.classList.add('certificate-backdrop');
       root.querySelector('.sheet').classList.add('certificate-sheet');
       const canvas = root.querySelector('[data-certificate-canvas]');
-      const confirm = root.querySelector('[data-certificate-confirm]');
       const download = root.querySelector('[data-certificate-download]');
       const print = root.querySelector('[data-certificate-print]');
       const expand = root.querySelector('[data-certificate-expand]');
@@ -185,7 +182,7 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
       let ready = false;
       let previewOpen = false;
       const syncButtons = () => {
-        download.disabled = print.disabled = busy || !ready || confirm.disabled || !confirm.checked;
+        download.disabled = print.disabled = busy || !ready || !isCertificateReady(card) || previewOpen;
         expand.disabled = !ready || busy || previewOpen;
       };
       const redraw = () => {
@@ -193,18 +190,15 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
           drawAchievementCertificate(canvas, card, options);
           canvas.setAttribute('aria-label', certificateDescription(card, options));
           ready = true;
-          confirm.disabled = !isCertificateReady(card);
-          status.textContent = card.text ? 'المعاينة هي المحتوى الذي سيظهر في الصورة والطباعة.' : 'اكتب نص الشهادة لإتاحة التصدير.';
+          status.textContent = !card.text ? 'اكتب نص الشهادة لإتاحة التصدير.' : !card.name ? 'تعذّر تحديد اسم الطالب للشهادة.' : '';
         } catch {
           ready = false;
-          confirm.disabled = true;
-          confirm.checked = false;
           status.textContent = 'تعذرت معاينة الشهادة في هذا المتصفح.';
         }
+        status.hidden = !status.textContent;
         syncButtons();
       };
       const update = () => {
-        confirm.checked = false;
         options = certificateMetadata({ ...initialOptions,
           ...Object.fromEntries([...root.querySelectorAll('[data-certificate-meta]')].map(field => [field.dataset.certificateMeta, field.value])),
           design: root.querySelector('[data-certificate-design]:checked').value,
@@ -218,7 +212,6 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
       };
       root.querySelectorAll('[data-certificate-design]').forEach(field => field.addEventListener('change', update));
       root.querySelectorAll('[data-certificate-meta], [data-certificate-text]').forEach(field => field.addEventListener('input', update));
-      confirm.addEventListener('change', syncButtons);
       expand.addEventListener('click', async () => {
         if (previewOpen) return;
         previewOpen = true;
@@ -233,18 +226,22 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
         }
       });
       const exportCertificate = async (kind) => {
-        if (busy || !ready || confirm.disabled || !confirm.checked) return;
+        if (busy || !ready || !isCertificateReady(card) || previewOpen) return;
         const selectedCard = card;
+        const selectedOptions = options;
+        const isCurrent = () => root.isConnected && selectedCard === card && ready && isCertificateReady(card);
         busy = true;
         syncButtons();
         let url;
         try {
+          await document.fonts?.ready;
+          if (!isCurrent()) return;
+          drawAchievementCertificate(canvas, selectedCard, selectedOptions);
           if (kind === 'print') {
-            const opened = await printCertificate(canvas, selectedCard, true, () => root.isConnected && selectedCard === card && confirm.checked);
-            if (opened) status.textContent = 'من نافذة الطباعة يمكنك اختيار الطابعة أو «حفظ بتنسيق PDF».';
+            await printCertificate(canvas, selectedCard, isCurrent);
           } else {
-            const blob = await certificatePng(canvas, selectedCard, true);
-            if (!root.isConnected || selectedCard !== card || !confirm.checked) return;
+            const blob = await certificatePng(canvas, selectedCard);
+            if (!isCurrent()) return;
             url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -257,7 +254,6 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
         } finally {
           if (url) setTimeout(() => URL.revokeObjectURL(url), 1000);
           busy = false;
-          confirm.checked = false;
           syncButtons();
         }
       };

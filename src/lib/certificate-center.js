@@ -20,8 +20,7 @@ export function openCertificateCenter({ teachingId } = {}) {
   loadStyle();
   const teachings = store.teachings();
   const initialTeaching = teachings.find(teaching => teaching.id === teachingId) ?? teachings[0];
-  const suggestedText = id => defaultCertificateText(store.getSubject(store.getTeaching(id)?.subjectId)?.name);
-  const initialText = suggestedText(initialTeaching?.id);
+  const initialText = defaultCertificateText();
   const profile = store.state.profile ?? {};
   const presentation = getAccountPresentation(profile.teacherForm);
   const metadata = {
@@ -32,7 +31,7 @@ export function openCertificateCenter({ teachingId } = {}) {
   };
   return openSheet({
     title: 'شهادات التقدير',
-    desc: 'اختر الفصل والطلاب والتصميم، ثم راجع شهاداتهم قبل الطباعة.',
+    desc: 'اختر الفصل والطلاب، وخصّص نص الشهادة وتصميمها، ثم حمّلها أو اطبعها.',
     body: html`
       <div class="certificate-center" dir="rtl">
         <aside class="certificate-center__controls">
@@ -69,8 +68,7 @@ export function openCertificateCenter({ teachingId } = {}) {
           <div class="certificate-center__preview-head"><div><h3>معاينة الشهادة</h3><span>A4 · أفقي</span></div><button type="button" class="btn btn--ghost btn--sm" data-center-expand disabled>معاينة موسّعة</button></div>
           <div class="certificate-center__paper"><canvas data-center-canvas role="img" aria-label="معاينة شهادة التقدير"></canvas></div>
           <div class="certificate-center__navigation"><button type="button" class="btn btn--ghost btn--sm" data-center-prev disabled>السابق</button><span data-center-position>اختر طلابًا للمعاينة</span><button type="button" class="btn btn--ghost btn--sm" data-center-next disabled>التالي</button></div>
-          <p class="certificate-center__status" data-center-status role="status"></p>
-          <label class="certificate-center__consent"><input type="checkbox" data-center-confirm disabled><span>راجعت شهادات الطلاب المحددين وأوافق على تصدير محتواها المختار</span></label>
+          <p class="certificate-center__status" data-center-status role="status" hidden></p>
         </section>
       </div>`,
     foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button><button class="btn btn--outline" data-center-download disabled>${icon('download')} صورة الشهادة المعروضة</button><button class="btn btn--primary" data-center-print disabled>${icon('print')} طباعة الشهادات / PDF</button>`,
@@ -79,11 +77,9 @@ export function openCertificateCenter({ teachingId } = {}) {
       root.querySelector('.sheet').classList.add('certificate-center-sheet');
       const $ = selector => root.querySelector(selector);
       const canvas = $('[data-center-canvas]');
-      const confirm = $('[data-center-confirm]');
       const selected = new Set();
       let currentTeachingId = initialTeaching?.id ?? '';
       let text = initialText;
-      let textEdited = false;
       let design = CERTIFICATE_DESIGNS[0]?.id;
       let query = '';
       let index = 0;
@@ -113,8 +109,7 @@ export function openCertificateCenter({ teachingId } = {}) {
       };
       const syncButtons = () => {
         const valid = ready && selectionState().valid;
-        confirm.disabled = !valid || busy;
-        $('[data-center-print]').disabled = $('[data-center-download]').disabled = !valid || !confirm.checked || busy || previewOpen;
+        $('[data-center-print]').disabled = $('[data-center-download]').disabled = !valid || busy || previewOpen;
         $('[data-center-expand]').disabled = !ready || !entries.length || busy || previewOpen;
         $('[data-center-prev]').disabled = busy || index <= 0;
         $('[data-center-next]').disabled = busy || index >= entries.length - 1;
@@ -130,7 +125,7 @@ export function openCertificateCenter({ teachingId } = {}) {
           .find(field => field.dataset.centerStudent === focusedStudentId)?.focus({ preventScroll: true });
       };
       const refresh = (contentChanged = true) => {
-        if (contentChanged) { revision++; confirm.checked = false; }
+        if (contentChanged) revision++;
         const state = selectionState();
         entries = state.cards;
         index = Math.min(index, Math.max(0, entries.length - 1));
@@ -146,24 +141,23 @@ export function openCertificateCenter({ teachingId } = {}) {
           : !selected.size ? 'حدّد الطلاب الذين تريد تجهيز شهاداتهم.'
           : !certificateText(text) ? 'اكتب نص الشهادة لإتاحة التصدير.'
           : !state.valid ? 'تحقّق من أسماء الطلاب المحددين قبل التصدير.'
-          : 'راجِع الشهادات باستخدام السابق والتالي، ثم وافق على التصدير.';
+          : '';
+        $('[data-center-status]').hidden = !$('[data-center-status]').textContent;
         syncButtons();
       };
       root.addEventListener('change', event => {
         const target = event.target;
         if (target.matches('[data-center-teaching]')) {
           currentTeachingId = target.value; selected.clear(); index = 0; query = ''; $('[data-center-search]').value = '';
-          if (!textEdited) { text = suggestedText(currentTeachingId); $('[data-center-text]').value = text; }
         }
         else if (target.matches('[data-center-student]')) { target.checked ? selected.add(target.dataset.centerStudent) : selected.delete(target.dataset.centerStudent); index = 0; }
-        else if (target === confirm) { syncButtons(); return; }
         else return;
         renderRoster(); refresh();
       });
       root.addEventListener('input', event => {
         const target = event.target;
         if (target.matches('[data-center-search]')) { query = target.value.trim().toLocaleLowerCase('ar'); renderRoster(); }
-        else if (target.matches('[data-center-text]')) { text = target.value; textEdited = text !== suggestedText(currentTeachingId); refresh(); }
+        else if (target.matches('[data-center-text]')) { text = target.value; refresh(); }
         else if (target.matches('[data-center-meta]')) { metadata[target.dataset.centerMeta] = target.value; refresh(); }
       });
       root.addEventListener('click', async event => {
@@ -182,17 +176,17 @@ export function openCertificateCenter({ teachingId } = {}) {
         } else if (button.matches('[data-center-prev], [data-center-next]')) { index += button.matches('[data-center-prev]') ? -1 : 1; refresh(false); }
         else if (button.matches('[data-center-expand]')) {
           previewOpen = true; syncButtons();
-          try { await openDocumentPreview({ title: 'معاينة شهادة التقدير', canvas, description: 'معاينة الشهادة المعروضة. عد لمراجعة بقية الشهادات.' }); }
+          try { await openDocumentPreview({ title: 'معاينة شهادة التقدير', canvas, description: 'يمكنك التكبير أو ملاءمة الشهادة للشاشة.' }); }
           catch { toast('تعذّر فتح المعاينة الموسّعة', 'danger'); }
           finally { previewOpen = false; syncButtons(); if (root.isConnected) button.focus({ preventScroll: true }); }
         } else if (button.matches('[data-center-print], [data-center-download]')) {
-          if (!confirm.checked || !ready || !selectionState().valid) { refresh(); return; }
+          if (!ready || !selectionState().valid) { refresh(); return; }
           const outputRevision = revision;
           const selectedIds = [...selected];
           const outputEntries = selectionState().cards;
           const snapshotOptions = options();
           const fingerprint = JSON.stringify({ cards: outputEntries.map(entry => entry.card), options: snapshotOptions });
-          const isCurrent = () => root.isConnected && revision === outputRevision && confirm.checked && selectionState().valid
+          const isCurrent = () => root.isConnected && revision === outputRevision && selectionState().valid
             && selectedIds.length === selected.size && selectedIds.every(id => selected.has(id))
             && fingerprint === JSON.stringify({ cards: selectionState().cards.map(entry => entry.card), options: options() });
           let url;
@@ -205,21 +199,20 @@ export function openCertificateCenter({ teachingId } = {}) {
               // a full-resolution canvas allocation for every selected student.
               const pages = outputEntries.map(({ card }) => ({ card, options: snapshotOptions }));
               if (!isCurrent()) return;
-              const opened = await printCertificateBatch(pages, true, isCurrent);
-              if (opened) $('[data-center-status]').textContent = 'من نافذة الطباعة اختر الطابعة أو «حفظ بتنسيق PDF». لكل طالب صفحة مستقلة.';
+              await printCertificateBatch(pages, isCurrent);
             } else {
               const output = document.createElement('canvas');
               const card = outputEntries[index]?.card;
               if (!card) return;
               drawAchievementCertificate(output, card, snapshotOptions);
-              const blob = await certificatePng(output, card, true);
+              const blob = await certificatePng(output, card);
               if (!isCurrent()) return;
               url = URL.createObjectURL(blob);
               const link = document.createElement('a'); link.href = url; link.download = 'rakeez-achievement-certificate.png'; link.click();
               toast('تم تجهيز صورة الشهادة للتنزيل', 'ok');
             }
           } catch { toast('تعذّر تجهيز الشهادات — حاول مرة أخرى', 'danger'); }
-          finally { if (url) setTimeout(() => URL.revokeObjectURL(url), 1000); busy = false; confirm.checked = false; syncButtons(); }
+          finally { if (url) setTimeout(() => URL.revokeObjectURL(url), 1000); busy = false; syncButtons(); }
         }
       });
       renderRoster(); refresh();

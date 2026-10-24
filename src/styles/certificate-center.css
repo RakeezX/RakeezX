@@ -43,8 +43,6 @@
 .certificate-center__navigation { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 18px 0 8px; }
 .certificate-center__navigation span { text-align: center; font-size: 12px; color: var(--text-3, #718078); }
 .certificate-center__status { min-height: 40px; line-height: 1.8; color: var(--text-3, #718078); font-size: 12px; margin: 10px 0; }
-.certificate-center__consent { display: flex; align-items: flex-start; gap: 9px; padding: 13px; border: 1px solid var(--border, #dce4db); border-radius: 10px; background: var(--surface, #fff); font-size: 13px; line-height: 1.8; cursor: pointer; }
-.certificate-center__consent input { margin-top: 5px; }
 @media (max-width: 850px) {
   .certificate-center { grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); gap: 14px; }
   .certificate-center__section, .certificate-center__preview { padding: 14px; }

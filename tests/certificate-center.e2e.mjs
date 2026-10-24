@@ -46,7 +46,6 @@ test('certificate center applies editable appreciation text to any chosen studen
   await expect(sheet).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   const canvas = sheet.locator('[data-center-canvas]');
-  const consent = sheet.locator('[data-center-confirm]');
   const print = sheet.locator('[data-center-print]');
   const message = sheet.locator('[data-center-text]');
   await sheet.locator('[data-center-teaching]').selectOption(fixture.teachingId);
@@ -57,12 +56,16 @@ test('certificate center applies editable appreciation text to any chosen studen
     await expect(sheet.locator(`[data-center-meta="${key}"]`)).toHaveValue(fixture.identity[key]);
   }
   await expect(sheet.locator('[data-center-evidence]')).toHaveCount(0);
-  await expect(message).toHaveValue(/وذلك نظير تميّزه.*في مادة المهارات الرقمية/);
+  await expect(message).toHaveValue('تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد');
+  await expect(sheet.locator('[data-center-confirm]')).toHaveCount(0);
+  await expect(sheet).not.toContainText('راجعت شهادات الطلاب المحددين وأوافق');
   const defaultText = await message.inputValue();
   await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
   await expect(print).toBeDisabled();
+  await expect(sheet.locator('[data-center-download]')).toBeDisabled();
   await sheet.locator(`[data-center-student="${fixture.noEvidenceId}"]`).check();
-  await expect(consent).toBeEnabled();
+  await expect(print).toBeEnabled();
+  await expect(sheet.locator('[data-center-download]')).toBeEnabled();
   await sheet.locator('[data-center-all]').click();
   await expect(sheet.locator(`[data-center-student="${fixture.noEvidenceId}"]`)).toBeChecked();
   await sheet.locator('[data-center-clear]').click();
@@ -80,10 +83,8 @@ test('certificate center applies editable appreciation text to any chosen studen
     await sheet.locator(`[data-center-meta="${key}"]`).fill(value);
   }
   await expect(canvas).toHaveAttribute('aria-label', /مدرسة ركيز التجريبية/);
-  await consent.check();
   await sheet.locator('[data-center-design="school"]').click();
-  await expect(consent).not.toBeChecked();
-  await expect(print).toBeDisabled();
+  await expect(print).toBeEnabled();
   await expect(sheet.locator('[data-center-design="school"]')).toHaveAttribute('aria-pressed', 'true');
   await canvas.screenshot({ path: testInfo.outputPath('certificate-school-preview.png') });
   await fs.writeFile(testInfo.outputPath('certificate-school-output.png'), Buffer.from(await canvas.evaluate(node => node.toDataURL('image/png').split(',')[1]), 'base64'));
@@ -93,19 +94,18 @@ test('certificate center applies editable appreciation text to any chosen studen
   await sheet.locator('.certificate-center__metadata > summary').click();
   await page.screenshot({ path: testInfo.outputPath('certificate-center-designs.png'), fullPage: false });
   await sheet.locator('[data-center-tab="students"]').click();
-  await consent.check();
   await message.fill('');
-  await expect(consent).not.toBeChecked();
-  await expect(consent).toBeDisabled();
   await expect(print).toBeDisabled();
+  await expect(sheet.locator('[data-center-download]')).toBeDisabled();
   const customText = 'وذلك تقديرًا لمثابرته وإبداعه في مادة المهارات الرقمية.\nنعتز بجهده، ونسأل الله له دوام التوفيق والسداد.';
   await message.fill(customText);
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
-  await consent.check();
+  await expect(print).toBeEnabled();
+  await expect(sheet.locator('[data-center-download]')).toBeEnabled();
   await sheet.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[1]));
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
-  await expect(consent).toBeChecked();
+  await expect(print).toBeEnabled();
   await sheet.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[2]));
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
@@ -118,11 +118,12 @@ test('certificate center applies editable appreciation text to any chosen studen
   await page.keyboard.press('Escape');
   await expect(expanded).toHaveCount(0);
   await expect(sheet.locator('[data-center-expand]')).toBeFocused();
-  await expect(consent).toBeChecked();
+  await expect(print).toBeEnabled();
   await sheet.locator('.sheet__body').evaluate(node => { node.scrollTop = 0; });
   await page.screenshot({ path: testInfo.outputPath('certificate-center-desktop.png'), fullPage: false });
   const outgoing = [];
   const observe = request => outgoing.push(request.url());
+  const expectedImage = await canvas.evaluate(node => node.toDataURL('image/png'));
   page.on('request', observe);
   const pendingDownload = page.waitForEvent('download');
   await sheet.locator('[data-center-download]').click();
@@ -132,8 +133,8 @@ test('certificate center applies editable appreciation text to any chosen studen
   const png = await fs.readFile(pngPath);
   expect(png.readUInt32BE(16)).toBe(2970);
   expect(png.readUInt32BE(20)).toBe(2100);
-  await expect(consent).not.toBeChecked();
-  await consent.check();
+  expect(png.toString('base64')).toBe(expectedImage.split(',')[1]);
+  await expect(print).toBeEnabled();
   await print.click();
   await page.waitForFunction(() => window.__certificateBatchProof);
   const proof = await page.evaluate(() => window.__certificateBatchProof);
@@ -142,9 +143,12 @@ test('certificate center applies editable appreciation text to any chosen studen
   expect(proof.text).toBe('');
   expect(proof.html).not.toContain(fixture.ids[0]);
   expect(proof.html).not.toContain('certificate-center__roster');
+  expect(proof.html).toContain(expectedImage);
   await page.evaluate(() => document.querySelector('iframe[data-certificate-print]')?.contentWindow.dispatchEvent(new Event('afterprint')));
   await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
-  await expect(consent).not.toBeChecked();
+  await expect(print).toBeEnabled();
+  await expect(sheet.locator('[data-center-download]')).toBeEnabled();
+  await expect(sheet).not.toContainText('من نافذة الطباعة');
   expect(outgoing).toEqual([]);
   page.off('request', observe);
   const printPage = await context.newPage();
@@ -166,8 +170,8 @@ test('certificate center applies editable appreciation text to any chosen studen
   if (otherTeaching) {
     await sheet.locator('[data-center-teaching]').selectOption(otherTeaching);
     await expect(sheet.locator('[data-center-student]:checked')).toHaveCount(0);
-    await expect(consent).not.toBeChecked();
     await expect(print).toBeDisabled();
+    await expect(sheet.locator('[data-center-download]')).toBeDisabled();
     await expect(message).toHaveValue(customText);
   }
   expect(await page.evaluate(async () => JSON.stringify((await import('/src/store.js')).state))).toBe(stateBefore);
