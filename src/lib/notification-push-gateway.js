@@ -110,9 +110,10 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
     async authorizeEvent(_snapshot, event) {
       try {
         const r = await request('events/authorize', { ...scope, consentRevision: remote?.consentRevision, registrationId: receipt?.registrationId ?? null, event });
-        if (r.status !== 'authorized') invalidated();
-        return r.status === 'authorized';
-      } catch { invalidated(); return false; }
+        // Event refusal or an unknown transport outcome grants no action.
+        // Binding retirement belongs to verified context/owner/consent guards.
+        return r.status === 'authorized' && valid();
+      } catch { return false; }
     },
     expiresAt: () => Math.min(remote?.sessionExpiresAt ?? 0, receipt?.expiresAt ?? Infinity),
     async project(kind, sourceId, expectedStamp) {
