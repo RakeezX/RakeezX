@@ -16,6 +16,7 @@ const WIDTH = 1485;
 const HEIGHT = 1050;
 const CENTER = WIDTH / 2;
 const FONT = '"Tajawal", sans-serif';
+const HEADER_FONT = '"Thmanyah Sans", sans-serif';
 const TITLE_FONT = `"${TITLE_FONT_FAMILY}", "Aref Ruqaa", serif`;
 const INK = '#243e35';
 const GOLD = '#a77b2e';
@@ -445,13 +446,13 @@ function headerIdentity(ctx, value, x, school, size, color) {
   const height = 104;
   let lines = [];
   for (; size >= 16; size -= 1) {
-    ctx.font = `700 ${size}px ${FONT}`;
+    ctx.font = `700 ${size}px ${HEADER_FONT}`;
     lines = textLines(ctx, value, width);
     if (lines.length * size * 1.25 <= height) break;
   }
   const lineHeight = size * 1.25;
   const firstBaseline = top + (height - lines.length * lineHeight) / 2 + lineHeight * 0.76;
-  lines.forEach((text, index) => label(ctx, text, x, firstBaseline + index * lineHeight, size, 700, color, width));
+  lines.forEach((text, index) => label(ctx, text, x, firstBaseline + index * lineHeight, size, 700, color, width, HEADER_FONT));
 }
 
 /** Paint only certificate identity and the teacher's explicit appreciation text. */

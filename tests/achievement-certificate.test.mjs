@@ -82,6 +82,7 @@ test('both designs display bounded identity, the original Ministry logo, the fix
     assert.ok(department.x > x + width, 'Education department belongs to the right of the centered logo');
     assert.ok(school.x < x, 'School belongs to the left of the centered logo');
     assert.equal(school.font, department.font, 'The header labels use coordinated typography');
+    assert.ok(school.font.includes('"Thmanyah Sans"'), 'The header uses the available Rakeez brand font');
     assert.equal(school.color, department.color, 'The header labels use the same theme color');
     assert.equal(school.color, design.id === 'ornate' ? '#806027' : '#f3e3ba');
     assert.ok(Math.abs(width / height - ministryLogo.naturalWidth / ministryLogo.naturalHeight) < 1e-10, 'The logo must retain its original aspect ratio');

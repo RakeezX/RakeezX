@@ -292,7 +292,8 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
     const collect = download => downloads.push(download);
     page.on('download', collect);
     await button.click();
-    await expect.poll(() => downloads.length).toBe(fixture.names.length);
+    // Chromium's native A4 PNG encoder can dispatch its first download after about seven seconds.
+    await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(fixture.names.length);
     await expect(button).toBeEnabled();
     page.off('download', collect);
     expect(downloads).toHaveLength(fixture.names.length);
@@ -332,7 +333,8 @@ test('certificate center downloads a separate named PNG and A4 PDF for every sel
     delete window.__holdCertificateAfter;
     window.__heldCertificateExports.splice(0).forEach(release => release());
   });
-  await expect(pngButton).toBeEnabled();
+  // Cancellation is applied after the pending native PNG encode returns.
+  await expect(pngButton).toBeEnabled({ timeout: 10000 });
   await expect(exportStatus).toContainText('توقف التجهيز بعد 1 من 3');
   expect(stoppedDownloads).toHaveLength(1);
   page.off('download', collectStopped);
