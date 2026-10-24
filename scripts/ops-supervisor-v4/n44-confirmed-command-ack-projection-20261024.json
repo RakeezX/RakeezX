@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-confirmed-command-ack-projection-20261024",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -5610,
+      "scopeKey": "n44-confirmed-command-ack-projection",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 25,
+      "idleMinutes": 8,
+      "dependsOn": [],
+      "baseSha": "2afc3eb4ee11a982ba7991ec7630a7ccea18ada5",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX/.worktrees/continuous-n44-confirmed-command-ack-projection-20261024",
+      "allowedPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/store.js",
+        "src/app.js",
+        "tests/n44-confirmed-projection-20261024/runtime.mjs",
+        "tests/n44-confirmed-projection-20261024/runtime.json",
+        "tests/n44-confirmed-projection-20261024/engine.mjs",
+        "tests/n44-confirmed-projection-20261024/engine.json",
+        "tests/n44-confirmed-projection-20261024/app.mjs",
+        "tests/n44-confirmed-projection-20261024/app.json",
+        "tests/n44-confirmed-projection-20261024/provenance.json",
+        "docs/automation-evidence/20261024/N44_CONFIRMED_ACK_PROJECTION.md"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/store.js",
+        "src/app.js"
+      ],
+      "requiredChecks": [
+        "n44_direct_receipt_and_no_change_sync_projection",
+        "n44_projection_owner_recovery_and_grade_guards",
+        "n44_actual_app_projection_and_candidate_scope"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "Latest direct PO full necessary completion delegation, no repeated permission requests. Reproduced direct N44 outcome blocker; original publisher integrates and verifies public code only.",
+      "preparationAuthority": {
+        "kind": "qualified_frontend_slice_only",
+        "publication": true,
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "registrations": 0,
+        "sends": 0,
+        "authorityEvidence": "artifacts/ops-supervisor-v4/intake-evidence/po-20261023-user-0538/po-20261024-full-outcome-authority.json"
+      },
+      "acceptance": [
+        "Genuine canonical ACK of a normal item/subitem command projects its eligible N44 reminder without needing an unrelated full Sync write.",
+        "A newly subscribed/restored current device can project already confirmed server sources without fabricated ACK or a user edit.",
+        "Pending/unknown/failed/local-only/foreign/retired work never becomes a confirmed source; preserve grades, owner isolation, transactions and cleanup.",
+        "Actual affected synthetic app/engine/runtime guards and served publisher proof; no claim of real device arrival or private service deployment."
+      ],
+      "objective": "ACTUAL IMMUTABLE HANDOFF: original custodian candidate 22b8d649e1394b20e04cc03bbc62dcf8913ddfc2, run cf3bddba-1114-4c49-8d87-8025af6f245d, public summary Second unchanged blocker. Preserved the exact AI candidate and reused evidence; no edits, repeated tests, shared leases or live operations. N44 remains OPEN.. Read only its docs/automation-evidence/20261024/N44_CURRENT_ELIGIBILITY_OUTCOME.md and named redacted projection/receipt tests. Current device dispositions are revoked/consentfalse/disarmed, sendsZERO. The owned due source was deleted locally but cloud cleanup remains UNKNOWN after Sync failure; never claim that cleanup succeeded, resurrect that source, or treat its unacknowledged state as initial-projection eligible. Include unrelated failed outbox versus independently canonical direct-ACK separation; no false acknowledgement or pending-delete projection.\n\nFIX ONLY THE REPRODUCED N44 CANONICAL-ACK/PROJECTION HANDOFF, THROUGH ORIGINAL PUBLISHER. Original private device task continuous-n44-one-approved-closed-page-push-20261019 runbb0c340b observed a valid due source in the ordinary notification center, with19 frontend/canonical projection casesPASS. Same device successfully registered with NEW identity after prior revoked ID. A successful no-change Sync caused no due projection. A normal label-only score-command edit then ACKed durably and preserved definitions, but still no projection request: direct score commands acknowledge outside N44's full-Sync-only observer. No provider send was spent. This is concrete actual outcome evidence, not speculation; original custodian will commit final sanitized receipt in its isolated worktree. Read only privacy-safe current outcome/tests/docs, NEVER custody scripts/state/keys, raw browser events or private files. Actual source e8064e4b remains original service custodian's responsibility; no service code/API/schema changes requested.\n\nConfirm causal reproduction locally FIRST using actual current app/store/Sync-v2 receipt adoption and notification runtime, not a hand-made mirror. Inspect src/app.js subscribeAcknowledged wiring, src/lib/sync.js full-Sync acknowledgement listener, store's direct engine.dispatchPending paths, and notification runtime optIn/restore/afterSyncAck. Existing runtime only projects after a full-Sync pushed ACK. Choose the smallest existing-boundary correction: publish a genuine durable canonical ACK/adopted-state notification for direct commands, and safely initialize projection of already-confirmed server sources after successful current-device opt-in/restore as necessary. Do not fake a Sync checkpoint, notify from a local optimistic change, treat HTTP200/unknown as COMMIT, relax source/owner/lease/expiry guards, scan another owner, change score/grade math or business mutations, add a poller/cron/general retry or send private source payloads as truth. Server projection must still derive owned source from original typed read and revision CAS. Preserve grade/outbox/history/locks/cancellation/late ACK semantics. Avoid a broad Sync rewrite; if a smaller affected path outside declared scope is genuinely necessary, report it specifically instead of editing broadly.\n\nUse actual local-only synthetic app/engine handlers through canonical isolated-local-browser helper where appropriate, fresh owned loopback context, no live browser/account/credentials/Service Workers. Required meaningful cases: source exists before subscription with no unrelated dirty data; direct subitem create/update ACK triggers projection; no-change Sync/read completion is handled without inventing a pushed ACK; pending/lost/unknown/rejected/local-only results do NOT claim confirmed materialization; owner/session/workspace switch/dispose/late receipt cannot cross-bind; duplicate canonical ACK is idempotent; existing grade values, source revisions, normal Sync and cleanup stay unchanged. Reuse unchanged13 N44 lifecycle/35 authority/19 due-source guards; rerun only source-sensitive subset. No test-only shortcut that bypasses actual command/receipt store path. Test this cause before/after in the real source implementation. No generic startup projected claims before trusted context; restored existing server source is distinct from unacked local outbox.\n\nPrepare minimal production patch and compact privacy-safe evidence in this ISOLATED PUBLIC worktree. ZERO real-account/browser/provider/native/pin/policy/SQL/Auth/migration/registration/send operations. Do not open original private custody or control original task. Do not overwrite current main from old worktrees. Source reads may include affected dependencies but edits restricted to declared paths. Public evidence records scope/dependency hashes and exact actual tests; do not include original encrypted proposal or account/test IDs. Candidate commit and truthful LOCAL_READY with these THREE prepublication checks when actually PASS. Original publisher integrates/deploys/verifies served changed files; do not push/deploy/main-write yourself. Whole N44 and actual device send remain original-parent acceptance; successful local/prod code does not claim delivered notification. No repeated unchanged test suite, new planner/reviewer or alternative dispatcher.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "2afc3eb4ee11a982ba7991ec7630a7ccea18ada5",
+        "requiredSourcePaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/lib/sync.js",
+          "src/lib/sync-v2.js",
+          "src/store.js",
+          "src/app.js",
+          "src/lib/notification-events.js",
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-client.js",
+          "scripts/ops-supervisor-v4/isolated-local-browser.mjs"
+        ],
+        "editPaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/lib/sync.js",
+          "src/lib/sync-v2.js",
+          "src/store.js",
+          "src/app.js",
+          "tests/n44-confirmed-projection-20261024/runtime.mjs",
+          "tests/n44-confirmed-projection-20261024/runtime.json",
+          "tests/n44-confirmed-projection-20261024/engine.mjs",
+          "tests/n44-confirmed-projection-20261024/engine.json",
+          "tests/n44-confirmed-projection-20261024/app.mjs",
+          "tests/n44-confirmed-projection-20261024/app.json",
+          "tests/n44-confirmed-projection-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N44_CONFIRMED_ACK_PROJECTION.md"
+        ],
+        "newPaths": [
+          "tests/n44-confirmed-projection-20261024/runtime.mjs",
+          "tests/n44-confirmed-projection-20261024/runtime.json",
+          "tests/n44-confirmed-projection-20261024/engine.mjs",
+          "tests/n44-confirmed-projection-20261024/engine.json",
+          "tests/n44-confirmed-projection-20261024/app.mjs",
+          "tests/n44-confirmed-projection-20261024/app.json",
+          "tests/n44-confirmed-projection-20261024/provenance.json",
+          "docs/automation-evidence/20261024/N44_CONFIRMED_ACK_PROJECTION.md"
+        ],
+        "workerChecks": [
+          "n44_direct_receipt_and_no_change_sync_projection",
+          "n44_projection_owner_recovery_and_grade_guards",
+          "n44_actual_app_projection_and_candidate_scope"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
