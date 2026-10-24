@@ -276,35 +276,56 @@ async function sendRequest(path, options, isAuth) {
 }
 
 export async function request(path, options = {}, isAuth = false, { responseMetadata = false, assertAccess = () => {} } = {}) {
-  assertAccess();
+  const contextGeneration = authContextGeneration;
+  const expectedOwnerId = user?.id;
+  const expectedPersistedOwner = persistedAuthOwner();
+  // AI N88/N44: a late data response cannot refresh, replay or sign out a
+  // different Auth context. Same-owner refresh remains valid within this one.
+  const assertRequestContext = () => {
+    assertAccess();
+    options.signal?.throwIfAborted();
+    if (!isAuth && (authContextGeneration !== contextGeneration || user?.id !== expectedOwnerId ||
+        persistedAuthOwner() !== expectedPersistedOwner)) {
+      throw Object.assign(new Error('Authentication changed during request'), { code: 'AUTH_CONTEXT_CHANGED' });
+    }
+  };
+  assertRequestContext();
   if (!isAuth) await ensureFreshSession();
-  assertAccess();
-  const attemptedToken = session?.access_token ?? null;
+  assertRequestContext();
+  let attemptedToken = session?.access_token ?? null;
   let res = await sendRequest(path, options, isAuth);
-  assertAccess();
-  if (!isAuth && [401, 403].includes(res.status)) {
+  assertRequestContext();
+  // Data API 403 (including PostgreSQL 42501) is a permission rejection,
+  // not evidence of an expired token. Never refresh/replay that denied write.
+  if (!isAuth && res.status === 401) {
     if (session?.refresh_token) {
       if (session.access_token === attemptedToken) await refreshSession();
-      assertAccess();
+      assertRequestContext();
+      attemptedToken = session?.access_token ?? null;
       res = await sendRequest(path, options, false);
-      assertAccess();
+      assertRequestContext();
     }
-    if ([401, 403].includes(res.status)) {
+    if (res.status === 401) {
       const failure = await responseFailure(res);
-      assertAccess();
+      assertRequestContext();
+      if ((session?.access_token ?? null) !== attemptedToken) {
+        throw Object.assign(new Error('Authentication token changed during request'), { code: 'AUTH_CONTEXT_CHANGED' });
+      }
       saveSession(null);
       throw authError(failure.message);
     }
   }
   if (!res.ok) {
-    throw await responseFailure(res);
+    const failure = await responseFailure(res);
+    assertRequestContext();
+    throw failure;
   }
   
   const result = (data) => responseMetadata ? { data, contentRange: res.headers.get('content-range') } : data;
   if (res.status === 204) return result(null);
   
   const text = await res.text();
-  assertAccess();
+  assertRequestContext();
   if (!text) return result(null);
   
   try {
