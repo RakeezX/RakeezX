@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { certificateCard, certificatePng, isCertificateReady, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateBatchPrintHtml, certificateIssueDate, certificateFilename } from '../src/lib/achievement-certificate.js';
+import { certificateCard, certificatePng, certificatePdf, isCertificateReady, drawAchievementCertificate, certificateDescription, certificatePrintHtml, certificateIssueDate, certificateFilename } from '../src/lib/achievement-certificate.js';
+import { certificatePdfFromJpeg } from '../src/lib/certificate-pdf.js';
 import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata, TITLE_FONT_FAMILY } from '../src/lib/certificate-designs.js';
 
 const approvedText = 'تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد';
@@ -12,7 +13,7 @@ function recordingCanvas() {
   const context = new Proxy({
     createLinearGradient() { return { addColorStop() {} }; },
     createRadialGradient() { return { addColorStop() {} }; },
-    fillText(value, x, y) { texts.push(String(value)); lettering.push({ text: String(value), font: this.font, x, y }); },
+    fillText(value, x, y) { texts.push(String(value)); lettering.push({ text: String(value), font: this.font, color: this.fillStyle, x, y }); },
     drawImage(...args) { images.push(args); },
     measureText(value) { return { width: Array.from(String(value)).length * Number((this.font || '24px').match(/([\d.]+)px/)[1]) * 0.55 }; },
   }, { get(target, key) { return key in target ? target[key] : () => {}; } });
@@ -76,6 +77,13 @@ test('both designs display bounded identity, the original Ministry logo, the fix
     assert.ok(Math.abs(x + width / 2 - canvas.width / 4) < 1e-8, 'The Ministry logo must be horizontally centered in the certificate');
     const title = canvas.lettering.find(entry => entry.text === 'شهادة شكر وتقدير');
     assert.ok(title?.font.includes(TITLE_FONT_FAMILY), 'The title must use the dedicated Arabic display font');
+    const department = canvas.lettering.find(entry => entry.text === raw.educationDepartment);
+    const school = canvas.lettering.find(entry => entry.text === 'مدرسة تجريبية');
+    assert.ok(department.x > x + width, 'Education department belongs to the right of the centered logo');
+    assert.ok(school.x < x, 'School belongs to the left of the centered logo');
+    assert.equal(school.font, department.font, 'The header labels use coordinated typography');
+    assert.equal(school.color, department.color, 'The header labels use the same theme color');
+    assert.equal(school.color, design.id === 'ornate' ? '#806027' : '#f3e3ba');
     assert.ok(Math.abs(width / height - ministryLogo.naturalWidth / ministryLogo.naturalHeight) < 1e-10, 'The logo must retain its original aspect ratio');
     const output = canvas.texts.join(' ') + certificateDescription(card, options);
     for (const expected of ['آل مبدي العتيبي', 'مدرسة', 'معلم تجريبي', 'مدير تجريبي', 'الخامس 1', '2026', 'بيانات تجريبية', 'نعتز بجهدك']) assert.ok(output.includes(expected));
@@ -92,27 +100,56 @@ test('both designs display bounded identity, the original Ministry logo, the fix
   assert.equal(metadata.token, undefined);
 });
 
-test('batch print directly exports one isolated raster per named student with nonempty text', () => {
-  const card = certificateCard({ studentName: '<script>private-name</script>', text: 'تقديرًا لتميّزك ومثابرتك.' });
-  const entries = Array.from({ length: 3 }, () => ({ canvas: recordingCanvas(), card }));
-  assert.throws(() => certificateBatchPrintHtml([]));
-  for (const incomplete of [certificateCard({ studentName: 'طالب' }), certificateCard({ text: 'عبارة تقدير' })]) {
-    assert.throws(() => certificateBatchPrintHtml([...entries, { canvas: recordingCanvas(), card: incomplete }]));
+test('direct PDF is one complete A4 landscape page with byte-accurate cross references and the selected image', async () => {
+  // A real, synthetic 2x2 RGB JPEG keeps this binary-format test independent of a browser.
+  const jpeg = Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQIBAQEBAQIBAQECAgICAgICAgIDAwQDAwMDAwICAwQDAwQEBAQEAgMFBQQEBQQEBAT/2wBDAQEBAQEBAQIBAQIEAwIDBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAT/wAARCAACAAIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD+/iiiigD/2Q==', 'base64');
+  const blob = certificatePdfFromJpeg(jpeg, 2, 2);
+  assert.equal(blob.type, 'application/pdf');
+  const bytes = Buffer.from(await blob.arrayBuffer());
+  const document = bytes.toString('latin1');
+  assert.match(document, /^%PDF-1\.[4-7]/);
+  assert.match(document, /%%EOF\s*$/);
+  assert.equal((document.match(/\/Type\s*\/Page\b/g) || []).length, 1);
+  assert.match(document, /\/Type\s*\/Pages\b[\s\S]*?\/Count\s+1\b/);
+  const page = document.match(/\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]/);
+  assert.ok(page, 'The document declares its page dimensions');
+  assert.ok(Math.abs(Number(page[1]) - 841.8898) < 0.02);
+  assert.ok(Math.abs(Number(page[2]) - 595.2756) < 0.02);
+  const xrefOffset = Number(document.match(/startxref\s+(\d+)\s+%%EOF/)[1]);
+  const xref = document.slice(xrefOffset).match(/^xref\s+0\s+(\d+)\s*\r?\n([\s\S]*?)trailer/);
+  assert.ok(xref, 'startxref points to the actual byte position of the cross-reference table');
+  const entries = xref[2].trim().split(/\r?\n/);
+  assert.equal(entries.length, Number(xref[1]));
+  entries.slice(1).forEach((entry, index) => {
+    const offset = Number(entry.slice(0, 10));
+    assert.equal(document.slice(offset, offset + `${index + 1} 0 obj`.length), `${index + 1} 0 obj`);
+  });
+  const imageAt = document.indexOf('/Subtype /Image');
+  assert.ok(imageAt > 0);
+  const streamAt = document.indexOf('stream\n', imageAt) + 'stream\n'.length;
+  const imageDictionary = document.slice(imageAt, streamAt);
+  assert.match(imageDictionary, /\/ColorSpace\s*\/DeviceRGB/);
+  assert.match(imageDictionary, /\/Filter\s*\/DCTDecode/);
+  const imageLength = Number(imageDictionary.match(/\/Length\s+(\d+)/)[1]);
+  assert.deepEqual(bytes.subarray(streamAt, streamAt + imageLength), jpeg);
+  for (const [data, width, height] of [[new Uint8Array(), 2, 2], [jpeg, 0, 2], [jpeg, 2, NaN]]) {
+    assert.throws(() => certificatePdfFromJpeg(data, width, height));
   }
-  const output = certificateBatchPrintHtml(entries);
-  assert.equal((output.match(/<img /g) || []).length, 3);
-  assert.equal((output.match(/<div class="certificate-page"/g) || []).length, 3);
-  assert.match(output, /break-after:page/);
-  assert.doesNotMatch(output, /<script|private-|student-profile|https?:\/\//);
+  const canvas = { width: 2, height: 2, toBlob(callback, type) {
+    assert.equal(type, 'image/jpeg'); callback(new Blob([jpeg], { type }));
+  } };
+  const card = certificateCard({ studentName: 'طالب تجريبي', text: approvedText });
+  assert.equal((await certificatePdf(canvas, card)).type, 'application/pdf');
 });
 
-test('PNG and print export custom text directly while rejecting empty name, text or image', async () => {
+test('PNG, PDF and print export custom text directly while rejecting empty name, text or image', async () => {
   const canvas = recordingCanvas();
   const empty = certificateCard({ studentName: 'طالب', text: '   ' });
   const card = certificateCard({ studentName: '<script>private-name</script>', text: '<b>تقديرًا لمثابرتك</b>' });
   for (const incomplete of [empty, certificateCard({ text: 'عبارة تقدير' })]) {
     assert.throws(() => certificatePrintHtml(canvas, incomplete));
     await assert.rejects(certificatePng(canvas, incomplete));
+    await assert.rejects(certificatePdf(canvas, incomplete));
   }
   assert.equal((await certificatePng(canvas, card)).type, 'image/png');
   const html = certificatePrintHtml(canvas, card);
@@ -124,11 +161,9 @@ test('PNG and print export custom text directly while rejecting empty name, text
   assert.throws(() => certificatePrintHtml({ toDataURL: () => 'data:,' }, card));
 });
 
-test('certificate filenames preserve Arabic identity, distinguish batches and remain safe to save', () => {
+test('individual certificate filenames preserve Arabic identity and remain safe to save', () => {
   assert.equal(certificateFilename({ studentName: 'أحمد محمد', className: 'الرابع الابتدائي / 2' }),
     'شهادة شكر وتقدير - أحمد محمد - الرابع الابتدائي - 2');
-  assert.equal(certificateFilename({ studentName: 'أحمد', className: 'الخامس / 1', studentCount: 3 }),
-    'شهادات شكر وتقدير - الخامس - 1 - 3 طلاب');
   assert.equal(certificateFilename(), 'شهادة شكر وتقدير - طالب');
   const unsafe = certificateFilename({ studentName: '  أحمد\u202e/علي<>:\"|?*  ', className: 'الخامس\\2. ' });
   assert.doesNotMatch(unsafe, /[<>:\"/\\|?*\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069]/);
@@ -143,8 +178,5 @@ test('certificate filenames preserve Arabic identity, distinguish batches and re
   const document = certificatePrintHtml(recordingCanvas(), card, { className: 'الخامس / 2' });
   assert.match(document, /<title>شهادة شكر وتقدير - طالب &amp; مبدع - الخامس - 2<\/title>/);
   assert.doesNotMatch(document.match(/<body>([\s\S]*)<\/body>/)[1], /طالب|مبدع|الخامس/);
-  const entries = ['الخامس / 2', 'السادس / 1'].map(className => ({ canvas: recordingCanvas(), card, options: { className } }));
-  assert.match(certificateBatchPrintHtml(entries), /<title>شهادات شكر وتقدير - فصول متعددة - 2 طلاب<\/title>/);
-  entries[1].options.className = '';
-  assert.match(certificateBatchPrintHtml(entries), /<title>شهادات شكر وتقدير - 2 طلاب<\/title>/);
+
 });

@@ -3,10 +3,11 @@ import { todayISO } from '../models.js';
 import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, TITLE_FONT_FAMILY, certificateText, defaultCertificateText, certificateMetadata, drawCertificateDesign } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
 import { getMinistryLogo, loadMinistryLogo } from './ministry-brand.js';
+import { certificatePdfFromJpeg } from './certificate-pdf.js';
 
 const styleUrl = new URL('../styles/achievement-certificate.css', import.meta.url).href;
 const brandedCanvases = new WeakSet();
-const titleFontUrl = new URL('../../assets/fonts/amiri/Amiri-Bold.ttf', import.meta.url).href;
+const titleFontUrl = new URL('../../assets/fonts/aref-ruqaa/ArefRuqaa-Bold.ttf', import.meta.url).href;
 let titleFontReady;
 
 function prepareTitleFont() {
@@ -78,19 +79,70 @@ export function certificateFilename({ studentName = '', className = '', studentC
   return [title, name, classroom].filter(Boolean).join(' - ');
 }
 
-function batchFilename(entries) {
-  const classes = entries.map(entry => filenamePart(entry.options?.className));
-  const knownClasses = new Set(classes.filter(Boolean));
-  const className = knownClasses.size > 1 ? 'فصول متعددة'
-    : classes.every(Boolean) ? classes[0] : '';
-  return certificateFilename({ studentName: entries[0]?.card?.name, className, studentCount: entries.length });
-}
-
 export function certificatePng(canvas, card) {
   if (!isCertificateReady(card)) return Promise.reject(new Error('Certificate name and text are required'));
   try { requireMinistryMark(canvas); } catch (error) { return Promise.reject(error); }
   return new Promise((resolve, reject) => canvas.toBlob(blob =>
     blob ? resolve(blob) : reject(new Error('PNG unavailable')), 'image/png'));
+}
+
+export async function certificatePdf(canvas, card) {
+  if (!isCertificateReady(card)) throw new Error('Certificate name and text are required');
+  requireMinistryMark(canvas);
+  const width = canvas.width, height = canvas.height;
+  const jpeg = await new Promise((resolve, reject) => canvas.toBlob(blob =>
+    blob?.type === 'image/jpeg' ? resolve(blob) : reject(new Error('Certificate JPEG is unavailable')), 'image/jpeg', 0.98));
+  return certificatePdfFromJpeg(new Uint8Array(await jpeg.arrayBuffer()), width, height);
+}
+
+function requestCertificateDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.hidden = true;
+  document.body.append(link);
+  try { link.click(); }
+  finally {
+    link.remove();
+    // Allow the browser to consume the Blob; only a few pending files are retained.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}
+
+/** One named file per student, one reusable canvas. "prepared" is not a disk-save receipt. */
+export async function downloadCertificates(entries, { format = 'pdf', isCurrent = () => true, onProgress = () => {} } = {}) {
+  if (!['png', 'pdf'].includes(format)) throw new Error('Unsupported certificate format');
+  if (!Array.isArray(entries) || !entries.length || entries.some(entry => !isCertificateReady(entry?.card))) {
+    throw new Error('Each selected certificate requires a name and text');
+  }
+  const total = entries.length;
+  let prepared = 0;
+  const result = cancelled => ({ prepared, total, cancelled });
+  onProgress({ prepared, total });
+  if (!isCurrent()) return result(true);
+  await prepareCertificateAssets();
+  if (!isCurrent()) return result(true);
+  const scratch = document.createElement('canvas');
+  const filenames = new Map();
+  try {
+    for (const entry of entries) {
+      if (!isCurrent()) return result(true);
+      const canvas = entry.canvas || drawAchievementCertificate(scratch, entry.card, entry.options);
+      const blob = format === 'pdf' ? await certificatePdf(canvas, entry.card) : await certificatePng(canvas, entry.card);
+      if (!isCurrent()) return result(true);
+      const stem = certificateFilename({ studentName: entry.card.name, className: entry.options?.className });
+      const occurrence = (filenames.get(stem) || 0) + 1;
+      filenames.set(stem, occurrence);
+      const suffix = occurrence > 1 ? ` - ${occurrence}` : '';
+      const filename = boundedFilenamePart(stem, 240 - filenameEncoder.encode(suffix).length) + suffix;
+      requestCertificateDownload(blob, `${filename}.${format}`);
+      prepared++;
+      onProgress({ prepared, total });
+      if (prepared < total) await new Promise(resolve => setTimeout(resolve, 150));
+    }
+    return result(false);
+  } finally { scratch.width = scratch.height = 1; }
 }
 
 /** Shared artwork, driven only by explicit certificate display projections. */
@@ -144,11 +196,6 @@ export function certificatePrintHtml(canvas, card, options = {}) {
   return rasterDocument([certificateRaster(canvas, card)], filename);
 }
 
-export function certificateBatchPrintHtml(entries) {
-  if (!Array.isArray(entries) || !entries.length) throw new Error('Select at least one certificate to print');
-  return rasterDocument(entries.map(({ canvas, card }) => certificateRaster(canvas, card)), batchFilename(entries));
-}
-
 async function printDocument(documentHtml, isCurrent, filename) {
   const frame = document.createElement('iframe');
   frame.title = filename;
@@ -194,29 +241,6 @@ async function printCertificate(canvas, card, isCurrent, options = {}) {
   return printDocument(certificatePrintHtml(canvas, card, options), isCurrent, filename);
 }
 
-/** Render sequentially with one reusable canvas; cancellation is checked between pages. */
-export async function printCertificateBatch(entries, isCurrent = () => true) {
-  if (!Array.isArray(entries) || !entries.length || entries.some(entry => !isCertificateReady(entry.card))) {
-    throw new Error('Each selected certificate requires a name and text');
-  }
-  await prepareCertificateAssets();
-  if (!isCurrent()) return false;
-  const scratch = document.createElement('canvas');
-  const images = [];
-  try {
-    for (const entry of entries) {
-      if (!isCurrent()) return false;
-      const canvas = entry.canvas || drawAchievementCertificate(scratch, entry.card, entry.options);
-      images.push(certificateRaster(canvas, entry.card));
-      // Let the UI respond to cancellation or edits while preparing a whole class.
-      await new Promise(resolve => setTimeout(resolve, 0));
-    }
-    if (!isCurrent()) return false;
-    const filename = batchFilename(entries);
-    return await printDocument(rasterDocument(images, filename), isCurrent, filename);
-  } finally { scratch.width = scratch.height = 1; }
-}
-
 /** Read-only local editor. It never saves, dispatches, uploads or sends student data. */
 export function openAchievementCertificate({ studentName = '', demo = false, metadata = {} } = {}) {
   loadStyle();
@@ -249,14 +273,16 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
         </section>
       </div>`,
     foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>
-      <button class="btn btn--outline" data-certificate-print disabled>${icon('print')} طباعة / PDF</button>
-      <button class="btn btn--primary" data-certificate-download disabled>${icon('download')} تنزيل الصورة</button>`,
+      <button class="btn btn--ghost" data-certificate-print disabled>${icon('print')} طباعة</button>
+      <button class="btn btn--outline" data-certificate-download disabled>${icon('download')} تنزيل الصورة</button>
+      <button class="btn btn--primary" data-certificate-pdf disabled>${icon('download')} تنزيل PDF</button>`,
     onMount(root) {
       root.classList.add('certificate-backdrop');
       root.querySelector('.sheet').classList.add('certificate-sheet');
       const canvas = root.querySelector('[data-certificate-canvas]');
       const download = root.querySelector('[data-certificate-download]');
       const print = root.querySelector('[data-certificate-print]');
+      const pdf = root.querySelector('[data-certificate-pdf]');
       const expand = root.querySelector('[data-certificate-expand]');
       const status = root.querySelector('[data-certificate-status]');
       let card;
@@ -267,7 +293,7 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
       let assetsReady = false;
       let assetsFailed = false;
       const syncButtons = () => {
-        download.disabled = print.disabled = busy || !ready || !isCertificateReady(card) || previewOpen;
+        download.disabled = pdf.disabled = print.disabled = busy || !ready || !isCertificateReady(card) || previewOpen;
         expand.disabled = !ready || busy || previewOpen;
       };
       const redraw = () => {
@@ -324,7 +350,6 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
         const isCurrent = () => root.isConnected && selectedCard === card && ready && isCertificateReady(card);
         busy = true;
         syncButtons();
-        let url;
         try {
           await prepareCertificateAssets();
           if (!isCurrent()) return;
@@ -332,24 +357,20 @@ export function openAchievementCertificate({ studentName = '', demo = false, met
           if (kind === 'print') {
             await printCertificate(canvas, selectedCard, isCurrent, selectedOptions);
           } else {
-            const blob = await certificatePng(canvas, selectedCard);
-            if (!isCurrent()) return;
-            url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = certificateFilename({ studentName: selectedCard.name, className: selectedOptions.className }) + '.png';
-            link.click();
-            toast('تم تجهيز صورة الشهادة للتنزيل', 'ok');
+            const result = await downloadCertificates([{ canvas, card: selectedCard, options: selectedOptions }], {
+              format: kind === 'pdf' ? 'pdf' : 'png', isCurrent,
+            });
+            if (!result.cancelled) toast('تم تجهيز ملف الشهادة للتنزيل', 'ok');
           }
         } catch {
           toast(kind === 'print' ? 'تعذّر فتح الطباعة — يمكنك تنزيل الصورة' : 'تعذّر تنزيل الشهادة — حاول مرة أخرى', 'danger');
         } finally {
-          if (url) setTimeout(() => URL.revokeObjectURL(url), 1000);
           busy = false;
           syncButtons();
         }
       };
       download.addEventListener('click', () => exportCertificate('download'));
+      pdf.addEventListener('click', () => exportCertificate('pdf'));
       print.addEventListener('click', () => exportCertificate('print'));
       const drawThumbnails = () => root.querySelectorAll('[data-certificate-thumbnail]').forEach(thumbnail => {
         const sample = document.createElement('canvas');

@@ -1,6 +1,28 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
+function expectSingleCertificatePdf(pdf, jpegDataUrl) {
+  const text = pdf.toString('latin1');
+  expect(text).toMatch(/^%PDF-1\.[4-7]/);
+  expect(text).toMatch(/%%EOF\s*$/);
+  expect((text.match(/\/Type\s*\/Page\b/g) || []).length).toBe(1);
+  expect((text.match(/\/Subtype\s*\/Image\b/g) || []).length).toBe(1);
+  const box = text.match(/\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]/);
+  expect(box).not.toBeNull();
+  expect(Number(box[1])).toBeCloseTo(841.8898, 1);
+  expect(Number(box[2])).toBeCloseTo(595.2756, 1);
+  const xref = Number(text.match(/startxref\s+(\d+)\s+%%EOF/)[1]);
+  expect(text.slice(xref, xref + 4)).toBe('xref');
+  const imageAt = text.indexOf('/Subtype /Image');
+  const streamAt = text.indexOf('stream\n', imageAt) + 'stream\n'.length;
+  const dictionary = text.slice(imageAt, streamAt);
+  expect(dictionary).toMatch(/\/Width\s+2970\b/);
+  expect(dictionary).toMatch(/\/Height\s+2100\b/);
+  expect(dictionary).toMatch(/\/Filter\s*\/DCTDecode/);
+  const length = Number(dictionary.match(/\/Length\s+(\d+)/)[1]);
+  expect(pdf.subarray(streamAt, streamAt + length)).toEqual(Buffer.from(jpegDataUrl.split(',')[1], 'base64'));
+}
+
 async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
   await expect.poll(() => canvas.evaluate(node => node.__ministryLogoDraws?.length ?? 0)).toBeGreaterThan(previousCount);
   const proof = await canvas.evaluate(node => node.__ministryLogoDraws.at(-1));
@@ -98,12 +120,15 @@ test('certificate edits appreciation text and directly exports the current image
   await expect(sheet).not.toContainText('راجعت الشهادة وأوافق');
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
+  await expect(sheet.locator('[data-certificate-pdf]')).toBeEnabled();
   await expectPaintedMinistryLogo(canvas);
   expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
   expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
+  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/aref-ruqaa/ArefRuqaa-Bold.ttf')))).toBe(true);
   await message.fill('');
   await expect(sheet.locator('[data-certificate-download]')).toBeDisabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeDisabled();
+  await expect(sheet.locator('[data-certificate-pdf]')).toBeDisabled();
   const customText = 'وذلك تقديرًا لمثابرته وإبداعه في مادة المهارات الرقمية.\nنعتز بجهده، ونسأل الله له دوام التوفيق والسداد.';
   await message.fill(customText);
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
@@ -112,6 +137,7 @@ test('certificate edits appreciation text and directly exports the current image
   await expect(canvas).toHaveAttribute('aria-label', /بيانات تجريبية/);
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
+  await expect(sheet.locator('[data-certificate-pdf]')).toBeEnabled();
   await page.screenshot({ path: testInfo.outputPath('certificate-desktop.png'), fullPage: false });
 
   await sheet.locator('[data-certificate-expand]').click();
@@ -151,7 +177,18 @@ test('certificate edits appreciation text and directly exports the current image
   expect(png.readUInt32BE(16)).toBe(2970);
   expect(png.readUInt32BE(20)).toBe(2100);
   expect(png.toString('base64')).toBe(expectedImage.split(',')[1]);
+  await expect(sheet.locator('[data-certificate-pdf]')).toBeEnabled();
+  const expectedJpeg = await canvas.evaluate(node => node.toDataURL('image/jpeg', 0.98));
+  const pendingPdf = page.waitForEvent('download');
+  await sheet.locator('[data-certificate-pdf]').click();
+  const pdfDownload = await pendingPdf;
+  expect(pdfDownload.suggestedFilename()).toBe(expectedFilename + '.pdf');
+  const pdfPath = testInfo.outputPath('certificate-direct-output.pdf');
+  await pdfDownload.saveAs(pdfPath);
+  expectSingleCertificatePdf(await fs.readFile(pdfPath), expectedJpeg);
+  await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
+  await expect(sheet.locator('[data-certificate-pdf]')).toBeEnabled();
   expect(outgoing).toEqual([]);
   page.off('request', observe);
 
@@ -174,6 +211,7 @@ test('certificate edits appreciation text and directly exports the current image
   await expect(page).toHaveTitle(originalTitle);
   await expect(sheet.locator('[data-certificate-download]')).toBeEnabled();
   await expect(sheet.locator('[data-certificate-print]')).toBeEnabled();
+  await expect(sheet.locator('[data-certificate-pdf]')).toBeEnabled();
   await expect(sheet).not.toContainText('من نافذة الطباعة');
 
   // Render the exact application-generated print document to a real one-page PDF.

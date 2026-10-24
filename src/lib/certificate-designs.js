@@ -16,7 +16,7 @@ const WIDTH = 1485;
 const HEIGHT = 1050;
 const CENTER = WIDTH / 2;
 const FONT = '"Tajawal", sans-serif';
-const TITLE_FONT = `"${TITLE_FONT_FAMILY}", "Amiri", serif`;
+const TITLE_FONT = `"${TITLE_FONT_FAMILY}", "Aref Ruqaa", serif`;
 const INK = '#243e35';
 const GOLD = '#a77b2e';
 const MUTED = '#767768';
@@ -473,13 +473,14 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
 
   ministryMark(ctx, options.ministryLogo, school);
 
-  const headerColor = school ? '#fffdf2' : INK;
-  const secondaryColor = school ? '#d6e3cf' : '#8c805f';
-  headerIdentity(ctx, meta.schoolName || 'رَكيز المعلم', CENTER + 312.5, school, 28, headerColor);
-  headerIdentity(ctx, meta.educationDepartment, CENTER - 312.5, school, 24, secondaryColor);
+  // Give both institutions equal visual weight, with a palette chosen for each
+  // certificate. Physical placement follows the Arabic reading order.
+  const headerColor = school ? '#f3e3ba' : '#806027';
+  headerIdentity(ctx, meta.educationDepartment, CENTER + 312.5, school, 26, headerColor);
+  headerIdentity(ctx, meta.schoolName || 'رَكيز المعلم', CENTER - 312.5, school, 26, headerColor);
 
   medal(ctx, school ? WIDTH - 191 : 191, 292, school);
-  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 323, 900, 94, 70, 700, school ? '#244c3a' : '#9e792f', TITLE_FONT);
+  fitted(ctx, 'شهادة شكر وتقدير', CENTER, 321, 900, 98, 74, 700, school ? '#244c3a' : '#946c24', TITLE_FONT);
   flourish(ctx, 361, school);
   label(ctx, 'تُمنح هذه الشهادة بكل تقدير إلى', CENTER, 404, 24, 500, MUTED);
   recipient(ctx, name);

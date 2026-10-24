@@ -1,6 +1,6 @@
 import { html, icon, toast } from './dom.js';
 import * as store from '../store.js';
-import { certificateCard, certificatePng, certificateFilename, isCertificateReady, drawAchievementCertificate, certificateDescription, certificateIssueDate, printCertificateBatch, prepareCertificateAssets } from './achievement-certificate.js';
+import { certificateCard, isCertificateReady, drawAchievementCertificate, certificateDescription, certificateIssueDate, downloadCertificates, prepareCertificateAssets } from './achievement-certificate.js';
 import { CERTIFICATE_DESIGNS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText } from './certificate-designs.js';
 import { openDocumentPreview } from './document-preview.js';
 import { resolvedReportPrincipalName, isDemoOutput } from './report-print.js';
@@ -42,8 +42,9 @@ export function createCertificateCenter({ teachingId } = {}) {
             <button type="button" class="btn btn--quiet" data-center-toggle-controls aria-expanded="true">${icon('settings')} <span>إخفاء الإعدادات</span></button>
           </div>
           <div class="certificate-page__exports">
-            <button type="button" class="btn btn--outline" data-center-download disabled>${icon('download')} صورة الشهادة المعروضة</button>
-            <button type="button" class="btn btn--primary" data-center-print disabled>${icon('print')} طباعة الشهادات / PDF</button>
+            <button type="button" class="btn btn--outline" data-center-download disabled>${icon('download')} تنزيل الصور</button>
+            <button type="button" class="btn btn--primary" data-center-print disabled>${icon('download')} تنزيل PDF</button>
+            <button type="button" class="btn btn--ghost" data-center-cancel hidden>إيقاف المتبقي</button>
           </div>
         </div>
       <div class="certificate-center" dir="rtl">
@@ -83,6 +84,8 @@ export function createCertificateCenter({ teachingId } = {}) {
           <div class="certificate-center__paper"><canvas data-center-canvas width="2970" height="2100" role="img" aria-label="معاينة شهادة التقدير"></canvas></div>
           <div class="certificate-center__navigation"><button type="button" class="btn btn--ghost btn--sm" data-center-prev disabled>السابق</button><span data-center-position>اختر طلابًا للمعاينة</span><button type="button" class="btn btn--ghost btn--sm" data-center-next disabled>التالي</button></div>
           <p class="certificate-center__status" data-center-status role="status" hidden></p>
+          <p class="certificate-center__local" data-center-export-hint hidden>لكل طالب ملف مستقل باسمه. اسمح بتنزيل عدة ملفات إذا طلب المتصفح ذلك.</p>
+          <p class="certificate-center__status" data-center-export-status role="status" hidden></p>
         </section>
       </div>
       </div>`,
@@ -91,6 +94,7 @@ export function createCertificateCenter({ teachingId } = {}) {
       mounted.add(root);
       const $ = selector => root.querySelector(selector);
       const canvas = $('[data-center-canvas]');
+      const exportStatus = $('[data-center-export-status]');
       const selected = new Set();
       let currentTeachingId = initialTeaching?.id ?? '';
       let text = initialText;
@@ -99,6 +103,7 @@ export function createCertificateCenter({ teachingId } = {}) {
       let index = 0;
       let revision = 0;
       let busy = false;
+      let exportCancelled = false;
       let previewOpen = false;
       let ready = false;
       let assetsReady = false;
@@ -131,6 +136,9 @@ export function createCertificateCenter({ teachingId } = {}) {
         $('[data-center-prev]').disabled = busy || index <= 0;
         $('[data-center-next]').disabled = busy || index >= entries.length - 1;
         $('[data-center-honors]').disabled = busy || !roster().length;
+        $('[data-center-cancel]').hidden = !busy;
+        $('[data-center-cancel]').disabled = !busy || exportCancelled;
+        $('[data-center-export-hint]').hidden = selected.size <= 1;
       };
       const renderRoster = () => {
         const focusedStudentId = root.contains(document.activeElement) ? document.activeElement?.dataset?.centerStudent : null;
@@ -146,6 +154,7 @@ export function createCertificateCenter({ teachingId } = {}) {
       };
       const refresh = (contentChanged = true) => {
         if (contentChanged) revision++;
+        if (contentChanged && !busy) exportStatus.hidden = true;
         const state = selectionState();
         entries = state.cards;
         index = Math.min(index, Math.max(0, entries.length - 1));
@@ -190,7 +199,15 @@ export function createCertificateCenter({ teachingId } = {}) {
       });
       root.addEventListener('click', async event => {
         const button = event.target.closest('button');
-        if (!button || busy) return;
+        if (!button) return;
+        if (button.matches('[data-center-cancel]')) {
+          if (!busy) return;
+          exportCancelled = true;
+          exportStatus.textContent = 'جارٍ إيقاف تجهيز بقية الملفات…';
+          syncButtons();
+          return;
+        }
+        if (busy) return;
         if (button.matches('[data-center-toggle-controls]')) {
           const hidden = root.classList.toggle('is-preview-only');
           $('.certificate-center__controls').hidden = hidden;
@@ -228,35 +245,38 @@ export function createCertificateCenter({ teachingId } = {}) {
           const outputEntries = selectionState().cards;
           const snapshotOptions = options();
           const fingerprint = JSON.stringify({ cards: outputEntries.map(entry => entry.card), options: snapshotOptions });
-          const isCurrent = () => root.isConnected && revision === outputRevision && selectionState().valid
+          const isCurrent = () => !exportCancelled && root.isConnected && revision === outputRevision && selectionState().valid
             && selectedIds.length === selected.size && selectedIds.every(id => selected.has(id))
             && fingerprint === JSON.stringify({ cards: selectionState().cards.map(entry => entry.card), options: options() });
-          let url;
+          let prepared = 0;
+          exportCancelled = false;
           busy = true; syncButtons();
           try {
-            await prepareCertificateAssets();
-            if (!isCurrent()) return;
-            if (button.matches('[data-center-print]')) {
-              // The print helper renders one scratch canvas at a time, avoiding
-              // a full-resolution canvas allocation for every selected student.
-              const pages = outputEntries.map(({ card }) => ({ card, options: snapshotOptions }));
-              if (!isCurrent()) return;
-              await printCertificateBatch(pages, isCurrent);
-            } else {
-              const output = document.createElement('canvas');
-              const card = outputEntries[index]?.card;
-              if (!card) return;
-              drawAchievementCertificate(output, card, snapshotOptions);
-              const blob = await certificatePng(output, card);
-              if (!isCurrent()) return;
-              url = URL.createObjectURL(blob);
-              const link = document.createElement('a'); link.href = url;
-              link.download = certificateFilename({ studentName: card.name, className: snapshotOptions.className }) + '.png';
-              link.click();
-              toast('تم تجهيز صورة الشهادة للتنزيل', 'ok');
+            const files = outputEntries.map(({ card }) => ({ card, options: snapshotOptions }));
+            const result = await downloadCertificates(files, {
+              format: button.matches('[data-center-print]') ? 'pdf' : 'png', isCurrent,
+              onProgress(progress) {
+                prepared = progress.prepared;
+                if (!root.isConnected) return;
+                exportStatus.hidden = false;
+                exportStatus.textContent = `جارٍ تجهيز الملفات: ${progress.prepared} من ${progress.total}`;
+              },
+            });
+            if (root.isConnected) {
+              exportStatus.textContent = result.cancelled
+                ? `توقف التجهيز بعد ${result.prepared} من ${result.total} ملفات. يمكنك إعادة التصدير عند الاستعداد.`
+                : result.total === 1 ? 'تم تجهيز ملف الشهادة للتنزيل.' : `تم تجهيز ${result.prepared} ملفات مستقلة للتنزيل، ملف لكل طالب.`;
+              exportStatus.hidden = false;
+              if (!result.cancelled) toast('تم تجهيز الشهادات للتنزيل', 'ok');
             }
-          } catch { toast('تعذّر تجهيز الشهادات — حاول مرة أخرى', 'danger'); }
-          finally { if (url) setTimeout(() => URL.revokeObjectURL(url), 1000); busy = false; syncButtons(); }
+          } catch {
+            if (root.isConnected) {
+              exportStatus.textContent = `تعذّر استكمال التجهيز. جُهّز ${prepared} من ${outputEntries.length} ملفات؛ حاول مجددًا.`;
+              exportStatus.hidden = false;
+              toast('تعذّر تجهيز بقية الشهادات — حاول مرة أخرى', 'danger');
+            }
+          }
+          finally { busy = false; syncButtons(); }
         }
       });
       renderRoster(); refresh();

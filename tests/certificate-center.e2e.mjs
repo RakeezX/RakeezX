@@ -1,6 +1,28 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
+function expectSingleCertificatePdf(pdf, jpegDataUrl) {
+  const text = pdf.toString('latin1');
+  expect(text).toMatch(/^%PDF-1\.[4-7]/);
+  expect(text).toMatch(/%%EOF\s*$/);
+  expect((text.match(/\/Type\s*\/Page\b/g) || []).length).toBe(1);
+  expect((text.match(/\/Subtype\s*\/Image\b/g) || []).length).toBe(1);
+  const box = text.match(/\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]/);
+  expect(box).not.toBeNull();
+  expect(Number(box[1])).toBeCloseTo(841.8898, 1);
+  expect(Number(box[2])).toBeCloseTo(595.2756, 1);
+  const xref = Number(text.match(/startxref\s+(\d+)\s+%%EOF/)[1]);
+  expect(text.slice(xref, xref + 4)).toBe('xref');
+  const imageAt = text.indexOf('/Subtype /Image');
+  const streamAt = text.indexOf('stream\n', imageAt) + 'stream\n'.length;
+  const dictionary = text.slice(imageAt, streamAt);
+  expect(dictionary).toMatch(/\/Width\s+2970\b/);
+  expect(dictionary).toMatch(/\/Height\s+2100\b/);
+  expect(dictionary).toMatch(/\/Filter\s*\/DCTDecode/);
+  const length = Number(dictionary.match(/\/Length\s+(\d+)/)[1]);
+  expect(pdf.subarray(streamAt, streamAt + length)).toEqual(Buffer.from(jpegDataUrl.split(',')[1], 'base64'));
+}
+
 async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
   await expect.poll(() => canvas.evaluate(node => node.__ministryLogoDraws?.length ?? 0)).toBeGreaterThan(previousCount);
   const proof = await canvas.evaluate(node => node.__ministryLogoDraws.at(-1));
@@ -10,7 +32,7 @@ async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
   return canvas.evaluate(node => node.__ministryLogoDraws.length);
 }
 
-test('certificate center applies editable appreciation text to any chosen students and exports their isolated A4 pages', async ({ page, context, baseURL }, testInfo) => {
+test('certificate center downloads a separate named PNG and A4 PDF for every selected student', async ({ page, context, baseURL }, testInfo) => {
   const origin = new URL(baseURL).origin;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -36,7 +58,15 @@ test('certificate center applies editable appreciation text to any chosen studen
       if (text === 'شهادة شكر وتقدير') this.canvas.__certificateTitleFont = this.font;
       return fillText.call(this, text, ...args);
     };
-    window.print = () => { window.top.__certificateBatchProof = { isolated: window !== window.top, title: document.title, parentTitle: window.top.document.title, html: document.documentElement.outerHTML, images: document.images.length, text: document.body.innerText }; };
+    window.print = () => { window.top.__certificatePrintCount = (window.top.__certificatePrintCount || 0) + 1; };
+    const toBlob = HTMLCanvasElement.prototype.toBlob;
+    HTMLCanvasElement.prototype.toBlob = function (callback, ...args) {
+      if (Number.isInteger(window.__holdCertificateAfter) && window.__holdCertificateAfter-- === 0) {
+        (window.__heldCertificateExports ??= []).push(() => toBlob.call(this, callback, ...args));
+        return;
+      }
+      return toBlob.call(this, callback, ...args);
+    };
   });
   await page.goto('/#/classes');
   await page.waitForFunction(async () => {
@@ -167,6 +197,7 @@ test('certificate center applies editable appreciation text to any chosen studen
   await expectPaintedMinistryLogo(canvas);
   expect(await canvas.evaluate(node => node.__certificateTitleFont)).toContain('Rakeez Certificate Title');
   expect(await page.evaluate(() => [...document.fonts].some(face => face.family.replaceAll('\"', '') === 'Rakeez Certificate Title' && face.status === 'loaded'))).toBe(true);
+  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/assets/fonts/aref-ruqaa/ArefRuqaa-Bold.ttf')))).toBe(true);
   const previewWidth = await canvas.evaluate(node => {
     const parent = node.closest('.certificate-center__preview');
     const style = getComputedStyle(parent);
@@ -220,15 +251,23 @@ test('certificate center applies editable appreciation text to any chosen studen
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
   await expect(print).toBeEnabled();
   await expect(workspace.locator('[data-center-download]')).toBeEnabled();
+  const expectedImages = [], expectedJpegs = [];
+  const captureCertificate = async () => {
+    const images = await canvas.evaluate(node => ({ png: node.toDataURL('image/png'), jpeg: node.toDataURL('image/jpeg', 0.98) }));
+    expectedImages.push(images.png); expectedJpegs.push(images.jpeg);
+  };
+  await captureCertificate();
   await workspace.locator('[data-center-tab=students]').click();
   await expect(message).toBeHidden();
   await workspace.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[1]));
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
+  await captureCertificate();
   await expect(print).toBeEnabled();
   await workspace.locator('[data-center-next]').click();
   await expect(canvas).toHaveAttribute('aria-label', new RegExp(fixture.names[2]));
   await expect(canvas).toHaveAttribute('aria-label', /نعتز بجهده/);
+  await captureCertificate();
   await expect(workspace.locator('[data-center-next]')).toBeDisabled();
   await workspace.locator('[data-center-prev]').click();
   await workspace.locator('[data-center-prev]').click();
@@ -243,52 +282,82 @@ test('certificate center applies editable appreciation text to any chosen studen
   await page.screenshot({ path: testInfo.outputPath('certificate-center-desktop.png'), fullPage: false });
   const outgoing = [];
   const observe = request => outgoing.push(request.url());
-  const expectedImage = await canvas.evaluate(node => node.toDataURL('image/png'));
-  page.on('request', observe);
-  const pendingDownload = page.waitForEvent('download');
-  await workspace.locator('[data-center-download]').click();
-  const download = await pendingDownload;
+  const pngButton = workspace.locator('[data-center-download]');
+  const exportStatus = workspace.locator('[data-center-export-status]');
   const safeClass = fixture.className.replace(/\s*[/\\]\s*/g, ' - ');
-  expect(download.suggestedFilename()).toBe(`شهادة شكر وتقدير - ${fixture.names[0]} - ${safeClass}.png`);
-  const pngPath = testInfo.outputPath('certificate-center-current.png');
-  await download.saveAs(pngPath);
-  const png = await fs.readFile(pngPath);
-  expect(png.readUInt32BE(16)).toBe(2970);
-  expect(png.readUInt32BE(20)).toBe(2100);
-  expect(png.toString('base64')).toBe(expectedImage.split(',')[1]);
-  await expect(print).toBeEnabled();
   const originalTitle = await page.title();
-  await print.click();
-  await page.waitForFunction(() => window.__certificateBatchProof);
-  const proof = await page.evaluate(() => window.__certificateBatchProof);
-  expect(proof.isolated).toBe(true);
-  const batchTitle = `شهادات شكر وتقدير - ${safeClass} - 3 طلاب`;
-  expect(proof.title).toBe(batchTitle);
-  expect(proof.parentTitle).toBe(batchTitle);
-  await expect(page).toHaveTitle(batchTitle);
-  expect(proof.images).toBe(3);
-  expect(proof.text).toBe('');
-  expect(proof.html).not.toContain(fixture.ids[0]);
-  expect(proof.html).not.toContain('certificate-center__roster');
-  expect(proof.html).toContain(expectedImage);
-  // A later page title must survive completion of an older print dialog.
-  await page.evaluate(() => { document.title = 'عنوان أحدث أثناء الطباعة';
-    document.querySelector('iframe[data-certificate-print]')?.contentWindow.dispatchEvent(new Event('afterprint')); });
-  await expect(page).toHaveTitle('عنوان أحدث أثناء الطباعة');
-  await page.evaluate(title => { document.title = title; }, originalTitle);
-  await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
-  await expect(print).toBeEnabled();
-  await expect(workspace.locator('[data-center-download]')).toBeEnabled();
+  page.on('request', observe);
+  for (const [format, button] of [['png', pngButton], ['pdf', print]]) {
+    const downloads = [];
+    const collect = download => downloads.push(download);
+    page.on('download', collect);
+    await button.click();
+    await expect.poll(() => downloads.length).toBe(fixture.names.length);
+    await expect(button).toBeEnabled();
+    page.off('download', collect);
+    expect(downloads).toHaveLength(fixture.names.length);
+    expect(new Set(downloads.map(download => download.suggestedFilename())).size).toBe(fixture.names.length);
+    for (const [index, download] of downloads.entries()) {
+      expect(download.suggestedFilename()).toBe(`شهادة شكر وتقدير - ${fixture.names[index]} - ${safeClass}.${format}`);
+      const outputPath = testInfo.outputPath(`certificate-student-${index + 1}.${format}`);
+      await download.saveAs(outputPath);
+      const data = await fs.readFile(outputPath);
+      if (format === 'png') {
+        expect(data.readUInt32BE(16)).toBe(2970);
+        expect(data.readUInt32BE(20)).toBe(2100);
+        expect(data.toString('base64')).toBe(expectedImages[index].split(',')[1]);
+      } else {
+        expectSingleCertificatePdf(data, expectedJpegs[index]);
+        expect(data.toString('latin1')).not.toContain(fixture.ids[index]);
+      }
+    }
+    await expect(exportStatus).toContainText('3 ملفات مستقلة');
+    await expect(page.locator('iframe[data-certificate-print]')).toHaveCount(0);
+    await expect(page).toHaveTitle(originalTitle);
+  }
+  expect(await page.evaluate(() => window.__certificatePrintCount || 0)).toBe(0);
   await expect(workspace).not.toContainText('من نافذة الطباعة');
+
+  // Pause encoding of the second file so stopping the remainder is deterministic.
+  const stoppedDownloads = [];
+  const collectStopped = download => stoppedDownloads.push(download);
+  page.on('download', collectStopped);
+  await page.evaluate(() => { window.__holdCertificateAfter = 1; window.__heldCertificateExports = []; });
+  await pngButton.click();
+  await page.waitForFunction(() => window.__heldCertificateExports?.length === 1);
+  await expect.poll(() => stoppedDownloads.length).toBe(1);
+  await expect(workspace.locator('[data-center-cancel]')).toBeVisible();
+  await workspace.locator('[data-center-cancel]').click();
+  await page.evaluate(() => {
+    delete window.__holdCertificateAfter;
+    window.__heldCertificateExports.splice(0).forEach(release => release());
+  });
+  await expect(pngButton).toBeEnabled();
+  await expect(exportStatus).toContainText('توقف التجهيز بعد 1 من 3');
+  expect(stoppedDownloads).toHaveLength(1);
+  page.off('download', collectStopped);
+
+  // A text edit while the first PDF is still encoding must invalidate the old selection snapshot.
+  await workspace.locator('[data-center-tab=design]').click();
+  const staleDownloads = [];
+  const collectStale = download => staleDownloads.push(download);
+  page.on('download', collectStale);
+  await page.evaluate(() => { window.__holdCertificateAfter = 0; window.__heldCertificateExports = []; });
+  await print.click();
+  await page.waitForFunction(() => window.__heldCertificateExports?.length === 1);
+  await message.fill('نص جديد أثناء تجهيز الشهادة.');
+  await page.evaluate(() => {
+    delete window.__holdCertificateAfter;
+    window.__heldCertificateExports.splice(0).forEach(release => release());
+  });
+  await expect(print).toBeEnabled();
+  await expect(exportStatus).toContainText('توقف التجهيز بعد 0 من 3');
+  expect(staleDownloads).toHaveLength(0);
+  page.off('download', collectStale);
+  await message.fill(customText);
+  await workspace.locator('[data-center-tab=students]').click();
   expect(outgoing).toEqual([]);
   page.off('request', observe);
-  const printPage = await context.newPage();
-  await printPage.route(origin + '/__certificate-batch-proof', route => route.fulfill({ status: 200, contentType: 'text/html', body: proof.html }));
-  await printPage.goto(origin + '/__certificate-batch-proof');
-  await printPage.locator('img').evaluateAll(images => Promise.all(images.map(img => img.decode())));
-  const pdf = await printPage.pdf({ path: testInfo.outputPath('certificate-three-students.pdf'), preferCSSPageSize: true, printBackground: true });
-  expect((pdf.toString('latin1').match(/\/Type \/Page\b/g) || []).length).toBe(3);
-  await printPage.close();
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
