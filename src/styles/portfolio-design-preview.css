@@ -203,3 +203,114 @@
   .folio-evidence__image-placeholder,.folio-evidence__photo { height:174px !important; }
   .folio-evidence__photo { object-fit:contain !important; }
 }
+
+
+/* F09 / PO second design review: a year-wide professional portfolio, not a
+   class report. Typography and ministry identity are restrained and printable. */
+.folio-sheet { font-family:var(--font, "Noto Naskh Arabic", sans-serif); }
+.folio-cover__hero { height:64%; padding:150px 58px 42px; background-image:linear-gradient(138deg,#0d3042 0%,#0b5c69 53%,#168978 100%); }
+.folio-cover__hero::before { width:390px;height:390px;left:-125px;top:32%;border-color:rgba(237,213,155,.20); }
+.folio-cover__hero::after { inset:15px; border-color:rgba(242,218,174,.42); }
+.folio-cover__grain { opacity:.15; }
+.folio-cover__top {
+  position:absolute; z-index:3; top:0;left:0;right:0;
+  display:grid;grid-template-columns:minmax(0,1fr) 160px minmax(0,1fr);
+  align-items:center;gap:15px;
+  height:124px; padding:12px 49px;
+  background:#fbfaf5; border-block-end:3px solid #bfa066;
+}
+.folio-cover__top .folio-cover__classification {
+  border:0;padding:0;max-width:100%;text-align:center;
+  color:#546e66;font-size:13px;font-weight:800;line-height:1.7;
+}
+.folio-cover__ministry {
+  grid-column:2;grid-row:1;justify-self:center;width:148px;
+  box-shadow:none;border:0;padding:0;background:none;
+}
+.folio-cover__ministry .folio-ministry { width:136px;max-height:98px;object-fit:contain;margin:auto; }
+.folio-cover__title { margin-top:76px;max-width:590px; }
+.folio-cover__kicker { color:#e6cea1; font-size:18px; }
+.folio-cover__title h2 { font-size:65px;line-height:1.3;letter-spacing:0;font-weight:900;text-wrap:balance; }
+.folio-cover__title p { font-size:16px;color:#e1efea;max-width:440px;line-height:1.9; }
+.folio-cover__rule { width:85px;margin:21px 0 17px;border-top:3px solid #d7b47c; }
+.folio-cover__year { color:rgba(255,255,255,.10); font-size:140px;bottom:20px; }
+.folio-cover__details { text-align:center; align-items:stretch;padding:42px 55px 29px; }
+.folio-cover__meta-label { font-size:12px;color:#af9055; }
+.folio-cover__teacher { font-size:30px;color:#183d43;line-height:1.55; }
+.folio-cover__school { font-size:16px;color:#486765; }
+.folio-cover__bottom >div { text-align:center; }
+.folio-interior__headline h2 { font-size:39px; }
+.folio-coverage .folio-coverage__row { grid-template-columns:35px minmax(0,1fr); min-height:46px; }
+.folio-coverage__metrics>div { text-align:center; }
+.folio-coverage__metrics strong { font-size:33px; }
+.folio-coverage__section { margin-top:22px; }
+.folio-contents__note { border-inline-start:3px solid #b99c67; }
+.folio-evidence__meta { grid-template-columns:1fr 1.15fr 1fr; }
+.folio-evidence__image-block { margin-top:18px; }
+.folio-evidence__gallery { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;align-items:start; }
+.folio-evidence__gallery--one { grid-template-columns:1fr; }
+.folio-evidence__gallery--three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.folio-evidence__gallery-item { margin:0; min-width:0; position:relative;border:1px solid #d0ded5;background:#f8faf6;padding:5px;border-radius:3px; }
+.folio-evidence__gallery .folio-evidence__photo { display:block; width:100%;max-width:100%;height:var(--folio-photo-height,138px);object-fit:contain;border:0;margin:0;background:transparent; }
+.folio-evidence__image-tools { display:flex;align-items:center;justify-content:space-between;gap:4px;padding:4px 0 0;min-height:26px; }
+.folio-evidence__image-tools span { flex:1;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:#66796b; }
+.folio-evidence__image-tools button { cursor:pointer;border:1px solid #cfdbd3;background:#fff;border-radius:4px;width:27px;height:26px;color:#35594f;font-size:14px;line-height:1;flex:none; }
+.folio-evidence__image-tools button:disabled { opacity:.3;cursor:not-allowed; }
+.folio-evidence__image-tools button:focus-visible { outline:2px solid #237d67; }
+.folio-toolbar__layout { flex:0 1 165px; }
+.folio-toolbar__layout .select { min-height:44px;width:100%; }
+
+@media(max-width:650px) {
+ .folio-cover__hero { height:360px;padding:135px 25px 20px; }
+ .folio-cover__top { height:104px;padding:9px 14px;grid-template-columns:minmax(0,1fr) 108px minmax(0,1fr);gap:5px; }
+ .folio-cover__top .folio-cover__classification { font-size:8px; }
+ .folio-cover__ministry { grid-column:2;width:108px; }
+ .folio-cover__ministry .folio-ministry { width:100px;max-height:86px; }
+ .folio-cover__title { margin-top:21px; }
+ .folio-cover__title h2 { font-size:clamp(32px,8.7vw,45px);line-height:1.34; }
+ .folio-cover__title p { font-size:12px; }
+ .folio-cover__details { padding:22px 20px 20px; }
+ .folio-cover__teacher { font-size:22px; }
+ .folio-cover__year { font-size:85px; }
+ .folio-toolbar__layout { flex:1 1 120px; }
+ .folio-evidence__gallery { gap:5px; }
+ .folio-evidence__gallery .folio-evidence__photo { height:min(var(--folio-photo-height,135px),115px); }
+ .folio-evidence__image-tools { flex-wrap:wrap; }
+ .folio-evidence__image-tools span { flex:1 0 100%; }
+ .folio-evidence__meta { grid-template-columns:1fr 1fr; }
+}
+@media print {
+ .folio-cover__top { grid-template-columns:minmax(0,1fr) 160px minmax(0,1fr) !important;background:#fbfaf5 !important; }
+ .folio-cover__hero { height:64% !important;padding:150px 58px 42px !important;background:#0f5662 !important; }
+ .folio-cover__title { margin-top:76px !important; }
+ .folio-cover__title h2 { font-size:65px !important; color:#fff !important; }
+ .folio-cover__top .folio-cover__classification { font-size:13px !important; }
+ .folio-cover__ministry { width:148px !important; }
+ .folio-cover__details { padding:42px 55px 29px !important; }
+ .folio-coverage .folio-coverage__row { grid-template-columns:35px minmax(0,1fr) !important; min-height:44px !important; }
+ .folio-evidence__gallery { gap:9px !important; }
+ .folio-evidence__gallery--one { grid-template-columns:1fr !important; }
+ .folio-evidence__gallery--two { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+ .folio-evidence__gallery--three { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+ .folio-evidence__gallery .folio-evidence__photo { height:var(--folio-photo-height,140px) !important;object-fit:contain !important; }
+ .folio-evidence__gallery-item { border-color:#dee5df !important;break-inside:avoid !important; }
+ .folio-evidence__image-tools { display:none !important; }
+}
+
+/* Compact, truthful positive activity graph built from the same saved records. */
+.folio-evidence__chart { margin-top:17px; display:grid;gap:8px; }
+.folio-evidence__chart .folio-evidence__section-head { margin:0 0 6px; }
+.folio-evidence__chart-row { display:grid;grid-template-columns:minmax(102px,145px) minmax(0,1fr) 22px;align-items:center;gap:9px;min-height:22px;color:#385c52;font-size:11px; }
+.folio-evidence__chart-row >span {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.folio-evidence__chart-row b {text-align:left;color:#2c6758;font-size:12px;}
+.folio-evidence__chart-track {height:10px;border-radius:99px;background:#e8f1ec;overflow:hidden;}
+.folio-evidence__chart-track i {display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#17816c,#46ad88);}
+@media(max-width:650px) {
+  .folio-evidence__chart-row {grid-template-columns:minmax(80px,110px) minmax(0,1fr) 18px;gap:5px;font-size:9px;}
+}
+@media print {
+  .folio-evidence__chart {gap:6px !important;margin-top:10px !important;}
+  .folio-evidence__chart-row {min-height:19px !important;}
+  .folio-evidence__chart-track {print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+  .folio-evidence__chart-track i {background:#26866e !important;print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+}

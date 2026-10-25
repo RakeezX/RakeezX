@@ -29,3 +29,32 @@ The eleven criterion names and weights are captured in `src/lib/portfolio-design
 ## Next-stage decisions after PO review
 
 Choose final typography/layout, decide whether a photo evidence placeholder should be omitted when empty on export, and design a real editable evidence collection with upload privacy/retention, multi-source matching, duplicate/version handling, and a year-scoped export manifest. None of these are implied delivered by this Preview.
+
+## PO's second design review — implemented in Preview v2
+
+1. Portfolio is scoped to **the teacher's academic year**, not a chosen class. The view aggregates all the year's terms and teaching assignments (including archived sections) through Rakeez's existing read-only execution reports. The only selector in the editor is the professional criterion being illustrated.
+2. All eleven criteria remain present in the table of contents and in the professional domains page. No missing-evidence labels, made-up completion percentages, negative scorecards, lengthy source disclaimers or technical limitations are printed.
+3. The inner-page overview emphasizes documented academic-year activities and the actual count of sections, subjects and attendance-recorded sessions; it does not claim measured student achievement or teacher appraisal.
+4. The cover has been redesigned with the Ministry logo centered above a deep teal field, a calmer Arabic headline, restrained gold separators and annual teacher information.
+5. Each criterion has its **own ephemeral gallery** in the prototype, independently storing picture order and 1-/2-/3-column presentation choices in memory. An editor can add multiple images, remove a specific picture, reorder it, and switch to a different criterion without mixing the image sets. Private photos stay off the repository and off the server.
+6. A witness with too many photos for its first A4 page continues on additional A4 pages rather than clipping images in the PDF. PDF checks enforce the expected page count and photo/footer separation at each layout.
+7. The original source-provenance identifiers and data-integrity guards remain available internally; they are not mandatory text in the exported portfolio. The printed content highlights actual evidence only. This is not a promise of an approved official appraisal.
+8. Cloud saving and cross-device synchronization are a separate **documented architecture proposal**, not enabled in Preview. See `F09_PORTFOLIO_SYNC_ARCHITECTURE_AR.md`.
+
+### Future evidence map — not delivered here
+
+| Criterion | Suggested evidence source in Rakeez / manually reviewed additions |
+| --- | --- |
+| 01 Duties | timetable and confirmed work, teacher-supplied official records |
+| 02 Professional community | training certificates, workshops, collegial visits |
+| 03 Parents | authenticated communication receipts, redacted parent responses |
+| 04 Strategies | planned strategies plus teacher-confirmed classroom uses and photos |
+| 05 Improvement | comparable diagnostic/pre-post analysis anchored in dated actual assessments |
+| 06 Learning plan | curriculum distribution, verified preparation and delivery confirmations |
+| 07 Technology | executed digital activities/projects, classroom screenshots and photos |
+| 08 Learning environment | class charter, incentives, environment photos reviewed for privacy |
+| 09 Classroom management | attendance and participation saved in Rakeez, teacher-added support photos |
+| 10 Results analysis | anonymized grade distributions and actual student-result comparisons |
+| 11 Assessment diversity | actual assigned projects, exams, homework, performance tasks, rubrics |
+
+This mapping is a product design suggestion, not a Ministry-authored evidence checklist.

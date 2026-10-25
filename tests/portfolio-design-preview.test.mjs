@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { PORTFOLIO_CRITERIA, portfolioAttendanceEvidence, portfolioDesignSummary, isValidEvidenceDate } from '../src/lib/portfolio-design-preview.js';
+import { PORTFOLIO_CRITERIA, portfolioAttendanceEvidence, portfolioYearEvidence, portfolioDesignSummary, isValidEvidenceDate } from '../src/lib/portfolio-design-preview.js';
 
 const selected={id:'test:t1'},other={id:'test:t2'};
 const row=(id,date,recorded,expected,state='completed',teaching=selected)=>({
@@ -77,4 +77,35 @@ test('Preview loads CSS as a linked stylesheet on Cloudflare source-ESM, not a J
  assert.match(src,/data-folio-document/);
  for(const verb of ['store.save(','store.patchProfile(','store.setAttendance(']) assert.equal(src.includes(verb),false);
  assert.doesNotMatch(src,/عبدالله بخيت المعبدي|عبدالله الحربي/);
+});
+
+
+test('one annual portfolio aggregates every term, class, and subject, never a single chosen teaching', () => {
+ const a = { ...selected, sectionId:'section-A',subjectId:'subject-M',sectionLabel:'رابع / 1',subjectName:'الرياضيات' };
+ const b = { ...other, sectionId:'section-B',subjectId:'subject-D',sectionLabel:'خامس / 3',subjectName:'المهارات الرقمية' };
+ const groups=[
+   {teachings:[a],report:{teachings:[a],rows:[row('session-A','2026-09-10',22,22,'completed',a)]}},
+   {teachings:[b],report:{teachings:[b],rows:[row('session-B','2026-10-10',18,20,'pending',b)]}},
+ ];
+ const before=JSON.stringify(groups);
+ const e=portfolioYearEvidence(groups,'2026-10-25');
+ assert.equal(e.recordedSessions,2);
+ assert.equal(e.sectionCount,2);
+ assert.equal(e.subjectCount,2);
+ assert.equal(e.assignmentCount,2);
+ assert.deepEqual(e.rows.map(r=>r.section),['خامس / 3','رابع / 1']);
+ assert.deepEqual(e.rows.map(r=>r.subject),['المهارات الرقمية','الرياضيات']);
+ assert.equal(e.recordedMarks,40);
+ assert.equal(JSON.stringify(groups),before);
+});
+
+test('year-wide source deduplicates a session already in another term or report snapshot', () => {
+ const a = { ...selected, sectionId:'section-A',subjectId:'subject-M' };
+ const input = row('session-1','2026-09-15',15,15,'completed',a);
+ const e=portfolioYearEvidence([
+   {teachings:[a],report:{teachings:[a],rows:[input]}},
+   {teachings:[a],report:{teachings:[a],rows:[input]}},
+ ]);
+ assert.equal(e.recordedSessions,1);
+ assert.equal(e.recordedMarks,15);
 });

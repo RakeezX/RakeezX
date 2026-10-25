@@ -66,6 +66,49 @@ export function portfolioAttendanceEvidence(report, teachingId, asOf = todayLoca
   });
 }
 
+/**
+ * Aggregate all teaching assignments and all terms in ONE selected academic year.
+ * The caller supplies year-scoped groups; every saved session is deduplicated
+ * across terms and subjects by its persistent identity.
+ */
+export function portfolioYearEvidence(groups, asOf = todayLocalISO()) {
+  const sectionIds = new Set(), subjectIds = new Set(), usedSessions = new Set();
+  const rows = [];
+  let classAssignments = 0, recordedMarks = 0, expectedMarks = 0, omitted = 0;
+  for (const group of Array.isArray(groups) ? groups : []) {
+    const report = group?.report;
+    for (const teaching of group?.teachings ?? []) {
+      if (!teaching?.id) continue;
+      classAssignments++;
+      if (teaching.sectionId) sectionIds.add(teaching.sectionId);
+      if (teaching.subjectId) subjectIds.add(teaching.subjectId);
+      const evidence = portfolioAttendanceEvidence(report, teaching.id, asOf);
+      omitted += evidence.omitted;
+      for (const row of evidence.rows) {
+        if (usedSessions.has(row.id)) continue;
+        usedSessions.add(row.id);
+        rows.push(Object.freeze({
+          ...row, teachingId: teaching.id,
+          section: String(teaching.sectionLabel ?? ''),
+          subject: String(teaching.subjectName ?? ''),
+        }));
+        recordedMarks += row.recorded;
+        expectedMarks += row.expected;
+      }
+    }
+  }
+  rows.sort((a,b)=>b.date.localeCompare(a.date) || b.period-a.period || a.id.localeCompare(b.id));
+  return Object.freeze({
+    rows: Object.freeze(rows), recordedSessions: rows.length,
+    fullSessions: rows.filter(row=>row.full).length,
+    partialSessions: rows.filter(row=>!row.full).length,
+    sectionCount: sectionIds.size, subjectCount: subjectIds.size,
+    assignmentCount: classAssignments, recordedMarks, expectedMarks,
+    omitted, asOf, source: 'سجلات الحصص الفعلية المحفوظة في ركيز',
+    criteriaNumber: '09',
+  });
+}
+
 export function portfolioDesignSummary(evidence) {
   // These are DOCUMENT-COVERAGE counts, not official evaluation scores.
   const present = Number(evidence?.recordedSessions) > 0;
