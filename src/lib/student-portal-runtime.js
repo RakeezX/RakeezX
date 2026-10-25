@@ -28,43 +28,26 @@ function failureSnapshot(value){
  if(!Number.isInteger(value.httpStatus)||(value.httpStatus!==0&&(value.httpStatus<100||value.httpStatus>599))||!Number.isFinite(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000)return null;
  return Object.freeze({phase:value.phase,code:value.code,stage:value.stage,httpStatus:value.httpStatus,elapsedMs:Math.round(value.elapsedMs/100)*100,sourceVersion:'n88-class-deadline-v1',...sourceClassification(value.httpStatus,value.stage,value),...(value.httpStatus===503&&value.stage==='synchronize-validate'&&validationFamilies.includes(value.validationFamily)?{validationFamily:value.validationFamily}:{})});
 }
-// AI: serialize only this finite public attestation, never the attribute wholesale.
+// AI: one finite SAME-list-request support snapshot; write outcomes stay separate.
 function listResponseSnapshot(root,diagnostic=null){
- try{
-  const raw=root.getAttribute('data-n88-list-response');if(!raw||raw.length>256)return null;
-  const value=JSON.parse(raw);
-  if(!value||Object.keys(value).length!==3||!['region','elapsedMs','outcome'].every(k=>Object.hasOwn(value,k)))return null;
-  if(typeof value.region!=='string'||(value.region!=='unknown'&&classListRegion(value.region)!==value.region)||!Number.isInteger(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000||!['success','failure'].includes(value.outcome))return null;
-  return JSON.stringify({schema:'n88-list-response-v1',region:value.region,elapsedMs:value.elapsedMs,outcome:value.outcome,...(value.outcome==='failure'?sourceClassification(diagnostic?.httpStatus,diagnostic?.stage,diagnostic):{})});
+ const safe=failureSnapshot(diagnostic);try{
+  const raw=root.getAttribute('data-n88-list-response');if(!raw||raw.length>256)return safe?JSON.stringify({schema:'n88-support-read-v1',kind:'entry-without-list',...safe}):null;
+  const v=JSON.parse(raw);if(!v||Object.keys(v).length!==3||!['region','elapsedMs','outcome'].every(k=>Object.hasOwn(v,k))||classListRegion(v.region)!==v.region||!Number.isInteger(v.elapsedMs)||v.elapsedMs<0||v.elapsedMs>30000||!['success','failure'].includes(v.outcome))return null;
+  const failure=v.outcome==='failure'?safe:null;
+  return JSON.stringify({schema:'n88-support-read-v1',kind:'teacher-list-read',phase:failure?.phase||'admitted',code:failure?.code||'none',httpStatus:failure?.httpStatus||(v.outcome==='success'?200:0),stage:failure?.stage||'none',...sourceClassification(failure?.httpStatus,failure?.stage,failure),region:v.region,elapsedMs:v.elapsedMs,outcome:v.outcome,...(failure?.validationFamily?{validationFamily:failure.validationFamily}:{})});
  }catch{return null;}
 }
 function listResponseSupport(root,isCurrent,getDiagnostic=()=>null){
- const body=entryShell(root),doc=root.ownerDocument;
- let details=body.querySelector('[data-n88-failure-details]');
- if(!details){details=doc.createElement('details');const summary=doc.createElement('summary');summary.textContent='تفاصيل الدعم';details.append(summary);body.append(details);}
- details.dataset.n88ListSupport='';
- const button=doc.createElement('button');button.type='button';button.className='btn';button.dataset.n88CopyList='';button.textContent='نسخ تفاصيل قراءة القائمة';
+ const body=entryShell(root),doc=root.ownerDocument;let details=body.querySelector('[data-n88-failure-details]');
+ if(!details){details=doc.createElement('details');const summary=doc.createElement('summary');summary.textContent='تفاصيل الدعم';details.append(summary);body.append(details);}details.dataset.n88ListSupport='';
+ const button=doc.createElement('button');button.type='button';button.className='btn';button.dataset.n88CopyList='';button.textContent='نسخ تفاصيل الدعم';
+ const text=doc.createElement('pre');text.dataset.n88FailureText='';
  const status=doc.createElement('p');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.dataset.n88ListCopyStatus='';
- const fallback=doc.createElement('textarea');fallback.readOnly=true;fallback.hidden=true;fallback.dir='ltr';fallback.rows=3;fallback.setAttribute('aria-label','تفاصيل قراءة القائمة للنسخ اليدوي');fallback.dataset.n88ListCopyText='';
- details.append(button,status,fallback);
- const valid=()=>root.contains(details)&&root.contains(button)&&isCurrent();
- const clear=()=>{fallback.value='';fallback.hidden=true;status.textContent='';};
- const absent=()=>{clear();status.textContent='لا تتوفر تفاصيل لهذه القراءة. لم يُنسخ شيء.';};
- details.addEventListener('toggle',()=>{clear();if(details.open&&(!valid()||!listResponseSnapshot(root,getDiagnostic())))absent();});
- button.addEventListener('click',async()=>{
-  if(button.disabled)return;clear();
-  const text=valid()?listResponseSnapshot(root,getDiagnostic()):null;if(!text){absent();return;}
-  button.disabled=true;
-  try{
-   const clipboard=doc.defaultView.navigator.clipboard;if(!clipboard?.writeText)throw Error('unavailable');
-   await clipboard.writeText(text);
-   if(valid()&&listResponseSnapshot(root,getDiagnostic())===text)status.textContent='تم نسخ تفاصيل القراءة.';
-   else clear();
-  }catch{
-   if(valid()&&listResponseSnapshot(root,getDiagnostic())===text){fallback.value=text;fallback.hidden=false;status.textContent='تعذّر النسخ التلقائي. حدّد النص وانسخه يدويًا.';}
-   else clear();
-  }finally{button.disabled=false;}
- });
+ const fallback=doc.createElement('textarea');fallback.readOnly=true;fallback.hidden=true;fallback.dir='ltr';fallback.rows=4;fallback.setAttribute('aria-label','تفاصيل الدعم للنسخ اليدوي');fallback.dataset.n88ListCopyText='';details.append(text,button,status,fallback);
+ const valid=()=>root.contains(details)&&root.contains(button)&&isCurrent(),snapshot=()=>valid()?listResponseSnapshot(root,getDiagnostic()):null;
+ const clear=()=>{fallback.value='';fallback.hidden=true;status.textContent='';text.textContent='';};
+ details.addEventListener('toggle',()=>{clear();if(details.open){const value=snapshot();if(value)text.textContent=JSON.stringify(JSON.parse(value),null,2);else status.textContent='لا تتوفر تفاصيل لهذه القراءة.';}});
+ button.addEventListener('click',async()=>{if(button.disabled)return;clear();const value=snapshot();if(!value){status.textContent='لا تتوفر تفاصيل لهذه القراءة. لم يُنسخ شيء.';return;}text.textContent=JSON.stringify(JSON.parse(value),null,2);button.disabled=true;try{const clipboard=doc.defaultView.navigator.clipboard;if(!clipboard?.writeText)throw Error('unavailable');await clipboard.writeText(value);if(snapshot()===value)status.textContent='تم نسخ تفاصيل الدعم.';else clear();}catch{if(snapshot()===value){fallback.value=value;fallback.hidden=false;status.textContent='تعذّر النسخ التلقائي. حدّد النص وانسخه يدويًا.';}else clear();}finally{button.disabled=false;}});
 }
 // Change only through a separately authorized, service-evidenced activation diff.
 export const PORTAL_READINESS = Object.freeze({ enabled: true, serviceRevision: 'n88-integrated-class-v1', mode: 'public' });
@@ -131,12 +114,13 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
   let ownDiagnostic=null;const record=(...args)=>{ownDiagnostic=checkpoint(...args);};
   let initial;try{initial=getBinding(false);record('binding');}catch(e){let retired=false;const state=e.portalState||'context';record('binding',0,0,'unavailable');classEntryState(root,state,ownDiagnostic,()=>{if(retired)return false;try{getBinding(false);return false;}catch(next){return (next.portalState||'context')===state;}});return {dispose(){retired=true;root.replaceChildren();}};}
   let disposed=false,handle=null,admitted=false,failure='connection';const entryStarted=performance.now(),lifetime=new AbortController();
+  let ownListFailure=null;
   const current=write=>{try{const b=getBinding(write);if(disposed||b.key!==initial.key)throw bindingError('context');return b;}catch(e){failure=e.portalState||'context';throw e;}};
   const getContext=()=>{try{return current(false).context;}catch{return null;}};
   const client=createClassPortalClient({getContext,getReceiptScope:()=>current(false).receiptScope??'',readTimeoutMs,onListDiagnostic:value=>{
     if(disposed)return;
-    if(value===null){root.removeAttribute('data-n88-list-response');return;}
-    try{current(false);root.setAttribute('data-n88-list-response',JSON.stringify(value));}catch{root.removeAttribute('data-n88-list-response');}
+    if(value===null){ownListFailure=null;root.removeAttribute('data-n88-list-response');return;}
+    try{current(false);ownListFailure=value.outcome==='failure'?failureSnapshot(ownDiagnostic):null;root.setAttribute('data-n88-list-response',JSON.stringify(value));}catch{root.removeAttribute('data-n88-list-response');}
   },onMutationDiagnostic:value=>{
     root.querySelector('[data-n88-mutation-details]')?.remove();
     if(disposed||!value)return;
@@ -206,7 +190,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     let firstList=initialList;
     const admittedClient={...client,listClass:async teachingId=>{current(false);if(firstList&&teachingId===initial.context.teachingId){const data=firstList;firstList=null;return data;}return client.listClass(teachingId);}};
     handle=mountClassPortal(content,{client:admittedClient,getContext,subscribe,classLabel});
-    listResponseSupport(root,()=>{try{current(false);return true;}catch{return false;}},()=>ownDiagnostic);
+    listResponseSupport(root,()=>{try{current(false);return true;}catch{return false;}},()=>ownListFailure);
   }).catch(e=>{if(!disposed){const last=ownDiagnostic;record(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage,last?.validationFamily,last);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure),ownDiagnostic,()=>{try{current(false);return true;}catch{return false;}});}});
   return {dispose(){disposed=true;lifetime.abort();handle?.dispose();root.removeAttribute('data-n88-list-response');root.replaceChildren();}};
 }
@@ -222,29 +206,9 @@ function entryShell(root){
 function classEntryState(root,state,diagnostic=null,isCurrent=()=>false){
  if(!Object.hasOwn(classEntryMessages,state))state='context';
  const body=entryShell(root);body.replaceChildren();root.dataset.n88EntryState=state;root.setAttribute('aria-busy',String(state==='loading'));
- const message=root.ownerDocument.createElement('p');message.dataset.n88EntryStatus='';message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.textContent=classEntryMessages[state];body.append(message);
- if(!['loading','disabled'].includes(state)){const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88Retry='';button.textContent='إعادة المحاولة';body.append(button);}
+ const message=root.ownerDocument.createElement('p');message.dataset.n88EntryStatus='';message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.textContent=diagnostic?.stage==='source'&&diagnostic?.sourceReason==='canonical-lock-contention'?'بيانات الفصل مشغولة مؤقتًا بعملية أخرى. لم تُؤكَّد قراءة جديدة؛ راجع القائمة بعد اكتمال العملية.':classEntryMessages[state];body.append(message);
+ if(!['loading','disabled'].includes(state)){const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88Retry='';button.textContent='مراجعة القائمة';body.append(button);}
  const snapshot=failureSnapshot(diagnostic);
- if(!['loading','disabled'].includes(state)&&snapshot){
-  const button=root.ownerDocument.createElement('button');button.type='button';button.className='btn';button.dataset.n88CopyFailure='';button.textContent='نسخ تفاصيل التعذّر';body.append(button);
-  const valid=()=>root.contains(button)&&root.contains(body)&&isCurrent();
-  const details=root.ownerDocument.createElement('details');details.dataset.n88FailureDetails='';
-  const summary=root.ownerDocument.createElement('summary');summary.textContent='تفاصيل الدعم';
-  const text=root.ownerDocument.createElement('pre');text.dataset.n88FailureText='';
-  details.append(summary,text);body.append(details);
-  // Populate only on normal expansion while the original owner/context remains
-  // current. No clipboard, network, hidden state or arbitrary diagnostic fields.
-  const retire=()=>{text.textContent='';details.open=false;details.remove();};
-  details.addEventListener('toggle',()=>{if(!valid()){retire();return;}text.textContent=details.open?JSON.stringify(snapshot,null,2):'';});
-  summary.addEventListener('click',event=>{if(!valid()){event.preventDefault();retire();}});
-  button.addEventListener('click',async()=>{
-   if(!valid()||button.disabled)return;
-   button.disabled=true;
-   try{const clipboard=root.ownerDocument.defaultView.navigator.clipboard;if(!clipboard?.writeText)throw Error('unavailable');await clipboard.writeText(JSON.stringify(snapshot));if(valid())button.textContent='تم النسخ';}
-   catch{if(valid())button.textContent='تعذّر النسخ';}
-   finally{if(valid())button.disabled=false;}
-  });
- }
  if(!['loading','disabled'].includes(state))listResponseSupport(root,isCurrent,()=>snapshot);
 }
 export function unavailable(root) {
