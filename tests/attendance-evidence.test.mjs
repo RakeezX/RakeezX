@@ -1,6 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { attendanceEvidenceProjection, validEvidenceDate } from '../src/lib/attendance-evidence.js';
+
+test('Cloudflare raw-ESM route links CSS without importing text/css as JavaScript', () => {
+  const source = readFileSync(new URL('../src/views/attendance-evidence.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(source, /^\s*import\s+['"][^'"]+\.css['"]\s*;?\s*$/m);
+  assert.match(source, /link\.rel = 'stylesheet'/);
+  assert.match(source, /ensureAttendanceEvidenceStyles\(\)/);
+});
 
 const t1 = { id: 'test-teaching-1' }, t2 = { id: 'test-teaching-2' };
 const row = (id, date, recorded, expected, state = 'completed', teaching = t1, status = 'held') => ({

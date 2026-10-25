@@ -1,5 +1,17 @@
 import '../lib/rakeez-datetime.js';
-import '../styles/attendance-evidence.css';
+
+// The production Pages deployment serves source ESM directly. A static CSS
+// import would be fetched as a JavaScript module and rejected for MIME text/css.
+// Load the stylesheet through a real link, as the existing certificate view does.
+const styleUrl = new URL('../styles/attendance-evidence.css', import.meta.url).href;
+function ensureAttendanceEvidenceStyles() {
+  if (document.querySelector('link[data-attendance-evidence-style]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = styleUrl;
+  link.dataset.attendanceEvidenceStyle = '';
+  document.head.append(link);
+}
 
 import { html, icon, fmtDate, toast } from '../lib/dom.js';
 import * as store from '../store.js';
@@ -51,7 +63,7 @@ export default {
   subtitle: () => store.activeTerm()?.name ?? '',
   back: () => '#/reports',
   wide: true,
-  beforeRender() { teachingId = ''; from = ''; to = ''; },
+  beforeRender() { ensureAttendanceEvidenceStyles(); teachingId = ''; from = ''; to = ''; },
   render() {
     const { offerings, chosen, year, term, projection, profile } = context();
     if (!offerings.length) return html`

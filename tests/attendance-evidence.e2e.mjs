@@ -27,6 +27,8 @@ test('Demo witness derives saved attendance, renders A4, prints and preserves st
   expect(fixture.sourceHasRecords,'Demo requires saved attendance from original test fixture').toBe(true);
   const view=page.locator('[data-attendance-evidence]');
   await expect(view).toBeVisible();
+  await expect(page.locator('link[data-attendance-evidence-style]')).toHaveAttribute('rel', 'stylesheet');
+  await expect(view.locator('.attendance-evidence-document__metrics')).toHaveCSS('display', 'grid');
   const select=page.getByRole('combobox',{name:'الفصل والمادة'});
   await select.selectOption(fixture.pickId);
   const snapshot=await page.evaluate(async()=>JSON.stringify((await import('/src/store.js')).state));
