@@ -10,7 +10,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const doc = root.ownerDocument, win = doc.defaultView;
   let disposed = false, generation = 0, busy = false, timer, cooldownUntil = 0, codeDraft = '',pendingCompletion=null,pendingForm=false,pendingMessage='';
   let returnRead = null, endingSession = false, retiredPage = false, screen = 'pending';
-  let freshnessTimer, settledAt = 0, settledTick = 0, settledContext, settledProjection = null, clearing = false;
+  let freshnessTimer, settledAt = 0, settledTick = 0, settledContext, settledProjection = null, clearing = false,viewDiagnostic=null;
   const previousDir = root.getAttribute('dir');
   root.classList.add('n88-unified'); root.dir = 'rtl';
   const style = doc.createElement('link'); style.rel = 'stylesheet';
@@ -19,6 +19,9 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const paint = (content, focus = true) => {
     if (disposed) return;
     root.innerHTML = `<header>${brandLockup({ compact: true })}</header><main>${content}<details class="n88-student-support"><summary>تفاصيل الدعم الاختيارية</summary><p>يمكنك نسخ نتيجة طلب واحد دون بيانات الطالب. لا تُرسل تلقائيًا.</p><button type="button" data-copy-diagnostic>نسخ تفاصيل التحقق</button><p role="status" data-copy-status></p><textarea readonly hidden dir="ltr" aria-label="تفاصيل التحقق للنسخ اليدوي" data-copy-text></textarea></details></main>`;
+    const support=root.querySelector('.n88-student-support');
+    const result=doc.createElement('pre');result.dir='ltr';result.className='n88-guidance-text';result.setAttribute('data-support-diagnostic','');
+    result.textContent=diagnosticText()||'لا تتوفر نتيجة مكتملة بعد.';support.insertBefore(result,support.querySelector('[data-copy-diagnostic]'));
     if(focus)root.querySelector('h1')?.focus();
   };
   function entry(message = '') {
@@ -88,7 +91,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   }
   // Reconstruct only finite fields, even if a supplied client returns extra data.
   function diagnosticText() {
-    const d = client?.getDiagnostic?.();
+    let d;try{d=client?.getDiagnostic?.();}catch{}d=d||viewDiagnostic;
     if (!d || !['read','end'].includes(d.action) || !['initial','return','manual','end'].includes(d.phase)
       || !['success','denied','rate','unavailable','timeout','stale'].includes(d.outcome)
       || !['none','2xx','4xx','5xx','other'].includes(d.httpStatusClass)
@@ -98,6 +101,11 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     const readPhases=d.action==='read'&&d.outcome==='success'&&d.httpStatusClass==='2xx'?parseStudentReadPhases(JSON.stringify(d.readPhases)):null;
     return JSON.stringify({action:d.action,phase:d.phase,outcome:d.outcome,httpStatusClass:d.httpStatusClass,
       elapsedMs:Math.min(15000,Math.max(0,Math.floor(d.elapsedMs/250)*250)),visibility:d.visibility,retirementReason:d.retirementReason,
+      clientStage:['call','request','response','transport','decode','projection','adopt','unknown'].includes(d.clientStage)?d.clientStage:'unknown',
+      responseKind:['json','html','other','none'].includes(d.responseKind)?d.responseKind:'none',
+      ...(d.httpStatusClass==='5xx'&&Number.isInteger(d.http5xx)&&d.http5xx>=500&&d.http5xx<=599?{http5xx:d.http5xx}:{}),
+      ...(d.action==='read'&&d.httpStatusClass==='5xx'&&['configuration','upstream','upstream-body','upstream-http-5xx','reply','reply-shape'].includes(d.transportStage)?{transportStage:d.transportStage}:{}),
+      ...(d.action==='read'&&d.httpStatusClass==='5xx'&&['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate','projection','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'].includes(d.serviceStage)?{serviceStage:d.serviceStage}:{}),
       ...(readPhases?{readPhases}:{})});
   }
   async function copyDiagnostic(button) {
@@ -129,7 +137,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if(beforeContext!==generation)return; // A newly discovered peer change rejects this stale UI command.
     returnRead = null;
     endingSession = ending;
-    busy = true; const checkpoint = ++generation;
+    busy = true; const checkpoint = ++generation;viewDiagnostic=null;const attemptStarted=win.performance.now();let attemptStage='call';
     pendingForm=sameForm;pendingMessage=resuming?'جارٍ التحقق من الجلسة…':'جارٍ التحقق من الرمز…';
     clearTimeout(freshnessTimer);
     if(!quiet){settledProjection=null;settledAt=0;settledContext=undefined;}
@@ -145,11 +153,12 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       codeDraft='';
       if(doc.visibilityState==='hidden'){const field=root.querySelector('[data-claim] input');if(field)field.value='';}
       pendingCompletion={checkpoint,context,data,ending,sameForm,resuming,quiet,completedAt:Date.now()};
-      adoptCompletion();
+      attemptStage='adopt';adoptCompletion();
     } catch (error) {
       if (disposed || checkpoint !== generation) return;
       if (error?.kind === 'rate') cooldownUntil = Date.now() + Math.min(300, Math.max(1, error.retryAfter || 30)) * 1000;
       if(client.isContextCurrent&&!client.isContextCurrent(context)){clear();return;}
+      viewDiagnostic=Object.freeze({action:ending?'end':'read',phase:ending?'end':resuming?'initial':'manual',outcome:'unavailable',httpStatusClass:'none',elapsedMs:Math.min(15000,Math.max(0,Math.floor((win.performance.now()-attemptStarted)/250)*250)),visibility:doc.visibilityState==='hidden'?'hidden':'visible',retirementReason:'visible',clientStage:attemptStage,responseKind:'none'});
       if(error?.viewDeadline){clear(false,'deadline');if(ending)endUncertain();return;}
       pendingCompletion={checkpoint,context,errorKind:error?.kind||'unavailable',claimState:error?.claimState,ending,sameForm,resuming,quiet};
       adoptCompletion();
@@ -223,7 +232,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     clearTimeout(freshnessTimer);settledProjection=null;settledAt=0;settledContext=undefined;
     returnRead = null;
     if(preserveDraft){const field=root.querySelector('[data-claim] input');if(field)codeDraft=normalizeStudentCode(field.value);}else codeDraft='';
-    generation++; busy = false;endingSession=false;pendingForm=false;pendingCompletion=null;pendingMessage=''; clearTimeout(timer); if(invalidateClient)client?.invalidate?.(reason);
+    generation++;viewDiagnostic=null; busy = false;endingSession=false;pendingForm=false;pendingCompletion=null;pendingMessage=''; clearTimeout(timer); if(invalidateClient)client?.invalidate?.(reason);
     // Retire private data/pending replies, retaining only this page's editable
     // unsubmitted draft. An existing entry keeps its DOM, selection and focus.
     if(preserveDraft&&root.querySelector('[data-claim]'))inlineEntry();else recovery('لم تُحسم حالة الجلسة. تحقّق مجددًا للمتابعة.');
