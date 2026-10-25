@@ -5,6 +5,7 @@ import { repaint } from '../repaint.js';
 import { MINISTRY_LOGO_URL } from '../lib/ministry-brand.js';
 import { printReport } from '../lib/report-print.js';
 import { PORTFOLIO_CRITERIA, portfolioYearEvidence, portfolioDesignSummary } from '../lib/portfolio-design-preview.js';
+import { buildPortfolioEvidenceSuggestions, guideForCriterion } from '../lib/portfolio-smart-evidence.js';
 
 const styleUrl = new URL('../styles/portfolio-design-preview.css', import.meta.url).href;
 function loadStyle() {
@@ -19,11 +20,15 @@ const short = (value, fallback='غير مسجل') => String(value ?? '').trim() 
 const digits = new Intl.NumberFormat('ar-SA', { useGrouping: false });
 const date = value => value ? fmtDate(value, false) : '—';
 let editingCriterion = '09';
+let selectedSuggestionId = null;
 const photoLayouts = new Map();
-const layoutFor = (criterion = editingCriterion) => photoLayouts.get(criterion) ?? 'two';
-let photoError = '';
 const photoGroups = new Map();
-const photosFor = (criterion = editingCriterion) => photoGroups.get(criterion) ?? [];
+const confirmedSuggestions = new Set();
+const descriptions = new Map();
+const titles = new Map();
+const layoutFor = key => photoLayouts.get(key) ?? 'two';
+const photosFor = key => photoGroups.get(key) ?? [];
+let photoError = '';
 function context() {
   const year = store.activeYear();
   const terms = year ? store.termsOf(year.id) : [];
@@ -36,15 +41,42 @@ function context() {
     })),
   }));
   const evidence = portfolioYearEvidence(groups);
-  const summary = portfolioDesignSummary(evidence);
+  const allTeachings = groups.flatMap(group=>group.teachings);
+  const teachingIds = [...new Set(allTeachings.map(teaching=>teaching.id))];
+  const sources = buildPortfolioEvidenceSuggestions({
+    yearId:year?.id,teachingIds,attendance:evidence,asOf:evidence.asOf,
+    slots:teachingIds.flatMap(id=>store.slotsOf(id)),
+    sessions:teachingIds.flatMap(id=>store.sessionsOf(id)),
+    classRules:teachingIds.flatMap(id=>store.classRulesOf(id)),
+    items:teachingIds.flatMap(id=>store.items(id)),
+    scores:store.state.scores ?? [],
+    assignments:store.state.assignments ?? [],
+    submissions:store.state.submissions ?? [],
+  });
+  const candidates = sources.filter(proposal=>proposal.criterion===editingCriterion);
+  const manualId='manual:'+editingCriterion;
+  const manualSelected=selectedSuggestionId===manualId;
+  const proposal=manualSelected?null:(candidates.find(s=>s.id===selectedSuggestionId)||candidates[0]||null);
+  if(proposal && selectedSuggestionId!==proposal.id) selectedSuggestionId=proposal.id;
+  if(!proposal && !manualSelected)selectedSuggestionId=manualId;
+  const photoKey=proposal?.id ?? 'manual:'+editingCriterion;
+  const guide=guideForCriterion(editingCriterion);
+  const pendingSourceReview=!!proposal?.requiresReview && !confirmedSuggestions.has(photoKey);
+  const summaryBase = portfolioDesignSummary(evidence);
+  const summary = {...summaryBase,criteria:summaryBase.criteria.map(c=>({...c,
+    page:c.number===editingCriterion && (proposal||photosFor(photoKey).length) ? '4':'—'}))};
   const criterion = PORTFOLIO_CRITERIA.find(c => c.number === editingCriterion) ?? PORTFOLIO_CRITERIA[8];
+  const canPrint=(!pendingSourceReview && !!proposal) || (!proposal && photosFor(photoKey).length>0);
+  const title=titles.get(photoKey)??proposal?.title??guide?.evidence??criterion.title;
   const profile = store.state.profile ?? {};
   const person = {
     teacher: short(profile.teacherName, 'اسم المعلم'),
     school: short(profile.schoolName, 'اسم المدرسة'),
     department: short(profile.educationDepartment, 'إدارة التعليم'),
   };
-  return {year,terms,evidence,summary,person,criterion,photos:photosFor(),photoLayout:layoutFor()};
+  return {year,terms,evidence,summary,person,criterion,guide,proposal,candidates,sources,photoKey,
+    photos:photosFor(photoKey),photoLayout:layoutFor(photoKey),
+    description:descriptions.get(photoKey)??proposal?.description??'',title,pendingSourceReview,canPrint};
 }
 
 const ministry = (className='')=>html`<img class="folio-ministry ${className}" data-report-ministry src="${MINISTRY_LOGO_URL}" width="866" height="659" alt="وزارة التعليم" loading="eager" decoding="async">`;
@@ -79,7 +111,7 @@ function cover(ctx) {
       <div class="folio-cover__keyline"></div>
       <div class="folio-cover__bottom">
         <div><span>العام الدراسي</span><strong>${short(year?.label)}</strong></div>
-        <div><span>فصول المعلم</span><strong>${evidence.sectionCount ? digits.format(evidence.sectionCount) : '—'}</strong></div>
+        <div><span>نوع الملف</span><strong>ملف الإنجاز المهني</strong></div>
         <div><span>إدارة التعليم</span><strong>${person.department}</strong></div>
       </div>
 
@@ -142,8 +174,8 @@ function coverage(ctx) {
 }
 
 function evidencePage(ctx) {
-  const {evidence,year,criterion,photos,photoLayout} = ctx;
-  const isAttendance = criterion.number === '09';
+  const {evidence,year,criterion,photos,photoLayout,proposal} = ctx;
+  const isAttendance = proposal?.id === 'rakeez:attendance:'+year?.id;
   const rows = evidence.rows.slice(0,4);
   const hasData = isAttendance && evidence.recordedSessions > 0;
   const cols = photoLayout === 'one' ? 1 : photoLayout === 'three' ? 3 : 2;
@@ -161,8 +193,8 @@ function evidencePage(ctx) {
     ${pageLabel('شاهد مهني', '04')}
     <div class="folio-interior__headline folio-interior__headline--compact">
       <span class="folio-interior__eyebrow">${criterion.number} · ${criterion.title}</span>
-      <h2>${isAttendance ? 'متابعة رصد حضور الطلاب' : criterion.title}</h2>
-      <p>${isAttendance ? 'متابعة منظمة لحصص المعلم عبر الفصول والمواد خلال العام الدراسي.' : 'شواهد من أعمال المعلم المهنية موثقة بالصور المختارة.'}</p>
+      <h2>${ctx.title}</h2>
+      ${ctx.description?html`<p>${ctx.description}</p>`:''}
     </div>
     <div class="folio-evidence__meta">
       <div><small>العام الدراسي</small><strong>${short(year?.label)}</strong></div>
@@ -189,6 +221,14 @@ function evidencePage(ctx) {
         </div>`)}
       </div>` : ''}
       `:''}
+    ${proposal && !isAttendance?html`
+      <div class="folio-evidence__metrics">
+        ${proposal.metrics.slice(0,3).map(([label,value])=>html`<div><span>${label}</span><strong>${typeof value==='number'?digits.format(value):value}</strong></div>`)}
+      </div>
+      ${proposal.table?.length?html`<div class="folio-evidence__section-head"><h3>نماذج من الأعمال المسجلة</h3></div>
+        <table class="folio-evidence__table"><thead><tr>${proposal.tableHeaders.map(h=>html`<th>${h}</th>`)}</tr></thead>
+          <tbody>${proposal.table.map(row=>html`<tr>${row.map(cell=>html`<td>${cell}</td>`)}</tr>`)}</tbody></table>`:''}
+    `:''}
     <div class="folio-evidence__image-block ${firstPhotos.length ? '' : 'noprint'}">
       <div class="folio-evidence__image-caption"><h3>شواهد مصوّرة من عمل المعلم</h3><span>${photos.length ? `${digits.format(photos.length)} صور للشاهد` : ''}</span></div>
       ${firstPhotos.length ? html`<div class="folio-evidence__gallery folio-evidence__gallery--${photoLayout}" style="--folio-photo-height:${photoHeight}px">
@@ -241,15 +281,65 @@ function photoContinuation(ctx) {
   return pages;
 }
 
+function suggestionsPanel(ctx) {
+  const {guide,proposal,candidates,photoKey,title,description} = ctx;
+  return html`<section class="folio-suggestion-studio noprint" aria-label="مساعد تجهيز الشواهد">
+    <header class="folio-suggestion-studio__head">
+      <div><span>مساعد ركيز للشواهد</span><h2>شواهد يقترحها ركيز من عملك</h2>
+        <p>اقتراحات مستخرجة من السجلات الفعلية للعام الدراسي. اختر المقترح المناسب، وعدّل وصفه أو أضف صورته فقط.</p></div>
+      <strong class="folio-suggestion-studio__count">${digits.format(ctx.sources.length)} اقتراحات في هذا العام</strong>
+    </header>
+    <div class="folio-suggestion-studio__candidates">
+      ${candidates.map(item=>html`<button type="button"
+        class="folio-suggestion-studio__choice ${proposal?.id===item.id?'is-selected':''}"
+        data-act="pick-suggestion" data-id="${item.id}" aria-pressed="${proposal?.id===item.id}">
+          <strong>${item.title}</strong><span>${item.source}</span>
+          <small>${item.requiresReview?'مسجل — يحتاج تأكيد التنفيذ':'جاهز من بيانات ركيز'}</small>
+      </button>`)}
+      <button type="button" class="folio-suggestion-studio__choice ${!proposal?'is-selected':''}"
+        data-act="manual-suggestion" aria-pressed="${!proposal}">
+        <strong>إضافة شاهد خاص بي</strong><span>صورة أو شهادة أو مستند من عمل المعلم</span>
+        <small>يدخله المعلم بنفسه</small>
+      </button>
+    </div>
+    <div class="folio-suggestion-studio__editor">
+      <div class="folio-suggestion-studio__guide">
+        <div><b>ماذا يحتوي هذا المعيار؟</b><p>${guide?.content||''}</p></div>
+        <div><b>ما يأتي من ركيز؟</b><p>${guide?.rakeez||''}</p></div>
+        <div><b>أقل إضافة مطلوبة</b><p>${guide?.minimum||''}</p></div>
+      </div>
+      <div class="folio-suggestion-studio__fields">
+        <label class="field"><span class="field__label">عنوان الشاهد</span>
+          <input class="input" data-change="suggestion-title" value="${title}" maxlength="100" aria-label="عنوان الشاهد" />
+        </label>
+        <label class="field"><span class="field__label">وصف العمل</span>
+          <textarea class="textarea" data-change="suggestion-description" rows="2"
+            maxlength="450" aria-label="وصف الشاهد">${description}</textarea>
+        </label>
+        ${proposal?.requiresReview?html`<label class="folio-suggestion-studio__review">
+          <input type="checkbox" data-change="confirm-suggestion" ${ctx.pendingSourceReview?'':'checked'} />
+          راجعت بيانات هذا الشاهد وأؤكد صحة ما أضيف إليه
+        </label>`:''}
+        <p class="folio-suggestion-studio__source">${proposal
+          ? 'المصدر: بيانات '+proposal.source+' · '+(proposal.requiresReview?'يلزم تأكيد المعلم قبل تصديره':'مقترح من بيانات مسجلة')
+          : 'يمكنك إضافة صورة ووصف لشاهد لا يوجد له مصدر آلي حاليًا.'}</p>
+        <p class="folio-suggestion-studio__integration">تكامل مدرستي لاحقًا: ${guide?.madrasati||'—'}.
+          تكامل نور لاحقًا: ${guide?.noor||'—'}.</p>
+      </div>
+    </div>
+  </section>`;
+}
+
 export default {
   title: ()=>'ملف الإنجاز — نموذج التصميم',
   subtitle: ()=>store.activeYear()?.label ?? '',
   back: ()=>'#/reports',
   wide: true,
-  beforeRender() { loadStyle(); editingCriterion = '09'; photoError = ''; },
+  beforeRender() { loadStyle(); editingCriterion = '09'; selectedSuggestionId=null; photoError = ''; },
   onUnmount() {
     for (const group of photoGroups.values()) for (const photo of group) URL.revokeObjectURL(photo.url);
-    photoGroups.clear(); photoLayouts.clear(); photoError = '';
+    photoGroups.clear(); photoLayouts.clear(); confirmedSuggestions.clear(); descriptions.clear(); titles.clear();
+    selectedSuggestionId=null; photoError = '';
   },
   render() {
     const ctx = context();
@@ -280,13 +370,14 @@ export default {
           <input type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="photo" aria-label="إضافة صور للشاهد" />
         </label>
         ${ctx.photos.length?html`<button class="btn btn--ghost" data-act="clear-photo">إزالة صور هذا الشاهد</button>`:''}
-        <button class="btn btn--primary" data-act="print">${icon('print')} طباعة / PDF</button>
+        <button class="btn btn--primary" data-act="print" ${ctx.canPrint?'':'disabled'}>${icon('print')} طباعة / PDF</button>
         <p class="folio-toolbar__helper">
-          ${ctx.photos.length ? `${digits.format(ctx.photos.length)} صور لهذا المعيار، يمكن ترتيبها أو حذفها كلٌّ على حدة.` : 'تُربط الصور بالمعيار المحدد فقط.'}
+          ${ctx.photos.length ? `${digits.format(ctx.photos.length)} صور للشاهد المختار، يمكن ترتيبها أو حذفها كلٌّ على حدة.` : 'صور خاصة بالشاهد المحدد؛ لا تنتقل إلى شواهد أخرى.'}
           الصور مؤقتة في المعاينة الحالية؛ الحفظ والمزامنة السحابية ستحتاج تفعيلًا مستقلًا.
           ${photoError?` · ${photoError}`:''}
         </p>
       </section>
+      ${suggestionsPanel(ctx)}
       <nav class="folio-nav noprint" aria-label="صفحات النموذج">
         ${navPages.map(([n,title])=>html`
           <button type="button" class="folio-nav__item" data-act="go" data-page="${n}">
@@ -298,13 +389,19 @@ export default {
     </div>`;
   },
   actions: {
-    criterion(el) { editingCriterion = el.value; photoError = ''; repaint(); },
-    layout(el) { photoLayouts.set(editingCriterion, el.value); repaint(); },
+    criterion(el) { editingCriterion = el.value; selectedSuggestionId=null; photoError = ''; repaint(); },
+    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id; repaint(); },
+    'manual-suggestion'() { selectedSuggestionId='manual:'+editingCriterion; repaint(); },
+    'suggestion-title'(el) { const key=context().photoKey; titles.set(key,el.value.slice(0,100)); repaint(); },
+    'suggestion-description'(el) { const key=context().photoKey; descriptions.set(key,el.value.slice(0,450)); repaint(); },
+    'confirm-suggestion'(el) { const key=context().photoKey; if(el.checked)confirmedSuggestions.add(key);else confirmedSuggestions.delete(key);repaint(); },
+    layout(el) { photoLayouts.set(context().photoKey, el.value); repaint(); },
     go(el) { document.querySelector(`[data-portfolio-page="${el.dataset.page}"]`)?.scrollIntoView({behavior:'smooth',block:'start'}); },
     photo(el) {
       const incoming = [...(el.files ?? [])];
       if(!incoming.length) return;
-      const existing = photosFor();
+      const key=context().photoKey;
+      const existing = photosFor(key);
       const allowed = new Set(['image/png','image/jpeg','image/webp']);
       if (existing.length + incoming.length > 6 ||
           incoming.some(file=>!allowed.has(file.type) || file.size>6*1024*1024) ||
@@ -315,33 +412,34 @@ export default {
       const additions = incoming.map(file=>({
         id:crypto.randomUUID(), url:URL.createObjectURL(file), name:String(file.name).slice(0,70), bytes:file.size,
       }));
-      photoGroups.set(editingCriterion,[...existing,...additions]);
+      photoGroups.set(key,[...existing,...additions]);
       photoError = ''; repaint();
     },
     'remove-photo'(el) {
-      const group=photosFor(), p=group.find(photo=>photo.id===el.dataset.id);
+      const key=context().photoKey, group=photosFor(key), p=group.find(photo=>photo.id===el.dataset.id);
       if(!p) return;
       URL.revokeObjectURL(p.url);
-      photoGroups.set(editingCriterion,group.filter(photo=>photo.id!==p.id));
+      photoGroups.set(key,group.filter(photo=>photo.id!==p.id));
       repaint();
     },
     'move-photo'(el) {
-      const group=[...photosFor()];
+      const key=context().photoKey,group=[...photosFor(key)];
       const index=group.findIndex(photo=>photo.id===el.dataset.id);
       const next=index+Number(el.dataset.dir);
       if(index<0 || next<0 || next>=group.length) return;
       [group[index],group[next]]=[group[next],group[index]];
-      photoGroups.set(editingCriterion,group);
+      photoGroups.set(key,group);
       repaint();
     },
     'clear-photo'() {
-      for(const photo of photosFor()) URL.revokeObjectURL(photo.url);
-      photoGroups.delete(editingCriterion); repaint();
+      const key=context().photoKey;
+      for(const photo of photosFor(key)) URL.revokeObjectURL(photo.url);
+      photoGroups.delete(key); repaint();
     },
     async print(){
       const ctx=context();
-      if(!(editingCriterion==='09' && ctx.evidence.recordedSessions>0) && !ctx.photos.length) {
-        toast('أضف شاهدًا مصورًا أو اختر معيار الإدارة الصفية الذي يضم سجلات ركيز.', 'warn');
+      if(!ctx.canPrint) {
+        toast('اختر شاهدًا موثقًا، أو أضف صورة لشاهدك، أو أكد تنفيذ العمل قبل التصدير.', 'warn');
         return false;
       }
       try {

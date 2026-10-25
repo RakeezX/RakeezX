@@ -52,6 +52,9 @@ test('four coherent Arabic A4 pages render actual scoped Demo evidence and print
  await expect(page.locator('select[data-change="teaching"]')).toHaveCount(0);
  await expect(page.locator('.folio-evidence__metrics strong').first()).toHaveText(new Intl.NumberFormat('ar-SA',{useGrouping:false}).format(demo.expected));
  await expect(page.locator('.folio-cover')).toContainText('ملف الإنجاز المهني');
+ await expect(page.locator('.folio-cover')).not.toContainText('فصول المعلم');
+ await expect(page.locator('.folio-suggestion-studio')).toContainText('شواهد يقترحها ركيز من عملك');
+ await expect(page.locator('.folio-suggestion-studio__choice.is-selected')).toContainText('متابعة رصد حضور الطلاب');
  await expect(page.locator('.folio-evidence')).toContainText('جميع الفصول والمواد');
  await expect(page.locator('.folio-coverage')).not.toContainText('لم يُضف');
  await expect(page.locator('.folio-coverage')).not.toContainText('حدود هذا النموذج');
@@ -127,4 +130,42 @@ test('photo arrangements fit A4 export and are independently scoped to the selec
  }
  await page.getByRole('combobox',{name:'معيار الشاهد'}).selectOption('07');
  await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+});
+
+
+test('manual witness needs only a title, description and photo; automatic records stay separate', async({page,context,baseURL},info)=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry); await ready(page);
+ await page.getByRole('combobox',{name:'معيار الشاهد'}).selectOption('03');
+ await expect(page.locator('.folio-suggestion-studio__choice.is-selected')).toContainText('إضافة شاهد خاص بي');
+ await expect(page.getByRole('button',{name:/طباعة \/ PDF/})).toBeDisabled();
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('التواصل التربوي مع أولياء الأمور');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('متابعة التواصل مع الأسر عبر قنوات التواصل المعتمدة.');
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+ const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
+ await page.locator('input[data-change="photo"]').setInputFiles({name:'contact.png',mimeType:'image/png',buffer:tiny});
+ await expect(page.locator('.folio-evidence')).toContainText('متابعة التواصل مع الأسر');
+ await expect(page.getByRole('button',{name:/طباعة \/ PDF/})).toBeEnabled();
+ const pdf=await page.pdf({path:info.outputPath('folio-manual-parent-communication.pdf'),preferCSSPageSize:true,printBackground:true});
+ expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(4);
+ await page.getByRole('combobox',{name:'معيار الشاهد'}).selectOption('09');
+ await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+ await page.getByRole('combobox',{name:'معيار الشاهد'}).selectOption('03');
+ await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+});
+
+test('scheduled work suggestions require teacher review while saved attendance needs none',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry);await ready(page);
+ await expect(page.getByRole('button',{name:/طباعة \/ PDF/})).toBeEnabled();
+ await page.getByRole('combobox',{name:'معيار الشاهد'}).selectOption('01');
+ const planned=page.locator('.folio-suggestion-studio__choice').filter({hasText:'الجدول الدراسي الأسبوعي'});
+ if(await planned.count()){
+   await planned.click();
+   await expect(page.getByRole('button',{name:/طباعة \/ PDF/})).toBeDisabled();
+   await page.getByText('راجعت بيانات هذا الشاهد وأؤكد صحة ما أضيف إليه').click();
+   await expect(page.getByRole('button',{name:/طباعة \/ PDF/})).toBeEnabled();
+   await expect(page.locator('.folio-evidence')).toContainText('الجدول الدراسي الأسبوعي');
+ }
 });
