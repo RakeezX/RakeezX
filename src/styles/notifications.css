@@ -40,3 +40,28 @@
 .n44-day-grid { direction: rtl; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
 .n44-timing-options .btn { min-height: 44px; min-width: 0; padding: 8px 4px; white-space: normal; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .n44-timing-options [aria-pressed="true"], .n44-timing-options [aria-checked="true"] { background: var(--bg-sunk); box-shadow: inset 0 0 0 2px var(--action-primary); }
+
+/* AI N44: ordinary preferences first; diagnostics stay in one native disclosure. */
+.n44-settings-page .n44-settings { gap: 12px; }
+.n44-settings-page .n44-settings-back { margin-bottom: 12px; }
+.n44-settings-page .n44-settings-intro h1 { margin: 0; font-size: 24px; line-height: 1.6; }
+.n44-settings-page .n44-settings-intro p { margin: 6px 0 4px; color: var(--text-2); line-height: 1.8; }
+.n44-settings-page .n44-preference { padding: 16px; }
+.n44-settings-page .n44-preference p { margin-block: 8px; line-height: 1.8; }
+.n44-settings-page .n44-timing { margin-top: 12px; }
+.n44-settings-page .n44-device-permission,
+.n44-settings-page .n44-settings-saved { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.8; }
+.n44-settings-page .n44-preference > .btn { min-height: 44px; margin-top: 8px; white-space: normal; max-width: 100%; }
+.n44-settings-page .n44-support { min-width: 0; padding: 8px 16px; overflow-wrap: anywhere; }
+.n44-settings-page summary { cursor: pointer; min-height: 44px; align-content: center; line-height: 1.8; }
+.n44-settings-page summary:focus-visible { outline: 3px solid var(--action-primary); outline-offset: 3px; border-radius: 4px; }
+.n44-settings-page .n44-support-content { display: grid; gap: 12px; margin-block: 8px; }
+.n44-settings-page .n44-support-content .card { box-shadow: none; }
+.n44-settings-page .n44-support article { border-top: 1px solid var(--border); padding-block: 12px; }
+.n44-settings-page .n44-support :is(h3, h4) { margin-block: 8px; }
+.n44-settings-page .n44-support dd { margin-inline: 0; margin-block: 4px 12px; }
+.n44-settings-page .n44-deleted-sources { border-top: 1px solid var(--border); }
+@media (max-width: 480px) {
+  .n44-settings-page .n44-preference { padding: 12px; }
+  .n44-settings-page .n44-support { padding-inline: 12px; }
+}

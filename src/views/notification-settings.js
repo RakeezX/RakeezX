@@ -9,6 +9,8 @@ import { getPushRuntime, readPushQuiet, writePushQuiet } from '../lib/notificati
 import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificationTiming, readNotificationCategories, writeNotificationCategory } from '../lib/notification-state.js';
 
 let cleanup = () => {};
+let mountedRoot = null;
+let supportScope = null;
 const dayLabels = { 3: 'قبل 3 أيام', 2: 'قبل يومين', 1: 'قبل يوم', 0: 'يوم التسليم' };
 const eligibilityText = {
   "idle": "تذكيرات الجهاز غير جاهزة حاليًا.",
@@ -62,7 +64,15 @@ function normalEvidence(ui, scope) {
         </dl></details>` : ''}` : ''}
     </article>`) : html`<p>لا يوجد تذكير حالي ضمن المواعيد والتفضيلات المعتمدة.</p>`}
     <h3>حالة مصادر تذكيرات التسليم</h3>
-    ${ui.sources.map(r => html`<article style="overflow-wrap:anywhere" data-n44-source="${r.parentId}">
+    ${sourceRows(ui.sources.filter(r => !r.deleted), ui, scope)}
+    ${ui.sources.some(r => r.deleted) ? html`<details class="n44-deleted-sources" data-n44-deleted-sources>
+      <summary>مصادر سابقة محذوفة (${ui.sources.filter(r => r.deleted).length})</summary>
+      ${sourceRows(ui.sources.filter(r => r.deleted), ui, scope)}
+    </details>` : ''}
+  </section>`;
+}
+function sourceRows(rows, ui, scope) {
+  return html`${rows.map(r => html`<article style="overflow-wrap:anywhere" data-n44-source="${r.parentId}">
       <h4>${r.name}${r.deleted ? ' — محذوف' : ''}</h4>
       <details ${ui.sourceStatus?.token === r.token ? 'open' : ''}><summary>هوية المصدر وإقرار الحفظ</summary><dl>
         <dt>الحساب</dt><dd dir="ltr">${r.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${r.workspaceId}</dd>
@@ -77,47 +87,43 @@ function normalEvidence(ui, scope) {
           <dt>معرّف الإيصال</dt><dd dir="ltr">${ui.sourceStatus.cleanupReceipt.mutationId}</dd>
           <dt>الهدف / الجهاز / ختم الحذف</dt><dd dir="ltr">${ui.sourceStatus.cleanupReceipt.targetId} / ${ui.sourceStatus.cleanupReceipt.deviceId} / ${ui.sourceStatus.cleanupReceipt.clientUpdatedAt}</dd></dl>` : ''}` : ''}
       </details>
-    </article>`)}
-  </section>`;
+    </article>`)}`;
 }
 const view = {
   title: () => 'الإشعارات',
   render() {
     const context = currentNotificationContext(store, cloud);
     const scope = notificationScope(context);
+    // Preserve an explicit disclosure choice only while the mounted context matches.
+    const supportOpen = scope != null && supportScope === scope &&
+      mountedRoot?.querySelector('[data-n44-support]')?.open === true;
+    supportScope = scope;
     const categories = readNotificationCategories(context);
     const timing = readNotificationTiming(context);
     const push = getPushRuntime()?.snapshot();
     const quiet = readPushQuiet(context);
+    const permission = globalThis.Notification?.permission;
+    const permissionLabel = permission === 'granted' ? 'مسموح بها' : permission === 'denied' ? 'محظورة' : permission === 'default' ? 'لم تُمنح بعد' : 'غير مدعومة';
     const ui = context ? getPushRuntime()?.normalUiSnapshot() : null;
     const eligibilityFlag = key => typeof push?.eligibility?.[key] === 'boolean' ? String(push.eligibility[key]) : 'not_observed';
     return html`<div class="n44-settings-page">
       <a class="btn btn--quiet n44-settings-back" href="#/settings">${icon('back')} الإعدادات</a>
       <div class="n44-settings" data-notification-scope="${scope ?? ''}">
       ${context ? html`
-        <details class="n44-preference card card--pad" data-n44-current-identity style="overflow-wrap:anywhere">
-          <summary>هوية الحساب والجهاز الحالي</summary>
-          <p>سياق الحساب المحلي الحالي. لا يثبت موافقة الخدمة أو تفعيل التذكيرات أو وصولها.</p>
-          <dl><dt>الحساب</dt><dd dir="ltr">${context.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${context.workspaceId}</dd><dt>الجهاز</dt><dd dir="ltr">${context.deviceId}</dd></dl>
-        </details>
-        ${push?.configOutcome ? html`<details class="n44-preference card card--pad" data-n44-config-outcome style="overflow-wrap:anywhere">
-          <summary>نتيجة التحقق من إعداد تذكيرات الجهاز</summary>
-          <dl><dt>HTTP</dt><dd dir="ltr">${Number.isInteger(push.configOutcome.httpStatus) && push.configOutcome.httpStatus >= 100 && push.configOutcome.httpStatus <= 599 ? push.configOutcome.httpStatus : 'UNKNOWN'}</dd>
-          <dt>المرحلة</dt><dd dir="ltr">${['request', 'transport', 'http', 'response_read', 'response_size', 'decode', 'shape', 'context', 'deadline', 'complete'].includes(push.configOutcome.phase) ? push.configOutcome.phase : 'request'}</dd>
-          ${push.configOutcome.servicePhase ? html`<dt>مرحلة الخدمة (وصف عام)</dt><dd dir="ltr" data-n44-config-service-phase>${push.configOutcome.servicePhase}</dd>` : ''}
-          <dt>النتيجة</dt><dd>${configResultText[push.eligibility?.configuration] ?? eligibilityText.idle}</dd></dl>
-        </details>` : ''}
-        ${push?.preferenceStopped && push.status !== 'cleanup_pending' ? html`<p role="status">أُوقفت تذكيرات الجهاز بعد تعديل التفضيلات. أعد تفعيلها لتطبيق التفضيلات الجديدة.</p>` : ''}
+        <header class="n44-settings-intro">
+          <h1>الإشعارات</h1>
+          <p>الجرس يعرض إشعاراتك داخل رَكيز، وتذكيرات الجهاز تنبّهك حتى عند إغلاقه إذا كانت مفعّلة.</p>
+        </header>
+        ${push?.preferenceStopped && push.status !== 'cleanup_pending' ? html`<p role="status">أُوقفت تذكيرات الجهاز بعد تعديل التفضيلات. تُطبّق التفضيلات الجديدة عند توفر التفعيل مجددًا.</p>` : ''}
         ${push?.available || push?.cleanupAvailable ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
           <h2>تذكيرات الجهاز</h2>
           <button type="button" class="btn btn--quiet" data-act="notification-push" data-scope="${scope}" ${push.cleanupBusy ? 'disabled' : ''}>${push.status === 'subscribed' ? 'إيقاف تذكيرات الجهاز' : push.status === 'cleanup_pending' ? 'إعادة محاولة الإيقاف' : 'تفعيل تذكيرات الجهاز'}</button>
           <p role="status">${push.status === 'subscribed' ? 'مفعّلة على هذا الجهاز' : push.status === 'cleanup_pending' ? 'لم يكتمل الإيقاف. أعد المحاولة.' : push.status === 'unsubscribed' ? 'غير مفعّلة' : 'لم يكتمل التفعيل'}</p>
-          <button type="button" class="btn btn--quiet" role="switch" aria-checked="${String(!!quiet)}" data-act="notification-push-quiet" data-scope="${scope}">هدوء من 10 مساءً إلى 7 صباحًا</button>
         </section>` : push?.eligibility ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
           <h2>تذكيرات الجهاز</h2>
           <p role="status" data-n44-runtime-ready="${String(push.available === true)}" data-n44-push-eligibility="${Object.hasOwn(eligibilityText, push.eligibility.reason) ? push.eligibility.reason : 'idle'}" data-n44-context-match="${eligibilityFlag('contextMatches')}" data-n44-session-match="${eligibilityFlag('sessionMatches')}" data-n44-workspace-match="${eligibilityFlag('workspaceMatches')}" data-n44-lease-match="${eligibilityFlag('leaseMatches')}" data-n44-consent-match="${eligibilityFlag('consentMatches')}" data-n44-generation-match="${eligibilityFlag('generationMatches')}" data-n44-browser-supported="${eligibilityFlag('browserSupported')}" data-n44-worker-ready="${eligibilityFlag('workerReady')}" data-n44-config-category="${['ready', 'disabled', 'invalid', 'request_failed', 'not_observed'].includes(push.eligibility.configuration) ? push.eligibility.configuration : 'not_observed'}">${eligibilityText[push.eligibility.reason] ?? eligibilityText.idle}</p>
         </section>` : ''}
-        ${normalEvidence(ui, scope)}
+        <p class="n44-device-permission">إذن إشعارات المتصفح: ${permissionLabel}.</p>
         <section class="n44-preference card card--pad" aria-labelledby="n44-lesson-heading">
           <div class="n44-preference-heading">
             <h2 id="n44-lesson-heading">تذكيرات الحصص</h2>
@@ -149,16 +155,43 @@ const view = {
                 aria-checked="${String(timing.dueDays.includes(day))}" data-fk="n44-day-${day}">${dayLabels[day]}</button>`)}
             </div>
           </div>` : ''}
-        </section>` : html`<p class="t-3" role="status">تتوفر إعدادات الإشعارات عند فتح مساحة حسابك.</p>`}
+        </section>
+        <section class="n44-preference card card--pad" aria-labelledby="n44-quiet-heading">
+          <h2 id="n44-quiet-heading">وقت الهدوء</h2>
+          <button type="button" class="btn btn--quiet" role="switch" aria-checked="${String(!!quiet)}" data-act="notification-push-quiet" data-scope="${scope}" ${!push?.available ? 'disabled' : ''}>من 10 مساءً إلى 7 صباحًا</button>
+          ${!push?.available ? html`<p>يمكن تعديل وقت الهدوء عند توفر تذكيرات الجهاز.</p>` : ''}
+        </section>
+        <p class="n44-settings-saved" role="status">تُحفظ تفضيلاتك على هذا الجهاز تلقائيًا.</p>
+        ${ui?.verification && ['unknown', 'rejected', 'pending'].includes(ui.verification.status) ? html`<p role="status">${verificationText[ui.verification.status]}</p>` : ''}
+        ${ui?.sourceStatus && ['unknown', 'rejected', 'pending'].includes(ui.sourceStatus.status) ? html`<p role="status">${verificationText[ui.sourceStatus.status]}</p>` : ''}
+        <details class="n44-support card card--pad" data-n44-support ${supportOpen ? 'open' : ''}>
+          <summary data-fk="n44-support">الدعم الفني</summary>
+          <div class="n44-support-content">
+        <details class="n44-preference card card--pad" data-n44-current-identity style="overflow-wrap:anywhere">
+          <summary>هوية الحساب والجهاز الحالي</summary>
+          <p>سياق الحساب المحلي الحالي. لا يثبت موافقة الخدمة أو تفعيل التذكيرات أو وصولها.</p>
+          <dl><dt>الحساب</dt><dd dir="ltr">${context.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${context.workspaceId}</dd><dt>الجهاز</dt><dd dir="ltr">${context.deviceId}</dd></dl>
+        </details>
+        ${push?.configOutcome ? html`<details class="n44-preference card card--pad" data-n44-config-outcome style="overflow-wrap:anywhere">
+          <summary>نتيجة التحقق من إعداد تذكيرات الجهاز</summary>
+          <dl><dt>HTTP</dt><dd dir="ltr">${Number.isInteger(push.configOutcome.httpStatus) && push.configOutcome.httpStatus >= 100 && push.configOutcome.httpStatus <= 599 ? push.configOutcome.httpStatus : 'UNKNOWN'}</dd>
+          <dt>المرحلة</dt><dd dir="ltr">${['request', 'transport', 'http', 'response_read', 'response_size', 'decode', 'shape', 'context', 'deadline', 'complete'].includes(push.configOutcome.phase) ? push.configOutcome.phase : 'request'}</dd>
+          ${push.configOutcome.servicePhase ? html`<dt>مرحلة الخدمة (وصف عام)</dt><dd dir="ltr" data-n44-config-service-phase>${push.configOutcome.servicePhase}</dd>` : ''}
+          <dt>النتيجة</dt><dd>${configResultText[push.eligibility?.configuration] ?? eligibilityText.idle}</dd></dl>
+        </details>` : ''}
+            ${normalEvidence(ui, scope)}
+          </div>
+        </details>` : html`<p class="t-3" role="status">تتوفر إعدادات الإشعارات عند فتح مساحة حسابك.</p>`}
       </div>
     </div>`;
   },
   onMount(root) {
     cleanup();
+    mountedRoot = root;
     const previousTitle = document.title;
     document.title = 'الإشعارات — رَكيز المعلم';
     // Discard private DOM synchronously before a workspace/identity can change.
-    const clear = () => root.querySelector('.n44-settings')?.replaceChildren();
+    const clear = () => { supportScope = null; root.querySelector('.n44-settings')?.replaceChildren(); };
     const validate = () => {
       const mounted = root.querySelector('[data-notification-scope]');
       if (mounted && (mounted.dataset.notificationScope !== notificationScope(currentNotificationContext(store, cloud)) ||
@@ -170,7 +203,7 @@ const view = {
     addEventListener('storage', validate);
     cleanup = () => { document.title = previousTitle; removeWorkspace(); removeAuth(); removeStore(); removeEventListener('storage', validate); };
   },
-  onUnmount() { cleanup(); cleanup = () => {}; },
+  onUnmount() { cleanup(); cleanup = () => {}; mountedRoot = null; supportScope = null; },
   actions: {
     async 'notification-verify'(el) {
       if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;

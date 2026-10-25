@@ -1,0 +1,102 @@
+{
+  "taskId": "continuous-n44-user-settings-simplification-20261026",
+  "runId": "5bfa6d74-f0cf-4c82-b46e-549faef46dd1",
+  "checks": [
+    {
+      "name": "n44_settings_default_user_hierarchy_and_support_disclosure",
+      "status": "PASS",
+      "evidence": "Actual account UI: one closed bottom Support, no visible IDs/HTTP; 30 deleted sources grouped closed; keyboard open/close persists only explicit same-context choice; zero automatic source/verification calls."
+    },
+    {
+      "name": "n44_settings_cleanup_and_owner_context_fences",
+      "status": "PASS",
+      "evidence": "Disabled/unsupported states show no activation; cleanupPending invokes existing Stop despite unavailable activation; manual source/cleanup/authorization selectors retained; real store timing/category/focus preserved; deactivation synchronously clears private DOM and stale actions are owner-guarded; new owner Support closed."
+    },
+    {
+      "name": "n44_settings_actual_responsive_keyboard_no_extra_requests",
+      "status": "PASS",
+      "evidence": "Actual HTTP application/CSS: 320/390/1280 in light/dark plus expanded Support at 320 dark, RTL/no overflow, visible controls >=44px; keyboard disclosure/category and focus preserved; no additional service requests, source reads or verification without explicit action. Screenshots saved for inspection."
+    }
+  ],
+  "layouts": [
+    {
+      "width": 320,
+      "scheme": "light",
+      "label": "default",
+      "overflow": false,
+      "bad": [],
+      "direction": "rtl",
+      "text": "rgb(21, 37, 61)",
+      "background": "rgb(255, 255, 255)",
+      "contrastViolations": 0
+    },
+    {
+      "width": 390,
+      "scheme": "light",
+      "label": "default",
+      "overflow": false,
+      "bad": [],
+      "direction": "rtl",
+      "text": "rgb(21, 37, 61)",
+      "background": "rgb(255, 255, 255)",
+      "contrastViolations": 0
+    },
+    {
+      "width": 1280,
+      "scheme": "light",
+      "label": "default",
+      "overflow": false,
+      "bad": [],
+      "direction": "rtl",
+      "text": "rgb(21, 37, 61)",
+      "background": "rgb(255, 255, 255)",
+      "contrastViolations": 0
+    },
+    {
+      "width": 320,
+      "scheme": "dark",
+      "label": "default",
+      "overflow": false,
+      "bad": [],
+      "direction": "rtl",
+      "text": "rgb(238, 241, 245)",
+      "background": "rgb(20, 32, 26)",
+      "contrastViolations": 0
+    },
+    {
+      "width": 390,
+      "scheme": "dark",
+      "label": "default",
+      "overflow": false,
+      "bad": [],
+      "direction": "rtl",
+      "text": "rgb(238, 241, 245)",
+      "background": "rgb(20, 32, 26)",
+      "contrastViolations": 0
+    },
+    {
+      "width": 1280,
+      "scheme": "dark",
+      "label": "default",
+      "overflow": false,
+      "bad": [],
+      "direction": "rtl",
+      "text": "rgb(238, 241, 245)",
+      "background": "rgb(20, 32, 26)",
+      "contrastViolations": 0
+    },
+    {
+      "width": 320,
+      "scheme": "dark",
+      "label": "support",
+      "overflow": false,
+      "bad": [],
+      "direction": "rtl",
+      "text": "rgb(238, 241, 245)",
+      "background": "rgb(20, 32, 26)",
+      "contrastViolations": 0
+    }
+  ],
+  "serviceRequests": 0,
+  "syntheticOnly": true
+}
