@@ -29,6 +29,7 @@ const ROUTES = [
   { path: '/reports/certificates',       load: () => import('./views/certificates.js') },
   { path: '/reports/grades',            load: () => import('./views/cross-class-reports.js') },
   { path: '/reports/followup',          load: () => import('./views/cross-class-reports.js') },
+  { path: '/reports/attendance-evidence', load: () => import('./views/attendance-evidence.js') },
   { path: '/reports/execution',         load: () => import('./views/execution-report.js') },
   { path: '/archive',                  load: () => import('./views/archive.js') },
   { path: '/archive/former-students',   load: () => import('./views/former-students.js') },

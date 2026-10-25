@@ -68,6 +68,14 @@ export default {
               <span class="row__chev">${icon('chev')}</span>
             </a>
           </section>
+          <section class="surface surface--flat report-hub" aria-labelledby="attendance-evidence-title">
+            <a class="report-destination" data-act="attendance-evidence" href="#/reports/attendance-evidence">
+              <span class="report-destination__icon" aria-hidden="true">${icon('attendance')}</span>
+              <span class="row__main"><span class="row__title" id="attendance-evidence-title">شاهد متابعة الحضور</span>
+                <span class="row__sub">شاهد تلقائي من سجلات الحضور المحفوظة، مع معاينة A4 وخيار الطباعة أو PDF.</span></span>
+              <span class="row__chev">${icon('chev')}</span>
+            </a>
+          </section>
           <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
             <div class="report-hub__head">
               <div>

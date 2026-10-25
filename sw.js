@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v87';
+const VERSION = 'rakeezx-v88';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -54,6 +54,7 @@ const SHELL = [
   './src/styles/calendar-work-0417.css',
   './src/styles/rakeez-datetime.css',
   './src/styles/work-n70.css',
+  './src/styles/attendance-evidence.css',
   './src/styles/work-n82.css',
 
   './src/vendor/flatpickr/flatpickr.min.css',
@@ -171,6 +172,7 @@ const SHELL = [
   './src/lib/build-meta.js',
   './src/lib/cloud-recovery-ui.js',
   './src/lib/report-print.js',
+  './src/lib/attendance-evidence.js',
   './src/lib/thmanyah-font.js',
   './src/lib/thmanyah-payload.js',
   './src/lib/schedule-export.js',
@@ -210,6 +212,7 @@ const SHELL = [
   './src/views/reports-index.js',
   './src/views/certificates.js',
   './src/views/cross-class-reports.js',
+  './src/views/attendance-evidence.js',
   './src/views/execution-report.js',
   './src/views/archive.js',
   './src/views/archive-detail.js',
