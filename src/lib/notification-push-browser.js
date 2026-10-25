@@ -42,6 +42,16 @@ export function createPushBrowser({ window: win = globalThis.window, publicKey, 
       const result = await message({ type: 'n44-consent-bind', binding: receipt.registrationId, expiresAt: receipt.expiresAt });
       return result?.ok === true;
     },
+    async deviceOutcome(binding) {
+      if(typeof binding!=='string'||!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(binding))return null;
+      try{
+        const url=new URL((await registration())?.active?.scriptURL);
+        if(url.origin!==win.location.origin||url.pathname!=='/sw.js')return null;
+        const r=await message({type:'n44-device-outcome',binding});
+        if(r?.ok!==true||!['received','display-requested','display-accepted','display-failed','unknown'].includes(r.stage)||!(r.minute===null||Number.isSafeInteger(r.minute)&&r.minute>=0)||![true,false,null].includes(r.present))return null;
+        return {stage:r.stage,minute:r.minute,present:r.present};
+      }catch{return null;}
+    },
     consent: () => message({ type: 'n44-consent-status' }),
     async clearConsent(binding) {
       const result = await message({ type: 'n44-consent-clear', binding: binding ?? null });

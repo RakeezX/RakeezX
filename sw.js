@@ -399,6 +399,7 @@ self.addEventListener('fetch', (event) => {
 const N44_PUSH_ENABLED = true;
 const N44_CONSENT_CACHE = 'rakeezx-n44-consent-v1';
 const N44_CONSENT_KEY = '/__n44_device_consent';
+const n44OutcomeStages = ['received','display-requested','display-accepted','display-failed','unknown'];
 let n44Epoch = 0, n44Writes = Promise.resolve();
 const n44Uuid = s => typeof s === 'string' && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(s);
 const n44AppClient = client => {
@@ -426,12 +427,14 @@ function n44Envelope(raw) {
   const event = n44Payload(raw.event);
   return event ? { v: 1, binding: raw.binding, expiresAt: raw.expiresAt, event } : null;
 }
-async function n44Read() {
+async function n44Read(clearExpired=false) {
   try {
     const response = await (await caches.open(N44_CONSENT_CACHE)).match(N44_CONSENT_KEY);
     const raw = response && await response.text(); if (!raw || raw.length > 40000) return null;
     const value = JSON.parse(raw);
-    if (Object.keys(value).sort().join(',') !== 'binding,expiresAt,seen' || !n44Uuid(value.binding) || !Number.isSafeInteger(value.expiresAt) ||
+    if(clearExpired&&Number.isSafeInteger(value?.expiresAt)&&value.expiresAt<=Date.now()){await n44Write(null);await n44Close();return null;}
+    if (!['binding,expiresAt,seen','binding,expiresAt,outcome,seen'].includes(Object.keys(value).sort().join(',')) ||
+      value.outcome && (Object.keys(value.outcome).sort().join(',')!=='minute,stage' || !n44OutcomeStages.includes(value.outcome.stage) || !Number.isSafeInteger(value.outcome.minute) || value.outcome.minute<0) || !n44Uuid(value.binding) || !Number.isSafeInteger(value.expiresAt) ||
       value.expiresAt <= Date.now() || value.expiresAt > Date.now()+2592000000 || !Array.isArray(value.seen) || value.seen.length > 100 ||
       value.seen.some(e => Object.keys(e).sort().join(',') !== 'expiresAt,id' || typeof e.id !== 'string' || !/^[a-zA-Z0-9_:%.-]{1,240}$/.test(e.id) || !Number.isSafeInteger(e.expiresAt))) return null;
     return value;
@@ -446,24 +449,31 @@ async function n44Close() {
 self.addEventListener('message', event => {
   if (!n44AppClient(event.source) || !event.ports?.[0]) return;
   const data = event.data, port = event.ports[0];
-  if (!['n44-consent-status','n44-consent-bind','n44-consent-clear'].includes(data?.type)) return;
-  const epoch = data.type === 'n44-consent-status' ? n44Epoch : ++n44Epoch;
+  if (!['n44-consent-status','n44-consent-bind','n44-consent-clear','n44-device-outcome'].includes(data?.type)) return;
+  const epoch = ['n44-consent-status','n44-device-outcome'].includes(data.type) ? n44Epoch : ++n44Epoch;
   const work = async () => {
     let ok = false, answered = false;
     try {
+      if (data.type === 'n44-device-outcome') {
+        const current=await n44Read(true);
+        if(Object.keys(data).sort().join(',')!=='binding,type'||!n44Uuid(data.binding)||current?.binding!==data.binding||!event.source.id||!(await n44Clients()).some(c=>c.id===event.source.id))return;
+        let present=null;try{present=(await self.registration.getNotifications()).some(n=>String(n.tag).startsWith('n44:'+current.binding+':'));}catch{}
+        if(epoch!==n44Epoch)return;
+        answered=true;port.postMessage({ok:true,stage:current.outcome?.stage??'unknown',minute:current.outcome?.minute??null,present});return;
+      }
       if (data.type === 'n44-consent-status') {
-        const current = await n44Read();answered=true;port.postMessage({ok:true,enabled:N44_PUSH_ENABLED,binding:current?.binding??null,expiresAt:current?.expiresAt??0});return;
+        const current = await n44Read(true);answered=true;port.postMessage({ok:true,enabled:N44_PUSH_ENABLED,binding:current?.binding??null,expiresAt:current?.expiresAt??0});return;
       }
       if (epoch !== n44Epoch) return;
       if (data.type === 'n44-consent-clear' && Object.keys(data).sort().join(',') === 'binding,type' && (data.binding === null || n44Uuid(data.binding))) {
-        const current = await n44Read();
+        const current = await n44Read(true);
         if (!current || data.binding === null || current.binding === data.binding) { await n44Write(null); await n44Close(); }
         ok = true;
       } else if (N44_PUSH_ENABLED && data.type === 'n44-consent-bind' && Object.keys(data).sort().join(',') === 'binding,expiresAt,type' && n44Uuid(data.binding) &&
         Number.isSafeInteger(data.expiresAt) && data.expiresAt > Date.now() && data.expiresAt <= Date.now()+2592000000) {
-        const previous = await n44Read();
+        const previous = await n44Read(true);
         if (epoch !== n44Epoch) return;
-        await n44Write({binding:data.binding,expiresAt:data.expiresAt,seen:previous?.binding===data.binding?previous.seen:[]});
+        await n44Write({binding:data.binding,expiresAt:data.expiresAt,seen:previous?.binding===data.binding?previous.seen:[],...(previous?.binding===data.binding&&previous.outcome?{outcome:previous.outcome}:{})});
         ok = epoch === n44Epoch;
         if (!ok) await n44Write(null);
       }
@@ -490,17 +500,33 @@ self.addEventListener('push', event => {
     const epoch = n44Epoch;
     // Serialize durable dedupe with consent mutations, including SW restarts.
     const work = async () => {
-      const state = await n44Read();
+      const state = await n44Read(true);
       if (epoch!==n44Epoch || !state || state.binding!==envelope.binding || envelope.expiresAt>state.expiresAt) return;
       state.seen=state.seen.filter(e=>e.expiresAt>Date.now());
       if (state.seen.some(e=>e.id===envelope.event.id) || state.seen.length>=100) return;
       state.seen.push({id:envelope.event.id,expiresAt:Math.min(envelope.event.expiresAt,envelope.expiresAt)});
-      await n44Write(state);
+      const outcome=stage=>{state.outcome={stage,minute:Math.floor(Date.now()/60000)};};
+      outcome('received');await n44Write(state);
       if (epoch!==n44Epoch || !n44Envelope(envelope)) return;
-      await self.registration.showNotification('\u0631\u064e\u0643\u064a\u0632 \u0627\u0644\u0645\u0639\u0644\u0645',{
+      let display;
+      try { const requested=Promise.resolve(self.registration.showNotification('\u0631\u064e\u0643\u064a\u0632 \u0627\u0644\u0645\u0639\u0644\u0645',{
         body:'\u0644\u062f\u064a\u0643 \u062a\u0630\u0643\u064a\u0631 \u062c\u062f\u064a\u062f. \u0627\u0641\u062a\u062d \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0644\u0639\u0631\u0636\u0647.',
         tag:'n44:'+envelope.binding+':'+envelope.event.id,data:envelope,icon:'/assets/icon-192.png',renotify:false,
-      });
+      })).then(()=>({accepted:true}),error=>({accepted:false,error}));
+        outcome('display-requested');
+        try{await n44Write(state);}catch{/* Request was made; durable received reservation remains. */}
+        display=await requested;
+      }catch(error){display={accepted:false,error};}
+      if(display.accepted)outcome('display-accepted');
+      else { const error=display.error;
+        // Only explicit API rejection proves no display. Generic/unknown failures
+        // retain the durable seen reservation, including across SW restart.
+        const known=error instanceof TypeError || typeof DOMException!=='undefined'&&error instanceof DOMException&&error.name==='NotAllowedError';
+        if(known)state.seen=state.seen.filter(e=>e.id!==envelope.event.id);
+        outcome(known?'display-failed':'unknown');
+      }
+      if(epoch!==n44Epoch){await n44Close();return;}
+      try{await n44Write(state);}catch{/* Durable pre-display reservation stays UNKNOWN. */}
       if (epoch!==n44Epoch) await n44Close();
     };
     n44Writes=n44Writes.catch(()=>{}).then(work);await n44Writes;

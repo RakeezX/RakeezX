@@ -11,6 +11,7 @@ import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificat
 let cleanup = () => {};
 let mountedRoot = null;
 let supportScope = null;
+let outcomeView = null, outcomeEpoch = 0;
 const dayLabels = { 3: 'قبل 3 أيام', 2: 'قبل يومين', 1: 'قبل يوم', 0: 'يوم التسليم' };
 const eligibilityText = {
   "idle": "تذكيرات الجهاز غير جاهزة حاليًا.",
@@ -42,6 +43,34 @@ const configResultText = {
   invalid: eligibilityText.configuration_invalid,
   request_failed: eligibilityText.request_unavailable,
 };
+const deviceOutcomeText = {
+  received: 'استُقبلت رسالة التذكير في المتصفح.',
+  'display-requested': 'طُلب عرض إشعار على الجهاز.',
+  'display-accepted': 'قبل المتصفح طلب عرض الإشعار.',
+  'display-failed': 'رفض المتصفح طلب عرض الإشعار.',
+  unknown: 'نتيجة العرض غير معروفة.',
+};
+const viewContext = () => ({scope:notificationScope(currentNotificationContext(store,cloud)),workspace:store.getActiveWorkspace(),session:cloud.session,runtime:getPushRuntime()});
+const sameOutcomeContext = value => {
+  const current=viewContext();
+  return current.scope!=null&&value?.scope===current.scope&&value.workspace===current.workspace&&value.session===current.session&&value.runtime===current.runtime;
+};
+const finiteOutcome = value => value&&Object.hasOwn(deviceOutcomeText,value.stage)&&
+  (value.minute===null||Number.isSafeInteger(value.minute)&&value.minute>=0&&value.minute*60000<=Date.now()+60000)&&[true,false,null].includes(value.present)
+  ? {stage:value.stage,minute:value.minute,present:value.present}:null;
+function deviceOutcomeSection(push,scope) {
+  const value=outcomeView?.value;
+  return html`<section class="n44-preference card card--pad" aria-label="نتيجة استقبال الجهاز">
+    <h2>نتيجة استقبال الجهاز</h2>
+    <p>هذه نتيجة من المتصفح؛ لا تثبت ظهور إشعار مرئي على شاشة Windows.</p>
+    ${push?.deviceOutcomeAvailable ? html`<button type="button" class="btn btn--quiet" data-act="notification-device-outcome" data-scope="${scope}" ${outcomeView?.pending?'disabled':''}>قراءة نتيجة استقبال الجهاز</button>`:html`<p>لا تتوفر نتيجة استقبال مرتبطة بهذا الحساب والجهاز.</p>`}
+    ${outcomeView ? html`<div role="status" data-n44-device-outcome>
+      <p>${outcomeView.pending?'جارٍ قراءة النتيجة من المتصفح…':value?deviceOutcomeText[value.stage]:'نتيجة استقبال الجهاز غير متاحة أو غير معروفة.'}</p>
+      ${value?html`<p>${value.minute===null?'وقت الاستقبال غير معروف.':html`وقت النتيجة التقريبي: ${new Date(value.minute*60000).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}`}</p>
+        <p>${value.present===true?'يوجد إشعار مسجّل في المتصفح.':value.present===false?'لا يظهر إشعار مسجّل في المتصفح الآن.':'تعذر تحديد وجود إشعار مسجّل في المتصفح.'}</p>`:''}
+    </div>`:''}
+  </section>`;
+}
 function normalEvidence(ui, scope) {
   if (!ui) return '';
   return html`<section class="n44-preference card card--pad" aria-label="التحقق من التذكيرات">
@@ -94,6 +123,7 @@ const view = {
   render() {
     const context = currentNotificationContext(store, cloud);
     const scope = notificationScope(context);
+    if(outcomeView&&(!sameOutcomeContext(outcomeView.context)||!getPushRuntime()?.snapshot().deviceOutcomeAvailable)){outcomeView=null;++outcomeEpoch;}
     // Preserve an explicit disclosure choice only while the mounted context matches.
     const supportOpen = scope != null && supportScope === scope &&
       mountedRoot?.querySelector('[data-n44-support]')?.open === true;
@@ -167,6 +197,7 @@ const view = {
         <details class="n44-support card card--pad" data-n44-support ${supportOpen ? 'open' : ''}>
           <summary data-fk="n44-support">الدعم الفني</summary>
           <div class="n44-support-content">
+            ${deviceOutcomeSection(push,scope)}
         <details class="n44-preference card card--pad" data-n44-current-identity style="overflow-wrap:anywhere">
           <summary>هوية الحساب والجهاز الحالي</summary>
           <p>سياق الحساب المحلي الحالي. لا يثبت موافقة الخدمة أو تفعيل التذكيرات أو وصولها.</p>
@@ -191,8 +222,10 @@ const view = {
     const previousTitle = document.title;
     document.title = 'الإشعارات — رَكيز المعلم';
     // Discard private DOM synchronously before a workspace/identity can change.
-    const clear = () => { supportScope = null; root.querySelector('.n44-settings')?.replaceChildren(); };
+    const clearOutcome = () => {outcomeView=null;++outcomeEpoch;root.querySelector('[data-n44-device-outcome]')?.remove();};
+    const clear = () => { clearOutcome(); supportScope = null; root.querySelector('.n44-settings')?.replaceChildren(); };
     const validate = () => {
+      clearOutcome();
       const mounted = root.querySelector('[data-notification-scope]');
       if (mounted && (mounted.dataset.notificationScope !== notificationScope(currentNotificationContext(store, cloud)) ||
           mounted.querySelector('[data-n44-config-outcome]') && !getPushRuntime()?.snapshot().configOutcome)) clear();
@@ -203,8 +236,16 @@ const view = {
     addEventListener('storage', validate);
     cleanup = () => { document.title = previousTitle; removeWorkspace(); removeAuth(); removeStore(); removeEventListener('storage', validate); };
   },
-  onUnmount() { cleanup(); cleanup = () => {}; mountedRoot = null; supportScope = null; },
+  onUnmount() { cleanup(); cleanup = () => {}; mountedRoot = null; supportScope = null; outcomeView=null;++outcomeEpoch; },
   actions: {
+    async 'notification-device-outcome'(el) {
+      const context=viewContext(),runtime=context.runtime;
+      if(el.dataset.scope!==context.scope||!el.closest('[data-n44-support]')?.open||!runtime?.snapshot().deviceOutcomeAvailable)return;
+      const epoch=++outcomeEpoch;outcomeView={context,pending:true};repaint();
+      let value=null;try{value=await runtime.deviceOutcome();}catch{}
+      if(epoch!==outcomeEpoch||!sameOutcomeContext(context)||!runtime.snapshot().deviceOutcomeAvailable)return;
+      outcomeView={context,pending:false,value:finiteOutcome(value)};repaint();
+    },
     async 'notification-verify'(el) {
       if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;
       await getPushRuntime()?.verifyReminder(el.dataset.choice); repaint();
@@ -219,6 +260,7 @@ const view = {
       if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;
       const runtime = getPushRuntime();
       if (!runtime?.snapshot().available && !runtime?.snapshot().cleanupAvailable) return;
+      outcomeView=null;++outcomeEpoch;mountedRoot?.querySelector('[data-n44-device-outcome]')?.remove();
       const result = await (['subscribed', 'cleanup_pending'].includes(runtime.snapshot().status) ? runtime.disable() : runtime.optIn());
       if (!['subscribed', 'revoked'].includes(result?.status)) toast(result?.status === 'cleanup_pending' ? 'لم يكتمل إيقاف تذكيرات الجهاز. أعد المحاولة.' : 'تعذر تفعيل تذكيرات الجهاز', 'warn');
       repaint();

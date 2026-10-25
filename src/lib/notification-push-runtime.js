@@ -224,6 +224,18 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     }
   }
   const usable = () => gateway?.expiresAt() > Date.now() && ready && matches(binding) && browser.permission() === 'granted' && status === 'subscribed';
+  const outcomeBinding = () => {
+    if(disposed||disabling)return null;
+    if(usable())return {binding,gateway,registration:gateway.registration(),pending:null};
+    const p=pendingDisable,b=p?.binding,g=p?.gateway,r=g?.registration();
+    if(!p?.cleanupOnly||status!=='cleanup_pending'||!ownsCleanup(b)||!bindingChecks(b).consentMatches||b.serverConsent!==true||!r||!(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/).test(r.registrationId??'')||!Number.isSafeInteger(r.expiresAt)||r.expiresAt<=Date.now())return null;
+    try{
+      const saved=JSON.parse(storage.getItem('rakeezx-n44-registration:'+JSON.stringify([b.context.ownerId,b.context.workspaceId,b.context.deviceId]))||'null');
+      if(saved?.retired||saved?.registrationId!==r.registrationId||saved?.workspaceId!==b.context.workspaceId||saved?.deviceId!==b.context.deviceId)return null;
+    }catch{return null;}
+    return {binding:b,gateway:g,registration:r,pending:p};
+  };
+
   // AI N44: bootstrap and adopted canonical state are distinct from a pushed ACK.
   // Only confirmed IDs are hints; no local event payload becomes server truth.
   function projectConfirmed(checkpoint) {
@@ -358,7 +370,13 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
         canVerify: usable() };
     },
-    snapshot: () => ({ available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
+    async deviceOutcome() {
+      const before=outcomeBinding();if(!before?.registration)return null;
+      const epoch=generation,id=before.registration.registrationId;
+      const outcome=await browser.deviceOutcome(id),after=outcomeBinding();
+      return epoch===generation&&after?.binding===before.binding&&after.gateway===before.gateway&&after.pending===before.pending&&after.registration?.registrationId===id&&after.registration?.expiresAt===before.registration.expiresAt?outcome:null;
+    },
+    snapshot: () => ({ deviceOutcomeAvailable: !!outcomeBinding(), available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
     async optIn() {
       if (!ready || !matches(binding)) return { status: 'unavailable' };
       const c = client, result = await c.optIn();
