@@ -6,6 +6,7 @@ import { MINISTRY_LOGO_URL } from '../lib/ministry-brand.js';
 import { printReport } from '../lib/report-print.js';
 import { PORTFOLIO_CRITERIA, portfolioYearEvidence, portfolioDesignSummary } from '../lib/portfolio-design-preview.js';
 import { buildPortfolioEvidenceSuggestions, guideForCriterion } from '../lib/portfolio-smart-evidence.js';
+import { F09_EVIDENCE_TEMPLATES, templatesForCriterion } from '../lib/portfolio-evidence-templates.js';
 
 const styleUrl = new URL('../styles/portfolio-design-preview.css', import.meta.url).href;
 function loadStyle() {
@@ -23,7 +24,7 @@ let editingCriterion = '09';
 let selectedSuggestionId = null;
 const photoLayouts = new Map();
 const photoGroups = new Map();
-const confirmedSuggestions = new Set();
+const selectedByCriterion = new Map();
 const descriptions = new Map();
 const titles = new Map();
 const layoutFor = key => photoLayouts.get(key) ?? 'two';
@@ -53,20 +54,22 @@ function context() {
     assignments:store.state.assignments ?? [],
     submissions:store.state.submissions ?? [],
   });
-  const candidates = sources.filter(proposal=>proposal.criterion===editingCriterion);
+  const recorded = sources.filter(candidate=>candidate.criterion===editingCriterion);
+  const templates = templatesForCriterion(editingCriterion);
+  const candidates = [...recorded,...templates];
   const manualId='manual:'+editingCriterion;
-  const manualSelected=selectedSuggestionId===manualId;
-  const proposal=manualSelected?null:(candidates.find(s=>s.id===selectedSuggestionId)||candidates[0]||null);
-  if(proposal && selectedSuggestionId!==proposal.id) selectedSuggestionId=proposal.id;
-  if(!proposal && !manualSelected)selectedSuggestionId=manualId;
-  const photoKey=proposal?.id ?? 'manual:'+editingCriterion;
+  const lastChoice=selectedByCriterion.get(editingCriterion);
+  const chosenId=selectedSuggestionId ?? lastChoice ?? candidates[0]?.id ?? manualId;
+  const proposal=chosenId===manualId?null:(candidates.find(s=>s.id===chosenId)||candidates[0]||null);
+  selectedSuggestionId=proposal?.id ?? manualId;
+  selectedByCriterion.set(editingCriterion,selectedSuggestionId);
+  const photoKey=proposal?.id ?? manualId;
   const guide=guideForCriterion(editingCriterion);
-  const pendingSourceReview=!!proposal?.requiresReview && !confirmedSuggestions.has(photoKey);
   const summaryBase = portfolioDesignSummary(evidence);
   const summary = {...summaryBase,criteria:summaryBase.criteria.map(c=>({...c,
     page:c.number===editingCriterion && (proposal||photosFor(photoKey).length) ? '4':'—'}))};
   const criterion = PORTFOLIO_CRITERIA.find(c => c.number === editingCriterion) ?? PORTFOLIO_CRITERIA[8];
-  const canPrint=(!pendingSourceReview && !!proposal) || (!proposal && photosFor(photoKey).length>0);
+  const canPrint=!!proposal || photosFor(photoKey).length>0 || !!descriptions.get(photoKey)?.trim();
   const title=titles.get(photoKey)??proposal?.title??guide?.evidence??criterion.title;
   const profile = store.state.profile ?? {};
   const person = {
@@ -76,7 +79,7 @@ function context() {
   };
   return {year,terms,evidence,summary,person,criterion,guide,proposal,candidates,sources,photoKey,
     photos:photosFor(photoKey),photoLayout:layoutFor(photoKey),
-    description:descriptions.get(photoKey)??proposal?.description??'',title,pendingSourceReview,canPrint};
+    description:descriptions.get(photoKey)??proposal?.description??'',title,canPrint};
 }
 
 const ministry = (className='')=>html`<img class="folio-ministry ${className}" data-report-ministry src="${MINISTRY_LOGO_URL}" width="866" height="659" alt="وزارة التعليم" loading="eager" decoding="async">`;
@@ -173,6 +176,24 @@ function coverage(ctx) {
   </section>`;
 }
 
+function witnessImageTools(ctx) {
+  return html`<div class="folio-evidence__media-tools noprint" role="group" aria-label="صور الشاهد المحدد">
+    <label class="folio-evidence__upload">
+      <span>+ إضافة صور للشاهد</span>
+      <input type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="photo" aria-label="إضافة صور للشاهد" />
+    </label>
+    <label class="folio-evidence__layout">
+      <span>توزيع الصور</span>
+      <select class="select" data-change="layout" aria-label="توزيع الصور">
+        <option value="one" ${ctx.photoLayout==='one'?'selected':''}>صورة في الصف</option>
+        <option value="two" ${ctx.photoLayout==='two'?'selected':''}>صورتان في الصف</option>
+        <option value="three" ${ctx.photoLayout==='three'?'selected':''}>ثلاث صور في الصف</option>
+      </select>
+    </label>
+    ${ctx.photos.length?html`<button class="btn btn--ghost" data-act="clear-photo">حذف جميع الصور</button>`:''}
+  </div>`;
+}
+
 function evidencePage(ctx) {
   const {evidence,year,criterion,photos,photoLayout,proposal} = ctx;
   const isAttendance = proposal?.id === 'rakeez:attendance:'+year?.id;
@@ -193,8 +214,16 @@ function evidencePage(ctx) {
     ${pageLabel('شاهد مهني', '04')}
     <div class="folio-interior__headline folio-interior__headline--compact">
       <span class="folio-interior__eyebrow">${criterion.number} · ${criterion.title}</span>
-      <h2>${ctx.title}</h2>
-      ${ctx.description?html`<p>${ctx.description}</p>`:''}
+      <div class="folio-evidence__inline-edit noprint">
+        <input class="folio-evidence__title-edit" data-change="suggestion-title" value="${ctx.title}"
+          maxlength="100" aria-label="عنوان الشاهد" />
+        <textarea class="folio-evidence__description-edit" data-change="suggestion-description"
+          aria-label="وصف الشاهد" maxlength="450" rows="2" placeholder="اكتب وصفًا موجزًا للشاهد">${ctx.description}</textarea>
+      </div>
+      <div class="folio-evidence__print-copy">
+        <h2>${ctx.title}</h2>
+        ${ctx.description?html`<p>${ctx.description}</p>`:''}
+      </div>
     </div>
     <div class="folio-evidence__meta">
       <div><small>العام الدراسي</small><strong>${short(year?.label)}</strong></div>
@@ -229,8 +258,19 @@ function evidencePage(ctx) {
         <table class="folio-evidence__table"><thead><tr>${proposal.tableHeaders.map(h=>html`<th>${h}</th>`)}</tr></thead>
           <tbody>${proposal.table.map(row=>html`<tr>${row.map(cell=>html`<td>${cell}</td>`)}</tr>`)}</tbody></table>`:''}
     `:''}
+    ${proposal?.sourceKind==='template' && !photos.length && proposal.visualSteps?.length ? html`
+      <div class="folio-evidence__illustration" role="group" aria-label="مخطط توضيحي للنشاط">
+        <div class="folio-evidence__image-caption"><h3>خطوات النشاط</h3><span>مخطط توضيحي</span></div>
+        <div class="folio-evidence__steps">
+          ${proposal.visualSteps.map((step,i)=>html`<div class="folio-evidence__step">
+            <span class="folio-evidence__step-number">${digits.format(i+1)}</span>
+            <strong>${step}</strong>
+          </div>`)}
+        </div>
+      </div>` : ''}
     <div class="folio-evidence__image-block ${firstPhotos.length ? '' : 'noprint'}">
-      <div class="folio-evidence__image-caption"><h3>شواهد مصوّرة من عمل المعلم</h3><span>${photos.length ? `${digits.format(photos.length)} صور للشاهد` : ''}</span></div>
+      <div class="folio-evidence__image-caption"><h3>صور الشاهد</h3><span>${photos.length ? `${digits.format(photos.length)} صور` : ''}</span></div>
+      ${witnessImageTools(ctx)}
       ${firstPhotos.length ? html`<div class="folio-evidence__gallery folio-evidence__gallery--${photoLayout}" style="--folio-photo-height:${photoHeight}px">
         ${firstPhotos.map((photo, i)=>html`<figure class="folio-evidence__gallery-item">
           <img class="folio-evidence__photo" src="${photo.url}" alt="صورة داعمة رقم ${digits.format(i+1)}" loading="eager" decoding="async" />
@@ -282,51 +322,33 @@ function photoContinuation(ctx) {
 }
 
 function suggestionsPanel(ctx) {
-  const {guide,proposal,candidates,photoKey,title,description} = ctx;
+  const {guide,proposal,candidates} = ctx;
   return html`<section class="folio-suggestion-studio noprint" aria-label="مساعد تجهيز الشواهد">
     <header class="folio-suggestion-studio__head">
-      <div><span>مساعد ركيز للشواهد</span><h2>شواهد يقترحها ركيز من عملك</h2>
-        <p>اقتراحات مستخرجة من السجلات الفعلية للعام الدراسي. اختر المقترح المناسب، وعدّل وصفه أو أضف صورته فقط.</p></div>
-      <strong class="folio-suggestion-studio__count">${digits.format(ctx.sources.length)} اقتراحات في هذا العام</strong>
+      <div><span>مساعد ركيز</span><h2>مكتبة الشواهد الجاهزة</h2>
+        <p>اختر شاهدًا من أعمالك المسجلة أو قالبًا مناسبًا، وعدّله مباشرة داخل صفحة الشاهد.</p></div>
+      <strong class="folio-suggestion-studio__count">${digits.format(candidates.length)} خيارات</strong>
     </header>
     <div class="folio-suggestion-studio__candidates">
       ${candidates.map(item=>html`<button type="button"
         class="folio-suggestion-studio__choice ${proposal?.id===item.id?'is-selected':''}"
         data-act="pick-suggestion" data-id="${item.id}" aria-pressed="${proposal?.id===item.id}">
-          <strong>${item.title}</strong><span>${item.source}</span>
-          <small>${item.requiresReview?'مسجل — يحتاج تأكيد التنفيذ':'جاهز من بيانات ركيز'}</small>
+          <strong>${item.title}</strong>
+          <small>${item.sourceKind==='template'?'قالب قابل للتخصيص':'من بيانات ركيز'}</small>
       </button>`)}
       <button type="button" class="folio-suggestion-studio__choice ${!proposal?'is-selected':''}"
         data-act="manual-suggestion" aria-pressed="${!proposal}">
-        <strong>إضافة شاهد خاص بي</strong><span>صورة أو شهادة أو مستند من عمل المعلم</span>
-        <small>يدخله المعلم بنفسه</small>
+        <strong>شاهد جديد</strong><small>أبدأ بعنوان ووصف وصور خاصة بي</small>
       </button>
     </div>
-    <div class="folio-suggestion-studio__editor">
-      <div class="folio-suggestion-studio__guide">
-        <div><b>ماذا يحتوي هذا المعيار؟</b><p>${guide?.content||''}</p></div>
-        <div><b>ما يأتي من ركيز؟</b><p>${guide?.rakeez||''}</p></div>
-        <div><b>أقل إضافة مطلوبة</b><p>${guide?.minimum||''}</p></div>
+    <details class="folio-suggestion-studio__details">
+      <summary>أمثلة ومصادر داعمة لهذا المعيار</summary>
+      <div class="folio-suggestion-studio__details-body">
+        <p><strong>مكونات الشاهد:</strong> ${guide?.content||''}</p>
+        <p><strong>إضافة مقترحة:</strong> ${proposal?.imageHint||guide?.minimum||''}</p>
+        <p><strong>مصادر لاحقة:</strong> مدرستي (${guide?.madrasati||'غير متاح'})، نور (${guide?.noor||'غير متاح'}).</p>
       </div>
-      <div class="folio-suggestion-studio__fields">
-        <label class="field"><span class="field__label">عنوان الشاهد</span>
-          <input class="input" data-change="suggestion-title" value="${title}" maxlength="100" aria-label="عنوان الشاهد" />
-        </label>
-        <label class="field"><span class="field__label">وصف العمل</span>
-          <textarea class="textarea" data-change="suggestion-description" rows="2"
-            maxlength="450" aria-label="وصف الشاهد">${description}</textarea>
-        </label>
-        ${proposal?.requiresReview?html`<label class="folio-suggestion-studio__review">
-          <input type="checkbox" data-change="confirm-suggestion" ${ctx.pendingSourceReview?'':'checked'} />
-          راجعت بيانات هذا الشاهد وأؤكد صحة ما أضيف إليه
-        </label>`:''}
-        <p class="folio-suggestion-studio__source">${proposal
-          ? 'المصدر: بيانات '+proposal.source+' · '+(proposal.requiresReview?'يلزم تأكيد المعلم قبل تصديره':'مقترح من بيانات مسجلة')
-          : 'يمكنك إضافة صورة ووصف لشاهد لا يوجد له مصدر آلي حاليًا.'}</p>
-        <p class="folio-suggestion-studio__integration">تكامل مدرستي لاحقًا: ${guide?.madrasati||'—'}.
-          تكامل نور لاحقًا: ${guide?.noor||'—'}.</p>
-      </div>
-    </div>
+    </details>
   </section>`;
 }
 
@@ -338,7 +360,7 @@ export default {
   beforeRender() { loadStyle(); editingCriterion = '09'; selectedSuggestionId=null; photoError = ''; },
   onUnmount() {
     for (const group of photoGroups.values()) for (const photo of group) URL.revokeObjectURL(photo.url);
-    photoGroups.clear(); photoLayouts.clear(); confirmedSuggestions.clear(); descriptions.clear(); titles.clear();
+    photoGroups.clear(); photoLayouts.clear(); selectedByCriterion.clear(); descriptions.clear(); titles.clear();
     selectedSuggestionId=null; photoError = '';
   },
   render() {
@@ -359,23 +381,8 @@ export default {
             ${PORTFOLIO_CRITERIA.map(c=>html`<option value="${c.number}" ${c.number===editingCriterion?'selected':''}>${c.number} · ${c.title}</option>`)}
           </select>
         </label>
-        <label class="field folio-toolbar__layout"><span class="field__label">توزيع الصور</span>
-          <select class="select" data-change="layout" aria-label="توزيع الصور">
-            <option value="one" ${ctx.photoLayout==='one'?'selected':''}>صورة في الصف</option>
-            <option value="two" ${ctx.photoLayout==='two'?'selected':''}>صورتان في الصف</option>
-            <option value="three" ${ctx.photoLayout==='three'?'selected':''}>ثلاث صور في الصف</option>
-          </select>
-        </label>
-        <label class="folio-toolbar__upload"><span>إضافة صور للشاهد</span>
-          <input type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="photo" aria-label="إضافة صور للشاهد" />
-        </label>
-        ${ctx.photos.length?html`<button class="btn btn--ghost" data-act="clear-photo">إزالة صور هذا الشاهد</button>`:''}
         <button class="btn btn--primary" data-act="print" ${ctx.canPrint?'':'disabled'}>${icon('print')} طباعة / PDF</button>
-        <p class="folio-toolbar__helper">
-          ${ctx.photos.length ? `${digits.format(ctx.photos.length)} صور للشاهد المختار، يمكن ترتيبها أو حذفها كلٌّ على حدة.` : 'صور خاصة بالشاهد المحدد؛ لا تنتقل إلى شواهد أخرى.'}
-          الصور مؤقتة في المعاينة الحالية؛ الحفظ والمزامنة السحابية ستحتاج تفعيلًا مستقلًا.
-          ${photoError?` · ${photoError}`:''}
-        </p>
+        ${photoError?html`<p class="folio-toolbar__helper" role="status">${photoError}</p>`:''}
       </section>
       ${suggestionsPanel(ctx)}
       <nav class="folio-nav noprint" aria-label="صفحات النموذج">
@@ -390,11 +397,10 @@ export default {
   },
   actions: {
     criterion(el) { editingCriterion = el.value; selectedSuggestionId=null; photoError = ''; repaint(); },
-    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id; repaint(); },
-    'manual-suggestion'() { selectedSuggestionId='manual:'+editingCriterion; repaint(); },
+    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id; selectedByCriterion.set(editingCriterion,selectedSuggestionId); repaint(); },
+    'manual-suggestion'() { selectedSuggestionId='manual:'+editingCriterion;selectedByCriterion.set(editingCriterion,selectedSuggestionId); repaint(); },
     'suggestion-title'(el) { const key=context().photoKey; titles.set(key,el.value.slice(0,100)); repaint(); },
     'suggestion-description'(el) { const key=context().photoKey; descriptions.set(key,el.value.slice(0,450)); repaint(); },
-    'confirm-suggestion'(el) { const key=context().photoKey; if(el.checked)confirmedSuggestions.add(key);else confirmedSuggestions.delete(key);repaint(); },
     layout(el) { photoLayouts.set(context().photoKey, el.value); repaint(); },
     go(el) { document.querySelector(`[data-portfolio-page="${el.dataset.page}"]`)?.scrollIntoView({behavior:'smooth',block:'start'}); },
     photo(el) {
@@ -439,7 +445,7 @@ export default {
     async print(){
       const ctx=context();
       if(!ctx.canPrint) {
-        toast('اختر شاهدًا موثقًا، أو أضف صورة لشاهدك، أو أكد تنفيذ العمل قبل التصدير.', 'warn');
+        toast('اختر شاهدًا جاهزًا أو أضف وصفًا وصورًا لشاهدك.', 'warn');
         return false;
       }
       try {
