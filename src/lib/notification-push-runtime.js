@@ -158,7 +158,19 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const accepted = supportedPushConfiguration(publicConfiguration) === true;
       configObservation = { binding: b, generation: token, outcome: { httpStatus, phase: accepted || publicConfiguration?.status === 'disabled' ? 'complete' : 'shape' } };
       mark(!accepted ? publicConfiguration?.status === 'disabled' ? 'configuration_disabled' : 'configuration_invalid' : 'checking_context', { configuration: accepted ? 'ready' : publicConfiguration?.status === 'disabled' ? 'disabled' : 'invalid' });
-      if (!accepted) throw Error('unavailable');
+      if (!accepted) {
+        // A consumed/target-bound approval cannot grant another registration.
+        // Existing owner cleanup uses its normal server context/CAS, not preview.
+        const cleanupHint = consentRevision(b.context) || storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, b.context.deviceId]));
+        if (publicConfiguration?.status === 'disabled' && typeof cleanupHint === 'string' && cleanupHint.length > 0 && cleanupHint.length <= 8192) {
+          const observed = await g.read();
+          if (valid() && observed.status === 'current' && observed.context?.pushConsent === true) {
+            pendingDisable = { gateway: g, binding: b, preferences: preferences(), cleanupOnly: true };
+            status = 'cleanup_pending'; mark('cleanup_pending'); return;
+          }
+        }
+        throw Error('unavailable');
+      }
       if (!valid()) { mark('binding_changed'); throw Error('unavailable'); }
       b.serviceExpiresAt = publicConfiguration.expiresAt;
       browser = createPushBrowser({ window: win, publicKey: publicConfiguration.publicKey, navigate });
@@ -370,6 +382,11 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
           if (!ownsCleanup(stop.binding)) return { status: 'unavailable' };
           if (!await stop.gateway.retire() || (await drain()).status !== 'revoked') return { status: 'cleanup_pending' };
           if (!ownsCleanup(stop.binding)) return { status: 'unavailable' };
+          if (stop.cleanupOnly) {
+            if (!await stop.gateway.remove()) return { status: 'cleanup_pending' };
+            const existing = await browser.existing();
+            if (!ownsCleanup(stop.binding) || existing && !await existing.unsubscribe()) return { status: 'cleanup_pending' };
+          }
           const selectedPreferences = stop.preferences;
           await stop.gateway.update(false, { cleanup: true, selectedPreferences });
           if (!ownsCleanup(stop.binding)) return { status: 'unavailable' };
