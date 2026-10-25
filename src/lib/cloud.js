@@ -1642,13 +1642,16 @@ export async function fetchRecords(tableName) {
 }
 
 /** Exact owner-bound status read for an already issued source cleanup. No replay. */
-export async function readRetiredScoreSourceCleanup({parentId,deviceId,cleanupStamp,cleanupMutationId}) {
+export async function readRetiredScoreSourceCleanup({parentId,deviceId,cleanupStamp,cleanupMutationId,recoverCleanupMutationId=false}) {
  const assertCurrent=captureOwnedMutationContext();assertCurrent();const workspace=runtimeSyncOwnershipGuard.getWorkspace(),owner=user?.id;
- if(workspace.type!=='account'||workspace.authUserId!==owner||typeof cleanupMutationId!=='string'||!cleanupMutationId||typeof parentId!=='string'||typeof deviceId!=='string'||!Number.isSafeInteger(cleanupStamp))throw Error('Exact owned cleanup status required');
- let rows;if(mockBackend){rows=await mockBackend.readRetiredScoreSourceCleanup({parentId,deviceId,cleanupStamp,cleanupMutationId});}else{
- const q=new URLSearchParams({select:'owner_id,mutation_id,record_id,device_id,client_updated_at,request_envelope,result',owner_id:'eq.'+owner,mutation_id:'eq.'+cleanupMutationId,record_id:'eq.'+parentId,device_id:'eq.'+deviceId,operation:'eq.lifecycle',client_updated_at:'eq.'+cleanupStamp,limit:'2'});
+ // Missing custody IDs may only be recovered from one unique canonical receipt
+ // at the exact original owner/device/target/tombstone stamp. Never invent an ID.
+ const recoverId=recoverCleanupMutationId===true&&cleanupMutationId==null;
+ if(workspace.type!=='account'||workspace.authUserId!==owner||(!recoverId&&(typeof cleanupMutationId!=='string'||!cleanupMutationId))||typeof parentId!=='string'||typeof deviceId!=='string'||!Number.isSafeInteger(cleanupStamp))throw Error('Exact owned cleanup status required');
+ let rows;if(mockBackend){rows=await mockBackend.readRetiredScoreSourceCleanup({parentId,deviceId,cleanupStamp,cleanupMutationId,recoverCleanupMutationId:recoverId});}else{
+ const q=new URLSearchParams({select:'owner_id,mutation_id,record_id,device_id,client_updated_at,request_envelope,result',owner_id:'eq.'+owner,...(!recoverId?{mutation_id:'eq.'+cleanupMutationId}:{}),record_id:'eq.'+parentId,device_id:'eq.'+deviceId,operation:'eq.lifecycle',client_updated_at:'eq.'+cleanupStamp,limit:'2'});
  rows=await request('/sync_mutation_receipts?'+q,{method:'GET',headers:{Accept:'application/json','Accept-Profile':'rakeezx'}},false,{assertAccess:assertCurrent});}
  assertCurrent();if(!Array.isArray(rows)||rows.length!==1)return null;const r=rows[0],e=r.request_envelope,v=r.result;
- if(r.mutation_id!==cleanupMutationId||r.owner_id!==owner||r.record_id!==parentId||r.device_id!==deviceId||Number(r.client_updated_at)!==cleanupStamp||e?.command!=='delete_item'||e.targetId!==parentId||e.deviceId!==deviceId||e.clientUpdatedAt!==cleanupStamp||e.mutationId!==r.mutation_id||v?.mutationId!==r.mutation_id||v.command!=='delete_item'||v.targetId!==parentId||!['deleted','already_deleted'].includes(v.outcome))return null;
+ if(typeof r.mutation_id!=='string'||!r.mutation_id||(!recoverId&&r.mutation_id!==cleanupMutationId)||r.owner_id!==owner||r.record_id!==parentId||r.device_id!==deviceId||Number(r.client_updated_at)!==cleanupStamp||e?.command!=='delete_item'||e.targetId!==parentId||e.deviceId!==deviceId||e.clientUpdatedAt!==cleanupStamp||e.mutationId!==r.mutation_id||v?.mutationId!==r.mutation_id||v.command!=='delete_item'||v.targetId!==parentId||!['deleted','already_deleted'].includes(v.outcome))return null;
  return {ownerId:owner,targetId:parentId,deviceId,clientUpdatedAt:cleanupStamp,mutationId:r.mutation_id,command:'delete_item',outcome:v.outcome};
 }

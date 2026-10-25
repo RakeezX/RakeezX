@@ -2526,10 +2526,11 @@ export function createSyncV2Engine({
 
 /** Retire only definitively rejected, locally deleted definition creates after
  * the original owner-bound delete receipt. Never dispatch or replace an intent. */
-export async function reconcileRetiredScoreSource({database,ownershipGuard,currentAuthenticatedUserId,readCleanupReceipt,parentId,childIds,cleanupMutationId,now=Date.now,assertWritable}){
+export async function reconcileRetiredScoreSource({database,ownershipGuard,currentAuthenticatedUserId,readCleanupReceipt,parentId,childIds,cleanupMutationId,recoverCleanupMutationId=false,now=Date.now,assertWritable}){
  const workspace=ownershipGuard.getWorkspace(),owner=workspace.authUserId;
  const fence=()=>{const access=ownershipGuard.cloudAccess({operation:'read',authenticatedUserId:currentAuthenticatedUserId()});if(workspace.type!=='account'||workspace.ownershipState!=='claimed'||ownershipGuard.getWorkspace()!==workspace||currentAuthenticatedUserId()!==owner||!access.allowed)throw Error('Score source recovery owner changed');assertWritable();};
- if(typeof cleanupMutationId!=='string'||!cleanupMutationId||typeof parentId!=='string'||!Array.isArray(childIds)||childIds.length!==1||typeof childIds[0]!=='string'||parentId===childIds[0])throw Error('Exact source group required');fence();
+ const recoverId=recoverCleanupMutationId===true&&cleanupMutationId==null;
+ if((!recoverId&&(typeof cleanupMutationId!=='string'||!cleanupMutationId))||typeof parentId!=='string'||!Array.isArray(childIds)||childIds.length!==1||typeof childIds[0]!=='string'||parentId===childIds[0])throw Error('Exact source group required');fence();
  const scope={items:{},scoreSubitems:{},scores:{},scoreSubitemCompletions:{},outbox:{}};
  const snapshot=async()=>Object.fromEntries(await Promise.all(Object.keys(scope).map(async n=>[n,await database.getAll(n)])));
  const pick=current=>{
@@ -2542,9 +2543,9 @@ export async function reconcileRetiredScoreSource({database,ownershipGuard,curre
   if(!child||child.state!=='rejected'||child.envelopeLocked!==false||child.attemptCount!==0||child.patch?.item_id!==parentId)throw Error('Never-dispatched rejected dependent required');
   return {parent,children,rows,create,stamp:parent.updatedAt};
  };
- const initial=pick(await snapshot()),fingerprint=JSON.stringify(initial),receipt=await readCleanupReceipt({parentId,deviceId:initial.create.deviceId,cleanupStamp:initial.stamp,cleanupMutationId});fence();
- if(!receipt||receipt.ownerId!==owner||receipt.targetId!==parentId||receipt.deviceId!==initial.create.deviceId||receipt.clientUpdatedAt!==initial.stamp||receipt.command!=='delete_item'||!['deleted','already_deleted'].includes(receipt.outcome)||receipt.mutationId!==cleanupMutationId)return {status:'unknown',writes:0};
+ const initial=pick(await snapshot()),fingerprint=JSON.stringify(initial),receipt=await readCleanupReceipt({parentId,deviceId:initial.create.deviceId,cleanupStamp:initial.stamp,cleanupMutationId,recoverCleanupMutationId:recoverId});fence();
+ if(!receipt||receipt.ownerId!==owner||receipt.targetId!==parentId||receipt.deviceId!==initial.create.deviceId||receipt.clientUpdatedAt!==initial.stamp||receipt.command!=='delete_item'||!['deleted','already_deleted'].includes(receipt.outcome)||typeof receipt.mutationId!=='string'||!receipt.mutationId||(!recoverId&&receipt.mutationId!==cleanupMutationId))return {status:'unknown',writes:0};
  let writes=0;
  await database.applyBatch(scope,{prepare(current){fence();const currentSource=pick(current);if(JSON.stringify(currentSource)!==fingerprint)throw Error('Source commands changed during reconciliation');writes=currentSource.rows.length;return {outbox:{put:currentSource.rows.map(row=>({...row,state:'superseded',supersededByMutationId:receipt.mutationId,supersededAt:now(),recoveryReason:'retired-atomic-definition-source',recoveryReceipt:{command:receipt.command,outcome:receipt.outcome,targetId:receipt.targetId,clientUpdatedAt:receipt.clientUpdatedAt}})),remove:[]}};}});
- return {status:'reconciled',writes,cleanupAcknowledged:true,remoteWrites:0,replayedRequests:0};
+ return {status:'reconciled',writes,cleanupAcknowledged:true,originalDeleteIdRecovered:recoverId,remoteWrites:0,replayedRequests:0};
 }

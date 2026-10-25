@@ -5716,8 +5716,8 @@ export async function confirmRejectedSessionRepairs(plan, selectedIds, confirmed
 }
 
 /** Foreground recovery of a deleted, unused source with definitive rejection. */
-export async function reconcileRetiredSourceGroup({parentId,childIds,cleanupMutationId}) {
+export async function reconcileRetiredSourceGroup({parentId,childIds,cleanupMutationId,recoverCleanupMutationId=false}) {
  assertCloudRestoreWritable();const assertCurrent=cloud.captureOwnedMutationContext();assertCurrent();
- const result=await reconcileRetiredScoreSource({database:rawDB,ownershipGuard:runtimeSyncOwnershipGuard,currentAuthenticatedUserId:()=>cloud.user?.id,readCleanupReceipt:cloud.readRetiredScoreSourceCleanup,parentId,childIds,cleanupMutationId,assertWritable:()=>{assertCurrent();assertCloudRestoreWritable();}});
+ const result=await reconcileRetiredScoreSource({database:rawDB,ownershipGuard:runtimeSyncOwnershipGuard,currentAuthenticatedUserId:()=>cloud.user?.id,readCleanupReceipt:cloud.readRetiredScoreSourceCleanup,parentId,childIds,cleanupMutationId,recoverCleanupMutationId,assertWritable:()=>{assertCurrent();assertCloudRestoreWritable();}});
  assertCurrent();notify();return result;
 }
