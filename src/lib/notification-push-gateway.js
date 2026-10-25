@@ -13,15 +13,15 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
   const preferenceKey = p => JSON.stringify([p?.lesson, p?.due, p?.lessonMinutes, p?.dueDays, p?.timezone, p?.quiet === null ? null : [p?.quiet?.start, p?.quiet?.end]]);
   let cleanupIdentity;
   try { cleanupIdentity = JSON.parse(storage.getItem(key) || 'null'); } catch { cleanupIdentity = 'invalid'; }
-  const request = async (path, body, cleanup = false) => {
+  const request = async (path, body, cleanup = false, metadata = false) => {
     if (!cleanup && !valid()) throw Error('stale');
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), N44_RESPONSE_DEADLINE_MS);
     try {
       const response = await send('/api/n44/' + path, { method: 'POST', credentials: 'omit', redirect: 'error', cache: 'no-store',
         headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : typeof authorization === 'function' ? authorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });
-      if (!response.ok || (!cleanup && !valid())) { const error=Error('unavailable'); error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
+      if (!response.ok || (!cleanup && !valid())) { const error=Error('unavailable'); error.httpStatus=response.status; error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
       const raw = await response.text(); if (raw.length > 8192 || !cleanup && !valid()) throw Error('unavailable');
-      return JSON.parse(raw);
+      const value = JSON.parse(raw); return metadata ? { body: value, httpStatus: response.status } : value;
     } finally { clearTimeout(timer); }
   };
   return Object.freeze({
@@ -107,13 +107,18 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
       if (JSON.parse(storage.getItem(key) || 'null')?.registrationId === saved.registrationId) storage.removeItem(key);
       cleanupIdentity = null; return true;
     },
-    async authorizeEvent(_snapshot, event) {
+    async authorizationReceipt(event) {
+      if (!valid()) return { status: 'rejected', httpStatus: null, authorizationStatus: null, attempts: 0 };
       try {
-        const r = await request('events/authorize', { ...scope, consentRevision: remote?.consentRevision, registrationId: receipt?.registrationId ?? null, event });
-        // Event refusal or an unknown transport outcome grants no action.
-        // Binding retirement belongs to verified context/owner/consent guards.
-        return r.status === 'authorized' && valid();
-      } catch { return false; }
+        const { body: r, httpStatus } = await request('events/authorize', { ...scope, consentRevision: remote?.consentRevision, registrationId: receipt?.registrationId ?? null, event }, false, true);
+        const authorizationStatus = ['authorized', 'rejected', 'disabled', 'expired', 'stale', 'suppressed'].includes(r.status) ? r.status : 'unknown';
+        return { status: r.status === 'authorized' && valid() ? 'confirmed'
+          : authorizationStatus !== 'authorized' && authorizationStatus !== 'unknown' ? 'rejected' : 'unknown', httpStatus, authorizationStatus, attempts: 1 };
+      } catch (error) { return { status: error.projectionDisposition === 'rejected' ? 'rejected' : 'unknown', httpStatus: error.httpStatus ?? null, authorizationStatus: null, attempts: 1 }; }
+    },
+    async authorizationResult(event) { return (await this.authorizationReceipt(event)).status; },
+    async authorizeEvent(_snapshot, event) {
+      return await this.authorizationResult(event) === 'confirmed';
     },
     expiresAt: () => Math.min(remote?.sessionExpiresAt ?? 0, receipt?.expiresAt ?? Infinity),
     async project(kind, sourceId, expectedStamp) {

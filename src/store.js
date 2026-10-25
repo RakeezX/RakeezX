@@ -190,6 +190,64 @@ export async function confirmedNotificationSources(previousSources = []) {
   return result;
 }
 
+/** AI N44: normal mounted-store source choices, including exact cleanup tombstones. */
+export function notificationSourceGroups() {
+  const w = activeWorkspace, owner = cloud.user?.id;
+  if (!state.ready || w?.type !== 'account' || w.ownershipState !== 'claimed' || !cloud.session || owner !== w.authUserId ||
+      cloud.authStatus().state !== 'authenticated' || !getOfflineLeaseStatus().editable ||
+      runtimeSyncOwnershipGuard.getWorkspace().databaseName !== w.databaseName ||
+      !runtimeSyncOwnershipGuard.cloudAccess({ operation: 'read', authenticatedUserId: owner }).allowed) return [];
+  const owned = r => r && (r.ownerId == null || r.ownerId === owner);
+  return state.items.filter(r => r.scoreMode === 'subitems' && owned(r)).flatMap(parent => {
+    const teaching = getTeaching(parent.teachingId), term = getTerm(teaching?.termId), year = getYear(term?.yearId);
+    const section = getSection(teaching?.sectionId), subject = getSubject(teaching?.subjectId);
+    const children = state.scoreSubitems.filter(r => r.itemId === parent.id);
+    if (![teaching, term, year, section, subject].every(r => owned(r) && !r.deleted) || section.yearId !== year.id ||
+        !children.length || children.length > 200 || !children.every(owned)) return [];
+    return [{ ownerId: owner, workspaceId: w.databaseName, deviceId: state.device?.deviceId,
+      parentId: parent.id, childIds: children.map(r => r.id).sort(), name: parent.name,
+      teachingId: teaching.id, termId: term.id, yearId: year.id, sectionId: section.id, subjectId: subject.id,
+      deleted: !!parent.deleted, cleanupStamp: parent.deleted ? parent.updatedAt : null,
+      revisions: [parent, ...children].map(r => ({ id: r.id, revision: r.serverRevision ?? null, deleted: !!r.deleted })),
+      ancestryConfirmed: [teaching, term, year, section, subject].every(r => Number.isSafeInteger(r.serverRevision) && r.serverRevision > 0 && !r.syncCreatePending && !isLocalOnlyRecord(r)),
+      fingerprint: JSON.stringify([parent, children, teaching, term, year, section, subject]) }];
+  });
+}
+/** Read only: no SyncNow, adoption, reconciliation, delete, or receipt replay. */
+export async function readNotificationSourceStatus(parentId) {
+  const assertCurrent = cloud.captureOwnedMutationContext(); assertCurrent();
+  const initial = notificationSourceGroups().find(r => r.parentId === parentId);
+  if (!initial) return { status: 'rejected' };
+  const fence = () => {
+    assertCurrent();
+    const next = notificationSourceGroups().find(r => r.parentId === parentId);
+    if (!next || JSON.stringify(next) !== JSON.stringify(initial)) throw Error('Source changed');
+  };
+  const pending = (await db.getAll('outbox')).filter(r => r.state !== 'superseded'); fence();
+  const related = pending.some(r => [parentId, ...initial.childIds, initial.teachingId, initial.termId, initial.yearId, initial.sectionId, initial.subjectId].some(id =>
+    r.recordId === id || r.patch?.targetId === id || r.patch?.itemId === id || r.dependencies?.some(d => d.recordId === id)) || ['restore:apply', 'score:distribution_apply'].includes(r.command));
+  const confirmed = await confirmedNotificationSources(); fence();
+  const sourceConfirmed = initial.ancestryConfirmed && (initial.deleted || initial.childIds.every(id => confirmed.some(r => r.kind === 'due' && r.id === id)));
+  const canonical = await cloud.readNotificationSourceIdentity(parentId); fence();
+  const matches = sourceConfirmed && canonical && canonical.parent.teachingId === initial.teachingId &&
+    JSON.stringify(canonical.children.map(r => r.id).sort()) === JSON.stringify(initial.childIds) &&
+    [canonical.parent, ...canonical.children].every(r => initial.revisions.some(l => l.id === r.id && l.revision === r.revision && l.deleted === r.deleted));
+  let cleanupReceipt = null;
+  if (initial.deleted && initial.revisions.every(r => r.deleted)) {
+    const savedParent = await db.get('items', parentId); fence();
+    if (savedParent?.deleted && Number.isSafeInteger(savedParent.updatedAt) && (savedParent.ownerId == null || savedParent.ownerId === initial.ownerId)) {
+      cleanupReceipt = await cloud.readRetiredScoreSourceCleanup({ parentId, deviceId: initial.deviceId,
+        cleanupStamp: savedParent.updatedAt, recoverCleanupMutationId: true }); fence();
+      if (JSON.stringify(await db.get('items', parentId)) !== JSON.stringify(savedParent)) throw Error('Cleanup tombstone changed');
+      fence();
+    }
+  }
+  const pendingAfter = (await db.getAll('outbox')).filter(r => r.state !== 'superseded'); fence();
+  if (JSON.stringify(pendingAfter) !== JSON.stringify(pending)) return { status: 'unknown' };
+  return { status: related ? 'pending' : matches && (!initial.deleted || cleanupReceipt) ? initial.deleted ? 'cleanup_confirmed' : 'confirmed' : 'unknown',
+    canonical: matches ? canonical : null, cleanupReceipt, observedAt: Date.now() };
+}
+
 export function subscribe(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);

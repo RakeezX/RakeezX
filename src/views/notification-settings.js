@@ -27,6 +27,53 @@ const eligibilityText = {
   "cleanup_pending": "تعذر إكمال إيقاف سابق لتذكيرات الجهاز.",
   "ready": "تذكيرات الجهاز غير جاهزة حاليًا."
 };
+const verificationText = {
+  confirmed: 'تأكد تفويض التذكير الحالي. هذا لا يثبت الإرسال أو الوصول.',
+  rejected: 'رُفض التحقق من التذكير الحالي.',
+  unknown: 'UNKNOWN — نتيجة التحقق غير معروفة. لن تُعاد المحاولة تلقائيًا.',
+  pending: 'حفظ المصدر لم يُؤكد بعد. لم يُطلب تفويض التذكير.',
+  cleanup_confirmed: 'تأكد إيصال حذف المصدر والعناصر التابعة.',
+};
+function normalEvidence(ui, scope) {
+  if (!ui) return '';
+  return html`<section class="n44-preference card card--pad" aria-label="التحقق من التذكيرات">
+    <h2>التحقق من التذكيرات الحالية</h2>
+    <p>تفعيل الجهاز يعني الاشتراك فقط. التحقق لا يرسل إشعارًا ولا يثبت وصوله.</p>
+    <p role="status" data-n44-verification-ready="${String(ui.canVerify)}">${ui.canVerify ? 'جاهز للتحقق من تذكير حالي محفوظ.' : 'التحقق يتطلب اشتراكًا صالحًا وسياق الحساب الحالي.'}</p>
+    ${ui.reminders.length ? ui.reminders.map(r => html`<article style="overflow-wrap:anywhere">
+      <h3>${r.title}</h3><p>${r.body}</p>
+      <details><summary>هوية التذكير</summary><dl><dt>معرّف الحدث</dt><dd dir="ltr">${r.id}</dd>
+        <dt>معرّف المصدر</dt><dd dir="ltr">${r.targetId}</dd><dt>البند</dt><dd dir="ltr">${r.itemId ?? '—'}</dd>
+        <dt>التدريس</dt><dd dir="ltr">${r.teachingId}</dd></dl></details>
+      <button type="button" class="btn btn--quiet" data-act="notification-verify" data-choice="${r.token}" data-scope="${scope}"
+        ${!ui.canVerify || ui.verifying || ui.verification?.token === r.token && ui.verification.status === 'unknown' ? 'disabled' : ''}>التحقق من هذا التذكير</button>
+      ${ui.verification?.token === r.token ? html`<p role="status" data-n44-verification="${ui.verification.status}">${verificationText[ui.verification.status]}</p>
+        ${ui.verification.authorization ? html`<details open><summary>إيصال التحقق</summary><dl data-n44-authorization-receipt>
+          <dt>HTTP / التفويض / عدد الطلبات</dt><dd dir="ltr">${ui.verification.authorization.httpStatus ?? 'UNKNOWN'} / ${ui.verification.authorization.authorizationStatus ?? 'UNKNOWN'} / ${ui.verification.authorization.attempts ?? 0}</dd>
+          <dt>إقرار المصدر</dt><dd dir="ltr">${ui.verification.sourceStamp}</dd>
+          <dt>اشتراك الجهاز</dt><dd dir="ltr">${ui.verification.registrationId}</dd>
+          <dt>حفظ المصدر / ربط الخدمة / وجود الاشتراك / الموافقة</dt><dd dir="ltr">${String(ui.verification.canonicalAck)} / ${String(ui.verification.workerBindingMatches)} / ${String(ui.verification.subscriptionPresent)} / ${String(ui.verification.consentTrue)}</dd>
+        </dl></details>` : ''}` : ''}
+    </article>`) : html`<p>لا يوجد تذكير حالي ضمن المواعيد والتفضيلات المعتمدة.</p>`}
+    <h3>حالة مصادر تذكيرات التسليم</h3>
+    ${ui.sources.map(r => html`<article style="overflow-wrap:anywhere" data-n44-source="${r.parentId}">
+      <h4>${r.name}${r.deleted ? ' — محذوف' : ''}</h4>
+      <details ${ui.sourceStatus?.token === r.token ? 'open' : ''}><summary>هوية المصدر وإقرار الحفظ</summary><dl>
+        <dt>الحساب</dt><dd dir="ltr">${r.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${r.workspaceId}</dd>
+        <dt>الجهاز</dt><dd dir="ltr">${r.deviceId}</dd><dt>البند</dt><dd dir="ltr">${r.parentId}</dd>
+        <dt>العناصر التابعة</dt><dd dir="ltr">${r.childIds.join(' / ')}</dd>
+        <dt>التدريس / الفصل الدراسي / العام / الشعبة / المادة</dt><dd dir="ltr">${[r.teachingId, r.termId, r.yearId, r.sectionId, r.subjectId].join(' / ')}</dd>
+      </dl>
+      <button type="button" class="btn btn--quiet" data-act="notification-source-status" data-choice="${r.token}" data-scope="${scope}">قراءة حالة المصدر</button>
+      ${ui.sourceStatus?.token === r.token ? html`<p role="status" data-n44-source-status="${ui.sourceStatus.status}">${ui.sourceStatus.status === 'confirmed' ? 'تأكد حفظ هوية المصدر وإصداراته في الحساب. هذا لا يعني تفويض التذكير.' : verificationText[ui.sourceStatus.status]}</p>
+        ${ui.sourceStatus.canonical ? html`<p>إصدارات الحفظ المؤكدة: <span dir="ltr">${[ui.sourceStatus.canonical.parent, ...ui.sourceStatus.canonical.children].map(v => `${v.id}: ${v.revision}`).join(' / ')}</span></p>` : ''}
+        ${ui.sourceStatus.cleanupReceipt ? html`<dl data-n44-cleanup-receipt><dt>عملية الحذف / النتيجة</dt><dd>${ui.sourceStatus.cleanupReceipt.command} / ${ui.sourceStatus.cleanupReceipt.outcome}</dd>
+          <dt>معرّف الإيصال</dt><dd dir="ltr">${ui.sourceStatus.cleanupReceipt.mutationId}</dd>
+          <dt>الهدف / الجهاز / ختم الحذف</dt><dd dir="ltr">${ui.sourceStatus.cleanupReceipt.targetId} / ${ui.sourceStatus.cleanupReceipt.deviceId} / ${ui.sourceStatus.cleanupReceipt.clientUpdatedAt}</dd></dl>` : ''}` : ''}
+      </details>
+    </article>`)}
+  </section>`;
+}
 const view = {
   title: () => 'الإشعارات',
   render() {
@@ -36,6 +83,7 @@ const view = {
     const timing = readNotificationTiming(context);
     const push = getPushRuntime()?.snapshot();
     const quiet = readPushQuiet(context);
+    const ui = context ? getPushRuntime()?.normalUiSnapshot() : null;
     const eligibilityFlag = key => typeof push?.eligibility?.[key] === 'boolean' ? String(push.eligibility[key]) : 'not_observed';
     return html`<div class="n44-settings-page">
       <a class="btn btn--quiet n44-settings-back" href="#/settings">${icon('back')} الإعدادات</a>
@@ -51,6 +99,7 @@ const view = {
           <h2>تذكيرات الجهاز</h2>
           <p role="status" data-n44-runtime-ready="${String(push.available === true)}" data-n44-push-eligibility="${Object.hasOwn(eligibilityText, push.eligibility.reason) ? push.eligibility.reason : 'idle'}" data-n44-context-match="${eligibilityFlag('contextMatches')}" data-n44-session-match="${eligibilityFlag('sessionMatches')}" data-n44-workspace-match="${eligibilityFlag('workspaceMatches')}" data-n44-lease-match="${eligibilityFlag('leaseMatches')}" data-n44-consent-match="${eligibilityFlag('consentMatches')}" data-n44-generation-match="${eligibilityFlag('generationMatches')}" data-n44-browser-supported="${eligibilityFlag('browserSupported')}" data-n44-worker-ready="${eligibilityFlag('workerReady')}" data-n44-config-category="${['ready', 'disabled', 'invalid', 'request_failed', 'not_observed'].includes(push.eligibility.configuration) ? push.eligibility.configuration : 'not_observed'}">${eligibilityText[push.eligibility.reason] ?? eligibilityText.idle}</p>
         </section>` : ''}
+        ${normalEvidence(ui, scope)}
         <section class="n44-preference card card--pad" aria-labelledby="n44-lesson-heading">
           <div class="n44-preference-heading">
             <h2 id="n44-lesson-heading">تذكيرات الحصص</h2>
@@ -104,6 +153,16 @@ const view = {
   },
   onUnmount() { cleanup(); cleanup = () => {}; },
   actions: {
+    async 'notification-verify'(el) {
+      if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;
+      await getPushRuntime()?.verifyReminder(el.dataset.choice); repaint();
+    },
+    async 'notification-source-status'(el) {
+      if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;
+      el.disabled = true;
+      try { await getPushRuntime()?.readSourceStatus(el.dataset.choice); repaint(); }
+      finally { if (el.isConnected) el.disabled = false; }
+    },
     async 'notification-push'(el) {
       if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;
       const runtime = getPushRuntime();

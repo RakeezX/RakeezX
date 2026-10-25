@@ -2,7 +2,7 @@
 import { createPushClient } from './notification-push-client.js';
 import { createPushBrowser } from './notification-push-browser.js';
 import { createPushGateway } from './notification-push-gateway.js';
-import { currentNotificationContext, notificationDestination } from './notification-events.js';
+import { currentNotificationContext, currentNotificationEvents, notificationDestination } from './notification-events.js';
 import { readNotificationCategories, readNotificationTiming } from './notification-state.js';
 import { LEASE_STORAGE_PREFIX } from './offline-lease.js';
 import { normalizePushPayload, normalizePushEnvelope } from './notification-push-core.js';
@@ -22,6 +22,23 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   let generation = 0, binding = null, client = null, gateway = null, ready = false, status = 'disabled', preparing = false;
   let stamps = new Map(), projecting = null, cleanup = Promise.resolve();
   let queuedProjection = null;
+  let choiceSerial = 0, choices = new Map(), verification = null, sourceStatus = null, verifying = false;
+  const choiceSignature = (type, value) => JSON.stringify([generation, current(), type, value]);
+  function normalChoices() {
+    if (!current()) { choices.clear(); return { reminders: [], sources: [] }; }
+    const previous = choices, next = new Map();
+    const issue = (type, value) => {
+      const signature = choiceSignature(type, value);
+      const token = [...previous].find(([, r]) => r.signature === signature)?.[0] ?? 'choice-' + (++choiceSerial);
+      next.set(token, { type, value, signature }); return token;
+    };
+    const sources = store.notificationSourceGroups().map(value => ({ ...value, token: issue('source', value) }));
+    const reminders = currentNotificationEvents(store, current()).filter(e => readNotificationCategories(current(), storage)[e.kind])
+      .map(value => ({ ...value, token: issue('reminder', { event: value, source: activeProjectionSources(store, current()).find(s => s.kind === value.kind && s.id === value.targetId)?.revision }) }));
+    choices = next; return { reminders, sources };
+  }
+  const selectedChoice = (token, type) => { normalChoices(); const c = choices.get(token); return c?.type === type ? c : null; };
+  const currentResult = value => value && choices.get(value.token)?.signature === value.signature ? value : null;
   const projectionFailures = new Map();
   // Retain only the original cleanup capability, never a usable/new consent binding.
   let pendingDisable = null, disabling = null, preferenceStop = null;
@@ -70,7 +87,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   };
   function invalidate() {
     const old = client, originalGateway = gateway;
-    ++generation; renewing = null; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
+    ++generation; choices.clear(); verification = null; sourceStatus = null; verifying = false; renewing = null; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
     let clearing;
     try { clearing = configuration.enabled ? originalGateway?.retire() ?? browser.clearConsent(null) : Promise.resolve(true); } catch { clearing = browser.clearConsent(null); }
     cleanup = Promise.all([cleanup, Promise.resolve(clearing).catch(() => false)]).then(results => results[1] === false ? {status:'cleanup_pending'} : results[0]);
@@ -192,9 +209,9 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const pass = (async () => {
         const confirmed = await store.confirmedNotificationSources([...stamps.keys()].map(key => { const [kind,id]=JSON.parse(key); return {kind,id}; }));
         const confirmedKeys = new Set(confirmed.map(s=>JSON.stringify([s.kind,s.id])));
-        const sources = activeProjectionSources(store,b.context).filter(s=>confirmedKeys.has(s.key));
+        const sources = activeProjectionSources(store,b.context).filter(s=>confirmedKeys.has(s.key) && (!checkpoint.sourceKey || checkpoint.sourceKey === s.key));
         const liveKeys = new Set(sources.map(s => s.key));
-        for (const key of stamps.keys()) if (!liveKeys.has(key)) stamps.delete(key);
+        if (!checkpoint.sourceKey) for (const key of stamps.keys()) if (!liveKeys.has(key)) stamps.delete(key);
         for (const { key, kind, id, revision } of sources) {
           if (!usable() || binding !== b) break;
           const pendingKey = 'rakeezx-n44-projection-pending:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, key]);
@@ -221,11 +238,68 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       projecting = pass;
       return pass.finally(() => { if (projecting === pass) projecting = null; });
   }
-  async function authorize(raw) {
-    const c = client, b = binding, event = normalizePushPayload(raw, Date.now());
-    if (!usable() || !event || !readNotificationCategories(current(), storage)[event.kind]) return false;
-    if (notificationDestination(store, current(), event.id, Date.now()) !== event.actionPath) return false;
-    try { return await gateway.authorizeEvent(b.context, event) === true && client === c && usable(); } catch { return false; }
+  async function authorizationResult(raw) {
+    const c = client, b = binding, g = gateway, event = normalizePushPayload(raw, Date.now());
+    if (!usable() || !event || !readNotificationCategories(current(), storage)[event.kind]) return { status: 'rejected' };
+    if (notificationDestination(store, current(), event.id, Date.now()) !== event.actionPath) return { status: 'rejected' };
+    const result = await g.authorizationReceipt(event);
+    return client === c && binding === b && gateway === g && usable() &&
+      notificationDestination(store, current(), event.id, Date.now()) === event.actionPath ? result : { status: 'rejected' };
+  }
+  async function authorize(raw) { return (await authorizationResult(raw)).status === 'confirmed'; }
+  // Only a current normal-store choice is accepted. No caller-supplied payload,
+  // owner, workspace, source ID, event ID or action path enters this boundary.
+  async function verifyReminder(token) {
+    const choice = selectedChoice(token, 'reminder'), b = binding, epoch = generation;
+    if (!choice || !usable() || verifying) return { status: 'rejected' };
+    if (currentResult(verification)?.token === token && verification.status === 'unknown') return { status: 'unknown' };
+    const event = choice.value.event;
+    const valid = () => epoch === generation && binding === b && usable() && selectedChoice(token, 'reminder')?.signature === choice.signature;
+    const finish = (status, receipt = {}) => {
+      if (!valid()) return { status: 'rejected' };
+      verification = { ...receipt, token, signature: choice.signature, status, eventId: event.id, sourceId: event.targetId,
+        parentId: event.itemId ?? null, expiresAt: event.expiresAt, observedAt: Date.now() };
+      return { ...verification };
+    };
+    verifying = true; changed();
+    try {
+      const confirmed = await store.confirmedNotificationSources();
+      if (!valid()) return { status: 'rejected' };
+      if (!confirmed.some(s => s.kind === event.kind && s.id === event.targetId)) return finish('pending');
+      const key = JSON.stringify([event.kind, event.targetId]);
+      await projectConfirmed({ workspace: b.workspace, session: b.session, sourceKey: key });
+      if (!valid()) return { status: 'rejected' };
+      const pendingKey = 'rakeezx-n44-projection-pending:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, key]);
+      if (storage.getItem(pendingKey)) return finish('unknown');
+      if (projectionFailures.get(pendingKey) === choice.value.source) return finish('rejected');
+      if (!stamps.has(key)) return finish('unknown');
+      const registration = gateway.registration();
+      const [subscription, consent] = await Promise.all([browser.existing(), browser.consent()]);
+      if (!valid()) return { status: 'rejected' };
+      const facts = { canonicalAck: true, sourceStamp: stamps.get(key), registrationId: registration?.registrationId,
+        subscriptionPresent: !!subscription, workerBindingMatches: consent?.binding === registration?.registrationId && consent?.expiresAt >= registration?.expiresAt,
+        consentTrue: b.serverConsent === true };
+      if (!facts.subscriptionPresent || !facts.workerBindingMatches || !facts.consentTrue) return finish('rejected');
+      const authorization = await authorizationResult({ id: event.id, kind: event.kind, expiresAt: event.expiresAt,
+        actionPath: notificationDestination(store, current(), event.id, Date.now()) });
+      const stillConfirmed = await store.confirmedNotificationSources();
+      if (!stillConfirmed.some(s => s.kind === event.kind && s.id === event.targetId)) return finish('pending');
+      return finish(authorization.status, { ...facts, authorization });
+    } catch { return finish('unknown'); }
+    finally { if (epoch === generation) { verifying = false; changed(); } }
+  }
+  async function readSourceStatus(token) {
+    const choice = selectedChoice(token, 'source'), epoch = generation;
+    if (!choice) return { status: 'rejected' };
+    let result, timer;
+    try {
+      result = await Promise.race([store.readNotificationSourceStatus(choice.value.parentId), new Promise(resolve => {
+        timer = setTimeout(() => resolve({ status: 'unknown' }), 15000);
+      })]);
+    } catch { result = { status: 'unknown' }; }
+    finally { clearTimeout(timer); }
+    if (epoch !== generation || selectedChoice(token, 'source')?.signature !== choice.signature) return { status: 'rejected' };
+    sourceStatus = { ...result, token, signature: choice.signature }; changed(); return { ...sourceStatus };
   }
   const onMessage = event => {
     // Only the actual controlling SW can request a bounded action; no page-message API.
@@ -252,7 +326,12 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     }).catch(() => {});
   }
   return Object.freeze({
-    refresh, invalidate,
+    refresh, invalidate, verifyReminder, readSourceStatus,
+    normalUiSnapshot() {
+      const options = normalChoices();
+      return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
+        canVerify: usable() };
+    },
     snapshot: () => ({ available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility } }),
     async optIn() {
       if (!ready || !matches(binding)) return { status: 'unavailable' };

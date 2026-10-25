@@ -1655,3 +1655,36 @@ export async function readRetiredScoreSourceCleanup({parentId,deviceId,cleanupSt
  if(typeof r.mutation_id!=='string'||!r.mutation_id||(!recoverId&&r.mutation_id!==cleanupMutationId)||r.owner_id!==owner||r.record_id!==parentId||r.device_id!==deviceId||Number(r.client_updated_at)!==cleanupStamp||e?.command!=='delete_item'||e.targetId!==parentId||e.deviceId!==deviceId||e.clientUpdatedAt!==cleanupStamp||e.mutationId!==r.mutation_id||v?.mutationId!==r.mutation_id||v.command!=='delete_item'||v.targetId!==parentId||!['deleted','already_deleted'].includes(v.outcome))return null;
  return {ownerId:owner,targetId:parentId,deviceId,clientUpdatedAt:cleanupStamp,mutationId:r.mutation_id,command:'delete_item',outcome:v.outcome};
 }
+
+/** AI N44: bounded canonical identity read, using existing owner table permissions. */
+export async function readNotificationSourceIdentity(parentId) {
+  const assertOwned = captureOwnedMutationContext(), workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  const owner = user?.id;
+  const assertCurrent = () => {
+    assertOwned();
+    if (workspace.type !== 'account' || runtimeSyncOwnershipGuard.getWorkspace() !== workspace ||
+        !runtimeSyncOwnershipGuard.cloudAccess({ operation: 'read', authenticatedUserId: owner }).allowed) throw Error('Owned source read unavailable');
+  };
+  assertCurrent();
+  if (!owner || typeof parentId !== 'string' || !parentId || parentId.length > 180) throw Error('Owned source required');
+  let result;
+  if (mockBackend) result = await mockBackend.readNotificationSourceIdentity?.(parentId);
+  else {
+    const headers = { Accept: 'application/json', 'Accept-Profile': 'rakeezx' };
+    const parentQuery = new URLSearchParams({ select: 'id,owner_id,teaching_id,revision,deleted_at', owner_id: 'eq.' + owner, id: 'eq.' + parentId, limit: '2' });
+    const childQuery = new URLSearchParams({ select: 'id,owner_id,item_id,revision,deleted_at', owner_id: 'eq.' + owner, item_id: 'eq.' + parentId, limit: '201' });
+    const [items, children] = await Promise.all([
+      request('/items?' + parentQuery, { method: 'GET', headers }, false, { assertAccess: assertCurrent }),
+      request('/score_subitems?' + childQuery, { method: 'GET', headers }, false, { assertAccess: assertCurrent }),
+    ]);
+    result = { items, children };
+  }
+  assertCurrent();
+  if (!Array.isArray(result?.items) || result.items.length !== 1 || !Array.isArray(result.children) || result.children.length > 200) return null;
+  const parent = result.items[0], children = result.children;
+  if (parent.id !== parentId || parent.owner_id !== owner || children.some(r => r.owner_id !== owner || r.item_id !== parentId) ||
+      new Set(children.map(r => r.id)).size !== children.length || [parent, ...children].some(r => !Number.isSafeInteger(r.revision) || r.revision <= 0)) return null;
+  // Return only the fixed public receipt fields, including for synthetic backends.
+  return { parent: { id: parent.id, teachingId: parent.teaching_id, revision: parent.revision, deleted: parent.deleted_at != null },
+    children: children.map(r => ({ id: r.id, parentId: r.item_id, revision: r.revision, deleted: r.deleted_at != null })) };
+}
