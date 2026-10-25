@@ -1,0 +1,58 @@
+{
+  "taskId": "continuous-n44-settings-context-recovery-20261026",
+  "runId": "22edd3b9-a0c5-4a41-9961-000efc3c2b31",
+  "phase": "green",
+  "checks": [
+    {
+      "name": "n44_settings_actual_empty_mount_red_green",
+      "status": "PASS",
+      "evidence": "Baseline FAIL preserved. Actual runtime invalidation + same-owner ready reset and rebind recover without reload, including identical renderRegions markup."
+    },
+    {
+      "name": "n44_settings_privacy_deferred_recovery_and_unmount_fences",
+      "status": "PASS",
+      "evidence": "Actual store deactivation clears before context switch; B-only recovery, logout/no-context safe text, real same-owner cloud/store notifications coalesce and obsolete deferred unmount callback is fenced."
+    },
+    {
+      "name": "n44_settings_recovery_no_automatic_io_and_actual_layout",
+      "status": "PASS",
+      "evidence": "Actual view/CSS at 320 dark + 390 light: one collapsed Support, Stop + keyboard focus, no overflow. View-only manual port: zero automatic reads/Stop calls; pending disabled, Stop/owner/unmount fence late outcomes. Actual runtime recovery adds zero configuration calls. Native/real Push NOT_RUN."
+    }
+  ],
+  "realPush": "NOT_RUN",
+  "osArrival": "NOT_PROVEN",
+  "sourceHashes": {
+    "src/views/notification-settings.js": "c325f440e43511e5db8e01e25a131e92348eb65583c5f46c080a5f908ea290a3",
+    "src/repaint.js": "cd8e0a2975f59e4e9cfcb6b1a284d799542837b36362764326630c629b75fad8",
+    "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480",
+    "src/store.js": "a92922ceaaa2305b92bc7d8d25215f64364a3cbfda7b2b52ae900d9227318a2c",
+    "src/lib/cloud.js": "e1a3b58add1dfa669773251bf28f219731bff46a557129e8a6255daebcaf1ffa",
+    "src/lib/notification-events.js": "e673fea9da1ee873cef980464b19b2094faa3c309e21e31653dfe0711a4f94c8",
+    "src/lib/notification-push-runtime.js": "8e832818f2196fc50d5ae7a288d64267cf283279f879edc999aa52a2836ed1e1",
+    "src/styles/notifications.css": "19c8105d5fdbed143b9268d954f526ee66c82252f980fea9050cdfc6a73ddc35"
+  },
+  "readinessReset": {
+    "before": {
+      "paints": 1,
+      "requests": 1,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    },
+    "after": {
+      "support": 1,
+      "buttons": 15,
+      "paints": 2,
+      "requests": 1,
+      "config": null,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    }
+  },
+  "identicalMarkupRecovery": {
+    "cleared": 0,
+    "identical": true
+  },
+  "notificationBursts": {
+    "paints": 0,
+    "requests": 0
+  },
+  "pageErrors": []
+}

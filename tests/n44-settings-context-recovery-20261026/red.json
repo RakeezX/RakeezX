@@ -1,0 +1,29 @@
+{
+  "taskId": "continuous-n44-settings-context-recovery-20261026",
+  "runId": "22edd3b9-a0c5-4a41-9961-000efc3c2b31",
+  "phase": "red",
+  "checks": [
+    {
+      "name": "n44_settings_actual_empty_mount_red_green",
+      "status": "FAIL",
+      "evidence": "Actual baseline onMount validate clears settings during same-owner readiness reset; after settled rebind Support/buttons remain zero with no repaint."
+    }
+  ],
+  "realPush": "NOT_RUN",
+  "osArrival": "NOT_PROVEN",
+  "readinessReset": {
+    "before": {
+      "paints": 1,
+      "requests": 1,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    },
+    "after": {
+      "support": 0,
+      "buttons": 0,
+      "paints": 1,
+      "requests": 1,
+      "config": null,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    }
+  }
+}

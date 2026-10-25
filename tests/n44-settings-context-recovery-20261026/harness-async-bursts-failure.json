@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n44-settings-context-recovery-20261026",
+  "runId": "22edd3b9-a0c5-4a41-9961-000efc3c2b31",
+  "phase": "green",
+  "checks": [
+    {
+      "name": "n44_settings_actual_empty_mount_red_green",
+      "status": "PASS",
+      "evidence": "Baseline FAIL preserved. Actual runtime invalidation + same-owner ready reset and rebind recover without reload, including identical renderRegions markup."
+    }
+  ],
+  "realPush": "NOT_RUN",
+  "osArrival": "NOT_PROVEN",
+  "readinessReset": {
+    "before": {
+      "paints": 1,
+      "requests": 1,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    },
+    "after": {
+      "support": 1,
+      "buttons": 15,
+      "paints": 2,
+      "requests": 1,
+      "config": null,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    }
+  },
+  "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(await page.evaluate(n => h.paints <= n.paints + 1 && h.requests === n.requests, notifications))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-settings-context-recovery-20261026/tests/n44-settings-context-recovery-20261026/check.mjs:79:12\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-settings-context-recovery-20261026/tests/n44-settings-context-recovery-20261026/check.mjs:23:3"
+}

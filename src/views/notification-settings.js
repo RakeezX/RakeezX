@@ -10,6 +10,7 @@ import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificat
 
 let cleanup = () => {};
 let mountedRoot = null;
+let recoveryRevision = 0;
 let supportScope = null;
 let outcomeView = null, outcomeEpoch = 0;
 const dayLabels = { 3: 'قبل 3 أيام', 2: 'قبل يومين', 1: 'قبل يوم', 0: 'يوم التسليم' };
@@ -138,7 +139,7 @@ const view = {
     const eligibilityFlag = key => typeof push?.eligibility?.[key] === 'boolean' ? String(push.eligibility[key]) : 'not_observed';
     return html`<div class="n44-settings-page">
       <a class="btn btn--quiet n44-settings-back" href="#/settings">${icon('back')} الإعدادات</a>
-      <div class="n44-settings" data-notification-scope="${scope ?? ''}">
+      <div class="n44-settings" data-notification-scope="${scope ?? ''}" data-n44-recovery="${recoveryRevision}">
       ${context ? html`
         <header class="n44-settings-intro">
           <h1>الإشعارات</h1>
@@ -221,20 +222,46 @@ const view = {
     mountedRoot = root;
     const previousTitle = document.title;
     document.title = 'الإشعارات — رَكيز المعلم';
+    let active = true, recoveryTimer = null;
+    // Deactivation fires before store replaces its workspace. Never repaint the
+    // old context in that callback; ask the existing bridge after it settles.
+    const recover = () => {
+      if (!active || recoveryTimer !== null) return;
+      recoveryTimer = setTimeout(() => {
+        recoveryTimer = null;
+        if (active && mountedRoot === root && root.isConnected) repaint();
+      }, 0);
+    };
     // Discard private DOM synchronously before a workspace/identity can change.
     const clearOutcome = () => {outcomeView=null;++outcomeEpoch;root.querySelector('[data-n44-device-outcome]')?.remove();};
-    const clear = () => { clearOutcome(); supportScope = null; root.querySelector('.n44-settings')?.replaceChildren(); };
+    const clear = () => {
+      if (!active) return;
+      clearOutcome(); supportScope = null;
+      root.querySelector('.n44-settings')?.replaceChildren();
+      // renderRegions compares generated markup, not mutated live DOM. Force a
+      // fresh region even when the same safe context returns before repaint.
+      ++recoveryRevision;
+      recover();
+    };
     const validate = () => {
+      if (!active) return;
+      const hadOutcome = outcomeView !== null || !!root.querySelector('[data-n44-device-outcome]');
       clearOutcome();
       const mounted = root.querySelector('[data-notification-scope]');
-      if (mounted && (mounted.dataset.notificationScope !== notificationScope(currentNotificationContext(store, cloud)) ||
+      if (mounted && (mounted.dataset.notificationScope !== (notificationScope(currentNotificationContext(store, cloud)) ?? '') ||
           mounted.querySelector('[data-n44-config-outcome]') && !getPushRuntime()?.snapshot().configOutcome)) clear();
+      // Stable notifications (including other tabs' lease clock witnesses) must
+      // not drive paints. Recover only removed content or a cleared region.
+      else if (hadOutcome || mounted && !mounted.childElementCount) recover();
     };
     const removeWorkspace = store.onWorkspaceDeactivation(clear);
     const removeAuth = cloud.subscribe(validate);
     const removeStore = store.subscribe(validate);
     addEventListener('storage', validate);
-    cleanup = () => { document.title = previousTitle; removeWorkspace(); removeAuth(); removeStore(); removeEventListener('storage', validate); };
+    cleanup = () => {
+      active = false; clearTimeout(recoveryTimer); recoveryTimer = null;
+      document.title = previousTitle; removeWorkspace(); removeAuth(); removeStore(); removeEventListener('storage', validate);
+    };
   },
   onUnmount() { cleanup(); cleanup = () => {}; mountedRoot = null; supportScope = null; outcomeView=null;++outcomeEpoch; },
   actions: {
