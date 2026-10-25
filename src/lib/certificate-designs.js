@@ -454,17 +454,17 @@ function headerIdentity(ctx, value, x, school, size, color) {
   lines.forEach((text, index) => label(ctx, text, x, firstBaseline + index * lineHeight, size, 700, color, width, HEADER_FONT));
 }
 
-/** The complete approved Thuluth phrase stays identical on every device/export. */
+/** Approved first-design calligraphy is a fixed transparent vector asset. */
 function titleArtwork(ctx, image) {
   const width = image?.naturalWidth || image?.width;
   const height = image?.naturalHeight || image?.height;
   if (!(width > 0 && height > 0)) throw new Error('Certificate title artwork is unavailable');
-  const scale = Math.min(900 / width, 142 / height);
+  const scale = Math.min(810 / width, 162 / height);
   const drawnWidth = width * scale;
   const drawnHeight = height * scale;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(image, CENTER - drawnWidth / 2, 282 - drawnHeight / 2, drawnWidth, drawnHeight);
+  ctx.drawImage(image, CENTER - drawnWidth / 2, 286 - drawnHeight / 2, drawnWidth, drawnHeight);
 }
 
 /** Paint only certificate identity and the teacher's explicit appreciation text. */
@@ -494,8 +494,8 @@ export function drawCertificateDesign(canvas, card = {}, options = {}) {
 
   medal(ctx, school ? WIDTH - 191 : 191, 292, school);
   titleArtwork(ctx, options.titleArtwork);
-  flourish(ctx, 361, school);
-  label(ctx, 'تمنح هذه الشهادة بكل تقدير إلى الطالب', CENTER, 404, 24, 500, MUTED);
+  flourish(ctx, 379, school);
+  label(ctx, 'تمنح هذه الشهادة بكل تقدير إلى الطالب', CENTER, 418, 24, 500, '#68685a');
   recipient(ctx, name);
 
   const contextLine = [meta.className, meta.subjectName].filter(Boolean).join('  ·  ');

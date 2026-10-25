@@ -9,8 +9,8 @@ const styleUrl = new URL('../styles/achievement-certificate.css', import.meta.ur
 const brandedCanvases = new WeakSet();
 const headerFontUrl = new URL('../../assets/fonts/noto-naskh-arabic/NotoNaskhArabic-Bold.ttf', import.meta.url).href;
 const titleArtworkUrls = {
-  ornate: new URL('../../assets/certificates/title-thuluth-gold.png', import.meta.url).href,
-  school: new URL('../../assets/certificates/title-thuluth-green.png', import.meta.url).href,
+  ornate: new URL('../../assets/certificates/title-approved-first-gold.svg', import.meta.url).href,
+  school: new URL('../../assets/certificates/title-approved-first-green.svg', import.meta.url).href,
 };
 let headerFontReady;
 let titleArtworksReady;
@@ -33,7 +33,7 @@ function prepareTitleArtworks() {
     const image = new Image();
     image.src = url;
     await image.decode();
-    if (image.naturalWidth !== 2655 || image.naturalHeight !== 479) throw new Error('Unexpected certificate title artwork');
+    if (image.naturalWidth !== 766 || image.naturalHeight !== 165) throw new Error('Unexpected certificate title artwork');
     return [design, image];
   })).then(entries => { titleArtworks = Object.fromEntries(entries); return titleArtworks; })
     .catch(error => { titleArtworksReady = null; titleArtworks = null; throw error; });

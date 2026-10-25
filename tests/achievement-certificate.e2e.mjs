@@ -35,12 +35,12 @@ async function expectPaintedMinistryLogo(canvas, previousCount = 0) {
 async function expectPaintedThuluth(canvas, theme = 'gold') {
   const proof = await canvas.evaluate(node => node.__certificateTitleDraws?.at(-1));
   expect(proof?.decoded).toBe(true);
-  expect(proof.src).toContain(`/assets/certificates/title-thuluth-${theme}.png`);
-  expect([proof.naturalWidth, proof.naturalHeight]).toEqual([2655, 479]);
+  expect(proof.src).toContain(`/assets/certificates/title-approved-first-${theme}.svg`);
+  expect([proof.naturalWidth, proof.naturalHeight]).toEqual([766, 165]);
   expect((proof.x + proof.width / 2) * proof.scaleX).toBeCloseTo(proof.canvasWidth / 2, 6);
-  expect(proof.width / proof.height).toBeCloseTo(2655 / 479, 8);
-  expect(proof.y).toBeGreaterThanOrEqual(205);
-  expect(proof.y + proof.height).toBeLessThan(361);
+  expect(proof.width / proof.height).toBeCloseTo(766 / 165, 8);
+  expect(proof.y).toBeGreaterThanOrEqual(200);
+  expect(proof.y + proof.height).toBeLessThan(379);
   expect(await canvas.evaluate(node => node.__certificateHeaderFont)).toContain('Rakeez Certificate Header');
 }
 
@@ -66,7 +66,7 @@ test('certificate edits appreciation text and directly exports the current image
           scaleX: this.getTransform().a, canvasWidth: this.canvas.width,
         });
       }
-      if (image instanceof HTMLImageElement && image.src.includes('/assets/certificates/title-thuluth-')) {
+      if (image instanceof HTMLImageElement && image.src.includes('/assets/certificates/title-approved-first-')) {
         const [x, y, width, height] = args.slice(-4);
         (this.canvas.__certificateTitleDraws ??= []).push({
           src: image.src, decoded: image.complete && image.naturalWidth > 0,
