@@ -1,0 +1,205 @@
+/* RAKEEZ F09 concept — self-contained four-page portfolio design. */
+.folio-page { max-width: 1180px; margin-inline: auto; display: grid; gap: 18px; min-width: 0; color: var(--text-1); }
+.folio-workspace { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.folio-workspace__eyebrow { display: block; font-size: 12px; color: var(--brand); font-weight: 800; }
+.folio-workspace h1 { margin: 5px 0; font-size: clamp(22px,2.7vw,30px); color: var(--text-1); }
+.folio-workspace p { margin: 0; max-width: 790px; line-height: 1.8; font-size: 13px; color: var(--text-3); }
+.folio-workspace__status { display: inline-flex; align-items: center; padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-2); font-weight: 800; font-size: 12px; }
+.folio-toolbar { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 15px; display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.folio-toolbar .field { min-width: 0; margin: 0; }
+.folio-toolbar__class { flex: 1 1 285px; }
+.folio-toolbar__class .select { min-height: 44px; inline-size: 100%; }
+.folio-toolbar__upload { display: inline-flex; justify-content: center; align-items: center; position: relative; border-radius: 10px; min-height: 44px; padding: 0 14px; cursor: pointer; background: var(--bg-sunk); border: 1px solid var(--border); color: var(--text-1); font-size: 13px; font-weight: 800; }
+.folio-toolbar__upload:focus-within { outline: 3px solid var(--brand); outline-offset: 2px; }
+.folio-toolbar__upload input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.folio-toolbar .btn { min-height: 44px; }
+.folio-toolbar__helper { flex: 1 0 100%; margin: 0; color: var(--text-3); font-size: 12px; line-height: 1.6; }
+.folio-nav { display: flex; gap: 8px; flex-wrap: wrap; padding-block: 1px; }
+.folio-nav__item { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 999px; padding: 7px 12px; color: var(--text-1); display: inline-flex; align-items: center; gap: 9px; font-size: 13px; cursor: pointer; }
+.folio-nav__item:hover { border-color: var(--brand); background: var(--brand-soft); }
+.folio-nav__item:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.folio-nav__item span { font-variant-numeric: tabular-nums; display: grid; place-items: center; width: 23px; height: 23px; border-radius: 50%; background: #e3f0e9; color: #176e56; font-size: 11px; font-weight: 900; }
+.folio-document { display: grid; gap: 23px; justify-items: center; padding: 25px 8px; min-width: 0; border: 1px solid var(--border); border-radius: var(--r-lg); background: color-mix(in srgb, var(--bg-sunk) 75%, #d8e7e2); }
+.folio-sheet { box-sizing: border-box; position: relative; isolation: isolate; overflow: hidden; flex: none; width: min(100%,790px); min-height: 1116px; aspect-ratio: 210/297; background: #fffefa; border-radius: 2px; color: #1b3b43; box-shadow: 0 16px 35px rgba(23,44,48,.11); font-family: "Tajawal","Noto Naskh Arabic",sans-serif; line-height: 1.65; }
+.folio-sheet * { box-sizing: border-box; }
+.folio-sheet h2, .folio-sheet h3 { letter-spacing: 0; }
+.folio-sheet .folio-ministry { display: block; width: 105px; max-width: 100%; height: auto; object-fit: contain; }
+.folio-dot { display:inline-block; flex:none; width: 9px; height: 9px; background:#b8954d; transform:rotate(45deg); }
+
+/* Cover: confident teal/navy first impression, not a reused competitor template. */
+.folio-cover { display: flex; flex-direction: column; }
+.folio-cover__hero { height: 66%; flex: none; position: relative; overflow: hidden; color: #fff; background-color: #103746; background-image: linear-gradient(144deg,#0e3648 0%,#105469 49%,#168f79 100%); padding: 44px 56px 48px; }
+.folio-cover__hero::before { content:""; position:absolute; width:450px; height:450px; left:-135px; top:10%; border: 1px solid rgba(229,216,176,.24); border-radius:50%; box-shadow:0 0 0 41px rgba(255,255,255,.017),0 0 0 89px rgba(255,255,255,.013); }
+.folio-cover__hero::after { content:""; position:absolute; inset:15px; pointer-events:none; border:1px solid rgba(241,222,172,.35); }
+.folio-cover__grain { position:absolute; inset:-15%; opacity:.22; background: repeating-radial-gradient(circle at 95% 28%,transparent 0,transparent 15px,#80ccbb 15.5px,transparent 16px,transparent 35px); pointer-events:none; }
+.folio-cover__top { position:relative; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.folio-cover__ministry { background:#fff; padding:10px 16px; width:151px; border-radius:2px; box-shadow:0 2px 5px #10374644; }
+.folio-cover__ministry .folio-ministry { width:100%; }
+.folio-cover__classification { color:#e7d8ac; font-weight:800; font-size:12px; border-block-start:2px solid #c9a964; padding-top:9px; }
+.folio-cover__title { position:relative; z-index:1; margin-top:104px; text-align:right; max-width:560px; }
+.folio-cover__kicker { display:inline-block; font-size:20px; font-weight:700; color:#d8c79c; margin-bottom:4px; }
+.folio-cover__title h2 { font-size:76px; line-height:1.1; font-weight:900; margin:0; color:#fff; }
+.folio-cover__rule { display:block; margin:26px 0 18px; width:115px; border-top:3px solid #c9a964; }
+.folio-cover__title p { margin:0; color:#dfefed; max-width:390px; font-size:18px; line-height:1.75; }
+.folio-cover__year { position:absolute; left:25px; bottom:0; font-size:169px; line-height:1; font-weight:900; color:rgba(255,255,255,.073); letter-spacing:-10px; }
+.folio-cover__details { flex:1; display:flex; flex-direction:column; padding:49px 57px 30px; background:#fffefa; }
+.folio-cover__meta-label { font-size:12px; color:#a7894a; font-weight:800; letter-spacing:0; }
+.folio-cover__teacher { margin-top:7px; color:#123d43; font-size:31px; line-height:1.4; font-weight:900; }
+.folio-cover__school { margin-top:4px; color:#45666a; font-size:16px; }
+.folio-cover__keyline { height:1px; width:100%; margin:23px 0; background:#dddccf; }
+.folio-cover__bottom { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:17px; }
+.folio-cover__bottom>div { display:grid; gap:4px; }
+.folio-cover__bottom span { color:#918a74; font-size:11px; }
+.folio-cover__bottom strong { color:#233e40; font-size:12px; font-weight:800; line-height:1.6; overflow-wrap:anywhere; }
+.folio-cover__mark { margin-top:auto; color:#9a9280; font-size:10px; text-align:center; padding-top:17px; }
+
+/* Shared inner page furniture */
+.folio-interior { padding:48px 55px 57px; }
+.folio-sheet__overline { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #d8d9d1; padding-bottom:10px; font-size:10px; color:#7f8985; }
+.folio-interior__headline { padding:55px 0 32px; }
+.folio-interior__eyebrow { color:#b18d4c; font-size:12px; font-weight:800; }
+.folio-interior__headline h2 { margin:4px 0 11px; font-size:43px; color:#173c48; font-weight:900; line-height:1.3; }
+.folio-interior__headline p { font-size:13px; line-height:1.9; color:#697b7a; margin:0; max-width:565px; }
+.folio-sheet__footer { position:absolute; left:55px; right:55px; bottom:31px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #d8d9d1; padding-top:11px; font-size:10px; color:#8a8b80; }
+.folio-sheet__footer span:last-child { font-size:14px; color:#b79a60; font-weight:800; }
+
+/* Content index, no fabricated page numbers. */
+.folio-contents__guide, .folio-contents__row { display:grid; grid-template-columns:57px minmax(0,1fr) 60px; align-items:center; gap:11px; }
+.folio-contents__guide { padding:9px 14px; border-block:1px solid #a6bab4; background:#f0f5f2; color:#476d63; font-size:11px; font-weight:800; }
+.folio-contents__rows { margin:6px 0 20px; }
+.folio-contents__row { min-height:51px; border-bottom:1px solid #e6e8e0; padding:6px 14px; }
+.folio-contents__number { color:#bd9c59; font-size:18px; font-weight:800; }
+.folio-contents__title { color:#254851; font-size:15px; font-weight:700; }
+.folio-contents__page { text-align:center; font-weight:800; color:#5a7670; }
+.folio-contents__note { display:flex; align-items:flex-start; gap:12px; background:#f6f5ee; padding:14px 18px; color:#6d756c; font-size:12px; line-height:1.75; }
+
+/* Coverage dashboard: the small labels are documentation states, never grades. */
+.folio-coverage .folio-interior__headline { padding-bottom:25px; }
+.folio-coverage__metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.folio-coverage__metrics >div { border:1px solid #d6e6df; background:#f2f7f4; border-radius:2px; padding:15px 13px; display:grid; gap:3px; }
+.folio-coverage__metrics span { font-size:11px; color:#678078; font-weight:700; }
+.folio-coverage__metrics strong { font-size:36px; line-height:1; color:#145c4c; }
+.folio-coverage__metrics small { font-size:10px; color:#728078; }
+.folio-coverage__section { margin:27px 0 12px; }
+.folio-coverage__section h3 { margin:0 0 5px; color:#284a4e; font-size:17px; }
+.folio-coverage__section p { margin:0; font-size:12px; color:#6f8079; line-height:1.7; }
+.folio-coverage__row { display:grid; grid-template-columns:35px minmax(0,1fr) 104px; gap:11px; align-items:center; min-height:47px; border-bottom:1px solid #e5eae6; }
+.folio-coverage__num { font-size:13px; color:#b38f4d; font-weight:900; }
+.folio-coverage__title { font-size:13px; color:#28484c; font-weight:700; }
+.folio-coverage__status { justify-self:start; padding:4px 7px; font-size:10px; color:#8c9089; background:#f3f4f0; white-space:nowrap; border-radius:99px; }
+.folio-coverage__status.is-present { color:#106344; background:#e3f3e9; }
+.folio-coverage__truth { display:grid; gap:3px; margin-top:19px; padding:11px 15px; border-right:3px solid #b99a55; background:#fbf8ed; font-size:11px; color:#727463; line-height:1.65; }
+.folio-coverage__truth strong { color:#786632; font-size:12px; }
+
+/* Evidence page: factual log, small optional photo, explicit provenance. */
+.folio-interior__headline--compact { padding:31px 0 20px; }
+.folio-evidence .folio-interior__headline h2 { font-size:30px; margin-block:2px 8px; }
+.folio-evidence__meta { display:grid; grid-template-columns:1.1fr 1fr .9fr; gap:8px; border:1px solid #e0e7df; background:#f5f8f3; padding:15px; }
+.folio-evidence__meta>div { display:grid; align-content:start; gap:4px; min-width:0; }
+.folio-evidence__meta small { color:#8a928c; font-size:10px; }
+.folio-evidence__meta strong { color:#325850; font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
+.folio-evidence__metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px; }
+.folio-evidence__metrics >div { border:1px solid #d3e4dc; border-radius:2px; background:#eaf3ee; padding:12px 11px; display:grid; gap:4px; }
+.folio-evidence__metrics span { font-size:11px; color:#5b756b; }
+.folio-evidence__metrics strong { color:#12614a; font-size:27px; font-weight:900; line-height:1.1; }
+.folio-evidence__section-head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin:27px 0 9px; }
+.folio-evidence__section-head h3 { margin:0; font-size:16px; color:#204e4c; }
+.folio-evidence__section-head span { font-size:11px; color:#889087; }
+.folio-evidence__table { width:100%; border-collapse:collapse; text-align:right; font-size:12px; table-layout:fixed; }
+.folio-evidence__table thead th { padding:9px; background:#ecf2ed; color:#2c5c50; border-block:1px solid #ccddd2; font-weight:800; }
+.folio-evidence__table td { padding:9px; border-bottom:1px solid #e0e6e0; color:#47625b; }
+.folio-evidence__table tr { break-inside:avoid; }
+.folio-evidence__small-note { font-size:10px; color:#84918a; margin-top:8px; }
+.folio-evidence__empty { border:1px dashed #bbcfc2; background:#f4f8f4; padding:20px; color:#5e746b; margin-top:20px; border-radius:2px; font-size:13px; }
+.folio-evidence__image-block { margin-top:25px; }
+.folio-evidence__image-caption { display:flex; gap:8px; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.folio-evidence__image-caption h3 { margin:0; color:#31584f; font-size:16px; }
+.folio-evidence__image-caption span { color:#9b987d; font-size:11px; }
+.folio-evidence__image-placeholder { height:174px; background:#f8faf6; border:1px dashed #c3d3c6; border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; color:#758d80; font-size:11px; text-align:center; }
+.folio-evidence__image-placeholder strong { font-size:14px; color:#557265; }
+.folio-evidence__photo-icon { font-size:29px; color:#9cb9a7; line-height:1; }
+.folio-evidence__photo { display:block; max-width:100%; height:174px; object-fit:contain; margin-inline:auto; border:1px solid #d3dfd5; background:#faf9f5; }
+.folio-evidence__provenance { margin-top:21px; padding:12px 15px; border-right:3px solid #ac9156; color:#66776f; font-size:11px; line-height:1.8; background:#f8f7f0; }
+.folio-evidence__provenance b { color:#354d42; }
+.folio-evidence__provenance span { display:block; }
+
+/* Reading mode on narrow devices remains flexible; PDF uses A4 geometry below. */
+@media (max-width:650px) {
+  .folio-workspace__status { display:none; }
+  .folio-document { padding:10px 6px; gap:13px; }
+  .folio-toolbar__class { flex-basis:100%; }
+  .folio-toolbar > .btn { flex:1 1 110px; }
+  .folio-sheet { aspect-ratio:auto; min-height:580px; }
+  .folio-cover__hero { height:350px; padding:25px 24px; }
+  .folio-cover__ministry { width:115px; padding:6px 9px; }
+  .folio-cover__classification { font-size:10px; max-width:115px; }
+  .folio-cover__title { margin-top:57px; }
+  .folio-cover__kicker { font-size:15px; }
+  .folio-cover__title h2 { font-size:clamp(35px,9vw,50px); }
+  .folio-cover__title p { font-size:13px; }
+  .folio-cover__rule { margin:13px 0 10px; }
+  .folio-cover__year { font-size:84px; }
+  .folio-cover__details { padding:24px 22px; }
+  .folio-cover__teacher { font-size:21px; }
+  .folio-cover__school { font-size:13px; }
+  .folio-cover__bottom { gap:8px; }
+  .folio-cover__bottom strong { font-size:10px; }
+  .folio-interior { padding:24px 20px 64px; }
+  .folio-sheet__overline { font-size:9px; }
+  .folio-interior__headline { padding:29px 0 18px; }
+  .folio-interior__headline h2 { font-size:29px; }
+  .folio-interior__headline p { font-size:11px; }
+  .folio-sheet__footer { left:20px; right:20px; bottom:18px; }
+  .folio-contents__guide,.folio-contents__row { grid-template-columns:31px minmax(0,1fr) 35px; gap:6px; padding-inline:5px; }
+  .folio-contents__row { min-height:45px; }
+  .folio-contents__number { font-size:13px; }
+  .folio-contents__title { font-size:11px; }
+  .folio-contents__page { font-size:12px; }
+  .folio-contents__note { font-size:10px; padding:10px; }
+  .folio-coverage__metrics >div { padding:9px 6px; }
+  .folio-coverage__metrics span { font-size:10px; }
+  .folio-coverage__metrics strong { font-size:25px; }
+  .folio-coverage__metrics small { font-size:9px; }
+  .folio-coverage__row { min-height:43px; grid-template-columns:25px minmax(0,1fr) 78px; gap:5px; }
+  .folio-coverage__title { font-size:10px; }
+  .folio-coverage__status { font-size:9px; padding:3px; }
+  .folio-evidence__meta { grid-template-columns:1fr 1fr; padding:9px; }
+  .folio-evidence__meta >div:last-child { grid-column:1/-1; }
+  .folio-evidence__metrics >div { padding:8px; }
+  .folio-evidence__metrics span { font-size:10px; }
+  .folio-evidence__metrics strong { font-size:21px; }
+  .folio-evidence__table { font-size:10px; }
+  .folio-evidence__table td,.folio-evidence__table th { padding:5px; }
+  .folio-evidence__image-placeholder,.folio-evidence__photo { height:138px; }
+  .folio-evidence__provenance { margin-bottom:15px; }
+}
+@media print {
+  @page { size:A4 portrait; margin:0; }
+  html,body { background:#fff !important; color:#1b3b43 !important; }
+  .folio-workspace,.folio-toolbar,.folio-nav { display:none !important; }
+  .folio-page { display:block !important; width:auto !important; max-width:none !important; margin:0 !important; padding:0 !important; }
+  .folio-document { display:block !important; padding:0 !important; border:0 !important; background:none !important; width:auto !important; margin:0 !important; }
+  .folio-sheet { display:flex !important; flex-direction:column; width:210mm !important; height:297mm !important; min-height:297mm !important; max-height:297mm !important; aspect-ratio:auto !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; break-inside:avoid !important; break-after:page !important; page-break-after:always !important; overflow:hidden !important; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  .folio-sheet:last-child { break-after:auto !important; page-break-after:auto !important; }
+  .folio-cover { display:flex !important; }
+  .folio-cover__hero { background:#123f4c !important; background-color:#123f4c !important; color:white !important; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  .folio-cover__title h2 { color:#fff !important; }
+  .folio-cover__year { color:#2b5661 !important; }
+  .folio-interior { display:block !important; padding:48px 55px 57px !important; }
+  .folio-interior .folio-sheet__footer { position:absolute !important; bottom:31px !important; }
+  .folio-interior__headline { padding:55px 0 32px !important; }
+  .folio-interior__headline--compact { padding:31px 0 20px !important; }
+  .folio-interior__headline h2 { font-size:43px !important; }
+  .folio-coverage .folio-interior__headline { padding:37px 0 19px !important; }
+  .folio-coverage__row { min-height:41px !important; }
+  .folio-coverage__section { margin:17px 0 8px !important; }
+  .folio-coverage__truth { margin-top:11px !important; padding:9px 12px !important; }
+  .folio-coverage__metrics >div { padding:11px !important; }
+  .folio-evidence .folio-interior__headline h2 { font-size:30px !important; }
+  .folio-evidence__meta { grid-template-columns:1.1fr 1fr .9fr !important; }
+  .folio-evidence__metrics { grid-template-columns:repeat(3,1fr) !important; }
+  .folio-evidence__metrics strong { font-size:27px !important; }
+  .folio-evidence__table { font-size:12px !important; }
+  .folio-evidence__image-placeholder,.folio-evidence__photo { height:174px !important; }
+  .folio-evidence__photo { object-fit:contain !important; }
+}

@@ -68,6 +68,13 @@ export default {
               <span class="row__chev">${icon('chev')}</span>
             </a>
           </section>
+          <section class="surface surface--flat report-hub" aria-labelledby="portfolio-preview-title">
+            <a class="report-destination" data-act="portfolio-preview" href="#/reports/portfolio-preview">
+              <span class="report-destination__icon" aria-hidden="true">${icon('reports')}</span>
+              <span class="row__main"><span class="row__title" id="portfolio-preview-title">ملف الإنجاز — نموذج التصميم</span><span class="row__sub">غلاف، فهرس، لوحة المعايير، وشاهد أولي من سجلات ركيز.</span></span>
+              <span class="row__chev">${icon('chev')}</span>
+            </a>
+          </section>
           <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
             <div class="report-hub__head">
               <div>
