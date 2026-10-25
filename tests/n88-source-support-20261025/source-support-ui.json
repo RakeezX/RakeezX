@@ -1,0 +1,378 @@
+{
+  "runtimeSha256": "4542a6a48c16a25860d71daa7ab1b7edf7b3111014847c258d699f66e2f43636",
+  "aiAuthored": true,
+  "status": "PASS",
+  "cases": [
+    {
+      "name": "source-lock/deadline",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-lock/cancelled",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-lock/canonical-lock-contention",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-lock/unclassified",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-resolver/deadline",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-resolver/cancelled",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-resolver/canonical-lock-contention",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-resolver/unclassified",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read-lock/deadline",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read-lock/cancelled",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read-lock/canonical-lock-contention",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read-lock/unclassified",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read/deadline",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read/cancelled",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read/canonical-lock-contention",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-read/unclassified",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-decode/deadline",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-decode/cancelled",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-decode/canonical-lock-contention",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-decode/unclassified",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-context/deadline",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-context/cancelled",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-context/canonical-lock-contention",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "source-context/unclassified",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "noMetadata",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "non503",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 0,
+      "authorized": true
+    },
+    {
+      "name": "validationUnknown",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "unknownPhase",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "unknownReason",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "missingReason",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "arrayPhase",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "objectReason",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "nullBody",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "bodyArray",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "badJSON",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "mismatchedStage",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "unauthorized",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 0,
+      "authorized": true
+    },
+    {
+      "name": "otherStage",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 0,
+      "authorized": true
+    },
+    {
+      "name": "noHeader",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 0,
+      "authorized": true
+    },
+    {
+      "name": "validation",
+      "status": "PASS",
+      "calls": 1,
+      "reads": 1,
+      "authorized": true
+    },
+    {
+      "name": "subsequent-list-review-copy",
+      "status": "PASS",
+      "requests": 2,
+      "bodyReads": 1
+    },
+    {
+      "name": "ignored-abort-late-body-deadline",
+      "status": "PASS",
+      "requests": 1
+    },
+    {
+      "name": "ignored-abort-late-body-owner",
+      "status": "PASS",
+      "requests": 1
+    },
+    {
+      "name": "ignored-abort-late-body-dispose",
+      "status": "PASS",
+      "requests": 1
+    },
+    {
+      "name": "pending-copy-context-initial",
+      "status": "PASS"
+    },
+    {
+      "name": "pending-copy-context-subsequent",
+      "status": "PASS"
+    },
+    {
+      "name": "normal-copy-manual-fallback",
+      "status": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "name": "n88_source_support_actual_runtime_copy_and_vocabulary",
+      "status": "PASS"
+    },
+    {
+      "name": "n88_source_support_body_cancellation_context_fences",
+      "status": "PASS"
+    },
+    {
+      "name": "n88_source_support_no_extra_requests_or_private_fields",
+      "status": "PASS"
+    }
+  ],
+  "limits": "Synthetic local app only; no service/real account/Production proof. Native28/carrier3 reused unchanged from immutable parent.",
+  "previousAttempts": [
+    {
+      "status": "FAIL",
+      "cases": 37,
+      "failure": {
+        "name": "TimeoutError",
+        "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-failure-details] summary')\u001b[22m\n",
+        "stack": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-failure-details] summary')\u001b[22m\n\n    at copy (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-source-support-public-dependency-20261025\\tests\\n88-source-support-20261025\\source-support-ui.mjs:41:127)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-source-support-public-dependency-20261025\\tests\\n88-source-support-20261025\\source-support-ui.mjs:49:352\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-source-support-public-dependency-20261025/tests/n88-source-support-20261025/source-support-ui.mjs:37:2"
+      },
+      "cleanup": "Isolated helper closed owned fresh contexts/browser in finally; task-owned loopback server closed; no shared/live lease used."
+    },
+    {
+      "status": "FAIL",
+      "cases": 39,
+      "failure": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n+   code: 'stale_context',\n-   code: 'none',\n    elapsedMs: 0,\n    httpStatus: 0,\n    phase: 'dispatch',\n    sourceVersion: 'n88-class-deadline-v1',\n    stage: 'none'\n",
+        "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n+   code: 'stale_context',\n-   code: 'none',\n    elapsedMs: 0,\n    httpStatus: 0,\n    phase: 'dispatch',\n    sourceVersion: 'n88-class-deadline-v1',\n    stage: 'none'\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-source-support-public-dependency-20261025/tests/n88-source-support-20261025/source-support-ui.mjs:52:608\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-source-support-public-dependency-20261025/tests/n88-source-support-20261025/source-support-ui.mjs:38:2"
+      },
+      "cleanup": "Isolated helper closed owned fresh contexts/browser in finally; task-owned loopback server closed; no shared/live lease used."
+    },
+    {
+      "status": "FAIL",
+      "cases": 41,
+      "failure": {
+        "name": "TimeoutError",
+        "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-copy-failure]')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled class=\"btn\" type=\"button\" data-n88-copy-failure=\"\">نسخ تفاصيل التعذّر</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    57 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+        "stack": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-copy-failure]')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled class=\"btn\" type=\"button\" data-n88-copy-failure=\"\">نسخ تفاصيل التعذّر</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    57 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-source-support-public-dependency-20261025\\tests\\n88-source-support-20261025\\source-support-ui.mjs:55:1067\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-source-support-public-dependency-20261025/tests/n88-source-support-20261025/source-support-ui.mjs:38:2"
+      },
+      "cleanup": "Isolated helper closed owned fresh contexts/browser in finally; task-owned loopback server closed; no shared/live lease used."
+    },
+    {
+      "status": "FAIL",
+      "cases": 46,
+      "failure": {
+        "name": "ReferenceError",
+        "message": "start is not defined",
+        "stack": "ReferenceError: start is not defined\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-source-support-public-dependency-20261025/tests/n88-source-support-20261025/source-support-ui.mjs:59:24"
+      },
+      "cleanup": "Isolated helper closed owned fresh contexts/browser in finally; task-owned loopback server closed; no shared/live lease used."
+    }
+  ],
+  "cleanup": "Isolated helper closed owned fresh contexts/browser in finally; task-owned loopback server closed; no shared/live lease used."
+}

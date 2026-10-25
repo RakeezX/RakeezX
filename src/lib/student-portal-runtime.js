@@ -10,27 +10,35 @@ let portalDiagnostic=null;
 export function studentPortalDiagnostic(){return portalDiagnostic?{...portalDiagnostic}:null;}
 const diagnosticCodes=['none','timeout','rejected','invalid_ack','stale_context','unavailable','uncertain'];
 const diagnosticStages=['none','configuration','key-configuration','envelope','upstream','upstream-body','upstream-http-5xx','reply','reply-shape','acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate','projection','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit','issuance-synchronize','issuance-roster','issuance-receipt','issuance-members','issuance-savepoint','issuance-recovery','issuance-member-result','issuance-member-release','issuance-member-rollback','issuance-flush'];
-function checkpoint(phase,httpStatus=0,elapsedMs=0,code='none',stage='none',validationFamily='none'){
+// AI: deployed native v133 vocabulary; accept the pair only, never arbitrary body fields.
+function sourceClassification(httpStatus,stage,value){
+ return httpStatus===503&&stage==='source'&&value&&
+  ['source-lock','source-resolver','source-read-lock','source-read','source-decode','source-context'].includes(value.sourcePhase)&&
+  ['deadline','cancelled','canonical-lock-contention','unclassified'].includes(value.sourceReason)
+  ?{sourcePhase:value.sourcePhase,sourceReason:value.sourceReason}:{};
+}
+function checkpoint(phase,httpStatus=0,elapsedMs=0,code='none',stage='none',validationFamily='none',source=null){
  if(!['binding','queue','dispatch','http','response','admitted','failure'].includes(phase))return;
  portalDiagnostic={phase,httpStatus:Number.isInteger(httpStatus)&&httpStatus>=100&&httpStatus<=599?httpStatus:0,elapsedMs:Math.min(30000,Math.max(0,Math.round(elapsedMs/100)*100)),sourceVersion:'n88-class-deadline-v1',code:diagnosticCodes.includes(code)?code:'uncertain',stage:diagnosticStages.includes(stage)?stage:'none',...(httpStatus===503&&stage==='synchronize-validate'&&validationFamilies.includes(validationFamily)?{validationFamily}:{})};
+ Object.assign(portalDiagnostic,sourceClassification(httpStatus,stage,source));
  return portalDiagnostic;
 }
 function failureSnapshot(value){
  if(!value||!['binding','queue','dispatch','http','response','admitted','failure'].includes(value.phase)||!diagnosticCodes.includes(value.code)||!diagnosticStages.includes(value.stage)||value.sourceVersion!=='n88-class-deadline-v1')return null;
  if(!Number.isInteger(value.httpStatus)||(value.httpStatus!==0&&(value.httpStatus<100||value.httpStatus>599))||!Number.isFinite(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000)return null;
- return Object.freeze({phase:value.phase,code:value.code,stage:value.stage,httpStatus:value.httpStatus,elapsedMs:Math.round(value.elapsedMs/100)*100,sourceVersion:'n88-class-deadline-v1',...(value.httpStatus===503&&value.stage==='synchronize-validate'&&validationFamilies.includes(value.validationFamily)?{validationFamily:value.validationFamily}:{})});
+ return Object.freeze({phase:value.phase,code:value.code,stage:value.stage,httpStatus:value.httpStatus,elapsedMs:Math.round(value.elapsedMs/100)*100,sourceVersion:'n88-class-deadline-v1',...sourceClassification(value.httpStatus,value.stage,value),...(value.httpStatus===503&&value.stage==='synchronize-validate'&&validationFamilies.includes(value.validationFamily)?{validationFamily:value.validationFamily}:{})});
 }
 // AI: serialize only this finite public attestation, never the attribute wholesale.
-function listResponseSnapshot(root){
+function listResponseSnapshot(root,diagnostic=null){
  try{
   const raw=root.getAttribute('data-n88-list-response');if(!raw||raw.length>256)return null;
   const value=JSON.parse(raw);
   if(!value||Object.keys(value).length!==3||!['region','elapsedMs','outcome'].every(k=>Object.hasOwn(value,k)))return null;
   if(typeof value.region!=='string'||(value.region!=='unknown'&&classListRegion(value.region)!==value.region)||!Number.isInteger(value.elapsedMs)||value.elapsedMs<0||value.elapsedMs>30000||!['success','failure'].includes(value.outcome))return null;
-  return JSON.stringify({schema:'n88-list-response-v1',region:value.region,elapsedMs:value.elapsedMs,outcome:value.outcome});
+  return JSON.stringify({schema:'n88-list-response-v1',region:value.region,elapsedMs:value.elapsedMs,outcome:value.outcome,...(value.outcome==='failure'?sourceClassification(diagnostic?.httpStatus,diagnostic?.stage,diagnostic):{})});
  }catch{return null;}
 }
-function listResponseSupport(root,isCurrent){
+function listResponseSupport(root,isCurrent,getDiagnostic=()=>null){
  const body=entryShell(root),doc=root.ownerDocument;
  let details=body.querySelector('[data-n88-failure-details]');
  if(!details){details=doc.createElement('details');const summary=doc.createElement('summary');summary.textContent='تفاصيل الدعم';details.append(summary);body.append(details);}
@@ -42,18 +50,18 @@ function listResponseSupport(root,isCurrent){
  const valid=()=>root.contains(details)&&root.contains(button)&&isCurrent();
  const clear=()=>{fallback.value='';fallback.hidden=true;status.textContent='';};
  const absent=()=>{clear();status.textContent='لا تتوفر تفاصيل لهذه القراءة. لم يُنسخ شيء.';};
- details.addEventListener('toggle',()=>{clear();if(details.open&&(!valid()||!listResponseSnapshot(root)))absent();});
+ details.addEventListener('toggle',()=>{clear();if(details.open&&(!valid()||!listResponseSnapshot(root,getDiagnostic())))absent();});
  button.addEventListener('click',async()=>{
   if(button.disabled)return;clear();
-  const text=valid()?listResponseSnapshot(root):null;if(!text){absent();return;}
+  const text=valid()?listResponseSnapshot(root,getDiagnostic()):null;if(!text){absent();return;}
   button.disabled=true;
   try{
    const clipboard=doc.defaultView.navigator.clipboard;if(!clipboard?.writeText)throw Error('unavailable');
    await clipboard.writeText(text);
-   if(valid()&&listResponseSnapshot(root)===text)status.textContent='تم نسخ تفاصيل القراءة.';
+   if(valid()&&listResponseSnapshot(root,getDiagnostic())===text)status.textContent='تم نسخ تفاصيل القراءة.';
    else clear();
   }catch{
-   if(valid()&&listResponseSnapshot(root)===text){fallback.value=text;fallback.hidden=false;status.textContent='تعذّر النسخ التلقائي. حدّد النص وانسخه يدويًا.';}
+   if(valid()&&listResponseSnapshot(root,getDiagnostic())===text){fallback.value=text;fallback.hidden=false;status.textContent='تعذّر النسخ التلقائي. حدّد النص وانسخه يدويًا.';}
    else clear();
   }finally{button.disabled=false;}
  });
@@ -161,17 +169,17 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     finally{signal.removeEventListener('abort',cancel);}
     if(signal.aborted)throw bindingError('context');
     const stage=classResponseStage(response.status,response.headers);
-    let validationFamily='none';
+    let validationFamily='none',source=null;
     // Existing failure body only, on this same owner-fenced response. No extra request or raw body retention.
-    if(path==='/api/n88/teacher/class/list'&&response.status===503&&stage==='synchronize-validate'){
+    if(path==='/api/n88/teacher/class/list'&&response.status===503&&['synchronize-validate','source'].includes(stage)){
       // Keep metadata reads inside the existing cancellation/deadline fence, even
       // when a failed transport ignores abort while delivering its body.
       signal.addEventListener('abort',cancel,{once:true});
-      try{const metadata=await Promise.race([response.json(),cancelled]);if(metadata?.stage===stage&&validationFamilies.includes(metadata.validationFamily))validationFamily=metadata.validationFamily;}catch{}
+      try{const metadata=await Promise.race([response.json(),cancelled]);if(metadata?.stage===stage){if(stage==='synchronize-validate'&&validationFamilies.includes(metadata.validationFamily))validationFamily=metadata.validationFamily;if(stage==='source')source=sourceClassification(response.status,stage,metadata);}}catch{}
       finally{signal.removeEventListener('abort',cancel);}
       if(signal.aborted)throw bindingError('context');current(false);
     }
-    record('http',response.status,performance.now()-started,'none',stage,validationFamily);
+    record('http',response.status,performance.now()-started,'none',stage,validationFamily,source);
     if(!response.ok)failure=[401,403].includes(response.status)?'denied':'connection';
     const region=path==='/api/n88/teacher/class/list'?classListRegion(response.headers?.get('x-n88-service-region')):'unknown';
     current(false);return {ok:response.ok,status:response.status,headers:new Headers({'x-n88-service-region':region,'x-n88-service-stage':stage}),async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
@@ -198,8 +206,8 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     let firstList=initialList;
     const admittedClient={...client,listClass:async teachingId=>{current(false);if(firstList&&teachingId===initial.context.teachingId){const data=firstList;firstList=null;return data;}return client.listClass(teachingId);}};
     handle=mountClassPortal(content,{client:admittedClient,getContext,subscribe,classLabel});
-    listResponseSupport(root,()=>{try{current(false);return true;}catch{return false;}});
-  }).catch(e=>{if(!disposed){const last=ownDiagnostic;record(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage,last?.validationFamily);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure),ownDiagnostic,()=>{try{current(false);return true;}catch{return false;}});}});
+    listResponseSupport(root,()=>{try{current(false);return true;}catch{return false;}},()=>ownDiagnostic);
+  }).catch(e=>{if(!disposed){const last=ownDiagnostic;record(last?.phase||'binding',last?.httpStatus||0,performance.now()-entryStarted,e.code||'uncertain',last?.stage,last?.validationFamily,last);classEntryState(root,e.portalState||(e.code==='timeout'?'timeout':failure),ownDiagnostic,()=>{try{current(false);return true;}catch{return false;}});}});
   return {dispose(){disposed=true;lifetime.abort();handle?.dispose();root.removeAttribute('data-n88-list-response');root.replaceChildren();}};
 }
 const classEntryMessages={timeout:'لم تكتمل قراءة الفصل خلال المهلة. أعد المحاولة؛ لم نغيّر أي رمز أو إعداد.',loading:'جارٍ فتح مساحة طلاب الفصل…',disabled:'مساحة طلاب الفصل غير متاحة حاليًا.',account:'يلزم حساب معلم متصل لفتح مساحة الفصل.',owner:'تعذّر تأكيد سياق الحساب. أعد فتح الفصل من حساب مالكه.',source:'هذا الفصل غير متاح ضمن السياق الدراسي الحالي.',lease:'تعذّر تأكيد صلاحية المزامنة لهذا التبويب. أعد فتح الفصل في التبويب النشط.',session:'انتهت صلاحية الاتصال بالحساب. أعد الاتصال ثم حاول مجددًا.',context:'تغيّر سياق الاتصال. أعد المحاولة لفتح الفصل من جديد.',denied:'لم يسمح الخادم بفتح المساحة لهذا السياق. تحقق من الحساب والفصل ثم أعد المحاولة.',revision:'تحتاج مساحة الطلاب إلى تحديث التطبيق. حدّث الصفحة ثم أعد المحاولة.',connection:'تعذّر الاتصال بمساحة الطلاب. حاول مجددًا.'};
@@ -237,7 +245,7 @@ function classEntryState(root,state,diagnostic=null,isCurrent=()=>false){
    finally{if(valid())button.disabled=false;}
   });
  }
- if(!['loading','disabled'].includes(state))listResponseSupport(root,isCurrent);
+ if(!['loading','disabled'].includes(state))listResponseSupport(root,isCurrent,()=>snapshot);
 }
 export function unavailable(root) {
   root.replaceChildren();
