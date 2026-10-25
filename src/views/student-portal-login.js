@@ -1,6 +1,6 @@
 /** AI: reusable actual student page, deliberately unregistered in the teacher app. */
 import { brandLockup } from '../lib/brand.js';
-import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData, parseStudentReadPhases } from '../lib/student-portal-unified-client.js';
+import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData, parseStudentReadPhases, parseStudentFailure } from '../lib/student-portal-unified-client.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const displayNumber = value => value === null ? 'لم تُرصد' : escape(value);
 // A display freshness bound, never a session lifetime or an authorization token.
@@ -37,6 +37,10 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     clearTimeout(timer);const cooling=Date.now()<cooldownUntil;
     paint(`<section class="n88-unified-entry"><h1 tabindex="-1">${end ? 'التحقق من الجلسة' : 'مساحة الطالب'}</h1><p role="status" aria-live="polite">${escape(message)}${cooling?' يرجى الانتظار قليلًا قبل المحاولة مجددًا.':''}</p><button class="btn btn--primary" data-session-retry ${cooling?'disabled':''}>${end ? 'التحقق مجددًا' : 'حاول مجددًا'}</button></section>`);
     if(cooling)timer=setTimeout(()=>recovery(message,end),Math.max(1,cooldownUntil-Date.now()));
+  }
+  function publicationReview() {
+    screen='publication';clearTimeout(freshnessTimer);settledProjection=null;settledAt=0;settledContext=undefined;
+    paint('<section class="n88-unified-entry" data-publication-review><h1 tabindex="-1">مساحة الطالب</h1><p role="status">يلزم أن يراجع معلّمك النشر الحالي قبل عرض بياناتك. جلستك ما زالت متاحة.</p><button type="button" data-read>التحقق من النشر</button><button type="button" data-end>إنهاء الجلسة</button></section>');
   }
   function show(raw, preserve = false) {
     const data = projectUnifiedStudentData(raw);
@@ -93,7 +97,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   function diagnosticText() {
     let d;try{d=client?.getDiagnostic?.();}catch{}d=d||viewDiagnostic;
     if (!d || !['read','end'].includes(d.action) || !['initial','return','manual','end'].includes(d.phase)
-      || !['success','denied','rate','unavailable','timeout','stale'].includes(d.outcome)
+      || !['success','denied','rate','unavailable','timeout','stale','publication'].includes(d.outcome)
       || !['none','2xx','4xx','5xx','other'].includes(d.httpStatusClass)
       || !['visible','hidden'].includes(d.visibility)
       || !['visible','hidden','pagehide','disposed','context','superseded','deadline'].includes(d.retirementReason)
@@ -106,6 +110,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       ...(d.httpStatusClass==='5xx'&&Number.isInteger(d.http5xx)&&d.http5xx>=500&&d.http5xx<=599?{http5xx:d.http5xx}:{}),
       ...(d.action==='read'&&d.httpStatusClass==='5xx'&&['configuration','upstream','upstream-body','upstream-http-5xx','reply','reply-shape'].includes(d.transportStage)?{transportStage:d.transportStage}:{}),
       ...(d.action==='read'&&d.httpStatusClass==='5xx'&&['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate','projection','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'].includes(d.serviceStage)?{serviceStage:d.serviceStage}:{}),
+      ...(d.action==='read'&&d.httpStatusClass==='5xx'&&parseStudentFailure(JSON.stringify(d.readFailure))?{readFailure:parseStudentFailure(JSON.stringify(d.readFailure))}:{}),
       ...(readPhases?{readPhases}:{})});
   }
   async function copyDiagnostic(button) {
@@ -173,6 +178,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     busy=false;pendingForm=false;endingSession=false;
     if(result.errorKind){
       settledProjection=null;settledAt=0;settledContext=undefined;
+      if(result.errorKind==='publication'&&!result.ending){publicationReview();return;}
       // A denied or failed revalidation never leaves a private projection visible.
       if(result.quiet){clear(false,result.errorKind==='timeout'?'deadline':'context');return;}
       const rejected = !result.resuming && result.claimState === 'rejected' && result.errorKind === 'session';
@@ -249,7 +255,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       const fallback=root.querySelector('[data-copy-text]');if(fallback){fallback.hidden=true;fallback.value='';}
       if(screen==='end-pending'||screen==='end-ack'||screen==='end-uncertain')return;
       if(busy&&pendingForm){codeDraft='';pending();return;}
-      if(screen==='entry')return; // Same document, unsubmitted draft: no network or remount.
+      if(screen==='entry'||screen==='publication')return; // No automatic retry for an informational publication state.
       if(screen==='private'&&!busy){
         if(!currentView())return;
         const retain=client.canRetainView?.()!==false;if(screen!=='private')return;

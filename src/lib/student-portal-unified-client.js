@@ -1,5 +1,6 @@
 /** AI: universal student transport; no identity lookup or private projection storage. Finite opt-in diagnostics only. */
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
+export function parseStudentFailure(value){try{if(typeof value!=='string'||value.length>768)return null;const d=JSON.parse(value),keys=['phase','category','sqlstate','connection','cancelled','deadline','rollback','commit'];if(!d||typeof d!=='object'||Array.isArray(d)||Object.keys(d).filter(k=>!['site','requirement','exception'].includes(k)).sort().join(',')!==keys.sort().join(','))return null;if(!["acquire","guard","begin","snapshot","operation","synchronize-lock","synchronize-memberships","synchronize-sessions","synchronize-sources","synchronize-publications","synchronize-validate","projection-finalize","projection-membership-flush","projection-commitguards","projection-commit","unknown"].includes(d.phase)||!["acquire","guard","transaction","projection","commit","unknown","admission_denied","session_required","denied"].includes(d.category)||!["none","55P03","57014","42501","23503","23505","40001","40P01","08000","08001","08003","08004","08006","08007","08P01","28P01","28000","53300","53400","57P01","57P02","57P03","25P02","22001","22P02","42703","42883","42P01"].includes(d.sqlstate)||!['none','reset','timeout','refused','dns'].includes(d.connection)||typeof d.cancelled!=='boolean'||typeof d.deadline!=='boolean'||!['not_needed','acknowledged','unknown'].includes(d.rollback)||!['not_started','unknown','acknowledged'].includes(d.commit))return null;const tagged=['site','requirement','exception'].some(k=>Object.hasOwn(d,k));if(tagged&&(!["canonical-fetch","canonical-decode","term-selection","visibility-fetch","visibility-selection","guidance-fetch","guidance-decode","student-scope","visibility-validation","visibility-scope","grade-context","grade-score","work-projection","guidance-projection"].includes(d.site)||!["unknown","current-membership-and-policy","canonical-revision","canonical-row-identity","unique-current-enrollment","unique-student-item-score","unique-student-subitem-completion","canonical-atomic-subitem-score","bounded-years","bounded-terms","bounded-sections","bounded-students","bounded-enrollments","bounded-teachings","bounded-items","bounded-scores","bounded-scoreSubitems","bounded-scoreSubitemCompletions","bounded-sessions","bounded-attendance","bounded-logs","portable-grade-context","unique-current-term","canonical-source-bound","canonical-read-mode","guidance-contract","visibility-policy","score-decimals","canonical-date","subitem-date-order","subitem-late-score","subitem-count","score-student-identity"].includes(d.requirement)||!["rejected","type","range","syntax","other"].includes(d.exception)))return null;return Object.freeze({...Object.fromEntries(['phase','category','sqlstate','connection','cancelled','deadline','rollback','commit'].map(k=>[k,d[k]])),...(tagged?{site:d.site,requirement:d.requirement,exception:d.exception}:{})});}catch{return null;}}
 
 export const normalizeStudentCode = value => typeof value === 'string' ? normalizeDateTimeDigits(value).replace(/ /g, '') : '';
 export const validStudentCode = value => typeof value === 'string' && /^1[0-9]{5}$/.test(value);
@@ -56,6 +57,7 @@ export function projectUnifiedStudentData(data) {
   }
   return result;
 }
+export const isStudentPublicationReview=data=>object(data)&&Object.keys(data).sort().join(',')==='state,version'&&data.version==='n88-student-domain-v1'&&data.state==='publication-needs-review';
 
 // Rejection-only same-origin retirement epoch. No identity or projection is stored.
 // p=pending mutation, s=neutral/acknowledged generation, u=uncertain. Never a commit receipt or access grant.
@@ -102,13 +104,13 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     cancelRequest(); lastDiagnostic=null; const checkpoint = generation;
     const owned = controller = new AbortController(), started = performance.now();
     let timedOut = false, statusClass = 'none', recorded = false, readPhases=null;
-    let clientStage='call',responseKind='none',http5xx,transportStage,serviceStage;
+    let clientStage='call',responseKind='none',http5xx,transportStage,serviceStage,readFailure;
     const record = (outcome, reason = 'visible') => {
       if (recorded || checkpoint!==generation || !['read','end'].includes(action)) return;
       recorded = true;
       lastDiagnostic = Object.freeze({action, phase: action === 'end' ? 'end' : ['initial','return','manual'].includes(phase) ? phase : 'manual', outcome,
         httpStatusClass: statusClass, elapsedMs: Math.min(15000, Math.max(0, Math.floor((performance.now() - started) / 250) * 250)),
-        visibility: visibility(), retirementReason: reason,clientStage,responseKind,...(http5xx?{http5xx}:{}),...(transportStage?{transportStage}:{}),...(serviceStage?{serviceStage}:{}),
+        visibility: visibility(), retirementReason: reason,clientStage,responseKind,...(http5xx?{http5xx}:{}),...(transportStage?{transportStage}:{}),...(serviceStage?{serviceStage}:{}),...(readFailure?{readFailure}:{}),
         ...(action==='read'&&outcome==='success'&&readPhases?{readPhases}:{})});
     };
     retireDiagnostic = reason => record(reason === 'deadline' ? 'timeout' : 'stale', reason);
@@ -136,6 +138,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       statusClass = response.status >= 200 && response.status < 300 ? '2xx' : response.status >= 400 && response.status < 500 ? '4xx' : response.status >= 500 && response.status < 600 ? '5xx' : 'other';
       http5xx=statusClass==='5xx'?response.status:undefined;
       if(action==='read'&&statusClass==='5xx'){
+        readFailure=parseStudentFailure(response.headers?.get('x-n88-student-failure'));
         const transport=response.headers?.get('x-n88-transport-stage'),service=response.headers?.get('x-n88-service-stage');
         if(['configuration','upstream','upstream-body','upstream-http-5xx','reply','reply-shape'].includes(transport))transportStage=transport;
         if(['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate','projection','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'].includes(service))serviceStage=service;
@@ -144,6 +147,11 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       responseKind=/^application\/(?:[a-z0-9.+-]+\+)?json(?:;|$)/i.test(contentType)?'json':/^text\/html(?:;|$)/i.test(contentType)?'html':'other';
       await proof?.acceptFailure?.(response,()=>checkpoint===generation&&!owned.signal.aborted&&!disposed);
       if(checkpoint!==generation)throw fail('stale');withinDeadline();
+      if(action==='read'&&response.status===409&&responseKind==='json'){
+        clientStage='decode';const domain=await response.json();peer.sync();if(checkpoint!==generation)throw fail('stale');withinDeadline();
+        if(isStudentPublicationReview(domain))throw fail('publication');
+        throw fail();
+      }
       if (!response.ok || action === 'read' && response.status !== 200) {
         const retry = Number(response.headers?.get('Retry-After'));
         throw fail(response.status === 429 ? 'rate' : [401, 403, 410].includes(response.status) ? 'session' : 'unavailable', response.status === 429 ? Math.min(300, Math.max(1, Number.isFinite(retry) ? retry : 30)) : 0);
@@ -160,7 +168,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       })(), new Promise((_, reject) => { owned.signal.addEventListener('abort', () => reject(fail()), { once: true }); }) ]);
     } catch (error) {
       // Never forward server bodies, transport messages, credentials or payloads.
-      const kind = checkpoint !== generation ? 'stale' : timedOut ? 'timeout' : ['rate', 'session'].includes(error?.kind) ? error.kind : 'unavailable';
+      const kind = checkpoint !== generation ? 'stale' : timedOut ? 'timeout' : ['rate', 'session','publication'].includes(error?.kind) ? error.kind : 'unavailable';
       record(kind === 'session' ? 'denied' : kind, timedOut ? 'deadline' : 'visible');
       throw fail(kind, error?.retryAfter || 0);
     } finally { if(action==='claim'||action==='end')peer.finish(mutation,acknowledged);clearTimeout(timeout); body = null; if (checkpoint === generation) { controller = null; retireDiagnostic = null; } }
