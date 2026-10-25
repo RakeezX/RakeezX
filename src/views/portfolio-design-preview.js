@@ -22,6 +22,17 @@ const digits = new Intl.NumberFormat('ar-SA', { useGrouping: false });
 const date = value => value ? fmtDate(value, false) : '—';
 let editingCriterion = '09';
 let selectedSuggestionId = null;
+let navigatorOpen = false;
+let criterionEditorOpen = false;
+let libraryFilter = 'all';
+let libraryQuery = '';
+let nextExtraCriterionNumber = 12;
+const criterionNames = new Map();
+const hiddenCriteria = new Set();
+const extraCriteria = [];
+const customWitnesses = [];
+const hiddenWitnesses = new Set();
+const sectionPreferences = new Map();
 const photoLayouts = new Map();
 const photoGroups = new Map();
 const selectedByCriterion = new Map();
@@ -29,6 +40,16 @@ const descriptions = new Map();
 const titles = new Map();
 const layoutFor = key => photoLayouts.get(key) ?? 'two';
 const photosFor = key => photoGroups.get(key) ?? [];
+const showSection = (key,section) => sectionPreferences.get(key)?.[section] !== false;
+const allCriteria = () => [
+  ...PORTFOLIO_CRITERIA.map(c=>({...c,title:criterionNames.get(c.number)||c.title,originalTitle:c.title,custom:false})),
+  ...extraCriteria.map(c=>({...c,title:criterionNames.get(c.number)||c.title,originalTitle:c.title,custom:true})),
+];
+function forgetWitness(id){
+  for(const photo of photosFor(id)) URL.revokeObjectURL(photo.url);
+  photoGroups.delete(id);photoLayouts.delete(id);descriptions.delete(id);
+  titles.delete(id);sectionPreferences.delete(id);hiddenWitnesses.delete(id);
+}
 let photoError = '';
 function context() {
   const year = store.activeYear();
@@ -54,23 +75,52 @@ function context() {
     assignments:store.state.assignments ?? [],
     submissions:store.state.submissions ?? [],
   });
+  const criteria=allCriteria();
+  const criterion=criteria.find(c=>c.number===editingCriterion)||criteria[0];
+  if(editingCriterion!==criterion.number)editingCriterion=criterion.number;
   const recorded = sources.filter(candidate=>candidate.criterion===editingCriterion);
   const templates = templatesForCriterion(editingCriterion);
-  const candidates = [...recorded,...templates];
-  const manualId='manual:'+editingCriterion;
+  const personal = customWitnesses.filter(w=>w.criterion===editingCriterion);
+  const candidates = [...recorded,...personal,...templates];
+  const available = candidates.filter(w=>!hiddenWitnesses.has(w.id));
   const lastChoice=selectedByCriterion.get(editingCriterion);
-  const chosenId=selectedSuggestionId ?? lastChoice ?? candidates[0]?.id ?? manualId;
-  const proposal=chosenId===manualId?null:(candidates.find(s=>s.id===chosenId)||candidates[0]||null);
-  selectedSuggestionId=proposal?.id ?? manualId;
-  selectedByCriterion.set(editingCriterion,selectedSuggestionId);
-  const photoKey=proposal?.id ?? manualId;
+  const chosenId=selectedSuggestionId ?? lastChoice ?? available[0]?.id ?? null;
+  const proposal=available.find(w=>w.id===chosenId)||available[0]||null;
+  selectedSuggestionId=proposal?.id ?? null;
+  if(proposal)selectedByCriterion.set(editingCriterion,proposal.id);
+  const photoKey=proposal?.id ?? 'manual:'+editingCriterion;
   const guide=guideForCriterion(editingCriterion);
   const summaryBase = portfolioDesignSummary(evidence);
-  const summary = {...summaryBase,criteria:summaryBase.criteria.map(c=>({...c,
-    page:c.number===editingCriterion && (proposal||photosFor(photoKey).length) ? '4':'—'}))};
-  const criterion = PORTFOLIO_CRITERIA.find(c => c.number === editingCriterion) ?? PORTFOLIO_CRITERIA[8];
-  const canPrint=!!proposal || photosFor(photoKey).length>0 || !!descriptions.get(photoKey)?.trim();
+  const printCriteria = criteria.filter(c=>!hiddenCriteria.has(c.number));
+  const summary = {...summaryBase,criteriaCount:printCriteria.length,criteria:printCriteria.map(c=>({
+    ...c,page:c.number===editingCriterion && !hiddenCriteria.has(editingCriterion) &&
+      (proposal || photosFor(photoKey).length) ? '4':'—',
+  }))};
+  const canPrint=!hiddenCriteria.has(editingCriterion) && (
+    (!!proposal && proposal.sourceKind!=='custom') ||
+    photosFor(photoKey).length>0 || !!descriptions.get(photoKey)?.trim()
+  );
   const title=titles.get(photoKey)??proposal?.title??guide?.evidence??criterion.title;
+  const visibleCandidates=available.filter(w=>{
+    if(libraryFilter==='rakeez' && (w.sourceKind==='template'||w.sourceKind==='custom'))return false;
+    if(libraryFilter==='templates' && w.sourceKind!=='template')return false;
+    if(libraryFilter==='my' && w.sourceKind!=='custom')return false;
+    const q=libraryQuery.trim().toLocaleLowerCase('ar');
+    return !q || (w.title+' '+(w.description||'')).toLocaleLowerCase('ar').includes(q);
+  });
+  const criteriaNav=criteria.map(c=>({
+    ...c,excluded:hiddenCriteria.has(c.number),
+    candidateCount:sources.filter(w=>w.criterion===c.number).length+
+      templatesForCriterion(c.number).filter(w=>!hiddenWitnesses.has(w.id)).length+
+      customWitnesses.filter(w=>w.criterion===c.number).length,
+  }));
+  const includedSections={
+    metrics:showSection(photoKey,'metrics'),
+    table:showSection(photoKey,'table'),
+    chart:showSection(photoKey,'chart'),
+    illustration:showSection(photoKey,'illustration'),
+    photos:showSection(photoKey,'photos'),
+  };
   const profile = store.state.profile ?? {};
   const person = {
     teacher: short(profile.teacherName, 'اسم المعلم'),
@@ -78,7 +128,9 @@ function context() {
     department: short(profile.educationDepartment, 'إدارة التعليم'),
   };
   return {year,terms,evidence,summary,person,criterion,guide,proposal,candidates,sources,photoKey,
-    photos:photosFor(photoKey),photoLayout:layoutFor(photoKey),
+    visibleCandidates,criteriaNav,libraryFilter,libraryQuery,hiddenCount:candidates.filter(w=>hiddenWitnesses.has(w.id)).length,
+    criterionExcluded:hiddenCriteria.has(editingCriterion),criterionEditorOpen,
+    includedSections,photos:photosFor(photoKey),photoLayout:layoutFor(photoKey),
     description:descriptions.get(photoKey)??proposal?.description??'',title,canPrint};
 }
 
@@ -176,6 +228,26 @@ function coverage(ctx) {
   </section>`;
 }
 
+function witnessSectionsControls(ctx, hasData, chartRows) {
+  const options=[
+    ...((hasData || ctx.proposal?.metrics?.length) ? [['metrics','مؤشرات العمل']] : []),
+    ...((hasData || ctx.proposal?.table?.length) ? [['table','الجدول']] : []),
+    ...(hasData && chartRows.length ? [['chart','توزيع المتابعة على الفصول']] : []),
+    ...(ctx.proposal?.visualSteps?.length ? [['illustration','المخطط التوضيحي']] : []),
+    ['photos','الصور المرفقة'],
+  ];
+  return html`<div class="folio-evidence__sections noprint">
+    <strong>محتوى الشاهد</strong>
+    <div class="folio-evidence__section-options" role="group" aria-label="إظهار وإخفاء عناصر الشاهد">
+      ${options.map(([id,name])=>html`<label>
+        <input type="checkbox" data-change="toggle-section" data-section="${id}"
+          ${ctx.includedSections[id]?'checked':''} />
+        <span>${name}</span>
+      </label>`)}
+    </div>
+  </div>`;
+}
+
 function witnessImageTools(ctx) {
   return html`<div class="folio-evidence__media-tools noprint" role="group" aria-label="صور الشاهد المحدد">
     <label class="folio-evidence__upload">
@@ -200,7 +272,9 @@ function evidencePage(ctx) {
   const rows = evidence.rows.slice(0,4);
   const hasData = isAttendance && evidence.recordedSessions > 0;
   const cols = photoLayout === 'one' ? 1 : photoLayout === 'three' ? 3 : 2;
-  const firstPhotos = photos.slice(0, {one:2,two:4,three:6}[photoLayout] ?? 4);
+  const reserveFirstPageForChart = hasData && ctx.includedSections.chart;
+  const firstPhotos = ctx.includedSections.photos && !reserveFirstPageForChart
+    ? photos.slice(0, {one:2,two:4,three:6}[photoLayout] ?? 4) : [];
   const rowsOfPhotos = Math.ceil(firstPhotos.length / cols) || 1;
   const photoHeight = Math.min(164, Math.max(72, Math.floor(290 / rowsOfPhotos)));
   const sectionCounts = new Map();
@@ -230,19 +304,20 @@ function evidencePage(ctx) {
       <div><small>المعيار المهني</small><strong>${criterion.title}</strong></div>
       <div><small>نطاق الإنجاز</small><strong>جميع الفصول والمواد</strong></div>
     </div>
+    ${witnessSectionsControls(ctx,hasData,chartRows)}
     ${hasData?html`
-      <div class="folio-evidence__metrics">
+      ${ctx.includedSections.metrics?html`<div class="folio-evidence__metrics">
         <div><span>حصص جرى رصدها</span><strong>${digits.format(evidence.recordedSessions)}</strong></div>
         <div><span>حصص اكتمل رصدها</span><strong>${digits.format(evidence.fullSessions)}</strong></div>
         <div><span>فصول شملتها المتابعة</span><strong>${digits.format(new Set(evidence.rows.map(row=>row.section)).size)}</strong></div>
-      </div>
-      <div class="folio-evidence__section-head"><h3>نماذج من أعمال المتابعة</h3><span>${short(year?.label)}</span></div>
+      </div>`:''}
+      ${ctx.includedSections.table?html`<div class="folio-evidence__section-head"><h3>نماذج من أعمال المتابعة</h3><span>${short(year?.label)}</span></div>
       <table class="folio-evidence__table">
         <thead><tr><th>التاريخ</th><th>الفصل</th><th>المادة</th><th>الحصة</th></tr></thead>
         <tbody>${rows.map(row=>html`<tr><td>${date(row.date)}</td><td>${row.section}</td>
           <td>${row.subject}</td><td>${digits.format(row.period)}</td></tr>`)}</tbody>
-      </table>
-      ${!photos.length && chartRows.length ? html`<div class="folio-evidence__chart">
+      </table>`:''}
+      ${ctx.includedSections.chart && chartRows.length ? html`<div class="folio-evidence__chart">
         <div class="folio-evidence__section-head"><h3>توزيع أعمال المتابعة على الفصول</h3><span>${digits.format(evidence.recordedSessions)} حصة موثقة بالرصد</span></div>
         ${chartRows.map(([label,count])=>html`<div class="folio-evidence__chart-row">
           <span>${label}</span><div class="folio-evidence__chart-track"><i style="width:${Math.round(count/chartMax*100)}%"></i></div>
@@ -251,14 +326,14 @@ function evidencePage(ctx) {
       </div>` : ''}
       `:''}
     ${proposal && !isAttendance?html`
-      <div class="folio-evidence__metrics">
+      ${ctx.includedSections.metrics && proposal.metrics.length?html`<div class="folio-evidence__metrics">
         ${proposal.metrics.slice(0,3).map(([label,value])=>html`<div><span>${label}</span><strong>${typeof value==='number'?digits.format(value):value}</strong></div>`)}
-      </div>
-      ${proposal.table?.length?html`<div class="folio-evidence__section-head"><h3>نماذج من الأعمال المسجلة</h3></div>
+      </div>`:''}
+      ${ctx.includedSections.table && proposal.table?.length?html`<div class="folio-evidence__section-head"><h3>نماذج من الأعمال المسجلة</h3></div>
         <table class="folio-evidence__table"><thead><tr>${proposal.tableHeaders.map(h=>html`<th>${h}</th>`)}</tr></thead>
           <tbody>${proposal.table.map(row=>html`<tr>${row.map(cell=>html`<td>${cell}</td>`)}</tr>`)}</tbody></table>`:''}
     `:''}
-    ${proposal?.sourceKind==='template' && !photos.length && proposal.visualSteps?.length ? html`
+    ${ctx.includedSections.illustration && proposal?.sourceKind==='template' && !photos.length && proposal.visualSteps?.length ? html`
       <div class="folio-evidence__illustration" role="group" aria-label="مخطط توضيحي للنشاط">
         <div class="folio-evidence__image-caption"><h3>خطوات النشاط</h3><span>مخطط توضيحي</span></div>
         <div class="folio-evidence__steps">
@@ -268,10 +343,10 @@ function evidencePage(ctx) {
           </div>`)}
         </div>
       </div>` : ''}
-    <div class="folio-evidence__image-block ${firstPhotos.length ? '' : 'noprint'}">
+    <div class="folio-evidence__image-block ${firstPhotos.length && ctx.includedSections.photos ? '' : 'noprint'}">
       <div class="folio-evidence__image-caption"><h3>صور الشاهد</h3><span>${photos.length ? `${digits.format(photos.length)} صور` : ''}</span></div>
       ${witnessImageTools(ctx)}
-      ${firstPhotos.length ? html`<div class="folio-evidence__gallery folio-evidence__gallery--${photoLayout}" style="--folio-photo-height:${photoHeight}px">
+      ${ctx.includedSections.photos && firstPhotos.length ? html`<div class="folio-evidence__gallery folio-evidence__gallery--${photoLayout}" style="--folio-photo-height:${photoHeight}px">
         ${firstPhotos.map((photo, i)=>html`<figure class="folio-evidence__gallery-item">
           <img class="folio-evidence__photo" src="${photo.url}" alt="صورة داعمة رقم ${digits.format(i+1)}" loading="eager" decoding="async" />
           <figcaption class="folio-evidence__image-tools noprint"><span>${photo.name}</span>
@@ -288,10 +363,13 @@ function evidencePage(ctx) {
 
 function photoContinuation(ctx) {
   const {photos,photoLayout,criterion} = ctx;
-  const first = {one:2,two:4,three:6}[photoLayout] ?? 4;
+  const chartOnFirstPage=ctx.proposal?.id==='rakeez:attendance:'+ctx.year?.id &&
+    ctx.evidence.recordedSessions>0 && ctx.includedSections.chart;
+  const first = chartOnFirstPage ? 0 : ({one:2,two:4,three:6}[photoLayout] ?? 4);
   const capacity = {one:4,two:8,three:9}[photoLayout] ?? 8;
   const cols = photoLayout === 'one' ? 1 : photoLayout === 'three' ? 3 : 2;
   const pages=[];
+  if(!ctx.includedSections.photos)return pages;
   for(let offset=first; offset<photos.length; offset+=capacity) {
     const batch=photos.slice(offset,offset+capacity);
     const num=5+pages.length;
@@ -321,32 +399,86 @@ function photoContinuation(ctx) {
   return pages;
 }
 
-function suggestionsPanel(ctx) {
-  const {guide,proposal,candidates} = ctx;
-  return html`<section class="folio-suggestion-studio noprint" aria-label="مساعد تجهيز الشواهد">
-    <header class="folio-suggestion-studio__head">
-      <div><span>مساعد ركيز</span><h2>مكتبة الشواهد الجاهزة</h2>
-        <p>اختر شاهدًا من أعمالك المسجلة أو قالبًا مناسبًا، وعدّله مباشرة داخل صفحة الشاهد.</p></div>
-      <strong class="folio-suggestion-studio__count">${digits.format(candidates.length)} خيارات</strong>
-    </header>
-    <div class="folio-suggestion-studio__candidates">
-      ${candidates.map(item=>html`<button type="button"
-        class="folio-suggestion-studio__choice ${proposal?.id===item.id?'is-selected':''}"
-        data-act="pick-suggestion" data-id="${item.id}" aria-pressed="${proposal?.id===item.id}">
-          <strong>${item.title}</strong>
-          <small>${item.sourceKind==='template'?'قالب قابل للتخصيص':'من بيانات ركيز'}</small>
-      </button>`)}
-      <button type="button" class="folio-suggestion-studio__choice ${!proposal?'is-selected':''}"
-        data-act="manual-suggestion" aria-pressed="${!proposal}">
-        <strong>شاهد جديد</strong><small>أبدأ بعنوان ووصف وصور خاصة بي</small>
+function criteriaNavigator(ctx) {
+  return html`<aside class="folio-criteria noprint" aria-label="مجالات ملف الإنجاز">
+    <div class="folio-criteria__head">
+      <div><span>ملف الإنجاز</span><h2>المعايير المهنية</h2></div>
+      <button type="button" class="folio-criteria__toggle" data-act="toggle-criteria"
+        aria-expanded="${navigatorOpen}" aria-controls="folio-criteria-list">
+        ${ctx.criterion.number} · ${ctx.criterion.title} <span aria-hidden="true">⌄</span>
       </button>
     </div>
+    <div id="folio-criteria-list" class="folio-criteria__list ${navigatorOpen?'is-expanded':''}">
+      ${ctx.criteriaNav.map(c=>html`<button type="button" class="folio-criteria__item
+         ${c.number===editingCriterion?'is-selected':''} ${c.excluded?'is-excluded':''}"
+         data-act="select-criterion" data-id="${c.number}" aria-current="${c.number===editingCriterion?'true':'false'}">
+        <span class="folio-criteria__number">${c.number}</span>
+        <span class="folio-criteria__title">${c.title}</span>
+        <span class="folio-criteria__count" aria-label="${c.candidateCount} خيارات">${digits.format(c.candidateCount)}</span>
+      </button>`)}
+      <button type="button" class="folio-criteria__add" data-act="add-criterion">+ إضافة قسم خاص</button>
+    </div>
+    <div class="folio-criteria__settings">
+      ${criterionEditorOpen?html`<label class="field">
+        <span class="field__label">اسم القسم في ملفي</span>
+        <input class="input" data-change="criterion-name" value="${ctx.criterion.title}"
+          maxlength="70" aria-label="اسم القسم في ملفي" />
+      </label>
+      <button class="btn btn--ghost" type="button" data-act="close-criterion-editor">تم</button>
+      ${!ctx.criterion.custom && criterionNames.has(editingCriterion)?
+        html`<button class="btn btn--ghost" type="button" data-act="reset-criterion-name">الاسم الأصلي</button>`:''}
+      `:html`<button class="folio-criteria__edit" type="button" data-act="edit-criterion">تخصيص اسم القسم</button>`}
+      <button class="folio-criteria__edit" type="button" data-act="toggle-criterion-in-file">
+        ${ctx.criterionExcluded?'إظهار القسم في الملف':'إخفاء القسم من الملف'}
+      </button>
+      ${ctx.criterion.custom?html`<button class="folio-criteria__edit is-danger" type="button"
+        data-act="delete-custom-criterion">حذف القسم الخاص</button>`:''}
+    </div>
+  </aside>`;
+}
+
+function suggestionsPanel(ctx) {
+  const {guide,proposal,visibleCandidates} = ctx;
+  return html`<section class="folio-suggestion-studio noprint" aria-label="مكتبة الشواهد">
+    <header class="folio-suggestion-studio__head">
+      <div><span>الشواهد</span><h2>اختر شاهدًا أو أنشئ شاهدًا جديدًا</h2></div>
+      <button class="btn btn--primary" type="button" data-act="manual-suggestion">+ شاهد جديد</button>
+    </header>
+    <div class="folio-library__tools">
+      <input class="input folio-library__search" data-input="library-search"
+        value="${ctx.libraryQuery}" placeholder="ابحث عن شاهد…" aria-label="بحث في الشواهد" />
+      <div class="folio-library__filters" role="group" aria-label="مصدر الشواهد">
+        ${[['all','الكل'],['rakeez','من ركيز'],['templates','نماذج جاهزة'],['my','شواهدي']].map(([id,label])=>html`
+          <button type="button" data-act="library-filter" data-id="${id}"
+            class="folio-library__filter ${ctx.libraryFilter===id?'is-active':''}"
+            aria-pressed="${ctx.libraryFilter===id}">${label}</button>`)}
+      </div>
+    </div>
+    <div class="folio-suggestion-studio__candidates" data-library-results>
+      ${visibleCandidates.map(item=>html`<button type="button"
+        class="folio-suggestion-studio__choice ${proposal?.id===item.id?'is-selected':''}"
+        data-library-card data-search="${(item.title+' '+(item.description||'')).toLocaleLowerCase('ar')}"
+        data-act="pick-suggestion" data-id="${item.id}" aria-pressed="${proposal?.id===item.id}">
+          <strong>${titles.get(item.id)||item.title}</strong>
+          <span>${item.description?.slice(0,84)||'شاهد قابل للتعديل وإضافة الصور'}</span>
+          <small>${item.sourceKind==='template'?'قالب مقترح':
+            item.sourceKind==='custom'?'شاهد خاص':'من سجلات ركيز'}</small>
+      </button>`)}
+      <p class="folio-library__empty" data-library-empty ${visibleCandidates.length?'hidden':''}>لا توجد شواهد مطابقة.</p>
+    </div>
+    ${ctx.hiddenCount?html`<button type="button" class="folio-library__restore"
+      data-act="restore-witnesses">إظهار الشواهد المخفية (${digits.format(ctx.hiddenCount)})</button>`:''}
+    ${proposal?html`<div class="folio-library__selected">
+      <span>المحدد: <strong>${titles.get(proposal.id)||proposal.title}</strong></span>
+      <button type="button" class="folio-library__selected-action" data-act="hide-witness">
+        ${proposal.sourceKind==='custom'?'حذف شاهدي':'إخفاء من مكتبتي'}</button>
+    </div>`:''}
     <details class="folio-suggestion-studio__details">
-      <summary>أمثلة ومصادر داعمة لهذا المعيار</summary>
+      <summary>تفاصيل المعيار ومصادر الشواهد</summary>
       <div class="folio-suggestion-studio__details-body">
-        <p><strong>مكونات الشاهد:</strong> ${guide?.content||''}</p>
-        <p><strong>إضافة مقترحة:</strong> ${proposal?.imageHint||guide?.minimum||''}</p>
-        <p><strong>مصادر لاحقة:</strong> مدرستي (${guide?.madrasati||'غير متاح'})، نور (${guide?.noor||'غير متاح'}).</p>
+        <p><strong>أمثلة:</strong> ${guide?.content||''}</p>
+        <p><strong>مصادر مستقبلية:</strong> مدرستي (${guide?.madrasati||'غير متاح'})،
+          نور (${guide?.noor||'غير متاح'}).</p>
       </div>
     </details>
   </section>`;
@@ -357,17 +489,19 @@ export default {
   subtitle: ()=>store.activeYear()?.label ?? '',
   back: ()=>'#/reports',
   wide: true,
-  beforeRender() { loadStyle(); editingCriterion = '09'; selectedSuggestionId=null; photoError = ''; },
+  beforeRender() { loadStyle(); editingCriterion='09'; selectedSuggestionId=null;photoError=''; },
   onUnmount() {
-    for (const group of photoGroups.values()) for (const photo of group) URL.revokeObjectURL(photo.url);
-    photoGroups.clear(); photoLayouts.clear(); selectedByCriterion.clear(); descriptions.clear(); titles.clear();
-    selectedSuggestionId=null; photoError = '';
+    for(const group of photoGroups.values())for(const photo of group)URL.revokeObjectURL(photo.url);
+    photoGroups.clear();photoLayouts.clear();selectedByCriterion.clear();
+    descriptions.clear();titles.clear();criterionNames.clear();hiddenCriteria.clear();
+    hiddenWitnesses.clear();sectionPreferences.clear();extraCriteria.length=0;
+    customWitnesses.length=0;nextExtraCriterionNumber=12;
+    editingCriterion='09';selectedSuggestionId=null;navigatorOpen=false;
+    criterionEditorOpen=false;libraryFilter='all';libraryQuery='';photoError='';
   },
   render() {
     const ctx = context();
     const extraPages = photoContinuation(ctx);
-    const navPages = [['1','الغلاف'],['2','الفهرس'],['3','موجز الإنجازات'],['4','الشاهد المختار'],
-      ...extraPages.map((_,i)=>[String(i+5),'صور الشاهد'])];
     return html`<div class="folio-page" dir="rtl">
       <header class="folio-workspace noprint">
         <div><span class="folio-workspace__eyebrow">ملف الإنجاز · مراجعة التصميم</span>
@@ -375,30 +509,107 @@ export default {
           <p>ملف شامل لأعمال المعلم في جميع مواده وفصوله خلال العام الدراسي، مع شواهد وصور لكل معيار.</p></div>
         <span class="folio-workspace__status">Preview فقط</span>
       </header>
-      <section class="folio-toolbar noprint" aria-label="التحكم في نموذج الملف">
-        <label class="field folio-toolbar__class"><span class="field__label">المعيار الذي تود تنسيق شواهده</span>
-          <select class="select" data-change="criterion" aria-label="معيار الشاهد">
-            ${PORTFOLIO_CRITERIA.map(c=>html`<option value="${c.number}" ${c.number===editingCriterion?'selected':''}>${c.number} · ${c.title}</option>`)}
-          </select>
-        </label>
-        <button class="btn btn--primary" data-act="print" ${ctx.canPrint?'':'disabled'}>${icon('print')} طباعة / PDF</button>
+      <section class="folio-toolbar noprint" aria-label="إجراءات ملف الإنجاز">
+        <span class="folio-toolbar__year">${short(ctx.year?.label)}</span>
+        <button class="btn btn--primary" data-act="print" ${ctx.canPrint?'':'disabled'}>
+          ${icon('print')} تصدير الشاهد / PDF</button>
         ${photoError?html`<p class="folio-toolbar__helper" role="status">${photoError}</p>`:''}
       </section>
-      ${suggestionsPanel(ctx)}
-      <nav class="folio-nav noprint" aria-label="صفحات النموذج">
-        ${navPages.map(([n,title])=>html`
-          <button type="button" class="folio-nav__item" data-act="go" data-page="${n}">
-            <span>${digits.format(Number(n))}</span> ${title}</button>`)}
-      </nav>
-      <div class="print-report folio-document" data-folio-document>
-        ${cover(ctx)}${contents(ctx)}${coverage(ctx)}${evidencePage(ctx)}${extraPages}
+      <div class="folio-editor-shell">
+        ${criteriaNavigator(ctx)}
+        <div class="folio-editor-main">
+          ${suggestionsPanel(ctx)}
+          <nav class="folio-nav noprint" aria-label="معاينة صفحات الملف">
+            ${[['4','الشاهد'],['1','الغلاف'],['2','الفهرس'],['3','موجز الأعمال'],
+               ...extraPages.map((_,i)=>[String(i+5),'صور إضافية'])].map(([n,title])=>html`
+              <button type="button" class="folio-nav__item" data-act="go" data-page="${n}">
+                <span>${digits.format(Number(n))}</span> ${title}</button>`)}
+          </nav>
+          <div class="print-report folio-document" data-folio-document>
+            ${cover(ctx)}${contents(ctx)}${coverage(ctx)}${evidencePage(ctx)}${extraPages}
+          </div>
+        </div>
       </div>
     </div>`;
   },
   actions: {
-    criterion(el) { editingCriterion = el.value; selectedSuggestionId=null; photoError = ''; repaint(); },
-    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id; selectedByCriterion.set(editingCriterion,selectedSuggestionId); repaint(); },
-    'manual-suggestion'() { selectedSuggestionId='manual:'+editingCriterion;selectedByCriterion.set(editingCriterion,selectedSuggestionId); repaint(); },
+    'toggle-criteria'() { navigatorOpen=!navigatorOpen;repaint(); },
+    'select-criterion'(el) {
+      editingCriterion=el.dataset.id;
+      selectedSuggestionId=selectedByCriterion.get(editingCriterion)||null;
+      navigatorOpen=false;criterionEditorOpen=false;libraryQuery='';libraryFilter='all';
+      photoError='';repaint();
+    },
+    'add-criterion'() {
+      const number=String(nextExtraCriterionNumber++);
+      extraCriteria.push({number,title:'قسم إضافي',weight:0});
+      editingCriterion=number; selectedSuggestionId=null;criterionEditorOpen=true;
+      navigatorOpen=false; libraryQuery='';libraryFilter='all';repaint();
+    },
+    'edit-criterion'(){criterionEditorOpen=true;repaint();},
+    'close-criterion-editor'(){criterionEditorOpen=false;repaint();},
+    'criterion-name'(el) {
+      const value=el.value.trim().slice(0,70);
+      if(value) criterionNames.set(editingCriterion,value);
+      else criterionNames.delete(editingCriterion);
+      repaint();
+    },
+    'reset-criterion-name'(){criterionNames.delete(editingCriterion);repaint();},
+    'toggle-criterion-in-file'(){
+      if(hiddenCriteria.has(editingCriterion))hiddenCriteria.delete(editingCriterion);
+      else hiddenCriteria.add(editingCriterion);
+      repaint();
+    },
+    'delete-custom-criterion'() {
+      const index=extraCriteria.findIndex(c=>c.number===editingCriterion);
+      if(index<0)return;
+      extraCriteria.splice(index,1);
+      for(let i=customWitnesses.length-1;i>=0;i--)
+        if(customWitnesses[i].criterion===editingCriterion){
+          forgetWitness(customWitnesses[i].id);customWitnesses.splice(i,1);
+        }
+      criterionNames.delete(editingCriterion);hiddenCriteria.delete(editingCriterion);
+      selectedByCriterion.delete(editingCriterion);
+      editingCriterion='09';selectedSuggestionId=selectedByCriterion.get('09')||null;
+      criterionEditorOpen=false;repaint();
+    },
+    'library-filter'(el){libraryFilter=el.dataset.id;repaint();},
+    'library-search'(el) {
+      libraryQuery=el.value;
+      const q=libraryQuery.trim().toLocaleLowerCase('ar');
+      const cards=el.closest('.folio-suggestion-studio')?.querySelectorAll('[data-library-card]')||[];
+      for(const card of cards)card.hidden=!!q && !(card.dataset.search||'').includes(q);
+      const empty=el.closest('.folio-suggestion-studio')?.querySelector('[data-library-empty]');
+      if(empty)empty.hidden=[...cards].some(card=>!card.hidden);
+    },
+    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id;selectedByCriterion.set(editingCriterion,selectedSuggestionId);repaint(); },
+    'manual-suggestion'() {
+      const id='custom:'+editingCriterion+':'+crypto.randomUUID();
+      customWitnesses.push({id,criterion:editingCriterion,title:'شاهد جديد',
+        description:'',sourceKind:'custom',metrics:[],table:[]});
+      selectedSuggestionId=id;selectedByCriterion.set(editingCriterion,id);
+      titles.set(id,'شاهد جديد');libraryFilter='all';libraryQuery='';repaint();
+    },
+    'hide-witness'() {
+      const proposal=context().proposal;if(!proposal)return;
+      if(proposal.sourceKind==='custom'){
+        const index=customWitnesses.findIndex(w=>w.id===proposal.id);
+        if(index>=0)customWitnesses.splice(index,1);
+        forgetWitness(proposal.id);
+      }else hiddenWitnesses.add(proposal.id);
+      selectedByCriterion.delete(editingCriterion);
+      selectedSuggestionId=null;repaint();
+    },
+    'restore-witnesses'(){
+      for(const proposal of context().candidates)hiddenWitnesses.delete(proposal.id);
+      repaint();
+    },
+    'toggle-section'(el){
+      const key=context().photoKey;
+      const prev=sectionPreferences.get(key)||{};
+      sectionPreferences.set(key,{...prev,[el.dataset.section]:el.checked});
+      repaint();
+    },
     'suggestion-title'(el) { const key=context().photoKey; titles.set(key,el.value.slice(0,100)); repaint(); },
     'suggestion-description'(el) { const key=context().photoKey; descriptions.set(key,el.value.slice(0,450)); repaint(); },
     layout(el) { photoLayouts.set(context().photoKey, el.value); repaint(); },
