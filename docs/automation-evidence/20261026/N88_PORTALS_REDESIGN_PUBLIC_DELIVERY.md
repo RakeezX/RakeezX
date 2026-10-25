@@ -52,3 +52,9 @@ Current affected checks: exact decoded patch hash/path set, four preimages/targe
 ## Independent publisher evidence
 
 Public Git integration, standard build, Pages deployment and canonical served-source/asset verification: **NOT_RUN in this source worker**. The sole controller/publisher owns these steps and their new immutable receipt. No new public publisher proof exists at candidate preparation; the controller must record the actual integrated revision, provider identity and canonical served assets before claiming delivery. No push/deploy, queue/ledger edit, live proof repeat, manual PO trial or whole-N88 closure is performed here.
+
+## Saved-session result-scope correction
+
+Continuation run `a3de341b-39d5-4889-a067-2be881d205e5` preserves source candidate `cf1bedbc7279f81ff3a5192375cd18669da22251` and its completed checks. The preceding result was rejected with `Candidate validation: An affected check must pass and no recorded check may fail`: it incorrectly included the original custodian's historical private served-HTML byte FAIL as a check of this source-only attempt. That historical result remains FAIL above and in the immutable original receipt; no gate was rerun, repaired or changed to PASS. The activated card explicitly retains that limitation and requests source-only readiness after exact public transfer.
+
+This continuation changes only this evidence document. Its result check list covers the three required source/prerequisite/evidence-preservation checks and scoped syntax/whitespace/path validation, reusing their completed evidence for unchanged source. Private HTML and public publisher operations are not executed by this continuation. The historical private HTML failure remains an explicit limitation in the result summary; public publication remains NOT_RUN. No controller rule, queue state, permission, service artifact or acceptance requirement is changed.
