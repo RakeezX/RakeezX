@@ -6,7 +6,7 @@ import { certificateCard, certificatePng, certificatePdf, isCertificateReady, dr
 import { certificatePdfFromJpeg } from '../src/lib/certificate-pdf.js';
 import { CERTIFICATE_DESIGNS, CERTIFICATE_MEDALS, CERTIFICATE_TEXT_LIMIT, certificateText, defaultCertificateText, certificateMetadata, HEADER_FONT_FAMILY } from '../src/lib/certificate-designs.js';
 
-const titleArtwork = { naturalWidth: 2655, naturalHeight: 479 };
+const titleArtwork = { naturalWidth: 766, naturalHeight: 165 };
 
 const approvedText = 'تقديرًا لجهوده المتميزة، واجتهاده ومثابرته في طلب العلم، وتشجيعًا له على مواصلة مسيرة التميّز والإبداع، سائلين الله له دوام التوفيق والسداد';
 
@@ -65,8 +65,8 @@ test('approved default text is exact for every subject and editable text remains
 });
 
 test('both designs display bounded identity, the original Ministry logo, the fixed medal and the complete edited text', () => {
-  const approvedTitle = readFileSync(new URL('../assets/certificates/title-thuluth-gold.png', import.meta.url));
-  assert.equal(createHash('sha256').update(approvedTitle).digest('hex'), '7f92dafc19aa5bcd8f69798db558f02a13c0dc5b4d8efde3d7c601d6caeb3531', 'Keep the exact Thuluth model selected by the PO');
+  const approvedTitle = readFileSync(new URL('../assets/certificates/title-approved-first-gold.svg', import.meta.url));
+  assert.equal(createHash('sha256').update(approvedTitle).digest('hex'), 'b8b27a0b6f08f5bb98ba813501c9069177343210c0741229802e0c936c8933fe', 'Keep the exact approved first-design lettering selected by the PO');
   const card = certificateCard({ studentName: '\u202eعبدالله بن عبدالرحمن بن محمد بن عبدالعزيز بن عبدالله آل مبدي العتيبي', text: 'تقديرًا لمثابرتك وإبداعك.\nنعتز بجهدك ونحتفي بإنجازك.', demo: true });
   const raw = { schoolName: 'مدرسة\u202e تجريبية', teacherName: 'معلم تجريبي', principalName: 'مدير تجريبي',
     educationDepartment: 'إدارة تعليم تجريبية', className: 'الخامس 1', subjectName: 'المهارات الرقمية',
@@ -85,8 +85,8 @@ test('both designs display bounded identity, the original Ministry logo, the fix
     assert.equal(titleDraws.length, 1, 'Paint the approved complete Thuluth phrase once');
     const [, titleX, titleY, titleWidth, titleHeight] = titleDraws[0];
     assert.ok(Math.abs(titleX + titleWidth / 2 - canvas.width / 4) < 1e-8);
-    assert.ok(Math.abs(titleWidth / titleHeight - 2655 / 479) < 1e-10, 'Preserve the approved lettering proportions');
-    assert.ok(titleY >= 205 && titleY + titleHeight < 361, 'Keep the title clear of the logo and flourish');
+    assert.ok(Math.abs(titleWidth / titleHeight - 766 / 165) < 1e-10, 'Preserve the approved lettering proportions');
+    assert.ok(titleY >= 200 && titleY + titleHeight < 379, 'Keep the title clear of the logo and flourish');
     const department = canvas.lettering.find(entry => entry.text === raw.educationDepartment);
     const school = canvas.lettering.find(entry => entry.text === 'مدرسة تجريبية');
     assert.ok(department.x > x + width, 'Education department belongs to the right of the centered logo');
