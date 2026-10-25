@@ -1,7 +1,7 @@
 /** AI: staged browser composition. Activation requires a reviewed source change. */
 import { createPushClient } from './notification-push-client.js';
 import { createPushBrowser } from './notification-push-browser.js';
-import { createPushGateway } from './notification-push-gateway.js';
+import { createPushGateway, N44_CONFIG_SERVICE_PHASES } from './notification-push-gateway.js';
 import { currentNotificationContext, currentNotificationEvents, notificationDestination } from './notification-events.js';
 import { readNotificationCategories, readNotificationTiming } from './notification-state.js';
 import { LEASE_STORAGE_PREFIX } from './offline-lease.js';
@@ -197,7 +197,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       if (!await g.remove() || !valid() || existing && !await existing.unsubscribe()) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
       ready = true; status = 'unsubscribed'; mark('ready');
     } catch (error) { status = 'unavailable'; if (!valid()) { configObservation = null; mark('binding_changed', { configuration: 'not_observed' }); } else if (eligibility.reason === 'checking_configuration') {
-      configObservation = { binding: b, generation: token, outcome: error.configOutcome ?? { httpStatus: null, phase: 'request' } };
+      const observed = error.configOutcome;
+      const outcome = { httpStatus: observed?.httpStatus ?? null, phase: observed?.phase ?? 'request' };
+      if (outcome.httpStatus === 503 && outcome.phase === 'http' && N44_CONFIG_SERVICE_PHASES.includes(observed?.servicePhase)) outcome.servicePhase = observed.servicePhase;
+      configObservation = { binding: b, generation: token, outcome };
       mark('request_unavailable', { configuration: 'request_failed' });
     } else if (eligibility.reason === 'checking_context') mark('context_unavailable'); }
     finally {

@@ -104,6 +104,7 @@ const view = {
           <summary>نتيجة التحقق من إعداد تذكيرات الجهاز</summary>
           <dl><dt>HTTP</dt><dd dir="ltr">${Number.isInteger(push.configOutcome.httpStatus) && push.configOutcome.httpStatus >= 100 && push.configOutcome.httpStatus <= 599 ? push.configOutcome.httpStatus : 'UNKNOWN'}</dd>
           <dt>المرحلة</dt><dd dir="ltr">${['request', 'transport', 'http', 'response_read', 'response_size', 'decode', 'shape', 'context', 'deadline', 'complete'].includes(push.configOutcome.phase) ? push.configOutcome.phase : 'request'}</dd>
+          ${push.configOutcome.servicePhase ? html`<dt>مرحلة الخدمة (وصف عام)</dt><dd dir="ltr" data-n44-config-service-phase>${push.configOutcome.servicePhase}</dd>` : ''}
           <dt>النتيجة</dt><dd>${configResultText[push.eligibility?.configuration] ?? eligibilityText.idle}</dd></dl>
         </details>` : ''}
         ${push?.preferenceStopped && push.status !== 'cleanup_pending' ? html`<p role="status">أُوقفت تذكيرات الجهاز بعد تعديل التفضيلات. أعد تفعيلها لتطبيق التفضيلات الجديدة.</p>` : ''}

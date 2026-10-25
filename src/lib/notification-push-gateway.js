@@ -3,6 +3,41 @@ export const N44_PROTOCOL = 'n44-browser-v2';
 // The ingress has a bounded12s deadline. Allow its committed response to reach
 // this client before aborting;10s could lose a successful consent CAS ACK.
 export const N44_RESPONSE_DEADLINE_MS = 15000;
+// AI: original runtime-failure enum in native 5319f959 (installed 696f71d0).
+// These are coarse source phases, never a claim of cause or native arrival.
+export const N44_CONFIG_SERVICE_PHASES = Object.freeze([
+  'configuration', 'configuration_origin', 'configuration_revision', 'configuration_policy',
+  'configuration_transport', 'configuration_crypto', 'configuration_provider', 'connect',
+  'identity', 'set_role', 'private_session', 'source', 'ingress', 'query', 'deadline',
+  'registration_input', 'registration_auth', 'registration_protect', 'registration_repository',
+]);
+// Reuse web-protocol.mjs readBytes algorithm locally: no draft/startup dependency.
+async function readConfigFailurePhase(stream, signal) {
+  if (!stream) return;
+  const reader = stream.getReader(), parts = []; let total = 0;
+  const cancel = () => { void reader.cancel().catch(() => {}); };
+  signal.addEventListener('abort', cancel, { once: true });
+  try {
+    for (;;) {
+      if (signal.aborted) return;
+      const { done, value } = await reader.read();
+      if (signal.aborted) return;
+      if (done) break;
+      total += value.byteLength;
+      if (total > 2048) return;
+      parts.push(value);
+    }
+    const bytes = new Uint8Array(total); let at = 0;
+    for (const part of parts) { bytes.set(part, at); at += part.byteLength; }
+    const body = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes), (key, value) => {
+      if (['__proto__', 'constructor', 'prototype'].includes(key)) throw Error('unavailable');
+      return value;
+    });
+    if (body && !Array.isArray(body) && Object.getPrototypeOf(body) === Object.prototype &&
+        body.error === 'unavailable' && N44_CONFIG_SERVICE_PHASES.includes(body.phase)) return body.phase;
+  } catch { /* Optional evidence only; never retain the body or read/decode error. */ }
+  finally { signal.removeEventListener('abort', cancel); cancel(); reader.releaseLock(); }
+}
 export function createPushGateway({ fetch: send = globalThis.fetch, authorization, context, preferences,
   storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => typeof authorization === 'function' ? authorization() : authorization, bindConsent = async () => false, clearConsent = async () => true }) {
   const scope = { workspaceId: context.workspaceId, deviceId: context.deviceId };
@@ -16,12 +51,17 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
   const request = async (path, body, cleanup = false, metadata = false) => {
     if (!cleanup && !valid()) throw Error('stale');
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), N44_RESPONSE_DEADLINE_MS);
-    let phase = 'transport', httpStatus = null;
+    let phase = 'transport', httpStatus = null, servicePhase;
     try {
       const response = await send('/api/n44/' + path, { method: 'POST', credentials: 'omit', redirect: 'error', cache: 'no-store',
         headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : typeof authorization === 'function' ? authorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });
       httpStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599 ? response.status : null;
       phase = !cleanup && !valid() ? 'context' : 'http';
+      // The sole non-2xx body exception: this owned POST config action, JSON503.
+      if (path === 'push/config' && !cleanup && valid() && response.status === 503 &&
+          response.headers?.get('content-type')?.split(';', 1)[0].trim().toLowerCase() === 'application/json') {
+        servicePhase = await readConfigFailurePhase(response.body, abort.signal);
+      }
       if (!response.ok || (!cleanup && !valid())) { const error=Error('unavailable'); error.httpStatus=response.status; error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
       phase = 'response_read';
       const raw = await response.text(); phase = !cleanup && !valid() ? 'context' : 'response_size';
@@ -33,6 +73,7 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
       if (path === 'push/config') {
         const safe = Error('unavailable');
         safe.configOutcome = { httpStatus, phase: !valid() ? 'context' : abort.signal.aborted ? 'deadline' : phase };
+        if (valid() && !abort.signal.aborted && servicePhase) safe.configOutcome.servicePhase = servicePhase;
         throw safe;
       }
       throw error;
