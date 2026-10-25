@@ -9,10 +9,10 @@
       "scopeKey": "n44-one-approved-current-device-test",
       "riskClass": "SENSITIVE",
       "validationTier": "SENSITIVE",
-      "executionMode": "local",
-      "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261025-CONFIRMED-LOCK-INDIA-AND-ACTUAL-NOTIFICATION",
-      "budgetMinutes": 25,
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "budgetMinutes": 55,
       "idleMinutes": 12,
       "allowedPaths": [
         "drafts/n44-push/**",
@@ -25,20 +25,15 @@
         "docs/automation-evidence/20261023/N44_RENEWED_DEVICE_OUTCOME.md",
         "src/lib/notification-push-gateway.js",
         "src/lib/notification-push-*.js",
-        "src/lib/notification-center.js",
-        "src/views/notification-settings.js",
-        "src/styles/notifications.css",
         "tests/n44-device-20261024/**",
         "docs/automation-evidence/20261024/N44_CURRENT_ELIGIBILITY_OUTCOME.md",
         "tests/n44-atomic-current-cleanup-20261024/**",
         "docs/automation-evidence/20261024/N44_ATOMIC_CURRENT_ITEM_CLEANUP.md",
-        "src/store.js",
-        "src/lib/sync-v2.js",
-        "src/lib/cloud.js",
-        "src/views/items.js",
         "tests/n44-current-closed-page-followup-20261024/**",
         "docs/automation-evidence/20261024/N44_RECOVERED_CURRENT_CLOSED_PAGE_OUTCOME.md",
-        "src/app.js"
+        "sw.js",
+        "tests/n44-functional-readiness-20261026/**",
+        "docs/automation-evidence/20261026/N44_FUNCTIONAL_READINESS.md"
       ],
       "verificationPaths": [
         "src/lib/notification-push-runtime.js",
@@ -624,7 +619,7 @@
         "continuous-n44-config-readiness-public-dependency-20261025",
         "continuous-n44-disabled-cleanup-public-20261025"
       ],
-      "objective": "CONTINUE SAME saved14a4d9797d6cb85c2cde38f0fb3e372464e5cae9/session01a14fcd aftere5dada normalStopPASS and independent readFAIL. Userwasaway/foundnonotification/cannotconfirmOSarrival: artifactartifacts/ops-supervisor-v4/intake-evidence/po-20261025-n44-2319-os-observation-unknown.json. OSarrivalNOTPROVEN, allTHREEsendsCONSUMED/no4/resend/reg9/source4/window4. NormalStopONEalreadycompleted withhandlerretirement/removal/unsubifpresent/consentfalseACK, preferencespreserved/disabled/currentownerverified. DO NOTrepeatStop/sourceDelete/configCAS/serviceupload/pin/carrier/Auth/configchanges or anyactivation. All47 andbotharchives/OFF/approvalNULLwereactualPASS; reuse unchanged. Specific ordinary verification defect: current-disposal-readback.mjs catch{} drops existing tagged runtimeFailure phase+finiteidentityflags, leaving coarse session_guard and no cause. First fix ONLYlocaloriginal readback diagnostic capture: use EXISTINGruntime-failure.mjs operatorInspectionFailure/requestFailure closed DTO, retain ONLYknownphase/knownconnectioncategory/strictbooleanidentityflags and fixed guard category. NEVERrawerrors/messages/SQL/stack/IDs/catalogrows/cookies/credentials/URLs/secrets/newtrace. Preserve actualfailedread/consumedreservation; newappend-onlycapturemarker explicitlyseparate. Prove locally actualprepareRequestSession/assertPrivateDatabaseSession failure sites mapthroughsamebundledWeakMap anddeny beforeprivateQuery; source/catalog/logging/privacy/role/TLSguards UNCHANGED, no arbitrarySQLornewmetadataquery. Do not invent broad readinesssuite. Then originalcustodian may ONE separatelyreservedfreshconnection through SAME exactguardedoperatorSessionConfig/prepareOperatorSession andsameCA/restrictedrole/typedrepository/exactregistration8 target. This is a materiallycorrected failurecapture, not unchangedretry or guardbypass. Maximumone new read-only inspection; no commitwrites. If allguardsPASS, completeexactexistingprivateinspection inrollback-only transaction and confirmregistration8revoked/consentfalse/preferences and rollbackACK. If anyguardfails, recordfixedactualphase+finitebooleans and STOP beforeprivaterows; no secondconnection/fallback/directhost/providerAuth/logging/role/RLS/schema/catalogrepair/guardweakening. Existingoperatorreflectioncatalogqueries onlyasrequiredbyUNCHANGEDguard; no newgenericSQL orprivatequerybeforeguard. Guardfailure remainsFAIL, notPASS. Do not repeatprovider47/archivecheckifunchangedno writes thisturn; usefreshonlyifneededfororiginalauthorityguard, preserveN88actual2c6917bd/carrier5b786. Sameoriginalnormaltrial account onlyifnormalcurrentidentity needed for existingreadcustody; ONEownednormaldocument maximum, no Stop/UIactions/configretry/permission/register/send, no hiddenbrowserstate/OTP/profileclone/N36/personal/incognito. No browserneededifprotectedcustodyportalreadybound. Preserve publication266549 andcleanupsource565054, futureparityguardalreadyqualified14a4no furtherdeploy/test. ActualattributedOSobservation absent; never inferfromprovider/seen/showNotification/normalStop. Release ownedresources/finally, return exactJSON with specificguardcause or actualreadback, consumedbudget unchanged.",
+      "objective": "NEW26Oct PO explicitly says N44notready, finishactualfunctionality/fixcausesnotonlysettings. SAMEoriginalcustodian01a14fcd/saved5f65948195f85aee63babf6985f82e0df5f62b11, no alternateexecutor. This stage is STRICTLOCAL/SYNTHETIC ONLY: liveMutationfalse/liveAuthorizationRefnull, NOprovider/account/currentDPAPI/privateuserreads/networkDB/activation/send/newwindow/native/pin/env operations. OriginalthreeactualsendsremainSPENT/unknownOS, normalStopACK andsourceDeleteACK/OFF/all47exact preserved, no replay. NewPOintake inRoot currentconversation. Rootofficialsources: https://supabase.com/docs/guides/database/connecting-to-postgres (directIPv6, poolerIPv4) and /guides/platform/ssl-enforcement (enforcementbothlegs/reboot); doNOTchangeglobalSSLenforcement/Auth/network/paidIPv4 addon. Actualfailedoperatorconnectionc970 identityflags alltrueexceptupstreamSslfalse; RootDNSdirectAAAAonly+desktopnoIPv6defaultRoute. This proves LOCALoperatortransportcannotmeetguard, notnormalNativehostunavailable. StoplocalDBconnectionretry. OldhostedDISPOSALv1hardcodes oldscope/registration/expiryOct24; MUSTstayexpired/unchanged, notreactivateorrebindoldallowance.\n\nImplement minimal ADDITIVEcurrent-registrationREADONLYinspection capability inside ORIGINALsigned /schedule entry+existinghost+typedrepository usingexistingNonce/HMAC/time/source/role/TLS/catalogguards. No newpublicHTTProute, genericSQL/broadquery, roles/Auth/RLS/schema/migration/table/providerSSLsettings. Newdistinctpurpose/operation forread-onlycurrenttarget; onefixedsource-boundapproval fitsEXISTINGconfiguration approvalslot, exactowner/workspace/device/regtargetprovidedonlybyprotectedoriginalcustody atFUTURElivephase, notrequestbody. Configschema fixedclosedkeys/sourceSHA, approvedAt/expiresAt<=15min/DBclock, exactONErequestnonce admissionexistingdurablecounter; signedpurpose/HMAC/requestenvelope matchapproval/source+nonce, repeatednonce/unknowncommitnotreplayed. deliverymustOFF andnormaldeviceactivationdisabled. ServerreturnsONLYfixedenumcomplete/revoked-or-absent/consentfalse/pendingjobsempty/preferencesMatchbooleans, norawIDs/endpoints/keys/rows/prefs/SQL/messages. UseexistingexactOperatorCleanup inspect:true ONLY androllback-onlyrepository path, assertnoCTX/registration/job mutation/COMMITprivatewrites. Existingingressnonce/rateACKmaywriteasoriginaladmission, discloseit accurately. No calltoDISPOSAL or mutator, no oldregistration/scopev1constantschanged, no newservicecaller-selectedtarget. Existingnarrownormalreadbarriers retained. Plainpurposecapability cannotbeusedasnewpush/windowregistration. Scopeandapprovalorigin MUSTbeprotectedoriginalcustodian, wrongowner/workspace/device/reg/request/source/expiry/replay=>denybeforeprivaterows. Materialize futureinstallerpacket afterqualification ONLY; nativeupload/sourcepin+policyparity CAS andactualhostedread need later explicitstage, none now. Existingfutureparityguard14a4mustpreparepairedsource-policy updates preservingauthapproval/timestamps; no newattestationrenewal.\n\nReviewACTUALSWreceiver chain andexistingSW/browser/runtime tests for realdefect, donotguessedfix. Concretecandidatefromsource: seenmarkerwrittenBEFOREshowNotification; ifKNOWNAPIrejection thenredeliverymaydropforever. ReproduceusingexistingactualSW eventlogic/controlledfakeAPIs, distinguish knownreject vsUNKNOWN display/persistence outcome. Ifreproduced minimalrecoverysafe onknownfailureONLY; preserveoldseenUNKNOWN/nohistoricalreplay, duplicate/restart/expiry/binding/Stop/owner/durablemax100guards. Neverclaimthiswasactualhistoricalmisscause. Do NOTweaken dedupe or auto-resendfromserver. Add boundedfinite LOCALDEVICE outcome toexistingSWstatus/messagechannel, no newtelemetry/serverdatawrite/endpoint/schema. Samefirstpartycontrolledclient/origin/binding required, no eventIDs/UUIDs/code/endpoints/secrets/rawerrors or crossownerlastreceipt; fixed received/display-requested/display-accepted/display-failed/unknown stages andcoarsetime/booleanpresentfromgetNotifications whenappropriate; outcomesarebrowserAPIproof NOTOSvisualproof. Readonly fromnormalownedSupportlater withoutcookies/hiddenstate/toolworkarounds; Stop/account/binding/expiry clearsallprivatecontext, no statuspolling/newrequest eachpaint. Useexistingbrowser/client/runtime transport, no ServiceWorker inisolatedbrowserhelper (pureactualSWsourceVM fixture islocal; existingSWtestsreuse). Ifdisplaydurabilityneedsnewversionmigration writeboundedbackwardcompatibledevicecache handling, no arbitrarydata. Unknownshow/persistence failures remainunknown, neverreplayoldmessage. No requireInteraction/defaultnotificationbehaviorchangejusttofakearrival, respectpermission andOSsettings.\n\nFocusedqualification throughACTUALcompiledexistinghost/webentry/backend/typedPGoriginalfixture forinspection validity/wrongtarget/source/nonce/expiry/guard/rollback/noCOMMIT/no write/replay/admissionfailure; useexistingharness/PGleaseownershiponlyifneedednotnewbenchmarkengine. ActualSWfault+dedupe/restart/stop/contextproofs. Oldservice/SWchecks reusedwhileunchanged; do notrunglobalN88/wholeproject. No personalbrowser/SW/profiles/cloud orrealnotifications. IflocalUIneededcanonicalisolatedhelper noweligible non-live onlyloopback/ownedport no externalrequests/realSW. N88workerownsstudentfiles; N44settingsworkerownsnotification-settings+notificationsCSS, DO NOTeditthose evenifcandidatepacketexpectsfutureSupportaddition. Prepare exactpublicSW/browser/runtime packet againstCURRENTmain withoutwholeprivatebranchmerge; nativeprivatepacket separatelysourcebound. UI integration ofnewfiniteoutcome intoSupportwillbelateroriginalscopeaftersettingsworkercomplete. Saveconcrete readinesstoactivationchecklist requiringhostedTLSread, realdeviceconsent/reg/OSobserver BEFOREanyfutureboundednewsend; doNOTgrantfourthsendhere. Return BLOCKED withqualifiedcandidate/packets/localproofandactualremainingoperations; doNOTreturnLOCAL_READYforpublisher toautomergeprivatebranch. RequiredoriginalcustodialactivationcheckNOT_RUN, preserveallFAILs. Rootwillresume SAMEsession inlivephaseafterallworkersend/solepublisherandsharedleasesfree. Noqueue/ledgerwrites/subagents/manualPOpermissionrequests.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -1058,6 +1053,16 @@
         "maxWrites": 0,
         "closedExistingRuntimeFailureOnly": true,
         "noNewSendOrStop": true
+      },
+      "functionalPreparationAuthority": {
+        "version": 1,
+        "localOnly": true,
+        "newProviderOperations": 0,
+        "newSends": 0,
+        "newRegistration": 0,
+        "oldBudgetsUnchanged": true,
+        "additiveReadonlyCapability": true,
+        "oldHostedDisposalExpiredUnchanged": true
       }
     }
   ]
