@@ -16,16 +16,30 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
   const request = async (path, body, cleanup = false, metadata = false) => {
     if (!cleanup && !valid()) throw Error('stale');
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), N44_RESPONSE_DEADLINE_MS);
+    let phase = 'transport', httpStatus = null;
     try {
       const response = await send('/api/n44/' + path, { method: 'POST', credentials: 'omit', redirect: 'error', cache: 'no-store',
         headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : typeof authorization === 'function' ? authorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });
+      httpStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599 ? response.status : null;
+      phase = !cleanup && !valid() ? 'context' : 'http';
       if (!response.ok || (!cleanup && !valid())) { const error=Error('unavailable'); error.httpStatus=response.status; error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
-      const raw = await response.text(); if (raw.length > 8192 || !cleanup && !valid()) throw Error('unavailable');
-      const value = JSON.parse(raw); return metadata ? { body: value, httpStatus: response.status } : value;
+      phase = 'response_read';
+      const raw = await response.text(); phase = !cleanup && !valid() ? 'context' : 'response_size';
+      if (raw.length > 8192 || !cleanup && !valid()) throw Error('unavailable');
+      phase = 'decode';
+      const value = JSON.parse(raw); return metadata ? { body: value, httpStatus } : value;
+    } catch (error) {
+      // AI: config-only finite receipt from this attempt; never retain error data.
+      if (path === 'push/config') {
+        const safe = Error('unavailable');
+        safe.configOutcome = { httpStatus, phase: !valid() ? 'context' : abort.signal.aborted ? 'deadline' : phase };
+        throw safe;
+      }
+      throw error;
     } finally { clearTimeout(timer); }
   };
   return Object.freeze({
-    configuration: () => request('push/config', scope),
+    configuration: ({ metadata = false } = {}) => request('push/config', scope, false, metadata),
     async read({ accept = () => true } = {}) {
       const r = await request('context/read', scope);
       if (r.protocol !== N44_PROTOCOL || !['current', 'absent'].includes(r.status)) throw Error('unavailable');

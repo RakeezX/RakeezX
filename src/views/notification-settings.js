@@ -34,6 +34,12 @@ const verificationText = {
   pending: 'حفظ المصدر لم يُؤكد بعد. لم يُطلب تفويض التذكير.',
   cleanup_confirmed: 'تأكد إيصال حذف المصدر والعناصر التابعة.',
 };
+const configResultText = {
+  ready: 'تأكد إعداد تذكيرات الجهاز. هذا لا يثبت الاشتراك أو الإرسال أو الوصول.',
+  disabled: eligibilityText.configuration_disabled,
+  invalid: eligibilityText.configuration_invalid,
+  request_failed: eligibilityText.request_unavailable,
+};
 function normalEvidence(ui, scope) {
   if (!ui) return '';
   return html`<section class="n44-preference card card--pad" aria-label="التحقق من التذكيرات">
@@ -89,6 +95,17 @@ const view = {
       <a class="btn btn--quiet n44-settings-back" href="#/settings">${icon('back')} الإعدادات</a>
       <div class="n44-settings" data-notification-scope="${scope ?? ''}">
       ${context ? html`
+        <details class="n44-preference card card--pad" data-n44-current-identity style="overflow-wrap:anywhere">
+          <summary>هوية الحساب والجهاز الحالي</summary>
+          <p>سياق الحساب المحلي الحالي. لا يثبت موافقة الخدمة أو تفعيل التذكيرات أو وصولها.</p>
+          <dl><dt>الحساب</dt><dd dir="ltr">${context.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${context.workspaceId}</dd><dt>الجهاز</dt><dd dir="ltr">${context.deviceId}</dd></dl>
+        </details>
+        ${push?.configOutcome ? html`<details class="n44-preference card card--pad" data-n44-config-outcome style="overflow-wrap:anywhere">
+          <summary>نتيجة التحقق من إعداد تذكيرات الجهاز</summary>
+          <dl><dt>HTTP</dt><dd dir="ltr">${Number.isInteger(push.configOutcome.httpStatus) && push.configOutcome.httpStatus >= 100 && push.configOutcome.httpStatus <= 599 ? push.configOutcome.httpStatus : 'UNKNOWN'}</dd>
+          <dt>المرحلة</dt><dd dir="ltr">${['request', 'transport', 'http', 'response_read', 'response_size', 'decode', 'shape', 'context', 'deadline', 'complete'].includes(push.configOutcome.phase) ? push.configOutcome.phase : 'request'}</dd>
+          <dt>النتيجة</dt><dd>${configResultText[push.eligibility?.configuration] ?? eligibilityText.idle}</dd></dl>
+        </details>` : ''}
         ${push?.preferenceStopped && push.status !== 'cleanup_pending' ? html`<p role="status">أُوقفت تذكيرات الجهاز بعد تعديل التفضيلات. أعد تفعيلها لتطبيق التفضيلات الجديدة.</p>` : ''}
         ${push?.available || push?.cleanupAvailable ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
           <h2>تذكيرات الجهاز</h2>
@@ -143,7 +160,8 @@ const view = {
     const clear = () => root.querySelector('.n44-settings')?.replaceChildren();
     const validate = () => {
       const mounted = root.querySelector('[data-notification-scope]');
-      if (mounted && mounted.dataset.notificationScope !== notificationScope(currentNotificationContext(store, cloud))) clear();
+      if (mounted && (mounted.dataset.notificationScope !== notificationScope(currentNotificationContext(store, cloud)) ||
+          mounted.querySelector('[data-n44-config-outcome]') && !getPushRuntime()?.snapshot().configOutcome)) clear();
     };
     const removeWorkspace = store.onWorkspaceDeactivation(clear);
     const removeAuth = cloud.subscribe(validate);

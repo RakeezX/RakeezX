@@ -44,6 +44,11 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   let pendingDisable = null, disabling = null, preferenceStop = null;
   let preparingBinding = null, preparingGeneration = 0, refreshQueued = false;
   let eligibility = { reason: 'idle', configuration: 'not_observed' };
+  let configObservation = null;
+  const configOutcome = () => {
+    if (disposed || configObservation?.generation !== generation || !matches(configObservation?.binding)) { configObservation = null; return null; }
+    return { ...configObservation.outcome };
+  };
   const mark = (reason, flags = {}) => { eligibility = { ...eligibility, ...flags, reason }; };
   const retired = new Set();
   const drain = async () => {
@@ -86,6 +91,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, quiet: readPushQuiet(c, storage) };
   };
   function invalidate() {
+    configObservation = null;
     const old = client, originalGateway = gateway;
     ++generation; choices.clear(); verification = null; sourceStatus = null; verifying = false; renewing = null; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
     let clearing;
@@ -130,7 +136,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     // An unresolved explicit stop cannot be bypassed by focus/refresh or opt-in.
     if (pendingDisable) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
     if (binding) return;
-    preparing = true; const token = generation;
+    preparing = true; configObservation = null; const token = generation;
     const b = { context: current(), session: cloud.session, acceptedToken: currentToken(), cleanupToken: currentToken(), workspace: store.getActiveWorkspace(), leaseRevision: leaseRevision() };
     try { b.consentRevision = consentRevision(b.context); } catch { preparing = false; mark('context_unavailable'); return; }
     preparingBinding = b; preparingGeneration = token; eligibility = { reason: 'checking_configuration', configuration: 'not_observed', ...bindingChecks(b), generationMatches: true, browserSupported: false, workerReady: false };
@@ -147,8 +153,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
         storage.setItem(revisionKey(b.context), revision); b.consentRevision = revision;
       } });
     try {
-      const publicConfiguration = await g.configuration();
+      const { body: publicConfiguration, httpStatus } = await g.configuration({ metadata: true });
+      if (!valid()) { mark('binding_changed'); throw Error('unavailable'); }
       const accepted = supportedPushConfiguration(publicConfiguration) === true;
+      configObservation = { binding: b, generation: token, outcome: { httpStatus, phase: accepted || publicConfiguration?.status === 'disabled' ? 'complete' : 'shape' } };
       mark(!accepted ? publicConfiguration?.status === 'disabled' ? 'configuration_disabled' : 'configuration_invalid' : 'checking_context', { configuration: accepted ? 'ready' : publicConfiguration?.status === 'disabled' ? 'disabled' : 'invalid' });
       if (!accepted) throw Error('unavailable');
       if (!valid()) { mark('binding_changed'); throw Error('unavailable'); }
@@ -188,7 +196,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       if (!await g.retire()) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
       if (!await g.remove() || !valid() || existing && !await existing.unsubscribe()) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
       ready = true; status = 'unsubscribed'; mark('ready');
-    } catch { status = 'unavailable'; if (!valid()) mark('binding_changed', { configuration: 'not_observed' }); else if (eligibility.reason === 'checking_configuration') mark('request_unavailable', { configuration: 'request_failed' }); else if (eligibility.reason === 'checking_context') mark('context_unavailable'); }
+    } catch (error) { status = 'unavailable'; if (!valid()) { configObservation = null; mark('binding_changed', { configuration: 'not_observed' }); } else if (eligibility.reason === 'checking_configuration') {
+      configObservation = { binding: b, generation: token, outcome: error.configOutcome ?? { httpStatus: null, phase: 'request' } };
+      mark('request_unavailable', { configuration: 'request_failed' });
+    } else if (eligibility.reason === 'checking_context') mark('context_unavailable'); }
     finally {
       eligibility = { ...eligibility, ...bindingChecks(b), generationMatches: generation === token }; preparing = false; preparingBinding = null;
       const queued = refreshQueued; refreshQueued = false; changed();
@@ -332,7 +343,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
         canVerify: usable() };
     },
-    snapshot: () => ({ available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility } }),
+    snapshot: () => ({ available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
     async optIn() {
       if (!ready || !matches(binding)) return { status: 'unavailable' };
       const c = client, result = await c.optIn();
