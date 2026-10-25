@@ -72,3 +72,28 @@
 .n88-task-guidance[aria-busy=true] .n88-guidance-body>[role=status]{font-size:var(--fs-sm);color:var(--text-2);animation:n88-quiet-progress .15s .3s both}
 @keyframes n88-quiet-progress{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.n88-entry[data-n88-entry-state=loading] [data-n88-entry-status],.n88-task-guidance[aria-busy=true] .n88-guidance-body>[role=status]{animation:none}}
+
+/* AI: portal hierarchy — context, roster, then optional publication/task tools. */
+.n88-class-heading{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:24px 0;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.n88-class-heading h2{font-size:clamp(24px,3vw,32px);margin:4px 0;line-height:1.4}
+.n88-class-heading p{margin:0;color:var(--text-2)}
+.n88-class-heading .n88-eyebrow{color:var(--brand-text);font-size:var(--fs-sm);font-weight:600}
+.n88-class-toolbar{padding:16px 20px;margin:0;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg-elev)}
+.n88-roster-help{font-size:var(--fs-sm);color:var(--text-2);margin:10px 4px 16px}
+.n88-class-roster{border:1px solid var(--border);overflow:hidden;margin-block:8px 28px}
+.n88-class-roster>li{grid-template-columns:minmax(0,1fr) 9ch auto;padding:18px 20px;gap:16px}
+.n88-class-student strong{display:flex;align-items:center;gap:12px;font-size:16px}
+.n88-roster-number{display:inline-grid;place-items:center;inline-size:28px;block-size:28px;border-radius:50%;background:var(--bg-sunk);flex:none;font-family:var(--font-num)}
+.n88-class-actions{gap:8px;flex-wrap:wrap}
+.n88-class .n88-icon-button{padding:10px;display:inline-grid;place-items:center;min-inline-size:44px;min-block-size:44px;background:transparent;color:var(--text-2)}
+.n88-icon-button:hover{background:var(--bg-sunk);color:var(--text)}
+.n88-class-settings,.n88-task-guidance{border:1px solid var(--border);margin-block:12px}
+.n88-class-settings>summary,.n88-task-guidance>summary{padding:18px 20px}
+.n88-guidance-body{padding:0 20px 20px}
+.n88-editor-help{line-height:1.9;max-inline-size:52rem}
+.n88-class [data-confirm]{border:1px solid var(--border-strong);padding:20px;border-radius:var(--r-md);background:var(--bg-elev)}
+.n88-class [data-manual]{color:var(--text);background:var(--bg-elev);padding:16px;border:1px solid var(--border-strong);border-radius:var(--r-md)}
+@media(max-width:720px){.n88-class-heading{align-items:start;flex-direction:column;gap:16px;padding-block:16px}.n88-class-roster>li{grid-template-columns:minmax(0,1fr) 9ch;padding:16px 12px;gap:12px}.n88-class-student strong{grid-column:1;gap:8px}.n88-class-actions{grid-column:1/-1;justify-content:flex-end}.n88-class-toolbar{padding:16px 12px}.n88-class-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.n88-guidance-fields{grid-template-columns:1fr}.n88-class-heading .btn{max-inline-size:100%}}
+
+/* Keep the reusable portal comfortably inset even without the teacher shell. */
+.n88-class{padding:clamp(12px,2vw,24px);max-inline-size:1120px;margin-inline:auto}

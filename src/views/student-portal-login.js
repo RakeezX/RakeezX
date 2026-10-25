@@ -27,7 +27,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   function entry(message = '') {
     screen = 'entry';
     const cooling = Date.now() < cooldownUntil;
-    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي زوّدك به معلّمك.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form>${enabled ? '<button type="button" class="btn btn--ghost n88-unified-resume" data-resume>متابعة جلسة سابقة</button>' : ''}</section>`);
+    paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي زوّدك به معلّمك.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form></section>`);
     const field=root.querySelector('[data-claim] input');if(field)field.value=codeDraft;
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
@@ -40,7 +40,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   }
   function publicationReview() {
     screen='publication';clearTimeout(freshnessTimer);settledProjection=null;settledAt=0;settledContext=undefined;
-    paint('<section class="n88-unified-entry" data-publication-review><h1 tabindex="-1">مساحة الطالب</h1><p role="status">يلزم أن يراجع معلّمك النشر الحالي قبل عرض بياناتك. جلستك ما زالت متاحة.</p><button type="button" data-read>التحقق من النشر</button><button type="button" data-end>إنهاء الجلسة</button></section>');
+    paint('<section class="n88-unified-entry" data-publication-review><h1 tabindex="-1">مساحة الطالب</h1><p role="status">يلزم أن يراجع معلّمك النشر الحالي قبل عرض بياناتك. جلستك ما زالت متاحة.</p><button type="button" data-read>التحقق من النشر</button><button type="button" data-end>تسجيل الخروج من مساحة الطالب</button></section>');
   }
   function show(raw, preserve = false) {
     const data = projectUnifiedStudentData(raw);
@@ -50,16 +50,16 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     settledProjection = JSON.stringify(data); settledAt = Date.now(); settledTick = win.performance.now(); settledContext = client.captureContext?.();
     screen = 'private';
     const profile = data.profile;
-    let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end>إنهاء الجلسة</button></div></div><div class="n88-unified-sections">`;
+    let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end>تسجيل الخروج من مساحة الطالب</button></div></div><div class="n88-unified-sections">`;
     if (data.grades) {
       content += `<section class="n88-unified-grades"><h2>درجاتي</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">البند</th><th scope="col">الدرجة</th><th scope="col">من</th></tr></thead><tbody>${data.grades.items.map(item => `<tr><th scope="row">${escape(item.label)}${item.status !== undefined ? `<small>${escape({recorded:'مرصودة',unrecorded:'لم تُرصد'}[item.status]||'')}</small>` : ''}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join('')}</tbody></table></div>${data.grades.total ? `<p class="n88-unified-total">المجموع: <b dir="ltr">${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</b></p>` : ''}</section>`;
     }
-    for (const [key, label] of Object.entries({ required: 'المطلوب مني', completed: 'الأعمال المكتملة', scheduled: 'الأعمال القادمة' })) {
+    for (const [key, label] of Object.entries({ required: 'المطلوب مني', scheduled: 'الأعمال القادمة', completed: 'الأعمال المكتملة' })) {
       if (!Object.hasOwn(data.work || {}, key)) continue;
-      content += `<section data-section="${key}"><h2>${label}<span class="n88-unified-count" aria-label="عدد الأعمال">${data.work[key].length}</span></h2>${data.work[key].length ? data.work[key].map(item => {
+      content += `<section data-section="${key}" class="${key==='completed'?'n88-completed':''}">${key==='completed'?`<details class="n88-completed-group"><summary>الأعمال المكتملة <span class="n88-unified-count">${data.work[key].length}</span></summary>`:`<h2>${label}<span class="n88-unified-count" aria-label="عدد الأعمال">${data.work[key].length}</span></h2>`}${data.work[key].length ? data.work[key].map(item => {
         const detail = `${item.executionInstructions !== undefined ? `<h3>تعليمات التنفيذ</h3><p class="n88-guidance-text">${escape(item.executionInstructions)}</p>` : ''}${item.deliveryInstructions !== undefined ? `<h3>طريقة التسليم</h3><p class="n88-guidance-text">${escape(item.deliveryInstructions)}</p>` : ''}${item.instruction !== undefined ? `<p class="n88-unified-instruction">${escape(item.instruction)}</p>` : ''}${item.startDate ? `<p>يبدأ: <span dir="ltr">${escape(item.startDate)}</span></p>` : ''}${item.dueDate ? `<p>التسليم: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ''}${item.completionState !== undefined ? `<p>${escape({unrecorded:'لم يُرصد إنجاز',regular:'مكتمل',late:'مكتمل متأخر'}[item.completionState])}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}`;
-        return detail ? `<details class="n88-unified-work" data-work-id="${escape(key+':'+item.id)}"><summary><span>${escape(item.title)}</span><span class="n88-unified-detail-hint">التفاصيل</span></summary><div class="n88-unified-detail">${detail}</div></details>` : `<article class="n88-unified-work"><h3>${escape(item.title)}</h3></article>`;
-      }).join('') : '<p class="n88-unified-empty">لا توجد أعمال منشورة في هذا القسم.</p>'}</section>`;
+        return detail ? `<details class="n88-unified-work" data-work-id="${escape(key+':'+item.id)}"><summary><span>${escape(item.title)}${item.dueDate||item.deadline?`<small>التسليم: <span dir="ltr">${escape(item.dueDate||item.deadline)}</span></small>`: ""}${item.completionState?`<small>${escape({unrecorded:"لم يُرصد إنجاز",regular:"مكتمل",late:"مكتمل متأخر"}[item.completionState])}</small>`:""}</span><span class="n88-unified-detail-hint">التفاصيل</span></summary><div class="n88-unified-detail">${detail}</div></details>` : `<article class="n88-unified-work"><h3>${escape(item.title)}</h3></article>`;
+      }).join('') : '<p class="n88-unified-empty">لا توجد أعمال منشورة في هذا القسم.</p>'}${key==='completed'?'</details>':''}</section>`;
     }
     paint(content + '</div><p role="status" data-refresh-status>يُحدّث العرض تلقائيًا كل خمس دقائق أثناء فتحه. يمكنك تحديثه الآن.</p>',!preserve);
     if(preserve){for(const el of root.querySelectorAll('details[data-work-id]'))el.open=open.includes(el.getAttribute('data-work-id'));if(focus)root.querySelector('['+focus+']')?.focus({preventScroll:true});win.scrollTo(scroll.x,scroll.y);}
@@ -132,7 +132,6 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     field.setAttribute('aria-invalid',String(invalid));
     form.querySelector('[type=submit]').disabled=!enabled||busy||cooling;
     form.querySelector('[type=submit]').textContent=busy?'جارٍ التحقق…':'دخول الطالب';
-    root.querySelector('[data-resume]').disabled=busy||cooling;
     form.querySelector('[role=status]').textContent=cooling?'يرجى الانتظار قليلًا قبل المحاولة مجددًا.':message;
     clearTimeout(timer);if(cooling)timer=setTimeout(()=>inlineEntry('يمكنك المحاولة مجددًا.'),Math.max(1,cooldownUntil-Date.now()));
   }
@@ -186,7 +185,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
         : result.errorKind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.'
         : result.claimState === 'accepted' ? 'قُبل الرمز، لكن تعذّر عرض المساحة. اضغط التحقق مجددًا لإعادة قراءة الجلسة.'
         : result.claimState === 'uncertain' ? 'تعذّر تأكيد الدخول. اضغط التحقق مجددًا قبل إدخال الرمز مجددًا.'
-        : 'تعذّر الاتصال بالمساحة. يمكنك متابعة جلسة سابقة للمحاولة مجددًا.';
+        : 'تعذّر الاتصال بالمساحة. حاول مجددًا عندما يتوفر الاتصال.';
       if(result.ending) endUncertain();
       else if((result.resuming || !result.sameForm) && result.errorKind !== 'session') recovery('تعذّر فتح مساحتك الآن. حاول مجددًا.');
       else if(['accepted','uncertain'].includes(result.claimState) && result.errorKind !== 'session') recovery(message);
@@ -229,7 +228,6 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const click = event => {
     const copy = event.target.closest('[data-copy-diagnostic]');if(copy){void copyDiagnostic(copy);return;}
     if (event.target.closest('[data-session-retry]')) void run(() => client.read({phase:'manual'}),false,false,true);
-    if (event.target.closest('[data-resume]')) void run(() => client.read({phase:'manual'}),false,false,true);
     if (event.target.closest('[data-read]')) void refresh();
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
   };
