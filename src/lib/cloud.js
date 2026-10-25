@@ -1640,3 +1640,15 @@ export async function fetchRecords(tableName) {
     } finally { clearTimeout(timeout); }
   } });
 }
+
+/** Exact owner-bound status read for an already issued source cleanup. No replay. */
+export async function readRetiredScoreSourceCleanup({parentId,deviceId,cleanupStamp,cleanupMutationId}) {
+ const assertCurrent=captureOwnedMutationContext();assertCurrent();const workspace=runtimeSyncOwnershipGuard.getWorkspace(),owner=user?.id;
+ if(workspace.type!=='account'||workspace.authUserId!==owner||typeof cleanupMutationId!=='string'||!cleanupMutationId||typeof parentId!=='string'||typeof deviceId!=='string'||!Number.isSafeInteger(cleanupStamp))throw Error('Exact owned cleanup status required');
+ let rows;if(mockBackend){rows=await mockBackend.readRetiredScoreSourceCleanup({parentId,deviceId,cleanupStamp,cleanupMutationId});}else{
+ const q=new URLSearchParams({select:'owner_id,mutation_id,record_id,device_id,client_updated_at,request_envelope,result',owner_id:'eq.'+owner,mutation_id:'eq.'+cleanupMutationId,record_id:'eq.'+parentId,device_id:'eq.'+deviceId,operation:'eq.lifecycle',client_updated_at:'eq.'+cleanupStamp,limit:'2'});
+ rows=await request('/sync_mutation_receipts?'+q,{method:'GET',headers:{Accept:'application/json','Accept-Profile':'rakeezx'}},false,{assertAccess:assertCurrent});}
+ assertCurrent();if(!Array.isArray(rows)||rows.length!==1)return null;const r=rows[0],e=r.request_envelope,v=r.result;
+ if(r.mutation_id!==cleanupMutationId||r.owner_id!==owner||r.record_id!==parentId||r.device_id!==deviceId||Number(r.client_updated_at)!==cleanupStamp||e?.command!=='delete_item'||e.targetId!==parentId||e.deviceId!==deviceId||e.clientUpdatedAt!==cleanupStamp||e.mutationId!==r.mutation_id||v?.mutationId!==r.mutation_id||v.command!=='delete_item'||v.targetId!==parentId||!['deleted','already_deleted'].includes(v.outcome))return null;
+ return {ownerId:owner,targetId:parentId,deviceId,clientUpdatedAt:cleanupStamp,mutationId:r.mutation_id,command:'delete_item',outcome:v.outcome};
+}

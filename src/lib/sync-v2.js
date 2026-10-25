@@ -2523,3 +2523,28 @@ export function createSyncV2Engine({
     status,
   };
 }
+
+/** Retire only definitively rejected, locally deleted definition creates after
+ * the original owner-bound delete receipt. Never dispatch or replace an intent. */
+export async function reconcileRetiredScoreSource({database,ownershipGuard,currentAuthenticatedUserId,readCleanupReceipt,parentId,childIds,cleanupMutationId,now=Date.now,assertWritable}){
+ const workspace=ownershipGuard.getWorkspace(),owner=workspace.authUserId;
+ const fence=()=>{const access=ownershipGuard.cloudAccess({operation:'read',authenticatedUserId:currentAuthenticatedUserId()});if(workspace.type!=='account'||workspace.ownershipState!=='claimed'||ownershipGuard.getWorkspace()!==workspace||currentAuthenticatedUserId()!==owner||!access.allowed)throw Error('Score source recovery owner changed');assertWritable();};
+ if(typeof cleanupMutationId!=='string'||!cleanupMutationId||typeof parentId!=='string'||!Array.isArray(childIds)||childIds.length!==1||typeof childIds[0]!=='string'||parentId===childIds[0])throw Error('Exact source group required');fence();
+ const scope={items:{},scoreSubitems:{},scores:{},scoreSubitemCompletions:{},outbox:{}};
+ const snapshot=async()=>Object.fromEntries(await Promise.all(Object.keys(scope).map(async n=>[n,await database.getAll(n)])));
+ const pick=current=>{
+  const parent=current.items.find(r=>r.id===parentId),children=current.scoreSubitems.filter(r=>childIds.includes(r.id));
+  if(!parent?.deleted||children.length!==1||children.some(r=>!r.deleted||r.itemId!==parentId)||current.scores.some(r=>r.itemId===parentId)||current.scoreSubitemCompletions.some(r=>childIds.includes(r.subitemId)))throw Error('Deleted unused source group required');
+  const rows=current.outbox.filter(r=>r.recordId===parentId||childIds.includes(r.recordId)||r.patch?.targetId===parentId);
+  if(rows.length!==2||rows.some(r=>r.protocol!=='v2'||r.ownerId!==owner))throw Error('Exact saved source commands required');
+  const create=rows.find(r=>r.store==='items'&&r.op==='create'&&r.recordId===parentId),child=rows.find(r=>r.store==='scoreSubitems'&&r.op==='create'&&r.recordId===childIds[0]);
+  if(!create||create.state!=='failed'||create.envelopeLocked!==true||create.lastError?.code!=='42501'||create.lastError?.status!==403||create.lastError?.message!=='Subitem configuration requires atomic score domain command'||create.patch?.score_mode!=='subitems'||create.patch.max!==0||create.patch.auto!==null||create.patch.distribution_mode!==null)throw Error('Definitive atomic-definition rejection required');
+  if(!child||child.state!=='rejected'||child.envelopeLocked!==false||child.attemptCount!==0||child.patch?.item_id!==parentId)throw Error('Never-dispatched rejected dependent required');
+  return {parent,children,rows,create,stamp:parent.updatedAt};
+ };
+ const initial=pick(await snapshot()),fingerprint=JSON.stringify(initial),receipt=await readCleanupReceipt({parentId,deviceId:initial.create.deviceId,cleanupStamp:initial.stamp,cleanupMutationId});fence();
+ if(!receipt||receipt.ownerId!==owner||receipt.targetId!==parentId||receipt.deviceId!==initial.create.deviceId||receipt.clientUpdatedAt!==initial.stamp||receipt.command!=='delete_item'||!['deleted','already_deleted'].includes(receipt.outcome)||receipt.mutationId!==cleanupMutationId)return {status:'unknown',writes:0};
+ let writes=0;
+ await database.applyBatch(scope,{prepare(current){fence();const currentSource=pick(current);if(JSON.stringify(currentSource)!==fingerprint)throw Error('Source commands changed during reconciliation');writes=currentSource.rows.length;return {outbox:{put:currentSource.rows.map(row=>({...row,state:'superseded',supersededByMutationId:receipt.mutationId,supersededAt:now(),recoveryReason:'retired-atomic-definition-source',recoveryReceipt:{command:receipt.command,outcome:receipt.outcome,targetId:receipt.targetId,clientUpdatedAt:receipt.clientUpdatedAt}})),remove:[]}};}});
+ return {status:'reconciled',writes,cleanupAcknowledged:true,remoteWrites:0,replayedRequests:0};
+}

@@ -38,7 +38,7 @@ import { reviewGradeTransfer, gradeCommand, isTransferItem, importScoreBinding, 
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites, validateSubjectlessPlan, subjectlessDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
-import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, calendarDependencies, createSyncV2Engine } from './lib/sync-v2.js';
+import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, calendarDependencies, createSyncV2Engine, reconcileRetiredScoreSource } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
 import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents,
@@ -5713,4 +5713,11 @@ export async function confirmRejectedSessionRepairs(plan, selectedIds, confirmed
     currentAuthenticatedUserId: () => cloud.user?.id ?? null }).confirmSessionRepairs(plan, selectedIds, confirmed);
   notify();
   return ids;
+}
+
+/** Foreground recovery of a deleted, unused source with definitive rejection. */
+export async function reconcileRetiredSourceGroup({parentId,childIds,cleanupMutationId}) {
+ assertCloudRestoreWritable();const assertCurrent=cloud.captureOwnedMutationContext();assertCurrent();
+ const result=await reconcileRetiredScoreSource({database:rawDB,ownershipGuard:runtimeSyncOwnershipGuard,currentAuthenticatedUserId:()=>cloud.user?.id,readCleanupReceipt:cloud.readRetiredScoreSourceCleanup,parentId,childIds,cleanupMutationId,assertWritable:()=>{assertCurrent();assertCloudRestoreWritable();}});
+ assertCurrent();notify();return result;
 }
