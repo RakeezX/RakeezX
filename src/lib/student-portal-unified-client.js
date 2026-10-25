@@ -102,12 +102,13 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     cancelRequest(); lastDiagnostic=null; const checkpoint = generation;
     const owned = controller = new AbortController(), started = performance.now();
     let timedOut = false, statusClass = 'none', recorded = false, readPhases=null;
+    let clientStage='call',responseKind='none',http5xx,transportStage,serviceStage;
     const record = (outcome, reason = 'visible') => {
       if (recorded || checkpoint!==generation || !['read','end'].includes(action)) return;
       recorded = true;
       lastDiagnostic = Object.freeze({action, phase: action === 'end' ? 'end' : ['initial','return','manual'].includes(phase) ? phase : 'manual', outcome,
         httpStatusClass: statusClass, elapsedMs: Math.min(15000, Math.max(0, Math.floor((performance.now() - started) / 250) * 250)),
-        visibility: visibility(), retirementReason: reason,
+        visibility: visibility(), retirementReason: reason,clientStage,responseKind,...(http5xx?{http5xx}:{}),...(transportStage?{transportStage}:{}),...(serviceStage?{serviceStage}:{}),
         ...(action==='read'&&outcome==='success'&&readPhases?{readPhases}:{})});
     };
     retireDiagnostic = reason => record(reason === 'deadline' ? 'timeout' : 'stale', reason);
@@ -120,16 +121,27 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     try {
       return await Promise.race([ (async () => {
       const proof=action==='read'?bindingProof?.reserve():null;
-      const response = await send('/api/n88/student/' + action, {
+      clientStage='request';
+      const responsePending = send('/api/n88/student/' + action, {
         method: action === 'read' ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
         redirect: 'error', referrerPolicy: 'no-referrer', signal: owned.signal,
         headers: action === 'read' ? { Accept: 'application/json',...proof?.headers } : { Accept: 'application/json', 'Content-Type': 'application/json', 'X-N88-CSRF': '1' },
         ...(action === 'read' ? {} : { body: JSON.stringify(body) })
       });
-      body = null;
+      clientStage='transport';
+      const response=await responsePending;
+      clientStage='response';body = null;
       peer.sync();if (checkpoint !== generation) throw fail('stale');
       withinDeadline(); // A suspended tab may resume promise jobs before its timer.
       statusClass = response.status >= 200 && response.status < 300 ? '2xx' : response.status >= 400 && response.status < 500 ? '4xx' : response.status >= 500 && response.status < 600 ? '5xx' : 'other';
+      http5xx=statusClass==='5xx'?response.status:undefined;
+      if(action==='read'&&statusClass==='5xx'){
+        const transport=response.headers?.get('x-n88-transport-stage'),service=response.headers?.get('x-n88-service-stage');
+        if(['configuration','upstream','upstream-body','upstream-http-5xx','reply','reply-shape'].includes(transport))transportStage=transport;
+        if(['acquire','begin','snapshot','repository','teacher','source','synchronize','synchronize-lock','synchronize-memberships','synchronize-sessions','synchronize-sources','synchronize-publications','synchronize-validate','projection','projection-finalize','projection-membership-flush','projection-commitguards','projection-commit'].includes(service))serviceStage=service;
+      }
+      const contentType=response.headers?.get('content-type')||'';
+      responseKind=/^application\/(?:[a-z0-9.+-]+\+)?json(?:;|$)/i.test(contentType)?'json':/^text\/html(?:;|$)/i.test(contentType)?'html':'other';
       await proof?.acceptFailure?.(response,()=>checkpoint===generation&&!owned.signal.aborted&&!disposed);
       if(checkpoint!==generation)throw fail('stale');withinDeadline();
       if (!response.ok || action === 'read' && response.status !== 200) {
@@ -137,10 +149,10 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
         throw fail(response.status === 429 ? 'rate' : [401, 403, 410].includes(response.status) ? 'session' : 'unavailable', response.status === 429 ? Math.min(300, Math.max(1, Number.isFinite(retry) ? retry : 30)) : 0);
       }
       if (action === 'end' || action === 'claim') { acknowledged=true;record('success'); return null; }
-      const data = await response.json();
+      clientStage='decode';const data = await response.json();
       peer.sync();if (checkpoint !== generation) throw fail('stale');
       withinDeadline();
-      const projected = projectUnifiedStudentData(data);
+      clientStage='projection';const projected = projectUnifiedStudentData(data);
       await proof?.accept(response,()=>checkpoint===generation&&!owned.signal.aborted&&!disposed);
       if(checkpoint!==generation)throw fail('stale');withinDeadline();
       readPhases=parseStudentReadPhases(response.headers?.get('x-n88-student-read-phases'));
