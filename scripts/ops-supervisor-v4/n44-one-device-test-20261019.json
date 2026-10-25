@@ -9,16 +9,18 @@
       "scopeKey": "n44-one-approved-current-device-test",
       "riskClass": "SENSITIVE",
       "validationTier": "SENSITIVE",
-      "executionMode": "synthetic",
-      "liveMutation": false,
-      "liveAuthorizationRef": null,
-      "budgetMinutes": 35,
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261026-N44-ONE-INSTRUMENTED-FOURTH-ACTUAL-OUTCOME",
+      "budgetMinutes": 60,
       "idleMinutes": 12,
       "allowedPaths": [
         "drafts/n44-push/**",
         "supabase/functions/n44-notifications/**",
         "tests/n44-instrumented-fourth-20261026/**",
-        "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md"
+        "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md",
+        "tests/n44-instrumented-fourth-actual-20261026/**",
+        "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md"
       ],
       "verificationPaths": [
         "sw.js",
@@ -54,7 +56,7 @@
         "authorityStartsAt": "2026-10-24T02:14:27.943Z",
         "authorityExpiresAt": "2026-10-24T04:14:27.944Z",
         "productId": "N44",
-        "liveAuthorizationRef": null,
+        "liveAuthorizationRef": "PO-20261026-N44-ONE-INSTRUMENTED-FOURTH-ACTUAL-OUTCOME",
         "namedOperations": [
           "reconcile original one-device attempt and cleanup",
           "qualify exact changed two-hour hard stop preserving consumed budget",
@@ -73,7 +75,7 @@
           ],
           "requiredHistoricalAggregate": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
         },
-        "currentPhase": "LOCAL_ONLY_instrumented_fourth_qualification_ZERO_live",
+        "currentPhase": "qualified_one_instrumented_fourth_actual_outcome",
         "newTargetUserAuthorization": "PO23October current reply identifies normal Chrome Rakeez test account; incognito reserved for N36",
         "newLiveWindowGranted": true,
         "providerWritesThisPhase": "only exact qualified activation/one-device approval and owner cleanup",
@@ -599,9 +601,10 @@
         "continuous-n44-authorization-unknown-public-dependency-20261025",
         "continuous-n44-normal-ui-custody-dependency-20261025",
         "continuous-n44-config-readiness-public-dependency-20261025",
-        "continuous-n44-disabled-cleanup-public-20261025"
+        "continuous-n44-disabled-cleanup-public-20261025",
+        "continuous-n44-receiver-outcome-public-20261026"
       ],
-      "objective": "CONTINUE ORIGINAL SESSION AND SAVED CANDIDATE 54b9059ee99301a99daee5832d57590bc9503841. STRICT LOCAL SYNTHETIC QUALIFICATION ONLY, no live provider/browser/account/DPAPI/current private database operations, no native uploads/pin/policy/source/registration/consent/send. Read stable Root scope artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-instrumented-fourth-scope.json (requestRun 7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967, authority f9a16de8a27b52f32f346e0c975e4714c68d45b92eecf84efbbbd9bccc201287, hardEnd 2026-10-26T05:09:54.185Z). User requested actual N44 completion, broad delegation; Root chose finite new prospective trial, not renewal/reset of old three. Current native actually c1ec411c898320eeded8ba8a3363c69a3e192418 archive cb0bec6dcc12b3831b518add1cc2af7cf7339b4a33f5cc04623dcd2c820f3dec. Registration8 independently revoked/consentfalse/no pending jobs/prefs match/read rollback; hosted receipt tests/n44-functional-readiness-20261026/hosted-result-dfd4e638.json SHA335c748e29285415909deab8fc67c35fcce1fc837fd424511b5bfd0f3b0e3e7f. Do NOT repeat inspection or cleanup. Protected staging deletion was tool-policy REJECTED: leave retained, zero cleanup retries or alternate deletion.\nImplement only additive fixed source-bound prospective fourth request branch to existing current-request-authority/one-device-test/native package: old requestRun 2b688310-93cb-40f3-82a2-5dfdf8898fae and hash/old-three markers remain immutable spent; new fourth gate requires first+additional+third server markers spent, registration8 revoked and generation8 consumed, fresh same owner/workspace/physicaldevice consent, max1 registration9, max1 source/window, max20min window and hardEnd above, max1 new send global ceiling4. No generic quota option, no rollover reset, no registration revival, no public capability/protocol changes. Keep existing original typed operation constraints, transaction+COMMIT/privacy/owner/nonce/rate/pin guards. Existing code max3/prior2 blocks legitimate future fourth; qualify exact additive replacement before any live stage. Require monotonic consumed markers on failure/unknown, race and expiry/wrong target denied; no fallback/resend. Reuse unchanged transport/SW proofs; local existing compiled/native and real synthetic typedPG only for affected cap/race/oldhistory/revocation/rollback+COMMIT. No new framework, broad audit or paidreview. If local PG requires forbidden cleanup preserve it in protected storage, never delete refused staging.\nPrepare exact source-native package and named next-live operation sequence only, preserve original session/candidate/base/history and all FAIL/NOT_RUN. Public receiver packet remains immutable54b9059, patchd626b24aaa4942ab96395ee7df02f0c7cc4dfe3d956a241a18afb52b81d72c09 and a disjoint PUBLIC source-only child handles four files. DO NOT edit sw.js/src at all. Return BLOCKED with qualified local candidate and bounded next native+instrumented trial prerequisites; do not upload/send or claim arrival. Root will separately activate exact live stage after public served proof, observer readiness, fresh same target SyncGREEN. Prior scoped rules superseded only for THIS local stage; do not interpret expired historical live budgets as available. Historical required checks remain obligations; preserve their true existing evidence and NOT_RUN for postpublication actual arrival. This strict local stage is BLOCKED pending final live outcome, never fabricate live PASS.",
+      "objective": "ORIGINAL CUSTODIAN ONLY. Continue saved qualified candidate, do not reimplement tests or repeat consumed old scopes. This live stage may begin only after actual new public receiver four assets served, qualified fixed fourth cap packet, no active shared service/browser worker/publisher, fresh exact same original protected normalChrome owner/workspace/physicaldevice and SyncGREEN. No new account, incognito/N36/Madrasati contact, credential/cookie/session-store extraction, browser evaluation hidden storage, service-security/Auth/RLS/SQL schema migration, OSsettings change, cron/general/bulk delivery. Scope immutable artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-instrumented-fourth-scope.json requestRun7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967 authorityf9a16de8a27b52f32f346e0c975e4714c68d45b92eecf84efbbbd9bccc201287 hardEnd2026-10-26T05:09:54.185Z. No automatic renewal; abort if prerequisites cannot fit. Prior actual3 remain spent; old first/additional/third markers never reset; new fourth global4 atmost1, reg9atmost1 and reg8 verifiedrevoked, max1sourcegroup4/max1window4<=20min and hardEnd.\nOriginal native qualified upload atmost1 plus exactown pin/session-policy source-only pairedCAS atmost1 (preserve Auth approval times/flags/other47keys/N88archive/carriers). Readback source/archive, peer source/archive and invariantdigest; metadata versions legitimately increment withsecretwrites, compare source+archive. Existing ingress/service typed contracts+nonce/rate+private guards untouched. Source code cap package is NEW and must actually be served, oldc1ec is prerequisite not new deployedclaim. No new diagnostic/chanceupload or desktop upstreamSSLFAIL retry. On material failure stop, preserve budget and evidence.\nBefore new send, arm finite passive local OS observer through documented cua APIs only, no input/foreground/notificationcenter/OSDB/registry/customhelper. getApp on actually observed attributable Chrome/Rakeez/notificationwindow may readAX/screenshot; don't capture unrelated private alerts. CUA rewriteDocumentation first after summary; listWindows emitfalse then exact observed IDs, no guessed handles. Need observer ready BEFORE dispatch; if can't observe nativeUI record limitation, never providerACK=OS. Current SWSupport outcome provides independent finite device receipt via sameorigin controlledclient, no network/eval; read its legitimate disabled/cleanupPending path BEFORE Stop/sourceDelete/expiry clears binding. Do not discard evidence by cleaning first.\nNormal UI currenttarget optin/preferences/registration9; targetauthorizeACK required. If necessary temporary SAMEDEVICE test timing/quiet preference via existing normal UI only, journal exactoriginal and restore; no broad system/browser preference change. Exact current curriculum operational sourcegroup4 max1/autogeneratedchildmax1 via normal app route only, zero grade/student changes; intent durable before normalcreation and normalcanonicalACKs. Save every normal mutation ID before dispatch, no arbitrary generated-ID mismatch/directSQL substitute. Fresh20minwindow with exactscope hash/id, service validates all3spent/8retired then consumes new markers atomically. Close only authorized normaltrialRakeezpages, keep Chrome running and personal/incognito/Madrasati intact. Exactlyone actual new push after ledger provesunspent; no uncertain resend. Capture server commit/provider disposition AND SW received/displayrequested/accepted/failed/unknown/getNotifications presence AND attributed native banner if observable, each separate. Device outcome may be reread once through explicitclosedSupport after normal ownedappreopen, no focuspoll/network and no accountchange.\nOnly AFTER receipt capture, delete exact source4 via normal recoverableDeleteACK, Stop/revoke9/consentfalse/unsubscribe+bindingabsence and originalpreferences restore normalUI. Independently verify exactreg9 disposition using bounded signed existing hosted inspector once (max15minreadonlyapproval, rollbackACK/zeroprivatewrites), not spent oldreg8approval replay; no desktopupstreamSSLretry. Finally approvalNULL/deliveryOFF/cronOFF, samepeer/47nonapprovedkeys preservation, ownedtabs/processes/leases release. Protectedstaging previous deletion POLICYREJECTED MUST remain retained, no deletion retries/alternatetools/ACL. Do not delete any such folder.\nRecord actualservedrevision/native/pin+policy hashes/window/request/budget/receipt finite statuses withoutsecretIDs. Nativevisual notobservable/unknown remains NOT_PROVEN, never manufacturePASS fromsynthetic/HTTP200/provideracceptance. No fourthrepeat/fifth under anyauthority. Preserve errors/NOTRUN and no broaderN44umbrellaCLOSED. Return truthful runner schema and bounded candidate outcome; solepublisher only handles any approvedpublicdelta.\n\nNative observer MUST target only an actually observed notification toast/transient notification window, attributed to Chrome/Rakeez by its actual AX/title. Never capture the main Chrome window or other personal browsing content, and never infer toast presence from a generic Chrome app window. If no safe attributable native window is available, keep OS visual proof NOT_PROVEN and still collect finite legitimate SW device receipt before cleanup; do not add another send.\n\nACTUAL PUBLIC PREREQUISITE COMPLETE: candidate6a0dcbc64347e294b50cbb59e1623899c220ee37 published75248486914481c0a72fcd6acb76d67d43d337a2 VERIFIED2026-10-25T23:26:16.374Z; all FOUR actual servedassets exact manifest targethashes. Reuse certificate, no unchanged public/networkchecks. LOCAL qualification complete19focusedtyped-nativePGcases, fixedscope/race/history/COMMIT/noresend; candidatee9764e0a046e1c7a5c3f085de8cb2626106dc6e6, immutable qualified Native source9e8732c48990e1a46e164f3770a79cc2004da0c4 edge85acc24888a78bde80a15e9048f0a6d4edc1d7470718cc2b3dc59631e7f68743 importMap50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421 qualification0b37c864760e34b5d08214ba5842f851bdc966aa463f036c4c5166ddf828cfd0. Read qualified-source.json and named next-live sequence N44_INSTRUMENTED_FOURTH_QUALIFICATION.md, use deployable edge, never testlibrary. Registration8 disposal actual independentreceipt335c748 proved. No further localqualification/testframework.\nA fresh original-normal profile owned app document may be opened if needed (max2 normal owned appdocuments total for pretrial/reopen, except already open authorized trialsourcepages); verify same protectedidentity on legitimate UI and SyncGREEN. Confirm new finite SW/device outcome path is available through normal Support before consuming send. If a prior uncontrolled old worker is active, close only authorized normal Rakeeztrialtabs to let actual SW activate; never forceChrome/profile or OSinput/settings. Keep screenshot/freezingviewport no personallyunrelated windows. Current device preferences/timezone govern actualdue selection; new source exactnormalUI currentKSA date and <=20min scope before UTCboundary, no guessedUTC day or defaultmaterial. Protected originalcustody markers BEFOREmutation for reg9/source4/window4/send4; no consumedattemptreuse. Signed finaldisposition approval max15min read-onlyrollback, zero privatewrites. Final own stop/sourcecleanup remains required even if capture is inconclusive.\nAll historical requiredchecks retained with actual trueevidence/FAIL/NOTRUN; olddesktopSSLFAIL may be preserved while hostedactualnewone is independentlyqualified, never relabel it. No broadN44CLOSED. This live stage supersedes ONLY preceding localstage zero-live allocation; no expired historical windowrenewal or marker reset.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -627,7 +630,10 @@
         "n44_current_actual_closed_page_os_arrival",
         "n44_fourth_additive_fixed_scope_and_global_history",
         "n44_fourth_typed_native_transaction_race_and_unknown_guards",
-        "n44_fourth_exact_native_packet_and_zero_live_operations"
+        "n44_fourth_exact_native_packet_and_zero_live_operations",
+        "n44_fourth_qualified_native_actual_source_and_peer_preservation",
+        "n44_fourth_actual_closed_page_device_and_os_receipt",
+        "n44_fourth_final_reg9_disposition_and_off"
       ],
       "acceptance": [
         "Exactly one approved current-device actual push attempt, after pages closed, with explicit browser consent and truthful OS result.",
@@ -637,18 +643,19 @@
       "effort": "medium",
       "preflight": {
         "version": 1,
-        "sourceCommit": "54b9059ee99301a99daee5832d57590bc9503841",
+        "sourceCommit": "e9764e0a046e1c7a5c3f085de8cb2626106dc6e6",
         "requiredSourcePaths": [
-          "drafts/n44-push/one-device-test.mjs",
-          "drafts/n44-push/current-request-authority.mjs"
+          "drafts/n44-push/activation/instrumented-fourth-20261026/qualified-source.json",
+          "drafts/n44-push/activation/instrumented-fourth-20261026/edge.mjs",
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md"
         ],
         "editPaths": [
-          "drafts/n44-push/one-device-test.mjs",
-          "drafts/n44-push/current-request-authority.mjs",
-          "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md"
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md"
         ],
         "newPaths": [
-          "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md"
+          "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md"
         ],
         "workerChecks": [
           "n44_one_authorized_device_registration_single_push_with_pages_closed",
@@ -675,11 +682,14 @@
           "n44_current_actual_closed_page_os_arrival",
           "n44_fourth_additive_fixed_scope_and_global_history",
           "n44_fourth_typed_native_transaction_race_and_unknown_guards",
-          "n44_fourth_exact_native_packet_and_zero_live_operations"
+          "n44_fourth_exact_native_packet_and_zero_live_operations",
+          "n44_fourth_qualified_native_actual_source_and_peer_preservation",
+          "n44_fourth_actual_closed_page_device_and_os_receipt",
+          "n44_fourth_final_reg9_disposition_and_off"
         ],
         "publisherChecks": []
       },
-      "completionMode": "qualify_instrumented_fourth_local_only",
+      "completionMode": "complete_one_instrumented_fourth_actual_outcome",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
@@ -1118,6 +1128,35 @@
         "accountActions": 0,
         "browserActions": 0,
         "liveSql": 0
+      },
+      "instrumentedFourthActivation": {
+        "version": 1,
+        "intake": "artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-instrumented-fourth-scope.json",
+        "scopeSha256": "f9a16de8a27b52f32f346e0c975e4714c68d45b92eecf84efbbbd9bccc201287",
+        "requestRun": "7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967",
+        "hardEnd": "2026-10-26T05:09:54.185Z",
+        "qualifiedCandidate": "e9764e0a046e1c7a5c3f085de8cb2626106dc6e6",
+        "nativeSource": "9e8732c48990e1a46e164f3770a79cc2004da0c4",
+        "edgeSha256": "85acc24888a78bde80a15e9048f0a6d4edc1d7470718cc2b3dc59631e7f68743",
+        "qualificationSha256": "0b37c864760e34b5d08214ba5842f851bdc966aa463f036c4c5166ddf828cfd0",
+        "maxNativeUploads": 1,
+        "maxOwnPairedPinPolicySourceTransitions": 1,
+        "preserveAuthAttestation": true,
+        "maxFreshSameDeviceRegistration": 1,
+        "priorAcks": 8,
+        "maxLifetimeAck": 9,
+        "priorActualSends": 3,
+        "maxNewActualSends": 1,
+        "maxGlobalSends": 4,
+        "maxNewSourceGroups": 1,
+        "maxNewWindows": 1,
+        "maxWindowMs": 1200000,
+        "maxReadonlyFinalDispositionApprovals": 1,
+        "maxSignedFinalDispositionReads": 1,
+        "deviceReceiptBeforeCleanup": true,
+        "noAutomaticRenewal": true,
+        "noGeneralBulkOrCron": true,
+        "protectedDeletionRetries": 0
       }
     }
   ]
