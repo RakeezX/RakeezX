@@ -9,6 +9,7 @@ import { performance } from 'node:perf_hooks';
 import { normalizePushPayload, normalizePushEnvelope } from '../../src/lib/notification-push-core.js';
 import { approvedProviderOrigins, trustedSubscription, publicAddress, decode64, validatePoint } from './provider-policy.mjs';
 import { consumeCommittedPermit } from './committed-permit.mjs';
+import { WNS_WEBPUSH_ORIGIN, isWnsWebPushEndpoint } from './shared.mjs';
 
 const fail = () => { throw Error('n44_sender_unavailable'); };
 // http_ece deliberately has a diagnostic key logger. Never run it in that mode;
@@ -68,6 +69,7 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
         if(!signing)fail();
         const sub=trustedSubscription(opened.subscription,origins);
         const url=new URL(sub.endpoint);
+        const wns=isWnsWebPushEndpoint(url) && origins.includes(WNS_WEBPUSH_ORIGIN);
         const cancel=new Promise((_,reject)=>controller.signal.addEventListener('abort',()=>reject(Error('n44_sender_unavailable')),{once:true}));
         const answers=await Promise.race([Promise.resolve().then(()=>resolve(url.hostname,{all:true,verbatim:true})),cancel]);
         check();
@@ -89,6 +91,12 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
         // Recompute TTL after encryption too; it never outlives immutable expiry.
         details.headers.TTL=Math.min(ttl,Math.floor((allowedExpiry-clock())/1000));
         if(details.headers.TTL<1) fail();
+        if (wns) {
+          // Microsoft Edge WebPush WNS uses raw encrypted body with explicit type.
+          // The endpoint query is an opaque capability: preserve it exactly.
+          details.headers['X-WNS-Type']='wns/raw';
+          details.headers['Content-Type']='application/octet-stream';
+        }
         return await new Promise(resolveOutcome=>{
           const finish=outcome=>{
             if(done) return; done=true;
@@ -102,7 +110,7 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
           if(controller.signal.aborted){stop();return;}
           try {
             const options={protocol:'https:',hostname:url.hostname,port:443,
-              path:url.pathname,method:'POST',headers:details.headers,
+              path:url.pathname+url.search,method:'POST',headers:details.headers,
               servername:url.hostname,rejectUnauthorized:true,checkServerIdentity,
               minVersion:'TLSv1.2',agent:false,autoSelectFamily:false,family:pinned.family,
               maxHeaderSize:8192,signal:controller.signal,
@@ -120,7 +128,7 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
               const code=response.statusCode;
               // Only a definitive service rejection is retryable. 5xx, redirects,
               // malformed, truncated and all unknown-after-send remain uncertain.
-              finish([201,202].includes(code)?'accepted':code===404||code===410?code:
+              finish(([201,202].includes(code) || wns && code===200)?'accepted':code===404||code===410?code:
                 code===429?'not_accepted_retryable':'uncertain');
             });
             req.on('error',()=>finish('uncertain'));

@@ -52,7 +52,9 @@ export function makeFixture(options={}) {
     check(()=>{
       assert.equal(o.hostname,new URL(f.subscription.endpoint).hostname);assert.equal(o.servername,o.hostname);
       assert.equal(o.port,443);assert.equal(o.protocol,'https:');assert.equal(o.method,'POST');
-      assert.equal(o.path,new URL(f.subscription.endpoint).pathname);
+      assert.equal(o.path,new URL(f.subscription.endpoint).pathname+new URL(f.subscription.endpoint).search);
+      if (options.wns) assert.equal(o.headers['X-WNS-Type'],'wns/raw');
+      else assert.equal(o.headers['X-WNS-Type'],undefined);
       assert.equal(o.rejectUnauthorized,true);assert.equal(o.checkServerIdentity,checkServerIdentity);
       assert.equal(o.agent,false);assert.equal(o.autoSelectFamily,false);assert.equal(o.minVersion,'TLSv1.2');
       assert.equal(o.maxHeaderSize,8192); assert.equal(o.headers['Content-Encoding'],'aes128gcm');
@@ -94,7 +96,7 @@ export function makeFixture(options={}) {
         assert.ok(verify('sha256',Buffer.from(header+'.'+claims),{key:publicKey,dsaEncoding:'ieee-p1363'},Buffer.from(signature,'base64url')));
         f.transportChecks++;
       });
-      const respond=(code=f.statusCode??201)=>{
+      const respond=(code=f.statusCode??(options.wns?200:201))=>{
         const res=new EventEmitter();res.statusCode=code;res.destroyed=false;
         res.headers={location:'http://169.254.169.254/metadata'};
         res.destroy=()=>{res.destroyed=true;};f.responses.push(res);callback(res);

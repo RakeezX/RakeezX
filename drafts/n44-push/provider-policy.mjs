@@ -3,6 +3,7 @@ import { p256 } from '@noble/curves/nist.js';
 import { isIP } from 'node:net';
 import ipaddr from 'ipaddr.js';
 import { validateSubscription } from './registration.mjs';
+import { WNS_WEBPUSH_ORIGIN, isWnsWebPushEndpoint } from './shared.mjs';
 
 // Reviewed standard Web Push services, not generic user-controlled endpoints.
 // Config must explicitly opt in to each origin, in addition to this fixed policy.
@@ -17,7 +18,7 @@ const policies = new Map([
 ]);
 const fail = () => { throw Error('n44_crypto_unavailable'); };
 export function approvedProviderOrigins(origins = []) {
-  if (!Array.isArray(origins) || origins.some(s => !policies.has(s)) || new Set(origins).size !== origins.length) fail();
+  if (!Array.isArray(origins) || origins.some(s => s !== WNS_WEBPUSH_ORIGIN && !policies.has(s)) || new Set(origins).size !== origins.length) fail();
   return Object.freeze([...origins]);
 }
 export function decode64(s, length) {
@@ -40,7 +41,9 @@ export function trustedSubscription(raw, origins) {
   const sub = validateSubscription(raw, origins);
   if (!sub) fail();
   const u = new URL(sub.endpoint);
-  if (u.search || !policies.get(u.origin)?.test(u.pathname)) fail();
+  if (isWnsWebPushEndpoint(u)) {
+    if (!origins.includes(WNS_WEBPUSH_ORIGIN)) fail();
+  } else if (u.search || !policies.get(u.origin)?.test(u.pathname)) fail();
   validatePoint(sub.keys.p256dh); decode64(sub.keys.auth, 16);
   return sub;
 }
