@@ -139,11 +139,24 @@ test('cleanup failures stay retryable, private and block later subscription', as
   assert.ok(!JSON.stringify([f.diagnostics, fault.diagnostics, fault.client]).includes('PRIVATE'));
 });
 
-test('n44_focused_source_binding_and_truthful_live_activation_prerequisites', () => {
+test('n44_current_source_binding_keeps_explicit_optin_and_worker_handler', () => {
   const actual = execFileSync('git', ['grep', '--untracked', '-l', 'notification-push-', '--', 'src', 'sw.js'], { encoding: 'utf8' });
-  assert.deepEqual(actual.trim().split(/\r?\n/).filter(Boolean), ['src/lib/notification-push-client.js']);
-  const evidence = readFileSync(new URL('../docs/automation-evidence/20261017/N44_INACTIVE_PUSH_PRIMITIVES_PREPARATION.md', import.meta.url), 'utf8');
-  for (const marker of ['NOT_RUN', 'NOT_ACTIVATED', 'N44 remains OPEN', 'server', 'app-closed']) assert.ok(evidence.includes(marker));
+  assert.deepEqual(actual.trim().split(/\r?\n/).filter(Boolean), [
+    'src/app.js',
+    'src/lib/notification-push-client.js',
+    'src/lib/notification-push-runtime.js',
+    'src/views/notification-settings.js',
+    'sw.js',
+  ]);
+  const src = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
+  assert.match(src('src/lib/notification-push-client.js'), /browser\.hasUserActivation\(\)/);
+  assert.match(src('src/lib/notification-push-client.js'), /browser\.requestPermission\(\)/);
+  assert.match(src('src/lib/notification-push-client.js'), /gateway\.register\(/);
+  assert.match(src('src/lib/notification-push-runtime.js'), /supportedPushConfiguration/);
+  assert.match(src('src/views/notification-settings.js'), /data-act="notification-push"/);
+  assert.match(src('sw.js'), /self\.addEventListener\('push',/);
+  assert.match(src('sw.js'), /self\.addEventListener\('notificationclick',/);
+  // This is a wiring guard, not a claim that a real device received a Push.
 });
 
 test('action independently authorized and re-derived with current owner, expiry and destination', async () => {

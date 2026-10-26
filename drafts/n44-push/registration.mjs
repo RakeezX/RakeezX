@@ -1,4 +1,4 @@
-import { LIMITS, result, id, uuid, record, principal, current, rate } from './shared.mjs';
+import { LIMITS, result, id, uuid, record, principal, current, rate, WNS_WEBPUSH_ORIGIN, isWnsWebPushEndpoint } from './shared.mjs';
 import { runtimeFailure } from './runtime-failure.mjs';
 
 // No provider origins are supplied by this package. Configuration is a later gate.
@@ -16,7 +16,8 @@ export function validateSubscription(raw, approvedOrigins = []) {
     if (url.protocol !== 'https:' || url.username || url.password || url.hash ||
         url.port || url.href !== raw.endpoint || !url.pathname.startsWith('/') ||
         !/^[a-z][a-z0-9.-]*\.[a-z]{2,}$/.test(url.hostname) ||
-        !approvedOrigins.includes(url.origin)) return null;
+        !(approvedOrigins.includes(url.origin) ||
+          approvedOrigins.includes(WNS_WEBPUSH_ORIGIN) && isWnsWebPushEndpoint(url))) return null;
     return Object.freeze({ endpoint: url.href, keys: Object.freeze({ ...raw.keys }) });
   } catch { return null; }
 }
