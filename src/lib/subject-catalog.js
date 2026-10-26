@@ -29,7 +29,7 @@ export const BUILTIN_SUBJECTS = Object.freeze([
     'الحاسب الآلي', 'الحاسب', 'مهارات رقمية', 'digital skills', 'computer',
   ], ['computer']),
   defineSubject('art', 'الفنية', ['التربية الفنية', 'تربية فنية', 'art']),
-  defineSubject('physical-education', 'البدنية', ['التربية البدنية', 'تربية بدنية', 'physical education', 'pe']),
+  defineSubject('physical-education', 'البدنية', ['التربية البدنية', 'التربية البدنية والدفاع عن النفس', 'تربية بدنية', 'physical education', 'pe']),
   defineSubject('life-family-skills', 'الحياتية والأسرية', [
     'المهارات الحياتية والأسرية', 'التربية الأسرية', 'الأسرية', 'life and family skills',
   ]),
