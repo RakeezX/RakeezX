@@ -1,0 +1,100 @@
+{
+  "taskId": "continuous-n44-click-shell-preservation-20261027",
+  "runId": "522e5179-6be6-406b-a27e-e4bd285b4aed",
+  "baseSha": "3b6a6b03beb2bad1a8365539a9caadc125da9957",
+  "qualifiedClickCommit": "0c3111b6b1de6f755dba6063019a633bd63e23f5",
+  "priorCompleteShellCommit": "1131917dd7cd69d7b094e78185cd6f633313c64e",
+  "priorDelivery": "e2f40e680edea6a546331d4adc58f5de9fcd392c",
+  "observedOriginMain": "3b6a6b03beb2bad1a8365539a9caadc125da9957",
+  "version": "rakeezx-v89",
+  "shell": {
+    "baseCount": 191,
+    "priorV88Count": 200,
+    "candidateCount": 200,
+    "completePriorSubset": true,
+    "restored": [
+      {
+        "path": "./src/views/portfolio-design-preview.js",
+        "sha256": "8f15383b5e4fa36aa0fb463d27ea244385c0277db248371cd259ed870005e913"
+      },
+      {
+        "path": "./src/styles/portfolio-design-preview.css",
+        "sha256": "9ac109f4ae3cfc82d48c5eb88f1e103a48ff90e0feca2c9fe5ad5bd7b173b5b4"
+      },
+      {
+        "path": "./src/lib/portfolio-design-preview.js",
+        "sha256": "c71d227a29ec9d4a24e610275b6c61ed19719559022b33320a41ad6ee395f014"
+      },
+      {
+        "path": "./src/lib/portfolio-annual-plan.js",
+        "sha256": "358344a204f239283514ac86af28b93fbe0b34234dfb4336aa943722a6f0587c"
+      },
+      {
+        "path": "./src/lib/portfolio-smart-evidence.js",
+        "sha256": "3807d6a22edf6bf3fe0d45c2d1fe99ed010bfac93e116f7815c6b3453b5a128e"
+      },
+      {
+        "path": "./src/lib/portfolio-evidence-templates.js",
+        "sha256": "d1c53658bcf7d666aba8ddd9ecee20a80e4f87d6f66ab8f6ed1d5c463f4bc8ff"
+      },
+      {
+        "path": "./src/lib/portfolio-local-draft.js",
+        "sha256": "434f0c1028d43f936ddd2b5d7eaa2480288831a8f07876bba8a9cd41228c77cd"
+      },
+      {
+        "path": "./src/lib/portfolio-local-state.js",
+        "sha256": "a21f2be03094c3e326026fcc48b8c9171f6b287991070f0968971a04266ca6ef"
+      },
+      {
+        "path": "./src/lib/portfolio-local-archive.js",
+        "sha256": "a876e523cbd5da91dae460b38f67a4765d09c3d71bceca4d3a171f015d376c5f"
+      }
+    ]
+  },
+  "normalizedWorkerSha256": "65e4b299c50f64681ad3a9c4508a7b8a12ceee7375d1723fc810c1212ee14b5e",
+  "normalizedN44BlockSha256": "6169dbf2b41ace7453cd3472b72cdb69d6678ddd2003f969c6dfe53a534b3880",
+  "runtimeCanonicalGitSha256": "f1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0",
+  "workerHarness": {
+    "immutableSource": "0c3111b6b1de6f755dba6063019a633bd63e23f5:tests/n44-pr6-completion-20261026/click-worker.test.mjs",
+    "sha256": "492f63eb9b85eace3d822561e531624941be059023cd35434179cb62d84eb3be",
+    "output": "✔ existing client is shown before a slow consent read or rejected authorization (72.5247ms)\n✔ cold boot opens only public root before consent I/O and waits for readiness (548.91ms)\n✔ invalid or expired envelope never opens/focuses an application (0.9502ms)\n✔ concurrent duplicate click opens only one public root and dispatches once (45.6405ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 675.4608\n"
+  },
+  "initialHarnessReportingFailure": {
+    "status": "FAIL_REPORTER_FORMAT_ONLY",
+    "reason": "First wrapper expected TAP # pass 4, but installed Node emitted spec reporter info pass 4. All four actual tests passed. Summary assertion corrected to accept reporter-independent pass/fail text; immutable harness unchanged."
+  },
+  "reusedEvidence": {
+    "path": "tests/n44-click-frontend-delivery-20261027/qualification.json",
+    "normalizedSha256": "7346952d427e4a7b42371224cab2b4a8bdc5820a2df816601a53be99986a47b0",
+    "actualHttpDomOwnerPrivacy": "10 PASS reused; original failures remain in immutable references",
+    "physicalArrival": "PASS prior PO witness reused",
+    "physicalClickPrior": "FAIL_NO_VISIBLE_APPLICATION",
+    "physicalClickPostFix": "NOT_RUN",
+    "localSubscriptionBindingCleanup": "UNKNOWN; historical FAIL_UNCONFIRMED retained",
+    "livePhase": "consumed and retired"
+  },
+  "liveOperations": 0,
+  "registrations": 0,
+  "sends": 0,
+  "providerOperations": 0,
+  "browserServerPhases": 0,
+  "leases": 0,
+  "productStatus": "N44 OPEN",
+  "checks": [
+    {
+      "name": "n44_click_shell_latest_assets_and_monotonic_generation",
+      "status": "PASS",
+      "evidence": "v89 > prior v88; 200/200 prior entries and 191/191 base entries retained; exactly 9 restored assets exist. Observed origin/main 3b6a6b03beb2bad1a8365539a9caadc125da9957 at v87."
+    },
+    {
+      "name": "n44_click_shell_qualified_handler_and_runtime_unchanged",
+      "status": "PASS",
+      "evidence": "Complete N44 block equals qualified source after CRLF-to-LF normalization; runtime SHA256 f1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0; immutable worker harness 4 PASS / 0 FAIL. Prior actual HTTP DOM/owner/privacy 10 PASS reused."
+    },
+    {
+      "name": "n44_click_shell_single_file_scope_zero_live_operations",
+      "status": "PASS",
+      "evidence": "Full-worker equality allows only v87-to-v89 and exact prior asset block. node --check sw.js and git diff --check PASS. Only sw.js plus own note/proof. Zero live operations, leases, browser/server, sends, registrations, provider operations, pushes or deployments."
+    }
+  ]
+}
