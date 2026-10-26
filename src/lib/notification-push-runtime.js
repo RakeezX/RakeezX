@@ -6,6 +6,7 @@ import { currentNotificationContext, currentNotificationEvents, notificationDest
 import { readNotificationCategories, readNotificationTiming } from './notification-state.js';
 import { LEASE_STORAGE_PREFIX } from './offline-lease.js';
 import { normalizePushPayload, normalizePushEnvelope } from './notification-push-core.js';
+import { toast } from './dom.js';
 
 // Public-key discovery is authenticated and same-origin. This enables discovery,
 // never permission, subscription, a scheduler or delivery on application load.
@@ -364,17 +365,40 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     if (epoch !== generation || selectedChoice(token, 'source')?.signature !== choice.signature) return { status: 'rejected' };
     sourceStatus = { ...result, token, signature: choice.signature }; changed(); return { ...sourceStatus };
   }
+  const clicked = new Map();
   const onMessage = event => {
     // Only the actual controlling SW can request a bounded action; no page-message API.
     if (!event.source || event.source !== win.navigator.serviceWorker?.controller) return;
     if (event.data?.type === 'n44-subscription-stale') { invalidate(); return; }
     if (!event.ports?.[0] ||
-      !['n44-push-check', 'n44-push-click'].includes(event.data?.type)) return;
+      !['n44-push-ready', 'n44-push-check', 'n44-push-click'].includes(event.data?.type)) return;
     const port = event.ports[0];
+    if (event.data.type === 'n44-push-ready') {
+      // Terminal unavailability also answers ready: the action can explain a
+      // denial visibly without another configuration/authorization request.
+      port.postMessage({ ok: !disposed && !preparing && store.state?.ready === true }); port.close(); return;
+    }
     void (async () => {
       const envelope = normalizePushEnvelope(event.data.event, Date.now());
-      let ok = envelope && envelope.binding === gateway?.registration()?.registrationId && await authorize(envelope.event);
-      if (ok && event.data.type === 'n44-push-click') ok = (await client?.applyAction(envelope.event))?.status === 'action_applied';
+      let ok = false;
+      if (event.data.type === 'n44-push-check') ok = !!envelope && envelope.binding === gateway?.registration()?.registrationId && await authorize(envelope.event);
+      else {
+        for (const [id, value] of clicked) if (value.expiresAt <= Date.now()) clicked.delete(id);
+        const key = envelope && envelope.binding + ':' + envelope.event.id;
+        const eligible = () => !!envelope && usable() && envelope.binding === gateway?.registration()?.registrationId &&
+          readNotificationCategories(current(), storage)[envelope.event.kind] &&
+          notificationDestination(store, current(), envelope.event.id, Date.now()) === envelope.event.actionPath;
+        if (eligible() && !clicked.has(key) && clicked.size < 100) {
+          const action = (async () => {
+            // applyAction performs the fresh server check and re-derives the
+            // current destination/owner AFTER it resolves. Do not authorize twice.
+            return (await client.applyAction(envelope.event)).status === 'action_applied';
+          })();
+          clicked.set(key, { expiresAt: Math.min(envelope.expiresAt, envelope.event.expiresAt), action });
+        }
+        ok = eligible() && await clicked.get(key)?.action === true && eligible();
+        if (!ok && !disposed) toast('تعذّر فتح التذكير. تحقق من الحساب وصلاحية التذكير داخل التطبيق.', 'warn');
+      }
       port.postMessage({ ok }); port.close();
     })().catch(() => { port.postMessage({ ok: false }); port.close(); });
   };

@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v88';
+const VERSION = 'rakeezx-v87';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -61,17 +61,6 @@ const SHELL = [
   './src/vendor/flatpickr/ar.js',
 
   './src/app.js',
-  // AI N126: complete opt-in local Portfolio Preview shell.
-  './src/views/portfolio-design-preview.js',
-  './src/styles/portfolio-design-preview.css',
-  './src/lib/portfolio-design-preview.js',
-  './src/lib/portfolio-annual-plan.js',
-  './src/lib/portfolio-smart-evidence.js',
-  './src/lib/portfolio-evidence-templates.js',
-  './src/lib/portfolio-local-draft.js',
-  './src/lib/portfolio-local-state.js',
-  './src/lib/portfolio-local-archive.js',
-
   './src/lib/app-update.js',
   './src/router.js',
   './src/lib/student-portal-client.js',
@@ -493,13 +482,13 @@ self.addEventListener('message', event => {
   n44Writes = n44Writes.catch(()=>{}).then(work);
   event.waitUntil(n44Writes);
 });
-async function n44Ask(client, envelope) {
+async function n44Ask(client, envelope, type = 'n44-push-click') {
   return new Promise(resolve => {
     const channel = new MessageChannel();
     const finish = ok => { clearTimeout(timer); channel.port1.close(); channel.port2.close(); resolve(ok); };
     const timer = setTimeout(() => finish(false),1500);
     channel.port1.onmessage = message => finish(message.data?.ok === true);
-    try { client.postMessage({type:'n44-push-click',event:envelope},[channel.port2]); } catch { finish(false); }
+    try { client.postMessage(type === 'n44-push-ready' ? {type} : {type,event:envelope},[channel.port2]); } catch { finish(false); }
   });
 }
 const n44Clients = async () => (await self.clients.matchAll({type:'window',includeUncontrolled:false})).filter(n44AppClient);
@@ -543,24 +532,39 @@ self.addEventListener('push', event => {
     n44Writes=n44Writes.catch(()=>{}).then(work);await n44Writes;
   })());
 });
+const n44Clicks = new Map();
 self.addEventListener('notificationclick', event => {
   if (!String(event.notification.tag).startsWith('n44:')) return;
   event.notification.close();
   if (!N44_PUSH_ENABLED) return;
-  event.waitUntil((async () => {
-    const envelope=n44Envelope(event.notification.data),state=await n44Read();
-    if (!envelope || state?.binding!==envelope.binding || state.expiresAt<envelope.expiresAt) return;
-    const epoch=n44Epoch,clients=await n44Clients();
-    for (const client of clients) if (await n44Ask(client,envelope) && epoch===n44Epoch) { await client.focus();return; }
-    if (clients.length || epoch!==n44Epoch) return;
-    // Fixed public application root ONLY. Private destination is never opened by
-    // the SW: the booted page must authenticate and authorize it afresh.
-    const client=await self.clients.openWindow(self.location.origin+'/');
-    for (let attempt=0;client&&attempt<6&&epoch===n44Epoch;attempt++) {
-      if (await n44Ask(client,envelope)) { await client.focus();return; }
-      await new Promise(resolve=>setTimeout(resolve,250));
+  const envelope = n44Envelope(event.notification.data);
+  if (!envelope) return;
+  const key = envelope.binding + ':' + envelope.event.id;
+  for (const [id, click] of n44Clicks) if (click.expiresAt <= Date.now()) n44Clicks.delete(id);
+  if (n44Clicks.has(key)) { event.waitUntil(n44Clicks.get(key).work); return; }
+  if (n44Clicks.size >= 100) return;
+  const work = (async () => {
+    // Show the app while the notification gesture is fresh, BEFORE storage or
+    // authentication. Never put a private route or notification data in the URL.
+    const clients = await n44Clients();
+    const client = clients[0] ? await clients[0].focus() : await self.clients.openWindow(self.location.origin + '/');
+    if (!client) return;
+    const epoch = n44Epoch, state = await n44Read();
+    if (state?.binding !== envelope.binding || state.expiresAt < envelope.expiresAt) return;
+    // Readiness probes have no authorization/navigation side effects. A cold
+    // boot may not yet have installed its listener or restored the owner store.
+    // Send the action ONCE, never retry an unknown authorization/navigation.
+    const deadline = Date.now() + 10000;
+    while (Date.now() < deadline && epoch === n44Epoch && n44Envelope(envelope)) {
+      if (await n44Ask(client, null, 'n44-push-ready')) {
+        if (epoch === n44Epoch && n44Envelope(envelope)) await n44Ask(client, envelope);
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve,250));
     }
-  })());
+  })().catch(() => {});
+  n44Clicks.set(key, { expiresAt: Math.min(envelope.expiresAt, envelope.event.expiresAt), work });
+  event.waitUntil(work);
 });
 self.addEventListener('pushsubscriptionchange', event => {
   ++n44Epoch;

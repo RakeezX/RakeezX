@@ -1,0 +1,508 @@
+{
+  "taskId": "continuous-n44-qualified-click-frontend-20261027",
+  "runId": "2bee937f-f892-4006-b761-c849181e5fd5",
+  "baseSha": "1131917dd7cd69d7b094e78185cd6f633313c64e",
+  "qualifiedParent": "0c3111b6b1de6f755dba6063019a633bd63e23f5",
+  "scope": "Two exact qualified canonical Git frontend blobs; source-only readiness",
+  "lineEndings": {
+    "sw.js": {
+      "testedWorkingSha256": "e9a6f5cefa0ddd8e2f034fe5b822cb53349461d3f07eb1b0098436703526dfe1",
+      "canonicalGitSha256": "641b4a73e7de755ae6b9a4f9e6c603a383538e1f991978b761d3415aeb67b866",
+      "difference": "CRLF versus LF only",
+      "initialRawHashComparison": "FAIL_DIFFERENT_BYTES",
+      "completeNormalizedTextEqual": true
+    },
+    "src/lib/notification-push-runtime.js": {
+      "testedWorkingSha256": "c3e129d5696628436665e133bf949ac6fb8c44182928e25caf362c6d1db45123",
+      "canonicalGitSha256": "f1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0",
+      "difference": "CRLF versus LF only",
+      "initialRawHashComparison": "FAIL_DIFFERENT_BYTES",
+      "completeNormalizedTextEqual": true
+    }
+  },
+  "rawWorkingProofIdentity": "FAIL_DIFFERENT_BYTES retained; CRLF reconstruction matches each full tested-working hash; only parser line endings differ",
+  "sourceProof": {
+    "tests/n44-pr6-completion-20261026/click-qualification.json": {
+      "gitSha256": "ddf2ba990c75724bf09e2f7f5ba1a1e105a6f6ad39c90e4671f90d5a7488556b",
+      "record": {
+        "runId": "7d510da5-d58f-496f-95ac-5957d0f1b3f4",
+        "status": "PASS_FRONTEND_SCOPE_ONLY",
+        "baseSha": "61dbc4bc6cd66f7875ac3446e208dce1c5f3678b",
+        "parentCandidate": "4c93ebd21d9aa2b58d1d2ae5cc66e276e4e94702",
+        "sourceHashes": {
+          "sw.js": "e9a6f5cefa0ddd8e2f034fe5b822cb53349461d3f07eb1b0098436703526dfe1",
+          "src/lib/notification-push-runtime.js": "c3e129d5696628436665e133bf949ac6fb8c44182928e25caf362c6d1db45123",
+          "tests/n44-pr6-completion-20261026/click-host.mjs": "9f12bcf84ffa1e22177425674586273a154edd83a3b09aab3337bdb350093480",
+          "tests/n44-pr6-completion-20261026/click-browser.mjs": "a31c53129083f8fe92e91249787a2b8b6cabf0565402ea54f9373c861c916be1",
+          "tests/n44-pr6-completion-20261026/click-worker.test.mjs": "492f63eb9b85eace3d822561e531624941be059023cd35434179cb62d84eb3be"
+        },
+        "moduleBundle": {
+          "status": "PASS",
+          "inputs": 18,
+          "bytes": 94818,
+          "sha256": "42eb07d4f193950a8e8ffedd4917076ae8ee89ba91851a263891632a68deed44"
+        },
+        "offlineShell": "runtime and existing dom.js dependency present",
+        "nativeInputHashesUnchanged": 51,
+        "qualifiedPr6FrontendUnchanged": [
+          "src/lib/notification-push-browser.js",
+          "src/lib/notification-push-client.js",
+          "src/views/notification-settings.js"
+        ],
+        "whitespace": "PASS",
+        "allChangedPathsAllowed": true,
+        "changedPathCount": 192,
+        "workerRed": {
+          "baseline": "4c93ebd21d9aa2b58d1d2ae5cc66e276e4e94702",
+          "failed": 3,
+          "passed": 1,
+          "failures": [
+            "focus deferred behind rejection/storage",
+            "cold root deferred behind storage/readiness",
+            "duplicate concurrent public windows"
+          ]
+        },
+        "workerGreen": {
+          "passed": 4,
+          "failed": 0
+        },
+        "browserRed": "click-browser-baseline-red.json",
+        "browserGreen": "click-browser-result.json",
+        "actualNewOsArrival": {
+          "status": "PASS",
+          "basis": "PO attributed device witness",
+          "sha256": "8ae064e12515b16a423ba3ee37e699b56dae046a759243170d3d593395242e27"
+        },
+        "physicalClick": {
+          "prior": "FAIL_NO_VISIBLE_APPLICATION",
+          "postFix": "NOT_RUN",
+          "requiresServedFix": true
+        },
+        "reusedDisposition": {
+          "source7Deleted": true,
+          "registration9Revoked": true,
+          "consentFalse": true,
+          "pendingEmpty": true,
+          "preferencesExact": true,
+          "offNull": true,
+          "all47Exact": true,
+          "localSubscriptionAndBindingCleanup": "FAIL_UNCONFIRMED (unchanged)"
+        },
+        "liveOperations": 0,
+        "phaseConsumedAndRetired": true,
+        "lifetimeSends": 4,
+        "lifetimeRegistrationAcks": 9,
+        "lifetimeNativeUploads": 3,
+        "publication": "NOT_RUN; sole publisher must serve sw.js and runtime together",
+        "resources": {
+          "browserClosed": true,
+          "serverClosed": true,
+          "leaseRelease": "RELEASED browser"
+        }
+      }
+    },
+    "tests/n44-pr6-completion-20261026/click-browser-result.json": {
+      "gitSha256": "c0e9e74ff46538c01034a6b2aa9154bebbb6756c384160865b12e37031a7c1fb",
+      "record": {
+        "runId": "7d510da5-d58f-496f-95ac-5957d0f1b3f4",
+        "baselineRef": null,
+        "checks": [
+          {
+            "name": "actual_runtime_one_authorization_and_duplicate_click",
+            "status": "PASS",
+            "evidence": "Actual runtime/client/gateway + actual mounted owner/store: exactly one fresh synthetic authorization and one real router transition; repeated action shares settled result."
+          },
+          {
+            "name": "actual_runtime_unknown",
+            "status": "PASS",
+            "evidence": "Trusted worker message cannot navigate; actual source/context/binding/expiry/server fences and generic rendered source-CSS warning retained. No private content in warning."
+          },
+          {
+            "name": "actual_runtime_revoked",
+            "status": "PASS",
+            "evidence": "Trusted worker message cannot navigate; actual source/context/binding/expiry/server fences and generic rendered source-CSS warning retained. No private content in warning."
+          },
+          {
+            "name": "actual_runtime_deleted",
+            "status": "PASS",
+            "evidence": "Trusted worker message cannot navigate; actual source/context/binding/expiry/server fences and generic rendered source-CSS warning retained. No private content in warning."
+          },
+          {
+            "name": "actual_runtime_expired",
+            "status": "PASS",
+            "evidence": "Trusted worker message cannot navigate; actual source/context/binding/expiry/server fences and generic rendered source-CSS warning retained. No private content in warning."
+          },
+          {
+            "name": "actual_runtime_binding",
+            "status": "PASS",
+            "evidence": "Trusted worker message cannot navigate; actual source/context/binding/expiry/server fences and generic rendered source-CSS warning retained. No private content in warning."
+          },
+          {
+            "name": "actual_runtime_context-switch",
+            "status": "PASS",
+            "evidence": "Trusted worker message cannot navigate; actual source/context/binding/expiry/server fences and generic rendered source-CSS warning retained. No private content in warning."
+          },
+          {
+            "name": "trusted_controller",
+            "status": "PASS",
+            "evidence": "Page/foreign-worker message is ignored before reply, authorization or navigation."
+          },
+          {
+            "name": "deleted_during_authorization",
+            "status": "PASS",
+            "evidence": "Actual client re-derives the source destination after a delayed authorization ACK; deleted parent prevents navigation."
+          },
+          {
+            "name": "actual_cold_document_slow_runtime",
+            "status": "PASS",
+            "evidence": "Zero browser app pages before click; original SW VM opens ONLY public root once. Actual HTTP app/DOM/CSS cold boot plus 2.1s delayed context restoration becomes ready, authorizes once, and routes to the current synthetic items screen. Native OS activation is not simulated as a physical PASS."
+          }
+        ],
+        "liveOperations": 0,
+        "providerRequests": 0,
+        "realRegistrations": 0,
+        "cleanup": {
+          "browserClosed": true,
+          "serverClosed": true,
+          "leaseRelease": "RELEASED browser"
+        },
+        "browserLease": "ACQUIRED browser",
+        "status": "PASS"
+      }
+    },
+    "tests/n44-pr6-completion-20261026/click-browser-baseline-red.json": {
+      "gitSha256": "e1e6e67cd22521414446a926ee3607b0eb67a41f1d80a909d42143ac459da02d",
+      "record": {
+        "runId": "7d510da5-d58f-496f-95ac-5957d0f1b3f4",
+        "baselineRef": "4c93ebd21d9aa2b58d1d2ae5cc66e276e4e94702",
+        "checks": [],
+        "liveOperations": 0,
+        "providerRequests": 0,
+        "realRegistrations": 0,
+        "cleanup": {
+          "browserClosed": true,
+          "serverClosed": true,
+          "leaseRelease": "RELEASED browser"
+        },
+        "browserLease": "ACQUIRED browser",
+        "status": "FAIL",
+        "failure": "Expected values to be strictly equal:\n\n2 !== 1\n"
+      }
+    },
+    "tests/n44-pr6-completion-20261026/click-browser-initial-fixture-failure.json": {
+      "gitSha256": "b777854eae680b11c48c5ede4708d8eaf12ea00ddb9f3131233d34059d2d91a6",
+      "record": {
+        "runId": "7d510da5-d58f-496f-95ac-5957d0f1b3f4",
+        "checks": [],
+        "liveOperations": 0,
+        "providerRequests": 0,
+        "realRegistrations": 0,
+        "cleanup": {
+          "browserClosed": true,
+          "serverClosed": true,
+          "leaseRelease": "RELEASED browser"
+        },
+        "browserLease": "ACQUIRED browser",
+        "status": "FAIL",
+        "failure": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'unavailable'\n- 'subscribed'\n"
+      }
+    },
+    "tests/n44-pr6-completion-20261026/click-worker.test.mjs": {
+      "gitSha256": "492f63eb9b85eace3d822561e531624941be059023cd35434179cb62d84eb3be"
+    },
+    "tests/n44-pr6-completion-20261026/click-browser.mjs": {
+      "gitSha256": "a31c53129083f8fe92e91249787a2b8b6cabf0565402ea54f9373c861c916be1"
+    },
+    "tests/n44-pr6-completion-20261026/click-host.mjs": {
+      "gitSha256": "9f12bcf84ffa1e22177425674586273a154edd83a3b09aab3337bdb350093480"
+    }
+  },
+  "dependencyReuse": {
+    "comparedFiles": 151,
+    "unchangedFiles": 149,
+    "unchangedGitBlobs": {
+      "index.html": "b9c07e1738c2bf1f3911e2f116646f1c5aa45602",
+      "src/lib/account-profile.js": "3b1c780e7de50d96a1d1fc1f9b7cc0efca12567c",
+      "src/lib/achievement-certificate.js": "b66870eb70532a8614f22e015852e0426f6f8508",
+      "src/lib/avatar.js": "f3197941111135f392ac47834f6013ba13353990",
+      "src/lib/backup-v2.js": "ee3fee0894708e60cce35415873d55f8d3c778bf",
+      "src/lib/brand.js": "7c203bd28f79ac0b29d96d75e50b660780c3e5b9",
+      "src/lib/build-meta.js": "7b9be698c1b3ccc7ae3805b2b685373aa4c3c9f4",
+      "src/lib/calendar-presets.js": "671dd0a00daf75e3714937f89a3851d939bc29d0",
+      "src/lib/calendar-recovery.js": "f22f1d609aaed3f154135569c3e932ff2b63d3a3",
+      "src/lib/calendar-runtime.js": "5e1dd9086e659bc17a9c337051226910b7b5cff8",
+      "src/lib/certificate-center.js": "3c7cb4a7564c3d9d7652a03414ec7f383fa896c9",
+      "src/lib/certificate-designs.js": "e3792638f649998292326a54a8caf00808ba8b9b",
+      "src/lib/certificate-pdf.js": "e5eeccbbb4cb60cbaa264f9be7c05028117685d8",
+      "src/lib/certificate-selection.js": "5ce7f00a928dffcc48229053432b47afce52755e",
+      "src/lib/class-import-background.js": "a42138f75aadbf958614277be9676c870f92c075",
+      "src/lib/class-import-file.js": "8918cbd588ad2b4407b7fd84bbb1ebe0de5aeebc",
+      "src/lib/class-koshoof-bundle.js": "af79c493a36b9c18d6b9ad4acddc312732d425b3",
+      "src/lib/class-order.js": "3b59f569a802f1f44fec87144ae903491dca280d",
+      "src/lib/class-subject-default.js": "1127420e486e6feb74654324d59552ec334b2a44",
+      "src/lib/cloud-recovery-ui.js": "041823851746d7e8d700378fa778a255d4cf29cd",
+      "src/lib/cloud.js": "33c22a8e5b7107f7407bd13fa4884e1553ad6f53",
+      "src/lib/complete-read.js": "14a701bbe25cebe5cf9e17cef90abbb48df5ad8b",
+      "src/lib/curriculum-bootstrap.js": "a78257308c9e623bacd7fbe5698b88c02b08ea0b",
+      "src/lib/day-targeting.js": "a25ee71d78bb79dd1259ba2a112109179d5c6515",
+      "src/lib/db.js": "ca3b9014693026cae18a0070c22d84845ce136e1",
+      "src/lib/demo-workspace.js": "6380512b1ef326cb2be20ffabda2dd10ad20a269",
+      "src/lib/demo.js": "eeffcb07d05cd3ac2a5c3a4e131e33d3bd6a4249",
+      "src/lib/display-identity.js": "4af3562c11b7b9c18440aded87ac636e5a67aeab",
+      "src/lib/document-preview.js": "f2226544370b6c810c509661a1dfb0d0b0098f4f",
+      "src/lib/dom.js": "88fbca218a3d4af4acf8bbf9247aadf126262a87",
+      "src/lib/education-department-directory.js": "6269367c6491c22d3c3e141941a5ba43a3642eb1",
+      "src/lib/effects.js": "c869e8e88250dab4ad095dcdd14dd1ffd8b91c4d",
+      "src/lib/export.js": "e66f9a4804f8f6dc935671efda15888404760f65",
+      "src/lib/grade-transfer-export.js": "49a6b7a5914f756e2440cc05b35799676fb783ba",
+      "src/lib/grade-transfer-parsers.js": "416534bad053780f2c7925d00eea5fa78c3f98a4",
+      "src/lib/grade-transfer-xlsx.js": "d9c71749844a30a03eb08f61e98848633fc05231",
+      "src/lib/grade-transfer.js": "9aeff78ee4f864767cb3d9c916495ef97cb9bb8c",
+      "src/lib/group-count-ui.js": "bd0bbb24b660bd2a3ef5deed2e608b8bf726a38d",
+      "src/lib/hijri-year-input.js": "dc4c33ab236b6bc355625943d4815f57453efdae",
+      "src/lib/initial-restore.js": "38286d1e6f8155e8e04b4cf249470a3efae0bbe2",
+      "src/lib/install-guide-ui.js": "dc794ba684380392b22253818c72077431bf194a",
+      "src/lib/ministry-brand.js": "28f009f746d4bbed184ef5f132d305b546974a93",
+      "src/lib/n36-extension-handoff.js": "42cb06d9b919bdf6fb5bfed88b323ff09041c159",
+      "src/lib/n36-extension-protocol.js": "eca14f9b172646c4bfaaf98da5db89629c0549e9",
+      "src/lib/n77-delete.js": "81ee0bbdc5f7b87d91329c8f0a67806de2b2f4d9",
+      "src/lib/n88-invite-lab.js": "a79e2de859809ec1f0b5374d653682a978a296eb",
+      "src/lib/notification-center.js": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+      "src/lib/notification-events.js": "ff18feca8d7040f9e939c446314bccdd03b498d1",
+      "src/lib/notification-push-browser.js": "140a12fee6dda566c9f24ea786559b4d959588eb",
+      "src/lib/notification-push-client.js": "b91a941701c68687fed3c38b8c98477cc1449399",
+      "src/lib/notification-push-core.js": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962",
+      "src/lib/notification-push-gateway.js": "020b7884eddca0fa72ed0d322209ebe55ded1225",
+      "src/lib/notification-state.js": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99",
+      "src/lib/offline-lease.js": "ba307f3677afe68981d79388f02ee017a6049565",
+      "src/lib/owner-invalidation-channel.js": "116c023e133ffc691f35949062d12906923e887c",
+      "src/lib/pristine-teaching.js": "a8f704a2a22c6b392ba50ff3585b2a6c4c074a1b",
+      "src/lib/rakeez-datetime-values.js": "80a1df2413705abe822494e173d58f7ec0b92752",
+      "src/lib/rakeez-datetime.js": "36b546d3eabf5b9edd06a745bc58a96dd0ad5016",
+      "src/lib/remote-sync.js": "c1daf49d5b44f68e5e7379ace3c37338c0cb6b5d",
+      "src/lib/report-print.js": "869d089ff51a7d903398875f4fce9d2e36a53e23",
+      "src/lib/restore-deletion-scope.js": "dcd3784cc3305324c47bd0ffdecf01112722e325",
+      "src/lib/schedule-export.js": "f8314b9250d73e9b938f40b07d854bb306af0f02",
+      "src/lib/score-foundation.js": "96c7bbf8d27963c30dcb15e74bc300f9fd65a157",
+      "src/lib/session-delete-ui.js": "fba36c395f9b589a49d15715d09473f7c9a71679",
+      "src/lib/session-editor-ui.js": "eec360127491c98f5784f7caeca6160c0b5c1a1b",
+      "src/lib/session-recovery.js": "945546cca713157f6675aa9c605ab4d3c3d73cc1",
+      "src/lib/session-start-ui.js": "63c0233db79487cc0d2e935e7a14cd1501dbf230",
+      "src/lib/settings-profile-ui.js": "2949dfbe3d4f4f0df0331a6ae19c31e9e7189463",
+      "src/lib/sound.js": "d439738e27986dd68f076bdfba0ff166490bdd13",
+      "src/lib/student-achievements.js": "ba42bc0f5d353e5a5b0bd6fb6cee330b010b9327",
+      "src/lib/student-import-parsers.js": "75bf8b8089f21f13c67606b9e39ff1fa4e9df062",
+      "src/lib/student-import.js": "2fd8a8d07ae0bcf5922b73bb15739bc8cf64d7cc",
+      "src/lib/student-lifecycle-ui.js": "d1bd1a635be92fa8ec130440534ba7b08d86d212",
+      "src/lib/student-lifecycle.js": "3c6f22fac0ad7a5ddca514ad90937d403f0b3cec",
+      "src/lib/student-portal-class-client.js": "3fd2382c9c15619216326503097ac09f8bd8612a",
+      "src/lib/student-portal-runtime.js": "75ce051b4ebad1e1e4a5ced25609767999a6d211",
+      "src/lib/student-portal-task-guidance-client.js": "e0fc8fda81c4976ca2e1e1ad4116a30863782ab6",
+      "src/lib/student-search-ui.js": "d7effdbccab380c4b2d153e3c34d7f8f13964401",
+      "src/lib/subitem-default-name.js": "aed78c8239f9c05396b1f957fe157c2072a3bf66",
+      "src/lib/subject-catalog.js": "9c3e45d589b2ecc9244f4c97a5caa653749971de",
+      "src/lib/support-origin.js": "c63e3c8540625158f76809fc45172071a2239d6a",
+      "src/lib/support-public-config.js": "f0c6c75347bd63776693d597cfcb92c3d873ad1d",
+      "src/lib/support-whatsapp.js": "426d8d029d34d7be231a3efd5aeeb35600fa8cd3",
+      "src/lib/support.js": "0c27304412c937987d246bdbb2b30b1bb5e932ae",
+      "src/lib/sync-ownership.js": "10e6be6e32bf23327cbf8d008a5a8077504e956f",
+      "src/lib/sync-status-severity.js": "ac9aaf2c348032d10625218598425f4e39d1d719",
+      "src/lib/sync-v2.js": "0367bc023833f3292e88054154c8e96f9f5b9416",
+      "src/lib/sync.js": "f693b9cbec7458f3eb06155dfe7bef11f380a1fc",
+      "src/lib/teacher-setup-import.js": "68174c268cab4b372af497f6a4d355dee2c0c189",
+      "src/lib/thmanyah-font.js": "f274b9b678f2a7b54ff7a495c4ce386068fee9ea",
+      "src/lib/thmanyah-payload.js": "fe6693a5674f8752a4a91c917562e6e5d672ee96",
+      "src/lib/visible-numerals.js": "d67273acb8dbd5a81f8a9b0040d52a91c6c3117e",
+      "src/lib/visible-viewport.js": "34db491052ac79c4a62280bd1b32d2771a79139d",
+      "src/lib/workspace-claim.js": "b69085a0b2552b83ba2b1cccce420541740f8a5a",
+      "src/lib/workspace-routing.js": "640988df7a83f118828bd4ce6d58a40321031a1d",
+      "src/lib/workspaces.js": "f2ed032ee2c2974cbd02aa51127282eab92a9daf",
+      "src/lib/zip.js": "0a3d885db8cebdeb607500d3f9400cf434bd2a9a",
+      "src/models.js": "8789837a8978df2f3c8b10a2438c3724ea2b836d",
+      "src/repaint.js": "3aa2c1f2abd3a7d73ab27d1c4f0f6f587af67849",
+      "src/router.js": "e45519404d7e0095b41d355600992e1f2c33017c",
+      "src/store.js": "61f1f61cf226d9c17e2e7496652acb1e8c47c4e0",
+      "src/styles/app.css": "14bf799b745bbad356ab0eaf923f3f5273570a04",
+      "src/styles/calendar-work-0417.css": "6cad8ed92da5a22dbbd61bbd973262f1f2f9f244",
+      "src/styles/components.css": "e3a81b89facf4e9b5279805f699a7dc671c9c689",
+      "src/styles/filters.css": "15bcd452284077d900b374a292d2f47704e1dbb3",
+      "src/styles/rakeez-datetime.css": "7ca77b9046e83ab386a9bbe82bee7fd499c191ab",
+      "src/styles/schedule-work-integration.css": "8addee9e2deb9b0e2076f81fc2484041475e8432",
+      "src/styles/work-n70.css": "c17f7985f806c1c33c2d135e9b71619d211642ce",
+      "src/styles/work-n82.css": "7aa55706ff640c7150d29d1b37c652e4325ebbbe",
+      "src/vendor/flatpickr/ar.js": "06a5108b4f622d56be16f6d9424292ad2ca5aebe",
+      "src/vendor/flatpickr/flatpickr.min.js": "b0f59ec214938696c88f1a6b8b797bde01bccb98",
+      "src/views/archive-detail.js": "7f7a036640ff2c9036fbbfb4745ed79cef125a63",
+      "src/views/archive.js": "b986088f29fb5786946ba1bd65d48c65326ee8cb",
+      "src/views/attendance.js": "655ce9979a3e5af148b6a07d319c6bda353798c9",
+      "src/views/backup.js": "b1d84d945ec04bf3f5c4a673357dcb7ac7ed7d78",
+      "src/views/board.js": "0e9e408e5254e5fb1ef026874f7b9d34e6c9654c",
+      "src/views/calendar-0417-ui.js": "290fa8961cfd61703ce085c7d99aeced28ea2910",
+      "src/views/calendar.js": "5942e51d46485fafe4fa182a02c6a7460c92a485",
+      "src/views/certificates.js": "70cdbbecf368c397d297a777a04ebb947ba973c1",
+      "src/views/class-import-center.js": "37febb92058068ef881791aaf19d107f4b33c0ae",
+      "src/views/class-rules.js": "61b0979058b5d570f99df9150e179534f13c20da",
+      "src/views/cross-class-reports.js": "983ae6fef890ab6bd5bae41b292bd40890e4f7ae",
+      "src/views/curriculum.js": "fc8e14cbfd8495f9e46d1bda37dbe98f121d7aed",
+      "src/views/execution-report.js": "0ab140358d5487519403fae1668d7137a5a21a20",
+      "src/views/former-students.js": "2c85997974d10d613d56fdabb054e8b5e7c77b55",
+      "src/views/grades.js": "cfd4fc42f7423f9708cca26b9c7cf5e265b0ac36",
+      "src/views/groups.js": "1dd66dd74feff3030b0da01b15aaf6439ce06f67",
+      "src/views/home.js": "a3b8bde29a974156cfd0a753560af38022930fa4",
+      "src/views/items.js": "7990e14e9e529802fe87baa482e471e40f497ac7",
+      "src/views/n88-student-invite-lab.js": "951dde42dee0d61613662ee41f69f2af49a7026c",
+      "src/views/notification-settings.js": "a07f3a22cfdd431faa07538dcae39340e52e46da",
+      "src/views/picker.js": "4cc4cd4347d8286fd9ac2f7b0bec10e05f1e9fac",
+      "src/views/quicklog.js": "a1ac042b973a852093a08c3c55452b62a7379ee8",
+      "src/views/reports-index.js": "6c4e6a79e9ec2a74f212afe488cbe1822fee5d34",
+      "src/views/reports.js": "323ad498f2d2b2e4006dadad7b041d0d35b220a7",
+      "src/views/schedule.js": "58118f1973231baf43fec8b607775e92962bdebb",
+      "src/views/sessions.js": "21bf5c6d45f257bb99eea9d213817c9561ff1fc2",
+      "src/views/settings.js": "988fe8352cd6f6b244424905a5a3b6271d36ebd7",
+      "src/views/student-portal-class.js": "ee0d3678a2e9f2e78f8d96aef96ffce828c8ee70",
+      "src/views/student-portal-teacher.js": "23965079240599a397f9ca0bf7a9cd1d1e9f063f",
+      "src/views/student.js": "896a1cc02aababcf54d5bc0be900d41ffa833b86",
+      "src/views/students.js": "e7dfd361a91a737c45881e0413fed190cde4f8b6",
+      "src/views/support.js": "7a9ac23f056c8b072ba8e7c655a30b89b1219b7f",
+      "src/views/teacher-setup-import.js": "609999065efb943457126bf5b22db68a0be62156",
+      "src/views/teaching-hub.js": "3a25e5040b83376f67d425ab54c3688efffbf7a0",
+      "src/views/teachings.js": "627225641a43a4fd8e49655d2a99f37b300edc1e",
+      "src/views/times.js": "5e2cd4ee857428227e5153f644834a868b9cc568",
+      "tests/helpers/served-demo-readiness.mjs": "60eae8819243025caed1bfc176538b5e2d7769e8",
+      "tests/n44-fixture.mjs": "307fde46eb34fd622b8351e86394cd8db53d1535"
+    },
+    "moduleDependencyHashes": {
+      "src/lib/notification-center.js": {
+        "qualifiedGitBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+        "currentGitBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e"
+      },
+      "src/lib/notification-push-core.js": {
+        "qualifiedGitBlob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962",
+        "currentGitBlob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962"
+      },
+      "src/lib/notification-push-client.js": {
+        "qualifiedGitBlob": "b91a941701c68687fed3c38b8c98477cc1449399",
+        "currentGitBlob": "b91a941701c68687fed3c38b8c98477cc1449399"
+      },
+      "src/lib/notification-push-browser.js": {
+        "qualifiedGitBlob": "140a12fee6dda566c9f24ea786559b4d959588eb",
+        "currentGitBlob": "140a12fee6dda566c9f24ea786559b4d959588eb"
+      },
+      "src/lib/notification-push-gateway.js": {
+        "qualifiedGitBlob": "020b7884eddca0fa72ed0d322209ebe55ded1225",
+        "currentGitBlob": "020b7884eddca0fa72ed0d322209ebe55ded1225"
+      },
+      "src/lib/notification-state.js": {
+        "qualifiedGitBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99",
+        "currentGitBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99"
+      },
+      "src/lib/score-foundation.js": {
+        "qualifiedGitBlob": "96c7bbf8d27963c30dcb15e74bc300f9fd65a157",
+        "currentGitBlob": "96c7bbf8d27963c30dcb15e74bc300f9fd65a157"
+      },
+      "src/models.js": {
+        "qualifiedGitBlob": "8789837a8978df2f3c8b10a2438c3724ea2b836d",
+        "currentGitBlob": "8789837a8978df2f3c8b10a2438c3724ea2b836d"
+      },
+      "src/lib/db.js": {
+        "qualifiedGitBlob": "ca3b9014693026cae18a0070c22d84845ce136e1",
+        "currentGitBlob": "ca3b9014693026cae18a0070c22d84845ce136e1"
+      },
+      "src/lib/workspaces.js": {
+        "qualifiedGitBlob": "f2ed032ee2c2974cbd02aa51127282eab92a9daf",
+        "currentGitBlob": "f2ed032ee2c2974cbd02aa51127282eab92a9daf"
+      },
+      "src/lib/offline-lease.js": {
+        "qualifiedGitBlob": "ba307f3677afe68981d79388f02ee017a6049565",
+        "currentGitBlob": "ba307f3677afe68981d79388f02ee017a6049565"
+      },
+      "src/lib/sync-ownership.js": {
+        "qualifiedGitBlob": "10e6be6e32bf23327cbf8d008a5a8077504e956f",
+        "currentGitBlob": "10e6be6e32bf23327cbf8d008a5a8077504e956f"
+      },
+      "src/lib/notification-events.js": {
+        "qualifiedGitBlob": "ff18feca8d7040f9e939c446314bccdd03b498d1",
+        "currentGitBlob": "ff18feca8d7040f9e939c446314bccdd03b498d1"
+      },
+      "src/lib/rakeez-datetime-values.js": {
+        "qualifiedGitBlob": "80a1df2413705abe822494e173d58f7ec0b92752",
+        "currentGitBlob": "80a1df2413705abe822494e173d58f7ec0b92752"
+      },
+      "src/lib/visible-numerals.js": {
+        "qualifiedGitBlob": "d67273acb8dbd5a81f8a9b0040d52a91c6c3117e",
+        "currentGitBlob": "d67273acb8dbd5a81f8a9b0040d52a91c6c3117e"
+      },
+      "src/lib/visible-viewport.js": {
+        "qualifiedGitBlob": "34db491052ac79c4a62280bd1b32d2771a79139d",
+        "currentGitBlob": "34db491052ac79c4a62280bd1b32d2771a79139d"
+      },
+      "src/lib/dom.js": {
+        "qualifiedGitBlob": "88fbca218a3d4af4acf8bbf9247aadf126262a87",
+        "currentGitBlob": "88fbca218a3d4af4acf8bbf9247aadf126262a87"
+      }
+    },
+    "inspectedExceptions": {
+      "src/generated/build-meta.generated.js": "Only buildSha/buildTimestamp differ; no click authorization/navigation behavior; publisher owns metadata.",
+      "src/app.js": "Only opt-in /reports/portfolio-preview route branch differs; all other routes retain match(path), with unchanged boot/owner guards.",
+      "sw.js": "Exact qualified v87 blob replaces current v88 including omission of portfolio-preview shell entries. Explicit card demands byte-exact copy; no claim of portfolio offline acceptance; publisher owns deterministic build/metadata."
+    }
+  },
+  "freshChecks": {
+    "syntax": [
+      "node --check sw.js",
+      "node --check src/lib/notification-push-runtime.js"
+    ],
+    "worker": {
+      "passed": 4,
+      "failed": 0,
+      "output": "✔ existing client is shown before a slow consent read or rejected authorization (88.467ms)\n✔ cold boot opens only public root before consent I/O and waits for readiness (568.1097ms)\n✔ invalid or expired envelope never opens/focuses an application (1.6847ms)\n✔ concurrent duplicate click opens only one public root and dispatches once (46.77ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 713.5562\n"
+    },
+    "module": {
+      "inputs": 18,
+      "outputSha256": "42eb07d4f193950a8e8ffedd4917076ae8ee89ba91851a263891632a68deed44",
+      "status": "PASS"
+    },
+    "offlineShell": "runtime and dom.js already listed",
+    "diffCheck": "PASS"
+  },
+  "preservedLimitations": {
+    "product": "N44 OPEN; issue 5 / PR 6",
+    "physicalClickPrior": "FAIL_NO_VISIBLE_APPLICATION",
+    "physicalClickPostFix": "NOT_RUN",
+    "localCleanup": "UNKNOWN; historical FAIL_UNCONFIRMED retained",
+    "initialFixtureFailure": "FAIL retained in immutable source proof",
+    "parentResult": "Original parent LOCAL_READY and validator rejection retained unchanged; whole-parent publication forbidden.",
+    "phaseConsumedAndRetired": true,
+    "lifetimeSends": 4,
+    "lifetimeRegistrationAcks": 9,
+    "lifetimeNativeUploads": 3,
+    "reusedContextOnly": "PO Windows arrival PASS; Native156 published; OFF/NULL; reg9 revoked; Source6/7 deleted. No new verification or operations."
+  },
+  "operations": {
+    "live": 0,
+    "provider": 0,
+    "privateCustody": 0,
+    "realAccountReads": 0,
+    "registrations": 0,
+    "sends": 0,
+    "browser": 0,
+    "servers": 0,
+    "push": 0,
+    "deploy": 0
+  },
+  "requiredChecks": [
+    {
+      "name": "n44_click_frontend_exact_qualified_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "n44_click_frontend_actual_red_green_and_owner_guards",
+      "status": "PASS"
+    },
+    {
+      "name": "n44_click_frontend_only_scope_zero_live_operations",
+      "status": "PASS"
+    }
+  ],
+  "publication": "NOT_RUN; controller/publisher owns integration/build/served asset parity; not Product acceptance"
+}

@@ -1,0 +1,17 @@
+# N44 qualified frontend source delivery
+
+AI-prepared candidate for `continuous-n44-qualified-click-frontend-20261027`, run `2bee937f-f892-4006-b761-c849181e5fd5`, based on `1131917dd7cd69d7b094e78185cd6f633313c64e`. Refs issue 5 / PR 6. N44 remains OPEN.
+
+Only `sw.js` and `src/lib/notification-push-runtime.js` are copied from qualified commit `0c3111b6b1de6f755dba6063019a633bd63e23f5`; the other changes are this note and the scoped qualification JSON. No parent history/private files are imported.
+
+The qualification JSON records both SHA256 mappings. Initial raw comparison remains **FAIL_DIFFERENT_BYTES**: tested working files used CRLF, canonical Git blobs use LF. Reconstructing CRLF from each complete canonical blob reproduces its original tested-working hash; complete normalized text is equal. This is not raw byte identity with the prior working-tree proof. No other normalization was performed.
+
+Affected verification: both Node syntax checks PASS; immutable parent worker harness executes against the copied worker, 4 PASS / 0 FAIL; runtime module bundles with 18 inputs and output SHA256 `42eb07d4f193950a8e8ffedd4917076ae8ee89ba91851a263891632a68deed44`, identical to the original qualification. Offline shell includes runtime and dom.js. Scoped whitespace check PASS.
+
+The dependency comparison covers 151 files, with 149 unchanged canonical Git blobs recorded. The two closure exceptions are the copied runtime and generated build SHA/timestamp. The separate app.js diff only adds the opt-in portfolio-preview route; existing route matching, boot and ownership gates remain. Actual prior HTTP application DOM/CSS/browser evidence (10 PASS), baseline worker 3 FAIL / 1 PASS, repaired worker 4 PASS, baseline browser failure and initial fixture failure are preserved through immutable parent references and hashed records. No new rendered-browser PASS is claimed.
+
+Exact copying also replaces current worker v88 with the qualified v87 and omits portfolio-preview shell entries introduced after qualification. This is explicitly recorded, not silently rewritten: the activated card requires the exact blobs. Portfolio offline behavior is not certified by this component. Deterministic build/metadata and served worker/runtime parity belong to the publisher.
+
+Historical physical click remains **FAIL_NO_VISIBLE_APPLICATION**; post-fix physical click is **NOT_RUN**; local subscription/binding cleanup remains **UNKNOWN**, retaining the historical **FAIL_UNCONFIRMED**. Original parent LOCAL_READY and its validator rejection remain unchanged; this component does not qualify whole-parent publication. The live phase is consumed and retired. Budgets remain spent: 4 sends / 9 registration ACKs / 3 Native uploads. Prior PO Windows-arrival PASS, Native156 publication, OFF/NULL, registration9 revocation and Source6/7 deletion are reused context only.
+
+This run performs zero live/provider/private-custody/account operations, registrations, notifications, browser/server phases, pushes or deployments. No resource leases or processes were created. The three PASS checks in `tests/n44-click-frontend-delivery-20261027/qualification.json` concern exact qualified source, affected click/owner guards and source-only scope. Integration and Production evidence remain with the independent controller/publisher; correct physical OS click still awaits the served fix and separate bounded authority if needed.
