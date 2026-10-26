@@ -5,7 +5,7 @@ Status: **SOURCE QUALIFIED ONLY; N44 OPEN.** This review does not claim a comple
 ## Isolation and starting evidence
 - Reviewed from exact Git commit `e7b5fdc1b5fa50b38775b79272785e478e2266e8` in a new independent checkout outside the active RakeezX controller worktree.
 - The original `artifacts/ops-supervisor-v4/STOP` was confirmed present, controller `paused=true`, and all active workers drained to zero before this change. STOP is retained.
-- Last original N44 attempt remained `BLOCKED`: model-capacity interruption left a Chrome tab on an unexpected editable Student Portal page; browser ownership/closure was not proved. No bypass, tab automation, provider send or login attempted by this review.
+- Last original N44 attempt `18a2be47-366d-4ba8-b338-a0de28c85b96` was inspected from its immutable result after STOP: `Source6` **was actually saved** (canonical parent/child revisions 2/1, Sync GREEN) before the Chrome tab returned on an unexpected *editable* Student Portal page. The Source6 current-roster impact assessment and cleanup were NOT_RUN, and Source6 must be reconciled safely before any deletion. No fourth provider send/reg9/window7/Native activation occurred; terminal readback OFF/NULL and all 47 existing provider config entries unchanged. The prior `Source4/5` fixes do not establish that Source6 is cleaned. No bypass, tab automation, provider send or login attempted by this review.
 - Hosted Supabase `n44-notifications` function was read-only listed as ACTIVE version 154, `ezbr_sha256=4ff97fce2fe078ef1d9308d784cb135d6aa3dbe581e21cc1ebe7fbdecdbe019a`. No hosted configuration or source change.
 
 ## Concrete source findings and improvements
@@ -27,7 +27,7 @@ Status: **SOURCE QUALIFIED ONLY; N44 OPEN.** This review does not claim a comple
 - Source policy changes are **not** the compiled deployed Edge function. Service publication, configuration opt-in and live sends require a new legitimate guarded, current authority and functional proof, not reusing spent attempts or disabling the existing safety gates.
 
 ## Next engineering actions to reach actual Product acceptance
-1. Keep current STOP until ownership and isolation are settled. Preserve historical N44 receipt/budget and closed-source cleanup, without replaying Source4/Source5 or a fourth send.
+1. Keep current STOP until ownership and isolation are settled. First reconcile the single saved Source6 on the original verified owner/account context, confirm complete roster and zero grade impact, then use a normal exact canonical cleanup with receipts only if allowed. Preserve all historical N44 receipts/budget and prior Source4/Source5 cleanup; never duplicate Source6 save, replay fourth send, delete while another browser document is editable, or assume an unknown operation succeeded.
 2. Use an independent disposable browser + fake gateway to qualify the user click, registration ACK, SW push event, close/reopen and disable sequence; actual physical OS arrival requires a real provider send in a separately authorized window.
 3. Inspect exact newly delivered browser `PushSubscription.endpoint` for Edge/Windows and configure its provider only after a verified Web Push contract and bounded negative endpoint tests. Do not accept any untrusted arbitrary origin.
 4. Rebuild and verify the Supabase service from the reviewed current native source with the existing sole-publisher procedure; never overwrite v154 or its pins with an unreviewed stale bundle.
