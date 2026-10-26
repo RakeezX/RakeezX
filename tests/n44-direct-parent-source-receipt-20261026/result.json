@@ -1,0 +1,38 @@
+{
+  "taskId": "continuous-n44-direct-parent-source-receipt-20261026",
+  "runId": "79fe5e31-4e73-4c6e-9053-f904a015cac6",
+  "baseSha": "7d4b7db15278f04c1fd59414e4b42357fbb053ab",
+  "red": "Actual base module omitted direct/no-child and returned rejected, zero canonical reads (--red).",
+  "checks": [
+    {
+      "name": "direct and unconfigured subitems exact canonical parent, no due projection or writes",
+      "status": "PASS"
+    },
+    {
+      "name": "existing normal Support runtime issues and reads the direct parent choice only on request",
+      "status": "PASS"
+    },
+    {
+      "name": "pending and unknown commands, pending create and unconfirmed ancestry",
+      "status": "PASS"
+    },
+    {
+      "name": "canonical absent, revision, parent, teaching, deleted, malformed and child guards",
+      "status": "PASS"
+    },
+    {
+      "name": "owner session workspace lease device ancestry and revision fenced after canonical await",
+      "status": "PASS"
+    },
+    {
+      "name": "outbox drift returns unknown; unsupported/direct-with-children/local foreign children rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "configured subitem and exact cleanup tombstone receipt retained; empty is never cleanup ACK",
+      "status": "PASS"
+    }
+  ],
+  "liveSource4": "UNKNOWN; no live operations",
+  "renderedUI": "NOT_RUN; view unchanged"
+}

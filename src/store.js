@@ -198,17 +198,20 @@ export function notificationSourceGroups() {
       runtimeSyncOwnershipGuard.getWorkspace().databaseName !== w.databaseName ||
       !runtimeSyncOwnershipGuard.cloudAccess({ operation: 'read', authenticatedUserId: owner }).allowed) return [];
   const owned = r => r && (r.ownerId == null || r.ownerId === owner);
-  return state.items.filter(r => r.scoreMode === 'subitems' && owned(r)).flatMap(parent => {
+  return state.items.filter(r => ['direct', 'subitems'].includes(r.scoreMode) && owned(r)).flatMap(parent => {
     const teaching = getTeaching(parent.teachingId), term = getTerm(teaching?.termId), year = getYear(term?.yearId);
     const section = getSection(teaching?.sectionId), subject = getSubject(teaching?.subjectId);
     const children = state.scoreSubitems.filter(r => r.itemId === parent.id);
     if (![teaching, term, year, section, subject].every(r => owned(r) && !r.deleted) || section.yearId !== year.id ||
-        !children.length || children.length > 200 || !children.every(owned)) return [];
+        (parent.scoreMode === 'direct' && children.length > 0) || children.length > 200 || !children.every(owned)) return [];
     return [{ ownerId: owner, workspaceId: w.databaseName, deviceId: state.device?.deviceId,
       parentId: parent.id, childIds: children.map(r => r.id).sort(), name: parent.name,
       teachingId: teaching.id, termId: term.id, yearId: year.id, sectionId: section.id, subjectId: subject.id,
       deleted: !!parent.deleted, cleanupStamp: parent.deleted ? parent.updatedAt : null,
       revisions: [parent, ...children].map(r => ({ id: r.id, revision: r.serverRevision ?? null, deleted: !!r.deleted })),
+      // Empty definitions can prove only this exact parent's save, never a due
+      // event or cleanup. Do not let an empty child.every stand in for its ACK.
+      parentConfirmed: Number.isSafeInteger(parent.serverRevision) && parent.serverRevision > 0 && !parent.syncCreatePending && !isLocalOnlyRecord(parent),
       ancestryConfirmed: [teaching, term, year, section, subject].every(r => Number.isSafeInteger(r.serverRevision) && r.serverRevision > 0 && !r.syncCreatePending && !isLocalOnlyRecord(r)),
       fingerprint: JSON.stringify([parent, children, teaching, term, year, section, subject]) }];
   });
@@ -216,24 +219,26 @@ export function notificationSourceGroups() {
 /** Read only: no SyncNow, adoption, reconciliation, delete, or receipt replay. */
 export async function readNotificationSourceStatus(parentId) {
   const assertCurrent = cloud.captureOwnedMutationContext(); assertCurrent();
+  const workspace = activeWorkspace, session = cloud.session;
   const initial = notificationSourceGroups().find(r => r.parentId === parentId);
   if (!initial) return { status: 'rejected' };
   const fence = () => {
     assertCurrent();
+    if (workspace !== activeWorkspace || session !== cloud.session) throw Error('Source context changed');
     const next = notificationSourceGroups().find(r => r.parentId === parentId);
     if (!next || JSON.stringify(next) !== JSON.stringify(initial)) throw Error('Source changed');
   };
   const pending = (await db.getAll('outbox')).filter(r => r.state !== 'superseded'); fence();
   const related = pending.some(r => [parentId, ...initial.childIds, initial.teachingId, initial.termId, initial.yearId, initial.sectionId, initial.subjectId].some(id =>
-    r.recordId === id || r.patch?.targetId === id || r.patch?.itemId === id || r.dependencies?.some(d => d.recordId === id)) || ['restore:apply', 'score:distribution_apply'].includes(r.command));
+    r.recordId === id || r.patch?.targetId === id || r.patch?.itemId === id || r.patch?.teachingId === id || r.dependencies?.some(d => d.recordId === id)) || ['restore:apply', 'score:distribution_apply'].includes(r.command));
   const confirmed = await confirmedNotificationSources(); fence();
-  const sourceConfirmed = initial.ancestryConfirmed && (initial.deleted || initial.childIds.every(id => confirmed.some(r => r.kind === 'due' && r.id === id)));
+  const sourceConfirmed = initial.parentConfirmed && initial.ancestryConfirmed && (initial.deleted || initial.childIds.every(id => confirmed.some(r => r.kind === 'due' && r.id === id)));
   const canonical = await cloud.readNotificationSourceIdentity(parentId); fence();
-  const matches = sourceConfirmed && canonical && canonical.parent.teachingId === initial.teachingId &&
+  const matches = sourceConfirmed && canonical && canonical.parent.id === parentId && canonical.parent.teachingId === initial.teachingId &&
     JSON.stringify(canonical.children.map(r => r.id).sort()) === JSON.stringify(initial.childIds) &&
     [canonical.parent, ...canonical.children].every(r => initial.revisions.some(l => l.id === r.id && l.revision === r.revision && l.deleted === r.deleted));
   let cleanupReceipt = null;
-  if (initial.deleted && initial.revisions.every(r => r.deleted)) {
+  if (initial.deleted && initial.childIds.length > 0 && initial.revisions.every(r => r.deleted)) {
     const savedParent = await db.get('items', parentId); fence();
     if (savedParent?.deleted && Number.isSafeInteger(savedParent.updatedAt) && (savedParent.ownerId == null || savedParent.ownerId === initial.ownerId)) {
       cleanupReceipt = await cloud.readRetiredScoreSourceCleanup({ parentId, deviceId: initial.deviceId,
