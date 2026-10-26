@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-qualified-click-frontend-20261027",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -6000,
+      "scopeKey": "n44-qualified-click-frontend-prerequisite",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 20,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "allowedPaths": [
+        "sw.js",
+        "src/lib/notification-push-runtime.js",
+        "docs/automation-evidence/20261027/N44_CLICK_FRONTEND_DELIVERY.md",
+        "tests/n44-click-frontend-delivery-20261027/**"
+      ],
+      "verificationPaths": [
+        "sw.js",
+        "src/lib/notification-push-runtime.js"
+      ],
+      "requiredChecks": [
+        "n44_click_frontend_exact_qualified_bytes",
+        "n44_click_frontend_actual_red_green_and_owner_guards",
+        "n44_click_frontend_only_scope_zero_live_operations"
+      ],
+      "releaseAuthority": "Direct PO N44 actual outcome request and actual observed click failure authorize this qualified two-file correction through the sole publisher. Source-only component; no further device notification or service/account operation. No claim of umbrella acceptance.",
+      "preparationAuthority": {
+        "kind": "qualified_frontend_prerequisite_only",
+        "publication": true,
+        "originalQualifiedCandidate": "0c3111b6b1de6f755dba6063019a633bd63e23f5",
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "pr": "https://github.com/RakeezX/RakeezX/pull/6",
+        "expectedSourceHashes": {
+          "sw.js": "641b4a73e7de755ae6b9a4f9e6c603a383538e1f991978b761d3415aeb67b866",
+          "src/lib/notification-push-runtime.js": "f1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0"
+        },
+        "providerServiceOperations": 0,
+        "privateCustodyAccess": 0,
+        "realAccountReads": 0,
+        "registrations": 0,
+        "sends": 0,
+        "source6Operations": 0,
+        "source7Operations": 0,
+        "workingToGitLineEndings": {
+          "sw.js": {
+            "testedWorkingSha256": "e9a6f5cefa0ddd8e2f034fe5b822cb53349461d3f07eb1b0098436703526dfe1",
+            "canonicalGitSha256": "641b4a73e7de755ae6b9a4f9e6c603a383538e1f991978b761d3415aeb67b866",
+            "difference": "CRLF versus LF only",
+            "initialRawHashComparison": "FAIL_DIFFERENT_BYTES",
+            "completeNormalizedTextEqual": true
+          },
+          "src/lib/notification-push-runtime.js": {
+            "testedWorkingSha256": "c3e129d5696628436665e133bf949ac6fb8c44182928e25caf362c6d1db45123",
+            "canonicalGitSha256": "f1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0",
+            "difference": "CRLF versus LF only",
+            "initialRawHashComparison": "FAIL_DIFFERENT_BYTES",
+            "completeNormalizedTextEqual": true
+          }
+        }
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "0c3111b6b1de6f755dba6063019a633bd63e23f5",
+        "requiredSourcePaths": [
+          "sw.js",
+          "src/lib/notification-push-runtime.js"
+        ],
+        "editPaths": [
+          "sw.js",
+          "src/lib/notification-push-runtime.js",
+          "docs/automation-evidence/20261027/N44_CLICK_FRONTEND_DELIVERY.md",
+          "tests/n44-click-frontend-delivery-20261027/qualification.json"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261027/N44_CLICK_FRONTEND_DELIVERY.md",
+          "tests/n44-click-frontend-delivery-20261027/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_click_frontend_exact_qualified_bytes",
+          "n44_click_frontend_actual_red_green_and_owner_guards",
+          "n44_click_frontend_only_scope_zero_live_operations"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "QUALIFICATION BYTE DETAIL: raw tested-working hashes differ from canonicalGit hashes ONLY because WindowsCRLF vsGitLF. InitialrawcomparisonFAIL is retained; mapping {\"sw.js\":{\"testedWorkingSha256\":\"e9a6f5cefa0ddd8e2f034fe5b822cb53349461d3f07eb1b0098436703526dfe1\",\"canonicalGitSha256\":\"641b4a73e7de755ae6b9a4f9e6c603a383538e1f991978b761d3415aeb67b866\",\"difference\":\"CRLF versus LF only\",\"initialRawHashComparison\":\"FAIL_DIFFERENT_BYTES\",\"completeNormalizedTextEqual\":true},\"src/lib/notification-push-runtime.js\":{\"testedWorkingSha256\":\"c3e129d5696628436665e133bf949ac6fb8c44182928e25caf362c6d1db45123\",\"canonicalGitSha256\":\"f1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0\",\"difference\":\"CRLF versus LF only\",\"initialRawHashComparison\":\"FAIL_DIFFERENT_BYTES\",\"completeNormalizedTextEqual\":true}} verified completefiletext equality after CRLF->LF. Nootherwhitespace/string/behaviorchange permitted. Copy exact canonicalGitblobs, verify this explicit mapping and module/syntax/affectedworker check; do not claim raw byteidentity to workingtreeproof. No signedJSON/SQL/helper normalization. Reuse unchanged browser behavior evidence with this recorded parser-line-ending distinction; if any non-EOL difference emerges, stop reuse and verify only affectedbehavior.\n\nPublish exactly TWO qualified frontend Git blobs from 0c3111b6b1de6f755dba6063019a633bd63e23f5: sw.js, src/lib/notification-push-runtime.js; expectedSHA256 {\"sw.js\":\"641b4a73e7de755ae6b9a4f9e6c603a383538e1f991978b761d3415aeb67b866\",\"src/lib/notification-push-runtime.js\":\"f1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0\"}. SAME N44issue5/PR6; this is a sequential publication prerequisite after original custodian has exited, not another parallel Product worker/newticket. Currentmain isolatedcontrollerworktree; don'tedit originalparent/QAcheckout. Only2publicfiles+minimaldoc/qualificationJSON. Do notmerge parent192historical/privatepaths or touchNative156/pins/SQL/Auth/provider/account/browser/SWconsent/localbinding. ZERO liveoperations, zero newnotification, zeroregistration, zero lease on personalbrowser.\n\nExact parent tests/n44-pr6-completion-20261026/click-qualification.json and click-browser-result.json are immutable qualifiedsourceproof. Reuse by matchingactualsourcehashes plus dependentfilehashes rather than rerun unaffectedcrypto/Native/device tests. ActualbaselineSW3FAIL/1PASS then repaired4PASS; renderedactualDOM/CSS/runtime/client/gateway/router/ownerguard10checksPASS including coldboot, delayedsingleauthorization, expiry/deletion/revocation/wrongbinding/foreigncontroller/accountswitch. PriorinitialfixtureFAIL remainshistorical. Native51inputs and PR6browser/client/settings unchanged. Actualpublicrootshow/focus separatefromfreshprivaterouteauth, trustedcontroller checks, singleaction/dedup and no privatepath inSWURL.\n\nOriginal parent LOCAL_READY was rejected because it included TRUE historicalphysicalclick/localcleanupFAIL; preserve that result and validator rejection, doNOTremove/relabel failures or trywholeparentpublication. Thiscomponent's3checks concern ONLY exactqualifiedfrontend source/affectedguards/zeroliveoperations, notphysicalacceptance. Minimal evidence mustexplicitly keep oldphysicalclickFAIL/postfixNOT_RUN/localcleanupUNKNOWN. AlreadyactualNEW SupabaseWindowsarrivalPASS by PO, Native156actualpublished/OFFNULL/reg9serverrevoked/Source6and7deleted are reused context, notnewproofs oroperations here.\n\nCompare existingcurrent-main dependentfiles against testedparent to determine honestproofreuse. If differences can affectclicksemantics, inspect/retestonlythat affectedboundary. Module/syntax/diffcheck ifneeded; publisher owns actualdeterministicbuild/metadata and servedSW+runtimeparity. No blankettest/anotherUIredesign/nativeupload/newsource/notification/window. ReturnLOCAL_READY withthreeexactrequiredchecksPASS onlyifqualified; ProductN44OPEN, actualcorrectOSclickawaitservedfixandseparateboundedauthorityifneeded. Preserveallbudgetsspent4sends/9ACKs/3Native and oldunknowns. Do notaskPOapproval foralready-authorized sourcepublication."
+    }
+  ]
+}
