@@ -748,3 +748,48 @@
   .folio-workspace__status {display:inline-flex;max-width:100%;padding:7px 10px;}
   .folio-local-loading {min-height:135px;padding:16px;}
 }
+
+/* F09 portable safety copy: fully local, not the N71 unified backup. */
+.folio-local-archive {
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  gap:14px; border:1px solid var(--border); border-radius:12px; padding:13px 15px;
+  background:var(--bg-elev); min-width:0;
+}
+.folio-local-archive__intro {display:grid;gap:4px;max-width:630px;min-width:180px;flex:1 1 320px;}
+.folio-local-archive__intro strong {font-size:13px;color:var(--text-1);}
+.folio-local-archive__intro p {
+  font-size:11px;line-height:1.8;color:var(--text-3);margin:0;
+}
+.folio-local-archive__actions {display:flex;flex-wrap:wrap;align-items:center;gap:7px;}
+.folio-local-archive__actions .btn,.folio-local-archive__import-label {
+  font-size:11px;min-height:37px;
+}
+.folio-local-archive__import-label {
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  padding:8px 12px;border:1px solid var(--brand);border-radius:8px;
+  color:var(--brand);background:var(--brand-soft);font-weight:800;cursor:pointer;
+}
+.folio-local-archive__import-label:focus-within {outline:3px solid var(--brand);outline-offset:2px;}
+.folio-local-archive__import-label.is-busy {opacity:.5;cursor:not-allowed;}
+.folio-local-archive__import-label input {
+  position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;
+}
+.folio-local-archive__error,
+.folio-local-archive__confirmation {
+  flex-basis:100%;margin:0;font-size:12px;line-height:1.8;
+  border-radius:9px;padding:11px 13px;
+}
+.folio-local-archive__error {color:#a44e43;border:1px solid #dbb1a9;background:var(--bg-sunk);}
+.folio-local-archive__confirmation {
+  display:grid;gap:10px;border:1px solid var(--border);background:var(--bg-sunk);color:var(--text-2);
+}
+.folio-local-archive__confirmation p {margin:0;}
+.folio-local-archive__confirmation-actions {display:flex;gap:7px;flex-wrap:wrap;}
+.folio-local-archive__confirmation-actions .btn {font-size:12px;}
+@media(max-width:540px) {
+  .folio-local-archive {padding:11px;}
+  .folio-local-archive__actions {width:100%;}
+  .folio-local-archive__actions .btn,
+  .folio-local-archive__import-label {flex:1 1 130px;text-align:center;}
+}
+@media print {.folio-local-archive {display:none !important;}}

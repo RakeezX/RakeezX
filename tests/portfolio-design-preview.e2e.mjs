@@ -696,3 +696,145 @@ test('F09 removes deleted personal photos from disk while allowing the in-page u
  await expect(page.locator('[data-library-card]')).toHaveCount(0);
  expect((await imageCount()).count).toBe(0);
 });
+
+test('F09 local safety archive downloads and restores original witness with its image after a deliberate confirmation',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry);await ready(page);
+ await chooseCriterion(page,'04');
+ await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('الشاهد قبل النسخ');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('شاهد اختباري بالصورة قبل الاستعادة');
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+ const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
+ await page.locator('input[data-change="photo"]').setInputFiles({
+   name:'teacher-demo.png',mimeType:'image/png',buffer:tiny,
+ });
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ const downloadEvent=page.waitForEvent('download');
+ await page.locator('[data-act="export-portfolio-archive"]').click();
+ const downloaded=await downloadEvent;
+ expect(downloaded.suggestedFilename()).toMatch(/^rakeez-portfolio-.*\.json$/);
+ const bytes=await (await import('node:fs/promises')).readFile(await downloaded.path());
+ const savedFile=JSON.parse(bytes.toString('utf8'));
+ expect(savedFile.kind).toBe('rakeezx-f09-local-archive');
+ expect(savedFile.attachments).toHaveLength(1);
+ expect(savedFile.payload.customWitnesses).toHaveLength(1);
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('عنوان أحدث سيستبدل عند الاستعادة');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ await page.locator('input[data-change="read-portfolio-archive"]').setInputFiles({
+   name:'rakeez-portfolio-test.json',mimeType:'application/json',buffer:bytes,
+ });
+ await expect(page.locator('.folio-local-archive__confirmation')).toBeVisible();
+ await expect(page.locator('.folio-local-archive__confirmation')).toContainText('١ صور');
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'}))
+   .toHaveValue('عنوان أحدث سيستبدل عند الاستعادة');
+ await page.locator('[data-act="confirm-portfolio-archive"]').click();
+ await expect(page.locator('.folio-local-archive__confirmation')).toHaveCount(0);
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('الشاهد قبل النسخ');
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+ await page.reload();await ready(page);
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('الشاهد قبل النسخ');
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+});
+
+test('F09 rejects a foreign or tampered portable copy, and cancel never overwrites local edits',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry);await ready(page);
+ await chooseCriterion(page,'04');
+ await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('الأصل المحفوظ');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('بيانات تجريبية للحماية.');
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ const d=page.waitForEvent('download');
+ await page.locator('[data-act="export-portfolio-archive"]').click();
+ const download=await d;
+ const original=JSON.parse((await (await import('node:fs/promises')).readFile(await download.path())).toString('utf8'));
+ const foreign=structuredClone(original);
+ foreign.scope.ownerId='foreign-teacher';
+ await page.locator('input[data-change="read-portfolio-archive"]').setInputFiles({
+   name:'foreign.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(foreign)),
+ });
+ await expect(page.locator('.folio-local-archive__error')).toContainText('حسابًا أو عامًا دراسيًا مختلفًا');
+ await expect(page.locator('.folio-local-archive__confirmation')).toHaveCount(0);
+ const tampered=structuredClone(original);tampered.payload.titles=[['custom:04:other','مُعدل']];
+ await page.locator('input[data-change="read-portfolio-archive"]').setInputFiles({
+   name:'tampered.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(tampered)),
+ });
+ await expect(page.locator('.folio-local-archive__error')).toContainText('تعذّر التحقق');
+ await page.locator('input[data-change="read-portfolio-archive"]').setInputFiles({
+   name:'valid.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(original)),
+ });
+ await expect(page.locator('.folio-local-archive__confirmation')).toBeVisible();
+ await page.locator('[data-act="cancel-portfolio-archive"]').click();
+ await expect(page.locator('.folio-local-archive__confirmation')).toHaveCount(0);
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('الأصل المحفوظ');
+ await page.reload();await ready(page);
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('الأصل المحفوظ');
+});
+
+test('F09 refuses restoring a backup preview after newer edits have been saved',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry);await ready(page);
+ await chooseCriterion(page,'04');
+ await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('النسخة الأقدم');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('وثيقة اصطناعية.');
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ const d=page.waitForEvent('download');
+ await page.locator('[data-act="export-portfolio-archive"]').click();
+ const archived=await d;
+ const bytes=await (await import('node:fs/promises')).readFile(await archived.path());
+ await page.locator('input[data-change="read-portfolio-archive"]').setInputFiles({
+   name:'backup.json',mimeType:'application/json',buffer:bytes,
+ });
+ await expect(page.locator('.folio-local-archive__confirmation')).toBeVisible();
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('التعديل الأحدث يجب حفظه');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ await page.locator('[data-act="confirm-portfolio-archive"]').click();
+ await expect(page.locator('.folio-local-archive__error')).toContainText('تغيّرت المسودة');
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('التعديل الأحدث يجب حفظه');
+ await page.reload();await ready(page);
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('التعديل الأحدث يجب حفظه');
+});
+
+test('F09 portable copy can restore into a clean separate browser context for the same synthetic year',async({page,context,browser,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry);await ready(page);
+ await chooseCriterion(page,'04');
+ await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('ملف المعلم في متصفح آخر');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('اختبار جهاز اصطناعي مستقل.');
+ await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+ const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
+ await page.locator('input[data-change="photo"]').setInputFiles({name:'other-browser.png',mimeType:'image/png',buffer:tiny});
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ const wait=page.waitForEvent('download');
+ await page.locator('[data-act="export-portfolio-archive"]').click();
+ const dl=await wait,bytes=await (await import('node:fs/promises')).readFile(await dl.path());
+ const clean=await browser.newContext({locale:'ar-SA',serviceWorkers:'block'});
+ try{
+   await sameOriginOnly(clean,baseURL);
+   const fresh=await clean.newPage();
+   await fresh.goto(entry);await ready(fresh);
+   await expect(fresh.getByRole('textbox',{name:'عنوان الشاهد'})).not.toHaveValue('ملف المعلم في متصفح آخر');
+   await fresh.locator('input[data-change="read-portfolio-archive"]').setInputFiles({
+     name:'portfolio.json',mimeType:'application/json',buffer:bytes,
+   });
+   await expect(fresh.locator('.folio-local-archive__confirmation')).toBeVisible();
+   await fresh.locator('[data-act="confirm-portfolio-archive"]').click();
+   await expect(fresh.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+   await expect(fresh.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('ملف المعلم في متصفح آخر');
+   await expect(fresh.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+   await fresh.reload();await ready(fresh);
+   await expect(fresh.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('ملف المعلم في متصفح آخر');
+ }finally{await clean.close();}
+});

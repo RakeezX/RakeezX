@@ -10,6 +10,7 @@ import { F09_EVIDENCE_TEMPLATES, templatesForCriterion } from '../lib/portfolio-
 import { buildAnnualPortfolioPlan } from '../lib/portfolio-annual-plan.js';
 import { portfolioLocalScope, loadPortfolioLocal, savePortfolioLocal, isPortfolioConflict } from '../lib/portfolio-local-draft.js';
 import { snapshotPortfolioDraft, restorePortfolioDraft } from '../lib/portfolio-local-state.js';
+import { buildPortfolioArchive, readPortfolioArchiveFile, applyPortfolioArchive, portfolioArchiveFilename } from '../lib/portfolio-local-archive.js';
 
 const styleUrl = new URL('../styles/portfolio-design-preview.css', import.meta.url).href;
 function loadStyle() {
@@ -68,7 +69,11 @@ function offerUndo(message,restore,discard) {
 }
 let photoError = '';
 let localDraftSession = null;
+let archiveCandidate = null;
+let archiveError = '';
+let archiveBusy = false;
 function resetDraftView() {
+  archiveCandidate=null;archiveError='';archiveBusy=false;
   clearUndo();
   for(const group of photoGroups.values())for(const photo of group)URL.revokeObjectURL(photo.url);
   photoGroups.clear();photoLayouts.clear();selectedByCriterion.clear();
@@ -753,12 +758,44 @@ const portfolioPreviewView = {
           <button class="btn btn--ghost" type="button" disabled title="يُفعّل بعد الحفظ والنشر الآمن">مشاركة الرابط</button>
           <button class="btn btn--ghost" type="button" disabled title="يتطلب رابط مشاركة منشورًا صالحًا">رمز QR</button>
         </div>
-        <p class="folio-toolbar__helper">التغييرات تُحفظ على هذا الجهاز فقط. ليست مزامنة سحابية أو نسخة احتياطية. لحفظ PDF اختر «حفظ بتنسيق PDF» من نافذة الطباعة.</p>
+        <p class="folio-toolbar__helper">التغييرات تُحفظ على هذا الجهاز فقط، وليست مزامنة سحابية أو جزءًا من نسخة ركيز الموحدة. لحفظ PDF اختر «حفظ بتنسيق PDF» من نافذة الطباعة، أو نزّل نسخة حماية مستقلة لملف الإنجاز أدناه.</p>
         ${localDraftSession?.status==='error'&&localDraftSession.ready?html`<button type="button"
           class="btn btn--ghost" data-act="retry-local-save">إعادة محاولة الحفظ المحلي</button>`:''}
         ${localDraftSession?.status==='conflict'?html`<p class="folio-toolbar__helper" role="alert">
           عدّل تبويب آخر هذه المسودة. لن نكتب فوق التغييرات الأحدث؛ احتفظ بنسختك الحالية عبر الطباعة قبل الانتقال.</p>`:''}
         ${photoError?html`<p class="folio-toolbar__helper" role="status">${photoError}</p>`:''}
+      </section>
+      <section class="folio-local-archive noprint" aria-label="حماية مسودة ملف الإنجاز">
+        <div class="folio-local-archive__intro">
+          <strong>نسخة حماية لملف الإنجاز على جهازك</strong>
+          <p>تضم تعديلاتك وصورك لهذا العام، وقد تحتوي بيانات خاصة.
+            هذه نسخة مستقلة مؤقتة، وليست النسخة الاحتياطية الموحدة لركيز أو مزامنة سحابية.</p>
+        </div>
+        <div class="folio-local-archive__actions">
+          <button type="button" class="btn btn--ghost" data-act="export-portfolio-archive"
+            ${archiveBusy||localDraftSession?.status!=='saved'?'disabled':''}>
+            تنزيل نسخة شواهد وصور</button>
+          <label class="folio-local-archive__import-label ${archiveBusy?'is-busy':''}">
+            اختيار ملف للاستعادة
+            <input type="file" data-change="read-portfolio-archive"
+              aria-label="اختيار نسخة ملف الإنجاز للاستعادة" accept=".json,application/json"
+              ${archiveBusy?'disabled':''} />
+          </label>
+        </div>
+        ${archiveError?html`<p class="folio-local-archive__error" role="alert">${archiveError}</p>`:''}
+        ${archiveCandidate?html`<div class="folio-local-archive__confirmation" role="group"
+          aria-label="تأكيد استعادة ملف الإنجاز">
+          <p><strong>النسخة المقروءة:</strong> ${digits.format(archiveCandidate.summary.customWitnesses)}
+            شواهد خاصة، ${digits.format(archiveCandidate.summary.photoCount)} صور.
+            استعادتها تستبدل مسودة ملف الإنجاز لهذا العام على هذا الجهاز فقط.
+            لن تتغير درجات الطلاب أو سجلات الفصول.</p>
+          <div class="folio-local-archive__confirmation-actions">
+            <button type="button" class="btn btn--primary" data-act="confirm-portfolio-archive"
+              ${archiveBusy?'disabled':''}>اعتماد الاستعادة المحلية</button>
+            <button type="button" class="btn btn--ghost" data-act="cancel-portfolio-archive"
+              ${archiveBusy?'disabled':''}>إلغاء</button>
+          </div>
+        </div>`:''}
       </section>
       <div class="folio-editor-shell">
         ${criteriaNavigator(ctx)}
@@ -787,6 +824,83 @@ const portfolioPreviewView = {
     </div>`;
   },
   actions: {
+    'export-portfolio-archive':async function(){
+      const session=localDraftSession;
+      if(archiveBusy||!session?.ready||session.failed||session.status!=='saved')return;
+      archiveBusy=true;archiveError='';repaint();
+      try{
+        await session.writeQueue;
+        if(localDraftSession!==session||session.failed)
+          throw new Error('Portfolio changed before download');
+        const stored=await loadPortfolioLocal(session.scope);
+        if(!stored.payload)throw new Error('No saved portfolio document');
+        const archive=await buildPortfolioArchive(session.scope,stored);
+        const blob=new Blob([archive],{type:'application/json;charset=utf-8'});
+        const url=URL.createObjectURL(blob),link=document.createElement('a');
+        link.href=url;link.download=portfolioArchiveFilename(session.scope.yearId);
+        link.style.display='none';document.body.append(link);link.click();link.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),4000);
+        toast('جُهزت نسخة شواهد ملف الإنجاز للتنزيل على جهازك.', 'success');
+      }catch{
+        archiveError='تعذّر تجهيز النسخة. تأكد من اكتمال الحفظ المحلي وسعة جهازك.';
+      }finally{
+        archiveBusy=false;if(localDraftSession===session)repaint();
+      }
+    },
+    'read-portfolio-archive':async function(el){
+      const session=localDraftSession,file=el.files?.[0];
+      el.value='';
+      if(archiveBusy||!session?.ready||!file)return;
+      archiveBusy=true;archiveCandidate=null;archiveError='';repaint();
+      try{
+        const validated=await readPortfolioArchiveFile(file,session.scope);
+        if(localDraftSession!==session)return;
+        archiveCandidate={...validated,expectedRevision:session.revision};
+      }catch(error){
+        if(error?.code==='PORTFOLIO_ARCHIVE_OWNER')
+          archiveError='هذه النسخة تخص حسابًا أو عامًا دراسيًا مختلفًا؛ لم نغيّر مسودتك.';
+        else if(error?.code==='PORTFOLIO_ARCHIVE_TOO_LARGE')
+          archiveError='حجم الملف يتجاوز حدود النسخ المحلية الحالية؛ لم نغيّر مسودتك.';
+        else archiveError='تعذّر التحقق من النسخة أو صورها. لم نغيّر مسودتك الحالية.';
+      }finally{
+        archiveBusy=false;if(localDraftSession===session)repaint();
+      }
+    },
+    'cancel-portfolio-archive'(){
+      archiveCandidate=null;archiveError='';repaint();
+    },
+    'confirm-portfolio-archive':async function(){
+      const session=localDraftSession,pending=archiveCandidate;
+      if(archiveBusy||!session?.ready||!pending)return;
+      archiveBusy=true;archiveError='';repaint();
+      try{
+        await session.writeQueue;
+        if(localDraftSession!==session||session.failed||
+          session.revision!==pending.expectedRevision)
+          throw new Error('Portfolio changed since the import preview');
+        if(session.scope.type==='account')store.assertLeaseWritable();
+        const result=await applyPortfolioArchive(session.scope,pending,{
+          expectedRevision:pending.expectedRevision,
+        });
+        const loaded=await loadPortfolioLocal(session.scope);
+        if(!loaded.payload||loaded.revision!==result.revision)
+          throw new Error('Restored portfolio could not be re-read');
+        if(localDraftSession!==session)return;
+        loadDraftIntoView(loaded.payload,loaded.images);
+        session.revision=loaded.revision;
+        session.lastSavedAt=result.savedAt;
+        session.status='saved';session.failed=false;
+        archiveCandidate=null;archiveError='';
+        toast('استُعيد ملف الإنجاز محليًا مع صوره. لم تُعدّل بيانات الفصول.', 'success');
+      }catch(error){
+        if(isPortfolioConflict(error)||session.revision!==pending.expectedRevision)
+          archiveError='تغيّرت المسودة في تبويب آخر أو أثناء المراجعة. أعد اختيار الملف قبل الاستعادة.';
+        else archiveError='تعذّرت الاستعادة الآمنة. بقيت البيانات الحالية دون استبدال ما لم يكتمل الحفظ.';
+        archiveCandidate=null;
+      }finally{
+        archiveBusy=false;if(localDraftSession===session)repaint();
+      }
+    },
     'reload-local-draft'(){localDraftSession=null;ensureDraftScope();repaint();},
     'retry-local-save'(){
       const s=localDraftSession;
