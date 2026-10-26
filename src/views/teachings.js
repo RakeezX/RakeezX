@@ -87,7 +87,9 @@ function sheet(existing = null, selectedSectionId = '') {
 
   return openSheet({
     title: selectedSectionId ? 'إضافة مادة للفصل' : existing ? 'تعديل الفصل' : 'فصل جديد',
-    desc: 'اختر الصف والفصل والمادة. إذا كان الفصل موجودًا، تُضاف المادة بقائمة الطلاب نفسها.',
+    desc: selectedSectionId
+      ? 'المادة الجديدة ستستخدم الطلاب الموجودين في هذا الفصل، وتبقى درجات وحضور كل مادة مستقلين.'
+      : 'اختر الصف والفصل والمادة. إذا كان الفصل موجودًا، تُضاف المادة بقائمة الطلاب نفسها.',
     body: html`
       <form id="tch-form" class="management-form class-form">
         <div class="field-row">
