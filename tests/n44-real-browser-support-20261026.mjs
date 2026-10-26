@@ -5,10 +5,10 @@ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const url='http://127.0.0.1:'+server.address().port+'/';
 let failures=0;
 try {
- for(const [name,engine] of Object.entries({chromium,firefox,webkit})){
+ for(const [name,engine] of Object.entries({chromium,firefox,webkit,edge:chromium})){
    let browser;
    try{
-    browser=await engine.launch({headless:true,timeout:20000});
+    browser=await engine.launch({headless:true,timeout:20000,...(name==='edge'?{channel:'msedge'}:{})});
     const page=await browser.newPage();
     await page.goto(url,{waitUntil:'domcontentloaded'});
     await page.locator('#btn').click();

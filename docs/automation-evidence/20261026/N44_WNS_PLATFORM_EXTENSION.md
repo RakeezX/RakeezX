@@ -18,8 +18,9 @@ The existing sender recognized FCM, Mozilla, and Apple only. Edge on Windows may
 - `node --test` across eight selected N44 suites: PASS 40/40.
 - `node tests/n44-crypto-sender.mjs`: PASS all 19 cases; `networkAttempts=0`.
 - `npm run build`: PASS Vite production build, isolated only.
-- Browser activation probe `node tests/n44-real-browser-support-20261026.mjs`: Chromium/Firefox/WebKit all reported `navigator.userActivation.isActive=true` inside real click and Notification/PushManager/ServiceWorker exposed in localhost browser engines. Not a physical device WebPush subscription test.
+- Browser activation probe `node tests/n44-real-browser-support-20261026.mjs`: Chromium/Firefox/WebKit/**actual Microsoft Edge** all reported `navigator.userActivation.isActive=true` inside real click and Notification/PushManager/ServiceWorker exposed on localhost. This proves API presence, NOT real Push delivery.
 - Localhost Service Worker check: Chromium registration ready and no missing assets. Firefox session did not complete in a bounded practical window; owned test process was stopped. NO Firefox service-worker PASS claimed; no browser-profile data touched.
+- A separate disposable Playwright Edge localhost PushSubscription attempt used a temporary generated VAPID key and a real click and returned `AbortError`. It revealed NO endpoint and caused NO send or account operation; headless provider availability is unproved. Do NOT call this a functioning or failed live Rakeez subscription; physical Edge qualification remains necessary.
 
 ## Open acceptance
 - The original Source6 from the test account has a confirmed canonical save but incomplete same-owner roster-impact/canonical cleanup. Never delete without direct owner/ancestry/zero-grade proof. No repeated Save/registration/window/send or resetting old markers.
