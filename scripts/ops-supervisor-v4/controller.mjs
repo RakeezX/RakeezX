@@ -14,7 +14,7 @@ import { verifiedLiveServicePublication } from './live-service-publication.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SHA = /^[a-f0-9]{40}$/i;
 const ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,139}$/;
-const OUTAGE = new Set(['quota', 'network', 'auth']);
+const OUTAGE = new Set(['quota', 'network', 'auth', 'capacity']);
 const normalize = value => String(value ?? '').replaceAll('\\', '/').toLowerCase();
 const timestamp = value => Date.parse(value ?? '') || 0;
 const clean = value => String(value ?? '').replace(/\b(?:github_pat_|gh[pousr]_|sb_secret_)[A-Za-z0-9_]+/g, '[redacted]')
@@ -182,6 +182,7 @@ export function workerBlockerClass(result) {
 export function classifyFailure(message, explicit = null) {
   if (OUTAGE.has(explicit) || ['implementation', 'external', 'environment'].includes(explicit)) return explicit;
   const text = String(message ?? '');
+  if (/^Selected model is at capacity\. Please try a different model\.$/i.test(text.trim())) return 'capacity';
   if (/usage limit|quota|rate.limit|too many requests|\b429\b/i.test(text)) return 'quota';
   if (/unauthorized|invalid.*(?:token|auth)|authentication.*fail|\b401\b|please.*(?:log|sign).?in|not logged in/i.test(text)) return 'auth';
   if (/stream disconnected|error sending request|connection (?:reset|refused)|network|temporary failure|timed? ?out|\bETIMEDOUT\b|\bECONNRESET\b|failed to connect|dns|tls handshake/i.test(text)) return 'network';
@@ -690,6 +691,35 @@ export class Controller {
     if (options.delivery) task.deliveryRepair = options.delivery;
     task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null; task.ownedProcesses = [];
     await this.save(task); await this.event(task.status, { taskId: task.id, type, message: clean(message), retryAt: task.retryAt });
+  }
+  async recoverMisclassifiedN44Capacity(task, processes) {
+    // One exact raw runtime failure; no Product result or active process is reclassified.
+    const message = 'Selected model is at capacity. Please try a different model.';
+    if (task.id !== 'continuous-n44-one-approved-closed-page-push-20261019'
+      || task.sessionId !== '01a14fcd-032c-7ec0-8b0c-0e0395862c61'
+      || task.attempt?.runId !== 'd2312f20-9a40-4e16-8259-5fb096e12e58'
+      || task.liveAuthorizationRef !== 'PO-20261026-N44-USER-CLOSED-SAME-FOURTH'
+      || task.status !== 'blocked' || task.failureClass !== 'implementation'
+      || task.lastFailure !== message || task.lastModelError !== message
+      || task.capacityReclassification || task.deliveryReceipt) return false;
+    const reap = task.lastWorkerReap, cp = await readJson(task.attempt.checkpointPath);
+    if (!reap?.exactAbsence || reap.runId !== task.attempt.runId || reap.activationId !== task.activationId
+      || !reap.owners?.length || !cp?.finishedAt || cp.status !== 'exited' || cp.exitCode !== 1
+      || cp.taskId !== task.id || cp.runId !== task.attempt.runId || cp.sessionId !== task.sessionId
+      || cp.activationId !== task.activationId || task.checkpointIssue || task.eventLogIssue || task.watchdogIncident
+      || workerProcesses({ ...task, ownedProcesses: [...(task.ownedProcesses ?? []), ...reap.owners] }, cp, processes).length
+      || await readJson(task.attempt.outputPath)) return false;
+    const original = { at: this.now(), runId: task.attempt.runId, from: task.failureClass, to: 'capacity',
+      originalFailure: task.lastFailure, originalFailureAt: task.lastFailureAt,
+      originalImplementationFailures: task.implementationFailures, originalCandidateSha: task.candidateSha,
+      reason: 'Exact raw model-capacity failure is temporary infrastructure overload; preserve source and original session, wait before one ordinary controller probe.' };
+    task.capacityReclassification = original;
+    task.implementationFailures = Math.max(0, Number(task.implementationFailures ?? 0) - 2);
+    task.infrastructureRetries = Number(task.infrastructureRetries ?? 0) + 1;
+    task.failureClass = 'capacity'; task.status = 'retry_wait';
+    task.retryAt = new Date(Math.max(this.clock(), timestamp(task.lastFailureAt) + 900000)).toISOString();
+    await this.save(task); await this.event('runtime_capacity_reclassified', { taskId: task.id, ...original, retryAt: task.retryAt });
+    return true;
   }
   async scopedProgress(task) {
     if (this.clock() - timestamp(task.lastProgressScanAt) < 15000) return;
@@ -1239,6 +1269,10 @@ export class Controller {
     let processes;
     try { processes = await this.inventory(); }
     catch (error) { this.issues.push({ code: 'PROCESS_INVENTORY_UNAVAILABLE', message: clean(error.message) }); await this.snapshot(paused, false); return; }
+    if (!paused) for (const task of this.jobs.filter(t => t.status === 'blocked' && t.failureClass === 'implementation')) {
+      try { await this.recoverMisclassifiedN44Capacity(task, processes); }
+      catch (error) { this.issues.push({ code: 'CAPACITY_CLASSIFICATION_RECOVERY_FAILED', taskId: task.id, message: clean(error.message) }); }
+    }
     for (const task of this.jobs.filter(t => t.status === 'retry_wait' && ['auth', 'network'].includes(t.failureClass))) {
       try { await this.isolateCompletedAuthBlocker(task, processes); }
       catch (error) { this.issues.push({ code: 'SCOPED_AUTH_RECONCILE_FAILED', taskId: task.id, message: clean(error.message) }); }
