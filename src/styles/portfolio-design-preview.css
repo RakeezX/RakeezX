@@ -733,3 +733,18 @@
   }
   .folio-suggestion-studio__head p {font-size:11px;}
 }
+
+/* Local-only F09 draft availability is deliberately distinct from Cloud Sync. */
+.folio-local-loading {
+  display:grid;gap:10px;justify-items:start;align-content:center;
+  min-height:190px;background:var(--bg-elev);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:24px;
+}
+.folio-local-loading h2 {font-size:20px;margin:0;color:var(--text-1);}
+.folio-local-loading p {margin:0;color:var(--text-2);line-height:1.8;font-size:13px;}
+.folio-workspace__status {white-space:normal;max-width:350px;line-height:1.6;}
+.folio-toolbar [data-act="retry-local-save"] {font-size:12px;max-width:240px;}
+@media (max-width:650px) {
+  .folio-workspace__status {display:inline-flex;max-width:100%;padding:7px 10px;}
+  .folio-local-loading {min-height:135px;padding:16px;}
+}

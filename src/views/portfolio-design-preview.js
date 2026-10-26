@@ -8,6 +8,8 @@ import { PORTFOLIO_CRITERIA, portfolioYearEvidence, portfolioDesignSummary } fro
 import { buildPortfolioEvidenceSuggestions, guideForCriterion } from '../lib/portfolio-smart-evidence.js';
 import { F09_EVIDENCE_TEMPLATES, templatesForCriterion } from '../lib/portfolio-evidence-templates.js';
 import { buildAnnualPortfolioPlan } from '../lib/portfolio-annual-plan.js';
+import { portfolioLocalScope, loadPortfolioLocal, savePortfolioLocal, isPortfolioConflict } from '../lib/portfolio-local-draft.js';
+import { snapshotPortfolioDraft, restorePortfolioDraft } from '../lib/portfolio-local-state.js';
 
 const styleUrl = new URL('../styles/portfolio-design-preview.css', import.meta.url).href;
 function loadStyle() {
@@ -65,6 +67,115 @@ function offerUndo(message,restore,discard) {
   clearUndo();pendingUndo={message,restore,discard};
 }
 let photoError = '';
+let localDraftSession = null;
+function resetDraftView() {
+  clearUndo();
+  for(const group of photoGroups.values())for(const photo of group)URL.revokeObjectURL(photo.url);
+  photoGroups.clear();photoLayouts.clear();selectedByCriterion.clear();
+  includedWitnesses.clear();excludedWitnesses.clear();
+  descriptions.clear();titles.clear();criterionNames.clear();hiddenCriteria.clear();
+  hiddenWitnesses.clear();sectionPreferences.clear();extraCriteria.length=0;
+  customWitnesses.length=0;nextExtraCriterionNumber=12;
+  editingCriterion='09';selectedSuggestionId=null;viewingFullPortfolio=false;
+  navigatorOpen=false;criterionEditorOpen=false;libraryFilter='all';libraryQuery='';
+  photoError='';
+}
+function draftModel() {
+  return {criterionNames,hiddenCriteria,extraCriteria,customWitnesses,hiddenWitnesses,
+    sectionPreferences,photoLayouts,photoGroups,selectedByCriterion,descriptions,titles,
+    includedWitnesses,excludedWitnesses,editingCriterion,nextExtraCriterionNumber};
+}
+function loadDraftIntoView(payload,images) {
+  const restored=restorePortfolioDraft(payload,images);
+  const replaceMap=(target,source)=>{
+    target.clear();for(const [key,value] of source)target.set(key,value);
+  };
+  const replaceSet=(target,source)=>{
+    target.clear();for(const value of source)target.add(value);
+  };
+  resetDraftView();
+  for(const key of ['criterionNames','photoLayouts','photoGroups','selectedByCriterion',
+    'descriptions','titles','sectionPreferences'])replaceMap(draftModel()[key],restored[key]);
+  for(const key of ['hiddenCriteria','hiddenWitnesses','includedWitnesses','excludedWitnesses'])
+    replaceSet(draftModel()[key],restored[key]);
+  extraCriteria.push(...restored.extraCriteria);
+  customWitnesses.push(...restored.customWitnesses);
+  editingCriterion=restored.editingCriterion;
+  selectedSuggestionId=selectedByCriterion.get(editingCriterion)||null;
+  nextExtraCriterionNumber=restored.nextExtraCriterionNumber;
+}
+function localDraftStatus() {
+  const session=localDraftSession;
+  if(session?.status==='saved')return 'محفوظ على هذا الجهاز فقط · لم تتم المزامنة';
+  if(session?.status==='saving')return 'جارٍ حفظ تعديلات ملف الإنجاز على هذا الجهاز…';
+  if(session?.status==='conflict')return 'تعارض تعديل من تبويب آخر · لم نكتب فوقه';
+  if(session?.status==='error')return 'تعذّر الحفظ المحلي · لا تغلق الصفحة قبل حل المشكلة';
+  if(session?.status==='load-error')return 'تعذّر قراءة المسودة المحلية · لم نغيّر بياناتها';
+  if(session?.status==='loading')return 'جارٍ استعادة ملف الإنجاز المحلي…';
+  return 'جاهز للحفظ على هذا الجهاز فقط · دون مزامنة';
+}
+function ensureDraftScope() {
+  const workspace=store.getActiveWorkspace();
+  const scope=store.state.ready&&portfolioLocalScope(workspace,store.activeYear());
+  if(!scope)return null;
+  if(localDraftSession?.scope.key===scope.key&&
+     localDraftSession.scope.ownerId===scope.ownerId)return localDraftSession;
+  resetDraftView();
+  const session={scope,revision:0,status:'loading',ready:false,failed:false,
+    pending:0,saveGeneration:0,writeQueue:Promise.resolve(),lastSavedAt:null};
+  localDraftSession=session;
+  void loadPortfolioLocal(scope).then(({payload,images,revision,savedAt})=>{
+    if(localDraftSession!==session)return;
+    if(payload)loadDraftIntoView(payload,images);
+    session.revision=revision;
+    session.lastSavedAt=savedAt??null;
+    session.status=payload?'saved':'empty';
+    session.ready=true;repaint();
+  }).catch(err=>{
+    if(localDraftSession!==session)return;
+    session.ready=false;session.failed=true;session.status='load-error';
+    session.reason=err?.code??'PORTFOLIO_LOAD_ERROR';repaint();
+  });
+  return session;
+}
+function enqueueLocalSave() {
+  const session=localDraftSession;
+  if(!session?.ready||session.failed)return;
+  let snapshot;
+  try{snapshot=snapshotPortfolioDraft(draftModel());}
+  catch(err){
+    session.status='error';session.failed=true;session.reason='PORTFOLIO_SNAPSHOT_ERROR';
+    repaint();return;
+  }
+  session.status='saving';session.pending++;session.saveGeneration++;
+  const generation=session.saveGeneration;
+  session.writeQueue=session.writeQueue.then(async()=>{
+    if(session.failed)return;
+    const workspace=store.getActiveWorkspace();
+    if(!workspace||workspace.databaseName!==session.scope.workspaceDatabase||
+      (session.scope.type==='account'&&workspace.authUserId!==session.scope.ownerId))
+      throw Object.assign(new Error('The active account changed before portfolio save'),{code:'PORTFOLIO_OWNER_CHANGED'});
+    if(session.scope.type==='account')store.assertLeaseWritable();
+    const result=await savePortfolioLocal(session.scope,{
+      payload:snapshot.payload,images:snapshot.images,expectedRevision:session.revision,
+    });
+    session.revision=result.revision;
+    session.lastSavedAt=result.savedAt;
+    const savedIds=new Set(snapshot.images.map(image=>image.id));
+    for(const group of photoGroups.values())
+      for(const photo of group)if(savedIds.has(photo.id))photo.stored=true;
+  }).catch(error=>{
+    session.failed=true;
+    session.status=isPortfolioConflict(error)?'conflict':'error';
+    session.reason=error?.code??'PORTFOLIO_SAVE_FAILED';
+  }).finally(()=>{
+    session.pending=Math.max(0,session.pending-1);
+    if(!session.failed&&session.pending===0&&generation===session.saveGeneration)
+      session.status='saved';
+    if(localDraftSession===session)repaint();
+  });
+  repaint();
+}
 function context() {
   const year = store.activeYear();
   const terms = year ? store.termsOf(year.id) : [];
@@ -599,24 +710,26 @@ async function printAnnualFile() {
   return printReport('ملف الإنجاز المهني الكامل');
 }
 
-export default {
+const portfolioPreviewView = {
   title: ()=>'ملف الإنجاز — نموذج التصميم',
   subtitle: ()=>store.activeYear()?.label ?? '',
   back: ()=>'#/reports',
   wide: true,
   beforeRender() { loadStyle(); editingCriterion='09'; selectedSuggestionId=null;viewingFullPortfolio=false;photoError=''; },
   onUnmount() {
-    clearUndo();
-    for(const group of photoGroups.values())for(const photo of group)URL.revokeObjectURL(photo.url);
-    photoGroups.clear();photoLayouts.clear();selectedByCriterion.clear();
-    includedWitnesses.clear();excludedWitnesses.clear();viewingFullPortfolio=false;
-    descriptions.clear();titles.clear();criterionNames.clear();hiddenCriteria.clear();
-    hiddenWitnesses.clear();sectionPreferences.clear();extraCriteria.length=0;
-    customWitnesses.length=0;nextExtraCriterionNumber=12;
-    editingCriterion='09';selectedSuggestionId=null;navigatorOpen=false;
-    criterionEditorOpen=false;libraryFilter='all';libraryQuery='';photoError='';
+    resetDraftView();
+    localDraftSession=null;
   },
   render() {
+    const session=ensureDraftScope();
+    if(!session||!session.ready)return html`<div class="folio-page" dir="rtl">
+      <section class="folio-local-loading noprint" role="status">
+        <h2>ملف الإنجاز المهني</h2>
+        <p>${localDraftStatus()}</p>
+        ${session?.status==='load-error'?html`<button class="btn btn--ghost" type="button"
+          data-act="reload-local-draft">إعادة محاولة القراءة</button>`:''}
+      </section>
+    </div>`;
     const ctx=context();
     const focusExtra=ctx.proposal?photoContinuation(ctx,5,true):[];
     const pages=exportPages(ctx);
@@ -626,7 +739,8 @@ export default {
         <div><span class="folio-workspace__eyebrow">ملف الإنجاز · مراجعة التصميم</span>
           <h1>ملف الإنجاز المهني</h1>
           <p>تصفح معيارًا واحدًا للتحرير أو اعرض الملف السنوي كاملًا بالترتيب الذي اخترته.</p></div>
-        <span class="folio-workspace__status">Preview · التغييرات مؤقتة ولم تُحفظ في حسابك</span>
+        <span class="folio-workspace__status" role="status" data-portfolio-save-status>
+          Preview · ${localDraftStatus()}</span>
       </header>
       <section class="folio-toolbar noprint" aria-label="إجراءات ملف الإنجاز">
         <div class="folio-toolbar__overview">
@@ -639,7 +753,11 @@ export default {
           <button class="btn btn--ghost" type="button" disabled title="يُفعّل بعد الحفظ والنشر الآمن">مشاركة الرابط</button>
           <button class="btn btn--ghost" type="button" disabled title="يتطلب رابط مشاركة منشورًا صالحًا">رمز QR</button>
         </div>
-        <p class="folio-toolbar__helper">لحفظ PDF اختر «حفظ بتنسيق PDF» من نافذة الطباعة. الرابط والباركود سيتاحان بعد تفعيل الحفظ والمشاركة الآمنة.</p>
+        <p class="folio-toolbar__helper">التغييرات تُحفظ على هذا الجهاز فقط. ليست مزامنة سحابية أو نسخة احتياطية. لحفظ PDF اختر «حفظ بتنسيق PDF» من نافذة الطباعة.</p>
+        ${localDraftSession?.status==='error'&&localDraftSession.ready?html`<button type="button"
+          class="btn btn--ghost" data-act="retry-local-save">إعادة محاولة الحفظ المحلي</button>`:''}
+        ${localDraftSession?.status==='conflict'?html`<p class="folio-toolbar__helper" role="alert">
+          عدّل تبويب آخر هذه المسودة. لن نكتب فوق التغييرات الأحدث؛ احتفظ بنسختك الحالية عبر الطباعة قبل الانتقال.</p>`:''}
         ${photoError?html`<p class="folio-toolbar__helper" role="status">${photoError}</p>`:''}
       </section>
       <div class="folio-editor-shell">
@@ -669,6 +787,13 @@ export default {
     </div>`;
   },
   actions: {
+    'reload-local-draft'(){localDraftSession=null;ensureDraftScope();repaint();},
+    'retry-local-save'(){
+      const s=localDraftSession;
+      if(!s?.ready||s.status!=='error')return;
+      s.failed=false;s.reason=null;s.writeQueue=Promise.resolve();
+      enqueueLocalSave();
+    },
     'toggle-criteria'() { navigatorOpen=!navigatorOpen;repaint(); },
     'edit-criterion-row'(el) {
       editingCriterion=el.dataset.id;selectedSuggestionId=selectedByCriterion.get(editingCriterion)||null;
@@ -712,6 +837,7 @@ export default {
       const section=extraCriteria[index], name=criterionNames.get(number);
       const excluded=hiddenCriteria.has(number), selected=selectedByCriterion.get(number);
       const removed=customWitnesses.map((w,i)=>({w,i})).filter(x=>x.w.criterion===number);
+      for(const {w} of removed)for(const photo of photosFor(w.id))photo.stored=false;
       offerUndo('حُذف القسم الخاص وشواهده من المعاينة.',()=>{
         extraCriteria.splice(index,0,section);
         for(const {w,i} of removed)customWitnesses.splice(Math.min(i,customWitnesses.length),0,w);
@@ -778,6 +904,7 @@ export default {
       if(proposal.sourceKind==='custom'){
         const index=customWitnesses.findIndex(w=>w.id===proposal.id);
         if(index<0)return;
+        for(const photo of photosFor(proposal.id))photo.stored=false;
         offerUndo('حُذف الشاهد الخاص من المعاينة.',()=>{
           customWitnesses.splice(Math.min(index,customWitnesses.length),0,proposal);
           editingCriterion=criterion;selectedSuggestionId=proposal.id;
@@ -832,7 +959,8 @@ export default {
       }
       clearUndo();
       const additions = incoming.map(file=>({
-        id:crypto.randomUUID(), url:URL.createObjectURL(file), name:String(file.name).slice(0,70), bytes:file.size,
+        id:crypto.randomUUID(), url:URL.createObjectURL(file),
+        blob:file,stored:false,name:String(file.name).slice(0,70), bytes:file.size,
       }));
       photoGroups.set(key,[...existing,...additions]);
       photoError = ''; repaint();
@@ -841,6 +969,8 @@ export default {
       const key=context().photoKey, group=photosFor(key), index=group.findIndex(photo=>photo.id===el.dataset.id);
       if(index<0)return;
       const photo=group[index];
+      // The saved Blob may be deleted immediately; undo must reinsert it.
+      photo.stored=false;
       offerUndo('حُذفت الصورة من الشاهد.',()=>{
         const current=photosFor(key);
         photoGroups.set(key,[...current.slice(0,index),photo,...current.slice(index)]);
@@ -861,6 +991,7 @@ export default {
     'clear-photo'() {
       const key=context().photoKey, removed=photosFor(key);
       if(!removed.length)return;
+      for(const photo of removed)photo.stored=false;
       offerUndo('حُذفت صور الشاهد من المعاينة.',()=>{
         photoGroups.set(key,removed);
       },()=>{for(const photo of removed)URL.revokeObjectURL(photo.url)});
@@ -870,3 +1001,23 @@ export default {
     'save-pdf'(){return printAnnualFile();},
   },
 };
+
+/* Persist only meaningful draft mutations, never printing or filter navigation. */
+const LOCAL_DRAFT_ACTIONS=[
+  'select-criterion','add-criterion','criterion-name','reset-criterion-name',
+  'criterion-inclusion','toggle-criterion-in-file','delete-custom-criterion',
+  'pick-suggestion','move-witness','undo-change','manual-suggestion','hide-witness',
+  'restore-witness-item','restore-witnesses','toggle-witness-in-file',
+  'toggle-section','suggestion-title','suggestion-description','layout',
+  'photo','remove-photo','move-photo','clear-photo',
+];
+for(const key of LOCAL_DRAFT_ACTIONS) {
+  const original=portfolioPreviewView.actions[key];
+  if(typeof original!=='function')throw new Error('Missing portfolio draft action: '+key);
+  portfolioPreviewView.actions[key]=function(...args){
+    const result=original.apply(this,args);
+    enqueueLocalSave();
+    return result;
+  };
+}
+export default portfolioPreviewView;

@@ -554,3 +554,145 @@ test('criterion editing is a pen icon only with accessible descriptive name',asy
  await expect(page.locator('.folio-criteria__row').filter({has:page.locator('.folio-criteria__item[data-id="04"]')})
    .locator('.folio-criteria__inline-editor')).toBeVisible();
 });
+
+test('F09 saves witness text, owned photos and criterion customizations across a full reload',async({page,context,baseURL})=>{
+  await sameOriginOnly(context,baseURL);
+  await page.goto(entry);await ready(page);
+  const before=await page.evaluate(async()=>JSON.stringify((await import('/src/store.js')).state));
+  await chooseCriterion(page,'04');
+  await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('مشروعي المحفوظ');
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+  await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('تجربة تجريبية بقيت بعد التحديث.');
+  await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
+  await page.locator('input[data-change="photo"]').setInputFiles(
+    {name:'persisted-synthetic.png',mimeType:'image/png',buffer:tiny});
+  await page.locator('input[data-change="criterion-inclusion"][data-id="02"]').uncheck();
+  await page.locator('[data-act="edit-criterion-row"][data-id="04"]').click();
+  await page.getByRole('textbox',{name:'اسم القسم في ملفي'}).fill('استراتيجياتي المخصصة');
+  await page.getByRole('textbox',{name:'اسم القسم في ملفي'}).blur();
+  await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط',{timeout:15000});
+  const snapshot=await page.evaluate(async()=>{
+    const m=await import('/src/lib/portfolio-local-draft.js');
+    const s=await import('/src/store.js');
+    const scope=m.portfolioLocalScope(s.getActiveWorkspace(),s.activeYear());
+    const saved=await m.loadPortfolioLocal(scope);
+    return {revision:saved.revision,photos:saved.payload?.photos?.length,
+      imageCount:saved.images.size,scope:scope.type};
+  });
+  expect(snapshot.revision).toBeGreaterThan(0);
+  expect(snapshot.imageCount).toBe(1);
+  expect(snapshot.scope).toBe('demo');
+  await page.reload();await ready(page);
+  await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+  await expect(page.locator('input[data-change="criterion-inclusion"][data-id="02"]')).not.toBeChecked();
+  await expect(page.locator('.folio-criteria__item[data-id="04"]')).toContainText('استراتيجياتي المخصصة');
+  await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('مشروعي المحفوظ');
+  await expect(page.getByRole('textbox',{name:'وصف الشاهد'})).toHaveValue('تجربة تجريبية بقيت بعد التحديث.');
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+  await expect(page.locator('.folio-focus .folio-evidence__photo')).toHaveJSProperty('naturalWidth',1);
+  const after=await page.evaluate(async()=>JSON.stringify((await import('/src/store.js')).state));
+  expect(after).toBe(before);
+  await page.getByRole('button',{name:'حذف الصورة'}).click();
+  await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+  await page.reload();await ready(page);
+  await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('مشروعي المحفوظ');
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
+  const remaining=await page.evaluate(async()=>{
+    const s=await import('/src/store.js'),p=await import('/src/lib/portfolio-local-draft.js');
+    return (await p.loadPortfolioLocal(p.portfolioLocalScope(s.getActiveWorkspace(),s.activeYear()))).images.size;
+  });
+  expect(remaining).toBe(0);
+});
+
+test('F09 refuses a stale tab save rather than overwriting the other tab',async({page,context,baseURL})=>{
+  await sameOriginOnly(context,baseURL);
+  await page.goto(entry);await ready(page);
+  const other=await context.newPage();
+  await other.goto(entry);await ready(other);
+  await chooseCriterion(page,'04');
+  await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('ملف التبويب الأول');
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+  await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('حفظ موثق على الجهاز.');
+  await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+  await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+  await chooseCriterion(other,'07');
+  await expect(other.locator('[data-portfolio-save-status]')).toContainText('تعارض تعديل من تبويب آخر');
+  const snapshot=await other.evaluate(async()=>{
+    const s=await import('/src/store.js'),p=await import('/src/lib/portfolio-local-draft.js');
+    return (await p.loadPortfolioLocal(p.portfolioLocalScope(s.getActiveWorkspace(),s.activeYear()))).payload;
+  });
+  expect(snapshot.customWitnesses.some(w=>w.title==='شاهد جديد')).toBe(true);
+  await other.reload();await ready(other);
+  await chooseCriterion(other,'04');
+  await expect(other.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('ملف التبويب الأول');
+  await other.close();
+});
+
+test('F09 isolates synthetic owners and years without touching the product database',async({page,context,baseURL})=>{
+  await sameOriginOnly(context,baseURL);
+  await page.goto(entry);await ready(page);
+  const result=await page.evaluate(async()=>{
+    const p=await import('/src/lib/portfolio-local-draft.js');
+    const user=a=>({type:'account',databaseName:'rakeezx-user-'+a.repeat(32),authUserId:a});
+    const one=p.portfolioLocalScope(user('a'),{id:'year-1'});
+    const otherOwner=p.portfolioLocalScope(user('b'),{id:'year-1'});
+    const anotherYear=p.portfolioLocalScope(user('a'),{id:'year-2'});
+    const payload={photos:[],criterionNames:[['01','Synthetic']],customWitnesses:[]};
+    const receipt=await p.savePortfolioLocal(one,{payload,expectedRevision:0});
+    const first=await p.loadPortfolioLocal(one);
+    const isolated=await p.loadPortfolioLocal(otherOwner);
+    const year=await p.loadPortfolioLocal(anotherYear);
+    let conflict=null;
+    try{await p.savePortfolioLocal(one,{payload:{...payload,criterionNames:[]},expectedRevision:0})}
+    catch(e){conflict=e.code}
+    await p.removePortfolioLocal(one,{expectedRevision:receipt.revision});
+    const deleted=await p.loadPortfolioLocal(one);
+    return {first:first.payload.criterionNames,other:isolated.payload,year:year.payload,
+      conflict,deleted:deleted.payload};
+  });
+  expect(result.first).toEqual([['01','Synthetic']]);
+  expect(result.other).toBeNull();
+  expect(result.year).toBeNull();
+  expect(result.conflict).toBe('PORTFOLIO_LOCAL_CONFLICT');
+  expect(result.deleted).toBeNull();
+});
+
+test('F09 removes deleted personal photos from disk while allowing the in-page undo to restore them',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry);await ready(page);
+ await chooseCriterion(page,'04');
+ await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('شاهد يُحذف ويُستعاد');
+ await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+ const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
+ await page.locator('input[data-change="photo"]').setInputFiles(
+   {name:'disposable.png',mimeType:'image/png',buffer:tiny});
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ const imageCount=async()=>page.evaluate(async()=>{
+   const s=await import('/src/store.js'),p=await import('/src/lib/portfolio-local-draft.js');
+   const x=await p.loadPortfolioLocal(p.portfolioLocalScope(s.getActiveWorkspace(),s.activeYear()));
+   return {count:x.images.size,personal:x.payload.customWitnesses.length,refs:x.payload.photos.length};
+ });
+ expect((await imageCount()).count).toBe(1);
+ await page.getByRole('button',{name:'حذف شاهدي'}).click();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ expect(await imageCount()).toEqual({count:0,personal:0,refs:0});
+ await page.locator('.folio-undo').getByRole('button',{name:'تراجع'}).click();
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ expect((await imageCount()).count).toBe(1);
+ await page.reload();await ready(page);
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('شاهد يُحذف ويُستعاد');
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+ await page.getByRole('button',{name:'حذف شاهدي'}).click();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ expect((await imageCount()).count).toBe(0);
+ await page.reload();await ready(page);
+ await chooseCriterion(page,'04');
+ await page.getByRole('button',{name:'شواهدي'}).click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(0);
+ expect((await imageCount()).count).toBe(0);
+});

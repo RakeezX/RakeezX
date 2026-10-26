@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v92';
+const VERSION = 'rakeezx-v93';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -174,6 +174,8 @@ const SHELL = [
   './src/lib/report-print.js',
   './src/lib/portfolio-design-preview.js',
   './src/lib/portfolio-annual-plan.js',
+  './src/lib/portfolio-local-draft.js',
+  './src/lib/portfolio-local-state.js',
   './src/lib/portfolio-smart-evidence.js',
   './src/lib/portfolio-evidence-templates.js',
   './src/lib/thmanyah-font.js',
