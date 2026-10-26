@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
+  <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://xlrubcwjqktzzunrvuns.supabase.co wss://xlrubcwjqktzzunrvuns.supabase.co https://cloud.umami.is">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>رَكيز المعلم — إدارة الفصول والطلاب والحضور والدرجات</title>
@@ -71,12 +72,15 @@
   <div id="modal-root"></div>
 
   <script type="module">
-    if (location.hash === '#/n88-invite-lab') {
-      // This public illustration never starts the account/workspace module graph.
+    if (location.hash === '#/n88-invite-lab' || location.hash === '#/v2-preview-lab') {
+      // Isolated public illustrations do NOT start Product/Cloud/Auth modules.
+      const isV2Preview = location.hash === '#/v2-preview-lab';
       addEventListener('hashchange', () => location.reload(), { once: true });
-      import('./src/views/n88-public-guest.js').catch(() => {
+      import(isV2Preview ? './src/views/n71-v2-public-preview.js' : './src/views/n88-public-guest.js').catch(() => {
         const message = document.createElement('p');
-        message.textContent = 'تعذّر تحميل نموذج الدعوة التجريبي. لا يوجد دخول فعلي أو بيانات طلاب. أعد تحميل الصفحة للمحاولة.';
+        message.textContent = isV2Preview
+          ? 'تعذّر تحميل معاينة المناهج V2. لا توجد كتابة أو بيانات معلمين. أعد تحميل الصفحة.'
+          : 'تعذّر تحميل نموذج الدعوة التجريبي. لا يوجد دخول فعلي أو بيانات طلاب. أعد تحميل الصفحة للمحاولة.';
         const back = document.createElement('a');
         back.href = './';
         back.textContent = 'العودة لرَكيز المعلم';

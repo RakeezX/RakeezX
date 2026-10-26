@@ -3,7 +3,7 @@ import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 
-const NEW_STORES = ['scoreSubitems', 'scoreSubitemCompletions'];
+const NEW_STORES = ['scoreSubitems', 'scoreSubitemCompletions', 'sectionCurriculumScopes', 'teachingCourseBindings'];
 
 function openLegacyV7(name = db.DB_NAME) {
   return new Promise((resolve, reject) => {
@@ -20,7 +20,7 @@ function openLegacyV7(name = db.DB_NAME) {
   });
 }
 
-test('existing v7 Product item and score survive additive v8 upgrade', async () => {
+test('existing v7 Product item and score survive cumulative v9 upgrade', async () => {
   const legacy = await openLegacyV7();
   const beforeItem = { id: 'v7:item', teachingId: 'v7:teaching', name: 'اختبار', max: 10, updatedAt: 5 };
   const beforeScore = { id: 'v7:score', itemId: beforeItem.id, studentId: 'v7:student', value: 0, updatedAt: 6 };
@@ -36,7 +36,7 @@ test('existing v7 Product item and score survive additive v8 upgrade', async () 
   });
   legacy.close();
   const upgraded = await db.openDB();
-  assert.equal(upgraded.version, 8);
+  assert.equal(upgraded.version, 9);
   assert.deepEqual([...upgraded.objectStoreNames].sort(), [...db.STORES].sort());
   assert.deepEqual(await db.get('items', beforeItem.id), beforeItem);
   assert.deepEqual(await db.get('scores', beforeScore.id), beforeScore);
@@ -50,16 +50,16 @@ test('existing v7 Product item and score survive additive v8 upgrade', async () 
   }
   await db.closeDB();
   const reopened = await db.openDB();
-  assert.equal(reopened.version, 8);
+  assert.equal(reopened.version, 9);
   assert.deepEqual(await db.get('outbox', beforeOutbox.id), beforeOutbox,
     'pending command and retry count survive an actual database reopen');
 });
 
-test('a fresh v8 database creates the same complete store and key-path contract', async () => {
+test('a fresh v9 database creates the same complete store and key-path contract', async () => {
   await db.closeDB();
   db.selectDatabase('rakeezx-demo');
   const fresh = await db.openDB();
-  assert.equal(fresh.version, 8);
+  assert.equal(fresh.version, 9);
   assert.deepEqual([...fresh.objectStoreNames].sort(), [...db.STORES].sort());
   for (const name of NEW_STORES) {
     const tx = fresh.transaction(name, 'readonly');
@@ -68,7 +68,7 @@ test('a fresh v8 database creates the same complete store and key-path contract'
   }
 });
 
-test('an aborted v8 upgrade leaves legacy v7 bytes available for a later clean upgrade', async () => {
+test('an aborted v8 upgrade leaves legacy v7 bytes available for later clean v9 upgrade', async () => {
   await db.closeDB();
   const name = 'rakeezx-user-00000000000000000000000000000001';
   const legacy = await openLegacyV7(name);
@@ -90,7 +90,7 @@ test('an aborted v8 upgrade leaves legacy v7 bytes available for a later clean u
   stillV7.close();
   db.selectDatabase(name);
   const upgraded = await db.openDB();
-  assert.equal(upgraded.version, 8);
+  assert.equal(upgraded.version, 9);
   assert.deepEqual(await db.get('items', 'interrupted:item'),
     { id: 'interrupted:item', name: 'unchanged', max: 10 });
 });

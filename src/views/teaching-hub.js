@@ -8,6 +8,7 @@ import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
 import studentsView, { canOpenRoster, classAccessFeedback } from './students.js';
 import teachingsView, { addSubjectToClass } from './teachings.js';
+import {openTeachingSubjectChangePreview} from './teaching-subject-change.js';
 
 const TOOLS = (id) => [
   { href: `#/teaching/${teachingRouteId(id)}/student-portal`, icon: 'students', title: 'مساحة الطلاب', sub: 'رموز الدخول والحقول المنشورة' },
@@ -259,7 +260,10 @@ export default {
           title: 'تعديل الفصل',
           body: html`
             <p class="field__hint">تعديل اسم الفصل ولونه يظهر في جميع مواده. الدرجات والحصص مستقلة لكل مادة.</p>
-            <button type="button" class="btn btn--quiet mb-3" data-add-subject>${icon('plus')} إضافة مادة أخرى لهذا الفصل</button>
+            <div class="hstack gap-2 wrap mb-3">
+              <button type="button" class="btn btn--quiet" data-change-subject>${icon('edit')} تغيير المادة</button>
+              <button type="button" class="btn btn--quiet" data-add-subject>${icon('plus')} إضافة مادة أخرى لهذا الفصل</button>
+            </div>
             <form id="edit-sec-form">
               <div class="field-row">
                 <label class="field">
@@ -303,6 +307,7 @@ export default {
           `,
           onMount: (root, done) => {
             root.querySelector('[data-add-subject]').addEventListener('click', () => done({ addSubject: true }));
+            root.querySelector('[data-change-subject]').addEventListener('click', () => done({ changeSubject: true }));
             const form = root.querySelector('#edit-sec-form');
             const preview = root.querySelector('#sec-color-preview');
             const toggleBtn = root.querySelector('#btn-toggle-color-picker');
@@ -348,6 +353,10 @@ export default {
       });
       if (!data) return;
       if (data.addSubject) { await addSubjectToClass(sec.id); return; }
+      if (data.changeSubject) {
+        await openTeachingSubjectChangePreview(tch.id, { onAdd: (sectionId) => addSubjectToClass(sectionId) });
+        return;
+      }
       try {
         await store.editSection(sec.id, data);
         toast('تم تعديل بيانات الفصل بنجاح');

@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v87';
+const VERSION = 'rakeezx-v88';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -189,6 +189,8 @@ const SHELL = [
   './src/lib/calendar-presets.js',
   './src/lib/calendar-runtime.js',
   './src/lib/subject-catalog.js',
+  './src/lib/stage-subject-options.js',
+  './src/lib/official-v6-subject-data.js',
   './src/lib/effects.js',
   './src/lib/sound.js',
 

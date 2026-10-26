@@ -18,31 +18,43 @@ import {
   normalizeSubjectName, validateCustomSubjectName,
 } from '../lib/subject-catalog.js';
 import { classSubjectDefault } from '../lib/class-subject-default.js';
+import {
+  stageSubjectOptions, v6ProgramsForGrade, v6TracksForGrade, V6_SOURCE_URL
+} from '../lib/stage-subject-options.js';
 import { repaint } from '../repaint.js';
 import { teachingRouteId } from '../router.js';
 
-function subjectMenu(options, query = '') {
+function subjectMenu(options, query = '', scope = {}) {
+  const view = stageSubjectOptions({ ...scope, options });
   const normalized = normalizeSubjectName(query);
-  const matches = options.filter((option) => !normalized || option.searchText.includes(normalized));
-  const used = matches.filter((option) => option.used);
-  const rest = matches.filter((option) => !option.used);
+  const matches = group => group.filter(option => !normalized || option.searchText.includes(normalized));
+  const guide = matches(view.guide);
+  const otherUsed = matches(view.other).filter(option => option.used);
+  const other = matches(view.other).filter(option => !option.used);
   const rows = (items) => items.map((option) => html`
     <button type="button" class="subject-picker__option" role="option"
-            data-subject-token="${option.token}" data-subject-name="${option.name}">
+            data-subject-token="${option.token}" data-subject-name="${option.name}"
+            data-subject-guide-custom="${option.customName ?? ''}">
       <span>${option.name}</span>
-      ${option.builtin ? '' : html`<span class="badge">مخصصة</span>`}
+      ${option.officialGuide ? html`<span class="badge">من الدليل</span>` :
+        option.builtin ? '' : html`<span class="badge">مخصصة</span>`}
     </button>
   `);
   return html`
-    ${used.length ? html`
-      <div class="subject-picker__group-label">موادك</div>
-      <div class="subject-picker__group">${rows(used)}</div>
+    ${guide.length ? html`
+      <div class="subject-picker__group-label">مواد هذا الصف — الإصدار السادس</div>
+      <div class="subject-picker__group">${rows(guide)}</div>
     ` : ''}
-    ${rest.length ? html`
-      <div class="subject-picker__group-label">كل المواد</div>
-      <div class="subject-picker__group">${rows(rest)}</div>
+    ${otherUsed.length ? html`
+      <div class="subject-picker__group-label">موادك الأخرى</div>
+      <div class="subject-picker__group">${rows(otherUsed)}</div>
     ` : ''}
-    ${!matches.length ? html`<div class="subject-picker__empty">لا توجد مادة مطابقة</div>` : ''}
+    ${other.length ? html`
+      <div class="subject-picker__group-label">بقية المواد والمواد المخصصة</div>
+      <div class="subject-picker__group">${rows(other)}</div>
+    ` : ''}
+    ${!guide.length && !otherUsed.length && !other.length ?
+      html`<div class="subject-picker__empty">لا توجد مادة مطابقة في القائمة الحالية.</div>` : ''}
     <button type="button" class="subject-picker__custom-action" data-subject-custom>
       ${icon('plus')} مادة مخصصة
     </button>
@@ -75,7 +87,7 @@ function sheet(existing = null, selectedSectionId = '') {
   const secs = store.sections();
   const options = store.subjectOptions();
   const autoColor = autoAssignSectionColor(secs);
-  const selectedOption = classSubjectDefault(options, store.state.teachings.filter(teaching => !store.isTeachingArchived(teaching)), store.teachings(), existing);
+  const historicalOption = classSubjectDefault(options, store.state.teachings.filter(teaching => !store.isTeachingArchived(teaching)), store.teachings(), existing);
   const selectedSection = store.getSection(selectedSectionId || existing?.sectionId);
   const c = selectedSection
     ? {
@@ -84,6 +96,11 @@ function sheet(existing = null, selectedSectionId = '') {
         color: selectedSection.color,
       }
     : { grade: 4, label: '1', color: autoColor };
+  const initialGuide = stageSubjectOptions({ grade: c.grade, program: 'general', options });
+  const matchingSuggestion = initialGuide.guide.find(option => option.token === historicalOption?.token);
+  // A reused suggestion must belong to this grade; never default to an unrelated subject.
+  const selectedOption = existing ? historicalOption :
+    matchingSuggestion ? { ...historicalOption, name: matchingSuggestion.name } : null;
 
   return openSheet({
     title: selectedSectionId ? 'إضافة مادة للفصل' : existing ? 'تعديل الفصل' : 'فصل جديد',
@@ -106,6 +123,24 @@ function sheet(existing = null, selectedSectionId = '') {
           </label>
         </div>
 
+        <div class="field-row" data-v6-scope>
+          <label class="field">
+            <span class="field__label">نوع التعليم — لتصفية المواد</span>
+            <select class="select" data-v6-program aria-label="نوع التعليم">
+              ${v6ProgramsForGrade(c.grade).map(p =>
+                html`<option value="${p.value}" ${p.value === 'general' ? 'selected' : ''}>${p.label}</option>`)}
+            </select>
+          </label>
+          <label class="field" data-v6-track-field hidden>
+            <span class="field__label">المسار الدراسي</span>
+            <select class="select" data-v6-track aria-label="المسار الدراسي"></select>
+          </label>
+        </div>
+        <div class="field__hint" data-v6-scope-hint>
+          فهرس المواد من دليل الخطط الدراسية، الإصدار السادس. يعتمد الاختيار على السياق،
+          لكن سنة النفاذ العامة لم تُحسم، ونوع التعليم/المسار لا يُحفظان ضمن بيانات الفصل الحالية.
+        </div>
+
         <div class="field subject-picker" data-subject-picker>
           <span class="field__label">المادة</span>
           <input type="hidden" name="subjectToken" value="${selectedOption?.token ?? ''}">
@@ -120,7 +155,7 @@ function sheet(existing = null, selectedSectionId = '') {
                    role="combobox" aria-expanded="true" aria-controls="subject-picker-options"
                    autocomplete="off">
             <div id="subject-picker-options" class="subject-picker__options" role="listbox" data-subject-options>
-              ${subjectMenu(options)}
+              ${subjectMenu(options, '', { grade: c.grade, program: 'general' })}
             </div>
           </div>
           <div class="subject-picker__custom" data-subject-custom-fields hidden>
@@ -128,7 +163,10 @@ function sheet(existing = null, selectedSectionId = '') {
                    placeholder="اسم المادة بالعربية أو الإنجليزية" aria-label="اسم المادة المخصصة">
             <button type="button" class="btn btn--quiet btn--sm" data-subject-custom-back>العودة إلى المواد</button>
           </div>
-          <span class="field__hint">يمكنك البحث في المواد أو إضافة مادة مخصصة.</span>
+          <span class="field__hint">
+            يمكنك البحث في المواد أو إضافة مادة مخصصة.
+            <a href="${V6_SOURCE_URL}" target="_blank" rel="noopener noreferrer">مصدر أسماء المواد: دليل الخطط — الإصدار السادس</a>
+          </span>
         </div>
 
         ${existing
@@ -164,6 +202,48 @@ function sheet(existing = null, selectedSectionId = '') {
       const tokenInput = picker.querySelector('[name="subjectToken"]');
       const customFields = picker.querySelector('[data-subject-custom-fields]');
       const customInput = picker.querySelector('[name="customSubjectName"]');
+      const gradeInput = root.querySelector('[name="grade"]');
+      const programInput = root.querySelector('[data-v6-program]');
+      const trackInput = root.querySelector('[data-v6-track]');
+      const trackField = root.querySelector('[data-v6-track-field]');
+      const guideHint = root.querySelector('[data-v6-scope-hint]');
+      const appendOption = (target, value, label) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        target.append(option);
+      };
+      const currentScope = () => ({
+        grade: selectedSectionId ? selectedSection.grade : Number(gradeInput.value),
+        program: programInput.value,
+        track: trackInput.value,
+      });
+      const dropSelection = () => {
+        tokenInput.value = '';
+        selected.textContent = 'اختر المادة';
+        customInput.value = '';
+        customFields.hidden = true;
+      };
+      const refreshTracks = () => {
+        const {grade,program} = currentScope();
+        const tracks = v6TracksForGrade(grade,program);
+        trackInput.replaceChildren();
+        if (tracks.length > 1) appendOption(trackInput, '', 'اختر المسار أولًا');
+        for (const t of tracks) appendOption(trackInput,t.value,t.label);
+        trackField.hidden = tracks.length < 2;
+        trackInput.disabled = tracks.length < 2;
+        if (tracks.length === 1) trackInput.value = tracks[0].value;
+      };
+      const refreshPrograms = () => {
+        const grade = selectedSectionId ? selectedSection.grade : Number(gradeInput.value);
+        const previous = programInput.value;
+        const programs = v6ProgramsForGrade(grade);
+        programInput.replaceChildren();
+        for (const p of programs) appendOption(programInput,p.value,p.label);
+        if (programs.some(p=>p.value === previous)) programInput.value = previous;
+        else if (programs.some(p=>p.value === 'general')) programInput.value = 'general';
+        refreshTracks();
+      };
 
       const closeMenu = () => {
         menu.hidden = true;
@@ -175,7 +255,26 @@ function sheet(existing = null, selectedSectionId = '') {
         trigger.setAttribute('aria-expanded', 'true');
         search.focus();
       };
-      const renderOptions = () => { optionList.innerHTML = subjectMenu(options, search.value).value; };
+      const renderOptions = () => {
+        const view = stageSubjectOptions({ ...currentScope(), options });
+        optionList.innerHTML = subjectMenu(options, search.value, currentScope()).value;
+        guideHint.textContent = view.scopeStatus === 'choose_track'
+          ? 'اختر المسار الدراسي ليظهر محتوى المواد الخاص به. يمكنك أيضًا اختيار مادة من قائمتك أو إضافتها يدويًا.'
+          : view.supplementaryOnly
+            ? 'هذا البرنامج يعرض مقررات إضافية أو مواد الهوية الوطنية فقط؛ لا يمثل قائمة المدرسة كاملة. نوع التعليم والمسار لا يُحفظان بعد ضمن بيانات الفصل.'
+            : 'اقتراحات من دليل الخطط الدراسية، الإصدار السادس؛ سنة النفاذ العامة لم تثبت لكل سياق. نوع التعليم والمسار يُستخدمان لتصفية القائمة فقط ولا يُحفظان في بيانات الفصل الحالية.';
+      };
+      gradeInput.addEventListener('change', () => {
+        dropSelection(); refreshPrograms(); renderOptions();
+      });
+      programInput.addEventListener('change', () => {
+        dropSelection(); refreshTracks(); renderOptions();
+      });
+      trackInput.addEventListener('change', () => {
+        dropSelection(); renderOptions();
+      });
+      refreshPrograms();
+      renderOptions();
 
       trigger.addEventListener('click', () => menu.hidden ? openMenu() : closeMenu());
       search.addEventListener('input', renderOptions);
@@ -191,7 +290,9 @@ function sheet(existing = null, selectedSectionId = '') {
         if (option) {
           tokenInput.value = option.dataset.subjectToken;
           selected.textContent = option.dataset.subjectName;
-          customInput.value = '';
+          // New reference-only guide entries reuse the existing guarded custom
+          // material creation path. No database schema or owner guards change.
+          customInput.value = option.dataset.subjectGuideCustom || '';
           closeMenu();
           trigger.focus();
           return;

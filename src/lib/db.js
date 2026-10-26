@@ -6,7 +6,8 @@
  */
 
 export const DB_NAME = 'rakeezx';
-export const DB_VERSION = 8;
+// Additive V2 sidecars; legacy stores and keys remain unchanged.
+export const DB_VERSION = 9;
 
 let activeDatabaseName = DB_NAME;
 
@@ -21,6 +22,8 @@ export const STORES = [
   'subjects',      // المواد
   'sections',      // الشعب (٤/أ) — تعيش السنة كاملة
   'teachings',     // الإسناد التدريسي: شعبة × مادة × فصل دراسي
+  'sectionCurriculumScopes', // V2 curriculum context (additive, no cloud activation)
+  'teachingCourseBindings', // V2 source-course binding (additive, no cloud activation)
   'students',      // هوية الطالب — بلا انتماء دائم
   'enrollments',   // انتساب الطالب لشعبة خلال مدة
   'items',         // بنود التقييم

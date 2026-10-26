@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 async function openNewClass(page) {
-  await page.getByRole('button', { name: /فصل جديد|إضافة فصل/, exact: true }).first().click();
+  await page.getByRole('button', { name: /فصل جديد|إضافة فصل|إنشاء أول فصل/, exact: true }).first().click();
   return page.getByRole('dialog');
 }
 
@@ -22,8 +22,8 @@ test('new class uses a searchable built-in/custom subject picker and stable subj
   const search = dialog.getByRole('combobox', { name: 'ابحث عن مادة' });
   await search.fill('لغتي');
   await expect(dialog.locator('[data-subject-token]')).toHaveCount(1);
-  await dialog.getByRole('option', { name: 'العربية' }).click();
-  await expect(dialog.locator('[data-subject-selected]')).toHaveText('العربية');
+  await dialog.getByRole('option', { name: 'اللغة العربية' }).click();
+  await expect(dialog.locator('[data-subject-selected]')).toHaveText('اللغة العربية');
   await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(page.locator('.class-card__sub').first()).toHaveText('العربية');
@@ -39,8 +39,8 @@ test('new class uses a searchable built-in/custom subject picker and stable subj
   dialog = await openNewClass(page);
   await dialog.locator('[name="label"]').fill('2');
   await dialog.locator('[data-subject-trigger]').click();
-  await expect(dialog.getByText('موادك', { exact: true })).toBeVisible();
-  await expect(dialog.getByRole('option', { name: 'العربية' }).first()).toBeVisible();
+  await expect(dialog.getByText('موادك الأخرى', { exact: true })).toBeVisible();
+  await expect(dialog.getByRole('option', { name: 'اللغة العربية' }).first()).toBeVisible();
   await dialog.locator('[data-subject-custom]').click();
   await dialog.getByRole('textbox', { name: 'اسم المادة المخصصة' }).fill('  علم   الأرض  ');
   await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
@@ -85,9 +85,9 @@ test('subject picker remains usable on desktop and dark theme without exposing a
   await expect(menu).toBeHidden();
   await dialog.locator('[data-subject-trigger]').click();
   await expect(menu).toBeVisible();
-  await expect(dialog.locator('[data-subject-options] [role="option"]')).toHaveCount(12);
+  expect(await dialog.locator('[data-subject-options] [role="option"]').count()).toBeGreaterThan(12);
   await dialog.getByRole('combobox', { name: 'ابحث عن مادة' }).fill('physical education');
-  await expect(dialog.getByRole('option', { name: 'البدنية' })).toBeVisible();
+  await expect(dialog.getByRole('option', { name: 'التربية البدنية والدفاع عن النفس' })).toBeVisible();
   const tapHeight = await dialog.locator('[data-subject-token]').first().evaluate((node) => node.getBoundingClientRect().height);
   expect(tapHeight).toBeGreaterThanOrEqual(44);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);

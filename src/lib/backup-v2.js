@@ -5,6 +5,7 @@ import * as cloud from './cloud.js';
 import * as sync from './sync.js';
 import * as store from '../store.js';
 import { validateBackupIntegrity } from './export.js';
+import { assertCurriculumV2CloudPayloadSupported, assertCurriculumV2CloudRestoreSupported } from './curriculum-v2-cloud-restore-gate.js';
 import { assertScoreSnapshotInvariant } from './initial-restore.js';
 import { deletionScope, visibleClosedTermReport, restoreSuppressionReason } from './restore-deletion-scope.js';
 import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
@@ -162,6 +163,7 @@ export function canonicalRestoreManifest(serverData, { version = 4, protocol = U
 
 /** Pure, deterministic three-way planner. It never reads or writes storage. */
 export function planCloudRestore(payload, serverData, { ownerId = null, ownerHistoryRevision = null } = {}) {
+  assertCurriculumV2CloudPayloadSupported(payload);
   const cloudStores = restoreStores(payload.version);
   if (cloudStores.some((name) => !Array.isArray(serverData?.[name]) ||
       new Set(serverData[name].map((row) => row.id)).size !== serverData[name].length)) {
@@ -295,6 +297,7 @@ export async function previewCloudRestore(payload, {
 } = {}) {
   const validation = await validateBackupIntegrity(payload);
   if (!validation.ok) return { validation, plan: null };
+  await assertCurriculumV2CloudRestoreSupported(payload, db);
   if (!cloud.user || !cloud.session) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
   return coordinator.runCloudRestoreExclusive(async () => {
     const expectedOwnerId = await ownerVerifier();
@@ -323,6 +326,7 @@ async function assertRestoreOwner(expectedOwnerId = cloud.user?.id) {
 
 export async function reconcileCanonicalRestore(payload, canonicalRows, { restoreId = null,
   expectedOwnerId = cloud.user?.id, verifyOwner = assertRestoreOwner, protocol = UNIFIED_RESTORE_PROTOCOL } = {}) {
+  await assertCurriculumV2CloudRestoreSupported(payload, db);
   const cloudStores = restoreStores(payload.version, protocol);
   if (!canonicalRows || typeof canonicalRows !== 'object' || cloudStores.some((storeName) =>
     !Array.isArray(canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]))) {
@@ -499,6 +503,7 @@ export async function resumeCloudRestore({
   ownerVerifier = assertRestoreOwner,
 } = {}) {
   let checkpoint = await resumeCheckpoint();
+  await assertCurriculumV2CloudRestoreSupported(null, db);
   if (!checkpoint) throw Object.assign(new Error('No cloud restore is waiting to resume'), { code: 'NO_RESTORE_TO_RESUME' });
   if (checkpoint.ownerId && checkpoint.ownerId !== cloud.user?.id) {
     throw Object.assign(new Error('Stored restore belongs to another account'), { code: 'RESTORE_OWNER_MISMATCH' });
@@ -549,6 +554,7 @@ export async function restoreBackupToCloud(payload, {
 } = {}) {
   const validation = await validateBackupIntegrity(payload);
   if (!validation.ok) throw Object.assign(new Error(validation.errors.join('\n')), { code: validation.code ?? 'INVALID_BACKUP' });
+  await assertCurriculumV2CloudRestoreSupported(payload, db);
   if (await resumeCheckpoint()) {
     throw Object.assign(new Error('A prior cloud restore must be resumed before starting another'), {
       code: 'CLOUD_RESTORE_RESUME_REQUIRED',
