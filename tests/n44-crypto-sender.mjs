@@ -2,7 +2,8 @@
 import assert from 'node:assert/strict';
 import { Socket } from 'node:net';
 import { randomBytes, createHash } from 'node:crypto';
-import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
+import { assertNoPrivatePushImports } from './n44-crypto-sender-import-guard.mjs';
 import { execFileSync } from 'node:child_process';
 import { createSubscriptionProtector } from '../drafts/n44-push/subscription-protector.mjs';
 import { createAuditedSender } from '../drafts/n44-push/audited-sender.mjs';
@@ -38,6 +39,22 @@ test('actual protection -> authenticated registration -> committed reservation -
     assert.equal(f.networkCalls,1);assert.equal(f.dnsCalls,1);assert.equal(f.transportChecks,1);
     assert.equal(f.transportFailure,undefined);
     assert.ok(f.requests.every(r=>r.destroyed));assert.ok(f.responses.every(r=>r.destroyed));
+  }
+});
+test('Mozilla and Apple Web Push use the same audited encrypted VAPID transport without egress', async () => {
+  for (const [origin, path] of [
+    ['https://updates.push.services.mozilla.com', '/wpush/v2/SYNTHETIC-DO-NOT-SEND'],
+    ['https://web.push.apple.com', '/Q_SYNTHETIC-DO-NOT-SEND'],
+  ]) {
+    const f=fmake({origin,endpoint:origin+path,assertCommitted:true});
+    assert.equal((await f.register()).status,'registered');
+    assert.equal((await f.deliver()).status,'sent');
+    assert.deepEqual(f.received,f.event);
+    assert.equal(f.networkCalls,1);
+    assert.equal(f.dnsCalls,1);
+    assert.equal(f.transportChecks,1);
+    assert.equal(f.transportFailure,undefined);
+    assert.ok(f.requests.every(r=>r.destroyed));
   }
 });
 test('versioned authenticated envelope, independent HMAC domains and strict tamper denial',()=>{
@@ -262,20 +279,10 @@ test('actual import/construction has no side effects and app/service executable 
   const out=execFileSync(process.execPath,['--input-type=module','-e',construction],
     {cwd:new URL('..',import.meta.url),env:{SystemRoot:process.env.SystemRoot},stdio:['ignore','pipe','pipe']});
   assert.equal(out.length,0);
-  let scanned=0;
-  async function scan(dir){
-    for(const entry of await readdir(dir,{withFileTypes:true})){
-      if(entry.isDirectory()){if(!['node_modules','.git'].includes(entry.name))await scan(new URL(entry.name+'/',dir));continue;}
-      if(!/\.(?:[cm]?js|tsx?|jsx|html)$/.test(entry.name))continue;
-      const source=await readFile(new URL(entry.name,dir),'utf8');scanned++;
-      // Match executable import forms, not source paths stored as JSON/evidence.
-      const imported=/(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*|\bsrc\s*=\s*)['"][^'"\n]*drafts\/n44-push\//.test(source);
-      assert.equal(imported,false);
-    }
-  }
-  for(const dir of ['src/','supabase/','scripts/'])await scan(new URL('../'+dir,import.meta.url));
-  const sw=await readFile(new URL('../sw.js',import.meta.url),'utf8');assert.equal(sw.includes('drafts/n44-push'),false);
-  assert.ok(scanned>100);
+  // Current production intentionally imports private modules through its exact
+  // reviewed Edge entry; the shared guard still rejects public-app leakage.
+  const inspection=assertNoPrivatePushImports();
+  assert.ok(inspection.scanned>100);
 });
 
 const originalConnect=Socket.prototype.connect;

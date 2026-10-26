@@ -1,18 +1,39 @@
-/** Scoped successor to the legacy raw-path grep. No Product imports or writes. */
+/** Guard private N44 modules from accidental public/runtime imports.
+ * The real N44 Edge entry and its reviewed staging bundler are intentional. */
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
+import { relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// Check literal module/script imports, not a source path held in JSON/evidence.
-// This retains the existing focused suite's executable-import interpretation.
 export function importsPrivatePush(source) {
   return /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*|\bsrc\s*=\s*)['"][^'"\r\n]*n44-push[\\/]/.test(source);
 }
 
+const allowedImports = new Set([
+  'supabase/functions/n44-notifications/index.ts',
+  'scripts/n44-activation-custody.mjs',
+]);
+const edgeImports = [
+  'node-globals.mjs', 'existing-host.mjs', 'web-protocol.mjs',
+  'readiness-entry.mjs', 'edge-request.mjs', 'runtime-failure.mjs',
+].sort();
+
 export function assertNoPrivatePushImports(root = new URL('../', import.meta.url)) {
   let scanned = 0;
+  const origin = fileURLToPath(root);
   function inspect(file) {
-    assert.equal(importsPrivatePush(readFileSync(file, 'utf8')), false,
-      'Private Push module imported by an application/service/script entry');
+    const source = readFileSync(file, 'utf8');
+    const name = relative(origin, fileURLToPath(file)).replaceAll('\\', '/');
+    if (importsPrivatePush(source)) {
+      assert.ok(allowedImports.has(name), 'Unexpected private Push import in ' + name);
+      if (name === 'supabase/functions/n44-notifications/index.ts') {
+        const imports = [...source.matchAll(/['"]\.\.\/\.\.\/\.\.\/drafts\/n44-push\/([^'"]+)['"]/g)]
+          .map(match => match[1]).sort();
+        assert.deepEqual(imports, edgeImports, 'Only the reviewed N44 Edge entry graph is permitted');
+      } else {
+        assert.match(source, /await import\('\.\.\/drafts\/n44-push\/web-protocol\.mjs'\)/);
+      }
+    }
     scanned++;
   }
   function scan(directory) {
@@ -26,7 +47,7 @@ export function assertNoPrivatePushImports(root = new URL('../', import.meta.url
   for (const directory of ['src/', 'supabase/', 'scripts/']) scan(new URL(directory, root));
   for (const entry of ['sw.js', 'index.html']) inspect(new URL(entry, root));
   assert.ok(scanned > 100, 'Application/service/script scan unexpectedly empty');
-  return Object.freeze({ scanned });
+  return Object.freeze({ scanned, approvedEntrypoints: allowedImports.size });
 }
 
 export function qualifyImportGuard() {

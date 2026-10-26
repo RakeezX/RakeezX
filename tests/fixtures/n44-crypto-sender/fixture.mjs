@@ -33,14 +33,15 @@ export function cryptoConfig() {
 export function makeFixture(options={}) {
   const f=priorFixture(), receiver=keys(), signing=keys();
   f.cryptoConfig=cryptoConfig();
-  f.subscription={endpoint:ORIGIN+'/wp/SYNTHETIC-DO-NOT-SEND',
+  if (options.origin) f.cryptoConfig.providerOrigins=[options.origin];
+  f.subscription={endpoint:options.endpoint ?? ORIGIN+'/wp/SYNTHETIC-DO-NOT-SEND',
     keys:{p256dh:receiver.publicKey,auth:randomBytes(16).toString('base64url')}};
   f.vapid={subject:'mailto:synthetic@example.invalid',publicKey:signing.publicKey,privateKey:signing.privateKey};
   f.vapidKeys=new Map([['vapid-1',f.vapid]]);
   f.protector=createSubscriptionProtector(f.cryptoConfig);
   f.networkCalls=0; f.dnsCalls=0; f.transportChecks=0; f.requests=[]; f.responses=[]; f.receiver=receiver;
   f.resolve=async(host,dnsOptions)=>{
-    f.dnsCalls++; assert.equal(host,'fcm.googleapis.com'); assert.deepEqual(dnsOptions,{all:true,verbatim:true});
+    f.dnsCalls++; assert.equal(host,new URL(f.subscription.endpoint).hostname); assert.deepEqual(dnsOptions,{all:true,verbatim:true});
     if(f.resolveHook)return f.resolveHook();
     return [{...PUBLIC}];
   };
@@ -49,7 +50,7 @@ export function makeFixture(options={}) {
     // Any fixture assertion propagates to the test (sender normally hides errors).
     const check=fn=>{try{fn();}catch(e){f.transportFailure=e;throw e;}};
     check(()=>{
-      assert.equal(o.hostname,'fcm.googleapis.com');assert.equal(o.servername,o.hostname);
+      assert.equal(o.hostname,new URL(f.subscription.endpoint).hostname);assert.equal(o.servername,o.hostname);
       assert.equal(o.port,443);assert.equal(o.protocol,'https:');assert.equal(o.method,'POST');
       assert.equal(o.path,new URL(f.subscription.endpoint).pathname);
       assert.equal(o.rejectUnauthorized,true);assert.equal(o.checkServerIdentity,checkServerIdentity);
@@ -85,7 +86,7 @@ export function makeFixture(options={}) {
         assert.equal(auth[2],expectedVapid.publicKey);
         const [header,claims,signature]=auth[1].split('.');
         assert.equal(JSON.parse(Buffer.from(header,'base64url')).alg,'ES256');
-        const jwt=JSON.parse(Buffer.from(claims,'base64url'));assert.equal(jwt.aud,ORIGIN);assert.equal(jwt.sub,expectedVapid.subject);
+        const jwt=JSON.parse(Buffer.from(claims,'base64url'));assert.equal(jwt.aud,new URL(f.subscription.endpoint).origin);assert.equal(jwt.sub,expectedVapid.subject);
         assert.ok(jwt.exp>Date.now()/1000 && jwt.exp<=Date.now()/1000+86400);
         const point=Buffer.from(expectedVapid.publicKey,'base64url');
         const publicKey=createPublicKey({format:'jwk',key:{kty:'EC',crv:'P-256',
@@ -109,12 +110,12 @@ export function makeFixture(options={}) {
     };
     f.requests.push(req);return req;
   };
-  f.senderOptions={enabled:true,providerOrigins:[ORIGIN],protector:f.protector,vapidKeys:f.vapidKeys,
+  f.senderOptions={enabled:true,providerOrigins:f.cryptoConfig.providerOrigins,protector:f.protector,vapidKeys:f.vapidKeys,
     clock:()=>f.now,resolve:(...args)=>f.resolve(...args),httpsRequest:(...args)=>f.httpsRequest(...args)};
   f.sender=createAuditedSender(f.senderOptions);
   f.event=payload();
   f.boundary=createRegistrationBoundary({repository:f.repository,verifySession:f.verifySession,
-    protect:(...args)=>f.protector.protect(...args),clock:()=>f.now,approvedOrigins:[ORIGIN]});
+    protect:(...args)=>f.protector.protect(...args),clock:()=>f.now,approvedOrigins:f.cryptoConfig.providerOrigins});
   f.registration=f.boundary;
   const originalBody=f.body;f.body=()=>({...originalBody(),subscription:structuredClone(f.subscription)});
   f.delivery=createDeliveryBoundary({repository:f.repository,clock:()=>f.now,recompute:()=>f.event,

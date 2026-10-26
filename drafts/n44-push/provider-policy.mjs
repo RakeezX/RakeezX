@@ -4,12 +4,16 @@ import { isIP } from 'node:net';
 import ipaddr from 'ipaddr.js';
 import { validateSubscription } from './registration.mjs';
 
-// Chromium's current Web Push endpoint and its documented previous path.
-// https://chromium.googlesource.com/chromium/src/+/40644b8cf2b03be542976e7d1192c653e389c14e%5E%21/
-// https://web.dev/articles/codelab-notifications-push-server
-// Deliberately no generic HTTPS/wildcard/provider inferred from a subscription.
+// Reviewed standard Web Push services, not generic user-controlled endpoints.
+// Config must explicitly opt in to each origin, in addition to this fixed policy.
+// FCM (Chromium), Mozilla Autopush (Firefox), Apple web.push (Safari/iOS PWA).
+// https://mozilla-services.github.io/autopush-rs/
+// https://developer.apple.com/documentation/usernotifications/sending-web-push-notifications-in-web-apps-and-browsers
+// Keep HTTPS, path and DNS/TLS pinning guards; never accept arbitrary origins.
 const policies = new Map([
   ['https://fcm.googleapis.com', /^\/(?:wp|fcm\/send)\/[A-Za-z0-9_:-]{1,1900}$/],
+  ['https://updates.push.services.mozilla.com', /^\/wpush\/v[12]\/[A-Za-z0-9_-]{1,1900}$/],
+  ['https://web.push.apple.com', /^\/[A-Za-z0-9_-]{1,1900}$/],
 ]);
 const fail = () => { throw Error('n44_crypto_unavailable'); };
 export function approvedProviderOrigins(origins = []) {
