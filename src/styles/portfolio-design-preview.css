@@ -652,3 +652,52 @@
   .folio-sheet.folio-export-witness {padding-bottom:115px !important;}
   .folio-export-witness .folio-evidence__image-tools {display:none !important;}
 }
+
+/* F09: editing and check-mark visibility controls belong to each criterion row. */
+.folio-criteria__legend {
+  grid-column:1 / -1; margin:0 0 4px; padding:9px 10px;
+  font-size:11px; line-height:1.75; color:var(--text-2);
+  background:var(--bg-sunk); border-radius:8px;
+}
+.folio-criteria__row {
+  display:flex; flex-wrap:wrap; align-items:center; gap:4px;
+  padding:2px; border-radius:9px; min-width:0;
+}
+.folio-criteria__row:focus-within {outline:1px solid var(--border);}
+.folio-criteria__row .folio-criteria__item {min-height:35px; flex:1 1 0; min-width:0;}
+.folio-criteria__row-tools {display:flex; gap:4px; flex:none; align-items:center;}
+.folio-criteria__row-tools .folio-criteria__edit-trigger {
+  display:inline-flex; align-items:center; justify-content:center; gap:3px;
+  width:auto; height:31px; min-width:48px; padding:4px 6px;
+  border:1px solid var(--border); background:var(--bg-elev);
+  font-size:10px; font-weight:800; color:var(--text-2); border-radius:7px;
+  white-space:nowrap;
+}
+.folio-criteria__edit-trigger span {font-size:13px;}
+.folio-criteria__inclusion {
+  display:flex; align-items:center; justify-content:center; flex:none;
+  width:29px; height:31px; border:1px solid var(--border);
+  border-radius:7px; background:var(--bg-elev); cursor:pointer;
+}
+.folio-criteria__inclusion:hover {border-color:var(--brand); background:var(--brand-soft);}
+.folio-criteria__inclusion:focus-within {outline:3px solid var(--brand); outline-offset:2px;}
+.folio-criteria__inclusion input {
+  appearance:auto; width:18px; height:18px; flex:none; margin:0;
+  accent-color:#168268; cursor:pointer;
+}
+.folio-criteria__inline-editor {
+  flex:1 0 100%; min-width:0; display:grid; gap:8px;
+  padding:12px; border:1px solid var(--border); border-radius:9px;
+  background:var(--bg-sunk);
+}
+.folio-criteria__edit-label {display:grid; gap:6px; font-size:12px; font-weight:800; color:var(--text-1);}
+.folio-criteria__edit-label .input {width:100%; min-width:0; font-size:13px; text-align:right;}
+.folio-criteria__inline-editor p {margin:0; font-size:11px; color:var(--text-3); line-height:1.7;}
+.folio-criteria__edit-actions {display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+.folio-criteria__edit-actions .btn {min-height:32px; padding:5px 10px; font-size:11px;}
+.folio-criteria__edit-actions .folio-criteria__delete-custom {color:#a85246;}
+@media (max-width:540px) {
+  .folio-criteria__list.is-expanded {grid-template-columns:minmax(0,1fr);}
+  .folio-criteria__row-tools .folio-criteria__edit-trigger {min-width:57px; font-size:11px;}
+  .folio-criteria__legend {font-size:12px;}
+}

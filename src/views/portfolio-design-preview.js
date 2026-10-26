@@ -427,6 +427,7 @@ function criteriaNavigator(ctx) {
       </button>
     </div>
     <div id="folio-criteria-list" class="folio-criteria__list ${navigatorOpen?'is-expanded':''}">
+      <p class="folio-criteria__legend">✓ علامة الصح تعني أن المعيار ضمن الملف، وإزالتها تخفيه.</p>
       ${ctx.criteriaNav.map(c=>html`<div class="folio-criteria__row">
         <button type="button" class="folio-criteria__item
           ${c.number===editingCriterion&&!viewingFullPortfolio?'is-selected':''} ${c.excluded?'is-excluded':''}"
@@ -437,27 +438,33 @@ function criteriaNavigator(ctx) {
           <span class="folio-criteria__count" aria-label="${c.candidateCount} خيارات">${digits.format(c.candidateCount)}</span>
         </button>
         <div class="folio-criteria__row-tools">
-          <button type="button" data-act="edit-criterion-row" data-id="${c.number}"
-            title="تعديل اسم القسم" aria-label="تعديل اسم ${c.title}">✎</button>
-          <button type="button" data-act="toggle-criterion-row" data-id="${c.number}"
-            title="${c.excluded?'إظهار القسم في الملف':'إخفاء القسم من الملف'}"
-            aria-label="${c.excluded?'إظهار':'إخفاء'} ${c.title}">${c.excluded?'◌':'◉'}</button>
+          <button type="button" class="folio-criteria__edit-trigger"
+            data-act="edit-criterion-row" data-id="${c.number}"
+            aria-label="تعديل اسم ${c.title}" title="تعديل اسم المعيار في ملفك">
+            <span aria-hidden="true">✎</span> تعديل
+          </button>
+          <label class="folio-criteria__inclusion"
+            title="${c.excluded?'ضع علامة الصح لإظهار المعيار في الملف':'أزل علامة الصح لإخفاء المعيار من الملف'}">
+            <input type="checkbox" data-change="criterion-inclusion" data-id="${c.number}"
+              aria-label="إدراج ${c.title} في الملف" ${c.excluded?'':'checked'} />
+          </label>
         </div>
+        ${criterionEditorOpen&&c.number===editingCriterion?html`<div class="folio-criteria__inline-editor">
+          <label class="folio-criteria__edit-label">تعديل اسم المعيار في ملفي
+            <input class="input" data-change="criterion-name"
+              value="${c.title}" maxlength="70" aria-label="اسم القسم في ملفي" />
+          </label>
+          <p>يتغير الاسم في ملفك فقط، مع بقاء اسم المعيار الأصلي محفوظًا.</p>
+          <div class="folio-criteria__edit-actions">
+            <button class="btn btn--ghost" type="button" data-act="close-criterion-editor">تم</button>
+            ${!c.custom&&criterionNames.has(c.number)?html`<button class="btn btn--ghost" type="button"
+              data-act="reset-criterion-name">الاسم الأصلي</button>`:''}
+            ${c.custom?html`<button class="btn btn--ghost folio-criteria__delete-custom" type="button"
+              data-act="delete-custom-criterion">حذف القسم الخاص</button>`:''}
+          </div>
+        </div>`:''}
       </div>`)}
       <button type="button" class="folio-criteria__add" data-act="add-criterion">+ إضافة قسم خاص</button>
-    </div>
-    <div class="folio-criteria__settings">
-      ${criterionEditorOpen?html`<label class="field">
-        <span class="field__label">اسم القسم في ملفي</span>
-        <input class="input" data-change="criterion-name" value="${ctx.criterion.title}"
-          maxlength="70" aria-label="اسم القسم في ملفي" />
-      </label>
-      <button class="btn btn--ghost" type="button" data-act="close-criterion-editor">تم</button>
-      ${!ctx.criterion.custom && criterionNames.has(editingCriterion)?
-        html`<button class="btn btn--ghost" type="button" data-act="reset-criterion-name">الاسم الأصلي</button>`:''}
-      `:''}
-      ${ctx.criterion.custom?html`<button class="folio-criteria__edit is-danger" type="button"
-        data-act="delete-custom-criterion">حذف القسم الخاص</button>`:''}
     </div>
   </aside>`;
 }
@@ -646,9 +653,9 @@ export default {
       editingCriterion=el.dataset.id;selectedSuggestionId=selectedByCriterion.get(editingCriterion)||null;
       viewingFullPortfolio=false;criterionEditorOpen=true;repaint();
     },
-    'toggle-criterion-row'(el) {
+    'criterion-inclusion'(el) {
       const id=el.dataset.id;
-      if(hiddenCriteria.has(id))hiddenCriteria.delete(id);
+      if(el.checked)hiddenCriteria.delete(id);
       else hiddenCriteria.add(id);
       repaint();
     },
@@ -662,7 +669,7 @@ export default {
       const number=String(nextExtraCriterionNumber++);
       extraCriteria.push({number,title:'قسم إضافي',weight:0});
       editingCriterion=number; selectedSuggestionId=null;criterionEditorOpen=true;viewingFullPortfolio=false;
-      navigatorOpen=false; libraryQuery='';libraryFilter='all';repaint();
+      navigatorOpen=true; libraryQuery='';libraryFilter='all';repaint();
     },
     'edit-criterion'(){criterionEditorOpen=true;repaint();},
     'close-criterion-editor'(){criterionEditorOpen=false;repaint();},
