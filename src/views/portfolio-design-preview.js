@@ -1,4 +1,4 @@
-import { html, icon, fmtDate, toast } from '../lib/dom.js';
+import { html, raw, icon, fmtDate, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
 import { repaint } from '../repaint.js';
@@ -7,6 +7,7 @@ import { printReport } from '../lib/report-print.js';
 import { PORTFOLIO_CRITERIA, portfolioYearEvidence, portfolioDesignSummary } from '../lib/portfolio-design-preview.js';
 import { buildPortfolioEvidenceSuggestions, guideForCriterion } from '../lib/portfolio-smart-evidence.js';
 import { F09_EVIDENCE_TEMPLATES, templatesForCriterion } from '../lib/portfolio-evidence-templates.js';
+import { buildAnnualPortfolioPlan } from '../lib/portfolio-annual-plan.js';
 
 const styleUrl = new URL('../styles/portfolio-design-preview.css', import.meta.url).href;
 function loadStyle() {
@@ -22,6 +23,9 @@ const digits = new Intl.NumberFormat('ar-SA', { useGrouping: false });
 const date = value => value ? fmtDate(value, false) : '—';
 let editingCriterion = '09';
 let selectedSuggestionId = null;
+let viewingFullPortfolio = false;
+const includedWitnesses = new Set();
+const excludedWitnesses = new Set();
 let navigatorOpen = false;
 let criterionEditorOpen = false;
 let libraryFilter = 'all';
@@ -49,6 +53,7 @@ function forgetWitness(id){
   for(const photo of photosFor(id)) URL.revokeObjectURL(photo.url);
   photoGroups.delete(id);photoLayouts.delete(id);descriptions.delete(id);
   titles.delete(id);sectionPreferences.delete(id);hiddenWitnesses.delete(id);
+  includedWitnesses.delete(id);excludedWitnesses.delete(id);
 }
 // One-step, session-only undo. Delay revoking removed photo URLs until undo expires.
 let pendingUndo = null;
@@ -100,15 +105,14 @@ function context() {
   const photoKey=proposal?.id ?? 'manual:'+editingCriterion;
   const guide=guideForCriterion(editingCriterion);
   const summaryBase = portfolioDesignSummary(evidence);
-  const printCriteria = criteria.filter(c=>!hiddenCriteria.has(c.number));
-  const summary = {...summaryBase,criteriaCount:printCriteria.length,criteria:printCriteria.map(c=>({
-    ...c,page:c.number===editingCriterion && !hiddenCriteria.has(editingCriterion) &&
-      (proposal || photosFor(photoKey).length) ? '4':'—',
-  }))};
-  const canPrint=!hiddenCriteria.has(editingCriterion) && (
-    (!!proposal && proposal.sourceKind!=='custom') ||
-    photosFor(photoKey).length>0 || !!descriptions.get(photoKey)?.trim()
-  );
+  const annual=buildAnnualPortfolioPlan({
+    criteria,sources,templates:F09_EVIDENCE_TEMPLATES,custom:customWitnesses,
+    hiddenCriteria,hiddenWitnesses,included:includedWitnesses,excluded:excludedWitnesses,
+    titles,descriptions,photos:photoGroups,layouts:photoLayouts,
+    sections:sectionPreferences,yearId:year?.id,
+  });
+  const summary={...summaryBase,criteriaCount:annual.criteriaCount,criteria:annual.toc};
+  const canPrint=annual.witnessCount>0;
   const title=titles.get(photoKey)??proposal?.title??guide?.evidence??criterion.title;
   const visibleCandidates=available.filter(w=>{
     if(libraryFilter==='rakeez' && (w.sourceKind==='template'||w.sourceKind==='custom'))return false;
@@ -138,11 +142,12 @@ function context() {
     school: short(profile.schoolName, 'اسم المدرسة'),
     department: short(profile.educationDepartment, 'إدارة التعليم'),
   };
-  return {year,terms,evidence,summary,person,criterion,guide,proposal,candidates,sources,photoKey,
+  return {year,terms,evidence,summary,annual,person,criterion,guide,proposal,candidates,sources,photoKey,
     visibleCandidates,criteriaNav,libraryFilter,libraryQuery,hiddenCount:candidates.filter(w=>hiddenWitnesses.has(w.id)).length,
     criterionExcluded:hiddenCriteria.has(editingCriterion),criterionEditorOpen,
     includedSections,photos:photosFor(photoKey),photoLayout:layoutFor(photoKey),
-    description:descriptions.get(photoKey)??proposal?.description??'',title,canPrint};
+    description:descriptions.get(photoKey)??proposal?.description??'',title,canPrint,
+    viewingFullPortfolio,currentlyIncluded:annual.entries.some(x=>x.proposal.id===proposal?.id)};
 }
 
 const ministry = (className='')=>html`<img class="folio-ministry ${className}" data-report-ministry src="${MINISTRY_LOGO_URL}" width="866" height="659" alt="وزارة التعليم" loading="eager" decoding="async">`;
@@ -185,18 +190,18 @@ function cover(ctx) {
   </section>`;
 }
 
-function contents(ctx) {
+function contents(ctx,list=ctx.summary.criteria,page=2) {
   const {summary} = ctx;
-  return html`<section class="folio-sheet folio-interior folio-contents" data-portfolio-page="2" aria-label="فهرس ملف الإنجاز">
-    ${pageLabel('الفهرس', '02')}
+  return html`<section class="folio-sheet folio-interior folio-contents" data-portfolio-page="${page}" aria-label="فهرس ملف الإنجاز">
+    ${pageLabel('الفهرس', String(page).padStart(2,'0'))}
     <div class="folio-interior__headline">
       <span class="folio-interior__eyebrow">دليل التنقل</span>
       <h2>المحتويات</h2>
-      <p>المجالات المهنية الأحد عشر التي توثق خبرة المعلم وأعماله خلال العام الدراسي.</p>
+      <p>المعايير والأقسام المهنية التي يضمّها المعلم في ملفه السنوي.</p>
     </div>
     <div class="folio-contents__guide"><span>الباب</span><span>المعيار</span><span>الصفحة</span></div>
     <div class="folio-contents__rows">
-      ${summary.criteria.map(c=>html`<div class="folio-contents__row">
+      ${list.map(c=>html`<div class="folio-contents__row">
         <span class="folio-contents__number">${c.number}</span>
         <span class="folio-contents__title">${c.title}</span>
         <span class="folio-contents__page">${c.page === '—' ? '' : c.page}</span>
@@ -205,14 +210,14 @@ function contents(ctx) {
     <div class="folio-contents__note"><span class="folio-dot"></span>
       أعمال تعليمية ومهنية تجمع التخطيط والتدريس والتقويم والتواصل، في ملف واحد منظم.
     </div>
-    ${foot(2)}
+    ${foot(page)}
   </section>`;
 }
 
-function coverage(ctx) {
+function coverage(ctx,list=ctx.summary.criteria,page=3) {
   const {summary, evidence} = ctx;
-  return html`<section class="folio-sheet folio-interior folio-coverage" data-portfolio-page="3" aria-label="لوحة توثيق الشواهد">
-    ${pageLabel('موجز الإنجازات', '03')}
+  return html`<section class="folio-sheet folio-interior folio-coverage" data-portfolio-page="${page}" aria-label="لوحة توثيق الشواهد">
+    ${pageLabel('موجز الإنجازات', String(page).padStart(2,'0'))}
     <div class="folio-interior__headline">
       <span class="folio-interior__eyebrow">حصيلة عام دراسي</span>
       <h2>أعمال وإنجازات المعلم</h2>
@@ -228,14 +233,14 @@ function coverage(ctx) {
       <p>يجمع ركيز المجالات المهنية في مكان واحد، مع إمكانية إرفاق الشواهد الخاصة بكل مجال.</p>
     </div>
     <div class="folio-coverage__list">
-      ${summary.criteria.map(c=>html`<div class="folio-coverage__row">
+      ${list.map(c=>html`<div class="folio-coverage__row">
         <span class="folio-coverage__num">${c.number}</span>
         <span class="folio-coverage__title">${c.title}</span>
 
       </div>`)}
     </div>
 
-    ${foot(3)}
+    ${foot(page)}
   </section>`;
 }
 
@@ -277,7 +282,7 @@ function witnessImageTools(ctx) {
   </div>`;
 }
 
-function evidencePage(ctx) {
+function evidencePage(ctx,page=4,editor=true) {
   const {evidence,year,criterion,photos,photoLayout,proposal} = ctx;
   const isAttendance = proposal?.id === 'rakeez:attendance:'+year?.id;
   const rows = evidence.rows.slice(0,4);
@@ -295,16 +300,16 @@ function evidencePage(ctx) {
   }
   const chartRows = [...sectionCounts].sort((a,b)=>b[1]-a[1]).slice(0,6);
   const chartMax = Math.max(1,...chartRows.map(row=>row[1]));
-  return html`<section class="folio-sheet folio-interior folio-evidence" data-portfolio-page="4" aria-label="شاهد مهني مختار">
-    ${pageLabel('شاهد مهني', '04')}
+  return html`<section class="folio-sheet folio-interior ${editor?'folio-evidence':'folio-export-witness'}" ${raw(editor?'data-focus-page="4"':'data-portfolio-page="'+page+'"')} aria-label="شاهد مهني">
+    ${pageLabel('شاهد مهني', String(page).padStart(2,'0'))}
     <div class="folio-interior__headline folio-interior__headline--compact">
       <span class="folio-interior__eyebrow">${criterion.number} · ${criterion.title}</span>
-      <div class="folio-evidence__inline-edit noprint">
+      ${editor?html`<div class="folio-evidence__inline-edit noprint">
         <input class="folio-evidence__title-edit" data-change="suggestion-title" value="${ctx.title}"
           maxlength="100" aria-label="عنوان الشاهد" />
         <textarea class="folio-evidence__description-edit" data-change="suggestion-description"
           aria-label="وصف الشاهد" maxlength="450" rows="2" placeholder="اكتب وصفًا موجزًا للشاهد">${ctx.description}</textarea>
-      </div>
+      </div>`:''}
       <div class="folio-evidence__print-copy">
         <h2>${ctx.title}</h2>
         ${ctx.description?html`<p>${ctx.description}</p>`:''}
@@ -315,7 +320,7 @@ function evidencePage(ctx) {
       <div><small>المعيار المهني</small><strong>${criterion.title}</strong></div>
       <div><small>نطاق الإنجاز</small><strong>جميع الفصول والمواد</strong></div>
     </div>
-    ${witnessSectionsControls(ctx,hasData,chartRows)}
+
     ${hasData?html`
       ${ctx.includedSections.metrics?html`<div class="folio-evidence__metrics">
         <div><span>حصص جرى رصدها</span><strong>${digits.format(evidence.recordedSessions)}</strong></div>
@@ -356,23 +361,23 @@ function evidencePage(ctx) {
       </div>` : ''}
     <div class="folio-evidence__image-block ${firstPhotos.length && ctx.includedSections.photos ? '' : 'noprint'}">
       <div class="folio-evidence__image-caption"><h3>صور الشاهد</h3><span>${photos.length ? `${digits.format(photos.length)} صور` : ''}</span></div>
-      ${witnessImageTools(ctx)}
+
       ${ctx.includedSections.photos && firstPhotos.length ? html`<div class="folio-evidence__gallery folio-evidence__gallery--${photoLayout}" style="--folio-photo-height:${photoHeight}px">
         ${firstPhotos.map((photo, i)=>html`<figure class="folio-evidence__gallery-item">
           <img class="folio-evidence__photo" src="${photo.url}" alt="صورة داعمة رقم ${digits.format(i+1)}" loading="eager" decoding="async" />
-          <figcaption class="folio-evidence__image-tools noprint"><span>${photo.name}</span>
+          ${editor?html`<figcaption class="folio-evidence__image-tools noprint"><span>${photo.name}</span>
             <button type="button" data-act="move-photo" data-id="${photo.id}" data-dir="-1" aria-label="تقديم الصورة" ${i===0?'disabled':''}>↑</button>
             <button type="button" data-act="move-photo" data-id="${photo.id}" data-dir="1" aria-label="تأخير الصورة" ${i===photos.length-1?'disabled':''}>↓</button>
             <button type="button" data-act="remove-photo" data-id="${photo.id}" aria-label="حذف الصورة">×</button>
-          </figcaption>
+          </figcaption>`:''}
         </figure>`) }
       </div>` : ''}
     </div>
-    ${foot(4)}
+    ${foot(page)}
   </section>`;
 }
 
-function photoContinuation(ctx) {
+function photoContinuation(ctx,startPage=5,editor=true) {
   const {photos,photoLayout,criterion} = ctx;
   const chartOnFirstPage=ctx.proposal?.id==='rakeez:attendance:'+ctx.year?.id &&
     ctx.evidence.recordedSessions>0 && ctx.includedSections.chart;
@@ -383,9 +388,9 @@ function photoContinuation(ctx) {
   if(!ctx.includedSections.photos)return pages;
   for(let offset=first; offset<photos.length; offset+=capacity) {
     const batch=photos.slice(offset,offset+capacity);
-    const num=5+pages.length;
+    const num=startPage+pages.length;
     const imageHeight=Math.min(190,Math.max(110,Math.floor(610/Math.ceil(batch.length/cols))));
-    pages.push(html`<section class="folio-sheet folio-interior folio-evidence folio-evidence--continuation" data-portfolio-page="${num}" aria-label="صور مرفقة بالشاهد">
+    pages.push(html`<section class="folio-sheet folio-interior ${editor?'folio-evidence':'folio-export-witness'} folio-evidence--continuation" ${raw(editor?'data-focus-continuation="'+num+'"':'data-portfolio-page="'+num+'"')} aria-label="صور مرفقة بالشاهد">
       ${pageLabel('صور الشاهد', String(num).padStart(2,'0'))}
       <div class="folio-interior__headline folio-interior__headline--compact">
         <span class="folio-interior__eyebrow">${criterion.number} · ${criterion.title}</span>
@@ -396,11 +401,11 @@ function photoContinuation(ctx) {
         <div class="folio-evidence__gallery folio-evidence__gallery--${photoLayout}" style="--folio-photo-height:${imageHeight}px">
           ${batch.map((photo,i)=>html`<figure class="folio-evidence__gallery-item">
             <img class="folio-evidence__photo" src="${photo.url}" alt="صورة داعمة رقم ${digits.format(offset+i+1)}" loading="eager" decoding="async" />
-            <figcaption class="folio-evidence__image-tools noprint"><span>${photo.name}</span>
+            ${editor?html`<figcaption class="folio-evidence__image-tools noprint"><span>${photo.name}</span>
               <button type="button" data-act="move-photo" data-id="${photo.id}" data-dir="-1" aria-label="تقديم الصورة" ${offset+i===0?'disabled':''}>↑</button>
               <button type="button" data-act="move-photo" data-id="${photo.id}" data-dir="1" aria-label="تأخير الصورة" ${offset+i===photos.length-1?'disabled':''}>↓</button>
               <button type="button" data-act="remove-photo" data-id="${photo.id}" aria-label="حذف الصورة">×</button>
-            </figcaption>
+            </figcaption>`:''}
           </figure>`)}
         </div>
       </div>
@@ -414,19 +419,31 @@ function criteriaNavigator(ctx) {
   return html`<aside class="folio-criteria noprint" aria-label="مجالات ملف الإنجاز">
     <div class="folio-criteria__head">
       <div><span>ملف الإنجاز</span><h2>المعايير المهنية</h2></div>
+      <button type="button" class="folio-criteria__all ${viewingFullPortfolio?'is-active':''}"
+        data-act="show-full-portfolio" aria-pressed="${viewingFullPortfolio}">▤ عرض الملف كاملًا</button>
       <button type="button" class="folio-criteria__toggle" data-act="toggle-criteria"
         aria-expanded="${navigatorOpen}" aria-controls="folio-criteria-list">
         ${ctx.criterion.number} · ${ctx.criterion.title} <span aria-hidden="true">⌄</span>
       </button>
     </div>
     <div id="folio-criteria-list" class="folio-criteria__list ${navigatorOpen?'is-expanded':''}">
-      ${ctx.criteriaNav.map(c=>html`<button type="button" class="folio-criteria__item
-         ${c.number===editingCriterion?'is-selected':''} ${c.excluded?'is-excluded':''}"
-         data-act="select-criterion" data-id="${c.number}" aria-current="${c.number===editingCriterion?'true':'false'}">
-        <span class="folio-criteria__number">${c.number}</span>
-        <span class="folio-criteria__title">${c.title}</span>
-        <span class="folio-criteria__count" aria-label="${c.candidateCount} خيارات">${digits.format(c.candidateCount)}</span>
-      </button>`)}
+      ${ctx.criteriaNav.map(c=>html`<div class="folio-criteria__row">
+        <button type="button" class="folio-criteria__item
+          ${c.number===editingCriterion&&!viewingFullPortfolio?'is-selected':''} ${c.excluded?'is-excluded':''}"
+          data-act="select-criterion" data-id="${c.number}"
+          aria-current="${c.number===editingCriterion&&!viewingFullPortfolio?'true':'false'}">
+          <span class="folio-criteria__number">${c.number}</span>
+          <span class="folio-criteria__title">${c.title}</span>
+          <span class="folio-criteria__count" aria-label="${c.candidateCount} خيارات">${digits.format(c.candidateCount)}</span>
+        </button>
+        <div class="folio-criteria__row-tools">
+          <button type="button" data-act="edit-criterion-row" data-id="${c.number}"
+            title="تعديل اسم القسم" aria-label="تعديل اسم ${c.title}">✎</button>
+          <button type="button" data-act="toggle-criterion-row" data-id="${c.number}"
+            title="${c.excluded?'إظهار القسم في الملف':'إخفاء القسم من الملف'}"
+            aria-label="${c.excluded?'إظهار':'إخفاء'} ${c.title}">${c.excluded?'◌':'◉'}</button>
+        </div>
+      </div>`)}
       <button type="button" class="folio-criteria__add" data-act="add-criterion">+ إضافة قسم خاص</button>
     </div>
     <div class="folio-criteria__settings">
@@ -438,10 +455,7 @@ function criteriaNavigator(ctx) {
       <button class="btn btn--ghost" type="button" data-act="close-criterion-editor">تم</button>
       ${!ctx.criterion.custom && criterionNames.has(editingCriterion)?
         html`<button class="btn btn--ghost" type="button" data-act="reset-criterion-name">الاسم الأصلي</button>`:''}
-      `:html`<button class="folio-criteria__edit" type="button" data-act="edit-criterion">تخصيص اسم القسم</button>`}
-      <button class="folio-criteria__edit" type="button" data-act="toggle-criterion-in-file">
-        ${ctx.criterionExcluded?'إظهار القسم في الملف':'إخفاء القسم من الملف'}
-      </button>
+      `:''}
       ${ctx.criterion.custom?html`<button class="folio-criteria__edit is-danger" type="button"
         data-act="delete-custom-criterion">حذف القسم الخاص</button>`:''}
     </div>
@@ -489,6 +503,8 @@ function suggestionsPanel(ctx) {
           <button type="button" class="folio-library__selected-action" data-act="move-witness"
             data-dir="1" aria-label="تأخير شاهدي"
             ${customWitnesses.filter(w=>w.criterion===editingCriterion).findIndex(w=>w.id===proposal.id)===customWitnesses.filter(w=>w.criterion===editingCriterion).length-1?'disabled':''}>↓</button>`:''}
+        <button type="button" class="folio-library__selected-action is-include" data-act="toggle-witness-in-file"
+          aria-pressed="${ctx.currentlyIncluded}">${ctx.currentlyIncluded?'✓ ضمن الملف':'＋ أضف إلى الملف'}</button>
         <button type="button" class="folio-library__selected-action is-danger" data-act="hide-witness">
           ${proposal.sourceKind==='custom'?'حذف شاهدي':'إخفاء من مكتبتي'}</button>
       </div>
@@ -508,16 +524,64 @@ function suggestionsPanel(ctx) {
   </section>`;
 }
 
+
+function pagesOf(array,size=11) {
+  const out=[];for(let n=0;n<array.length;n+=size)out.push(array.slice(n,n+size));
+  return out.length?out:[[]];
+}
+function entryContext(ctx,entry) {
+  return {...ctx,criterion:entry.criterion,proposal:entry.proposal,
+    photoKey:entry.proposal.id,photos:entry.photos,photoLayout:entry.layout,
+    title:entry.title,description:entry.description,includedSections:entry.includedSections};
+}
+function exportPages(ctx) {
+  const blocks=pagesOf(ctx.annual.toc),n=blocks.length;
+  const pages=[cover(ctx)];
+  for(let i=0;i<n;i++)pages.push(contents(ctx,blocks[i],2+i));
+  for(let i=0;i<n;i++)pages.push(coverage(ctx,blocks[i],2+n+i));
+  for(const entry of ctx.annual.entries) {
+    const item=entryContext(ctx,entry);
+    pages.push(evidencePage(item,entry.page,false),
+      ...photoContinuation(item,entry.page+1,false));
+  }
+  return pages;
+}
+function editorOptions(ctx) {
+  if(!ctx.proposal)return '';
+  const hasData=ctx.proposal.id==='rakeez:attendance:'+ctx.year?.id &&
+    ctx.evidence.recordedSessions>0;
+  const counts=new Set(ctx.evidence.rows.map(r=>r.section));
+  return html`<section class="folio-display-controls noprint" aria-label="إعدادات عرض الشاهد">
+    <div class="folio-display-controls__head">
+      <div><strong>تنسيق محتوى الشاهد</strong>
+        <p>هذه أدوات تحرير فقط، ولا تظهر ضمن صفحات ملف الإنجاز أو PDF.</p></div>
+    </div>
+    ${witnessSectionsControls(ctx,hasData,hasData?[...counts]:[])}
+    ${witnessImageTools(ctx)}
+  </section>`;
+}
+
+async function printAnnualFile() {
+  const ctx=context();
+  if(!ctx.canPrint){toast('أضف شاهدًا مكتملًا إلى الملف قبل الطباعة.', 'warn');return false;}
+  try{
+    await Promise.all([...document.querySelectorAll('[data-folio-document] .folio-evidence__photo')].map(img=>
+      img.decode?img.decode():(img.complete&&img.naturalWidth?Promise.resolve():Promise.reject())));
+  }catch{toast('تعذّر تحميل بعض الصور. أعد المحاولة قبل التصدير.', 'danger');return false;}
+  return printReport('ملف الإنجاز المهني الكامل');
+}
+
 export default {
   title: ()=>'ملف الإنجاز — نموذج التصميم',
   subtitle: ()=>store.activeYear()?.label ?? '',
   back: ()=>'#/reports',
   wide: true,
-  beforeRender() { loadStyle(); editingCriterion='09'; selectedSuggestionId=null;photoError=''; },
+  beforeRender() { loadStyle(); editingCriterion='09'; selectedSuggestionId=null;viewingFullPortfolio=false;photoError=''; },
   onUnmount() {
     clearUndo();
     for(const group of photoGroups.values())for(const photo of group)URL.revokeObjectURL(photo.url);
     photoGroups.clear();photoLayouts.clear();selectedByCriterion.clear();
+    includedWitnesses.clear();excludedWitnesses.clear();viewingFullPortfolio=false;
     descriptions.clear();titles.clear();criterionNames.clear();hiddenCriteria.clear();
     hiddenWitnesses.clear();sectionPreferences.clear();extraCriteria.length=0;
     customWitnesses.length=0;nextExtraCriterionNumber=12;
@@ -525,33 +589,52 @@ export default {
     criterionEditorOpen=false;libraryFilter='all';libraryQuery='';photoError='';
   },
   render() {
-    const ctx = context();
-    const extraPages = photoContinuation(ctx);
+    const ctx=context();
+    const focusExtra=ctx.proposal?photoContinuation(ctx,5,true):[];
+    const pages=exportPages(ctx);
+    const full=viewingFullPortfolio;
     return html`<div class="folio-page" dir="rtl">
       <header class="folio-workspace noprint">
         <div><span class="folio-workspace__eyebrow">ملف الإنجاز · مراجعة التصميم</span>
           <h1>ملف الإنجاز المهني</h1>
-          <p>ملف شامل لأعمال المعلم في جميع مواده وفصوله خلال العام الدراسي، مع شواهد وصور لكل معيار.</p></div>
+          <p>تصفح معيارًا واحدًا للتحرير أو اعرض الملف السنوي كاملًا بالترتيب الذي اخترته.</p></div>
         <span class="folio-workspace__status">Preview · التغييرات مؤقتة ولم تُحفظ في حسابك</span>
       </header>
       <section class="folio-toolbar noprint" aria-label="إجراءات ملف الإنجاز">
-        <span class="folio-toolbar__year">${short(ctx.year?.label)}</span>
-        <button class="btn btn--primary" data-act="print" ${ctx.canPrint?'':'disabled'}>
-          ${icon('print')} تصدير الشاهد / PDF</button>
+        <div class="folio-toolbar__overview">
+          <strong>${digits.format(ctx.annual.witnessCount)} شواهد في الملف</strong>
+          <span>${digits.format(ctx.annual.totalPages)} صفحة · ${short(ctx.year?.label)}</span>
+        </div>
+        <div class="folio-toolbar__actions" role="group" aria-label="طرق إخراج ومشاركة الملف">
+          <button class="btn btn--primary" data-act="print" ${ctx.canPrint?'':'disabled'}>طباعة الملف كاملًا</button>
+          <button class="btn btn--ghost" data-act="save-pdf" ${ctx.canPrint?'':'disabled'}>حفظ PDF</button>
+          <button class="btn btn--ghost" type="button" disabled title="يُفعّل بعد الحفظ والنشر الآمن">مشاركة الرابط</button>
+          <button class="btn btn--ghost" type="button" disabled title="يتطلب رابط مشاركة منشورًا صالحًا">رمز QR</button>
+        </div>
+        <p class="folio-toolbar__helper">لحفظ PDF اختر «حفظ بتنسيق PDF» من نافذة الطباعة. الرابط والباركود سيتاحان بعد تفعيل الحفظ والمشاركة الآمنة.</p>
         ${photoError?html`<p class="folio-toolbar__helper" role="status">${photoError}</p>`:''}
       </section>
       <div class="folio-editor-shell">
         ${criteriaNavigator(ctx)}
-        <div class="folio-editor-main">
-          ${suggestionsPanel(ctx)}
-          <nav class="folio-nav noprint" aria-label="معاينة صفحات الملف">
-            ${[['4','الشاهد'],['1','الغلاف'],['2','الفهرس'],['3','موجز الأعمال'],
-               ...extraPages.map((_,i)=>[String(i+5),'صور إضافية'])].map(([n,title])=>html`
-              <button type="button" class="folio-nav__item" data-act="go" data-page="${n}">
-                <span>${digits.format(Number(n))}</span> ${title}</button>`)}
-          </nav>
+        <div class="folio-editor-main ${full?'is-full':'is-focused'}">
+          ${full?'':suggestionsPanel(ctx)}
+          ${full?'':editorOptions(ctx)}
+          <div class="folio-focus noprint" data-folio-focus>
+            ${ctx.proposal?html`<div class="folio-focus__heading">
+              <strong>معاينة الشاهد · ${ctx.criterion.title}</strong>
+              <button type="button" data-act="show-full-portfolio">عرض الملف كاملًا</button>
+            </div>
+            <div class="folio-focus__pages">
+              ${evidencePage(ctx,4,true)}${focusExtra}
+            </div>`:html`<div class="folio-library__empty">اختر شاهدًا من المكتبة أو أضف شاهدًا خاصًا.</div>`}
+          </div>
+          ${full?html`<nav class="folio-nav noprint" aria-label="التنقل بين صفحات الملف">
+            ${[['1','الغلاف'],['2','الفهرس'],[String(ctx.annual.frontPageCount),'موجز الأعمال'],
+              ...ctx.annual.entries.map(x=>[String(x.page),x.title])].map(([n,label])=>html`
+              <button class="folio-nav__item" data-act="go" data-page="${n}">${label}</button>`)}
+          </nav>`:''}
           <div class="print-report folio-document" data-folio-document>
-            ${cover(ctx)}${contents(ctx)}${coverage(ctx)}${evidencePage(ctx)}${extraPages}
+            ${pages}
           </div>
         </div>
       </div>
@@ -559,8 +642,18 @@ export default {
   },
   actions: {
     'toggle-criteria'() { navigatorOpen=!navigatorOpen;repaint(); },
+    'edit-criterion-row'(el) {
+      editingCriterion=el.dataset.id;selectedSuggestionId=selectedByCriterion.get(editingCriterion)||null;
+      viewingFullPortfolio=false;criterionEditorOpen=true;repaint();
+    },
+    'toggle-criterion-row'(el) {
+      const id=el.dataset.id;
+      if(hiddenCriteria.has(id))hiddenCriteria.delete(id);
+      else hiddenCriteria.add(id);
+      repaint();
+    },
     'select-criterion'(el) {
-      editingCriterion=el.dataset.id;
+      editingCriterion=el.dataset.id;viewingFullPortfolio=false;
       selectedSuggestionId=selectedByCriterion.get(editingCriterion)||null;
       navigatorOpen=false;criterionEditorOpen=false;libraryQuery='';libraryFilter='all';
       photoError='';repaint();
@@ -568,7 +661,7 @@ export default {
     'add-criterion'() {
       const number=String(nextExtraCriterionNumber++);
       extraCriteria.push({number,title:'قسم إضافي',weight:0});
-      editingCriterion=number; selectedSuggestionId=null;criterionEditorOpen=true;
+      editingCriterion=number; selectedSuggestionId=null;criterionEditorOpen=true;viewingFullPortfolio=false;
       navigatorOpen=false; libraryQuery='';libraryFilter='all';repaint();
     },
     'edit-criterion'(){criterionEditorOpen=true;repaint();},
@@ -619,7 +712,16 @@ export default {
       const empty=el.closest('.folio-suggestion-studio')?.querySelector('[data-library-empty]');
       if(empty)empty.hidden=[...cards].some(card=>!card.hidden);
     },
-    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id;selectedByCriterion.set(editingCriterion,selectedSuggestionId);repaint(); },
+    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id;selectedByCriterion.set(editingCriterion,selectedSuggestionId);viewingFullPortfolio=false;repaint(); },
+    'show-full-portfolio'(){viewingFullPortfolio=true;repaint();},
+    'show-current-criterion'(){viewingFullPortfolio=false;repaint();},
+    'toggle-witness-in-file'(){
+      const candidate=context().proposal;if(!candidate)return;
+      const id=candidate.id,active=context().currentlyIncluded;
+      if(active){includedWitnesses.delete(id);excludedWitnesses.add(id)}
+      else {includedWitnesses.add(id);excludedWitnesses.delete(id)}
+      repaint();
+    },
     'move-witness'(el) {
       const proposal=context().proposal;if(proposal?.sourceKind!=='custom')return;
       const personal=customWitnesses.filter(w=>w.criterion===editingCriterion);
@@ -639,6 +741,7 @@ export default {
       customWitnesses.push({id,criterion:editingCriterion,title:'شاهد جديد',
         description:'',sourceKind:'custom',metrics:[],table:[]});
       selectedSuggestionId=id;selectedByCriterion.set(editingCriterion,id);
+      includedWitnesses.add(id);excludedWitnesses.delete(id);viewingFullPortfolio=false;
       titles.set(id,'شاهد جديد');libraryFilter='all';libraryQuery='';repaint();
     },
     'hide-witness'() {
@@ -727,20 +830,7 @@ export default {
       },()=>{for(const photo of removed)URL.revokeObjectURL(photo.url)});
       photoGroups.delete(key);repaint();
     },
-    async print(){
-      const ctx=context();
-      if(!ctx.canPrint) {
-        toast('اختر شاهدًا جاهزًا أو أضف وصفًا وصورًا لشاهدك.', 'warn');
-        return false;
-      }
-      try {
-        await Promise.all([...document.querySelectorAll('.folio-evidence__photo')].map(img =>
-          img.decode ? img.decode() : (img.complete && img.naturalWidth ? Promise.resolve() : Promise.reject())
-        ));
-      } catch {
-        toast('تعذّر تحميل إحدى الصور. راجع الصور قبل الطباعة.', 'danger'); return false;
-      }
-      return printReport('ملف الإنجاز المهني');
-    },
+    print(){return printAnnualFile();},
+    'save-pdf'(){return printAnnualFile();},
   },
 };

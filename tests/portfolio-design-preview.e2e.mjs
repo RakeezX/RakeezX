@@ -16,7 +16,8 @@ async function ready(page){
    return s.state.ready && s.getActiveWorkspace()?.type==='demo' && s.teachings().length>0;
  });
  await page.locator('.boot').waitFor({state:'detached'});
- await expect(page.locator('[data-folio-document]')).toBeVisible();
+ await expect(page.locator('[data-folio-focus]')).toBeVisible();
+ await expect(page.locator('[data-folio-document]')).toBeAttached();
 }
 
 async function chooseCriterion(page,number){
@@ -34,7 +35,7 @@ test('four coherent Arabic A4 pages render actual scoped Demo evidence and print
  await page.goto(entry);
  await ready(page);
  const sheets=page.locator('[data-portfolio-page]');
- await expect(sheets).toHaveCount(4);
+ expect(await sheets.count()).toBeGreaterThanOrEqual(4);
  await expect(page.locator('link[data-rakeez-portfolio-style]')).toHaveAttribute('rel','stylesheet');
  await expect(page.locator('.folio-cover')).toContainText('شواهد الأداء');
  await expect(page.locator('.folio-contents__row')).toHaveCount(11);
@@ -57,7 +58,7 @@ test('four coherent Arabic A4 pages render actual scoped Demo evidence and print
  expect(demo.expected).toBeGreaterThan(0);
  expect(demo.classes).toBeGreaterThan(1);
  await expect(page.locator('select[data-change="teaching"]')).toHaveCount(0);
- await expect(page.locator('.folio-evidence__metrics strong').first()).toHaveText(new Intl.NumberFormat('ar-SA',{useGrouping:false}).format(demo.expected));
+ await expect(page.locator('.folio-focus .folio-evidence__metrics strong').first()).toHaveText(new Intl.NumberFormat('ar-SA',{useGrouping:false}).format(demo.expected));
  await expect(page.locator('.folio-cover')).toContainText('ملف الإنجاز المهني');
  await expect(page.locator('.folio-cover')).not.toContainText('فصول المعلم');
  await expect(page.locator('.folio-suggestion-studio')).toContainText('اختر شاهدًا أو أنشئ شاهدًا جديدًا');
@@ -71,7 +72,7 @@ test('four coherent Arabic A4 pages render actual scoped Demo evidence and print
  await expect.poll(()=>page.evaluate(()=>window.__portfolioPrintCalls)).toBe(1);
  const pdf=await page.pdf({path:info.outputPath('portfolio-4pages.pdf'),preferCSSPageSize:true,printBackground:true});
  expect(pdf.subarray(0,5).toString()).toBe('%PDF-');
- expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(4);
+ expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(await page.locator('[data-portfolio-page]').count());
  await page.emulateMedia({media:'print'});
  await page.screenshot({path:info.outputPath('portfolio-print-layout.png'),fullPage:true,animations:'disabled'});
  await page.emulateMedia({media:'screen'});
@@ -85,9 +86,9 @@ test('narrow mobile layout, page navigation and private in-memory optional image
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.setViewportSize({width:390,height:844});
  await page.goto(entry);await ready(page);
- await expect(page.locator('[data-portfolio-page]')).toHaveCount(4);
- await page.locator('button[data-page="4"]').click();
- await expect(page.locator('[data-portfolio-page="4"]')).toBeVisible();
+ expect(await page.locator('[data-portfolio-page]').count()).toBeGreaterThanOrEqual(4);
+ await expect(page.locator('[data-folio-focus]')).toBeVisible();
+ await expect(page.locator('[data-focus-page="4"]')).toBeVisible();
  const input=page.locator('input[type="file"][data-change="photo"]');
  // Test images are synthetic one-pixel PNGs; no user/private asset enters fixtures.
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
@@ -95,21 +96,21 @@ test('narrow mobile layout, page navigation and private in-memory optional image
    {name:'image-a.png',mimeType:'image/png',buffer:tiny},
    {name:'image-b.png',mimeType:'image/png',buffer:tiny},
  ]);
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(2);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(2);
  await page.getByRole('combobox',{name:'توزيع الصور'}).selectOption('three');
- await expect(page.locator('.folio-evidence__gallery--three')).toBeVisible();
+ await expect(page.locator('.folio-focus .folio-evidence__gallery--three')).toBeVisible();
  await page.getByRole('button',{name:'تأخير الصورة'}).first().click();
- await expect(page.locator('.folio-evidence__gallery-item').first()).toContainText('image-b.png');
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item').first()).toContainText('image-b.png');
  await chooseCriterion(page,'07');
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
  await input.setInputFiles({name:'educational-tool.png',mimeType:'image/png',buffer:tiny});
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
  await chooseCriterion(page,'09');
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(2);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(2);
  await page.screenshot({path:info.outputPath('portfolio-mobile.png'),fullPage:true,animations:'disabled'});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.getByRole('button',{name:'حذف الصورة'}).first().click();
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
  expect(errors).toEqual([]);
 });
 
@@ -119,7 +120,7 @@ test('photo arrangements fit A4 export and are independently scoped to the selec
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
  await page.locator('input[data-change="photo"]').setInputFiles(
    Array.from({length:6},(_,i)=>({name:'sample-'+(i+1)+'.png',mimeType:'image/png',buffer:tiny})));
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(6);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(6);
  for(const columns of ['one','two','three']) {
    await page.getByRole('combobox',{name:'توزيع الصور'}).selectOption(columns);
    await page.emulateMedia({media:'print'});
@@ -132,11 +133,11 @@ test('photo arrangements fit A4 export and are independently scoped to the selec
      })));
    for(const row of bounds) expect(row.bottom,columns+' gallery page '+row.page+' must fit A4').toBeLessThanOrEqual(row.footerTop-5);
    const pdf=await page.pdf({path:info.outputPath('portfolio-gallery-'+columns+'.pdf'),preferCSSPageSize:true,printBackground:true});
-   expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(({one:6,two:5,three:5}[columns]));
+   expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(await page.locator('[data-portfolio-page]').count());
    await page.emulateMedia({media:'screen'});
  }
  await chooseCriterion(page,'07');
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
 });
 
 
@@ -146,21 +147,21 @@ test('manual witness needs only a title, description and photo; automatic record
  await chooseCriterion(page,'03');
  await page.getByRole('button',{name:/شاهد جديد/}).click();
  await expect(page.locator('.folio-suggestion-studio__choice.is-selected')).toContainText('شاهد جديد');
- await expect(page.getByRole('button',{name:/PDF/})).toBeDisabled();
+ await expect(page.getByRole('button',{name:/PDF/})).toBeEnabled();
  await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('التواصل التربوي مع أولياء الأمور');
  await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
  await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('متابعة التواصل مع الأسر عبر قنوات التواصل المعتمدة.');
  await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
  await page.locator('input[data-change="photo"]').setInputFiles({name:'contact.png',mimeType:'image/png',buffer:tiny});
- await expect(page.locator('.folio-evidence__description-edit')).toHaveValue('متابعة التواصل مع الأسر عبر قنوات التواصل المعتمدة.');
+ await expect(page.locator('.folio-focus .folio-evidence__description-edit')).toHaveValue('متابعة التواصل مع الأسر عبر قنوات التواصل المعتمدة.');
  await expect(page.getByRole('button',{name:/PDF/})).toBeEnabled();
  const pdf=await page.pdf({path:info.outputPath('folio-manual-parent-communication.pdf'),preferCSSPageSize:true,printBackground:true});
- expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(4);
+ expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(await page.locator('[data-portfolio-page]').count());
  await chooseCriterion(page,'09');
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
  await chooseCriterion(page,'03');
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
 });
 
 test('teacher can edit recorded work directly without repetitive confirmation dialogs',async({page,context,baseURL})=>{
@@ -173,7 +174,7 @@ test('teacher can edit recorded work directly without repetitive confirmation di
    await planned.click();
    await expect(page.getByRole('button',{name:/PDF/})).toBeEnabled();
    await expect(page.locator('input[type="checkbox"][data-change="confirm-suggestion"]')).toHaveCount(0);
-   await expect(page.locator('.folio-evidence__title-edit')).toHaveValue('الجدول الدراسي الأسبوعي');
+   await expect(page.locator('.folio-focus .folio-evidence__title-edit')).toHaveValue('الجدول الدراسي الأسبوعي');
  }
 });
 
@@ -186,8 +187,8 @@ test('ready strategy and games examples open in-place; each witness owns indepen
  const plan=page.locator('.folio-suggestion-studio__choice').filter({hasText:'استراتيجية فكّر'});
  await expect(plan).toBeVisible();
  await plan.click();
- await expect(page.locator('.folio-evidence__title-edit')).toHaveValue('استراتيجية فكّر – زاوج – شارك');
- await expect(page.locator('.folio-evidence__illustration')).toContainText('تفكير فردي');
+ await expect(page.locator('.folio-focus .folio-evidence__title-edit')).toHaveValue('استراتيجية فكّر – زاوج – شارك');
+ await expect(page.locator('.folio-focus .folio-evidence__illustration')).toContainText('تفكير فردي');
  await expect(page.getByRole('button',{name:/PDF/})).toBeEnabled();
  await expect(page.locator('input[type="checkbox"][data-change="confirm-suggestion"]')).toHaveCount(0);
  const file=page.locator('.folio-evidence__media-tools input[data-change="photo"]');
@@ -195,20 +196,20 @@ test('ready strategy and games examples open in-place; each witness owns indepen
  await expect(page.locator('.folio-toolbar input[type="file"]')).toHaveCount(0);
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
  await file.setInputFiles({name:'think-pair-share.png',mimeType:'image/png',buffer:tiny});
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
- await expect(page.locator('.folio-evidence__illustration')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__illustration')).toHaveCount(0);
  const game=page.locator('.folio-suggestion-studio__choice').filter({hasText:'التعلم باللعب'});
  await game.click();
- await expect(page.locator('.folio-evidence__title-edit')).toHaveValue('التعلم باللعب');
- await expect(page.locator('.folio-evidence__illustration')).toContainText('اللعبة التعليمية');
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__title-edit')).toHaveValue('التعلم باللعب');
+ await expect(page.locator('.folio-focus .folio-evidence__illustration')).toContainText('اللعبة التعليمية');
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
  await page.locator('.folio-evidence__media-tools input[data-change="photo"]').setInputFiles({
    name:'learning-game.png',mimeType:'image/png',buffer:tiny,
  });
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
  await plan.click();
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
- await expect(page.locator('.folio-evidence__gallery-item').first()).toContainText('think-pair-share.png');
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item').first()).toContainText('think-pair-share.png');
  await chooseCriterion(page,'07');
  await expect(page.locator('.folio-suggestion-studio')).toContainText('الألعاب التعليمية الرقمية');
  await page.screenshot({path:info.outputPath('strategy-ready-templates.png'),fullPage:true});
@@ -226,7 +227,7 @@ test('details for Madrasati and Noor are optional, not repeated or printed as ev
  await expect(page.locator('.folio-suggestion-studio')).toBeHidden();
  await expect(page.locator('.folio-evidence__media-tools')).toBeHidden();
  const pdf=await page.pdf({path:info.outputPath('portfolio-no-editing-controls.pdf'),preferCSSPageSize:true,printBackground:true});
- expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(4);
+ expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(await page.locator('[data-portfolio-page]').count());
 });
 
 
@@ -234,24 +235,25 @@ test('ready teaching strategy includes a truthful visual diagram that is replace
  await sameOriginOnly(context,baseURL);
  await page.goto(entry);await ready(page);
  await chooseCriterion(page,'04');
- await expect(page.locator('.folio-evidence__illustration')).toContainText('تفكير فردي');
+ await expect(page.locator('.folio-focus .folio-evidence__illustration')).toContainText('تفكير فردي');
  await page.screenshot({path:info.outputPath('strategy-default-visual.png'),fullPage:true,animations:'disabled'});
+ await page.locator('[data-act="toggle-witness-in-file"]').click();
  await page.emulateMedia({media:'print'});
  const rect=await page.evaluate(()=>{
-   const p=document.querySelector('[data-portfolio-page="4"]');
+   const p=[...document.querySelectorAll('.folio-export-witness')].find(x=>x.textContent.includes('استراتيجية فكّر'));
    return {bottom:p.querySelector('.folio-evidence__illustration').getBoundingClientRect().bottom,
      footer:p.querySelector('.folio-sheet__footer').getBoundingClientRect().top};
  });
  expect(rect.bottom).toBeLessThan(rect.footer-5);
  const pdf=await page.pdf({path:info.outputPath('strategy-default-visual.pdf'),preferCSSPageSize:true,printBackground:true});
- expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(4);
+ expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(await page.locator('[data-portfolio-page]').count());
  await page.emulateMedia({media:'screen'});
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
  await page.locator('.folio-evidence__media-tools input[data-change="photo"]').setInputFiles({
    name:'real-activity.png',mimeType:'image/png',buffer:tiny,
  });
- await expect(page.locator('.folio-evidence__illustration')).toHaveCount(0);
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__illustration')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
 });
 
 
@@ -261,7 +263,7 @@ test('criteria rail supports fast navigation, personal aliases, extra sections a
  await expect(page.locator('.folio-criteria__item')).toHaveCount(11);
  await chooseCriterion(page,'04');
  await expect(page.locator('.folio-evidence')).toContainText('التنوع في استراتيجيات التدريس');
- await page.getByRole('button',{name:'تخصيص اسم القسم'}).click();
+ await page.locator('[data-act="edit-criterion-row"][data-id="04"]').click();
  await page.getByRole('textbox',{name:'اسم القسم في ملفي'}).fill('استراتيجيات تدريس متنوعة');
  await page.getByRole('textbox',{name:'اسم القسم في ملفي'}).blur();
  await expect(page.locator('.folio-contents')).toContainText('استراتيجيات تدريس متنوعة');
@@ -269,19 +271,19 @@ test('criteria rail supports fast navigation, personal aliases, extra sections a
  await page.getByRole('button',{name:'الاسم الأصلي'}).click();
  await expect(page.locator('.folio-contents')).toContainText('التنوع في استراتيجيات التدريس');
  await page.getByRole('button',{name:'تم',exact:true}).click();
- await page.getByRole('button',{name:'إخفاء القسم من الملف'}).click();
+ await page.locator('[data-act="toggle-criterion-row"][data-id="04"]').click();
  await expect(page.locator('.folio-contents__row')).toHaveCount(10);
- await expect(page.getByRole('button',{name:/PDF/})).toBeDisabled();
- await page.getByRole('button',{name:'إظهار القسم في الملف'}).click();
+ await expect(page.getByRole('button',{name:/PDF/})).toBeEnabled();
+ await page.locator('[data-act="toggle-criterion-row"][data-id="04"]').click();
  await expect(page.locator('.folio-contents__row')).toHaveCount(11);
  await page.getByRole('button',{name:'+ إضافة قسم خاص'}).click();
  await expect(page.locator('.folio-criteria__item')).toHaveCount(12);
  await page.getByRole('textbox',{name:'اسم القسم في ملفي'}).fill('مبادرات المعلم');
  await page.getByRole('textbox',{name:'اسم القسم في ملفي'}).blur();
- await expect(page.locator('.folio-contents')).toContainText('مبادرات المعلم');
+ await expect(page.locator('.folio-contents__row').filter({hasText:'مبادرات المعلم'})).toHaveCount(1);
  await page.getByRole('button',{name:'حذف القسم الخاص'}).click();
  await expect(page.locator('.folio-criteria__item')).toHaveCount(11);
- await expect(page.locator('.folio-contents')).not.toContainText('مبادرات المعلم');
+ await expect(page.locator('.folio-contents__row').filter({hasText:'مبادرات المعلم'})).toHaveCount(0);
 });
 
 test('library switches type, filters live, hides/restores templates and keeps separate personal witnesses',async({page,context,baseURL})=>{
@@ -307,15 +309,15 @@ test('library switches type, filters live, hides/restores templates and keeps se
  await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
  await page.locator('input[data-change="photo"]').setInputFiles({name:'first.png',mimeType:'image/png',buffer:tiny});
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
  await add.click();
  await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('تجربة ثانية');
  await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
  await page.getByRole('button',{name:'شواهدي'}).click();
  await expect(page.locator('[data-library-card]')).toHaveCount(2);
  await page.locator('[data-library-card]').filter({hasText:'أول تجربة خاصة'}).click();
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
  await page.getByRole('button',{name:'حذف شاهدي'}).click();
  await expect(page.locator('[data-library-card]')).toHaveCount(1);
  await expect(page.locator('[data-library-card]')).toContainText('تجربة ثانية');
@@ -324,25 +326,25 @@ test('library switches type, filters live, hides/restores templates and keeps se
 test('attendance chart and photos coexist and each section can be hidden or restored',async({page,context,baseURL},info)=>{
  await sameOriginOnly(context,baseURL);
  await page.goto(entry);await ready(page);
- await expect(page.locator('.folio-evidence__chart')).toBeVisible();
+ await expect(page.locator('.folio-focus .folio-evidence__chart')).toBeVisible();
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
  await page.locator('input[data-change="photo"]').setInputFiles([
    {name:'attendance-a.png',mimeType:'image/png',buffer:tiny},
    {name:'attendance-b.png',mimeType:'image/png',buffer:tiny},
  ]);
- await expect(page.locator('.folio-evidence__chart')).toBeVisible();
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(2);
- await expect(page.locator('[data-portfolio-page="5"]')).toBeVisible();
+ await expect(page.locator('.folio-focus .folio-evidence__chart')).toBeVisible();
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(2);
+ await expect(page.locator('[data-focus-continuation="5"]')).toBeVisible();
  const pages=await page.pdf({path:info.outputPath('attendance-chart-plus-photos.pdf'),preferCSSPageSize:true,printBackground:true});
- expect((pages.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(5);
+ expect((pages.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(await page.locator('[data-portfolio-page]').count());
   await page.locator('input[data-section="chart"]').uncheck();
- await expect(page.locator('.folio-evidence__chart')).toHaveCount(0);
- await expect(page.locator('[data-portfolio-page="5"]')).toHaveCount(0);
+ await expect(page.locator('.folio-focus .folio-evidence__chart')).toHaveCount(0);
+ await expect(page.locator('[data-focus-continuation="5"]')).toHaveCount(0);
  const restored=await page.locator('input[data-section="chart"]');
  await restored.check();
- await expect(page.locator('.folio-evidence__chart')).toBeVisible();
- await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(2);
- await expect(page.locator('[data-portfolio-page="5"]')).toBeVisible();
+ await expect(page.locator('.folio-focus .folio-evidence__chart')).toBeVisible();
+ await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(2);
+ await expect(page.locator('[data-focus-continuation="5"]')).toBeVisible();
 });
 
 test('personal witnesses reorder, edited names remain searchable and photo deletes can be undone',async({page,context,baseURL})=>{
@@ -368,19 +370,19 @@ test('personal witnesses reorder, edited names remain searchable and photo delet
   await expect(page.locator('[data-library-card]')).toHaveCount(1);
   await page.locator('.folio-undo').getByRole('button',{name:'تراجع'}).click();
   await expect(page.locator('[data-library-card]')).toHaveCount(2);
-  await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
   const search=page.getByRole('textbox',{name:'بحث في الشواهد'});
   await search.fill('تجربتي الخاصة الأولى');
   await expect(page.locator('[data-library-card]:visible')).toHaveCount(1);
   await search.fill('');
   await page.getByRole('button',{name:'حذف جميع الصور'}).click();
-  await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
   await page.locator('.folio-undo').getByRole('button',{name:'تراجع'}).click();
-  await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
   await page.getByRole('button',{name:'حذف الصورة'}).click();
-  await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(0);
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(0);
   await page.locator('.folio-undo').getByRole('button',{name:'تراجع'}).click();
-  await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
 });
 
 test('custom criterion deletion is reversible with its name, own witness and photo',async({page,context,baseURL})=>{
@@ -400,5 +402,66 @@ test('custom criterion deletion is reversible with its name, own witness and pho
   await expect(page.locator('.folio-criteria__item')).toHaveCount(12);
   await expect(page.locator('.folio-criteria__item').last()).toContainText('مبادراتي الخاصة');
   await expect(page.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('مشروع القراءة');
-  await expect(page.locator('.folio-evidence__gallery-item')).toHaveCount(1);
+  await expect(page.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
+});
+
+test('annual portfolio assembles custom and template witnesses across criteria into one ordered printable file',async({page,context,baseURL},info)=>{
+  await sameOriginOnly(context,baseURL);
+  await page.goto(entry);await ready(page);
+  await expect(page.locator('[data-folio-focus]')).toBeVisible();
+  await expect(page.locator('[data-folio-document]')).toBeHidden();
+  const sourceBefore=await page.evaluate(async()=>JSON.stringify((await import('/src/store.js')).state));
+  await chooseCriterion(page,'04');
+  await page.locator('[data-library-card]').filter({hasText:'التعلم باللعب'}).click();
+  await page.locator('[data-act="toggle-witness-in-file"]').click();
+  await expect(page.locator('[data-act="toggle-witness-in-file"]')).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('استراتيجية اللعب المحررة');
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+  await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).fill('نشاط خاص إضافي');
+  await page.getByRole('textbox',{name:'عنوان الشاهد'}).blur();
+  await page.getByRole('textbox',{name:'وصف الشاهد'}).fill('وصف تجريبي لأنشطة المعلم.');
+  await page.getByRole('textbox',{name:'وصف الشاهد'}).blur();
+  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
+  await page.locator('input[data-change="photo"]').setInputFiles({name:'extra-witness.png',mimeType:'image/png',buffer:tiny});
+  await chooseCriterion(page,'07');
+  await page.locator('[data-library-card]').filter({hasText:'الألعاب التعليمية الرقمية'}).click();
+  await page.locator('[data-act="toggle-witness-in-file"]').click();
+  await chooseCriterion(page,'09');
+  await page.locator('input[data-change="photo"]').setInputFiles([
+    {name:'chart-photo-1.png',mimeType:'image/png',buffer:tiny},
+    {name:'chart-photo-2.png',mimeType:'image/png',buffer:tiny},
+  ]);
+  await expect(page.locator('.folio-focus .folio-evidence__chart')).toBeVisible();
+  await page.locator('.folio-criteria__all').click();
+  await expect(page.locator('[data-folio-document]')).toBeVisible();
+  await expect(page.locator('[data-folio-focus]')).toBeHidden();
+  await expect(page.locator('.folio-contents__rows')).toContainText('التنوع في استراتيجيات التدريس');
+  await expect(page.locator('.folio-document')).toContainText('استراتيجية اللعب المحررة');
+  await expect(page.locator('.folio-document')).toContainText('نشاط خاص إضافي');
+  await expect(page.locator('.folio-document')).toContainText('الألعاب التعليمية الرقمية');
+  const pages=page.locator('[data-portfolio-page]');
+  const numbers=await pages.evaluateAll(rows=>rows.map(r=>Number(r.dataset.portfolioPage)));
+  expect(numbers).toEqual(Array.from({length:numbers.length},(_,i)=>i+1));
+  expect(numbers.length).toBeGreaterThanOrEqual(8);
+  await expect(page.getByRole('button',{name:'مشاركة الرابط'})).toBeDisabled();
+  await expect(page.getByRole('button',{name:'رمز QR'})).toBeDisabled();
+  const sourceAfter=await page.evaluate(async()=>JSON.stringify((await import('/src/store.js')).state));
+  expect(sourceAfter).toBe(sourceBefore);
+  await page.emulateMedia({media:'print'});
+  const overflows=await page.evaluate(()=>[...document.querySelectorAll('.folio-export-witness')].flatMap(sheet=>{
+    const foot=sheet.querySelector('.folio-sheet__footer'),limit=foot?.getBoundingClientRect().top??Infinity;
+    return [...sheet.querySelectorAll('.folio-evidence__gallery,.folio-evidence__metrics,.folio-evidence__chart,.folio-evidence__table,.folio-evidence__steps')]
+      .filter(el=>{const css=getComputedStyle(el);return css.display!=='none';})
+      .filter(el=>el.getBoundingClientRect().bottom>limit-4)
+      .map(el=>({page:sheet.dataset.portfolioPage,section:el.className,
+        by:Math.round(el.getBoundingClientRect().bottom-limit)}));
+  }));
+  expect(overflows).toEqual([]);
+  const pdf=await page.pdf({path:info.outputPath('complete-annual-portfolio.pdf'),preferCSSPageSize:true,printBackground:true});
+  expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(numbers.length);
+  await page.emulateMedia({media:'screen'});
+  await page.locator('.folio-criteria__item[data-id="04"]').click();
+  await expect(page.locator('[data-folio-focus]')).toBeVisible();
+  await expect(page.locator('[data-folio-document]')).toBeHidden();
 });

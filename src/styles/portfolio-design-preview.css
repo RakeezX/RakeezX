@@ -582,3 +582,73 @@
   .folio-workspace__status {white-space:normal;line-height:1.6;}
 }
 @media print {.folio-undo {display:none !important;}}
+
+/* F09 annual portfolio: edit one witness, export the selected year-wide file. */
+.folio-editor-main.is-focused .folio-document {display:none;}
+.folio-editor-main.is-full .folio-focus,
+.folio-editor-main.is-full .folio-display-controls {display:none;}
+.folio-editor-main.is-full .folio-document {display:grid;}
+.folio-document > [data-portfolio-page] {order:initial !important;}
+.folio-focus {display:grid;gap:12px;min-width:0;}
+.folio-focus__heading {display:flex;justify-content:space-between;align-items:center;gap:10px;
+  flex-wrap:wrap;border:1px solid var(--border);border-radius:10px;padding:11px 14px;background:var(--bg-elev);
+  font-size:13px;color:var(--text-1);}
+.folio-focus__heading button {border:1px solid var(--brand);border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);font:inherit;font-weight:800;padding:7px 11px;cursor:pointer;}
+.folio-focus__pages {display:grid;justify-items:center;gap:22px;min-width:0;
+  border:1px solid var(--border);border-radius:12px;padding:20px 8px;
+  background:color-mix(in srgb,var(--bg-sunk) 75%,#d8e7e2);}
+.folio-export-witness .folio-evidence__print-copy {display:block !important;}
+.folio-export-witness .folio-evidence__inline-edit {display:none !important;}
+.folio-display-controls {display:grid;gap:9px;min-width:0;padding:12px 14px;
+  border:1px solid var(--border);border-radius:12px;background:var(--bg-elev);}
+.folio-display-controls__head strong {font-size:14px;color:var(--text-1);}
+.folio-display-controls__head p {margin:4px 0 0;font-size:11px;color:var(--text-3);line-height:1.6;}
+.folio-display-controls .folio-evidence__sections {margin:0;}
+.folio-display-controls .folio-evidence__media-tools {margin-top:2px;}
+.folio-toolbar__overview {display:grid;gap:2px;color:var(--text-1);font-size:13px;}
+.folio-toolbar__overview span {font-size:11px;color:var(--text-3);}
+.folio-toolbar__actions {display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.folio-toolbar__actions .btn {min-height:40px;font-size:12px;}
+.folio-toolbar__actions button:disabled {opacity:.48;cursor:not-allowed;}
+.folio-criteria__all {min-width:110px;border:1px solid var(--brand);border-radius:9px;
+  padding:8px 10px;font:inherit;font-size:11px;font-weight:800;cursor:pointer;
+  color:var(--brand);background:var(--brand-soft);}
+.folio-criteria__all.is-active {background:var(--brand);color:#fff;}
+.folio-criteria__row {display:flex;gap:2px;align-items:center;min-width:0;}
+.folio-criteria__row .folio-criteria__item {flex:1;min-width:0;}
+.folio-criteria__row-tools {display:flex;gap:1px;align-items:center;flex:none;}
+.folio-criteria__row-tools button {width:26px;height:30px;display:grid;place-items:center;
+  border:1px solid transparent;background:transparent;color:var(--text-2);border-radius:6px;
+  font-size:14px;cursor:pointer;line-height:1;}
+.folio-criteria__row-tools button:hover {border-color:var(--brand);color:var(--brand);background:var(--brand-soft);}
+.folio-criteria__row-tools button:focus-visible,.folio-criteria__all:focus-visible,
+.folio-focus__heading button:focus-visible {outline:3px solid var(--brand);outline-offset:2px;}
+.folio-library__selected-action.is-include {border:1px solid var(--brand);border-radius:7px;
+  padding:6px 10px;color:var(--brand);background:var(--brand-soft);}
+.folio-library__selected-action.is-include[aria-pressed="true"] {color:#16593e;background:#e5f4e9;border-color:#b8dcc6;}
+.folio-sheet.folio-evidence,
+.folio-sheet.folio-export-witness {padding-bottom:110px;}
+.folio-sheet.folio-evidence--continuation {padding-bottom:110px;}
+.folio-sheet__footer {pointer-events:none;z-index:2;}
+@media(max-width:930px) {
+  .folio-criteria__head {gap:8px;}
+  .folio-criteria__all {flex:1 1 auto;}
+}
+@media(max-width:540px) {
+  .folio-toolbar__actions {width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+  .folio-toolbar__actions .btn {width:100%;padding-inline:8px;}
+  .folio-focus__pages {padding:8px 5px;}
+  .folio-criteria__row-tools button {width:23px;}
+  .folio-criteria__item {gap:3px;}
+  .folio-display-controls {padding:10px;}
+}
+@media print {
+  .folio-focus,.folio-display-controls,.folio-focus__heading {display:none !important;}
+  .folio-editor-main.is-focused .folio-document,
+  .folio-editor-main.is-full .folio-document {display:block !important;}
+  .folio-document > [data-portfolio-page] {order:initial !important;}
+  .folio-export-witness .folio-evidence__print-copy {display:block !important;}
+  .folio-sheet.folio-export-witness {padding-bottom:115px !important;}
+  .folio-export-witness .folio-evidence__image-tools {display:none !important;}
+}
