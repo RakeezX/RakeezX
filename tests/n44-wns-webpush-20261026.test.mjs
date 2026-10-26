@@ -5,7 +5,8 @@ import { approvedProviderOrigins, trustedSubscription } from '../drafts/n44-push
 import { WNS_WEBPUSH_ORIGIN } from '../drafts/n44-push/shared.mjs';
 import { makeFixture } from './fixtures/n44-crypto-sender/fixture.mjs';
 
-const ENDPOINT='https://wns2-prod13.notify.windows.com/?token=OPAQUE_TEST_123%2FABC%3D';
+// Edge alternate-channel subscriptions use /w/; root / belongs to older WNS examples.
+const ENDPOINT='https://wns2-ln2p.notify.windows.com/w/?token=OPAQUE_TEST_123%2FABC%3D';
 test('Edge WNS requires explicit trusted provider, preserves opaque endpoint, encrypts VAPID and accepts 200', async()=>{
  const f=makeFixture({origin:WNS_WEBPUSH_ORIGIN,endpoint:ENDPOINT,wns:true});
  try {
@@ -36,6 +37,9 @@ test('only approved WNS subdomain and bounded exact opaque query are allowed',()
     'http://wns2-prod13.notify.windows.com/?token=OPAQUE_TEST_123',
     'https://wns2-prod13.notify.windows.com:8443/?token=OPAQUE_TEST_123',
     'https://wns2-prod13.notify.windows.com/admin?token=OPAQUE_TEST_123',
+    'https://wns2-prod13.notify.windows.com/w/extra?token=OPAQUE_TEST_123',
+    'https://wns2-prod13.notify.windows.com/w/?token=OPAQUE_TEST_123&admin=1',
+    'https://wns2-prod13.notify.windows.com/w/?wrong=OPAQUE_TEST_123',
     'https://wns2-prod13.notify.windows.com/?token=OPAQUE_TEST_123#junk',
     'https://127.0.0.1/?token=OPAQUE_TEST_123',
     'https://wns2-prod13.notify.windows.com/?token=%0A',

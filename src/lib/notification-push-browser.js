@@ -1,4 +1,22 @@
 /** AI: native adapter. Public binding is not an Auth credential. Never prompt on load. */
+// Device-only display diagnostic. No subscription, server request, or app event.
+export async function showLocalNotificationCheck(win = globalThis.window) {
+  if (!win?.isSecureContext || win.Notification?.permission !== 'granted' ||
+      !win.navigator?.serviceWorker) return 'permission_unavailable';
+  try {
+    const reg = await win.navigator.serviceWorker.getRegistration('/');
+    const url = new URL(reg?.active?.scriptURL);
+    if (url.origin !== win.location.origin || url.pathname !== '/sw.js' ||
+        typeof reg.showNotification !== 'function') return 'worker_unavailable';
+    await reg.showNotification('رَكيز المعلم', {
+      body: 'هذا اختبار محلي لعرض إشعارات ركيز على جهازك.',
+      icon: '/assets/icon-192.png',
+      tag: 'rakeez-device-local-check',
+    });
+    return 'display_requested';
+  } catch { return 'unavailable'; }
+}
+
 export function createPushBrowser({ window: win = globalThis.window, publicKey, navigate }) {
   const key = () => {
     if (typeof publicKey !== 'string' || !/^B[A-Za-z0-9_-]{86}$/.test(publicKey)) throw Error('unavailable');

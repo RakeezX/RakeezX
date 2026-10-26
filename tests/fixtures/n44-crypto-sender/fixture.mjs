@@ -58,7 +58,8 @@ export function makeFixture(options={}) {
       assert.equal(o.rejectUnauthorized,true);assert.equal(o.checkServerIdentity,checkServerIdentity);
       assert.equal(o.agent,false);assert.equal(o.autoSelectFamily,false);assert.equal(o.minVersion,'TLSv1.2');
       assert.equal(o.maxHeaderSize,8192); assert.equal(o.headers['Content-Encoding'],'aes128gcm');
-      assert.equal(o.headers['Content-Type'],'application/octet-stream'); assert.equal(o.headers.Urgency,'normal');
+      assert.equal(o.headers['Content-Type'],'application/octet-stream');
+      assert.equal(o.headers.Urgency,options.wns?undefined:'normal');
       assert.ok(o.headers.TTL>0 && o.headers.TTL*1000<=f.event.expiresAt-f.now);
       assert.equal('proxy' in o,false);assert.equal('Authorization' in o.headers,true);
       // Invoking the exact connection lookup again cannot re-resolve DNS, even if

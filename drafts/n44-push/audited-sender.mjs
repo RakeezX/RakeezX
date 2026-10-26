@@ -96,6 +96,8 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
           // The endpoint query is an opaque capability: preserve it exactly.
           details.headers['X-WNS-Type']='wns/raw';
           details.headers['Content-Type']='application/octet-stream';
+          // WNS WebPush rejects generic Urgency; retain it for other push services.
+          delete details.headers.Urgency;
         }
         return await new Promise(resolveOutcome=>{
           const finish=outcome=>{

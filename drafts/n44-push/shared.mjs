@@ -8,8 +8,8 @@ export const WNS_WEBPUSH_ORIGIN = 'https://*.notify.windows.com';
 export const isWnsWebPushEndpoint = url =>
   url?.protocol === 'https:' &&
   /^wns2-[a-z0-9-]{1,70}\.notify\.windows\.com$/.test(url.hostname) &&
-  url.pathname === '/' &&
-  /^\?[A-Za-z0-9_.~%!$&'()*+,;=:@/?-]{1,1900}$/.test(url.search) &&
+  ['/', '/w/'].includes(url.pathname) &&
+  /^\?token=[A-Za-z0-9._~%+=/-]{1,1900}$/.test(url.search) &&
   !/%(?:0[0-9a-f]|1[0-9a-f]|7f)/i.test(url.search) &&
   !url.username && !url.password && !url.hash && !url.port;
 export const result = status => Object.freeze({ status });
