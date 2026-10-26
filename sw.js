@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v87';
+const VERSION = 'rakeezx-v88';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -61,6 +61,17 @@ const SHELL = [
   './src/vendor/flatpickr/ar.js',
 
   './src/app.js',
+  // AI N126: complete opt-in local Portfolio Preview shell.
+  './src/views/portfolio-design-preview.js',
+  './src/styles/portfolio-design-preview.css',
+  './src/lib/portfolio-design-preview.js',
+  './src/lib/portfolio-annual-plan.js',
+  './src/lib/portfolio-smart-evidence.js',
+  './src/lib/portfolio-evidence-templates.js',
+  './src/lib/portfolio-local-draft.js',
+  './src/lib/portfolio-local-state.js',
+  './src/lib/portfolio-local-archive.js',
+
   './src/lib/app-update.js',
   './src/router.js',
   './src/lib/student-portal-client.js',

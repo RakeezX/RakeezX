@@ -901,7 +901,13 @@ async function resolve() {
   const generation = ++resolveGeneration;
   const path = currentPath();
   const isCurrent = () => generation === resolveGeneration && path === currentPath();
-  const found = match(path);
+  // AI N126: opt-in Preview shares the normal workspace boot/shell protection.
+  // Keep Reports and its live navigation unchanged.
+  const previewPath = '/reports/portfolio-preview';
+  const found = path.split('?')[0] === previewPath
+    ? { path: previewPath, params: {}, route: { path: previewPath,
+        load: () => import('./views/portfolio-design-preview.js') } }
+    : match(path);
 
   if (!found) {
     go('/', { replace: true });
