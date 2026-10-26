@@ -46,6 +46,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   let preparingBinding = null, preparingGeneration = 0, refreshQueued = false;
   let eligibility = { reason: 'idle', configuration: 'not_observed' };
   let configObservation = null;
+  let existingClickOnly = false;
   // AI: a settled attempt is not permission to poll again on store/focus events.
   // Keep credentials only in the existing in-memory fenced binding.
   let configAttempt = null;
@@ -96,6 +97,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, quiet: readPushQuiet(c, storage) };
   };
   function invalidate() {
+    existingClickOnly = false;
     configObservation = null;
     configAttempt = null;
     const old = client, originalGateway = gateway;
@@ -161,6 +163,42 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
         const revision = ctx?.consentRevision ?? '';
         storage.setItem(revisionKey(b.context), revision); b.consentRevision = revision;
       } });
+    const resumeExistingForClick = async (observed, native, consent) => {
+      const receipt = observed?.registration;
+      const saved = () => {
+        try { const raw = storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId,b.context.workspaceId,b.context.deviceId]));
+          if (!raw || raw.length > 8192) return null;
+          const value = JSON.parse(raw);
+          return value && value.retired !== true && value.registrationId === receipt?.registrationId &&
+            value.workspaceId === b.context.workspaceId && value.deviceId === b.context.deviceId ? value : null;
+        } catch { return null; }
+      };
+      if (!valid() || observed?.status !== 'current' || observed.context?.pushConsent !== true || !receipt ||
+          !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(receipt.registrationId ?? '') ||
+          !Number.isSafeInteger(receipt.expiresAt) || receipt.expiresAt <= Date.now() ||
+          receipt.expiresAt > observed.context.sessionExpiresAt || !saved() || browser.permission() !== 'granted') return false;
+      if (!await browser.ready() || !valid()) return false;
+      const existing = native ?? await browser.existing(), worker = consent ?? await browser.consent();
+      const workerMatches = value => value?.enabled === true && value.binding === receipt.registrationId && value.expiresAt >= receipt.expiresAt;
+      if (!existing || !workerMatches(worker) || !valid()) return false;
+      b.serviceExpiresAt = Math.min(receipt.expiresAt, observed.context.sessionExpiresAt);
+      binding = b; gateway = g; existingClickOnly = true;
+      const c = createPushClient({ browser, gateway: g, clock: Date.now,
+        getVerifiedContext: () => valid() ? { ...b.context, authRevision: String(token) } : null,
+        resolveAction: (_ctx,id,now) => notificationDestination(store,current(),id,now),
+        confirmExisting: async (_snapshot, subscription) => {
+          const currentWorker = await browser.consent();
+          return subscription === existing && binding === b && gateway === g && valid() && !!saved() &&
+            g.registration()?.registrationId === receipt.registrationId && g.registration()?.expiresAt === receipt.expiresAt && workerMatches(currentWorker);
+        } });
+      client = c;
+      const restored = await c.restoreReadOnly(existing);
+      if (!valid() || binding !== b || client !== c || restored.status !== 'subscribed') {
+        if (binding === b && client === c) { binding = null; gateway = null; client = null; existingClickOnly = false; }
+        return false;
+      }
+      ready = true; status = 'subscribed'; mark('ready', { workerReady: true }); return true;
+    };
     try {
       const { body: publicConfiguration, httpStatus } = await g.configuration({ metadata: true });
       if (!valid()) { mark('binding_changed'); throw Error('unavailable'); }
@@ -173,6 +211,9 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
         const cleanupHint = consentRevision(b.context) || storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, b.context.deviceId]));
         if (publicConfiguration?.status === 'disabled' && typeof cleanupHint === 'string' && cleanupHint.length > 0 && cleanupHint.length <= 8192) {
           const observed = await g.read();
+          // Admission to a NEW registration is independent of read-only access
+          // to an already active exact receipt after the one-shot is consumed.
+          if (!readinessOnly && await resumeExistingForClick(observed)) return;
           if (valid() && observed.status === 'current' && observed.context?.pushConsent === true) {
             pendingDisable = { gateway: g, binding: b, preferences: preferences(), cleanupOnly: true };
             status = 'cleanup_pending'; mark('cleanup_pending'); return;
@@ -207,19 +248,16 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       // A manual readiness gesture must not restore/register or retire a saved
       // subscription. Its normal lifecycle remains separate from this read.
       if (readinessOnly && (r.registration || existing || workerConsent.binding || storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, b.context.deviceId])))) { status = 'unavailable'; mark('context_unavailable'); return; }
+      if (!readinessOnly && r.registration) {
+        if (await resumeExistingForClick(r, existing, workerConsent)) return;
+        status = 'unavailable'; mark('context_unavailable'); return;
+      }
       binding = b; gateway = g;
       const verified = () => valid() ? { ...b.context, authRevision: String(token) } : null;
       const c = createPushClient({ browser, gateway: g, getVerifiedContext: verified, clock: Date.now,
         resolveAction: (_ctx, id, now) => notificationDestination(store, current(), id, now) });
       client = c;
       if (readinessOnly) { ready = true; status = 'unsubscribed'; mark('ready'); return; }
-      if (r.registration && existing && workerConsent.binding === r.registration.registrationId &&
-          workerConsent.expiresAt >= r.registration.expiresAt && browser.permission() === 'granted') {
-        const restored = await c.restore(existing);
-        if (!valid()) return;
-        if (restored.status === 'subscribed') { ready = true; status = 'subscribed'; mark('ready'); await projectConfirmed({ workspace: b.workspace, session: b.session }); return; }
-        if (restored.status === 'cleanup_pending') { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
-      }
       // No new subscription or permission request on load. Retired identities
       // are reconciled before allowing another explicit opt-in.
       if (!await g.retire()) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
@@ -265,7 +303,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   // AI N44: bootstrap and adopted canonical state are distinct from a pushed ACK.
   // Only confirmed IDs are hints; no local event payload becomes server truth.
   function projectConfirmed(checkpoint) {
-      if (!usable() || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return Promise.resolve();
+      if (existingClickOnly || !usable() || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return Promise.resolve();
       // Overlapping ACK hooks share one current-owner pass. Never queue a replay
       // of a write whose response was lost.
       if (projecting) return projecting;
@@ -417,7 +455,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     normalUiSnapshot() {
       const options = normalChoices();
       return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
-        canVerify: usable() };
+        canVerify: !existingClickOnly && usable() };
     },
     async deviceOutcome() {
       const before=outcomeBinding();if(!before?.registration)return null;
@@ -426,9 +464,9 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       return epoch===generation&&after?.binding===before.binding&&after.gateway===before.gateway&&after.pending===before.pending&&after.registration?.registrationId===id&&after.registration?.expiresAt===before.registration.expiresAt?outcome:null;
     },
     snapshot: () => ({ configRecheckAvailable: !disposed && configuration.enabled && !!current() && !binding && !pendingDisable && !disabling, configRecheckBusy: preparing, configRecheckCoolingDown: sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt,
-      deviceOutcomeAvailable: !!outcomeBinding(), available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
+      deviceOutcomeAvailable: !!outcomeBinding(), available: !existingClickOnly && ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding) || existingClickOnly && ownsCleanup(binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
     async optIn() {
-      if (!ready || !matches(binding)) return { status: 'unavailable' };
+      if (existingClickOnly || !ready || !matches(binding)) return { status: 'unavailable' };
       const c = client, result = await c.optIn();
       if (client === c && matches(binding)) {
         status = result.status; if (status === 'subscribed') preferenceStop = null; changed();
