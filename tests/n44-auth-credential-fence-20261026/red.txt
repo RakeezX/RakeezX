@@ -1,0 +1,280 @@
+✖ preflight: stale independent client must not POST a consumed refresh token (150.4377ms)
+✖ late refresh 200 cannot replace/remove peer winner (10.43ms)
+✖ late refresh 400 cannot replace/remove peer winner (8.2727ms)
+✖ late refresh 401 cannot replace/remove peer winner (9.3404ms)
+✖ late refresh 403 cannot replace/remove peer winner (9.9953ms)
+✖ late verify401 respects shared credential replacement (9.7502ms)
+✖ late verify403 respects shared credential replacement (8.4859ms)
+✖ late verify200 respects shared credential replacement (7.168ms)
+✖ late data401 respects shared credential replacement (7.0469ms)
+✖ late data200 respects shared credential replacement (7.035ms)
+✔ logout during refresh retires old reply (7.8848ms)
+✔ owner during refresh retires old reply (7.521ms)
+✖ same-owner-session during refresh retires old reply (6.7502ms)
+✔ memory during refresh retires old reply (5.9564ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 3
+ℹ fail 11
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 395.1476
+
+✖ failing tests:
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:33:1
+✖ preflight: stale independent client must not POST a consumed refresh token (150.4377ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    Comparison {
+  +   code: 'AUTH_REQUIRED'
+  -   code: 'AUTH_CONTEXT_CHANGED'
+    }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:38:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: old refresh rejected
+        at authError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-1:114:17)
+        at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-1:240:15
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:38:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:43:41
+✖ late refresh 200 cannot replace/remove peer winner (10.43ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:50:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:43:41
+✖ late refresh 400 cannot replace/remove peer winner (8.2727ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    Comparison {
+  +   code: 'AUTH_REQUIRED'
+  -   code: 'AUTH_CONTEXT_CHANGED'
+    }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:50:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: denied
+        at authError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-3:114:17)
+        at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-3:240:15
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:50:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:43:41
+✖ late refresh 401 cannot replace/remove peer winner (9.3404ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    Comparison {
+  +   code: 'AUTH_REQUIRED'
+  -   code: 'AUTH_CONTEXT_CHANGED'
+    }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:50:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: denied
+        at authError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-4:114:17)
+        at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-4:240:15
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:50:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:43:41
+✖ late refresh 403 cannot replace/remove peer winner (9.9953ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    Comparison {
+  +   code: 'AUTH_REQUIRED'
+  -   code: 'AUTH_CONTEXT_CHANGED'
+    }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:50:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: denied
+        at authError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-5:114:17)
+        at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-5:240:15
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:50:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:54:84
+✖ late verify401 respects shared credential replacement (9.7502ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + Comparison {}
+  - Comparison {
+  -   code: 'AUTH_CONTEXT_CHANGED'
+  - }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: denied
+        at parseFailure (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-6:137:17)
+        at responseFailure (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-6:148:17)
+        at async request (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-6:319:21)
+        at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-6:418:18
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:54:84
+✖ late verify403 respects shared credential replacement (8.4859ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + Comparison {}
+  - Comparison {
+  -   code: 'AUTH_CONTEXT_CHANGED'
+  - }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: denied
+        at parseFailure (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-7:137:17)
+        at responseFailure (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-7:148:17)
+        at async request (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-7:319:21)
+        at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-7:418:18
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:54:84
+✖ late verify200 respects shared credential replacement (7.168ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:54:84
+✖ late data401 respects shared credential replacement (7.0469ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    Comparison {
+  +   code: 'AUTH_REQUIRED'
+  -   code: 'AUTH_CONTEXT_CHANGED'
+    }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: denied
+        at authError (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-9:114:17)
+        at Module.request (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/src/lib/cloud.js?n44-a-9:315:13)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:54:84
+✖ late data200 respects shared credential replacement (7.035ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:71:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:74:72
+✖ same-owner-session during refresh retires old reply (6.7502ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-auth-credential-fence-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:84:39)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

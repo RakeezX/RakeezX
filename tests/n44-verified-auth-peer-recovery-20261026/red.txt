@@ -1,0 +1,42 @@
+✖ normal next and successive requests recover peer rotation without reload or stale POST (118.5529ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 406.3905
+
+✖ failing tests:
+
+test at tests\n44-verified-auth-peer-recovery-20261026\check.mjs:43:1
+✖ normal next and successive requests recover peer rotation without reload or stale POST (118.5529ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+  +   'AUTH_CONTEXT_CHANGED',
+  +   'AUTH_CONTEXT_CHANGED',
+  +   'AUTH_CONTEXT_CHANGED'
+  -   {
+  -     ok: true
+  -   },
+  -   {
+  -     ok: true
+  -   },
+  -   {
+  -     ok: true
+  -   }
+    ]
+
+      at TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-verified-auth-peer-recovery-20261026/tests/n44-verified-auth-peer-recovery-20261026/check.mjs:48:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'AUTH_CONTEXT_CHANGED', 'AUTH_CONTEXT_CHANGED', 'AUTH_CONTEXT_CHANGED' ],
+    expected: [ { ok: true }, { ok: true }, { ok: true } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

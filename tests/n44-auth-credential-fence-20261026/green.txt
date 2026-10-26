@@ -1,0 +1,33 @@
+✔ preflight: stale independent client must not POST a consumed refresh token (48.815ms)
+✔ late refresh 200 cannot replace/remove peer winner (8.7488ms)
+✔ late refresh 400 cannot replace/remove peer winner (8.5622ms)
+✔ late refresh 401 cannot replace/remove peer winner (8.5679ms)
+✔ late refresh 403 cannot replace/remove peer winner (9.0026ms)
+✔ late verify401 respects shared credential replacement (10.0461ms)
+✔ late verify403 respects shared credential replacement (7.9769ms)
+✔ late verify200 respects shared credential replacement (8.2674ms)
+✔ late data401 respects shared credential replacement (6.8599ms)
+✔ late data200 respects shared credential replacement (8.6252ms)
+✔ logout during refresh retires old reply (7.3481ms)
+✔ owner during refresh retires old reply (7.7188ms)
+✔ same-owner-session during refresh retires old reply (7.069ms)
+✔ memory during refresh retires old reply (6.5938ms)
+✔ peer rotation while refresh 200 body waits cannot commit (7.2556ms)
+✔ peer rotation while refresh 400 body waits cannot commit (7.8433ms)
+✔ current unchanged verified identity denial 401 still clears (9.188ms)
+✔ current unchanged verified identity denial 403 still clears (8.6962ms)
+✔ transient refresh 429 preserves current credentials (8.8396ms)
+✔ transient refresh 500 preserves current credentials (8.3035ms)
+✔ transient refresh 503 preserves current credentials (6.8011ms)
+✔ transient refresh network preserves current credentials (6.5217ms)
+✔ singleflight deadline aborts once and a late ignored-abort body cannot persist (18.2228ms)
+✔ same-owner explicit new login retires old data request even with identical credential tuple (6.6903ms)
+✔ preflight owner change or peer logout sends no data against a retired context (16.2518ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 386.679

@@ -1,0 +1,5 @@
+PASS: observed remote main and isolated HEAD = 31db4997640f2b1c69e500c6ba0b188dcca9c5ce
+PASS: pinned prior object exists; exact seven-path delta ported before extension; five historical doc/log Git blobs remain exact.
+PASS: five original credential comparison guards remain exact after Git EOL normalization; 26-case regression sources and bounded test unchanged.
+PASS: activated card public verificationPaths = src/lib/cloud.js only; actual sync-ownership.js import exists.
+Prior cloud blob: be96ca287f68119a40394ed52641b6c3067b340c

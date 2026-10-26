@@ -1,0 +1,91 @@
+✔ identical verification preserves references; nested identity and token changes remain observable (65.2213ms)
+✖ preflight: stale independent client must not POST a consumed refresh token (101.2748ms)
+✔ late refresh 200 cannot replace/remove peer winner (18.9847ms)
+✔ late refresh 400 cannot replace/remove peer winner (15.4572ms)
+✔ late refresh 401 cannot replace/remove peer winner (11.5146ms)
+✔ late refresh 403 cannot replace/remove peer winner (12.3415ms)
+✔ late verify401 respects shared credential replacement (11.7336ms)
+✔ late verify403 respects shared credential replacement (10.0227ms)
+✔ late verify200 respects shared credential replacement (8.8867ms)
+✔ late data401 respects shared credential replacement (8.011ms)
+✔ late data200 respects shared credential replacement (10.6702ms)
+✔ logout during refresh retires old reply (10.393ms)
+✔ owner during refresh retires old reply (9.5312ms)
+✔ same-owner-session during refresh retires old reply (9.7545ms)
+✔ memory during refresh retires old reply (7.9529ms)
+✔ peer rotation while refresh 200 body waits cannot commit (9.037ms)
+✔ peer rotation while refresh 400 body waits cannot commit (9.5776ms)
+✔ current unchanged verified identity denial 401 still clears (10.9318ms)
+✔ current unchanged verified identity denial 403 still clears (8.2768ms)
+✔ transient refresh 429 preserves current credentials (7.8878ms)
+✔ transient refresh 500 preserves current credentials (7.3299ms)
+✔ transient refresh 503 preserves current credentials (7.817ms)
+✔ transient refresh network preserves current credentials (11.2851ms)
+✔ singleflight deadline aborts once and a late ignored-abort body cannot persist (23.0441ms)
+✔ same-owner explicit new login retires old data request even with identical credential tuple (7.4426ms)
+✔ preflight owner change or peer logout sends no data against a retired context (16.5432ms)
+✔ bounded lifecycle, shared refresh independence, stale owner/token/logout, body timeout and retry (84.6052ms)
+✔ pending_sync_permission_failure_and_reopen_auth: real guarded store entry retains exact denied envelope (85.6527ms)
+✔ permission403_preserves_session_without_refresh_or_replay, including reopen and pending state (61.6754ms)
+✔ true401 refresh then 200 (3.196ms)
+✔ true401 refresh then 403 (1.7294ms)
+✔ true401 refresh then 401 (1.8424ms)
+✔ invalid Auth refresh 400 still clears session (1.2593ms)
+✔ invalid Auth refresh 401 still clears session (1.1928ms)
+✔ invalid Auth refresh 403 still clears session (0.9395ms)
+✔ concurrent true401 requests share one refresh (1.2265ms)
+✔ owner during request fences stale request (0.7028ms)
+✔ cancel during request fences stale request (0.4557ms)
+✔ cross-tab during request fences stale request (0.3727ms)
+✔ owner during refresh fences stale request (1.0525ms)
+✔ cancel during refresh fences stale request (1.0094ms)
+✔ cross-tab during refresh fences stale request (1.0299ms)
+✔ owner during retry fences stale request (2.6642ms)
+✔ cancel during retry fences stale request (0.9764ms)
+✔ cross-tab during retry fences stale request (1.0221ms)
+✔ owner during failure-body fences stale request (0.503ms)
+✔ cancel during failure-body fences stale request (0.4225ms)
+✔ cross-tab during failure-body fences stale request (0.3955ms)
+✔ new same-owner token arriving during retry cannot be cleared by stale401 (0.8735ms)
+✔ caller assertAccess remains authoritative (0.4823ms)
+✔ already refreshed same-owner token is reused after late401 without another refresh (0.7061ms)
+✔ transient refresh503 preserves Auth and does not replay mutation (0.7937ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 51
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 596.4197
+
+✖ failing tests:
+
+test at tests\n44-auth-credential-fence-20261026\credential.test.mjs:33:1
+✖ preflight: stale independent client must not POST a consumed refresh token (101.2748ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + Comparison {}
+  - Comparison {
+  -   code: 'AUTH_CONTEXT_CHANGED'
+  - }
+
+      at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-verified-auth-peer-recovery-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:38:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: old refresh rejected
+        at parseFailure (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-verified-auth-peer-recovery-20261026/src/lib/cloud.js?n44-a-1:137:17)
+        at responseFailure (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-verified-auth-peer-recovery-20261026/src/lib/cloud.js?n44-a-1:148:17)
+        at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-verified-auth-peer-recovery-20261026/src/lib/cloud.js?n44-a-1:243:23
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-verified-auth-peer-recovery-20261026/tests/n44-auth-credential-fence-20261026/credential.test.mjs:38:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),
+    expected: { code: 'AUTH_CONTEXT_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

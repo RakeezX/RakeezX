@@ -161,7 +161,128 @@ function persistedAuthOwner() {
   catch { return null; }
 }
 
-function saveSession(data, { required = true } = {}) {
+// AI N44: owner equality is not credential/session equality. These snapshots
+// are comparison fences only; cached identity never grants workspace authority.
+function credentialTuple(value) {
+  return JSON.stringify([value?.user?.id ?? null, value?.access_token ?? null, value?.refresh_token ?? null]);
+}
+function persistedCredentialTuple() {
+  try { return credentialTuple(JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || 'null')); }
+  catch { return null; }
+}
+function credentialContextChanged() {
+  return Object.assign(new Error('Authentication credentials changed'), { code: 'AUTH_CONTEXT_CHANGED' });
+}
+function assertPersistedCredentials() {
+  if (persistedCredentialTuple() !== credentialTuple(session)) throw credentialContextChanged();
+}
+function captureCredentialContext() {
+  assertPersistedCredentials();
+  const generation = authContextGeneration, tuple = credentialTuple(session);
+  return () => {
+    if (generation !== authContextGeneration || credentialTuple(session) !== tuple ||
+        persistedCredentialTuple() !== tuple) throw credentialContextChanged();
+  };
+}
+
+let peerRecoveryInFlight = null;
+let peerRecoveryAttemptKey = null;
+let peerCredentialGeneration = 0;
+let verifiedAccessToken = null;
+// Claims never establish identity. After Auth verifies the candidate token,
+// these IDs only decide whether to retire the previous session's capabilities.
+function tokenSessionId(value) {
+  try {
+    const encoded = String(value?.access_token ?? '').split('.')[1];
+    const payload = JSON.parse(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')));
+    return typeof payload.session_id === 'string' && payload.session_id ? payload.session_id : null;
+  } catch { return null; }
+}
+function retirePeerCapabilities(owner) {
+  revokeOwnerLeases(owner);
+  revokeScoreCapabilities(owner);
+}
+function reconcilePeerCredentials() {
+  if (persistedCredentialTuple() === credentialTuple(session)) return Promise.resolve(session);
+  const previous = session, expectedOwner = user?.id, generation = authContextGeneration;
+  let candidate;
+  try { candidate = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || 'null'); } catch {}
+  if (!previous?.access_token || !expectedOwner || !candidate?.access_token ||
+      !candidate?.refresh_token || candidate.user?.id !== expectedOwner) {
+    // Never remove another tab's winning store or resurrect a signed-out actor.
+    if (previous && expectedOwner) {
+      retirePeerCapabilities(expectedOwner);
+      authContextGeneration++;
+      session = null; user = null; authRequired = true; notify();
+    }
+    return Promise.reject(credentialContextChanged());
+  }
+  const originalTuple = credentialTuple(previous), candidateTuple = credentialTuple(candidate);
+  const key = JSON.stringify([generation, originalTuple, candidateTuple]);
+  peerRecoveryAttemptKey = key;
+  if (peerRecoveryInFlight?.key === key) return peerRecoveryInFlight.promise;
+  const previousSessionId = verifiedAccessToken === previous.access_token ? tokenSessionId(previous) : null;
+  const differentSession = !previousSessionId || previousSessionId !== tokenSessionId(candidate);
+  // Untrusted claims may revoke, never grant. Even a failed verification must
+  // not leave a different session able to reuse the former offline receipt.
+  if (differentSession) retirePeerCapabilities(expectedOwner);
+  const flight = { key };
+  flight.promise = boundedAuthRequest(async (signal, assertActive) => {
+    const assertContext = () => {
+      assertActive();
+      if (generation !== authContextGeneration || user?.id !== expectedOwner ||
+          session !== previous || credentialTuple(session) !== originalTuple ||
+          persistedCredentialTuple() !== candidateTuple) throw credentialContextChanged();
+    };
+    assertContext();
+    let response;
+    try {
+      // sendRequest deliberately uses memory's bearer. This Auth-only request
+      // must instead verify the exact candidate, never send it to Product REST.
+      response = await fetch(`${SUPABASE_URL}/auth/v1/user`, { method: 'GET', signal,
+        headers: { apikey: PUBLISHABLE_KEY, Authorization: `Bearer ${candidate.access_token}` } });
+    } catch (error) {
+      assertContext();
+      error.code ??= 'AUTH_NETWORK';
+      throw error;
+    }
+    assertContext();
+    if (!response.ok) {
+      const failure = await responseFailure(response);
+      assertContext();
+      if ([401, 403].includes(response.status)) saveSession(null);
+      throw failure;
+    }
+    let verified;
+    try { verified = await response.json(); }
+    catch (error) { assertContext(); throw error; }
+    assertContext();
+    if (verified?.id !== expectedOwner) {
+      retirePeerCapabilities(expectedOwner);
+      throw Object.assign(new Error('Verified peer owner mismatch'), { code: 'AUTH_OWNER_MISMATCH' });
+    }
+    peerCredentialGeneration++;
+    saveSession({ ...candidate, user: verified }, { newSession: differentSession, verified: true });
+    // A new session needs the ordinary verified workspace/lease entry. Never
+    // continue an operation holding the former session's capabilities.
+    if (differentSession) throw credentialContextChanged();
+    return session;
+  }).finally(() => { if (peerRecoveryInFlight === flight) peerRecoveryInFlight = null; });
+  peerRecoveryInFlight = flight;
+  return flight.promise;
+}
+
+if (typeof window !== 'undefined') window.addEventListener('storage', event => {
+  if ((event.key === AUTH_STORAGE_KEY || event.key === null) && session &&
+      persistedCredentialTuple() !== credentialTuple(session)) {
+    const key = JSON.stringify([authContextGeneration, credentialTuple(session), persistedCredentialTuple()]);
+    if (key === peerRecoveryAttemptKey) return;
+    // Read current storage, never event.newValue. No retry loop or write replay.
+    void reconcilePeerCredentials().catch(() => {});
+  }
+});
+
+function saveSession(data, { required = true, newSession = false, verified = false } = {}) {
   const priorSignature = authSignature();
   const priorSession = session, priorIdentity = user;
   const nextUserId = data?.access_token ? (data.user?.id ?? user?.id) : null;
@@ -174,7 +295,8 @@ function saveSession(data, { required = true } = {}) {
     revokeOwnerLeases(user.id);
     revokeScoreCapabilities(user.id);
   }
-  if ((user?.id ?? null) !== (nextUserId ?? null) || !!session !== !!data?.access_token) authContextGeneration++;
+  if (newSession || (user?.id ?? null) !== (nextUserId ?? null) || !!session !== !!data?.access_token) authContextGeneration++;
+  verifiedAccessToken = verified ? data?.access_token ?? null : null;
   if (!data?.access_token) {
     session = null;
     user = null;
@@ -201,6 +323,8 @@ function saveSession(data, { required = true } = {}) {
 }
 
 export async function refreshSession() {
+  if (persistedCredentialTuple() !== credentialTuple(session)) return reconcilePeerCredentials();
+  const assertCredentials = captureCredentialContext();
   const refreshKey = JSON.stringify([authContextGeneration, user?.id, session?.access_token, session?.refresh_token]);
   if (refreshInFlight?.key === refreshKey) return refreshInFlight.promise;
   if (!session?.refresh_token) {
@@ -212,6 +336,7 @@ export async function refreshSession() {
   const expectedOwnerId = user?.id;
   const contextGeneration = authContextGeneration;
   const assertRefreshContext = () => {
+    assertCredentials();
     if (authContextGeneration !== contextGeneration || persistedAuthOwner() !== expectedOwnerId || user?.id !== expectedOwnerId || session?.access_token !== previous.access_token || session?.refresh_token !== refreshToken) {
       throw Object.assign(new Error('Authentication changed during refresh'), { code: 'AUTH_CONTEXT_CHANGED' });
     }
@@ -245,7 +370,7 @@ export async function refreshSession() {
     assertActive();
     assertRefreshContext();
     if (refreshed.user?.id && refreshed.user.id !== expectedOwnerId) throw Object.assign(new Error('Refresh owner mismatch'), { code: 'AUTH_OWNER_MISMATCH' });
-    saveSession({ ...previous, ...refreshed, user: refreshed.user ?? previous.user ?? user });
+    saveSession({ ...previous, ...refreshed, user: refreshed.user ?? previous.user ?? user }, { verified: true });
     return session;
   }).finally(() => { if (refreshInFlight === flight) refreshInFlight = null; });
   refreshInFlight = flight;
@@ -253,6 +378,7 @@ export async function refreshSession() {
 }
 
 async function ensureFreshSession() {
+  if (persistedCredentialTuple() !== credentialTuple(session)) await reconcilePeerCredentials();
   if (!session || !tokenNeedsRefresh(session)) return session;
   return refreshSession();
 }
@@ -279,12 +405,19 @@ export async function request(path, options = {}, isAuth = false, { responseMeta
   const contextGeneration = authContextGeneration;
   const expectedOwnerId = user?.id;
   const expectedPersistedOwner = persistedAuthOwner();
+  if (!isAuth && persistedCredentialTuple() !== credentialTuple(session)) {
+    assertAccess();
+    options.signal?.throwIfAborted();
+    await reconcilePeerCredentials();
+  }
+  const peerGeneration = peerCredentialGeneration;
   // AI N88/N44: a late data response cannot refresh, replay or sign out a
   // different Auth context. Same-owner refresh remains valid within this one.
   const assertRequestContext = () => {
     assertAccess();
     options.signal?.throwIfAborted();
-    if (!isAuth && (authContextGeneration !== contextGeneration || user?.id !== expectedOwnerId ||
+    if (!isAuth) assertPersistedCredentials();
+    if (!isAuth && (authContextGeneration !== contextGeneration || peerGeneration !== peerCredentialGeneration || user?.id !== expectedOwnerId ||
         persistedAuthOwner() !== expectedPersistedOwner)) {
       throw Object.assign(new Error('Authentication changed during request'), { code: 'AUTH_CONTEXT_CHANGED' });
     }
@@ -293,6 +426,7 @@ export async function request(path, options = {}, isAuth = false, { responseMeta
   if (!isAuth) await ensureFreshSession();
   assertRequestContext();
   let attemptedToken = session?.access_token ?? null;
+  let assertAttemptedCredentials = !isAuth ? captureCredentialContext() : () => {};
   let res = await sendRequest(path, options, isAuth);
   assertRequestContext();
   // Data API 403 (including PostgreSQL 42501) is a permission rejection,
@@ -302,12 +436,14 @@ export async function request(path, options = {}, isAuth = false, { responseMeta
       if (session.access_token === attemptedToken) await refreshSession();
       assertRequestContext();
       attemptedToken = session?.access_token ?? null;
+      assertAttemptedCredentials = captureCredentialContext();
       res = await sendRequest(path, options, false);
       assertRequestContext();
     }
     if (res.status === 401) {
       const failure = await responseFailure(res);
       assertRequestContext();
+      assertAttemptedCredentials();
       if ((session?.access_token ?? null) !== attemptedToken) {
         throw Object.assign(new Error('Authentication token changed during request'), { code: 'AUTH_CONTEXT_CHANGED' });
       }
@@ -363,7 +499,7 @@ export async function signIn(email, password) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   }, true);
-  saveSession(data);
+  saveSession(data, { newSession: true, verified: true });
 }
 
 /** One email OTP flow; the global Product gate controls new-user creation. */
@@ -383,7 +519,7 @@ export async function verifyEmailOtp(email, token) {
     body: JSON.stringify({ email, token, type: 'email' }),
   }, true);
   if (!data?.access_token || !data?.user?.id) throw authError('OTP verification did not return an authenticated user');
-  saveSession(data);
+  saveSession(data, { newSession: true, verified: true });
   return user;
 }
 
@@ -411,6 +547,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     // This deadline never aborts the independently bounded shared refresh.
     await ensureFreshSession();
     assertContext();
+    const assertCredentials = captureCredentialContext();
     const attemptedToken = session?.access_token;
     if (!session?.access_token) throw authError('Authentication required');
     let verified;
@@ -418,12 +555,14 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
       verified = await request('/user', { method: 'GET', signal }, true);
     } catch (error) {
       assertContext();
+      assertCredentials();
       if (session?.access_token === attemptedToken && [401, 403].includes(error?.status) && contextGeneration === authContextGeneration && user?.id === expected && persistedAuthOwner() === expected) {
         saveSession(null);
       }
       throw error;
     }
     assertContext();
+    assertCredentials();
     if (session?.access_token !== attemptedToken) throw Object.assign(new Error('Authentication token changed during verification'), { code: 'AUTH_CONTEXT_CHANGED' });
     const persistedOwner = persistedAuthOwner();
     if (contextGeneration !== authContextGeneration || user?.id !== expected || !session?.access_token || persistedOwner !== expected) {
@@ -437,7 +576,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
         code: 'AUTH_OWNER_MISMATCH', expectedOwnerId: expected, verifiedOwnerId: actual || null,
       });
     }
-    saveSession({ ...session, user: verified });
+    saveSession({ ...session, user: verified }, { verified: true });
     return Object.freeze({
       id: actual,
       verifiedAt: Date.now(),
@@ -481,7 +620,7 @@ export async function updateCurrentUserEmail(email) {
         code: 'AUTH_OWNER_MISMATCH', expectedOwnerId, verifiedOwnerId: actualOwnerId || null,
       });
     }
-    saveSession({ ...session, user: { ...user, ...updated, id: expectedOwnerId } });
+    saveSession({ ...session, user: { ...user, ...updated, id: expectedOwnerId } }, { verified: true });
     return user;
   });
 }
