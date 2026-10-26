@@ -1,4 +1,22 @@
 /** AI: native adapter. Public binding is not an Auth credential. Never prompt on load. */
+// Device-only display diagnostic. No subscription, server request, or app event.
+export async function showLocalNotificationCheck(win = globalThis.window) {
+  if (!win?.isSecureContext || win.Notification?.permission !== 'granted' ||
+      !win.navigator?.serviceWorker) return 'permission_unavailable';
+  try {
+    const reg = await win.navigator.serviceWorker.getRegistration('/');
+    const url = new URL(reg?.active?.scriptURL);
+    if (url.origin !== win.location.origin || url.pathname !== '/sw.js' ||
+        typeof reg.showNotification !== 'function') return 'worker_unavailable';
+    await reg.showNotification('رَكيز المعلم', {
+      body: 'هذا اختبار محلي لعرض إشعارات ركيز على جهازك.',
+      icon: '/assets/icon-192.png',
+      tag: 'rakeez-device-local-check',
+    });
+    return 'display_requested';
+  } catch { return 'unavailable'; }
+}
+
 export function createPushBrowser({ window: win = globalThis.window, publicKey, navigate }) {
   const key = () => {
     if (typeof publicKey !== 'string' || !/^B[A-Za-z0-9_-]{86}$/.test(publicKey)) throw Error('unavailable');
@@ -7,6 +25,10 @@ export function createPushBrowser({ window: win = globalThis.window, publicKey, 
     return bytes;
   };
   const registration = () => win.navigator.serviceWorker.getRegistration('/');
+  // The worker is already verified during readiness. Reuse that registration
+  // synchronously when the user clicks, so Safari/Firefox can consume the
+  // transient user activation BEFORE the first await.
+  let preparedRegistration = null;
   const message = async data => {
     const worker = (await registration())?.active;
     if (!worker) throw Error('unavailable');
@@ -32,10 +54,14 @@ export function createPushBrowser({ window: win = globalThis.window, publicKey, 
     permission: () => win.Notification?.permission,
     requestPermission: () => win.Notification.requestPermission(),
     async ready() {
+      preparedRegistration = null;
       try {
-        const url = new URL((await registration())?.active?.scriptURL);
+        const r = await registration();
+        const url = new URL(r?.active?.scriptURL);
         if (url.origin !== win.location.origin || url.pathname !== '/sw.js') return false;
-        return (await message({ type: 'n44-consent-status' }))?.enabled === true;
+        const ready = (await message({ type: 'n44-consent-status' }))?.enabled === true;
+        preparedRegistration = ready ? r : null;
+        return ready;
       } catch { return false; }
     },
     async bind(receipt) {
@@ -64,7 +90,19 @@ export function createPushBrowser({ window: win = globalThis.window, publicKey, 
     },
     async existing() {
       const r = await registration();
-      return r?.active ? wrap(await r.pushManager.getSubscription(), r.pushManager) : null;
+      const u = r?.active?.scriptURL ? new URL(r.active.scriptURL) : null;
+      preparedRegistration = u?.origin === win.location.origin && u.pathname === '/sw.js' ? r : null;
+      return preparedRegistration ? wrap(await r.pushManager.getSubscription(), r.pushManager) : null;
+    },
+    subscribeOnGesture() {
+      const r = preparedRegistration;
+      if (!r?.active || win.navigator.userActivation?.isActive !== true) throw Error('unavailable');
+      const u = new URL(r.active.scriptURL);
+      if (u.origin !== win.location.origin || u.pathname !== '/sw.js') throw Error('unavailable');
+      // Crucial: invoke native PushManager.subscribe synchronously here. Neither
+      // a getRegistration nor getSubscription promise may precede this call.
+      const request = r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key() });
+      return Promise.resolve(request).then(value => wrap(value, r.pushManager));
     },
     async subscribe() {
       const r = await registration();

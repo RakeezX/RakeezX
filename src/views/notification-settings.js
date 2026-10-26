@@ -6,11 +6,13 @@ import { repaint } from '../repaint.js';
 import { currentNotificationContext } from '../lib/notification-events.js';
 import { notificationScope } from '../lib/notification-center.js';
 import { getPushRuntime, readPushQuiet, writePushQuiet } from '../lib/notification-push-runtime.js';
+import { showLocalNotificationCheck } from '../lib/notification-push-browser.js';
 import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificationTiming, readNotificationCategories, writeNotificationCategory } from '../lib/notification-state.js';
 
 let cleanup = () => {};
 let mountedRoot = null;
 let recoveryRevision = 0;
+
 let supportScope = null;
 let outcomeView = null, outcomeEpoch = 0;
 const dayLabels = { 3: 'قبل 3 أيام', 2: 'قبل يومين', 1: 'قبل يوم', 0: 'يوم التسليم' };
@@ -25,7 +27,8 @@ const eligibilityText = {
   "configuration_invalid": "تعذر التحقق من إعداد تذكيرات الجهاز.",
   "request_unavailable": "تعذر تحميل إعداد تذكيرات الجهاز.",
   "binding_changed": "تغير اتصال الحساب أثناء التحقق من الجاهزية.",
-  "browser_unsupported": "المتصفح لا يدعم تذكيرات الجهاز.",
+  "browser_unsupported": "المتصفح لا يدعم تذكيرات الجهاز في وضعه الحالي. على آيفون وآيباد أضف ركيز إلى الشاشة الرئيسية وافتحه من أيقونته، ثم فعّل التنبيهات.",
+
   "context_unavailable": "تعذر التحقق من سياق تذكيرات الجهاز.",
   "service_worker_unavailable": "خدمة تذكيرات الجهاز في المتصفح غير جاهزة.",
   "cleanup_pending": "تعذر إكمال إيقاف سابق لتذكيرات الجهاز.",
@@ -202,6 +205,12 @@ const view = {
               <button type="button" class="btn btn--quiet" data-act="notification-config-recheck" data-scope="${scope}" ${push.configRecheckBusy ? 'disabled' : ''}>إعادة فحص جاهزية تذكيرات الجهاز</button>
               <p role="status" data-n44-config-recheck-feedback>${push.configRecheckBusy ? 'جارٍ فحص الجاهزية.' : push.configRecheckCoolingDown ? 'انتظر دقيقة على الأقل بعد آخر رفض قبل إعادة الفحص. لن يُعاد الفحص تلقائيًا.' : 'يفحص الجاهزية فقط، دون طلب إذن الإشعارات أو تفعيل التذكيرات.'}</p>
             </section>` : ''}
+            <section class="n44-preference card card--pad">
+              <button type="button" class="btn btn--quiet" data-act="notification-local-check" data-scope="${scope}">اختبار ظهور إشعار على الجهاز</button>
+              <p>يعرض إشعارًا محليًا فقط، دون إرسال من الخادم أو تغيير بياناتك.</p>
+            </section>
+
+
             ${deviceOutcomeSection(push,scope)}
         <details class="n44-preference card card--pad" data-n44-current-identity style="overflow-wrap:anywhere">
           <summary>هوية الحساب والجهاز الحالي</summary>
@@ -257,6 +266,7 @@ const view = {
       // Stable notifications (including other tabs' lease clock witnesses) must
       // not drive paints. Recover only removed content or a cleared region.
       else if (hadOutcome || mounted && !mounted.childElementCount) recover();
+
     };
     const removeWorkspace = store.onWorkspaceDeactivation(clear);
     const removeAuth = cloud.subscribe(validate);
@@ -269,6 +279,21 @@ const view = {
   },
   onUnmount() { cleanup(); cleanup = () => {}; mountedRoot = null; supportScope = null; outcomeView=null;++outcomeEpoch; },
   actions: {
+    async 'notification-local-check'(el) {
+      const context = viewContext();
+      if (!mountedRoot?.contains(el) || context.scope !== el.dataset.scope ||
+          !el.closest('[data-n44-support]')?.open) return;
+      el.disabled = true;
+      try {
+        const status = await showLocalNotificationCheck();
+        if (!sameOutcomeContext(context)) return;
+        if (status === 'display_requested') toast('طُلب عرض إشعار محلي. تحقّق من ظهوره على جهازك؛ هذا لا يختبر الإرسال من الخادم.');
+        else toast(status === 'permission_unavailable' ?
+          'اسمح بإشعارات ركيز في إعدادات الجهاز أولاً.' :
+          'لم يتمكن الجهاز من عرض الإشعار التجريبي.', 'warn');
+      } finally { if (el.isConnected) el.disabled = false; }
+    },
+
     async 'notification-config-recheck'(el) {
       const context = viewContext(), runtime = context.runtime, root = mountedRoot;
       if (!root?.contains(el) || el.dataset.scope !== context.scope || !el.closest('[data-n44-support]')?.open || !runtime?.snapshot().configRecheckAvailable) return;
@@ -283,6 +308,7 @@ const view = {
         }
       }
     },
+
     async 'notification-device-outcome'(el) {
       const context=viewContext(),runtime=context.runtime;
       if(el.dataset.scope!==context.scope||!el.closest('[data-n44-support]')?.open||!runtime?.snapshot().deviceOutcomeAvailable)return;

@@ -1,0 +1,121 @@
+{
+  "taskId": "continuous-n44-pr6-qualified-frontend-20261026",
+  "runId": "c7bee154-dbbc-4601-9279-5fa7a890060f",
+  "baseSha": "2a027b0808821ab8f7e3888aa1aa468b345f3c17",
+  "qualifiedParent": "790d290650babc00a602f37cb8902b9480903ad3",
+  "files": [
+    {
+      "path": "src/lib/notification-push-browser.js",
+      "sha256": "bdae0add60f5d996bf7b29a44411c647882ff3c179fbe87635a357b748f48cc9",
+      "gitBlob": "140a12fee6dda566c9f24ea786559b4d959588eb",
+      "exactParentAndPreservedRef": true,
+      "syntax": "PASS"
+    },
+    {
+      "path": "src/lib/notification-push-client.js",
+      "sha256": "329de8b75d9ef670d31a362469ec7a3fbb885aa9fc8edc395900bdd8efe3c62e",
+      "gitBlob": "b91a941701c68687fed3c38b8c98477cc1449399",
+      "exactParentAndPreservedRef": true,
+      "syntax": "PASS"
+    },
+    {
+      "path": "src/views/notification-settings.js",
+      "sha256": "59cfe0c0effd1e681a35b738673bfb25aa4303a49acea00c2ce95f22df233c43",
+      "gitBlob": "a07f3a22cfdd431faa07538dcae39340e52e46da",
+      "exactParentAndPreservedRef": true,
+      "syntax": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "name": "n44_pr6_frontend_exact_qualified_bytes",
+      "status": "PASS",
+      "evidence": "All three raw SHA256 values and Git source blobs match qualified parent and preserved ref; node --check passes for each."
+    },
+    {
+      "name": "n44_pr6_frontend_existing_guard_proof",
+      "status": "PASS",
+      "evidence": "Reused immutable actual-app authenticated synthetic DOM/CSS/handler and foreign-owner rejection proof. Source inspection confirms synchronous native gesture call, context/epoch fencing, original-owner cleanup and scoped mounted handler; public import closure contains 46 modules, no private/service import."
+    },
+    {
+      "name": "n44_pr6_frontend_only_scope_and_no_live_operations",
+      "status": "PASS",
+      "evidence": "Only three public source files plus this qualification and its scope note. No browser/server/lease, notification, account, private-custody, Source6, service, SQL/Auth, native or provider operation; no push/deploy."
+    }
+  ],
+  "reusedEvidence": [
+    {
+      "ref": "790d290650babc00a602f37cb8902b9480903ad3",
+      "path": "tests/n44-pr6-completion-20261026/scoped-qualification.json",
+      "commit": "790d290650babc00a602f37cb8902b9480903ad3",
+      "sha256": "e16e3da26b4c85c8e77df8f2c2a32ae883f1df38790c1b3a95bec31d33fa0b44"
+    },
+    {
+      "ref": "codex/n44-pr6-custody-preserved-82b3f54",
+      "path": "tests/n44-pr6-completion-20261026/rendered-ui-main-advanced.json",
+      "commit": "82b3f5450615010743811e6aca2207c51aebe717",
+      "sha256": "3a2b2feb25f6911ef90ac2af8dc17c9df113b125b877fbedcb92ae823c9ab877"
+    },
+    {
+      "ref": "codex/n44-pr6-custody-preserved-82b3f54",
+      "path": "tests/n44-pr6-completion-20261026/proof-reuse-main-advanced.json",
+      "commit": "82b3f5450615010743811e6aca2207c51aebe717",
+      "sha256": "d407c74ff7ab392e8f257ac76e9d0c2945102538bd18ef4b66f2eba11650a13c"
+    }
+  ],
+  "sourceProof": {
+    "kind": "source inspection plus immutable prior rendered evidence; no new rendered UI run",
+    "gestureBeforeAwait": true,
+    "ownerEpochAndOriginalContextCleanup": true,
+    "mountedScopeAndSupportGuard": true,
+    "publicImportClosureModules": 46,
+    "privateImports": 0
+  },
+  "frontendInputComparison": {
+    "paths": [
+      "src",
+      "assets",
+      "public",
+      "config",
+      "index.html",
+      "404.html",
+      "manifest.webmanifest",
+      "package.json",
+      "package-lock.json",
+      "sw.js",
+      "_headers",
+      "robots.txt",
+      "sitemap.xml"
+    ],
+    "count": 320,
+    "differences": [],
+    "manifestSha256": "c5fec0bac54199dabb64f751abc2b2c38cb9ec5e882ab20b43aafa4328e33dcd",
+    "historicalQualificationCompared": 312,
+    "historicalVitePass": true,
+    "newBuildRun": false
+  },
+  "historicalEvidence": {
+    "crypto19AndNative8": "Retained from parent qualification; not rerun or a claim of new backend readiness.",
+    "whitespace": {
+      "status": "FAIL",
+      "evidence": "Four exact preserved original module blobs have blank line at EOF: causal-current-checkpoint, causal-current-live, current-named-admission, qualified-current-journey. No source byte rewrite to hide this result."
+    },
+    "ui": "Synthetic actual application only, not real-device/OS delivery."
+  },
+  "operations": {
+    "browser": 0,
+    "server": 0,
+    "leases": 0,
+    "accountReads": 0,
+    "privateCustody": 0,
+    "source6": 0,
+    "service": 0,
+    "sqlAuth": 0,
+    "registrations": 0,
+    "sends": 0,
+    "localNotifications": 0,
+    "pushes": 0,
+    "deployments": 0
+  },
+  "limitations": "Source-only prerequisite. N44 and issue5 remain open; publisher must integrate and verify served assets before original session resumes. No backend deployment or all-platform arrival claim."
+}
