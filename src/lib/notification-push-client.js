@@ -82,10 +82,20 @@ export function createPushClient({ browser, gateway, getVerifiedContext, clock, 
           if (browser.permission() === 'granted') return report('subscribed');
           return await revoke({ wait: false });
         }
-        const permission = await browser.requestPermission();
-        if (!current(snapshot, token)) return report('stale_context');
-        if (permission !== 'granted') return report(permission === 'denied' ? 'denied' : 'unsubscribed');
-        const subscription = await browser.subscribe();
+        let subscription;
+        if (typeof browser.subscribeOnGesture === 'function') {
+          // Safari/Firefox can require PushManager.subscribe directly inside
+          // the click activation. Native subscribe requests permission itself;
+          // don't await Notification.requestPermission before invoking it.
+          if (browser.permission() === 'denied') return report('denied');
+          subscription = await browser.subscribeOnGesture();
+        } else {
+          // Legacy synthetic ports: retain their explicit permission path.
+          const permission = await browser.requestPermission();
+          if (!current(snapshot, token)) return report('stale_context');
+          if (permission !== 'granted') return report(permission === 'denied' ? 'denied' : 'unsubscribed');
+          subscription = await browser.subscribe();
+        }
         if (!subscription || typeof subscription.unsubscribe !== 'function') return report('unsubscribed');
         record = { subscription, context: snapshot, registerAttempted: false };
         if (!current(snapshot, token)) {
