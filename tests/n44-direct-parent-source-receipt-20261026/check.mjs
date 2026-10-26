@@ -106,7 +106,7 @@ try {
       await arrange('subitems', true); store.state.scoreSubitems[0].ownerId = 'foreign'; assert.equal((await read()).status, 'rejected');
       await arrange('subitems', true); store.state.scoreSubitems = Array.from({length:201}, (_,i) => ({...store.state.scoreSubitems[0],id:'c'+i})); assert.equal((await read()).status, 'rejected');
     });
-    await check('configured subitem and exact cleanup tombstone receipt retained; empty is never cleanup ACK', async () => {
+    await check('configured subitem exact cleanup retained; empty alone is never cleanup ACK', async () => {
       await arrange('subitems', true); assert.equal((await read()).status, 'confirmed');
       const stamp = Date.now(), parent = store.state.items[0], child = store.state.scoreSubitems[0];
       parent.deleted = child.deleted = true; parent.updatedAt = stamp;
@@ -117,9 +117,11 @@ try {
         request_envelope: { mutationId, command: 'delete_item', targetId: parent.id, deviceId, clientUpdatedAt: stamp },
         result: { mutationId, command: 'delete_item', targetId: parent.id, outcome: 'deleted' } };
       assert.equal((await read()).status, 'cleanup_confirmed');
-      await arrange(); store.state.items[0].deleted = true; remote.items[0].deleted_at = stamp;
-      assert.equal((await read()).status, 'unknown'); assert.equal(cleanupReads, 0);
+      await arrange(); store.state.items[0].deleted = true; store.state.items[0].updatedAt = stamp;
+      await db.put('items', store.state.items[0]); remote.items[0].deleted_at = stamp;
+      // N44 correction: empty children permit an exact receipt read, never a vacuous ACK.
+      assert.equal((await read()).status, 'unknown'); assert.equal(cleanupReads, 1);
     });
-    await writeFile(new URL('./result.json', import.meta.url), JSON.stringify({ taskId: 'continuous-n44-direct-parent-source-receipt-20261026', runId: '79fe5e31-4e73-4c6e-9053-f904a015cac6', baseSha: '7d4b7db15278f04c1fd59414e4b42357fbb053ab', red: 'Actual base module omitted direct/no-child and returned rejected, zero canonical reads (--red).', checks: results, liveSource4: 'UNKNOWN; no live operations', renderedUI: 'NOT_RUN; view unchanged' }, null, 2) + '\n');
+    if (!process.argv.includes('--no-write')) await writeFile(new URL('./result.json', import.meta.url), JSON.stringify({ taskId: 'continuous-n44-direct-parent-source-receipt-20261026', runId: '79fe5e31-4e73-4c6e-9053-f904a015cac6', baseSha: '7d4b7db15278f04c1fd59414e4b42357fbb053ab', red: 'Actual base module omitted direct/no-child and returned rejected, zero canonical reads (--red).', checks: results, liveSource4: 'UNKNOWN; no live operations', renderedUI: 'NOT_RUN; view unchanged' }, null, 2) + '\n');
   }
 } finally { store.deactivateWorkspace(); await db.closeDB(); }

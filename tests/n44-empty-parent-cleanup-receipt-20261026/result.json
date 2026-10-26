@@ -1,0 +1,38 @@
+{
+  "taskId": "continuous-n44-empty-parent-cleanup-receipt-20261026",
+  "runId": "f801a14d-f183-49d5-ab9b-a58b6f777cce",
+  "baseSha": "8528d1995b36541c10529b9d268adf80b6d354b9",
+  "red": {
+    "baseSha": "8528d1995b36541c10529b9d268adf80b6d354b9",
+    "observations": [
+      {
+        "mode": "direct",
+        "status": "unknown",
+        "cleanupReads": 0,
+        "rawReceiptValidatedSeparately": true
+      },
+      {
+        "mode": "subitems",
+        "status": "unknown",
+        "cleanupReads": 0,
+        "rawReceiptValidatedSeparately": true
+      }
+    ]
+  },
+  "checks": [
+    {
+      "name": "n44_valid_empty_parent_cleanup_receipt_red_green",
+      "status": "PASS"
+    },
+    {
+      "name": "n44_real_cloud_receipt_validation_remains_strict",
+      "status": "PASS"
+    },
+    {
+      "name": "n44_existing_parent_source_status_fences_preserved",
+      "status": "PASS"
+    }
+  ],
+  "liveOperations": 0,
+  "renderedUI": "NOT_RUN; no view changes"
+}

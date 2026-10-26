@@ -209,8 +209,8 @@ export function notificationSourceGroups() {
       teachingId: teaching.id, termId: term.id, yearId: year.id, sectionId: section.id, subjectId: subject.id,
       deleted: !!parent.deleted, cleanupStamp: parent.deleted ? parent.updatedAt : null,
       revisions: [parent, ...children].map(r => ({ id: r.id, revision: r.serverRevision ?? null, deleted: !!r.deleted })),
-      // Empty definitions can prove only this exact parent's save, never a due
-      // event or cleanup. Do not let an empty child.every stand in for its ACK.
+      // Empty definitions prove no due event or cleanup by themselves. Cleanup
+      // still requires this exact parent's canonical delete receipt below.
       parentConfirmed: Number.isSafeInteger(parent.serverRevision) && parent.serverRevision > 0 && !parent.syncCreatePending && !isLocalOnlyRecord(parent),
       ancestryConfirmed: [teaching, term, year, section, subject].every(r => Number.isSafeInteger(r.serverRevision) && r.serverRevision > 0 && !r.syncCreatePending && !isLocalOnlyRecord(r)),
       fingerprint: JSON.stringify([parent, children, teaching, term, year, section, subject]) }];
@@ -238,7 +238,7 @@ export async function readNotificationSourceStatus(parentId) {
     JSON.stringify(canonical.children.map(r => r.id).sort()) === JSON.stringify(initial.childIds) &&
     [canonical.parent, ...canonical.children].every(r => initial.revisions.some(l => l.id === r.id && l.revision === r.revision && l.deleted === r.deleted));
   let cleanupReceipt = null;
-  if (initial.deleted && initial.childIds.length > 0 && initial.revisions.every(r => r.deleted)) {
+  if (initial.deleted && initial.revisions.every(r => r.deleted)) {
     const savedParent = await db.get('items', parentId); fence();
     if (savedParent?.deleted && Number.isSafeInteger(savedParent.updatedAt) && (savedParent.ownerId == null || savedParent.ownerId === initial.ownerId)) {
       cleanupReceipt = await cloud.readRetiredScoreSourceCleanup({ parentId, deviceId: initial.deviceId,
