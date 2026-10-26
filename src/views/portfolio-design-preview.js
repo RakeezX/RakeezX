@@ -114,10 +114,14 @@ function context() {
   const summary={...summaryBase,criteriaCount:annual.criteriaCount,criteria:annual.toc};
   const canPrint=annual.witnessCount>0;
   const title=titles.get(photoKey)??proposal?.title??guide?.evidence??criterion.title;
-  const visibleCandidates=available.filter(w=>{
+  const includedIds=new Set(annual.entries.map(entry=>entry.proposal.id));
+  const visibleCandidates=candidates.filter(w=>{
+    const hidden=hiddenWitnesses.has(w.id);
+    if(libraryFilter==='hidden' ? !hidden : hidden)return false;
     if(libraryFilter==='rakeez' && (w.sourceKind==='template'||w.sourceKind==='custom'))return false;
     if(libraryFilter==='templates' && w.sourceKind!=='template')return false;
     if(libraryFilter==='my' && w.sourceKind!=='custom')return false;
+    if(libraryFilter==='in-file' && !includedIds.has(w.id))return false;
     const q=libraryQuery.trim().toLocaleLowerCase('ar');
     const title=titles.get(w.id)??w.title;
     const description=descriptions.get(w.id)??w.description??'';
@@ -125,7 +129,7 @@ function context() {
   });
   const criteriaNav=criteria.map(c=>({
     ...c,excluded:hiddenCriteria.has(c.number),
-    candidateCount:sources.filter(w=>w.criterion===c.number).length+
+    candidateCount:sources.filter(w=>w.criterion===c.number&&!hiddenWitnesses.has(w.id)).length+
       templatesForCriterion(c.number).filter(w=>!hiddenWitnesses.has(w.id)).length+
       customWitnesses.filter(w=>w.criterion===c.number).length,
   }));
@@ -143,7 +147,9 @@ function context() {
     department: short(profile.educationDepartment, 'إدارة التعليم'),
   };
   return {year,terms,evidence,summary,annual,person,criterion,guide,proposal,candidates,sources,photoKey,
-    visibleCandidates,criteriaNav,libraryFilter,libraryQuery,hiddenCount:candidates.filter(w=>hiddenWitnesses.has(w.id)).length,
+    visibleCandidates,criteriaNav,libraryFilter,libraryQuery,
+    hiddenCount:candidates.filter(w=>hiddenWitnesses.has(w.id)).length,
+    includedCount:annual.entries.filter(entry=>entry.criterion.number===editingCriterion).length,
     criterionExcluded:hiddenCriteria.has(editingCriterion),criterionEditorOpen,
     includedSections,photos:photosFor(photoKey),photoLayout:layoutFor(photoKey),
     description:descriptions.get(photoKey)??proposal?.description??'',title,canPrint,
@@ -441,7 +447,7 @@ function criteriaNavigator(ctx) {
           <button type="button" class="folio-criteria__edit-trigger"
             data-act="edit-criterion-row" data-id="${c.number}"
             aria-label="تعديل اسم ${c.title}" title="تعديل اسم المعيار في ملفك">
-            <span aria-hidden="true">✎</span> تعديل
+            <span aria-hidden="true">✎</span>
           </button>
           <label class="folio-criteria__inclusion"
             title="${c.excluded?'ضع علامة الصح لإظهار المعيار في الملف':'أزل علامة الصح لإخفاء المعيار من الملف'}">
@@ -473,14 +479,17 @@ function suggestionsPanel(ctx) {
   const {guide,proposal,visibleCandidates} = ctx;
   return html`<section class="folio-suggestion-studio noprint" aria-label="مكتبة الشواهد">
     <header class="folio-suggestion-studio__head">
-      <div><span>الشواهد</span><h2>اختر شاهدًا أو أنشئ شاهدًا جديدًا</h2></div>
+      <div><span>مكتبة هذا المعيار</span><h2>شواهد ${ctx.criterion.title}</h2>
+        <p>اختر من بيانات ركيز أو النماذج المقترحة، ثم أضف ما يناسب عملك إلى ملفك.</p></div>
       <button class="btn btn--primary" type="button" data-act="manual-suggestion">+ شاهد جديد</button>
     </header>
     <div class="folio-library__tools">
       <input class="input folio-library__search" data-input="library-search"
         value="${ctx.libraryQuery}" placeholder="ابحث عن شاهد…" aria-label="بحث في الشواهد" />
       <div class="folio-library__filters" role="group" aria-label="مصدر الشواهد">
-        ${[['all','الكل'],['rakeez','من ركيز'],['templates','نماذج جاهزة'],['my','شواهدي']].map(([id,label])=>html`
+        ${[['all','الكل'],['rakeez','من ركيز'],['templates','نماذج جاهزة'],['my','شواهدي'],
+          ['in-file',`ضمن ملفي (${digits.format(ctx.includedCount)})`],
+          ['hidden',`المخفية (${digits.format(ctx.hiddenCount)})`]].map(([id,label])=>html`
           <button type="button" data-act="library-filter" data-id="${id}"
             class="folio-library__filter ${ctx.libraryFilter===id?'is-active':''}"
             aria-pressed="${ctx.libraryFilter===id}">${label}</button>`)}
@@ -488,18 +497,30 @@ function suggestionsPanel(ctx) {
     </div>
     <div class="folio-suggestion-studio__candidates" data-library-results>
       ${visibleCandidates.map(item=>html`<button type="button"
-        class="folio-suggestion-studio__choice ${proposal?.id===item.id?'is-selected':''}"
+        class="folio-suggestion-studio__choice ${proposal?.id===item.id?'is-selected':''} ${hiddenWitnesses.has(item.id)?'is-hidden':''}"
         data-library-card data-search="${((titles.get(item.id)??item.title)+' '+(descriptions.get(item.id)??item.description??'')).toLocaleLowerCase('ar')}"
-        data-act="pick-suggestion" data-id="${item.id}" aria-pressed="${proposal?.id===item.id}">
+        data-act="${hiddenWitnesses.has(item.id)?'restore-witness-item':'pick-suggestion'}" data-id="${item.id}"
+        aria-label="${hiddenWitnesses.has(item.id)?'استعادة '+(titles.get(item.id)||item.title):'اختيار '+(titles.get(item.id)||item.title)}"
+        aria-pressed="${proposal?.id===item.id}">
           <strong>${titles.get(item.id)||item.title}</strong>
           <span>${item.description?.slice(0,84)||'شاهد قابل للتعديل وإضافة الصور'}</span>
-          <small>${item.sourceKind==='template'?'قالب مقترح':
-            item.sourceKind==='custom'?'شاهد خاص':'من سجلات ركيز'}</small>
+          <small>${hiddenWitnesses.has(item.id)?'↶ مخفي · اضغط للاستعادة':
+            (item.sourceKind==='automatic'?'سجل موثق من ركيز':
+            item.sourceKind==='review'?'سجل ركيز يحتاج استكمالًا':
+            item.sourceKind==='template'?'نموذج مقترح قابل للتعديل':'شاهدي الخاص') +
+            (ctx.annual.entries.some(e=>e.proposal.id===item.id)?' · ✓ ضمن الملف':'')}</small>
       </button>`)}
-      <p class="folio-library__empty" data-library-empty ${visibleCandidates.length?'hidden':''}>لا توجد شواهد مطابقة.</p>
+      <p class="folio-library__empty" data-library-empty ${visibleCandidates.length?'hidden':''}>${ctx.libraryFilter==='hidden'?'لا توجد شواهد مخفية في هذا المعيار.':'لا توجد شواهد مطابقة.'}</p>
     </div>
     ${ctx.hiddenCount?html`<button type="button" class="folio-library__restore"
       data-act="restore-witnesses">إظهار الشواهد المخفية (${digits.format(ctx.hiddenCount)})</button>`:''}
+    ${proposal?.sourceKind==='template'?html`<div class="folio-library__guidance" role="note">
+      <strong>نموذج مقترح، وليس إثبات تنفيذ.</strong>
+      ${proposal.imageHint?html`<span>لتوثيقه عند الحاجة: ${proposal.imageHint}.</span>`:''}
+    </div>`:''}
+    ${proposal?.sourceKind==='review'?html`<div class="folio-library__guidance" role="note">
+      <strong>البيانات موجودة في ركيز، لكن يلزم استكمال سياق الشاهد عند الحاجة.</strong>
+    </div>`:''}
     ${proposal?html`<div class="folio-library__selected">
       <span>المحدد: <strong>${titles.get(proposal.id)||proposal.title}</strong></span>
       <div class="folio-library__selected-controls">
@@ -774,10 +795,18 @@ export default {
       selectedByCriterion.delete(criterion);
       selectedSuggestionId=null;repaint();
     },
+    'restore-witness-item'(el){
+      const id=el.dataset.id;
+      const item=context().candidates.find(candidate=>candidate.id===id);
+      if(!item||!hiddenWitnesses.has(id))return;
+      clearUndo();hiddenWitnesses.delete(id);
+      selectedSuggestionId=id;selectedByCriterion.set(editingCriterion,id);
+      libraryFilter='all';libraryQuery='';repaint();
+    },
     'restore-witnesses'(){
       clearUndo();
       for(const proposal of context().candidates)hiddenWitnesses.delete(proposal.id);
-      repaint();
+      libraryFilter='all';libraryQuery='';repaint();
     },
     'toggle-section'(el){
       const key=context().photoKey;

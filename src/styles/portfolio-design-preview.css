@@ -701,3 +701,35 @@
   .folio-criteria__row-tools .folio-criteria__edit-trigger {min-width:57px; font-size:11px;}
   .folio-criteria__legend {font-size:12px;}
 }
+
+/* F09: compact icon-only criterion editing and selective evidence-library recovery. */
+.folio-criteria__row-tools .folio-criteria__edit-trigger {
+  width:31px; min-width:31px; max-width:31px; padding:4px;
+}
+.folio-criteria__row-tools .folio-criteria__edit-trigger span {font-size:16px;}
+.folio-suggestion-studio__head p {
+  margin:4px 0 0; line-height:1.65; font-size:11px;
+  color:var(--text-3); max-width:440px;
+}
+.folio-suggestion-studio__choice.is-hidden {
+  border-style:dashed; background:var(--bg-sunk); color:var(--text-2);
+}
+.folio-suggestion-studio__choice.is-hidden:hover {
+  opacity:1; border-color:var(--brand);
+}
+.folio-suggestion-studio__choice small {line-height:1.5;}
+.folio-library__guidance {
+  display:grid; gap:4px; padding:10px 12px;
+  border-inline-start:3px solid var(--border);
+  border-radius:6px; background:var(--bg-sunk);
+  color:var(--text-3);font-size:11px;line-height:1.8;
+}
+.folio-library__guidance strong {font-size:11px;color:var(--text-2);}
+.folio-library__filters {gap:5px;}
+.folio-library__filters button {white-space:normal;}
+@media(max-width:540px) {
+  .folio-criteria__row-tools .folio-criteria__edit-trigger {
+    width:30px;min-width:30px;max-width:30px;padding:4px;
+  }
+  .folio-suggestion-studio__head p {font-size:11px;}
+}

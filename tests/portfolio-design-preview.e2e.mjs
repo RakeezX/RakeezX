@@ -61,7 +61,7 @@ test('four coherent Arabic A4 pages render actual scoped Demo evidence and print
  await expect(page.locator('.folio-focus .folio-evidence__metrics strong').first()).toHaveText(new Intl.NumberFormat('ar-SA',{useGrouping:false}).format(demo.expected));
  await expect(page.locator('.folio-cover')).toContainText('ملف الإنجاز المهني');
  await expect(page.locator('.folio-cover')).not.toContainText('فصول المعلم');
- await expect(page.locator('.folio-suggestion-studio')).toContainText('اختر شاهدًا أو أنشئ شاهدًا جديدًا');
+ await expect(page.locator('.folio-suggestion-studio')).toContainText('شواهد الإدارة الصفية');
  await expect(page.locator('.folio-suggestion-studio__choice.is-selected')).toContainText('متابعة رصد حضور الطلاب');
  await expect(page.locator('.folio-evidence')).toContainText('جميع الفصول والمواد');
  await expect(page.locator('.folio-coverage')).not.toContainText('لم يُضف');
@@ -506,4 +506,51 @@ test('criteria edit action is visible beside the section and checkmark controls 
  await expect(added.locator('.folio-criteria__item')).toHaveClass(/is-excluded/);
  await added.getByRole('checkbox',{name:/إدراج/}).check();
  await page.locator('.folio-criteria').screenshot({path:info.outputPath('criteria-actions-mobile.png'),animations:'disabled'});
+});
+
+test('one criterion library supports individual hide, restore and adding back to the annual file',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(entry);await ready(page);
+ await chooseCriterion(page,'03');
+ await expect(page.locator('[data-library-card]')).toHaveCount(3);
+ const a='لقاءات أولياء الأمور',b='رسائل التوعية والتوجيه للأسر';
+ await page.locator('[data-library-card]').filter({hasText:a}).click();
+ await expect(page.locator('.folio-library__guidance')).toContainText('نموذج مقترح، وليس إثبات تنفيذ');
+ await page.getByRole('button',{name:'إخفاء من مكتبتي'}).click();
+ await page.locator('[data-library-card]').filter({hasText:b}).click();
+ await page.getByRole('button',{name:'إخفاء من مكتبتي'}).click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(1);
+ await page.locator('[data-act="library-filter"][data-id="hidden"]').click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(2);
+ await page.locator('[data-library-card]').filter({hasText:a}).click();
+ await expect(page.locator('[data-library-card]').filter({hasText:a})).toHaveCount(1);
+ await expect(page.locator('[data-library-card]').filter({hasText:b})).toHaveCount(0);
+ await page.getByRole('button',{name:/إظهار الشواهد المخفية/}).click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(3);
+ await page.locator('[data-library-card]').filter({hasText:a}).click();
+ await page.locator('[data-act="toggle-witness-in-file"]').click();
+ await expect(page.locator('[data-act="toggle-witness-in-file"]')).toHaveAttribute('aria-pressed','true');
+ await page.locator('[data-act="library-filter"][data-id="in-file"]').click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(1);
+ await expect(page.locator('[data-library-card]')).toContainText(a);
+ await page.locator('[data-act="toggle-witness-in-file"]').click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(0);
+ await page.locator('[data-act="library-filter"][data-id="templates"]').click();
+ await page.locator('[data-library-card]').filter({hasText:a}).click();
+ await page.locator('[data-act="toggle-witness-in-file"]').click();
+ await page.locator('[data-act="show-full-portfolio"]').first().click();
+ await expect(page.locator('[data-folio-document]')).toContainText(a);
+});
+test('criterion editing is a pen icon only with accessible descriptive name',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);
+ await page.setViewportSize({width:390,height:844});
+ await page.goto(entry);await ready(page);
+ await page.locator('[data-act="toggle-criteria"]').click();
+ const edit=page.locator('[data-act="edit-criterion-row"][data-id="04"]');
+ await expect(edit).toBeVisible();
+ await expect(edit).toHaveText('✎');
+ await expect(edit).toHaveAttribute('aria-label',/تعديل اسم/);
+ await edit.click();
+ await expect(page.locator('.folio-criteria__row').filter({has:page.locator('.folio-criteria__item[data-id="04"]')})
+   .locator('.folio-criteria__inline-editor')).toBeVisible();
 });
