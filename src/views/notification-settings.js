@@ -198,6 +198,10 @@ const view = {
         <details class="n44-support card card--pad" data-n44-support ${supportOpen ? 'open' : ''}>
           <summary data-fk="n44-support">الدعم الفني</summary>
           <div class="n44-support-content">
+            ${push?.configRecheckAvailable ? html`<section class="n44-preference card card--pad">
+              <button type="button" class="btn btn--quiet" data-act="notification-config-recheck" data-scope="${scope}" ${push.configRecheckBusy ? 'disabled' : ''}>إعادة فحص جاهزية تذكيرات الجهاز</button>
+              <p role="status" data-n44-config-recheck-feedback>${push.configRecheckBusy ? 'جارٍ فحص الجاهزية.' : push.configRecheckCoolingDown ? 'انتظر دقيقة على الأقل بعد آخر رفض قبل إعادة الفحص. لن يُعاد الفحص تلقائيًا.' : 'يفحص الجاهزية فقط، دون طلب إذن الإشعارات أو تفعيل التذكيرات.'}</p>
+            </section>` : ''}
             ${deviceOutcomeSection(push,scope)}
         <details class="n44-preference card card--pad" data-n44-current-identity style="overflow-wrap:anywhere">
           <summary>هوية الحساب والجهاز الحالي</summary>
@@ -265,6 +269,20 @@ const view = {
   },
   onUnmount() { cleanup(); cleanup = () => {}; mountedRoot = null; supportScope = null; outcomeView=null;++outcomeEpoch; },
   actions: {
+    async 'notification-config-recheck'(el) {
+      const context = viewContext(), runtime = context.runtime, root = mountedRoot;
+      if (!root?.contains(el) || el.dataset.scope !== context.scope || !el.closest('[data-n44-support]')?.open || !runtime?.snapshot().configRecheckAvailable) return;
+      el.disabled = true;
+      try { await runtime.recheckConfiguration(); }
+      finally {
+        if (mountedRoot === root && root.isConnected && sameOutcomeContext(context)) {
+          // A cooldown refusal can render identical markup; region diffing must
+          // not leave this imperatively disabled button stuck until another paint.
+          if (el.isConnected) el.disabled = runtime.snapshot().configRecheckBusy;
+          repaint();
+        }
+      }
+    },
     async 'notification-device-outcome'(el) {
       const context=viewContext(),runtime=context.runtime;
       if(el.dataset.scope!==context.scope||!el.closest('[data-n44-support]')?.open||!runtime?.snapshot().deviceOutcomeAvailable)return;

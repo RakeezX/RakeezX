@@ -45,6 +45,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   let preparingBinding = null, preparingGeneration = 0, refreshQueued = false;
   let eligibility = { reason: 'idle', configuration: 'not_observed' };
   let configObservation = null;
+  // AI: a settled attempt is not permission to poll again on store/focus events.
+  // Keep credentials only in the existing in-memory fenced binding.
+  let configAttempt = null;
+  const sameConfigAttempt = a => !!a && a.generation === generation && matches(a.binding) && a.permission === browser.permission();
   const configOutcome = () => {
     if (disposed || configObservation?.generation !== generation || !matches(configObservation?.binding)) { configObservation = null; return null; }
     return { ...configObservation.outcome };
@@ -73,7 +77,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   const bindingChecks = b => {
     const c = current();
     return { contextMatches: !!b && !!c && c.ownerId === b.context.ownerId && c.workspaceId === b.context.workspaceId && c.deviceId === b.context.deviceId,
-      sessionMatches: !!b && currentToken() === b.acceptedToken && cloudSessionContinues(b), workspaceMatches: !!b && store.getActiveWorkspace() === b.workspace,
+      sessionMatches: !!b && currentToken() === b.acceptedToken && cloudSessionContinues(b), workspaceMatches: !!b && !!c && store.getActiveWorkspace()?.id === b.workspace.id && store.getActiveWorkspace()?.databaseName === b.workspace.databaseName,
       leaseMatches: !!b && leaseRevision() === b.leaseRevision, consentMatches: !!b && consentRevision(b.context) === b.consentRevision };
   };
   const matches = b => !!b && (b.serviceExpiresAt ?? Infinity) > Date.now() && Object.values(bindingChecks(b)).every(Boolean);
@@ -92,6 +96,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   };
   function invalidate() {
     configObservation = null;
+    configAttempt = null;
     const old = client, originalGateway = gateway;
     ++generation; choices.clear(); verification = null; sourceStatus = null; verifying = false; renewing = null; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
     let clearing;
@@ -106,7 +111,8 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     }
     changed();
   }
-  async function refresh() {
+  async function refresh(options) {
+    const readinessOnly = options?.readinessOnly === true;
     if (disposed) return;
     if (binding && currentToken() !== binding.acceptedToken && continuation(binding)) {
       if (renewing) return renewing.promise;
@@ -130,17 +136,19 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       return attempt.promise;
     }
     if (binding && (!matches(binding) || status === 'subscribed' && browser.permission() !== 'granted')) invalidate();
-    if (preparing) { if (preparingBinding && (preparingGeneration !== generation || !matches(preparingBinding))) refreshQueued = true; return; }
+    if (preparing) { if (preparingBinding && (preparingGeneration !== generation || !matches(preparingBinding) || configAttempt?.permission !== browser.permission())) refreshQueued = true; return; }
     if (!configuration.enabled) { mark('disabled'); return; }
     if (!current()) { mark('account_unavailable'); return; }
     // An unresolved explicit stop cannot be bypassed by focus/refresh or opt-in.
     if (pendingDisable) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
     if (binding) return;
+    if (sameConfigAttempt(configAttempt)) return;
     preparing = true; configObservation = null; const token = generation;
     const b = { context: current(), session: cloud.session, acceptedToken: currentToken(), cleanupToken: currentToken(), workspace: store.getActiveWorkspace(), leaseRevision: leaseRevision() };
     try { b.consentRevision = consentRevision(b.context); } catch { preparing = false; mark('context_unavailable'); return; }
     preparingBinding = b; preparingGeneration = token; eligibility = { reason: 'checking_configuration', configuration: 'not_observed', ...bindingChecks(b), generationMatches: true, browserSupported: false, workerReady: false };
-    const valid = () => generation === token && (matches(b)||renewing?.binding===b&&currentToken()===renewing.candidate&&continuation(b));
+    const attempt = configAttempt = { binding: b, generation: token, permission: browser.permission(), retryAt: 0 };
+    const valid = () => generation === token && (binding === b || attempt.permission === browser.permission()) && (matches(b)||renewing?.binding===b&&currentToken()===renewing.candidate&&continuation(b));
     const g = createPushGateway({ fetch, storage, context: b.context, authorization: () => 'Bearer ' + currentToken(), preferences, valid, invalidated: invalidate, bindConsent: r => browser.bind(r), clearConsent: id => browser.clearConsent(id),
       cleanupAuthorization() {
         const c = current();
@@ -180,22 +188,30 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const r = await g.read();
       // Same owner/device, new Auth session: retire the old context via its
       // observed CAS revision before acknowledging original registration cleanup.
-      if (r.status === 'absent' && r.expectedRevision) await g.update(false);
+      if (r.status === 'absent' && r.expectedRevision) {
+        if (readinessOnly) { status = 'unavailable'; mark('context_unavailable'); return; }
+        await g.update(false);
+      }
       const previousCleanup = await cleanup;
-      if (previousCleanup?.status === 'cleanup_pending' && !await browser.clearConsent(null)) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
-      const cleaned = await drain();
+      if (previousCleanup?.status === 'cleanup_pending' && (readinessOnly || !await browser.clearConsent(null))) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
+      const cleaned = readinessOnly ? { status: retired.size ? 'cleanup_pending' : 'revoked' } : await drain();
       if (!valid() || cleaned?.status === 'cleanup_pending') { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
       if (!valid()) return;
       mark('checking_service_worker');
       const workerReady = await browser.ready(); mark(workerReady ? 'checking_context' : 'service_worker_unavailable', { workerReady });
       if (!workerReady || !valid()) { if (!valid()) mark('binding_changed'); status = 'unavailable'; return; }
+      const existing = await browser.existing();
+      const workerConsent = await browser.consent();
+      if (!valid()) return;
+      // A manual readiness gesture must not restore/register or retire a saved
+      // subscription. Its normal lifecycle remains separate from this read.
+      if (readinessOnly && (r.registration || existing || workerConsent.binding || storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, b.context.deviceId])))) { status = 'unavailable'; mark('context_unavailable'); return; }
       binding = b; gateway = g;
       const verified = () => valid() ? { ...b.context, authRevision: String(token) } : null;
       const c = createPushClient({ browser, gateway: g, getVerifiedContext: verified, clock: Date.now,
         resolveAction: (_ctx, id, now) => notificationDestination(store, current(), id, now) });
       client = c;
-      const existing = await browser.existing();
-      const workerConsent = await browser.consent();
+      if (readinessOnly) { ready = true; status = 'unsubscribed'; mark('ready'); return; }
       if (r.registration && existing && workerConsent.binding === r.registration.registrationId &&
           workerConsent.expiresAt >= r.registration.expiresAt && browser.permission() === 'granted') {
         const restored = await c.restore(existing);
@@ -213,6 +229,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const outcome = { httpStatus: observed?.httpStatus ?? null, phase: observed?.phase ?? 'request' };
       if (outcome.httpStatus === 503 && outcome.phase === 'http' && N44_CONFIG_SERVICE_PHASES.includes(observed?.servicePhase)) outcome.servicePhase = observed.servicePhase;
       configObservation = { binding: b, generation: token, outcome };
+      if (outcome.httpStatus === 429) attempt.retryAt = Date.now() + 60000;
       mark('request_unavailable', { configuration: 'request_failed' });
     } else if (eligibility.reason === 'checking_context') mark('context_unavailable'); }
     finally {
@@ -222,6 +239,14 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       // Unchanged failed requests never enqueue an automatic retry.
       if (queued && !valid() && !disposed) void refresh();
     }
+  }
+  async function recheckConfiguration() {
+    // A manual readiness check never retires a valid registration or Stop work.
+    if (disposed || preparing || binding || pendingDisable || disabling || !configuration.enabled || !current()) return { status: 'unavailable' };
+    if (sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt) return { status: 'cooldown' };
+    configAttempt = null;
+    await refresh({ readinessOnly: true });
+    return { status: 'checked' };
   }
   const usable = () => gateway?.expiresAt() > Date.now() && ready && matches(binding) && browser.permission() === 'granted' && status === 'subscribed';
   const outcomeBinding = () => {
@@ -364,7 +389,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     }).catch(() => {});
   }
   return Object.freeze({
-    refresh, invalidate, verifyReminder, readSourceStatus,
+    refresh, invalidate, verifyReminder, readSourceStatus, recheckConfiguration,
     normalUiSnapshot() {
       const options = normalChoices();
       return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
@@ -376,7 +401,8 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const outcome=await browser.deviceOutcome(id),after=outcomeBinding();
       return epoch===generation&&after?.binding===before.binding&&after.gateway===before.gateway&&after.pending===before.pending&&after.registration?.registrationId===id&&after.registration?.expiresAt===before.registration.expiresAt?outcome:null;
     },
-    snapshot: () => ({ deviceOutcomeAvailable: !!outcomeBinding(), available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
+    snapshot: () => ({ configRecheckAvailable: !disposed && configuration.enabled && !!current() && !binding && !pendingDisable && !disabling, configRecheckBusy: preparing, configRecheckCoolingDown: sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt,
+      deviceOutcomeAvailable: !!outcomeBinding(), available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
     async optIn() {
       if (!ready || !matches(binding)) return { status: 'unavailable' };
       const c = client, result = await c.optIn();

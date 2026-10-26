@@ -1,0 +1,50 @@
+{
+  "taskId": "continuous-n44-config-read-stability-20261026",
+  "runId": "3f79b806-4902-4a96-b085-ead96b851234",
+  "phase": "green",
+  "checks": [
+    {
+      "name": "passive_429",
+      "status": "PASS",
+      "evidence": "Actual runtime/gateway settled response + stable focus/store/cloud refresh: 1 config requests; expected 1."
+    },
+    {
+      "name": "passive_503",
+      "status": "PASS",
+      "evidence": "Actual runtime/gateway settled response + stable focus/store/cloud refresh: 1 config requests; expected 1."
+    },
+    {
+      "name": "passive_disabled",
+      "status": "PASS",
+      "evidence": "Actual runtime/gateway settled response + stable focus/store/cloud refresh: 1 config requests; expected 1."
+    },
+    {
+      "name": "passive_shape",
+      "status": "PASS",
+      "evidence": "Actual runtime/gateway settled response + stable focus/store/cloud refresh: 1 config requests; expected 1."
+    },
+    {
+      "name": "passive_transport",
+      "status": "PASS",
+      "evidence": "Actual runtime/gateway settled response + stable focus/store/cloud refresh: 1 config requests; expected 1."
+    },
+    {
+      "name": "n44_manual_config_cooldown_context_and_inflight_fences",
+      "status": "PASS",
+      "evidence": "Actual delegated Support action refuses before 60 seconds, no timer retry; one explicit request afterwards, double gesture coalesced while pending."
+    }
+  ],
+  "realPush": "NOT_RUN",
+  "osArrival": "NOT_PROVEN",
+  "sourceHashes": {
+    "src/views/notification-settings.js": "768444691d3aa54e7e1ccd237a0b726757faa7ada829b68bd08deddd4d99a9c9",
+    "src/repaint.js": "cd8e0a2975f59e4e9cfcb6b1a284d799542837b36362764326630c629b75fad8",
+    "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480",
+    "src/store.js": "a92922ceaaa2305b92bc7d8d25215f64364a3cbfda7b2b52ae900d9227318a2c",
+    "src/lib/cloud.js": "e1a3b58add1dfa669773251bf28f219731bff46a557129e8a6255daebcaf1ffa",
+    "src/lib/notification-events.js": "e673fea9da1ee873cef980464b19b2094faa3c309e21e31653dfe0711a4f94c8",
+    "src/lib/notification-push-runtime.js": "a877928046b7706f31404582a24ffc4f8cd6c9a024c32f37d2dccbc23e6f2c20",
+    "src/styles/notifications.css": "19c8105d5fdbed143b9268d954f526ee66c82252f980fea9050cdfc6a73ddc35"
+  },
+  "error": "AssertionError [ERR_ASSERTION]: workspace\n\n0 !== 1\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-config-read-stability-20261026/tests/n44-config-read-stability-20261026/check.mjs:77:14\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-config-read-stability-20261026/tests/n44-config-read-stability-20261026/check.mjs:29:3"
+}

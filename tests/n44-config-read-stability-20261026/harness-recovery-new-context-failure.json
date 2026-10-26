@@ -1,0 +1,48 @@
+{
+  "taskId": "continuous-n44-config-read-stability-20261026",
+  "runId": "3f79b806-4902-4a96-b085-ead96b851234",
+  "phase": "green",
+  "checks": [
+    {
+      "name": "n44_settings_actual_empty_mount_red_green",
+      "status": "PASS",
+      "evidence": "Baseline FAIL preserved. Actual runtime invalidation + same-owner ready reset and rebind recover without reload, including identical renderRegions markup."
+    }
+  ],
+  "realPush": "NOT_RUN",
+  "osArrival": "NOT_PROVEN",
+  "sourceHashes": {
+    "src/views/notification-settings.js": "4454c4c0647a88288fe4bc5d01697ee6ad1a77aaff2bbc0ba09bd18600d8a2a5",
+    "src/repaint.js": "cd8e0a2975f59e4e9cfcb6b1a284d799542837b36362764326630c629b75fad8",
+    "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480",
+    "src/store.js": "a92922ceaaa2305b92bc7d8d25215f64364a3cbfda7b2b52ae900d9227318a2c",
+    "src/lib/cloud.js": "e1a3b58add1dfa669773251bf28f219731bff46a557129e8a6255daebcaf1ffa",
+    "src/lib/notification-events.js": "e673fea9da1ee873cef980464b19b2094faa3c309e21e31653dfe0711a4f94c8",
+    "src/lib/notification-push-runtime.js": "a877928046b7706f31404582a24ffc4f8cd6c9a024c32f37d2dccbc23e6f2c20",
+    "src/styles/notifications.css": "19c8105d5fdbed143b9268d954f526ee66c82252f980fea9050cdfc6a73ddc35"
+  },
+  "readinessReset": {
+    "before": {
+      "paints": 1,
+      "requests": 1,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    },
+    "after": {
+      "support": 1,
+      "buttons": 16,
+      "paints": 2,
+      "requests": 1,
+      "config": null,
+      "context": "rakeezx-user-ea6648b2949ca5609a8287419c903833"
+    }
+  },
+  "identicalMarkupRecovery": {
+    "cleared": 0,
+    "identical": true
+  },
+  "notificationBursts": {
+    "paints": 0,
+    "requests": 1
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-config-read-stability-20261026/tests/n44-config-read-stability-20261026/recovery.mjs:102:56\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-config-read-stability-20261026/tests/n44-config-read-stability-20261026/recovery.mjs:29:3"
+}

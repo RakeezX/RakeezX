@@ -1,0 +1,43 @@
+[
+  {
+    "command": [
+      "node",
+      "--check",
+      "src/lib/notification-push-runtime.js"
+    ],
+    "status": "PASS",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "src/views/notification-settings.js"
+    ],
+    "status": "PASS",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "node",
+      "--test",
+      "--test-name-pattern=payload|explicit_consent|owner/workspace|cleanup failures|action independently",
+      "tests/n44-push-preparation.test.mjs"
+    ],
+    "status": "PASS",
+    "exitCode": 0,
+    "output": "✔ n44_push_payload_expiry_dedupe_and_safe_action_contract (5.7062ms)\n✔ n44_push_explicit_consent_owner_context_revoke_with_fake_gateway (1.5865ms)\n✔ owner/workspace/device/session switches at each async boundary and logout reject stale work (2.2902ms)\n✔ cleanup failures stay retryable, private and block later subscription (0.577ms)\n✔ action independently authorized and re-derived with current owner, expiry and destination (0.6877ms)\nℹ tests 5\nℹ suites 0\nℹ pass 5\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 129.6699\n"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "status": "PASS",
+    "exitCode": 0,
+    "output": "warning: in the working copy of 'src/lib/notification-push-runtime.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/views/notification-settings.js', LF will be replaced by CRLF the next time Git touches it\n"
+  }
+]
