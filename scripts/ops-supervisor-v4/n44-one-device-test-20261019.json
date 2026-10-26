@@ -11,8 +11,8 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261026-N44-ONE-INSTRUMENTED-FOURTH-ACTUAL-OUTCOME",
-      "budgetMinutes": 60,
+      "liveAuthorizationRef": "PO-20261026-SAME-ACCOUNT-SOURCE4-RECONCILIATION",
+      "budgetMinutes": 30,
       "idleMinutes": 12,
       "allowedPaths": [
         "drafts/n44-push/**",
@@ -20,14 +20,13 @@
         "tests/n44-instrumented-fourth-20261026/**",
         "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md",
         "tests/n44-instrumented-fourth-actual-20261026/**",
-        "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md"
+        "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md",
+        "tests/n44-source4-reconciliation-20261026/**",
+        "docs/automation-evidence/20261026/N44_SOURCE4_RECONCILIATION.md"
       ],
       "verificationPaths": [
-        "sw.js",
-        "src/lib/notification-push-runtime.js",
-        "src/lib/notification-push-browser.js",
         "src/views/notification-settings.js",
-        "tests/n44-functional-readiness-20261026/hosted-final-certificate-dfd4e638.json"
+        "src/lib/cloud.js"
       ],
       "preparationAuthority": {
         "kind": "scoped_preview_and_fixture_ops",
@@ -56,7 +55,7 @@
         "authorityStartsAt": "2026-10-24T02:14:27.943Z",
         "authorityExpiresAt": "2026-10-24T04:14:27.944Z",
         "productId": "N44",
-        "liveAuthorizationRef": "PO-20261026-N44-ONE-INSTRUMENTED-FOURTH-ACTUAL-OUTCOME",
+        "liveAuthorizationRef": "PO-20261026-SAME-ACCOUNT-SOURCE4-RECONCILIATION",
         "namedOperations": [
           "reconcile original one-device attempt and cleanup",
           "qualify exact changed two-hour hard stop preserving consumed budget",
@@ -75,7 +74,7 @@
           ],
           "requiredHistoricalAggregate": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
         },
-        "currentPhase": "qualified_one_instrumented_fourth_actual_outcome",
+        "currentPhase": "same_account_source4_reconciliation_only",
         "newTargetUserAuthorization": "PO23October current reply identifies normal Chrome Rakeez test account; incognito reserved for N36",
         "newLiveWindowGranted": true,
         "providerWritesThisPhase": "only exact qualified activation/one-device approval and owner cleanup",
@@ -604,9 +603,10 @@
         "continuous-n44-disabled-cleanup-public-20261025",
         "continuous-n44-receiver-outcome-public-20261026",
         "continuous-n44-settings-context-recovery-20261026",
-        "continuous-n44-config-read-stability-20261026"
+        "continuous-n44-config-read-stability-20261026",
+        "continuous-n44-verified-auth-peer-recovery-20261026"
       ],
-      "objective": "ORIGINAL CUSTODIAN ONLY. Continue saved qualified candidate, do not reimplement tests or repeat consumed old scopes. This live stage may begin only after actual new public receiver four assets served, qualified fixed fourth cap packet, no active shared service/browser worker/publisher, fresh exact same original protected normalChrome owner/workspace/physicaldevice and SyncGREEN. No new account, incognito/N36/Madrasati contact, credential/cookie/session-store extraction, browser evaluation hidden storage, service-security/Auth/RLS/SQL schema migration, OSsettings change, cron/general/bulk delivery. Scope immutable artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-instrumented-fourth-scope.json requestRun7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967 authorityf9a16de8a27b52f32f346e0c975e4714c68d45b92eecf84efbbbd9bccc201287 hardEnd2026-10-26T05:09:54.185Z. No automatic renewal; abort if prerequisites cannot fit. Prior actual3 remain spent; old first/additional/third markers never reset; new fourth global4 atmost1, reg9atmost1 and reg8 verifiedrevoked, max1sourcegroup4/max1window4<=20min and hardEnd.\nOriginal native qualified upload atmost1 plus exactown pin/session-policy source-only pairedCAS atmost1 (preserve Auth approval times/flags/other47keys/N88archive/carriers). Readback source/archive, peer source/archive and invariantdigest; metadata versions legitimately increment withsecretwrites, compare source+archive. Existing ingress/service typed contracts+nonce/rate+private guards untouched. Source code cap package is NEW and must actually be served, oldc1ec is prerequisite not new deployedclaim. No new diagnostic/chanceupload or desktop upstreamSSLFAIL retry. On material failure stop, preserve budget and evidence.\nBefore new send, arm finite passive local OS observer through documented cua APIs only, no input/foreground/notificationcenter/OSDB/registry/customhelper. getApp on actually observed attributable Chrome/Rakeez/notificationwindow may readAX/screenshot; don't capture unrelated private alerts. CUA rewriteDocumentation first after summary; listWindows emitfalse then exact observed IDs, no guessed handles. Need observer ready BEFORE dispatch; if can't observe nativeUI record limitation, never providerACK=OS. Current SWSupport outcome provides independent finite device receipt via sameorigin controlledclient, no network/eval; read its legitimate disabled/cleanupPending path BEFORE Stop/sourceDelete/expiry clears binding. Do not discard evidence by cleaning first.\nNormal UI currenttarget optin/preferences/registration9; targetauthorizeACK required. If necessary temporary SAMEDEVICE test timing/quiet preference via existing normal UI only, journal exactoriginal and restore; no broad system/browser preference change. Exact current curriculum operational sourcegroup4 max1/autogeneratedchildmax1 via normal app route only, zero grade/student changes; intent durable before normalcreation and normalcanonicalACKs. Save every normal mutation ID before dispatch, no arbitrary generated-ID mismatch/directSQL substitute. Fresh20minwindow with exactscope hash/id, service validates all3spent/8retired then consumes new markers atomically. Close only authorized normaltrialRakeezpages, keep Chrome running and personal/incognito/Madrasati intact. Exactlyone actual new push after ledger provesunspent; no uncertain resend. Capture server commit/provider disposition AND SW received/displayrequested/accepted/failed/unknown/getNotifications presence AND attributed native banner if observable, each separate. Device outcome may be reread once through explicitclosedSupport after normal ownedappreopen, no focuspoll/network and no accountchange.\nOnly AFTER receipt capture, delete exact source4 via normal recoverableDeleteACK, Stop/revoke9/consentfalse/unsubscribe+bindingabsence and originalpreferences restore normalUI. Independently verify exactreg9 disposition using bounded signed existing hosted inspector once (max15minreadonlyapproval, rollbackACK/zeroprivatewrites), not spent oldreg8approval replay; no desktopupstreamSSLretry. Finally approvalNULL/deliveryOFF/cronOFF, samepeer/47nonapprovedkeys preservation, ownedtabs/processes/leases release. Protectedstaging previous deletion POLICYREJECTED MUST remain retained, no deletion retries/alternatetools/ACL. Do not delete any such folder.\nRecord actualservedrevision/native/pin+policy hashes/window/request/budget/receipt finite statuses withoutsecretIDs. Nativevisual notobservable/unknown remains NOT_PROVEN, never manufacturePASS fromsynthetic/HTTP200/provideracceptance. No fourthrepeat/fifth under anyauthority. Preserve errors/NOTRUN and no broaderN44umbrellaCLOSED. Return truthful runner schema and bounded candidate outcome; solepublisher only handles any approvedpublicdelta.\n\nNative observer MUST target only an actually observed notification toast/transient notification window, attributed to Chrome/Rakeez by its actual AX/title. Never capture the main Chrome window or other personal browsing content, and never infer toast presence from a generic Chrome app window. If no safe attributable native window is available, keep OS visual proof NOT_PROVEN and still collect finite legitimate SW device receipt before cleanup; do not add another send.\n\nCURRENT MATERIAL RESUME (all historical scoped evidence retained): Original145f6205 emptyUI/5aunchanged corrected by actualpublisheddba2c8; original1bd36343 afterfix actualnormal identity owner/workspace/device EXACT protectedjournal compare/SyncGREEN/Supportfiniteoutcomeregion+recoverymarkerPRESENT, but initialconfig429phasehttp thencheckingwithoutworkerrefresh. Committedcandidate6cd0eadbba2b9eb21acd05481db61def7157fefb; source tests/n44-instrumented-fourth-actual-20261026/corrected-preflight-1bd36343.json, limitingLayerNOTESTABLISHED, actualNative/source/window/consent/reg/sendALLZERO. Do NOT repeat old429 or claim itslayerproved.\nNEW QUALIFIED MATERIAL CORRECTION ACTUALLY SERVED: continuous-n44-config-read-stability-20261026 candidate8bddf0e631ddaa40283c596546c54fb13367cc87 publishedbf3aae18dc5f99bb3e175e97a26534008ad89c26 VERIFIED2026-10-26T00:18:10.912Z; exactcurrentservedassets [{\"path\":\"src/lib/notification-push-runtime.js\",\"sha256\":\"369278a341eb1a8fdb5837c2fa8629a8af8514ce5583c7f26774ea56df9b1cff\"},{\"path\":\"src/views/notification-settings.js\",\"sha256\":\"4454c4c0647a88288fe4bc5d01697ee6ad1a77aaff2bbc0ba09bd18600d8a2a5\"}]. Actualruntime+realgatewayRED6stableeventrequests after429/503/disabled/shape/transport -> GREEN1permaterialcontext, noauto429retry/cooldown>=60smanualonly, actualbinding/restoration/sameAuthtokencontinuity/Stop/expiredowner/outcome/unmount/UIrecovery/320390PASS. NormalSupportbutton now explicitly 'إعادة فحص جاهزية تذكيرات الجهاز', actionscallrecheckConfiguration withoutforcingactivebinding/Stop. Reuse sourcepublication/localproof, no newlocaltests or servicechanges tofixlimits. OnlySW+browseroldreceiverhashes7524848remain; runtime+viewhashesabove supersedeolderpacket. Privatecheckoutpublicsrc may be OLD; actualbrowserMUST use servednewUI. NEVERportprivateoldsrcintoProduction. Newpublicruntime/view are NOT nativepacketinputs.\nUNCHANGED exactimmutable Native qualifiedsource9e8732c48990e1a46e164f3770a79cc2004da0c4/entry85acc24888a78bde80a15e9048f0a6d4edc1d7470718cc2b3dc59631e7f68743/importMap50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421/19typedPGqualification0b37c864760e34b5d08214ba5842f851bdc966aa463f036c4c5166ddf828cfd0. CurrentACTUAL installedbeforelive stillc1ec/archivecb0/reg8verifiedrevoked. ONE nativeupload+pairedownpin/sourcepolicyCAS and ONEreg9/source4/window4/fourthsend were NEVERspent inpriorpreflights. ThiscorrectiongrantsZEROextraNative/sends, SAMEstableRootrequestRun7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967/hashf9a16de8a27b52f32f346e0c975e4714c68d45b92eecf84efbbbd9bccc201287/hardEnd05:09:54.185UTC26Oct. Nativeidentityuseoriginalcomputedsourcepinmachinery; Git40tag isprovenance, doNOTmistakeitforprotocol64digest. PreserveAuthattestation/47keys/N88archive/carriers/sourcebindingparity. No diagnosticnativeupload or quota/counter/nonce/permission change.\nBOUNDED NORMALBROWSER MATERIAL RECOVERY: prior2ownedpreflightdocumentsclosedandcountspreserved. Max2 NEW ownednormalappdocs nowallowed forpretrial+postsendreceipt, sameoriginalprotectedtarget. Existing exactalready-known ORIGINAL NORMAL Rakeeztrialtabs maytemporarilyclose(max3) andberestored(max3) to theirprotectedrecordednormalURLs aftercleanup, aspreviouslyexplicitPOallowed N44temporaryclosure afterN88evidence. This removesolderloaded auto-requesting appinstances and ensuresproperclosed-pages trial. NEVER classifyunknownprofiletabasnormalmerelybytitle/hostname, nevercloseunknown/personal/incognitoN36/Madrasati orforceunsaved/beforeunload. Usealreadyverifiednormalbinding/protectednormalproviderTabIDs/URLs; ifambiguousleaveit. KeepChromerunning. RecordonlyneededtrialURLs inprotectedcustody, no publicIDs/history. Newactualnormalidentity+SyncGREENstillrequired. Supportdeviceoutcomeregion/pathpresent BEFOREactivation; readbuttonnaturallyabsentwithoutboundregistrationandisNOTfailedgate. Afterreg9/authorizeACK requirefiniteoutcomereadbuttonBEFOREsend.\nCONFIG ADMISSION: allowcurrentpublishedclient oneinitialnormalconfigread. Stopolderknownnormaltrialloadedclientsbeforecontrolledrecheck, no newforeground/UIsecuritysetting/cachepurge. Ifinitial429 persists whileolderclientclosure/ownnewclientmaterialfixhasjusttaken effect, waitNATURAL>=60spernormalcooldown, then atmostONEexplicitnewSupportreadbuttongesture (zeroautomaticretry, no oldrequestnonce replay, no quotareset). This is onelegitimate materialcorrectedread after normalratetime, NOT nativeuploadbypass. If429againSTOPandpreservefinitecause; doNOTrepeat/raiselimits/changedirectroute/diagnosticupload. Otheractual401/503/newfailurestopandnameexactphase. A validHTTP200statusdisabled is EXPECTED before originalqualifiedactivation/sourcewindow; doNOTrequireREADY/registration/consentBEFOREapproval (circular). Onceactualadmission+identityokay, executeonlyunspentnative/pin/policytransition, normaldurableSource4intent/createcanonicalACK/window4<=20min(samecurrentUTCbucketbeforehardEnd), normalfreshconsent/reg9/authorize. After REALmaterialserviceapprovalactivation, allowONEexplicitSupportreadinessgesture ifcachedprior200disabled; no reload/newdoc or loop. Followgenuinepreference/contexttransitionexistingprotocol only.\nREAL ARRIVAL WITNESS: reserve stablefourthmarkerBEFOREone signedrequest. To observewhiletheONErequestinflight, use EXISTINGone-shotoriginalcustodianoperation helper in anownedHIDDENasyncprocess ifneeded, recordingPID/birth andjournal first; max1samecustodianhelper, no newdispatcher/framework/Productworker or unreviewedendpoint. Never blocktheentiretoastlifetimebywaitingforsynchronoussenderresponsebeforefirstOSobservation. OnlydocumentedCUApassiveinventory/attributableNEWnotificationtoastAX+screenshot, noOSinput/mainChromecapture/notificationcenter/OSDB/customobserver. No existingtoastbeforetestisexpected; observercapabilityarmeddoesNOTrequireanexistingtoast. Captureprovider/COMMIT+SWreceived/displayrequest/displayaccepted/failed/unknown/presence+attributednativevisualEACHseparately. A deviceDTOisnewarrivalproofbeyondprovider butNOTWindowsvisualproof. IfnosafeToastobservablekeepnativeNOTPROVEN; NOextrasend. ReopenONEownnormaldocandexplicitmanualdeviceoutcomeBEFOREsourceDelete/Stop/expiry clearsbinding.\nThen exactnormalcanonicalSource4DeleteACK (savemutationIDbefore), normalStop/revoke9/consentfalse/unsub+bindingabsence, originalprefsrestored, ONEnewtargetsignedreadonlyhosteddispositionapproval<=15m/readrollback(nooldreg8approvalreuse/desktopTLSretry), finalOFF/NULL/cronOFF/all47peer/N88archives preserved. RestoreonlyknownnormaltrialtabURLs aftercleanup. ProtectedstagingdeletionPOLICYREFUSAL isbinding: no deletionretry/alternatefs/ACL. PreserveallFAILNOTRUNandold3spends. Finish ALL specifiedunconsumedoperations whilevalid, no stoppingatpublic/localPASS. No newPOmanualtrial/permissionquestions, no broadN44CLOSED. Ifactualnewblockedpreserveboundedexactresult (externalgenuine vsimplementation), neverloopunchanged.",
+      "objective": "RESUME ORIGINAL saved session01a14fcd-032c-7ec0-8b0c-0e0395862c61 candidate7a094dc081466286a0a16c83df83012e608d5a33, base63e09b1c49172ee5fd9f26a88f4f8abe3e3c330b. NEW HUMAN INPUT: PO26Oct confirms login to SAME original stable-email trialaccount in normalChrome. This resolves external account prerequisite only, NOT oldwindowrenewal/sendauthority. Follow skillticketrouter/existingcontroller; no newProductexecutor. Original9453d5ba source4 ONE normalparent Save wentsignedout BEFOREcanonicalACK, IDs/mutationIDNOTEXPOSED/sourcecommitUNKNOWN, childconfig0/reg9zero/send4zero. Nativeupload9e+pairedpinpolicy/window4/source4intent wereCONSUMED andmustNEVERreset/repeat. Window4 expired~00:54UTC26. Review inactiveconstraints artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-unknown-source4-recovery-preparation.json plusbounded-run/final945existingproof.\nACTUAL prerequisite delivered Authcandidate01cd956cf03be69c093e95388e31e9cbb49aafa2 publishedd57705ca79d7e7a5791e476d0624107e1d9017f2 VERIFIED01:25:18.198UTC26 cloudJSa1687116d1bef2046cba769eac2630c8f1f5f595e160a31aa3ad52ba2245581c. 94actualaffectedSYNTHETICcasesPASS; no liveAuthcauseclaim. FreshnormalUI identity/Sync/state required, no unchangedassetchecks/test reruns. Privatecheckoutpublicsrcmaystale: use actualserved UI, no copyingwholeprivatebranch. NativeACTUAL9e8732/archivef1a01056af05e4a72d27fc775adf9ac70a0957fdd66c93bb3c4bb9f3b944864d, baselineall47digest8fd2ab2573aa9920e932ca112f029622c1e78aaf18dfb8fec0bc472fc6f1ddeb, N88peerarchive01a45e02e121dfa425f70cf73e8f3f5827ce3b09bbe51c9047fee0e252c0f3fc, lastOFF/approvalNULL confirmed. Preserve it; ZERO provider/native/pin/policy/SQL/Authsettings/sessioncreation/registration/window/sourcecreation/send ops thisphase. Originalthreeactualsendsspent andfourthunspentnotnewpermission.\nUse originalprotectedcustody only toread exactSource4intent and compare fresh legitimate expanded normalUI owner/workspace/device values, retainonlyequality/hashes publicly. Usercurrentnormalteacherpageavailable; sameoriginalnormalChromeconnectiononly. Acquire browserphaselease onlywhenneeded. No incognitoN36/Madrasati/personal or ambiguous tabs, foregroundOSinput, cookie/token/hiddenbrowserDBstoragecapture, accountlogin/OTP/creation, directgeneralSQL/providerquery. Existingknownnormaltabpreferred; maxONEfreshownednormaldocumentonlyifneededtoobtainactualcurrentUI, no sourceSave/reloadretryloop. Do not forceSync/retryoldcommand; normalexistingidempotentSyncmaysettlethealready-authorizedsavedcommand, OBSERVEitsactualnormalack/status withoutre-savingorrecreating. Source4stageunknownmayhaveparentwithoutchild(childconfiguration0); doNOTlimitsearchtoalreadyactiveSourceGroupsonly.\nREADONLYFIRST: currentnormalclass/items UI for exactsavedSource4 uniqueintent label/targetancestry. ReadSyncstatusandnormalreceipt/Supportmetadatatoidentifyactualgeneratedparent/child/mutationIDs IFavailable throughlegitimateUI only. AnemptyLOCALlistorSyncGREENalone doesNOTestablishserverabsenceorcommit. Distinguishlocalpending/ack/canonicalread/absence/unresolved; neverchangeUNKNOWNtoFAILorPASSbyguess. Exhaustiveauthoritativeexistingread/normalreceipt mayestablishcreation/absence; recordexactevidencelimits. No newmeasurement/diagnosticframework or backendupload toobtainit.\nCONDITIONAL OLD CLEANUP alreadyauthorizedoriginaltrial: ONLYifexactSource4identity+owner/teaching/ancestry established AND authoritativeACK/no pendingunknowncreatecapableofrevival ANDnormalpreviewzeroaffectedgrades, performmaxONEexistingnormalrecoverableparentDelete with savednewmutationIDBEFOREdispatch andcanonicalparent/childtombstoneACK. No guessingIDs, no oldDelete replay, no unrelatedoldSourceGroups orstudent/grades changes. IfnoexistingSource4/ambiguous/unprovedcommit, doNOTdeleteorcreateanything; preserveUNKNOWNwithprecisenextmissingproof. ThisphaseallocatesZEROnewsource/subitem/window/registration/send anddoesNOTresumeoldtest. No needreg9dispositioninspectbecausereg9NEVERexisted; reg8alreadyverifiedrevoked, no oldinspectionretry/desktopTLSretry.\nKeepapprovalNULL/deliveryOFF/cronOFF/servicearchives/sourcepolicy untouched. NormalUIreads suffice; doNOTreadprovider47metadataunchangedmerelyfortrophy. Releaseownedbrowser/liveleasesandcloseonlyownedintermediatedocuments; preserveusercurrentteacherpage. ProtectedstagingdeletionPOLICYREJECTED: no retries/alternatefilesystems/ACL. No newlocaltests/rebuild/redeployunlessactualNEWcausalProductdefectreproducedwithinthisscope, nevermodifypubliccodeoutsideallowedprivatepaths.\nReturnaccurate runnerJSON with exacttask/run/candidate/base and scopedproof; historicalFAIL/NOTRUN preserved. N44OSarrivalstillNOTPROVEN, no broadCLOSED. Afterreconciliation/conditionalcleanup, save precise originaltarget/source/budgetstate for Root nextboundedtrialreview; doNOTmintnewwindow5/source5 orsendautomatically. Humanalreadygrantsfullgoalpermission; doNOTaskagainforpermissionoraskthemtorepeattests whileactualallowedreads/conditionalcleanupremain.",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -635,7 +635,10 @@
         "n44_fourth_exact_native_packet_and_zero_live_operations",
         "n44_fourth_qualified_native_actual_source_and_peer_preservation",
         "n44_fourth_actual_closed_page_device_and_os_receipt",
-        "n44_fourth_final_reg9_disposition_and_off"
+        "n44_fourth_final_reg9_disposition_and_off",
+        "n44_source4_same_original_account_actual_reconciliation",
+        "n44_source4_exact_conditional_cleanup_or_preserved_unknown",
+        "n44_source4_no_new_allocations_and_owned_resource_release"
       ],
       "acceptance": [
         "Exactly one approved current-device actual push attempt, after pages closed, with explicit browser consent and truthful OS result.",
@@ -645,19 +648,18 @@
       "effort": "medium",
       "preflight": {
         "version": 1,
-        "sourceCommit": "6cd0eadbba2b9eb21acd05481db61def7157fefb",
+        "sourceCommit": "7a094dc081466286a0a16c83df83012e608d5a33",
         "requiredSourcePaths": [
-          "drafts/n44-push/activation/instrumented-fourth-20261026/qualified-source.json",
-          "drafts/n44-push/activation/instrumented-fourth-20261026/edge.mjs",
           "drafts/n44-push/activation/device-custodian.mjs",
-          "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md",
           "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md"
         ],
         "editPaths": [
           "drafts/n44-push/activation/device-custodian.mjs",
-          "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md"
+          "docs/automation-evidence/20261026/N44_SOURCE4_RECONCILIATION.md"
         ],
-        "newPaths": [],
+        "newPaths": [
+          "docs/automation-evidence/20261026/N44_SOURCE4_RECONCILIATION.md"
+        ],
         "workerChecks": [
           "n44_one_authorized_device_registration_single_push_with_pages_closed",
           "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -686,11 +688,14 @@
           "n44_fourth_exact_native_packet_and_zero_live_operations",
           "n44_fourth_qualified_native_actual_source_and_peer_preservation",
           "n44_fourth_actual_closed_page_device_and_os_receipt",
-          "n44_fourth_final_reg9_disposition_and_off"
+          "n44_fourth_final_reg9_disposition_and_off",
+          "n44_source4_same_original_account_actual_reconciliation",
+          "n44_source4_exact_conditional_cleanup_or_preserved_unknown",
+          "n44_source4_no_new_allocations_and_owned_resource_release"
         ],
         "publisherChecks": []
       },
-      "completionMode": "complete_one_instrumented_fourth_actual_outcome",
+      "completionMode": "reconcile_existing_unknown_source4_only",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
@@ -1202,6 +1207,24 @@
         "maxConditionalManualInitialConfigRecheckAfterNaturalCooldown": 1,
         "maxManualConfigRecheckAfterMaterialServiceActivation": 1,
         "keepRequestAuthorityHardEnd": true
+      },
+      "source4Recovery": {
+        "version": 1,
+        "userReply": "PO26Oct: سجلت الدخول إلى الحساب نفسه",
+        "preparation": "artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-unknown-source4-recovery-preparation.json",
+        "sameOriginalTargetOnly": true,
+        "readOnlyFirst": true,
+        "maxExactExistingSourceParentDeletes": 1,
+        "requiresAuthoritativeAckAndZeroGrades": true,
+        "newNativeUploads": 0,
+        "newPinPolicyWrites": 0,
+        "newWindows": 0,
+        "newSources": 0,
+        "newSubitems": 0,
+        "newRegistrations": 0,
+        "newSends": 0,
+        "noUnknownCreateReplay": true,
+        "oldWindowExpiredPreserved": true
       }
     }
   ]
