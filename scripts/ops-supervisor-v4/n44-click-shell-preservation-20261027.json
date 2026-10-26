@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-click-shell-preservation-20261027",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -6100,
+      "scopeKey": "n44-click-latest-shell-preservation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 15,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n44-qualified-click-frontend-20261027"
+      ],
+      "allowedPaths": [
+        "sw.js",
+        "docs/automation-evidence/20261027/N44_CLICK_SHELL_PRESERVATION.md",
+        "tests/n44-click-shell-preservation-20261027/qualification.json"
+      ],
+      "verificationPaths": [
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n44_click_shell_latest_assets_and_monotonic_generation",
+        "n44_click_shell_qualified_handler_and_runtime_unchanged",
+        "n44_click_shell_single_file_scope_zero_live_operations"
+      ],
+      "releaseAuthority": "Direct PO N44 completion request includes correcting an identified delivery regression introduced by the exact-qualified two-file copy. Source-only one-file followup via sole publisher; no account/browser/provider operations.",
+      "preparationAuthority": {
+        "kind": "qualified_frontend_preservation_only",
+        "publication": true,
+        "priorDelivery": "e2f40e680edea6a546331d4adc58f5de9fcd392c",
+        "qualifiedClickCommit": "0c3111b6b1de6f755dba6063019a633bd63e23f5",
+        "priorCompleteShellCommit": "1131917dd7cd69d7b094e78185cd6f633313c64e",
+        "registrations": 0,
+        "sends": 0,
+        "providerServiceOperations": 0,
+        "realAccountReads": 0
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "e2f40e680edea6a546331d4adc58f5de9fcd392c",
+        "requiredSourcePaths": [
+          "sw.js",
+          "src/lib/notification-push-runtime.js"
+        ],
+        "editPaths": [
+          "sw.js",
+          "docs/automation-evidence/20261027/N44_CLICK_SHELL_PRESERVATION.md",
+          "tests/n44-click-shell-preservation-20261027/qualification.json"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261027/N44_CLICK_SHELL_PRESERVATION.md",
+          "tests/n44-click-shell-preservation-20261027/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_click_shell_latest_assets_and_monotonic_generation",
+          "n44_click_shell_qualified_handler_and_runtime_unchanged",
+          "n44_click_shell_single_file_scope_zero_live_operations"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "Fix ONE identified N44 delivery regression on currentmain after verified e2f40e680edea6a546331d4adc58f5de9fcd392c. Exact2filecopy preservedclickfix butreplacedlatestv88workerwithqualifiedv87 andomitted9portfolioShellassets introducedbypriorN126delivery. Thiswasexplicitlydocumented inN44_CLICK_FRONTEND_DELIVERY.md; preserve that historicalresult, don'tclaimitneverhappened. SameN44issue5/PR6, sequentialone-file repair, notnewticket/research/UIredesign. Workonlysw.js+minimalowndoc/proof, nootherProductfile/historymerge. DoNOTtouchoriginalcustodianworktree/QAcheckout, provider/service/Native/pins/account/browser/storage/source6/source7/notifications. ZERO liveoperations/sends/reg/leases.\n\nInspect exactsw.jsdiff between qualifiedclicksource0c3111b6b1de6f755dba6063019a633bd63e23f5 and pre-copycurrentmain1131917dd7cd69d7b094e78185cd6f633313c64e. Differences outsideN44pushblock are ONLY VERSIONv87->v88 and9PortfolioPreviewSHELLentries. Preserve CURRENTqualifiedN44 n44Ask/readiness/notificationclick code exactly, preserve runtimeexactGitf1e6815b18568320ba6531d290403d7317c0a8a3d698d6920acd33dd259cc5f0. Restoreonlythe9shellentries from1131917, notthewholeoldSWwhichwouldreintroduceclickfailure. SetmonotoniccacheVERSIONrakeezx-v89(orhigheronlyifcurrentmainalreadyadvancedbeyond89); neverdowngrade. Preserveallcurrentshellentriesandexistingcachecleanup/lifecycle/namespace, offlinePushconsentseparation, customdatetime/sourceprivacyguards unchanged.\n\nVerifyeachrestoredshellassetexistsandcompletepriorv88SHELLsubsetofnewSHELL. VerifyN44pushblockbyteequivalence toqualifiedsourceafterGitline-ending normalization and runtimehashunchanged, reuseactualDOMowner/privacyproofs; runexisting4caseworkerregression against newworker ifneededexactprefixchanged. Syntax/scopeddiffcheck; noall-suite/realbrowser/actualcacheinstallation/liveinspection/newnotification. Publisherdoescurrentbuild/servedbytes. Document sourcev87copyregression/currentv89restoration, reusedphysicalarrivalPASSandpostfixOSclickNOTRUN/localcleanupUNKNOWN. N44wholeOPEN. NoNative4/send5/reg10/windowrenewal/Source8, noerasingpreviousFAIL orclaimingphysicalplatformPASS. CommitnarrowAIlabelledcandidate/3checks andreturnLOCAL_READY forsolepublisher. ThisfixmustnotwaitforPOpermissionalreadyprovided."
+    }
+  ]
+}
