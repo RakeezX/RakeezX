@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-pr6-qualified-frontend-20261026",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -5990,
+      "scopeKey": "n44-pr6-qualified-frontend-prerequisite",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 20,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "allowedPaths": [
+        "src/lib/notification-push-browser.js",
+        "src/lib/notification-push-client.js",
+        "src/views/notification-settings.js",
+        "docs/automation-evidence/20261026/N44_PR6_FRONTEND_PUBLICATION.md",
+        "tests/n44-pr6-frontend-publication-20261026/**"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-browser.js",
+        "src/lib/notification-push-client.js",
+        "src/views/notification-settings.js"
+      ],
+      "requiredChecks": [
+        "n44_pr6_frontend_exact_qualified_bytes",
+        "n44_pr6_frontend_existing_guard_proof",
+        "n44_pr6_frontend_only_scope_and_no_live_operations"
+      ],
+      "releaseAuthority": "Latest direct PO N44 issue5/PR6 completion request authorizes this already-qualified frontend prerequisite through the sole existing publisher. Existing normal user-click opt-in semantics only; zero service/SQL/Auth/account/Push operations here. This delivery does not accept the N44 umbrella or prove actual Push.",
+      "preparationAuthority": {
+        "kind": "qualified_frontend_prerequisite_only",
+        "publication": true,
+        "originalQualifiedCandidate": "790d290650babc00a602f37cb8902b9480903ad3",
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "pr": "https://github.com/RakeezX/RakeezX/pull/6",
+        "prQualifiedHead": "5c82947350a72b53beb4dc694edf49dac220422a",
+        "expectedSourceHashes": {
+          "src/lib/notification-push-browser.js": "bdae0add60f5d996bf7b29a44411c647882ff3c179fbe87635a357b748f48cc9",
+          "src/lib/notification-push-client.js": "329de8b75d9ef670d31a362469ec7a3fbb885aa9fc8edc395900bdd8efe3c62e",
+          "src/views/notification-settings.js": "59cfe0c0effd1e681a35b738673bfb25aa4303a49acea00c2ce95f22df233c43"
+        },
+        "providerServiceOperations": 0,
+        "privateCustodyAccess": 0,
+        "realAccountReads": 0,
+        "registrations": 0,
+        "sends": 0,
+        "source6Operations": 0
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "790d290650babc00a602f37cb8902b9480903ad3",
+        "requiredSourcePaths": [
+          "src/lib/notification-push-browser.js",
+          "src/lib/notification-push-client.js",
+          "src/views/notification-settings.js"
+        ],
+        "editPaths": [
+          "src/lib/notification-push-browser.js",
+          "src/lib/notification-push-client.js",
+          "src/views/notification-settings.js"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261026/N44_PR6_FRONTEND_PUBLICATION.md",
+          "tests/n44-pr6-frontend-publication-20261026/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_pr6_frontend_exact_qualified_bytes",
+          "n44_pr6_frontend_existing_guard_proof",
+          "n44_pr6_frontend_only_scope_and_no_live_operations"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "Deliver ONLY the THREE already-qualified PR6 frontend files from saved original N44 candidate790d290650babc00a602f37cb8902b9480903ad3, not another N44 investigation. Same issue5/PR6; original live custodian is BLOCKED awaiting this precise prerequisite, so this is a SEQUENTIAL component step, not another parallel worker/ticket. Work in this controller-owned isolated worktree on current main. Copy exact Git blobs for src/lib/notification-push-browser.js, src/lib/notification-push-client.js, src/views/notification-settings.js from qualifiedparent; expectedsha256 {\"src/lib/notification-push-browser.js\":\"bdae0add60f5d996bf7b29a44411c647882ff3c179fbe87635a357b748f48cc9\",\"src/lib/notification-push-client.js\":\"329de8b75d9ef670d31a362469ec7a3fbb885aa9fc8edc395900bdd8efe3c62e\",\"src/views/notification-settings.js\":\"59cfe0c0effd1e681a35b738673bfb25aa4303a49acea00c2ce95f22df233c43\"}. Do not modify originalparentworktree/QAcheckout, source6, privatehelpers, servicefunction/env/SQL/Auth/schema or browseraccount. Do notmergeentireparent131files, no senderlibrarychange or UIredesign. This source contains nativegesture ordering/localdisplay check/owner cleanup already qualified in originalworktree.\n\nReuse immutable parent tests/n44-pr6-completion-20261026/scoped-qualification.json (all312frontendbuildinputblobsunchanged, actualVitePASS,19crypto/8Native reused), rendered-ui-main-advanced.json and sourceProof in preservedGitref codex/n44-pr6-custody-preserved-82b3f54. Verify exacthashes and existingpublic/private import boundaries/owner+gesture proof; no newmeasurement/whole-suite/browser/Push test. If any testedfilehashdiffers, investigate affected change only, neverclaimreusedproof. Threepublicfiles gitdiff--check was independentlyPASS; parent's whitespaceFAIL elsewhere in oldprivatehelpers remainspreserved, do notturnitPASS. Shortscope/syntax ifneeded. Publisher handles deterministicbuild/metadata/servedparity, no manualmainpush/deploy. Minimal doc+qualificationJSON describe source scope and evidence, notnewglobalreport. Actual localcontrolled UI proof reused is synthetic, not actualdevice.\n\nCommit exact3publicfiles and minimalown evidence, return LOCAL_READY with three requiredchecks truthfulPASS onlyifmatch, candidate/base/worktree. Every live/service/browser/source6/notification allocation remainsZERO. No acquire livebrowserlease, noAuth/session/logout/cookie/secret access, no nativefunction/carrier/pin changes, no notification evenlocal. DO NOTWAIT for POapproval alreadyprovided. OriginalN44session resumes AFTER originalpublisher verifies these actual servedassets; Source6 is already canonicallyclean, do notretouch. Keep N44issueOPEN and no claim of allplatform/OSarrival or backenddeployment."
+    }
+  ]
+}
