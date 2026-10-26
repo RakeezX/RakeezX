@@ -11,8 +11,8 @@
       "validationTier": "SENSITIVE",
       "executionMode": "local",
       "liveMutation": true,
-      "liveAuthorizationRef": "PO-20261026-SAME-ACCOUNT-SOURCE4-RECONCILIATION",
-      "budgetMinutes": 30,
+      "liveAuthorizationRef": "PO-20261026-MATERIAL-SOURCE4-AND-UNSPENT-FOURTH-COMPLETION",
+      "budgetMinutes": 40,
       "idleMinutes": 12,
       "allowedPaths": [
         "drafts/n44-push/**",
@@ -22,7 +22,9 @@
         "tests/n44-instrumented-fourth-actual-20261026/**",
         "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md",
         "tests/n44-source4-reconciliation-20261026/**",
-        "docs/automation-evidence/20261026/N44_SOURCE4_RECONCILIATION.md"
+        "docs/automation-evidence/20261026/N44_SOURCE4_RECONCILIATION.md",
+        "tests/n44-material-source4-completion-20261026/**",
+        "docs/automation-evidence/20261026/N44_MATERIAL_SOURCE4_COMPLETION.md"
       ],
       "verificationPaths": [
         "src/views/notification-settings.js",
@@ -55,14 +57,13 @@
         "authorityStartsAt": "2026-10-24T02:14:27.943Z",
         "authorityExpiresAt": "2026-10-24T04:14:27.944Z",
         "productId": "N44",
-        "liveAuthorizationRef": "PO-20261026-SAME-ACCOUNT-SOURCE4-RECONCILIATION",
+        "liveAuthorizationRef": "PO-20261026-MATERIAL-SOURCE4-AND-UNSPENT-FOURTH-COMPLETION",
         "namedOperations": [
-          "reconcile original one-device attempt and cleanup",
-          "qualify exact changed two-hour hard stop preserving consumed budget",
-          "activate pinned disabled-recovery source in original N44 function",
-          "one source-bound recovery registration if unconsumed",
-          "one total closed-page provider-send if unconsumed",
-          "owner-safe cleanup and sendingOFF/cronempty readback"
+          "locally qualify exact current-run append-only adapter with shared original fourth marker",
+          "normal same-source4 canonical status and at most one zero-grade recoverable cleanup",
+          "after cleanup ACK, at most one separately reviewed window5/source5 within unchanged root hard end",
+          "one fresh same-device registration9 and one unspent global fourth push only",
+          "finite device/native observation before exact cleanup and final disarm"
         ],
         "configurationDeltaProof": {
           "readOnlyOriginalCustodian": true,
@@ -74,10 +75,10 @@
           ],
           "requiredHistoricalAggregate": "347cc9ac19fba751af0eb461d80dba157b2a72279e2ece9722159f27f0fb9186"
         },
-        "currentPhase": "same_account_source4_reconciliation_only",
+        "currentPhase": "material_source4_cleanup_then_unspent_fourth_completion",
         "newTargetUserAuthorization": "PO23October current reply identifies normal Chrome Rakeez test account; incognito reserved for N36",
         "newLiveWindowGranted": true,
-        "providerWritesThisPhase": "only exact qualified activation/one-device approval and owner cleanup",
+        "providerWritesThisPhase": "Only exact N44_ONE_DEVICE_TEST_JSON / N44_DELIVERY_ENABLED approval/disarm deltas after gates; no Native/pin/policy",
         "registrationsThisPhase": 1,
         "sendsThisPhase": 1,
         "cleanupMutationsThisPhase": "only exact old/current owner-bound registrations and consent",
@@ -451,7 +452,7 @@
         },
         "qualifiedFreshCurrentFollowupWindow": {
           "version": 1,
-          "priorExpiredAt": "2026-10-24T15:49:15.430Z",
+          "priorExpiredAt": "2026-10-24T15:49:15.43Z",
           "currentCleanupCommitted": true,
           "closedPageRehearsalQualified": true,
           "originalCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
@@ -584,7 +585,79 @@
             "N88CurrentTurnSharedPhaseFirst": true
           }
         },
-        "historicalFieldsAreNotFreshGrants": true
+        "historicalFieldsAreNotFreshGrants": true,
+        "priorSource4Recovery": {
+          "version": 1,
+          "userReply": "PO26Oct: سجلت الدخول إلى الحساب نفسه",
+          "preparation": "artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-unknown-source4-recovery-preparation.json",
+          "sameOriginalTargetOnly": true,
+          "readOnlyFirst": true,
+          "maxExactExistingSourceParentDeletes": 1,
+          "requiresAuthoritativeAckAndZeroGrades": true,
+          "newNativeUploads": 0,
+          "newPinPolicyWrites": 0,
+          "newWindows": 0,
+          "newSources": 0,
+          "newSubitems": 0,
+          "newRegistrations": 0,
+          "newSends": 0,
+          "noUnknownCreateReplay": true,
+          "oldWindowExpiredPreserved": true
+        },
+        "source4Recovery": {
+          "version": 2,
+          "firstStage": "same_original_source4_canonical_reconciliation_and_conditional_exact_cleanup",
+          "maxExactExistingSourceParentDeletes": 1,
+          "requiresAuthoritativeAckAndZeroGrades": true,
+          "noUnknownCreateReplay": true,
+          "oldWindowExpiredPreserved": true,
+          "firstStageNewNativeUploads": 0,
+          "firstStageNewWindows": 0,
+          "firstStageNewSources": 0,
+          "firstStageNewRegistrations": 0,
+          "firstStageNewSends": 0,
+          "subsequentStageOnlyAfterCanonicalCleanupAck": true,
+          "materialReview": "scripts/ops-supervisor-v4/n44-material-source4-completion-review-20261026.json",
+          "materialReviewSha256": "8f7f82c5007a1c761ef464a764b03c6a2345c5c2750bb33ae08ae1777b21335e"
+        },
+        "materialSource4Completion": {
+          "version": 1,
+          "reviewPath": "scripts/ops-supervisor-v4/n44-material-source4-completion-review-20261026.json",
+          "reviewSha256": "8f7f82c5007a1c761ef464a764b03c6a2345c5c2750bb33ae08ae1777b21335e",
+          "prerequisites": [
+            {
+              "taskId": "continuous-n44-direct-parent-source-receipt-20261026",
+              "candidateSha": "230cd3481b7054b77fe533f2d70f321215a32a64",
+              "publishedSha": "8528d1995b36541c10529b9d268adf80b6d354b9",
+              "verifiedAt": "2026-10-26T04:20:57.86Z",
+              "servedStoreSha256": "eb4c997e4c32caad274771274391b7d8ba12d8c3e8d9500154b7401a69b41557"
+            },
+            {
+              "taskId": "continuous-n44-empty-parent-cleanup-receipt-20261026",
+              "candidateSha": "17f735d02c31125f59e05d02800496af2c401cd9",
+              "publishedSha": "65bd1762e8271258df69a452dcc766c86d5f6d21",
+              "verifiedAt": "2026-10-26T04:26:50.414Z",
+              "servedStoreSha256": "340c77770caca4799076929962b1f4187bca031dac8c79e7487a8448e9525592"
+            }
+          ],
+          "oldWindowsSpent": 1,
+          "maxNewWindows": 1,
+          "windowOrdinal": 5,
+          "oldSource4IntentPreserved": true,
+          "maxNewSourceGroups": 1,
+          "sourceOrdinal": 5,
+          "newNativeUploads": 0,
+          "newPinPolicyWrites": 0,
+          "priorActualSends": 3,
+          "maxNewActualSends": 1,
+          "maxLifetimeSends": 4,
+          "priorRegistrationAcks": 8,
+          "maxNewRegistrationAttempts": 1,
+          "maxLifetimeAcks": 9,
+          "originalHardEnd": "2026-10-26T05:09:54.185Z",
+          "noAutomaticRenewal": true,
+          "reviewCanonicalJson": "{\n  \"version\": 1,\n  \"status\": \"ROOT_REVIEWED_FOR_GUARDED_ORIGINAL_CUSTODIAN_RESUME\",\n  \"reviewer\": \"Root operator under user's continuing full N44 functional-completion delegation; counts/time bounds below selected by operator, not quoted as new user-specified numbers\",\n  \"materialChange\": \"Actual Source4 candidate identified on correct current account; published read path excluded its direct empty parent and successor additionally fixes exact genuine empty-parent cleanup receipt. Final peer-Auth recovery already served. These are material prerequisites, not an unchanged notification retry.\",\n  \"originalTask\": \"continuous-n44-one-approved-closed-page-push-20261019\",\n  \"originalSession\": \"01a14fcd-032c-7ec0-8b0c-0e0395862c61\",\n  \"savedCandidate\": \"296f39ef3c00aa11e65f8c59d668533ac7792294\",\n  \"source4IdHash\": \"877057d56f46d5ffcffd4111ef4175ee6953905c00529de849690ea6fd1db2b3\",\n  \"sameProtectedOwnerWorkspaceDeviceTeachingOnly\": true,\n  \"preserve\": {\n    \"originalRootRequest\": \"7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967\",\n    \"originalRootAuthoritySha256\": \"f9a16de8a27b52f32f346e0c975e4714c68d45b92eecf84efbbbd9bccc201287\",\n    \"originalHardEnd\": \"2026-10-26T05:09:54.185Z\",\n    \"nativeSource\": \"9e8732c48990e1a46e164f3770a79cc2004da0c4\",\n    \"nativeArchive\": \"f1a01056af05e4a72d27fc775adf9ac70a0957fdd66c93bb3c4bb9f3b944864d\",\n    \"nativeUploadAndPairedPinPolicyTransitionSpent\": 1,\n    \"oldWindow4ExpiredAndConsumed\": true,\n    \"oldSource4IntentConsumedUnknownUntilExactReconciliation\": true,\n    \"actualProviderRequestsSpent\": 3,\n    \"fourthProviderRequestSpent\": false,\n    \"actualRegistrationAcksSpent\": 8,\n    \"registration9NeverAllocated\": true,\n    \"allHistoricFailNotRunUnknownAndRevocations\": true,\n    \"protectedStagingDeletionRefusalPermanent\": true\n  },\n  \"firstGate\": \"After BOTH actual served read-path fixes, one fresh legitimate owned normal document if necessary. Match protected context and exact Source4 hash/label/ancestry through existing Support. Read canonical status once, pending unknown create must be absent. Only then normal zero-affected-grades preview and at most ONE exact recoverable Source4 parent deletion with new durable mutation identity and exact canonical tombstone/delete receipt ACK. Unknown/ambiguous/pending/no-preview means STOP, preserve UNKNOWN and no new allocations.\",\n  \"freshMaterialStageReview\": {\n    \"notAutomaticRenewalOfWindow4\": true,\n    \"oldWindow4AndItsReservationUnchanged\": true,\n    \"requiresSource4CanonicalCleanupAckAndSyncGreen\": true,\n    \"newNativeUploads\": 0,\n    \"newPinPolicyTransitions\": 0,\n    \"maxAdditionalBoundedWindows\": 1,\n    \"newWindowOrdinal\": 5,\n    \"cumulativeWindowsWithinCurrentRootReview\": 2,\n    \"maxWindowMs\": 1200000,\n    \"expiresNoLaterThanUnchangedOriginalRootHardEnd\": true,\n    \"minimumRemainingBeforeWindowAllocationMs\": 900000,\n    \"maxAdditionalNormalSyntheticSourceGroups\": 1,\n    \"newSourceOrdinal\": 5,\n    \"oldSource4NeverRecreatedOrReplayed\": true,\n    \"maxNewSamePhysicalDeviceRegistrationAttempts\": 1,\n    \"maxLifetimeRegistrationAcks\": 9,\n    \"maxConcurrentActiveRegistrations\": 1,\n    \"maxAdditionalActualProviderRequests\": 1,\n    \"maxLifetimeActualProviderRequests\": 4,\n    \"sameFourthRequestStableReservationAndMarker\": true,\n    \"maxReadinessChecksAfterMaterialApproval\": 1,\n    \"maxNewOwnedNormalDocuments\": 2,\n    \"closeOnlyHistoricallyVerifiedNormalTrialTabs\": true,\n    \"knownNormalTrialTabsClosureMax\": 3,\n    \"noOtherAccountIncognitoMadrasatiOrPersonalPageActions\": true,\n    \"allGeneralBulkCronDeliveryRemainOff\": true,\n    \"noNextWindowOrUnchangedRetryIfThisStageFails\": true\n  },\n  \"beforeLiveAllocation\": \"Original custodian must locally qualify smallest append-only exact-current-run adapter against this reviewed scope, existing Native/deviceApproval, stable global fourth-send marker and preserved encrypted old journals. Reuse unchanged Native19/receiver/Auth proofs. Do not edit old encrypted reservations/window4 or weaken old guards. No raw private data returned. Actual failed assertion or tool denial is not bypassed by another route. If remaining hard-end time is insufficient, stop without extending or allocating.\",\n  \"actualAcceptance\": \"Observe one closed-page delivery through same running Chrome, record provider/COMMIT, finite SW received/display status and available attributed native toast observation BEFORE Stop/expiry/source deletion. getNotifications/device result alone is not Windows visual proof. No fifth provider request or extra test send. Then exact new-source deletion ACK, Stop/consentfalse/unsubscribe/binding absence/original preferences restored, at most one bounded independently signed hosted registration9 final disposition and final OFF/NULL/cronOFF/all47 peer-preserved readback. No registration9 disposition if no registration9 was allocated.\",\n  \"activation\": \"This file allocates no live operation. Only existing apply-reviewed-maintenance in proved all-workers-zero/publisher-idle with requireNoActiveWorkers=true may update original blocked card, preserving saved session/candidate/base. Controller then dispatches original custodian. No alternative executor or direct queue edits.\",\n  \"reviewedAt\": \"2026-10-26T04:28:10.319Z\",\n  \"verifiedPrerequisites\": [\n    {\n      \"taskId\": \"continuous-n44-direct-parent-source-receipt-20261026\",\n      \"candidateSha\": \"230cd3481b7054b77fe533f2d70f321215a32a64\",\n      \"publishedSha\": \"8528d1995b36541c10529b9d268adf80b6d354b9\",\n      \"verifiedAt\": \"2026-10-26T04:20:57.860Z\",\n      \"servedStoreSha256\": \"eb4c997e4c32caad274771274391b7d8ba12d8c3e8d9500154b7401a69b41557\"\n    },\n    {\n      \"taskId\": \"continuous-n44-empty-parent-cleanup-receipt-20261026\",\n      \"candidateSha\": \"17f735d02c31125f59e05d02800496af2c401cd9\",\n      \"publishedSha\": \"65bd1762e8271258df69a452dcc766c86d5f6d21\",\n      \"verifiedAt\": \"2026-10-26T04:26:50.414Z\",\n      \"servedStoreSha256\": \"340c77770caca4799076929962b1f4187bca031dac8c79e7487a8448e9525592\"\n    }\n  ],\n  \"cleanupRemainsRequiredAfterWindowExpiry\": true\n}\n"
+        }
       },
       "releaseAuthority": "Latest direct PO full outcome delegation authorizes necessary qualified affected notification frontend delivery through the sole publisher and named original-custodian service prerequisites. No general delivery/cron activation, old-disposal replay, tool denial bypass or consumed budget reset.",
       "id": "continuous-n44-one-approved-closed-page-push-20261019",
@@ -604,9 +677,11 @@
         "continuous-n44-receiver-outcome-public-20261026",
         "continuous-n44-settings-context-recovery-20261026",
         "continuous-n44-config-read-stability-20261026",
-        "continuous-n44-verified-auth-peer-recovery-20261026"
+        "continuous-n44-verified-auth-peer-recovery-20261026",
+        "continuous-n44-direct-parent-source-receipt-20261026",
+        "continuous-n44-empty-parent-cleanup-receipt-20261026"
       ],
-      "objective": "RESUME ORIGINAL saved session01a14fcd-032c-7ec0-8b0c-0e0395862c61 candidate7a094dc081466286a0a16c83df83012e608d5a33, base63e09b1c49172ee5fd9f26a88f4f8abe3e3c330b. NEW HUMAN INPUT: PO26Oct confirms login to SAME original stable-email trialaccount in normalChrome. This resolves external account prerequisite only, NOT oldwindowrenewal/sendauthority. Follow skillticketrouter/existingcontroller; no newProductexecutor. Original9453d5ba source4 ONE normalparent Save wentsignedout BEFOREcanonicalACK, IDs/mutationIDNOTEXPOSED/sourcecommitUNKNOWN, childconfig0/reg9zero/send4zero. Nativeupload9e+pairedpinpolicy/window4/source4intent wereCONSUMED andmustNEVERreset/repeat. Window4 expired~00:54UTC26. Review inactiveconstraints artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-unknown-source4-recovery-preparation.json plusbounded-run/final945existingproof.\nACTUAL prerequisite delivered Authcandidate01cd956cf03be69c093e95388e31e9cbb49aafa2 publishedd57705ca79d7e7a5791e476d0624107e1d9017f2 VERIFIED01:25:18.198UTC26 cloudJSa1687116d1bef2046cba769eac2630c8f1f5f595e160a31aa3ad52ba2245581c. 94actualaffectedSYNTHETICcasesPASS; no liveAuthcauseclaim. FreshnormalUI identity/Sync/state required, no unchangedassetchecks/test reruns. Privatecheckoutpublicsrcmaystale: use actualserved UI, no copyingwholeprivatebranch. NativeACTUAL9e8732/archivef1a01056af05e4a72d27fc775adf9ac70a0957fdd66c93bb3c4bb9f3b944864d, baselineall47digest8fd2ab2573aa9920e932ca112f029622c1e78aaf18dfb8fec0bc472fc6f1ddeb, N88peerarchive01a45e02e121dfa425f70cf73e8f3f5827ce3b09bbe51c9047fee0e252c0f3fc, lastOFF/approvalNULL confirmed. Preserve it; ZERO provider/native/pin/policy/SQL/Authsettings/sessioncreation/registration/window/sourcecreation/send ops thisphase. Originalthreeactualsendsspent andfourthunspentnotnewpermission.\nUse originalprotectedcustody only toread exactSource4intent and compare fresh legitimate expanded normalUI owner/workspace/device values, retainonlyequality/hashes publicly. Usercurrentnormalteacherpageavailable; sameoriginalnormalChromeconnectiononly. Acquire browserphaselease onlywhenneeded. No incognitoN36/Madrasati/personal or ambiguous tabs, foregroundOSinput, cookie/token/hiddenbrowserDBstoragecapture, accountlogin/OTP/creation, directgeneralSQL/providerquery. Existingknownnormaltabpreferred; maxONEfreshownednormaldocumentonlyifneededtoobtainactualcurrentUI, no sourceSave/reloadretryloop. Do not forceSync/retryoldcommand; normalexistingidempotentSyncmaysettlethealready-authorizedsavedcommand, OBSERVEitsactualnormalack/status withoutre-savingorrecreating. Source4stageunknownmayhaveparentwithoutchild(childconfiguration0); doNOTlimitsearchtoalreadyactiveSourceGroupsonly.\nREADONLYFIRST: currentnormalclass/items UI for exactsavedSource4 uniqueintent label/targetancestry. ReadSyncstatusandnormalreceipt/Supportmetadatatoidentifyactualgeneratedparent/child/mutationIDs IFavailable throughlegitimateUI only. AnemptyLOCALlistorSyncGREENalone doesNOTestablishserverabsenceorcommit. Distinguishlocalpending/ack/canonicalread/absence/unresolved; neverchangeUNKNOWNtoFAILorPASSbyguess. Exhaustiveauthoritativeexistingread/normalreceipt mayestablishcreation/absence; recordexactevidencelimits. No newmeasurement/diagnosticframework or backendupload toobtainit.\nCONDITIONAL OLD CLEANUP alreadyauthorizedoriginaltrial: ONLYifexactSource4identity+owner/teaching/ancestry established AND authoritativeACK/no pendingunknowncreatecapableofrevival ANDnormalpreviewzeroaffectedgrades, performmaxONEexistingnormalrecoverableparentDelete with savednewmutationIDBEFOREdispatch andcanonicalparent/childtombstoneACK. No guessingIDs, no oldDelete replay, no unrelatedoldSourceGroups orstudent/grades changes. IfnoexistingSource4/ambiguous/unprovedcommit, doNOTdeleteorcreateanything; preserveUNKNOWNwithprecisenextmissingproof. ThisphaseallocatesZEROnewsource/subitem/window/registration/send anddoesNOTresumeoldtest. No needreg9dispositioninspectbecausereg9NEVERexisted; reg8alreadyverifiedrevoked, no oldinspectionretry/desktopTLSretry.\nKeepapprovalNULL/deliveryOFF/cronOFF/servicearchives/sourcepolicy untouched. NormalUIreads suffice; doNOTreadprovider47metadataunchangedmerelyfortrophy. Releaseownedbrowser/liveleasesandcloseonlyownedintermediatedocuments; preserveusercurrentteacherpage. ProtectedstagingdeletionPOLICYREJECTED: no retries/alternatefilesystems/ACL. No newlocaltests/rebuild/redeployunlessactualNEWcausalProductdefectreproducedwithinthisscope, nevermodifypubliccodeoutsideallowedprivatepaths.\nReturnaccurate runnerJSON with exacttask/run/candidate/base and scopedproof; historicalFAIL/NOTRUN preserved. N44OSarrivalstillNOTPROVEN, no broadCLOSED. Afterreconciliation/conditionalcleanup, save precise originaltarget/source/budgetstate for Root nextboundedtrialreview; doNOTmintnewwindow5/source5 orsendautomatically. Humanalreadygrantsfullgoalpermission; doNOTaskagainforpermissionoraskthemtorepeattests whileactualallowedreads/conditionalcleanupremain.",
+      "objective": "COMPLETE THE ACTUAL N44 DEVICE OUTCOME through the SAME original custodian/session/candidate, not a new executor. Current saved private HEAD296f39ef3c00aa11e65f8c59d668533ac7792294/base63e09, last inactive runa795516e-cc65-48e2-baa2-2eb0f5db4804. Its first reconciliationb7adb434 used one normal owned document, verified protected current owner/workspace/device/teaching, found one local direct parent named تحقق تذكير الجهاز المحدد 4 with ID hash877057d56f46d5ffcffd4111ef4175ee6953905c00529de849690ea6fd1db2b3, preserved canonicalUNKNOWN, no delete/newallocation. Source read gap NOW materially repaired and actually served in BOTH prerequisite receipts appended to this card; use actual deployed normal UI, not stale public files in private checkout. Reuse94 Auth/19 Native/receiver proofs and actualreg8 disposition, do not rebuild or rerun unaffected qualification or inspect old reg8 again. Original SourceSave FAIL/source4 intent+window4+Native transition spent; all history immutable. Source4 has no proven canonical ancestry/children/zero-grade impact yet. No hidden browser state/API/SQL, no forced Sync/re-Save or replacement before cleanup.\n\nFIRST, locally qualify only the smallest exact-current-run append-only custody adapter against C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/n44-material-source4-completion-review-20261026.json and its SHA on the card. This is a deliberate bounded operator review after newly fixed Auth/source-status/cleanup read prerequisites under full continuing PO delegation, NOT automatic renewal of old window4. Old window4 remains expired/disarmed/consumed. Scope explicitly allows at most ONE NEW window5<=20min and ONE normal synthetic source5 ONLY AFTER exact source4 canonical cleanup ACK. Current root7c7b/f9a16 and hardEnd2026-10-26T05:09:54.185Z remain UNCHANGED; require >=15min remaining BEFORE any new window allocation. No next window/unchanged retry. Cumulative windows2 in this root scope preserves old1, not reset. Native9e/archivef1a/pin/policy remain installed; ZERO new Native uploads/pin/policy. Same global FOURTH send reservation/marker must be shared with original prospective fourth path, old three actual sends stay SPENT; no new authority-specific marker that could allow fifthsend. Reg8 revoked, reg9 never allocated, at most one fresh reg9 attempt/lifetimeACK<=9/concurrent1. No new counter bucket or old journal changes. Qualify a few affected guard/counter/expiry/context cases using existing actual primitives/Native deviceApproval; no new harness/tree or old broad19 rerun. Do not invoke old9453-specific helper with a mismatching current run; use reviewed exact new action adapter, preserve old code/journals and all guard semantics. Refused tools/staging deletion/desktopSSL failure are permanent boundaries, never alternative-route retry. Native itself must accept unchanged approval shape/marker; if it would require a Native change or new service permission, stop with exact blocker rather than improvise.\n\nThen acquire existing phase leases only as needed. Use at most two NEW owned normal documents (preflight and receipt); preserve user's actual normal teacher page, all personal/incognito/N36/Madrasati pages. Legitimate foreground normal DOM only, no cookies/tokens/DB/hidden API/eval. Match exact protected identity and source4 normal row hash/label/ancestry through repaired collapsed Support; perform one source status read. Require canonical exact parent identity/revision/ancestry and no related pending/unknown creation. A local row/SyncGREEN is not this proof. If confirmed, use existing normal zero-affected-grades deletion preview and at most ONE exact recoverable source4 parent Delete. Normal existing atomic durable command/outbox contract must persist its fresh mutation identity before dispatch; do not invent an extra hidden read or require capturing internal ID through browser storage. Recover and retain actual exact mutation identity from supported canonical cleanup receipt; only actual cleanup_confirmed/tombstone ACK discharges cleanup. No unknown/ambiguous/grade-effect/pending delete. Fresh Support read after completed mutation is a changed-state read, not replay. If unresolved, preserve UNKNOWN and stop new allocations with blockerType=external.\n\nAfter source4 cleanupACK and SyncGREEN, prove normal config200/disabled and current owner context; arm finite receiver DTO and supported passive attributed new-toast observation path. Existing one-shot owned HIDDEN original-custodian async signed sender helper may permit observation while request is in flight; maxone process with PID/birth ownership and stable reservation BEFORE dispatch, not a new scheduler/dispatcher. Do not require a toast window to exist BEFORE the request. Only newly attributed notification window/AX/screenshot, never main personal Chrome/OS settings/notificationcenter/OSDB/customhelper. No OS keyboard/mouse. ZERO new Native/pin/policy. At most one new source-bound approval window5, starts only when all inputs ready and expiry min(now+20min, unchanged root hardEnd/currentUTCday); no automatic renewal or reset. Verify only necessary N44 approval/delivery env deltas with all47/N88 peer unchanged. One normal source5 creation+child configuration, canonicalACK and exact ancestry/current due event; user trial account only, no students/grades changes. Never replay source4 unknown operation. One normal explicit consent/register9 attempt then canonical projection/authorizationACK. One explicit Support readiness recheck after material approval may replace cached disabled state; no passive churn/quota reset/429 unchanged retry.\n\nOnly with actual canonical source/registration/authorization/current proof and preserved server spent oldthree markers, reserve the SAME global fourth request durably and perform at most ONE signed targeted push while ONLY historically verified normal Rakeez trial pages (max3) are closed, Chrome running. Never close inferred/personal/incognito/unsaved pages. Capture provider response/COMMIT, finite SW received/display status and available actually attributed native toast BEFORE Stop/source deletion/expiry clears receiver. DeviceDTO/getNotifications is browser arrival evidence, not Windows visible proof. No fifth request or another send to chase a missing banner; preserve exact rejection/unknown state, no fabricated PASS.\n\nComplete cleanup even on failure: exact source5 normal canonical deleteACK if it exists, normal Stop/revoke9/consentfalse/unsubscribe/bindingabsence/original quiet/timing/category preferences restored, at most one newly bounded15min signed hosted registration9 disposition ONLY IF reg9 exists, no old reg8 replay/desktop SSL retry. Disarm approvalNULL/deliveryOFF/cronOFF and necessary final exact all47/peer archive readback; source/receiver/native proof separate. Cleanup/disarm remains obligatory after test window expiry, but no new live registration/window/source/send past hardEnd. Restore only exact saved known normal trial URLs; close owned intermediate documents/processes and release owned leases. No protected staging deletion retry. No generic extra metadata trophies. Return truthful exact runner JSON, candidate/base and actual checks, BLOCKED with blockerType=external for unmet live prerequisite/OS observation. No manual PO trial or new permission question; full delegation stands. No public Product source edits, no queue edits, no user-account creation. N88 redesign already actually published/N36 future retest stays untouched.\n\nVERIFIED PREREQUISITES [{\"taskId\":\"continuous-n44-direct-parent-source-receipt-20261026\",\"candidateSha\":\"230cd3481b7054b77fe533f2d70f321215a32a64\",\"publishedSha\":\"8528d1995b36541c10529b9d268adf80b6d354b9\",\"verifiedAt\":\"2026-10-26T04:20:57.860Z\",\"servedStoreSha256\":\"eb4c997e4c32caad274771274391b7d8ba12d8c3e8d9500154b7401a69b41557\"},{\"taskId\":\"continuous-n44-empty-parent-cleanup-receipt-20261026\",\"candidateSha\":\"17f735d02c31125f59e05d02800496af2c401cd9\",\"publishedSha\":\"65bd1762e8271258df69a452dcc766c86d5f6d21\",\"verifiedAt\":\"2026-10-26T04:26:50.414Z\",\"servedStoreSha256\":\"340c77770caca4799076929962b1f4187bca031dac8c79e7487a8448e9525592\"}]\nREVIEW COMPANION C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/n44-material-source4-completion-review-20261026.json SHA256 8f7f82c5007a1c761ef464a764b03c6a2345c5c2750bb33ae08ae1777b21335e",
       "requiredChecks": [
         "n44_one_authorized_device_registration_single_push_with_pages_closed",
         "n44_device_test_final_disposition_and_no_extra_delivery",
@@ -638,7 +713,11 @@
         "n44_fourth_final_reg9_disposition_and_off",
         "n44_source4_same_original_account_actual_reconciliation",
         "n44_source4_exact_conditional_cleanup_or_preserved_unknown",
-        "n44_source4_no_new_allocations_and_owned_resource_release"
+        "n44_source4_no_new_allocations_and_owned_resource_release",
+        "n44_material_completion_append_only_scope_and_shared_fourth_marker",
+        "n44_source4_actual_canonical_cleanup_before_new_allocation",
+        "n44_material_closed_page_actual_device_and_native_observation",
+        "n44_material_final_cleanup_and_original_global_budget_disarm"
       ],
       "acceptance": [
         "Exactly one approved current-device actual push attempt, after pages closed, with explicit browser consent and truthful OS result.",
@@ -695,7 +774,7 @@
         ],
         "publisherChecks": []
       },
-      "completionMode": "reconcile_existing_unknown_source4_only",
+      "completionMode": "complete_material_source4_and_unspent_fourth_actual_outcome",
       "frontendPrerequisite": {
         "taskId": "continuous-n44-deliver-qualified-optin-ui-20261024",
         "sourceFile": "scripts/ops-supervisor-v4/n44-deliver-qualified-optin-ui-20261024.json",
@@ -915,8 +994,8 @@
         "maxSuccessorGenerations": 1,
         "maxNewNamedWindows": 1,
         "maxWindowMs": 5400000,
-        "latestWindowStart": "2026-10-24T23:25:00.000Z",
-        "hardStop": "2026-10-24T23:55:00.000Z",
+        "latestWindowStart": "2026-10-24T23:25:00Z",
+        "hardStop": "2026-10-24T23:55:00Z",
         "maxQualifiedNativeUploads": 1,
         "maxQualifiedPinUpdates": 1,
         "maxFreshDueSourceGroups": 1,
@@ -1209,6 +1288,22 @@
         "keepRequestAuthorityHardEnd": true
       },
       "source4Recovery": {
+        "version": 2,
+        "firstStage": "same_original_source4_canonical_reconciliation_and_conditional_exact_cleanup",
+        "maxExactExistingSourceParentDeletes": 1,
+        "requiresAuthoritativeAckAndZeroGrades": true,
+        "noUnknownCreateReplay": true,
+        "oldWindowExpiredPreserved": true,
+        "firstStageNewNativeUploads": 0,
+        "firstStageNewWindows": 0,
+        "firstStageNewSources": 0,
+        "firstStageNewRegistrations": 0,
+        "firstStageNewSends": 0,
+        "subsequentStageOnlyAfterCanonicalCleanupAck": true,
+        "materialReview": "scripts/ops-supervisor-v4/n44-material-source4-completion-review-20261026.json",
+        "materialReviewSha256": "8f7f82c5007a1c761ef464a764b03c6a2345c5c2750bb33ae08ae1777b21335e"
+      },
+      "priorSource4Recovery": {
         "version": 1,
         "userReply": "PO26Oct: سجلت الدخول إلى الحساب نفسه",
         "preparation": "artifacts/ops-supervisor-v4/intake-evidence/po-20261026-n44-unknown-source4-recovery-preparation.json",
@@ -1225,6 +1320,44 @@
         "newSends": 0,
         "noUnknownCreateReplay": true,
         "oldWindowExpiredPreserved": true
+      },
+      "materialSource4Completion": {
+        "version": 1,
+        "reviewPath": "scripts/ops-supervisor-v4/n44-material-source4-completion-review-20261026.json",
+        "reviewSha256": "8f7f82c5007a1c761ef464a764b03c6a2345c5c2750bb33ae08ae1777b21335e",
+        "prerequisites": [
+          {
+            "taskId": "continuous-n44-direct-parent-source-receipt-20261026",
+            "candidateSha": "230cd3481b7054b77fe533f2d70f321215a32a64",
+            "publishedSha": "8528d1995b36541c10529b9d268adf80b6d354b9",
+            "verifiedAt": "2026-10-26T04:20:57.86Z",
+            "servedStoreSha256": "eb4c997e4c32caad274771274391b7d8ba12d8c3e8d9500154b7401a69b41557"
+          },
+          {
+            "taskId": "continuous-n44-empty-parent-cleanup-receipt-20261026",
+            "candidateSha": "17f735d02c31125f59e05d02800496af2c401cd9",
+            "publishedSha": "65bd1762e8271258df69a452dcc766c86d5f6d21",
+            "verifiedAt": "2026-10-26T04:26:50.414Z",
+            "servedStoreSha256": "340c77770caca4799076929962b1f4187bca031dac8c79e7487a8448e9525592"
+          }
+        ],
+        "oldWindowsSpent": 1,
+        "maxNewWindows": 1,
+        "windowOrdinal": 5,
+        "oldSource4IntentPreserved": true,
+        "maxNewSourceGroups": 1,
+        "sourceOrdinal": 5,
+        "newNativeUploads": 0,
+        "newPinPolicyWrites": 0,
+        "priorActualSends": 3,
+        "maxNewActualSends": 1,
+        "maxLifetimeSends": 4,
+        "priorRegistrationAcks": 8,
+        "maxNewRegistrationAttempts": 1,
+        "maxLifetimeAcks": 9,
+        "originalHardEnd": "2026-10-26T05:09:54.185Z",
+        "noAutomaticRenewal": true,
+        "reviewCanonicalJson": "{\n  \"version\": 1,\n  \"status\": \"ROOT_REVIEWED_FOR_GUARDED_ORIGINAL_CUSTODIAN_RESUME\",\n  \"reviewer\": \"Root operator under user's continuing full N44 functional-completion delegation; counts/time bounds below selected by operator, not quoted as new user-specified numbers\",\n  \"materialChange\": \"Actual Source4 candidate identified on correct current account; published read path excluded its direct empty parent and successor additionally fixes exact genuine empty-parent cleanup receipt. Final peer-Auth recovery already served. These are material prerequisites, not an unchanged notification retry.\",\n  \"originalTask\": \"continuous-n44-one-approved-closed-page-push-20261019\",\n  \"originalSession\": \"01a14fcd-032c-7ec0-8b0c-0e0395862c61\",\n  \"savedCandidate\": \"296f39ef3c00aa11e65f8c59d668533ac7792294\",\n  \"source4IdHash\": \"877057d56f46d5ffcffd4111ef4175ee6953905c00529de849690ea6fd1db2b3\",\n  \"sameProtectedOwnerWorkspaceDeviceTeachingOnly\": true,\n  \"preserve\": {\n    \"originalRootRequest\": \"7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967\",\n    \"originalRootAuthoritySha256\": \"f9a16de8a27b52f32f346e0c975e4714c68d45b92eecf84efbbbd9bccc201287\",\n    \"originalHardEnd\": \"2026-10-26T05:09:54.185Z\",\n    \"nativeSource\": \"9e8732c48990e1a46e164f3770a79cc2004da0c4\",\n    \"nativeArchive\": \"f1a01056af05e4a72d27fc775adf9ac70a0957fdd66c93bb3c4bb9f3b944864d\",\n    \"nativeUploadAndPairedPinPolicyTransitionSpent\": 1,\n    \"oldWindow4ExpiredAndConsumed\": true,\n    \"oldSource4IntentConsumedUnknownUntilExactReconciliation\": true,\n    \"actualProviderRequestsSpent\": 3,\n    \"fourthProviderRequestSpent\": false,\n    \"actualRegistrationAcksSpent\": 8,\n    \"registration9NeverAllocated\": true,\n    \"allHistoricFailNotRunUnknownAndRevocations\": true,\n    \"protectedStagingDeletionRefusalPermanent\": true\n  },\n  \"firstGate\": \"After BOTH actual served read-path fixes, one fresh legitimate owned normal document if necessary. Match protected context and exact Source4 hash/label/ancestry through existing Support. Read canonical status once, pending unknown create must be absent. Only then normal zero-affected-grades preview and at most ONE exact recoverable Source4 parent deletion with new durable mutation identity and exact canonical tombstone/delete receipt ACK. Unknown/ambiguous/pending/no-preview means STOP, preserve UNKNOWN and no new allocations.\",\n  \"freshMaterialStageReview\": {\n    \"notAutomaticRenewalOfWindow4\": true,\n    \"oldWindow4AndItsReservationUnchanged\": true,\n    \"requiresSource4CanonicalCleanupAckAndSyncGreen\": true,\n    \"newNativeUploads\": 0,\n    \"newPinPolicyTransitions\": 0,\n    \"maxAdditionalBoundedWindows\": 1,\n    \"newWindowOrdinal\": 5,\n    \"cumulativeWindowsWithinCurrentRootReview\": 2,\n    \"maxWindowMs\": 1200000,\n    \"expiresNoLaterThanUnchangedOriginalRootHardEnd\": true,\n    \"minimumRemainingBeforeWindowAllocationMs\": 900000,\n    \"maxAdditionalNormalSyntheticSourceGroups\": 1,\n    \"newSourceOrdinal\": 5,\n    \"oldSource4NeverRecreatedOrReplayed\": true,\n    \"maxNewSamePhysicalDeviceRegistrationAttempts\": 1,\n    \"maxLifetimeRegistrationAcks\": 9,\n    \"maxConcurrentActiveRegistrations\": 1,\n    \"maxAdditionalActualProviderRequests\": 1,\n    \"maxLifetimeActualProviderRequests\": 4,\n    \"sameFourthRequestStableReservationAndMarker\": true,\n    \"maxReadinessChecksAfterMaterialApproval\": 1,\n    \"maxNewOwnedNormalDocuments\": 2,\n    \"closeOnlyHistoricallyVerifiedNormalTrialTabs\": true,\n    \"knownNormalTrialTabsClosureMax\": 3,\n    \"noOtherAccountIncognitoMadrasatiOrPersonalPageActions\": true,\n    \"allGeneralBulkCronDeliveryRemainOff\": true,\n    \"noNextWindowOrUnchangedRetryIfThisStageFails\": true\n  },\n  \"beforeLiveAllocation\": \"Original custodian must locally qualify smallest append-only exact-current-run adapter against this reviewed scope, existing Native/deviceApproval, stable global fourth-send marker and preserved encrypted old journals. Reuse unchanged Native19/receiver/Auth proofs. Do not edit old encrypted reservations/window4 or weaken old guards. No raw private data returned. Actual failed assertion or tool denial is not bypassed by another route. If remaining hard-end time is insufficient, stop without extending or allocating.\",\n  \"actualAcceptance\": \"Observe one closed-page delivery through same running Chrome, record provider/COMMIT, finite SW received/display status and available attributed native toast observation BEFORE Stop/expiry/source deletion. getNotifications/device result alone is not Windows visual proof. No fifth provider request or extra test send. Then exact new-source deletion ACK, Stop/consentfalse/unsubscribe/binding absence/original preferences restored, at most one bounded independently signed hosted registration9 final disposition and final OFF/NULL/cronOFF/all47 peer-preserved readback. No registration9 disposition if no registration9 was allocated.\",\n  \"activation\": \"This file allocates no live operation. Only existing apply-reviewed-maintenance in proved all-workers-zero/publisher-idle with requireNoActiveWorkers=true may update original blocked card, preserving saved session/candidate/base. Controller then dispatches original custodian. No alternative executor or direct queue edits.\",\n  \"reviewedAt\": \"2026-10-26T04:28:10.319Z\",\n  \"verifiedPrerequisites\": [\n    {\n      \"taskId\": \"continuous-n44-direct-parent-source-receipt-20261026\",\n      \"candidateSha\": \"230cd3481b7054b77fe533f2d70f321215a32a64\",\n      \"publishedSha\": \"8528d1995b36541c10529b9d268adf80b6d354b9\",\n      \"verifiedAt\": \"2026-10-26T04:20:57.860Z\",\n      \"servedStoreSha256\": \"eb4c997e4c32caad274771274391b7d8ba12d8c3e8d9500154b7401a69b41557\"\n    },\n    {\n      \"taskId\": \"continuous-n44-empty-parent-cleanup-receipt-20261026\",\n      \"candidateSha\": \"17f735d02c31125f59e05d02800496af2c401cd9\",\n      \"publishedSha\": \"65bd1762e8271258df69a452dcc766c86d5f6d21\",\n      \"verifiedAt\": \"2026-10-26T04:26:50.414Z\",\n      \"servedStoreSha256\": \"340c77770caca4799076929962b1f4187bca031dac8c79e7487a8448e9525592\"\n    }\n  ],\n  \"cleanupRemainsRequiredAfterWindowExpiry\": true\n}\n"
       }
     }
   ]
