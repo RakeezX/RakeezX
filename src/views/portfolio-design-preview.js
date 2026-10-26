@@ -50,6 +50,15 @@ function forgetWitness(id){
   photoGroups.delete(id);photoLayouts.delete(id);descriptions.delete(id);
   titles.delete(id);sectionPreferences.delete(id);hiddenWitnesses.delete(id);
 }
+// One-step, session-only undo. Delay revoking removed photo URLs until undo expires.
+let pendingUndo = null;
+function clearUndo() {
+  if(!pendingUndo) return;
+  const old=pendingUndo;pendingUndo=null;old.discard?.();
+}
+function offerUndo(message,restore,discard) {
+  clearUndo();pendingUndo={message,restore,discard};
+}
 let photoError = '';
 function context() {
   const year = store.activeYear();
@@ -106,7 +115,9 @@ function context() {
     if(libraryFilter==='templates' && w.sourceKind!=='template')return false;
     if(libraryFilter==='my' && w.sourceKind!=='custom')return false;
     const q=libraryQuery.trim().toLocaleLowerCase('ar');
-    return !q || (w.title+' '+(w.description||'')).toLocaleLowerCase('ar').includes(q);
+    const title=titles.get(w.id)??w.title;
+    const description=descriptions.get(w.id)??w.description??'';
+    return !q || (title+' '+description).toLocaleLowerCase('ar').includes(q);
   });
   const criteriaNav=criteria.map(c=>({
     ...c,excluded:hiddenCriteria.has(c.number),
@@ -457,7 +468,7 @@ function suggestionsPanel(ctx) {
     <div class="folio-suggestion-studio__candidates" data-library-results>
       ${visibleCandidates.map(item=>html`<button type="button"
         class="folio-suggestion-studio__choice ${proposal?.id===item.id?'is-selected':''}"
-        data-library-card data-search="${(item.title+' '+(item.description||'')).toLocaleLowerCase('ar')}"
+        data-library-card data-search="${((titles.get(item.id)??item.title)+' '+(descriptions.get(item.id)??item.description??'')).toLocaleLowerCase('ar')}"
         data-act="pick-suggestion" data-id="${item.id}" aria-pressed="${proposal?.id===item.id}">
           <strong>${titles.get(item.id)||item.title}</strong>
           <span>${item.description?.slice(0,84)||'شاهد قابل للتعديل وإضافة الصور'}</span>
@@ -470,8 +481,21 @@ function suggestionsPanel(ctx) {
       data-act="restore-witnesses">إظهار الشواهد المخفية (${digits.format(ctx.hiddenCount)})</button>`:''}
     ${proposal?html`<div class="folio-library__selected">
       <span>المحدد: <strong>${titles.get(proposal.id)||proposal.title}</strong></span>
-      <button type="button" class="folio-library__selected-action" data-act="hide-witness">
-        ${proposal.sourceKind==='custom'?'حذف شاهدي':'إخفاء من مكتبتي'}</button>
+      <div class="folio-library__selected-controls">
+        ${proposal.sourceKind==='custom'?html`
+          <button type="button" class="folio-library__selected-action" data-act="move-witness"
+            data-dir="-1" aria-label="تقديم شاهدي"
+            ${customWitnesses.filter(w=>w.criterion===editingCriterion).findIndex(w=>w.id===proposal.id)===0?'disabled':''}>↑</button>
+          <button type="button" class="folio-library__selected-action" data-act="move-witness"
+            data-dir="1" aria-label="تأخير شاهدي"
+            ${customWitnesses.filter(w=>w.criterion===editingCriterion).findIndex(w=>w.id===proposal.id)===customWitnesses.filter(w=>w.criterion===editingCriterion).length-1?'disabled':''}>↓</button>`:''}
+        <button type="button" class="folio-library__selected-action is-danger" data-act="hide-witness">
+          ${proposal.sourceKind==='custom'?'حذف شاهدي':'إخفاء من مكتبتي'}</button>
+      </div>
+    </div>`:''}
+    ${pendingUndo?html`<div class="folio-undo" role="status">
+      <span>${pendingUndo.message}</span>
+      <button type="button" data-act="undo-change">تراجع</button>
     </div>`:''}
     <details class="folio-suggestion-studio__details">
       <summary>تفاصيل المعيار ومصادر الشواهد</summary>
@@ -491,6 +515,7 @@ export default {
   wide: true,
   beforeRender() { loadStyle(); editingCriterion='09'; selectedSuggestionId=null;photoError=''; },
   onUnmount() {
+    clearUndo();
     for(const group of photoGroups.values())for(const photo of group)URL.revokeObjectURL(photo.url);
     photoGroups.clear();photoLayouts.clear();selectedByCriterion.clear();
     descriptions.clear();titles.clear();criterionNames.clear();hiddenCriteria.clear();
@@ -507,7 +532,7 @@ export default {
         <div><span class="folio-workspace__eyebrow">ملف الإنجاز · مراجعة التصميم</span>
           <h1>ملف الإنجاز المهني</h1>
           <p>ملف شامل لأعمال المعلم في جميع مواده وفصوله خلال العام الدراسي، مع شواهد وصور لكل معيار.</p></div>
-        <span class="folio-workspace__status">Preview فقط</span>
+        <span class="folio-workspace__status">Preview · التغييرات مؤقتة ولم تُحفظ في حسابك</span>
       </header>
       <section class="folio-toolbar noprint" aria-label="إجراءات ملف الإنجاز">
         <span class="folio-toolbar__year">${short(ctx.year?.label)}</span>
@@ -561,15 +586,27 @@ export default {
       repaint();
     },
     'delete-custom-criterion'() {
-      const index=extraCriteria.findIndex(c=>c.number===editingCriterion);
+      const number=editingCriterion, index=extraCriteria.findIndex(c=>c.number===number);
       if(index<0)return;
+      const section=extraCriteria[index], name=criterionNames.get(number);
+      const excluded=hiddenCriteria.has(number), selected=selectedByCriterion.get(number);
+      const removed=customWitnesses.map((w,i)=>({w,i})).filter(x=>x.w.criterion===number);
+      offerUndo('حُذف القسم الخاص وشواهده من المعاينة.',()=>{
+        extraCriteria.splice(index,0,section);
+        for(const {w,i} of removed)customWitnesses.splice(Math.min(i,customWitnesses.length),0,w);
+        if(name!==undefined)criterionNames.set(number,name);
+        if(excluded)hiddenCriteria.add(number);
+        if(selected)selectedByCriterion.set(number,selected);
+        editingCriterion=number;selectedSuggestionId=selected||null;
+        criterionEditorOpen=false;
+      },()=>{for(const {w} of removed)forgetWitness(w.id)});
       extraCriteria.splice(index,1);
-      for(let i=customWitnesses.length-1;i>=0;i--)
-        if(customWitnesses[i].criterion===editingCriterion){
-          forgetWitness(customWitnesses[i].id);customWitnesses.splice(i,1);
-        }
-      criterionNames.delete(editingCriterion);hiddenCriteria.delete(editingCriterion);
-      selectedByCriterion.delete(editingCriterion);
+      for(const {w} of removed){
+        const at=customWitnesses.findIndex(x=>x.id===w.id);
+        if(at>=0)customWitnesses.splice(at,1);
+      }
+      criterionNames.delete(number);hiddenCriteria.delete(number);
+      selectedByCriterion.delete(number);
       editingCriterion='09';selectedSuggestionId=selectedByCriterion.get('09')||null;
       criterionEditorOpen=false;repaint();
     },
@@ -583,6 +620,20 @@ export default {
       if(empty)empty.hidden=[...cards].some(card=>!card.hidden);
     },
     'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id;selectedByCriterion.set(editingCriterion,selectedSuggestionId);repaint(); },
+    'move-witness'(el) {
+      const proposal=context().proposal;if(proposal?.sourceKind!=='custom')return;
+      const personal=customWitnesses.filter(w=>w.criterion===editingCriterion);
+      const index=personal.findIndex(w=>w.id===proposal.id),next=index+Number(el.dataset.dir);
+      if(index<0||next<0||next>=personal.length)return;
+      const i=customWitnesses.findIndex(w=>w.id===personal[index].id);
+      const j=customWitnesses.findIndex(w=>w.id===personal[next].id);
+      [customWitnesses[i],customWitnesses[j]]=[customWitnesses[j],customWitnesses[i]];
+      repaint();
+    },
+    'undo-change'() {
+      const old=pendingUndo;if(!old)return;
+      pendingUndo=null;old.restore();photoError='';repaint();
+    },
     'manual-suggestion'() {
       const id='custom:'+editingCriterion+':'+crypto.randomUUID();
       customWitnesses.push({id,criterion:editingCriterion,title:'شاهد جديد',
@@ -592,15 +643,29 @@ export default {
     },
     'hide-witness'() {
       const proposal=context().proposal;if(!proposal)return;
+      const criterion=editingCriterion;
       if(proposal.sourceKind==='custom'){
         const index=customWitnesses.findIndex(w=>w.id===proposal.id);
-        if(index>=0)customWitnesses.splice(index,1);
-        forgetWitness(proposal.id);
-      }else hiddenWitnesses.add(proposal.id);
-      selectedByCriterion.delete(editingCriterion);
+        if(index<0)return;
+        offerUndo('حُذف الشاهد الخاص من المعاينة.',()=>{
+          customWitnesses.splice(Math.min(index,customWitnesses.length),0,proposal);
+          editingCriterion=criterion;selectedSuggestionId=proposal.id;
+          selectedByCriterion.set(criterion,proposal.id);
+        },()=>forgetWitness(proposal.id));
+        customWitnesses.splice(index,1);
+      }else {
+        offerUndo('أُخفي الشاهد من مكتبتك.',()=>{
+          hiddenWitnesses.delete(proposal.id);
+          editingCriterion=criterion;selectedSuggestionId=proposal.id;
+          selectedByCriterion.set(criterion,proposal.id);
+        });
+        hiddenWitnesses.add(proposal.id);
+      }
+      selectedByCriterion.delete(criterion);
       selectedSuggestionId=null;repaint();
     },
     'restore-witnesses'(){
+      clearUndo();
       for(const proposal of context().candidates)hiddenWitnesses.delete(proposal.id);
       repaint();
     },
@@ -626,6 +691,7 @@ export default {
         photoError = 'يسمح النموذج بست صور كحد أقصى لكل شاهد، حجم الواحدة 6 ميجابايت والمجموع 24 ميجابايت.';
         toast(photoError,'warn'); repaint(); return;
       }
+      clearUndo();
       const additions = incoming.map(file=>({
         id:crypto.randomUUID(), url:URL.createObjectURL(file), name:String(file.name).slice(0,70), bytes:file.size,
       }));
@@ -633,10 +699,14 @@ export default {
       photoError = ''; repaint();
     },
     'remove-photo'(el) {
-      const key=context().photoKey, group=photosFor(key), p=group.find(photo=>photo.id===el.dataset.id);
-      if(!p) return;
-      URL.revokeObjectURL(p.url);
-      photoGroups.set(key,group.filter(photo=>photo.id!==p.id));
+      const key=context().photoKey, group=photosFor(key), index=group.findIndex(photo=>photo.id===el.dataset.id);
+      if(index<0)return;
+      const photo=group[index];
+      offerUndo('حُذفت الصورة من الشاهد.',()=>{
+        const current=photosFor(key);
+        photoGroups.set(key,[...current.slice(0,index),photo,...current.slice(index)]);
+      },()=>URL.revokeObjectURL(photo.url));
+      photoGroups.set(key,group.filter(x=>x.id!==photo.id));
       repaint();
     },
     'move-photo'(el) {
@@ -644,14 +714,18 @@ export default {
       const index=group.findIndex(photo=>photo.id===el.dataset.id);
       const next=index+Number(el.dataset.dir);
       if(index<0 || next<0 || next>=group.length) return;
+      clearUndo();
       [group[index],group[next]]=[group[next],group[index]];
       photoGroups.set(key,group);
       repaint();
     },
     'clear-photo'() {
-      const key=context().photoKey;
-      for(const photo of photosFor(key)) URL.revokeObjectURL(photo.url);
-      photoGroups.delete(key); repaint();
+      const key=context().photoKey, removed=photosFor(key);
+      if(!removed.length)return;
+      offerUndo('حُذفت صور الشاهد من المعاينة.',()=>{
+        photoGroups.set(key,removed);
+      },()=>{for(const photo of removed)URL.revokeObjectURL(photo.url)});
+      photoGroups.delete(key);repaint();
     },
     async print(){
       const ctx=context();

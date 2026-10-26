@@ -564,3 +564,21 @@
 
 .folio-evidence__sections > strong {display:block;font-size:11px;color:#2c6b55;font-weight:800;}
 .folio-evidence__section-options {padding:6px 0 0;}
+
+/* F09 reversible editing and custom-witness ordering; local Preview only. */
+.folio-library__selected-controls {display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;}
+.folio-library__selected-action {min-height:30px;padding-inline:6px;}
+.folio-library__selected-action:disabled {opacity:.35;cursor:not-allowed;}
+.folio-library__selected-action.is-danger {color:#a25a50;}
+.folio-undo {display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border:1px solid #bbd7cb;border-radius:9px;background:var(--bg-elev);
+  padding:11px 13px;color:var(--text-2);font-size:12px;line-height:1.6;}
+.folio-undo button {border:1px solid var(--brand);border-radius:8px;background:var(--brand-soft);
+  color:var(--brand);font:inherit;font-weight:800;padding:5px 14px;cursor:pointer;}
+.folio-undo button:focus-visible {outline:3px solid var(--brand);outline-offset:2px;}
+@media(max-width:540px) {
+  .folio-library__selected {flex-wrap:wrap;}
+  .folio-library__selected-controls {width:100%;justify-content:flex-start;}
+  .folio-workspace__status {white-space:normal;line-height:1.6;}
+}
+@media print {.folio-undo {display:none !important;}}
