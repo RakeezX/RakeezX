@@ -37,10 +37,9 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
         </div>
         <div class="class-hub-header__end">
           ${sec && store.activeTerm()?.id === tch.termId && !store.isTermClosed(tch.termId) ? html`
-            <button type="button" class="btn btn--sm btn--quiet" data-act="add-subject"
-                    aria-label="إضافة مادة أخرى لهذا الفصل"
-                    title="نفس قائمة الطلاب، ودرجات وحضور مستقلان لكل مادة">
-              ${icon('plus')} إضافة مادة أخرى
+            <button type="button" class="iconbtn" data-act="add-subject"
+                    aria-label="إضافة مادة أخرى لهذا الفصل" title="إضافة مادة أخرى لهذا الفصل">
+              ${icon('plus')}
             </button>
           ` : ''}
           <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل" title="تعديل الفصل">${icon('settings')}</button>

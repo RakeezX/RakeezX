@@ -72,7 +72,9 @@ test('visible addition in class header shares its roster but keeps marks in the 
   const add=page.getByRole('button',{name:'إضافة مادة أخرى لهذا الفصل'});
   await expect(add).toBeVisible();
   await expect(add).toBeEnabled();
-  await expect(add).toContainText('إضافة مادة أخرى');
+  await expect(add).toHaveText('');
+  await expect(add).toHaveAttribute('title','إضافة مادة أخرى لهذا الفصل');
+  await expect(add.locator('svg')).toHaveCount(1);
   await expect(page.getByRole('button',{name:'تغيير المادة'})).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth+2)).toBe(true);
 
