@@ -66,7 +66,9 @@
         "editPaths": [
           "src/lib/notification-push-browser.js",
           "src/lib/notification-push-client.js",
-          "src/views/notification-settings.js"
+          "src/views/notification-settings.js",
+          "docs/automation-evidence/20261026/N44_PR6_FRONTEND_PUBLICATION.md",
+          "tests/n44-pr6-frontend-publication-20261026/qualification.json"
         ],
         "newPaths": [
           "docs/automation-evidence/20261026/N44_PR6_FRONTEND_PUBLICATION.md",
