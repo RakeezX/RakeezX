@@ -36,6 +36,12 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
           </div>
         </div>
         <div class="class-hub-header__end">
+          ${sec && store.activeTerm()?.id === tch.termId && !store.isTermClosed(tch.termId) ? html`
+            <button type="button" class="iconbtn" data-act="add-subject"
+                    aria-label="إضافة مادة أخرى لهذا الفصل" title="إضافة مادة أخرى لهذا الفصل">
+              ${icon('plus')}
+            </button>
+          ` : ''}
           <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل" title="تعديل الفصل">${icon('settings')}</button>
         </div>
       </div>
@@ -232,6 +238,11 @@ export default {
     'file-export': (el, ev, params) => studentsView.actions['file-export'](el, ev, params),
     'paste-names': (el, ev, params) => studentsView.actions.import(el, ev, params),
     'add-student': (el, ev, params) => studentsView.actions.add(el, ev, params),
+    'add-subject'(el, ev, params) {
+      const teaching = store.getTeaching(params.id);
+      if (!teaching || store.isTeachingArchived(teaching)) return;
+      return addSubjectToClass(teaching.sectionId);
+    },
     'switch-class'(el, ev, params) {
       const suffix = location.hash.replace(/^#\/teaching\/[^/]+/, '').replace(/^\?/, '?');
       openSheet({
