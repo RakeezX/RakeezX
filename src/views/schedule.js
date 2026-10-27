@@ -18,6 +18,8 @@ import {
   shareOrDownloadSchedule,
 } from "../lib/schedule-export.js";
 import * as store from "../store.js";
+import { compactSubjectLabel } from "../lib/subject-catalog.js";
+import { compactSectionLabel } from "../lib/class-order.js";
 import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingDay, CALENDAR_KIND, safeColor, gradeLabel, slotKind, isNonTeachingSlot, slotKindLabel } from "../models.js";
 import { repaint } from "../repaint.js";
 import { getAccountPresentation } from "../lib/account-profile.js";
@@ -80,10 +82,7 @@ export function formatSectionDisplay(secOrGrade, maybeName) {
  * مثال: خامس/أ أو أول متوسط/2
  */
 export function shortClassLabel(sec) {
-  if (!sec) return "";
-  const shortGrade = SHORT_GRADES[Number(sec.grade)] || gradeLabel(sec.grade) || "";
-  const secName = formatSectionDisplay(sec);
-  return shortGrade ? `${shortGrade}/${secName}` : secName;
+  return compactSectionLabel(sec);
 }
 
 /** صياغة عربية موجزة لعدد الحصص الأسبوعية دون تغيير القيمة المشتقة من الجدول. */
@@ -536,7 +535,7 @@ export default {
                 }).map(t => {
                   const sec = store.getSection(t.sectionId);
                   const sub = store.getSubject(t.subjectId);
-                  return html`<div class="n59-load-row"><span class="n59-load-row__class">${gradeLabel(sec?.grade)} — ${formatSectionDisplay(sec)}</span><span class="n59-load-row__subject">${sub?.name || "مادة"}</span><span class="n59-load-row__count"><strong>${store.weeklyPeriods(t.id) || 0}</strong> حصص</span></div>`;
+                  return html`<div class="n59-load-row"><span class="n59-load-row__class" title="${sectionLabel(sec)}" aria-label="${sectionLabel(sec)}">${shortClassLabel(sec)}</span><span class="n59-load-row__subject" title="${sub?.name || 'مادة'}" aria-label="${sub?.name || 'مادة'}">${compactSubjectLabel(sub, store.subjects()) || 'مادة'}</span><span class="n59-load-row__count"><strong>${store.weeklyPeriods(t.id) || 0}</strong> حصص</span></div>`;
                 })}
               </div>
 
@@ -705,7 +704,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
                         </div>
                         <div class="slot__main-col">
                           <div class="slot__top-row">
-                            <span class="slot__grade-sec" style="--sec-color: ${safeColor(sec?.color)}">
+                            <span class="slot__grade-sec" style="--sec-color: ${safeColor(sec?.color)}" title="${isNonTeachingSlot(s) ? slotKindLabel(s) : sectionLabel(sec)}" aria-label="${isNonTeachingSlot(s) ? slotKindLabel(s) : sectionLabel(sec)}">
                               <span class="sec-dot" aria-hidden="true"></span>
                               <strong>${isNonTeachingSlot(s) ? slotKindLabel(s) : shortClassLabel(sec)}</strong>
                             </span>
@@ -719,7 +718,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
                             </div>
                           </div>
                           <div class="slot__subject-row">
-                            <span class="slot__subject">${isNonTeachingSlot(s) ? 'موعد أسبوعي ثابت' : store.getSubject(tch?.subjectId)?.name || "مادة"}</span>
+                            <span class="slot__subject" title="${isNonTeachingSlot(s) ? 'موعد أسبوعي ثابت' : store.getSubject(tch?.subjectId)?.name || 'مادة'}" aria-label="${isNonTeachingSlot(s) ? 'موعد أسبوعي ثابت' : store.getSubject(tch?.subjectId)?.name || 'مادة'}">${isNonTeachingSlot(s) ? 'موعد أسبوعي ثابت' : compactSubjectLabel(store.getSubject(tch?.subjectId), store.subjects()) || 'مادة'}</span>
                           </div>
                           <div class="slot__time-row">
                             <span class="slot__time tabular">${t ? fmtTimeRange(t.start, t.end) : "—"}</span>
