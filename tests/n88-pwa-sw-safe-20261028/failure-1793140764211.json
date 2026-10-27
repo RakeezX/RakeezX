@@ -1,0 +1,27 @@
+{
+  "taskId": "n88-pwa-sw-safe-1028",
+  "runId": "bc2dc652-b0cb-4e6e-8398-014eb71217be",
+  "base": "9dc2acf8ce7cc070657116658a010cd0dd77adb0",
+  "startedAt": "2026-10-27T22:38:40.662Z",
+  "checks": [
+    {
+      "name": "source_manifest_syntax",
+      "status": "PASS",
+      "evidence": "Only VERSION changes v92 to v93; every other byte (Push, cache cleanup, private exclusions, full shell) equals remote base; all shell paths exist and SW syntax passes."
+    }
+  ],
+  "matrix": [],
+  "cleanup": {
+    "browserAndServerClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "providerOperations": 0,
+  "status": "FAIL",
+  "failure": {
+    "stage": "320:offline",
+    "message": "page.waitForFunction: Timeout 30000ms exceeded.",
+    "stack": "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-pwa-sw-safe-1028\\tests\\n88-pwa-sw-safe-20261028\\cache.test.mjs:80:15"
+  },
+  "completedAt": "2026-10-27T22:39:24.211Z"
+}

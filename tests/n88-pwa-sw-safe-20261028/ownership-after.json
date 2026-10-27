@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-27T22:41:27.694Z",
+  "active": [
+    {
+      "id": "n88-closure-1028",
+      "status": "delivery",
+      "allowedPaths": [
+        "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs",
+        "tests/n88-closure-20261028/**",
+        "docs/automation-evidence/20261028/N88_UNKNOWN_ISSUANCE_SAFE_TERMINAL_CONTRACT.md"
+      ]
+    },
+    {
+      "id": "n88-pwa-sw-safe-1028",
+      "status": "running",
+      "allowedPaths": [
+        "sw.js",
+        "tests/n88-pwa-sw-safe-20261028/**",
+        "docs/automation-evidence/20261028/N88_SW_SAFE_AFTER_N44_BLOCKER.md"
+      ]
+    }
+  ],
+  "n44Status": "blocked",
+  "n44PreviousPidBirthSurvivors": [],
+  "publishers": [],
+  "leases": [],
+  "latestRemoteMain": "aa8fd551c23e0692321e7742fcb053492dbf4bc7",
+  "affectedDiffFromBase": "",
+  "sourceCheck": "No affected source movement after disjoint N88 contract publication"
+}

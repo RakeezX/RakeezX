@@ -1,0 +1,27 @@
+{
+  "taskId": "n88-pwa-sw-safe-1028",
+  "runId": "bc2dc652-b0cb-4e6e-8398-014eb71217be",
+  "base": "9dc2acf8ce7cc070657116658a010cd0dd77adb0",
+  "startedAt": "2026-10-27T22:36:26.087Z",
+  "checks": [
+    {
+      "name": "source_manifest_syntax",
+      "status": "PASS",
+      "evidence": "Only VERSION changes v92 to v93; every other byte (Push, cache cleanup, private exclusions, full shell) equals remote base; all shell paths exist and SW syntax passes."
+    }
+  ],
+  "matrix": [],
+  "cleanup": {
+    "browserAndServerClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "providerOperations": 0,
+  "status": "FAIL",
+  "failure": {
+    "stage": "320:update",
+    "message": "page.evaluate: TypeError: Cannot read properties of undefined (reading 'text')\n    at eval (eval at evaluate (:311:30), <anonymous>:1:131)\n    at async Promise.all (index 0)\n    at async eval (eval at evaluate (:311:30), <anonymous>:1:33)\n    at async <anonymous>:337:30",
+    "stack": "page.evaluate: TypeError: Cannot read properties of undefined (reading 'text')\n    at eval (eval at evaluate (:311:30), <anonymous>:1:131)\n    at async Promise.all (index 0)\n    at async eval (eval at evaluate (:311:30), <anonymous>:1:33)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-pwa-sw-safe-1028\\tests\\n88-pwa-sw-safe-20261028\\cache.test.mjs:49:29"
+  },
+  "completedAt": "2026-10-27T22:36:32.682Z"
+}
