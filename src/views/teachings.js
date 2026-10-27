@@ -1,4 +1,4 @@
-import { compareAcademicClasses } from '../lib/class-order.js';
+import { compareAcademicClasses, compactSectionLabel } from '../lib/class-order.js';
 /**
  * الفصول — قائمة الإسنادات التدريسية في الفصل الدراسي الحالي.
  *
@@ -15,7 +15,7 @@ import {
 } from '../models.js';
 import {
   builtinSubject, customSubjectSlug, findPersistedBuiltin, matchBuiltinSubject,
-  normalizeSubjectName, validateCustomSubjectName,
+  normalizeSubjectName, validateCustomSubjectName, compactSubjectLabel,
 } from '../lib/subject-catalog.js';
 import { classSubjectDefault } from '../lib/class-subject-default.js';
 import {
@@ -437,7 +437,7 @@ function renderClassCard(tch) {
         <div class="class-card__head">
           <div class="class-card__identity">
             <span class="class-card__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
-            <span class="class-card__title">${sectionLabel(sec) || '—'}</span>
+            <span class="class-card__title" title="${sectionLabel(sec) || '—'}" role="text" aria-label="${sectionLabel(sec) || '—'}"><span class="n133-full-name" aria-hidden="true">${sectionLabel(sec) || '—'}</span><span class="n133-short-name" aria-hidden="true">${compactSectionLabel(sec) || '—'}</span></span>
           </div>
           ${todaySessions.length
             ? marked >= roster.length && roster.length
@@ -446,7 +446,7 @@ function renderClassCard(tch) {
             : ''}
         </div>
         <div class="class-card__body">
-          <span class="class-card__sub">${sub?.name ?? ''}</span>
+          <span class="class-card__sub" title="${sub?.name ?? ''}" role="text" aria-label="${sub?.name ?? ''}"><span class="n133-full-name" aria-hidden="true">${sub?.name ?? ''}</span><span class="n133-short-name" aria-hidden="true">${compactSubjectLabel(sub, store.subjects())}</span></span>
           <span class="class-card__count"><span class="tabular">${roster.length}</span> طالبًا</span>
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
@@ -480,7 +480,7 @@ function subjectlessDeleteTargets(){
 function renderSectionCard({ section, students }) {
   return html`<details class="class-card" data-section-roster="${section.id}">
     <summary class="class-card__main">
-      <span class="class-card__head"><span class="class-card__title">${sectionLabel(section)}</span></span>
+      <span class="class-card__head"><span class="class-card__title" role="text" aria-label="${sectionLabel(section)}" title="${sectionLabel(section)}"><span class="n133-full-name" aria-hidden="true">${sectionLabel(section)}</span><span class="n133-short-name" aria-hidden="true">${compactSectionLabel(section)}</span></span></span>
       <span class="class-card__body"><span class="class-card__sub">بلا مادة في الفصل الدراسي الحالي · عرض الطلاب</span><span class="class-card__count">${students.length} طالبًا</span></span>
     </summary>
     <div class="card--pad">
