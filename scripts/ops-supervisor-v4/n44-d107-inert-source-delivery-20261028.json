@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-d107-inert-source-delivery-20261028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100001,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "executionProfile": {
+        "version": 1,
+        "authorityRef": "PO-20261027-N44-ASTRA-SINGLE-WORKER",
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "serviceTier": "priority",
+        "fastMode": true,
+        "singleAgent": true,
+        "ultraExcludedBecause": "Installed model describes Ultra as automatic task delegation; PO explicitly prefers highest supported single-worker effort in this case.",
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "qualifiedSource": "6025dcbcca3a7bc21893297fed0dfac954c17e1b"
+      },
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n44-push/activation/mobile-ui-target.mjs",
+        "drafts/n44-push/publisher-authority.inactive.mjs",
+        "drafts/n44-push/publisher-synthetic-host.mjs",
+        "drafts/n44-push/publisher-preview-server.mjs",
+        "drafts/n44-push/publisher-preview.html",
+        "drafts/n44-push/publisher-preview.mjs",
+        "drafts/n44-push/publisher-preview.css",
+        "docs/automation-evidence/20261027/N44_D107_INERT_SOURCE_DELIVERY_20261028.md",
+        "tests/n44-d107-inert-source-delivery-20261028/qualification.json",
+        "src/views/notification-settings.js",
+        "src/lib/cloud.js"
+      ],
+      "verificationPaths": [
+        "src/views/notification-settings.js",
+        "src/lib/cloud.js"
+      ],
+      "requiredChecks": [
+        "n44_inert_packet_exact_seven_files_and_current_dependencies",
+        "n44_inert_qualified_behavior_and_rendered_evidence_binding",
+        "n44_inert_no_startup_service_or_live_authority_change"
+      ],
+      "postDeliveryChecks": [],
+      "releaseAuthority": "PO attachment 051c1b99 on 28 October: publish qualified work through the original sole publisher. This is inert inactive source-only delivery, same original Astra session, sequential after the parent stopped. No live authority renewed; no umbrella acceptance.",
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inert inactive source-only D107 synthetic publisher and exact mobile target preparation",
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "originalQualifiedCandidate": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+        "qualifiedSource": "6025dcbcca3a7bc21893297fed0dfac954c17e1b",
+        "providerServiceOperations": 0,
+        "privateCustodyAccess": 0,
+        "realAccountReads": 0,
+        "registrations": 0,
+        "sends": 0,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realData": false,
+        "realSend": false
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/mobile-ui-target.mjs",
+          "drafts/n44-push/publisher-authority.inactive.mjs",
+          "drafts/n44-push/publisher-synthetic-host.mjs",
+          "drafts/n44-push/publisher-preview-server.mjs",
+          "drafts/n44-push/publisher-preview.html",
+          "drafts/n44-push/publisher-preview.mjs",
+          "drafts/n44-push/publisher-preview.css"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/mobile-ui-target.mjs",
+          "drafts/n44-push/publisher-authority.inactive.mjs",
+          "drafts/n44-push/publisher-synthetic-host.mjs",
+          "drafts/n44-push/publisher-preview-server.mjs",
+          "drafts/n44-push/publisher-preview.html",
+          "drafts/n44-push/publisher-preview.mjs",
+          "drafts/n44-push/publisher-preview.css",
+          "docs/automation-evidence/20261027/N44_D107_INERT_SOURCE_DELIVERY_20261028.md",
+          "tests/n44-d107-inert-source-delivery-20261028/qualification.json"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261027/N44_D107_INERT_SOURCE_DELIVERY_20261028.md",
+          "tests/n44-d107-inert-source-delivery-20261028/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_inert_packet_exact_seven_files_and_current_dependencies",
+          "n44_inert_qualified_behavior_and_rendered_evidence_binding",
+          "n44_inert_no_startup_service_or_live_authority_change"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "Resume the SAME ORIGINAL SESSION 01a14fcd-032c-7ec0-8b0c-0e0395862c61 for a sequential source-only delivery phase of N44, NOT another concurrent worker or a new Product ticket. The controller-created CURRENT-MAIN worktree supplied in this activated card is the writable delivery checkout. Original private worktree C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019, original candidate c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5, all 56 parent acceptance checks and all historical FAIL/NOT_RUN remain untouched. The parent remains BLOCKED. Do NOT modify controller validators or relabel/remove historical acceptance gates. No whole-private-branch merge/cherry-pick.\n\nApply exactly the seven canonical Git blobs described by C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019/tests/n44-d107-continuation-20261028/publisher-packet-cfb3f132.json. Source commit 6025dcbcca3a7bc21893297fed0dfac954c17e1b; patch canonical SHA256 57f81324dbef55b1fee777bfd73c945e3142a2ba671e1b0b01d5c633007ff43f. Validate every preimage/absence against current main and all seven postimage hashes. Four new inert modules plus three preview updates only. Preserve newer main app/SW/styles/N88 and every service/config file. The two verificationPaths are UNCHANGED baseline served assets and must NOT be edited: their publisher verification proves the deployment binding, not runtime activation of Admin.\n\nReuse actual immutable qualifications in that original checkout: original-target-qualified.txt, publisher-host-qualified.txt, publisher-main-host-qualified.txt, publisher-http-qualified.txt, publisher-http-assets-qualified.txt, publisher-ui-result.json, publisher-interactions-cfb3f132-5379-4263-b69b-2a5ec03f8662.json, continuation-cfb3f132.json, finalization-cfb3f132.json. Existing evidence includes actual 1100/390px browser rendering and interactions, drafts/edit/save/reopen/version/audit, fixed synthetic audiences/peer denial, category/marketing channels, central date picker scheduling/cancel/expiry and UNKNOWN/no-replay. Compare exact dependency Git blobs and shared-CSS semantic delta from the packet; rerun ONLY if a material affected dependency changed. Do not recreate a Preview/browser server for unchanged code; do not rerun unrelated Native/device/crypto tests. Any relevant failing check stays FAIL and blocks THIS component. Document historical parent failure and phone NOT_RUN as preserved context, not new successes.\n\nPublish only seven inert files plus minimal safe doc and qualification JSON. Root's local packet/readback preparation remains in the original private checkout; do not copy private helpers, live state, sealed files, device/account identities, real receipts, or secrets. The local synthetic preview is NOT a live Admin surface, no teacher startup import or navigation, no all-user read or broadcast permission. Original Native178 already installed and OFF/NULL with closed grant pin UNSET; no additional upload is needed or permitted here. No source create/delete, account read, real browser action, registration/send/Stop, provider, Auth/RLS/schema, budgets, cron, ledger/queue edits or new session/agent.\n\nReturn LOCAL_READY only for this component's three required checks once exact proof binding is verified; original publisher owns deterministic build and immutable/Production asset parity. N44 and D107 remain OPEN, physical Android/iPhone and real Admin authorization remain separate genuine acceptance gates. Record source-only publication truthfully; never claim public runtime activation or new physical notification proof."
+    }
+  ]
+}

@@ -12,7 +12,9 @@ function Get-N44ExecutionProfile($Task, $Spec) {
     $profile.originalSession -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.qualifiedSource -eq 'f71e2dfd64ddb8e79b18d4f30151c0a9cfedb3b2'
   $sourceFoundationN44 = $Task.id -eq 'continuous-n44-pr6-source-foundation-delivery-20261027' -and $profile.originalTaskId -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and
     $profile.originalSession -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.qualifiedSource -eq '73518d6e66241c09f8f30bbbe91dedf5922b6d7c'
-  $n44 = ($originalN44 -or $renewalDeliveryN44 -or $sourceFoundationN44) -and $Task.productId -eq 'N44' -and $Spec.taskId -eq $Task.id -and
+  $inertD107N44 = $Task.id -eq 'continuous-n44-d107-inert-source-delivery-20261028' -and $Spec.sessionId -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and
+    $profile.originalTaskId -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and $profile.originalSession -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.qualifiedSource -eq '6025dcbcca3a7bc21893297fed0dfac954c17e1b'
+  $n44 = ($originalN44 -or $renewalDeliveryN44 -or $sourceFoundationN44 -or $inertD107N44) -and $Task.productId -eq 'N44' -and $Spec.taskId -eq $Task.id -and
     $profile.authorityRef -eq 'PO-20261027-N44-ASTRA-SINGLE-WORKER' -and $profile.version -eq 1
   if ($n44) {
     if ($Spec.model -ne 'gpt-6-astra' -or $Spec.effort -ne 'max' -or $profile.model -ne $Spec.model -or $profile.effort -ne $Spec.effort -or
