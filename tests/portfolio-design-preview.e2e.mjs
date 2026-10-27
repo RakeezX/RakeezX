@@ -5,8 +5,8 @@ import { withIsolatedLocalBrowser } from 'C:/Users/Abody/Projects/RakeezX/script
 const test = base.extend({
  isolatedBrowser: async ({baseURL}, use) => {
    await withIsolatedLocalBrowser({
-     taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n126-f09-witness-context-library-20261027.json',
-     runId:'ebb435b7-07d8-49dc-b71f-2e25fb0839c4',url:baseURL,timeoutMs:120000,
+     taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n126-f09-documented-work-suggestions-20261027.json',
+     runId:'197d3648-99e4-4083-9b32-003033a1397e',url:baseURL,timeoutMs:120000,
    }, async ({createContext}) => use({newContext: async ({serviceWorkers, ...visual}={}) => {
      if(serviceWorkers && serviceWorkers!=='block')throw Error('Service Workers must stay blocked');
      return createContext(visual);
@@ -1064,4 +1064,66 @@ test('N126 context account entry keeps the real lease guard and refuses an unaut
  });
  expect(result.type).toBe('account');expect(result.scope).toBe('synthetic-context-owner');
  expect(result.saved).toBeNull();expect(result.lease).toBe('LIMITED');
+});
+
+
+test('N126 recorded work uses actual caller and CSS, separates review/log provenance and prints only aggregate data without Product writes',async({page,context,baseURL},info)=>{
+ await sameOriginOnly(context,baseURL);
+ await page.goto(new URL(entry,baseURL).href);await ready(page);
+ const yearId=await page.evaluate(async()=>{
+   const s=await import('/src/store.js'),m=await import('/src/models.js');
+   const yearId=s.activeYear().id;
+   const date=new Date(Date.now()-86400000).toISOString().slice(0,10),stamp=Date.parse(date+'T08:00:00Z');
+   const term=m.makeTerm({id:'recorded-term',yearId,index:4,startDate:date.slice(0,4)+'-01-01',endDate:date.slice(0,4)+'-12-31'});
+   const section=m.makeSection({id:'recorded-section',yearId,grade:4,label:'هـ'});
+   const subject=m.makeSubject({id:'recorded-subject',name:'مادة تجريبية'});
+   const teaching=m.makeTeaching({id:'recorded-teaching',termId:term.id,sectionId:section.id,subjectId:subject.id});
+   // Synthetic in-memory saved-record snapshot only. No store.save/db write.
+   s.state.groupArrangements=[];s.state.classGoals=[];s.state.logs=[];
+   s.state.terms.push(term);s.state.sections.push(section);s.state.subjects.push(subject);s.state.teachings.push(teaching);
+   s.state.students.push(m.makeStudent({id:'DO-NOT-DISCLOSE-STUDENT',name:'عائلة سرية لا تظهر'}));
+   s.state.enrollments.push(m.makeEnrollment({id:'recorded-enrollment',studentId:'DO-NOT-DISCLOSE-STUDENT',sectionId:section.id,startDate:term.startDate}));
+   s.state.sessions.push(m.makeSession({id:'recorded-session',teachingId:teaching.id,date,status:'held'}));
+   s.state.groupArrangements.push(m.makeGroupArrangement({teachingId:teaching.id,groups:[['DO-NOT-DISCLOSE-STUDENT']],updatedAt:stamp}));
+   s.state.classGoals.push({id:'class-goal:'+teaching.id,teachingId:teaching.id,sessionId:'recorded-session',date,state:'completed',runId:'recorded-run',startedAt:stamp,completedAt:stamp+60000,text:'عائلة سرية لا تظهر'});
+   s.state.logs.push({id:'DO-NOT-DISCLOSE-STUDENT-log',teachingId:teaching.id,sessionId:'recorded-session',studentId:'DO-NOT-DISCLOSE-STUDENT',date,kind:'participation',delta:1,note:'عائلة سرية لا تظهر'});
+   const log=s.state.logs.at(-1);
+   s.state.logs.push({...log,id:'foreign-log',ownerId:'foreign'}, {...log,id:'future-log',date:'2999-01-01'}, {...log,id:'deleted-log',deleted:true});
+   (await import('/src/repaint.js')).repaint();
+   return yearId;
+ });
+ const snapshot=()=>page.evaluate(async()=>{
+   const s=await import('/src/store.js'),db=await import('/src/lib/db.js');
+   const tables=['years','terms','sections','teachings','students','enrollments','groupArrangements','classGoals','sessions','logs','scores','outbox'];
+   return {memory:JSON.stringify(s.state),disk:JSON.stringify(await Promise.all(tables.map(t=>db.getAll(t))))};
+ });
+ const before=await snapshot();
+ const entries=[['09','group-arrangements','تنظيم المجموعات المحفوظ','سجل ركيز يحتاج استكمالًا'],
+   ['08','completed-goals','سجل الأهداف الصفية المكتملة','سجل ركيز يحتاج استكمالًا'],
+   ['09','participation-logs','متابعة سجلات المشاركة المؤرخة','سجل موثق من ركيز']];
+ for(const [criterion,key,title,label] of entries){
+   await chooseCriterion(page,criterion);
+   const card=page.locator(`[data-library-card][data-id="rakeez:${key}:${yearId}"]`);
+   await expect(card).toContainText(label);await card.click();
+   await expect(page.getByRole('textbox',{name:'عنوان الشاهد',exact:true})).toHaveValue(title);
+   if(key==='participation-logs')await expect(page.locator('.folio-focus .folio-evidence__metrics strong').first()).toHaveText('١');
+   const toggle=page.locator('[data-act="toggle-witness-in-file"]');
+   // Recorded sources retain existing automatic annual inclusion behavior.
+   if(!(await toggle.innerText()).includes('ضمن الملف'))await toggle.click();
+   await expect(toggle).toContainText('ضمن الملف');
+ }
+ await page.locator('[data-act="show-full-portfolio"]').first().click();
+ for(const [, ,title] of entries)await expect(page.locator('[data-folio-document]')).toContainText(title);
+ const rendered=await page.locator('[data-folio-document]').evaluate(n=>n.outerHTML);
+ expect(rendered).not.toMatch(/DO-NOT-DISCLOSE|عائلة سرية|foreign-log|future-log|recorded-run/);
+ await expect(page.locator('[data-folio-document]')).toContainText('لا تثبت استخدامها');
+ await expect(page.locator('[data-folio-document]')).toContainText('لا يعني ذلك تحقق التعلم');
+ await page.getByRole('button',{name:/PDF/}).click();
+ await expect.poll(()=>page.evaluate(()=>window.__portfolioPrintCalls)).toBe(1);
+ await page.emulateMedia({media:'print'});
+ const pages=await page.locator('[data-portfolio-page]').count();
+ const pdf=await page.pdf({path:info.outputPath('recorded-work-annual.pdf'),preferCSSPageSize:true,printBackground:true});
+ expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(pages);
+ await page.locator('[data-folio-document]').screenshot({path:info.outputPath('recorded-work-annual.png')});
+ expect(await snapshot()).toEqual(before);
 });
