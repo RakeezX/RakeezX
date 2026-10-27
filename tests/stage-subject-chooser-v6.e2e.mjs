@@ -21,7 +21,7 @@ test('grade-four official names + legacy builtin identity + manual input',async(
   const dialog=await openPicker(page);
   await dialog.locator('[name="grade"]').selectOption('4');
   await dialog.locator('[data-subject-trigger]').click();
-  await expect(dialog.getByText('مواد هذا الصف — الإصدار السادس')).toBeVisible();
+  await expect(dialog.getByText('مواد هذا الصف — الإصدار السادس')).toHaveCount(0);
   const search=dialog.getByRole('combobox',{name:'ابحث عن مادة'});
   await search.fill('لغتي');
   await expect(dialog.locator('[data-subject-token]')).toHaveCount(1);
