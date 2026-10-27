@@ -5,12 +5,12 @@
     {
       "productId": "N44",
       "activationId": "po-20261012-continuous",
-      "priority": -6200,
+      "priority": -100000,
       "scopeKey": "n44-one-approved-current-device-test",
       "riskClass": "SENSITIVE",
       "validationTier": "SENSITIVE",
       "executionMode": "local",
-      "liveMutation": false,
+      "liveMutation": true,
       "allowedPaths": [
         "drafts/n44-push/**",
         "supabase/functions/n44-notifications/**",
@@ -64,7 +64,9 @@
         "tests/n44-mobile-admin-inactive-20261027/**",
         "docs/automation-evidence/20261027/N44_MOBILE_ADMIN_INACTIVE_CONTRACT.md",
         "tests/n44-mobile-host-inactive-20261027/**",
-        "docs/automation-evidence/20261027/N44_MOBILE_HOST_INACTIVE_PACKET.md"
+        "docs/automation-evidence/20261027/N44_MOBILE_HOST_INACTIVE_PACKET.md",
+        "tests/n44-mobile-live-20261027/**",
+        "docs/automation-evidence/20261027/N44_MOBILE_ACTUAL_OUTCOME.md"
       ],
       "verificationPaths": [
         "src/views/notification-settings.js",
@@ -142,7 +144,11 @@
         "n44_inactive_mobile_exact_finite_preparation_and_historical_ledger_preservation",
         "n44_admin_inactive_server_contract_and_untrusted_input_denial",
         "n44_inactive_mobile_actual_host_and_compiled_packet_qualification",
-        "n44_inactive_actual_host_retains_first_mobile_registration_when_second_registers"
+        "n44_inactive_actual_host_retains_first_mobile_registration_when_second_registers",
+        "n44_mobile_actual_native_revision_and_authority_binding",
+        "n44_android_actual_closed_app_cloud_arrival_click",
+        "n44_ios_actual_closed_app_cloud_arrival_click_and_peer_retention",
+        "n44_mobile_actual_cloud_local_cleanup_off_and_peer_integrity"
       ],
       "acceptance": [
         "Exactly one approved current-device actual push attempt, after pages closed, with explicit browser consent and truthful OS result.",
@@ -151,9 +157,9 @@
       ],
       "model": "gpt-6-astra",
       "effort": "max",
-      "budgetMinutes": 30,
+      "budgetMinutes": 80,
       "idleMinutes": 15,
-      "completionMode": "qualify_inactive_mobile_same_owner_peer_retention",
+      "completionMode": "execute_two_named_mobile_cloud_trials_20261027",
       "pr6Completion": {
         "version": 1,
         "reviewedAt": "2026-10-26T19:08:35.175Z",
@@ -223,28 +229,21 @@
         "reviewSha256": "e005deabfe4ecd762aa8697f8fcb844c2fc94f2cc6b23eda9b1c94365c7386d0"
       },
       "preparationAuthority": {
-        "kind": "inactive_mobile_peer_retention_preparation",
-        "productId": "N44",
-        "authorityRef": "PO-20261027-N44-ASTRA-SINGLE-WORKER",
+        "kind": "superseded_by_exact_two_mobile_live_authority",
+        "authorityRef": "PO-20261027-N44-TWO-MOBILE-LIVE",
+        "liveAuthorizationRef": {
+          "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-two-mobile-live-authority.json",
+          "sha256": "3f0d77e7402c01c5ff3dcf0ae711c630006f98b8240a062854313c8e2927933a",
+          "authorityRef": "PO-20261027-N44-TWO-MOBILE-LIVE",
+          "grantId": "bcf51d2a-7f6e-4d86-b322-ab7b380a0c45"
+        },
         "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
-        "providerOperations": 0,
-        "realAccountMutations": 0,
-        "registrationAttempts": 0,
-        "sends": 0,
-        "sourceCreations": 0,
-        "sourceDeletions": 0,
-        "nativeUploads": 0,
+        "originalLiveHistoryPreserved": true,
         "generalDelivery": false,
         "cron": false,
-        "authSchemaRlsChanges": 0,
-        "originalLiveHistoryPreserved": true,
-        "realAccountReads": 0,
-        "privateCustodyReads": 0,
-        "realPermissionPrompts": 0,
-        "proposedGrantsAreInactive": true,
-        "hostedOperations": 0
+        "authSchemaRlsChanges": 0
       },
-      "releaseAuthority": "Latest direct PO N44 completion request authorizes necessary qualified PR6 delivery through the sole original service custodian and existing publisher, only after affected readiness gates. No generic Supabase plugin deployment, general sender/cron enablement, expired permit reuse, counter reset, schema/Auth/RLS mutation or untested-platform PASS.",
+      "releaseAuthority": "Explicit latest PO attachment 18133056 authorizes ONE Native upload if necessary, ONE new registration and ONE cloud Push attempt per sealed named phone, Android then Home Screen iPhone; one durable <=60min activation window, original custodian/publisher, required physical gestures/witnesses, owned cleanup and OFF. No new approval is required for these exact operations. No general delivery, Auth/RLS/schema/roles, extra accounts, spent retries or security bypass.",
       "preflight": {
         "version": 1,
         "sourceCommit": "21b50f3aaf1ed80d6bbef95d40e267d9fdc1eae2",
@@ -330,7 +329,7 @@
         ],
         "publisherChecks": []
       },
-      "objective": "Continue SAME original Astra/max/Fast single-agent session 01a14fcd-032c-7ec0-8b0c-0e0395862c61 from bb4ac89ad4a1c81c3636470d63b07aa8180853b5. Do not repeat the completed host wiring, provider qualification, original investigation, old Windows trial, old cleanup, Admin preparation or unchanged checks. No subagents or independent executor.\n\nOne concrete acceptance mismatch was found by Root in mobile-trial.inactive.mjs: sequential(tx,slot1) requires the first registration to be revoked/dead with cleared binding before the second phone can register. The actual PO criterion is that registering the second device must NOT lose the first device's valid subscription. A trial that requires first-device retirement cannot establish that criterion. The compiled-host positive sequence currently stops phone1 before registering phone2; a preseeded unrelated peer is useful but does not replace the two actual named-phone registration transition.\n\nMake the smallest inactive SOURCE correction so the prospective finite trial can keep the first same-owner registration active while admitting the second phone, only after the first's one provider budget is spent and its delivery rows are terminal. Keep serial scheduling, the exact independently pinned two-device descriptor, one new registration and one send maximum per device, all same-owner/workspace/session/consent/lease/source/expiry checks, and unknown-response budget consumption. Do NOT make second-device admission a generic registration or increase any budget. The first registration must remain independently valid, including its sealed binding, after second registration and second-device Stop. Current installed Native176 and live configuration remain untouched. All current live allowances are ZERO.\n\nUse the existing compiled-host fixture and actual host/config/register/signed-schedule/typed transaction/committed-permit pipeline already qualified. Add or adapt only the necessary affected composition: Android registers and sends once; first receipt remains active; iOS registers without first Stop; first registration and its binding are unchanged; iOS sends once; stopping one leaves the other active; final Stop retires both. Also verify second-device denial while first provider budget is unspent or first delivery is nonterminal, no resend after unknown, and exact same-UUID cold restoration does not consume a second registration or touch its peer. Distinguish synthetic cloud state preservation from physical native-subscription proof, which still requires the later real-phone trial. No new permissive fake or test framework. Existing typed operations/codecs remain strict; no SQL/schema/role change. Preserve all unrelated prior evidence and real rejection history.\n\nRebuild and qualify only the affected compiled Native bundle using the same source-only path. Reuse unchanged Node/Deno/compiler/provider/module evidence where exact source/dependencies allow it; the material peer-retention change requires its own affected composition, not every suite. Update the same tests/n44-mobile-host-inactive-20261027 packet and N44_MOBILE_HOST_INACTIVE_PACKET.md, plus prior mobile execution packet/contract wording only where the now-obsolete retire-before-second recipe appears. Keep old evidence as prior revision, not silently rewritten PASS. Record revised hashes, exact delta, Native176 rollback and N88 peer preservation. No actual IDs/times/window/grant/source are invented.\n\nThe proposed future live sequence is now: finite scoped register/send/closed-app physical witness/click for phone1; retain its active registration with no pending delivery; register/send/witness/click phone2; verify phone1 subscription remains; normal Stop/consent-false/nativeNULL/SWbindingNULL cleanup for each, then OFF/NULL. This is a PREPARATION PROPOSAL ONLY, not a fresh live grant. Still two registrations/two sends maximum proposed, one Native upload proposed; no new Windows send, consumed budget reset, general cron, Admin fanout or extra source. A fresh exact scope and phone identities remain required before activation.\n\nPreserve all50existing checks and historical44 gate outcomes; append the one genuine new affected check. Commit the qualified candidate and return exact taskId/runId/base/candidate schema. Full N44 remains OPEN/BLOCKED only at genuine live-device inputs/fresh bounded authority/physical witnesses and privileged Admin integration gate. Do not describe physical multidevice acceptance as PASS from synthetic tests.\n\nZERO service/provider/configuration/policy/SQL/Auth/RLS/schema/key/region/account/browser/private-custody reads or writes, permission prompts, registration/send/source creation/delete, Native upload, live window or general scheduler activation. Original6sends/11registrationACK/6Nativeuploads stay spent, Source6-10 stay cleaned. No code outside the existing allowed paths or accepted teacher UI change.",
+      "objective": "URGENT ACTUAL ANDROID/IPHONE EXECUTION, not another synthetic preparation. Latest explicit PO attachment C:/Users/Abody/.codex/attachments/18133056-b157-43e3-b995-b5553720d6ae/Pasted text.txt authorizes the exact live operations in artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-two-mobile-live-authority.json SHA256 3f0d77e7402c01c5ff3dcf0ae711c630006f98b8240a062854313c8e2927933a. Resume SAME original session 01a14fcd-032c-7ec0-8b0c-0e0395862c61 from qualified candidate 16e9ebac14ca56b6e8872ceaf3ac89930470d28a, original base 61dbc4bc6cd66f7875ac3446e208dce1c5f3678b, Astra/max/Fast single worker. Keep current model/profile; no new actor, delegate, planner, capacity workaround or old Windows replay. Reuse the complete revision-two Native packet and actual prior proof. Do not rerun completed13host/entry,4peer,21module/provider/browser suites or re-read the whole historical chain. Target actual completion30-45min once prerequisites allow. All51oldcheck names/outcomes and old44 rejection history remain; new phone outcomes are separate. Last public renewal/source foundation repairs already served; preserve current main/frontend, N130/N88 and accepted UI.\n\nEXACT TRUSTED INPUTS: recover sealed phone context using Windows CurrentUser DPAPI ConvertTo-SecureString from artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-mobile-device-context-2018.dpapi, encrypted SHA256 575c23951df2a95e3119d3328b7889ff6b1d803ff99ff4687b680cd8aab98f12, with its adjacent safe meta. Do this ONLY in the original authorized user/custodian context, parse in memory, never print identities/keys/endpoints/tokens/cookies or write plaintext identity to Git/logs. Verify same owner/account and workspace, two distinct devices, match original sealed test owner/custody (not merely displayed names), Android installed+local display PO_PASS, iPhone Safari Home Screen installed+permission not yet granted. Do NOT ask PO to repeat identities already supplied. Original meta's context-only label is superseded ONLY for the new exact operations by this latest grant; it remains no blanket authority. If decryption or identity comparison fails, preserve the safe exact failure; no credential cloning/alternate-account guessing.\n\nREAD-ONLY READY FIRST: use existing original custodian/approved publisher path and required phase leases. Verify current Native176 source/archive/config baseline against saved73518d6 source and new current-packet.json -> peer-retention packet SHA6fc665bd74447d075be9e58dd0009b7bc62003c5df98fc073c62401567969de0. Verify entry192c49205c7e94a1ae23dc21673d8aaa1a31861f7f160c710015da7e87c1a5d8/archivef56776715e6b9e44e5b506ed4350b65fb8628cec33c27aaf915dda0513622f37 and source45352c4. Preserve rollback176/source/archive, genuine Auth policy fields, current N88 peer/config. A mismatch is a factual preflight issue, not permission to overwrite another revision. Read affected differences only, no generic management deployment or wholesale PR6/private-branch merge. Read-only official documentation was checked at Root: Supabase deploy guide/changelog; Oct12 TLS CBC removal startsNov10 at earliest, no present reason to alter transport/ciphers. Keep existing qualified pinned transport.\n\nONE DURABLE NEW GRANT: bcf51d2a-7f6e-4d86-b322-ab7b380a0c45. Independently bind the full descriptor/pin to these exact decrypted identities and verified source/policy. All six old sends, eleven ACKs, six Nativeuploads and old Source6-10 cleanup are SPENT/PRESERVED. Append new budgets to existing durable custodial history; do not reset old markers, copy an expired window, change grant ID on resume or replenish on date/run change. New caps are ONE Native upload, TWO new registrations total (one each) and TWO provider attempts total (one each). Source allowance is at most one genuinely new exact parent+child fixture shared where valid, only if required through normal app/official source path with no grades/completions/manual contributions and canonical save ACK. No repeat creation after UNKNOWN; reconcile read-only once then stop if unresolved. Never touch/recreate Sources6-10. Config/policy binding, per-device consent/preferences and existing source projection/authorization are allowed only as necessary for this named trial, saved/restored exactly; no genuine Auth/schema/RLS/role/region/key changes or general SQL. Preserve existing restricted operations and source protection. Ordinary small proven local code/config blockers may be repaired in existing allowed scope before deployment; no library or framework replacement.\n\nWINDOW: do not activate while awaiting another worker/publisher or while merely reading source readiness. Immediately BEFORE the earliest live mutation (upload/config/source), atomically record activatedAt UTC and hardEnd <=activatedAt+60min in an append-only durable journal under the existing custody. This is the only activation, not a new permission request. Record it in safe progress for Root. Do not renew, shift or reopen it. Do not start a registration/send that cannot finish with physical witness and cleanup inside the remaining window; reserve cleanup margin. After expiry only already-authorized owned Stop/disarm/cleanup, never registration/send/upload/source recreation. A second Native upload, including a rollback upload, is not granted; preserve rollback material and fail closed/disarm on unknown failure. An uncertain provider call consumes that phone's sole attempt forever; no resend.\n\nLIVE INSTALL/SETUP: at most ONE original-custodian qualified Native upload if necessary, followed by exact entry/map/archive/source/version readback. Set only finite named grant/independent pin and source-policy binding, keep general delivery and cron OFF, preserve Auth fields and N88 peer. No unqualified installation. Prepare canonical test target via existing approved normal account flow and date adapter. No editable student portal. Make Android's normal Enable genuinely ready; do not merely change a label. The service must adopt the normal client UUID after direct human consent and record registered ACK. No synthetic registration, copied browser profile, captured phone credentials or fabricated receipt.\n\nHUMAN HANDOFF WITHOUT NEW APPROVAL: phones require user gestures/witnesses; Root will relay ONLY those actions. Create safe stage progress in tests/n44-mobile-live-20261027/progress.json and emit concise commentary containing stage, ready action, actual send UTC/KSA time, hardEnd and expected destination WITHOUT private IDs. Root writes immutable PO replies under artifacts/ops-supervisor-v4/intake-evidence/n44-mobile-live-bcf51d2a-7f6e-4d86-b322-ab7b380a0c45/human-steps/. Read only matching grant/stage evidence, no guessed answers or elapsed-time-as-witness. Do not duplicate Root questions. Use bounded waits <=45s between progress checks; human steps should not consume a fresh process or retry a mutation. After Android configuration ready, request one Enable gesture, and after registered require all Rakeez documents on that phone closed; Root can combine these safe sequential manual instructions. Emit actual ACK and closed-app witness state, execute ONE original signed Supabase targeted Android send after durableCOMMIT, announce exact timestamp immediately, then request actual OS appearance+one click to correct target. Keep Android registration ACTIVE regardless of successful witness, with no nonterminal jobs, so second-phone registration can prove retention. If witness is unavailable, record UNKNOWN rather than sending again; continue the independent iPhone slot only while safe remaining scope permits.\n\nIPHONE SECOND: Root asks only necessary Enable then iOS Allow gesture inside installed Safari Home Screen app. Verify actual permission/registered ACK, same owner and unchanged Android registration/binding. Close iPhone app documents per trial, then ONE original signed targeted Supabase send; immediately report timestamp and request actual OS/click witness. Ensure exact intended phone, no duplicates or third/Windows delivery. Registration/send preserves the first active phone; retain immutable comparison proof. Do not treat200/201 or provider acceptance as OS arrival. The direct human receipt is mandatory; Root/worker opening a page is not a cold notification click.\n\nFINALLY ALWAYS: normal iPhone Stop first, prove cloud retirement and local native subscription/worker binding cleared using original safe normal-flow receipts; read unchanged active Android after iPhone Stop. Then normal Android Stop and both local/cloud acknowledgements. Root may ask necessary phone Stop gestures, not reauthorization. If local NULL cannot be read/proven, say UNKNOWN explicitly and preserve exact next manual action; do not imply server revoke alone cleans a physical browser. Clean ONLY the newly created exact owned test source via official UI/canonical path with zero-grade invariant, deletion ACK/re-read local+cloud. Restore necessary saved trial preferences, finite descriptor NULL and mobile pin UNSET (not string null), general delivery/cronOFF. Preserve all genuine Auth/config and N88 source/baseline; release owned phase resources. If partially failed or window expired, prioritize authorized cleanup/disarm and retain any unconfirmed residual. Do not leave active test scope because a phase failed.\n\nWrite compact actual source/version/hash, new spent counts, Android registration/send/provider/OS/click, iOS same, exact peer preservation and cleanup receipts plus any honest gap to docs/automation-evidence/20261027/N44_MOBILE_ACTUAL_OUTCOME.md and tests/n44-mobile-live-20261027; private data stays encrypted in original custody. Return existing exact task/run/candidate/base JSON. Full N44/D107 still needs any remaining separate privileged Admin contracts; do not activate Admin or general delivery with this grant and do not use its missing authority to defer the two authorized phones. Do not stop at plan/localPASS while a concrete permitted live step remains. A real tool security denial is final for that operation: no alternative executor, debugger loop or API bypass.",
       "source6VisibleAck": {
         "inputPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261026-source6-visible-ack.json",
         "inputSha256": "23554e28d5a06f1339fdf6f13b47d72a177a462da4dc8292280819ea74039aa8",
@@ -837,6 +836,24 @@
         "runId": "0e287d51-4b01-497b-ab50-2f5bb7d8151e",
         "candidateSha": "bb4ac89ad4a1c81c3636470d63b07aa8180853b5",
         "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n44-one-approved-closed-page-push-20261019\\0e287d51-4b01-497b-ab50-2f5bb7d8151e\\result.json"
+      },
+      "previousInactivePeerPacket": {
+        "runId": "b23a0593-9b8b-458f-b7c8-9e2d90150b2c",
+        "candidateSha": "16e9ebac14ca56b6e8872ceaf3ac89930470d28a",
+        "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n44-one-approved-closed-page-push-20261019\\b23a0593-9b8b-458f-b7c8-9e2d90150b2c\\result.json"
+      },
+      "previousLiveAuthorizationRef": null,
+      "liveAuthorizationRef": {
+        "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-two-mobile-live-authority.json",
+        "sha256": "3f0d77e7402c01c5ff3dcf0ae711c630006f98b8240a062854313c8e2927933a",
+        "authorityRef": "PO-20261027-N44-TWO-MOBILE-LIVE",
+        "grantId": "bcf51d2a-7f6e-4d86-b322-ab7b380a0c45"
+      },
+      "mobileLiveAuthority": {
+        "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-two-mobile-live-authority.json",
+        "sha256": "3f0d77e7402c01c5ff3dcf0ae711c630006f98b8240a062854313c8e2927933a",
+        "authorityRef": "PO-20261027-N44-TWO-MOBILE-LIVE",
+        "grantId": "bcf51d2a-7f6e-4d86-b322-ab7b380a0c45"
       }
     }
   ]
