@@ -322,11 +322,11 @@
           "version": 1,
           "authority": "PO-20261027-N44-POSTFIX-ONE-ADDITIONAL-TEST",
           "reviewRun": "121c24c9-b5c7-4392-acb3-8593400bead4",
-          "questionCall": "call_e619e4fb93b54bc5bd5caa56b0f1984c",
-          "answer": "نعم، نفّذ الاختبار الإضافي المحدد",
-          "approvalObservedAt": "2026-10-26T22:53:46.000Z",
-          "notAfter": "2026-10-27T00:48:46.000Z",
-          "conservativeExpiryNote": "115minutes from observed answer, five-minute safety margin within the approved two-hour maximum. This end never renews automatically.",
+          "questionCall": "call_027acdc6b01e4e22a4ac4ba8e3939123",
+          "answer": "نعم، جدّد النافذة ونفّذ الاختبار نفسه",
+          "approvalObservedAt": "2026-10-27T04:11:24.000Z",
+          "notAfter": "2026-10-27T06:06:24.000Z",
+          "conservativeExpiryNote": "115minutes from the renewed approval receipt, five-minute safety margin inside the newly approved two-hour maximum. This is the SAME unspent fifth/reg10/Native4 trial, not a second additional attempt.",
           "originalTask": "continuous-n44-one-approved-closed-page-push-20261019",
           "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
           "originalCandidate": "25411369cb082ddb6c9c03ed77ceb14ae259db60",
@@ -375,8 +375,24 @@
           "all47CurrentBaselineDigest": "a525f3a11f1f2c967e87397ee42c17eb18959c03c571c38c5bceae8ea48762af",
           "requiredFinalOutcome": "Current teacher explicit consent -> one registered ACK -> app documents actually closed -> one Supabase provider/COMMIT request -> new OS notification -> actual click to correct original class/subject/items -> server revoke/localunsubscribe/bindingnull/source8 canonical cleanup/prefsrestore/OFFNULL.",
           "physicalPostFixClickMustBeWitnessed": true,
-          "reviewPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-postclick-additive-review.json",
-          "reviewSha256": "3076dd8b62e70da7bc2b8b7e98a042c51732340c38e1739e4cb8c00fc284e275"
+          "renewal": {
+            "version": 2,
+            "previousReviewPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-postclick-additive-review.json",
+            "previousReviewSha256": "3076dd8b62e70da7bc2b8b7e98a042c51732340c38e1739e4cb8c00fc284e275",
+            "previousNotAfter": "2026-10-27T00:48:46.000Z",
+            "previousWindowExpired": true,
+            "previousAdditionalAllocationsAllZero": true,
+            "renewalChangesTimeOnly": true,
+            "presenceQuestionCall": "call_ecd10af3c5b94bb38a8c7965f79507af",
+            "presenceAnswer": "نعم، حاضر للملاحظة والنقر",
+            "presenceObservedAt": "2026-10-27T04:10:17.000Z",
+            "sameReviewRun": true,
+            "sameBudgetRoot": true,
+            "sameFifthReservation": true,
+            "sameRegistration10Generation": true
+          },
+          "reviewPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-fifth-window-renewed-0711.json",
+          "reviewSha256": "88caf756c77ace5f857b151618e7d91e0277e3072380cb5163a7aa820487ff73"
         }
       },
       "releaseAuthority": "Latest direct PO N44 completion request authorizes necessary qualified PR6 delivery through the sole original service custodian and existing publisher, only after affected readiness gates. No generic Supabase plugin deployment, general sender/cron enablement, expired permit reuse, counter reset, schema/Auth/RLS mutation or untested-platform PASS.",
@@ -465,7 +481,7 @@
         ],
         "publisherChecks": []
       },
-      "objective": "FRONTEND PREREQUISITE NOW ACTUALLY DONE: continuous-n44-readonly-bootstrap-delivery-20261027, candidate4ba30dab2e59e7180c48a4a54143c0e6f50a9b0f, published1e75716b68f99ff68022a75060573681c2188c20, ProductionVERIFIED2026-10-26T23:28:11.146Z; exactBOTHmoduleassets+metadata verified bysolepublisher, SWandlatestSHELLleftunchanged. Native51dependencyinputsunchanged. Reusebe2qualifiedactualNativeconsumedcontract+DOM17/client3; don'trepeatpatching/sourcepublication oroldchecks. Resume SAMEoriginalsession/candidatebe2/base61dbc. Loadactualservedappinowneduser-openedNORMALChrome originalaccount freshsupportedinventory, confirmoriginaldigest/Sync/currentclientreadiness; nooldremovedhandle2005442124, noautomatednewtab/profile/debuggerloop.\n\nNOWproceedoriginalauthorizedincrementalfifth/reg10Nativeguardqualification+actualoneadditionalphase, notanotherlocalPASShandoff. postClickCompletionreview3076... currentauthority unchanged. ConservativeHARDEXPIRY00:48:46UTC27October/03:48:46KSA, NOrenewal. Approxremaining79minutes atactivation; keepactualclock. Selectdescriptor/windowonlyafterqualifiedsource/frontend/browserreadyand>=15mintrialmargin. CurrentadditionalallocationsALLZERO(4/9/3spentbaseline). MaxaddONE Native4ifneeded/Source8ifneeded/reg10ACK/fifthsend. No sixth/reg11/Native5/Source9; sameglobal7croot/history, noreset/unknown/expiredreplay. Priorreg9localNULL/serverrevoked/Source6&7deletedDONE, no repeats.\n\nIf physicalwitnessavailabilityisuncertain atpacketready, requestonlythatreadinessinput beforeallocatingtheone-shot; no newapprovalneeded. NeedactualOSnotificationclickafterpagesclosed; doNOTkeephiddenclient/iframealive. CurrentreadonlycoldbootstraprestoresEXACTactiveexistingreceiptwithout2ndregister/update/bind/projection, newoptinunavailable; don'tundoit. GenuineAuthfields/N88peer/all47/sourcepolicyCAS preserved, noAuth/schema/keys/regions/generalcron/send. DoNOTmodifypublicfrontendagainwithoutnewprovenactualdefect; applyminimalcurrentmainhunksifnecessary, nofulloldSWcopy. Fullcurrentgrant/instructionsbelowgovernalready-authorizedactualflow.\n\nNEW EXPLICIT ADDITIVE AUTHORITY, SAME N44 originalsession/worktree. PO answered \"نعم، نفّذ الاختبار الإضافي المحدد\" to exact oneadditionalpostfixdevice test. Read card.postClickCompletion and review artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-postclick-additive-review.json SHA2563076dd8b62e70da7bc2b8b7e98a042c51732340c38e1739e4cb8c00fc284e275 BEFORE implementation/livework. Authorityobserved22:53:46UTC26October, conservativeHARDEND **2026-10-27T00:48:46.000Z** (=03:48:46KSA27October), noautomaticrenewal. Userapprovedmax2h; this115minendincludes5minmargin. STOPnewallocationsifinsufficientqualification+15mintrialmargin; preserveactualoutcomes/disarm/cleanup, noextendclockwithoutnewPO. ExistingSol6.1/medium/Standard unchanged.\n\nACTUAL PRIORSTATE: Native156/sourcec702f74bec80c3b4e87f0513048dbae650bbb46f/archive312fa9560c4db6c500fea9017e97dd82d822011b30eae22134b10aea29d033cc, rollback154retained, N88peer01a45e02e121dfa425f70cf73e8f3f5827ce3b09bbe51c9047fee0e252c0f3fc, all47baselinea525f3a11f1f2c967e87397ee42c17eb18959c03c571c38c5bceae8ea48762af, OFFNULL/serverreg9revoked/consentfalse/pendingnone/prefsrestored. Source6andSource7canonicallydeleted/NOmoreactions. ActualfourthSupabase00:17:02->providerCOMMIT/originalSW/POWindowsARRIVALPASS; oldclickFAIL. Qualifiedclickfixactuallyserved e2f40e6 thenv89SHELLrestored/published2db0ef8, currentmainmayhaveNEWER N127/N128assets—PRESERVEthem. No fulloldSWcopy. Actualretiredreg9LOCALCLEANUP nowverified: originalsame-owner/workspace/device currentdocument/SyncGREEN, nativegetSubscriptionNULL, exactSWconsentrecordexplicitNULL, zeroadditionalmutation. Reuse tests/n44-pr6-completion-20261026/retired-local-cleanup-confirmed-3252.json andserverfinalproof; don'trepeatStop/revoke/readinspection/delete/source6or7cleanupagain.\n\nOldpr6Completionsealedreviewe005..., actualOneShotConsumed/currentRetiredCleanupPhase/oldzerobounds remainIMMUTABLE HISTORY forOLDphase. NEW postClickCompletionONLY iscurrentnamedadditiveauthority, supersedingno-new5th ONLYforoneNEWphase. DO NOTeditoldproofs/counters/signatures orreactivateoldphases. Spent4providerrequests/9ACK/3Native remainbaseline. MaxONE newNativeupload(ifnecessary), ONEnewreg10/ACK(maxlifetime10), ONEnewfifthsend(maxlifetime5), ONEnewSource8ifneeded. StableGLOBAL7croot andoldspentmarkersstayprerequisites; new5threservation/reg10generation areseparatepurpose withinSAMElifetimeledger, NEVERnewbudgetroot/date-derivedreset. Unknownsend/commit/ACK=>spent/no retry. No sixth/reg11/Native5/Source9, newaccount/profile/user/schema/Auth/RLS/roles/keys/region. Generalcron/broadcast/deliveryOFF exceptexacttargetrequest. No extralocalnotificationdiagnostic.\n\nIMPORTANT PRE-SEND QUALIFICATION, NEW SOURCEFACT FROMROOT READONLY: actualbackend /push/config returnsready ONLYif classifyDeviceRegistration(preview)allows. Consumedgeneration/target-boundapproval returnsdisabled. Runtime.refreshcurrently returnscleanup_pending ondisabled+activeconsent, andnormalrestore calls /push/register again. The existingcoldDOMfixture usedreadyconfiguration, so MUST reproduceactualCONSUMED-admission+EXISTINGactiveoriginalregistration coldbootshape BEFOREburningfifth. Needreadonlyclickrestoration toauthenticate/authorizeexistingreceipt withoutanotherregister/ACK ornewdevicegrant. This is a concretecross-boundaryhypothesis frombackend.mjs~112, one-device-test.mjs~91, runtime.refresh~170/restore~215, NOTyetprovenlivecause. Do NOTrelaxnewregistrationguard orallowanotherACK beyond10; don'tjustreturnreadyfornewregistrations. ExistingapplyAction canperformfreshserverauth; privateclickmayneedseparateread-onlybootstrap, preservingcurrentowner/lease/session/workerbinding+event/sourcechecks. ReproduceactualfiniteNativecontractshape andactualfrontend, thenminimalcausalfixifneeded andaffectedcoldboot/consumed/owner/unknown/deleted/revoked tests. No broadrewrite/newlibrary/newSQLshape. Ifextrafrontenddeliveryneeded, prepareexactminimalcurrent-mainhunks/sourceproof andreturnBLOCKEDpreciseSERVEprerequisite withalloldfailures; Rootsolepublisherhandlesit, THENresume exactsavedcandidate withoutrepeatingqualification orallocations. Neverkeepa hiddenappdoc/iframealive tofakeclosedpagecoldboot. DON'TSPENDnewNative/window/source/reguntilrequiredfrontendreallyreadyandremainingdeadlineadequate.\n\nExtend existing ORIGINALcustodian/closedguard incrementallyforEXACT newnamedPOscope, reusepriorcounterreceipts/purposeboundHMAC/TLS/VAPID/COMMIT/registrationownershipguards. No replacementorganizer/sender/testmeasurement/newPGfixture. Existing19crypto/51Nativeinputproofs reusedwhereunchanged; requalifyONLYactuallychangedclosed-envelope/admission/runtimeinputswithrealcompiledDeno/nativecases, refusals(old4consumed/cap5/no6th/unknown/noexpired/reusedreg/oldSource7)andpeer/Auth/policy/sourceboundnegatives. PreserveinitialFAIL andchangedfixturecauses truthfully; noFAIL/NOTRUN->PASSmask. Commitqualifiedsource beforeNative4 sourcepin. Existingweb-push3.6.7 stays. No PMhandoffatlocalPASSwhileauthorizedrealstepavailable.\n\nActualexecutionviaORIGINALprivatecustodianonly: freshcurrentNative156/archive/profile/47mapreadback; maxonequalifiedNative4installifneeded+source-onlypin/policyCASpreserveallgenuineAuthfields/provider-originexistingkeys, rollback156savedandindependententry/map/archive/versionproof/N88peerpreserve. SelectONEfinitefreshdescriptorwithhardend<=2026-10-27T00:48:46.000Z ONLYaftercurrentbrowserandrequiredsource/frontendready. SelectONElate<=20mintrialwindow with>=15minremainingmarginwithinthatHARDEND. Neverrenewconsumed/expiredwindow orprepdeadline. Samefreshuser-openedoriginalnormalChrome page; protectedscopedigest61bab...matches; freshinventory/claimonly, nooldtab2005442124/debuggerloop. Userleftreadysettings, nonewautomatedtabunlessexactrealblockrequiresPOsinglemanualstep.\n\nIfnewSource8needed, useONLYnormalUI/approvedcentraldateadapter/actualAsiaRiyadhday, oneparent+childwithZEROgrade/completionimpact andfullrostercheck; normalcanonicalACKbeforeprojection. Do nottouchSource6/7 oroldUNKNOWN. Preserveexistingcalendar/classes/students/grades/useredits. Singleexplicitteacherconsent/reg10/ACK andprojection/authorize. DoNOTcallrestore/registeragain afterACK; readonlyreopen/coldclick mustworkwithout2ndACK. Verifyactualsourceprojection/canonical/currentAuthreceipt. ThencloseallownedappdocumentswithoutdiscardingeditableStudentPortal/personal/incognitowork, proveclosedclients, ONEsignedoriginalfifthrequest/canonicaldurableCOMMIT/provideracceptance. FiniteSWoutcome+newOSarrival/correctclassFourth1Quranitems actualclick witness. PromptPO withEXACTsendtime onlyafteractualsend; rootcanrelaylivequestion. Do notinferOSorclickfromHTTP. Don'taskquestionforalreadyconfirmedFOURTHarrival; thisisNEWFIFTHpostfixonly.\n\nAfteractualclickwitness(orboundedunknown), normalserverrevoke/localunsubscribe+SWbindingNULL verifiedthroughpermittedorigin-scopednativeinspection; restoreprefs/source8onecanonicalcleanup3/2 ifcreated/OFFNULL/all47peer/archiveproof. No blindunknownrevoke/delete/Stopreplay. Leavecurrentuserpageusable/ownedleasesFREE. Actualnewproof supersedesonlypostfixacceptance; historicaloldclickFAIL/oldStopfailurepreserved, source-onlyreproNOTphysicalPASS. D107generalcron/schedule/multidevice/adminAuth/platformgatesremainhonest; no otherhardwareclaimorProductCLOSEDononeisolatedpathalone.\n\nHistoricalpreviousphaseinstructions archived artifacts/ops-supervisor-v4/intake-evidence/n44-objective-before-postclick-additive-20261027.txt SHA2569ffeca42a32a15f91a3d8256534f7dcca47d839db45e89b41ae5988199c18944; consultonlyconcretemissingfact. Currentgrant+AGENTS/OPS+structuredauthority govern. Onlyexistingcontrollerdispatch/solepublisherdelivery, noRootmanualProductexecutor/newparallelworker/newGitHubticket. Return exacttask/run/candidate/base/checks truthful; LOCAL_READYmustnotcontainhistoricalFAILthatwouldtriggerunchangedvalidatorloop—useBLOCKEDforphysical/realexternalgate, narrowfrontendpublicationseparatewithoutwaivingparentacceptance.",
+      "objective": "EXPLICIT PO TIME RENEWAL + HUMAN READY, SAME UNSPENT TEST. Currentreview artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-fifth-window-renewed-0711.json SHA25688caf756c77ace5f857b151618e7d91e0277e3072380cb5163a7aa820487ff73. POjustanswered \"نعم، جدّد النافذة ونفّذ الاختبار نفسه\"; separatelyconfirmed \"نعم، حاضر للملاحظة والنقر\". Newapprovalobserved04:11:24UTC27October; conservativeHARDEND **2026-10-27T06:06:24Z /09:06:24KSA**, 115minutes/five-minute margin insidePOtwohours. Previous00:48:46UTCwindowisEXPIREDandmuststayexpired; thisisexpresslyrenewedTIMEONLY. SAMEreviewRun121c24c9-b5c7-4392-acb3-8593400bead4, SAMERoot7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967, SAMEfifthreservation/reg10generation, old4sends9ACK3Native spent; zeroadditionalallocations sofar. No newextraattempt/count reset. MaxONEnewNative4ifneeded/Source8oneifneeded/reg10one/fifthsendone; no6th/reg11/Native5/Source9. Currenthumanreadyinputexists—doNOTaskpermission/readinessagainabsentactualnewexternalproblem.\n\nResume EXACT originalcandidate2e522f678f78db4f5042986acd95790f043e2e4d/base61dbc/SAMEsession01a14fcd. FifthNativeguardALREADYimplemented/qualified13Deno+7originalcases. UpdateONLYfixedauthoritytime/reviewhash references tothisexplicitrenewal, keepoldreview3076/historyimmutable andCOUNTERS/MARKERSunchanged. Knownfixedpins in drafts/n44-push/postclick-authority.mjs (oldcreatedAt/hardEnd/hash) andactivation/pr6-service-live.mjs(postclickreviewhash3076) mustmatchnewreview; don'tdeleteguardorallowarbitraryreview. Newreviewkeeps originalauthorityref andrunId; doNOTinventnewbudget/run namespace. Recompile/affectedDeno13+7 onlybecausechangedtime/hashinputs, rejectexpiredoldwindow, reuseunchangedcrypto51Native/17DOM+3clientproof. Thisisactualchangedinputqualification, notunchangedretry. No newPGfixture/library/SQL/Auth/schema/roles/keys/region/counterreset. Commitqualifiedsource beforeNativeupload.\n\nSOURCE/LOCALPREREQUISITESDONE: actualreadonlybootstrapfrontendpublished1e75716b68f99ff68022a75060573681c2188c20/verified23:28:11UTC; runtime6cc35...clientaf6f... preserveexactqualifiedreadonlyexistingreceiptbootstrap(no2ndregister/update/bind/projection). Clickhandler/SHELLlatestcurrentmainmustremain, nofulloldSWcopy. Source6and7deleted; reg9serverrevoked+consentfalse/pendingnone/prefsrestored/OFFNULL andLOCALsubscriptionNULL/exactSWconsentNULL actualproof3252, zerocleanupmutation. ActualfourthSupabasearrivalPOPASS/oldclickFAIL; doNOTrepeatcleanuporoldarrivalquestion orsourceops. ActualNative156baseline sourcec702/archive312fa/N88peer01a45/all47a525 remainslastverified; FRESHreadonlyservice/account/browserpreflightbecauseelapsedtimebeforeanyrealoperation, compareidentity/source/map/Authgenuinefields/47/N88; don'tguessunchangedorchangeAuthsettings. Useonlyoriginalprivatecustodian, max1newNativeupload/source-onlypin+policyCASifneeded, preserveallAuthfields/47otherkeys/originfixedallowlist/rollback156and154/readbackactualversion/archive. Generaldelivery/cronOFF outsideoneexacttarget.\n\nEXECUTEACTUALFLOWWITHINNEWBOUND: FreshsupportedNORMALChromeinventoryclaimonlycurrentoriginalteachercheckpoint/opaqueownerdigest/SyncGREEN, nooldremovedhandle2005442124/noautomatednewprofile/tab/sessionclone/incognito/studenteditablepage/foregroundpersonaldisruption. Currentwitnessreadybutifactualpage/sessionunavailable, nameEXACTsinglemanualactioninsteaddebuggerloop. One newSource8ifneeded viaordinaryUI+approveddateadapteractual27October, zeroGradeCompletion/fullroster/canonicalACK, currentcalendar/classes/userdata preserved. Chooseonefreshfinitecloseddescriptor+oneLATE<=20minwindow>=15minmarginwithinNEW06:06:24UTCEND ONLYafterqualifiedsource/frontend/browserready; alloldwindows remainexpired, nonewextensionwithoutPO. Oneconsent/reg10ACK/project/auth, thenactualallappdocsclosed(nohiddenwarmclient/iframe), oneoriginalsignedFIFTHrequest/durableCOMMIT/providerACK, finiteSWoutcome+NEWOSappearanceandactualclicktocorrectFourth1Quranitems. TellPOexactsendtimeonlyAFTERactualsendandrequestnewarrival/clickwitness once. Rootcanrelayquestion. Don'tstopatlocalPASSwhenactualauthorizedstepavailable.\n\nFINALLY normalserverrevoke/localunsubscribe+SWbindingNULLverifiedthroughapprovedorigin-scopedinspection, normalSource8canonicalcleanupifcreated/prefsrestore/finalOFFNULL/all47/N88/archivechecks, nounknownreplay. No counters beyond5/10/4; samepermanentglobal7c ledgerprerequisites oldspents unchanged. DoNOTsendagainforunknown/providererror orPOabsence, no extraevenlocaldiagnostic. HistoricalFAILs retained, newpostfixphysicalNOTRUNuntilactualproof, fullN44/D107/platformCLOSEDnotinferredfromonepath. Sol6.1mediumStandard; soleexistingcontroller/publisher; noRootProductexecutor/newGitHubticket/parallelworker. AllstructuredPO/privacy/owner/lease/date/scoring/Sync safeguardsremain. Previousphaseobjectivearchived artifacts/ops-supervisor-v4/intake-evidence/n44-objective-before-window-renewal-0711.txt SHA25630b63fd4669d3b657cb724b0327127b817b50763e010c03fb517c6a7c08d18a2; consultonlymissingfact, itsoldtime/readinessawaitisSUPERSEDEDbyexpressnewPOrenewalhere.",
       "source6VisibleAck": {
         "inputPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261026-source6-visible-ack.json",
         "inputSha256": "23554e28d5a06f1339fdf6f13b47d72a177a462da4dc8292280819ea74039aa8",
@@ -610,11 +626,11 @@
         "version": 1,
         "authority": "PO-20261027-N44-POSTFIX-ONE-ADDITIONAL-TEST",
         "reviewRun": "121c24c9-b5c7-4392-acb3-8593400bead4",
-        "questionCall": "call_e619e4fb93b54bc5bd5caa56b0f1984c",
-        "answer": "نعم، نفّذ الاختبار الإضافي المحدد",
-        "approvalObservedAt": "2026-10-26T22:53:46.000Z",
-        "notAfter": "2026-10-27T00:48:46.000Z",
-        "conservativeExpiryNote": "115minutes from observed answer, five-minute safety margin within the approved two-hour maximum. This end never renews automatically.",
+        "questionCall": "call_027acdc6b01e4e22a4ac4ba8e3939123",
+        "answer": "نعم، جدّد النافذة ونفّذ الاختبار نفسه",
+        "approvalObservedAt": "2026-10-27T04:11:24.000Z",
+        "notAfter": "2026-10-27T06:06:24.000Z",
+        "conservativeExpiryNote": "115minutes from the renewed approval receipt, five-minute safety margin inside the newly approved two-hour maximum. This is the SAME unspent fifth/reg10/Native4 trial, not a second additional attempt.",
         "originalTask": "continuous-n44-one-approved-closed-page-push-20261019",
         "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
         "originalCandidate": "25411369cb082ddb6c9c03ed77ceb14ae259db60",
@@ -663,8 +679,24 @@
         "all47CurrentBaselineDigest": "a525f3a11f1f2c967e87397ee42c17eb18959c03c571c38c5bceae8ea48762af",
         "requiredFinalOutcome": "Current teacher explicit consent -> one registered ACK -> app documents actually closed -> one Supabase provider/COMMIT request -> new OS notification -> actual click to correct original class/subject/items -> server revoke/localunsubscribe/bindingnull/source8 canonical cleanup/prefsrestore/OFFNULL.",
         "physicalPostFixClickMustBeWitnessed": true,
-        "reviewPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-postclick-additive-review.json",
-        "reviewSha256": "3076dd8b62e70da7bc2b8b7e98a042c51732340c38e1739e4cb8c00fc284e275"
+        "renewal": {
+          "version": 2,
+          "previousReviewPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-postclick-additive-review.json",
+          "previousReviewSha256": "3076dd8b62e70da7bc2b8b7e98a042c51732340c38e1739e4cb8c00fc284e275",
+          "previousNotAfter": "2026-10-27T00:48:46.000Z",
+          "previousWindowExpired": true,
+          "previousAdditionalAllocationsAllZero": true,
+          "renewalChangesTimeOnly": true,
+          "presenceQuestionCall": "call_ecd10af3c5b94bb38a8c7965f79507af",
+          "presenceAnswer": "نعم، حاضر للملاحظة والنقر",
+          "presenceObservedAt": "2026-10-27T04:10:17.000Z",
+          "sameReviewRun": true,
+          "sameBudgetRoot": true,
+          "sameFifthReservation": true,
+          "sameRegistration10Generation": true
+        },
+        "reviewPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-fifth-window-renewed-0711.json",
+        "reviewSha256": "88caf756c77ace5f857b151618e7d91e0277e3072380cb5163a7aa820487ff73"
       },
       "retiredLocalCleanupVerified": {
         "path": "tests/n44-pr6-completion-20261026/retired-local-cleanup-confirmed-3252.json",
@@ -694,7 +726,23 @@
             "verified": true
           }
         ]
-      }
+      },
+      "currentWitnessReady": {
+        "questionCall": "call_ecd10af3c5b94bb38a8c7965f79507af",
+        "answer": "نعم، حاضر للملاحظة والنقر",
+        "observedAt": "2026-10-27T04:10:17.000Z",
+        "currentRenewalQuestion": "call_027acdc6b01e4e22a4ac4ba8e3939123",
+        "purpose": "Current original-device human ready to observe and click the one unspent additional notification; do not repeat the readiness question without a new concrete availability problem."
+      },
+      "postClickAuthorityHistory": [
+        {
+          "reviewPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-postclick-additive-review.json",
+          "reviewSha256": "3076dd8b62e70da7bc2b8b7e98a042c51732340c38e1739e4cb8c00fc284e275",
+          "notAfter": "2026-10-27T00:48:46.000Z",
+          "expired": true,
+          "additionalAllocations": 0
+        }
+      ]
     }
   ]
 }
