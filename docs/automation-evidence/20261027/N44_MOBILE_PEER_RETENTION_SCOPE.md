@@ -1,0 +1,3 @@
+# N44 inactive peer-retention acceptance correction
+
+Root inspected mobile-trial.inactive.mjs and the actual compiled-host sequence. Requiring the first registration to be retired before second admission prevents proving the explicitly requested no-loss-on-second-device-registration behavior. Resume SAME original session from bb4ac89ad4a1c81c3636470d63b07aa8180853b5 for this one material local correction and affected compiled-host case. No new live operations, identities, authority or budget. All50existing checks and original44 gate outcomes remain; append only the affected peer-retention check.
