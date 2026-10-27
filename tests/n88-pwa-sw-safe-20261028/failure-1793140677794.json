@@ -1,0 +1,27 @@
+{
+  "taskId": "n88-pwa-sw-safe-1028",
+  "runId": "bc2dc652-b0cb-4e6e-8398-014eb71217be",
+  "base": "9dc2acf8ce7cc070657116658a010cd0dd77adb0",
+  "startedAt": "2026-10-27T22:37:28.783Z",
+  "checks": [
+    {
+      "name": "source_manifest_syntax",
+      "status": "PASS",
+      "evidence": "Only VERSION changes v92 to v93; every other byte (Push, cache cleanup, private exclusions, full shell) equals remote base; all shell paths exist and SW syntax passes."
+    }
+  ],
+  "matrix": [],
+  "cleanup": {
+    "browserAndServerClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "providerOperations": 0,
+  "status": "FAIL",
+  "failure": {
+    "stage": "320:update",
+    "message": "locator.evaluate: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.n88-code-management')\u001b[22m\n",
+    "stack": "locator.evaluate: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.n88-code-management')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-pwa-sw-safe-1028\\tests\\n88-pwa-sw-safe-20261028\\cache.test.mjs:52:60"
+  },
+  "completedAt": "2026-10-27T22:37:57.794Z"
+}
