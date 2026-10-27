@@ -209,15 +209,6 @@
           "tests/n44-pr6-source-foundation-delivery-20261027/qualification.json"
         ],
         "newPaths": [
-          "drafts/n44-push/native-http-transport.mjs",
-          "src/lib/notification-preferences.js",
-          "src/lib/notification-schedule.js",
-          "drafts/n44-push/publisher-model.mjs",
-          "drafts/n44-push/publisher-preview.html",
-          "drafts/n44-push/publisher-preview.css",
-          "drafts/n44-push/publisher-preview.mjs",
-          "tests/n44-provider-crossbrowser-20261026.test.mjs",
-          "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
           "docs/automation-evidence/20261027/N44_PR6_SOURCE_FOUNDATION_DELIVERY.md",
           "tests/n44-pr6-source-foundation-delivery-20261027/qualification.json"
         ],
