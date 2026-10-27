@@ -73,7 +73,7 @@
 @keyframes n88-quiet-progress{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.n88-entry[data-n88-entry-state=loading] [data-n88-entry-status],.n88-task-guidance[aria-busy=true] .n88-guidance-body>[role=status]{animation:none}}
 
-/* AI: portal hierarchy — context, roster, then optional publication/task tools. */
+/* AI: shared teacher cards and responsive roster rows. */
 .n88-class-heading{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:24px 0;margin-bottom:24px;border-bottom:1px solid var(--border)}
 .n88-class-heading h2{font-size:clamp(24px,3vw,32px);margin:4px 0;line-height:1.4}
 .n88-class-heading p{margin:0;color:var(--text-2)}
@@ -98,7 +98,7 @@
 /* Keep the reusable portal comfortably inset even without the teacher shell. */
 .n88-class{padding:clamp(12px,2vw,24px);max-inline-size:1120px;margin-inline:auto}
 
-/* AI: roster first, with explicit navigation to editors even for large classes. */
+/* AI: work and display policy precede the explicitly opened private code manager. */
 .n88-class-heading{padding-block:8px;margin-bottom:12px;gap:12px}
 .n88-class-heading h2{font-size:clamp(20px,3vw,26px);margin:0}
 .n88-class-heading .n88-eyebrow{margin:0}
@@ -108,3 +108,8 @@
 .n88-class-status:has(>p:empty):not(:has(button)){min-block-size:0}
 .n88-class-roster>li{padding-block:12px}
 .n88-class-settings,.n88-task-guidance{scroll-margin-block:16px}
+.n88-code-management{border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg-elev);margin-block:20px 12px;scroll-margin-block:16px}
+.n88-code-management>summary{padding:18px 20px}
+.n88-code-body{padding:0 12px 12px}
+.n88-class-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.n88-code-management:not([open])>.n88-code-body{display:none}

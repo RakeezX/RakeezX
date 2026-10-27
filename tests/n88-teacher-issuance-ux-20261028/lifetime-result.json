@@ -1,0 +1,14 @@
+{
+  "checks": [
+    {
+      "name": "actual_UI_session_expiry_hidden_visibility_and_admitted_diagnostic",
+      "status": "PASS",
+      "evidence": "Real classBinding rejects expired fabricated JWT; hidden visibility synchronously wipes codes and collapses roster; returning document needs explicit expansion; actual support DOM reports admitted/200/none/ap-south-1. No mutations."
+    }
+  ],
+  "providerOperations": 0,
+  "cleanup": {
+    "serverClosed": true,
+    "integrationLease": "RELEASED integration"
+  }
+}

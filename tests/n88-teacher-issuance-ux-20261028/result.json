@@ -1,0 +1,93 @@
+{
+  "taskId": "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+  "runId": "dcf225dd-076a-47fc-91c7-404b3dd31ec7",
+  "providerOperations": 0,
+  "realAccountReads": 0,
+  "realAccountMutations": 0,
+  "matrix": [
+    {
+      "width": 320,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "n88_teacher_unknown_request_disables_only_unsafe_issue_and_has_honest_review",
+      "status": "PASS",
+      "evidence": "8 actual route/runtime synthetic 28-pupil UNKNOWN cases; HTTP 200 read, sanitized region/stage, original hint preserved, zero issuance/revoke calls; read-only review. Separate missing-revision and explicit terminal-capability cases."
+    },
+    {
+      "name": "n88_identity_name_class_not_optional_with_six_field_transport_contract",
+      "status": "PASS",
+      "evidence": "4 visible field choices, no identity checkboxes or mount writes; explicit exact six-key save with true name/class; failed ACK retains actual false policy and legacy explanation."
+    },
+    {
+      "name": "n88_teacher_work_first_ui_collapsible_private_roster_and_restore_on_context",
+      "status": "PASS",
+      "evidence": "Actual DOM order fields/guidance/code-manager; default collapsed with no code DOM, explicit open read, collapse/manual wipe, 50 mixed/legacy/revoked and empty rosters; source-backed guidance CAS save, independent read failure/recovery and uncertain-save draft retention."
+    },
+    {
+      "name": "n88_canonical_owner_ack_grades_privacy_and_320_390_768_1280_mobile",
+      "status": "PASS",
+      "evidence": "Chromium 320/390/768/1280 RTL light/dark, geometry and screenshots; real ownership/lease guard, stale delayed reply and pagehide/pageshow, 403 admission, six-digit copy/share/failure/cancel and confirmed selective rotate/revoke. Client receipt guards separately in client-result.json."
+    }
+  ],
+  "pageErrors": [],
+  "cleanup": {
+    "serverClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "matrixReuse": "matrix-result.json"
+}
