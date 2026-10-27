@@ -4,17 +4,23 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>معاينة ناشر ركيز</title>
   <link rel="stylesheet" href="/src/styles/app.css"><link rel="stylesheet" href="/src/styles/components.css">
-  <link rel="stylesheet" href="/src/styles/rakeez-datetime.css"><link rel="stylesheet" href="./publisher-preview.css">
+  <link rel="stylesheet" href="/src/styles/rakeez-datetime.css"><link rel="stylesheet" href="/drafts/n44-push/publisher-preview.css">
 </head>
 <body><main class="publisher page">
   <header><p class="publisher-eyebrow">رَكيز المعلم · أدوات الإدارة</p><h1>معاينة ناشر الإشعارات</h1>
     <p class="publisher-notice" role="note">بيئة محلية ببيانات اصطناعية. لا ترسل إشعارات أو بريدًا، ولا تدخل إلى حسابات المستخدمين.</p></header>
+  <section class="card card--pad" aria-labelledby="drafts-title">
+    <div class="publisher-list-head"><h2 id="drafts-title">المسودات المحلية</h2><button class="btn btn--quiet" type="button" data-new-draft>مسودة جديدة</button><button class="btn btn--quiet" type="button" data-refresh>تحديث القائمة</button></div>
+    <p>تُحفظ بيانات هذه البيئة الاصطناعية على هذا الجهاز فقط. لا تعني حالات المعاينة وصول إشعار.</p>
+    <div data-draft-list aria-live="polite"></div>
+  </section>
   <form id="publisher-form" class="card card--pad">
+    <h2 data-editor-title>مسودة جديدة</h2><p data-editor-version>لم تُحفظ بعد</p>
     <label>العنوان<input name="title" required maxlength="80" value="تنظيم أسبوعك الدراسي"></label>
     <label>النص<textarea name="body" required maxlength="500" rows="3">راجع حصصك والبنود القادمة من داخل ركيز.</textarea></label>
     <div class="publisher-grid">
       <label>الفئة<select name="category"><option value="announcement">إعلانات ركيز</option><option value="operational">تذكيرات المعلم</option><option value="account">الحساب والخدمة</option><option value="marketing">عروض الاشتراك الاختيارية</option></select></label>
-      <label>الجمهور التجريبي<select name="audience"><option value="operator">المشرف فقط</option><option value="selected">مجموعة مختارة</option><option value="all">كل العينة الاصطناعية</option><option value="segment">شريحة محفوظة — غير موصولة</option></select></label>
+      <label>الجمهور التجريبي<select name="audience"><option value="operator">المشرف الاصطناعي فقط</option><option value="selected">المجموعة المختارة: العينة أ</option><option value="all">كل العينة الاصطناعية (3)</option><option value="segment" disabled>شرائح مستقبلية — غير موصولة</option></select></label>
     </div>
     <label class="publisher-check"><input type="checkbox" name="critical" disabled>تنبيه مهم لحماية الحساب أو البيانات</label>
     <fieldset><legend>القنوات المطلوبة</legend><div class="publisher-options">
@@ -32,12 +38,18 @@
       <label>وقت الانتهاء<input name="expiryTime" data-rakeez-datetime="time" required></label>
     </div>
     <p>تنتهي المعاينة خلال 7 أيام من موعدها. تُرفض الأوقات المفقودة أو المتكررة عند تغيير التوقيت الصيفي.</p>
-    <div class="publisher-actions"><button class="btn btn--primary" type="submit">حفظ ومعاينة</button><button class="btn btn--quiet" type="button" data-publisher-test disabled>معاينة للمشرف</button><button class="btn btn--quiet" type="button" data-publisher-cancel disabled>إلغاء التحضير</button></div>
+    <div class="publisher-actions"><button class="btn btn--primary" type="submit">حفظ المسودة</button><button class="btn btn--quiet" type="button" data-publisher-test disabled>تشغيل المعاينة الاصطناعية</button><button class="btn btn--quiet" type="button" data-publisher-cancel disabled>إلغاء التحضير</button></div>
     <p id="publisher-status" role="status" aria-live="polite">لم تُحفظ مسودة بعد.</p>
   </form>
+  <details class="card card--pad publisher-fixtures"><summary>تفضيلات العينة ونتيجة المحاكاة</summary>
+    <p>هذه تفضيلات العينة الاصطناعية فقط، مستقلة لكل فئة وقناة. العينة ب ترفض إشعار الجهاز. المجموعة المختارة محددة على المضيف بالعينة أ؛ لا تُدخل معرفات مستخدمين.</p>
+    <form data-fixture-preferences><div data-preference-grid></div><button class="btn btn--quiet" type="submit">حفظ تفضيلات العينة</button></form>
+    <label>نتيجة المحاكاة التالية<select data-synthetic-outcome><option value="accepted">قبول اصطناعي — ليس وصولًا فعليًا</option><option value="not_accepted">عدم قبول اصطناعي</option><option value="unknown">نتيجة غير مؤكدة — دون إعادة</option></select></label>
+  </details>
   <section class="card card--pad publisher-preview" aria-label="معاينة الإشعار" hidden>
     <h2 data-preview-title></h2><p data-preview-body></p><p data-preview-route></p><p data-preview-time></p>
     <div data-preview-outcomes></div>
+    <h3>سجل العمليات المحلي</h3><ol data-campaign-audit></ol>
   </section>
   <p class="publisher-notice">النشر الفعلي غير متاح هنا. يلزم ربط صلاحية إدارة موثّقة وجمهور مصرح به على الخادم قبل تمكينه.</p>
-</main><script type="module" src="./publisher-preview.mjs"></script></body></html>
+</main><script type="module" src="/drafts/n44-push/publisher-preview.mjs"></script></body></html>
