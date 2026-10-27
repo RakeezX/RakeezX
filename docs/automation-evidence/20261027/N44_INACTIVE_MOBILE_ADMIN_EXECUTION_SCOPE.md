@@ -1,0 +1,3 @@
+# N44 next original-session source preparation
+
+The original Astra run9f81 is complete and its candidate826d566 preserved. Renewal repair is verified in Production and the selective PR6/D107 source integration is verified at 9e8c4037871e427a2e1130ec989e67b8457a8f83. The next material scope is concrete inactive mobile admission and server-authorized Admin contract source, both explicitly permitted by the latest PO attachment. New card paths repair the previous documented missing-scope boundary; they confer no live rights. Original47 checks, prior failures, original session, candidate/base and all6/11/6 spent budgets remain preserved. Fresh signed/finite phone authority and the explicit privileged Admin gate are still missing.
