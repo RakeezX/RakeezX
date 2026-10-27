@@ -33,14 +33,15 @@ export function cryptoConfig() {
 export function makeFixture(options={}) {
   const f=priorFixture(), receiver=keys(), signing=keys();
   f.cryptoConfig=cryptoConfig();
-  f.subscription={endpoint:ORIGIN+'/wp/SYNTHETIC-DO-NOT-SEND',
+  if (options.origin) f.cryptoConfig.providerOrigins=[options.origin];
+  f.subscription={endpoint:options.endpoint ?? ORIGIN+'/wp/SYNTHETIC-DO-NOT-SEND',
     keys:{p256dh:receiver.publicKey,auth:randomBytes(16).toString('base64url')}};
   f.vapid={subject:'mailto:synthetic@example.invalid',publicKey:signing.publicKey,privateKey:signing.privateKey};
   f.vapidKeys=new Map([['vapid-1',f.vapid]]);
   f.protector=createSubscriptionProtector(f.cryptoConfig);
   f.networkCalls=0; f.dnsCalls=0; f.transportChecks=0; f.requests=[]; f.responses=[]; f.receiver=receiver;
   f.resolve=async(host,dnsOptions)=>{
-    f.dnsCalls++; assert.equal(host,'fcm.googleapis.com'); assert.deepEqual(dnsOptions,{all:true,verbatim:true});
+    f.dnsCalls++; assert.equal(host,new URL(f.subscription.endpoint).hostname); assert.deepEqual(dnsOptions,{all:true,verbatim:true});
     if(f.resolveHook)return f.resolveHook();
     return [{...PUBLIC}];
   };
@@ -49,13 +50,16 @@ export function makeFixture(options={}) {
     // Any fixture assertion propagates to the test (sender normally hides errors).
     const check=fn=>{try{fn();}catch(e){f.transportFailure=e;throw e;}};
     check(()=>{
-      assert.equal(o.hostname,'fcm.googleapis.com');assert.equal(o.servername,o.hostname);
+      assert.equal(o.hostname,new URL(f.subscription.endpoint).hostname);assert.equal(o.servername,o.hostname);
       assert.equal(o.port,443);assert.equal(o.protocol,'https:');assert.equal(o.method,'POST');
-      assert.equal(o.path,new URL(f.subscription.endpoint).pathname);
+      assert.equal(o.path,new URL(f.subscription.endpoint).pathname+new URL(f.subscription.endpoint).search);
+      if (options.wns) assert.equal(o.headers['X-WNS-Type'],'wns/raw');
+      else assert.equal(o.headers['X-WNS-Type'],undefined);
       assert.equal(o.rejectUnauthorized,true);assert.equal(o.checkServerIdentity,checkServerIdentity);
       assert.equal(o.agent,false);assert.equal(o.autoSelectFamily,false);assert.equal(o.minVersion,'TLSv1.2');
       assert.equal(o.maxHeaderSize,8192); assert.equal(o.headers['Content-Encoding'],'aes128gcm');
-      assert.equal(o.headers['Content-Type'],'application/octet-stream'); assert.equal(o.headers.Urgency,'normal');
+      assert.equal(o.headers['Content-Type'],'application/octet-stream');
+      assert.equal(o.headers.Urgency,options.wns?undefined:'normal');
       assert.ok(o.headers.TTL>0 && o.headers.TTL*1000<=f.event.expiresAt-f.now);
       assert.equal('proxy' in o,false);assert.equal('Authorization' in o.headers,true);
       // Invoking the exact connection lookup again cannot re-resolve DNS, even if
@@ -85,7 +89,7 @@ export function makeFixture(options={}) {
         assert.equal(auth[2],expectedVapid.publicKey);
         const [header,claims,signature]=auth[1].split('.');
         assert.equal(JSON.parse(Buffer.from(header,'base64url')).alg,'ES256');
-        const jwt=JSON.parse(Buffer.from(claims,'base64url'));assert.equal(jwt.aud,ORIGIN);assert.equal(jwt.sub,expectedVapid.subject);
+        const jwt=JSON.parse(Buffer.from(claims,'base64url'));assert.equal(jwt.aud,new URL(f.subscription.endpoint).origin);assert.equal(jwt.sub,expectedVapid.subject);
         assert.ok(jwt.exp>Date.now()/1000 && jwt.exp<=Date.now()/1000+86400);
         const point=Buffer.from(expectedVapid.publicKey,'base64url');
         const publicKey=createPublicKey({format:'jwk',key:{kty:'EC',crv:'P-256',
@@ -93,28 +97,30 @@ export function makeFixture(options={}) {
         assert.ok(verify('sha256',Buffer.from(header+'.'+claims),{key:publicKey,dsaEncoding:'ieee-p1363'},Buffer.from(signature,'base64url')));
         f.transportChecks++;
       });
-      const respond=(code=f.statusCode??201)=>{
+      const respond=(code=f.statusCode??(options.wns?200:201))=>{
         const res=new EventEmitter();res.statusCode=code;res.destroyed=false;
         res.headers={location:'http://169.254.169.254/metadata'};
         res.destroy=()=>{res.destroyed=true;};f.responses.push(res);callback(res);
       };
       f.respond=respond;
       queueMicrotask(()=>{
-        const socket=new EventEmitter();socket.authorized=f.tlsAuthorized??true;socket.remoteAddress=f.remoteAddress??(f.pin??PUBLIC).address;
-        req.emit('socket',socket);socket.emit('secureConnect');
         if(f.requestError)req.emit('error',Error('PRIVATE endpoint keys NEVER REFLECT'));
         else if(f.sendHook)f.sendHook(respond);
         else if(!f.hang)respond();
       });
     };
-    f.requests.push(req);return req;
+    f.requests.push(req);
+    // Original integrated sender waits for verified TLS before releasing the body.
+    // Emit the socket independently of end(), as Node HTTPS does.
+    queueMicrotask(()=>{const socket=new EventEmitter();socket.authorized=f.tlsAuthorized??true;socket.remoteAddress=f.remoteAddress??(f.pin??PUBLIC).address;req.emit('socket',socket);socket.emit('secureConnect');});
+    return req;
   };
-  f.senderOptions={enabled:true,providerOrigins:[ORIGIN],protector:f.protector,vapidKeys:f.vapidKeys,
+  f.senderOptions={enabled:true,providerOrigins:f.cryptoConfig.providerOrigins,protector:f.protector,vapidKeys:f.vapidKeys,
     clock:()=>f.now,resolve:(...args)=>f.resolve(...args),httpsRequest:(...args)=>f.httpsRequest(...args)};
   f.sender=createAuditedSender(f.senderOptions);
   f.event=payload();
   f.boundary=createRegistrationBoundary({repository:f.repository,verifySession:f.verifySession,
-    protect:(...args)=>f.protector.protect(...args),clock:()=>f.now,approvedOrigins:[ORIGIN]});
+    protect:(...args)=>f.protector.protect(...args),clock:()=>f.now,approvedOrigins:f.cryptoConfig.providerOrigins});
   f.registration=f.boundary;
   const originalBody=f.body;f.body=()=>({...originalBody(),subscription:structuredClone(f.subscription)});
   f.delivery=createDeliveryBoundary({repository:f.repository,clock:()=>f.now,recompute:()=>f.event,

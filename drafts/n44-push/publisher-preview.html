@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>معاينة ناشر ركيز</title>
+  <link rel="stylesheet" href="/src/styles/app.css"><link rel="stylesheet" href="/src/styles/components.css">
+  <link rel="stylesheet" href="/src/styles/rakeez-datetime.css"><link rel="stylesheet" href="./publisher-preview.css">
+</head>
+<body><main class="publisher page">
+  <header><p class="publisher-eyebrow">رَكيز المعلم · أدوات الإدارة</p><h1>معاينة ناشر الإشعارات</h1>
+    <p class="publisher-notice" role="note">بيئة محلية ببيانات اصطناعية. لا ترسل إشعارات أو بريدًا، ولا تدخل إلى حسابات المستخدمين.</p></header>
+  <form id="publisher-form" class="card card--pad">
+    <label>العنوان<input name="title" required maxlength="80" value="تنظيم أسبوعك الدراسي"></label>
+    <label>النص<textarea name="body" required maxlength="500" rows="3">راجع حصصك والبنود القادمة من داخل ركيز.</textarea></label>
+    <div class="publisher-grid">
+      <label>الفئة<select name="category"><option value="announcement">إعلانات ركيز</option><option value="operational">تذكيرات المعلم</option><option value="account">الحساب والخدمة</option><option value="marketing">عروض الاشتراك الاختيارية</option></select></label>
+      <label>الجمهور التجريبي<select name="audience"><option value="operator">المشرف فقط</option><option value="selected">مجموعة مختارة</option><option value="all">كل العينة الاصطناعية</option><option value="segment">شريحة محفوظة — غير موصولة</option></select></label>
+    </div>
+    <label class="publisher-check"><input type="checkbox" name="critical" disabled>تنبيه مهم لحماية الحساب أو البيانات</label>
+    <fieldset><legend>القنوات المطلوبة</legend><div class="publisher-options">
+      <label><input type="checkbox" name="inApp" checked>داخل ركيز</label>
+      <label><input type="checkbox" name="push">إشعار الجهاز</label>
+      <label><input type="checkbox" name="email">البريد الإلكتروني</label>
+    </div><p>تُحترم تفضيلات المستلم وأذوناته لكل قناة؛ لا يُستخدم البريد بديلًا تلقائيًا لإشعار الجهاز.</p></fieldset>
+    <label>الوجهة داخل ركيز<select name="actionPath"><option value="/">الرئيسية</option><option value="/settings">الإعدادات</option><option value="/settings/notifications">إعدادات الإشعارات</option></select></label>
+    <div class="publisher-grid">
+      <label>التوقيت<select name="mode"><option value="now">المعاينة الآن</option><option value="scheduled">جدولة التحضير</option></select></label>
+      <label>المنطقة الزمنية IANA<input name="timezone" value="Asia/Riyadh" dir="ltr" required maxlength="80"></label>
+      <label>تاريخ البدء<input name="startDate" data-rakeez-datetime="date" data-rakeez-date-scope="planning" disabled></label>
+      <label>وقت البدء<input name="startTime" data-rakeez-datetime="time" disabled></label>
+      <label>تاريخ الانتهاء<input name="expiryDate" data-rakeez-datetime="date" data-rakeez-date-scope="planning" required></label>
+      <label>وقت الانتهاء<input name="expiryTime" data-rakeez-datetime="time" required></label>
+    </div>
+    <p>تنتهي المعاينة خلال 7 أيام من موعدها. تُرفض الأوقات المفقودة أو المتكررة عند تغيير التوقيت الصيفي.</p>
+    <div class="publisher-actions"><button class="btn btn--primary" type="submit">حفظ ومعاينة</button><button class="btn btn--quiet" type="button" data-publisher-test disabled>معاينة للمشرف</button><button class="btn btn--quiet" type="button" data-publisher-cancel disabled>إلغاء التحضير</button></div>
+    <p id="publisher-status" role="status" aria-live="polite">لم تُحفظ مسودة بعد.</p>
+  </form>
+  <section class="card card--pad publisher-preview" aria-label="معاينة الإشعار" hidden>
+    <h2 data-preview-title></h2><p data-preview-body></p><p data-preview-route></p><p data-preview-time></p>
+    <div data-preview-outcomes></div>
+  </section>
+  <p class="publisher-notice">النشر الفعلي غير متاح هنا. يلزم ربط صلاحية إدارة موثّقة وجمهور مصرح به على الخادم قبل تمكينه.</p>
+</main><script type="module" src="./publisher-preview.mjs"></script></body></html>

@@ -1,0 +1,881 @@
+{
+  "taskId": "continuous-n44-pr6-source-foundation-delivery-20261027",
+  "runId": "46d6faad-5fe2-4a47-8faa-72c8e33221e5",
+  "baseSha": "7b2d66179a18af9ed6d604328c689f917619e983",
+  "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-pr6-source-foundation-delivery-20261027",
+  "recordedAt": "2026-10-27T14:07:25.432904+00:00",
+  "status": "LOCAL_READY",
+  "sourceManifest": [
+    {
+      "path": "drafts/n44-push/provider-policy.mjs",
+      "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+      "sourceBlob": "0f42a67c5d129a875c5488b0063864f8f91aaa7d",
+      "sourceSha256": "0d263f46db6096b8457e05332f53a9f2565b0fa513ec85b93e1eccf7ae5af7fc",
+      "baseBlob": "d75420f3daef59d04c32d785628962286ceb98dd",
+      "postBlob": "0f42a67c5d129a875c5488b0063864f8f91aaa7d",
+      "postSha256": "0d263f46db6096b8457e05332f53a9f2565b0fa513ec85b93e1eccf7ae5af7fc",
+      "baseSha256": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+      "group": "verified_native_provider"
+    },
+    {
+      "path": "drafts/n44-push/shared.mjs",
+      "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+      "sourceBlob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+      "sourceSha256": "4fe07e7728276e86507e20e166de816240bf8c291fcae09ff75637081a69c96a",
+      "baseBlob": "a3647502d7ee11f2547ab4a134b752c571584bb6",
+      "postBlob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+      "postSha256": "4fe07e7728276e86507e20e166de816240bf8c291fcae09ff75637081a69c96a",
+      "baseSha256": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d",
+      "group": "verified_native_provider"
+    },
+    {
+      "path": "drafts/n44-push/registration.mjs",
+      "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+      "sourceBlob": "c1f14b082a94273aa29014a4d31b8c6f5f95ff76",
+      "sourceSha256": "d5362771fac889c4eb652ad7c74e901aab60aaea871c956dede105e54488fa26",
+      "baseBlob": "307d5f26832bf774aa14e63a3cb46f2282e125c7",
+      "postBlob": "c1f14b082a94273aa29014a4d31b8c6f5f95ff76",
+      "postSha256": "d5362771fac889c4eb652ad7c74e901aab60aaea871c956dede105e54488fa26",
+      "baseSha256": "1f76a9f45e6b6fb21c8c5c81964898de4668258f85beac5549194a06c4fde525",
+      "group": "verified_native_provider"
+    },
+    {
+      "path": "drafts/n44-push/audited-sender.mjs",
+      "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+      "sourceBlob": "76237b813b9e8a2750355c2eea297a3f95a70109",
+      "sourceSha256": "c46828787151aca741902b49fe705332995337b300d66bb31132e76541c2892f",
+      "baseBlob": "19ec5c6ce8aed9280f3884b0452148330b42632a",
+      "postBlob": "76237b813b9e8a2750355c2eea297a3f95a70109",
+      "postSha256": "c46828787151aca741902b49fe705332995337b300d66bb31132e76541c2892f",
+      "baseSha256": "e890933c9287a4d9e0812caa40f96fb899d8b3c74d15dd0fbdfab9840d77ae69",
+      "group": "verified_native_provider"
+    },
+    {
+      "path": "drafts/n44-push/native-http-transport.mjs",
+      "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+      "sourceBlob": "38100417c78856055ccc560f4501fc0af7d180d7",
+      "sourceSha256": "2c06a405c9d428ad2d6bfeaf10e4533250b5107a4a16e9e57d751c7689efe96f",
+      "baseBlob": null,
+      "postBlob": "38100417c78856055ccc560f4501fc0af7d180d7",
+      "postSha256": "2c06a405c9d428ad2d6bfeaf10e4533250b5107a4a16e9e57d751c7689efe96f",
+      "baseSha256": null,
+      "group": "verified_native_provider"
+    },
+    {
+      "path": "src/lib/notification-preferences.js",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+      "sourceSha256": "78e6bc295e1d176d35a2fb093f906d85ceba70517a3ce07e68de6e95863cf99b",
+      "baseBlob": null,
+      "postBlob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+      "postSha256": "78e6bc295e1d176d35a2fb093f906d85ceba70517a3ce07e68de6e95863cf99b",
+      "baseSha256": null,
+      "group": "qualified_d107"
+    },
+    {
+      "path": "src/lib/notification-schedule.js",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+      "sourceSha256": "3386d650d44e84d5691bcaa91d34498c70823936ddddb2c0a79d44675902e857",
+      "baseBlob": null,
+      "postBlob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+      "postSha256": "3386d650d44e84d5691bcaa91d34498c70823936ddddb2c0a79d44675902e857",
+      "baseSha256": null,
+      "group": "qualified_d107"
+    },
+    {
+      "path": "drafts/n44-push/publisher-model.mjs",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "3ef7e15b041a9ad019765cd1a9ba550e6f7b8a58",
+      "sourceSha256": "98207243612b96c784ec341c60f0b4190fdc51196524bd3e3c20fd9d03096a7f",
+      "baseBlob": null,
+      "postBlob": "3ef7e15b041a9ad019765cd1a9ba550e6f7b8a58",
+      "postSha256": "98207243612b96c784ec341c60f0b4190fdc51196524bd3e3c20fd9d03096a7f",
+      "baseSha256": null,
+      "group": "qualified_d107"
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview.html",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "e946beb1b527520aebd41ced48820df1474d4192",
+      "sourceSha256": "06f2805ad9db712aa42fae95ce6f700ba58a99661e4f63f4ab6d5b3b44706744",
+      "baseBlob": null,
+      "postBlob": "e946beb1b527520aebd41ced48820df1474d4192",
+      "postSha256": "06f2805ad9db712aa42fae95ce6f700ba58a99661e4f63f4ab6d5b3b44706744",
+      "baseSha256": null,
+      "group": "qualified_d107"
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview.css",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "5b06725d4dde59a8263acd478df8cf2578919f00",
+      "sourceSha256": "c8ccf706018ac677297f38341e8b7a31b5aa3d6dd17b233f1d732fc15223b32c",
+      "baseBlob": null,
+      "postBlob": "5b06725d4dde59a8263acd478df8cf2578919f00",
+      "postSha256": "c8ccf706018ac677297f38341e8b7a31b5aa3d6dd17b233f1d732fc15223b32c",
+      "baseSha256": null,
+      "group": "qualified_d107"
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview.mjs",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "705d469a94e323999f1d1bf398660b6c8dde1ce2",
+      "sourceSha256": "55d2a7b3b22a37cc908abff966dadb0600caa9258e861f8b4f79745ed039c215",
+      "baseBlob": null,
+      "postBlob": "705d469a94e323999f1d1bf398660b6c8dde1ce2",
+      "postSha256": "55d2a7b3b22a37cc908abff966dadb0600caa9258e861f8b4f79745ed039c215",
+      "baseSha256": null,
+      "group": "qualified_d107"
+    },
+    {
+      "path": "tests/fixtures/n44-crypto-sender/fixture.mjs",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "dfd70bd1bf0c5a712a07e96ed984e0fad7b94d69",
+      "sourceSha256": "54f3454fc310e376f6555637b64cd0fd7e9fdd22cbefda09539a9cbdc5b7ade1",
+      "baseBlob": "6df8c904c0b7117b80ea72c233f3068b4f0e69a0",
+      "postBlob": "dfd70bd1bf0c5a712a07e96ed984e0fad7b94d69",
+      "postSha256": "54f3454fc310e376f6555637b64cd0fd7e9fdd22cbefda09539a9cbdc5b7ade1",
+      "baseSha256": "943fc96e55c5de1674b9282aa85e0e57a47adc954207814eb0ea081d92d24ba1",
+      "group": "existing_synthetic_test_or_fixture"
+    },
+    {
+      "path": "tests/n44-provider-crossbrowser-20261026.test.mjs",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "2a1579776aa72bd6c12cc6187ea5f8ad66df3c9b",
+      "sourceSha256": "0129d65a3af9e407d54f02ff46ffbceb5f5e9846cd0214d5d0dc127134fd44f7",
+      "baseBlob": null,
+      "postBlob": "2a1579776aa72bd6c12cc6187ea5f8ad66df3c9b",
+      "postSha256": "0129d65a3af9e407d54f02ff46ffbceb5f5e9846cd0214d5d0dc127134fd44f7",
+      "baseSha256": null,
+      "group": "existing_synthetic_test_or_fixture"
+    },
+    {
+      "path": "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "sourceBlob": "dc7f15139d51b9c1286d51e12f78cb29bba09a9a",
+      "sourceSha256": "bfc070844adaae3567c7f49e23fef6a74a48f354f803d516f2e60866265d4e06",
+      "baseBlob": null,
+      "postBlob": "dc7f15139d51b9c1286d51e12f78cb29bba09a9a",
+      "postSha256": "bfc070844adaae3567c7f49e23fef6a74a48f354f803d516f2e60866265d4e06",
+      "baseSha256": null,
+      "group": "existing_synthetic_test_or_fixture"
+    }
+  ],
+  "providerIntegration": {
+    "command": [
+      "node",
+      "--import",
+      "./drafts/n44-push/node-globals.mjs",
+      "--test",
+      "--test-reporter=tap",
+      "tests/n44-provider-crossbrowser-20261026.test.mjs",
+      "tests/n44-pr6-completion-20261026/native-provider.test.mjs"
+    ],
+    "nodeVersion": "v24.19.0",
+    "exitCode": 0,
+    "stdout": "TAP version 13\n# Subtest: integrated native branch WNS200 preserves policy/opaque query and committed permit\nok 1 - integrated native branch WNS200 preserves policy/opaque query and committed permit\n  ---\n  duration_ms: 43.3953\n  type: 'test'\n  ...\n# Subtest: integrated native branch WNS201 preserves policy/opaque query and committed permit\nok 2 - integrated native branch WNS201 preserves policy/opaque query and committed permit\n  ---\n  duration_ms: 6.7866\n  type: 'test'\n  ...\n# Subtest: integrated native branch FCM200 preserves policy/opaque query and committed permit\nok 3 - integrated native branch FCM200 preserves policy/opaque query and committed permit\n  ---\n  duration_ms: 4.1999\n  type: 'test'\n  ...\n# Subtest: integrated native branch FCM201 preserves policy/opaque query and committed permit\nok 4 - integrated native branch FCM201 preserves policy/opaque query and committed permit\n  ---\n  duration_ms: 3.3463\n  type: 'test'\n  ...\n# Subtest: native pinMatch failure remains uncertain\nok 5 - native pinMatch failure remains uncertain\n  ---\n  duration_ms: 4.0865\n  type: 'test'\n  ...\n# Subtest: native tlsVerified failure remains uncertain\nok 6 - native tlsVerified failure remains uncertain\n  ---\n  duration_ms: 3.2362\n  type: 'test'\n  ...\n# Subtest: native requestWritten failure remains uncertain\nok 7 - native requestWritten failure remains uncertain\n  ---\n  duration_ms: 3.8267\n  type: 'test'\n  ...\n# Subtest: native closed failure remains uncertain\nok 8 - native closed failure remains uncertain\n  ---\n  duration_ms: 3.1736\n  type: 'test'\n  ...\n# Subtest: N44 accepts trusted Chromium FCM subscription\nok 9 - N44 accepts trusted Chromium FCM subscription\n  ---\n  duration_ms: 3.7364\n  type: 'test'\n  ...\n# Subtest: N44 accepts trusted Mozilla Firefox v2 subscription\nok 10 - N44 accepts trusted Mozilla Firefox v2 subscription\n  ---\n  duration_ms: 0.5797\n  type: 'test'\n  ...\n# Subtest: N44 accepts trusted Mozilla Firefox v1 subscription\nok 11 - N44 accepts trusted Mozilla Firefox v1 subscription\n  ---\n  duration_ms: 0.3848\n  type: 'test'\n  ...\n# Subtest: N44 accepts trusted Apple Safari and installed iOS PWA subscription\nok 12 - N44 accepts trusted Apple Safari and installed iOS PWA subscription\n  ---\n  duration_ms: 0.3137\n  type: 'test'\n  ...\n# Subtest: N44 rejects foreign provider hosts and malformed endpoints\nok 13 - N44 rejects foreign provider hosts and malformed endpoints\n  ---\n  duration_ms: 1.3092\n  type: 'test'\n  ...\n# Subtest: N44 refuses unreviewed provider domains and duplicate entries\nok 14 - N44 refuses unreviewed provider domains and duplicate entries\n  ---\n  duration_ms: 0.4085\n  type: 'test'\n  ...\n1..14\n# tests 14\n# suites 0\n# pass 14\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 338.126\n",
+    "stderr": "",
+    "stdoutSha256": "6974b63388f04d22ec720778c103490ffa7848dfa722390af77dc63ddb6483d4",
+    "network": "Synthetic keys/subscriptions, injected DNS/HTTPS/nativeExchange; no real provider, TLS connection or outgoing request.",
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "suites": [
+      {
+        "path": "tests/n44-provider-crossbrowser-20261026.test.mjs",
+        "passed": 6
+      },
+      {
+        "path": "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
+        "passed": 8
+      }
+    ],
+    "actualProviderRequests": 0,
+    "actualTlsConnections": 0,
+    "freshCoverage": [
+      "recognized/rejected origins and malformed endpoint policy",
+      "WNS opaque query, headers and acceptance status versus FCM",
+      "native pin/TLS/write/close failures stay uncertain",
+      "committed delivery deduplication"
+    ],
+    "preservedNotRerun": "Existing negative SSRF/address/certificate/serialized-permit/owner/consent tests and guards remain. No extra crypto51/PG19 suite."
+  },
+  "syntaxChecks": [
+    {
+      "path": "drafts/n44-push/provider-policy.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "drafts/n44-push/shared.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "drafts/n44-push/registration.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "drafts/n44-push/audited-sender.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "drafts/n44-push/native-http-transport.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "src/lib/notification-preferences.js",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "src/lib/notification-schedule.js",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "drafts/n44-push/publisher-model.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "tests/fixtures/n44-crypto-sender/fixture.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "tests/n44-provider-crossbrowser-20261026.test.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "path": "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "candidateBinding": "The Git commit containing this record; its full immutable SHA is returned in the runner result.",
+  "baseObservation": {
+    "command": "git ls-remote origin refs/heads/main",
+    "observedRemoteMain": "7b2d66179a18af9ed6d604328c689f917619e983",
+    "localOriginMain": "7b2d66179a18af9ed6d604328c689f917619e983",
+    "cleanInitialWorktree": true
+  },
+  "authority": {
+    "productId": "N44",
+    "activationId": "po-20261012-continuous",
+    "kind": "n44_selective_pr6_source_and_qualified_d107_preparation",
+    "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+    "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+    "preservedCandidate": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+    "verifiedNativeSource": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+    "frontendPublication": "b6f5864afc6a93509bb5458305b3c2d1982569e1"
+  },
+  "providerImportClosure": {
+    "files": [
+      {
+        "path": "drafts/n44-push/audited-sender.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "76237b813b9e8a2750355c2eea297a3f95a70109",
+        "postBlob": "76237b813b9e8a2750355c2eea297a3f95a70109",
+        "sourceSha256": "c46828787151aca741902b49fe705332995337b300d66bb31132e76541c2892f",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/committed-permit.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "b9d51b49f658554cd09bea20706f723f25f59173",
+        "postBlob": "b9d51b49f658554cd09bea20706f723f25f59173",
+        "sourceSha256": "6cc549a645edd1ebcad0edfd46163b4ebea23c8c48e3524f574eb35f609ea961",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/native-http-transport.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "38100417c78856055ccc560f4501fc0af7d180d7",
+        "postBlob": "38100417c78856055ccc560f4501fc0af7d180d7",
+        "sourceSha256": "2c06a405c9d428ad2d6bfeaf10e4533250b5107a4a16e9e57d751c7689efe96f",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/provider-policy.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "0f42a67c5d129a875c5488b0063864f8f91aaa7d",
+        "postBlob": "0f42a67c5d129a875c5488b0063864f8f91aaa7d",
+        "sourceSha256": "0d263f46db6096b8457e05332f53a9f2565b0fa513ec85b93e1eccf7ae5af7fc",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/registration.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "c1f14b082a94273aa29014a4d31b8c6f5f95ff76",
+        "postBlob": "c1f14b082a94273aa29014a4d31b8c6f5f95ff76",
+        "sourceSha256": "d5362771fac889c4eb652ad7c74e901aab60aaea871c956dede105e54488fa26",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/runtime-failure.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "161494424762c1db59dc897ede74b615a502a668",
+        "postBlob": "5ec9cfcc218bf0fba18c281c7355b81baf406faf",
+        "sourceSha256": "97c0b0bd6dc6ec2d4255be57d65bd59bf792539012238aea86dafd664910b681",
+        "matchesSource": false
+      },
+      {
+        "path": "drafts/n44-push/shared.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+        "postBlob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+        "sourceSha256": "4fe07e7728276e86507e20e166de816240bf8c291fcae09ff75637081a69c96a",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/web-protocol.mjs",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "7ed28465472f1eb0d2f43ca154068d5cb3fe64d6",
+        "postBlob": "7ed28465472f1eb0d2f43ca154068d5cb3fe64d6",
+        "sourceSha256": "d7bdadc704790aca42aca0506501493de52869c3a8ca774119b588b549ad71a9",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/notification-center.js",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+        "postBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+        "sourceSha256": "cc09773cc6a8092c67cd55e561881fda94b71c1f79310f398a57b08f73b761c3",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/notification-push-core.js",
+        "sourceCommit": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "sourceBlob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962",
+        "postBlob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962",
+        "sourceSha256": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+        "matchesSource": true
+      }
+    ],
+    "externalImports": [
+      "@noble/curves/nist.js",
+      "ipaddr.js",
+      "node:crypto",
+      "node:dns/promises",
+      "node:https",
+      "node:net",
+      "node:perf_hooks",
+      "node:tls",
+      "web-push"
+    ],
+    "review": "Only runtime-failure.mjs differs: current-main behavior retained; Native-only diagnostics are not needed by registration runtimeFailure. The two existing integration suites pass against this current-main boundary. Native transport adds no further import."
+  },
+  "d107DependencyReview": {
+    "files": [
+      {
+        "path": "drafts/n44-push/committed-permit.mjs",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "b9d51b49f658554cd09bea20706f723f25f59173",
+        "postBlob": "b9d51b49f658554cd09bea20706f723f25f59173",
+        "sourceSha256": "6cc549a645edd1ebcad0edfd46163b4ebea23c8c48e3524f574eb35f609ea961",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/delivery.mjs",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "9b9fbcdaae2252decf350e51464b780d0733772a",
+        "postBlob": "4144578f2794d845c00ce1afd8e59a26c84aeeb9",
+        "sourceSha256": "b2f09b7066b6d238304ed4041f47b2a68da8622cb5aceb4205d8682f75517db8",
+        "matchesSource": false
+      },
+      {
+        "path": "drafts/n44-push/publisher-model.mjs",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "3ef7e15b041a9ad019765cd1a9ba550e6f7b8a58",
+        "postBlob": "3ef7e15b041a9ad019765cd1a9ba550e6f7b8a58",
+        "sourceSha256": "98207243612b96c784ec341c60f0b4190fdc51196524bd3e3c20fd9d03096a7f",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/publisher-preview.css",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "5b06725d4dde59a8263acd478df8cf2578919f00",
+        "postBlob": "5b06725d4dde59a8263acd478df8cf2578919f00",
+        "sourceSha256": "c8ccf706018ac677297f38341e8b7a31b5aa3d6dd17b233f1d732fc15223b32c",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/publisher-preview.html",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "e946beb1b527520aebd41ced48820df1474d4192",
+        "postBlob": "e946beb1b527520aebd41ced48820df1474d4192",
+        "sourceSha256": "06f2805ad9db712aa42fae95ce6f700ba58a99661e4f63f4ab6d5b3b44706744",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/publisher-preview.mjs",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "705d469a94e323999f1d1bf398660b6c8dde1ce2",
+        "postBlob": "705d469a94e323999f1d1bf398660b6c8dde1ce2",
+        "sourceSha256": "55d2a7b3b22a37cc908abff966dadb0600caa9258e861f8b4f79745ed039c215",
+        "matchesSource": true
+      },
+      {
+        "path": "drafts/n44-push/shared.mjs",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+        "postBlob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+        "sourceSha256": "4fe07e7728276e86507e20e166de816240bf8c291fcae09ff75637081a69c96a",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/notification-center.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+        "postBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+        "sourceSha256": "cc09773cc6a8092c67cd55e561881fda94b71c1f79310f398a57b08f73b761c3",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/notification-preferences.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+        "postBlob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+        "sourceSha256": "78e6bc295e1d176d35a2fb093f906d85ceba70517a3ce07e68de6e95863cf99b",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/notification-push-core.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962",
+        "postBlob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962",
+        "sourceSha256": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/notification-schedule.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+        "postBlob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+        "sourceSha256": "3386d650d44e84d5691bcaa91d34498c70823936ddddb2c0a79d44675902e857",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/notification-state.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99",
+        "postBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99",
+        "sourceSha256": "d3c0d36ab1e40900586a9964f1ff0919e5317df52289afa7ac898ce67f0a4f35",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/rakeez-datetime-values.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "80a1df2413705abe822494e173d58f7ec0b92752",
+        "postBlob": "80a1df2413705abe822494e173d58f7ec0b92752",
+        "sourceSha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/rakeez-datetime.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "36b546d3eabf5b9edd06a745bc58a96dd0ad5016",
+        "postBlob": "36b546d3eabf5b9edd06a745bc58a96dd0ad5016",
+        "sourceSha256": "6e2bf54eb828ae47f75f15e64f74d33b3092ae160b213e258af2b07d6ed90a2d",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/thmanyah-font.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "f274b9b678f2a7b54ff7a495c4ce386068fee9ea",
+        "postBlob": "f274b9b678f2a7b54ff7a495c4ce386068fee9ea",
+        "sourceSha256": "cb13a4a4e00e108aa7abca3f43b44263771b1d2a242a0344da298f0674d99451",
+        "matchesSource": true
+      },
+      {
+        "path": "src/lib/thmanyah-payload.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "fe6693a5674f8752a4a91c917562e6e5d672ee96",
+        "postBlob": "fe6693a5674f8752a4a91c917562e6e5d672ee96",
+        "sourceSha256": "301cabdc13e0aaacbb7ebe89079e7c7bd6cdb6362b1c10727183d74d9760e43f",
+        "matchesSource": true
+      },
+      {
+        "path": "src/styles/app.css",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "14bf799b745bbad356ab0eaf923f3f5273570a04",
+        "postBlob": "d17a1415f82748195b1a766f991cb5081a3ae2e4",
+        "sourceSha256": "2be93eb79d5695c33c4745e4ad14cc8bcabd7c52342b523590ef902e4d5221a7",
+        "matchesSource": false
+      },
+      {
+        "path": "src/styles/components.css",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "e3a81b89facf4e9b5279805f699a7dc671c9c689",
+        "postBlob": "fae4fe950d5f3b2fd964ad0eb80684c2bdb23629",
+        "sourceSha256": "e38d302040fdd40b4e7bb58d83432b5480bb5a0bb5d0dad30404f0779cdaff02",
+        "matchesSource": false
+      },
+      {
+        "path": "src/styles/rakeez-datetime.css",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "7ca77b9046e83ab386a9bbe82bee7fd499c191ab",
+        "postBlob": "7ca77b9046e83ab386a9bbe82bee7fd499c191ab",
+        "sourceSha256": "e927007fda12daea75ab18436ea2b0b7097b2625283f01a943b46eaf0e19dbf4",
+        "matchesSource": true
+      },
+      {
+        "path": "src/vendor/flatpickr/ar.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "06a5108b4f622d56be16f6d9424292ad2ca5aebe",
+        "postBlob": "06a5108b4f622d56be16f6d9424292ad2ca5aebe",
+        "sourceSha256": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b",
+        "matchesSource": true
+      },
+      {
+        "path": "src/vendor/flatpickr/flatpickr.min.js",
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "sourceBlob": "b0f59ec214938696c88f1a6b8b797bde01bccb98",
+        "postBlob": "b0f59ec214938696c88f1a6b8b797bde01bccb98",
+        "sourceSha256": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1",
+        "matchesSource": true
+      }
+    ],
+    "quietNowSha256": "e652c7a288d8c9ac10f04416baf178d76f92285ce6ffa5a0d3b958e13036ef7f",
+    "materialDifferences": false,
+    "reviewedDifferences": [
+      {
+        "path": "drafts/n44-push/delivery.mjs",
+        "reason": "Only optional trace diagnostics differ; the sole Publisher import quietNow is byte-identical."
+      },
+      {
+        "path": "src/styles/app.css",
+        "reason": "Only subject-picker menu/search/options selectors changed; absent from Publisher source and generated handlers."
+      },
+      {
+        "path": "src/styles/components.css",
+        "reason": "Only class-header and Home class-label selectors added; absent from Publisher."
+      }
+    ],
+    "centralDateAndPickerAndFontDependencies": "Exact source blobs preserved. Planning scopes, optional values, ISO semantics, central bounds and ASCII digits retained.",
+    "newBrowserOrModelRerun": false
+  },
+  "reusedEvidence": [
+    {
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "path": "tests/n44-astra-continuation-20261027/preparation.tap",
+      "blob": "eaa0e6899205a040ede3d8fd4a9bae1d9236fdca",
+      "sha256": "e4801c290089187cfbce38509458611766f4823ba0574e0dd286d4a60e40b999",
+      "historicalPassCount": 7,
+      "rerun": false,
+      "affectedD107Cases": 4,
+      "scope": "Reuse category/channel, IANA schedule and two Publisher model cases. All seven original PASS results retained; other cases remain historical."
+    },
+    {
+      "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+      "path": "tests/n44-astra-continuation-20261027/publisher-ui.json",
+      "blob": "61102c67289f5bbfc30b106e497a35467cb9f5da",
+      "sha256": "4fbbab1784ac0ecf22395ba9670ff06665793895fd599d174ff4e9d819ed0e70",
+      "historicalPassCount": 3,
+      "rerun": false,
+      "checks": [
+        {
+          "name": "publisher_actual_draft_operator_preview",
+          "status": "PASS",
+          "evidence": "New Publisher source HTML/module/CSS runs on loopback; actual handlers save, escape text, preview ONLY synthetic operator and dedupe. No alternate page template, transport or sender."
+        },
+        {
+          "name": "publisher_schedule_cancel_and_category_guards",
+          "status": "PASS",
+          "evidence": "Central marked date/time adapter, scheduled preparation/cancel and intended critical-account category guard exercise real UI handlers. Invalid IANA fails visibly; no account data or live scheduler."
+        },
+        {
+          "name": "publisher_rendered_css_and_zero_service_calls",
+          "status": "PASS",
+          "evidence": "Actual source CSS at1100/390px without horizontal overflow; all requests source assets at owned HTTP origin, zero service/native/permission requests."
+        }
+      ],
+      "cleanup": {
+        "browserClosed": true,
+        "serverClosed": true,
+        "leaseRelease": "RELEASED browser"
+      },
+      "scope": "Actual Publisher source HTML/module/CSS on owned loopback HTTP at 1100/390px. All materially relevant dependencies unchanged; no new rendered-UI claim."
+    }
+  ],
+  "preservedCurrentMainFiles": [
+    {
+      "path": "src/app.js",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "0132fe2f57606df1d9c11c8a78eaf9f1c2ebefa6",
+      "postBlob": "0132fe2f57606df1d9c11c8a78eaf9f1c2ebefa6",
+      "sourceSha256": "a38d094b8fced8e82df504784d1cda66d2b9d70631011d9f5d0456b555213d65",
+      "matchesSource": true
+    },
+    {
+      "path": "sw.js",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "70ab37641824f17b600bbba6246cc71d34bff7ef",
+      "postBlob": "70ab37641824f17b600bbba6246cc71d34bff7ef",
+      "sourceSha256": "42725332d35822fd61ec1fa1a063943a35ff52d790d43492c490fa48927a18de",
+      "matchesSource": true
+    },
+    {
+      "path": "src/lib/notification-push-browser.js",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "140a12fee6dda566c9f24ea786559b4d959588eb",
+      "postBlob": "140a12fee6dda566c9f24ea786559b4d959588eb",
+      "sourceSha256": "bdae0add60f5d996bf7b29a44411c647882ff3c179fbe87635a357b748f48cc9",
+      "matchesSource": true
+    },
+    {
+      "path": "src/lib/notification-push-gateway.js",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "aff767fe17f5fe003a7c87d0f9ea66acdc12ba3d",
+      "postBlob": "aff767fe17f5fe003a7c87d0f9ea66acdc12ba3d",
+      "sourceSha256": "31799ecaf24725c81831699e44b2eb414a7e3545e9d7a1a914ba3af83b349ddc",
+      "matchesSource": true
+    },
+    {
+      "path": "src/lib/notification-push-runtime.js",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "d11bfb0647c625620535e78b67c85c5d7f0e9091",
+      "postBlob": "d11bfb0647c625620535e78b67c85c5d7f0e9091",
+      "sourceSha256": "c00108487399c26a9e4736822f104ac4acff767e9e5ea08bea97a7d631f009d5",
+      "matchesSource": true
+    },
+    {
+      "path": "src/lib/notification-push-client.js",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "f1ac8ee88141b3231f7ac0af154905801d3bf79a",
+      "postBlob": "f1ac8ee88141b3231f7ac0af154905801d3bf79a",
+      "sourceSha256": "af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570",
+      "matchesSource": true
+    },
+    {
+      "path": "src/views/notification-settings.js",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "9bf50edc293079e92b7cb4c24c141f26d1c7a656",
+      "postBlob": "9bf50edc293079e92b7cb4c24c141f26d1c7a656",
+      "sourceSha256": "eba6af139c08ff1ddf7ed712b7acdc1c936bf263e8be85d5e089703de5f998a6",
+      "matchesSource": true
+    },
+    {
+      "path": "drafts/n44-push/runtime-failure.mjs",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "5ec9cfcc218bf0fba18c281c7355b81baf406faf",
+      "postBlob": "5ec9cfcc218bf0fba18c281c7355b81baf406faf",
+      "sourceSha256": "cc56eaf32d76430a2a6e633103c74af7c0d8b3c28825a4897664c67575aadc14",
+      "matchesSource": true
+    },
+    {
+      "path": "drafts/n44-push/delivery.mjs",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "4144578f2794d845c00ce1afd8e59a26c84aeeb9",
+      "postBlob": "4144578f2794d845c00ce1afd8e59a26c84aeeb9",
+      "sourceSha256": "1eebbc4ef28faf93101c6b2342dac12eb501631e6713c4d5754b8de38bd491bb",
+      "matchesSource": true
+    },
+    {
+      "path": "drafts/n44-push/committed-permit.mjs",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "b9d51b49f658554cd09bea20706f723f25f59173",
+      "postBlob": "b9d51b49f658554cd09bea20706f723f25f59173",
+      "sourceSha256": "6cc549a645edd1ebcad0edfd46163b4ebea23c8c48e3524f574eb35f609ea961",
+      "matchesSource": true
+    },
+    {
+      "path": "drafts/n44-push/subscription-protector.mjs",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "8ec311f2cb81c7d7c3a8086274bc74149b6a99a5",
+      "postBlob": "8ec311f2cb81c7d7c3a8086274bc74149b6a99a5",
+      "sourceSha256": "e386e3d82e5cf41ab29499a8f94ea2f93c5e7d880ae59789be07c358739451a6",
+      "matchesSource": true
+    },
+    {
+      "path": "drafts/n44-push/node-globals.mjs",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "6aa6ad948b09726f13c7edabf75965d555b0cf23",
+      "postBlob": "6aa6ad948b09726f13c7edabf75965d555b0cf23",
+      "sourceSha256": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+      "matchesSource": true
+    },
+    {
+      "path": "drafts/n44-push/package.json",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "316fcc096288eeafb6cfb19b19e80fc8c302abe4",
+      "postBlob": "316fcc096288eeafb6cfb19b19e80fc8c302abe4",
+      "sourceSha256": "d7c66a4eae59ed9ad60b03b4ab368304d9c3e67eb31e5d659d4f7f6ea8f7960a",
+      "matchesSource": true
+    },
+    {
+      "path": "drafts/n44-push/package-lock.json",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "054023f0aecd48604e4ad79b903262488844144c",
+      "postBlob": "054023f0aecd48604e4ad79b903262488844144c",
+      "sourceSha256": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+      "matchesSource": true
+    },
+    {
+      "path": "package.json",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "56658d1763448865fb84a1facca001817e7934dc",
+      "postBlob": "56658d1763448865fb84a1facca001817e7934dc",
+      "sourceSha256": "e22bc2d4ef45e39e622ad2171463f54764be0f5d9073a8dae629d695a3eaea38",
+      "matchesSource": true
+    },
+    {
+      "path": "package-lock.json",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "035400122400c30ccb8ad64e4520a7c3e98081bb",
+      "postBlob": "035400122400c30ccb8ad64e4520a7c3e98081bb",
+      "sourceSha256": "20d34148a9e1b74333587cd5317f34a28dd2265b1ebc1d32203b1f874f35fa5d",
+      "matchesSource": true
+    },
+    {
+      "path": "tests/n44-crypto-sender.mjs",
+      "sourceCommit": "7b2d66179a18af9ed6d604328c689f917619e983",
+      "sourceBlob": "c902728b703d080c024b3d8a637c4484ba594f8c",
+      "postBlob": "c902728b703d080c024b3d8a637c4484ba594f8c",
+      "sourceSha256": "32b302f2a33e8a03f7e194584dd092e9048846400aeabe9264d115de0d0a7d85",
+      "matchesSource": true
+    }
+  ],
+  "draftBoundary": {
+    "startupOrTeacherImports": [],
+    "newPrivilegedRoute": false,
+    "realPublishPort": false,
+    "realRecipientAccess": false,
+    "credentialsOrAccountEnumeration": false,
+    "publicHelpersMayBeServedButUnusedByStartup": true,
+    "publisherDraftOnly": true,
+    "dateControlMarkers": 4,
+    "planningDateScopeMarkers": 2,
+    "publisherSourceClassification": "Existing publisher.mjs defaultAsset selects root assets/src/assets; draft files remain source-only. No build or served verification executed."
+  },
+  "dependencySetup": {
+    "initialProbe": "MODULE_NOT_FOUND for private test dependencies, before test execution",
+    "correction": "npm.cmd --prefix drafts/n44-push ci --ignore-scripts --offline --no-audit --no-fund",
+    "exitCode": 0,
+    "packagesRestoredFromCache": 36,
+    "newDependencies": 0,
+    "lockfileChanges": 0,
+    "networkInstallation": false,
+    "installedVersions": {
+      "web-push": "3.6.7",
+      "http_ece": "1.2.0",
+      "@noble/curves": "1.9.7",
+      "ipaddr.js": "2.5.0"
+    }
+  },
+  "resources": {
+    "browserOrServerCreated": false,
+    "sharedPhaseLeaseAcquired": false,
+    "ownedProcessesRemaining": 0,
+    "note": "No browser/server/integration/live-mutation phase was entered. Test/install processes completed; no shared leases required."
+  },
+  "delivery": {
+    "productPush": false,
+    "deployment": false,
+    "fullViteBuild": false,
+    "providerCheck": false,
+    "servedProductionVerification": false,
+    "pr6MergeOrClosure": false,
+    "issue5Closure": false,
+    "queueOrStatusEdits": false,
+    "nextOwner": "Existing independent controller/publisher"
+  },
+  "retainedParentState": {
+    "observationSource": "Activated card and preserved immutable evidence; no new live observation",
+    "native176": "unchanged",
+    "spent": {
+      "sends": 6,
+      "registrationAcks": 11,
+      "nativeUploads": 6
+    },
+    "windows135920ArrivalAndCorrectClick": "PASS reused",
+    "sources6Through10": "cleaned/OFF/NULL retained",
+    "historicalChecks": 44,
+    "historicalFailures": "unchanged",
+    "fullN44": "OPEN",
+    "remaining": [
+      "PR6/full N44 acceptance",
+      "Android/iPhone cloud proof under exact bounded authority",
+      "Live privileged Admin publishing under exact bounded authority"
+    ],
+    "newEmailOrGeneralCronAuthority": false
+  },
+  "checks": [
+    {
+      "name": "n44_pr6_source_matches_verified_native_without_live_redeployment",
+      "status": "PASS",
+      "evidence": "Five provider files exactly match verified Native source blob/SHA256; full import closure inspected; runtime-failure retained; zero redeployment."
+    },
+    {
+      "name": "n44_pr6_current_main_provider_integration_and_scope",
+      "status": "PASS",
+      "evidence": "Two existing suites pass 14/14 with synthetic injected ports and zero actual requests/TLS; all 12 syntax checks pass; preimages and bounded scope verified."
+    },
+    {
+      "name": "n44_d107_qualified_draft_only_foundation_preserved",
+      "status": "PASS",
+      "evidence": "Six exact D107 source blobs; unchanged relevant dependency behavior; immutable preparation.tap (7 historical PASS, 4 relevant D107 cases) and publisher-ui.json (3 actual HTTP DOM/CSS PASS) reused; no startup imports or live publishing."
+    }
+  ],
+  "blocker": null,
+  "changedPaths": [
+    "docs/automation-evidence/20261027/N44_PR6_SOURCE_FOUNDATION_DELIVERY.md",
+    "drafts/n44-push/audited-sender.mjs",
+    "drafts/n44-push/native-http-transport.mjs",
+    "drafts/n44-push/provider-policy.mjs",
+    "drafts/n44-push/publisher-model.mjs",
+    "drafts/n44-push/publisher-preview.css",
+    "drafts/n44-push/publisher-preview.html",
+    "drafts/n44-push/publisher-preview.mjs",
+    "drafts/n44-push/registration.mjs",
+    "drafts/n44-push/shared.mjs",
+    "src/lib/notification-preferences.js",
+    "src/lib/notification-schedule.js",
+    "tests/fixtures/n44-crypto-sender/fixture.mjs",
+    "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
+    "tests/n44-pr6-source-foundation-delivery-20261027/qualification.json",
+    "tests/n44-provider-crossbrowser-20261026.test.mjs"
+  ],
+  "newLiveOperations": {
+    "service": 0,
+    "provider": 0,
+    "configuration": 0,
+    "nativeUpload": 0,
+    "sql": 0,
+    "auth": 0,
+    "rls": 0,
+    "schema": 0,
+    "role": 0,
+    "region": 0,
+    "browserAccount": 0,
+    "registration": 0,
+    "consent": 0,
+    "sourceMutation": 0,
+    "delete": 0,
+    "send": 0,
+    "tlsConnection": 0,
+    "browser": 0,
+    "server": 0,
+    "preview": 0
+  },
+  "scopeCheck": {
+    "command": "git diff --cached --check",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "",
+    "stagedPathsExactlyMatchAllowedPaths": true,
+    "stagedPathCount": 16,
+    "manifestIndexBlobsMatch": 14,
+    "unchangedFilesRemainAtBase": 17
+  }
+}
