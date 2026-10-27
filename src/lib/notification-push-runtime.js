@@ -74,7 +74,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     const value=JSON.parse(atob(parts[1].replaceAll('-','+').replaceAll('_','/')));
     return value.sub===owner&&value.role==='authenticated'&&Number.isSafeInteger(value.exp)&&value.exp*1000>Date.now()&&/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(value.session_id??'')?value.session_id:null;
   } catch { return null; } };
-  let renewing = null;
+  let renewing = null, failedRenewal = null;
   const cloudSessionContinues = b => !!b && (cloud.session?.access_token === b.acceptedToken || !!b.authSessionId && sessionHint(cloud.session?.access_token??'',b.context.ownerId) === b.authSessionId);
   const bindingChecks = b => {
     const c = current();
@@ -85,7 +85,11 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   const matches = b => !!b && (b.serviceExpiresAt ?? Infinity) > Date.now() && Object.values(bindingChecks(b)).every(Boolean);
   const continuation = b => {
     const checks=bindingChecks(b);
-    return !!b&&b.serviceExpiresAt>Date.now()&&checks.contextMatches&&checks.workspaceMatches&&checks.leaseMatches&&checks.consentMatches&&cloudSessionContinues(b)&&!!b.authSessionId&&sessionHint(currentToken()??'',b.context.ownerId)===b.authSessionId;
+    // A verified same-owner offline-lease renewal rotates renewalId. It is a
+    // reason to revalidate the existing server receipt, not consent to retire
+    // it. current() still requires the actual editable owner/workspace lease.
+    return !!b&&b.serviceExpiresAt>Date.now()&&checks.contextMatches&&checks.workspaceMatches&&checks.consentMatches&&
+      typeof leaseRevision()==='string'&&!!leaseRevision()&&cloudSessionContinues(b)&&!!b.authSessionId&&sessionHint(currentToken()??'',b.context.ownerId)===b.authSessionId;
   };
   const ownsCleanup = b => {
     const checks = bindingChecks(b);
@@ -97,6 +101,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, quiet: readPushQuiet(c, storage) };
   };
   function invalidate() {
+    failedRenewal = null;
     existingClickOnly = false;
     configObservation = null;
     configAttempt = null;
@@ -117,21 +122,29 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   async function refresh(options) {
     const readinessOnly = options?.readinessOnly === true;
     if (disposed) return;
-    if (binding && currentToken() !== binding.acceptedToken && continuation(binding)) {
+    if (binding && (status === 'subscribed' || failedRenewal?.resumeStatus === 'subscribed') && browser.permission() !== 'granted') invalidate();
+    if (binding && (failedRenewal || currentToken() !== binding.acceptedToken || leaseRevision() !== binding.leaseRevision) && continuation(binding)) {
       if (renewing) return renewing.promise;
-      const b=binding,g=gateway,candidate=currentToken(),receipt=g.registration(),revision=b.serverSessionRevision,consent=b.consentRevision,consentState=b.serverConsent;
-      const attempt={binding:b,candidate};renewing=attempt;
+      if (failedRenewal && failedRenewal.candidate === currentToken() && failedRenewal.candidateLease === leaseRevision() && !failedRenewal.retryRequested) return;
+      const b=binding,g=gateway,candidate=currentToken(),candidateLease=leaseRevision(),receipt=g.registration(),revision=b.serverSessionRevision,consent=b.consentRevision,consentState=b.serverConsent;
+      const resumeStatus=failedRenewal?.resumeStatus??status;
+      const attempt={binding:b,candidate,candidateLease};renewing=attempt;
       attempt.promise=(async()=>{
         let replaced=false;
         try {
           await g.read({accept:r=>r.status==='current'&&r.context?.sessionId===b.authSessionId&&r.context.sessionRevision===revision&&r.context.consentRevision===consent&&r.context.pushConsent===consentState&&r.registration?.registrationId===receipt?.registrationId&&r.registration?.expiresAt===receipt?.expiresAt});
-          if(binding!==b||renewing!==attempt||currentToken()!==candidate||!continuation(b))throw Error('stale');
-          b.acceptedToken=candidate;b.cleanupToken=candidate;mark('ready');
-        } catch {
-          // Only a genuinely newer same-session credential may supersede this
-          // read. Never retry the unchanged failed credential.
-          replaced=binding===b&&currentToken()!==candidate&&continuation(b);
-          if(binding===b&&!replaced)invalidate();
+          if(binding!==b||renewing!==attempt||currentToken()!==candidate||leaseRevision()!==candidateLease||!continuation(b)||resumeStatus==='subscribed'&&browser.permission()!=='granted')throw Error('stale');
+          b.acceptedToken=candidate;b.cleanupToken=candidate;b.leaseRevision=candidateLease;failedRenewal=null;status=resumeStatus;mark('ready');
+        } catch (error) {
+          // Only a genuinely newer same-session credential or verified lease
+          // may supersede this read. Never retry an unchanged failed binding.
+          replaced=binding===b&&(currentToken()!==candidate||leaseRevision()!==candidateLease)&&continuation(b);
+          if(binding===b&&!replaced) {
+            if(error.readDisposition==='unknown'&&continuation(b)&&browser.permission()==='granted') {
+              failedRenewal={candidate,candidateLease,resumeStatus,retryRequested:false};
+              status='unavailable';mark('renewal_unavailable');
+            } else invalidate();
+          }
         }
         finally { if(renewing===attempt)renewing=null;changed(); }
         if(replaced&&binding===b)await refresh();
@@ -151,8 +164,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     try { b.consentRevision = consentRevision(b.context); } catch { preparing = false; mark('context_unavailable'); return; }
     preparingBinding = b; preparingGeneration = token; eligibility = { reason: 'checking_configuration', configuration: 'not_observed', ...bindingChecks(b), generationMatches: true, browserSupported: false, workerReady: false };
     const attempt = configAttempt = { binding: b, generation: token, permission: browser.permission(), retryAt: 0 };
-    const valid = () => generation === token && (binding === b || attempt.permission === browser.permission()) && (matches(b)||renewing?.binding===b&&currentToken()===renewing.candidate&&continuation(b));
-    const g = createPushGateway({ fetch, storage, context: b.context, authorization: () => 'Bearer ' + currentToken(), preferences, valid, invalidated: invalidate, bindConsent: r => browser.bind(r), clearConsent: id => browser.clearConsent(id),
+    const activeGeneration = () => generation === token && (binding === b || attempt.permission === browser.permission());
+    const valid = () => activeGeneration() && matches(b);
+    const readValid = () => valid() || activeGeneration() && renewing?.binding===b&&currentToken()===renewing.candidate&&leaseRevision()===renewing.candidateLease&&continuation(b);
+    const g = createPushGateway({ fetch, storage, context: b.context, authorization: () => 'Bearer ' + currentToken(), preferences, valid, readValid, invalidated: invalidate, bindConsent: r => browser.bind(r), clearConsent: id => browser.clearConsent(id),
       cleanupAuthorization() {
         const c = current();
         return c?.ownerId === b.context.ownerId && c?.workspaceId === b.context.workspaceId && c?.deviceId === b.context.deviceId && (currentToken()===b.acceptedToken||continuation(b))
@@ -280,6 +295,9 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     }
   }
   async function recheckConfiguration() {
+    if (!disposed && failedRenewal && binding && !renewing && !pendingDisable && !disabling && continuation(binding)) {
+      failedRenewal.retryRequested=true;await refresh();return {status:'checked'};
+    }
     // A manual readiness check never retires a valid registration or Stop work.
     if (disposed || preparing || binding || pendingDisable || disabling || !configuration.enabled || !current()) return { status: 'unavailable' };
     if (sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt) return { status: 'cooldown' };
@@ -463,7 +481,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const outcome=await browser.deviceOutcome(id),after=outcomeBinding();
       return epoch===generation&&after?.binding===before.binding&&after.gateway===before.gateway&&after.pending===before.pending&&after.registration?.registrationId===id&&after.registration?.expiresAt===before.registration.expiresAt?outcome:null;
     },
-    snapshot: () => ({ configRecheckAvailable: !disposed && configuration.enabled && !!current() && !binding && !pendingDisable && !disabling, configRecheckBusy: preparing, configRecheckCoolingDown: sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt,
+    snapshot: () => ({ configRecheckAvailable: !disposed && configuration.enabled && !!current() && (!binding || !!failedRenewal && continuation(binding)) && !pendingDisable && !disabling, configRecheckBusy: preparing || !!renewing, configRecheckCoolingDown: sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt,
       deviceOutcomeAvailable: !!outcomeBinding(), available: !existingClickOnly && ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding) || existingClickOnly && ownsCleanup(binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
     async optIn() {
       if (existingClickOnly || !ready || !matches(binding)) return { status: 'unavailable' };
