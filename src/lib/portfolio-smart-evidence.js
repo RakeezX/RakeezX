@@ -29,13 +29,15 @@ const short = value => String(value ?? '').trim().slice(0,120);
 const unique = (array,key) => [...new Map(array.map(x=>[key(x),x])).values()];
 const references = (type,items) => ({type,ids:items.map(x=>x.id).filter(Boolean).slice(0,150)});
 const summary = (criterion,yearId,key,title,description,metrics,records,kind,other={}) =>
-  Object.freeze({id:'rakeez:'+key+':'+yearId,criterion,title,description,metrics,sourceKind:kind,
-    requiresReview:kind==='review',source:'ركيز المعلم',references:records,...other});
+  Object.freeze(Object.defineProperty({id:'rakeez:'+key+':'+yearId,criterion,title,description,metrics,sourceKind:kind,
+    requiresReview:kind==='review',source:'ركيز المعلم',...other},
+    'references',{value:records,enumerable:false}));
 
 /** Input arrays are caller-filtered year-wide product snapshots; no writes. */
 export function buildPortfolioEvidenceSuggestions({
   yearId,teachingIds=[],attendance=null,slots=[],sessions=[],classRules=[],
   items=[],scores=[],assignments=[],submissions=[],asOf='9999-12-31',
+  recordedScope=null,groupArrangements=[],classGoals=[],logs=[],
 }={}) {
   const ids=new Set(teachingIds.filter(Boolean));
   if(!yearId||!ids.size)return [];
@@ -106,7 +108,84 @@ export function buildPortfolioEvidenceSuggestions({
     references('assignments',tasks),'automatic',
     {tableHeaders:['المهمة','تاريخ الإسناد'],
      table:tasks.slice(0,4).map(x=>[short(x.title),x.assignedDate])}));
+  appendRecordedWork(suggestions,{yearId,ids,sessions,asOf,recordedScope,groupArrangements,classGoals,logs});
   return Object.freeze(suggestions.sort((a,b)=>Number(a.criterion)-Number(b.criterion)||
     a.title.localeCompare(b.title,'ar')));
 }
 export const guideForCriterion = id => F09_EVIDENCE_GUIDE.find(x=>x.criterion===id)||null;
+
+/** AI N126: deny uncertain ancestry rather than treating a supplied teaching ID
+ * or a current roster projection as proof. Account rows must have explicit
+ * ownership; ownerless legacy/local rows are deliberately omitted here.
+ * Demo provenance is confined to its mounted disposable database.
+ */
+function appendRecordedWork(out,{yearId,ids,sessions,asOf,recordedScope:scope,groupArrangements,classGoals,logs}) {
+  if(!scope || !validDate(asOf) || asOf==='9999-12-31')return;
+  const w=scope.workspace;
+  const demo=w?.type==='demo' && w.id==='demo' && w.databaseName==='rakeezx-demo';
+  const account=w?.type==='account' && w.ownershipState==='claimed' && w.authUserId && w.databaseName;
+  if(!demo&&!account)return;
+  const owned=x=>!!x?.id && !x.deleted && (demo ? x.ownerId==null : x.ownerId===w.authUserId);
+  // Conflicting duplicates (including tombstones) fail closed. Identical copies
+  // can be counted once, with no mutation or dependence on input order.
+  const clean=rows=>{
+    const byId=new Map(),denied=new Set();
+    for(const x of rows??[]){
+      if(!x?.id)continue;
+      if(!owned(x)||byId.has(x.id)&&JSON.stringify(byId.get(x.id))!==JSON.stringify(x))denied.add(x.id);
+      else byId.set(x.id,x);
+    }
+    return [...byId.values()].filter(x=>!denied.has(x.id));
+  };
+  const year=clean(scope.years).find(x=>x.id===yearId);
+  if(!year)return;
+  const terms=new Map(clean(scope.terms).filter(x=>x.yearId===yearId).map(x=>[x.id,x]));
+  const sections=new Map(clean(scope.sections).filter(x=>x.yearId===yearId).map(x=>[x.id,x]));
+  const subjects=new Set(clean(scope.subjects).map(x=>x.id));
+  const teachings=new Map(clean(scope.teachings).filter(x=>ids.has(x.id)&&terms.has(x.termId)&&
+    sections.has(x.sectionId)&&subjects.has(x.subjectId)).map(x=>[x.id,x]));
+  const dated=(x)=>{
+    const t=teachings.get(x.teachingId),term=terms.get(t?.termId),section=sections.get(t?.sectionId);
+    return !!t&&validDate(x.date)&&x.date<=asOf&&validDate(term.startDate)&&validDate(term.endDate)&&
+      term.startDate<=x.date&&x.date<=term.endDate&&
+      (section.status!=='archived'||validDate(section.archiveDate)&&x.date<=section.archiveDate);
+  };
+  const held=new Map(clean(sessions).filter(x=>x.status==='held'&&dated(x)).map(x=>[x.id,x]));
+  const sessionBound=x=>dated(x)&&held.has(x.sessionId)&&held.get(x.sessionId).teachingId===x.teachingId&&
+    held.get(x.sessionId).date===x.date;
+  const studentIds=new Set(clean(scope.students).map(x=>x.id));
+  const enrollments=clean(scope.enrollments);
+  const member=(studentId,teachingId,date,current=false)=>studentIds.has(studentId)&&enrollments.some(e=>
+    e.studentId===studentId&&e.sectionId===teachings.get(teachingId)?.sectionId&&
+    validDate(e.startDate)&&e.startDate<=date&&
+    (e.endDate==null||validDate(e.endDate)&&date<=e.endDate)&&(!current||e.status==='active'));
+  const arrangements=clean(groupArrangements).filter(x=>{
+    const t=teachings.get(x.teachingId),term=terms.get(t?.termId),section=sections.get(t?.sectionId);
+    if(!t||x.id!=='group-arrangement:'+t.id||section.status==='archived'||term.status==='closed'||
+      !validDate(term.startDate)||term.startDate>asOf||
+      !Number.isSafeInteger(x.updatedAt)||x.updatedAt<=0||x.updatedAt>=Date.parse(asOf+'T00:00:00Z')+86400000||!Array.isArray(x.groups)||!x.groups.length)return false;
+    const seen=new Set();
+    return x.groups.every(g=>Array.isArray(g)&&g.every(id=>typeof id==='string'&&member(id,t.id,asOf,true)&&
+      !seen.has(id)&&seen.add(id)))&&seen.size>0;
+  });
+  if(arrangements.length)out.push(summary('09',yearId,'group-arrangements','تنظيم المجموعات المحفوظ',
+    'ترتيبات مجموعات محفوظة في ركيز تحتاج مراجعة؛ لا تثبت استخدامها داخل الحصة.',
+    [['ترتيبات محفوظة',arrangements.length],['مجموعات غير فارغة',arrangements.reduce((n,x)=>n+x.groups.filter(g=>g.length).length,0)]],
+    references('groupArrangements',arrangements),'review',
+    {provenanceNotice:'مصدر يحتاج مراجعة: ترتيب تنظيمي محفوظ، وليس إثبات استخدام داخل الحصة.'}));
+  const goals=clean(classGoals).filter(x=>x.id==='class-goal:'+x.teachingId&&x.state==='completed'&&
+    x.runId&&sessionBound(x)&&Number.isSafeInteger(x.startedAt)&&Number.isSafeInteger(x.completedAt)&&
+    x.startedAt>0&&x.completedAt>=x.startedAt&&x.completedAt<Date.parse(asOf+'T00:00:00Z')+86400000&&
+    x.completedAt>=Date.parse(x.date+'T00:00:00Z'));
+  if(goals.length)out.push(summary('08',yearId,'completed-goals','سجل الأهداف الصفية المكتملة',
+    'أهداف صفية حالتها مكتملة في السجل وتحتاج مراجعة؛ لا يعني ذلك تحقق التعلم لدى جميع الطلاب.',
+    [['سجلات أهداف مكتملة',goals.length]],references('classGoals',goals),'review',
+    {provenanceNotice:'مصدر يحتاج مراجعة: سجل هدف مكتمل، وليس إثبات تحقق تعلم جميع الطلاب.'}));
+  const participation=clean(logs).filter(x=>x.kind==='participation'&&sessionBound(x)&&member(x.studentId,x.teachingId,x.date)&&
+    typeof x.delta==='number'&&Number.isFinite(x.delta)&&x.delta!==0);
+  if(participation.length)out.push(summary('09',yearId,'participation-logs','متابعة سجلات المشاركة المؤرخة',
+    'عدد سجلات المشاركة المؤرخة المرتبطة بحصص منعقدة، دون بيانات فردية أو استنتاج تحسن أو تحقق تعلم.',
+    [['سجلات مشاركة',participation.length],['حصص لها سجلات',new Set(participation.map(x=>x.sessionId)).size]],
+    references('logs',participation),'automatic',
+    {provenanceNotice:'مصدر تلقائي: أعداد من سجلات مشاركة فعلية مؤرخة، دون استنتاج نتائج التعلم.'}));
+}

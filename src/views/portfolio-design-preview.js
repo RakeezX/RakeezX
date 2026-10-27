@@ -197,10 +197,26 @@ function context() {
   const evidence = portfolioYearEvidence(groups);
   const allTeachings = groups.flatMap(group=>group.teachings);
   const teachingIds = [...new Set(allTeachings.map(teaching=>teaching.id))];
+  const scopedTeachings=store.state.teachings.filter(x=>teachingIds.includes(x.id));
+  const sectionIds=new Set(scopedTeachings.map(x=>x.sectionId));
+  const subjectIds=new Set(scopedTeachings.map(x=>x.subjectId));
+  const termIds=new Set(scopedTeachings.map(x=>x.termId));
+  const scopedEnrollments=store.state.enrollments.filter(x=>sectionIds.has(x.sectionId));
+  const studentIds=new Set(scopedEnrollments.map(x=>x.studentId));
   const sources = buildPortfolioEvidenceSuggestions({
     yearId:year?.id,teachingIds,attendance:evidence,asOf:evidence.asOf,
+    // Read only the mounted workspace. The engine rechecks exact owner/year,
+    // raw tombstones, teaching/session ancestry and archived/current bounds.
+    recordedScope:{workspace:store.getActiveWorkspace(),years:store.state.years.filter(x=>x.id===year?.id),
+      terms:store.state.terms.filter(x=>termIds.has(x.id)),
+      sections:store.state.sections.filter(x=>sectionIds.has(x.id)),
+      subjects:store.state.subjects.filter(x=>subjectIds.has(x.id)),teachings:scopedTeachings,
+      students:store.state.students.filter(x=>studentIds.has(x.id)),enrollments:scopedEnrollments},
+    groupArrangements:(store.state.groupArrangements??[]).filter(x=>teachingIds.includes(x.teachingId)),
+    classGoals:(store.state.classGoals??[]).filter(x=>teachingIds.includes(x.teachingId)),
+    logs:(store.state.logs??[]).filter(x=>teachingIds.includes(x.teachingId)),
     slots:teachingIds.flatMap(id=>store.slotsOf(id)),
-    sessions:teachingIds.flatMap(id=>store.sessionsOf(id)),
+    sessions:(store.state.sessions??[]).filter(x=>teachingIds.includes(x.teachingId)),
     classRules:teachingIds.flatMap(id=>store.classRulesOf(id)),
     items:teachingIds.flatMap(id=>store.items(id)),
     scores:store.state.scores ?? [],
@@ -463,6 +479,7 @@ function evidencePage(ctx,page=4,editor=true) {
       <div class="folio-evidence__print-copy">
         <h2>${ctx.title}</h2>
         ${ctx.description?html`<p>${ctx.description}</p>`:''}
+        ${proposal?.provenanceNotice?html`<p>${proposal.provenanceNotice}</p>`:''}
       </div>
     </div>
     <div class="folio-evidence__meta">
