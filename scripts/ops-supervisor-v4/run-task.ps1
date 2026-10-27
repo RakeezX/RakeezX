@@ -5,6 +5,19 @@ param(
 $ErrorActionPreference = 'Stop'
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 function Read-Json([string]$File) { [System.IO.File]::ReadAllText($File, [System.Text.Encoding]::UTF8) | ConvertFrom-Json }
+function Get-N44ExecutionProfile($Task, $Spec) {
+  $profile = $Task.executionProfile
+  $n44 = $Task.id -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and $Task.productId -eq 'N44' -and
+    $Spec.taskId -eq $Task.id -and $Spec.sessionId -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and
+    $profile.authorityRef -eq 'PO-20261027-N44-ASTRA-SINGLE-WORKER' -and $profile.version -eq 1
+  if ($n44) {
+    if ($Spec.model -ne 'gpt-6-astra' -or $Spec.effort -ne 'max' -or $profile.model -ne $Spec.model -or $profile.effort -ne $Spec.effort -or
+        $profile.serviceTier -ne 'priority' -or $profile.fastMode -ne $true -or $profile.singleAgent -ne $true) { throw 'N44 execution profile differs from its explicit PO authority' }
+    return @{ model=$Spec.model; effort=$Spec.effort; serviceTier='priority'; fastMode=$true; singleAgent=$true; authorityRef=$profile.authorityRef;
+      config=@('features.fast_mode=true','service_tier=priority','features.multi_agent=false','features.multi_agent_v2=false') }
+  }
+  return @{ model=$Spec.model; effort=$Spec.effort; fastMode=$false; config=@('features.fast_mode=false') }
+}
 function Save-Checkpoint {
   $checkpoint.heartbeatAt = [DateTime]::UtcNow.ToString('o')
   $temporary = "$($spec.checkpointPath).$PID.tmp"
@@ -74,7 +87,9 @@ try {
   if ($spec.sessionId) { $arguments.Add('resume') }
   if ($spec.model) { $arguments.Add('--model'); $arguments.Add([string]$spec.model) }
   $arguments.Add('-c'); $arguments.Add('model_reasoning_effort=' + [string]$spec.effort)
-  $arguments.Add('-c'); $arguments.Add('features.fast_mode=false')
+  $executionProfile = Get-N44ExecutionProfile $task $spec
+  foreach ($setting in $executionProfile.config) { $arguments.Add('-c'); $arguments.Add([string]$setting) }
+  $checkpoint['executionProfile'] = $executionProfile
   $arguments.Add('-c'); $arguments.Add('approval_policy=never')
   if ($spec.sessionId) {
     # The installed exec-resume has no -C/--sandbox option. Preserve exact cwd
