@@ -1,0 +1,13 @@
+✔ end enrollment preserves the interval after reload and converges to two independent devices (4141.2787ms)
+✔ offline/auth/pending work cannot perform destructive lifecycle writes (99.7143ms)
+✔ lost response after server commit survives reload and resumes SAME identity without duplicate mutation (414.9826ms)
+✔ V1 rejects reinstatement before checkpoint or local activation; stale ending leaves history intact (264.6095ms)
+✔ finalized receipt resumes local reconciliation after transaction failure without another server call (192.3034ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5555.1362

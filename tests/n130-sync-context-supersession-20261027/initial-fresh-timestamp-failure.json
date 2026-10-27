@@ -1,0 +1,49 @@
+{
+  "taskId": "continuous-n130-sync-context-after-qualified-sw-20261027",
+  "runId": "5b8f5719-114b-4dc1-8b1f-f571e3797f51",
+  "baseline": false,
+  "checks": [],
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(success.summary.lastSuccessfulSyncAt>before)\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n130-sync-context-after-qualified-sw-20261027/tests/n130-sync-context-supersession-20261027/browser.mjs:60:61\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n130-sync-context-after-qualified-sw-20261027/tests/n130-sync-context-supersession-20261027/browser.mjs:24:2"
+  ],
+  "reproduction": {
+    "success": false,
+    "elapsedMs": 14037.40000000596,
+    "summary": {
+      "state": "pending",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": false,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "none",
+      "reasonLabel": "لا توجد تغييرات حالية تحتاج إجراءً.",
+      "lastSuccessfulSyncAt": 1793122553021,
+      "automaticRetryActive": false,
+      "automaticSyncActive": false,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": false,
+        "authRequired": false,
+        "awaitingVerification": true,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": null
+    },
+    "reads": 24,
+    "markers": 2,
+    "sends": 0,
+    "renewed": true
+  }
+}

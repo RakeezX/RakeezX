@@ -1,0 +1,18 @@
+✔ owner identity change while bounded reads are in flight prevents all local applies (14.5795ms)
+✔ lost response retries the exact mutationId and clears one receipt without duplication (15.9692ms)
+✔ a blocked child is durable, does not turn the run fatal, and automatically recovers after its parent arrives (14.9887ms)
+✔ protocol-invalid work is durably rejected without a fatal sync state (8.3728ms)
+✔ operational summary preserves historical evidence without masking actionable outbox priority or leaking private data (1.2643ms)
+✔ two devices materializing the same dated session converge to one canonical identity and retain only historical evidence (18.6075ms)
+✔ pull overlays pending patches and deletes, then converges to an authoritative tombstone (21.4277ms)
+✔ a delayed receipt cannot regress a newer authoritative pull revision (6.6216ms)
+✔ three isolated clients converge through sequential edit/pull/sync cycles (7.7371ms)
+✔ offline failure remains durable, reconnect succeeds, and score zero is distinct from null (11.8008ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 856.7162
