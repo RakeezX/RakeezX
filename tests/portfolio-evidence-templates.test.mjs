@@ -33,9 +33,9 @@ test('the editable starter library has balanced coverage and does not imply impl
  for(const item of F09_EVIDENCE_TEMPLATES) counts.set(item.criterion,(counts.get(item.criterion)||0)+1);
  for(let i=1;i<=11;i++){
    const n=String(i).padStart(2,'0');
-   assert.ok(counts.get(n)>=3,'criterion '+n+' should have at least 3 curated starters');
+   assert.ok(counts.get(n)>=4,'criterion '+n+' should have at least 4 curated starters');
  }
- assert.ok(F09_EVIDENCE_TEMPLATES.length>=36);
+ assert.ok(F09_EVIDENCE_TEMPLATES.length>=46);
  assert.equal(F09_EVIDENCE_TEMPLATES.filter(x=>x.criterion==='03').some(x=>x.title==='لقاءات أولياء الأمور'),true);
  assert.equal(F09_EVIDENCE_TEMPLATES.filter(x=>x.criterion==='10').some(x=>x.title==='تحليل المهارات التي تحتاج دعمًا'),true);
  for(const row of F09_EVIDENCE_TEMPLATES){

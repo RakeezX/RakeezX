@@ -1,3 +1,4 @@
+import { normalizePortfolioContext } from './portfolio-local-state.js';
 /**
  * Preview-only, deterministic year-wide printable portfolio manifest.
  * No edits to sourced grades, attendance, or teacher records.
@@ -14,7 +15,7 @@ export function buildAnnualPortfolioPlan({
   criteria=[],sources=[],templates=[],custom=[],
   hiddenCriteria=new Set(),hiddenWitnesses=new Set(),
   included=new Set(),excluded=new Set(),
-  titles=new Map(),descriptions=new Map(),photos=new Map(),
+  titles=new Map(),descriptions=new Map(),contexts=new Map(),photos=new Map(),
   layouts=new Map(),sections=new Map(),yearId=null,
 }={}) {
   const visibleCriteria=criteria.filter(c=>!hiddenCriteria.has(c.number));
@@ -28,8 +29,10 @@ export function buildAnnualPortfolioPlan({
       const photoList=photos.get(candidate.id)??[];
       const description=descriptions.get(candidate.id)??candidate.description??'';
       const title=titles.get(candidate.id)??candidate.title??'';
+      const professionalContext=normalizePortfolioContext(contexts.get(candidate.id));
+      const contextPages=Object.keys(professionalContext).length?1:0;
       const readyPersonal=candidate.sourceKind==='custom' &&
-        (!!String(description).trim()||photoList.length>0);
+        (!!String(description).trim()||photoList.length>0||contextPages>0);
       if(candidate.sourceKind==='custom'&&!readyPersonal)continue;
       const active=included.has(candidate.id) ||
         (candidate.sourceKind==='automatic') || readyPersonal;
@@ -42,7 +45,7 @@ export function buildAnnualPortfolioPlan({
         count:photoList.length,layout,chart,showPhotos:options.photos!==false,
       });
       entries.push(Object.freeze({
-        criterion,proposal:candidate,title,description,
+        criterion,proposal:candidate,title,description,professionalContext,contextPages,
         page:nextPage,continuations,layout,photos:photoList,
         includedSections:{
           metrics:options.metrics!==false,table:options.table!==false,
@@ -50,7 +53,7 @@ export function buildAnnualPortfolioPlan({
           photos:options.photos!==false,
         },
       }));
-      nextPage+=1+continuations;
+      nextPage+=1+contextPages+continuations;
     }
   }
   const toc=visibleCriteria.map(c=>{

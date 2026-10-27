@@ -5,8 +5,8 @@ import { withIsolatedLocalBrowser } from 'C:/Users/Abody/Projects/RakeezX/script
 const test = base.extend({
  isolatedBrowser: async ({baseURL}, use) => {
    await withIsolatedLocalBrowser({
-     taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n126-f09-verified-portfolio-preview-20261027.json',
-     runId:'9ded171f-cbeb-43c9-a2ea-09e6aa03d204',url:baseURL,timeoutMs:120000,
+     taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n126-f09-witness-context-library-20261027.json',
+     runId:'ebb435b7-07d8-49dc-b71f-2e25fb0839c4',url:baseURL,timeoutMs:120000,
    }, async ({createContext}) => use({newContext: async ({serviceWorkers, ...visual}={}) => {
      if(serviceWorkers && serviceWorkers!=='block')throw Error('Service Workers must stay blocked');
      return createContext(visual);
@@ -662,7 +662,7 @@ test('F09 isolates synthetic owners and years without touching the product datab
     const one=p.portfolioLocalScope(user('a'),{id:'year-1'});
     const otherOwner=p.portfolioLocalScope(user('b'),{id:'year-1'});
     const anotherYear=p.portfolioLocalScope(user('a'),{id:'year-2'});
-    const payload={photos:[],criterionNames:[['01','Synthetic']],customWitnesses:[]};
+    const payload={photos:[],criterionNames:[['01','Synthetic']],customWitnesses:[],contexts:[['template:01:official-assignments',{action:'owned context'}]]};
     const receipt=await p.savePortfolioLocal(one,{payload,expectedRevision:0});
     const first=await p.loadPortfolioLocal(one);
     const isolated=await p.loadPortfolioLocal(otherOwner);
@@ -672,10 +672,11 @@ test('F09 isolates synthetic owners and years without touching the product datab
     catch(e){conflict=e.code}
     await p.removePortfolioLocal(one,{expectedRevision:receipt.revision});
     const deleted=await p.loadPortfolioLocal(one);
-    return {first:first.payload.criterionNames,other:isolated.payload,year:year.payload,
+    return {context:first.payload.contexts,first:first.payload.criterionNames,other:isolated.payload,year:year.payload,
       conflict,deleted:deleted.payload};
   });
   expect(result.first).toEqual([['01','Synthetic']]);
+  expect(result.context).toEqual([['template:01:official-assignments',{action:'owned context'}]]);
   expect(result.other).toBeNull();
   expect(result.year).toBeNull();
   expect(result.conflict).toBe('PORTFOLIO_LOCAL_CONFLICT');
@@ -839,6 +840,9 @@ test('F09 portable copy can restore into a clean separate browser context for th
  const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
  await page.locator('input[data-change="photo"]').setInputFiles({name:'other-browser.png',mimeType:'image/png',buffer:tiny});
  await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ await page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true}).fill('عمل تجريبي في السياق');
+ await page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true}).blur();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
  const wait=page.waitForEvent('download');
  await page.locator('[data-act="export-portfolio-archive"]').click();
  const dl=await wait,bytes=await (await import('node:fs/promises')).readFile(await dl.path());
@@ -855,9 +859,11 @@ test('F09 portable copy can restore into a clean separate browser context for th
    await fresh.locator('[data-act="confirm-portfolio-archive"]').click();
    await expect(fresh.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
    await expect(fresh.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('ملف المعلم في متصفح آخر');
+   await expect(fresh.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true})).toHaveValue('عمل تجريبي في السياق');
    await expect(fresh.locator('.folio-focus .folio-evidence__gallery-item')).toHaveCount(1);
    await fresh.reload();await ready(fresh);
    await expect(fresh.getByRole('textbox',{name:'عنوان الشاهد'})).toHaveValue('ملف المعلم في متصفح آخر');
+   await expect(fresh.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true})).toHaveValue('عمل تجريبي في السياق');
    await expect(fresh.locator('.folio-focus .folio-evidence__photo')).toHaveJSProperty('naturalWidth',1);
    const restored=await fresh.evaluate(async()=>{
      const s=await import('/src/store.js'),p=await import('/src/lib/portfolio-local-draft.js');
@@ -894,4 +900,168 @@ test('N126 direct Preview refuses unsupported local scope and leaves Reports and
  await expect(page.locator('link[data-rakeez-portfolio-style]')).toHaveCount(0);
  await page.evaluate(()=>location.hash='#/reports/portfolio-preview');await ready(page);
  await expect(page.locator('link[data-rakeez-portfolio-style]')).toHaveCount(1);
+});
+
+// AI N126: real application entry, source styles and handlers over loopback HTTP.
+test('N126 cross-criterion search navigates every standard and preserves renamed hidden provenance and keyboard focus',async({page,context,baseURL})=>{
+ test.setTimeout(90000);
+ await sameOriginOnly(context,baseURL);
+ await page.goto(new URL(entry,baseURL).href);await ready(page);
+ const examples=await page.evaluate(async()=>{
+  const {F09_EVIDENCE_TEMPLATES:t}=await import('/src/lib/portfolio-evidence-templates.js');
+  return Array.from({length:11},(_,i)=>t.find(w=>w.criterion===String(i+1).padStart(2,'0')));
+ });
+ const search=page.getByRole('textbox',{name:'بحث في الشواهد'});
+ await page.getByRole('button',{name:'نماذج جاهزة',exact:true}).click();
+ for(const item of examples){
+  await search.fill(item.title);
+  const card=page.locator(`[data-library-card][data-id="${item.id}"]`);
+  await expect(card).toContainText(item.criterion+' ·');
+  await expect(card).toContainText('نموذج مقترح قابل للتعديل');
+  await expect(search).toBeFocused();
+  await card.click();
+  await expect(page.locator(`.folio-criteria__item[data-id="${item.criterion}"]`)).toHaveClass(/is-selected/);
+  await expect(page.getByRole('textbox',{name:'عنوان الشاهد',exact:true})).toHaveValue(item.title);
+ }
+ await page.getByRole('textbox',{name:'عنوان الشاهد',exact:true}).fill('اسم خاص مميز للبحث');
+ await page.getByRole('textbox',{name:'عنوان الشاهد',exact:true}).blur();
+ await page.getByRole('textbox',{name:'وصف الشاهد',exact:true}).fill('وصف خاص يمكن إيجاده');
+ await page.getByRole('textbox',{name:'وصف الشاهد',exact:true}).blur();
+ await search.fill('وصف خاص');
+ await expect(page.locator('[data-library-card]')).toHaveCount(1);
+ await expect(page.locator('[data-library-card]')).toContainText('اسم خاص مميز');
+ await page.locator('[data-act="hide-witness"]').click();
+ await page.getByRole('button',{name:/^المخفية/}).click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(1);
+ await expect(page.locator('[data-library-card]')).toContainText('نموذج مقترح');
+ await chooseCriterion(page,'01');
+ await page.getByRole('button',{name:/^المخفية/}).click();
+ await search.fill('اسم خاص مميز');
+ await page.locator('[data-library-card]').click();
+ await expect(page.locator('.folio-criteria__item[data-id="11"]')).toHaveClass(/is-selected/);
+ await expect(page.getByRole('textbox',{name:'عنوان الشاهد',exact:true})).toHaveValue('اسم خاص مميز للبحث');
+ await search.fill('اسم خاص');
+ await page.getByRole('button',{name:/^ضمن ملفي/}).click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(0);
+ await page.getByRole('button',{name:'الكل',exact:true}).click();
+ await page.locator('[data-library-card]').click();
+ await page.locator('[data-act="toggle-witness-in-file"]').click();
+ await page.getByRole('button',{name:/^ضمن ملفي/}).click();
+ await expect(page.locator('[data-library-card]')).toHaveCount(1);
+ await search.fill('');
+ await page.getByRole('button',{name:'نماذج جاهزة',exact:true}).click();
+ const ids=await page.locator('[data-library-card]').evaluateAll(items=>items.map(n=>n.dataset.id));
+ expect(ids.every(id=>id.startsWith('template:11:'))).toBe(true);
+});
+
+test('N126 optional context reloads and prints bounded A4 pages with chart and photos at 320 and 390px',async({page,context,baseURL},info)=>{
+ test.setTimeout(90000);
+ await sameOriginOnly(context,baseURL);
+ await page.goto(new URL(entry,baseURL).href);await ready(page);
+ await expect(page.locator('.folio-context-page')).toHaveCount(0);
+ const before=await page.evaluate(async()=>JSON.stringify((await import('/src/store.js')).state));
+ const fields=[['action','العمل المنفذ فعليًا',240],['activity','النشاط',120],['teaching','السياق التعليمي (الفصل / المادة)',180],['reflection','الأثر النوعي والتأمل المهني',300],['source','ملاحظة الدليل أو المصدر',200]];
+ for(const [key,label,max] of fields){
+  const input=page.getByRole('textbox',{name:label,exact:true});
+  await input.fill(('سياق اصطناعي '+key+' ').repeat(30).slice(0,max));await input.blur();
+  await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ }
+ const day=page.getByRole('textbox',{name:'تاريخ النشاط',exact:true});
+ await expect(day).toHaveClass(/rakeez-datetime/);
+ await day.fill('٢٠٢٦-١٠-٢٠');await day.press('Tab');
+ await expect(day).toHaveValue('2026-10-20');
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ const tiny=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+SY4UiwAAAABJRU5ErkJggg==','base64');
+ await page.locator('input[data-change="photo"]').setInputFiles(Array.from({length:6},(_,i)=>({name:`context-${i}.png`,mimeType:'image/png',buffer:tiny})));
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ await page.reload();await ready(page);
+ for(const [key,label] of fields)await expect(page.getByRole('textbox',{name:label,exact:true})).toHaveValue(new RegExp('سياق اصطناعي '+key));
+ await expect(day).toHaveValue('2026-10-20');
+ await expect(page.locator('.folio-context-page')).toHaveCount(1);
+ await expect(page.locator('.folio-context-page dt')).toHaveCount(6);
+ await expect(page.locator('.folio-export-witness .folio-evidence__chart')).toHaveCount(1);
+ for(const width of [320,390]){
+  await page.setViewportSize({width,height:844});
+  await expect(page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  await page.getByRole('textbox',{name:'بحث في الشواهد'}).pressSequentially('نشاط',{delay:35});
+  await expect(page.getByRole('textbox',{name:'بحث في الشواهد'})).toBeFocused();
+  await expect(page.getByRole('textbox',{name:'بحث في الشواهد'})).toHaveValue('نشاط');
+  await page.getByRole('textbox',{name:'بحث في الشواهد'}).fill('');
+  await page.screenshot({path:info.outputPath(`context-mobile-${width}.png`),fullPage:true});
+  await page.locator('.folio-context-editor').screenshot({path:info.outputPath(`context-fields-${width}.png`)});
+ }
+ await page.setViewportSize({width:1280,height:900});
+ await page.emulateMedia({media:'print'});
+ await page.locator('.folio-context-page').screenshot({path:info.outputPath('context-a4-sheet.png')});
+ const layout=await page.locator('.folio-context-page').evaluate(el=>({height:el.getBoundingClientRect().height,
+  contentBottom:el.querySelector('dl').getBoundingClientRect().bottom,
+  footerTop:el.querySelector('.folio-sheet__footer').getBoundingClientRect().top,
+  overflow:el.scrollWidth>el.clientWidth||el.scrollHeight>el.clientHeight}));
+ expect(layout.overflow).toBe(false);expect(layout.contentBottom).toBeLessThan(layout.footerTop);
+ const sheets=page.locator('[data-folio-document] [data-portfolio-page]');
+ const numbers=await sheets.evaluateAll(els=>els.map(e=>Number(e.dataset.portfolioPage)));
+ expect(numbers).toEqual(numbers.map((_,i)=>i+1));
+ const pdf=await page.pdf({path:info.outputPath('context-annual-a4.pdf'),preferCSSPageSize:true,printBackground:true});
+ expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length).toBe(numbers.length);
+ expect(pdf.toString('latin1')).toMatch(/MediaBox\s*\[0 0 594\.95996 841\.91998\]/);
+ await page.screenshot({path:info.outputPath('context-print.png'),fullPage:true});
+ await page.emulateMedia({media:'screen'});
+ await page.getByRole('textbox',{name:'ملاحظة الدليل أو المصدر',exact:true}).fill('');
+ await page.getByRole('textbox',{name:'ملاحظة الدليل أو المصدر',exact:true}).blur();
+ await expect(page.locator('.folio-context-page dt')).toHaveCount(5);
+ expect(await page.evaluate(async()=>JSON.stringify((await import('/src/store.js')).state))).toBe(before);
+});
+
+test('N126 personal context deletion removes metadata from disk and undo returns it',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);await page.goto(new URL(entry,baseURL).href);await ready(page);
+ await page.getByRole('button',{name:'+ شاهد جديد'}).click();
+ await page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true}).fill('عمل شخصي اصطناعي');
+ await page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true}).blur();
+ const savedContexts=async()=>page.evaluate(async()=>{
+  const p=await import('/src/lib/portfolio-local-draft.js'),s=await import('/src/store.js');
+  return (await p.loadPortfolioLocal(p.portfolioLocalScope(s.getActiveWorkspace(),s.activeYear()))).payload.contexts;
+ });
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ expect((await savedContexts()).length).toBe(1);
+ await page.getByRole('button',{name:'حذف شاهدي'}).click();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ expect(await savedContexts()).toEqual([]);
+ await page.locator('.folio-undo').getByRole('button',{name:'تراجع'}).click();
+ await expect(page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true})).toHaveValue('عمل شخصي اصطناعي');
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ expect((await savedContexts()).length).toBe(1);
+ await page.getByRole('button',{name:'حذف شاهدي'}).click();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('محفوظ على هذا الجهاز فقط');
+ await page.reload();await ready(page);
+ expect(await savedContexts()).toEqual([]);
+});
+
+// AI N126: actual account UI -> existing store lease guard; never issue credentials.
+test('N126 context account entry keeps the real lease guard and refuses an unauthenticated local save',async({page,context,baseURL})=>{
+ await sameOriginOnly(context,baseURL);await page.goto(new URL(entry,baseURL).href);await ready(page);
+ await page.evaluate(async()=>{
+  const s=await import('/src/store.js');
+  // Only a fresh synthetic browser's in-memory fixture changes identity.
+  // No Product store is written and no cloud/session/lease guard is mocked.
+  s.deactivateWorkspace('synthetic-test-transition');
+  s.activateWorkspace({type:'account',databaseName:'rakeezx-user-'+'c'.repeat(32),
+    authUserId:'synthetic-context-owner',broadcastChannelName:'synthetic-context-owner-channel'});
+  s.state.years=[{id:'synthetic-context-year',label:'عام اصطناعي 1448'}];
+  s.state.profile={teacherName:'معلم اصطناعي'};s.state.device={};
+  s.state.ready=true;
+  (await import('/src/repaint.js')).repaint();
+ });
+ await expect(page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true})).toBeVisible();
+ await page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true}).fill('لا يجوز حفظه دون صلاحية الحساب');
+ await page.getByRole('textbox',{name:'العمل المنفذ فعليًا',exact:true}).blur();
+ await expect(page.locator('[data-portfolio-save-status]')).toContainText('تعذّر الحفظ المحلي');
+ const result=await page.evaluate(async()=>{
+  const s=await import('/src/store.js'),p=await import('/src/lib/portfolio-local-draft.js');
+  const scope=p.portfolioLocalScope(s.getActiveWorkspace(),s.activeYear());
+  return {type:s.getActiveWorkspace().type,scope:scope.ownerId,
+    saved:(await p.loadPortfolioLocal(scope)).payload,lease:s.getOfflineLeaseStatus().state};
+ });
+ expect(result.type).toBe('account');expect(result.scope).toBe('synthetic-context-owner');
+ expect(result.saved).toBeNull();expect(result.lease).toBe('LIMITED');
 });

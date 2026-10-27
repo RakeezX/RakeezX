@@ -793,3 +793,20 @@
   .folio-local-archive__import-label {flex:1 1 130px;text-align:center;}
 }
 @media print {.folio-local-archive {display:none !important;}}
+
+/* AI N126: optional context stays outside chart/photo sheets. */
+.folio-context-editor {padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--bg-elev);min-width:0;}
+.folio-context-editor h3 {margin:0 0 6px;font-size:15px;}
+.folio-context-editor p {font-size:12px;line-height:1.8;color:var(--text-3);}
+.folio-context-editor__fields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.folio-context-editor label {display:grid;gap:5px;min-width:0;font-size:12px;}
+.folio-context-editor textarea,.folio-context-editor input {width:100%;min-width:0;box-sizing:border-box;padding:9px;border:1px solid var(--border);border-radius:7px;background:var(--bg-sunk);color:var(--text-1);font:inherit;}
+.folio-context-editor textarea {resize:vertical;}
+.folio-context-editor :is(textarea,input):focus-visible {outline:2px solid var(--brand);outline-offset:2px;}
+.folio-context-page dl {display:grid;gap:16px;margin:0;}
+.folio-context-page dl > div {border-bottom:1px solid #d7e6de;padding-bottom:12px;break-inside:avoid;}
+.folio-context-page dt {font-size:13px;font-weight:800;color:#176c56;}
+.folio-context-page dd {margin:5px 0 0;font-size:14px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;}
+.folio-library__criterion {font-weight:700;color:var(--brand);}
+@media(max-width:650px) {.folio-context-editor__fields {grid-template-columns:minmax(0,1fr);}.folio-context-editor {padding:11px;}}
+@media print {.folio-context-editor {display:none!important;}}
