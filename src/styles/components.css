@@ -8522,3 +8522,70 @@
   .home-teaching-display__short { display: inline; }
   .today-focus__class, .home-session-row .row__title { min-width: 0; overflow-wrap: anywhere; }
 }
+
+
+/* N133 — Compact ONLY where classroom names compete with mobile actions.
+   Full original names remain in title/ARIA, input forms, print and storage. */
+.n133-short-name { display:none; }
+@media (max-width: 640px) {
+  .n133-full-name { display:none; }
+  .n133-short-name { display:inline; }
+
+  /* Existing class-header rules used flex-wrap and a 100%-wide action rail at
+     <=540px. The mobile short labels should occupy ONE row with the +/settings. */
+  .class-hub .class-hub-header__top { display:flex; flex-wrap:nowrap; gap:6px; align-items:center; }
+  .class-hub .class-hub-header__identity-block {
+    min-width:0; flex:1 1 0; gap:6px; overflow:hidden; align-items:center;
+  }
+  .class-hub .class-hub-header__name-group {
+    display:flex; flex:1 1 auto; width:100%; min-width:0;
+    gap:4px; flex-wrap:nowrap; overflow:hidden; white-space:nowrap;
+  }
+  .class-hub .class-name-switcher-btn {
+    min-width:0; max-width:62%; flex:0 1 auto;
+  }
+  .class-hub .class-name-switcher-btn__title {
+    display:block; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  }
+  .class-hub .class-name-switcher-btn__chevron { flex:none; }
+  .class-hub .class-hub-header__sep { flex:none; }
+  .class-hub .class-hub-header__sub {
+    flex:1 1 auto; min-width:0; max-width:none;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .class-hub .class-hub-header__end {
+    width:auto; flex:0 0 auto; gap:4px; justify-content:flex-end;
+  }
+  .class-hub .class-hub-header__end .iconbtn {
+    width:40px; min-width:40px; min-height:40px; height:40px; flex:none;
+  }
+
+  /* Classes cards: short grade and subject are single-line on small screens. */
+  .classes-page .class-card__identity { min-width:0; }
+  .classes-page .class-card__title,
+  .classes-page .class-card__sub {
+    display:block; min-width:0; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  /* Attendance context: no accidental second line just for class/material. */
+  .attendance-01c__identity .attendance-01c__names { min-width:0; max-width:100%; }
+  .attendance-01c__identity h2 {
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .attendance-01c__identity p {
+    min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  /* This is only the clickable report destination, NOT printed reports. */
+  .reports-index-page .report-class-row .row__main { min-width:0; }
+  .reports-index-page .n133-report-class-name {
+    display:block; min-width:0; overflow:hidden;
+    white-space:nowrap; text-overflow:ellipsis;
+  }
+}
+
+@media print {
+  .n133-full-name { display:inline !important; }
+  .n133-short-name { display:none !important; }
+}
