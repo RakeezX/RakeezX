@@ -12,6 +12,8 @@ import { APP_ICON_URL } from '../lib/brand.js';
 import { openStudentSearch } from '../lib/student-search-ui.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
 import * as store from '../store.js';
+import { compactSectionLabel } from '../lib/class-order.js';
+import { compactSubjectLabel } from '../lib/subject-catalog.js';
 import { repaint } from '../repaint.js';
 import { go } from '../router.js';
 import {
@@ -264,6 +266,31 @@ function renderOnboarding(onboarding) {
   `;
 }
 
+/**
+ * A read-only home label. Narrow viewports use the already-published compact
+ * aliases; the persisted Section/Subject names remain full.
+ */
+export function homeCompactTeachingLabel(teaching, {
+  sectionFor = store.getSection,
+  subjectFor = store.getSubject,
+  nearbySubjects = store.subjects(),
+} = {}) {
+  if (!teaching) return '';
+  const section = sectionFor(teaching.sectionId);
+  const subject = subjectFor(teaching.subjectId);
+  return [compactSectionLabel(section), compactSubjectLabel(subject, nearbySubjects)]
+    .filter(Boolean).join(' · ');
+}
+
+function homeTeachingDisplay(teaching) {
+  const full = visibleLatinDigits(store.teachingLabel(teaching));
+  const compact = visibleLatinDigits(homeCompactTeachingLabel(teaching)) || full;
+  return html`<span class="home-teaching-display" role="text" aria-label="${full}" title="${full}">
+    <span class="home-teaching-display__full" aria-hidden="true">${full}</span>
+    <span class="home-teaching-display__short" aria-hidden="true">${compact}</span>
+  </span>`;
+}
+
 // Sibling links keep native keyboard/new-tab navigation without nested actions.
 // Stretch the teaching link across the card; explicit attendance links sit above it.
 function lessonClassLink(session) {
@@ -293,7 +320,7 @@ function renderTodayFocus(focus) {
       <div class="today-focus__signal" style="z-index:auto"><span>${content.eyebrow}</span><i aria-hidden="true"></i></div>
       <div class="today-focus__main" style="z-index:auto">
         <div class="today-focus__title">${content.title}</div>
-        <div class="today-focus__class">${visibleLatinDigits(store.teachingLabel(teaching))}</div>
+        <div class="today-focus__class">${homeTeachingDisplay(teaching)}</div>
         <div class="today-focus__detail">الحصة ${session.period}${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</div>
         ${completeness.completed ? '' : html`<div class="today-focus__state">${content.detail}</div>`}
       </div>
@@ -454,7 +481,7 @@ export default {
                       ${lessonClassLink(s)}
                       <span class="period">${s.period}</span>
                       <span class="row__main">
-                        <span class="row__title">${visibleLatinDigits(store.teachingLabel(tch))}</span>
+                        <span class="row__title">${homeTeachingDisplay(tch)}</span>
                         <span class="row__sub">
                           ${s.startTime ? html`<bdi dir="ltr">${fmtTimeRange(s.startTime, s.endTime)}</bdi>` : 'بدون وقت محدد'}
                           ${marked && roster

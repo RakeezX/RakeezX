@@ -8511,3 +8511,14 @@
   .class-hub-header__sub { min-width:0; max-width: min(37vw, 190px);
     overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 }
+
+
+/* N132: show N131's existing compact class/subject labels on small Home
+   screens only. Full labels stay in the DOM's title/accessible label and on
+   larger screens; this does not write or re-identify any academic records. */
+.home-teaching-display__short { display: none; }
+@media (max-width: 640px) {
+  .home-teaching-display__full { display: none; }
+  .home-teaching-display__short { display: inline; }
+  .today-focus__class, .home-session-row .row__title { min-width: 0; overflow-wrap: anywhere; }
+}
