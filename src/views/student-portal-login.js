@@ -44,25 +44,30 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   }
   function show(raw, preserve = false) {
     const data = projectUnifiedStudentData(raw);
-    const open=preserve ? [...root.querySelectorAll('details[data-work-id][open]')].map(el=>el.getAttribute('data-work-id')) : [];
+    const completedOpen = preserve && root.querySelector('.n88-completed-group')?.open;
     const scroll=preserve ? {x:win.scrollX,y:win.scrollY} : null;
     const focus=preserve && root.contains(doc.activeElement) ? ['data-read','data-end'].find(key=>doc.activeElement.hasAttribute(key)) : null;
     settledProjection = JSON.stringify(data); settledAt = Date.now(); settledTick = win.performance.now(); settledContext = client.captureContext?.();
     screen = 'private';
     const profile = data.profile;
-    let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end>تسجيل الخروج من مساحة الطالب</button></div></div><div class="n88-unified-sections">`;
+    let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end aria-label="تسجيل الخروج من مساحة الطالب">تسجيل الخروج</button></div></div><div class="n88-unified-sections">`;
+    const workSection = (key, label) => {
+      if (!data.work?.[key]?.length) return '';
+      let content = '';
+      content += `<section data-section="${key}" class="${key==='completed'?'n88-completed':''}">${key==='completed'?`<details class="n88-completed-group"><summary>الأعمال المكتملة <span class="n88-unified-count">${data.work[key].length}</span></summary>`:`<h2>${label}<span class="n88-unified-count" aria-label="عدد الأعمال">${data.work[key].length}</span></h2>`}${data.work[key].length ? data.work[key].map(item => {
+        const detail = `${item.executionInstructions !== undefined ? `<h3>تعليمات التنفيذ</h3><p class="n88-guidance-text">${escape(item.executionInstructions)}</p>` : ''}${item.deliveryInstructions !== undefined ? `<h3>طريقة التسليم</h3><p class="n88-guidance-text">${escape(item.deliveryInstructions)}</p>` : ''}${item.instruction !== undefined ? `<p class="n88-unified-instruction">${escape(item.instruction)}</p>` : ''}${item.startDate ? `<p>يبدأ: <span dir="ltr">${escape(item.startDate)}</span></p>` : ''}${item.dueDate ? `<p>التسليم: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ''}${item.completionState !== undefined ? `<p>${escape({unrecorded:'لم يُرصد إنجاز',regular:'مكتمل',late:'مكتمل متأخر'}[item.completionState])}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}`;
+        return `<article class="n88-unified-work" data-work-id="${escape(key+':'+item.id)}"><h3>${escape(item.title)}</h3>${detail ? `<div class="n88-unified-detail">${detail}</div>` : ''}</article>`;
+      }).join('') : '<p class="n88-unified-empty">لا توجد أعمال منشورة في هذا القسم.</p>'}${key==='completed'?'</details>':''}</section>`;
+      return content;
+    };
+    content += workSection('required', 'المطلوب مني') + workSection('scheduled', 'الأعمال القادمة');
     if (data.grades) {
       content += `<section class="n88-unified-grades"><h2>درجاتي</h2><div class="n88-unified-table"><table><thead><tr><th scope="col">البند</th><th scope="col">الدرجة</th><th scope="col">من</th></tr></thead><tbody>${data.grades.items.map(item => `<tr><th scope="row">${escape(item.label)}${item.status !== undefined ? `<small>${escape({recorded:'مرصودة',unrecorded:'لم تُرصد'}[item.status]||'')}</small>` : ''}</th><td>${displayNumber(item.value)}</td><td>${displayNumber(item.max)}</td></tr>`).join('')}</tbody></table></div>${data.grades.total ? `<p class="n88-unified-total">المجموع: <b dir="ltr">${displayNumber(data.grades.total.earned)} / ${displayNumber(data.grades.total.possible)}</b></p>` : ''}</section>`;
     }
-    for (const [key, label] of Object.entries({ required: 'المطلوب مني', scheduled: 'الأعمال القادمة', completed: 'الأعمال المكتملة' })) {
-      if (!Object.hasOwn(data.work || {}, key)) continue;
-      content += `<section data-section="${key}" class="${key==='completed'?'n88-completed':''}">${key==='completed'?`<details class="n88-completed-group"><summary>الأعمال المكتملة <span class="n88-unified-count">${data.work[key].length}</span></summary>`:`<h2>${label}<span class="n88-unified-count" aria-label="عدد الأعمال">${data.work[key].length}</span></h2>`}${data.work[key].length ? data.work[key].map(item => {
-        const detail = `${item.executionInstructions !== undefined ? `<h3>تعليمات التنفيذ</h3><p class="n88-guidance-text">${escape(item.executionInstructions)}</p>` : ''}${item.deliveryInstructions !== undefined ? `<h3>طريقة التسليم</h3><p class="n88-guidance-text">${escape(item.deliveryInstructions)}</p>` : ''}${item.instruction !== undefined ? `<p class="n88-unified-instruction">${escape(item.instruction)}</p>` : ''}${item.startDate ? `<p>يبدأ: <span dir="ltr">${escape(item.startDate)}</span></p>` : ''}${item.dueDate ? `<p>التسليم: <span dir="ltr">${escape(item.dueDate)}</span></p>` : ''}${item.completionState !== undefined ? `<p>${escape({unrecorded:'لم يُرصد إنجاز',regular:'مكتمل',late:'مكتمل متأخر'}[item.completionState])}</p>` : ''}${item.deadline !== undefined ? `<p>الموعد: <span dir="ltr">${escape(item.deadline)}</span></p>` : ''}${item.status !== undefined ? `<p>${escape(item.status)}</p>` : ''}`;
-        return detail ? `<details class="n88-unified-work" data-work-id="${escape(key+':'+item.id)}"><summary><span>${escape(item.title)}${item.dueDate||item.deadline?`<small>التسليم: <span dir="ltr">${escape(item.dueDate||item.deadline)}</span></small>`: ""}${item.completionState?`<small>${escape({unrecorded:"لم يُرصد إنجاز",regular:"مكتمل",late:"مكتمل متأخر"}[item.completionState])}</small>`:""}</span><span class="n88-unified-detail-hint">التفاصيل</span></summary><div class="n88-unified-detail">${detail}</div></details>` : `<article class="n88-unified-work"><h3>${escape(item.title)}</h3></article>`;
-      }).join('') : '<p class="n88-unified-empty">لا توجد أعمال منشورة في هذا القسم.</p>'}${key==='completed'?'</details>':''}</section>`;
-    }
+    content += workSection('completed', 'الأعمال المكتملة');
+    if (!Object.values(data.work || {}).some(items => items.length) && !data.grades) content += '<p class="n88-unified-empty">لا توجد أعمال أو درجات منشورة حاليًا.</p>';
     paint(content + '</div><p role="status" data-refresh-status>يُحدّث العرض تلقائيًا كل خمس دقائق أثناء فتحه. يمكنك تحديثه الآن.</p>',!preserve);
-    if(preserve){for(const el of root.querySelectorAll('details[data-work-id]'))el.open=open.includes(el.getAttribute('data-work-id'));if(focus)root.querySelector('['+focus+']')?.focus({preventScroll:true});win.scrollTo(scroll.x,scroll.y);}
+    if(preserve){const completed = root.querySelector('.n88-completed-group');if(completed)completed.open=!!completedOpen;if(focus)root.querySelector('['+focus+']')?.focus({preventScroll:true});win.scrollTo(scroll.x,scroll.y);}
     scheduleFreshness();
   }
   const displayAge = () => Math.max(Date.now()-settledAt,win.performance.now()-settledTick);

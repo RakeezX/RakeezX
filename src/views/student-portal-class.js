@@ -36,11 +36,11 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
   opened=root.querySelector('details')?.open??opened;
   const focus=root.contains(root.ownerDocument.activeElement)?root.ownerDocument.activeElement:null;
   const selection=focus?.tagName==='TEXTAREA'?[focus.selectionStart,focus.selectionEnd]:null;
-  const focusKey=focus&&(focus.name||[...focus.attributes].find(a=>a.name.startsWith('data-guidance-'))?.name);
+  const focusKey=focus&&(focus.tagName==='SUMMARY'?'summary':focus.name||[...focus.attributes].find(a=>a.name.startsWith('data-guidance-'))?.name);
   const {task,draft,stale}=state();const authorContext=current()?getContext():null;const authorHelp=authorContext?`<p class="n88-editor-help">1. أضف المهمة في توزيع المادة واحفظها. 2. اختر حقول المهام التي تريد إظهارها، ثم أضف التعليمات الاختيارية هنا.</p><a class="btn" data-guidance-author href="#/teaching/${encodeURIComponent(authorContext.teachingId)}/items">إعداد المهام في توزيع المادة</a>`:'';
   root.innerHTML=`<details class="n88-task-guidance" aria-busy="${busy}" ${opened?'open':''}><summary>تعليمات المهام وطريقة التسليم <small>${tasks.length||''}</small></summary><div class="n88-guidance-body">${authorHelp}<p role="status" aria-live="polite">${esc(!current()?'اختر فصلًا متاحًا لإدارة التعليمات.':busy?(saving?'جارٍ حفظ التعليمات…':'جارٍ قراءة المهام… يشمل الانتظار في الطابور، بحد أقصى 10 ثوانٍ.'):message)}</p>${readError?'<button class="btn" type="button" data-guidance-refresh>مراجعة الحالة</button>':''}${tasks.length?`<label>المهمة<select data-guidance-source ${busy?'disabled':''}>${tasks.map(t=>`<option value="${esc(t.subitemId)}" ${selected===t.subitemId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`:current()&&loaded&&!busy&&!readError?`<p class="n88-editor-help">لا توجد مهام متاحة ضمن الحقول المنشورة.</p>`:''}${task?`<form data-guidance><fieldset ${saving||!current()?'disabled':''}>${!readError&&(stale||uncertain.has(selected))?'<p class="n88-editor-help">راجع حالة المهمة الحالية؛ مسودتك محفوظة.</p><button class="btn" type="button" data-guidance-revalidate>راجعت الحالة؛ احتفظ بالمسودة</button>':task.needsRepublication?'<p class="n88-editor-help">تغيّرت المهمة؛ راجع التعليمات ثم احفظ لنشرها مجددًا.</p>':''}<div class="n88-guidance-fields"><label>تعليمات التنفيذ<textarea name="executionInstructions" maxlength="400" rows="3" placeholder="اختياري — يمكنك الحفظ دون تعليمات">${esc(draft.executionInstructions)}</textarea></label><label>طريقة التسليم<textarea name="deliveryInstructions" maxlength="400" rows="3" placeholder="اختياري — يمكنك الحفظ دون تعليمات">${esc(draft.deliveryInstructions)}</textarea></label></div><div class="n88-editor-footer"><small data-guidance-count aria-label="عدد الأحرف لكل حقل"></small><button class="btn btn--primary" type="submit">حفظ التعليمات</button></div></fieldset></form>`:''}</div></details>`;
   updateControls();
-  if(focusKey){const next=[...root.querySelectorAll('button,select,textarea,input')].find(e=>e.name===focusKey||e.hasAttribute(focusKey));next?.focus({preventScroll:true});if(next&&selection)next.setSelectionRange(...selection);}
+  if(focusKey){const next=focusKey==='summary'?root.querySelector('summary'):[...root.querySelectorAll('button,select,textarea,input')].find(e=>e.name===focusKey||e.hasAttribute(focusKey));next?.focus({preventScroll:true});if(next&&selection)next.setSelectionRange(...selection);}
  }
  function scheduleRead(){if(disposed||suspended||!opened)return;if(busy){if(operationSequence!==sequence)queued=true;return;}clearTimeout(wakeTimer);wakeTimer=setTimeout(()=>void refresh(),40);}
  async function refresh(keepMessage=false){
@@ -97,8 +97,8 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     const focusAction = root.contains(focused) ? { action: focused.dataset.action, index: focused.dataset.index, name: focused.name } : null;
     settingsOpen = panel.querySelector('.n88-class-settings')?.open ?? settingsOpen;
     root.setAttribute('aria-busy', String(busy));
-    panel.innerHTML = `<section aria-label="مساحة طلاب الفصل"><header class="n88-class-heading"><div><p class="n88-eyebrow">مساحة الطلاب</p><h2>${esc(classLabel())}</h2><p>أدر وصول طلابك وما يظهر في مساحتهم.</p></div></header>
-      <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'الطلاب: '+esc(roster.students.length)+' · الرموز الفعّالة: '+esc(roster.students.filter(s=>s.hasActiveCode===true).length)+(busy||retry?' · آخر حالة مؤكدة':'') : 'الطلاب والرموز الفعّالة: لم تُؤكّد القائمة بعد'}</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable || uncertainMutation || !roster.credentialRevision || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0) ? 'disabled' : ''}>إنشاء رموز الدخول${roster?` (${roster.students.filter(s=>!s.hasActiveCode&&s.credentialVersion===0).length})`:""}</button>` : ''}</div><p class="n88-roster-help">ينشئ رمزًا فقط لمن ليس لديه رمز دخول فعّال. الرموز الحالية لا تتغيّر.</p>
+    panel.innerHTML = `<section aria-label="مساحة طلاب الفصل"><header class="n88-class-heading"><div><p class="n88-eyebrow">مساحة الطلاب</p><h2>${esc(classLabel())}</h2></div></header>
+      <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'الطلاب: '+esc(roster.students.length)+' · الرموز الفعّالة: '+esc(roster.students.filter(s=>s.hasActiveCode===true).length)+(busy||retry?' · آخر حالة مؤكدة':'') : 'الطلاب والرموز الفعّالة: لم تُؤكّد القائمة بعد'}</p>${ready ? `<button class="btn btn--primary" data-action="batch" ${!writable || uncertainMutation || !roster.credentialRevision || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0) ? 'disabled' : ''}>إنشاء الرموز الناقصة${roster?` (${roster.students.filter(s=>!s.hasActiveCode&&s.credentialVersion===0).length})`:""}</button>` : ''}</div><nav class="n88-class-nav" aria-label="إعداد مساحة الطلاب"><button class="btn" data-action="open-guidance">تعليمات المهام والنشر</button><button class="btn" data-action="open-settings">الحقول الظاهرة للطلاب</button></nav>
       <div class="n88-class-status"><p role="status" aria-live="polite">${esc(message || (ready ? (busy && !roster ? 'جارٍ قراءة القائمة…' : '') : 'مساحة الطلاب غير مفعّلة حاليًا.'))}</p>${retry && ready ? `<button class="btn" data-action="refresh" ${busy ? 'disabled' : ''}>مراجعة القائمة</button>` : ''}</div>
       ${resolution?.eligible?`<button class="btn" data-action="close-unknown" ${busy?'disabled':''}>إغلاق الطلب السابق دون إنشاء رموز</button><p>يسجّل إغلاقًا جديدًا يمنع تنفيذ الطلب المتأخر؛ لا يثبت أن المحاولة السابقة تراجعت.</p>`:''}${resolution?.canRecover?`<button class="btn" data-action="recover-closure" ${busy?'disabled':''}>مراجعة إقرار الإغلاق مرة واحدة</button>`:''}
       ${uncertainMutation?'<p data-n88-uncertain role="status">نتيجة عملية سابقة غير مؤكدة. عدّاد الرموز من آخر قائمة مؤكدة، ولا يثبت مصير تلك العملية.</p>':''}
@@ -182,6 +182,11 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     const button = e.target.closest('[data-action]'); if (!button || !root.contains(button) || disposed) return;
     if (key() !== boundKey) { invalidate(); void refresh(); return; }
     const action = button.dataset.action;
+    if (action === 'open-guidance' || action === 'open-settings') {
+      const details = root.querySelector(action === 'open-guidance' ? '.n88-task-guidance' : '.n88-class-settings');
+      if (details) { details.open = true; details.querySelector('summary')?.focus(); }
+      return;
+    }
     if (busy) return;
     if(action==='close-unknown'||action==='recover-closure'){
       const g=++generation,k=key();busy=true;mutating=true;clearSecrets();message='جارٍ التحقق من إقرار الإغلاق…';draw();
@@ -212,7 +217,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
         intent.text='';deliveryIntent=null;
       });return;
     }
-    if (action === 'cancel') { selected = null; void refresh(); return; }
+    if (action === 'cancel') { const index = roster.students.indexOf(selected?.student), action = selected?.action; selected = null; void refresh().then(() => root.querySelector(`[data-action=review-${action}][data-index="${index}"]`)?.focus()); return; }
     if (action.startsWith('review-')) { const student = roster.students[Number(button.dataset.index)]; if (student && (student.hasActiveCode || action === 'review-rotate' && student.credentialVersion > 0)) { clearSecrets(); selected = { student, action: action.slice(7) }; draw(); root.querySelector('[data-confirm] button')?.focus(); } return; }
     if (action === 'batch') void perform(r => client.issueMissingClassCodes(context().teachingId, { requestId: requestId(), expectedRosterRevision: r.rosterRevision }), (result, r) => {
 

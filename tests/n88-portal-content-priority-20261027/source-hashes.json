@@ -1,0 +1,7 @@
+{
+  "src/views/student-portal-class.js": "062e5e1948080a4d59c93da56e64b25eb7ae0cc0e7d4b61f423facccd52da442",
+  "src/views/student-portal-login.js": "da8d7cf67a694c01b19653e653af627b5741fa77c65bf9ab4a64404d8f303487",
+  "src/styles/student-portal-class.css": "c2d01d3eea11e3a2db67bf8d56d426c89b95bbdbfcb5019e23822123e406e55a",
+  "src/styles/student-portal-login.css": "49dd9a3aa6f9801b75266fa584b13418145e636a0a3afb5bbf57a39358f05f98",
+  "sw.js": "e6276a7a1cd1703c8bedc2e0cda26da48dcda1cb29f2fede5eb447aa47f7981d"
+}
