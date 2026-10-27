@@ -7,8 +7,10 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 function Read-Json([string]$File) { [System.IO.File]::ReadAllText($File, [System.Text.Encoding]::UTF8) | ConvertFrom-Json }
 function Get-N44ExecutionProfile($Task, $Spec) {
   $profile = $Task.executionProfile
-  $n44 = $Task.id -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and $Task.productId -eq 'N44' -and
-    $Spec.taskId -eq $Task.id -and $Spec.sessionId -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and
+  $originalN44 = $Task.id -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and $Spec.sessionId -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61'
+  $renewalDeliveryN44 = $Task.id -eq 'continuous-n44-verified-renewal-delivery-20261027' -and $profile.originalTaskId -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and
+    $profile.originalSession -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.qualifiedSource -eq 'f71e2dfd64ddb8e79b18d4f30151c0a9cfedb3b2'
+  $n44 = ($originalN44 -or $renewalDeliveryN44) -and $Task.productId -eq 'N44' -and $Spec.taskId -eq $Task.id -and
     $profile.authorityRef -eq 'PO-20261027-N44-ASTRA-SINGLE-WORKER' -and $profile.version -eq 1
   if ($n44) {
     if ($Spec.model -ne 'gpt-6-astra' -or $Spec.effort -ne 'max' -or $profile.model -ne $Spec.model -or $profile.effort -ne $Spec.effort -or

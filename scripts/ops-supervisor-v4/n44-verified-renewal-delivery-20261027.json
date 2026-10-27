@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-verified-renewal-delivery-20261027",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -6400,
+      "scopeKey": "n44-verified-lease-renewal-publication",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "budgetMinutes": 30,
+      "idleMinutes": 15,
+      "dependsOn": [],
+      "executionProfile": {
+        "version": 1,
+        "authorityRef": "PO-20261027-N44-ASTRA-SINGLE-WORKER",
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "serviceTier": "priority",
+        "fastMode": true,
+        "singleAgent": true,
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "qualifiedSource": "f71e2dfd64ddb8e79b18d4f30151c0a9cfedb3b2"
+      },
+      "allowedPaths": [
+        "src/lib/notification-push-gateway.js",
+        "src/lib/notification-push-runtime.js",
+        "src/views/notification-settings.js",
+        "docs/automation-evidence/20261027/N44_VERIFIED_RENEWAL_DELIVERY.md",
+        "tests/n44-verified-renewal-delivery-20261027/qualification.json"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-gateway.js",
+        "src/lib/notification-push-runtime.js",
+        "src/views/notification-settings.js"
+      ],
+      "requiredChecks": [
+        "n44_renewal_exact_qualified_three_file_delta",
+        "n44_renewal_current_app_owner_click_and_failure_guards",
+        "n44_renewal_source_scope_and_zero_live_allocations"
+      ],
+      "releaseAuthority": "Latest direct PO N44 Astra completion instruction authorizes this already-qualified causal frontend repair through the sole existing publisher. This sequential integration component grants no service upload, live account/device action, new send budget, Auth/schema change, Admin activation or whole N44 acceptance.",
+      "preparationAuthority": {
+        "kind": "qualified_n44_three_file_frontend_component",
+        "publication": true,
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "originalCandidate": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "qualifiedSource": "f71e2dfd64ddb8e79b18d4f30151c0a9cfedb3b2",
+        "recipePath": "tests/n44-astra-continuation-20261027/integration-recipe.json",
+        "recipeSha256": "881963cbe9d8c6fccafc75dbfcf324a4bdb2d540f45c5dfca3c6b805df99e8de",
+        "patchPath": "tests/n44-astra-continuation-20261027/public-delta.patch",
+        "patchSha256": "d7457db645ab2bf083ff03cdbe9e5d5ce9bb95e249cedc7f3b506ddd60b9b61c",
+        "manifest": [
+          {
+            "path": "src/lib/notification-push-gateway.js",
+            "preimageBlob": "020b7884eddca0fa72ed0d322209ebe55ded1225",
+            "postimageBlob": "aff767fe17f5fe003a7c87d0f9ea66acdc12ba3d",
+            "preimageSha256": "7d59201fea6e812d90369e0be1d0691954a7294d3027631f16a132f4f0c13a3c",
+            "postimageSha256": "31799ecaf24725c81831699e44b2eb414a7e3545e9d7a1a914ba3af83b349ddc"
+          },
+          {
+            "path": "src/lib/notification-push-runtime.js",
+            "preimageBlob": "2b62a967ea26a20fd0e4d69bc616b7bfb359eb89",
+            "postimageBlob": "d11bfb0647c625620535e78b67c85c5d7f0e9091",
+            "preimageSha256": "6cc35c423945abc118f6e3310aede8e53bd902728f4875e363c7d29961e54319",
+            "postimageSha256": "c00108487399c26a9e4736822f104ac4acff767e9e5ea08bea97a7d631f009d5"
+          },
+          {
+            "path": "src/views/notification-settings.js",
+            "preimageBlob": "a07f3a22cfdd431faa07538dcae39340e52e46da",
+            "postimageBlob": "9bf50edc293079e92b7cb4c24c141f26d1c7a656",
+            "preimageSha256": "59cfe0c0effd1e681a35b738673bfb25aa4303a49acea00c2ce95f22df233c43",
+            "postimageSha256": "eba6af139c08ff1ddf7ed712b7acdc1c936bf263e8be85d5e089703de5f998a6"
+          }
+        ],
+        "proof": {
+          "composition-green.json": {
+            "sha256": "3738b78e18f80ad6553997d833b0f46522d361efd0489c296e09ea017c2821eb",
+            "checks": 15,
+            "status": "PASS"
+          },
+          "current-main-entry.json": {
+            "sha256": "b8e582c66e9706808e2db88dba3ceba9ed37955e1dd2264d71258a2811ee4a38",
+            "checks": 3,
+            "status": "PASS"
+          },
+          "mobile-admission.json": {
+            "sha256": "4a38ed845e141164354ce20d7f2f197302c8a7e8118e03a3cdc908b7bc8d9c67",
+            "checks": 2,
+            "status": "PASS"
+          }
+        },
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "privateCustodyAccess": 0,
+        "registrations": 0,
+        "sends": 0,
+        "sourceOperations": 0,
+        "trialWindowSelections": 0
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "requiredSourcePaths": [
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-runtime.js",
+          "src/views/notification-settings.js"
+        ],
+        "editPaths": [
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-runtime.js",
+          "src/views/notification-settings.js",
+          "docs/automation-evidence/20261027/N44_VERIFIED_RENEWAL_DELIVERY.md",
+          "tests/n44-verified-renewal-delivery-20261027/qualification.json"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261027/N44_VERIFIED_RENEWAL_DELIVERY.md",
+          "tests/n44-verified-renewal-delivery-20261027/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_renewal_exact_qualified_three_file_delta",
+          "n44_renewal_current_app_owner_click_and_failure_guards",
+          "n44_renewal_source_scope_and_zero_live_allocations"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "SEQUENTIAL EXACT INTEGRATION, NOT A NEW INVESTIGATION. The original N44 Astra custodian has finished its useful code and preserved the complete parent result. Resume no completed old trial. Use gpt-6-astra/max/Fast, ONE worker, no subagents or extra reviewer. The separate source integration checkout does NOT replace the original session or candidate and cannot access its private custody. The sole controller and publisher remain authoritative. Latest PO Astra instruction overrides old Sol/medium/Standard only for this explicitly tagged N44 component.\n\nDeliver ONLY src/lib/notification-push-gateway.js, src/lib/notification-push-runtime.js, src/views/notification-settings.js from qualified source f71e2dfd64ddb8e79b18d4f30151c0a9cfedb3b2, with immutable evidence candidate 826d566f044a87bc0c156a4760866045b5f6dc0c. Read tests/n44-astra-continuation-20261027/integration-recipe.json from that commit; expected SHA256 881963cbe9d8c6fccafc75dbfcf324a4bdb2d540f45c5dfca3c6b805df99e8de. Apply ONLY its public-delta.patch SHA256 d7457db645ab2bf083ff03cdbe9e5d5ce9bb95e249cedc7f3b506ddd60b9b61c, after checking all three exact current-main preimage blobs in the manifest. Verify exact three postimage blobs/hashes. If main moved only outside these paths, reuse the proof. If a relevant preimage differs, reconcile only actual conflicting hunks and run only the affected check. Do not cherry-pick/merge the whole private source/evidence branch, copy old app.js/sw.js, or overwrite newer Portfolio/offline/user work. Current shell v90 or later and all startup assets stay intact. No new startup imports exist in the three-file delta.\n\nReuse actual completed proof in 826d566f044a87bc0c156a4760866045b5f6dc0c:tests/n44-astra-continuation-20261027/: composition-green15, current-main-entry3, mobile-admission2, gateway-regressions7 and integration-recipe isolated-index verification. RED and fixture setup failures remain retained in the original candidate. Current-main-entry uses actual current app.js/SW overlay and real UI/store entry, so do NOT rerun the whole old suite or create another fixture/measurement. This repair retains valid native subscription across SAME confirmed Auth-session/owner/workspace/device lease renewal; only context/read receives provisional read capability. Token/lease/generation race fencing and strict mutation/click validation remain. Temporary read503 suspends actions without revocation; explicit rejection, revocation, logout, owner/workspace switch, invalid lease, permission withdrawal and expiry still retire the binding. Current-main actual item click, late click rejection and manual readiness recovery are verified. Check source/module syntax and exact diff scope; broaden testing only for a concrete semantic change from qualified inputs. Add a compact truthful source qualification JSON and delivery note, not a new audit.\n\nZERO browser/account/service/provider/config/Native/SQL/Auth/schema/role/region/registration/consent/source/send actions. Native176 remains unchanged; old6sends/11registrationACK/6Nativeuploads stay spent, Windows13:59:20 actual arrival+correctclick remains PASS, Sources6-10 cleaned/OFFNULL. New phone Push and privileged Admin remain separately gated. Do not include new category/schedule/Publisher Preview source in this public component. Do not change or waive original44 historical checks; parent N44 stays OPEN and original blocked record/session/candidate remain preserved. This is a new qualified Product fix, not a workaround for the rejected metadata-check reduction.\n\nCommit an AI-identified minimal current-main candidate and return LOCAL_READY with exactly the three required source-component checks when true. The existing publisher performs deterministic build/integration/provider/immutable/Production verification for these three modules. Local success is not deployed success. Do not push Product or deploy independently; no routine PM handoff or request for already granted release permission."
+    }
+  ]
+}
