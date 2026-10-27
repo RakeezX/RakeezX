@@ -8497,3 +8497,17 @@
   .class-import-page .n107-new-fields { grid-column:1; }
   .class-import-page .n107-noor-row { grid-template-columns:minmax(0,1fr); gap:0; }
 }
+
+
+/* N131: compact DISPLAY only in constrained class-header width.
+   Stored section/subject names and printable/export output stay unchanged. */
+.class-hub-header .class-identity-short { display:none; }
+@media (max-width:640px) {
+  .class-hub-header .class-identity-full { display:none; }
+  .class-hub-header .class-identity-short { display:inline; }
+  .class-hub-header__name-group { min-width:0; flex-wrap:nowrap; }
+  .class-hub-header__identity-block { min-width:0; flex:1; }
+  .class-name-switcher-btn { min-width:0; flex:none; }
+  .class-hub-header__sub { min-width:0; max-width: min(37vw, 190px);
+    overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+}

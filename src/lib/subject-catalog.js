@@ -128,3 +128,59 @@ export function subjectCatalogOptions(records, usedSubjectIds = []) {
   }));
   return [...builtins, ...custom];
 }
+
+
+/**
+ * Presentation only: a short but recognizable name on narrow schedule/class
+ * surfaces. The persisted Subject identity/name, search and exports stay full.
+ *
+ * Never abbreviate unknown teacher-defined subjects by arbitrary slicing.
+ */
+const SUBJECT_DISPLAY_SHORT_NAMES = new Map([
+  ['المهارات الرقمية', 'رقمية'],
+  ['الحاسب الآلي', 'حاسب'],
+  ['اللغة العربية', 'عربية'],
+  ['العربية', 'عربية'],
+  ['اللغة الإنجليزية', 'إنجليزي'],
+  ['الإنجليزية', 'إنجليزي'],
+  ['الدراسات الاجتماعية', 'اجتماعيات'],
+  ['الاجتماعيات', 'اجتماعيات'],
+  ['التربية الفنية', 'فنية'],
+  ['الفنية', 'فنية'],
+  ['التربية البدنية والدفاع عن النفس', 'بدنية ودفاع'],
+  ['التربية البدنية', 'بدنية'],
+  ['البدنية', 'بدنية'],
+  ['المهارات الحياتية والأسرية', 'حياتية وأسرية'],
+  ['الحياتية والأسرية', 'حياتية وأسرية'],
+  ['القرآن الكريم والدراسات الإسلامية', 'قرآن وإسلامية'],
+  ['القرآن والإسلامية', 'قرآن وإسلامية'],
+  ['الدراسات الإسلامية', 'إسلامية'],
+  ['التقنية الرقمية', 'تقنية رقمية'],
+  ['التفكير الناقد', 'تفكير ناقد'],
+  ['الرياضيات', 'رياضيات'],
+].map(([full, short]) => [normalizeSubjectName(full), short]));
+
+function shortSubjectCandidate(value) {
+  const full = typeof value === 'string' ? value : value?.name;
+  const name = String(full ?? '').trim();
+  return SUBJECT_DISPLAY_SHORT_NAMES.get(normalizeSubjectName(name)) ?? name;
+}
+
+/**
+ * Repeated source names from different subject records must not collapse to
+ * the same visible label. On collision, keep the original full teacher label.
+ */
+export function compactSubjectLabel(subject, nearbySubjects = []) {
+  const original = typeof subject === 'string' ? subject : subject?.name;
+  const full = String(original ?? '').trim();
+  if (!full) return '';
+  const candidate = shortSubjectCandidate(full);
+  if (candidate === full) return full;
+  const collides = nearbySubjects.some((other) => {
+    if (!other || other === subject || other.deleted) return false;
+    if (typeof other === 'object' && typeof subject === 'object' &&
+        other.id && subject?.id && other.id === subject.id) return false;
+    return shortSubjectCandidate(other) === candidate;
+  });
+  return collides ? full : candidate;
+}
