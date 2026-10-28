@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-external-plan-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100014,
+      "scopeKey": "n88-durable-publication-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n88-backend-package-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+        "tests/n88-external-plan-1028.test.mjs"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json"
+      ],
+      "requiredChecks": [
+        "exact_delta_and_fail_closed_target_authority",
+        "read_only_preflight_and_role_identity",
+        "installer_plan_rollback_nonexposure"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only backend integration and exact installation proposal"
+      },
+      "releaseAuthority": "PO continuing N88 authorizes concrete inactive external installer/preflight preparation and source-only publication. No hosted execution or schema/Auth/RLS/data mutation authorized by this card.",
+      "objective": "Continue SAME N88 session from verified inactive backend249f248e. Prepare the final concrete externally reviewable installation delta, not another local mock layer. Existing local schema gate MUST remain untouched; create separate exact external installer artifact for four relations/two roles/14fixed functions from immutable packet, default fail-closed behind target identity and matching authority. No execution of installer or hosted SQL, Auth/RLS changes, real data or new accounts. Produce narrow read-only preflight runner and exact identity inventory query plan for original target, using existing approved finite boundary only; if queries are denied record that accurately, do not bypass or probe alternate credential routes. Pin unchanged original Auth/canonical/numeric prerequisites and manifest. Enumerate explicit installation transaction, collision/partial state handling, privileges/nonexposure/readbacks, disable/rollback limits, original Sync/Delete actual attachment needed, and exact live permissions absent. Do not claim current local host is hosted-capable or change it. Reuse all unchanged native evidence. Make final live-authorization request concrete: what exact target/schema/roles/functions/writers would change, expected acceptance and rollback; if missing actual target/authority cannot be inferred record exact item. This task PREPARES only, no new live authorization. Deliver source-only via existing publisher, with no service activation. Do not stop at a document saying a later installer must be prepared; prepare the inactive artifact now.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "51bca7c959bd6faf96764849a48fb8c79170dd43",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/activation/v2-package-1028/schema.sql",
+          "drafts/n88-student-portal/activation/v2-package-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-package-1028/INSTALL.md"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+          "tests/n88-external-plan-1028.test.mjs"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+          "tests/n88-external-plan-1028.test.mjs"
+        ],
+        "workerChecks": [
+          "exact_delta_and_fail_closed_target_authority",
+          "read_only_preflight_and_role_identity",
+          "installer_plan_rollback_nonexposure"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
