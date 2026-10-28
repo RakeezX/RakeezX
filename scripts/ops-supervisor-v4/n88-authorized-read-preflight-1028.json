@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-authorized-read-preflight-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100014,
+      "scopeKey": "n88-durable-publication-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n88-external-plan-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+        "tests/n88-external-plan-1028.test.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/read-authority.json",
+        "tests/n88-authorized-read-preflight-1028.test.mjs",
+        "docs/automation-evidence/20261028/N88_AUTHORIZED_READ_PREFLIGHT.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json"
+      ],
+      "requiredChecks": [
+        "nine_exact_metadata_reads_only",
+        "original_boundary_authority_and_denials_preserved",
+        "actual_target_readback_or_precise_access_blocker"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only backend integration and exact installation proposal"
+      },
+      "releaseAuthority": "Direct user approval of read/inspection and exact nine-query original metadata admission. Local source repair and publication authorized. Current read-only phase does not execute installer or change live schema/data.",
+      "objective": "User explicitly approves original nine-query metadata preflight and broad read access; authority evidence po-20261028-n88-read-authority/authority.json. Do NOT ask again for read authorization. Continue original session from publishedfb33a9e0. Implement the missing exact nine-query admission and bound read authority in ORIGINAL finite boundary, preserving every existing statement identity/denial and rejecting arbitrary caller SQL. Collect actual project/database/role and prerequisite metadata through the original supported custodian connection only, using existing authorized credentials without displaying/copying secrets. Read minimal identity/schema/ACL metadata, no need for pupil names. Current step is read-only against hosted services; do not execute install.sql, create functions/roles, modify schema or data, or activate service. If original metadata mechanism requires an additional real DDL change, prepare exact change and document dependency rather than silently executing it as read. Do not bypass actual tool/policy denial or use alternate credentials. Fully implement authorized local admission now, with targeted tests, then perform actual bounded reads if original approved tool supports them. The target hint xlrubcwjqktzzunrvuns is not proof; bind actual provider/database evidence. Preserve actual failure/UNKNOWN and stop repeated unchanged denied call. Minimized report contains actual facts, precise missing capability if any, and concrete next installation step; do not stop only because previous card had null read authority. No extra PostgreSQL campaigns for unchanged code. Original publisher handles source delivery.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "6b143083c9b9b4d383e0179acbd9781530a99747",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+          "tests/n88-external-plan-1028.test.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+          "tests/n88-external-plan-1028.test.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/read-authority.json",
+          "tests/n88-authorized-read-preflight-1028.test.mjs",
+          "docs/automation-evidence/20261028/N88_AUTHORIZED_READ_PREFLIGHT.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/read-authority.json",
+          "tests/n88-authorized-read-preflight-1028.test.mjs",
+          "docs/automation-evidence/20261028/N88_AUTHORIZED_READ_PREFLIGHT.md"
+        ],
+        "workerChecks": [
+          "nine_exact_metadata_reads_only",
+          "original_boundary_authority_and_denials_preserved",
+          "actual_target_readback_or_precise_access_blocker"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
