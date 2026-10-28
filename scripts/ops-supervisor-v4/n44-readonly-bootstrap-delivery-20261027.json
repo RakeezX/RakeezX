@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-readonly-bootstrap-delivery-20261027",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -6200,
+      "scopeKey": "n44-readonly-existing-device-bootstrap",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 15,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n44-click-shell-preservation-20261027"
+      ],
+      "allowedPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/lib/notification-push-client.js",
+        "docs/automation-evidence/20261027/N44_READONLY_BOOTSTRAP_DELIVERY.md",
+        "tests/n44-readonly-bootstrap-delivery-20261027/qualification.json"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/lib/notification-push-client.js"
+      ],
+      "requiredChecks": [
+        "n44_readonly_bootstrap_exact_preimage_and_qualified_modules",
+        "n44_readonly_bootstrap_consumed_contract_and_ownership_guards",
+        "n44_readonly_bootstrap_two_module_scope_no_live_allocation"
+      ],
+      "releaseAuthority": "Direct PO authorized N44 actual completion and exact additive test; this already-qualified causal frontend prerequisite is source-only via sole publisher. No device/service/send allocations by this component.",
+      "preparationAuthority": {
+        "kind": "qualified_readonly_bootstrap_frontend_only",
+        "publication": true,
+        "originalQualifiedCandidate": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "expectedSourceHashes": {
+          "src/lib/notification-push-runtime.js": "6cc35c423945abc118f6e3310aede8e53bd902728f4875e363c7d29961e54319",
+          "src/lib/notification-push-client.js": "af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570"
+        },
+        "expectedPreimageGitBlobs": {
+          "src/lib/notification-push-runtime.js": "8061857311be0612ff2b1d2aca1c22dbdedd978e",
+          "src/lib/notification-push-client.js": "b91a941701c68687fed3c38b8c98477cc1449399"
+        },
+        "qualifiedPackage": "tests/n44-pr6-completion-20261026/postclick-frontend-package.json",
+        "qualifiedPackageSha256": "ec7b6d49602ebd5d096950f81adbe92a3f0ca2fbbbd98401a9de42f9037096e9",
+        "providerServiceOperations": 0,
+        "realAccountReads": 0,
+        "privateCustodyAccess": 0,
+        "registrations": 0,
+        "sends": 0,
+        "sourceOperations": 0,
+        "trialWindowSelections": 0
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+        "requiredSourcePaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-push-client.js"
+        ],
+        "editPaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-push-client.js",
+          "docs/automation-evidence/20261027/N44_READONLY_BOOTSTRAP_DELIVERY.md",
+          "tests/n44-readonly-bootstrap-delivery-20261027/qualification.json"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261027/N44_READONLY_BOOTSTRAP_DELIVERY.md",
+          "tests/n44-readonly-bootstrap-delivery-20261027/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_readonly_bootstrap_exact_preimage_and_qualified_modules",
+          "n44_readonly_bootstrap_consumed_contract_and_ownership_guards",
+          "n44_readonly_bootstrap_two_module_scope_no_live_allocation"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "Deliver ONLY TWO already-qualified frontendmodulehunks frombe2e70adb487f68a6c8fc4c51658d6163d6d3f02: src/lib/notification-push-runtime.js, src/lib/notification-push-client.js. Same N44issue5/PR6; originalcustodian54cblockedwaitingthisexactprerequisite, soSEQUENTIALsourceonlycomponent, no newGitHubticket/parallelworker. ActualPOadditiveauthorityhardend00:48:46UTC27October remainsunchanged; thiscomponentallocatesZEROliveops. Workoncurrentmainisolatedcontrollerworktree; nooriginalworktree/QAedit.\n\nSourcepackage tests/n44-pr6-completion-20261026/postclick-frontend-package.json describesexactpreimage/postimageGitblobs, canonicalLF+rawtestedhashes, zero-contextpatch andtests. ExpectedcanonicalSHA{\"src/lib/notification-push-runtime.js\":\"6cc35c423945abc118f6e3310aede8e53bd902728f4875e363c7d29961e54319\",\"src/lib/notification-push-client.js\":\"af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570\"}. Verifycurrentmain2preimageGitblobs exactly {\"src/lib/notification-push-runtime.js\":\"8061857311be0612ff2b1d2aca1c22dbdedd978e\",\"src/lib/notification-push-client.js\":\"b91a941701c68687fed3c38b8c98477cc1449399\"} beforeapplying; thenusepackagedzero-contextpatchonlywithgit apply--unidiff-zero afterpreimagecheck ORcopyexactpostimagesiffpreimagesmatch. No forcedpatch/fuzzyoverwrite. RuntimequalifiedrawCRLF vsGitLFmappingexplicit; clientalreadyLF. PreserveinitialvalidpatchartifactwhitespaceFAILthenzero-contextpackagingfix, no actualJSchange. Exactcanonicalmodulehashesrequired. Ifcurrentmainmodulehasnewunrelatedchanges, inspect/mergeminimalcausalhunks andverifyaffectedboundary, neveroverwrite.\n\nDO NOT EDIT/COPY sw.js orVERSION/SHELL atall. LatestSWalreadycontainsqualifiedclickhandler+newportfolio/otheruserassets(v89orlater). Executable.js/css fetchusesexistingNETWORKFIRST cache:'reload', so thisruntime-onlyreleasecanloadnewmoduleswithoutworkerreplacement. PreserveallcurrentmainApp.js/SW/Native156/pins/keys/Auth/SQL/source6/7/retiredreg9. OriginalNative51inputsunchanged. Parentfullhistory~200filesmustnotmerge. Only2modules+minimalowndoc/proofJSON.\n\nReuseIMMUTABLEproof actualcompiledNative/Deno consumed-admissioncontract (disabledconfigurationwithactiveexistingreceipt, targetBound/reusedNewRegistrationdenied), actualappDOM17checks+focusedclient3PASS, initialredretained. NewbootstrapreadsONLYexactexistingserver/local/native/workerreceipt, freshowner/session/lease/binding/expiryfences; sendszero/register/contextupdate/bind/projection onrestore. Newoptin/projection/verificationunavailable inexistingClickOnlymode; privateclickfreshserverauthorizeandcurrentdestination stillrequired. Revoked/expired/deleted/unknown/foreigncontroller/binding/accountswitchnegativesPASS. Comparecurrentmain18runtimeinputdependencies againstqualifiedparent, rerunonlyifnon-EOLsemanticschanged. Syntax/scopedmodulebundleexpect18inputs98229bytes/hash6d44c43ecbeaffe77e52924e0c57479f7c9241905c0a034d1d89af50a45a9087, diffcheck. No newwhole-suite/browser/provider/testdataset/measurement orrealaccountoperation. Keep oldphysicalclickFAIL/postfixNOTRUN, actualfourtharrivalPASS/localcleanupnowactualPASSby3252 proof; noProductCLOSEDornewphysicalplatformclaim.\n\nCommitminimalAI-labelledcandidateandthreeexactscopedchecks, returnLOCAL_READYonlysourcecomponent. OriginalparenthistoricalFAILand44acceptancegateunchanged. Solepublisherbuilds/verifiesservedmodulePAIR/currentmetadata. Rootresumesoriginalcustodianafteractualservedreceipt BEFOREnewNative4/Source8/window/reg10/fifth—no automaticrenewal ifdeadlineinsufficient. Native156/OFFNULLandspent4/9/3 remainunchangedbythisstep. Don'tasknewPOapprovalalreadygranted."
+    }
+  ]
+}

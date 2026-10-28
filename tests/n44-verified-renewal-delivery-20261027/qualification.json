@@ -1,0 +1,163 @@
+{
+  "taskId": "continuous-n44-verified-renewal-delivery-20261027",
+  "runId": "120b2e33-3682-4092-a6e7-8df4dd4b0de8",
+  "productId": "N44",
+  "recordedAt": "2026-10-27T13:56:23.427Z",
+  "baseSha": "d439e2d86cf6147ac7d98b3f93a5185423bb57f2",
+  "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-verified-renewal-delivery-20261027",
+  "qualifiedSource": "f71e2dfd64ddb8e79b18d4f30151c0a9cfedb3b2",
+  "evidenceCandidate": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+  "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+  "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+  "recipe": {
+    "path": "tests/n44-astra-continuation-20261027/integration-recipe.json",
+    "sha256": "881963cbe9d8c6fccafc75dbfcf324a4bdb2d540f45c5dfca3c6b805df99e8de",
+    "patchPath": "tests/n44-astra-continuation-20261027/public-delta.patch",
+    "patchSha256": "d7457db645ab2bf083ff03cdbe9e5d5ce9bb95e249cedc7f3b506ddd60b9b61c",
+    "isolatedIndexApplyProof": "REUSED_PASS"
+  },
+  "observedOriginMain": "d439e2d86cf6147ac7d98b3f93a5185423bb57f2",
+  "sourceRecipeObservedMain": "907ce88566e09f7b8df3b5c294f258d76fb72cdd",
+  "mainAdvancePaths": [
+    "docs/automation-evidence/20261027/N44_RENEWAL_COMPONENT_SCOPE.md",
+    "scripts/ops-supervisor-v4/n44-verified-renewal-delivery-20261027.json",
+    "scripts/ops-supervisor-v4/run-task.ps1"
+  ],
+  "manifest": [
+    {
+      "path": "src/lib/notification-push-gateway.js",
+      "preimageBlob": "020b7884eddca0fa72ed0d322209ebe55ded1225",
+      "postimageBlob": "aff767fe17f5fe003a7c87d0f9ea66acdc12ba3d",
+      "preimageSha256": "7d59201fea6e812d90369e0be1d0691954a7294d3027631f16a132f4f0c13a3c",
+      "postimageSha256": "31799ecaf24725c81831699e44b2eb414a7e3545e9d7a1a914ba3af83b349ddc"
+    },
+    {
+      "path": "src/lib/notification-push-runtime.js",
+      "preimageBlob": "2b62a967ea26a20fd0e4d69bc616b7bfb359eb89",
+      "postimageBlob": "d11bfb0647c625620535e78b67c85c5d7f0e9091",
+      "preimageSha256": "6cc35c423945abc118f6e3310aede8e53bd902728f4875e363c7d29961e54319",
+      "postimageSha256": "c00108487399c26a9e4736822f104ac4acff767e9e5ea08bea97a7d631f009d5"
+    },
+    {
+      "path": "src/views/notification-settings.js",
+      "preimageBlob": "a07f3a22cfdd431faa07538dcae39340e52e46da",
+      "postimageBlob": "9bf50edc293079e92b7cb4c24c141f26d1c7a656",
+      "preimageSha256": "59cfe0c0effd1e681a35b738673bfb25aa4303a49acea00c2ce95f22df233c43",
+      "postimageSha256": "eba6af139c08ff1ddf7ed712b7acdc1c936bf263e8be85d5e089703de5f998a6"
+    }
+  ],
+  "reusedProofs": {
+    "directory": "tests/n44-astra-continuation-20261027/",
+    "runId": "9f81c26d-ff03-4e2d-90ad-862a0fb60da5",
+    "artifacts": [
+      {
+        "file": "composition-green.json",
+        "sha256": "3738b78e18f80ad6553997d833b0f46522d361efd0489c296e09ea017c2821eb",
+        "passed": 15,
+        "mode": "REUSED_NOT_RERUN"
+      },
+      {
+        "file": "current-main-entry.json",
+        "sha256": "b8e582c66e9706808e2db88dba3ceba9ed37955e1dd2264d71258a2811ee4a38",
+        "passed": 3,
+        "mode": "REUSED_NOT_RERUN"
+      },
+      {
+        "file": "mobile-admission.json",
+        "sha256": "4a38ed845e141164354ce20d7f2f197302c8a7e8118e03a3cdc908b7bc8d9c67",
+        "passed": 2,
+        "mode": "REUSED_NOT_RERUN"
+      },
+      {
+        "file": "gateway-regressions.json",
+        "sha256": "2b62a641f87a8aa0aeb44ed9fce1847388b8ee9bc50b2bb671fd26b41ea15966",
+        "passed": 7,
+        "mode": "REUSED_NOT_RERUN"
+      }
+    ]
+  },
+  "preserved": {
+    "testedCompositionMain": "c49b1a2eb77df6291af12eec133c412bb2eb8ae2",
+    "files": [
+      {
+        "path": "src/app.js",
+        "blob": "0132fe2f57606df1d9c11c8a78eaf9f1c2ebefa6"
+      },
+      {
+        "path": "sw.js",
+        "blob": "70ab37641824f17b600bbba6246cc71d34bff7ef"
+      }
+    ],
+    "shellVersion": "rakeezx-v90",
+    "noNewStartupImports": true
+  },
+  "localVerification": {
+    "syntax": {
+      "command": "node --check <each manifest path>",
+      "passed": 3
+    },
+    "exactProductDiffSha256": "d7457db645ab2bf083ff03cdbe9e5d5ce9bb95e249cedc7f3b506ddd60b9b61c",
+    "semanticChangesFromQualifiedInputs": 0,
+    "correctedAttempt": {
+      "status": "FAIL_PRESERVED",
+      "phase": "Initial raw working-file SHA256 assertion after git apply",
+      "observedGatewaySha256": "106ceac3863a5446af016946f61b19a7ca4a8e7db68437b53f09a77d34e27b55",
+      "cause": "Git materialized CRLF; all Git postimage blobs already matched.",
+      "correction": "Verified LF normalization matched all three pinned SHA256 values before writing only these owned files with LF. Rechecked exact bytes, blobs, diff and syntax. No Git config change."
+    }
+  },
+  "checks": [
+    {
+      "name": "n44_renewal_exact_qualified_three_file_delta",
+      "status": "PASS",
+      "evidence": "Pinned recipe and public-delta.patch verified; all three base/origin preimage and qualified source/evidence postimage Git blobs and SHA256 values match. Applied zero-context patch; resulting Product diff SHA256 is exactly d7457db645ab2bf083ff03cdbe9e5d5ce9bb95e249cedc7f3b506ddd60b9b61c. No hunk reconciliation."
+    },
+    {
+      "name": "n44_renewal_current_app_owner_click_and_failure_guards",
+      "status": "PASS",
+      "evidence": "Reused immutable composition-green 15, current-main-entry 3, mobile-admission 2 and gateway-regressions 7 PASS cases, with verified hashes/counts. Actual HTTP app/store/DOM/CSS proof covers owner/lease/session rejection, expiry, revocation, temporary503 recovery, post-renewal item click and late-click rejection. Current app.js/SW blobs equal tested main. No browser or fixture rerun; no new physical-device proof."
+    },
+    {
+      "name": "n44_renewal_source_scope_and_zero_live_allocations",
+      "status": "PASS",
+      "evidence": "node --check passed for all three modules; static imports unchanged; exact Product diff is limited to these modules, with only this qualification and the delivery note added. Current app.js, v90 shell and all other startup assets preserved. No browser/server/phase resources or live operations; no push, build or deployment."
+    }
+  ],
+  "actions": {
+    "browser": 0,
+    "servers": 0,
+    "phaseLeases": 0,
+    "realAccountReads": 0,
+    "privateCustodyAccess": 0,
+    "providerServiceOperations": 0,
+    "configChanges": 0,
+    "nativeUploads": 0,
+    "sqlAuthSchemaRoleRegion": 0,
+    "registrations": 0,
+    "consentWrites": 0,
+    "sourceOperations": 0,
+    "sends": 0,
+    "trialWindowSelections": 0,
+    "gitPush": 0,
+    "deployments": 0
+  },
+  "retainedDisposition": {
+    "source": "Activated card and immutable parent evidence; not re-observed",
+    "nativeVersion": 176,
+    "spentSends": 6,
+    "spentRegistrationACKs": 11,
+    "spentNativeUploads": 6,
+    "windows135920ArrivalAndCorrectClick": "PASS_RETAINED",
+    "sources6to10": "CLEANED_OFF_NULL_RETAINED",
+    "original44HistoricalChecks": "UNCHANGED",
+    "originalBlockedRecordSessionCandidate": "PRESERVED",
+    "parentN44": "OPEN",
+    "newPhonePushAndPrivilegedAdmin": "SEPARATELY_GATED"
+  },
+  "boundaries": {
+    "fullBuild": "NOT_RUN_WORKER; publisher owns deterministic build",
+    "providerAndProductionVerification": "NOT_RUN_WORKER",
+    "publicationPerformed": false,
+    "productAcceptanceClaimed": false
+  }
+}

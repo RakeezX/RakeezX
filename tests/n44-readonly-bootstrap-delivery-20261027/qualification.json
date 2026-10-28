@@ -1,0 +1,210 @@
+{
+  "taskId": "continuous-n44-readonly-bootstrap-delivery-20261027",
+  "runId": "00a33892-4592-4e2c-b6e4-30cba375c1e1",
+  "status": "LOCAL_READY_SOURCE_COMPONENT_ONLY",
+  "baseSha": "0a5f729712cc273c48cb4d6a74762720b922cacd",
+  "qualifiedCandidate": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+  "modules": {
+    "src/lib/notification-push-runtime.js": {
+      "preimageGitBlob": "8061857311be0612ff2b1d2aca1c22dbdedd978e",
+      "postimageGitBlob": "2b62a967ea26a20fd0e4d69bc616b7bfb359eb89",
+      "gitLfSourceSha256": "6cc35c423945abc118f6e3310aede8e53bd902728f4875e363c7d29961e54319",
+      "rawWorktreeSha256": "678ab61555a10c2711c1578719054ef9d5cc71cd5e6863c4939367a492cabea5",
+      "actualCanonicalSha256": "6cc35c423945abc118f6e3310aede8e53bd902728f4875e363c7d29961e54319",
+      "syntax": "PASS",
+      "copyMethod": "Exact qualified LF Git postimage after exact preimage verification"
+    },
+    "src/lib/notification-push-client.js": {
+      "preimageGitBlob": "b91a941701c68687fed3c38b8c98477cc1449399",
+      "postimageGitBlob": "f1ac8ee88141b3231f7ac0af154905801d3bf79a",
+      "gitLfSourceSha256": "af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570",
+      "rawWorktreeSha256": "af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570",
+      "actualCanonicalSha256": "af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570",
+      "syntax": "PASS",
+      "copyMethod": "Exact qualified LF Git postimage after exact preimage verification"
+    }
+  },
+  "moduleBundle": {
+    "inputs": 18,
+    "bytes": 98229,
+    "sha256": "6d44c43ecbeaffe77e52924e0c57479f7c9241905c0a034d1d89af50a45a9087"
+  },
+  "runtimeInputs": {
+    "src/lib/notification-center.js": {
+      "canonicalSha256": "cc09773cc6a8092c67cd55e561881fda94b71c1f79310f398a57b08f73b761c3",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/notification-push-core.js": {
+      "canonicalSha256": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/notification-push-client.js": {
+      "canonicalSha256": "af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/notification-push-browser.js": {
+      "canonicalSha256": "bdae0add60f5d996bf7b29a44411c647882ff3c179fbe87635a357b748f48cc9",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/notification-push-gateway.js": {
+      "canonicalSha256": "7d59201fea6e812d90369e0be1d0691954a7294d3027631f16a132f4f0c13a3c",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/notification-state.js": {
+      "canonicalSha256": "d3c0d36ab1e40900586a9964f1ff0919e5317df52289afa7ac898ce67f0a4f35",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/score-foundation.js": {
+      "canonicalSha256": "d759fbec5a53638f2e05873df76db734430c8aafdc8b069bcdbbd23708e9af48",
+      "qualifiedParentEqual": true
+    },
+    "src/models.js": {
+      "canonicalSha256": "af9e624621e21686a86599b75eead8289af526072906efbe79e58a84d7b4a5fe",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/db.js": {
+      "canonicalSha256": "c72011471d26cc655d183e6b5e178f0b0534505805b777a02a54650c248674a0",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/workspaces.js": {
+      "canonicalSha256": "834d8546970a94dfd912bab56ca8082f7d0bd890529fc565e2d36d41cc91ee1e",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/offline-lease.js": {
+      "canonicalSha256": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/sync-ownership.js": {
+      "canonicalSha256": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/notification-events.js": {
+      "canonicalSha256": "e673fea9da1ee873cef980464b19b2094faa3c309e21e31653dfe0711a4f94c8",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/rakeez-datetime-values.js": {
+      "canonicalSha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/visible-numerals.js": {
+      "canonicalSha256": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/visible-viewport.js": {
+      "canonicalSha256": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/dom.js": {
+      "canonicalSha256": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480",
+      "qualifiedParentEqual": true
+    },
+    "src/lib/notification-push-runtime.js": {
+      "canonicalSha256": "6cc35c423945abc118f6e3310aede8e53bd902728f4875e363c7d29961e54319",
+      "qualifiedParentEqual": true
+    }
+  },
+  "checks": [
+    {
+      "name": "n44_readonly_bootstrap_exact_preimage_and_qualified_modules",
+      "status": "PASS",
+      "evidence": "Exact base preimages, package/patch hashes and canonical postimages; both node --check PASS; scoped bundle 18 inputs / 98229 bytes / SHA256 6d44c43ecbeaffe77e52924e0c57479f7c9241905c0a034d1d89af50a45a9087."
+    },
+    {
+      "name": "n44_readonly_bootstrap_consumed_contract_and_ownership_guards",
+      "status": "PASS",
+      "evidence": "Reused immutable compiled Native/Deno consumed-admission contract, actual app DOM 17 PASS and focused client 3 PASS. All 18 frontend inputs match qualified parent modulo EOL. Initial red retained; no browser/live replay."
+    },
+    {
+      "name": "n44_readonly_bootstrap_two_module_scope_no_live_allocation",
+      "status": "PASS",
+      "evidence": "Only two module postimages plus own documentation/proof. Diff whitespace PASS; SW v90 and all 51 current-base Native paths untouched, including existing absent paths. Offline shell covers all runtime inputs; executable network-first reload retained. Zero live allocation."
+    }
+  ],
+  "reusedEvidence": {
+    "postclick-frontend-package.json": {
+      "commit": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+      "path": "tests/n44-pr6-completion-20261026/postclick-frontend-package.json",
+      "sha256": "ec7b6d49602ebd5d096950f81adbe92a3f0ca2fbbbd98401a9de42f9037096e9"
+    },
+    "postclick-consumed-green.json": {
+      "commit": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+      "path": "tests/n44-pr6-completion-20261026/postclick-consumed-green.json",
+      "sha256": "b044aeaca603621ceba5d5bc6b512a7a174df21c3dd95cfaff7c2e29ebd2ff49"
+    },
+    "postclick-consumed-red.json": {
+      "commit": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+      "path": "tests/n44-pr6-completion-20261026/postclick-consumed-red.json",
+      "sha256": "b4f9aa4a77310cf1c0e20cf93957c68c167a431e1851790d753340e029d511a7"
+    },
+    "postclick-native-contract.json": {
+      "commit": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+      "path": "tests/n44-pr6-completion-20261026/postclick-native-contract.json",
+      "sha256": "181308900428c37f3759833e5975ee375856cdfb451b4e42a806a35168b0949f"
+    },
+    "retired-local-cleanup-confirmed-3252.json": {
+      "commit": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+      "path": "tests/n44-pr6-completion-20261026/retired-local-cleanup-confirmed-3252.json",
+      "sha256": "d539eed27996657f11b32c19de1a9f0612c158474261754284e3714e3f5cf2b1"
+    },
+    "postclick-readonly-client.test.mjs": {
+      "commit": "be2e70adb487f68a6c8fc4c51658d6163d6d3f02",
+      "path": "tests/n44-pr6-completion-20261026/postclick-readonly-client.test.mjs",
+      "sha256": "95c9095de24617a98feee725a15577da51a5c9c49b6486c7a34e62d98935c364",
+      "reusedPassed": 3
+    }
+  },
+  "initialPackagingWhitespace": "FAIL: added patch artifact contained a blank context line with one space; regenerated using git diff --unified=0, source bytes unchanged",
+  "rawRuntimeMapping": "Qualified CRLF raw hash retained above; canonical LF Git postimage copied. No semantic JS edits.",
+  "nativeInputs": {
+    "count": 51,
+    "unchangedRelativeToActivatedBase": true,
+    "historicalNativeProofNotCurrentMainServiceCertification": true
+  },
+  "diagnostics": [
+    {
+      "status": "FAIL",
+      "name": "extra historical Native parity comparison",
+      "reason": "Pre-existing main differences outside frontend input graph; no Native source copied or repaired. All 51 named paths remain unchanged from current base, including paths absent at base."
+    },
+    {
+      "status": "FAIL",
+      "name": "proof-generator draft assertions",
+      "reason": "First draft compared git hash output with undefined; next draft tried reading a historical path absent on current main. Corrected to canonical-byte hash and base-scoped Native diff. No Product code changed."
+    }
+  ],
+  "preservedGates": {
+    "initialConsumedDom": "FAIL",
+    "historicalPhysicalClick": "FAIL_NO_VISIBLE_APPLICATION",
+    "servedFixPhysicalClick": "NOT_RUN",
+    "fourthArrival": "PASS by existing PO witness",
+    "localCleanup": "PASS by actual 3252 proof",
+    "parentAcceptance": "UNCHANGED; N44 NOT CLOSED",
+    "native156": "UNCHANGED",
+    "offNull": "UNCHANGED",
+    "spent": {
+      "providerRequests": 4,
+      "registrationAcks": 9,
+      "nativeUploads": 3
+    }
+  },
+  "operations": {
+    "service": 0,
+    "realAccountReads": 0,
+    "privateCustodyAccess": 0,
+    "registrations": 0,
+    "sends": 0,
+    "sources": 0,
+    "windows": 0
+  },
+  "resources": {
+    "browserStarted": false,
+    "serverStarted": false,
+    "leasesAcquired": false
+  },
+  "delivery": {
+    "push": "NOT_RUN",
+    "deploy": "NOT_RUN",
+    "servedModules": "NOT_RUN",
+    "next": "Independent publisher must verify exact served module pair/current metadata before controller considers original custodian resumption within unchanged authority/deadline; no automatic renewal."
+  }
+}

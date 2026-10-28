@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Actual v92 Service Worker installed/controlled a fresh synthetic loopback context; current teacher view (existing synthetic mount seam only) and exact CSS bytes served after browser offline switch.",
+    "Actual mounted teacher component remains usable offline: explicit guidance/settings navigation and 390px no overflow, using synthetic ports.",
+    "Student private API remains network-only and unavailable offline; no private cache fallback."
+  ],
+  "cleanup": {
+    "ownedContextBrowserServerClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "limitations": "Synthetic PWA source/layout check, not live account/Sync, production served-asset or cold offline account boot certification. Student private offline availability is deliberately not enabled."
+}

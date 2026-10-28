@@ -1,3 +1,5 @@
+import { validDateTimeValue } from './rakeez-datetime-values.js';
+
 /**
  * F09 draft snapshot codec: no Blob or object URL in document metadata.
  * Actual files remain in a separate IndexedDB attachment store.
@@ -7,6 +9,23 @@ const values=value=>[...value.values()];
 const list=value=>Array.isArray(value)?value:[];
 const string=value=>typeof value==='string'?value:'';
 const finite=n=>Number.isFinite(n)&&n>=0?n:0;
+// AI N126: bounded, optional teacher-entered context; no inferred source metrics.
+export const PORTFOLIO_CONTEXT_FIELDS = Object.freeze([
+  {key:'action',label:'العمل المنفذ فعليًا',max:240},
+  {key:'activity',label:'النشاط',max:120},
+  {key:'date',label:'تاريخ النشاط',max:10},
+  {key:'teaching',label:'السياق التعليمي (الفصل / المادة)',max:180},
+  {key:'reflection',label:'الأثر النوعي والتأمل المهني',max:300},
+  {key:'source',label:'ملاحظة الدليل أو المصدر',max:200},
+]);
+export function normalizePortfolioContext(value) {
+  const result={};
+  for(const {key,max} of PORTFOLIO_CONTEXT_FIELDS) {
+    const text=string(value?.[key]).replace(/\s+/g,' ').trim().slice(0,max);
+    if(text && (key!=='date'||validDateTimeValue(text,'date')))result[key]=text;
+  }
+  return result;
+}
 export function snapshotPortfolioDraft(model) {
   const images=[];
   // A deleted personal witness may remain in memory for one-step Undo, but
@@ -33,6 +52,8 @@ export function snapshotPortfolioDraft(model) {
       photoLayouts:keepMap(model.photoLayouts),
       photos:photoGroups,
       selectedByCriterion:pairs(model.selectedByCriterion).filter(([,id])=>keep(id)),
+      contexts:keepMap(model.contexts??new Map()).map(([id,value])=>[id,normalizePortfolioContext(value)])
+        .filter(([,value])=>Object.keys(value).length),
       descriptions:keepMap(model.descriptions),
       titles:keepMap(model.titles),
       includedWitnesses:keepSet(model.includedWitnesses),
@@ -67,6 +88,9 @@ export function restorePortfolioDraft(payload,records,{makeUrl=blob=>URL.createO
     hiddenWitnesses:set('hiddenWitnesses'),sectionPreferences:map('sectionPreferences'),
     photoLayouts:map('photoLayouts'),photoGroups,
     selectedByCriterion:map('selectedByCriterion'),
+    contexts:new Map(list(payload.contexts).filter(([id])=>
+      !String(id).startsWith('custom:')||list(payload.customWitnesses).some(w=>w.id===id))
+      .map(([id,value])=>[id,normalizePortfolioContext(value)])),
     descriptions:map('descriptions'),titles:map('titles'),
     includedWitnesses:set('includedWitnesses'),
     excludedWitnesses:set('excludedWitnesses'),

@@ -1,0 +1,150 @@
+{
+  "at": "2026-10-27T22:35:31.840Z",
+  "active": [
+    {
+      "id": "n88-closure-1028",
+      "status": "running",
+      "allowedPaths": [
+        "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs",
+        "tests/n88-closure-20261028/**",
+        "docs/automation-evidence/20261028/N88_UNKNOWN_ISSUANCE_SAFE_TERMINAL_CONTRACT.md"
+      ]
+    },
+    {
+      "id": "n88-pwa-sw-safe-1028",
+      "status": "running",
+      "allowedPaths": [
+        "sw.js",
+        "tests/n88-pwa-sw-safe-20261028/**",
+        "docs/automation-evidence/20261028/N88_SW_SAFE_AFTER_N44_BLOCKER.md"
+      ]
+    }
+  ],
+  "processes": [
+    {
+      "ProcessId": 20764,
+      "CreationDate": "/Date(1793140344555)/",
+      "CommandLine": "\"C:\\Program Files\\nodejs\\node.exe\" C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\worker-broker.mjs --task C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\n88-closure-1028.json --attempt C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\n88-closure-1028\\87c816aa-2ce6-4238-b65b-bf26d42634b0\\attempt.json --powershell C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe --wrapper C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\run-task.ps1 --cwd C:\\Users\\Abody\\Projects\\RakeezX"
+    },
+    {
+      "ProcessId": 34704,
+      "CreationDate": "/Date(1793140344655)/",
+      "CommandLine": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\run-task.ps1 -TaskFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\n88-closure-1028.json -AttemptFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\n88-closure-1028\\87c816aa-2ce6-4238-b65b-bf26d42634b0\\attempt.json"
+    },
+    {
+      "ProcessId": 33184,
+      "CreationDate": "/Date(1793140434665)/",
+      "CommandLine": "\"C:\\Program Files\\nodejs\\node.exe\" C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\worker-broker.mjs --task C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\n88-pwa-sw-safe-1028.json --attempt C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\n88-pwa-sw-safe-1028\\bc2dc652-b0cb-4e6e-8398-014eb71217be\\attempt.json --powershell C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe --wrapper C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\run-task.ps1 --cwd C:\\Users\\Abody\\Projects\\RakeezX"
+    },
+    {
+      "ProcessId": 33600,
+      "CreationDate": "/Date(1793140434752)/",
+      "CommandLine": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\run-task.ps1 -TaskFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\n88-pwa-sw-safe-1028.json -AttemptFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\n88-pwa-sw-safe-1028\\bc2dc652-b0cb-4e6e-8398-014eb71217be\\attempt.json"
+    }
+  ],
+  "n44": {
+    "status": "blocked",
+    "lastFailure": "The active local card retains the exhausted grant's liveAuthorizationRef, so the canonical isolated-browser helper rejects the required rendered check. The worker cannot edit that card or bypass the helper. Native178 remains unchanged; the spent live grant cannot be reused.",
+    "absent": {
+      "activationId": "po-20261012-continuous",
+      "runId": "20634fb4-2429-4ba0-be54-bb4e90641586",
+      "verifiedAbsentAt": "2026-10-27T22:29:42.580Z",
+      "exactAbsence": true,
+      "owners": [
+        {
+          "pid": 11996,
+          "createdAt": "2026-10-27T21:52:18.5705280Z"
+        },
+        {
+          "pid": 32216,
+          "createdAt": "2026-10-27T21:52:18.7324780Z"
+        },
+        {
+          "pid": 4888,
+          "createdAt": "2026-10-27T21:52:19.9323260Z"
+        },
+        {
+          "pid": 34436,
+          "createdAt": "2026-10-27T21:52:18.7559200Z",
+          "name": "conhost.exe",
+          "parentPid": 32216,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 25572,
+          "createdAt": "2026-10-27T21:52:19.9433760Z",
+          "name": "conhost.exe",
+          "parentPid": 4888,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 4220,
+          "createdAt": "2026-10-27T21:52:21.8818730Z",
+          "name": "node_repl.exe",
+          "parentPid": 4888,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 30124,
+          "createdAt": "2026-10-27T21:52:21.8954680Z",
+          "name": "node.exe",
+          "parentPid": 4888,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 5300,
+          "createdAt": "2026-10-27T21:52:21.8955640Z",
+          "name": "conhost.exe",
+          "parentPid": 4220,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 35480,
+          "createdAt": "2026-10-27T21:52:21.9114490Z",
+          "name": "conhost.exe",
+          "parentPid": 30124,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 17068,
+          "createdAt": "2026-10-27T21:52:22.0428840Z",
+          "name": "node_repl.exe",
+          "parentPid": 30124,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 24476,
+          "createdAt": "2026-10-27T21:52:34.4783040Z",
+          "name": "codex-code-mode-host.exe",
+          "parentPid": 4888,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        },
+        {
+          "pid": 27772,
+          "createdAt": "2026-10-27T21:52:34.4938930Z",
+          "name": "conhost.exe",
+          "parentPid": 24476,
+          "observedAt": "2026-10-27T22:29:35.437Z"
+        }
+      ]
+    }
+  },
+  "receipts": [
+    {
+      "id": "continuous-n44-qualified-click-frontend-20261027",
+      "publishedSha": "e2f40e680edea6a546331d4adc58f5de9fcd392c",
+      "verifiedAt": "2026-10-26T22:17:44.669Z",
+      "immutable": true,
+      "production": true
+    },
+    {
+      "id": "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+      "publishedSha": "3fb70a8f91bfc5dbedbf6ae4ff29e608234815d1",
+      "verifiedAt": "2026-10-27T22:21:21.396Z",
+      "immutable": true,
+      "production": true
+    }
+  ],
+  "remoteMain": "9dc2acf8ce7cc070657116658a010cd0dd77adb0\trefs/heads/main",
+  "leases": []
+}

@@ -3,10 +3,27 @@
 import { html, icon, fmtPct } from '../lib/dom.js';
 import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
+import { compactSectionLabel } from '../lib/class-order.js';
+import { compactSubjectLabel } from '../lib/subject-catalog.js';
 import { studentTotal, sectionLabel, gradeLabel } from '../models.js';
 
 
 const classCount = (count) => count === 1 ? 'فصل واحد' : count === 2 ? 'فصلان' : `${count} فصول`;
+
+function portfolioDestination() {
+  return html`
+    <section class="surface surface--flat report-hub" aria-labelledby="portfolio-preview-title">
+      <a class="report-destination" href="#/reports/portfolio-preview">
+        <span class="report-destination__icon" aria-hidden="true">${icon('reports')}</span>
+        <span class="row__main">
+          <span class="row__title" id="portfolio-preview-title">ملف الإنجاز (معاينة)</span>
+          <span class="row__sub">ملف سنوي من 11 معيارًا للشواهد والصور وتصدير PDF. المسودة في هذا المتصفح فقط، مع أرشيف محلي يدوي قابل للنقل. المزامنة السحابية والربط بنسخ N71 غير مكتملين؛ لا تُزامن المسودة أو تُنسخ احتياطيًا إلى N71 أو جهاز آخر.</span>
+        </span>
+        <span class="row__chev">${icon('chev')}</span>
+      </a>
+    </section>
+  `;
+}
 
 function classReportRow(tch) {
   const { roster, items, ctx } = store.teachingContext(tch.id);
@@ -19,7 +36,7 @@ function classReportRow(tch) {
     <a class="report-class-row" href="#/teaching/${tch.id}/reports">
       <span class="report-class-row__icon" aria-hidden="true">${icon('reports')}</span>
       <span class="row__main">
-        <span class="row__title">${visibleLatinDigits(`${sectionLabel(section) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}`)}</span>
+        <span class="row__title n133-report-class-name" title="${visibleLatinDigits(`${sectionLabel(section) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}`)}" role="text" aria-label="${visibleLatinDigits(`${sectionLabel(section) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}`)}"><span class="n133-full-name" aria-hidden="true">${visibleLatinDigits(`${sectionLabel(section) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}`)}</span><span class="n133-short-name" aria-hidden="true">${visibleLatinDigits(`${compactSectionLabel(section) || ''} · ${compactSubjectLabel(store.getSubject(tch.subjectId), store.subjects())}`)}</span></span>
         <span class="row__sub">
           <span class="tabular">${roster.length}</span> طالبًا
           ${avg !== null ? html` · متوسط <span class="tabular">${fmtPct(avg)}</span>` : ''}
@@ -49,11 +66,14 @@ export default {
 
     if (!list.length) {
       return html`
-        <div class="empty">
-          <div class="empty__icon">${icon('reports')}</div>
-          <div class="empty__title">لا بيانات بعد</div>
-          <div class="empty__text">أنشئ فصلًا وأضف طلابه لتظهر التقارير.</div>
-          <a class="btn btn--primary" href="#/classes">${icon('plus')} الفصول</a>
+        <div class="stack stack-4">
+          <div class="stack stack-4" data-report-destinations>${portfolioDestination()}</div>
+          <div class="empty">
+            <div class="empty__icon">${icon('reports')}</div>
+            <div class="empty__title">لا بيانات بعد</div>
+            <div class="empty__text">أنشئ فصلًا وأضف طلابه لتظهر التقارير.</div>
+            <a class="btn btn--primary" href="#/classes">${icon('plus')} الفصول</a>
+          </div>
         </div>
       `;
     }
@@ -61,6 +81,7 @@ export default {
     return html`
       <div class="reports-index-page">
         <div class="stack stack-4" data-report-destinations>
+          ${portfolioDestination()}
           <section class="surface surface--flat report-hub" aria-labelledby="certificate-center-title">
             <a class="report-destination" data-act="certificate-center" href="#/reports/certificates">
               <span class="report-destination__icon" aria-hidden="true">${icon('star')}</span>

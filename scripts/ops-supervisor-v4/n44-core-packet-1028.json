@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-core-packet-1028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100012,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "budgetMinutes": 100,
+      "idleMinutes": 16,
+      "dependsOn": [
+        "n44-core-auto-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n44-push/activation/core-v1-packet/build.mjs",
+        "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+        "tests/n44-core-packet-1028/qualification.test.mjs",
+        "docs/automation-evidence/20261028/N44_CORE_V1_INSTALL_PACKET.md",
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/existing-host.mjs",
+        "drafts/n44-push/core-teacher-scheduler.mjs",
+        "drafts/n44-push/scheduler-entry.mjs",
+        "drafts/n44-push/activation/bundle/scheduler/worker.mjs",
+        "drafts/n44-push/activation/scheduler.staged.toml",
+        "supabase/functions/n44-notifications/index.ts",
+        "drafts/n44-push/activation/exact-operator-cleanup.mjs",
+        "drafts/n44-push/activation/current-hosted-inspection.mjs",
+        "drafts/n44-push/sender-material.mjs",
+        "drafts/n44-push/postclick-authority.mjs",
+        "drafts/n44-push/witness-sixth-authority.mjs",
+        "drafts/n44-push/pr6-closed-fourth.mjs",
+        "drafts/n44-push/user-closed-fourth-envelope.mjs",
+        "drafts/n44-push/closed-fourth-successor.mjs",
+        "drafts/n44-push/current-request-authority.mjs",
+        "drafts/n44-push/activation/hosted-disposal.mjs",
+        "drafts/n44-push/expired-admission.mjs",
+        "drafts/n44-push/attempt-trace.mjs",
+        "drafts/n44-push/mobile-trial.inactive.mjs",
+        "drafts/n44-push/activation/mobile-hosted-readback.mjs",
+        "drafts/n44-push/admission-authority.mjs",
+        "drafts/n44-push/transport-contract.mjs",
+        "drafts/n44-push/transport-readiness.mjs",
+        "drafts/n44-push/transport-window.mjs",
+        "drafts/n44-push/native-readiness.mjs",
+        "drafts/n44-push/runtime-failure.mjs",
+        "drafts/n44-push/delivery.mjs",
+        "drafts/n44-push/private-runtime.mjs",
+        "drafts/n44-push/one-device-test.mjs",
+        "drafts/n44-push/web-entry.mjs",
+        "drafts/n44-push/readiness-entry.mjs"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/existing-host.mjs",
+        "drafts/n44-push/core-teacher-scheduler.mjs"
+      ],
+      "requiredChecks": [
+        "n44_exact_finite_service_import_graph_and_compiled_hashes",
+        "n44_saved_native178_guards_preserved_without_remote_read",
+        "n44_scheduler_packet_off_caps_cleanup_and_no_secret_material"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only local compiled service installation preparation; zero provider operations"
+      },
+      "releaseAuthority": "Current PO continuation requests authorized blocker repair and resumption only through original controller. Existing N44 Core V1 scope explicitly requires a deployment-ready finite composition and exact concrete installation packet; original verified result names custodian compilation as next action. This is ONLY that remaining local synthetic source-only preparation, original session and sole publisher inert delivery. It grants NO service install, remote read, Native upload, clock/grant activation, cron, source creation/deletion, registrations, sends, SQL/Auth/RLS/schema changes or real account operations. Prior spent grants remain spent. Live activation still requires its exact separate authority.",
+      "objective": "Continue SAME original N44 custodian session. Actual verified inactive scheduler candidate72c67feac91f3a63bbf2ff26359260d466cf7a7d published7c761eec4ed1fee6b721d1846502996349b8a1b7; original result and N44_CORE_V1_AUTOMATIC.md explicitly leave exact compiled Native/service packet qualification before installation. Complete that missing LOCAL deliverable on fresh controller worktree, not another scheduler, generic review or repeated eight-test campaign. Preserve original private mobile candidate d4e695d3 and saved Native178 composition from original worktree C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019; read only existing nonsecret source and sanitized archive identity evidence. Do NOT read/decrypt private credentials, account/device data, environment secrets or fetch a service. Compile exact current finite service import graph using existing bundled tooling; preserve verified Native178 mobile/transport guards, HMAC/SQL/owner/COMMIT fences and inactive defaults. Keep compiled deployable archive ONLY in ignored local artifacts, never public; publish only reproducible nonsecret builder and allowlisted source/archive hash manifest. Reuse existing qualified unchanged proof. Check exact required finite callback/export/config composition in compiled output and finite OFF/null/empty cron. Do not bundle a secret or publicize a private archive; public manifest contains hashes and structural counts only. Write concrete reviewed install/enable/readback/cleanup/rollback packet, identifying existing normal UI source parent/child requirements from code without creating data, maximum two event sources/four event-device tuples/two registrations/four provider attempts/twenty ticks and <=20-minute proposed window only AFTER future readiness and exact new authority. These are proposals, never active grants. Original service code should remain byte-identical unless compilation exposes a concrete necessary integration defect, then fix only the listed source files and rerun only affected checks. If saved original baseline is unavailable or a tool actually rejects access, preserve precise BLOCKED evidence; no alternate actor or remote probe. No browser/account/student operations, no API/native/upload/pin/clock/register/send/delete/source/schedule mutations, no SQL/Auth/schema, no UI simplification before actual automatic acceptance. No queue or ledger writes, no extra agents. Return existing result schema LOCAL_READY for safe inert builder/manifest/doc deliverable after actual affected qualification, not live PASS. Original publisher alone may integrate these inert public sources; hosted code remains unchanged. Archive path and hash are local qualification evidence, never a deployed claim.\n\nMATERIAL SCOPE REPAIR — latest PO28October explicitly requests dedicated N44/N88 execution and repair of blockers. Exact 27 missing/differing nonsecret N44 source paths documented by ebba140d are now writable for local composition ONLY. Reuse SAME saved worktree/session/candidate; baseline source commit d4e695d3f823a9ba57c13aad2baeb9763da04aab is read-only. Restore only necessary nonsecret source dependencies from the saved Native178 graph, merge the finite scheduler delta without whole-branch copying or private state. Preserve the actual FAIL and verify its correction; no unchanged repeat. Existing compiled-hash and OFF checks reused unless their inputs change. No live operation/secret/account/SQL/Auth/schema authority added. Compile and qualify the exact deployable packet, return inert source-only delivery through original publisher; do not stop at a new study.",
+      "acceptance": [
+        "Actual reproducible service packaging with exact source graph and archive hash, preserving saved Native178 source guarantees; no hypothetical installed proof.",
+        "Only affected compiled-composition/inactive configuration checks; reuse original unchanged scheduler proof.",
+        "Concrete finite installation/cleanup proposal without activation, secrets, real data or consumed grant reuse; N44 remains OPEN."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "fd79f76a4847ccc6e69c8044714e030bb9cd3025",
+        "requiredSourcePaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/core-teacher-scheduler.mjs",
+          "drafts/n44-push/scheduler-entry.mjs",
+          "drafts/n44-push/activation/bundle/scheduler/worker.mjs",
+          "drafts/n44-push/activation/scheduler.staged.toml",
+          "supabase/functions/n44-notifications/index.ts",
+          "tests/n44-core-auto-1028/qualification.json",
+          "docs/automation-evidence/20261028/N44_CORE_V1_AUTOMATIC.md"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+          "tests/n44-core-packet-1028/qualification.test.mjs",
+          "docs/automation-evidence/20261028/N44_CORE_V1_INSTALL_PACKET.md"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+          "tests/n44-core-packet-1028/qualification.test.mjs",
+          "docs/automation-evidence/20261028/N44_CORE_V1_INSTALL_PACKET.md"
+        ],
+        "workerChecks": [
+          "n44_exact_finite_service_import_graph_and_compiled_hashes",
+          "n44_saved_native178_guards_preserved_without_remote_read",
+          "n44_scheduler_packet_off_caps_cleanup_and_no_secret_material"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

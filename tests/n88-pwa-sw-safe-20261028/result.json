@@ -1,0 +1,2962 @@
+{
+  "taskId": "n88-pwa-sw-safe-1028",
+  "runId": "bc2dc652-b0cb-4e6e-8398-014eb71217be",
+  "base": "9dc2acf8ce7cc070657116658a010cd0dd77adb0",
+  "startedAt": "2026-10-27T22:40:56.830Z",
+  "checks": [
+    {
+      "name": "source_manifest_syntax",
+      "status": "PASS",
+      "evidence": "Only VERSION changes v92 to v93; every other byte (Push, cache cleanup, private exclusions, full shell) equals remote base; all shell paths exist and SW syntax passes."
+    },
+    {
+      "name": "real_browser_upgrade_offline_private",
+      "status": "PASS",
+      "evidence": "320/390px fresh Chromium contexts: actual full v92 shell with pre-N88 teacher assets -> actual v93 SW; v92 retired, all 3 teacher assets refreshed, offline source bytes/DOM handlers, collapsed private roster, disabled uncertain issuance, private network-only failure, owner invalidation and unrelated cache/IDB preservation."
+    }
+  ],
+  "matrix": [
+    {
+      "width": 320,
+      "coldOfflineSessionFailClosed": true,
+      "oldGeneration": 92,
+      "newGeneration": 93,
+      "oldRetired": true,
+      "assets": [
+        {
+          "path": "/src/views/student-portal-class.js",
+          "oldHash": "8044307aec6b95e5ab712f0de32fd6e9a774b968ca0c880e4770b7568ab00fff",
+          "newHash": "bc453d0fc1006a5278b17bbcf7a154a0303394d1ef781e8c6cd9e4dcf964beb5"
+        },
+        {
+          "path": "/src/styles/student-portal-class.css",
+          "oldHash": "dbc1805e0b45aab6717291d05ddb557404bc78690d79f559ee1860aae4342935",
+          "newHash": "d06d26c3d07f9c51aafa16a71280f68b9ba88ec3492cae686f4656a805fc3e77"
+        },
+        {
+          "path": "/src/lib/student-portal-class-client.js",
+          "oldHash": "815d82573f1e2c5d8eaa263de781fe98f26b0d14f1a1847f37ddec63b54c2d8e",
+          "newHash": "815d82573f1e2c5d8eaa263de781fe98f26b0d14f1a1847f37ddec63b54c2d8e"
+        }
+      ],
+      "offlineActualTeacherHandlers": true,
+      "overflow": false,
+      "privateNetworkOnly": true,
+      "unrelatedCacheAndIdbPreserved": true,
+      "ownerInvalidation": true,
+      "mutations": 0,
+      "cacheAudit": [
+        {
+          "name": "synthetic-unrelated",
+          "path": "/synthetic-marker",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/manifest.webmanifest",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/favicon-32.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/favicon-32.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-180.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-192.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-512.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-maskable.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-light-compact.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-dark-compact.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/micro-mark.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/teacher-setup-import.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/grades.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/vendor/flatpickr/flatpickr.min.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/vendor/flatpickr/ar.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/portfolio-design-preview.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/portfolio-design-preview.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-design-preview.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-annual-plan.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-smart-evidence.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-evidence-templates.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-local-draft.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-local-state.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-local-archive.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student-portal.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student-portal-teacher.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/student-portal.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/n88-student-invite-lab.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/n88-public-guest.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n88-invite-lab.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-achievements.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/achievement-certificate.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-pdf.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-designs.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-selection.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-center.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/ministry-brand.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/brand/ministry-of-education.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/fonts/noto-naskh-arabic/NotoNaskhArabic-Bold.ttf",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/certificates/title-approved-first-gold.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/certificates/title-approved-first-green.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/certificate-center.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/document-preview.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/achievement-certificate.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/document-preview.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/day-targeting.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/hijri-year-input.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/rakeez-datetime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/export.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/migrate.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/group-count-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/install-guide-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-start-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/settings-profile-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-search-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/owner-invalidation-channel.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/score-distribution-copy.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/subitem-default-name.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/workspace-claim.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/backup-v2.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/build-meta.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/cloud-recovery-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/report-print.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/schedule-export.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-editor-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-delete-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-lifecycle.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-lifecycle-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support-whatsapp.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support-public-config.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/effects.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sound.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/home.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/attendance.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/quicklog.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/grades.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/items.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/picker.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/groups.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/board.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/sessions.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/reports.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/reports-index.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/certificates.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/cross-class-reports.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/execution-report.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/archive.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/archive-detail.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/former-students.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/schedule.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/curriculum.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/times.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/calendar-0417-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/settings.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/notification-settings.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/teacher-setup-import.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/backup.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/support.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/generated/build-meta.generated.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/index.html",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/app.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/components.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/schedule-work-integration.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/calendar-work-0417.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/rakeez-datetime.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/work-n82.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/work-n70.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-dark-standard.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-light-standard.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/vendor/flatpickr/flatpickr.min.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/app-update.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/calendar.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/app.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/dom.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/visible-numerals.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/display-identity.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/brand.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/visible-viewport.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/thmanyah-font.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-operational-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-warning-policy.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/store.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/db.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/cloud.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/marketing-analytics.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/offline-lease.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/router.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support-origin.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/class-import-center.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/repaint.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-auto.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/initial-restore.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/workspaces.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/workspace-routing.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/demo-workspace.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-events.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/account-provisioning.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-center.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-state.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-runtime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/notifications.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/account-profile.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/education-department-directory.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/email-otp.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/rakeez-datetime-values.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-status-severity.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/complete-read.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/thmanyah-payload.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-ownership.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/calendar-runtime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/calendar-recovery.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/score-distribution-copy.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-import-file.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-import.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n77-delete.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/restore-deletion-scope.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/pristine-teaching.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-v2.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/score-foundation.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/curriculum-bootstrap.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/models.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/calendar-presets.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/subject-catalog.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-import-background.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-order.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/demo.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-koshoof-bundle.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/students.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer-parsers.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n36-extension-handoff.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer-export.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n36-extension-protocol.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-browser.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/data/education-departments-2026-09-30.json",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-gateway.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-core.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/data/education-department-options-2026-09-30.json",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/remote-sync.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-import-parsers.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-recovery.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer-xlsx.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/avatar.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/teacher-setup-import.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/zip.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/notifications.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/review/bootstrap.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/tests/n88-teacher-issuance-ux-20261028/ports.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-runtime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-class-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student-portal-class.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-task-guidance-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/teaching-hub.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/class-rules.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/teachings.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-subject-default.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/stage-subject-options.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/official-v6-subject-data.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/student-portal-class.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "coldOfflineSessionFailClosed": true,
+      "oldGeneration": 92,
+      "newGeneration": 93,
+      "oldRetired": true,
+      "assets": [
+        {
+          "path": "/src/views/student-portal-class.js",
+          "oldHash": "8044307aec6b95e5ab712f0de32fd6e9a774b968ca0c880e4770b7568ab00fff",
+          "newHash": "bc453d0fc1006a5278b17bbcf7a154a0303394d1ef781e8c6cd9e4dcf964beb5"
+        },
+        {
+          "path": "/src/styles/student-portal-class.css",
+          "oldHash": "dbc1805e0b45aab6717291d05ddb557404bc78690d79f559ee1860aae4342935",
+          "newHash": "d06d26c3d07f9c51aafa16a71280f68b9ba88ec3492cae686f4656a805fc3e77"
+        },
+        {
+          "path": "/src/lib/student-portal-class-client.js",
+          "oldHash": "815d82573f1e2c5d8eaa263de781fe98f26b0d14f1a1847f37ddec63b54c2d8e",
+          "newHash": "815d82573f1e2c5d8eaa263de781fe98f26b0d14f1a1847f37ddec63b54c2d8e"
+        }
+      ],
+      "offlineActualTeacherHandlers": true,
+      "overflow": false,
+      "privateNetworkOnly": true,
+      "unrelatedCacheAndIdbPreserved": true,
+      "ownerInvalidation": true,
+      "mutations": 0,
+      "cacheAudit": [
+        {
+          "name": "synthetic-unrelated",
+          "path": "/synthetic-marker",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/manifest.webmanifest",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/favicon-32.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-180.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/favicon-32.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-192.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-512.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/icon-maskable.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-light-compact.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-dark-compact.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/micro-mark.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/teacher-setup-import.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/grades.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/vendor/flatpickr/flatpickr.min.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/vendor/flatpickr/ar.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/portfolio-design-preview.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/portfolio-design-preview.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-design-preview.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-annual-plan.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-smart-evidence.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-evidence-templates.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-local-draft.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-local-state.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/portfolio-local-archive.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student-portal.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student-portal-teacher.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/student-portal.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/n88-student-invite-lab.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/n88-public-guest.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n88-invite-lab.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-achievements.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/achievement-certificate.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-pdf.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-designs.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-center.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/certificate-selection.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/ministry-brand.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/brand/ministry-of-education.png",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/fonts/noto-naskh-arabic/NotoNaskhArabic-Bold.ttf",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/certificates/title-approved-first-gold.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/certificates/title-approved-first-green.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/certificate-center.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/document-preview.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/day-targeting.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/achievement-certificate.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/document-preview.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/hijri-year-input.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/rakeez-datetime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/export.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/migrate.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/group-count-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/install-guide-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-start-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/settings-profile-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-search-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/owner-invalidation-channel.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/score-distribution-copy.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/subitem-default-name.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/workspace-claim.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/backup-v2.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/build-meta.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/cloud-recovery-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/report-print.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/schedule-export.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-editor-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-delete-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-lifecycle.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-lifecycle-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support-whatsapp.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support-public-config.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/effects.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sound.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/home.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/attendance.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/quicklog.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/grades.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/items.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/picker.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/groups.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/board.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/sessions.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/reports.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/reports-index.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/certificates.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/cross-class-reports.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/execution-report.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/archive.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/archive-detail.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/former-students.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/schedule.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/times.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/curriculum.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/calendar-0417-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/settings.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/notification-settings.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/teacher-setup-import.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/backup.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/support.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/generated/build-meta.generated.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/index.html",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/app.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/schedule-work-integration.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/calendar-work-0417.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/work-n82.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/rakeez-datetime.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-light-standard.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/work-n70.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/assets/header-dark-standard.svg",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/components.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/vendor/flatpickr/flatpickr.min.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/app-update.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/calendar.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/app.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/dom.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/visible-numerals.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/display-identity.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/brand.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/visible-viewport.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-operational-ui.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/thmanyah-font.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-warning-policy.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/store.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/db.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/cloud.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/marketing-analytics.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/offline-lease.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/support-origin.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/router.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/repaint.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/class-import-center.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-auto.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/workspaces.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/workspace-routing.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/demo-workspace.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/account-provisioning.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/initial-restore.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-center.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-events.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-state.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-runtime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/notifications.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/account-profile.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/education-department-directory.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/email-otp.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/rakeez-datetime-values.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-status-severity.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/thmanyah-payload.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/complete-read.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/calendar-runtime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-ownership.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/calendar-recovery.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/score-distribution-copy.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-import-file.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-import.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n77-delete.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/restore-deletion-scope.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/pristine-teaching.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/score-foundation.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/models.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/curriculum-bootstrap.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/sync-v2.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/calendar-presets.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/subject-catalog.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-import-background.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-order.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/demo.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-koshoof-bundle.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/students.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer-parsers.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer-export.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n36-extension-handoff.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/n36-extension-protocol.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-browser.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-gateway.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/data/education-departments-2026-09-30.json",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/notification-push-core.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/data/education-department-options-2026-09-30.json",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/remote-sync.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-import-parsers.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/session-recovery.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/grade-transfer-xlsx.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/avatar.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/teacher-setup-import.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/zip.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/review/bootstrap.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/notifications.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/tests/n88-teacher-issuance-ux-20261028/ports.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-runtime.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-class-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/student-portal-class.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/student-portal-task-guidance-client.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/teaching-hub.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/class-rules.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/views/teachings.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/class-subject-default.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/stage-subject-options.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/lib/official-v6-subject-data.js",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        },
+        {
+          "name": "rakeezx-v93",
+          "path": "/src/styles/student-portal-class.css",
+          "privateSentinel": false,
+          "authToken": false,
+          "session": false
+        }
+      ]
+    }
+  ],
+  "cleanup": {
+    "browserAndServerClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "providerOperations": 0,
+  "status": "PASS",
+  "completedAt": "2026-10-27T22:41:11.917Z"
+}

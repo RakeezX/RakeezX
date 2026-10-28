@@ -1,0 +1,16 @@
+{
+  "taskId": "n88-term-negative-1028",
+  "runId": "3b7b773c-82bc-4cd5-aade-9b265aa7c2d8",
+  "sourceOnly": true,
+  "realOperations": 0,
+  "cases": [],
+  "cleanup": {
+    "serverClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "failure": {
+    "stage": "rendered-close-0",
+    "message": "bootstrap: [\"Failed to load module script: Expected a JSON module script but the server responded with a MIME type of \\\"application/octet-stream\\\". Strict MIME type checking is enforced for module scripts per HTML spec.\",\"Failed to fetch dynamically imported module: http://127.0.0.1:51473/src/app.js\",\"Failed to load module script: Expected a JSON module script but the server responded with a MIME type of \\\"application/octet-stream\\\". Strict MIME type checking is enforced for module scripts per HTML spec.\"]",
+    "stack": "Error: bootstrap: [\"Failed to load module script: Expected a JSON module script but the server responded with a MIME type of \\\"application/octet-stream\\\". Strict MIME type checking is enforced for module scripts per HTML spec.\",\"Failed to fetch dynamically imported module: http://127.0.0.1:51473/src/app.js\",\"Failed to load module script: Expected a JSON module script but the server responded with a MIME type of \\\"application/octet-stream\\\". Strict MIME type checking is enforced for module scripts per HTML spec.\"]\n    at boot (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-term-negative-1028/tests/n88-terminal-negative-20261028/browser.mjs:17:103)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-term-negative-1028/tests/n88-terminal-negative-20261028/browser.mjs:23:48\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-term-negative-1028/tests/n88-terminal-negative-20261028/browser.mjs:13:2"
+  }
+}

@@ -39,7 +39,7 @@ async function readConfigFailurePhase(stream, signal) {
   finally { signal.removeEventListener('abort', cancel); cancel(); reader.releaseLock(); }
 }
 export function createPushGateway({ fetch: send = globalThis.fetch, authorization, context, preferences,
-  storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => typeof authorization === 'function' ? authorization() : authorization, bindConsent = async () => false, clearConsent = async () => true }) {
+  storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, readValid = valid, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => typeof authorization === 'function' ? authorization() : authorization, bindConsent = async () => false, clearConsent = async () => true }) {
   const scope = { workspaceId: context.workspaceId, deviceId: context.deviceId };
   const sourceStamp = value => value === null || typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
   const key = 'rakeezx-n44-registration:' + JSON.stringify([context.ownerId, ...Object.values(scope)]);
@@ -49,23 +49,26 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
   let cleanupIdentity;
   try { cleanupIdentity = JSON.parse(storage.getItem(key) || 'null'); } catch { cleanupIdentity = 'invalid'; }
   const request = async (path, body, cleanup = false, metadata = false) => {
-    if (!cleanup && !valid()) throw Error('stale');
+    // Renewal may read the existing context while ordinary actions remain
+    // fenced. It cannot authorize registration, projection or a late click.
+    const current = path === 'context/read' ? readValid : valid;
+    if (!cleanup && !current()) throw Error('stale');
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), N44_RESPONSE_DEADLINE_MS);
     let phase = 'transport', httpStatus = null, servicePhase;
     try {
       const response = await send('/api/n44/' + path, { method: 'POST', credentials: 'omit', redirect: 'error', cache: 'no-store',
         headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : typeof authorization === 'function' ? authorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });
       httpStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599 ? response.status : null;
-      phase = !cleanup && !valid() ? 'context' : 'http';
+      phase = !cleanup && !current() ? 'context' : 'http';
       // The sole non-2xx body exception: this owned POST config action, JSON503.
       if (path === 'push/config' && !cleanup && valid() && response.status === 503 &&
           response.headers?.get('content-type')?.split(';', 1)[0].trim().toLowerCase() === 'application/json') {
         servicePhase = await readConfigFailurePhase(response.body, abort.signal);
       }
-      if (!response.ok || (!cleanup && !valid())) { const error=Error('unavailable'); error.httpStatus=response.status; error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
+      if (!response.ok || (!cleanup && !current())) { const error=Error('unavailable'); error.httpStatus=response.status; error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
       phase = 'response_read';
-      const raw = await response.text(); phase = !cleanup && !valid() ? 'context' : 'response_size';
-      if (raw.length > 8192 || !cleanup && !valid()) throw Error('unavailable');
+      const raw = await response.text(); phase = !cleanup && !current() ? 'context' : 'response_size';
+      if (raw.length > 8192 || !cleanup && !current()) throw Error('unavailable');
       phase = 'decode';
       const value = JSON.parse(raw); return metadata ? { body: value, httpStatus } : value;
     } catch (error) {
@@ -82,12 +85,22 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
   return Object.freeze({
     configuration: ({ metadata = false } = {}) => request('push/config', scope, false, metadata),
     async read({ accept = () => true } = {}) {
-      const r = await request('context/read', scope);
-      if (r.protocol !== N44_PROTOCOL || !['current', 'absent'].includes(r.status)) throw Error('unavailable');
-      if (!accept(r)) throw Error('stale');
-      remote = r.context ?? null; expectedRevision = remote?.consentRevision ?? r.expectedRevision ?? null;
-      if (remote && (!remote.active || remote.workspaceId !== scope.workspaceId || remote.deviceId !== scope.deviceId || remote.sessionExpiresAt <= Date.now())) throw Error('stale');
-      receipt = r.registration ?? null; contextChanged(remote); return r;
+      try {
+        const r = await request('context/read', scope);
+        if (r.protocol !== N44_PROTOCOL || !['current', 'absent'].includes(r.status)) throw Error('unavailable');
+        const next = r.context ?? null;
+        if (!accept(r) || next && (!next.active || next.workspaceId !== scope.workspaceId || next.deviceId !== scope.deviceId || next.sessionExpiresAt <= Date.now())) {
+          throw Object.assign(Error('stale'), { readDisposition: 'rejected' });
+        }
+        remote = next; expectedRevision = remote?.consentRevision ?? r.expectedRevision ?? null;
+        receipt = r.registration ?? null; contextChanged(remote); return r;
+      } catch (error) {
+        // A lost/503 read is not proof of revocation. Return only a fixed local
+        // classification; the caller must still fence all unconfirmed actions.
+        const safe = Error('unavailable');
+        safe.readDisposition = error.readDisposition === 'rejected' || [401, 403].includes(error.httpStatus) ? 'rejected' : 'unknown';
+        throw safe;
+      }
     },
     async update(pushConsent, { cleanup = false, selectedPreferences = preferences() } = {}) {
       if (cleanup && !pushConsent && uncertainStop) {

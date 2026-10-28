@@ -1,0 +1,22 @@
+{
+  "aiAuthored": true,
+  "taskId": "n88-core-stable-guidance-1028",
+  "runId": "0e0e1581-90bd-4c3e-9ec8-1c74827ef9cd",
+  "inactiveClosureCompiled": true,
+  "registeredNewOperations": 1,
+  "newExactRoutineIdentities": 2,
+  "stagingSha256": "bce8f06b60a0a0bce7d93aa6c33e4b6306714bdc7815883f6c8be4c41d67e177",
+  "nativePgClosedBeforeLeaseRelease": true,
+  "initialSecondPreparationCleanup": {
+    "status": "FAIL",
+    "operation": "resource-lease.ps1 -Name integration -Action release",
+    "reason": "IOException: runner checkpoint.json was being used by another process. SQL compilation and owned PG cleanup had already completed."
+  },
+  "ownedLeaseCleanupAfterContention": {
+    "status": "PASS",
+    "method": "same canonical release command with matching task/run token; no lock edits or process termination",
+    "output": "RELEASED integration"
+  },
+  "serviceProofReusedUnchanged": "result.json",
+  "providerOperations": 0
+}

@@ -1,0 +1,135 @@
+{
+  "taskId": "n88-guidance-read-1028",
+  "runId": "f1d7a109-b3dc-47a4-a74d-126c5dc3e4e0",
+  "checks": [
+    {
+      "name": "actual_app_rosters_faults_queue_unknown_and_term",
+      "status": "PASS",
+      "evidence": "0/28/50 fabricated members, saved ON/OFF, 320/390 RTL light/dark; UNKNOWN original hint unchanged, issue disabled, no writes. Actual runtime 401/403/503/null/partial/invalid JSON, draft preserved; queued read waits for prior list; independent actual UI 10-second deadline ignores late reply without automatic replay; term change retires controls."
+    },
+    {
+      "name": "n88_guidance_mobile_320_390_and_pwa_offline_cache_release_guards",
+      "status": "PASS",
+      "evidence": "Native app four RTL screenshots plus 12 roster/visibility scenarios and four 28-member screenshots; no overflow. Sole task SW owner, base generation94 only version bump95. Shared leased fresh-context upgrade evicts94, caches exact changed runtime/client/codec bytes and serves offline; N88 API stays network-only; other SW logic unchanged."
+    }
+  ],
+  "matrix": [
+    {
+      "members": 0,
+      "width": 320,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 0,
+      "width": 320,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 0,
+      "width": 390,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 0,
+      "width": 390,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 320,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 320,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 390,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 390,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 320,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 320,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 390,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 390,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    }
+  ],
+  "pageErrors": [],
+  "cleanup": {
+    "browserClosed": true,
+    "serverClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "realOperations": 0,
+  "baselineCodec": "Original null element throws TypeError; corrected codec returns false => invalid_ack.",
+  "expandedReuse": "ui-pwa-failure-1793166256931.json",
+  "queuedRead": {
+    "outcome": "success",
+    "elapsedMs": 330
+  },
+  "runtimeReuse": "ui-pwa-failure-1793166507986.json",
+  "hashes": {
+    "src/lib/student-portal-runtime.js": "c08fc019ad38b4ce0fc950b762bcbed3c80a87ef5e626e9a6109e539dd2e4471",
+    "src/lib/student-portal-class-client.js": "6ee0a943759e5203bfe39c6b47cf3adb2665d98f845c892d90094d5a25f72a9e",
+    "src/lib/student-portal-task-guidance-client.js": "b8a9aab426d4e6c9da7586cfb3a0bb5b6b99a62111fe64e0801c1c61a5ecc8fa",
+    "sw.js": "421286f28afd7eac457531975c745505ae76120c960e84978baeccf973c6e62c"
+  }
+}

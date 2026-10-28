@@ -1,0 +1,13 @@
+{
+  "status": "FAIL",
+  "checks": [],
+  "cleanup": {
+    "ownedContextBrowserServerClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "failure": {
+    "message": "Expected values to be strictly equal:\n+ actual - expected\n... Skipped lines\n\n  \"import { html } from '../lib/dom.js';\\r\\n\" +\n    '/** AI: reusable existing-class section; no route, runtime import, publication or network at import time. */\\r\\n' +\n    \"import { classContextKey, PORTAL_FIELDS } from '../lib/student-portal-class-client.js';\\r\\n\" +\n    `const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', \"'\":'&#39;' }[c]));\\r\\n` +\n    'export function buildStudentAccessMessage(student, url) {\\r\\n' +\n...\n    ' const changed=()=>{if(bound===current())return;reset();draw();scheduleRead();};\\r\\n' +\n+   ' const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);sequence++;queued=false;loaded=false;messag'... 22843 more characters\n-   ' const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);sequence++;queued=false;loaded=false;messag'... 22841 more characters\n",
+    "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n... Skipped lines\n\n  \"import { html } from '../lib/dom.js';\\r\\n\" +\n    '/** AI: reusable existing-class section; no route, runtime import, publication or network at import time. */\\r\\n' +\n    \"import { classContextKey, PORTAL_FIELDS } from '../lib/student-portal-class-client.js';\\r\\n\" +\n    `const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', \"'\":'&#39;' }[c]));\\r\\n` +\n    'export function buildStudentAccessMessage(student, url) {\\r\\n' +\n...\n    ' const changed=()=>{if(bound===current())return;reset();draw();scheduleRead();};\\r\\n' +\n+   ' const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);sequence++;queued=false;loaded=false;messag'... 22843 more characters\n-   ' const win=root.ownerDocument.defaultView,hide=()=>{suspended=true;clearTimeout(wakeTimer);sequence++;queued=false;loaded=false;messag'... 22841 more characters\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-content-priority-after-n130-20261027/tests/n88-portal-content-priority-20261027/pwa.mjs:20:194"
+  }
+}

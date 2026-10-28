@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-core-auto-1028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100011,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "dependsOn": [
+        "n44-core-click-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n44-push/scheduler-entry.mjs",
+        "drafts/n44-push/delivery.mjs",
+        "drafts/n44-push/canonical-source.mjs",
+        "drafts/n44-push/runtime-config.example.json",
+        "drafts/n44-push/activation/bundle/scheduler/worker.mjs",
+        "drafts/n44-push/activation/scheduler.staged.toml",
+        "supabase/functions/n44-notifications/index.ts",
+        "supabase/functions/n44-notifications/config.inactive.toml",
+        "drafts/n44-push/core-teacher-scheduler.mjs",
+        "tests/n44-core-auto-1028/timing-and-isolation.test.mjs",
+        "tests/n44-core-auto-1028/qualification.json",
+        "docs/automation-evidence/20261028/N44_CORE_V1_AUTOMATIC.md",
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/existing-host.mjs"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/scheduler-entry.mjs",
+        "drafts/n44-push/delivery.mjs",
+        "drafts/n44-push/canonical-source.mjs",
+        "drafts/n44-push/runtime-config.example.json",
+        "drafts/n44-push/activation/bundle/scheduler/worker.mjs",
+        "drafts/n44-push/activation/scheduler.staged.toml",
+        "supabase/functions/n44-notifications/index.ts",
+        "supabase/functions/n44-notifications/config.inactive.toml",
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/existing-host.mjs"
+      ],
+      "requiredChecks": [
+        "n44_core_automatic_lesson_due_timezone",
+        "n44_core_quiet_preferences_dedup_revocation_owner",
+        "n44_core_existing_scheduler_bounded_activation_disabled"
+      ],
+      "postDeliveryChecks": [],
+      "releaseAuthority": "Latest direct PO and issue5 comment6464988955: complete existing teacher automatic reminders, minimum affected tests and inactive source delivery through sole publisher. No live schedule/send/service upload or spent grant reuse. Separate exact live authority required after concrete qualification. [AI-reviewed exact inert source-only classification; NO live activation]",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "deb8562669ac08a7bf50f7ab0a865cc114733109",
+        "requiredSourcePaths": [
+          "drafts/n44-push/scheduler-entry.mjs",
+          "drafts/n44-push/delivery.mjs",
+          "drafts/n44-push/canonical-source.mjs",
+          "drafts/n44-push/runtime-config.example.json",
+          "drafts/n44-push/activation/bundle/scheduler/worker.mjs",
+          "drafts/n44-push/activation/scheduler.staged.toml",
+          "supabase/functions/n44-notifications/index.ts",
+          "supabase/functions/n44-notifications/config.inactive.toml",
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs"
+        ],
+        "editPaths": [
+          "drafts/n44-push/scheduler-entry.mjs",
+          "drafts/n44-push/delivery.mjs",
+          "drafts/n44-push/canonical-source.mjs",
+          "drafts/n44-push/runtime-config.example.json",
+          "drafts/n44-push/activation/bundle/scheduler/worker.mjs",
+          "drafts/n44-push/activation/scheduler.staged.toml",
+          "supabase/functions/n44-notifications/index.ts",
+          "supabase/functions/n44-notifications/config.inactive.toml",
+          "drafts/n44-push/core-teacher-scheduler.mjs",
+          "tests/n44-core-auto-1028/timing-and-isolation.test.mjs",
+          "tests/n44-core-auto-1028/qualification.json",
+          "docs/automation-evidence/20261028/N44_CORE_V1_AUTOMATIC.md",
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs"
+        ],
+        "newPaths": [
+          "drafts/n44-push/core-teacher-scheduler.mjs",
+          "tests/n44-core-auto-1028/timing-and-isolation.test.mjs",
+          "tests/n44-core-auto-1028/qualification.json",
+          "docs/automation-evidence/20261028/N44_CORE_V1_AUTOMATIC.md"
+        ],
+        "workerChecks": [
+          "n44_core_automatic_lesson_due_timezone",
+          "n44_core_quiet_preferences_dedup_revocation_owner",
+          "n44_core_existing_scheduler_bounded_activation_disabled"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "Continue original N44 session, preserve private mobile candidate d4e695d3 and original receipts. Astra Medium Standard Fast OFF, no subagents. Click fix deb8562669 is verified Production: do NOT repeat it or unaffected tests. Read latest Core V1 DECISIONS/ledger and issue5 approved follow-up6464988955. IMPLEMENT closest next useful automatic teacher slice using existing scheduler-entry/delivery/canonical-source and staged worker, not a new engine or manually triggered send disguised as automatic. Existing lesson lead/due3,2,1,0 and timezone/quiet/category/canonical source guards already exist. Finish minimal deployment-ready finite scheduler composition around them, bounded owner/workspace/device/source/event set, immutable send/tick caps, activation/hard end and automatic disarm; preserve ordinary teacher automation architecture beyond test scope without enabling general traffic. Use existing adapter files wherever possible; new core-teacher-scheduler file only if needed as small integration, never parallel domain engine. Prove affected scheduled lesson and due timing, quiet suppression/preferences, duplicate tick/UNKNOWN no resend, cancelled/deleted source and owner/device isolation with synthetic clock/provider. Reuse unaffected proofs. Preserve actual FAIL/UNKNOWN and no new full suite. Deliver qualified inactive source via sole publisher; no Supabase upload, cron creation, secret access, live register/send/delete/Auth/schema or old grant activation. Produce concrete smallest live acceptance packet: exact service source/hash and required delta, bounded schedule install/enable, target account/device references through original custodian, registration/event/provider caps, finite window only after ready, cleanup/rollback. Do not call this live PASS. Prior grant60fc7d23 is DISARMED_CLOSED_SPENT; cleanup final proof is READ ONLY and separate, never repeat delete. Record required read-only checkpoint for Root/original custodian while preserving original mutation receipt. After actual automatic behavior acceptance, next sequential slice must simplify teacher notifications settings/center: device state/enable-stop, lesson lead, due offsets, quiet hours, autosave; remove technical support/IDs/HTTP/long source lists from ordinary teacher UI but retain safe separate diagnostics. DO NOT edit UI now before stability; save exact follow-on scope. D107/Admin/marketing deferred, not gates. Return LOCAL_READY for qualified deliverable, leaving live acceptance explicitly pending rather than blocking inactive delivery for unavailable human proof.\n\nPO-20261028 MATERIAL SCOPE REPAIR: Previous worker proved backend.mjs and existing-host.mjs are necessary for the existing trusted bounded scheduler integration. These two exact existing service-side files are now allowed for local/synthetic edits and relevant verification only. Preserve three original checks, existing session/candidate, inactive delivery and zero live sends.",
+      "completionMode": "reconcile_two_current_inert_receipts",
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inert inactive source-only N44 Core V1 teacher scheduler staging"
+      },
+      "verificationRepair": {
+        "version": 1,
+        "kind": "n44-n88-exact-inert-receipt-v1",
+        "originalReceiptSha256": "09d660d4c90c07f4e8ee1edd00a0953482dcbfddbc1c3f47a854bc4a9319a5c8",
+        "originalResultSha256": "3b1b66222718cb79ecf024611f197418f20efaed24284d39678fef3232ae538e",
+        "candidateSha": "72c67feac91f3a63bbf2ff26359260d466cf7a7d",
+        "publishedSha": "7c761eec4ed1fee6b721d1846502996349b8a1b7",
+        "originalVerificationPaths": [
+          "drafts/n44-push/scheduler-entry.mjs",
+          "drafts/n44-push/delivery.mjs",
+          "drafts/n44-push/canonical-source.mjs",
+          "drafts/n44-push/runtime-config.example.json",
+          "drafts/n44-push/activation/bundle/scheduler/worker.mjs",
+          "drafts/n44-push/activation/scheduler.staged.toml",
+          "supabase/functions/n44-notifications/index.ts",
+          "supabase/functions/n44-notifications/config.inactive.toml",
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs"
+        ],
+        "readOnlyVerifiedPaths": [],
+        "reason": "Correct a documented source-only classification and malformed read-only verification scope after the original Cloudflare deploy already passed provider head plus immutable/Production asset checks. Preserve all original worker checks and all read-only served dependency hashes, without enabling live features, changing Auth/RLS, or hiding missing real acceptance."
+      }
+    }
+  ]
+}

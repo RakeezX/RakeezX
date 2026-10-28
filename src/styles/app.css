@@ -730,13 +730,19 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 }
 .subject-picker__trigger svg { width: 18px; height: 18px; color: var(--text-3); }
 .subject-picker__menu {
+  display: flex; flex-direction: column; min-height: 0;
   margin-top: var(--sp-2); padding: var(--sp-2);
   background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--r-lg);
   box-shadow: var(--shadow-2);
 }
 .subject-picker__menu[hidden], .subject-picker__custom[hidden] { display: none !important; }
-.subject-picker__search { margin-bottom: var(--sp-2); }
-.subject-picker__options { max-height: min(42dvh, 320px); overflow-y: auto; overscroll-behavior: contain; }
+.subject-picker__search { flex: none; margin-bottom: var(--sp-2); }
+.subject-picker__options {
+  min-height: 0; max-height: min(40dvh, 320px); overflow-y: auto;
+  overscroll-behavior-y: contain; touch-action: pan-y;
+  scrollbar-gutter: stable; scrollbar-color: var(--border-strong) transparent;
+  scroll-padding-block: 8px;
+}
 .subject-picker__group-label {
   padding: var(--sp-2) var(--sp-2) var(--sp-1); color: var(--text-3);
   font-size: 12px; font-weight: 700;

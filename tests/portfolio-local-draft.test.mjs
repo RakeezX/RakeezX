@@ -34,6 +34,7 @@ test('image Blobs are separated from metadata and restored with their original o
     selectedByCriterion:new Map([['04','custom:one']]),
     descriptions:new Map([['custom:one','وصف تجربة']]),
     titles:new Map([['custom:one','تجربة من عملي']]),
+    contexts:new Map([['custom:one',{action:'عمل اصطناعي',date:'2026-10-20',reflection:'تأمل'}]]),
     includedWitnesses:new Set(['custom:one']),
     excludedWitnesses:new Set(['template:04:old']),
     editingCriterion:'04',nextExtraCriterionNumber:13,
@@ -48,6 +49,9 @@ test('image Blobs are separated from metadata and restored with their original o
   assert.equal(restored.photoGroups.get('custom:one')[0].url,'local:4');
   assert.equal(restored.photoGroups.get('custom:one')[0].stored,true);
   assert.equal(restored.titles.get('custom:one'),'تجربة من عملي');
+  assert.deepEqual(restored.contexts.get('custom:one'),model.contexts.get('custom:one'));
+  delete payload.contexts;
+  assert.equal(restorePortfolioDraft(payload,new Map([['photo-1',{blob:png}]]),{makeUrl:()=>''}).contexts.size,0);
   assert.deepEqual([...restored.hiddenCriteria],['03']);
   assert.deepEqual([...restored.includedWitnesses],['custom:one']);
   assert.equal(restored.nextExtraCriterionNumber,13);
@@ -72,10 +76,12 @@ test('removed personal evidence cannot leave retained photos or titles in a save
    selectedByCriterion:new Map([['04','custom:deleted']]),
    descriptions:new Map([['custom:deleted','private note']]),
    titles:new Map([['custom:deleted','private evidence']]),
+   contexts:new Map([['custom:deleted',{source:'private source'}]]),
    includedWitnesses:new Set(['custom:deleted']),
    excludedWitnesses:new Set(),editingCriterion:'04',nextExtraCriterionNumber:12,
  };
  const {payload,images}=snapshotPortfolioDraft(model);
+ assert.deepEqual(payload.contexts,[]);
  assert.deepEqual(payload.photos,[]);
  assert.deepEqual(payload.titles,[]);
  assert.deepEqual(payload.descriptions,[]);

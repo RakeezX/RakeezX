@@ -1,0 +1,16 @@
+{
+  "taskId": "n88-term-negative-1028",
+  "runId": "3b7b773c-82bc-4cd5-aade-9b265aa7c2d8",
+  "sourceOnly": true,
+  "realOperations": 0,
+  "cases": [],
+  "cleanup": {
+    "serverClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "failure": {
+    "stage": "rendered-close-0",
+    "message": "page.waitForFunction: Timeout 8000ms exceeded.",
+    "stack": "page.waitForFunction: Timeout 8000ms exceeded.\n    at boot (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-term-negative-1028\\tests\\n88-terminal-negative-20261028\\browser.mjs:16:37)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-term-negative-1028/tests/n88-terminal-negative-20261028/browser.mjs:22:48\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-term-negative-1028/tests/n88-terminal-negative-20261028/browser.mjs:13:2"
+  }
+}

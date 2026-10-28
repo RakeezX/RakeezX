@@ -9,6 +9,9 @@ import { performance } from 'node:perf_hooks';
 import { normalizePushPayload, normalizePushEnvelope } from '../../src/lib/notification-push-core.js';
 import { approvedProviderOrigins, trustedSubscription, publicAddress, decode64, validatePoint } from './provider-policy.mjs';
 import { consumeCommittedPermit } from './committed-permit.mjs';
+import {nativeHttpExchange} from './native-http-transport.mjs';
+import { WNS_WEBPUSH_ORIGIN, isWnsWebPushEndpoint } from './shared.mjs';
+
 
 const fail = () => { throw Error('n44_sender_unavailable'); };
 // http_ece deliberately has a diagnostic key logger. Never run it in that mode;
@@ -16,8 +19,10 @@ const fail = () => { throw Error('n44_sender_unavailable'); };
 const unsafeKeyLogAtImport = process.env.ECE_KEYLOG === '1';
 const unsafeDiagnostics = () => unsafeKeyLogAtImport || process.env.ECE_KEYLOG === '1' ||
   process.execArgv.some(s=>s.startsWith('--tls-keylog')) || /(?:^|\s)--tls-keylog(?:[=\s]|$)/.test(process.env.NODE_OPTIONS??'');
+export const senderDiagnosticsUnsafe=unsafeDiagnostics;
 export function createAuditedSender({ enabled = false, providerOrigins = [], protector,
-  vapidKeys, clock = Date.now, resolve = lookup, httpsRequest = request } = {}) {
+  vapidKeys, clock = Date.now, resolve = lookup, httpsRequest = request,
+  nativeExchange = globalThis.Deno?.connect && httpsRequest===request ? nativeHttpExchange : null } = {}) {
   const origins = approvedProviderOrigins(providerOrigins);
   if (enabled !== true) return Object.freeze({send:async()=> 'uncertain',close(){}});
   const credentials=new Map();
@@ -44,16 +49,19 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
   } catch { fail(); }
   const active = new Set(); let closed = false;
   return Object.freeze({
-    async send(permit,{signal,deadlineMs=10000}={}) {
+    async send(permit,{signal,deadlineMs=10000,trace}={}) {
+      const note=(key,value=true)=>{try{trace?.(key,value);}catch{}};
       // Consumed once, even on validation failure; a JSON/lookalike/replayed permit
       // cannot cause decryption. Issuer is used solely after the boundary commit.
       if (!consumeCommittedPermit(permit)) return 'uncertain';
+      note('permit');
       const controller=new AbortController(); active.add(controller);
       let timer, req, res, done=false;
       const start=performance.now();
       const abort=()=>controller.abort();
       try {
         if (closed || unsafeDiagnostics() || signal?.aborted || !Number.isInteger(deadlineMs) || deadlineMs<1 || deadlineMs>10000) return 'uncertain';
+        note('material');
         const payload=normalizePushPayload(permit.payload,clock());
         if (!payload) return 'uncertain';
         const allowedExpiry=Math.min(payload.expiresAt,permit.binding?.expiresAt??Infinity);
@@ -66,8 +74,10 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
         const opened=protector.open(permit.sealed,permit,{signal:controller.signal});
         const signing=credentials.get(opened?.vapidKeyId);
         if(!signing)fail();
+        note('decrypt');
         const sub=trustedSubscription(opened.subscription,origins);
         const url=new URL(sub.endpoint);
+        const wns=isWnsWebPushEndpoint(url) && origins.includes(WNS_WEBPUSH_ORIGIN);
         const cancel=new Promise((_,reject)=>controller.signal.addEventListener('abort',()=>reject(Error('n44_sender_unavailable')),{once:true}));
         const answers=await Promise.race([Promise.resolve().then(()=>resolve(url.hostname,{all:true,verbatim:true})),cancel]);
         check();
@@ -75,6 +85,7 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
         if (!Array.isArray(answers) || answers.length<1 || answers.length>16 ||
             answers.some(a=>!publicAddress(a.address,a.family))) fail();
         const pinned=Object.freeze({address:answers[0].address,family:answers[0].family});
+        note('dns');
         const ttl=Math.floor((allowedExpiry-clock())/1000);
         if (ttl<1) fail();
         // Inner consumer schema stays allowlisted. The optional public binding
@@ -89,7 +100,27 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
         // Recompute TTL after encryption too; it never outlives immutable expiry.
         details.headers.TTL=Math.min(ttl,Math.floor((allowedExpiry-clock())/1000));
         if(details.headers.TTL<1) fail();
+        if (wns) {
+          // Microsoft Edge WebPush WNS uses raw encrypted body with explicit type.
+          // The endpoint query is an opaque capability: preserve it exactly.
+          details.headers['X-WNS-Type']='wns/raw';
+          details.headers['Content-Type']='application/octet-stream';
+          // WNS WebPush rejects generic Urgency; retain it for other push services.
+          delete details.headers.Urgency;
+        }
+        if(nativeExchange){
+          const headers=Object.fromEntries(Object.entries(details.headers).filter(([k])=>k.toLowerCase()!=='content-length'));
+          const result=await nativeExchange({hostname:url.hostname,pin:pinned,path:url.pathname+url.search,method:'POST',headers,body:details.body,signal:controller.signal,deadlineMs:milliseconds});
+          note('tls',result.tlsVerified===true&&result.pinMatch===true);note('requestWritten',result.requestWritten===true);
+          const code=result.statusCode;
+          if(result.tlsVerified&&result.pinMatch&&result.requestWritten){note('providerStatusClass',code>=200&&code<600?Math.floor(code/100)+'xx':'none');note('providerAccepted',([201,202].includes(code)||wns&&code===200));}
+          check();
+          if(!result.tlsVerified||!result.pinMatch||!result.requestWritten||!result.closed)return 'uncertain';
+          return ([201,202].includes(code)||wns&&code===200)?'accepted':code===404||code===410?code:code===429?'not_accepted_retryable':'uncertain';
+
+        }
         return await new Promise(resolveOutcome=>{
+          let verifiedSocket=false;
           const finish=outcome=>{
             if(done) return; done=true;
             controller.signal.removeEventListener('abort',stop);
@@ -102,7 +133,7 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
           if(controller.signal.aborted){stop();return;}
           try {
             const options={protocol:'https:',hostname:url.hostname,port:443,
-              path:url.pathname,method:'POST',headers:details.headers,
+              path:url.pathname+url.search,method:'POST',headers:details.headers,
               servername:url.hostname,rejectUnauthorized:true,checkServerIdentity,
               minVersion:'TLSv1.2',agent:false,autoSelectFamily:false,family:pinned.family,
               maxHeaderSize:8192,signal:controller.signal,
@@ -116,18 +147,29 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
             };
             req=httpsRequest(options,response=>{
               res=response;
-              try {check();} catch {finish('uncertain');return;}
               const code=response.statusCode;
+              if(verifiedSocket){note('providerStatusClass',code>=200&&code<600?Math.floor(code/100)+'xx':'none');note('providerAccepted',([201,202].includes(code)||wns&&code===200));}
+              try {check();} catch {finish('uncertain');return;}
+              if(!verifiedSocket){finish('uncertain');return;}
               // Only a definitive service rejection is retryable. 5xx, redirects,
               // malformed, truncated and all unknown-after-send remain uncertain.
-              finish([201,202].includes(code)?'accepted':code===404||code===410?code:
+              finish(([201,202].includes(code) || wns && code===200)?'accepted':code===404||code===410?code:
                 code===429?'not_accepted_retryable':'uncertain');
             });
             req.on('error',()=>finish('uncertain'));
             req.on('socket',socket=>socket.once('secureConnect',()=>{
-              if(socket.authorized!==true || socket.remoteAddress!==pinned.address) finish('uncertain');
+              try {
+                check();
+                if(socket.authorized!==true || socket.remoteAddress!==pinned.address){finish('uncertain');return;}
+                verifiedSocket=true;
+                note('tls');
+                req.end(details.body);
+                note('requestWritten');
+              } catch {finish('uncertain');}
             }));
-            check(); req.end(details.body);
+            // Unsupported runtimes must time out without releasing the payload.
+            // A response alone is not evidence that the pinned TLS check ran.
+            check();
           } catch {finish('uncertain');}
         });
       } catch {return 'uncertain';}

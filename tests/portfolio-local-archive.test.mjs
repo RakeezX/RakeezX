@@ -78,3 +78,16 @@ test('the archive format supports an empty valid document and rejects missing so
    payload,images:new Map(),savedAt:null,
  }), 'PORTFOLIO_ARCHIVE_INCOMPLETE');
 });
+
+// AI N126: both legacy and extended documents keep the original archive version.
+test('professional context survives portable archive with photos and remains owner/year bound',async()=>{
+ const contexts=[['custom:04:witness',{action:'تجربة اصطناعية',activity:'نشاط',date:'2026-10-20',
+   teaching:'فصل تجريبي / مادة',reflection:'ملاحظة نوعية',source:'مصدر محلي'}]];
+ const text=await buildPortfolioArchive(scope,{...saved,payload:{...payload,contexts}});
+ const restored=await inspectPortfolioArchive(text,scope);
+ assert.deepEqual(restored.payload.contexts,contexts);
+ const {restorePortfolioDraft}=await import('../src/lib/portfolio-local-state.js');
+ const model=restorePortfolioDraft(restored.payload,new Map(restored.images.map(i=>[i.id,i])),{makeUrl:()=>''});
+ assert.deepEqual([...model.contexts],contexts);
+ await failCode(()=>inspectPortfolioArchive(text,{...scope,yearId:'another-year'}),'PORTFOLIO_ARCHIVE_OWNER');
+});

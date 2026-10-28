@@ -1,0 +1,291 @@
+{
+  "baseline": {
+    "phase": "baseline",
+    "checks": [
+      {
+        "name": "cold_listener_after_11_seconds",
+        "status": "FAIL",
+        "evidence": "Expected values to be strictly equal:\n\n0 !== 1\n"
+      },
+      {
+        "name": "ready_store_before_source_restoration",
+        "status": "FAIL",
+        "evidence": "Expected values to be strictly equal:\n\n0 !== 1\n"
+      }
+    ],
+    "liveOperations": 0,
+    "actualBrowserServiceWorkers": false,
+    "workerMode": "original source in synthetic VM; no physical/offline-browser certification",
+    "fixtureSha256": "04efc33d377f7c22edc3419d3507e132cd93232c971d14a9d046f26bea0298f4",
+    "cleanup": {
+      "browser": "canonical helper finally",
+      "server": "owned finally"
+    }
+  },
+  "corrected": {
+    "phase": "corrected",
+    "checks": [
+      {
+        "name": "cold_listener_after_11_seconds",
+        "status": "FAIL",
+        "evidence": "Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'a4400000-0000-4000-8000-000000000001'\n"
+      },
+      {
+        "name": "ready_store_before_source_restoration",
+        "status": "FAIL",
+        "evidence": "Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'a4400000-0000-4000-8000-000000000001'\n"
+      },
+      {
+        "name": "deny_owner",
+        "status": "PASS",
+        "evidence": "Actual authenticated synthetic store/owner/runtime/client/gateway rejects navigation; original safe warning retained."
+      },
+      {
+        "name": "deny_revoked",
+        "status": "PASS",
+        "evidence": "Actual authenticated synthetic store/owner/runtime/client/gateway rejects navigation; original safe warning retained."
+      },
+      {
+        "name": "deny_expired",
+        "status": "PASS",
+        "evidence": "Actual authenticated synthetic store/owner/runtime/client/gateway rejects navigation; original safe warning retained."
+      },
+      {
+        "name": "deny_binding",
+        "status": "PASS",
+        "evidence": "Actual authenticated synthetic store/owner/runtime/client/gateway rejects navigation; original safe warning retained."
+      },
+      {
+        "name": "deny_offline",
+        "status": "PASS",
+        "evidence": "Actual authenticated synthetic store/owner/runtime/client/gateway rejects navigation; original safe warning retained."
+      },
+      {
+        "name": "deny_lease",
+        "status": "PASS",
+        "evidence": "Actual authenticated synthetic store/owner/runtime/client/gateway rejects navigation; original safe warning retained."
+      },
+      {
+        "name": "owner_changes_during_authorization",
+        "status": "PASS",
+        "evidence": "Owner revalidated after authorization; no stale navigation."
+      }
+    ],
+    "liveOperations": 0,
+    "actualBrowserServiceWorkers": false,
+    "workerMode": "original source in synthetic VM; no physical/offline-browser certification",
+    "fixtureSha256": "04efc33d377f7c22edc3419d3507e132cd93232c971d14a9d046f26bea0298f4",
+    "cleanup": {
+      "browser": "canonical helper finally",
+      "server": "owned finally"
+    }
+  },
+  "cold-corrected": {
+    "phase": "cold-corrected",
+    "checks": [
+      {
+        "name": "cold_listener_after_11_seconds",
+        "status": "PASS",
+        "evidence": {
+          "opens": 1,
+          "actions": 1,
+          "probes": 8,
+          "navigations": [
+            "/teaching/n44-teaching/items"
+          ],
+          "authorizations": 1,
+          "owner": "a4400000-0000-4000-8000-000000000001",
+          "receipt": "a4400000-0000-4000-8000-000000000001",
+          "ready": true,
+          "url": "http://127.0.0.1:43128/#/teaching/n44-teaching/items",
+          "width": 390,
+          "realAppDom": true,
+          "pendingText": null
+        }
+      },
+      {
+        "name": "ready_store_before_source_restoration",
+        "status": "PASS",
+        "evidence": {
+          "opens": 1,
+          "actions": 1,
+          "probes": 6,
+          "navigations": [
+            "/teaching/n44-teaching/items"
+          ],
+          "authorizations": 1,
+          "owner": "a4400000-0000-4000-8000-000000000001",
+          "receipt": "a4400000-0000-4000-8000-000000000001",
+          "ready": true,
+          "url": "http://127.0.0.1:43128/#/teaching/n44-teaching/items",
+          "width": 1100,
+          "realAppDom": true,
+          "pendingText": "جارٍ استعادة الحساب والتحقق من التذكير…"
+        }
+      }
+    ],
+    "liveOperations": 0,
+    "actualBrowserServiceWorkers": false,
+    "workerMode": "original source in synthetic VM; no physical/offline-browser certification",
+    "fixtureSha256": "04efc33d377f7c22edc3419d3507e132cd93232c971d14a9d046f26bea0298f4",
+    "cleanup": {
+      "browser": "canonical helper finally",
+      "server": "owned finally"
+    }
+  },
+  "compatibility": {
+    "phase": "compatibility",
+    "checks": [
+      {
+        "name": "offline_shell_and_expiring_wait",
+        "status": "PASS",
+        "evidence": {
+          "cachedRootReturned": true,
+          "privateApiNotCached": true,
+          "newerAndForeignCachesPreserved": true,
+          "noNewShellDependency": true,
+          "expiredWhileWaiting": {
+            "opens": 1,
+            "probes": 3,
+            "actions": 0
+          },
+          "actualBrowserOfflineCertification": false
+        }
+      }
+    ],
+    "liveOperations": 0,
+    "actualBrowserServiceWorkers": false,
+    "workerMode": "original source in synthetic VM; no physical/offline-browser certification",
+    "fixtureSha256": "04efc33d377f7c22edc3419d3507e132cd93232c971d14a9d046f26bea0298f4",
+    "cleanup": {
+      "browser": "canonical helper finally",
+      "server": "owned finally"
+    }
+  },
+  "pending-isolation": {
+    "phase": "pending-isolation",
+    "checks": [
+      {
+        "name": "owner_switch_while_source_pending",
+        "status": "PASS",
+        "evidence": {
+          "before": false,
+          "after": false,
+          "hint": "جارٍ استعادة الحساب والتحقق من التذكير…",
+          "navigations": 0,
+          "authorizations": 0
+        }
+      }
+    ],
+    "liveOperations": 0,
+    "actualBrowserServiceWorkers": false,
+    "workerMode": "original source in synthetic VM; no physical/offline-browser certification",
+    "fixtureSha256": "04efc33d377f7c22edc3419d3507e132cd93232c971d14a9d046f26bea0298f4",
+    "cleanup": {
+      "browser": "canonical helper finally",
+      "server": "owned finally"
+    }
+  },
+  "taskId": "n44-core-click-1028",
+  "runId": "d7f34bc7-111e-4146-bf2b-e13d4e8ef453",
+  "baseSha": "3d3f9a61d3c6a138f0326e3a7b563a163b52a141",
+  "observedOriginMain": "3d3f9a61d3c6a138f0326e3a7b563a163b52a141",
+  "status": "LOCAL_READY",
+  "qualifiedCaseCount": 11,
+  "historicalHarnessImportFailure": "ERR_UNSUPPORTED_ESM_URL_SCHEME: Windows Node absolute import corrected to file:/// module URL; browser navigation remained HTTP only.",
+  "historicalCorrectedFailures": "Two owner assertions read nonexistent workspace.ownerId; corrected to authUserId at same live checkpoint. Seven passing negatives reused; original records retained.",
+  "shellPrefixIdentical": true,
+  "syntax": "node --check sw.js, runtime and scoped harness PASS",
+  "liveOperations": 0,
+  "ownedResourcesReleased": true,
+  "checks": [
+    {
+      "name": "n44_core_cold_start_destination",
+      "status": "PASS",
+      "evidence": "cold-corrected: 2 actual-app cases at390/1100px; late listener and late source restored; one window/action/authorization/navigation."
+    },
+    {
+      "name": "n44_core_owner_and_stale_click_isolation",
+      "status": "PASS",
+      "evidence": "7 unchanged passing negative cases in corrected plus pending-isolation owner-switch PASS; no foreign/stale route or duplicate action."
+    },
+    {
+      "name": "n44_core_sw_offline_compatibility",
+      "status": "PASS",
+      "evidence": "compatibility: cached-root offline fallback, private API exclusion, cache generation isolation and expiry while waiting; unchanged shell prefix/dependencies. Synthetic VM, no physical offline certification."
+    }
+  ],
+  "bindings": [
+    {
+      "path": "sw.js",
+      "workingSha256": "73e7eb2302c5126dcf34d5622bfbbc29bba48f11d938dd5f2bb5171fde6bdf5b",
+      "gitBlob": "df72e56c6aa6fe97afc67b6df97f32d32dbaaf5a"
+    },
+    {
+      "path": "src/lib/notification-push-runtime.js",
+      "workingSha256": "a28d7d59e3cbadbeb78a3865e0e451469c28c2b1001f05925c9f010c9913df68",
+      "gitBlob": "214e3ebdd3a016f15edcadd7aa72abc0c668c76f"
+    },
+    {
+      "path": "src/lib/notification-push-client.js",
+      "workingSha256": "af6f408e606cfbf210a7503b3c504659ee9f65b8c222004a6e062e06f32cb570",
+      "gitBlob": "f1ac8ee88141b3231f7ac0af154905801d3bf79a"
+    },
+    {
+      "path": "src/lib/notification-push-browser.js",
+      "workingSha256": "bdae0add60f5d996bf7b29a44411c647882ff3c179fbe87635a357b748f48cc9",
+      "gitBlob": "140a12fee6dda566c9f24ea786559b4d959588eb"
+    },
+    {
+      "path": "src/lib/notification-push-gateway.js",
+      "workingSha256": "31799ecaf24725c81831699e44b2eb414a7e3545e9d7a1a914ba3af83b349ddc",
+      "gitBlob": "aff767fe17f5fe003a7c87d0f9ea66acdc12ba3d"
+    },
+    {
+      "path": "src/lib/notification-events.js",
+      "workingSha256": "e673fea9da1ee873cef980464b19b2094faa3c309e21e31653dfe0711a4f94c8",
+      "gitBlob": "ff18feca8d7040f9e939c446314bccdd03b498d1"
+    },
+    {
+      "path": "src/lib/notification-state.js",
+      "workingSha256": "d3c0d36ab1e40900586a9964f1ff0919e5317df52289afa7ac898ce67f0a4f35",
+      "gitBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99"
+    },
+    {
+      "path": "src/lib/sync-ownership.js",
+      "workingSha256": "e4793eae5c7512a193282cf9129561397cabe8a00f18421ac52810c7c43f3ff7",
+      "gitBlob": "10e6be6e32bf23327cbf8d008a5a8077504e956f"
+    },
+    {
+      "path": "src/store.js",
+      "workingSha256": "340c77770caca4799076929962b1f4187bca031dac8c79e7487a8448e9525592",
+      "gitBlob": "61f1f61cf226d9c17e2e7496652acb1e8c47c4e0"
+    },
+    {
+      "path": "src/router.js",
+      "workingSha256": "fec76735fef78d9b74a5c40115e75945bfbf48991d3c89e56ea3d5acc486b328",
+      "gitBlob": "e45519404d7e0095b41d355600992e1f2c33017c"
+    },
+    {
+      "path": "src/styles/notifications.css",
+      "workingSha256": "19c8105d5fdbed143b9268d954f526ee66c82252f980fea9050cdfc6a73ddc35",
+      "gitBlob": "3240879f3d80af232432ca1e593ea249bf5e9ec8"
+    },
+    {
+      "path": "tests/n44-fixture.mjs",
+      "workingSha256": "dfbeda8e0b72535cc76240d3d856414e956ff007476abcc632f92db1ab1b4704",
+      "gitBlob": "307fde46eb34fd622b8351e86394cd8db53d1535"
+    },
+    {
+      "path": "tests/helpers/served-demo-readiness.mjs",
+      "workingSha256": "4657d8ea394e1c4630b9e90bba4ce4429debd6cdb49f11ae698544834b08200c",
+      "gitBlob": "60eae8819243025caed1bfc176538b5e2d7769e8"
+    },
+    {
+      "path": "tests/n44-core-click-1028/cold-start.test.mjs",
+      "workingSha256": "668951320029136b913b177f278d8b7744966ea3c1e5489bdd2b85fa6d3ecc4f",
+      "gitBlob": "569d1437af601401ed41f2f8c9bace22b939b4d6"
+    }
+  ],
+  "remainingAcceptance": "Core V1 OPEN. No new physical click/automatic arrival/cleanup proof; old grant and mobile FAIL/UNKNOWN preserved. Publisher owns build/integration/served verification."
+}

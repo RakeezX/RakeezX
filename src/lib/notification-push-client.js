@@ -2,7 +2,7 @@
 import { notificationScope } from './notification-center.js';
 import { normalizePushPayload } from './notification-push-core.js';
 
-export function createPushClient({ browser, gateway, getVerifiedContext, clock, resolveAction, diagnostic = () => {} }) {
+export function createPushClient({ browser, gateway, getVerifiedContext, clock, resolveAction, confirmExisting = async () => false, diagnostic = () => {} }) {
   let epoch = 0, busy = false, active = null;
   const pending = new Set();
   let drained = Promise.resolve(), finishDrain;
@@ -50,6 +50,19 @@ export function createPushClient({ browser, gateway, getVerifiedContext, clock, 
     // before replacing the ownership guard; await cleanup before later opt-in.
     revoke,
     settled: () => drained,
+    async restoreReadOnly(subscription) {
+      // The composition must confirm a fresh authenticated server receipt plus
+      // the exact saved/native/worker binding. Never allocate or repair here.
+      if (busy || active || pending.size || !subscription || browser.permission() !== 'granted') return report('unavailable');
+      busy = true; drained = new Promise(resolve => { finishDrain = resolve; });
+      const snapshot = context(), token = epoch;
+      try {
+        if (!snapshot || await confirmExisting(snapshot, subscription) !== true || !current(snapshot, token) || browser.permission() !== 'granted') return report('unavailable');
+        active = { subscription, context: snapshot, registerAttempted: true };
+        return report('subscribed');
+      } catch { return report('unavailable'); }
+      finally { busy = false; finishDrain(); }
+    },
     async restore(subscription) {
       if (busy || !subscription || browser.permission() !== 'granted') return report('unsubscribed');
       busy = true; drained = new Promise(resolve => { finishDrain = resolve; });

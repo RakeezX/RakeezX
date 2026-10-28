@@ -1,0 +1,418 @@
+{
+  "taskId": "continuous-n44-d107-inert-source-delivery-20261028",
+  "runId": "0bd236b5-6d35-4cf7-b7a6-6b6fce15e791",
+  "recordedAt": "2026-10-27T23:30:11.852Z",
+  "baseSha": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+  "observedOriginMain": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+  "qualifiedSource": "6025dcbcca3a7bc21893297fed0dfac954c17e1b",
+  "evidenceCommit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+  "scope": "Seven inert files plus this qualification JSON and the scoped delivery document; no public Admin runtime activation.",
+  "packet": {
+    "path": "tests/n44-d107-continuation-20261028/publisher-packet-cfb3f132.json",
+    "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+    "blob": "ef65950f5ee260efdfc982680da03cd80bb81289",
+    "sha256": "6051bc61980198e606fc63d6b2d95e7a13c9b51ab6f41e81e29ef384490547b1",
+    "patchSha256": "57f81324dbef55b1fee777bfd73c945e3142a2ba671e1b0b01d5c633007ff43f",
+    "priorObservedMain": "8d56e9dd0ebde357f23667adae4fe24c57aa8c63"
+  },
+  "hashEncoding": "Canonical Git blob bytes, independent of checkout CRLF. Source postimages also match the exact bytes written in this checkout.",
+  "checks": [
+    {
+      "name": "n44_inert_packet_exact_seven_files_and_current_dependencies",
+      "status": "PASS",
+      "evidence": "Seven canonical Git postimages and SHA256 hashes match; four exact absences and three preimages match current main. All 15 transitive dependencies and four shared CSS assets unchanged since packet. Five MJS syntax checks passed."
+    },
+    {
+      "name": "n44_inert_qualified_behavior_and_rendered_evidence_binding",
+      "status": "PASS",
+      "evidence": "Immutable source/evidence hashes verified. Reused target 2, host 17, current-main host 7, HTTP 2 and assets 3 cases plus actual 1100/390px DOM/handlers/CSS interactions and four previously inspected images; no unchanged reruns."
+    },
+    {
+      "name": "n44_inert_no_startup_service_or_live_authority_change",
+      "status": "PASS",
+      "evidence": "Exact seven-file allowlist only before documentation; protected app/SW/styles and both baseline verification assets unchanged. No service/config/private helper copied or operation executed; parent acceptance and authority remain unchanged."
+    }
+  ],
+  "manifest": [
+    {
+      "path": "drafts/n44-push/activation/mobile-ui-target.mjs",
+      "preimageBlob": null,
+      "postimageBlob": "66e18a4416b294a5614a34300a5c808f47d87ea3",
+      "postimageSha256": "d7f16db3ce94c719c86a32f63ab1d635ef70a2e8c8cbc1261e70501601bddda3",
+      "preimageValidatedAgainst": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+      "postimageVerified": true
+    },
+    {
+      "path": "drafts/n44-push/publisher-authority.inactive.mjs",
+      "preimageBlob": null,
+      "postimageBlob": "998819b02d9c3f036c914acab5ecd15da61dcdc1",
+      "postimageSha256": "5415555abb9e730ccd4510f4d3ad246ee89e2d24776ee9979f829047b4d9fa7b",
+      "preimageValidatedAgainst": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+      "postimageVerified": true
+    },
+    {
+      "path": "drafts/n44-push/publisher-synthetic-host.mjs",
+      "preimageBlob": null,
+      "postimageBlob": "e61299b09f516b95f00723dd78d906c07cb20c39",
+      "postimageSha256": "37667fca0dcbb48e7c16266df2f1daa654f65be386c8cad61fcff0eed084b5cb",
+      "preimageValidatedAgainst": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+      "postimageVerified": true
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview-server.mjs",
+      "preimageBlob": null,
+      "postimageBlob": "d1d3135b280bd1dbc8f1690e659d53a401fbe550",
+      "postimageSha256": "6eeb03c3b4f0171a4b00f23d9951efafa383a785b9e554b6989fa8019404ced6",
+      "preimageValidatedAgainst": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+      "postimageVerified": true
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview.html",
+      "preimageBlob": "e946beb1b527520aebd41ced48820df1474d4192",
+      "postimageBlob": "860bb7c23cfd9bd8b6c8cf23a86b53ea0bf37f78",
+      "postimageSha256": "f3f14950573d3b810fa5098e9a73d2ed2025ac7648ee6219e6eb21493d9545da",
+      "preimageValidatedAgainst": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+      "postimageVerified": true
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview.mjs",
+      "preimageBlob": "705d469a94e323999f1d1bf398660b6c8dde1ce2",
+      "postimageBlob": "07f2315d139f84cf2f53734fc9658e47717ed651",
+      "postimageSha256": "549d4a891a5488329215d603c1435ef58d2b23fbf5e2ffd507f70f3f220f3f36",
+      "preimageValidatedAgainst": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+      "postimageVerified": true
+    },
+    {
+      "path": "drafts/n44-push/publisher-preview.css",
+      "preimageBlob": "5b06725d4dde59a8263acd478df8cf2578919f00",
+      "postimageBlob": "d79463785f9bfed491d811d26b8fbc7237246fbb",
+      "postimageSha256": "9e04354095cba31958c779a6f951f740d43195bed5fbbc5fd8127796eb4a6d0c",
+      "preimageValidatedAgainst": "c3f5ee04b251e88ca6c0ed82b2988fcfb7eca56b",
+      "postimageVerified": true
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "src/lib/notification-schedule.js",
+      "blob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee"
+    },
+    {
+      "path": "src/lib/rakeez-datetime-values.js",
+      "blob": "80a1df2413705abe822494e173d58f7ec0b92752",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "80a1df2413705abe822494e173d58f7ec0b92752"
+    },
+    {
+      "path": "src/lib/notification-push-core.js",
+      "blob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "c877ff5aa4184e4ef7a3d025cab5aa814e39c962"
+    },
+    {
+      "path": "src/lib/notification-center.js",
+      "blob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e"
+    },
+    {
+      "path": "drafts/n44-push/shared.mjs",
+      "blob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "baabf7c47b63f01bf775c615eb88b5a20a477845"
+    },
+    {
+      "path": "drafts/n44-push/publisher-model.mjs",
+      "blob": "3ef7e15b041a9ad019765cd1a9ba550e6f7b8a58",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "3ef7e15b041a9ad019765cd1a9ba550e6f7b8a58"
+    },
+    {
+      "path": "src/lib/notification-preferences.js",
+      "blob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58"
+    },
+    {
+      "path": "drafts/n44-push/delivery.mjs",
+      "blob": "4144578f2794d845c00ce1afd8e59a26c84aeeb9",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "4144578f2794d845c00ce1afd8e59a26c84aeeb9"
+    },
+    {
+      "path": "src/lib/notification-state.js",
+      "blob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99"
+    },
+    {
+      "path": "drafts/n44-push/committed-permit.mjs",
+      "blob": "b9d51b49f658554cd09bea20706f723f25f59173",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "b9d51b49f658554cd09bea20706f723f25f59173"
+    },
+    {
+      "path": "src/lib/rakeez-datetime.js",
+      "blob": "36b546d3eabf5b9edd06a745bc58a96dd0ad5016",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "36b546d3eabf5b9edd06a745bc58a96dd0ad5016"
+    },
+    {
+      "path": "src/vendor/flatpickr/flatpickr.min.js",
+      "blob": "b0f59ec214938696c88f1a6b8b797bde01bccb98",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "b0f59ec214938696c88f1a6b8b797bde01bccb98"
+    },
+    {
+      "path": "src/vendor/flatpickr/ar.js",
+      "blob": "06a5108b4f622d56be16f6d9424292ad2ca5aebe",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "06a5108b4f622d56be16f6d9424292ad2ca5aebe"
+    },
+    {
+      "path": "src/lib/thmanyah-font.js",
+      "blob": "f274b9b678f2a7b54ff7a495c4ce386068fee9ea",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "f274b9b678f2a7b54ff7a495c4ce386068fee9ea"
+    },
+    {
+      "path": "src/lib/thmanyah-payload.js",
+      "blob": "fe6693a5674f8752a4a91c917562e6e5d672ee96",
+      "unchangedSinceHostQualification": true,
+      "currentBlob": "fe6693a5674f8752a4a91c917562e6e5d672ee96"
+    }
+  ],
+  "sharedStyles": [
+    {
+      "path": "src/styles/app.css",
+      "baseBlob": "d17a1415f82748195b1a766f991cb5081a3ae2e4",
+      "unchangedSincePacketMain": true
+    },
+    {
+      "path": "src/styles/components.css",
+      "baseBlob": "b7ce3e3edbd7fa05f2971c5e26cfd3c0ee7fb043",
+      "unchangedSincePacketMain": true
+    },
+    {
+      "path": "src/styles/rakeez-datetime.css",
+      "baseBlob": "7ca77b9046e83ab386a9bbe82bee7fd499c191ab",
+      "unchangedSincePacketMain": true
+    },
+    {
+      "path": "src/vendor/flatpickr/flatpickr.min.css",
+      "baseBlob": "a10acc6233bb2ea2b9c58c72f1a405ace7f18992",
+      "unchangedSincePacketMain": true
+    }
+  ],
+  "sharedCssDelta": {
+    "path": "tests/n44-d107-continuation-20261028/publisher-css-main-delta-cfb3f132.txt",
+    "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+    "blob": "c56ac62f1337651b7213679d297509bb64c84a76",
+    "sha256": "7df088c7a09c086983fec479e5c119adcdc345f8e7c96ddf62cb4a3438277946",
+    "matchesCurrentBase": true,
+    "review": "Only subject-picker, class/home/attendance/report label selectors differ. These do not occur in the actual Publisher source/DOM; global rules/tokens and central date styles are unchanged. Reuse actual rendered evidence and preserve newer main styles.",
+    "copied": false
+  },
+  "reusedEvidence": [
+    {
+      "path": "tests/n44-d107-continuation-20261028/original-target-qualified.txt",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "ae20482d169cfc891463fa81c37afe8e88376bc5",
+      "sha256": "bee780899692bba47ddbb6d90575eb1b29497c33baca62d85439a454bf999237",
+      "status": "PASS",
+      "cases": 2,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-host-qualified.txt",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "00b1ca2f2991283021e19114711853c4c11c6099",
+      "sha256": "74cdcd8931b8ee188efc8a78fb8bc58f7aa57364087d66156f75f8f7fec670e2",
+      "status": "PASS",
+      "cases": 17,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-main-host-qualified.txt",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "c8fcf9b9252a024cf211545ede4e1d62b0efdffc",
+      "sha256": "d9a668c6b514019161ba1a555104b21181971a1b6a50dbc72e546edf0a7c8552",
+      "status": "PASS",
+      "cases": 7,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-http-qualified.txt",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "1341931842b44c3887e79ca1e9ec7c8446ca0df2",
+      "sha256": "6d3404c2a515a005a7e471428932373d2245662ab6c3e7f56fc08e4b76bdb8eb",
+      "status": "PASS",
+      "cases": 2,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-http-assets-qualified.txt",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "d3c8c921c75b846cfaa6851185108a52c55f635a",
+      "sha256": "d01850481143ca3a2b53a87b752f1d9b34293815366f0467f1c9e325617d90f7",
+      "status": "PASS",
+      "cases": 3,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-ui-result.json",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "98b50ea731e6fb349305e858b44e5b905b2d86d3",
+      "sha256": "d0fcb6a87ab7b8e6367fd8e16087f8a573554aab11ed6f69f5e12326da9ebf23",
+      "status": "PASS",
+      "viewports": [
+        1100,
+        390
+      ],
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-interactions-cfb3f132-5379-4263-b69b-2a5ec03f8662.json",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "31f02e6c8f27514a394655bcb96cb7ec20195a46",
+      "sha256": "a94a661aa6575a82f4fc07ad0adb976f63778b7de267163b0658019215105cc5",
+      "status": "PASS",
+      "viewports": [
+        1100,
+        390
+      ],
+      "reused": true
+    }
+  ],
+  "reusedVisuals": [
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-1100.png",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "d696fa004bb504892d53c6d27fa1b6a867cb5de5",
+      "sha256": "050777e6bbde4083a0833baad97060e6e9853496c61c5c417a4d481633e7706b",
+      "inspectedInQualifiedRun": true,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-390.png",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "7e6f6b1751f2bd55e3e87df46dc3533e702d0c7d",
+      "sha256": "1fc54444defb27c5f6d7986882b73864c48391604fd381dc4944bdf3c4e64e0e",
+      "inspectedInQualifiedRun": true,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-interactions-1100.png",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "fa03992d8be690e4dc6b4228501ac2d2617f180f",
+      "sha256": "3f7e63b1b84a39c9bdab631732c3ce75446df92d864ccf337b476328f136d6d8",
+      "inspectedInQualifiedRun": true,
+      "reused": true
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/publisher-interactions-390.png",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "dd482b13c612fbb34be0955e6611518072c4b627",
+      "sha256": "22771a6f807cfaa9e8e838f144a0f91d83bceb8a89320d12d433848ca0e2ae7b",
+      "inspectedInQualifiedRun": true,
+      "reused": true
+    }
+  ],
+  "qualificationRecords": [
+    {
+      "path": "tests/n44-d107-continuation-20261028/continuation-cfb3f132.json",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "9b36811f7c15eb6a870394073616d3107d2ade23",
+      "sha256": "9c075f87ce5221675a34b3bee8f6247202acc39a03aea1ce75832f334e444d2a"
+    },
+    {
+      "path": "tests/n44-d107-continuation-20261028/finalization-cfb3f132.json",
+      "commit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "blob": "34170c561cbe428d890049c9215215384fb7371a",
+      "sha256": "1be2b3ca357a839ccc652626d20fb7d49e64a7c68a1b38078cc5523714f6dac7"
+    }
+  ],
+  "verificationPaths": [
+    {
+      "path": "src/views/notification-settings.js",
+      "baseBlob": "9bf50edc293079e92b7cb4c24c141f26d1c7a656",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/cloud.js",
+      "baseBlob": "33c22a8e5b7107f7407bd13fa4884e1553ad6f53",
+      "unchanged": true
+    }
+  ],
+  "protectedFiles": [
+    {
+      "path": "src/app.js",
+      "baseBlob": "0132fe2f57606df1d9c11c8a78eaf9f1c2ebefa6",
+      "unchanged": true
+    },
+    {
+      "path": "sw.js",
+      "baseBlob": "dd97b892eae944569ae05cd19adeafad02606bb9",
+      "unchanged": true
+    },
+    {
+      "path": "src/styles/app.css",
+      "baseBlob": "d17a1415f82748195b1a766f991cb5081a3ae2e4",
+      "unchanged": true
+    },
+    {
+      "path": "src/styles/components.css",
+      "baseBlob": "b7ce3e3edbd7fa05f2971c5e26cfd3c0ee7fb043",
+      "unchanged": true
+    },
+    {
+      "path": "src/views/notification-settings.js",
+      "baseBlob": "9bf50edc293079e92b7cb4c24c141f26d1c7a656",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/cloud.js",
+      "baseBlob": "33c22a8e5b7107f7407bd13fa4884e1553ad6f53",
+      "unchanged": true
+    }
+  ],
+  "syntaxChecks": {
+    "command": "node --check <each of five copied .mjs files>",
+    "status": "PASS",
+    "executed": true
+  },
+  "currentRun": {
+    "productSuitesRerun": 0,
+    "browserOrServerStarted": 0,
+    "leasesAcquired": 0,
+    "privateCustodyReads": 0,
+    "providerOperations": 0,
+    "serviceUploads": 0,
+    "realAccountActions": 0,
+    "registrations": 0,
+    "sends": 0,
+    "liveFixtureMutations": 0,
+    "queueOrLedgerEdits": 0,
+    "pushOrDeploy": false,
+    "ownedResourcesRemaining": 0
+  },
+  "preservedParent": {
+    "taskId": "continuous-n44-one-approved-closed-page-push-20261019",
+    "candidateSha": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+    "status": "BLOCKED",
+    "historicalAcceptanceNames": 56,
+    "outcomesModified": false,
+    "originalFailures": "Preserved unchanged in the original candidate; not counted as successes for this component.",
+    "physicalAndroid": "NOT_RUN",
+    "physicalIphone": "NOT_RUN",
+    "closedGrantReused": false,
+    "privatePreparationCopied": false
+  },
+  "serviceDisposition": "Native178 remains installed inactive per saved parent receipts; no fresh service read or new upload. OFF/NULL and pin UNSET are historical observations, not new checks.",
+  "publisherNext": "Original sole publisher owns deterministic build and immutable/Production asset parity. The two verification paths remain baseline assets and do not demonstrate Admin activation.",
+  "publicationPerformed": false,
+  "N44": "OPEN",
+  "D107": "OPEN",
+  "liveAdminAuthorization": "NOT_GRANTED_BY_THIS_COMPONENT"
+}

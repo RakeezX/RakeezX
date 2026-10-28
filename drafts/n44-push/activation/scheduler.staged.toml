@@ -10,5 +10,6 @@ crons = []
 [vars]
 N44_ENABLED = "false"
 N44_SCHEDULER_ENABLED = "false"
+N44_FINITE_SCHEDULER = "true"
 [observability]
 enabled = false

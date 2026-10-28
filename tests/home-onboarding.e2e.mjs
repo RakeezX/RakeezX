@@ -5,7 +5,7 @@ test('Home guides a teacher from first class to students to a weekly schedule', 
   await page.goto('/#/');
   await page.waitForFunction(() => window.store?.state?.ready === true);
 
-  await expect(page.getByRole('heading', { name: 'أنشئ فصلك الأول' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ابدأ بفصولك وطلابك' })).toBeVisible();
   await expect(page.getByText('حصص اليوم', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'لا توجد حصص بعد' })).toBeVisible();
 
@@ -84,7 +84,8 @@ test('Home attendance completes the exact Focus session and retains current revi
   await expect(focus.locator('.today-focus__class')).toContainText(fixture.currentClassLabel);
   await expect(focus.locator('.time-range__token[data-time-token="start"]')).toHaveText(fixture.currentStartTime);
   await expect(focus.getByRole('link', { name: 'مراجعة الحضور' })).toHaveAttribute('data-session-id', fixture.currentSessionId);
-  await expect(focus).toContainText('تم رصد الحضور');
+  // The current Home intentionally puts completed attendance in the action, not a duplicate status line.
+  await expect(focus.locator('.today-focus__state')).toHaveCount(0);
   await expect(page.locator('.home-session-row[data-session-id="'+fixture.upcomingSessionId+'"]')).toBeVisible();
 });
 
@@ -114,7 +115,15 @@ for (const viewport of [
     const focus = page.locator('.today-focus');
     await expect(focus).toBeVisible();
     await expect(focus).toHaveAttribute('data-session-id', fixture.sessionId);
-    await expect(focus.getByText(fixture.subjectName, { exact: false })).toBeVisible();
+    const homeLabel = focus.locator('.home-teaching-display');
+    await expect(homeLabel).toHaveAttribute('title', new RegExp(fixture.subjectName));
+    if (viewport.width <= 640) {
+      await expect(homeLabel.locator('.home-teaching-display__short')).toBeVisible();
+      await expect(homeLabel.locator('.home-teaching-display__full')).toBeHidden();
+    } else {
+      await expect(homeLabel.locator('.home-teaching-display__full')).toBeVisible();
+      await expect(homeLabel.locator('.home-teaching-display__full')).toContainText(fixture.subjectName);
+    }
     await expect(focus.locator('.today-focus__detail .time-range__token[data-time-token="start"]')).toHaveText('10:25');
     await expect(focus.locator('.today-focus__detail .time-range__token[data-time-token="end"]')).toHaveText('11:10');
     await expect(focus.locator('.today-focus__detail')).toContainText(/الحصة 8\s*·\s*10:25\s*–\s*11:10/);

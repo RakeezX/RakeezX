@@ -46,6 +46,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   let preparingBinding = null, preparingGeneration = 0, refreshQueued = false;
   let eligibility = { reason: 'idle', configuration: 'not_observed' };
   let configObservation = null;
+  let existingClickOnly = false;
   // AI: a settled attempt is not permission to poll again on store/focus events.
   // Keep credentials only in the existing in-memory fenced binding.
   let configAttempt = null;
@@ -73,7 +74,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     const value=JSON.parse(atob(parts[1].replaceAll('-','+').replaceAll('_','/')));
     return value.sub===owner&&value.role==='authenticated'&&Number.isSafeInteger(value.exp)&&value.exp*1000>Date.now()&&/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(value.session_id??'')?value.session_id:null;
   } catch { return null; } };
-  let renewing = null;
+  let renewing = null, failedRenewal = null;
   const cloudSessionContinues = b => !!b && (cloud.session?.access_token === b.acceptedToken || !!b.authSessionId && sessionHint(cloud.session?.access_token??'',b.context.ownerId) === b.authSessionId);
   const bindingChecks = b => {
     const c = current();
@@ -84,7 +85,11 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   const matches = b => !!b && (b.serviceExpiresAt ?? Infinity) > Date.now() && Object.values(bindingChecks(b)).every(Boolean);
   const continuation = b => {
     const checks=bindingChecks(b);
-    return !!b&&b.serviceExpiresAt>Date.now()&&checks.contextMatches&&checks.workspaceMatches&&checks.leaseMatches&&checks.consentMatches&&cloudSessionContinues(b)&&!!b.authSessionId&&sessionHint(currentToken()??'',b.context.ownerId)===b.authSessionId;
+    // A verified same-owner offline-lease renewal rotates renewalId. It is a
+    // reason to revalidate the existing server receipt, not consent to retire
+    // it. current() still requires the actual editable owner/workspace lease.
+    return !!b&&b.serviceExpiresAt>Date.now()&&checks.contextMatches&&checks.workspaceMatches&&checks.consentMatches&&
+      typeof leaseRevision()==='string'&&!!leaseRevision()&&cloudSessionContinues(b)&&!!b.authSessionId&&sessionHint(currentToken()??'',b.context.ownerId)===b.authSessionId;
   };
   const ownsCleanup = b => {
     const checks = bindingChecks(b);
@@ -96,6 +101,8 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, quiet: readPushQuiet(c, storage) };
   };
   function invalidate() {
+    failedRenewal = null;
+    existingClickOnly = false;
     configObservation = null;
     configAttempt = null;
     const old = client, originalGateway = gateway;
@@ -115,21 +122,29 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   async function refresh(options) {
     const readinessOnly = options?.readinessOnly === true;
     if (disposed) return;
-    if (binding && currentToken() !== binding.acceptedToken && continuation(binding)) {
+    if (binding && (status === 'subscribed' || failedRenewal?.resumeStatus === 'subscribed') && browser.permission() !== 'granted') invalidate();
+    if (binding && (failedRenewal || currentToken() !== binding.acceptedToken || leaseRevision() !== binding.leaseRevision) && continuation(binding)) {
       if (renewing) return renewing.promise;
-      const b=binding,g=gateway,candidate=currentToken(),receipt=g.registration(),revision=b.serverSessionRevision,consent=b.consentRevision,consentState=b.serverConsent;
-      const attempt={binding:b,candidate};renewing=attempt;
+      if (failedRenewal && failedRenewal.candidate === currentToken() && failedRenewal.candidateLease === leaseRevision() && !failedRenewal.retryRequested) return;
+      const b=binding,g=gateway,candidate=currentToken(),candidateLease=leaseRevision(),receipt=g.registration(),revision=b.serverSessionRevision,consent=b.consentRevision,consentState=b.serverConsent;
+      const resumeStatus=failedRenewal?.resumeStatus??status;
+      const attempt={binding:b,candidate,candidateLease};renewing=attempt;
       attempt.promise=(async()=>{
         let replaced=false;
         try {
           await g.read({accept:r=>r.status==='current'&&r.context?.sessionId===b.authSessionId&&r.context.sessionRevision===revision&&r.context.consentRevision===consent&&r.context.pushConsent===consentState&&r.registration?.registrationId===receipt?.registrationId&&r.registration?.expiresAt===receipt?.expiresAt});
-          if(binding!==b||renewing!==attempt||currentToken()!==candidate||!continuation(b))throw Error('stale');
-          b.acceptedToken=candidate;b.cleanupToken=candidate;mark('ready');
-        } catch {
-          // Only a genuinely newer same-session credential may supersede this
-          // read. Never retry the unchanged failed credential.
-          replaced=binding===b&&currentToken()!==candidate&&continuation(b);
-          if(binding===b&&!replaced)invalidate();
+          if(binding!==b||renewing!==attempt||currentToken()!==candidate||leaseRevision()!==candidateLease||!continuation(b)||resumeStatus==='subscribed'&&browser.permission()!=='granted')throw Error('stale');
+          b.acceptedToken=candidate;b.cleanupToken=candidate;b.leaseRevision=candidateLease;failedRenewal=null;status=resumeStatus;mark('ready');
+        } catch (error) {
+          // Only a genuinely newer same-session credential or verified lease
+          // may supersede this read. Never retry an unchanged failed binding.
+          replaced=binding===b&&(currentToken()!==candidate||leaseRevision()!==candidateLease)&&continuation(b);
+          if(binding===b&&!replaced) {
+            if(error.readDisposition==='unknown'&&continuation(b)&&browser.permission()==='granted') {
+              failedRenewal={candidate,candidateLease,resumeStatus,retryRequested:false};
+              status='unavailable';mark('renewal_unavailable');
+            } else invalidate();
+          }
         }
         finally { if(renewing===attempt)renewing=null;changed(); }
         if(replaced&&binding===b)await refresh();
@@ -149,8 +164,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     try { b.consentRevision = consentRevision(b.context); } catch { preparing = false; mark('context_unavailable'); return; }
     preparingBinding = b; preparingGeneration = token; eligibility = { reason: 'checking_configuration', configuration: 'not_observed', ...bindingChecks(b), generationMatches: true, browserSupported: false, workerReady: false };
     const attempt = configAttempt = { binding: b, generation: token, permission: browser.permission(), retryAt: 0 };
-    const valid = () => generation === token && (binding === b || attempt.permission === browser.permission()) && (matches(b)||renewing?.binding===b&&currentToken()===renewing.candidate&&continuation(b));
-    const g = createPushGateway({ fetch, storage, context: b.context, authorization: () => 'Bearer ' + currentToken(), preferences, valid, invalidated: invalidate, bindConsent: r => browser.bind(r), clearConsent: id => browser.clearConsent(id),
+    const activeGeneration = () => generation === token && (binding === b || attempt.permission === browser.permission());
+    const valid = () => activeGeneration() && matches(b);
+    const readValid = () => valid() || activeGeneration() && renewing?.binding===b&&currentToken()===renewing.candidate&&leaseRevision()===renewing.candidateLease&&continuation(b);
+    const g = createPushGateway({ fetch, storage, context: b.context, authorization: () => 'Bearer ' + currentToken(), preferences, valid, readValid, invalidated: invalidate, bindConsent: r => browser.bind(r), clearConsent: id => browser.clearConsent(id),
       cleanupAuthorization() {
         const c = current();
         return c?.ownerId === b.context.ownerId && c?.workspaceId === b.context.workspaceId && c?.deviceId === b.context.deviceId && (currentToken()===b.acceptedToken||continuation(b))
@@ -161,6 +178,42 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
         const revision = ctx?.consentRevision ?? '';
         storage.setItem(revisionKey(b.context), revision); b.consentRevision = revision;
       } });
+    const resumeExistingForClick = async (observed, native, consent) => {
+      const receipt = observed?.registration;
+      const saved = () => {
+        try { const raw = storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId,b.context.workspaceId,b.context.deviceId]));
+          if (!raw || raw.length > 8192) return null;
+          const value = JSON.parse(raw);
+          return value && value.retired !== true && value.registrationId === receipt?.registrationId &&
+            value.workspaceId === b.context.workspaceId && value.deviceId === b.context.deviceId ? value : null;
+        } catch { return null; }
+      };
+      if (!valid() || observed?.status !== 'current' || observed.context?.pushConsent !== true || !receipt ||
+          !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(receipt.registrationId ?? '') ||
+          !Number.isSafeInteger(receipt.expiresAt) || receipt.expiresAt <= Date.now() ||
+          receipt.expiresAt > observed.context.sessionExpiresAt || !saved() || browser.permission() !== 'granted') return false;
+      if (!await browser.ready() || !valid()) return false;
+      const existing = native ?? await browser.existing(), worker = consent ?? await browser.consent();
+      const workerMatches = value => value?.enabled === true && value.binding === receipt.registrationId && value.expiresAt >= receipt.expiresAt;
+      if (!existing || !workerMatches(worker) || !valid()) return false;
+      b.serviceExpiresAt = Math.min(receipt.expiresAt, observed.context.sessionExpiresAt);
+      binding = b; gateway = g; existingClickOnly = true;
+      const c = createPushClient({ browser, gateway: g, clock: Date.now,
+        getVerifiedContext: () => valid() ? { ...b.context, authRevision: String(token) } : null,
+        resolveAction: (_ctx,id,now) => notificationDestination(store,current(),id,now),
+        confirmExisting: async (_snapshot, subscription) => {
+          const currentWorker = await browser.consent();
+          return subscription === existing && binding === b && gateway === g && valid() && !!saved() &&
+            g.registration()?.registrationId === receipt.registrationId && g.registration()?.expiresAt === receipt.expiresAt && workerMatches(currentWorker);
+        } });
+      client = c;
+      const restored = await c.restoreReadOnly(existing);
+      if (!valid() || binding !== b || client !== c || restored.status !== 'subscribed') {
+        if (binding === b && client === c) { binding = null; gateway = null; client = null; existingClickOnly = false; }
+        return false;
+      }
+      ready = true; status = 'subscribed'; mark('ready', { workerReady: true }); return true;
+    };
     try {
       const { body: publicConfiguration, httpStatus } = await g.configuration({ metadata: true });
       if (!valid()) { mark('binding_changed'); throw Error('unavailable'); }
@@ -173,6 +226,9 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
         const cleanupHint = consentRevision(b.context) || storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, b.context.deviceId]));
         if (publicConfiguration?.status === 'disabled' && typeof cleanupHint === 'string' && cleanupHint.length > 0 && cleanupHint.length <= 8192) {
           const observed = await g.read();
+          // Admission to a NEW registration is independent of read-only access
+          // to an already active exact receipt after the one-shot is consumed.
+          if (!readinessOnly && await resumeExistingForClick(observed)) return;
           if (valid() && observed.status === 'current' && observed.context?.pushConsent === true) {
             pendingDisable = { gateway: g, binding: b, preferences: preferences(), cleanupOnly: true };
             status = 'cleanup_pending'; mark('cleanup_pending'); return;
@@ -207,19 +263,16 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       // A manual readiness gesture must not restore/register or retire a saved
       // subscription. Its normal lifecycle remains separate from this read.
       if (readinessOnly && (r.registration || existing || workerConsent.binding || storage.getItem('rakeezx-n44-registration:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, b.context.deviceId])))) { status = 'unavailable'; mark('context_unavailable'); return; }
+      if (!readinessOnly && r.registration) {
+        if (await resumeExistingForClick(r, existing, workerConsent)) return;
+        status = 'unavailable'; mark('context_unavailable'); return;
+      }
       binding = b; gateway = g;
       const verified = () => valid() ? { ...b.context, authRevision: String(token) } : null;
       const c = createPushClient({ browser, gateway: g, getVerifiedContext: verified, clock: Date.now,
         resolveAction: (_ctx, id, now) => notificationDestination(store, current(), id, now) });
       client = c;
       if (readinessOnly) { ready = true; status = 'unsubscribed'; mark('ready'); return; }
-      if (r.registration && existing && workerConsent.binding === r.registration.registrationId &&
-          workerConsent.expiresAt >= r.registration.expiresAt && browser.permission() === 'granted') {
-        const restored = await c.restore(existing);
-        if (!valid()) return;
-        if (restored.status === 'subscribed') { ready = true; status = 'subscribed'; mark('ready'); await projectConfirmed({ workspace: b.workspace, session: b.session }); return; }
-        if (restored.status === 'cleanup_pending') { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
-      }
       // No new subscription or permission request on load. Retired identities
       // are reconciled before allowing another explicit opt-in.
       if (!await g.retire()) { status = 'cleanup_pending'; mark('cleanup_pending'); return; }
@@ -242,6 +295,9 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     }
   }
   async function recheckConfiguration() {
+    if (!disposed && failedRenewal && binding && !renewing && !pendingDisable && !disabling && continuation(binding)) {
+      failedRenewal.retryRequested=true;await refresh();return {status:'checked'};
+    }
     // A manual readiness check never retires a valid registration or Stop work.
     if (disposed || preparing || binding || pendingDisable || disabling || !configuration.enabled || !current()) return { status: 'unavailable' };
     if (sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt) return { status: 'cooldown' };
@@ -265,7 +321,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   // AI N44: bootstrap and adopted canonical state are distinct from a pushed ACK.
   // Only confirmed IDs are hints; no local event payload becomes server truth.
   function projectConfirmed(checkpoint) {
-      if (!usable() || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return Promise.resolve();
+      if (existingClickOnly || !usable() || checkpoint.workspace !== store.getActiveWorkspace() || checkpoint.session !== cloud.session) return Promise.resolve();
       // Overlapping ACK hooks share one current-owner pass. Never queue a replay
       // of a write whose response was lost.
       if (projecting) return projecting;
@@ -366,6 +422,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     sourceStatus = { ...result, token, signature: choice.signature }; changed(); return { ...sourceStatus };
   }
   const clicked = new Map();
+  let pendingClickHint = null;
   const onMessage = event => {
     // Only the actual controlling SW can request a bounded action; no page-message API.
     if (!event.source || event.source !== win.navigator.serviceWorker?.controller) return;
@@ -374,9 +431,22 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       !['n44-push-ready', 'n44-push-check', 'n44-push-click'].includes(event.data?.type)) return;
     const port = event.ports[0];
     if (event.data.type === 'n44-push-ready') {
-      // Terminal unavailability also answers ready: the action can explain a
-      // denial visibly without another configuration/authorization request.
-      port.postMessage({ ok: !disposed && !preparing && store.state?.ready === true }); port.close(); return;
+      // Store boot alone does not prove the current registration or source has
+      // restored. Probes are read-only: never spend the one action on that gap.
+      // Older workers send no envelope; retain their handshake without weakening
+      // the action's existing binding/source/owner checks.
+      const envelope = normalizePushEnvelope(event.data.event, Date.now());
+      const restored = !disposed && !preparing && !renewing && store.state?.ready === true && usable();
+      const ok = restored && (event.data.event == null || !!envelope &&
+        envelope.binding === gateway?.registration()?.registrationId &&
+        readNotificationCategories(current(), storage)[envelope.event.kind] &&
+        notificationDestination(store, current(), envelope.event.id, Date.now()) === envelope.event.actionPath);
+      const key = envelope && envelope.binding + ':' + envelope.event.id;
+      if (!ok && key && !disposed && pendingClickHint !== key) {
+        pendingClickHint = key;
+        toast('جارٍ استعادة الحساب والتحقق من التذكير…');
+      }
+      port.postMessage({ ok }); port.close(); return;
     }
     void (async () => {
       const envelope = normalizePushEnvelope(event.data.event, Date.now());
@@ -417,7 +487,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     normalUiSnapshot() {
       const options = normalChoices();
       return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
-        canVerify: usable() };
+        canVerify: !existingClickOnly && usable() };
     },
     async deviceOutcome() {
       const before=outcomeBinding();if(!before?.registration)return null;
@@ -425,10 +495,10 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const outcome=await browser.deviceOutcome(id),after=outcomeBinding();
       return epoch===generation&&after?.binding===before.binding&&after.gateway===before.gateway&&after.pending===before.pending&&after.registration?.registrationId===id&&after.registration?.expiresAt===before.registration.expiresAt?outcome:null;
     },
-    snapshot: () => ({ configRecheckAvailable: !disposed && configuration.enabled && !!current() && !binding && !pendingDisable && !disabling, configRecheckBusy: preparing, configRecheckCoolingDown: sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt,
-      deviceOutcomeAvailable: !!outcomeBinding(), available: ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
+    snapshot: () => ({ configRecheckAvailable: !disposed && configuration.enabled && !!current() && (!binding || !!failedRenewal && continuation(binding)) && !pendingDisable && !disabling, configRecheckBusy: preparing || !!renewing, configRecheckCoolingDown: sameConfigAttempt(configAttempt) && Date.now() < configAttempt.retryAt,
+      deviceOutcomeAvailable: !!outcomeBinding(), available: !existingClickOnly && ready && matches(binding) && (gateway?.expiresAt() > Date.now() || status !== 'subscribed'), cleanupAvailable: !!pendingDisable && ownsCleanup(pendingDisable.binding) || existingClickOnly && ownsCleanup(binding), cleanupBusy: !!disabling, preferenceStopped: !!preferenceStop && ownsCleanup(preferenceStop), status, eligibility: { ...eligibility }, configOutcome: configOutcome() }),
     async optIn() {
-      if (!ready || !matches(binding)) return { status: 'unavailable' };
+      if (existingClickOnly || !ready || !matches(binding)) return { status: 'unavailable' };
       const c = client, result = await c.optIn();
       if (client === c && matches(binding)) {
         status = result.status; if (status === 'subscribed') preferenceStop = null; changed();

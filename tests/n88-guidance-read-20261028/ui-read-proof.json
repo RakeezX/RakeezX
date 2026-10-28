@@ -1,0 +1,26 @@
+{
+  "matrix": [
+    {
+      "width": 320,
+      "theme": "light",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "overflow": false
+    }
+  ],
+  "readRetryUI": "PASS",
+  "evidence": "actual app read-only retry/draft/CAS disabled, separate roster/guidance statuses; four screenshots before uncertain-save harness failure"
+}

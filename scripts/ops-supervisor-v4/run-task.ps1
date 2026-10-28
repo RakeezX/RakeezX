@@ -5,6 +5,26 @@ param(
 $ErrorActionPreference = 'Stop'
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 function Read-Json([string]$File) { [System.IO.File]::ReadAllText($File, [System.Text.Encoding]::UTF8) | ConvertFrom-Json }
+function Get-N44ExecutionProfile($Task, $Spec) {
+  $profile = $Task.executionProfile
+  $originalN44 = $Task.id -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and $Spec.sessionId -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61'
+  $renewalDeliveryN44 = $Task.id -eq 'continuous-n44-verified-renewal-delivery-20261027' -and $profile.originalTaskId -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and
+    $profile.originalSession -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.qualifiedSource -eq 'f71e2dfd64ddb8e79b18d4f30151c0a9cfedb3b2'
+  $sourceFoundationN44 = $Task.id -eq 'continuous-n44-pr6-source-foundation-delivery-20261027' -and $profile.originalTaskId -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and
+    $profile.originalSession -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.qualifiedSource -eq '73518d6e66241c09f8f30bbbe91dedf5922b6d7c'
+  $inertD107N44 = $Task.id -eq 'continuous-n44-d107-inert-source-delivery-20261028' -and $Spec.sessionId -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and
+    $profile.originalTaskId -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and $profile.originalSession -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.qualifiedSource -eq '6025dcbcca3a7bc21893297fed0dfac954c17e1b'
+  $newMobileN44 = $Task.id -eq 'continuous-n44-two-mobile-actual-trial-20261028' -and $Spec.sessionId -eq '01a14fcd-032c-7ec0-8b0c-0e0395862c61' -and $profile.originalTaskId -eq 'continuous-n44-one-approved-closed-page-push-20261019' -and $profile.qualifiedSource -eq 'c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5'
+  $n44 = ($originalN44 -or $renewalDeliveryN44 -or $sourceFoundationN44 -or $inertD107N44 -or $newMobileN44) -and $Task.productId -eq 'N44' -and $Spec.taskId -eq $Task.id -and
+    $profile.authorityRef -eq 'PO-20261027-N44-ASTRA-SINGLE-WORKER' -and $profile.version -eq 1
+  if ($n44) {
+    if ($Spec.model -ne 'gpt-6-astra' -or $Spec.effort -ne 'max' -or $profile.model -ne $Spec.model -or $profile.effort -ne $Spec.effort -or
+        $profile.serviceTier -ne 'priority' -or $profile.fastMode -ne $true -or $profile.singleAgent -ne $true) { throw 'N44 execution profile differs from its explicit PO authority' }
+    return @{ model=$Spec.model; effort=$Spec.effort; serviceTier='priority'; fastMode=$true; singleAgent=$true; authorityRef=$profile.authorityRef;
+      config=@('features.fast_mode=true','service_tier=priority','features.multi_agent=false','features.multi_agent_v2=false') }
+  }
+  return @{ model=$Spec.model; effort=$Spec.effort; fastMode=$false; config=@('features.fast_mode=false') }
+}
 function Save-Checkpoint {
   $checkpoint.heartbeatAt = [DateTime]::UtcNow.ToString('o')
   $temporary = "$($spec.checkpointPath).$PID.tmp"
@@ -74,7 +94,9 @@ try {
   if ($spec.sessionId) { $arguments.Add('resume') }
   if ($spec.model) { $arguments.Add('--model'); $arguments.Add([string]$spec.model) }
   $arguments.Add('-c'); $arguments.Add('model_reasoning_effort=' + [string]$spec.effort)
-  $arguments.Add('-c'); $arguments.Add('features.fast_mode=false')
+  $executionProfile = Get-N44ExecutionProfile $task $spec
+  foreach ($setting in $executionProfile.config) { $arguments.Add('-c'); $arguments.Add([string]$setting) }
+  $checkpoint['executionProfile'] = $executionProfile
   $arguments.Add('-c'); $arguments.Add('approval_policy=never')
   if ($spec.sessionId) {
     # The installed exec-resume has no -C/--sandbox option. Preserve exact cwd

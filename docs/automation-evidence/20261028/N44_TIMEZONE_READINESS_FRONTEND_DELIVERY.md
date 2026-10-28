@@ -1,0 +1,11 @@
+# N44 runtime timezone receipt — frontend delivery candidate
+
+The current account/device disclosure now displays the device's runtime IANA timezone, using the same `Intl.DateTimeFormat().resolvedOptions().timeZone` rule as notification `preferences()`. This supplies the missing visible readiness fact. It is a read-only runtime value, not an acknowledgement of saved server settings.
+
+Only `src/views/notification-settings.js` is transferred from qualified source `fb9d78e7af01332aba6ed9bb4a1231341fcb979a` onto base `b099cf67183657a83bfa4b20e64856872eb8131b`. Preimage SHA256 is `612a79f6af151ff061ef9856a59caa1be27020024d3e331c14fd9c3244ea2778`; postimage is `f8cfea28abf586f4347d718af8ab9f57ff45232c962b7b8088e20fa69f3ab8eb`. No imports, handlers, ownership guards, app, Service Worker, styles, N88 or service configuration change.
+
+All 19 packet dependency blobs match this checkout and observed `origin/main`. Reused evidence at the qualified source commit covers actual authenticated synthetic application DOM/CSS at 390px in `Asia/Riyadh` and `Pacific/Kiritimati`, RTL without horizontal overflow, synchronous private DOM removal on owner invalidation, and rejection of the stale source action. Both cases recorded zero external requests and closed their owned resources. No browser or unchanged suite was rerun in this delivery phase. `node --check src/views/notification-settings.js`, the exact markup-only delta assertion and `git diff --check` passed.
+
+Exact packet, dependency and evidence hashes are bound in [qualification.json](../../../tests/n44-timezone-delivery-20261028/qualification.json). The pinned packet is `tests/n44-mobile-live-20261028/timezone-publisher-packet-c21a2c71.json` at original private candidate `9b4dc05db8235abde3ec6fb6bdd6f7951297d9fc`; private helpers, receipts and custody were not copied or modified.
+
+This is local readiness for this frontend component only. The sole publisher owns deterministic build and served postimage verification. After verified publication, the controller may resume the original mobile card and original custody for a fresh complete normal-UI receipt and current phone readiness. No live operation, Native upload, grant preparation or clock activation occurred here. Parent failures and phone NOT_RUN remain unchanged; N44 and D107 remain OPEN.

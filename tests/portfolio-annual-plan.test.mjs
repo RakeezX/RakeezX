@@ -59,3 +59,18 @@ test('more than eleven sections reserve extra contents and overview pages',()=>{
   assert.equal(m.totalPages,8);
   assert.equal(m.criteriaCount,24);
 });
+
+// AI N126: context never opts a mere template into the printable annual file.
+test('nonempty context reserves one numbered page without displacing chart/photo pages',()=>{
+ const id='rakeez:attendance:y';
+ const args={criteria,yearId:'y',sources:[automatic(id,'09')],templates:[template('idea','04')],
+  contexts:new Map([[id,{action:'ملاحظة فعلية',reflection:'تأمل'}],['idea',{action:'فكرة'}]]),
+  photos:new Map([[id,Array.from({length:6},(_,i)=>({id:String(i)}))]])};
+ const m=buildAnnualPortfolioPlan(args);
+ assert.equal(m.witnessCount,1);
+ assert.equal(m.entries[0].contextPages,1);
+ assert.equal(m.entries[0].continuations,1);
+ assert.equal(m.totalPages,6);
+ args.contexts.set(id,{action:'  ',date:'not-a-date'});
+ assert.equal(buildAnnualPortfolioPlan(args).entries[0].contextPages,0);
+});

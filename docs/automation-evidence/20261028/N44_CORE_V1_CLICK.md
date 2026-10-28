@@ -1,0 +1,37 @@
+# N44 Core V1 — cold-start click delivery
+
+Task `n44-core-click-1028`, run `d7f34bc7-111e-4146-bf2b-e13d4e8ef453`; base and observed `origin/main`: `3d3f9a61d3c6a138f0326e3a7b563a163b52a141`.
+
+This source-only slice follows the 28 October teacher-only Core V1 decision. Admin/D107 and marketing are deferred, not acceptance gates here. No real account, service, scheduler, registration, send, Delete or grant operation ran. Original mobile FAIL/UNKNOWN and private candidate `d4e695d3f823a9ba57c13aad2baeb9763da04aab` remain untouched; grant `60fc7d23-8c87-4d8b-b97f-d9c9e289af94` remains spent/disarmed. Core V1 is not CLOSED.
+
+## Reproduction and change
+
+Two actual-app synthetic cases failed on the base: a cold document whose listener becomes available after eleven seconds exceeded the worker's ten-second wait; a ready store with its source rows still restoring acknowledged readiness too early and consumed the only click action before a destination existed. These are reproduced failure paths consistent with the Home-only observation, not a claim that unavailable phone telemetry proves their exact physical cause.
+
+The worker still opens only the public root immediately. Its read-only readiness probe now carries the same bounded envelope over the existing trusted controller channel, never a private URL or persisted destination. The runtime waits for the current usable registration, settled restoration, matching binding/category and freshly derived destination. It does not authorize or navigate during probes. Waiting is bounded to thirty seconds and both envelope/event expiry. The eventual action still performs its original fresh server authorization and owner/source revalidation once; duplicate clicks share the existing action. Old envelope-free worker probes remain supported with usable-registration readiness; the action retains all guards.
+
+A generic existing toast says “جارٍ استعادة الحساب والتحقق من التذكير…” while the destination is pending. It contains no account, event or route details. No new imports, CSS, startup entry, storage, permissions or service capabilities were introduced. Failed/offline authorization remains fail-closed; this change does not promise offline access to a private reminder.
+
+## Affected verification
+
+`tests/n44-core-click-1028/cold-start.test.mjs` reuses the existing `n44-fixture.mjs`, served-app readiness helper and exact synthetic click-host fixture (hash recorded in qualification). The canonical isolated browser helper used fresh contexts at task-owned loopback port43128, actual app DOM/handlers/CSS and actual authenticated synthetic store/ownership guards. External requests and browser Service Workers were blocked. The original worker source ran in the existing VM boundary with synthetic native ports. Every context/browser and owned server closed in finally; no shared live-browser lease or user profile was used.
+
+- Two cold-start cases PASS at390/1100px: one public window, one action, one authorization, one actual router transition to the current items page. Identity/database receipt is checked in the same live document. The source-restoration case observed the actual rendered generic toast.
+- Seven affected rejection cases PASS: changed owner, revoked authorization, expired event, foreign binding, unavailable/offline authorization, deactivated workspace/lease and owner change during authorization. Their passing evidence was reused after correcting an unrelated harness field name.
+- Pending-source owner switch PASS: readiness stays false, zero authorization/navigation, generic text contains no target details.
+- Original worker offline compatibility PASS in the VM: network failure returns cached root, private API is not intercepted/cached, newer and foreign caches survive, and expiry during readiness polling causes zero click actions. The complete shell/cache/fetch prefix is unchanged, and the existing runtime remains in SHELL. This is synthetic compatibility evidence, not a physical browser offline/SW certification.
+- Syntax and scoped diff checks PASS. No full build or unchanged broad suite was run; deterministic build/metadata and served asset verification belong to the publisher.
+
+Historical records remain in `qualification.json`: both baseline Product failures, initial Windows ESM import harness error, and the first corrected run's two harness assertions using nonexistent workspace `ownerId` instead of `authUserId`. The two corrected cases passed after that precise harness repair; seven already passing negatives were not repeated. Eleven distinct affected cases are qualified. Browser phases are not physical Android/iPhone acceptance.
+
+## Smallest automatic teacher-reminder follow-on — read-only inspection
+
+Existing pieces already cover the domain rules: `notification-state.js` defaults to15 minutes and supports5/10/15/20/30/45/60-minute lesson leads plus due stages3/2/1/0. Runtime preferences carry category choices, current IANA timezone and quiet window. Confirmed-source projection uses owner/Sync checkpoints and persists UNKNOWN before requesting projection; it does not replay a lost acknowledgement. `canonical-source.mjs` derives lesson send time from canonical session start minus the selected lead, and due-stage midnight/expiry in the supplied timezone, rejecting deleted/archived/cancelled sources. `delivery.mjs` rechecks current consent, category, quiet hours and canonical payload inside the durable reservation, keys dedupe by workspace/device/event, and does not resend uncertain attempts. These components were inspected, not requalified or activated here.
+
+`scheduler-entry.mjs` is an inactive private signed driver. It requires explicit enable flags and currently pages up to4×25 due entries before cleanup. The local Supabase entry exposes an existing handler, not an installed automatic schedule. Nothing in this slice establishes a live cron or automatic timed arrival. General enabling that driver would be broader than a bounded teacher trial.
+
+The smallest next implementation is a finite automatic scheduler adapter around the existing due/claim/send boundary: independently pinned owner/workspace/device/source set, immutable event/cap budget, activation/hard end, limited tick count, no manual-send substitution, and automatic disarm. Reuse canonical projection, quiet-hour and UNKNOWN/dedupe logic. Qualify lesson and due timing, quiet suppression, cancellation/deletion, owner switch, duplicate tick and lost acknowledgement locally before provisioning. Do not add Admin or campaign machinery.
+
+Actual acceptance then needs a separate explicit authority naming the new finite source/device set, canonical fixture operations, exact registration and provider-attempt caps, scheduler/tick installation or enablement, hard window, cleanup and rollback/disarm owner. Any required service delta needs its own exact upload/readback allowance before frontend readiness; the generic publisher cannot supply it. Obtain real closed-app timed OS arrival and tap destination, peer/no-duplicate observation and local/cloud Stop plus exact source cleanup. The spent grant grants none of those new operations. Its outstanding fresh read-only deletion receipt remains a separate permitted live cleanup phase, never another Delete.
+
+The publisher may deliver only this checkout's qualified click source and safe proof. New physical click and automatic timed acceptance remain pending after publication; they do not block this source candidate.

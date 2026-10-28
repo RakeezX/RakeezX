@@ -34,3 +34,36 @@ export function compareAcademicClasses(a,b){
  if(x||y)return x?-1:1;
  return natural.compare(normalize(label(a)),normalize(label(b)));
 }
+
+
+// Display-only grade/section labels for constrained class cards, schedule
+// cells and small-screen headings. Never use for matching or persistence.
+const COMPACT_GRADES = Object.freeze([
+  '', 'أول', 'ثاني', 'ثالث', 'رابع', 'خامس', 'سادس',
+  'أول م', 'ثاني م', 'ثالث م', 'أول ث', 'ثاني ث', 'ثالث ث',
+]);
+const FULL_GRADES = Object.freeze([
+  '', 'الأول الابتدائي', 'الثاني الابتدائي', 'الثالث الابتدائي',
+  'الرابع الابتدائي', 'الخامس الابتدائي', 'السادس الابتدائي',
+  'الأول المتوسط', 'الثاني المتوسط', 'الثالث المتوسط',
+  'الأول الثانوي', 'الثاني الثانوي', 'الثالث الثانوي',
+]);
+
+export function compactSectionLabel(section) {
+  if (!section) return '';
+  const grade = Number(section.grade);
+  const short = COMPACT_GRADES[grade];
+  const raw = String(section.label ?? section.name ?? '').trim();
+  if (!short) return raw;
+  let suffix = raw;
+  // Legacy section labels can include the grade; do not duplicate it.
+  for (const prefix of [FULL_GRADES[grade], short, 'ال' + short]) {
+    if (!prefix || !suffix.startsWith(prefix)) continue;
+    const remaining = suffix.slice(prefix.length);
+    if (!remaining || /^[\s/—–-]/u.test(remaining)) {
+      suffix = remaining.replace(/^[\s/—–-]+/u, '').trim();
+      break;
+    }
+  }
+  return suffix ? short + '/' + suffix : short;
+}

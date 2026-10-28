@@ -2,6 +2,8 @@
 
 import { html, icon, openSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
+import { compactSubjectLabel } from '../lib/subject-catalog.js';
+import { compactSectionLabel } from '../lib/class-order.js';
 import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, SECTION_COLORS, safeColor, normalizeSectionLabel } from '../models.js';
 import { go, teachingRouteId } from '../router.js';
 import { repaint } from '../repaint.js';
@@ -28,14 +30,23 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
         <div class="class-hub-header__identity-block">
           <span class="class-hub-header__color-bar" style="background:${sec?.color || 'var(--brand)'}" aria-hidden="true"></span>
           <div class="class-hub-header__name-group">
-            <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل" title="تبديل الفصل">
-              <span class="class-name-switcher-btn__title">${sectionLabel(sec) || 'الفصل'}</span>
+            <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل" title="${sectionLabel(sec) || 'تبديل الفصل'}">
+              <span class="class-name-switcher-btn__title">
+                <span class="class-identity-full">${sectionLabel(sec) || 'الفصل'}</span>
+                <span class="class-identity-short" aria-hidden="true">${compactSectionLabel(sec) || 'الفصل'}</span>
+              </span>
               <span class="class-name-switcher-btn__chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
             </button>
-            ${sub?.name ? html`<span class="class-hub-header__sep" aria-hidden="true">—</span><span class="class-hub-header__sub">${sub.name}</span>` : ''}
+            ${sub?.name ? html`<span class="class-hub-header__sep" aria-hidden="true">—</span><span class="class-hub-header__sub" role="text" aria-label="${sub.name}" title="${sub.name}"><span class="class-identity-full">${sub.name}</span><span class="class-identity-short" aria-hidden="true">${compactSubjectLabel(sub, store.subjects())}</span></span>` : ''}
           </div>
         </div>
         <div class="class-hub-header__end">
+          ${sec && store.activeTerm()?.id === tch.termId && !store.isTermClosed(tch.termId) ? html`
+            <button type="button" class="iconbtn" data-act="add-subject"
+                    aria-label="إضافة مادة أخرى لهذا الفصل" title="إضافة مادة أخرى لهذا الفصل">
+              ${icon('plus')}
+            </button>
+          ` : ''}
           <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل" title="تعديل الفصل">${icon('settings')}</button>
         </div>
       </div>
@@ -232,6 +243,11 @@ export default {
     'file-export': (el, ev, params) => studentsView.actions['file-export'](el, ev, params),
     'paste-names': (el, ev, params) => studentsView.actions.import(el, ev, params),
     'add-student': (el, ev, params) => studentsView.actions.add(el, ev, params),
+    'add-subject'(el, ev, params) {
+      const teaching = store.getTeaching(params.id);
+      if (!teaching || store.isTeachingArchived(teaching)) return;
+      return addSubjectToClass(teaching.sectionId);
+    },
     'switch-class'(el, ev, params) {
       const suffix = location.hash.replace(/^#\/teaching\/[^/]+/, '').replace(/^\?/, '?');
       openSheet({

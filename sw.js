@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v87';
+const VERSION = 'rakeezx-v95';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -61,6 +61,17 @@ const SHELL = [
   './src/vendor/flatpickr/ar.js',
 
   './src/app.js',
+  // AI N126: complete opt-in local Portfolio Preview shell.
+  './src/views/portfolio-design-preview.js',
+  './src/styles/portfolio-design-preview.css',
+  './src/lib/portfolio-design-preview.js',
+  './src/lib/portfolio-annual-plan.js',
+  './src/lib/portfolio-smart-evidence.js',
+  './src/lib/portfolio-evidence-templates.js',
+  './src/lib/portfolio-local-draft.js',
+  './src/lib/portfolio-local-state.js',
+  './src/lib/portfolio-local-archive.js',
+
   './src/lib/app-update.js',
   './src/router.js',
   './src/lib/student-portal-client.js',
@@ -189,6 +200,8 @@ const SHELL = [
   './src/lib/calendar-presets.js',
   './src/lib/calendar-runtime.js',
   './src/lib/subject-catalog.js',
+  './src/lib/stage-subject-options.js',
+  './src/lib/official-v6-subject-data.js',
   './src/lib/effects.js',
   './src/lib/sound.js',
 
@@ -488,7 +501,7 @@ async function n44Ask(client, envelope, type = 'n44-push-click') {
     const finish = ok => { clearTimeout(timer); channel.port1.close(); channel.port2.close(); resolve(ok); };
     const timer = setTimeout(() => finish(false),1500);
     channel.port1.onmessage = message => finish(message.data?.ok === true);
-    try { client.postMessage(type === 'n44-push-ready' ? {type} : {type,event:envelope},[channel.port2]); } catch { finish(false); }
+    try { client.postMessage({type,event:envelope},[channel.port2]); } catch { finish(false); }
   });
 }
 const n44Clients = async () => (await self.clients.matchAll({type:'window',includeUncontrolled:false})).filter(n44AppClient);
@@ -554,9 +567,9 @@ self.addEventListener('notificationclick', event => {
     // Readiness probes have no authorization/navigation side effects. A cold
     // boot may not yet have installed its listener or restored the owner store.
     // Send the action ONCE, never retry an unknown authorization/navigation.
-    const deadline = Date.now() + 10000;
+    const deadline = Math.min(Date.now() + 30000, envelope.expiresAt, envelope.event.expiresAt);
     while (Date.now() < deadline && epoch === n44Epoch && n44Envelope(envelope)) {
-      if (await n44Ask(client, null, 'n44-push-ready')) {
+      if (await n44Ask(client, envelope, 'n44-push-ready')) {
         if (epoch === n44Epoch && n44Envelope(envelope)) await n44Ask(client, envelope);
         return;
       }

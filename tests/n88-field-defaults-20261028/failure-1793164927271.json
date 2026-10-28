@@ -1,0 +1,20 @@
+{
+  "taskId": "n88-fields-1028",
+  "runId": "3fab0d26-7de3-4b7b-bfc0-35e13783c3c6",
+  "base": "5a043dcd8201fcb10161e456e4b301222c843755",
+  "checks": [],
+  "matrix": [],
+  "pageErrors": [],
+  "realOperations": 0,
+  "cleanup": {
+    "browserClosed": true,
+    "serverClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "failure": {
+    "stage": "matrix-320-light",
+    "message": "Expected values to be strictly equal:\n\n0 !== 28\n",
+    "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 28\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-fields-1028/tests/n88-field-defaults-20261028/cases.mjs:37:80"
+  }
+}

@@ -1,3 +1,4 @@
+import '../lib/rakeez-datetime.js';
 import { html, raw, icon, fmtDate, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
@@ -9,7 +10,7 @@ import { buildPortfolioEvidenceSuggestions, guideForCriterion } from '../lib/por
 import { F09_EVIDENCE_TEMPLATES, templatesForCriterion } from '../lib/portfolio-evidence-templates.js';
 import { buildAnnualPortfolioPlan } from '../lib/portfolio-annual-plan.js';
 import { portfolioLocalScope, loadPortfolioLocal, savePortfolioLocal, isPortfolioConflict } from '../lib/portfolio-local-draft.js';
-import { snapshotPortfolioDraft, restorePortfolioDraft } from '../lib/portfolio-local-state.js';
+import { snapshotPortfolioDraft, restorePortfolioDraft, PORTFOLIO_CONTEXT_FIELDS, normalizePortfolioContext } from '../lib/portfolio-local-state.js';
 import { buildPortfolioArchive, readPortfolioArchiveFile, applyPortfolioArchive, portfolioArchiveFilename } from '../lib/portfolio-local-archive.js';
 
 const styleUrl = new URL('../styles/portfolio-design-preview.css', import.meta.url).href;
@@ -45,6 +46,7 @@ const photoGroups = new Map();
 const selectedByCriterion = new Map();
 const descriptions = new Map();
 const titles = new Map();
+const contexts = new Map();
 const layoutFor = key => photoLayouts.get(key) ?? 'two';
 const photosFor = key => photoGroups.get(key) ?? [];
 const showSection = (key,section) => sectionPreferences.get(key)?.[section] !== false;
@@ -55,7 +57,7 @@ const allCriteria = () => [
 function forgetWitness(id){
   for(const photo of photosFor(id)) URL.revokeObjectURL(photo.url);
   photoGroups.delete(id);photoLayouts.delete(id);descriptions.delete(id);
-  titles.delete(id);sectionPreferences.delete(id);hiddenWitnesses.delete(id);
+  contexts.delete(id);titles.delete(id);sectionPreferences.delete(id);hiddenWitnesses.delete(id);
   includedWitnesses.delete(id);excludedWitnesses.delete(id);
 }
 // One-step, session-only undo. Delay revoking removed photo URLs until undo expires.
@@ -78,7 +80,7 @@ function resetDraftView() {
   for(const group of photoGroups.values())for(const photo of group)URL.revokeObjectURL(photo.url);
   photoGroups.clear();photoLayouts.clear();selectedByCriterion.clear();
   includedWitnesses.clear();excludedWitnesses.clear();
-  descriptions.clear();titles.clear();criterionNames.clear();hiddenCriteria.clear();
+  contexts.clear();descriptions.clear();titles.clear();criterionNames.clear();hiddenCriteria.clear();
   hiddenWitnesses.clear();sectionPreferences.clear();extraCriteria.length=0;
   customWitnesses.length=0;nextExtraCriterionNumber=12;
   editingCriterion='09';selectedSuggestionId=null;viewingFullPortfolio=false;
@@ -87,7 +89,7 @@ function resetDraftView() {
 }
 function draftModel() {
   return {criterionNames,hiddenCriteria,extraCriteria,customWitnesses,hiddenWitnesses,
-    sectionPreferences,photoLayouts,photoGroups,selectedByCriterion,descriptions,titles,
+    sectionPreferences,photoLayouts,photoGroups,selectedByCriterion,descriptions,titles,contexts,
     includedWitnesses,excludedWitnesses,editingCriterion,nextExtraCriterionNumber};
 }
 function loadDraftIntoView(payload,images) {
@@ -100,7 +102,7 @@ function loadDraftIntoView(payload,images) {
   };
   resetDraftView();
   for(const key of ['criterionNames','photoLayouts','photoGroups','selectedByCriterion',
-    'descriptions','titles','sectionPreferences'])replaceMap(draftModel()[key],restored[key]);
+    'descriptions','titles','contexts','sectionPreferences'])replaceMap(draftModel()[key],restored[key]);
   for(const key of ['hiddenCriteria','hiddenWitnesses','includedWitnesses','excludedWitnesses'])
     replaceSet(draftModel()[key],restored[key]);
   extraCriteria.push(...restored.extraCriteria);
@@ -195,10 +197,26 @@ function context() {
   const evidence = portfolioYearEvidence(groups);
   const allTeachings = groups.flatMap(group=>group.teachings);
   const teachingIds = [...new Set(allTeachings.map(teaching=>teaching.id))];
+  const scopedTeachings=store.state.teachings.filter(x=>teachingIds.includes(x.id));
+  const sectionIds=new Set(scopedTeachings.map(x=>x.sectionId));
+  const subjectIds=new Set(scopedTeachings.map(x=>x.subjectId));
+  const termIds=new Set(scopedTeachings.map(x=>x.termId));
+  const scopedEnrollments=store.state.enrollments.filter(x=>sectionIds.has(x.sectionId));
+  const studentIds=new Set(scopedEnrollments.map(x=>x.studentId));
   const sources = buildPortfolioEvidenceSuggestions({
     yearId:year?.id,teachingIds,attendance:evidence,asOf:evidence.asOf,
+    // Read only the mounted workspace. The engine rechecks exact owner/year,
+    // raw tombstones, teaching/session ancestry and archived/current bounds.
+    recordedScope:{workspace:store.getActiveWorkspace(),years:store.state.years.filter(x=>x.id===year?.id),
+      terms:store.state.terms.filter(x=>termIds.has(x.id)),
+      sections:store.state.sections.filter(x=>sectionIds.has(x.id)),
+      subjects:store.state.subjects.filter(x=>subjectIds.has(x.id)),teachings:scopedTeachings,
+      students:store.state.students.filter(x=>studentIds.has(x.id)),enrollments:scopedEnrollments},
+    groupArrangements:(store.state.groupArrangements??[]).filter(x=>teachingIds.includes(x.teachingId)),
+    classGoals:(store.state.classGoals??[]).filter(x=>teachingIds.includes(x.teachingId)),
+    logs:(store.state.logs??[]).filter(x=>teachingIds.includes(x.teachingId)),
     slots:teachingIds.flatMap(id=>store.slotsOf(id)),
-    sessions:teachingIds.flatMap(id=>store.sessionsOf(id)),
+    sessions:(store.state.sessions??[]).filter(x=>teachingIds.includes(x.teachingId)),
     classRules:teachingIds.flatMap(id=>store.classRulesOf(id)),
     items:teachingIds.flatMap(id=>store.items(id)),
     scores:store.state.scores ?? [],
@@ -224,14 +242,15 @@ function context() {
   const annual=buildAnnualPortfolioPlan({
     criteria,sources,templates:F09_EVIDENCE_TEMPLATES,custom:customWitnesses,
     hiddenCriteria,hiddenWitnesses,included:includedWitnesses,excluded:excludedWitnesses,
-    titles,descriptions,photos:photoGroups,layouts:photoLayouts,
+    titles,descriptions,contexts,photos:photoGroups,layouts:photoLayouts,
     sections:sectionPreferences,yearId:year?.id,
   });
   const summary={...summaryBase,criteriaCount:annual.criteriaCount,criteria:annual.toc};
   const canPrint=annual.witnessCount>0;
   const title=titles.get(photoKey)??proposal?.title??guide?.evidence??criterion.title;
   const includedIds=new Set(annual.entries.map(entry=>entry.proposal.id));
-  const visibleCandidates=candidates.filter(w=>{
+  const libraryCandidates=libraryQuery.trim()?[...sources,...customWitnesses,...F09_EVIDENCE_TEMPLATES]:candidates;
+  const visibleCandidates=libraryCandidates.filter(w=>{
     const hidden=hiddenWitnesses.has(w.id);
     if(libraryFilter==='hidden' ? !hidden : hidden)return false;
     if(libraryFilter==='rakeez' && (w.sourceKind==='template'||w.sourceKind==='custom'))return false;
@@ -241,7 +260,7 @@ function context() {
     const q=libraryQuery.trim().toLocaleLowerCase('ar');
     const title=titles.get(w.id)??w.title;
     const description=descriptions.get(w.id)??w.description??'';
-    return !q || (title+' '+description).toLocaleLowerCase('ar').includes(q);
+    return !q || (title+' '+description+' '+w.criterion+' '+(criteria.find(c=>c.number===w.criterion)?.title??'')).toLocaleLowerCase('ar').includes(q);
   });
   const criteriaNav=criteria.map(c=>({
     ...c,excluded:hiddenCriteria.has(c.number),
@@ -263,9 +282,10 @@ function context() {
     department: short(profile.educationDepartment, 'إدارة التعليم'),
   };
   return {year,terms,evidence,summary,annual,person,criterion,guide,proposal,candidates,sources,photoKey,
-    visibleCandidates,criteriaNav,libraryFilter,libraryQuery,
-    hiddenCount:candidates.filter(w=>hiddenWitnesses.has(w.id)).length,
-    includedCount:annual.entries.filter(entry=>entry.criterion.number===editingCriterion).length,
+    visibleCandidates,libraryCandidates,criteriaNav,libraryFilter,libraryQuery,
+    professionalContext:normalizePortfolioContext(contexts.get(photoKey)),
+    hiddenCount:libraryCandidates.filter(w=>hiddenWitnesses.has(w.id)).length,
+    includedCount:annual.entries.filter(entry=>libraryQuery.trim()||entry.criterion.number===editingCriterion).length,
     criterionExcluded:hiddenCriteria.has(editingCriterion),criterionEditorOpen,
     includedSections,photos:photosFor(photoKey),photoLayout:layoutFor(photoKey),
     description:descriptions.get(photoKey)??proposal?.description??'',title,canPrint,
@@ -404,6 +424,30 @@ function witnessImageTools(ctx) {
   </div>`;
 }
 
+function contextEditor(ctx) {
+  return html`<section class="folio-context-editor noprint" aria-label="سياق الشاهد المهني">
+    <h3>سياق الشاهد المهني · اختياري</h3>
+    <p>اكتب ما نفذته فعلًا وما لاحظته. هذه ملاحظاتك، ولا تعدّل مقاييس ركيز المسجلة. الحقول الفارغة لا تُطبع.</p>
+    <div class="folio-context-editor__fields">${PORTFOLIO_CONTEXT_FIELDS.map(f=>html`<label>
+      <span>${f.label}</span>
+      ${f.key==='date'?html`<input type="text" data-rakeez-datetime="date" data-rakeez-date-scope="historical"
+        data-change="witness-context" data-field="date" data-fk="folio-context-date" aria-label="${f.label}" value="${ctx.professionalContext.date??''}" />`:
+        html`<textarea rows="2" maxlength="${f.max}" data-change="witness-context" data-field="${f.key}" data-fk="folio-context-${f.key}"
+          aria-label="${f.label}">${ctx.professionalContext[f.key]??''}</textarea>`}
+    </label>`)}</div>
+  </section>`;
+}
+function contextPage(ctx,page) {
+  const fields=PORTFOLIO_CONTEXT_FIELDS.filter(f=>ctx.professionalContext?.[f.key]);
+  return html`<section class="folio-sheet folio-interior folio-context-page" data-portfolio-page="${page}" aria-label="سياق الشاهد">
+    ${pageLabel('سياق الشاهد',String(page).padStart(2,'0'))}
+    <div class="folio-interior__headline"><span class="folio-interior__eyebrow">${ctx.criterion.number} · ${ctx.criterion.title}</span>
+      <h2>${ctx.title}</h2><p>سياق مهني أضافه المعلم</p></div>
+    <dl>${fields.map(f=>html`<div><dt>${f.label}</dt><dd>${f.key==='date'?date(ctx.professionalContext.date):ctx.professionalContext[f.key]}</dd></div>`)}</dl>
+    ${foot(page)}
+  </section>`;
+}
+
 function evidencePage(ctx,page=4,editor=true) {
   const {evidence,year,criterion,photos,photoLayout,proposal} = ctx;
   const isAttendance = proposal?.id === 'rakeez:attendance:'+year?.id;
@@ -435,6 +479,7 @@ function evidencePage(ctx,page=4,editor=true) {
       <div class="folio-evidence__print-copy">
         <h2>${ctx.title}</h2>
         ${ctx.description?html`<p>${ctx.description}</p>`:''}
+        ${proposal?.provenanceNotice?html`<p>${proposal.provenanceNotice}</p>`:''}
       </div>
     </div>
     <div class="folio-evidence__meta">
@@ -595,12 +640,12 @@ function suggestionsPanel(ctx) {
   const {guide,proposal,visibleCandidates} = ctx;
   return html`<section class="folio-suggestion-studio noprint" aria-label="مكتبة الشواهد">
     <header class="folio-suggestion-studio__head">
-      <div><span>مكتبة هذا المعيار</span><h2>شواهد ${ctx.criterion.title}</h2>
+      <div><span>${ctx.libraryQuery.trim()?'البحث في جميع المعايير':'مكتبة هذا المعيار'}</span><h2>شواهد ${ctx.criterion.title}</h2>
         <p>اختر من بيانات ركيز أو النماذج المقترحة، ثم أضف ما يناسب عملك إلى ملفك.</p></div>
       <button class="btn btn--primary" type="button" data-act="manual-suggestion">+ شاهد جديد</button>
     </header>
     <div class="folio-library__tools">
-      <input class="input folio-library__search" data-input="library-search"
+      <input class="input folio-library__search" data-input="library-search" data-fk="folio-library-search"
         value="${ctx.libraryQuery}" placeholder="ابحث عن شاهد…" aria-label="بحث في الشواهد" />
       <div class="folio-library__filters" role="group" aria-label="مصدر الشواهد">
         ${[['all','الكل'],['rakeez','من ركيز'],['templates','نماذج جاهزة'],['my','شواهدي'],
@@ -619,8 +664,9 @@ function suggestionsPanel(ctx) {
         aria-label="${hiddenWitnesses.has(item.id)?'استعادة '+(titles.get(item.id)||item.title):'اختيار '+(titles.get(item.id)||item.title)}"
         aria-pressed="${proposal?.id===item.id}">
           <strong>${titles.get(item.id)||item.title}</strong>
-          <span>${item.description?.slice(0,84)||'شاهد قابل للتعديل وإضافة الصور'}</span>
-          <small>${hiddenWitnesses.has(item.id)?'↶ مخفي · اضغط للاستعادة':
+          <span class="folio-library__criterion">${item.criterion} · ${allCriteria().find(c=>c.number===item.criterion)?.title??''}</span>
+          <span>${(descriptions.get(item.id)??item.description)?.slice(0,84)||'شاهد قابل للتعديل وإضافة الصور'}</span>
+          <small>${hiddenWitnesses.has(item.id)?'↶ مخفي · اضغط للاستعادة · ':''}${
             (item.sourceKind==='automatic'?'سجل موثق من ركيز':
             item.sourceKind==='review'?'سجل ركيز يحتاج استكمالًا':
             item.sourceKind==='template'?'نموذج مقترح قابل للتعديل':'شاهدي الخاص') +
@@ -676,6 +722,7 @@ function pagesOf(array,size=11) {
 function entryContext(ctx,entry) {
   return {...ctx,criterion:entry.criterion,proposal:entry.proposal,
     photoKey:entry.proposal.id,photos:entry.photos,photoLayout:entry.layout,
+    professionalContext:entry.professionalContext,
     title:entry.title,description:entry.description,includedSections:entry.includedSections};
 }
 function exportPages(ctx) {
@@ -686,7 +733,8 @@ function exportPages(ctx) {
   for(const entry of ctx.annual.entries) {
     const item=entryContext(ctx,entry);
     pages.push(evidencePage(item,entry.page,false),
-      ...photoContinuation(item,entry.page+1,false));
+      ...(entry.contextPages?[contextPage(item,entry.page+1)]:[]),
+      ...photoContinuation(item,entry.page+1+entry.contextPages,false));
   }
   return pages;
 }
@@ -695,7 +743,7 @@ function editorOptions(ctx) {
   const hasData=ctx.proposal.id==='rakeez:attendance:'+ctx.year?.id &&
     ctx.evidence.recordedSessions>0;
   const counts=new Set(ctx.evidence.rows.map(r=>r.section));
-  return html`<section class="folio-display-controls noprint" aria-label="إعدادات عرض الشاهد">
+  return html`${contextEditor(ctx)}<section class="folio-display-controls noprint" aria-label="إعدادات عرض الشاهد">
     <div class="folio-display-controls__head">
       <div><strong>تنسيق محتوى الشاهد</strong>
         <p>هذه أدوات تحرير فقط، ولا تظهر ضمن صفحات ملف الإنجاز أو PDF.</p></div>
@@ -976,13 +1024,15 @@ const portfolioPreviewView = {
     'library-filter'(el){libraryFilter=el.dataset.id;repaint();},
     'library-search'(el) {
       libraryQuery=el.value;
-      const q=libraryQuery.trim().toLocaleLowerCase('ar');
-      const cards=el.closest('.folio-suggestion-studio')?.querySelectorAll('[data-library-card]')||[];
-      for(const card of cards)card.hidden=!!q && !(card.dataset.search||'').includes(q);
-      const empty=el.closest('.folio-suggestion-studio')?.querySelector('[data-library-empty]');
-      if(empty)empty.hidden=[...cards].some(card=>!card.hidden);
+      // The application restores focus/caret through the existing data-fk hook.
+      repaint();
     },
-    'pick-suggestion'(el) { selectedSuggestionId=el.dataset.id;selectedByCriterion.set(editingCriterion,selectedSuggestionId);viewingFullPortfolio=false;repaint(); },
+    'pick-suggestion'(el) {
+      const item=context().libraryCandidates.find(w=>w.id===el.dataset.id);
+      if(!item)return;
+      editingCriterion=item.criterion;selectedSuggestionId=item.id;
+      selectedByCriterion.set(editingCriterion,item.id);viewingFullPortfolio=false;repaint();
+    },
     'show-full-portfolio'(){viewingFullPortfolio=true;repaint();},
     'show-current-criterion'(){viewingFullPortfolio=false;repaint();},
     'toggle-witness-in-file'(){
@@ -1040,21 +1090,28 @@ const portfolioPreviewView = {
     },
     'restore-witness-item'(el){
       const id=el.dataset.id;
-      const item=context().candidates.find(candidate=>candidate.id===id);
+      const item=context().libraryCandidates.find(candidate=>candidate.id===id);
       if(!item||!hiddenWitnesses.has(id))return;
-      clearUndo();hiddenWitnesses.delete(id);
+      clearUndo();hiddenWitnesses.delete(id);editingCriterion=item.criterion;
       selectedSuggestionId=id;selectedByCriterion.set(editingCriterion,id);
       libraryFilter='all';libraryQuery='';repaint();
     },
     'restore-witnesses'(){
       clearUndo();
-      for(const proposal of context().candidates)hiddenWitnesses.delete(proposal.id);
+      for(const proposal of context().libraryCandidates)hiddenWitnesses.delete(proposal.id);
       libraryFilter='all';libraryQuery='';repaint();
     },
     'toggle-section'(el){
       const key=context().photoKey;
       const prev=sectionPreferences.get(key)||{};
       sectionPreferences.set(key,{...prev,[el.dataset.section]:el.checked});
+      repaint();
+    },
+    'witness-context'(el) {
+      const key=context().photoKey,field=el.dataset.field;
+      if(!PORTFOLIO_CONTEXT_FIELDS.some(f=>f.key===field)||!el.checkValidity())return;
+      const value=normalizePortfolioContext({...contexts.get(key),[field]:el.value});
+      if(Object.keys(value).length)contexts.set(key,value);else contexts.delete(key);
       repaint();
     },
     'suggestion-title'(el) { const key=context().photoKey; titles.set(key,el.value.slice(0,100)); repaint(); },
@@ -1124,7 +1181,7 @@ const LOCAL_DRAFT_ACTIONS=[
   'criterion-inclusion','toggle-criterion-in-file','delete-custom-criterion',
   'pick-suggestion','move-witness','undo-change','manual-suggestion','hide-witness',
   'restore-witness-item','restore-witnesses','toggle-witness-in-file',
-  'toggle-section','suggestion-title','suggestion-description','layout',
+  'toggle-section','witness-context','suggestion-title','suggestion-description','layout',
   'photo','remove-photo','move-photo','clear-photo',
 ];
 for(const key of LOCAL_DRAFT_ACTIONS) {

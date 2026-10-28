@@ -1,0 +1,3 @@
+# N44 timezone receipt delivered
+
+Public source 02109fcd97ed68ff17192dc2910186fab298018b delivered as 49a1f60710fa63333235dee37c6a2b6acf4051bd at 2026-10-28T06:48:27.995Z. Both origins verify settings SHA256 f8cfea28abf586f4347d718af8ab9f57ff45232c962b7b8088e20fa69f3ab8eb. Resume original private candidate 9b4dc05db8235abde3ec6fb6bdd6f7951297d9fc and unused grant; no provider operation performed by this maintenance. Current-runtime timezone evidence replaces the missing observable field; no saved-server timezone claim. Original user Android page/Sync confirmation retained, actual Enable/send/arrival not yet tested.

@@ -1,0 +1,69 @@
+{
+  "taskId": "n88-guidance-read-1028",
+  "runId": "f1d7a109-b3dc-47a4-a74d-126c5dc3e4e0",
+  "checks": [
+    {
+      "name": "n88_guidance_list_http200_independent_class_list_and_actual_ack_shape",
+      "status": "PASS",
+      "evidence": "Actual /api/n88/teacher/class routes, gateway, integrated service and restricted native PG: list/guidance 200; saved visibility ON has tasks, OFF empty; renamed task_guidance or revoked backend SELECT gives independent guidance 503/projection while roster succeeds. No provider inference."
+    },
+    {
+      "name": "n88_guidance_owner_session_draft_preservation_and_absent_table_fail_closed",
+      "status": "PASS",
+      "evidence": "Native table constraints reject malformed payload; anon/authenticated denied private table; absent table and missing SELECT fail closed. UI owner/session/term/draft checks recorded below."
+    },
+    {
+      "name": "n88_guidance_failure_timeout_503_401_invalid_ack_distinguished_without_personal_data",
+      "status": "PASS",
+      "evidence": "Actual client distinguishes 401/403/503 rejected, malformed/partial/null/invalid JSON ACK invalid_ack, full default 10-second deadline timeout, stale owner/session/term. Exact operational-only diagnostic key allowlist and bounded timing; no body, IDs, credentials."
+    },
+    {
+      "name": "n88_guidance_read_only_retry_no_mutation_no_duplicate_guidance_publish",
+      "status": "PASS",
+      "evidence": "Whole actual app route + real store ownership guard + runtime/client + synthetic HTTP service: pagehide/pageshow failure preserves draft, disables save, one deliberate retry makes read only, no background retry; separate success roster and failed guidance details. Explicit uncertain save runs once, keeps draft/CAS fence, owner retirement removes controls."
+    }
+  ],
+  "matrix": [
+    {
+      "width": 320,
+      "theme": "light",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "overflow": false
+    }
+  ],
+  "cleanup": {
+    "httpAndPgClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "realOperations": 0,
+  "nativeReuse": "failure-1793165733793.json",
+  "boot": {
+    "fixture": true,
+    "text": "انتقل إلى المحتوى\nالفصل\nالطلاب\nالحضور\nكشف الدرجات\nرابع/أ\n—\nالمادة المصطنعة\nحصص اليوم\nابدأ\nلا حصة مسجّلة اليوم.\n\nأضف حصص هذا الفصل الأسبوعية من «الجدول».\n\nافتح حصة اليوم\nأدوات الفصل\n2 حصة منفّذة\nمساحة الطلاب\nهدف وميثاق الصف\nالرصد السريع\nالقرعة\nالمجموعات\nلوحة التميز\nالحصص\nالكشوف\nالتقارير\nتوزيع الدرجات\n2\nطالبًا\n59٪\nمتوسط المرصود\n1\nيحتاج دعمًا\nالرئيسية\nالفصول\nالجدول\nالتقارير\nالتقويم"
+  },
+  "failedResources": [
+    {
+      "path": "/api/n88/teacher/class/guidance-list",
+      "status": 503
+    },
+    {
+      "path": "/api/n88/teacher/class/guidance-save",
+      "status": 503
+    }
+  ],
+  "readRetryUI": "PASS"
+}

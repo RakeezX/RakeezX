@@ -15,6 +15,9 @@ let recoveryRevision = 0;
 
 let supportScope = null;
 let outcomeView = null, outcomeEpoch = 0;
+// Keep only disclosure choices from the currently verified mounted scope. All
+// identity/receipt contents are rendered afresh; deactivation still clears them.
+const disclosureOpen = (choices, key, initial = false) => (choices.has(key) ? choices.get(key) : initial) ? 'open' : '';
 const dayLabels = { 3: 'قبل 3 أيام', 2: 'قبل يومين', 1: 'قبل يوم', 0: 'يوم التسليم' };
 const eligibilityText = {
   "idle": "تذكيرات الجهاز غير جاهزة حاليًا.",
@@ -23,9 +26,10 @@ const eligibilityText = {
   "checking_configuration": "جارٍ التحقق من جاهزية تذكيرات الجهاز.",
   "checking_context": "جارٍ التحقق من جاهزية تذكيرات الجهاز.",
   "checking_service_worker": "جارٍ التحقق من جاهزية تذكيرات الجهاز.",
-  "configuration_disabled": "تذكيرات الجهاز غير متاحة لهذه المساحة حاليًا.",
+  "configuration_disabled": "التسجيل في تذكيرات الجهاز غير مفعّل حاليًا لهذا الحساب والجهاز. السماح بإشعارات المتصفح لا يفعّل الخدمة وحده.",
   "configuration_invalid": "تعذر التحقق من إعداد تذكيرات الجهاز.",
   "request_unavailable": "تعذر تحميل إعداد تذكيرات الجهاز.",
+  "renewal_unavailable": "الاشتراك محفوظ على الجهاز. تعذّر التحقق من اتصاله مؤقتًا. يمكنك التحقق من الجاهزية من الدعم الفني.",
   "binding_changed": "تغير اتصال الحساب أثناء التحقق من الجاهزية.",
   "browser_unsupported": "المتصفح لا يدعم تذكيرات الجهاز في وضعه الحالي. على آيفون وآيباد أضف ركيز إلى الشاشة الرئيسية وافتحه من أيقونته، ثم فعّل التنبيهات.",
 
@@ -75,7 +79,7 @@ function deviceOutcomeSection(push,scope) {
     </div>`:''}
   </section>`;
 }
-function normalEvidence(ui, scope) {
+function normalEvidence(ui, scope, disclosures) {
   if (!ui) return '';
   return html`<section class="n44-preference card card--pad" aria-label="التحقق من التذكيرات">
     <h2>التحقق من التذكيرات الحالية</h2>
@@ -83,13 +87,13 @@ function normalEvidence(ui, scope) {
     <p role="status" data-n44-verification-ready="${String(ui.canVerify)}">${ui.canVerify ? 'جاهز للتحقق من تذكير حالي محفوظ.' : 'التحقق يتطلب اشتراكًا صالحًا وسياق الحساب الحالي.'}</p>
     ${ui.reminders.length ? ui.reminders.map(r => html`<article style="overflow-wrap:anywhere">
       <h3>${r.title}</h3><p>${r.body}</p>
-      <details><summary>هوية التذكير</summary><dl><dt>معرّف الحدث</dt><dd dir="ltr">${r.id}</dd>
+      <details data-n44-disclosure="reminder:${r.id}" ${disclosureOpen(disclosures, `reminder:${r.id}`)}><summary>هوية التذكير</summary><dl><dt>معرّف الحدث</dt><dd dir="ltr">${r.id}</dd>
         <dt>معرّف المصدر</dt><dd dir="ltr">${r.targetId}</dd><dt>البند</dt><dd dir="ltr">${r.itemId ?? '—'}</dd>
         <dt>التدريس</dt><dd dir="ltr">${r.teachingId}</dd></dl></details>
       <button type="button" class="btn btn--quiet" data-act="notification-verify" data-choice="${r.token}" data-scope="${scope}"
         ${!ui.canVerify || ui.verifying || ui.verification?.token === r.token && ui.verification.status === 'unknown' ? 'disabled' : ''}>التحقق من هذا التذكير</button>
       ${ui.verification?.token === r.token ? html`<p role="status" data-n44-verification="${ui.verification.status}">${verificationText[ui.verification.status]}</p>
-        ${ui.verification.authorization ? html`<details open><summary>إيصال التحقق</summary><dl data-n44-authorization-receipt>
+        ${ui.verification.authorization ? html`<details data-n44-disclosure="authorization:${r.id}" ${disclosureOpen(disclosures, `authorization:${r.id}`, true)}><summary>إيصال التحقق</summary><dl data-n44-authorization-receipt>
           <dt>HTTP / التفويض / عدد الطلبات</dt><dd dir="ltr">${ui.verification.authorization.httpStatus ?? 'UNKNOWN'} / ${ui.verification.authorization.authorizationStatus ?? 'UNKNOWN'} / ${ui.verification.authorization.attempts ?? 0}</dd>
           <dt>إقرار المصدر</dt><dd dir="ltr">${ui.verification.sourceStamp}</dd>
           <dt>اشتراك الجهاز</dt><dd dir="ltr">${ui.verification.registrationId}</dd>
@@ -97,17 +101,17 @@ function normalEvidence(ui, scope) {
         </dl></details>` : ''}` : ''}
     </article>`) : html`<p>لا يوجد تذكير حالي ضمن المواعيد والتفضيلات المعتمدة.</p>`}
     <h3>حالة مصادر تذكيرات التسليم</h3>
-    ${sourceRows(ui.sources.filter(r => !r.deleted), ui, scope)}
-    ${ui.sources.some(r => r.deleted) ? html`<details class="n44-deleted-sources" data-n44-deleted-sources>
+    ${sourceRows(ui.sources.filter(r => !r.deleted), ui, scope, disclosures)}
+    ${ui.sources.some(r => r.deleted) ? html`<details class="n44-deleted-sources" data-n44-deleted-sources data-n44-disclosure="deleted-sources" ${disclosureOpen(disclosures, 'deleted-sources')}>
       <summary>مصادر سابقة محذوفة (${ui.sources.filter(r => r.deleted).length})</summary>
-      ${sourceRows(ui.sources.filter(r => r.deleted), ui, scope)}
+      ${sourceRows(ui.sources.filter(r => r.deleted), ui, scope, disclosures)}
     </details>` : ''}
   </section>`;
 }
-function sourceRows(rows, ui, scope) {
+function sourceRows(rows, ui, scope, disclosures) {
   return html`${rows.map(r => html`<article style="overflow-wrap:anywhere" data-n44-source="${r.parentId}">
       <h4>${r.name}${r.deleted ? ' — محذوف' : ''}</h4>
-      <details ${ui.sourceStatus?.token === r.token ? 'open' : ''}><summary>هوية المصدر وإقرار الحفظ</summary><dl>
+      <details data-n44-disclosure="source:${r.parentId}" ${disclosureOpen(disclosures, `source:${r.parentId}`, ui.sourceStatus?.token === r.token)}><summary>هوية المصدر وإقرار الحفظ</summary><dl>
         <dt>الحساب</dt><dd dir="ltr">${r.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${r.workspaceId}</dd>
         <dt>الجهاز</dt><dd dir="ltr">${r.deviceId}</dd><dt>البند</dt><dd dir="ltr">${r.parentId}</dd>
         <dt>العناصر التابعة</dt><dd dir="ltr">${r.childIds.join(' / ')}</dd>
@@ -128,9 +132,8 @@ const view = {
     const context = currentNotificationContext(store, cloud);
     const scope = notificationScope(context);
     if(outcomeView&&(!sameOutcomeContext(outcomeView.context)||!getPushRuntime()?.snapshot().deviceOutcomeAvailable)){outcomeView=null;++outcomeEpoch;}
-    // Preserve an explicit disclosure choice only while the mounted context matches.
-    const supportOpen = scope != null && supportScope === scope &&
-      mountedRoot?.querySelector('[data-n44-support]')?.open === true;
+    const disclosures = new Map(scope != null && supportScope === scope ?
+      [...(mountedRoot?.querySelectorAll('[data-n44-disclosure]') ?? [])].map(el => [el.dataset.n44Disclosure, el.open]) : []);
     supportScope = scope;
     const categories = readNotificationCategories(context);
     const timing = readNotificationTiming(context);
@@ -198,7 +201,7 @@ const view = {
         <p class="n44-settings-saved" role="status">تُحفظ تفضيلاتك على هذا الجهاز تلقائيًا.</p>
         ${ui?.verification && ['unknown', 'rejected', 'pending'].includes(ui.verification.status) ? html`<p role="status">${verificationText[ui.verification.status]}</p>` : ''}
         ${ui?.sourceStatus && ['unknown', 'rejected', 'pending'].includes(ui.sourceStatus.status) ? html`<p role="status">${verificationText[ui.sourceStatus.status]}</p>` : ''}
-        <details class="n44-support card card--pad" data-n44-support ${supportOpen ? 'open' : ''}>
+        <details class="n44-support card card--pad" data-n44-support data-n44-disclosure="support" ${disclosureOpen(disclosures, 'support')}>
           <summary data-fk="n44-support">الدعم الفني</summary>
           <div class="n44-support-content">
             ${push?.configRecheckAvailable ? html`<section class="n44-preference card card--pad">
@@ -212,19 +215,20 @@ const view = {
 
 
             ${deviceOutcomeSection(push,scope)}
-        <details class="n44-preference card card--pad" data-n44-current-identity style="overflow-wrap:anywhere">
+        <details class="n44-preference card card--pad" data-n44-current-identity data-n44-disclosure="current-identity" ${disclosureOpen(disclosures, 'current-identity')} style="overflow-wrap:anywhere">
           <summary>هوية الحساب والجهاز الحالي</summary>
           <p>سياق الحساب المحلي الحالي. لا يثبت موافقة الخدمة أو تفعيل التذكيرات أو وصولها.</p>
-          <dl><dt>الحساب</dt><dd dir="ltr">${context.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${context.workspaceId}</dd><dt>الجهاز</dt><dd dir="ltr">${context.deviceId}</dd></dl>
+          <dl><dt>الحساب</dt><dd dir="ltr">${context.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${context.workspaceId}</dd><dt>الجهاز</dt><dd dir="ltr">${context.deviceId}</dd>
+            <dt>المنطقة الزمنية للتذكيرات على هذا الجهاز</dt><dd dir="ltr" data-n44-runtime-timezone>${Intl.DateTimeFormat().resolvedOptions().timeZone}</dd></dl>
         </details>
-        ${push?.configOutcome ? html`<details class="n44-preference card card--pad" data-n44-config-outcome style="overflow-wrap:anywhere">
+        ${push?.configOutcome ? html`<details class="n44-preference card card--pad" data-n44-config-outcome data-n44-disclosure="config-outcome" ${disclosureOpen(disclosures, 'config-outcome')} style="overflow-wrap:anywhere">
           <summary>نتيجة التحقق من إعداد تذكيرات الجهاز</summary>
           <dl><dt>HTTP</dt><dd dir="ltr">${Number.isInteger(push.configOutcome.httpStatus) && push.configOutcome.httpStatus >= 100 && push.configOutcome.httpStatus <= 599 ? push.configOutcome.httpStatus : 'UNKNOWN'}</dd>
           <dt>المرحلة</dt><dd dir="ltr">${['request', 'transport', 'http', 'response_read', 'response_size', 'decode', 'shape', 'context', 'deadline', 'complete'].includes(push.configOutcome.phase) ? push.configOutcome.phase : 'request'}</dd>
           ${push.configOutcome.servicePhase ? html`<dt>مرحلة الخدمة (وصف عام)</dt><dd dir="ltr" data-n44-config-service-phase>${push.configOutcome.servicePhase}</dd>` : ''}
           <dt>النتيجة</dt><dd>${configResultText[push.eligibility?.configuration] ?? eligibilityText.idle}</dd></dl>
         </details>` : ''}
-            ${normalEvidence(ui, scope)}
+        ${normalEvidence(ui, scope, disclosures)}
           </div>
         </details>` : html`<p class="t-3" role="status">تتوفر إعدادات الإشعارات عند فتح مساحة حسابك.</p>`}
       </div>
@@ -261,8 +265,14 @@ const view = {
       const hadOutcome = outcomeView !== null || !!root.querySelector('[data-n44-device-outcome]');
       clearOutcome();
       const mounted = root.querySelector('[data-notification-scope]');
-      if (mounted && (mounted.dataset.notificationScope !== (notificationScope(currentNotificationContext(store, cloud)) ?? '') ||
-          mounted.querySelector('[data-n44-config-outcome]') && !getPushRuntime()?.snapshot().configOutcome)) clear();
+      if (mounted && mounted.dataset.notificationScope !== (notificationScope(currentNotificationContext(store, cloud)) ?? '')) clear();
+      else if (mounted?.querySelector('[data-n44-config-outcome]') && !getPushRuntime()?.snapshot().configOutcome) {
+        // An invalidated configuration receipt must disappear immediately. It
+        // does not invalidate same-owner disclosure choices or source controls.
+        mounted.querySelector('[data-n44-config-outcome]').remove();
+        ++recoveryRevision;
+        recover();
+      }
       // Stable notifications (including other tabs' lease clock witnesses) must
       // not drive paints. Recover only removed content or a cleared region.
       else if (hadOutcome || mounted && !mounted.childElementCount) recover();

@@ -1,4 +1,4 @@
-import { compareAcademicClasses } from '../lib/class-order.js';
+import { compareAcademicClasses, compactSectionLabel } from '../lib/class-order.js';
 /**
  * الفصول — قائمة الإسنادات التدريسية في الفصل الدراسي الحالي.
  *
@@ -15,11 +15,11 @@ import {
 } from '../models.js';
 import {
   builtinSubject, customSubjectSlug, findPersistedBuiltin, matchBuiltinSubject,
-  normalizeSubjectName, validateCustomSubjectName,
+  normalizeSubjectName, validateCustomSubjectName, compactSubjectLabel,
 } from '../lib/subject-catalog.js';
 import { classSubjectDefault } from '../lib/class-subject-default.js';
 import {
-  stageSubjectOptions, v6ProgramsForGrade, v6TracksForGrade, V6_SOURCE_URL
+  stageSubjectOptions, v6ProgramsForGrade, v6TracksForGrade
 } from '../lib/stage-subject-options.js';
 import { repaint } from '../repaint.js';
 import { teachingRouteId } from '../router.js';
@@ -36,13 +36,11 @@ function subjectMenu(options, query = '', scope = {}) {
             data-subject-token="${option.token}" data-subject-name="${option.name}"
             data-subject-guide-custom="${option.customName ?? ''}">
       <span>${option.name}</span>
-      ${option.officialGuide ? html`<span class="badge">من الدليل</span>` :
-        option.builtin ? '' : html`<span class="badge">مخصصة</span>`}
+      ${option.officialGuide || option.builtin ? '' : html`<span class="badge">مخصصة</span>`}
     </button>
   `);
   return html`
     ${guide.length ? html`
-      <div class="subject-picker__group-label">مواد هذا الصف — الإصدار السادس</div>
       <div class="subject-picker__group">${rows(guide)}</div>
     ` : ''}
     ${otherUsed.length ? html`
@@ -136,10 +134,7 @@ function sheet(existing = null, selectedSectionId = '') {
             <select class="select" data-v6-track aria-label="المسار الدراسي"></select>
           </label>
         </div>
-        <div class="field__hint" data-v6-scope-hint>
-          فهرس المواد من دليل الخطط الدراسية، الإصدار السادس. يعتمد الاختيار على السياق،
-          لكن سنة النفاذ العامة لم تُحسم، ونوع التعليم/المسار لا يُحفظان ضمن بيانات الفصل الحالية.
-        </div>
+        <div class="field__hint" data-v6-scope-hint hidden></div>
 
         <div class="field subject-picker" data-subject-picker>
           <span class="field__label">المادة</span>
@@ -163,10 +158,6 @@ function sheet(existing = null, selectedSectionId = '') {
                    placeholder="اسم المادة بالعربية أو الإنجليزية" aria-label="اسم المادة المخصصة">
             <button type="button" class="btn btn--quiet btn--sm" data-subject-custom-back>العودة إلى المواد</button>
           </div>
-          <span class="field__hint">
-            يمكنك البحث في المواد أو إضافة مادة مخصصة.
-            <a href="${V6_SOURCE_URL}" target="_blank" rel="noopener noreferrer">مصدر أسماء المواد: دليل الخطط — الإصدار السادس</a>
-          </span>
         </div>
 
         ${existing
@@ -245,24 +236,39 @@ function sheet(existing = null, selectedSectionId = '') {
         refreshTracks();
       };
 
+      const scrollBody = root.querySelector('.sheet__body');
       const closeMenu = () => {
         menu.hidden = true;
         trigger.setAttribute('aria-expanded', 'false');
+      };
+      const revealMenu = () => {
+        if (menu.hidden || !scrollBody) return;
+        // Keep the search and a scrollable slice of subjects within the sheet;
+        // otherwise a second hidden scroll area is hard to reach on phones.
+        const height = Math.max(128, Math.min(320,
+          scrollBody.clientHeight - trigger.offsetHeight - search.offsetHeight - 48));
+        optionList.style.maxHeight = `min(40dvh, ${height}px)`;
+        const viewportBottom = scrollBody.getBoundingClientRect().bottom - 8;
+        const dropdownBottom = menu.getBoundingClientRect().bottom;
+        if (dropdownBottom > viewportBottom) scrollBody.scrollTop += dropdownBottom - viewportBottom;
       };
       const openMenu = () => {
         customFields.hidden = true;
         menu.hidden = false;
         trigger.setAttribute('aria-expanded', 'true');
-        search.focus();
+        // Avoid opening the mobile keyboard just to browse the subject list.
+        if (!window.matchMedia('(pointer: coarse)').matches) search.focus({preventScroll:true});
+        requestAnimationFrame(revealMenu);
       };
       const renderOptions = () => {
         const view = stageSubjectOptions({ ...currentScope(), options });
         optionList.innerHTML = subjectMenu(options, search.value, currentScope()).value;
-        guideHint.textContent = view.scopeStatus === 'choose_track'
-          ? 'اختر المسار الدراسي ليظهر محتوى المواد الخاص به. يمكنك أيضًا اختيار مادة من قائمتك أو إضافتها يدويًا.'
-          : view.supplementaryOnly
-            ? 'هذا البرنامج يعرض مقررات إضافية أو مواد الهوية الوطنية فقط؛ لا يمثل قائمة المدرسة كاملة. نوع التعليم والمسار لا يُحفظان بعد ضمن بيانات الفصل.'
-            : 'اقتراحات من دليل الخطط الدراسية، الإصدار السادس؛ سنة النفاذ العامة لم تثبت لكل سياق. نوع التعليم والمسار يُستخدمان لتصفية القائمة فقط ولا يُحفظان في بيانات الفصل الحالية.';
+        optionList.scrollTop = 0;
+        const hint = view.scopeStatus === 'choose_track' ? 'اختر المسار الدراسي أولًا.'
+          : view.supplementaryOnly ? 'هذه قائمة مواد إضافية، وليست قائمة المدرسة كاملة.' : '';
+        guideHint.textContent = hint;
+        guideHint.hidden = !hint;
+        if (!menu.hidden) requestAnimationFrame(revealMenu);
       };
       gradeInput.addEventListener('change', () => {
         dropSelection(); refreshPrograms(); renderOptions();
@@ -277,9 +283,21 @@ function sheet(existing = null, selectedSectionId = '') {
       renderOptions();
 
       trigger.addEventListener('click', () => menu.hidden ? openMenu() : closeMenu());
+      // Dismiss on completed click, NOT pointerdown: collapsing an inline list
+      // during pointerdown re-centers the desktop sheet underneath mouseup and
+      // can retarget the subsequent click onto the backdrop, closing everything.
+      root.addEventListener('click', (ev) => {
+        if (!menu.hidden && !menu.contains(ev.target) && !trigger.contains(ev.target)) closeMenu();
+      }, true);
+      root.addEventListener('keydown', (ev) => {
+        if (ev.key !== 'Escape' || menu.hidden) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        closeMenu();
+        trigger.focus({preventScroll:true});
+      }, true);
       search.addEventListener('input', renderOptions);
       search.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Escape') { closeMenu(); trigger.focus(); }
         if (ev.key === 'Enter') {
           const first = optionList.querySelector('[data-subject-token]');
           if (first) { ev.preventDefault(); first.click(); }
@@ -419,7 +437,7 @@ function renderClassCard(tch) {
         <div class="class-card__head">
           <div class="class-card__identity">
             <span class="class-card__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
-            <span class="class-card__title">${sectionLabel(sec) || '—'}</span>
+            <span class="class-card__title" title="${sectionLabel(sec) || '—'}" role="text" aria-label="${sectionLabel(sec) || '—'}"><span class="n133-full-name" aria-hidden="true">${sectionLabel(sec) || '—'}</span><span class="n133-short-name" aria-hidden="true">${compactSectionLabel(sec) || '—'}</span></span>
           </div>
           ${todaySessions.length
             ? marked >= roster.length && roster.length
@@ -428,7 +446,7 @@ function renderClassCard(tch) {
             : ''}
         </div>
         <div class="class-card__body">
-          <span class="class-card__sub">${sub?.name ?? ''}</span>
+          <span class="class-card__sub" title="${sub?.name ?? ''}" role="text" aria-label="${sub?.name ?? ''}"><span class="n133-full-name" aria-hidden="true">${sub?.name ?? ''}</span><span class="n133-short-name" aria-hidden="true">${compactSubjectLabel(sub, store.subjects())}</span></span>
           <span class="class-card__count"><span class="tabular">${roster.length}</span> طالبًا</span>
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
@@ -462,7 +480,7 @@ function subjectlessDeleteTargets(){
 function renderSectionCard({ section, students }) {
   return html`<details class="class-card" data-section-roster="${section.id}">
     <summary class="class-card__main">
-      <span class="class-card__head"><span class="class-card__title">${sectionLabel(section)}</span></span>
+      <span class="class-card__head"><span class="class-card__title" role="text" aria-label="${sectionLabel(section)}" title="${sectionLabel(section)}"><span class="n133-full-name" aria-hidden="true">${sectionLabel(section)}</span><span class="n133-short-name" aria-hidden="true">${compactSectionLabel(section)}</span></span></span>
       <span class="class-card__body"><span class="class-card__sub">بلا مادة في الفصل الدراسي الحالي · عرض الطلاب</span><span class="class-card__count">${students.length} طالبًا</span></span>
     </summary>
     <div class="card--pad">

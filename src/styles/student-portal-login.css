@@ -117,3 +117,17 @@ html[data-n88-student-document]{background:var(--bg)}
 .n88-student-support pre{max-inline-size:100%;font:12px/1.8 monospace;padding:16px;background:var(--bg-sunk);border-radius:var(--r-sm)}
 @media(max-width:700px){.n88-unified-sections{grid-template-columns:1fr}.n88-unified-profile{padding-block:24px;gap:20px}.n88-unified-actions{display:grid;grid-template-columns:1fr;width:100%}.n88-unified-sections>section{padding:20px}.n88-unified-sections>.n88-completed{padding:0}.n88-unified-detail-hint{font-size:11px}.n88-unified header{padding-bottom:20px}.n88-unified h2{font-size:18px}}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .n88-unified .brand-lockup__image--light{display:none}:root:not([data-theme="light"]) .n88-unified .brand-lockup__image--dark{display:block}}
+
+/* AI: reading and focus follow document order; instructions are always visible. */
+.n88-unified-sections{grid-template-columns:minmax(0,1fr)}
+.n88-unified-sections>[data-section],.n88-unified-sections>.n88-unified-grades{order:initial}
+.n88-unified-profile{padding-block:16px;gap:12px}
+.n88-unified-profile h1{font-size:22px;margin-bottom:4px}
+.n88-unified-name{font-size:18px}
+.n88-unified-work>h3{font-size:17px;line-height:1.8}
+.n88-unified-detail{padding-block:4px 8px}
+.n88-unified-work .n88-unified-detail h3{font-size:14px;margin-top:8px}
+.n88-unified-sections>section{padding:clamp(16px,2vw,24px)}
+.n88-unified header{padding-bottom:12px}
+
+@media(max-width:700px){.n88-unified-profile{gap:12px;padding-block:12px}.n88-unified-profile h1{font-size:20px}.n88-unified-actions{display:flex;flex-wrap:wrap}.n88-unified-actions button{flex:1;padding-inline:8px;font-size:14px}}

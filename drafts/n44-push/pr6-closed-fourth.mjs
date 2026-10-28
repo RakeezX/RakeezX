@@ -1,0 +1,2 @@
+/** AI: one immutable PR6 closed envelope; old bounds and global counters unchanged. */
+export const PR6_CLOSED_FOURTH=Object.freeze({"runId":"bd88b79b-8d13-4102-ab6e-931ddc3b6fe2","authoritySha256":"426bbbafb43465253df7111f73a10a57fd8fc1d1f565c4e084310525e817f320","createdAt":1793048416331,"hardEnd":1793055616331,"maxWindowMs":1200000,"budgetRoot":"7c7b3fc0-f95b-4fe4-b896-0cca5cc7a967","parentReviewSha256":"e005deabfe4ecd762aa8697f8fcb844c2fc94f2cc6b23eda9b1c94365c7386d0"});

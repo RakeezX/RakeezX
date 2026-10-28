@@ -1,0 +1,55 @@
+{
+  "taskId": "continuous-n130-sync-context-after-qualified-sw-20261027",
+  "runId": "5b8f5719-114b-4dc1-8b1f-f571e3797f51",
+  "baseline": true,
+  "checks": [
+    "Baseline reproduced actual revision_validation CONTEXT_CHANGED after >=14s"
+  ],
+  "failures": [],
+  "reproduction": {
+    "success": false,
+    "elapsedMs": 14029.09999999404,
+    "summary": {
+      "state": "error",
+      "queuedCount": 0,
+      "pendingCount": 0,
+      "failedCount": 0,
+      "blockedCount": 0,
+      "rejectedCount": 0,
+      "historicalConflictCount": 0,
+      "actionableSyncIssue": true,
+      "affectedCategories": [],
+      "historicalConflictCategories": [],
+      "reasonCategory": "temporary_sync_failure",
+      "reasonLabel": "تعذّر إكمال المزامنة وستُعاد المحاولة.",
+      "lastSuccessfulSyncAt": 1793122462991,
+      "automaticRetryActive": true,
+      "automaticSyncActive": false,
+      "teacherActionRequired": false,
+      "localWorkSaved": true,
+      "cloudSyncHealthy": false,
+      "safeToContinueUnrelatedWork": true,
+      "studentLifecycleInFlight": false,
+      "classDeletionInFlight": false,
+      "presentationSeverity": {
+        "transient": false,
+        "hardFailure": true,
+        "authRequired": false,
+        "awaitingVerification": false,
+        "failureSince": null,
+        "failedAttempts": 0
+      },
+      "lastSafeFailure": {
+        "phase": "revision_validation",
+        "code": "CONTEXT_CHANGED",
+        "event": "automatic",
+        "at": "2026-10-27T17:34:37.026Z",
+        "elapsedMs": 14021
+      }
+    },
+    "reads": 24,
+    "markers": 2,
+    "sends": 0,
+    "renewed": true
+  }
+}

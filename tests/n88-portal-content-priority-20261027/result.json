@@ -1,0 +1,120 @@
+{
+  "taskId": "continuous-n88-content-priority-after-n130-20261027",
+  "runId": "87b53fe5-2574-46b3-86e5-35363518d70b",
+  "checks": [
+    {
+      "name": "n88_teacher_first_screen_accessible_actions_and_roster",
+      "status": "PASS",
+      "evidence": "24 real app route/owner-client roster cases; primary action, direct editor navigation, keyboard focus; 1/30/50 synthetic students."
+    },
+    {
+      "name": "n88_student_required_instructions_and_due_dates_visible",
+      "status": "PASS",
+      "evidence": "8 actual student view/client/CSS cases: published required/scheduled instructions, delivery, dates/status visible; DOM/visual order required, scheduled, grades, completed; one minimal empty state."
+    },
+    {
+      "name": "n88_published_data_privacy_session_and_owner_mutation_guards",
+      "status": "PASS",
+      "evidence": "Actual teacher owner guard denies/wipes after context change and delayed read; copy/share, confirmed rotate/revoke and cancel focus, guidance/visibility handlers. Actual student client retirement rejects delayed old response; omitted grades absent; pagehide wipe."
+    },
+    {
+      "name": "n88_mobile_rtl_keyboard_dom_visual_order",
+      "status": "PASS",
+      "evidence": "320/390/768/1280, light/dark: no horizontal overflow, 44px controls, RTL, DOM/visual order and keyboard navigation. Screenshots in same directory."
+    }
+  ],
+  "matrix": [
+    {
+      "theme": "light",
+      "width": 320,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "students": [
+        1,
+        30,
+        50
+      ],
+      "teacher": "PASS",
+      "student": "PASS"
+    }
+  ],
+  "cleanup": {
+    "serverClosed": true,
+    "integrationLease": "RELEASED integration"
+  }
+}

@@ -616,16 +616,28 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
   let phase = 'marker';
   const presentationToken = bindPresentationContext();
   const acknowledgedContext = { workspace: store.getActiveWorkspace(), session: cloud.session };
+  // AI-authored N130: keep object fencing, and also bind identity/token values
+  // so in-place auth changes cannot certify an obsolete pass.
+  const ownerId = cloud.user.id;
+  const accessToken = cloud.session.access_token;
+  const contextChanged = ownershipBlockedError({ reason: 'sync-context-changed' });
+  const contextMatches = () => acknowledgedContext.workspace === store.getActiveWorkspace() &&
+    acknowledgedContext.session === cloud.session && cloud.user?.id === ownerId &&
+    cloud.session?.access_token === accessToken && cloudOwnershipAccess('pull').allowed;
+  const assertContext = () => { if (!contextMatches()) throw contextChanged; };
   let presentationErrors = null;
   remoteSync.beginSync();
   suppressAutoSchedule = true;
   setState({ lastError: null });
   let failed = false;
+  let superseded = false;
   let madeProgress = false;
   let remoteCapture = null;
   try {
     if (full) remoteCapture = await remoteSync.beforeFullSync();
+    assertContext();
     const snapshot = await pendingOutbox();
+    assertContext();
     // AI-authored N123: open/return also need only one complete read when no
     // local work existed. The pre-read owner revision and final marker check
     // provide exactly the same coverage as a remote wake. Writes, absent marker
@@ -634,6 +646,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     phase = 'capability';
     const scoreDomainAvailable = await scoreDomainAvailableForSync();
     const unifiedCapability = await cloud.getUnifiedRestoreCapability();
+    assertContext();
     unifiedRestoreOwner = unifiedCapability?.protocol === 'N71_V1' ? cloud.user.id : null;
     const stores = v2StoresFor(snapshot, full, scoreDomainAvailable);
     phase = 'pull';
@@ -648,14 +661,15 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     const pullError = firstPullError(pull);
     if (pullError) presentationErrors = pull.failures.map((failure) => failure.error);
     if (pullError) throw pullError;
+    assertContext();
     phase = 'dispatch';
     const pushed = await v2Engine.dispatchPending();
     madeProgress = pushed.acknowledged > 0;
     // AI-authored N107: publish durable ACK revisions before unrelated trailing
     // failures. This is local reconciliation, never whole-run success.
-    if (madeProgress && acknowledgedContext.workspace === store.getActiveWorkspace() &&
-        acknowledgedContext.session === cloud.session && cloudOwnershipAccess('pull').allowed) {
+    if (madeProgress && contextMatches()) {
       await store.refreshSyncedState();
+      assertContext();
       store.publishConfirmedSources({ ...acknowledgedContext, reason: 'canonical-command-ack' });
     }
     if (pushed.ownershipBlocked) {
@@ -663,6 +677,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
       return false;
     }
     if (pushed.failed) throw new Error(`${pushed.failed} Sync V2 mutation(s) failed`);
+    assertContext();
     const skipPostPull = idleReceiver && pushed.attempted === 0 && (await pendingOutbox()).length === 0;
     // A receipt proves our own mutation, not every concurrent owner change.
     // Capture the marker AFTER dispatch and BEFORE a complete post-pull to
@@ -690,28 +705,28 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
       if (skipPostPull) await remoteSync.validateFullSync(remoteCapture);
       else await remoteSync.check(); // Advisory only after a complete post-pull.
     }
-    if (skipPostPull && (acknowledgedContext.workspace !== store.getActiveWorkspace() ||
-        acknowledgedContext.session !== cloud.session || !cloudOwnershipAccess('pull').allowed)) {
-      throw ownershipBlockedError({ reason: 'sync-context-changed' });
-    }
+    assertContext();
     phase = 'local_refresh';
     await store.refreshSyncedState();
-    store.publishConfirmedSources({ ...acknowledgedContext, reason: 'canonical-read' });
+    assertContext();
     const v2Status = await v2Engine.status();
+    assertContext();
+    store.publishConfirmedSources({ ...acknowledgedContext, reason: 'canonical-read' });
     const lastSyncedAt = Date.now();
     await store.patchDevice({ lastSyncAt: lastSyncedAt }, { notify: false, queue: false });
+    assertContext();
     state.lastSyncedAt = lastSyncedAt;
     retryAttempt = 0;
     retryScheduled = false;
     bindPresentationContext();
     presentationSeverity.succeeded(presentationToken);
+    if (full && v2Status.state === 'synced' && presentationToken === presentationContextToken) lastSafeFailure = null;
     setState({ status: v2Status.state, lastError: null });
     cacheOperationalSummary(v2Status, presentationToken);
     if (remoteCapture) remoteSync.afterFullSync(remoteCapture, true);
     if (remoteSync.diagnostics().pending) setState({ status: 'pending' });
     // Observers cannot alter Sync success or acquire an ACK from a failed run.
-    if (pushed.acknowledged > 0 && !pushed.failed && acknowledgedContext.workspace === store.getActiveWorkspace() &&
-        acknowledgedContext.session === cloud.session && cloudOwnershipAccess('pull').allowed) {
+    if (pushed.acknowledged > 0 && !pushed.failed && contextMatches()) {
       for (const observer of acknowledgedListeners) {
         try { Promise.resolve(observer(Object.freeze(acknowledgedContext))).catch(() => {}); } catch { /* isolated observer */ }
       }
@@ -719,6 +734,28 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     return true;
   } catch (err) {
     if (remoteCapture) remoteSync.afterFullSync(remoteCapture, false);
+    // Only a proved obsolete context is supersession. Transport/401/403,
+    // marker regression and durable failures retain the normal failure path.
+    const obsolete = !contextMatches() && (err === contextChanged ||
+      (phase === 'revision_validation' && err?.code === 'AUTH_CONTEXT_CHANGED'));
+    if (obsolete) {
+      superseded = true;
+      const token = bindPresentationContext();
+      const access = cloudOwnershipAccess('pull');
+      if (!cloud.session || !cloud.user || cloud.authStatus?.().state === 'auth_required') {
+        setState({ status: 'auth_required', lastError: null });
+      } else if (!access.allowed) {
+        stopOwnershipBlockedScheduling(access);
+      } else {
+        presentationSeverity.verifying(token);
+        setState({ status: 'pending', lastError: null });
+        // The existing finally path coalesces all wakes into one guarded full
+        // pass; no ACK, timestamp, success or mutation replay from this run.
+        rerunRequested = true;
+        fullRequested = true;
+      }
+      return false;
+    }
     failed = true;
     console.warn('[rakeezx sync] Automatic sync failed:', err);
     const needsAuth = cloud.isAuthRequiredError?.(err) || cloud.authStatus?.().state === 'auth_required';
@@ -735,6 +772,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     autoRunning = false;
     notify();
     try {
+      if (superseded) await remoteSync.refresh();
       const v2Status = await v2Engine.status();
       cacheOperationalSummary(v2Status, presentationToken);
       if (failed && cloud.authStatus?.().state !== 'auth_required') {

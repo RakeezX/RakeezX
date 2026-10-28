@@ -1,0 +1,244 @@
+{
+  "note": "Original local harness failures retained. No service operation, boundary rejection or Product failure was converted to PASS. Corrections: wait for scheduled/toggle events; unique full-document navigation plus isolated synthetic storage per independent scenario; notify every registered fixture subscriber, matching real store subscriptions.",
+  "attempts": [
+    {
+      "file": "failure-1793139216662.json",
+      "result": {
+        "taskId": "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+        "runId": "dcf225dd-076a-47fc-91c7-404b3dd31ec7",
+        "providerOperations": 0,
+        "realAccountReads": 0,
+        "realAccountMutations": 0,
+        "matrix": [],
+        "checks": [],
+        "pageErrors": [],
+        "cleanup": {
+          "serverClosed": true,
+          "integrationLease": "RELEASED integration"
+        },
+        "failure": {
+          "stage": "matrix-light-320",
+          "message": "Expected values to be strictly equal:\n\n0 !== 2\n",
+          "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at unknown (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:32:9)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:50:105\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:47:2"
+        }
+      }
+    },
+    {
+      "file": "failure-1793139227110.json",
+      "result": {
+        "taskId": "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+        "runId": "dcf225dd-076a-47fc-91c7-404b3dd31ec7",
+        "providerOperations": 0,
+        "realAccountReads": 0,
+        "realAccountMutations": 0,
+        "matrix": [],
+        "checks": [],
+        "pageErrors": [],
+        "cleanup": {
+          "serverClosed": true,
+          "integrationLease": "RELEASED integration"
+        },
+        "failure": {
+          "stage": "matrix-light-320",
+          "message": "Expected values to be strictly equal:\n\n1 !== 0\n",
+          "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:52:67\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:47:2"
+        }
+      }
+    },
+    {
+      "file": "failure-1793139238602.json",
+      "result": {
+        "taskId": "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+        "runId": "dcf225dd-076a-47fc-91c7-404b3dd31ec7",
+        "providerOperations": 0,
+        "realAccountReads": 0,
+        "realAccountMutations": 0,
+        "matrix": [],
+        "checks": [],
+        "pageErrors": [],
+        "cleanup": {
+          "serverClosed": true,
+          "integrationLease": "RELEASED integration"
+        },
+        "failure": {
+          "stage": "matrix-light-320",
+          "message": "Expected values to be strictly equal:\n\n0 !== 28\n",
+          "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 28\n\n    at unknown (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:41:25)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:50:105\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:47:2"
+        }
+      }
+    },
+    {
+      "file": "failure-1793139260465.json",
+      "result": {
+        "taskId": "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+        "runId": "dcf225dd-076a-47fc-91c7-404b3dd31ec7",
+        "providerOperations": 0,
+        "realAccountReads": 0,
+        "realAccountMutations": 0,
+        "matrix": [
+          {
+            "width": 320,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 390,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 768,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 1280,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 320,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 390,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 768,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 1280,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          }
+        ],
+        "checks": [],
+        "pageErrors": [],
+        "cleanup": {
+          "serverClosed": true,
+          "integrationLease": "RELEASED integration"
+        },
+        "failure": {
+          "stage": "capability offered only explicitly and never auto invoked",
+          "message": "page.waitForFunction: Timeout 6000ms exceeded.",
+          "stack": "page.waitForFunction: Timeout 6000ms exceeded.\n    at boot (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-teacher-issuance-review-and-content-hub-20261028\\tests\\n88-teacher-issuance-ux-20261028\\browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:61:69\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:47:2"
+        }
+      }
+    },
+    {
+      "file": "failure-1793139308106.json",
+      "result": {
+        "taskId": "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+        "runId": "dcf225dd-076a-47fc-91c7-404b3dd31ec7",
+        "providerOperations": 0,
+        "realAccountReads": 0,
+        "realAccountMutations": 0,
+        "matrix": [
+          {
+            "width": 320,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 390,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 768,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 1280,
+            "theme": "light",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 320,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 390,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 768,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          },
+          {
+            "width": 1280,
+            "theme": "dark",
+            "reportedSynthetic28": "PASS",
+            "rtl": true,
+            "overflow": false
+          }
+        ],
+        "checks": [],
+        "pageErrors": [],
+        "cleanup": {
+          "serverClosed": true,
+          "integrationLease": "RELEASED integration"
+        },
+        "failure": {
+          "stage": "capability offered only explicitly and never auto invoked",
+          "message": "boot: {\"entry\":\"connection\",\"diagnostic\":{\"phase\":\"response\",\"httpStatus\":200,\"elapsedMs\":0,\"sourceVersion\":\"n88-class-deadline-v1\",\"code\":\"invalid_ack\",\"stage\":\"none\"},\"actions\":[{\"action\":\"list\",\"reconcile\":0},{\"action\":\"guidance-list\"},{\"action\":\"list\",\"reconcile\":1}],\"hintRows\":1}",
+          "stack": "Error: boot: {\"entry\":\"connection\",\"diagnostic\":{\"phase\":\"response\",\"httpStatus\":200,\"elapsedMs\":0,\"sourceVersion\":\"n88-class-deadline-v1\",\"code\":\"invalid_ack\",\"stage\":\"none\"},\"actions\":[{\"action\":\"list\",\"reconcile\":0},{\"action\":\"guidance-list\"},{\"action\":\"list\",\"reconcile\":1}],\"hintRows\":1}\n    at boot (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:19:525)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:61:69\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/browser.mjs:47:2"
+        }
+      }
+    },
+    {
+      "file": "lifetime-initial-harness-failure",
+      "result": {
+        "checks": [],
+        "providerOperations": 0,
+        "cleanup": {
+          "serverClosed": true,
+          "integrationLease": "RELEASED integration"
+        },
+        "failure": {
+          "message": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-entry-state=session]') to be visible\u001b[22m\n",
+          "stack": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-n88-entry-state=session]') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-teacher-issuance-review-and-content-hub-20261028\\tests\\n88-teacher-issuance-ux-20261028\\lifetime.mjs:23:53\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-teacher-issuance-review-and-content-hub-20261028/tests/n88-teacher-issuance-ux-20261028/lifetime.mjs:12:2"
+        }
+      }
+    }
+  ]
+}

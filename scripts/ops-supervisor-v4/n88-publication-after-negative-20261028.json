@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-item-after-negative-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -8749,
+      "scopeKey": "n88-item-grade-source-successor-after-negative-terminal",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 120,
+      "idleMinutes": 17,
+      "dependsOn": [
+        "n88-term-negative-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/student-projection.mjs",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "tests/n88-publication-service-20261028/**",
+        "docs/automation-evidence/20261028/N88_PUBLICATION_V2_SERVICE_STAGE.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/student-projection.mjs"
+      ],
+      "requiredChecks": [
+        "n88_v2_only_current_owned_source_item_dates_and_off_by_default",
+        "n88_v2_per_item_grades_privacy_independent_from_group_flags_and_no_totals_leak",
+        "n88_v2_manual_task_https_and_date_cas_idempotent_unknown",
+        "n88_v2_tombstone_owner_session_term_change_negative_races",
+        "n88_v2_no_live_schema_provider_real_account_ops_no_unverified_publication_claim"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "objective": "SCOPE-PRESERVING successor to n88-item-service-1028, whose original dependency n88-term-service-1028 is truly BLOCKED by an unproven browser workspace lease. Wait for corrected n88-term-negative-1028 to reach VERIFIED source delivery; reuse the exact existing V2 source-only contract and source work, with no new service permissions, no live data writes, no SQL/Auth/RLS/schema, no duplicate worker. Before edits check whether equivalent source V2 service already exists and return NO_CHANGE rather than reapply. Preserve the original task as pending historical dependency, never force it through its blocked prerequisite. User continuing N88 requires that newly saved class distribution items appear in the teacher student-portal publication center with real start/due dates, a deliberate per-item publish choice, independent per-item grade disclosures, teacher-written independent tasks and optional safe HTTPS lesson/test links. The existing source-only contract modules n88-item-publication-proposal.js and n88-manual-task-link-safety.js with 6/6 synthetic tests and inert demo were verified in Production repository via 9dc2acf8 but NOT activated. Current class service offers only coarse 6-field visibility and source guidance; service lacks per-item storage/ack, and current student projection must not disclose hidden grades/aggregate totals. After n88-term-service-1028 reaches verified source delivery (same integrated-service file), REUSE the actual V2 contract sources and existing models/store, implement a default-OFF source-only server adapter that accepts authenticated canonical owned Teaching/Section/Term/source/grades through explicit injected ports, independently persists each item's publication decision under CAS with immutable original request receipt and tombstone/no resurrection safeguards only in a synthetic transaction port, supports approved manual tasks and HTTPS links, and produces exact allowlisted fresh student projection of current-pupil data without hidden grade/parent aggregate leak. Prototype real integrated-service source path behind a server-owned OFF switch, not controllable through client or query, and preserve all legacy group-field/issuer/terminal behavior when OFF. If persistence actually requires new DB table or schema/RLS policy, DO NOT fabricate an existing deployed capability or SQL success: document exact minimal migration/constraints/private access gate, and return source-only or BLOCKED when required; do not perform any provider operation or real data mutation. Test synthetic 0/1/30/50 students with actual service handler, owner/section/teaching/term/session/lease and score value revisions, addition/removal/rename/date changes, independent grade and task choices, manual link XSS/URL limits/dates central adapter, UNKNOWN/ACK loss and source deletion/tombstone. No actual server deployment, SQL/Auth/RLS/schema, real students or external sends. Keep teacher/student live UI unmodified until server readiness and privacy proof, and do not touch N44 SW. Scope only listed files, original controller and sole publisher. Deliver source-only with explicitly labeled inactive state; N88 remains OPEN until actual authorized service and student UX.",
+      "acceptance": [
+        "New tasks discovered only from authorized canonical distribution IDs/actual persisted dates and start unpublished; renames, deletions, source revision and owner context never silently republish or resurrect.",
+        "Student projection built from fresh authenticated membership/scores filters independently each selected grade item; coarse legacy visibility cannot publish hidden per-item grades; no total, rank or raw score payload if one item withheld.",
+        "Teacher-authored manual task + HTTPS explanation/exam URL validated server-side and with central date semantics, no automatic network fetch/send; source modifications and publication requests have CAS, owner-scoped immutable receipt, fail-closed unknown and durable tombstone design.",
+        "Synthetic actual-handler tests across owner/source/term and 0/1/30/50 fixtures, negative legacy and session cases; default-OFF preserves current live transport. Do not enable a route or production student access on Cloudflare alone.",
+        "No real/student/provider Auth/RLS/schema/SQL changes or SW; repository source-only via original publisher. Record exact backend service/DB prerequisites before any live publish."
+      ],
+      "preparationAuthority": {
+        "kind": "po_20261028_n88_publication_v2_source_followthrough",
+        "priorV2Verified": "9dc2acf8ce7cc070657116658a010cd0dd77adb0",
+        "originalWorkGradeManualContract": "2026-10-28-N88-PUBLICATION-V2-SOURCE",
+        "zeroLiveDataMutations": true,
+        "zeroServiceProviderOps": true,
+        "zeroAuthRlsSchemaChanges": true,
+        "liveRouteEnablement": false,
+        "publication": true,
+        "publicationScope": "inert inactive source-only N88 V2 item and grade publication staging"
+      },
+      "releaseAuthority": "PO now requests continuation of N88 and expressly requested per-item task/grade publication and manual HTTPS links. Authority remains scoped to local/source development, tests and original sole publisher's inert code release. No provider or real account activation, migration/RLS/Auth/schema, grade mutation or actual student disclosure. Final real service and teacher/student UI activation must have exact staged service authorization and verified provider/owner/privacy evidence, not inferred from generic PO completion intent. Scheduling only: duplicate historical gated pending V2 card remains unmodified; this successor uses verified corrected negative-only terminal source, does not expand data or service authority. [AI-reviewed exact inert source-only classification; NO live activation]",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "edaefa3dcd34232433cc4c6b2a25f88ac3b9dbb3",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/student-projection.mjs",
+          "drafts/n88-student-portal/visibility-policy.mjs",
+          "drafts/n88-student-portal/receipt-reconciliation.mjs",
+          "src/lib/n88-item-publication-proposal.js",
+          "src/lib/n88-manual-task-link-safety.js",
+          "src/lib/student-portal-unified-client.js",
+          "src/lib/student-portal-class-client.js",
+          "src/models.js",
+          "src/store.js",
+          "src/lib/rakeez-datetime-values.js"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/student-projection.mjs",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "tests/n88-publication-service-20261028/service.test.mjs",
+          "docs/automation-evidence/20261028/N88_PUBLICATION_V2_SERVICE_STAGE.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "tests/n88-publication-service-20261028/service.test.mjs",
+          "docs/automation-evidence/20261028/N88_PUBLICATION_V2_SERVICE_STAGE.md"
+        ],
+        "workerChecks": [
+          "n88_v2_only_current_owned_source_item_dates_and_off_by_default",
+          "n88_v2_per_item_grades_privacy_independent_from_group_flags_and_no_totals_leak",
+          "n88_v2_manual_task_https_and_date_cas_idempotent_unknown",
+          "n88_v2_tombstone_owner_session_term_change_negative_races",
+          "n88_v2_no_live_schema_provider_real_account_ops_no_unverified_publication_claim"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "reconcile_two_current_inert_receipts",
+      "verificationRepair": {
+        "version": 1,
+        "kind": "n44-n88-exact-inert-receipt-v1",
+        "originalReceiptSha256": "a2139d52c47e3befc6c3c25c43f14932a90665c1f5db8817071fab40a7bd9404",
+        "originalResultSha256": "df5fc620526564090e19c39b675cff889b3006421426e4155cd7d04a491b3652",
+        "candidateSha": "d7a32296caab52c01a6ed68c45a27dd9b3ab13bb",
+        "publishedSha": "9231e88595bc34d2b0e45178b2c3065637c7da97",
+        "originalVerificationPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/student-projection.mjs",
+          "drafts/n88-student-portal/visibility-policy.mjs",
+          "drafts/n88-student-portal/receipt-reconciliation.mjs",
+          "src/lib/n88-item-publication-proposal.js",
+          "src/lib/n88-manual-task-link-safety.js",
+          "src/lib/student-portal-unified-client.js",
+          "src/lib/student-portal-class-client.js",
+          "src/models.js",
+          "src/store.js",
+          "src/lib/rakeez-datetime-values.js"
+        ],
+        "readOnlyVerifiedPaths": [
+          "drafts/n88-student-portal/visibility-policy.mjs",
+          "drafts/n88-student-portal/receipt-reconciliation.mjs",
+          "src/lib/n88-item-publication-proposal.js",
+          "src/lib/n88-manual-task-link-safety.js",
+          "src/lib/student-portal-unified-client.js",
+          "src/lib/student-portal-class-client.js",
+          "src/models.js",
+          "src/store.js",
+          "src/lib/rakeez-datetime-values.js"
+        ],
+        "reason": "Correct a documented source-only classification and malformed read-only verification scope after the original Cloudflare deploy already passed provider head plus immutable/Production asset checks. Preserve all original worker checks and all read-only served dependency hashes, without enabling live features, changing Auth/RLS, or hiding missing real acceptance."
+      }
+    }
+  ]
+}

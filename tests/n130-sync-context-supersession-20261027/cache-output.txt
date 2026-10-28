@@ -1,0 +1,10 @@
+✔ N130 cache generation increments once; N44 handlers and shell are preserved, offline sync bytes are current (267.6272ms)
+✔ ignored abort and late marker reply cannot certify the timed-out validation (4.3248ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 409.2748

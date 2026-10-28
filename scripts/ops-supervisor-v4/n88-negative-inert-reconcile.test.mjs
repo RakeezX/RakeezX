@@ -1,0 +1,21 @@
+/** Exact N88 blocked receipt and fail-closed mutations. No runtime writes. */
+import assert from 'node:assert/strict';
+import {test} from 'node:test';
+import {createHash} from 'node:crypto';
+import fs from 'node:fs';
+import {verifiedN88NegativeInertReconciliation as qualified} from './n88-negative-inert-reconcile.mjs';
+const root='C:/Users/Abody/Projects/RakeezX/';
+const q=JSON.parse(fs.readFileSync(root+'artifacts/ops-supervisor-v4/queue/n88-term-negative-1028.json'));
+const result=JSON.parse(fs.readFileSync(q.resultPath));
+const wrapper=JSON.parse(fs.readFileSync(root+'scripts/ops-supervisor-v4/n88-terminal-negative-source-20261028.json'));
+const source=wrapper.tasks[0],digest=o=>createHash('sha256').update(JSON.stringify(o,null,2)+'\n').digest('hex');
+const originalPrep=Object.fromEntries(Object.entries(q.preparationAuthority).filter(([key])=>!['publication','publicationScope'].includes(key)));
+const prior={...q,status:'blocked',lastFailure:'Publisher returned incomplete or mismatched deployment proof',preparationAuthority:originalPrep};
+delete prior.completionMode;delete prior.verificationRepair;
+const card={...source,preparationAuthority:{...source.preparationAuthority,publication:true,publicationScope:'inert inactive source-only N88 original issuance terminal cancellation'},verificationPaths:['drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/receipt-terminal-review.inactive.mjs'],completionMode:'reconcile_n88_negative_inert_source',verificationRepair:{version:1,kind:'n88-exact-inactive-source-declaration-v1',sourceSha256:'b5de2677919fb9f681fe55d26a149c39adc80951b0769f5c75f67134e4d591b2',previousReceiptSha256:digest(prior.deliveryReceipt),publishedSha:'0c33b120b0baba74af8dd64c7425d7fb83de0411',reason:'The explicit original PO authority approved inactive SOURCE-ONLY publication; repair the source receipt classification without any service activation or real mutation, retaining exact provider, served bytes, and checks.'}};
+const update={card,expected:{id:prior.id,status:'blocked',sessionId:prior.sessionId,lastRunId:prior.attempt.runId,candidateSha:prior.candidateSha,baseSha:prior.baseSha,resultState:'LOCAL_READY'}};
+test('exact source-only original proves deployed source but not active service',()=>{assert.equal(qualified(prior,result,update),true);});
+test('cannot reclassify a live mutation or changed authority',()=>{assert.equal(qualified({...prior,liveMutation:true},result,update),false);assert.equal(qualified(prior,result,{...update,card:{...card,preparationAuthority:{...card.preparationAuthority,providerOps:1}}}),false);});
+test('cannot change source served receipt or candidate',()=>{assert.equal(qualified({...prior,deliveryReceipt:{...prior.deliveryReceipt,changedAssets:['app.js']}},result,update),false);assert.equal(qualified({...prior,candidateSha:'f'.repeat(40)},result,update),false);});
+test('never classify missing/failed N88 safety tests as pass',()=>{assert.equal(qualified(prior,{...result,checks:[...result.checks,{name:'cannot_fake',status:'FAIL'}]},update),false);assert.equal(qualified(prior,{...result,checks:result.checks.slice(0,1)},update),false);});
+test('server state remains originally blocked until guarded helper owns update',()=>{assert.equal(qualified({...prior,status:'awaiting_po'},result,update),false);assert.equal(qualified(prior,result,{...update,card:{...card,verificationPaths:['src/app.js']}}),false);});

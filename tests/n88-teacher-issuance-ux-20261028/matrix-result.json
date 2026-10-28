@@ -1,0 +1,66 @@
+{
+  "matrix": [
+    {
+      "width": 320,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "reportedSynthetic28": "PASS",
+      "rtl": true,
+      "overflow": false
+    }
+  ],
+  "sourceEvidence": "harness-history.json: failure-1793139308106.json",
+  "sourceHashes": {
+    "src/views/student-portal-class.js": "ba55a1a2598d82adc3aa3bda42453e70aeb9f0a36544587303c96413a4c0e8e9",
+    "src/styles/student-portal-class.css": "d06d26c3d07f9c51aafa16a71280f68b9ba88ec3492cae686f4656a805fc3e77",
+    "src/lib/student-portal-class-client.js": "815d82573f1e2c5d8eaa263de781fe98f26b0d14f1a1847f37ddec63b54c2d8e"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-core-live-1028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100014,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "executionMode": "live",
+      "liveMutation": true,
+      "liveAuthorizationRef": {
+        "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261028-n44-core-finite-authority.json",
+        "sha256": "e3a6ba3755963a0411fe58b29742e16d431ca8003fbad10d460a677883e7e207",
+        "authorityRef": "PO-20261028-N44-CORE-AUTOMATIC-FINITE-APPROVAL",
+        "grantId": "efedbcea-f227-4a91-bbab-79cad814fc81"
+      },
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "budgetMinutes": 100,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n44-core-packet-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n44-push/activation/core-v1-live/**",
+        "tests/n44-core-live-1028/**",
+        "docs/automation-evidence/20261028/N44_CORE_V1_FINITE_TRIAL.md",
+        "drafts/n44-push/mobile-trial.inactive.mjs",
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/existing-host.mjs",
+        "drafts/n44-push/activation/core-v1-packet/build.mjs",
+        "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+        "tests/n44-core-packet-1028/qualification.test.mjs"
+      ],
+      "verificationPaths": [],
+      "requiredChecks": [
+        "n44_new_grant_custody_and_compatible_enrollment_transition",
+        "n44_exact_installed_source_and_owned_schedule_readback",
+        "n44_automatic_os_arrival_and_correct_click_each_phone",
+        "n44_total_budget_unknown_no_replay_peer_retention",
+        "n44_owned_source_registration_schedule_cleanup_off"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "newFiniteGrantRef": "PO-20261028-N44-CORE-AUTOMATIC-FINITE-APPROVAL",
+        "generalDelivery": false,
+        "authSchemaRlsChanges": 0
+      },
+      "releaseAuthority": "Direct user expressly approved the exact bounded live trial recorded in artifacts/ops-supervisor-v4/intake-evidence/po-20261028-n44-core-finite-authority.json SHA256 e3a6ba3755963a0411fe58b29742e16d431ca8003fbad10d460a677883e7e207. Only original private custodian may execute the named single service installation if necessary, one finite scheduler, enrollment/sources/sends and owned cleanup under that grant. Ordinary no-push/no-deploy wrapper wording retains sole PUBLIC Product Git/Cloudflare publisher ownership; it does not revoke this exact newly authorized private service trial. No tool-policy bypass, other service changes or spent grant reuse.",
+      "objective": "Execute the newly authorized N44 automatic finite trial through SAME original custodian session. Read canonical exact hashed new grant, latest approved install packet and original saved custody references; never export identifiers/secrets. Existing private custody/worktree C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019 and original grant histories are read-only except new grant-specific append-only state. Corrected archive977a0ef1 is locally qualified and inactive source bd22635c is published: do NOT repeat qualification unless input changes. First establish exact local new grant state and compatibility of normal enrollment -> retained-registration finite mode under ONE immutable20min hard-end; never weaken mutual exclusion or reset clock. Read current service/config/source identity through already sanctioned original ports and acquire actual phase leases. If transition/readiness cannot be represented, record exact blocker and do not install/activate. Validate existing named account/devices and readiness with no unrelated account read. Root can relay normal visible teacher UI/physical phone observations when needed; request exact stage, never invent witnessed arrival/click. Do not activate while required user/phone witness is unavailable. Fresh service install at most1, scheduler at most1, registrations2 with schedule OFF and no sends first, then finite-only mode after retiring enrollment config without revoking those registrations. At most3 new zero-grade source records under verified existing ancestry: lesson session + item parent + due child. Two events/four event-device tuples, provider attempts4, ticks20. Canonical due midnight/lesson lead must genuinely fall within future <=20min window; do not fake time or change production timing to force a convenient trial. If future timing means waiting, save exact not-before/readiness rather than hold paid loop or start grant early. Every UNKNOWN consumes its permit, no replay. Automatic arrival while app closed and tap destinations are physical acceptance, not HTTP200. Stop ordered devices, preserve peer, cleanup only new source IDs, own cron removal and OFF/null readback within hard end; no historical deletion. Installation rollback upload beyond sole allowed install is NOT authorized; disarm first. No Auth/RLS/schema/SQL change, N88/shared assets, broad deployment, new account, personal browsing disruption or paid service. No public Product push or whole private branch merge. Write only minimized nonsecret evidence in allowed paths; raw custody and private archives stay outside Git. Generic publisher cannot certify private service; return truthful results, preserving missing checks as NOT_RUN/FAIL and original histories. No Product CLOSED or live PASS without actual witnessed evidence. Complete preparation and exact bounded operation when all conditions permit, not another unchanged review.\n\nMATERIAL SCOPE CORRECTION28October: preserve saved88cd672c and SAME session. The user requests continued goal delivery; the actual enrollment incompatibility is now authorized for local repair in mobile-trial.inactive.mjs and exact existing host/backend/builder files. Implement explicit new-grant enrollment-only behavior allowing both registrations BEFORE ANY send, retaining historical mobile sequential-send behavior for all old grants, owner/session/consent/peer and terminal guards. Never fake provider-budget rows or loosen old sequential predicates globally. Requalify only changed contract/compiled graph and bind resulting corrected archive hash in a NEW append-only qualification supplement to original efedbcea grant; preserve original authorization bytes/hash and original977a baseline. Sole previously authorized installation remains UNUSED and max1; no extra operation/grant/time/source/send allowance. No live installation until new enrollment-to-finite composition, actual source graph and exact derived archive identity are proven and original-custodian readiness passes. Continue same approved trial only after those prerequisites, preserving all five existing checks and all NOT_RUN history. If only phone/time witness remains, report exact stage and future condition; do not invent observation or spend clock while waiting.",
+      "acceptance": [
+        "New grant independent and finite; explicit identity/readiness before activation.",
+        "Only exact authorized trial operations and no spend beyond fixed caps.",
+        "Physical teacher outcome and exact cleanup witnessed/read back; truthful unavailable conditions."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "bd22635c3f0c4008a5fa27efa15c42d6da8c35a8",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+          "drafts/n44-push/core-teacher-scheduler.mjs",
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "docs/automation-evidence/20261028/N44_CORE_V1_INSTALL_PACKET.md"
+        ],
+        "editPaths": [
+          "docs/automation-evidence/20261028/N44_CORE_V1_FINITE_TRIAL.md",
+          "drafts/n44-push/mobile-trial.inactive.mjs",
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+          "tests/n44-core-packet-1028/qualification.test.mjs"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261028/N44_CORE_V1_FINITE_TRIAL.md"
+        ],
+        "workerChecks": [
+          "n44_new_grant_custody_and_compatible_enrollment_transition",
+          "n44_exact_installed_source_and_owned_schedule_readback",
+          "n44_automatic_os_arrival_and_correct_click_each_phone",
+          "n44_total_budget_unknown_no_replay_peer_retention",
+          "n44_owned_source_registration_schedule_cleanup_off"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

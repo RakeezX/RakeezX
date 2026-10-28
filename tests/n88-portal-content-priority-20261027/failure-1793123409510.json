@@ -1,0 +1,15 @@
+{
+  "taskId": "continuous-n88-content-priority-after-n130-20261027",
+  "runId": "87b53fe5-2574-46b3-86e5-35363518d70b",
+  "checks": [],
+  "matrix": [],
+  "cleanup": {
+    "serverClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "failure": {
+    "stage": "matrix light 320",
+    "message": "Expected values to be strictly equal:\n\nfalse !== true\n",
+    "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-content-priority-after-n130-20261027/tests/n88-portal-content-priority-20261027/browser.mjs:40:228\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-content-priority-after-n130-20261027/tests/n88-portal-content-priority-20261027/browser.mjs:36:2"
+  }
+}

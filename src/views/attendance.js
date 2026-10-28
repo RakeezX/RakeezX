@@ -9,6 +9,8 @@
 import { html, icon, toast, fmtDate, fmtSessionTime, fmtTimeRange, openSheet } from '../lib/dom.js';
 import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
+import { compactSectionLabel } from '../lib/class-order.js';
+import { compactSubjectLabel } from '../lib/subject-catalog.js';
 import { openSessionEditor } from '../lib/session-editor-ui.js';
 import { isBeforeScheduledStart } from '../lib/session-start-ui.js';
 import {
@@ -73,8 +75,8 @@ function renderSessionContext(teaching, session, sessions, status) {
       <div class="attendance-01c__context-top">
         <div class="attendance-01c__identity">
           <span class="attendance-01c__icon" aria-hidden="true">${icon('attendance')}</span>
-          <div><h2>حضور ${visibleLatinDigits(store.sectionLabel(section))}</h2>
-            <p>${visibleLatinDigits(subject?.name ?? '')}${session ? ' · قائمة هذه الحصة المحفوظة' : ''}</p></div>
+          <div class="attendance-01c__names"><h2 title="حضور ${visibleLatinDigits(store.sectionLabel(section))}" aria-label="حضور ${visibleLatinDigits(store.sectionLabel(section))}">حضور <span class="n133-full-name" aria-hidden="true">${visibleLatinDigits(store.sectionLabel(section))}</span><span class="n133-short-name" aria-hidden="true">${visibleLatinDigits(compactSectionLabel(section))}</span></h2>
+            <p title="${visibleLatinDigits(subject?.name ?? '')}" aria-label="${visibleLatinDigits(subject?.name ?? '')}${session ? ' · قائمة هذه الحصة المحفوظة' : ''}"><span class="n133-full-name" aria-hidden="true">${visibleLatinDigits(subject?.name ?? '')}</span><span class="n133-short-name" aria-hidden="true">${visibleLatinDigits(compactSubjectLabel(subject, store.subjects()))}</span>${session ? ' · قائمة هذه الحصة المحفوظة' : ''}</p></div>
         </div>
         <div class="attendance-01c__context-actions">
           ${session ? html`<button class="btn btn--sm btn--ghost" data-act="session-status">${icon('edit')} تعديل حالة الحصة</button>` : ''}

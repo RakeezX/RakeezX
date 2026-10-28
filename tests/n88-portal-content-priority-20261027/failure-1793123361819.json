@@ -1,0 +1,18 @@
+{
+  "taskId": "continuous-n88-content-priority-after-n130-20261027",
+  "runId": "87b53fe5-2574-46b3-86e5-35363518d70b",
+  "checks": [],
+  "matrix": [],
+  "cleanup": {
+    "serverClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "pageErrors": [
+    "Failed to fetch dynamically imported module: http://127.0.0.1:61528/src/app.js"
+  ],
+  "failure": {
+    "stage": "matrix light 320",
+    "message": "page.waitForFunction: Timeout 10000ms exceeded.",
+    "stack": "page.waitForFunction: Timeout 10000ms exceeded.\n    at teacher (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-content-priority-after-n130-20261027\\tests\\n88-portal-content-priority-20261027\\browser.mjs:14:41)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-content-priority-after-n130-20261027/tests/n88-portal-content-priority-20261027/browser.mjs:39:34\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-content-priority-after-n130-20261027/tests/n88-portal-content-priority-20261027/browser.mjs:36:2"
+  }
+}

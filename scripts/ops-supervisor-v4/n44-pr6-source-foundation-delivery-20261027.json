@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-pr6-source-foundation-delivery-20261027",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -6300,
+      "scopeKey": "n44-pr6-source-foundation-reconciliation",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "budgetMinutes": 40,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "continuous-n44-verified-renewal-delivery-20261027"
+      ],
+      "executionProfile": {
+        "version": 1,
+        "authorityRef": "PO-20261027-N44-ASTRA-SINGLE-WORKER",
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "serviceTier": "priority",
+        "fastMode": true,
+        "singleAgent": true,
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "qualifiedSource": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c"
+      },
+      "allowedPaths": [
+        "drafts/n44-push/provider-policy.mjs",
+        "drafts/n44-push/shared.mjs",
+        "drafts/n44-push/registration.mjs",
+        "drafts/n44-push/audited-sender.mjs",
+        "drafts/n44-push/native-http-transport.mjs",
+        "src/lib/notification-preferences.js",
+        "src/lib/notification-schedule.js",
+        "drafts/n44-push/publisher-model.mjs",
+        "drafts/n44-push/publisher-preview.html",
+        "drafts/n44-push/publisher-preview.css",
+        "drafts/n44-push/publisher-preview.mjs",
+        "tests/fixtures/n44-crypto-sender/fixture.mjs",
+        "tests/n44-provider-crossbrowser-20261026.test.mjs",
+        "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
+        "docs/automation-evidence/20261027/N44_PR6_SOURCE_FOUNDATION_DELIVERY.md",
+        "tests/n44-pr6-source-foundation-delivery-20261027/qualification.json"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-preferences.js",
+        "src/lib/notification-schedule.js"
+      ],
+      "requiredChecks": [
+        "n44_pr6_source_matches_verified_native_without_live_redeployment",
+        "n44_pr6_current_main_provider_integration_and_scope",
+        "n44_d107_qualified_draft_only_foundation_preserved"
+      ],
+      "releaseAuthority": "Latest direct PO N44 Astra request explicitly authorizes selective PR6/current-main reconciliation and implementation of source/Preview foundation through the existing publisher. Source integration does not grant any new hosted service upload, Admin role, real recipient access, general scheduling or send.",
+      "preparationAuthority": {
+        "kind": "n44_selective_pr6_source_and_qualified_d107_preparation",
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "preservedCandidate": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "verifiedNative": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+        "frontendPublication": "b6f5864afc6a93509bb5458305b3c2d1982569e1",
+        "manifest": [
+          {
+            "path": "drafts/n44-push/provider-policy.mjs",
+            "source": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+            "blob": "0f42a67c5d129a875c5488b0063864f8f91aaa7d",
+            "sha256": "0d263f46db6096b8457e05332f53a9f2565b0fa513ec85b93e1eccf7ae5af7fc",
+            "observedMainBlob": "d75420f3daef59d04c32d785628962286ceb98dd"
+          },
+          {
+            "path": "drafts/n44-push/shared.mjs",
+            "source": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+            "blob": "baabf7c47b63f01bf775c615eb88b5a20a477845",
+            "sha256": "4fe07e7728276e86507e20e166de816240bf8c291fcae09ff75637081a69c96a",
+            "observedMainBlob": "a3647502d7ee11f2547ab4a134b752c571584bb6"
+          },
+          {
+            "path": "drafts/n44-push/registration.mjs",
+            "source": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+            "blob": "c1f14b082a94273aa29014a4d31b8c6f5f95ff76",
+            "sha256": "d5362771fac889c4eb652ad7c74e901aab60aaea871c956dede105e54488fa26",
+            "observedMainBlob": "307d5f26832bf774aa14e63a3cb46f2282e125c7"
+          },
+          {
+            "path": "drafts/n44-push/audited-sender.mjs",
+            "source": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+            "blob": "76237b813b9e8a2750355c2eea297a3f95a70109",
+            "sha256": "c46828787151aca741902b49fe705332995337b300d66bb31132e76541c2892f",
+            "observedMainBlob": "19ec5c6ce8aed9280f3884b0452148330b42632a"
+          },
+          {
+            "path": "drafts/n44-push/native-http-transport.mjs",
+            "source": "73518d6e66241c09f8f30bbbe91dedf5922b6d7c",
+            "blob": "38100417c78856055ccc560f4501fc0af7d180d7",
+            "sha256": "2c06a405c9d428ad2d6bfeaf10e4533250b5107a4a16e9e57d751c7689efe96f",
+            "observedMainBlob": null
+          },
+          {
+            "path": "src/lib/notification-preferences.js",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+            "sha256": "78e6bc295e1d176d35a2fb093f906d85ceba70517a3ce07e68de6e95863cf99b",
+            "observedMainBlob": null
+          },
+          {
+            "path": "src/lib/notification-schedule.js",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+            "sha256": "3386d650d44e84d5691bcaa91d34498c70823936ddddb2c0a79d44675902e857",
+            "observedMainBlob": null
+          },
+          {
+            "path": "drafts/n44-push/publisher-model.mjs",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "3ef7e15b041a9ad019765cd1a9ba550e6f7b8a58",
+            "sha256": "98207243612b96c784ec341c60f0b4190fdc51196524bd3e3c20fd9d03096a7f",
+            "observedMainBlob": null
+          },
+          {
+            "path": "drafts/n44-push/publisher-preview.html",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "e946beb1b527520aebd41ced48820df1474d4192",
+            "sha256": "06f2805ad9db712aa42fae95ce6f700ba58a99661e4f63f4ab6d5b3b44706744",
+            "observedMainBlob": null
+          },
+          {
+            "path": "drafts/n44-push/publisher-preview.css",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "5b06725d4dde59a8263acd478df8cf2578919f00",
+            "sha256": "c8ccf706018ac677297f38341e8b7a31b5aa3d6dd17b233f1d732fc15223b32c",
+            "observedMainBlob": null
+          },
+          {
+            "path": "drafts/n44-push/publisher-preview.mjs",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "705d469a94e323999f1d1bf398660b6c8dde1ce2",
+            "sha256": "55d2a7b3b22a37cc908abff966dadb0600caa9258e861f8b4f79745ed039c215",
+            "observedMainBlob": null
+          },
+          {
+            "path": "tests/fixtures/n44-crypto-sender/fixture.mjs",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "dfd70bd1bf0c5a712a07e96ed984e0fad7b94d69",
+            "sha256": "54f3454fc310e376f6555637b64cd0fd7e9fdd22cbefda09539a9cbdc5b7ade1",
+            "observedMainBlob": "6df8c904c0b7117b80ea72c233f3068b4f0e69a0"
+          },
+          {
+            "path": "tests/n44-provider-crossbrowser-20261026.test.mjs",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "2a1579776aa72bd6c12cc6187ea5f8ad66df3c9b",
+            "sha256": "0129d65a3af9e407d54f02ff46ffbceb5f5e9846cd0214d5d0dc127134fd44f7",
+            "observedMainBlob": null
+          },
+          {
+            "path": "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
+            "source": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+            "blob": "dc7f15139d51b9c1286d51e12f78cb29bba09a9a",
+            "sha256": "bfc070844adaae3567c7f49e23fef6a74a48f354f803d516f2e60866265d4e06",
+            "observedMainBlob": null
+          }
+        ],
+        "liveServiceOperations": 0,
+        "registrations": 0,
+        "sends": 0,
+        "browserAccountActions": 0
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "826d566f044a87bc0c156a4760866045b5f6dc0c",
+        "requiredSourcePaths": [
+          "drafts/n44-push/provider-policy.mjs",
+          "drafts/n44-push/shared.mjs",
+          "drafts/n44-push/registration.mjs",
+          "drafts/n44-push/audited-sender.mjs",
+          "drafts/n44-push/native-http-transport.mjs",
+          "src/lib/notification-preferences.js",
+          "src/lib/notification-schedule.js",
+          "drafts/n44-push/publisher-model.mjs",
+          "drafts/n44-push/publisher-preview.html",
+          "drafts/n44-push/publisher-preview.css",
+          "drafts/n44-push/publisher-preview.mjs",
+          "tests/fixtures/n44-crypto-sender/fixture.mjs",
+          "tests/n44-provider-crossbrowser-20261026.test.mjs",
+          "tests/n44-pr6-completion-20261026/native-provider.test.mjs"
+        ],
+        "editPaths": [
+          "drafts/n44-push/provider-policy.mjs",
+          "drafts/n44-push/shared.mjs",
+          "drafts/n44-push/registration.mjs",
+          "drafts/n44-push/audited-sender.mjs",
+          "drafts/n44-push/native-http-transport.mjs",
+          "src/lib/notification-preferences.js",
+          "src/lib/notification-schedule.js",
+          "drafts/n44-push/publisher-model.mjs",
+          "drafts/n44-push/publisher-preview.html",
+          "drafts/n44-push/publisher-preview.css",
+          "drafts/n44-push/publisher-preview.mjs",
+          "tests/fixtures/n44-crypto-sender/fixture.mjs",
+          "tests/n44-provider-crossbrowser-20261026.test.mjs",
+          "tests/n44-pr6-completion-20261026/native-provider.test.mjs",
+          "docs/automation-evidence/20261027/N44_PR6_SOURCE_FOUNDATION_DELIVERY.md",
+          "tests/n44-pr6-source-foundation-delivery-20261027/qualification.json"
+        ],
+        "newPaths": [
+          "docs/automation-evidence/20261027/N44_PR6_SOURCE_FOUNDATION_DELIVERY.md",
+          "tests/n44-pr6-source-foundation-delivery-20261027/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_pr6_source_matches_verified_native_without_live_redeployment",
+          "n44_pr6_current_main_provider_integration_and_scope",
+          "n44_d107_qualified_draft_only_foundation_preserved"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "Complete the next independent N44 delivery, sequentially after verified renewal publication. Use Astra max/Fast and ONE worker; no subagents, new planner or review chain. Preserve original custodian session 01a14fcd-032c-7ec0-8b0c-0e0395862c61 and candidate 826d566f044a87bc0c156a4760866045b5f6dc0c. Do not replay its whole investigation, old live events, cleanup or unchanged test suites.\n\nThe concrete repository defect: PR6 browser gesture already shipped and later click/bootstrap/renewal fixes must remain; but main private provider source lacks the qualified Mozilla/Apple/WNS changes that are already in actual Native176 source 73518d6e66241c09f8f30bbbe91dedf5922b6d7c. Port exactly the FIVE provider paths in preparationAuthority.manifest from that verified Native source. Audited sender includes later Deno pinned default-trust transport/TLS fixes, so old PR6 head alone is insufficient. The sole new direct dependency native-http-transport.mjs is included. Existing runtime-failure.mjs differs from Native in unrelated old diagnostic-only additions; keep current-main behavior unless a concrete compatibility failure proves otherwise, and do not expand to activation/custody bundles. Review the small import closure and preserve current-main APIs/guards. Never copy old app.js/sw.js or the whole private branch. Verify exact copied blob hashes; preserve all newer unrelated work.\n\nPort the SIX already-qualified D107 source/Preview paths from 826d566f044a87bc0c156a4760866045b5f6dc0c using manifest hashes. These are source preparation: independent category/channel preferences and central date/IANA helper plus local Publisher model/HTML/CSS/module. They have NO teacher startup imports, privileged route, real publish port, service-role credentials, account enumeration or new access. They stay separate from live teacher navigation. Reuse preparation.tap7 and publisher-ui3 evidence from tests/n44-astra-continuation-20261027 at 826d566f044a87bc0c156a4760866045b5f6dc0c; exact unchanged source/dependencies allow reuse, do not rerun browser or construct another preview. Check dependencies against current main and run only a materially affected check if actual differences matter. Do not present source/Preview as live Admin publishing.\n\nFor provider integration into current main's existing boundary, reuse the THREE existing test/fixture paths listed in manifest from 826d566f044a87bc0c156a4760866045b5f6dc0c. Inspect before running: all keys/endpoints synthetic, network injected/zero actual requests. Run only existing n44-provider-crossbrowser-20261026.test.mjs and native-provider.test.mjs as the meaningful current-main integration check, with existing node-globals if needed; no new test harness, real subscriptions, outgoing requests, TLS connection, live browser or extra crypto51/PG19 suite. Keep negative SSRF/origin/WNS opaque query/TLS-before-body/one-use committed permit/deduplication coverage. If a source or fixture mismatch exposes a concrete Product defect outside allowed paths, preserve the failure and report exact scope rather than weaken the guard or silently copy an activation tree. No new dependencies/library replacement.\n\nRecord compact immutable pre/post/source manifest, actual tests, reused evidence and remaining PR6/fullN44 scope in docs/automation-evidence/20261027/N44_PR6_SOURCE_FOUNDATION_DELIVERY.md and tests/n44-pr6-source-foundation-delivery-20261027/qualification.json. Include no secrets/identities/subscriptions. Commit minimal AI-identified current-main candidate and return LOCAL_READY only when the three checks genuinely pass. Do not independently push Product, merge/close PR6 or issue5, upload Native, read/write hosted configuration or claim service activation. Publisher owns ordinary Git/build/served verification. Public helper modules may be served but are unused by startup; draft Publisher remains excluded from public teacher runtime. Source parity with Native is evidence for future builds, not new service deployment.\n\nZERO service/provider/config/Native/SQL/Auth/RLS/schema/role/region/browser-account/registration/consent/source/delete/send actions. Current Native176 is unchanged. Old6sends/11registrationACK/6Nativeuploads remain spent. Windows13:59:20 actual arrival+correctclick PASS reused; Sources6-10 cleaned/OFFNULL. Historical44 checks and failures unchanged. Android/iPhone cloud and live privileged Admin still need specific bounded authority; full N44 remains OPEN. No new scope for email or general cron. This useful source delivery must continue despite those independent live gates."
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import { createAuditedSender } from './audited-sender.mjs';
 import { createRuntime } from './runtime-gateway.mjs';
 
 export function createPrivatePushPorts({ enabled=false, providerOrigins=[], ...material }={},
-  {clock,resolve,httpsRequest}={}) {
+  {clock,resolve,httpsRequest,nativeExchange}={}) {
   if(enabled!==true) return Object.freeze({
     protect(){throw Error('n44_crypto_disabled');},
     sender:Object.freeze({send:async()=> 'uncertain'}),close(){},
@@ -15,7 +15,7 @@ export function createPrivatePushPorts({ enabled=false, providerOrigins=[], ...m
   const protector=createSubscriptionProtector({providerOrigins,...material});
   let sender;
   try {
-    sender=createAuditedSender({enabled:true,providerOrigins,protector,vapidKeys:material.vapidKeys,clock,resolve,httpsRequest});
+    sender=createAuditedSender({enabled:true,providerOrigins,protector,vapidKeys:material.vapidKeys,clock,resolve,httpsRequest,nativeExchange});
   } catch {
     protector.close();throw Error('n44_crypto_unavailable');
   }
