@@ -96,5 +96,3 @@ try{
   console.log('PASS mounted_context_capture_readonly_guards; encrypted_receipt_no_student_payload; browser_visible_support_binding_default_inert');
  });
 }finally{await new Promise(ok=>server.close(ok));}
-
-
