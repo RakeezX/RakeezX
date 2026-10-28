@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-capture-runtime-fix-1029",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100020,
+      "scopeKey": "n44-source-ui-readonly-binding",
+      "riskClass": "LOW",
+      "validationTier": "TARGETED",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 65,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "n44-source-ui-binding-1028"
+      ],
+      "allowedPaths": [
+        "src/views/teaching-hub.js",
+        "src/lib/notification-source-readiness.js",
+        "tests/n44-source-ui-binding-1028.test.mjs",
+        "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+      ],
+      "verificationPaths": [
+        "src/views/teaching-hub.js",
+        "src/lib/notification-source-readiness.js"
+      ],
+      "requiredChecks": [
+        "mounted_context_capture_readonly_guards",
+        "encrypted_receipt_no_student_payload",
+        "browser_visible_support_binding_default_inert"
+      ],
+      "postDeliveryChecks": [],
+      "releaseAuthority": "Latest direct PO requests actual capture rejection repair; frontend fix and source-only publication authorized, no grant consumption or live notifications.",
+      "objective": "Fix ACTUAL published N44 capture rejection, not another attempt/preparation-only proof. Existing UI publishedd3a92a0e; root selected original valid public challenge in actual teaching UI and clicked once; no download, data-source-error=unavailable. Evidence po-20261029-n44-operator-bridge/operator-error.json and ready.json. Original N44 custodian result834b4da2-c94c-4011-a43b-f699b18b6713 diagnosed challenge parse/key PASS, failure is swallowed and frontend out of its scope. You own EXACT frontend/module repair in this card. Read served module/import graph and actual original source contracts; root verified https://rakeezx.com/src/lib/notification-source-readiness.js returns200 JavaScript, so do not repeat that request. Identify runtime compatibility/load/argument error and FIX cause; generic tests with mocked module APIs failed to catch it. Never weaken ancestry/owner/sync/date/clock/key validation to obtain a receipt. Add minimal privacy-safe allowlisted stage and exception CATEGORY (not raw message/stack/user data) in existing support status so actual failure becomes diagnosable; do not broadly log sensitive context. Verify real module graph with only necessary affected check, reuse unchanged proofs. Publish actual correction through sole publisher and verify served code, no livecapture/sourcecreation/send/registration. Root controls supported actual browser and original custodian controls next challenge; if evidence genuinely cannot distinguish cause, deliver exact bounded diagnostic capability with required single next operator observation, not repeat current UNKNOWN capture or invent root cause. No separate review/mock/plan chain and no read of account storage or personal profile via CLI. Preserve all previous grant limits. Report fixed cause vs remaining unknown honestly.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "d3e04125539797ed9247fde8dadfa7220f49c9f0",
+        "requiredSourcePaths": [
+          "src/views/teaching-hub.js",
+          "src/lib/notification-events.js",
+          "src/lib/sync-operational-ui.js"
+        ],
+        "editPaths": [
+          "src/views/teaching-hub.js",
+          "src/lib/notification-source-readiness.js",
+          "tests/n44-source-ui-binding-1028.test.mjs",
+          "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+        ],
+        "newPaths": [
+          "src/lib/notification-source-readiness.js",
+          "tests/n44-source-ui-binding-1028.test.mjs",
+          "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+        ],
+        "workerChecks": [
+          "mounted_context_capture_readonly_guards",
+          "encrypted_receipt_no_student_payload",
+          "browser_visible_support_binding_default_inert"
+        ],
+        "publisherChecks": []
+      },
+      "acceptance": [
+        "Saved quiet ON/OFF plainly visible even when control disabled; no behavior changes.",
+        "Exact served source verified by publisher; no claim of phone state or live acceptance."
+      ],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "source-only correction of actual capture UI runtime"
+      }
+    }
+  ]
+}

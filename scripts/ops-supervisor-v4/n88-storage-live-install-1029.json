@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-storage-live-install-1029",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100015,
+      "scopeKey": "n88-durable-publication-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "live",
+      "liveMutation": true,
+      "liveAuthorizationRef": {
+        "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261029-n88-live-install/authority.json",
+        "sha256": "e16f65629fd7e75d1aa79e1bf5417a65efe10a431ce027fa195f01a513f2af0e",
+        "authorityRef": "PO-20261029-N88-ACTUAL-OPERATION"
+      },
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 90,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n88-authorized-read-preflight-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+        "tests/n88-external-plan-1028.test.mjs",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/read-authority.json",
+        "tests/n88-authorized-read-preflight-1028.test.mjs",
+        "docs/automation-evidence/20261028/N88_AUTHORIZED_READ_PREFLIGHT.md",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/install-bound.sql",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/install-authority.json",
+        "drafts/n88-student-portal/activation/v2-external-plan-1028/install-original-custodian.mjs",
+        "tests/n88-storage-live-install-1029.test.mjs",
+        "docs/automation-evidence/20261029/N88_STORAGE_LIVE_INSTALL.md"
+      ],
+      "verificationPaths": [
+        "docs/automation-evidence/20261029/N88_STORAGE_LIVE_INSTALL.md"
+      ],
+      "requiredChecks": [
+        "exact_original_target_actor_and_nonexposure",
+        "single_atomic_install_or_verified_no_change",
+        "actual_postinstall_object_privilege_readback"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "source-only installation implementation and minimized actual backend receipt; frontend publisher does not install database"
+      },
+      "releaseAuthority": "Latest direct PO request to move N88 to actual operation scopes the prepared storage prerequisite per hashed authority. Original custodian alone executes bounded installation; source-only publisher delivers code and truthful evidence, not service activation.",
+      "objective": "Continue SAME original N88 session from published6c3bca67 and preserved successful nine-read inventory. Deliver ACTUAL storage installation prerequisite in original Supabase project, not another proposal or mock. Read exact authority artifacts/ops-supervisor-v4/intake-evidence/po-20261029-n88-live-install/authority.json. Existing immutable packet and complete external install.sql are prepared; do not rerun unchanged nine queries/native suites. Original supported Supabase custodian tools and established finite relay are the only route; no alternate credentials or bypass. Observed postgres actor may be used for this bounded installation after verifying same actual role/physical target, not as an arbitrary runtime port. Obtain only missing independent provider nonexposure evidence through supported provider/read-only API; null pgrst.db_schemas is not proof. If needed implement exact finite install/readback admission within original boundary, denying arbitrary SQL, pinned to target/baseline/bound installer and run/authority. Bind original immutable delta to real target, actual postgres installer actor, authority and nonexposure; review final hash and transaction assertions before single application via supported DDL tool. Preserve all original 76/78 and nine-read denials/receipts. No full local campaign: test only changed binding/admission and denial, then execute actual authorized transaction once under owned integration/live-mutation leases. All collision/partial/UNKNOWN rules from PLAN apply; never reset or destructive rollback. Read back actual functions/roles/ACL/RLS/storage identities and prove no frontend exposure or canonical/Auth changes; record provider receipt and bound hash. Keep service default OFF until genuine hosted runtime and original transactional Sync/Delete writer attachment are separately complete; do not label installed storage as working service or close N88. State exact remaining host/writer step from source with paths and required capability, without creating a document-only task. No real account/grade writes or live fixture here, no N44, no new credentials/cost, no public exposure. User authorizes actual progress; do not stop merely because prior read-only card lacked install authority. If actual tool denies, preserve exact error and do not change credentials/tools to bypass it. Minimized evidence only; source-only publisher must not replay installer. Never repeat missing prerequisite attempts unchanged.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "d3e04125539797ed9247fde8dadfa7220f49c9f0",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+          "tests/n88-external-plan-1028.test.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+          "tests/n88-external-plan-1028.test.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/read-authority.json",
+          "tests/n88-authorized-read-preflight-1028.test.mjs",
+          "docs/automation-evidence/20261028/N88_AUTHORIZED_READ_PREFLIGHT.md",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install-bound.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install-authority.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install-original-custodian.mjs",
+          "tests/n88-storage-live-install-1029.test.mjs",
+          "docs/automation-evidence/20261029/N88_STORAGE_LIVE_INSTALL.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install-bound.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install-authority.json",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install-original-custodian.mjs",
+          "tests/n88-storage-live-install-1029.test.mjs",
+          "docs/automation-evidence/20261029/N88_STORAGE_LIVE_INSTALL.md"
+        ],
+        "workerChecks": [
+          "exact_original_target_actor_and_nonexposure",
+          "single_atomic_install_or_verified_no_change",
+          "actual_postinstall_object_privilege_readback"
+        ],
+        "publisherChecks": []
+      },
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17"
+    }
+  ]
+}
