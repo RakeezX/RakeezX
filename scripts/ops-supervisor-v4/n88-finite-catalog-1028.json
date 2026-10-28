@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-finite-catalog-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100013,
+      "scopeKey": "n88-durable-publication-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n88-canonical-binding-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+        "tests/n88-finite-catalog-1028/finite.test.mjs",
+        "docs/automation-evidence/20261028/N88_FINITE_CATALOG.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs"
+      ],
+      "requiredChecks": [
+        "n88_exact_fixed_v2_statement_catalogue",
+        "n88_typed_args_results_and_mutation_rejection",
+        "n88_original_finite_boundary_unchanged_off"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only finite catalogue"
+      },
+      "releaseAuthority": "PO continued N88 execution authorizes inactive source-only preparation and local fabricated qualification; original publisher only. No hosted boundary edits/SQL/Auth/RLS/schema/install or service enablement.",
+      "objective": "Continue SAME N88 session from published canonical binding503b735e/6b6013e. Implement executable INACTIVE exact finite-operation catalogue for new V2 adapter, not more prose:3 exact added fixed reads plus existing four bounded storage reads/seven fixed insert/CAS forms required by published adapter. Read N88_CANONICAL_BINDING.md and exact adapter sources for identities/hashes. Parameterized fixed SQL only, strict owner/session/types/output shape/row limits and bounded budgets; no caller-selected statement/table/function/role. Qualify positive canonical operations and foreign/malformed/extra-param/oversized-output/forbidden SQL/spent or mismatched request rejections locally with synthetic values. Existing hosted activation/private-error-boundary.mjs remains byte-identical and closed; new catalogue cannot be used to submit previously denied hosted statements. This is local preparation for later separately scoped actual installation only. Preserve defaultOFF, immutable outcomes, UNKNOWN no replay, tombstones and genuine lifecycle attachment still missing. No live database/account/credentials/provider operations, no frontend/N44/N134 edits. Reuse prior14native+targetedACK tests; run only new affected catalogue tests. Provide exact ready install/readback checklist with immutable catalogue hashes, no blanket readiness or full N88 closure. Sole original publisher publishes inactive source only.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "6b6013e817ff4e782bd7c58713178756bb0dd8d9",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "docs/automation-evidence/20261028/N88_CANONICAL_BINDING.md"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "tests/n88-finite-catalog-1028/finite.test.mjs",
+          "docs/automation-evidence/20261028/N88_FINITE_CATALOG.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "tests/n88-finite-catalog-1028/finite.test.mjs",
+          "docs/automation-evidence/20261028/N88_FINITE_CATALOG.md"
+        ],
+        "workerChecks": [
+          "n88_exact_fixed_v2_statement_catalogue",
+          "n88_typed_args_results_and_mutation_rejection",
+          "n88_original_finite_boundary_unchanged_off"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
