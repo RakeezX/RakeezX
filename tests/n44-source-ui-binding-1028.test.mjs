@@ -12,7 +12,7 @@ const server=http.createServer(async(req,res)=>{const u=new URL(req.url,'http://
 const {publicKey,privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});const jwk=publicKey.export({format:'jwk'});
 try{
  await new Promise(ok=>server.listen(0,'127.0.0.1',ok));const base=`http://127.0.0.1:${server.address().port}`;
- await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/n44-source-ui-binding-1028.json',runId:'91ecdbed-1631-47c1-8fa3-73118518edd9',url:base,timeoutMs:120000},async({createContext})=>{
+ await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/n44-capture-runtime-fix-1029.json',runId:'e26b457d-231d-4728-9c79-9caed6eacb37',url:base,timeoutMs:120000},async({createContext})=>{
   const ctx=await createContext({viewport:{width:390,height:844},locale:'ar-SA',timezoneId:'Asia/Riyadh'});await ctx.addInitScript(()=>sessionStorage.setItem('rakeezx-demo-session-v1','preparing'));
   const page=await ctx.newPage();await openReadyServedDemo(page,base);
   await page.evaluate(async()=>{
@@ -44,6 +44,31 @@ try{
    return {version:1,taskId:'n44-core-live-1028',grantId:'efedbcea-f227-4a91-bbab-79cad814fc81',runId:'11111111-1111-4111-8111-111111111111',nonce:'a'.repeat(64),issuedAt:Date.now(),expiresAt:Date.now()+240000,ownerHash:await m.readinessHash(context.ownerId),workspaceHash:await m.readinessHash(context.workspaceId),dueAt:due,publicKey};
   },{kty:jwk.kty,n:jwk.n,e:jwk.e});
   const upload=async c=>panel.locator('input').setInputFiles({name:'challenge.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(c))});
+  // Exercise failure reporting through the actual mounted handler and module graph.
+  // Transport stays synthetic; messages resembling sensitive data must never render.
+  await upload(challenge);
+  await page.evaluate(()=>{window.originalCaptureFileText=File.prototype.text;File.prototype.text=async()=>{throw new DOMException('PRIVATE_PAYLOAD_MUST_NOT_RENDER','NotReadableError');};});
+  try {
+   await panel.locator('button').click();
+   await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-stage','file_read');
+   await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-category','NotReadableError');
+   assert(!(await panel.locator('[role=status]').textContent()).includes('PRIVATE_PAYLOAD'));
+  } finally {await page.evaluate(()=>{File.prototype.text=window.originalCaptureFileText;delete window.originalCaptureFileText;});}
+  await panel.locator('input').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{PRIVATE_PAYLOAD_MUST_NOT_RENDER')});
+  await panel.locator('button').click();
+  await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-stage','challenge');
+  await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-category','SyntaxError');
+  assert(!(await panel.locator('[role=status]').textContent()).includes('PRIVATE_PAYLOAD'));
+  // A native crypto failure must retain its exact safe stage/category, not its text.
+  await upload(challenge);
+  await page.evaluate(()=>{window.originalCaptureImportKey=crypto.subtle.importKey;crypto.subtle.importKey=async()=>{throw new DOMException('PRIVATE_CRYPTO_DETAIL','DataError');};});
+  try {
+   await panel.locator('button').click();
+   await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-stage','key_import');
+   await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-category','DataError');
+   assert(!(await panel.locator('[role=status]').textContent()).includes('PRIVATE_CRYPTO'));
+  } finally {await page.evaluate(()=>{crypto.subtle.importKey=window.originalCaptureImportKey;delete window.originalCaptureImportKey;});}
+  console.log('PASS actual handler file_read/NotReadableError, module challenge/SyntaxError and key_import/DataError; no raw exception text');
   for(const change of [c=>c.expiresAt=0,c=>c.ownerHash='0'.repeat(64),c=>c.taskId='foreign',c=>c.publicKey.d='private']){
    const bad=structuredClone(challenge);change(bad);await upload(bad);await panel.locator('button').click();await expect(panel.locator('[role=status]')).toContainText('تعذّر');await expect(panel.locator('button')).not.toHaveAttribute('aria-busy','true');
   }
@@ -57,6 +82,7 @@ try{
    assert.equal(await panel.locator('[role=status]').getAttribute('data-source-error'),'sync_pending');
    await page.waitForFunction(async()=>{const s=await(await import('/src/lib/sync.js')).getSyncOperationalSummary();return s.state==='synced'&&s.cloudSyncHealthy;});
   }
+  assert(requests.includes('/src/lib/notification-source-readiness.js'),'real HTTP module graph loaded');
   assert(download,'normal UI download');const receipt=JSON.parse(await readFile(await download.path(),'utf8'));
   await expect(panel.locator('[role=status]')).toContainText('تم حفظ');
   const b=s=>Buffer.from(s,'base64url'),e=receipt.envelope;

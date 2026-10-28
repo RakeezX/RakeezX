@@ -257,20 +257,27 @@ export default {
       if (!panel || el.dataset.sourceBusy === 'true') return;
       const file = panel.querySelector('[data-source-challenge]').files?.[0];
       if (!file || file.size > 8192) { status.textContent = 'اختر ملف طلب دعم صالحًا ومحدود الحجم.'; return; }
-      el.dataset.sourceBusy = 'true'; el.setAttribute('aria-busy','true'); delete status.dataset.sourceError; status.textContent = 'جارٍ التحقق وحفظ التقرير محليًا…';
-      let url;
+      el.dataset.sourceBusy = 'true'; el.setAttribute('aria-busy','true'); delete status.dataset.sourceError; delete status.dataset.sourceStage; delete status.dataset.sourceCategory; status.textContent = 'جارٍ التحقق وحفظ التقرير محليًا…';
+      let url, stage = 'file_read';
       try {
         const raw = await file.text();
+        stage = 'module_load';
         const { captureNotificationSourceReadiness } = await import('../lib/notification-source-readiness.js');
+        stage = 'capture';
         const receipt = await captureNotificationSourceReadiness(raw, params.id, panel);
         if (!panel.isConnected) return;
+        stage = 'download';
         url = URL.createObjectURL(new Blob([JSON.stringify(receipt)], {type:'application/json'}));
         const link = document.createElement('a'); link.href = url; link.download = 'rakeez-source-readiness.encrypted.json';
         link.click(); status.textContent = 'تم حفظ التقرير المشفّر. لا يعني ذلك تفعيل التذكيرات أو اجتياز التجربة.';
       } catch (error) {
         const codes = ['challenge_shape','challenge_size','challenge_authority','challenge_identity','challenge_expired','challenge_scope','challenge_time','challenge_key','context_unavailable','context_replaced','owner_changed','not_writable','draft_open','ancestry_unconfirmed','ancestry_inactive','source_bound','scope_mismatch','key_size','sync_pending','snapshot_changed','timezone','calendar','lesson_time','challenge_used','receipt_size'];
         status.dataset.sourceError = codes.includes(error?.message) ? error.message : 'unavailable';
-        if (panel.isConnected) status.textContent = 'تعذّر إنشاء التقرير. تحقق من صلاحية طلب الدعم والحساب والفصل والمزامنة والتقويم، ثم اطلب طلبًا جديدًا من الدعم.';
+        const stages = ['challenge','context','ancestry','scope','key_import','sync','calendar','reservation','encryption','final_checkpoint'];
+        const categories = ['Error','TypeError','SyntaxError','RangeError','ReferenceError','DataError','OperationError','NotSupportedError','SecurityError','NotReadableError','AbortError','InvalidAccessError','InvalidStateError','QuotaExceededError'];
+        status.dataset.sourceStage = stage === 'capture' && stages.includes(error?.sourceReadinessStage) ? error.sourceReadinessStage : stage;
+        status.dataset.sourceCategory = categories.includes(error?.name) ? error.name : 'UnknownError';
+        if (panel.isConnected) status.textContent = `تعذّر إنشاء التقرير. رمز الدعم: ${status.dataset.sourceStage} / ${status.dataset.sourceError} / ${status.dataset.sourceCategory}. احتفظ بهذا الرمز للدعم.`;
       } finally { if (url) setTimeout(() => URL.revokeObjectURL(url), 1000); delete el.dataset.sourceBusy; el.removeAttribute('aria-busy'); }
     },
     'file-import': (el, ev, params) => studentsView.actions['file-import'](el, ev, params),

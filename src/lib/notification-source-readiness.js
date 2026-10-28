@@ -40,7 +40,11 @@ function sourceIds(id, owner) {
 const used = new Set();
 /** Called only by the mounted teaching view; no dependency injection or globals. */
 export async function captureNotificationSourceReadiness(raw, teachingId, mountedElement) {
-  const c = validateSourceChallenge(raw), context = currentNotificationContext(store, cloud);
+  let stage = 'challenge';
+  try {
+  const c = validateSourceChallenge(raw);
+  stage = 'context';
+  const context = currentNotificationContext(store, cloud);
   requireValue(context && mountedElement?.isConnected, 'context_unavailable');
   const workspace = store.getActiveWorkspace(), session = cloud.session, route = location.hash;
   const initial = selectedRows(teachingId), refs = Object.values(initial);
@@ -54,23 +58,30 @@ export async function captureNotificationSourceReadiness(raw, teachingId, mounte
     requireValue(rows.section.yearId === rows.year.id && rows.year.status === 'active' && !store.isTermClosed(rows.term.id) && !store.isTeachingArchived(rows.teaching), 'ancestry_inactive');
     return JSON.stringify({ rows: Object.fromEntries(Object.entries(rows).map(([k,r]) => [k,pick(r)])), sources: sourceIds(teachingId,context.ownerId) });
   };
+  stage = 'ancestry';
   const before = checkpoint();
+  stage = 'scope';
   requireValue(await readinessHash(context.ownerId) === c.ownerHash && await readinessHash(context.workspaceId) === c.workspaceHash, 'scope_mismatch');
+  stage = 'key_import';
   const key = await crypto.subtle.importKey('jwk', c.publicKey, { name:'RSA-OAEP', hash:'SHA-256' }, false, ['encrypt']);
   requireValue(key.algorithm.modulusLength >= 2048 && key.algorithm.modulusLength <= 4096, 'key_size');
   requireValue(checkpoint() === before, 'snapshot_changed');
+  stage = 'sync';
   const sync = await getSyncOperationalSummary();
   const healthy = value => value.state === 'synced' && value.cloudSyncHealthy === true && !value.studentLifecycleInFlight && !value.classDeletionInFlight && ['queuedCount','pendingCount','failedCount','blockedCount','rejectedCount'].every(k => value[k] === 0);
   requireValue(healthy(sync), 'sync_pending');
   requireValue(checkpoint() === before, 'snapshot_changed');
   requireValue(Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Riyadh', 'timezone');
+  stage = 'calendar';
   const date = new Date(c.dueAt + 10800000).toISOString().slice(0,10);
   const bounds = dateControlBounds('session', initial.term.startDate, initial.term.endDate, new Date());
   requireValue(validDateTimeValue(date,'date',bounds.min,bounds.max) && store.isSessionEligibleDate(date,{year:initial.year,term:initial.term}), 'calendar');
   requireValue(validDateTimeValue('00:15','time') && validDateTimeValue('00:45','time'), 'lesson_time');
+  stage = 'reservation';
   const challengeDigest = await readinessHash(JSON.stringify(c));
   requireValue(!used.has(challengeDigest) && used.size < 32, 'challenge_used');
   used.add(challengeDigest);
+  stage = 'encryption';
   const payload = { version:1, kind:'n44-source-readiness', taskId:TASK, grantId:GRANT, runId:c.runId, nonce:c.nonce, challengeDigest,
     observedAt:Date.now(), documentCheckpoint:crypto.randomUUID(), ownerId:context.ownerId, workspaceId:context.workspaceId,
     captureDevice:{ deviceId:context.deviceId, role:'read-only-capture', sendRecipientVerified:false },
@@ -85,8 +96,16 @@ export async function captureNotificationSourceReadiness(raw, teachingId, mounte
     const encrypted = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},aes,plain));
     const b64 = bytes => btoa(Array.from(new Uint8Array(bytes),b => String.fromCharCode(b)).join('')).replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');
     const envelope = {key:b64(await crypto.subtle.encrypt({name:'RSA-OAEP'},key,secret)),iv:b64(iv),tag:b64(encrypted.slice(-16)),ciphertext:b64(encrypted.slice(0,-16))};
+    stage = 'final_checkpoint';
     requireValue(healthy(await getSyncOperationalSummary()), 'sync_pending');
     validateSourceChallenge(raw); requireValue(checkpoint() === before, 'snapshot_changed');
     return {version:1,kind:payload.kind,taskId:TASK,grantId:GRANT,runId:c.runId,nonce:c.nonce,challengeDigest,observedAt:payload.observedAt,documentCheckpoint:payload.documentCheckpoint,envelope};
   } finally { plain.fill(0); secret.fill(0); }
+  } catch (error) {
+    // Only a fixed stage crosses to the support UI; no message/stack/context logging.
+    const failure = new Error(typeof error?.message === 'string' ? error.message : 'unavailable');
+    failure.name = error?.name;
+    failure.sourceReadinessStage = stage;
+    throw failure;
+  }
 }
