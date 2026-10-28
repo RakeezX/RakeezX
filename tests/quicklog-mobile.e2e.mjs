@@ -114,11 +114,14 @@ test('Quick Log renders available students before absent and excused students wi
   await expect(classesHeading).toHaveCount(1);
   await expect(classesHeading).toBeVisible();
   await page.evaluate(async () => {
-    const now = new Date();
-    const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+    const { todayISO } = await import('/src/models.js');
+    const today = todayISO();
+    const year = window.store.activeYear();
+    const term = window.store.activeTerm();
+    if (!year || !term || term.yearId !== year.id) throw new Error('Test requires a complete academic calendar context');
     await window.store.save({
-      sections: [{ id: 'ql-order-section', grade: 5, label: 'أ' }],
-      teachings: [{ id: 'ql-order-teaching', sectionId: 'ql-order-section' }],
+      sections: [{ id: 'ql-order-section', yearId: year.id, grade: 5, label: 'أ' }],
+      teachings: [{ id: 'ql-order-teaching', sectionId: 'ql-order-section', termId: term.id }],
       students: [{ id: 'ql-a', name: 'أحمد', status: 'active' }, { id: 'ql-b', name: 'بدر', status: 'active' }, { id: 'ql-c', name: 'تركي', status: 'active' }, { id: 'ql-d', name: 'سالم', status: 'active' }],
       enrollments: [{ id: 'ql-ea', studentId: 'ql-a', sectionId: 'ql-order-section', status: 'active', rollNo: 1 }, { id: 'ql-eb', studentId: 'ql-b', sectionId: 'ql-order-section', status: 'active', rollNo: 2 }, { id: 'ql-ec', studentId: 'ql-c', sectionId: 'ql-order-section', status: 'active', rollNo: 3 }, { id: 'ql-ed', studentId: 'ql-d', sectionId: 'ql-order-section', status: 'active', rollNo: 4 }],
       sessions: [{ id: 'ql-early', teachingId: 'ql-order-teaching', date: today, period: 1 }, { id: 'ql-late', teachingId: 'ql-order-teaching', date: today, period: 2 }],
@@ -136,4 +139,6 @@ test('Quick Log renders available students before absent and excused students wi
   await expect(page.locator('#ql-ql-d')).toContainText('مستأذن');
   await page.locator('#ql-ql-a [data-act="plus"]').click();
   await expect(page.locator('#ql-ql-a')).toContainText('+1');
+  await page.reload();
+  await expect(page.locator('#ql-ql-a')).toContainText('+1'); // Local Quick Log survives a fresh page load.
 });

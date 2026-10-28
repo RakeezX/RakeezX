@@ -43,3 +43,6 @@ desktop.ini
 
 # D087 per-run private recovery material; public receipts remain trackable
 /artifacts/ops-supervisor-v4/capabilities/d087/*/private/
+
+# Regenerated synthetic UX audit snapshots (keep outside Git; track source and reviewed report)
+/artifacts/ux-system-audit-v1/

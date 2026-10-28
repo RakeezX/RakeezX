@@ -76,7 +76,7 @@ function renderSessionContext(teaching, session, sessions, status) {
         <div class="attendance-01c__identity">
           <span class="attendance-01c__icon" aria-hidden="true">${icon('attendance')}</span>
           <div class="attendance-01c__names"><h2 title="حضور ${visibleLatinDigits(store.sectionLabel(section))}" aria-label="حضور ${visibleLatinDigits(store.sectionLabel(section))}">حضور <span class="n133-full-name" aria-hidden="true">${visibleLatinDigits(store.sectionLabel(section))}</span><span class="n133-short-name" aria-hidden="true">${visibleLatinDigits(compactSectionLabel(section))}</span></h2>
-            <p title="${visibleLatinDigits(subject?.name ?? '')}" aria-label="${visibleLatinDigits(subject?.name ?? '')}${session ? ' · قائمة هذه الحصة المحفوظة' : ''}"><span class="n133-full-name" aria-hidden="true">${visibleLatinDigits(subject?.name ?? '')}</span><span class="n133-short-name" aria-hidden="true">${visibleLatinDigits(compactSubjectLabel(subject, store.subjects()))}</span>${session ? ' · قائمة هذه الحصة المحفوظة' : ''}</p></div>
+            <p title="${visibleLatinDigits(subject?.name ?? '')}" ><span class="sr-only">${visibleLatinDigits(subject?.name ?? '')}</span><span class="n133-full-name" aria-hidden="true">${visibleLatinDigits(subject?.name ?? '')}</span><span class="n133-short-name" aria-hidden="true">${visibleLatinDigits(compactSubjectLabel(subject, store.subjects()))}</span>${session ? ' · قائمة هذه الحصة المحفوظة' : ''}</p></div>
         </div>
         <div class="attendance-01c__context-actions">
           ${session ? html`<button class="btn btn--sm btn--ghost" data-act="session-status">${icon('edit')} تعديل حالة الحصة</button>` : ''}
