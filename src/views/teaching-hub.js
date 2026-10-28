@@ -30,7 +30,7 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
         <div class="class-hub-header__identity-block">
           <span class="class-hub-header__color-bar" style="background:${sec?.color || 'var(--brand)'}" aria-hidden="true"></span>
           <div class="class-hub-header__name-group">
-            <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل" title="${sectionLabel(sec) || 'تبديل الفصل'}">
+            <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل: ${sectionLabel(sec) || 'الفصل'}" title="${sectionLabel(sec) || 'تبديل الفصل'}">
               <span class="class-name-switcher-btn__title">
                 <span class="class-identity-full">${sectionLabel(sec) || 'الفصل'}</span>
                 <span class="class-identity-short" aria-hidden="true">${compactSectionLabel(sec) || 'الفصل'}</span>
@@ -203,7 +203,7 @@ export default {
         <div class="grid quick-tools-grid" aria-label="أدوات الفصل">
           ${TOOLS(tch.id).map(
             (t) => html`
-              <a class="tile class-tool-card" href="${t.href}">
+              <a class="tile class-tool-card" href="${t.href}" aria-label="${t.title} — ${t.sub}">
                 <span class="tile__icon">${icon(t.icon)}</span>
                 <span class="class-tool-card__copy">
                   <span class="tile__title">${t.title}</span>
@@ -218,7 +218,7 @@ export default {
         <div class="grid grid--3 class-hub-stats">
           <div class="stat">
             <div class="stat__val tabular">${roster.length}</div>
-            <div class="stat__label">طالبًا</div>
+            <div class="stat__label">${roster.length === 1 ? "طالب" : "طالبًا"}</div>
           </div>
           <div class="stat">
             <div class="stat__val tabular">${avg === null ? '—' : fmtPct(avg)}</div>

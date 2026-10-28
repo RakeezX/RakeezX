@@ -8589,3 +8589,42 @@
   .n133-full-name { display:inline !important; }
   .n133-short-name { display:none !important; }
 }
+
+
+/* UX Skills Pilot 2026-10-28: scoped class hub/roster readability and native touch, preview only. */
+@media screen {
+  .students-roster-page .roster-summary { color: var(--text-2); }
+  .students-roster-page .roster-row .row__title { font-size: 14px; line-height: 1.45; }
+  .students-roster-page .roster-row .row__sub { font-size: 11px; line-height: 1.5; }
+  .class-hub .class-hub-header__sub { font-size: 12px; }
+  .class-hub .class-tool-card .tile__title { font-size: 14px; }
+  .class-hub .class-tool-card .tile__sub { font-size: 11px; }
+}
+@media screen and (max-width: 899px) {
+  .students-roster-page .roster-row .iconbtn {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+  }
+}
+@media screen and (max-width: 520px) {
+  .students-roster-page .roster-row .row__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+  }
+  .students-roster-page .roster-row .row__main { min-inline-size: 0; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .class-hub .class-tool-card,
+  .students-roster-page .roster-row .row__main {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .class-hub .class-tool-card { transition: none; }
+}
