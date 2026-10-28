@@ -71,6 +71,7 @@ async function runScheduled(env, { fetch: send = globalThis.fetch } = {}) {
       if (!response.ok) throw Error();
       return JSON.parse(new TextDecoder().decode(await readBytes(response.body, 8192, abort.signal)));
     };
+    if (env.N44_FINITE_SCHEDULER === "true") return await invoke({ operation: "finite-due", cursor: null, limit: 1 });
     let cursor = null;
     for (let page = 0; page < 4; page++) {
       const r = await invoke({ operation: "due", cursor, limit: 25 });

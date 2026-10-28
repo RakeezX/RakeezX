@@ -3,5 +3,6 @@
   "deliveryEnabled": false,
   "applicationOrigins": [],
   "providerOrigins": [],
-  "requestDeadlineMs": 5000
+  "requestDeadlineMs": 5000,
+  "finiteScheduler": null
 }
