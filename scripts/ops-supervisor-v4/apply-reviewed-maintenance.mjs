@@ -252,7 +252,7 @@ export function verifiedSourceOnlyDeclarationRepair(task, result, update) {
       && d?.publishedSha==='6b6013e817ff4e782bd7c58713178756bb0dd8d9' && d.candidateSha===result.candidateSha
       && proof?.priorReceiptSha256===sha256(bytes(d)) && proof.publishedSha===d.publishedSha
       && proof.originalResultSha256===sha256(bytes(result)) && proof.reason?.length>=80
-      && verifiedDeployment(card,d);
+      && verifiedDeployment({...task,...card},d);
   }
 
   return task.id==='continuous-n88-current-functional-review-20261018'
