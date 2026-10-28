@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'./tests',testMatch:['n135-class-badge-layout.e2e.mjs','n133-narrow-label-surface.e2e.mjs','n136-class-login-action.e2e.mjs'],workers:1,retries:0,timeout:65000,reporter:'list',use:{browserName:'chromium',baseURL:'http://127.0.0.1:5198',serviceWorkers:'block',locale:'ar-SA',timezoneId:'Asia/Riyadh'},webServer:{command:'node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5198 --strictPort',url:'http://127.0.0.1:5198',reuseExistingServer:false,timeout:60000}});
