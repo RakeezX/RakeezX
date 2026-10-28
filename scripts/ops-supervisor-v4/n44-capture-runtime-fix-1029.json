@@ -53,11 +53,7 @@
           "tests/n44-source-ui-binding-1028.test.mjs",
           "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
         ],
-        "newPaths": [
-          "src/lib/notification-source-readiness.js",
-          "tests/n44-source-ui-binding-1028.test.mjs",
-          "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
-        ],
+        "newPaths": [],
         "workerChecks": [
           "mounted_context_capture_readonly_guards",
           "encrypted_receipt_no_student_payload",
