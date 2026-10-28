@@ -307,6 +307,97 @@ export function verifiedN44FrontendPrerequisiteStage(task,result,update){try{
  return same(s.requiredChecks,['n44_ui_refresh_lifecycle_and_guarded_optin','n44_ui_actual_app_dom_styles_and_disposal','n44_ui_candidate_scope_and_provenance'])&&result.candidateSha===e.candidateSha&&result.baseSha===e.baseSha;
  }catch{return false;}}
 
+
+/** AI: two exact completed inert source publications; never a live enablement.
+ * Original checks, provider, served assets and unrelated read-only dependencies
+ * stay verified. This is not a generic waiver of deployment classification. */
+export function verifiedTwoCurrentInertReceipts(t,r,u) {
+ try {
+  const specs={
+   'n44-core-auto-1028':{
+     product:'N44',run:'ca7222f4-5a3d-4959-be3b-f61d0b825b98',
+     base:'deb8562669ac08a7bf50f7ab0a865cc114733109',
+     candidate:'72c67feac91f3a63bbf2ff26359260d466cf7a7d',
+     published:'7c761eec4ed1fee6b721d1846502996349b8a1b7',
+     source:'n44-core-auto-1028.json',sourceHash:'b011f7f1bedf31de2c58273c11783502ed2cfdd04088b0a7072197a7ce1cad1c',
+     scope:'inert inactive source-only N44 Core V1 teacher scheduler staging',
+     verification:null
+   },
+   'n88-item-after-negative-1028':{
+     product:'N88',run:'fde462c6-6842-4ab6-a5a8-8bbfbe033200',
+     base:'6646098108daa419b65d171883ec15850bf111f1',
+     candidate:'d7a32296caab52c01a6ed68c45a27dd9b3ab13bb',
+     published:'9231e88595bc34d2b0e45178b2c3065637c7da97',
+     source:'n88-publication-after-negative-20261028.json',sourceHash:'24de1e7339e9177adca005029e58fb4ecb409a43b98398688677b74aaedeecd8',
+     scope:'inert inactive source-only N88 V2 item and grade publication staging',
+     verification:['drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/student-projection.mjs']
+   }
+  };
+  const spec=specs[t?.id],c=u?.card,e=u?.expected,p=c?.verificationRepair,d=t?.deliveryReceipt;
+  if(!spec || t.productId!==spec.product || t.activationId!=='po-20261012-continuous' ||
+     t.status!=='blocked'||t.lastFailure!=='Publisher returned incomplete or mismatched deployment proof'||
+     t.attempt?.runId!==spec.run||t.baseSha!==spec.base||t.candidateSha!==spec.candidate||
+     t.approvedNote?.source!==spec.source||t.approvedNote.sha256!==spec.sourceHash||
+     !['local','synthetic'].includes(t.executionMode)||t.liveMutation!==false||t.liveAuthorizationRef||
+     t.deliveryReceipt?.status!=='deployed'||t.deliveryReceipt.state!=='DEPLOYED_AWAITING_PO'||
+     !t.deliveryReceipt.productionDeployed||t.deliveryReceipt.closed!==false||
+     t.deliveryReceipt.productSourceChangeObserved!==false||t.deliveryReceipt.changedAssets?.length!==0) return false;
+  if(c?.completionMode!=='reconcile_two_current_inert_receipts'||
+     c.id!==t.id||c.productId!==t.productId||c.activationId!==t.activationId||
+     c.scopeKey!==t.scopeKey||c.liveMutation!==false||c.liveAuthorizationRef||
+     e?.status!=='blocked'||e.id!==t.id||e.lastRunId!==spec.run||e.sessionId!==t.sessionId||
+     e.candidateSha!==spec.candidate||e.baseSha!==spec.base||e.resultState!=='LOCAL_READY'||
+     r?.taskId!==t.id||r.runId!==spec.run||r.state!=='LOCAL_READY'||
+     r.candidateSha!==spec.candidate||r.baseSha!==spec.base||r.blockerType!=='none'||r.blocker) return false;
+  if(!same(c.allowedPaths,t.allowedPaths)||!same(c.requiredChecks,t.requiredChecks)||
+     !same(c.postDeliveryChecks,t.postDeliveryChecks)||
+     !Object.entries(c).every(([k,v])=>
+       ['completionMode','verificationRepair','preparationAuthority','releaseAuthority','verificationPaths'].includes(k)||same(v,t[k]))) return false;
+  if(c.releaseAuthority!==t.releaseAuthority+' [AI-reviewed exact inert source-only classification; NO live activation]'||
+     c.preparationAuthority?.publication!==true||c.preparationAuthority.publicationScope!==spec.scope) return false;
+  if(t.preparationAuthority){
+    const {publication,publicationScope,...old}=c.preparationAuthority;
+    if(!same(old,t.preparationAuthority))return false;
+  } else {
+    if(!same(c.preparationAuthority,{publication:true,publicationScope:spec.scope})) return false;
+  }
+  const original=t.verificationPaths;
+  const readOnly=original.filter(x=>!t.allowedPaths.includes(x));
+  if(!Array.isArray(original)||!original.length||
+     !same(c.verificationPaths,spec.verification??original)||
+     !same(c.verificationPaths,original.filter(x=>t.allowedPaths.includes(x)))||
+     !same(p?.originalVerificationPaths,original)||!same(p?.readOnlyVerifiedPaths,readOnly)||
+     !Array.isArray(r.checks)||!r.checks.length||
+     !t.requiredChecks.every(name=>r.checks.some(x=>x.name===name&&x.status==='PASS'))||
+     !r.checks.every(x=>x.status==='PASS'||
+       t.id==='n88-item-after-negative-1028'&&x.name==='production_publication'&&x.status==='NOT_RUN'&&
+       t.postDeliveryChecks?.includes('production_publication')&&!t.requiredChecks.includes('production_publication')))return false;
+  if(r.changedPaths?.some(file=>!t.allowedPaths.includes(file))||
+     !Array.isArray(d.changedPaths)||!d.changedPaths.length||
+     d.changedPaths.some(file=>!t.allowedPaths.includes(file))||
+     !Array.isArray(d.sourceOnlyPaths)||!d.sourceOnlyPaths.length||
+     d.sourceOnlyPaths.some(file=>!d.changedPaths.includes(file)||!t.allowedPaths.includes(file))) return false;
+  if(p?.version!==1||p.kind!=='n44-n88-exact-inert-receipt-v1'||
+     p.originalReceiptSha256!==sha256(bytes(d))||
+     p.originalResultSha256!==sha256(bytes(r))||
+     p.candidateSha!==spec.candidate||p.publishedSha!==spec.published||
+     typeof p.reason!=='string'||p.reason.length<100) return false;
+  if(d.candidateSha!==spec.candidate||d.baseSha!==spec.base||d.publishedSha!==spec.published||
+     d.provider?.conclusion!=='success'||d.provider.headSha!==spec.published||
+     d.evidence?.immutable?.passed!==true||d.evidence?.production?.passed!==true)return false;
+  // Read-only N88 prerequisites retain immutable AND Production hashes.
+  for(const file of original){
+    for(const side of ['immutable','production']){
+      const asset=d.evidence[side].assets?.find(a=>a.repoPath===file);
+      if(!asset?.verified||asset.deleted||!SHA256.test(asset.expectedSha256??'')||
+         asset.observedSha256!==asset.expectedSha256) return false;
+    }
+  }
+  const declared={...t,...c};
+  return verifiedSourceOnlyPublication(declared,d)&&verifiedDeployment(declared,d);
+ }catch{return false;}
+}
+
 export function verifyInactiveIdentity(task, result, update, activationId, historicalContext = null) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
@@ -364,7 +455,7 @@ export function verifyInactiveIdentity(task, result, update, activationId, histo
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
   const historicalSupersession = update.card.completionMode === HISTORICAL_RUNTIME_MODE && verifyHistoricalRuntimeSupersession(task, result, update, historicalContext);
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedN44ClosedSuccessorContinuation(task,result,update) || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedStageContinuation(task,result,update) || verifiedN44FrontendPrerequisiteStage(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || verifiedN88NegativeInertReconciliation(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedN44ClosedSuccessorContinuation(task,result,update) || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedStageContinuation(task,result,update) || verifiedN44FrontendPrerequisiteStage(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || verifiedN88NegativeInertReconciliation(task,result,update) || verifiedTwoCurrentInertReceipts(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -484,6 +575,16 @@ export function revisedTask(task, update, commit, at, historicalContext = null) 
     saved.status = 'delivery'; saved.nextDeliveryAt = at; saved.lastFailure = null;
     saved.sourceParityHistory = [...(task.sourceParityHistory ?? []), { at, reason: update.materialReason, receipt: structuredClone(task.deliveryReceipt) }];
     saved.sourceParityState = null;
+  }
+  if(update.card.completionMode==='reconcile_two_current_inert_receipts'){
+    insist(verifiedTwoCurrentInertReceipts(task,json(task.resultPath),update),'Exact inert source proof invalid at activation');
+    insist(verifiedDeployment(saved,saved.deliveryReceipt),'Reconciled inert source does not qualify as deployed');
+    saved.status='awaiting_po';saved.productionVerifiedAt=saved.deliveryReceipt.verifiedAt;
+    saved.deliveryOwner=null;saved.nextDeliveryAt=null;
+    saved.publisherReconciliation={at,commit,publishedSha:saved.deliveryReceipt.publishedSha,
+      originalDeliveryReceiptSha256:sha256(bytes(task.deliveryReceipt)),kind:'exact-inert-source-only',
+      readOnlyVerifiedPaths:update.card.verificationRepair.readOnlyVerifiedPaths,
+      reason:update.materialReason};
   }
   if (update.card.completionMode === 'reconcile_verified_publication') {
     insist(task.deliveryReceipt?.status === 'deployed' && verifiedDeployment(task,task.deliveryReceipt), 'Production receipt no longer qualifies for reconciliation');
