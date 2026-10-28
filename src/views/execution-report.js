@@ -1,5 +1,5 @@
 import '../lib/rakeez-datetime.js';
-import '../styles/filters.css';
+// Stylesheets are linked at view entry because Cloudflare Pages serves native ESM.
 /** تقارير التنفيذ المجمعة: بيانات الحصص المؤرخة فقط. */
 
 import { html, icon, fmtDate, fmtTimeRange, formatTimeRange, toast, openSheet } from '../lib/dom.js';
@@ -43,7 +43,19 @@ function profile(report = null) {
 
 export default {
   title: () => archiveRoute ? 'تقارير التنفيذ' : 'الحصص والحضور', subtitle: () => (yearId ? store.getYear(yearId)?.label : store.activeYear()?.label) ?? '', back: () => archiveRoute ? '#/archive' : '#/reports', wide: true,
-  beforeRender(params = {}) { termId = params.termId ?? store.activeTerm()?.id ?? null; yearId = params.yearId ?? null; archiveRoute = !!params.termId; status = 'all'; teachingId = 'all'; from = ''; to = ''; },
+  beforeRender(params = {}) {
+    if (!document.getElementById('report-filter-style')) {
+      const style = document.createElement('link');
+      style.id = 'report-filter-style';
+      style.rel = 'stylesheet';
+      style.href = new URL('../styles/filters.css', import.meta.url).href;
+      document.head.append(style);
+    }
+    termId = params.termId ?? store.activeTerm()?.id ?? null;
+    yearId = params.yearId ?? null;
+    archiveRoute = !!params.termId;
+    status = 'all'; teachingId = 'all'; from = ''; to = '';
+  },
   render() {
     const report = scoped(); const rows = filters(report); const selectedTerm = store.getTerm(termId) ?? store.activeTerm();
     const emptyTerm = !report.teachings.length && !report.rows.length;

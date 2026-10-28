@@ -62,3 +62,9 @@ These are techniques and workflows, not a direction to auto-install all third-pa
 
 ## Cross-browser audit caveat (current)
 The **30-route full gate is verified on Chromium only**. Focused WebKit/Firefox tests of Schedule/Home from earlier Preview rounds succeeded, but optional full-inventory WebKit and Firefox commands are currently blocked by unstable Demo class context during the audit bootstrap. A separate WebKit Demo-only boot probe did load 8 synthetic classes and 184 students. We have not established whether the scanner's workspace transition or Product initialization causes the inconsistent class state; do not claim these full browser audits passed. Preserve their failed diagnostic evidence locally and investigate without touching Auth, Sync or active N88/N44/N36 scopes.
+
+
+## Additional live-Preview finding: strict native ESM CSS import
+The original execution-report view imported filters.css directly as a JavaScript module. The Cloudflare Pages preview serves the source JS as native ESM and the CSS resource as text/css, which a browser rejects as a module. The source-level issue also exists on the contemporaneous main branch, so local Vite build success hid a real deployed-navigation failure.
+
+The candidate replaces that static CSS import with the existing first-party pattern already used by Grades and cross-class Reports: an idempotent link rel=stylesheet inserted in beforeRender. A new node:test contract, tests/ux-native-esm-contract.test.mjs, checks all JavaScript sources against bare CSS module imports. The Preview must be revalidated after this correction; a local PASS is not sufficient.
