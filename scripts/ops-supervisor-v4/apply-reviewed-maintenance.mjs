@@ -361,22 +361,23 @@ export function verifiedTwoCurrentInertReceipts(t,r,u) {
   } else {
     if(!same(c.preparationAuthority,{publication:true,publicationScope:spec.scope})) return false;
   }
+  const withinScope=file=>t.allowedPaths.some(p=>p===file||p.endsWith('/**')&&file.startsWith(p.slice(0,-2)));
   const original=t.verificationPaths;
-  const readOnly=original.filter(x=>!t.allowedPaths.includes(x));
+  const readOnly=original.filter(x=>!withinScope(x));
   if(!Array.isArray(original)||!original.length||
      !same(c.verificationPaths,spec.verification??original)||
-     !same(c.verificationPaths,original.filter(x=>t.allowedPaths.includes(x)))||
+     !same(c.verificationPaths,original.filter(x=>withinScope(x)))||
      !same(p?.originalVerificationPaths,original)||!same(p?.readOnlyVerifiedPaths,readOnly)||
      !Array.isArray(r.checks)||!r.checks.length||
      !t.requiredChecks.every(name=>r.checks.some(x=>x.name===name&&x.status==='PASS'))||
      !r.checks.every(x=>x.status==='PASS'||
        t.id==='n88-item-after-negative-1028'&&x.name==='production_publication'&&x.status==='NOT_RUN'&&
        t.postDeliveryChecks?.includes('production_publication')&&!t.requiredChecks.includes('production_publication')))return false;
-  if(r.changedPaths?.some(file=>!t.allowedPaths.includes(file))||
+  if(r.changedPaths?.some(file=>!withinScope(file))||
      !Array.isArray(d.changedPaths)||!d.changedPaths.length||
-     d.changedPaths.some(file=>!t.allowedPaths.includes(file))||
+     d.changedPaths.some(file=>!withinScope(file))||
      !Array.isArray(d.sourceOnlyPaths)||!d.sourceOnlyPaths.length||
-     d.sourceOnlyPaths.some(file=>!d.changedPaths.includes(file)||!t.allowedPaths.includes(file))) return false;
+     d.sourceOnlyPaths.some(file=>!d.changedPaths.includes(file)||!withinScope(file))) return false;
   if(p?.version!==1||p.kind!=='n44-n88-exact-inert-receipt-v1'||
      p.originalReceiptSha256!==sha256(bytes(d))||
      p.originalResultSha256!==sha256(bytes(r))||
