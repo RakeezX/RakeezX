@@ -4,6 +4,7 @@ import {n88TypedReadTask,buildN88TypedReadEvidence,verifiedN88TypedReadPublicati
 import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
 import fs from 'node:fs';
+import {verifiedN44MobileOwnedWorktree} from './n44-mobile-owned-worktree.mjs';
 import {verifyOwnedPostPushRecovery} from './owned-postpush-recovery.mjs';
 import {verifyN44InterruptedResume} from './n44-interrupted-resume.mjs';
 import {verifiedN44SourceStageSplit,n44QualifiedTask} from './n44-qualified-source-evidence.mjs';
@@ -653,7 +654,17 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     }
     verifyInactiveIdentity(task, result, update, payload.activationId, historicalContext);
     if(update.card.verificationPathRepair?.blockedJournalSha256||update.card.verificationPathRepair?.publishedJournalSha256){const jf=path.join(rt,'delivery',task.id,update.expected.candidateSha+'.journal.json');noLinks(jf);prepareVerificationJournalRepair(task,update,fs.readFileSync(jf));}
-    insist(equalPath(task.worktreePath, path.join(root, '.worktrees', task.id)), 'Task worktree is outside its owned path');
+    let reviewedN44CustodianPath = false;
+    if (task.id === 'continuous-n44-two-mobile-actual-trial-20261028' && update.n44OriginalWorktreeProof) {
+      insist(payload.requireNoActiveWorkers === true && !plan.allowActiveTaskIds.length, 'N44 custodian continuation requires global idle');
+      const ownerFile=path.join(rt,'queue','continuous-n44-one-approved-closed-page-push-20261019.json');
+      const deliveryFile=path.join(rt,'queue','continuous-n44-disclosure-frontend-delivery-20261028.json');
+      noLinks(ownerFile);noLinks(deliveryFile);
+      const ownerRaw=fs.readFileSync(ownerFile),deliveryRaw=fs.readFileSync(deliveryFile),ownerTask=parse(ownerRaw),deliveryTask=parse(deliveryRaw);
+      reviewedN44CustodianPath=verifiedN44MobileOwnedWorktree({task,owner:ownerTask,delivery:deliveryTask,update,root,ownerSha256:sha256(ownerRaw),deliverySha256:sha256(deliveryRaw),frontendVerified:verifiedDeployment(deliveryTask,deliveryTask.deliveryReceipt)});
+      if(reviewedN44CustodianPath)git(['merge-base','--is-ancestor',ownerTask.candidateSha,result.candidateSha],task.worktreePath);
+    }
+    insist(equalPath(task.worktreePath, path.join(root, '.worktrees', task.id)) || reviewedN44CustodianPath, 'Task worktree is outside its owned path');
     noLinks(task.worktreePath);
     insist(git(['rev-parse', 'HEAD'], task.worktreePath) === update.expected.candidateSha, 'Worktree HEAD differs from preserved candidate: ' + task.id);
     if(update.card.completionMode==='reconcile_live_service_publication'){

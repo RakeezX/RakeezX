@@ -1,0 +1,3 @@
+# N44 exact admitted custodian ownership repair
+
+The guarded helper rejected child-card continuation because the already admitted child preserves the original private worktree. No mutation occurred. This repair requires the exact child/parent/session/grant, both inactive, unchanged scopes/checks/authority, exact queue preimages, qualified frontend served proof, original-candidate ancestry, saved-result HEAD and global idle. Ordinary path ownership and all other guards remain. No alternate dispatcher, queue edit, credential copy, budget reset or live action. Installed through the same helper files-only before a separately reviewed resume.
