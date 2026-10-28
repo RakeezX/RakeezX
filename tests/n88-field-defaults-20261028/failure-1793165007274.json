@@ -1,0 +1,86 @@
+{
+  "taskId": "n88-fields-1028",
+  "runId": "3fab0d26-7de3-4b7b-bfc0-35e13783c3c6",
+  "base": "5a043dcd8201fcb10161e456e4b301222c843755",
+  "checks": [],
+  "matrix": [
+    {
+      "width": 320,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    }
+  ],
+  "pageErrors": [],
+  "realOperations": 0,
+  "cleanup": {
+    "browserClosed": true,
+    "serverClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "matrixReuse": "matrix-result.json",
+  "failure": {
+    "stage": "failed read creates no form or defaults",
+    "message": "locator.waitFor: Timeout 9000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-action=refresh]') to be visible\u001b[22m\n",
+    "stack": "locator.waitFor: Timeout 9000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-action=refresh]') to be visible\u001b[22m\n\n    at boot (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-fields-1028\\tests\\n88-field-defaults-20261028\\cases.mjs:21:107)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-fields-1028/tests/n88-field-defaults-20261028/cases.mjs:55:50"
+  }
+}

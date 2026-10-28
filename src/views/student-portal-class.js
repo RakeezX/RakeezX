@@ -14,6 +14,8 @@ export function beginAccessDelivery(text, {copy, share=null}) {
 }
 const rowIcon=kind=>`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${kind==='rotate'?'<path d="M20 7v5h-5M19 12a7 7 0 1 0-2 5M20 7l-3-3"/>':'<circle cx="12" cy="12" r="8"/><path d="m6.5 6.5 11 11"/>'}</svg>`;
 const SELECTABLE_FIELDS = Object.freeze(['grades','required','scheduled','completed']);
+// AI: form-only defaults after an authoritative revision-zero read; never publish on read.
+const INITIAL_POLICY_DRAFT = Object.freeze({name:true,class:true,grades:false,required:true,scheduled:true,completed:true});
 const labels = { name:'اسم الطالب', class:'الفصل', grades:'الدرجات', required:'المهام المطلوبة', completed:'المهام المكتملة', scheduled:'المهام المجدولة' };
 // Display-only ordering: credentials remain attached to their stable identities.
 const rosterCollator = new Intl.Collator('ar', { numeric:true, sensitivity:'base' });
@@ -98,11 +100,13 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     const focusAction = root.contains(focused) ? { action: focused.dataset.action, index: focused.dataset.index, name: focused.name, summary: focused.tagName==='SUMMARY'?focused.parentElement.className:null } : null;
     settingsOpen = panel.querySelector('.n88-class-settings')?.open ?? settingsOpen;
     root.setAttribute('aria-busy', String(busy));
+    const formFields = draft ?? roster?.visibility;
+    const unsaved = !!roster && (roster.policyRevision === 0 || !!draft && PORTAL_FIELDS.some(f => draft[f] !== roster.visibility[f]));
     const issueBlocked = !writable || uncertainMutation || !roster?.credentialRevision || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0);
     const issueExplanation = uncertainMutation ? 'نتيجة عملية سابقة غير مؤكدة. نجاح قراءة القائمة لا يؤكد إنشاء الرموز؛ لا يمكن إعادة الإنشاء قبل إقرار مصير الطلب.' : roster && !roster.credentialRevision ? 'القائمة مقروءة، لكن مراجعة إصدار الرموز غير متاحة؛ إنشاء الرموز متوقف لحماية الطلبات السابقة.' : '';
     panel.innerHTML = `<section aria-label="ما يراه الطلاب"><header class="n88-class-heading"><div><p class="n88-eyebrow">مساحة الطلاب</p><h2>${esc(classLabel())}</h2></div></header><nav class="n88-class-nav" aria-label="إعداد مساحة الطلاب"><button class="btn" data-action="open-guidance">المهام المطلوبة وتعليماتها</button><button class="btn" data-action="open-settings">ما يراه الطلاب: الحقول والدرجات</button></nav>
       <div class="n88-class-status"><p role="status" aria-live="polite">${esc([message || (!ready?'مساحة الطلاب غير مفعّلة حاليًا.':busy&&!roster?'جارٍ قراءة القائمة…':''),issueExplanation].filter(Boolean).join(' '))}</p>${ready ? `<button class="btn" data-action="refresh" ${busy?'disabled':''}>إعادة التحقق من الحالة الحالية</button>`:''}</div>
-      ${roster ? `<details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${SELECTABLE_FIELDS.filter(f=>roster.visibility[f]).length} من ${SELECTABLE_FIELDS.length}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر ما يراه الطلاب ثم احفظ</legend><p class="n88-editor-help">اسم الطالب والفصل بيانات هوية ثابتة عند حفظ السياسة.</p>${!roster.visibility.name||!roster.visibility.class?'<p data-legacy-identity class="n88-editor-help">السياسة السابقة تخفي الاسم أو الفصل. لن تتغير إلا بعد حفظك وإقرار الخادم؛ عرض الطلاب الحالي يتبع السياسة السابقة.</p>':''}<div class="n88-class-fields">${SELECTABLE_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${(draft ?? roster.visibility)[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}</section>`;
+      ${roster ? `<details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${SELECTABLE_FIELDS.filter(f=>formFields[f]).length} من ${SELECTABLE_FIELDS.length} مختار${unsaved?' · غير محفوظ':''}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر ما يراه الطلاب ثم احفظ</legend><div class="n88-class-fields">${SELECTABLE_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${formFields[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}</section>`;
     accessRoot.innerHTML = `<details class="n88-code-management" ${rosterOpen?'open':''}><summary>إدارة رموز الطلاب <small>${roster?esc(roster.students.length):''}</small></summary><div class="n88-code-body">
       <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'الطلاب: '+esc(roster.students.length)+' · الرموز الفعّالة: '+esc(roster.students.filter(s=>s.hasActiveCode===true).length)+(busy||retry?' · آخر حالة مؤكدة':'') : 'لم تُؤكّد القائمة بعد'}</p>${ready?`<button class="btn btn--primary" data-action="batch" ${issueBlocked?'disabled':''}>إنشاء الرموز الناقصة${roster?` (${roster.students.filter(s=>!s.hasActiveCode&&s.credentialVersion===0).length})`:''}</button>`:''}</div>
       ${resolution?.eligible?`<button class="btn" data-action="close-unknown" ${busy?'disabled':''}>إغلاق الطلب السابق دون إنشاء رموز</button><p>يسجّل إغلاقًا جديدًا يمنع تنفيذ الطلب المتأخر؛ لا يثبت أن المحاولة السابقة تراجعت.</p>`:''}${resolution?.canRecover?`<button class="btn" data-action="recover-closure" ${busy?'disabled':''}>مراجعة إقرار الإغلاق مرة واحدة</button>`:''}
@@ -150,6 +154,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
           else if(result.reconciliation?.length&&result.reconciliation.every(x=>x.state==='committed'))uncertainMutation=false;
           if (draft && draftRevision !== result.policyRevision) { draft = null; draftRevision = null; message = 'تغيّرت إعدادات الحقول؛ راجع اختيارك من جديد.'; }
           else message = result.reconciliation?.some(x=>x.state==='unknown') ? '' : result.reconciliation?.some(x=>x.state==='committed') ? 'تأكد إقرار العملية السابقة من السجل؛ عُرضت الحالة الحالية دون إعادة إنشائها.' : '';
+          if (!draft && result.policyRevision === 0) { draft = {...INITIAL_POLICY_DRAFT}; draftRevision = 0; }
         }
       } catch { if (valid(g, k)) { clearSecrets(); retry = true; message = 'تعذّرت قراءة القائمة. البيانات المعروضة من آخر قراءة مؤكدة؛ راجعها للمتابعة.'; } }
       finally {
@@ -253,6 +258,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
     if (!e.target.closest('[data-visibility]') || !roster) return;
     draft = Object.fromEntries(PORTAL_FIELDS.map(f => [f, f==='name'||f==='class'?true:root.querySelector(`[name="${f}"]`).checked]));
     draftRevision = roster.policyRevision;
+    draw();
   };
   const changed = () => {
     if (key() === boundKey) return;

@@ -1,0 +1,112 @@
+{
+  "taskId": "n88-fields-1028",
+  "runId": "3fab0d26-7de3-4b7b-bfc0-35e13783c3c6",
+  "base": "5a043dcd8201fcb10161e456e4b301222c843755",
+  "checks": [
+    {
+      "name": "n88_remove_two_identity_explanation_paragraphs_no_fake_server_fix",
+      "status": "PASS",
+      "evidence": "Absent in actual zero, legacy and active saved UI; four checkboxes only; identity remains fixed in six-key explicit saves."
+    },
+    {
+      "name": "n88_new_policy_form_required_scheduled_completed_checked_grades_off",
+      "status": "PASS",
+      "evidence": "Revision-zero server all-false stays unchanged while draft is 3/4 unsaved; toggles/count/refresh and failed reads never auto-save."
+    },
+    {
+      "name": "n88_existing_saved_visibility_preserved_six_key_explicit_ack_only",
+      "status": "PASS",
+      "evidence": "Revision 7 all-false/mixed grades-on preserved exactly; guarded client CAS and ACK; 503/malformed ACK retain draft and unchanged server fixture."
+    },
+    {
+      "name": "n88_owner_unknown_issuance_and_guidance_safe_ui_320_390_768_1280",
+      "status": "PASS",
+      "evidence": "Eight actual-app RTL light/dark screenshots, 28 fabricated pupils, no overflow; UNKNOWN hint/disabled issue, read-only refresh, independent guidance error, real owner and lease guards retire drafts/stale reply."
+    },
+    {
+      "name": "n88_pwa_cache_update_and_no_n44_shared_sw_conflict",
+      "status": "PASS",
+      "evidence": "Fresh origin/main equals base; no running/delivery N44 SW owner at source edit. Only SW version byte change 93->94; shared leased fresh-context actual cache upgrade evicts v93, serves new teacher bytes offline; N88 API stays network-only; push unchanged."
+    }
+  ],
+  "matrix": [
+    {
+      "width": 320,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "rtl": true,
+      "overflow": false,
+      "targets": true,
+      "pupils": 28
+    }
+  ],
+  "pageErrors": [],
+  "realOperations": 0,
+  "cleanup": {
+    "browserClosed": true,
+    "serverClosed": true,
+    "browser": "RELEASED browser",
+    "integration": "RELEASED integration"
+  },
+  "matrixReuse": "matrix-result.json",
+  "sourceHashes": {
+    "src/views/student-portal-class.js": "1e2bf4b6958930061c940c9454108f7e413c941bb1d7ed5e338b7ee9a5454c3f",
+    "src/styles/student-portal-class.css": "d06d26c3d07f9c51aafa16a71280f68b9ba88ec3492cae686f4656a805fc3e77",
+    "sw.js": "1c57f3e10a13894c3f7485996fccb4db7e1fe535f348a3a6c68ba6119807259c"
+  }
+}
