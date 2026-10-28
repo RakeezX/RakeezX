@@ -196,6 +196,7 @@ const view = {
         <section class="n44-preference card card--pad" aria-labelledby="n44-quiet-heading">
           <h2 id="n44-quiet-heading">وقت الهدوء</h2>
           <button type="button" class="btn btn--quiet" role="switch" aria-checked="${String(!!quiet)}" data-act="notification-push-quiet" data-scope="${scope}" ${!push?.available ? 'disabled' : ''}>من 10 مساءً إلى 7 صباحًا</button>
+          <p data-n44-quiet-saved-state>وقت الهدوء المحفوظ: ${quiet ? 'مفعّل' : 'غير مفعّل'}</p>
           ${!push?.available ? html`<p>يمكن تعديل وقت الهدوء عند توفر تذكيرات الجهاز.</p>` : ''}
         </section>
         <p class="n44-settings-saved" role="status">تُحفظ تفضيلاتك على هذا الجهاز تلقائيًا.</p>
