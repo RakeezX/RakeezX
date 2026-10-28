@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-source-ui-binding-1028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100020,
+      "scopeKey": "n44-source-ui-readonly-binding",
+      "riskClass": "LOW",
+      "validationTier": "TARGETED",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "budgetMinutes": 55,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "n44-quiet-state-label-1028"
+      ],
+      "allowedPaths": [
+        "src/views/teaching-hub.js",
+        "src/lib/notification-source-readiness.js",
+        "tests/n44-source-ui-binding-1028.test.mjs",
+        "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+      ],
+      "verificationPaths": [
+        "src/views/teaching-hub.js",
+        "src/lib/notification-source-readiness.js"
+      ],
+      "requiredChecks": [
+        "mounted_context_capture_readonly_guards",
+        "encrypted_receipt_no_student_payload",
+        "browser_visible_support_binding_default_inert"
+      ],
+      "postDeliveryChecks": [],
+      "releaseAuthority": "Existing PO N44 completion and unrestricted read authorization covers narrow read-only UI diagnostic binding and source publication. No live account/data/notification mutation.",
+      "objective": "Resolve concrete N44 blocker: private captureSourceMetadata exists but no trusted binding to actual mounted store/cloud/document. Root supported cua_repl can read existing Chrome Rakeez tab; CLI worker browser absence must not halt code preparation. Read actual private capture implementation and evidence at po-20261028-n44-browser-surface/observation.json, but never publish private custody code/secrets or import its Node module into frontend. Implement minimal explicit read-only diagnostic integration in teaching-hub and a new browser-safe notification-source-readiness module, using actual mounted store/cloud and existing Sync/notification/date helpers, not global injection or fabricated snapshots. A collapsed support diagnostic must bind a bounded original-custodian public challenge (public key, grant/task/run, expiry and approved owner/workspace hashes; no secrets), collect only selected teaching ancestry/revisions plus source IDs and Sync guards, encrypt locally for original custodian, and expose bounded downloadable receipt. No student names/scores/token/session material, telemetry or outbound requests for capture. No data/preference mutation, registration, source creation or send. Do not mark current desktop as an authorized phone: distinguish read-only capture device provenance from the two registered send recipients, preserve owner/workspace verification; report precise private-adapter compatibility delta needed before live use rather than weaken device checks. Default no capture until explicit challenge/action, reject malformed/expired/mismatched challenge, missing/replaced context, pending writes and invalid calendar. Minimize normal UI clutter within support disclosure. Reuse semantics of existing capture tests and implement focused browser-side tests including actual API signatures; no stand-in getX methods assumed without inspecting store. Original parent may perform actual UI readback using supported browser after publication. Produce usable source integration and instructions for original-custodian challenge generation and receipt admission, not another abstract adapter requiring absent ports. Any private producer changes belong subsequent original core task; report exact interface needed. No live grant consumption. Current midnight window missed unless all real requirements proven in time; do not fake time. Single source-only publisher; N44 remains OPEN.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "6a637684df7b9cfde8527a1e6030687d0ac9a685",
+        "requiredSourcePaths": [
+          "src/views/teaching-hub.js",
+          "src/lib/notification-events.js",
+          "src/lib/sync-operational-ui.js"
+        ],
+        "editPaths": [
+          "src/views/teaching-hub.js",
+          "src/lib/notification-source-readiness.js",
+          "tests/n44-source-ui-binding-1028.test.mjs",
+          "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+        ],
+        "newPaths": [
+          "src/lib/notification-source-readiness.js",
+          "tests/n44-source-ui-binding-1028.test.mjs",
+          "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+        ],
+        "workerChecks": [
+          "mounted_context_capture_readonly_guards",
+          "encrypted_receipt_no_student_payload",
+          "browser_visible_support_binding_default_inert"
+        ],
+        "publisherChecks": []
+      },
+      "acceptance": [
+        "Saved quiet ON/OFF plainly visible even when control disabled; no behavior changes.",
+        "Exact served source verified by publisher; no claim of phone state or live acceptance."
+      ]
+    }
+  ]
+}
