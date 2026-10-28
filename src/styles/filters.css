@@ -121,3 +121,13 @@
     white-space: normal;
   }
 }
+
+
+/* UX System Quality V1: focusable horizontal execution table, screen only. */
+@media screen {
+  .execution-report-page .print-tablewrap:focus-visible {
+    outline: 3px solid var(--action-focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+  }
+}

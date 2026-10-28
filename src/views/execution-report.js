@@ -1,5 +1,5 @@
 import '../lib/rakeez-datetime.js';
-import '../styles/filters.css';
+// Stylesheets are linked at view entry because Cloudflare Pages serves native ESM.
 /** تقارير التنفيذ المجمعة: بيانات الحصص المؤرخة فقط. */
 
 import { html, icon, fmtDate, fmtTimeRange, formatTimeRange, toast, openSheet } from '../lib/dom.js';
@@ -43,7 +43,19 @@ function profile(report = null) {
 
 export default {
   title: () => archiveRoute ? 'تقارير التنفيذ' : 'الحصص والحضور', subtitle: () => (yearId ? store.getYear(yearId)?.label : store.activeYear()?.label) ?? '', back: () => archiveRoute ? '#/archive' : '#/reports', wide: true,
-  beforeRender(params = {}) { termId = params.termId ?? store.activeTerm()?.id ?? null; yearId = params.yearId ?? null; archiveRoute = !!params.termId; status = 'all'; teachingId = 'all'; from = ''; to = ''; },
+  beforeRender(params = {}) {
+    if (!document.getElementById('report-filter-style')) {
+      const style = document.createElement('link');
+      style.id = 'report-filter-style';
+      style.rel = 'stylesheet';
+      style.href = new URL('../styles/filters.css', import.meta.url).href;
+      document.head.append(style);
+    }
+    termId = params.termId ?? store.activeTerm()?.id ?? null;
+    yearId = params.yearId ?? null;
+    archiveRoute = !!params.termId;
+    status = 'all'; teachingId = 'all'; from = ''; to = '';
+  },
   render() {
     const report = scoped(); const rows = filters(report); const selectedTerm = store.getTerm(termId) ?? store.activeTerm();
     const emptyTerm = !report.teachings.length && !report.rows.length;
@@ -117,4 +129,4 @@ export default {
   },
 };
 
-function executionTable(rows) { return html`<div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th>التاريخ</th><th>الفصل</th><th>المادة</th><th>الحصة</th><th>الوقت</th><th>الحالة</th><th>الحضور</th></tr></thead><tbody>${rows.map((row) => { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; const time = row.session.startTime ? fmtTimeRange(row.session.startTime, row.session.endTime) : '—'; return html`<tr><td>${fmtDate(row.session.date, false)}</td><td>${sectionLabel(row.section)}</td><td>${subject}</td><td class="tabular">${row.session.period}</td><td class="tabular">${time}</td><td>${statusText(row.completeness.state)}</td><td class="tabular">${row.completeness.expected ? `${row.completeness.recorded}/${row.completeness.expected}` : '—'}</td></tr>`; })}</tbody></table></div>`; }
+function executionTable(rows) { return html`<div class="tablewrap scroll-x print-tablewrap" tabindex="0" role="region" aria-label="جدول تنفيذ الحصص، قابل للتمرير أفقيًا"><table class="gtable gtable--report"><thead><tr><th>التاريخ</th><th>الفصل</th><th>المادة</th><th>الحصة</th><th>الوقت</th><th>الحالة</th><th>الحضور</th></tr></thead><tbody>${rows.map((row) => { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; const time = row.session.startTime ? fmtTimeRange(row.session.startTime, row.session.endTime) : '—'; return html`<tr><td>${fmtDate(row.session.date, false)}</td><td>${sectionLabel(row.section)}</td><td>${subject}</td><td class="tabular">${row.session.period}</td><td class="tabular">${time}</td><td>${statusText(row.completeness.state)}</td><td class="tabular">${row.completeness.expected ? `${row.completeness.recorded}/${row.completeness.expected}` : '—'}</td></tr>`; })}</tbody></table></div>`; }

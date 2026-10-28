@@ -8589,3 +8589,262 @@
   .n133-full-name { display:inline !important; }
   .n133-short-name { display:none !important; }
 }
+
+
+/* UX Skills Pilot 2026-10-28: scoped class hub/roster readability and native touch, preview only. */
+@media screen {
+  .students-roster-page .roster-summary { color: var(--text-2); }
+  .students-roster-page .roster-row .row__title { font-size: 14px; line-height: 1.45; }
+  .students-roster-page .roster-row .row__sub { font-size: 11px; line-height: 1.5; }
+  .class-hub .class-hub-header__sub { font-size: 12px; }
+  .class-hub .class-tool-card .tile__title { font-size: 14px; }
+  .class-hub .class-tool-card .tile__sub { font-size: 11px; }
+}
+@media screen and (max-width: 899px) {
+  .students-roster-page .roster-row .iconbtn {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+  }
+}
+@media screen and (max-width: 520px) {
+  .students-roster-page .roster-row .row__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+  }
+  .students-roster-page .roster-row .row__main { min-inline-size: 0; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .class-hub .class-tool-card,
+  .students-roster-page .roster-row .row__main {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .class-hub .class-tool-card { transition: none; }
+}
+
+/* UX Skills Preview round 2: compact, keyboard-accessible teacher actions on phones. */
+.roster-populated-actions__primary { display: flex; flex-wrap: wrap; gap: var(--sp-2); min-inline-size: 0; }
+.roster-populated-actions__primary .btn { min-block-size: var(--tap); }
+@media screen and (max-width: 640px) {
+  .roster-populated-actions { display: grid; grid-template-columns: minmax(0,1fr); gap: 8px; }
+  .roster-populated-actions > .roster-populated-actions__primary,
+  .roster-populated-actions > .roster-entry-actions {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+    inline-size: 100%;
+    min-inline-size: 0;
+    grid-column: 1;
+    margin: 0;
+  }
+  .roster-populated-actions .btn {
+    min-block-size: 44px;
+    min-inline-size: 0;
+    padding-inline: 6px;
+    padding-block: 9px;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+    justify-content: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+@media screen and (max-width: 360px) {
+  .class-hub > .section.class-tools-section .quick-tools-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card {
+    grid-template-columns: 34px minmax(0,1fr);
+    min-block-size: 90px;
+    padding: 9px;
+    gap: 7px;
+    align-items: center;
+    min-inline-size: 0;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card .tile__icon {
+    inline-size: 34px;
+    block-size: 34px;
+    border-radius: 10px;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card .tile__icon svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card .tile__title {
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+@media screen and (max-width: 520px) {
+  .class-hub .class-hub-stats .stat__label { font-size: 11px; line-height: 1.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .roster-populated-actions .btn { transition: none; }
+}
+
+/* UX Skills Preview round 2: 24-class mobile list without losing class identity. */
+@media screen and (max-width: 520px) {
+  .classes-page .class-cards-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+  }
+  .classes-page .class-card {
+    min-block-size: 106px;
+    min-inline-size: 0;
+  }
+  .classes-page .class-card__main {
+    padding: 11px 10px;
+    gap: 7px;
+    min-inline-size: 0;
+  }
+  .classes-page .class-card__title { font-size: 14px; }
+  .classes-page .class-card__body {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    align-items: start;
+    gap: 4px;
+    padding-block-start: 7px;
+    min-inline-size: 0;
+  }
+  .classes-page .class-card__sub { font-size: 11px; line-height: 1.4; }
+  .classes-page .class-card__count {
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .classes-page .class-card__count .tabular { font-size: 13px; }
+  .classes-page .class-cards-grid > [data-section-roster] { grid-column: 1 / -1; }
+}
+
+
+/* UX Skills Preview round 3 — mobile attendance/readability and quick log ergonomics.
+   Scoped to the two lesson-time screens; no data, scoring, or session behavior. */
+@media screen and (max-width: 520px) {
+  .attendance-01c { gap: 10px; }
+  .attendance-01c__context { gap: 8px; padding: 10px; }
+  .attendance-01c__context-top { gap: 8px; }
+  .attendance-01c__identity { gap: 8px; }
+  .attendance-01c__icon { inline-size: 38px; block-size: 38px; border-radius: 11px; }
+  .attendance-01c__identity h2 { font-size: 16px; }
+  .attendance-01c__identity p { font-size: 12px; line-height: 1.4; }
+  .attendance-01c__date { padding-block: 8px 0; }
+  .attendance-01c__session-meta { gap: 5px; }
+  .attendance-01c__status-pill,
+  .attendance-01c__meta { min-block-size: 26px; padding: 3px 8px; font-size: 11px; }
+  .attendance-01c__progress { gap: 8px; padding: 9px 11px; }
+  .attendance-01c__progress-copy {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px 8px;
+  }
+  .attendance-01c__progress-copy strong { font-size: 12px; }
+  .attendance-01c__progress-copy > span { font-size: 11px; }
+  .attendance-01c__counts { gap: 4px; }
+  .attendance-01c__count { min-block-size: 27px; padding: 3px 6px; font-size: 10.5px; }
+  .attendance-01c__toolbar { gap: 7px; padding: 9px; }
+  .attendance-01c__row { padding-block: 8px; }
+  .attendance-01c__row .att-row__name { overflow-wrap: anywhere; }
+  .attendance-01c__row .att-row__name strong { font-size: 14px; line-height: 1.45; }
+  .attendance-01c__row .rollno { color: var(--text-2); }
+  .attendance-01c__row .att-row__note {
+    background: var(--bg-sunk);
+    border: 1px solid var(--border);
+  }
+
+  .quicklog-page .quicklog-toolbar { gap: 6px; padding: 8px 10px; }
+  .quicklog-page .quicklog__modes .segmented__btn { min-block-size: 44px; }
+  .quicklog-page .quicklog-filter-bar { gap: 6px; }
+  .quicklog-page .quicklog-filter-bar .quicklog-search .input {
+    font-size: 16px;
+    min-block-size: 44px;
+  }
+  .quicklog-page .quicklog-toolbar .classroom-meta-bar {
+    min-block-size: 34px;
+    padding-block-start: 4px;
+  }
+  .quicklog-page .qlcard__name { font-size: 13.5px; }
+  .quicklog-page .qlcard.is-unavail {
+    opacity: 1;
+    background: var(--bg-sunk);
+    border-style: dashed;
+  }
+  .quicklog-page .qlcard__hit { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .quicklog-page .qlcard__minus { touch-action: manipulation; }
+}
+.quicklog-page .qlcard__hit:focus-visible,
+.quicklog-page .qlcard__minus:focus-visible {
+  outline: 3px solid var(--brand-text);
+  outline-offset: -3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quicklog-page .qlcard,
+  .quicklog-page .qlcard__hit { transition: none; }
+  .quicklog-page .qlcard.is-plus,
+  .quicklog-page .qlcard.is-minus { animation: none; }
+}
+
+/* On narrow screens segmented controls use their space for 44px touch targets, not extra framing. */
+@media screen and (max-width: 520px) {
+  .quicklog-page .quicklog__modes,
+  .quicklog-page .quicklog-filter-bar .segmented {
+    padding: 0;
+    gap: 2px;
+  }
+  .quicklog-page .quicklog-filter-bar .segmented__btn { min-block-size: 44px; padding-inline: 4px; }
+}
+
+@media screen and (max-width: 520px) {
+  .quicklog-page .quicklog__filters .switch {
+    min-block-size: 44px;
+    padding-inline: 6px;
+    border-radius: var(--r-sm);
+  }
+  .quicklog-page .quicklog__filters .switch:focus-within {
+    outline: 2px solid var(--brand-text);
+    outline-offset: 2px;
+  }
+}
+
+
+/* UX Skills Preview round 4 — Keep Home's chosen session prominent but compact. */
+@media screen and (max-width: 520px) {
+  .page--home .today-focus {
+    min-block-size: 0;
+    padding: 12px 12px;
+    gap: 5px;
+    row-gap: 5px;
+  }
+  .page--home .today-focus__signal { margin: 0; }
+  .page--home .today-focus__title { font-size: 11px; }
+  .page--home .today-focus__class {
+    font-size: 17px;
+    line-height: 1.4;
+    margin-block-start: 1px;
+  }
+  .page--home .today-focus__detail {
+    font-size: 12.5px;
+    line-height: 1.45;
+    margin-block-start: 2px;
+  }
+  .page--home .today-focus__state { margin-block-start: 1px; font-size: 11px; }
+  .page--home .today-focus__action { min-block-size: 44px; }
+  .page--home .home-session-row {
+    min-block-size: 64px;
+    padding-block: 8px;
+    gap: 7px;
+  }
+  .page--home .home-session-row .row__sub { font-size: 11.5px; }
+}

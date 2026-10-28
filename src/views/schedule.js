@@ -506,6 +506,7 @@ export default {
       <!-- شريط الملخص وشريط التوقيت: محاذاة متوازنة ومتباعدة بشكل احترافي -->
       ${slots.length
         ? html`
+            <div class="schedule-summary-shell">
             <details class="n59-load-summary surface surface--flat">
               <summary class="schedule-summary-bar">
               <div class="schedule-summary-bar__stats">
@@ -520,12 +521,6 @@ export default {
                 </span>
                 <span class="n59-load-summary__hint">تفاصيل الفصول ${icon("chev")}</span>
               </div>
-              ${profile ? html`
-                <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${profile.name}">
-                  <span class="compact-timing-pill__icon" aria-hidden="true">${icon(timingProfileIcon(profile.name))}</span>
-                  <span>${profile.name}</span>
-                </a>
-              ` : ""}
               </summary>
               <div class="n59-load-summary__rows">
                 ${[...list].sort((a, b) => {
@@ -540,6 +535,12 @@ export default {
               </div>
 
             </details>
+            ${profile ? html`<a class="compact-timing-pill schedule-summary-profile-link" href="#/schedule/times"
+              title="أوقات الحصص — ${profile.name}" aria-label="فتح ملف أوقات الحصص: ${profile.name}">
+              <span class="compact-timing-pill__icon" aria-hidden="true">${icon(timingProfileIcon(profile.name))}</span>
+              <span>${profile.name}</span>
+            </a>` : ""}
+            </div>
           `
         : html`
             <div class="card card--pad mb-3 center">

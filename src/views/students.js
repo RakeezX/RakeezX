@@ -171,9 +171,11 @@ export default {
 
   topActions: (p) => !canOpenRoster(p) || !store.teachingContext(p.id).roster.length ? '' : html`
     <div class="roster-populated-actions">
-    ${rosterFileActions(p)}
-    <button class="btn roster-toolbar-action" data-act="import">${icon('upload')} لصق الأسماء</button>
-    <button class="btn roster-toolbar-action" data-act="add">${icon('plus')} إضافة طالب</button>
+      <div class="roster-populated-actions__primary" role="group" aria-label="إضافة الطلاب">
+        <button type="button" class="btn roster-toolbar-action" data-act="add">${icon('plus')} إضافة طالب</button>
+        <button type="button" class="btn roster-toolbar-action" data-act="import">${icon('upload')} لصق الأسماء</button>
+      </div>
+      ${rosterFileActions(p)}
     </div>
   `,
 
@@ -237,12 +239,12 @@ export default {
       <div class="searchbar roster-search">
         ${icon('search')}
         <input class="searchbar__input" type="search" data-input="search" data-fk="student-search"
-               value="${query}" placeholder="ابحث بالاسم أو رقم الكشف" autocomplete="off" aria-label="بحث الطلاب">
+               value="${query}" name="student-search" placeholder="ابحث بالاسم أو رقم الكشف" autocomplete="off" spellcheck="false" aria-label="بحث الطلاب">
         ${q ? html`<button type="button" class="iconbtn" data-act="clear-search" aria-label="مسح البحث">${icon('x')}</button>` : ''}
       </div>
 
       <div class="roster-summary t-3 fs-sm" aria-live="polite">
-        <span><span class="tabular fw-7">${shown.length}</span> من <span class="tabular fw-7">${roster.length}</span> طالبًا</span>
+        <span><span class="tabular fw-7">${shown.length}</span> من <span class="tabular fw-7">${roster.length}</span> ${roster.length === 1 ? "طالب" : "طالبًا"}</span>
       </div>
       </div>
 
@@ -259,7 +261,7 @@ export default {
                     <span class="rollno" aria-label="رقم الكشف ${s.displayNo ?? 'غير محدد'}">${s.displayNo ?? '—'}</span>
                     ${studentAvatar(s, 'sm')}
                     <a class="row__main" href="#/student/${s.id}?teaching=${tch.id}">
-                      <span class="row__title">${s.name}</span>
+                      <span class="row__title" title="${s.name}">${s.name}</span>
                       <span class="row__sub">
                         ${t.pct === null
                           ? 'لم تُرصد له درجات بعد'
@@ -294,7 +296,7 @@ export default {
                       <span class="rollno">${e.rollNo ?? '—'}</span>
                       ${studentAvatar(s, 'sm')}
                       <span class="row__main">
-                        <span class="row__title">${s.name}</span>
+                        <span class="row__title" title="${s.name}">${s.name}</span>
                         <span class="row__sub">
                           ${ENROLLMENT_STATUS[e.status] ?? e.status}
                           ${e.endDate ? html` · ${fmtDateFull(e.endDate)}` : ''}
