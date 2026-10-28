@@ -101,14 +101,15 @@ export function studentPortalProjectionQuality(input) {
 
 export function projectStudentPortal(input) {
   const s = readScope(input), { studentId, ownerId } = input;
-  const out = { version: STUDENT_PROJECTION_VERSION };
-  if (input.visibility == null) return out; // default: publish nothing
-  const policy = validateVisibilityPolicy(input.visibility);
-  if (scopeKeys.some(key => policy[key] !== input[key]) || policy.scopeStamp !== s.scopeStamp) deny();
+  const policy = input.visibility == null ? null : validateVisibilityPolicy(input.visibility);
+  if (policy && (scopeKeys.some(key => policy[key] !== input[key]) || policy.scopeStamp !== s.scopeStamp)) deny();
+  // AI: own identity is permanent after canonical admission. A supplied policy
+  // must still match the current scope before any response can be disclosed.
+  const out = { version: STUDENT_PROJECTION_VERSION,
+    profile: { name: s.student.name, classLabel: sectionLabel(s.section) } };
+  if (policy === null) return out; // no policy grants grades or work
   const enabled = key => policy.fields[key] === true;
   const grant = (kind, row) => policy.sources.find(source => source.kind === kind && source.sourceId === row.id && source.stamp === s.sourceStamp(kind, row));
-  if (enabled('name')) out.profile = { name: s.student.name };
-  if (enabled('class')) (out.profile ??= {}).classLabel = sectionLabel(s.section);
 
   if (enabled('grades')) {
     const published = s.items.filter(item => grant('item', item));
