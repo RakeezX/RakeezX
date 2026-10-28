@@ -184,6 +184,26 @@ export function reconcilableCheckOutcomes(task, result, receipt) {
 
 // Fresh proof only for the already-integrated N36 .11 candidate; no Product publication.
 export function verifiedObservedRepair(task, result, update) {
+ const bridgeCases={"n44-original-custodian-binding-source-20261028":{"candidate":"3b97aad9fe8cd37d5e6616a74958d804945f0bc1","run":"716dffc6-98ff-4275-99d2-1f7102d4c673","published":"d16735c8a00a0920b4aa848ad09fbbb730fb1410","source":"drafts/n44-push/activation/core-v1-binding.inactive.mjs","result":"be180f8839665c3f2b1f2e496f6100121653df6ab6168ce430979480c1145861","receipt":"21b75205501b20e2b78522ffd920c1fba13568f073baad8a6972f21637bf3ed4"},"n88-inactive-service-catalog-bridge-20261028":{"candidate":"f5d739c3dccb4266e342fca5bb5b69b47368fff2","run":"f062793f-0238-456c-a521-c28dc771f379","published":"6042d71eeae023380cd5bf7e84061d98d574711b","source":"drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs","result":"036a83bd27ba7534c31385f16ac46059086dbf1f06be3bf4b3424180c507ec62","receipt":"ba16c35e5ca907fab46575bb9e97e3a7f586523d8389e3ad7fc18b8f9ea42d47"}};
+ if(bridgeCases[task.id]) {
+  const spec=bridgeCases[task.id],c=update.card,p=c.verificationRepair,d=p?.observedReceipt;
+  const original=task.deliveryReceipt;
+  return c.completionMode==='reconcile_observed_publication' && task.status==='blocked'
+   && task.lastFailure==='Publisher returned incomplete or mismatched deployment proof'
+   && !task.liveMutation && !task.liveAuthorizationRef && !c.liveMutation && !c.liveAuthorizationRef
+   && result.state==='LOCAL_READY' && result.runId===spec.run && result.candidateSha===spec.candidate
+   && result.checks.every(x=>x.status==='PASS') && task.requiredChecks.every(n=>result.checks.some(x=>x.name===n&&x.status==='PASS'))
+   && sha256(bytes(result))===spec.result && sha256(bytes(original))===spec.receipt
+   && p?.originalReceiptSha256===spec.receipt && p.originalResultSha256===spec.result
+   && same(c.verificationPaths,[spec.source])
+   && same(c.preparationAuthority,{publication:true,publicationScope:'inactive source-only verified adapter'})
+   && c.releaseAuthority===task.releaseAuthority+' [Exact inactive source-only classification; no hosted activation.]'
+   && Object.entries(c).every(([k,v])=>['completionMode','verificationRepair','verificationPaths','preparationAuthority','releaseAuthority'].includes(k)||same(v,task[k]))
+   && d?.publishedSha===spec.published && Object.entries(original).every(([k,v])=>k==='evidence'||same(v,d[k]))
+   && ['immutable','production'].every(k=>same(d.evidence[k].assets.slice(0,-1),original.evidence[k].assets)&&d.evidence[k].assets.length===original.evidence[k].assets.length+1&&d.evidence[k].assets.at(-1).repoPath===spec.source)
+   && verifiedDeployment({...task,...c},d);
+ }
+
   const card=update.card, p=card.verificationRepair, old=task.deliveryReceipt, o=p?.observation, d=p?.observedReceipt;
   return card.completionMode==='reconcile_observed_publication'
     && task.id==='continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017'
@@ -641,7 +661,7 @@ export function revisedTask(task, update, commit, at, historicalContext = null) 
 
   if (update.card.completionMode==='reconcile_observed_publication') {
     const d=update.card.verificationRepair.observedReceipt;
-    insist(verifiedDeployment(task,d),'Observed Production receipt no longer qualifies');
+    insist(verifiedDeployment(saved,d),'Observed Production receipt no longer qualifies');
     saved.sourceParityHistory=[...(task.sourceParityHistory??[]),{at,reason:update.materialReason,receipt:structuredClone(task.deliveryReceipt)}];
     saved.deliveryReceipt=structuredClone(d); saved.status='awaiting_po';saved.productionVerifiedAt=d.verifiedAt;
     saved.deliveryOwner=null;saved.nextDeliveryAt=null;
