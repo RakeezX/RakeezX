@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-native-pg-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100013,
+      "scopeKey": "n88-durable-publication-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n88-durable-store-1028"
+      ],
+      "allowedPaths": [
+        "tests/n88-native-pg-1028/concurrency.test.mjs",
+        "tests/n88-native-pg-1028/run-local.mjs",
+        "docs/automation-evidence/20261028/N88_NATIVE_PG_QUALIFICATION.md",
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "tests/n88-durable-store-1028/transactions.test.mjs"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs"
+      ],
+      "requiredChecks": [
+        "n88_native_independent_connections_and_real_locks",
+        "n88_native_cas_rollback_late_ack_and_tombstone_races",
+        "n88_native_owner_privacy_and_exact_storage_identity",
+        "n88_owned_local_only_database_cleanup_no_hosted_ops"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only native PostgreSQL qualification and necessary causal fixes"
+      },
+      "releaseAuthority": "Latest direct PO requires N88 continue toward stable real service, resolves operational blockers using existing device/tools. This authorizes isolated LOCAL fabricated PostgreSQL qualification, ordinary unprivileged portable test runtime preparation if absent, and necessary source fixes; sole publisher may deliver inactive source-only. No hosted database, real account/student reads/writes, production SQL/Auth/RLS/schema or service activation is authorized by this local qualification card.",
+      "objective": "Continue SAME N88 implementation session after verified40b76a03/34e91039 durable adapter. Close the precise missing independent-connection native PostgreSQL proof; do not rerun unchanged16 PGlite+16 V2 campaign or produce another unexecutable prototype. Native tooling/Docker were unavailable, an environment setup issue: inspect existing machine tool/runtime inventory; if absent, prepare a bounded user-owned portable native PostgreSQL test runtime from official distribution with recorded provenance/hash/version, no admin/service/autostart/global PATH, no paid API/account or production credentials. This local fixture is newly fabricated, not a retired hosted fixture. Start only an owned loopback ephemeral cluster/port in ignored artifacts with safe local authentication, no external listen and bounded ownership cleanup. Execute exact inactive DDL in that scratch database only; actual PostgreSQL independent connections must contend for actual adapter locks, both CAS race orders, COMMIT/rollback/lostACK, immutable request outcomes, source retirement/tombstones, stale session/source and owner/student privacy. Use canonical fake rows/readers on the same transaction; document which genuine hosted writer lock integration remains missing rather than pretending local fixture proves deployed security. Fix concrete adapter/DDL/reader defects in listed source paths only, preserve OFF default, parameterization, grade algorithms and no replay. Never use hosted DSN, real secrets/service-role, real data, Docker daemon elevation, firewall/ACL changes, or bypass a tool rejection. Stop only owned local cluster by verified PID/birth and clean only owned temporary artifacts. Do not delete candidate/archive/evidence. Write minimal reproducible harness and exact install-readback remaining checklist tied to source hashes. User wants useful execution, not repetitive reviews; preserve valid prior evidence. No main push/provider deployment or queue editing; original controller and publisher only. LOCAL_READY only with the new real proof or BLOCKED with precise remaining cause and saved candidate.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "40b76a032d18b12e5ccaccfb4448ef769d10a181",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "tests/n88-durable-store-1028/transactions.test.mjs",
+          "docs/automation-evidence/20261028/N88_DURABLE_PUBLICATION_STORAGE.md"
+        ],
+        "editPaths": [
+          "tests/n88-native-pg-1028/concurrency.test.mjs",
+          "tests/n88-native-pg-1028/run-local.mjs",
+          "docs/automation-evidence/20261028/N88_NATIVE_PG_QUALIFICATION.md"
+        ],
+        "newPaths": [
+          "tests/n88-native-pg-1028/concurrency.test.mjs",
+          "tests/n88-native-pg-1028/run-local.mjs",
+          "docs/automation-evidence/20261028/N88_NATIVE_PG_QUALIFICATION.md"
+        ],
+        "workerChecks": [
+          "n88_native_independent_connections_and_real_locks",
+          "n88_native_cas_rollback_late_ack_and_tombstone_races",
+          "n88_native_owner_privacy_and_exact_storage_identity",
+          "n88_owned_local_only_database_cleanup_no_hosted_ops"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

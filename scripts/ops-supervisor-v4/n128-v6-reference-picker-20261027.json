@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "executionMode": "local",
+      "liveMutation": false,
+      "activationId": "po-20261012-continuous",
+      "dependsOn": [],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "id": "continuous-n128-v6-subject-picker-reference-20261027",
+      "productId": "N128",
+      "priority": -5650,
+      "scopeKey": "n128-v6-official-catalog-reference-only-current-main",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "budgetMinutes": 95,
+      "idleMinutes": 20,
+      "allowedPaths": [
+        "src/views/teachings.js",
+        "src/lib/subject-catalog.js",
+        "src/lib/official-v6-subject-data.js",
+        "src/lib/stage-subject-options.js",
+        "tests/stage-subject-options-v6.test.mjs",
+        "tests/stage-subject-chooser-v6.e2e.mjs",
+        "tests/stage-subject-v6-persistence.e2e.mjs",
+        "docs/automation-evidence/20261027/N128_V6_SUBJECT_CATALOG_REFERENCE_DELIVERY.md",
+        "sw.js"
+      ],
+      "verificationPaths": [
+        "src/views/teachings.js",
+        "src/lib/subject-catalog.js",
+        "src/lib/official-v6-subject-data.js",
+        "src/lib/stage-subject-options.js"
+      ],
+      "requiredChecks": [
+        "n128_catalog_1211_reference_rows_source_scope",
+        "n128_grade_program_track_picker_and_existing_subject_ids",
+        "n128_demo_persistence_two_subjects_no_duplicate_students",
+        "n128_current_main_no_schema_sync_restore_or_sw_changes",
+        "n128_current_main_safe_offline_route"
+      ],
+      "acceptance": [
+        "V6 catalog from tested 114-page National Curriculum Center guide presented as REFERENCE suggestions only for supported grade 1–12, program and appropriate secondary track. Never claim all programs officially effective in year 1448 or auto-bind a course to a Section server identity.",
+        "Any grade/program/track change clears mismatched selection. Current user subjects and custom subject fallback remain; built-in canonical subject IDs remain stable incl Arabic and PE aliases; no automatic rename/retag of historical teachers/students/grades.",
+        "Adding two materials to one section in synthetic demo persists across reload with one shared roster and separated Teaching and defaults. No schema/sync/Auth/RLS/backup/restore/SW/notification changes; old Product create guards stay.",
+        "Targeted 22/22 V6 tests, 5/5 UX and 3/3 synthetic persistence reused where exact source parity or rerun when changed; current-main dependent source must pass affected checks. If offline cache requires SW edit, BLOCKED and wait for N44 to finish rather than touch its scope or claim release."
+      ],
+      "preparationAuthority": {
+        "kind": "po_20261027_v6_catalog_if_qualified_source_release",
+        "sourceBranch": "preview/n71-v2-subject-20261026",
+        "sourceCommit": "61f7c90893fdf8561d395d5e2b688592aaf4af85",
+        "sourcePaths": [
+          "src/views/teachings.js",
+          "src/lib/subject-catalog.js",
+          "src/lib/official-v6-subject-data.js",
+          "src/lib/stage-subject-options.js",
+          "tests/stage-subject-options-v6.test.mjs",
+          "tests/stage-subject-chooser-v6.e2e.mjs",
+          "tests/stage-subject-v6-persistence.e2e.mjs"
+        ],
+        "withheldResearch": true,
+        "zeroNewLiveServiceOperations": true
+      },
+      "releaseAuthority": "Latest PO 2026-10-27 explicitly requests shipping the subject/material catalog if technically complete and independent of active N44 and N127. Only non-authoritative reference-based picker UI from 114-page V6 guide is authorized for focused source-only Product release after current-main persistence/identity/grade/program/track tests and served evidence. NO V2 persisted curriculum context, Supabase schema/RLS/Auth/Sync/Restore/SQL, student write path rewrites, or forced official effective-year attribution. If these checks cannot pass without SW clash or service change, BLOCKED with exact reason; no unauthorized workaround. Latest direct PO28October requests completing saved unfinished independent work and resolving operating blockers. This narrowly authorizes the necessary two-file SW cache registration and generation fix with affected offline verification, while protected product/data behavior remains unchanged.",
+      "objective": "In a new controller-owned isolated worktree based on latest original main, selectively PORT only V6 COURSE REFERENCE PICKER code from exact previously verified PR7 commit 61f7c90893fdf8561d395d5e2b688592aaf4af85: src/lib/official-v6-subject-data.js (1211 reference rows, guide SHA/provenance), src/lib/stage-subject-options.js, focused src/lib/subject-catalog.js builtin alias, and relevant src/views/teachings.js form/chooser improvements. Read source with git show/fetch exact named commit; never merge PR7 because change-subject is explicitly REJECTED and V2 server/restore is NOT ready. Do not import src/views/teaching-subject-change.js, src/lib/curriculum-*, teaching-hub.js, sw.js, src/lib/db.js, src/store.js, or tests of unsafe migrations. Maintain existing createTeaching and Rakeez subject identity and existing 'add another subject' UX; don't overwrite N127 src/views/teaching-hub.js. Run V6 unit/Chromium tests, synthetic data persistence and try current-main safe offline route check without modifying SW while N44 is active; report old OFFLINE_LEASE_LIMITED fixture failures as historical baseline (do not weaken guards). Cite current MOE public site displays fifth while SNCC sixth 114 pages; catalog presented as reference suggestions not certified 1448 complete implementation. If source conflict or validation failed, return BLOCKED not false PASS. Exact taskId/runId and real checks, sole publisher serializes integration and served Production. Never start another controller or Codex manually.\n\nMATERIAL PO-AUTHORIZED SCOPE REPAIR28October: the recorded N44 shared SW conflict is resolved: N44 current finite trial and N88 durable adapter scopes do not edit sw.js. Preserve candidate4db42308 and original session; update candidate to current main using bounded ordinary integration, never reset saved work. Explicitly allow ONLY adding the two picker dependencies to current SW cache manifest and one cache generation increment, preserving all current N44 click/push and N88 private network-only exclusions. The legacy check name n128_current_main_no_schema_sync_restore_or_sw_changes retains its original source-phase PASS/history; final guard must now additionally prove its documented ONLY SW exception, while schema/Sync/Restore/change-subject rejection stay unchanged. No required check removed. Add actual offline route check to required checks and re-run only affected cache/offline/source integration checks; reuse unchanged22catalog/chooser/persistence evidence. Before delivery inspect current main changes and preserve them. No real data, live service, Auth/RLS/schema, retired fixtures or public UI scope expansion. Sole controller/publisher only.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "1131917dd7cd69d7b094e78185cd6f633313c64e",
+        "requiredSourcePaths": [
+          "src/views/teachings.js",
+          "src/lib/subject-catalog.js",
+          "src/store.js",
+          "src/lib/offline-lease.js",
+          "sw.js"
+        ],
+        "editPaths": [
+          "src/views/teachings.js",
+          "src/lib/subject-catalog.js",
+          "src/lib/official-v6-subject-data.js",
+          "src/lib/stage-subject-options.js",
+          "tests/stage-subject-options-v6.test.mjs",
+          "tests/stage-subject-chooser-v6.e2e.mjs",
+          "tests/stage-subject-v6-persistence.e2e.mjs",
+          "docs/automation-evidence/20261027/N128_V6_SUBJECT_CATALOG_REFERENCE_DELIVERY.md",
+          "sw.js"
+        ],
+        "newPaths": [
+          "src/lib/official-v6-subject-data.js",
+          "src/lib/stage-subject-options.js",
+          "tests/stage-subject-options-v6.test.mjs",
+          "tests/stage-subject-chooser-v6.e2e.mjs",
+          "tests/stage-subject-v6-persistence.e2e.mjs",
+          "docs/automation-evidence/20261027/N128_V6_SUBJECT_CATALOG_REFERENCE_DELIVERY.md"
+        ],
+        "workerChecks": [
+          "n128_catalog_1211_reference_rows_source_scope",
+          "n128_grade_program_track_picker_and_existing_subject_ids",
+          "n128_demo_persistence_two_subjects_no_duplicate_students",
+          "n128_current_main_no_schema_sync_restore_or_sw_changes",
+          "n128_current_main_safe_offline_route"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
