@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import {n88DeniedReadTask,buildN88DeniedReadEvidence,verifiedN88DeniedReadPublication} from './n88-denied-read-publication.mjs';
 import {n88TypedReadTask,buildN88TypedReadEvidence,verifiedN88TypedReadPublication} from './n88-typed-read-publication.mjs';
+import { verifiedN134DeliveryGateSplit } from './n134-delivery-gates.mjs';
 import { verifiedN36SetupDeliveryGateSplit } from './n36-setup-delivery-gates.mjs';
 // Reviewed ops/card maintenance only. This is not a worker, scheduler or publisher.
 import fs from 'node:fs';
@@ -871,7 +872,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         && typeof update.card.objective === 'string' && update.card.objective.includes('VALIDATION CONTRACT REPAIR — 2026-10-17')
         && update.card.acceptance?.some(item => typeof item === 'string' && item.includes('Cloudflare provider/immutable/served Production parity'))
         && update.card.preparationAuthority?.publication === true;
-      insist(preservesChecks || verifiedN36SetupDeliveryGateSplit(state.task,json(state.task.resultPath),update,binding.baseline) || verifiedN44SourceStageSplit(state.task,json(state.task.resultPath),update,json(path.join(rt,'queue','continuous-n44-one-approved-closed-page-push-20261019.json'))) || n36PublisherGateSplit || verifiedPilotPreparation(state.task,json(state.task.resultPath),update), 'This helper cannot remove required checks');
+      insist(preservesChecks || verifiedN134DeliveryGateSplit(state.task,json(state.task.resultPath),update,binding.baseline) || verifiedN36SetupDeliveryGateSplit(state.task,json(state.task.resultPath),update,binding.baseline) || verifiedN44SourceStageSplit(state.task,json(state.task.resultPath),update,json(path.join(rt,'queue','continuous-n44-one-approved-closed-page-push-20261019.json'))) || n36PublisherGateSplit || verifiedPilotPreparation(state.task,json(state.task.resultPath),update), 'This helper cannot remove required checks');
     }
     insist(!dirtyPaths().length, 'Ops checkout must be clean before maintenance');
     const common = cwd => path.resolve(cwd, git(['rev-parse', '--git-common-dir'], cwd));
