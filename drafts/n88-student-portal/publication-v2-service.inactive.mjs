@@ -150,6 +150,9 @@ export function createPublicationV2Service({ executionMode, enabled = false, ori
         if (!tx?.state || !Array.isArray(tx.state.scopes) || !Array.isArray(tx.state.receipts) || typeof tx.beforeCommit !== 'function') fail();
         const auth = await authenticate(request, tx, student ? 'student' : 'teacher');
         if (auth?.current !== true || !id(auth.ownerId) || !id(auth.sessionId)) fail();
+        // AI: durable ports load ONLY the authenticated owner, in this same
+        // repository transaction. Existing synthetic ports need no load hook.
+        if (tx.bindOwner) await tx.bindOwner(auth.ownerId);
         const scope = student ? auth.scope : r?.scope;
         if (!exact(scope, scopeKeys) || !scopeKeys.every(k => id(scope[k])) || scope.ownerId !== auth.ownerId) fail();
         if (student) {
