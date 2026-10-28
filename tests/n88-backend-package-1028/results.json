@@ -1,0 +1,688 @@
+{
+  "taskId": "n88-backend-package-1028",
+  "runId": "ee57b00d-1c90-4926-8819-77989368fcc1",
+  "baseSha": "6096fe7c3232c728e5766b2f28b63fb015dde101",
+  "startedAt": "2026-10-28T19:47:03.833Z",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-backend-package-1028\\artifacts\\n88-backend-package-1028-58d8a31d-9163-4a0b-8667-32ee500252db.tmp",
+  "checks": [
+    {
+      "name": "owned_host_original_sdk_actual_finite_functions_empty_class",
+      "status": "PASS",
+      "evidence": {
+        "actualRole": "n88_v2_runtime",
+        "actualFiniteFunctions": 14,
+        "noDirectV2Sql": true,
+        "originalSDK": true,
+        "emptyPupils": true
+      }
+    },
+    {
+      "name": "native_bridge_numeric_codec_own_privacy_1",
+      "status": "PASS",
+      "evidence": {
+        "pupils": 1,
+        "actualBridgeNumericCodec": true,
+        "hiddenChildAndParentAggregateAbsent": true
+      }
+    },
+    {
+      "name": "native_bridge_numeric_codec_own_privacy_30",
+      "status": "PASS",
+      "evidence": {
+        "pupils": 30,
+        "actualBridgeNumericCodec": true,
+        "hiddenChildAndParentAggregateAbsent": true
+      }
+    },
+    {
+      "name": "native_bridge_numeric_codec_own_privacy_50",
+      "status": "PASS",
+      "evidence": {
+        "pupils": 50,
+        "actualBridgeNumericCodec": true,
+        "hiddenChildAndParentAggregateAbsent": true
+      }
+    },
+    {
+      "name": "real_role_acl_nonexposure_and_denied_privileges",
+      "status": "PASS",
+      "evidence": {
+        "denials42501": 6,
+        "noRuntimeAuthScanOrCanonicalWriteOrRawPrivateRead": true,
+        "foreignOwnScopeOnly": true,
+        "role": {
+          "rolsuper": false,
+          "rolbypassrls": false,
+          "rolinherit": false,
+          "rolcanlogin": false
+        }
+      }
+    },
+    {
+      "name": "real_bridge_owner_fk_writer_lock_and_cas_race",
+      "status": "PASS",
+      "evidence": {
+        "wait": {
+          "pid": 9960,
+          "wait_event_type": "Lock",
+          "blockers": [
+            34912
+          ]
+        },
+        "twoRealConnections": true,
+        "oneCasWinner": true,
+        "newSourceUnpublished": true
+      }
+    },
+    {
+      "name": "native_bridge_lost_commit_ack_unknown_original_status_no_replay",
+      "status": "PASS",
+      "evidence": {
+        "committedReceiptBeforeAck": true,
+        "unknownNoReplay": true,
+        "originalStatusConfirmed": true
+      }
+    },
+    {
+      "name": "original_session_revocation_and_numeric_expiry_deny",
+      "status": "PASS",
+      "evidence": {
+        "originalTeacherCurrentSession": true,
+        "originalNumericExpiry": true
+      }
+    },
+    {
+      "name": "original_writer_parent_child_receipt_atomic_rollback_and_restore_no_revival",
+      "status": "PASS",
+      "evidence": {
+        "events": [
+          "validate",
+          "lookup-original",
+          "original-mutation",
+          "validate",
+          "lookup-original",
+          "original-mutation",
+          "write-original-receipt",
+          "validate",
+          "lookup-original",
+          "original-mutation",
+          "write-original-receipt",
+          "validate",
+          "lookup-original"
+        ],
+        "parentChildRollback": true,
+        "originalReceiptAtomic": true,
+        "noReceiptReplay": true,
+        "tombstones": 2,
+        "restoreNoRevival": true,
+        "liveSyncWriterUnmodified": true
+      }
+    },
+    {
+      "name": "native_clean_restart_persists_original_receipts_and_tombstones",
+      "status": "PASS"
+    }
+  ],
+  "sourceSha256": {
+    "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs": "71c3314ce80ad3508d8f8b83bfafcecb37d8b017d9bf9cc563e0fba62b83ecb0",
+    "drafts/n88-student-portal/auth-verifier.mjs": "6605b61c5422a090c8220a346f5a1e7c00aea5bedde212f62b54ed6f4592be2c",
+    "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs": "0b38130ae2ecf097d72b92722d5157621f6dfa932b80b6079889c22b7edc32e0",
+    "drafts/n88-student-portal/publication-v2-storage.inactive.sql": "399f6d5f513bf0fd3bb3bb9f8a206018e451ed9d6cc5d9a9b7fa89b3a81525c0",
+    "drafts/n88-student-portal/publication-v2-service.inactive.mjs": "1950f6a195ac330c81d679fc90773bab84ee1d594e3a6c09a452bcfbc46c3cb6",
+    "drafts/n88-student-portal/student-projection.mjs": "b407eb68c492c6d861ceb2da9c8dafe24ab3736aa679174ff2539a881bb5d754",
+    "tests/n88-backend-package-1028/native-composition.test.mjs": "186fdba893ba8e4c3f7cfdd7bea0dd644517a240594a3d1e441e41bb71301f48",
+    "supabase/migrations/0001_core_schema.sql": "23b6ef2f2731fadd0e20aa1ac797c8be5e0b6ad47c9efe857c5418bc9dcf2332",
+    "supabase/migrations/0033_score_subitem_foundation.sql": "fe5bf1fb779113e555de349515ff5cd3753808c236a7b4ba1f5e9c99927967eb",
+    "supabase/migrations/0021_section_archive_lifecycle.sql": "ce0584229c5a65cbd3bf47955c5b28f8a4c9ce2c43eafa4c79ca55c971d0c78f",
+    "supabase/migrations/20261012234116_n94_subitem_dates_late_scoring.sql": "a08ead00360b9cfa4144467751dfa0c4fb620d47e6f303f0b9ca9a1392fdc595",
+    "supabase/migrations/0012_sync_v2_server_protocol.sql": "03b9abd0c904364ad6b9acdbf9315ab699782f3c8daa5a416a4828c7a67a2078",
+    "drafts/n88-student-portal/schema-proposal.sql": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+    "drafts/n88-student-portal/canonical-lock.inactive.sql": "3930408d7396e222e3a6dbdbc670cfa597b9ba1dd585b8ffe04e2476c139e1a5",
+    "drafts/n88-student-portal/auth-session.inactive.sql": "6200d9b7b72b92bae38b6c790234ee63367d0de990702e5b8c4261107e138aa5",
+    "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
+    "drafts/n88-student-portal/six-digit-schema.inactive.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
+    "drafts/n88-student-portal/activation/v2-package-1028/schema.sql": "bf8fbd6c695338f478216f348de2a073cd2e942aed80517715f9945d2204008a"
+  },
+  "cleanup": {
+    "stopped": true,
+    "pid": 1748,
+    "birth": "2026-10-28T19:47:33.9731050Z",
+    "pidAbsent": true,
+    "portFree": true,
+    "ownedDataRemoved": true
+  },
+  "ownershipEpochs": [
+    {
+      "commandLine": "\"C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin/postgres.exe\"  -D \"C:/Users/Abody/Projects/RakeezX/.worktrees/n88-backend-package-1028/artifacts/n88-backend-package-1028-58d8a31d-9163-4a0b-8667-32ee500252db.tmp/data\"  ",
+      "pid": 37332,
+      "executable": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\n77-native-pg17\\package\\native\\bin\\postgres.exe",
+      "birth": "2026-10-28T19:47:16.3483410Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-backend-package-1028\\artifacts\\n88-backend-package-1028-58d8a31d-9163-4a0b-8667-32ee500252db.tmp\\data",
+      "port": 61700
+    },
+    {
+      "commandLine": "\"C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin/postgres.exe\"  -D \"C:/Users/Abody/Projects/RakeezX/.worktrees/n88-backend-package-1028/artifacts/n88-backend-package-1028-58d8a31d-9163-4a0b-8667-32ee500252db.tmp/data\"  ",
+      "pid": 1748,
+      "executable": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\n77-native-pg17\\package\\native\\bin\\postgres.exe",
+      "birth": "2026-10-28T19:47:33.9731050Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\n88-backend-package-1028\\artifacts\\n88-backend-package-1028-58d8a31d-9163-4a0b-8667-32ee500252db.tmp\\data",
+      "port": 61700
+    }
+  ],
+  "runtime": {
+    "existing": true,
+    "package": "@embedded-postgres/windows-x64@17.6.0-beta.15",
+    "provenance": "existing N77 REPORT.md and archive; third-party packaged native PG, NOT claimed as an official EDB download",
+    "archiveSha256": "342a4d42245f9562fc7e7652b353e8f1cecb56febebc72db1a8e2ace0b100528",
+    "postgresSha256": "54e7e05939e61f3462e3fd295bc12292623ad3cf010c02ae9cc3295a64b0770f",
+    "initdbSha256": "96da800ec12faed19209c7f9e21231c3dca2dcb12d2215751e18b0b9df20cec1",
+    "pgctlSha256": "4343536036689feb178461c559cc71c1003d11d9a7b9191ddd13e1fb835481f4",
+    "version": "postgres (PostgreSQL) 17.6",
+    "driver": "pg@8.16.3"
+  },
+  "leaseAcquire": "ACQUIRED integration",
+  "port": 61700,
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "localConfig": {
+    "listen": "127.0.0.1",
+    "port": "61700",
+    "password_encryption": "scram-sha-256"
+  },
+  "hba": [
+    {
+      "type": "host",
+      "address": "127.0.0.1",
+      "auth_method": "scram-sha-256",
+      "error": null
+    },
+    {
+      "type": "host",
+      "address": "0.0.0.0",
+      "auth_method": "reject",
+      "error": null
+    },
+    {
+      "type": "host",
+      "address": "::",
+      "auth_method": "reject",
+      "error": null
+    }
+  ],
+  "functions": [
+    {
+      "name": "v2_0dad27a56bfdc5bfab552235",
+      "definition": "0aadee3865cb4c0575a3abe06ccd6fc1bce7e317da292c133145f6cc2117b91a",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_23ccfc1e16cd0b122d0cb3c3",
+      "definition": "277c6405d47dfe5f193982cb4d591889081f63aa403f1b53698da3cc963e6573",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_3b143936c792a16ff5425c3d",
+      "definition": "70ebe1fab16d248125ba9ba231e05e7d5385bddd91973031e5407f8b822564bb",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_5d62e77b02ab6a1fb4e97688",
+      "definition": "a70a8255124089753437b62447cb542fa21af059ee025fe7641f3e0a02454cf1",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_6d27c8049efec0665b9d1f91",
+      "definition": "ba27f79ab0a2aeab728a5695543ea64f660c9ee049847bcfa74f86c2badc8822",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_71a3e914da47cf1053850671",
+      "definition": "1d32ca5bbb74a3d9af199a378c9b71f5dca364db588fd47eadf9298203e9db28",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_74c4aa4d430911e99002af80",
+      "definition": "ccb5c0585d18d7e94f6765ca522a2426f0c0e4cc2ce363b23ffbd1d25dadbbda",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_7874a827dae2373223bc8adc",
+      "definition": "0f38db25d66389643b074dd8c46eab079aea0e3e25e8dd082bd58a327e26e533",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_94bb23dac56c2e002713130a",
+      "definition": "38a36af0320818a809b4dcca844098eadc71af5cf95912ed6aca49d9f89d34d3",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_a3e6d95cdff2d66f56ae84f6",
+      "definition": "f32fbd2a6ce1d8a3abb4503d67cee64f006d9af38c764ee8d2e0a9011fa6beb6",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_dbe074dae923ca8a3746d390",
+      "definition": "2b7cba6ba01cd276e76267da996f3a8a336e1e5d9ac1bad149698ff05908b5b5",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_e1b1c0927f6164faeccb760b",
+      "definition": "a8a31033f93b613376ac1c4695cc6839def54236794c8f698b000ba6605cb471",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_f46afed1e023d013cdabf257",
+      "definition": "17bd70bd63d76000de1a54906634e3cbecd9941350315af89d0210748ed45960",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_f8a1689cd78951d7fc52ef91",
+      "definition": "ed645e03679e62e1bf90646037781c367e0b2f421583749b59bfc591df866e33",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    }
+  ],
+  "lastStatement": {
+    "sha256": "9505cacb7c710ed17125fcc6cb3669e8ddca6c8cd8af6a31f6b3cd64604c3098",
+    "operation": "commit"
+  },
+  "trace": [
+    {
+      "sha256": "2c10f3346e981b9ed2dc8305875f3824a534388eaaa95a632a834cd6332281b4",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "c1e4d457aa8a6c7bd31e527748edbfcee6d4596fe9d2eaeed28eb787767a77ab",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "4b08189b1399c922f5d61eb4fa481dbc5514efdbb0c4030ecfdb41665bfd24de",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "7eaf0e6ad46189c16f430c17dd800730e9d28692ed8da386205100f0931e8997",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "d99ba259cd3929d391a53d98111abcea008221ff6305349f846018701fe92521",
+      "operation": "numeric-session",
+      "rows": 1
+    },
+    {
+      "sha256": "2bf4adcf886afcb73a542f9dc35369a709262c1b8b66f346ec10bc78b2b823b0",
+      "operation": "numeric-credential",
+      "rows": 1
+    },
+    {
+      "sha256": "72d1a0eba9dbe87a83c4e219497834df490ce5dcee2c261f6f9afd95d8f8fe68",
+      "operation": "owner-context",
+      "rows": 1
+    },
+    {
+      "sha256": "fd19cd46f568a4ae38795f6dc486c7114eb5fcc9572d03b1283638fdb7d629c5",
+      "operation": "select n88_private.lock_canonical_sources($1::uuid,$2::integer)",
+      "rows": 1
+    },
+    {
+      "sha256": "5c9fc4857874ea5002e6604f0346042f50388555b5feda400aebbf7877ce7a08",
+      "operation": "original-canonical-read",
+      "rows": 50
+    },
+    {
+      "sha256": "7dfce5786c5f02dcc6e78f35833314435cbe1c80242a0659c8a2ddd28f586827",
+      "operation": "original-canonical-read",
+      "rows": 3
+    },
+    {
+      "sha256": "522656818781827547d463af2c299a4f6afc0270269a00fff8f4b303edbaf7ea",
+      "operation": "original-projection-lock",
+      "rows": 1
+    },
+    {
+      "sha256": "e42d2de24a5b2a9d458219d0f0811b63290b1b833667e046020d034ed704dd80",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "218f1146d50bdae36e06ce857c4b460affeba670404965c975cc8901acce7c46",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "b75844e451c72d86ecce73615d1c1efc11d9fdde2d61ffe34b9ff4c351072076",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "7700d235b1326b49506b1222a4ba4d2c56766ce4e7517defbfbcbfb32463cd6b",
+      "operation": "original-canonical-read",
+      "rows": 50
+    },
+    {
+      "sha256": "38603fea89bb426312fb13d0edbcde2cf6740d1c26dcffa32315f62382a66fa6",
+      "operation": "original-canonical-read",
+      "rows": 50
+    },
+    {
+      "sha256": "0e8834ccf4cac5f256e9a2add530a1130edf9a5487c396c64985b49818a6c540",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "c365a70fb8ff3318f2e1f14c1b6352701e3adeeceacc38d8cd189f0ec1b29258",
+      "operation": "original-canonical-read",
+      "rows": 3
+    },
+    {
+      "sha256": "4f1ae4e620baf4b52e65c86639ed441c0d9a4071e3c8cd9d6cf08a2cf029ac31",
+      "operation": "original-canonical-read",
+      "rows": 50
+    },
+    {
+      "sha256": "ad2e84fec89ba9c5b1fd5f2076074793ca76f37b54b1f170afcf0f70903b10a8",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "2c10f3346e981b9ed2dc8305875f3824a534388eaaa95a632a834cd6332281b4",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "c1e4d457aa8a6c7bd31e527748edbfcee6d4596fe9d2eaeed28eb787767a77ab",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "4b08189b1399c922f5d61eb4fa481dbc5514efdbb0c4030ecfdb41665bfd24de",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "7eaf0e6ad46189c16f430c17dd800730e9d28692ed8da386205100f0931e8997",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677",
+      "operation": "transaction-config",
+      "rows": 1
+    },
+    {
+      "sha256": "522656818781827547d463af2c299a4f6afc0270269a00fff8f4b303edbaf7ea",
+      "operation": "original-projection-lock",
+      "rows": 1
+    },
+    {
+      "sha256": "e42d2de24a5b2a9d458219d0f0811b63290b1b833667e046020d034ed704dd80",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "218f1146d50bdae36e06ce857c4b460affeba670404965c975cc8901acce7c46",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "b75844e451c72d86ecce73615d1c1efc11d9fdde2d61ffe34b9ff4c351072076",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "7700d235b1326b49506b1222a4ba4d2c56766ce4e7517defbfbcbfb32463cd6b",
+      "operation": "original-canonical-read",
+      "rows": 50
+    },
+    {
+      "sha256": "38603fea89bb426312fb13d0edbcde2cf6740d1c26dcffa32315f62382a66fa6",
+      "operation": "original-canonical-read",
+      "rows": 50
+    },
+    {
+      "sha256": "0e8834ccf4cac5f256e9a2add530a1130edf9a5487c396c64985b49818a6c540",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "c365a70fb8ff3318f2e1f14c1b6352701e3adeeceacc38d8cd189f0ec1b29258",
+      "operation": "original-canonical-read",
+      "rows": 3
+    },
+    {
+      "sha256": "4f1ae4e620baf4b52e65c86639ed441c0d9a4071e3c8cd9d6cf08a2cf029ac31",
+      "operation": "original-canonical-read",
+      "rows": 50
+    },
+    {
+      "sha256": "ad2e84fec89ba9c5b1fd5f2076074793ca76f37b54b1f170afcf0f70903b10a8",
+      "operation": "original-canonical-read",
+      "rows": 1
+    },
+    {
+      "sha256": "2c10f3346e981b9ed2dc8305875f3824a534388eaaa95a632a834cd6332281b4",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "c1e4d457aa8a6c7bd31e527748edbfcee6d4596fe9d2eaeed28eb787767a77ab",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "4b08189b1399c922f5d61eb4fa481dbc5514efdbb0c4030ecfdb41665bfd24de",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "7eaf0e6ad46189c16f430c17dd800730e9d28692ed8da386205100f0931e8997",
+      "operation": "original-canonical-read",
+      "rows": 0
+    },
+    {
+      "sha256": "9505cacb7c710ed17125fcc6cb3669e8ddca6c8cd8af6a31f6b3cd64604c3098",
+      "operation": "commit",
+      "rows": null
+    }
+  ],
+  "nativePids": [
+    12176,
+    15016,
+    25728,
+    19804,
+    22612,
+    22408,
+    33644,
+    1224,
+    3168,
+    4112,
+    35576,
+    2992,
+    13848,
+    28304,
+    31468,
+    29884,
+    29384,
+    22724,
+    22732,
+    6020,
+    20728,
+    27568,
+    25936,
+    488,
+    31836,
+    9332,
+    34912,
+    24812,
+    29052,
+    24880,
+    28816,
+    28628,
+    26148,
+    6516,
+    26452,
+    20268,
+    28448
+  ],
+  "storageCatalog": [
+    {
+      "relname": "publication_v2_high_water",
+      "relrowsecurity": true,
+      "relforcerowsecurity": true,
+      "owner": "n88_local_admin"
+    },
+    {
+      "relname": "publication_v2_items",
+      "relrowsecurity": true,
+      "relforcerowsecurity": true,
+      "owner": "n88_local_admin"
+    },
+    {
+      "relname": "publication_v2_receipts",
+      "relrowsecurity": true,
+      "relforcerowsecurity": true,
+      "owner": "n88_local_admin"
+    },
+    {
+      "relname": "publication_v2_scopes",
+      "relrowsecurity": true,
+      "relforcerowsecurity": true,
+      "owner": "n88_local_admin"
+    }
+  ],
+  "restart": {
+    "prior": {
+      "pid": 37332,
+      "birth": "2026-10-28T19:47:16.3483410Z",
+      "pidAbsent": true,
+      "portFree": true
+    },
+    "newIdentity": {
+      "pid": 1748,
+      "birth": "2026-10-28T19:47:33.9731050Z"
+    }
+  },
+  "restartPersistence": {
+    "receipts": 12,
+    "tombstones": 2,
+    "original_receipts": 1
+  },
+  "leaseRelease": "RELEASED integration",
+  "finishedAt": "2026-10-28T19:47:37.550Z",
+  "status": "PASS"
+}

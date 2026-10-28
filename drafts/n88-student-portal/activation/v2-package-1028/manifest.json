@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "inactive": true,
+  "taskId": "n88-backend-package-1028",
+  "runId": "ee57b00d-1c90-4926-8819-77989368fcc1",
+  "baseSha": "6096fe7c3232c728e5766b2f28b63fb015dde101",
+  "sourceBridge": "6042d71eeae023380cd5bf7e84061d98d574711b",
+  "catalogSha256": "373b98aa5f9594c267fed36523d6affecb58ce20c247704d2605b9510d64aad5",
+  "files": {
+    "drafts/n88-student-portal/publication-v2-host.inactive.mjs": "d87cd25fa4dc7e46d870479a31dc2e47d79a403c8314461f29b441c13d8bed9b",
+    "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+    "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs": "e9dec5fb83b1897a229e328c6b57ffd8a30ff7bf15f3c4a79bc7a98aa7f1f780",
+    "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs": "71c3314ce80ad3508d8f8b83bfafcecb37d8b017d9bf9cc563e0fba62b83ecb0",
+    "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs": "0b38130ae2ecf097d72b92722d5157621f6dfa932b80b6079889c22b7edc32e0",
+    "drafts/n88-student-portal/publication-v2-service.inactive.mjs": "1950f6a195ac330c81d679fc90773bab84ee1d594e3a6c09a452bcfbc46c3cb6",
+    "drafts/n88-student-portal/publication-v2-storage.inactive.sql": "399f6d5f513bf0fd3bb3bb9f8a206018e451ed9d6cc5d9a9b7fa89b3a81525c0",
+    "drafts/n88-student-portal/auth-verifier.mjs": "6605b61c5422a090c8220a346f5a1e7c00aea5bedde212f62b54ed6f4592be2c",
+    "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
+    "drafts/n88-student-portal/canonical-grade-context.mjs": "1595f7588c9a683be570986bde907c2b6a3eb22ccdc3e00fa8cd43eb8c51152f",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/integrated-service.mjs": "6348d080dc6364d8741be4699afe0f8e71954e3ff6ae4dfb4a1b3c0532caaf64",
+    "drafts/n88-student-portal/student-projection.mjs": "b407eb68c492c6d861ceb2da9c8dafe24ab3736aa679174ff2539a881bb5d754",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "58ae1bb5f128cf31998ed8ccfa8e372e4980fdbfcc611f8aef61e9dc3098d49e",
+    "drafts/n88-student-portal/activation/error-boundary-contract.json": "19640c963f6696dbacfc68fbcac06ecc75765701686aaa08aed4fb52f1f753cb",
+    "drafts/n88-student-portal/activation/read-service-20261023/typed-read-operations.json": "ad5445a843afbfe464869fa6789b518d0f80fcb5518cd611c93442da768e9ccf",
+    "drafts/n88-student-portal/activation/v2-package-1028/schema.sql": "bf8fbd6c695338f478216f348de2a073cd2e942aed80517715f9945d2204008a",
+    "drafts/n88-student-portal/activation/v2-package-1028/boundary-operations.json": "202a22db6b07c212737dcc6bac36a3098b2e1344f4925398538ed624cfd7c553",
+    "drafts/n88-student-portal/activation/v2-package-1028/lifecycle-attach.inactive.mjs": "6f0e6b9ff819a43e948135d507227028731c7799d46d879e8e30d86b7a7453e2"
+  },
+  "functions": [
+    {
+      "name": "v2_0dad27a56bfdc5bfab552235",
+      "definition": "0aadee3865cb4c0575a3abe06ccd6fc1bce7e317da292c133145f6cc2117b91a",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_23ccfc1e16cd0b122d0cb3c3",
+      "definition": "277c6405d47dfe5f193982cb4d591889081f63aa403f1b53698da3cc963e6573",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_3b143936c792a16ff5425c3d",
+      "definition": "70ebe1fab16d248125ba9ba231e05e7d5385bddd91973031e5407f8b822564bb",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_5d62e77b02ab6a1fb4e97688",
+      "definition": "a70a8255124089753437b62447cb542fa21af059ee025fe7641f3e0a02454cf1",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_6d27c8049efec0665b9d1f91",
+      "definition": "ba27f79ab0a2aeab728a5695543ea64f660c9ee049847bcfa74f86c2badc8822",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_71a3e914da47cf1053850671",
+      "definition": "1d32ca5bbb74a3d9af199a378c9b71f5dca364db588fd47eadf9298203e9db28",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_74c4aa4d430911e99002af80",
+      "definition": "ccb5c0585d18d7e94f6765ca522a2426f0c0e4cc2ce363b23ffbd1d25dadbbda",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_7874a827dae2373223bc8adc",
+      "definition": "0f38db25d66389643b074dd8c46eab079aea0e3e25e8dd082bd58a327e26e533",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_94bb23dac56c2e002713130a",
+      "definition": "38a36af0320818a809b4dcca844098eadc71af5cf95912ed6aca49d9f89d34d3",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_a3e6d95cdff2d66f56ae84f6",
+      "definition": "f32fbd2a6ce1d8a3abb4503d67cee64f006d9af38c764ee8d2e0a9011fa6beb6",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_dbe074dae923ca8a3746d390",
+      "definition": "2b7cba6ba01cd276e76267da996f3a8a336e1e5d9ac1bad149698ff05908b5b5",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_e1b1c0927f6164faeccb760b",
+      "definition": "a8a31033f93b613376ac1c4695cc6839def54236794c8f698b000ba6605cb471",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_f46afed1e023d013cdabf257",
+      "definition": "17bd70bd63d76000de1a54906634e3cbecd9941350315af89d0210748ed45960",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_f8a1689cd78951d7fc52ef91",
+      "definition": "ed645e03679e62e1bf90646037781c367e0b2f421583749b59bfc591df866e33",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    }
+  ],
+  "sourceEncoding": "utf8-lf-preserve-bom"
+}
