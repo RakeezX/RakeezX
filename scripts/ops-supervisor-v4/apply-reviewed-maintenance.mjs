@@ -15,6 +15,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { verifiedDeployment, verifiedSourceOnlyPublication } from './controller.mjs';
+import {verifiedN88NegativeInertReconciliation} from './n88-negative-inert-reconcile.mjs';
 import { buildLiveServiceEvidence, verifiedLiveServicePublication } from './live-service-publication.mjs';
 import { n88MobileNativeTask } from './n88-mobile-native-publication.mjs';
 import { STAGED_ACTIVATION_MODE, verifiedActivationStageContinuation, verifiedPilotStagePreparation } from './staged-activation-contract.mjs';
@@ -363,7 +364,7 @@ export function verifyInactiveIdentity(task, result, update, activationId, histo
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
   const historicalSupersession = update.card.completionMode === HISTORICAL_RUNTIME_MODE && verifyHistoricalRuntimeSupersession(task, result, update, historicalContext);
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedN44ClosedSuccessorContinuation(task,result,update) || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedStageContinuation(task,result,update) || verifiedN44FrontendPrerequisiteStage(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedN44ClosedSuccessorContinuation(task,result,update) || verifiedLiveServiceDeclarationRepair(task,result,update) || verifiedStageContinuation(task,result,update) || verifiedN44FrontendPrerequisiteStage(task,result,update) || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || verifiedSourceOnlyDeclarationRepair(task,result,update) || verifiedN88NegativeInertReconciliation(task,result,update) || poDeferred || nameRepair || historicalSupersession) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -508,6 +509,15 @@ export function revisedTask(task, update, commit, at, historicalContext = null) 
     saved.deliveryOwner=null; saved.nextDeliveryAt=null;
     saved.publisherReconciliation={at,commit,publishedSha:saved.deliveryReceipt.publishedSha,
       originalDeliveryReceiptSha256:sha256(bytes(task.deliveryReceipt)),reason:update.materialReason,sourceOnly:true};
+  }
+
+  if(update.card.completionMode==='reconcile_n88_negative_inert_source'){
+    insist(verifiedN88NegativeInertReconciliation(task,json(task.resultPath),update),'Exact N88 inert source declaration and provider evidence no longer match');
+    insist(verifiedDeployment(saved,saved.deliveryReceipt),'N88 declared source receipt did not verify against original provider and assets');
+    saved.status='awaiting_po';saved.productionVerifiedAt=saved.deliveryReceipt.verifiedAt;
+    saved.deliveryOwner=null;saved.nextDeliveryAt=null;
+    saved.publisherReconciliation={at,commit,publishedSha:saved.deliveryReceipt.publishedSha,
+      originalDeliveryReceiptSha256:sha256(bytes(task.deliveryReceipt)),reason:update.materialReason,sourceOnly:true,serviceActivated:false};
   }
 
   if (update.card.completionMode==='reconcile_observed_publication') {
