@@ -13,7 +13,6 @@
       "executionMode": "local",
       "liveMutation": false,
       "liveAuthorizationRef": null,
-      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
       "model": "gpt-6.1-sol",
       "effort": "medium",
       "budgetMinutes": 110,
@@ -46,7 +45,7 @@
         "publication": true,
         "publicationScope": "inactive source-only backend integration and exact installation proposal"
       },
-      "releaseAuthority": "Direct user approval of read/inspection and exact nine-query original metadata admission. Local source repair and publication authorized. Current read-only phase does not execute installer or change live schema/data.",
+      "releaseAuthority": "Direct user approval of read/inspection and exact nine-query original metadata admission. Local source repair and publication authorized. Current read-only phase does not execute installer or change live schema/data. [Exact inactive source-only classification; no hosted activation.]",
       "objective": "User explicitly approves original nine-query metadata preflight and broad read access; authority evidence po-20261028-n88-read-authority/authority.json. Do NOT ask again for read authorization. Continue original session from publishedfb33a9e0. Implement the missing exact nine-query admission and bound read authority in ORIGINAL finite boundary, preserving every existing statement identity/denial and rejecting arbitrary caller SQL. Collect actual project/database/role and prerequisite metadata through the original supported custodian connection only, using existing authorized credentials without displaying/copying secrets. Read minimal identity/schema/ACL metadata, no need for pupil names. Current step is read-only against hosted services; do not execute install.sql, create functions/roles, modify schema or data, or activate service. If original metadata mechanism requires an additional real DDL change, prepare exact change and document dependency rather than silently executing it as read. Do not bypass actual tool/policy denial or use alternate credentials. Fully implement authorized local admission now, with targeted tests, then perform actual bounded reads if original approved tool supports them. The target hint xlrubcwjqktzzunrvuns is not proof; bind actual provider/database evidence. Preserve actual failure/UNKNOWN and stop repeated unchanged denied call. Minimized report contains actual facts, precise missing capability if any, and concrete next installation step; do not stop only because previous card had null read authority. No extra PostgreSQL campaigns for unchanged code. Original publisher handles source delivery.",
       "preflight": {
         "version": 1,
@@ -80,6 +79,13 @@
           "actual_target_readback_or_precise_access_blocker"
         ],
         "publisherChecks": []
+      },
+      "completionMode": "reconcile_source_only_declaration",
+      "verificationRepair": {
+        "priorReceiptSha256": "fff1e0285a279c796ecfa3c1f05403bafd6395d681225780c0d6908f6bbcbf49",
+        "publishedSha": "6c3bca67523fb48157b1bfb7f7da6ca4f8068f41",
+        "originalResultSha256": "9f710aa1874decea2bc18046792f9ff39be4e07b50664d6fc30a0dd9d97d873b",
+        "reason": "Original provider and immutable/production source hashes already verified. Missing literal source-only classification alone rejected receipt; preserve every actual read/result/provider proof and do not redeploy or rerun worker."
       }
     }
   ]
