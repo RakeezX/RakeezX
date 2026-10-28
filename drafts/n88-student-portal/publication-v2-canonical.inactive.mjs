@@ -24,7 +24,7 @@ const receiptScope = (c, owner, teachingId) => {
 };
 
 export function createCanonicalPublicationV2Ports({ executionMode, repository, teacher, numeric, rollout,
-  verifyIngress, origin, studentTeachingId, now = Date.now }) {
+  verifyIngress, origin, studentTeachingId, now = Date.now, onVerifiedIdentity }) {
   if (executionMode !== 'synthetic' || typeof verifyIngress !== 'function' || !id(studentTeachingId) ||
       typeof now !== 'function' || !rollout?.configured || !numeric) fail();
   const verifyTeacher = createTeacherVerifier({ ...teacher, now });
@@ -57,6 +57,9 @@ export function createCanonicalPublicationV2Ports({ executionMode, repository, t
       if (role === 'teacher') {
         const auth = await verifyTeacher(request.headers?.authorization, request.signal, tx);
         if (!auth?.current || !rollout.allowsOwner(auth.ownerId)) return null;
+        // Optional trusted host observer, never request authority. The original
+        // verifier/locks already succeeded; service admission still needs context.
+        await onVerifiedIdentity?.({ role, auth }, request, tx);
         const contexts = await tx.query('select namespace,owner_id,active from n88_private.contexts where owner_id=$1::uuid for share', [auth.ownerId]);
         if (contexts.rows.length !== 1 || contexts.rows[0].active !== true) return null;
         admission.set(tx, { role, auth }); return auth;
@@ -93,6 +96,8 @@ export function createCanonicalPublicationV2Ports({ executionMode, repository, t
       });
       const result = await handler({ ...request, path: '/student/read' });
       if (result.status !== 200 || !current) return null;
+      await onVerifiedIdentity?.({ role, auth: current, numeric: { tokenHash: s.tokenHash,
+        credentialId: s.credentialId, studentId: s.studentId, version: String(s.version) }, expiresAt: s.expiresAt }, request, tx);
       admission.set(tx, { role, auth: current }); return Object.freeze(current);
     },
     readCurrent: async (tx, auth, scope) => {
