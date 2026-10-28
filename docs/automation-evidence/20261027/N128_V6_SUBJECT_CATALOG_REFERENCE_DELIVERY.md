@@ -1,5 +1,62 @@
 # N128 — V6 reference picker candidate (AI)
 
+## Current continuation — 2026-10-28
+
+Result: **LOCAL_READY**, superseding the historical local blocker below for this materially corrected candidate only. No push, deployment or Product acceptance is claimed.
+
+- Task: `continuous-n128-v6-subject-picker-reference-20261027`
+- Run: `6496d078-8925-4871-b40d-b2ce7a7f53c1`
+- Original saved candidate: `4db42308ddd42f3cde6b88436c0cfaae24f1105c`; original base remains `3b6a6b03beb2bad1a8365539a9caadc125da9957`.
+- Observed current-main integration base: `d7648707104e5805f919e9f27e2dffda3c89dc83`, fetched from origin/main and reconfirmed with `git ls-remote` before final commit.
+- Ordinary local merge: `2575ae0f` (AI). Both original candidate and observed main remain ancestors; no saved work was reset. The final AI commit carrying this continuation is the candidate returned by the runner result.
+- Final delta relative to observed main: **this report and sw.js only**. All current-main Product, service and operations files are preserved, not new task-owned changes.
+
+### Reconciliation and exact authorized SW exception
+
+Inspection found main had already incorporated the catalog via the independent offline-completion delivery (`59ceaaa6`), then N129 picker dismissal/scroll changes, compact class/subject labels, N127's class header, N44 click changes, and subsequent N88 shell changes. Main was at cache generation **v95**, with both picker files already listed exactly once. There was no reason to add duplicate entries or restore the older v87/v90 worker.
+
+The two merge conflicts were in teachings.js and the chooser test; both were resolved to the exact observed-main versions, retaining the saved picker behavior and the later approved UI. Main's chooser test expects the subsequently removed edition heading to be absent. None of those existing changes was overwritten. The saved unit/data/options/persistence files remain byte-equivalent after LF normalization; submit/create validation and the add-subject handler remain equal to the saved candidate. Current main store/DB/models/offline-lease/Demo/readiness helper and N127 teaching-hub are preserved exactly. Existing sync-context changes on main are retained; this task changes no Sync implementation.
+
+The only new SW mutation is **v95 → v96 once**. A whole-source assertion proves sw.js equals observed main with precisely that replacement. Both preexisting picker module entries occur exactly once. Thus all current N44 push/click handlers and N88/private network-only exclusions are byte-identical to observed main. The legacy `n128_current_main_no_schema_sync_restore_or_sw_changes` source-phase PASS is retained historically; its final guard now includes this explicitly authorized generation-only exception. No schema/Auth/RLS/Restore, student writes, notification behavior, rejected change-subject code or curriculum V2 context was added.
+
+### Affected checks and actual offline proof
+
+- **PASS:** `node --test tests/offline-route-graph.test.mjs`, 1/1, complete current executable route graph precached. The historical v87 failure below remains unchanged.
+- **PASS:** whole-SW equality to the single authorized generation change; exactly one registration per picker dependency; ancestry and source integration assertions; current-main protected files preserved.
+- **Reused:** original 22/22 catalog, 5/5 chooser plus 2/2 selection-clearing cases, and 3/3 synthetic persistence evidence for the preserved catalog/selection/create behavior. These suites were not repeated. Later main UI changes are retained and the actual current picker is additionally exercised offline below; no claim of whole-file parity for teachings.js is made after integration.
+- **PASS:** `node --check sw.js`; whitespace verification uses the final diff against observed main. Existing unrelated upstream whitespace is not edited.
+
+A fresh Chromium **151.0.7922.34** context used the canonical shared browser lease and a task-owned static server at `http://127.0.0.1:5209`. Actual unmodified app files, handlers and source CSS were served with no-store headers and correct JS/JSON/CSS MIME types. Browser page requests outside that loopback origin were aborted. No credentials, personal profile, account service or real data were used. The existing `openReadyServedDemo` helper booted Demo, then the check awaited SW control and both cached modules. It switched the context offline, **closed the server**, and reloaded the actual application document before reading all workspace/database/data readiness in one awaited checkpoint.
+
+```json
+{
+  "check": "n128_current_main_safe_offline_route",
+  "status": "PASS",
+  "cache": {
+    "keys": ["rakeezx-v96"],
+    "entries": 202,
+    "modules": ["src/lib/stage-subject-options.js", "src/lib/official-v6-subject-data.js"]
+  },
+  "checkpoint": {
+    "workspace": "demo", "database": "rakeezx-demo", "ready": true,
+    "teachings": 8, "students": 184, "rows": 1211,
+    "controller": true, "demoSession": "active", "stylesheets": 8
+  },
+  "offlinePicker": "grade5/tahfiz/Tajweed custom token and name",
+  "requestsAfterClosure": 0,
+  "pageErrors": [],
+  "consoleErrors": []
+}
+```
+
+The actual visible Add Class dialog selected grade 5, Tahfiz, searched and selected التجويد, and asserted the existing `custom` token and exact custom name. No form was submitted in this new offline check. The earlier two-subject persistence evidence remains separate.
+
+Harness failure retained: the initial browser launch through `@playwright/test` requested absent engine revision 1248 and failed before navigation. Package resolution showed that wrapper used 1.64.1 while the installed canonical `playwright` package matches revision 1234. The corrected check used that existing package and installed engine; no browser download, global configuration, policy or dependency edit occurred.
+
+Owned context/browser/server closed in finally; canonical lease release returned `RELEASED browser`; no listener remained on 5209. No Preview/build/provider steps were repeated. The independent publisher owns integration and served Production verification.
+
+## Historical 2026-10-27 attempt — preserved original failure
+
 Date: 2026-10-27 Asia/Riyadh. Result: **BLOCKED; do not publish this candidate**.
 
 - Task: `continuous-n128-v6-subject-picker-reference-20261027`
