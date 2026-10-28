@@ -501,7 +501,7 @@ async function n44Ask(client, envelope, type = 'n44-push-click') {
     const finish = ok => { clearTimeout(timer); channel.port1.close(); channel.port2.close(); resolve(ok); };
     const timer = setTimeout(() => finish(false),1500);
     channel.port1.onmessage = message => finish(message.data?.ok === true);
-    try { client.postMessage(type === 'n44-push-ready' ? {type} : {type,event:envelope},[channel.port2]); } catch { finish(false); }
+    try { client.postMessage({type,event:envelope},[channel.port2]); } catch { finish(false); }
   });
 }
 const n44Clients = async () => (await self.clients.matchAll({type:'window',includeUncontrolled:false})).filter(n44AppClient);
@@ -567,9 +567,9 @@ self.addEventListener('notificationclick', event => {
     // Readiness probes have no authorization/navigation side effects. A cold
     // boot may not yet have installed its listener or restored the owner store.
     // Send the action ONCE, never retry an unknown authorization/navigation.
-    const deadline = Date.now() + 10000;
+    const deadline = Math.min(Date.now() + 30000, envelope.expiresAt, envelope.event.expiresAt);
     while (Date.now() < deadline && epoch === n44Epoch && n44Envelope(envelope)) {
-      if (await n44Ask(client, null, 'n44-push-ready')) {
+      if (await n44Ask(client, envelope, 'n44-push-ready')) {
         if (epoch === n44Epoch && n44Envelope(envelope)) await n44Ask(client, envelope);
         return;
       }

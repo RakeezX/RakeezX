@@ -422,6 +422,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     sourceStatus = { ...result, token, signature: choice.signature }; changed(); return { ...sourceStatus };
   }
   const clicked = new Map();
+  let pendingClickHint = null;
   const onMessage = event => {
     // Only the actual controlling SW can request a bounded action; no page-message API.
     if (!event.source || event.source !== win.navigator.serviceWorker?.controller) return;
@@ -430,9 +431,22 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       !['n44-push-ready', 'n44-push-check', 'n44-push-click'].includes(event.data?.type)) return;
     const port = event.ports[0];
     if (event.data.type === 'n44-push-ready') {
-      // Terminal unavailability also answers ready: the action can explain a
-      // denial visibly without another configuration/authorization request.
-      port.postMessage({ ok: !disposed && !preparing && store.state?.ready === true }); port.close(); return;
+      // Store boot alone does not prove the current registration or source has
+      // restored. Probes are read-only: never spend the one action on that gap.
+      // Older workers send no envelope; retain their handshake without weakening
+      // the action's existing binding/source/owner checks.
+      const envelope = normalizePushEnvelope(event.data.event, Date.now());
+      const restored = !disposed && !preparing && !renewing && store.state?.ready === true && usable();
+      const ok = restored && (event.data.event == null || !!envelope &&
+        envelope.binding === gateway?.registration()?.registrationId &&
+        readNotificationCategories(current(), storage)[envelope.event.kind] &&
+        notificationDestination(store, current(), envelope.event.id, Date.now()) === envelope.event.actionPath);
+      const key = envelope && envelope.binding + ':' + envelope.event.id;
+      if (!ok && key && !disposed && pendingClickHint !== key) {
+        pendingClickHint = key;
+        toast('جارٍ استعادة الحساب والتحقق من التذكير…');
+      }
+      port.postMessage({ ok }); port.close(); return;
     }
     void (async () => {
       const envelope = normalizePushEnvelope(event.data.event, Date.now());
