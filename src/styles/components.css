@@ -8726,3 +8726,94 @@
   .classes-page .class-card__count .tabular { font-size: 13px; }
   .classes-page .class-cards-grid > [data-section-roster] { grid-column: 1 / -1; }
 }
+
+
+/* UX Skills Preview round 3 — mobile attendance/readability and quick log ergonomics.
+   Scoped to the two lesson-time screens; no data, scoring, or session behavior. */
+@media screen and (max-width: 520px) {
+  .attendance-01c { gap: 10px; }
+  .attendance-01c__context { gap: 8px; padding: 10px; }
+  .attendance-01c__context-top { gap: 8px; }
+  .attendance-01c__identity { gap: 8px; }
+  .attendance-01c__icon { inline-size: 38px; block-size: 38px; border-radius: 11px; }
+  .attendance-01c__identity h2 { font-size: 16px; }
+  .attendance-01c__identity p { font-size: 12px; line-height: 1.4; }
+  .attendance-01c__date { padding-block: 8px 0; }
+  .attendance-01c__session-meta { gap: 5px; }
+  .attendance-01c__status-pill,
+  .attendance-01c__meta { min-block-size: 26px; padding: 3px 8px; font-size: 11px; }
+  .attendance-01c__progress { gap: 8px; padding: 9px 11px; }
+  .attendance-01c__progress-copy {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px 8px;
+  }
+  .attendance-01c__progress-copy strong { font-size: 12px; }
+  .attendance-01c__progress-copy > span { font-size: 11px; }
+  .attendance-01c__counts { gap: 4px; }
+  .attendance-01c__count { min-block-size: 27px; padding: 3px 6px; font-size: 10.5px; }
+  .attendance-01c__toolbar { gap: 7px; padding: 9px; }
+  .attendance-01c__row { padding-block: 8px; }
+  .attendance-01c__row .att-row__name { overflow-wrap: anywhere; }
+  .attendance-01c__row .att-row__name strong { font-size: 14px; line-height: 1.45; }
+  .attendance-01c__row .rollno { color: var(--text-2); }
+  .attendance-01c__row .att-row__note {
+    background: var(--bg-sunk);
+    border: 1px solid var(--border);
+  }
+
+  .quicklog-page .quicklog-toolbar { gap: 6px; padding: 8px 10px; }
+  .quicklog-page .quicklog__modes .segmented__btn { min-block-size: 44px; }
+  .quicklog-page .quicklog-filter-bar { gap: 6px; }
+  .quicklog-page .quicklog-filter-bar .quicklog-search .input {
+    font-size: 16px;
+    min-block-size: 44px;
+  }
+  .quicklog-page .quicklog-toolbar .classroom-meta-bar {
+    min-block-size: 34px;
+    padding-block-start: 4px;
+  }
+  .quicklog-page .qlcard__name { font-size: 13.5px; }
+  .quicklog-page .qlcard.is-unavail {
+    opacity: 1;
+    background: var(--bg-sunk);
+    border-style: dashed;
+  }
+  .quicklog-page .qlcard__hit { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .quicklog-page .qlcard__minus { touch-action: manipulation; }
+}
+.quicklog-page .qlcard__hit:focus-visible,
+.quicklog-page .qlcard__minus:focus-visible {
+  outline: 3px solid var(--brand-text);
+  outline-offset: -3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quicklog-page .qlcard,
+  .quicklog-page .qlcard__hit { transition: none; }
+  .quicklog-page .qlcard.is-plus,
+  .quicklog-page .qlcard.is-minus { animation: none; }
+}
+
+/* On narrow screens segmented controls use their space for 44px touch targets, not extra framing. */
+@media screen and (max-width: 520px) {
+  .quicklog-page .quicklog__modes,
+  .quicklog-page .quicklog-filter-bar .segmented {
+    padding: 0;
+    gap: 2px;
+  }
+  .quicklog-page .quicklog-filter-bar .segmented__btn { min-block-size: 44px; padding-inline: 4px; }
+}
+
+@media screen and (max-width: 520px) {
+  .quicklog-page .quicklog__filters .switch {
+    min-block-size: 44px;
+    padding-inline: 6px;
+    border-radius: var(--r-sm);
+  }
+  .quicklog-page .quicklog__filters .switch:focus-within {
+    outline: 2px solid var(--brand-text);
+    outline-offset: 2px;
+  }
+}

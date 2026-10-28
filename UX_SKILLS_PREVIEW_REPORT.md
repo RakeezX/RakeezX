@@ -98,3 +98,37 @@ This is an additive update to the same **Draft Preview PR #15**; it does not con
 ### Still outside this proof
 - Real Android/iPhone hardware, actual teacher account, Sync, Cloud, notifications, N36/N44/N88, cross-browser Safari/WebKit production behavior, and live application data.
 - Only the reviewer-selected changes should later enter normal integration through the sole existing Product publisher. Do not merge this Draft branch automatically.
+
+
+## Round 3 — Attendance and Quick Log lesson-time usability (2026-10-28)
+
+- **Scope:** visual, scoped CSS on the two class tools only. No changes to attendance statuses, quick-log scoring, model, store, session creation behavior, Sync, or Supabase.
+- **Method:** real app DOM with synthetic local 12-student class, one synthetic today session; Playwright Chromium on 320/390/768/1280 and light/dark; external requests blocked, no user account. Screenshots are retained locally under test-results/ux-skills-compare/lesson-before and lesson-candidate.
+
+### Before/after at 320px mobile
+
+| Metric | Before | After |
+| --- | --- | --- |
+| Attendance first student row top | 680px | 595px |
+| Attendance context card height | 242px | 211px |
+| Attendance progress height | 140px | 98px |
+| Attendance student name font | 13px | 14px |
+| Quick Log first student card top | 387px | 382px |
+| Quick Log toolbar height | 226px | 221px |
+| Quick Log card name font at 320px | 12.5px | 13.5px |
+| Quick Log search font at mobile | 14px | 16px (iOS auto-zoom prevention) |
+| Quick Log reason checkbox label hit target | below 44px | 44px |
+| Segmented mode/filter buttons | existing | all >=44px high |
+| Horizontal page overflow | none | none |
+
+Additional details: quick-log unavailable students now use a subtle dashed border and normal text opacity instead of dimming the entire card; keyboard focus is visible on plus/minus and attendance statuses, and Quick Log pulse is disabled under reduced-motion.
+
+### Verified checks
+
+- New tests/ux-skills-attendance-quicklog.spec.mjs **PASS** on all 16 configurations (2 pages x 4 widths x 2 themes). Focused WCAG axe scan found zero violations in its tested page scopes.
+- New tests/ux-skills-lesson-controls.spec.mjs **PASS** at 320px in light/dark, covering 44px targets, real keyboard Tab focus-visible, attendance search and clearing, Quick Log search/filter clearing, reduced-motion and iOS search font. A first trial of the test incorrectly used programmatic focus without keyboard navigation, which does not prove focus-visible; corrected the test to use Tab, then passed.
+- 9 focused attendance/Quick Log unit tests **PASS** (completeness, historical state, card layout, availability order).
+- Vite build **PASS**; git diff --check PASS. Generated build metadata was reverted from this source-only pilot after build.
+- No actual attendance or Quick Log points were changed for any real user. Real Android/iOS touch behavior and Production app account flows remain outside this proof.
+
+**Safety/approval:** The Draft PR remains Preview only. Do not auto-merge or use real credentials in Preview. N36/N88/N44 work continues in its existing lanes; use only the sole original publisher for any later user-approved Production integration.
