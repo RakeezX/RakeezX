@@ -70,6 +70,28 @@ export async function readCanonical(ports,ownerId,listScopeOnly=false) {
   }
   return canonical;
 }
+/** AI: complete current-class dependency closure, certified by the native reader.
+ * Same projection, raw scores and publication bindings; no fabricated families.
+ * Only construction-time synthetic qualification may select this inactive branch.
+ */
+export async function readGuidanceCanonical(ports,ownerId,classId,termId) {
+  const names=CANONICAL_PROJECTION_REQUIREMENTS.tables;
+  const canonical=Object.fromEntries(names.map(t=>[t,[]]));let bytes=0;
+  const result=await ports.query('select table_index,payload from n88_private.boundary_guidance_sources_v1($1::uuid,$2::text,$3::text)',[ownerId,classId,termId]);
+  const seen=new Set();
+  for(const {table_index,payload} of result.rows) {
+    if(!Number.isInteger(table_index)||!canonical[names[table_index]]||typeof payload!=='string'||(bytes+=Buffer.byteLength(payload))>2*1024*1024)throw Error('n88_projection_bound');
+    // Each family has a real query result, including a certified empty result.
+    const raw=JSON.parse(payload);if(!Array.isArray(raw)||seen.has(table_index)||raw.length>2000)throw Error('n88_projection_bound');
+    seen.add(table_index);
+    canonical[names[table_index]]=raw.map(r=>{
+      const row=Object.fromEntries(Object.entries(r).map(([k,v])=>[camel(k),v]));row.deleted=row.deletedAt!==null;
+      for(const k of numeric)if(row[k]!=null)row[k]=Number(row[k]);return row;
+    });
+  }
+  if(seen.size!==names.length)throw Error('n88_projection_bound');
+  return canonical;
+}
 const fieldsOff=()=>Object.fromEntries(VISIBILITY_FIELDS.map(f=>[f,false]));
 const bindingKeys=['ownerId','sessionId','leaseId','teachingId','classId','termId','contextRevision'];
 export const classListResponseMode=(mode,protocol)=>mode==='public'&&protocol===undefined?'pilot':mode;
@@ -94,6 +116,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
   // Server construction only; no env/body/client switch. Inert unless separately
   // qualified and explicitly enabled by a future authorized service custodian.
   const negativeTerminalEnabled=options.terminalResolutionEnabled===true;
+  const scopedGuidanceEnabled=options.syntheticGuidanceClosureEnabled===true&&options.executionMode==='synthetic';
   const rollout=options.rollout??createRolloutGuard();
   const repository=withCredentialRepository(baseRepository);
   const credentials=createNumericCredentialOperations({rollout,keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey});
@@ -107,12 +130,16 @@ export function createIntegratedService(options,adapter,baseRepository) {
     await recovery.append(ports,c,result.code);return result;
   }]));
   const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Riyadh',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  async function scope(db,ports,auth,teachingId,input={},listScopeOnly=false) {
+  async function scope(db,ports,auth,teachingId,input={},listScopeOnly=false,scopedGuidance=false) {
     const resolved=await createPgClassResolver()(db,ports,auth,teachingId,input);
     if(!resolved)return null;
-    const canonical=await readCanonical(ports,auth.ownerId,listScopeOnly);
+    let canonical=await readCanonical(ports,auth.ownerId,scopedGuidance||listScopeOnly);
     const teaching=canonical.teachings.find(t=>t.id===teachingId),term=canonical.terms.find(t=>t.id===teaching?.termId);
     if(!teaching || !term || term.startDate&&term.startDate>today() || term.endDate&&term.endDate<today())return null;
+    if(scopedGuidance) {
+      if(term.id!==input.binding?.termId)return null;
+      canonical=await readGuidanceCanonical(ports,auth.ownerId,resolved.classId,term.id);
+    }
     return {...resolved,canonical,termId:term.id};
   }
   const inputFor=(s,m)=>({teacherContextVersion:'n88-canonical-teacher-context-v1',canonical:s.canonical,ownerId:s.ownerId,classId:s.classId,termId:s.termId,studentId:m.studentId,enrollmentId:m.enrollmentId,now:today()});
@@ -146,7 +173,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
       const auth=await adapter.verifyTeacher(r,ports);
       return auth?.ownerId===binding.ownerId&&auth.sessionId===binding.sessionId?auth:null;
     };
-    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input,['list','issue-missing','rotate','revoke'].includes(action)).then(s=>{
+    const resolveClass=(db,ports,auth,teachingId,input)=>scope(db,ports,auth,teachingId??body.teachingId,input,['list','issue-missing','rotate','revoke'].includes(action),scopedGuidanceEnabled&&action==='guidance-list').then(s=>{
       if(!s||s.classId!==binding.classId||s.termId!==binding.termId||!rollout.admitsTeacher(auth,s))return null;
       // First deliberate admitted teacher access may create its own private context.
       // An existing inactive context is never reactivated; no canonical/Auth write.

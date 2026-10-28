@@ -1,0 +1,85 @@
+{
+  "taskId": "n88-core-stable-guidance-1028",
+  "runId": "0e0e1581-90bd-4c3e-9ec8-1c74827ef9cd",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "n88_guidance_source_503_actual_root_fixed_with_safe_class_read_and_unchanged_200_list",
+      "status": "PASS",
+      "evidence": "Actual signed-SDK service through original verified repository: 0/28/50, list200 identical; old guidance503/source independently for 2001 unrelated logs and 2.2MB unrelated score definitions; new200 exact baseline tasks/stamps; browser-body flag and constructor flag without synthetic mode cannot enable it."
+    },
+    {
+      "name": "n88_guidance_policy_grade_owner_term_and_cross_class_source_parity",
+      "status": "PASS",
+      "evidence": "Full/scoped exact source and binding equality; all 50 raw grade inconsistencies suppress tasks identically; restoring grades restores tasks; source revision invalidates prior publication; absent policy gives no tasks. Wrong owner/session/teaching/term, expired signed JWT, revoked Auth session and cross-class same-year active membership denied by actual service."
+    },
+    {
+      "name": "native_closure_lock_and_exact_catalog",
+      "status": "PASS",
+      "evidence": "Concurrent grade, enrollment and definition updates and a new child insert each blocked with 55P03 under the closure; transaction completes after writer rollback. Tampered helper owner and unregistered SQL are rejected."
+    },
+    {
+      "name": "n88_guidance_unknown_issuance_not_replayed_and_only_affected_checks_no_live_ops",
+      "status": "PASS",
+      "evidence": "No issuance/rotate/revoke/guidance save invoked; native credential/receipt/guidance counts remain zero. Missing definition and inactive term fail closed; delayed native closure exceeds transaction budget, returns503, rolls back and cannot commit late. No UI/build/provider or real-data operation."
+    }
+  ],
+  "matrix": [
+    {
+      "members": 0,
+      "listOld": 200,
+      "listNew": 200,
+      "oldLogBound": 503,
+      "oldByteBound": 503,
+      "newGuidance": 200,
+      "tasks": 0,
+      "exactBindingsAndSourceStamps": true,
+      "zeroActiveCodes": true
+    },
+    {
+      "members": 28,
+      "listOld": 200,
+      "listNew": 200,
+      "oldLogBound": 503,
+      "oldByteBound": 503,
+      "newGuidance": 200,
+      "tasks": 4,
+      "exactBindingsAndSourceStamps": true,
+      "zeroActiveCodes": true
+    },
+    {
+      "members": 50,
+      "listOld": 200,
+      "listNew": 200,
+      "oldLogBound": 503,
+      "oldByteBound": 503,
+      "newGuidance": 200,
+      "tasks": 4,
+      "exactBindingsAndSourceStamps": true,
+      "zeroActiveCodes": true
+    }
+  ],
+  "providerOperations": 0,
+  "realDataOperations": 0,
+  "cleanup": {
+    "ownedNativePgClosed": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "lockSQLStates": [
+    "55P03",
+    "55P03",
+    "55P03",
+    "55P03"
+  ],
+  "privateCounts": {
+    "credentials": 0,
+    "receipts": 0,
+    "guidance": 0
+  },
+  "sourceSha256": {
+    "integrated-service.mjs": "f11b4ce1d2ae7cbf0605dd7a01e8e279c626cf159a7c2fc908f190e327c9624c",
+    "guidance-closure.inactive.sql": "bce8f06b60a0a0bce7d93aa6c33e4b6306714bdc7815883f6c8be4c41d67e177",
+    "activation/private-error-boundary.mjs": "58ae1bb5f128cf31998ed8ccfa8e372e4980fdbfcc611f8aef61e9dc3098d49e",
+    "activation/error-boundary-contract.json": "19640c963f6696dbacfc68fbcac06ecc75765701686aaa08aed4fb52f1f753cb"
+  }
+}

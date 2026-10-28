@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "currentQueryCount": 76,
+  "registeredOperations": 79,
+  "legacyContractAndIdentitiesUnchanged": true,
+  "originalSerialAndTypedCatalogsAcceptedWithoutExtension": true,
+  "absentOrPartialClosureCannotDispatch": true,
+  "historicalCatalogUnchanged": true,
+  "unchangedSources": [
+    "task-guidance.mjs",
+    "student-projection.mjs",
+    "canonical-adapter.mjs",
+    "postgres-repository.mjs",
+    "receipt-reconciliation.mjs",
+    "receipt-terminal-review.inactive.mjs",
+    "activation/error-boundary-identities.json",
+    "activation/read-service-20261023/typed-read-operations.json",
+    "activation/read-service-20261023/typed-identities.json"
+  ],
+  "syntax": [
+    "drafts/n88-student-portal/integrated-service.mjs",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+    "drafts/n88-student-portal/activation/build-error-boundary.mjs",
+    "tests/n88-stable-guidance-20261028/prepare.mjs",
+    "tests/n88-stable-guidance-20261028/service.test.mjs",
+    "tests/n88-stable-guidance-20261028/registry.test.mjs"
+  ],
+  "stagingSha256": "bce8f06b60a0a0bce7d93aa6c33e4b6306714bdc7815883f6c8be4c41d67e177",
+  "providerOperations": 0
+}
