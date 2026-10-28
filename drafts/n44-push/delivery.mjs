@@ -36,7 +36,8 @@ function eligible(tx, r, payload, now, recompute) {
 /** Private scheduler capability only, NOT a public HTTP/admin/campaign handler.
  * No default sender; absent sender is disabled even if ports are misconfigured.
  * atomic is durable/serializable, with fencing + immutable-key constraints. */
-export function createDeliveryBoundary({ repository, clock, recompute, sender = null, envelope = false, beforePermit = null, maxAttempts = LIMITS.attempts, bindingExpiresAt = Infinity }) {
+export function createDeliveryBoundary({ repository, clock, recompute, sender = null, envelope = false, beforePermit = null, maxAttempts = LIMITS.attempts, bindingExpiresAt = Infinity, trace }) {
+  const note=(key,value=true)=>{try{trace?.(key,value);}catch{}};
   if(!Number.isInteger(maxAttempts)||maxAttempts<1||maxAttempts>LIMITS.attempts||beforePermit!==null&&typeof beforePermit!=='function')throw Error('n44_delivery_configuration');
   if(bindingExpiresAt!==Infinity&&(!Number.isSafeInteger(bindingExpiresAt)||bindingExpiresAt<=0))throw Error('n44_delivery_configuration');
   return Object.freeze({
@@ -89,13 +90,15 @@ export function createDeliveryBoundary({ repository, clock, recompute, sender = 
             ...(envelope ? {binding:{id:r.registrationId,expiresAt:Math.min(r.expiresAt,tx.context(r.workspaceId,r.deviceId).sessionExpiresAt,bindingExpiresAt)}} : {}) };
         });
         if (permit.status) return permit;
+        note('reservationCommit');
         let outcome;
         try { outcome = await sender.send(issueCommittedPermit({ sealed: permit.sealed, payload: permit.payload,
           fingerprint: permit.fingerprint, bindingFingerprint: permit.bindingFingerprint, ...(permit.binding ? {binding:permit.binding} : {}) })); }
         catch { outcome = 'uncertain'; }
-        return await repository.atomic(ownerId, tx => {
+        const finalResult=await repository.atomic(ownerId, tx => {
           const now = tx.time(clock()), job = tx.get('deliveries', permit.key);
           if (!job || job.attempts !== permit.attempt || job.state !== 'sending') return result('uncertain');
+          note('jobMatch');
           // Only an adapter-certified definitive non-acceptance may retry.
           let state = outcome === 'accepted' ? 'sent' : outcome === 'not_accepted_retryable' ? 'retry' :
             outcome === 404 || outcome === 410 ? 'dead' : 'uncertain';
@@ -111,6 +114,7 @@ export function createDeliveryBoundary({ repository, clock, recompute, sender = 
           tx.set('deliveries', permit.key, { ...job, state, nextAt });
           return result(state);
         });
+        note('commitAck');return finalResult;
       } catch { return result('unavailable'); }
     },
     async cleanup(ownerId) {

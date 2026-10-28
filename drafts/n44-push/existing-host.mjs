@@ -1,10 +1,12 @@
 /** AI: existing Supabase Edge composition; all external capabilities disabled by default. */
 import './node-globals.mjs';
+import {CURRENT_INSPECTION} from './activation/current-hosted-inspection.mjs';
 import {assertVerifiedBoundary,privateQuery} from './activation/private-error-boundary.mjs';
 import {supportedSessionPolicy} from './session-policy.mjs';
 import {Buffer} from 'node:buffer';
 import pg from 'pg';
 import {p256} from '@noble/curves/nist.js';
+import {readSenderMaterial} from './sender-material.mjs';
 import {createPrivatePushPorts} from './private-runtime.mjs';
 import {createWebEntry} from './web-entry.mjs';
 import {privateResponse} from './web-protocol.mjs';
@@ -36,7 +38,7 @@ export async function assertPrivateDatabaseSession(client,onSource=()=>{}) {
   // typed routines, source identities, owner, invoker mode and narrow ACL first.
   onSource();await assertVerifiedBoundary(client);
 }
-export function createExistingHost(readEnv) {
+export function createExistingHost(readEnv,{Pool=pg.Pool,fetch,now=Date.now,senderPorts={}}={}) {
  let configurationPhase='configuration';try{
  if(readEnv('N44_ENABLED')!=='true')return Object.freeze({handle:async()=>privateResponse(),close:async()=>{}});
  const required=n=>{const v=readEnv(n);if(typeof v!=='string'||!v)throw Error('n44_configuration');return v;};
@@ -45,20 +47,18 @@ export function createExistingHost(readEnv) {
  configurationPhase='configuration_revision';if(required('N44_SERVICE_REVISION')!=='n44-browser-service-v2')throw Error('n44_readback_missing');
  configurationPhase='configuration_policy';
  const sessionPolicy=JSON.parse(required('N44_SESSION_POLICY_JSON')),serviceSourceSha=required('N44_SERVICE_SOURCE_SHA');
- if(!supportedSessionPolicy(sessionPolicy,Date.now(),serviceSourceSha))throw Error('n44_session_policy_readback_missing');
+ if(!supportedSessionPolicy(sessionPolicy,now(),serviceSourceSha))throw Error('n44_session_policy_readback_missing');
  configurationPhase='configuration_transport';const transport=databaseConfig(readEnv);
  configurationPhase='configuration_crypto';
  const key=n=>{const v=required(n);if(!/^[a-f0-9]{64}$/.test(v))throw Error('n44_key_configuration');return Buffer.from(v,'hex');};
  const ingressKey=key('N44_INGRESS_KEY'),schedulerKey=key('N44_SCHEDULER_KEY'),rateKey=key('N44_RATE_KEY');
- const raw=JSON.parse(required('N44_CRYPTO_JSON'));
- const ring=x=>{if(!Array.isArray(x)||x.length<1||x.length>8)throw Error('n44_key_configuration');return new Map(x.map(([name,value])=>{if(!/^[a-f0-9]{64}$/.test(value))throw Error('n44_key_configuration');return [name,Buffer.from(value,'hex')];}));};
- const material={...raw,sealingKeys:ring(raw.sealingKeys),endpointHmacKeys:ring(raw.endpointHmacKeys),bindingHmacKeys:ring(raw.bindingHmacKeys),vapidKeys:new Map(raw.vapidKeys)};
+ const material=readSenderMaterial(required('N44_CRYPTO_JSON'));
  const keys=[ingressKey,schedulerKey,rateKey,...material.sealingKeys.values(),...material.endpointHmacKeys.values(),...material.bindingHmacKeys.values()];
  if(new Set(keys.map(v=>v.toString('hex'))).size!==keys.length)throw Error('n44_separate_keys_required');
  for(const v of material.vapidKeys.values()){if(!p256.utils.isValidPrivateKey(Buffer.from(v.privateKey??'','base64url')))throw Error('n44_private_key_configuration');}
  configurationPhase='configuration_provider';const providerOrigins=JSON.parse(required('N44_PROVIDER_ORIGINS_JSON'));
- const crypto=createPrivatePushPorts({...material,providerOrigins,enabled:true});
- const pool=new pg.Pool(transport);
+ const crypto=createPrivatePushPorts({...material,providerOrigins,enabled:true},{...senderPorts,clock:now});
+ const pool=new Pool(transport);
  pool.on('error',()=>{});let waiting=0;
  const acquire=async()=>{if(waiting>=4)throw Error('n44_pool_capacity');waiting++;let c;
   let phase='connect';try{c=await pool.connect();
@@ -67,9 +67,15 @@ export function createExistingHost(readEnv) {
   catch(e){c?.release(Error('n44_database_unavailable'));throw runtimeFailure(phase,e);}finally{waiting--;}};
  try {
   const finiteScheduler=JSON.parse(readEnv('N44_FINITE_SCHEDULER_JSON')??'null');
-  const deviceTest=JSON.parse(readEnv('N44_ONE_DEVICE_TEST_JSON')??'null');
+  const approval=JSON.parse(readEnv('N44_ONE_DEVICE_TEST_JSON')??'null');
+  // A separate reviewed pin is mandatory. Never derive authority from its own descriptor.
+  const mobileTrial=approval?.kind==='n44-mobile-pilot-v1'?approval:null;
+  const mobileGrantSha256=readEnv('N44_MOBILE_GRANT_SHA256')??null;
+  if(mobileGrantSha256!==null&&!mobileTrial)throw Error('n44_mobile_configuration_conflict');
+  if(mobileTrial&&(approval.purpose!==undefined||readEnv('N44_DELIVERY_ENABLED')==='true'||readEnv('N44_SCHEDULER_ENABLED')==='true'))throw Error('n44_mobile_configuration_conflict');
+  const operatorDisposal=approval?.purpose==='n44-exact-old-disposal-v1'?approval:null,currentInspection=approval?.purpose===CURRENT_INSPECTION?approval:null,deviceTest=mobileTrial||operatorDisposal||currentInspection?null:approval;
   const publicVapidKey=material.vapidKeys.get(material.activeVapidKeyId)?.publicKey??null;
-  const handle=createWebEntry({finiteScheduler,sessionPolicy,serviceSourceSha,acquire,authUrl,origin,apiKey:required('N44_AUTH_API_KEY'),providerOrigins,crypto,ingressKey,schedulerKey,rateKey,deviceTest,publicVapidKey,deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true'});
+  const handle=createWebEntry({finiteScheduler,sessionPolicy,serviceSourceSha,acquire,authUrl,origin,apiKey:required('N44_AUTH_API_KEY'),providerOrigins,crypto,ingressKey,schedulerKey,rateKey,deviceTest,operatorDisposal,currentInspection,mobileTrial,mobileGrantSha256,publicVapidKey,deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true',fetch,now});
   return Object.freeze({handle,async close(){crypto.close();await pool.end();}});
  }catch(e){crypto.close();void pool.end();throw runtimeFailure('configuration',e);}
  }catch(e){throw runtimeFailure(configurationPhase,e);}
