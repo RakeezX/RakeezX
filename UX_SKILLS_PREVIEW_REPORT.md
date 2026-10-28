@@ -132,3 +132,47 @@ Additional details: quick-log unavailable students now use a subtle dashed borde
 - No actual attendance or Quick Log points were changed for any real user. Real Android/iOS touch behavior and Production app account flows remain outside this proof.
 
 **Safety/approval:** The Draft PR remains Preview only. Do not auto-merge or use real credentials in Preview. N36/N88/N44 work continues in its existing lanes; use only the sole original publisher for any later user-approved Production integration.
+
+
+## Round 4 — Weekly Schedule and Today's Sessions (2026-10-28)
+
+**Scope:** The existing Schedule route (#/schedule) and the Home current-session/remaining-session presentation. Use the same Draft PR #15, with the single established Cloudflare Pages branch Preview. No real account, grade, attendance, underlying timetable date/time data, slot writes, calendar policy, sync, or notifications are changed.
+
+### Before/after in local synthetic Chromium, 320px
+
+| Measurement | Before | After |
+| --- | ---: | ---: |
+| Schedule first lesson card top | 479px | 388px |
+| Schedule title card height | 105px | 93px |
+| Schedule weekly summary height | 96px | 76px |
+| Schedule six weekday tabs | 2 rows / 105px | 1 row / 53px |
+| Home featured lesson card height | 228px | 179px |
+| Home first remaining lesson row top | 773px | 724px |
+| Home remaining lesson row height | 72px | 64px |
+| Horizontal overflow | none | none |
+
+Fixture: 30 recurring weekly periods over 5 teaching days and 3 synthetic grades/classes, six synthetic Wednesday sessions. Identical synthetic input for A/B. All six day tabs have a 44px height and at least 48px width on 320px, do not clip the Arabic labels, and retain keyboard arrow/selection behavior. Each visible slot Edit/Delete control remains 44×44.
+
+### Accessibility correction
+
+The original Schedule loaded class-summary disclosure contained an interactive timing-profile anchor nested inside its summary element. The baseline automated axe WCAG scan reported the nested-interactive issue. This candidate moves the timing-profile link into a visually aligned sibling of the details disclosure, with a separate accessible label; expanded/collapsed details, 3 summary rows and the link navigation were tested. Updated candidate scan finds no violations within the inspected Schedule/Home scopes. The summary's formatting is CSS-only, and no session or timing profile mutation is done in this change.
+
+### Targeted regression evidence
+
+- New tests/ux-skills-schedule-today.spec.mjs: dense week baseline / enhanced A/B, mobile weekday keyboard selection, independently focusable timing link and 3 class summary rows.
+- Existing tests/schedule-mobile-today.e2e.mjs: 3 passed — Today selection, empty Today copy and non-teaching holiday default.
+- Existing tests/n132-home-compact-labels.e2e.mjs: 2 passed — full/short class names and immutable stored class, subject and routing identity. These served-demo tests require RAKEEZX_E2E_BASE_URL pointing to the isolated loopback fixture; the pilot Playwright config now defaults that variable to http://127.0.0.1:5194 (not production).
+- First run of the new A/B test timed out because it awaited non-existent .home-page instead of the actual .page--home. Corrected test locator and reran successfully. The two existing Home tests initially lacked their required fixture origin; reran with that origin and passed. Neither was a demonstrated Product failure.
+
+### Limits
+
+Screen-width emulation is not physical iPhone/Android validation. The public Cloudflare Preview must use only the product's synthetic Demo path and no personal data. Preview publication and code source parity do not authorize Production merge. Keep N36/N88/N44 scopes and the sole publisher unchanged.
+
+
+### Round 4 final verification summary
+- **Chromium:** 16/16 Playwright tests PASS for all four pilot rounds, including three original Schedule Today tests and two Home compact-label identity tests.
+- **WebKit:** 3/3 focused Schedule/Home UI tests PASS on 320/390/768/1280, light and dark, including independent summary timing link and day keyboard navigation.
+- **Firefox:** 3/3 corresponding focused Schedule/Home tests PASS with the same fixture.
+- **Unit checks:** 21/21 relevant tests PASS for schedule-day policy, export/print eligibility, Home labels, attendance completeness, and Quick Log card layout. Vite build PASS. Source diff --check PASS.
+- **Corrected baseline test harness issues:** baseline original test initially timed out due to wrong .home-page locator; fixed to .page--home. Existing served-demo Home tests initially had no RAKEEZX_E2E_BASE_URL; corrected local-only pilot config and reran them successfully.
+- **Important:** WebKit and Firefox tests were executed with Playwright on Windows. This is not proof of actual mobile Safari, iPhone, Android, offline service worker, Cloudflare/production data, or real teacher accounts. Browser results belong to the exact pilot candidate.
