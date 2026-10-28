@@ -21,5 +21,6 @@ export function verifiedN134DeliveryGateSplit(task,result,update,baseline) {
   && first.every(n=>result.checks?.some(c=>c.name===n&&c.status==='PASS'))
   && result.checks?.some(c=>c.name===downstream&&c.status==='NOT_RUN') && !result.checks?.some(c=>c.status==='FAIL')
   && card.objective===baseline.objective+'\n\nPHASE CONTRACT REPAIR 2026-10-28: Preserve candidate cacb273e and all successful local evidence. The original publisher must prove provider, immutable and served Production AFTER local delivery; this remains mandatory for acceptance. Resume the saved session; do not repeat unchanged checks or publish from the worker.'
-  && same(card,expected);
+  && Object.entries(card).every(([k,v])=>same(v,expected[k]))
+  && ['id','productId','scopeKey','liveMutation','allowedPaths','verificationPaths','requiredChecks','postDeliveryChecks','preflight','preparationAuthority','releaseAuthority','acceptance','objective'].every(k=>same(card[k],expected[k]));
 }
