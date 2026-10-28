@@ -9,8 +9,40 @@
   "sourceEncoding": "utf8-lf-preserve-bom",
   "verifiedBackendDelivery": "249f248ed075d0d395456614e1147bb693c5e99c",
   "immutableSource": "51bca7c959bd6faf96764849a48fb8c79170dd43",
-  "target": null,
-  "preflightAuthority": null,
+  "target": {
+    "projectRef": "xlrubcwjqktzzunrvuns",
+    "databaseName": "postgres",
+    "databaseOid": "5",
+    "systemIdentifier": "7678071634733212629",
+    "serverAddress": "2406:da1a:314:7102:b56b:ec54:38ab:5060",
+    "serverPort": "5432",
+    "serverVersionNum": "170006",
+    "databaseIdentity": {
+      "database_name": "postgres",
+      "database_oid": "5",
+      "current_role": "postgres",
+      "session_role": "postgres",
+      "server_address": "2406:da1a:314:7102:b56b:ec54:38ab:5060",
+      "server_port": 5432,
+      "server_version_num": "170006",
+      "system_identifier": "7678071634733212629"
+    },
+    "observedReadSessionRole": "postgres",
+    "observedReadCurrentRole": "postgres",
+    "installerSessionRole": null,
+    "installerCurrentRole": null,
+    "baselineInventorySha256": "d5f9f0451c70076e67fc9adee68d672c2a42dc852a440b1995889a20db7b0b7f",
+    "nonExposureReadbackSha256": null
+  },
+  "preflightAuthority": {
+    "ref": "po-20261028-n88-read-authority/authority.json",
+    "evidenceSha256": "117927aeb8b003e31d662f76e1659b1b4784b2fac638166efc50d4987e952281",
+    "approvedAt": "2026-10-28T20:46:51.023Z",
+    "scope": "nine-exact-read-only-metadata-statements",
+    "queryPlanSha256": "fda7e7fdb72b79a80b4e33c4c0aef29da41c3a2aa60ccb27e849af744b74181b",
+    "providerEvidenceSha256": "0f93c24c07c46b188d1f4d4bed44e3e662f0db09072bca55c2eabb788afa6e56",
+    "phaseDeadline": "2026-10-28T22:38:35.817Z"
+  },
   "installationAuthority": null,
   "historicalTargetHint": {
     "projectRef": "xlrubcwjqktzzunrvuns",
@@ -231,7 +263,7 @@
     "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
     "drafts/n88-student-portal/integrated-service.mjs": "6348d080dc6364d8741be4699afe0f8e71954e3ff6ae4dfb4a1b3c0532caaf64",
     "drafts/n88-student-portal/student-projection.mjs": "b407eb68c492c6d861ceb2da9c8dafe24ab3736aa679174ff2539a881bb5d754",
-    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "58ae1bb5f128cf31998ed8ccfa8e372e4980fdbfcc611f8aef61e9dc3098d49e",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "d897789737dd6442fe0f51b1efe6deb7c86531bab658366c41453304dd01281f",
     "drafts/n88-student-portal/activation/error-boundary-contract.json": "19640c963f6696dbacfc68fbcac06ecc75765701686aaa08aed4fb52f1f753cb",
     "drafts/n88-student-portal/activation/read-service-20261023/typed-read-operations.json": "ad5445a843afbfe464869fa6789b518d0f80fcb5518cd611c93442da768e9ccf",
     "drafts/n88-student-portal/activation/v2-package-1028/schema.sql": "bf8fbd6c695338f478216f348de2a073cd2e942aed80517715f9945d2204008a",
@@ -245,7 +277,8 @@
     "drafts/n88-student-portal/six-digit-schema.inactive.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
     "drafts/n88-student-portal/activation/error-boundary-identities.json": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4",
     "drafts/n88-student-portal/activation/read-service-20261023/typed-identities.json": "1c9e9f0419bb2450acfab84996c9a6afc2566f07cb62398d2ae59a704f1dec04",
-    "supabase/migrations/0012_sync_v2_server_protocol.sql": "03b9abd0c904364ad6b9acdbf9315ab699782f3c8daa5a416a4828c7a67a2078"
+    "supabase/migrations/0012_sync_v2_server_protocol.sql": "03b9abd0c904364ad6b9acdbf9315ab699782f3c8daa5a416a4828c7a67a2078",
+    "drafts/n88-student-portal/activation/v2-external-plan-1028/read-authority.json": "2b5e1f0eed50c741ffccaf65d6e1785b791d53d809fc3a47ef3b3f7e41890acf"
   },
   "installerSha256": "49f6b904b6abc5511b2370490d70093d52d3a32463119cba285c91e707814271",
   "readOnlyQueryPlanSha256": "fda7e7fdb72b79a80b4e33c4c0aef29da41c3a2aa60ccb27e849af744b74181b",
@@ -256,63 +289,63 @@
       "sha256": "06e7a2bc647807b361ff0e5ec6a0bad3f341efc0dccc7159662e0eb16a9c7773",
       "maxRows": 1,
       "maxBytes": 8192,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "roles-and-memberships",
       "sha256": "c11726020aec75969838a93bdcd26c0d02063f374e5bfe75636f58ff1250ecca",
       "maxRows": 8,
       "maxBytes": 32768,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "relation-identity",
       "sha256": "1c4ce0241aa019e7d8c64a4e9064f78a82d935e2a078a8d9b803a0633a763950",
       "maxRows": 64,
       "maxBytes": 65536,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "constraints-columns-policies",
       "sha256": "c1c774c43129c8be23491337e28e46e264052b35cdaf7ff40192a5c7f13889cb",
       "maxRows": 64,
       "maxBytes": 524288,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "function-and-trigger-identity",
       "sha256": "089b41040ea77a109acc22f77d81cf29c1eb21faaa55d29f005c810485df5dec",
       "maxRows": 64,
       "maxBytes": 65536,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "trigger-and-index-identity",
       "sha256": "fe462bd8f0a8b38908aca24d904837e2f23458c145291ce89d26f643c0a8b8bc",
       "maxRows": 256,
       "maxBytes": 262144,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "effective-table-privileges",
       "sha256": "da7fbb557b64ab7946acd1d41ce00f6d437526f7f104afd875d8061690338265",
       "maxRows": 128,
       "maxBytes": 131072,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "exposure-and-effective-privileges",
       "sha256": "2ed736aeec2a50344553d29957fa2bb723531ac4266c978096471d9a8e25cea1",
       "maxRows": 3,
       "maxBytes": 16384,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     },
     {
       "id": "baseline-inventory-digest",
       "sha256": "9f6a6058d1259c3ee00f62c376714cfcc5aec813cb3b87f29e74603dd9d1edee",
       "maxRows": 1,
       "maxBytes": 1024,
-      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+      "currentBoundary": "EXPLICIT_PO_AUTHORIZED_SCOPED_ADMISSION"
     }
   ],
   "changeSet": {
@@ -363,5 +396,14 @@
     "canonicalWriterChanges": [],
     "serviceActivation": false
   },
-  "preflightSha256": "d3db12838b9c237c7d72b6939fcf0d33cf6c852569cd4ef9ae292844fd7edf17"
+  "preflightSha256": "0f16d5eb1e569e0657643fca03569a9aed77428c102c7a9dff9d82f3490a6178",
+  "originalBoundarySha256": "58ae1bb5f128cf31998ed8ccfa8e372e4980fdbfcc611f8aef61e9dc3098d49e",
+  "authorizedRead": {
+    "taskId": "n88-authorized-read-preflight-1028",
+    "runId": "6c91874c-cfc8-4e2f-88e4-2e084980210a",
+    "state": "READ_ONLY_COMPLETE",
+    "identityDiscoveryAuthorized": true,
+    "installationAuthorized": false,
+    "reportSha256": "7091f6d661c363a2b644005de89d61300acc6ca5dee35001f60f404a59698553"
+  }
 }

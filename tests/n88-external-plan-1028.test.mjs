@@ -22,7 +22,7 @@ test('exact immutable packet body, four relations/two roles/14 fixed functions; 
   assert.deepEqual(manifest.expectedFunctions,packet.functions);assert(await verifyPinnedSources());
 });
 test('unbound target/authority fail before DDL even if session attestation strings were set',()=>{
-  assert.equal(manifest.target,null);assert.equal(manifest.preflightAuthority,null);assert.equal(manifest.installationAuthority,null);assert.equal(manifest.execute,false);
+  assert.equal(manifest.target.projectRef,'xlrubcwjqktzzunrvuns');assert.equal(manifest.preflightAuthority.ref,'po-20261028-n88-read-authority/authority.json');assert.equal(manifest.installationAuthority,null);assert.equal(manifest.execute,false);
   const gate=sql.indexOf('n88_external_target_and_authority_unbound');assert(gate>=0&&gate<sql.indexOf('create schema'));
   assert(sql.includes("expected_target jsonb := 'null'::jsonb"));assert(sql.includes("expected_authority jsonb := 'null'::jsonb"));
   for(const required of ['n88_external_exact_authority_mismatch','n88_external_physical_target_or_role_mismatch','n88_external_prerequisite_inventory_changed','n88_external_collision_or_partial_state_readback_only','n88_external_fixed_function_readback_mismatch','n88_external_storage_rls_mismatch'])assert(sql.includes(required));
@@ -31,7 +31,7 @@ test('unbound target/authority fail before DDL even if session attestation strin
 });
 test('default read-only runner does not acquire or query anything',async()=>{
   let acquired=0;const r=await runReadOnlyPreflight({acquireApprovedReadOnly:()=>{acquired++;throw Error('must-not-open');}});
-  assert.equal(r.state,'NOT_RUN');assert.equal(r.queried,false);assert.equal(r.installationAuthorized,false);assert.equal(acquired,0);assert(r.missing.includes('exact_current_read_only_authority'));
+  assert.equal(r.state,'NOT_RUN');assert.equal(r.queried,false);assert.equal(r.installationAuthorized,false);assert.equal(acquired,0);assert(r.missing.includes('exact_current_read_only_authority')); // this legacy proposal API still requires its explicit verifier; actual direct-PO runner is separately covered
 });
 test('inventory is exact bounded SELECT catalog metadata, no Auth/application row reads or control execution',()=>{
   assert.equal(readOnlyQueryPlan.length,9);assert.equal(readOnlyQueryPlanSha256,manifest.readOnlyQueryPlanSha256);
@@ -51,11 +51,11 @@ const future=()=>{
   const binding={...manifest,target:{projectRef:approval.projectRef,databaseIdentity:{fabricated:true}},preflightAuthority:{ref:approval.ref}};
   return {approval,binding};
 };
-test('unchanged original finite boundary denies all nine proposed inventory queries locally; no SQL forwarded',async()=>{
+test('original finite boundary denies all nine inventory queries without the new explicit authority capability',async()=>{
   const calls=[];const client={query:async statement=>{calls.push(statement);assert.equal(statement,boundaryCatalogSql);return {rows:identities};}};
   await assertVerifiedBoundary(client);
   for(const q of readOnlyQueryPlan)await assert.rejects(privateQuery(client,q.sql,[]),{message:'n88_database_unavailable'});
-  assert.deepEqual(calls,[boundaryCatalogSql]);assert.equal(sha(read('drafts/n88-student-portal/activation/private-error-boundary.mjs')),'58ae1bb5f128cf31998ed8ccfa8e372e4980fdbfcc611f8aef61e9dc3098d49e');
+  assert.deepEqual(calls,[boundaryCatalogSql]);assert.equal(manifest.originalBoundarySha256,'58ae1bb5f128cf31998ed8ccfa8e372e4980fdbfcc611f8aef61e9dc3098d49e');assert.equal(sha(read('drafts/n88-student-portal/activation/private-error-boundary.mjs')),manifest.prerequisites['drafts/n88-student-portal/activation/private-error-boundary.mjs']);
 });
 test('future read-only protocol records first exact denial, disposes owned port, and never retries/falls back',async()=>{
   const f=future(),calls=[];let disposed=0;

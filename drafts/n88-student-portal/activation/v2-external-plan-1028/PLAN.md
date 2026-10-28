@@ -1,8 +1,10 @@
 # N88 external installation delta — INACTIVE, PREPARATION ONLY
 
+**Current read continuation:** task `n88-authorized-read-preflight-1028`, run `6c91874c-cfc8-4e2f-88e4-2e084980210a`, base `6a637684df7b9cfde8527a1e6030687d0ac9a685`. Direct PO read approval `po-20261028-n88-read-authority/authority.json` is granted; do not ask again. The nine original metadata reads are now **READ_ONLY_COMPLETE**, through the original boundary and supported Supabase custodian tool. See [actual evidence](../../../../docs/automation-evidence/20261028/N88_AUTHORIZED_READ_PREFLIGHT.md) and `read-authority.json`. Only the installation and activation remain unapproved/unexecuted; previous missing-read-authority text is superseded by this section.
+
 AI-authored 2026-10-28. Task `n88-external-plan-1028`, run `0ea5387f-105a-4e92-b19c-57d72ba1d3a1`, same saved session `01a1822d-de76-76d3-89eb-78fb47247a17`. Base `ac86b0315da113166bfd021d3f037151c4828ce6`; starting worktree clean. Candidate is the AI-labelled commit containing this plan. Original controller and sole publisher retain delivery ownership. No queue/status/ledger changes, worker spawning, push or deployment.
 
-**Delivered:** complete separate external `install.sql`, fixed read-only preflight runner/query plan, manifest and affected tests. **Not executed:** installer (including locally), hosted SQL, provider reads/writes, accounts, Auth/RLS/schema mutations or activation. Current defaults are `target:null`, `preflightAuthority:null`, `installationAuthority:null`, `execute:false`. Local source readiness is not installation or N88 acceptance.
+**Delivered:** complete separate external `install.sql`, fixed read-only preflight runner/query plan, bound read approval and actual metadata inventory. Installer (including locally), provider writes, accounts, Auth/RLS/schema mutations and activation remain unexecuted. Manifest now records the actual read target and preflight approval; `installationAuthority:null`, `execute:false`, and both installer SQL binding literals remain null. Reading the target does not enable that installer or confer N88 acceptance.
 
 ## Exact source and evidence reused
 
@@ -14,23 +16,23 @@ External artifact identities, UTF8/LF with BOM preserved:
 | --- | --- |
 | Complete external `install.sql` | `49f6b904b6abc5511b2370490d70093d52d3a32463119cba285c91e707814271` |
 | Exact copied package delta, excluding original transaction/local gate only | `9b0096b2ab45623e4168eee888fda9c2cfdb48fef2e87e2b7822506f782722bf` |
-| `preflight.mjs` | `d3db12838b9c237c7d72b6939fcf0d33cf6c852569cd4ef9ae292844fd7edf17` |
+| Current `preflight.mjs` | `0f16d5eb1e569e0657643fca03569a9aed77428c102c7a9dff9d82f3490a6178` |
 | Ordered nine-query read-only descriptor plan | `fda7e7fdb72b79a80b4e33c4c0aef29da41c3a2aa60ccb27e849af744b74181b` |
 
-Manifest pins28 unchanged prerequisite files: the packet/module identities, original teacher verifier/current-session helper, canonical adapter/locks/grade context, integrated numeric/six-v1 DDL and numeric handler, old finite boundary/contracts/identities, original student projection and Sync receipt/lifecycle source. It includes the14 exact proposed function names and native definition/owner/config/ACL identities. Nothing in those files was modified.
+Manifest retains28 historical dependency entries and adds the exact read-authority record. The original finite boundary's hash is deliberately updated for the authorized nine-read addition; its original preimage hash is retained. Packet/module identities, original teacher/current-session/canonical/numeric/grade/projection/Sync sources and existing76/78 statement/identity JSON files remain unchanged. The14 proposed installation function identities are still pinned, not installed.
 
 Reuse unchanged backend evidence: native10/10 phases, final identity-only2/2 and packet6/6; prior bridge11/11, finite17/17, canonical/native and targeted ACK reports remain intact. The old actual native result at `tests/n88-backend-package-1028/results.json` has raw SHA256 `0c69a2ebaa353cc0b1e9b12181f910d573c95ac29f1bfa2afe4f1c518a1f5f22`. No old native/Preview/UI campaign was repeated. New SQL gates are reviewed by source assertions only; this task does not claim they were parsed/executed on PostgreSQL or validated on a hosted target.
 
 ## Original target: known hint, missing current proof
 
-Original `activation/manifest.json` names project **`xlrubcwjqktzzunrvuns`**. This non-secret historical reference is pinned and is the only project this installer proposal can target. It is **not** a fresh target attestation, connection, current DB role or new permission. No DSN, credentials, token or account was located/read/probed.
+Original `activation/manifest.json` names project **`xlrubcwjqktzzunrvuns`**. The historical reference alone was insufficient; fresh `Supabase.get_project` evidence and the actual database metadata read now bind it to database `postgres`, OID5, system identifier`7678071634733212629`, server`2406:da1a:314:7102:b56b:ec54:38ab:5060:5432`, PG170006 and observed custodian session/current role`postgres`. No DSN, credentials, token or account was located/read/probed. This is management-plane metadata, not application-backend connectivity or an installer-role approval.
 
-These exact items remain missing and deliberately null:
+Remaining installation items (read permission is already granted):
 
-1. Fresh provider/custodian cross-attestation of that project to its actual database name/OID, PostgreSQL system identifier, backend server address/port/version, actual installer session/current role and current service backend login/memberships. No guessed `postgres` database/role/port is filled in. An IP or historical project string alone is insufficient.
-2. Exact current read-only authority and an original-custodian-owned existing finite read connection/phase. The proposed metadata queries are currently **NOT_ADMITTED** by the unchanged finite boundary. No alternative credential/management route or broader query port is requested by this runner.
-3. Fresh original schema/helper/column/key/RLS/ACL/function identities and deterministic baseline inventory digest, plus independent provider nonexposure readback/digest. Actual role privilege or provider settings are not inferred from local PG.
-4. A separate matching installation authority with exact target digest, delta digest, authority reference/expiry and original custodian. Current source publication permission is not that installation grant. No old fixture identity, spent proof phase, quota or data allowance is renewed by this task/run ID.
+1. Actual database/read-role identity is recorded above, not guessed. `installerSessionRole` and `installerCurrentRole` remain null because the observed manager role is not an installation grant. An actual runtime login/host assembly still needs its separately scoped proof.
+2. The historical **NOT_ADMITTED** read state is superseded: exact PO approval now binds an exclusive finite read client, nine byte-exact SELECTs, order/count/result bounds and120s deadline. Ordinary clients without this capability still deny these queries; all original76/78 paths retain their existing behavior. No alternate credentials or broad SQL port were used.
+3. Actual original source/role/ACL/function inventory and baseline digest `d5f9f0451c70076e67fc9adee68d672c2a42dc852a440b1995889a20db7b0b7f` are recorded. Independent provider API nonexposure still needs readback: the private schema denies anon/authenticated USAGE, but `pgrst.db_schemas` returned null and cannot prove provider exposure configuration.
+4. A separate matching installation authority with exact target/delta/baseline/nonexposure digests, actor, reference/expiry and original custodian remains absent. Source publication/read permission is not that installation grant. No old fixture identity, spent proof phase, quota or data allowance is renewed.
 
 ## Narrow read-only preflight
 
@@ -39,9 +41,9 @@ node drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs
 node --test tests/n88-external-plan-1028.test.mjs
 ```
 
-Default CLI result: **NOT_RUN**, `queried:false`, missing fresh target/read authority/owned finite connection. It performs only pinned local source reads. There is no driver, DSN, environment lookup, network acquisition or installer invocation.
+Default CLI opens no connection; it reports read authorization present and **NOT_RUN** only for a new invocation without the original custodian transport. The actual completed result is retained in `read-authority.json`. There is no driver, DSN, environment lookup, secret acquisition or installer invocation. The actual owned relay uses `--original-custodian-files`, short IDs/hashes and the pinned SQL plan; no terminal SQL text or closed stdin is used. Its same-run directory already exists after completion, preventing an accidental replay of that CLI phase.
 
-The future callable protocol requires a separately reviewed bound target and exact read-only approval, verified by the original custodian/controller's trusted authority port. It uses an exclusive approved connection with owned `dispose()`, a5s total budget/1s cleanup, one-use approval object and no retry. The only raw technical statement is the unchanged original `assertVerifiedBoundary` identity read. All inventory statements go exclusively through original `privateQuery`; the first denial stops and records exact `n88_database_unavailable`, query ID/hash and no fallback. Boundary verification does not verify the physical project or authorize DDL. No successful preflight grants installation; complete inventory would still return `REVIEW_REQUIRED`.
+The original proposal's generic future API remains available for compatibility. The current direct-PO `runAuthorizedReadPreflight` instead validates the exact approved evidence file/hash and provider project attestation, then discovers the actual identity. It uses an exclusive approved port with owned `dispose()`,120s/one-second cleanup and no retry. The only bootstrap technical statement is the unchanged original `assertVerifiedBoundary` read; inventory goes exclusively through original `privateQuery` and a short-lived named authority capability. No new hosted functions, DDL, role grants or settings were required for this local admission. The first denial poisons the client and records exact safe technical rejection. Once opted into this read phase, that client cannot use legacy mutations/controls. Complete read status grants no DDL/activation.
 
 Fixed inventory, no caller-selected SQL/table/role/function:
 
@@ -59,7 +61,7 @@ Fixed inventory, no caller-selected SQL/table/role/function:
 
 Full literal SQL/hash descriptors are exported in `preflight.mjs`; manifest records every hash/bound. The same deterministic baseline expression is embedded in the installation gate. Overflow sentinels fail, never truncate into PASS. The plan reads no `auth.users`/`auth.sessions` rows, pupil/teacher/scoring rows, credential payloads, tokens or secrets. `pg_control_system()` may itself require additional server privilege; **its server permission has not been tested**. No grant is added to overcome it.
 
-Local in-process tests use the actual unchanged boundary with fabricated existing identities. All nine inventory queries reject before forwarding SQL; the runner stops at the first target-identity rejection and disposes the fabricated port. This is a **local allowlist denial**, not a new hosted/service rejection. Actual hosted inventory remains NOT_RUN. A future original custodian must record any real denial verbatim/safely and stop; it cannot use raw query, alternate role, credential route or an expired approval to continue. Any exact metadata-operation admission/identity extension must be separately authorized in the original finite mechanism, preserving old refusals and pins.
+Local tests still prove all nine inventory queries reject without the explicit new capability. With the PO-bound capability, all nine execute once in exact order; altered SQL, extra args, wrong project/provider, expired/closed scope, oversized results, replay and attempts at legacy mutation/control deny. Actual supported-tool reads completed: counts1/6/19/19/6/173/38/3/1, no database/tool rejection. Initial relay failures and their correction are preserved in the current evidence; uncertain terminal-relayed role results were not used as proof. No denied service operation was retried through another role/credential or channel.
 
 ## Complete installer, exact change set and gates
 
@@ -81,11 +83,11 @@ Before COMMIT it checks all14 actual function definitions/owner/security/search_
 
 Collision/partial state handling: read-only classify **absent**, **already exact** or **mismatch/partial**. Absent may proceed only under new matching authority. Already exact means NO_CHANGE/no installer replay, with fresh identity readback and no service activation inference. Mismatch/partial means stop and preserve evidence; no CREATE IF NOT EXISTS adoption, repair grant, drop/recreate or rerun. The install guard rejects all collisions, including exact already-installed state; the original custodian, not this worker, decides that read-only disposition.
 
-## Concrete future authorization request — draft, NOT GRANTED
+## Concrete installation authorization request — draft, NOT GRANTED
 
 Requested custodian/target: the original authorized N88 custodian, original project `xlrubcwjqktzzunrvuns`, **after** fresh physical/role/provider identity fields above are supplied. Two distinct scoped phases must be named:
 
-1. **Read only:** authorize only the nine hashed metadata queries and unchanged boundary-verifier read through the existing finite mechanism on that exact project/connection. No application/Auth row reads, writes, role grant, DDL, account or token operation. Name exact operation admission if currently denied; no alternate credential route. Record authority ref/expiry, lease owner and bounded output disposition.
+1. **Read only — COMPLETE/GRANTED:** exact PO authority and nine hashed metadata queries have been implemented and executed through the original finite mechanism. No application/Auth rows or credentials were read, no DDL/write/grant/account/token operation occurred. Reuse the current bounded evidence; do not ask again for this permission or repeat it unchanged.
 2. **Install storage only:** authorize one atomic transaction of the exact delta hash in this plan, four relations, two roles,14 fixed/six support functions, eight immutable guards,23 policies and scoped grants above. Bind the final installer hash, fresh baseline/nonexposure receipts, actual installer role and independent authority proof into a newly reviewed bound artifact. Read back the complete object/privilege identities. Explicitly exclude Auth changes, real data/account reads/writes, issuance, cancellation, live writer attachment, service/route enablement and UI. Preserve all previous denials and fixture allocations.
 
 Expected acceptance: matching physical/provider target and source prerequisites, all new object/function/role/ACL/RLS/readback identities, absence of public exposure, runtime denial of raw Auth/private/credential/canonical writes, no privilege escalation via login memberships/RESET ROLE, unchanged OFF behavior and preserved immutable receipt/high-water/tombstone semantics. Target-specific fabricated live fixture and actual teacher/student UI acceptance need their own exact allowance after backend qualification; no retired identities may be reused. The frontend publisher performs none of these backend steps.
@@ -98,6 +100,6 @@ Before COMMIT, any failed gate/DDL/readback aborts the single transaction; the a
 
 ## Affected verification and delivery boundary
 
-Focused new JS tests: **10/10 PASS**, validating exact copied delta, hashes, default-deny NULL gates, SQL source transaction/postconditions, original boundary denials, source prerequisites, typed physical/role identity, finite read-only disposal/authority/no-retry behavior and this bounded plan. `node --check` and scoped diff checks PASS. No SQL was executed or native campaign rerun; no browser/server/cluster/phase lease was acquired, so no owned resource needs cleanup. Ticket-router and Postgres least-privilege guidance applied; official PostgreSQL17 identity documentation and Supabase changelog reviewed without library/configuration change.
+Original external-plan tests are updated for the explicitly approved read continuation, with a new targeted authorization/legacy-compatibility suite. They validate exact copied installer delta, still-null install gates, exact source pins, authority/order/output/replay denials and original76/78 behavior. Syntax/diff checks apply. Only the approved hosted metadata SELECTs ran; no installer or native PG campaign was executed. The integration lease was acquired/released for the actual read phase; owned relay process/port closed and response files removed, reports retained. No browser, server or cluster was launched.
 
-LOCAL_READY is for this completed inactive artifact and source-only preparation. External preflight/install/real acceptance remain NOT_RUN with the exact missing target/authority/admission items above; N88 remains OPEN.
+LOCAL_READY is for the completed local admission, actual read-only inventory and still-inactive installer packet. Installation/service/writer/actual teacher-student acceptance remain NOT_RUN under their separate exact gates; N88 remains OPEN.

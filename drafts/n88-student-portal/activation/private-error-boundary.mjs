@@ -1,9 +1,11 @@
 import typedReads from './read-service-20261023/typed-read-operations.json' with {type:'json'};
 import typedIdentities from './read-service-20261023/typed-identities.json' with {type:'json'};
+import metadataAuthority from './v2-external-plan-1028/read-authority.json' with {type:'json'};
 /** AI-authored. Finite trusted operations, native typed results, bound ASCII wire.
  * No caller-supplied SQL reaches PostgreSQL; no JSON result conversion is added.
  */
 import {Buffer} from 'node:buffer';
+import {createHash} from 'node:crypto';
 import contract from './error-boundary-contract.json' with {type:'json'};
 import identities from './error-boundary-identities.json' with {type:'json'};
 const fail=()=>{throw Error('n88_database_unavailable');};
@@ -13,6 +15,44 @@ const guidanceOperations=new Map((contract.guidanceClosure?.operations??[]).map(
 const operations=new Map(contract.operations.map(o=>[o.sql,o]));
 const controls=new Set(contract.controls);
 const typedOperations=new Map([...contract.operations,...typedReads].map(o=>[o.sql,o]));
+// Named PO-approved metadata addition ONLY. The original statement/identity maps,
+// controls, wrapper calls and all unrelated denials below remain unchanged.
+const metadataOperations=new Map(metadataAuthority.operations.map(o=>[o.sql,o]));
+const metadataReaders=new WeakMap(),metadataSpent=new WeakSet();
+const metadataKeys=[
+ ['database_name','database_oid','current_role','session_role','server_address','server_port','server_version_num','system_identifier'],
+ ['rolname','rolsuper','rolbypassrls','rolinherit','rolcanlogin','rolcreatedb','rolcreaterole','memberships'],
+ ['nspname','relname','relkind','owner','relrowsecurity','relforcerowsecurity','acl'],
+ ['nspname','relname','columns','constraints','policies'],
+ ['nspname','proname','arguments','definition','definer','owner','proconfig','acl'],
+ ['nspname','relname','name','kind','definition','enabled'],
+ ['nspname','relname','rolname','table_select','column_select','insert','update','column_update','delete','truncate'],
+ ['nspname','owner','acl','anon_usage','authenticated_usage','configured_api_schemas'],['sha256'],
+];
+export function authorizeMetadataPreflight(client,context,{durationMs=metadataAuthority.maxDurationMs}={}) {
+ if(!verified.has(client)||metadataSpent.has(client)||metadataOperations.size!==9||metadataAuthority.approved!==true||metadataAuthority.installationAuthorized!==false||
+   context?.authorityRef!==metadataAuthority.authorityRef||context.evidenceSha256!==metadataAuthority.evidenceSha256||
+   context.projectRef!==metadataAuthority.projectRef||context.providerEvidenceSha256!==metadataAuthority.providerEvidenceSha256||
+   !Number.isSafeInteger(durationMs)||durationMs<1||durationMs>120000||Date.now()>=Date.parse(metadataAuthority.phaseDeadline))fail();
+ for(const op of metadataAuthority.operations)if(createHash('sha256').update(op.sql).digest('hex')!==op.sha256||!op.sql.startsWith('select '))fail();
+ metadataSpent.add(client);metadataReaders.set(client,{position:0,deadline:Math.min(Date.now()+durationMs,Date.parse(metadataAuthority.phaseDeadline))});
+ return Object.freeze({authorityRef:context.authorityRef,projectRef:context.projectRef,statements:9});
+}
+export function closeMetadataPreflight(client){metadataReaders.delete(client);}
+async function metadataRead(client,sql,values){
+ const scope=metadataReaders.get(client),op=metadataOperations.get(sql);
+ try{
+  if(!scope||Date.now()>=scope.deadline||values.length!==0||metadataAuthority.operations[scope.position]?.sql!==sql)fail();
+  const keys=metadataKeys[scope.position++]; // consume BEFORE dispatch; no repeat after lost result
+  const r=await client.query(sql,[]);
+  if(metadataReaders.get(client)!==scope||Date.now()>=scope.deadline||!r||r.command!=='SELECT'||!Array.isArray(r.rows)||r.rows.length>op.maxRows||r.rowCount!==r.rows.length||
+    Buffer.byteLength(JSON.stringify(r.rows))>op.maxBytes||r.rows.some(row=>!row||Object.getPrototypeOf(row)!==Object.prototype||Object.keys(row).length!==keys.length||keys.some(k=>!Object.hasOwn(row,k))))fail();
+  if(scope.position===9)metadataReaders.delete(client);
+  return r;
+ }catch(e){metadataReaders.delete(client);const error=Error('n88_database_unavailable');
+  error.metadataDenial={queryId:op.id,sqlSha256:op.sha256,code:/^[A-Z0-9]{5}$/.test(e.code??'')?e.code:null,
+    custodianError:typeof e.custodianError==='string'?e.custodianError.slice(0,512):null};throw error;}
+}
 export const boundaryCatalogSql=`select p.proname as name,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,
     pg_get_function_identity_arguments(p.oid) as arguments,p.prosecdef as definer,
     r.rolname as owner,p.proconfig as config,
@@ -48,7 +88,11 @@ function pgText(value) {
   fail();
 }
 export async function privateQuery(client,sql,values=[]) {
-  if(!verified.has(client) || !Array.isArray(values))fail();
+  if(!verified.has(client) || !Array.isArray(values)){if(metadataSpent.has(client))metadataReaders.delete(client);fail();}
+  if(metadataOperations.has(sql))return metadataRead(client,sql,values);
+  // Opting an exclusive client into the NEW read phase never grants the legacy
+  // mutation/control operations. Ordinary legacy clients retain their old path.
+  if(metadataSpent.has(client)){metadataReaders.delete(client);fail();}
   if(controls.has(sql)) {
     if(sql.startsWith('select set_config')) {
       if(values.length!==3 || values.some(v=>typeof v!=='string'||!/^\d{1,5}$/.test(v)||Number(v)<1||Number(v)>60000))fail();
