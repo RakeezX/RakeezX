@@ -1,3 +1,4 @@
+import {finiteScope,finiteActive,finiteGuards} from './core-teacher-scheduler.mjs';
 /** AI: concrete private DB/Auth/context/events/delivery composition. No hosted operation. */
 import {supportedSessionPolicy,policySessionRevision} from './session-policy.mjs';
 import {randomUUID,createHmac} from 'node:crypto';
@@ -11,10 +12,11 @@ import {id,record,uuid,LIMITS} from './shared.mjs';
 import {deviceApproval,publicDeviceConfiguration,oneDeviceGuard} from './one-device-test.mjs';
 const fail=()=>{throw Error('n44_unavailable');};
 const exact=(v,keys)=>{if(!record(v,keys))fail();};
-export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,crypto,rateKey,deliveryEnabled=false,deviceTest=null,publicVapidKey=null,sessionPolicy,serviceSourceSha,now=Date.now}) {
+export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,crypto,rateKey,deliveryEnabled=false,finiteScheduler=null,deviceTest=null,publicVapidKey=null,sessionPolicy,serviceSourceSha,now=Date.now}) {
  if(!supportedSessionPolicy(sessionPolicy,now(),serviceSourceSha))fail();
  const policy=Object.freeze(structuredClone(sessionPolicy));
  const testApproval=deviceTest&&structuredClone(deviceTest);
+ const finite=finiteScheduler===null?null:finiteScope(finiteScheduler),finiteGuard=finite&&finiteGuards(finite);
  const verify=createTeacherVerifier({authUrl,apiKey,fetch,now});
  async function transaction(work,signal) {
   const c=await acquire();let committed=false;
@@ -38,7 +40,9 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
   const stored=await q('select * from n44_push_draft.events where owner_id=$1 order by workspace_id,device_id,event_id limit 101',[owner]);
   if(stored.rows.length>100)fail();
   const cache=new Map();
-  for(const e of stored.rows){const ctx=state.contexts.get(JSON.stringify([e.workspace_id,e.device_id]));if(!ctx?.active)continue;
+  for(const e of stored.rows){
+   if(finite&&!finite.targets.some(t=>t.workspaceId===e.workspace_id&&t.deviceId===e.device_id&&t.eventId===e.event_id&&t.sourceKind===e.source_kind&&t.sourceId===e.source_id&&t.sourceStamp===e.source_stamp))continue;
+   const ctx=state.contexts.get(JSON.stringify([e.workspace_id,e.device_id]));if(!ctx?.active)continue;
    const key=JSON.stringify([e.source_kind,e.source_id,ctx.preferences]);
    if(!cache.has(key))cache.set(key,await readSource(q,owner,e.source_kind,e.source_id,ctx.preferences));
    const fresh=cache.get(key);if(fresh?.stamp===e.source_stamp){const candidate=fresh.events.find(x=>x.id===e.event_id);if(candidate)events.set(JSON.stringify([e.workspace_id,e.device_id,e.event_id]),candidate);}
@@ -49,10 +53,10 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
     const live=await q('select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[owner,ctx.sessionId]);if(live.rows.length!==1)fail();
    }}};
  }
- const makeDelivery=(signal,oneDevice=false)=>{
+ const makeDelivery=(signal,oneDevice=false,finiteTick=false)=>{
   const fence=()=>{if(signal?.aborted||!supportedSessionPolicy(policy,now(),serviceSourceSha))fail();};
   const repository=createPostgresRepository({acquire,prepare:async(...args)=>{fence();const extension=await prepare(...args,signal);fence();return {...extension,async beforeCommit(){await extension.beforeCommit?.();fence();}};}});
-  return createDeliveryBoundary({repository,clock:now,envelope:true,...(oneDevice?{beforePermit:oneDeviceGuard(testApproval),maxAttempts:1,bindingExpiresAt:testApproval.expiresAt}:{}),recompute:(tx,r,event,time)=>tx.sourceEvent(r,event,time),sender:{send(permit){if(signal?.aborted||oneDevice&&!deviceApproval(testApproval,now()))return 'uncertain';return crypto.sender.send(permit,{signal});}}});
+  return createDeliveryBoundary({repository,clock:now,envelope:true,...(finiteTick?{beforePermit:finiteGuard.beforePermit,maxAttempts:1,bindingExpiresAt:finite.hardEnd}:{}),...(oneDevice?{beforePermit:oneDeviceGuard(testApproval),maxAttempts:1,bindingExpiresAt:testApproval.expiresAt}:{}),recompute:(tx,r,event,time)=>tx.sourceEvent(r,event,time),sender:{send(permit){if(signal?.aborted||finiteTick&&!finiteActive(finite,now())||oneDevice&&!deviceApproval(testApproval,now()))return 'uncertain';return crypto.sender.send(permit,{signal});}}});
  };
  // Both roles use a shared durable atomic upsert; raw IP/owner never used as rate keys.
  async function take(query,kind,key,limit) {
@@ -173,6 +177,22 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
   },signal);
  },
  async schedule({operation,cursor=null,limit=25},signal) {
+  if(finite) {
+   if(deliveryEnabled||operation!=='finite-due'||cursor!==null||limit!==1||!finiteActive(finite,now()))return {status:'disabled'};
+   const repository=createPostgresRepository({acquire});
+   const claimed=await repository.atomic(finite.ownerId,tx=>finiteGuard.tick(tx,tx.time(now())));
+   if(!claimed)return {status:'completed',count:0,cursor:null};
+   const outcomes=[];
+   for(const t of finite.targets){
+    if(signal?.aborted||!finiteActive(finite,now()))break;
+    const rows=await transaction(({query})=>query('select * from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and event_id=$4',[finite.ownerId,t.workspaceId,t.deviceId,t.eventId]),signal);
+    const e=rows.rows?.[0];
+    if(!e||e.source_kind!==t.sourceKind||e.source_id!==t.sourceId||e.source_stamp!==t.sourceStamp||Number(e.due_at_ms)>now())continue;
+    const payload=normalizePushPayload(e.payload,now());
+    if(payload&&payload.id===t.eventId)outcomes.push((await makeDelivery(signal,false,true).deliver(finite.ownerId,t.registrationId,payload)).status);
+   }
+   return {status:'completed',count:outcomes.length,outcomes,cursor:null};
+  }
   if(operation==='one-device-test') {
    const a=deviceApproval(testApproval,now());
    if(deliveryEnabled||!a?.target||cursor!==a.runId||limit!==1)return {status:'disabled'};

@@ -66,9 +66,10 @@ export function createExistingHost(readEnv) {
    return {query:async(sql,values)=>{try{return await privateQuery(c,sql,values);}catch(e){throw runtimeFailure('query',e);}},release:e=>c.release(e)};}
   catch(e){c?.release(Error('n44_database_unavailable'));throw runtimeFailure(phase,e);}finally{waiting--;}};
  try {
+  const finiteScheduler=JSON.parse(readEnv('N44_FINITE_SCHEDULER_JSON')??'null');
   const deviceTest=JSON.parse(readEnv('N44_ONE_DEVICE_TEST_JSON')??'null');
   const publicVapidKey=material.vapidKeys.get(material.activeVapidKeyId)?.publicKey??null;
-  const handle=createWebEntry({sessionPolicy,serviceSourceSha,acquire,authUrl,origin,apiKey:required('N44_AUTH_API_KEY'),providerOrigins,crypto,ingressKey,schedulerKey,rateKey,deviceTest,publicVapidKey,deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true'});
+  const handle=createWebEntry({finiteScheduler,sessionPolicy,serviceSourceSha,acquire,authUrl,origin,apiKey:required('N44_AUTH_API_KEY'),providerOrigins,crypto,ingressKey,schedulerKey,rateKey,deviceTest,publicVapidKey,deliveryEnabled:readEnv('N44_DELIVERY_ENABLED')==='true'});
   return Object.freeze({handle,async close(){crypto.close();await pool.end();}});
  }catch(e){crypto.close();void pool.end();throw runtimeFailure('configuration',e);}
  }catch(e){throw runtimeFailure(configurationPhase,e);}
