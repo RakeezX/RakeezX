@@ -1,0 +1,145 @@
+{
+  "taskId": "continuous-n44-timezone-readiness-frontend-delivery-20261028",
+  "runId": "31ef956a-0826-4bae-8a12-f8c1ce7ac6c1",
+  "productId": "N44",
+  "recordedAt": "2026-10-28T06:45:01.915Z",
+  "state": "LOCAL_READY",
+  "scope": "frontend-only runtime timezone receipt",
+  "baseSha": "b099cf67183657a83bfa4b20e64856872eb8131b",
+  "sourceCommit": "fb9d78e7af01332aba6ed9bb4a1231341fcb979a",
+  "sourcePacket": {
+    "commit": "9b4dc05db8235abde3ec6fb6bdd6f7951297d9fc",
+    "path": "tests/n44-mobile-live-20261028/timezone-publisher-packet-c21a2c71.json",
+    "sha256": "fbbdd895d0b24922dcb20ef72522750b43c3834d7f1c10b7a6d42a2a3f631d4a",
+    "patchPath": "tests/n44-mobile-live-20261028/timezone-public-c21a2c71.patch",
+    "patchSha256": "c597864ee3dda0eec4a6c95e2f3dc1ce1141580819faae29b46d85892d350064",
+    "hashEncoding": "Canonical Git-object bytes; extract without shell newline conversion"
+  },
+  "productFile": {
+    "path": "src/views/notification-settings.js",
+    "preimageBlob": "d407c97b3b2945d79bac68c2a68f0e33cd2c7842",
+    "preimageSha256": "612a79f6af151ff061ef9856a59caa1be27020024d3e331c14fd9c3244ea2778",
+    "postimageBlob": "9ecdb6962a68647e9817061229362b0904c51598",
+    "postimageSha256": "f8cfea28abf586f4347d718af8ab9f57ff45232c962b7b8088e20fa69f3ab8eb"
+  },
+  "dependencyBinding": {
+    "status": "PASS",
+    "testedCompositionMain": "b099cf67183657a83bfa4b20e64856872eb8131b",
+    "observedOriginMain": "b099cf67183657a83bfa4b20e64856872eb8131b",
+    "matchedPacketDependencyBlobs": 19,
+    "materialDifferences": [],
+    "stylesTree": "1a08471421eb5320e2569a86ba56e664939f6092",
+    "workingDependenciesUnchanged": true
+  },
+  "evidenceReuse": {
+    "status": "PASS",
+    "rerun": false,
+    "hashesVerified": [
+      {
+        "path": "tests/n44-mobile-live-20261028/disclosure-timezone-riyadh-c21a2c71.json",
+        "commit": "fb9d78e7af01332aba6ed9bb4a1231341fcb979a",
+        "sha256": "113b000a2feea557e1a2df1949d54940fed9edbde27cda79a96586abbdc0ed1d"
+      },
+      {
+        "path": "tests/n44-mobile-live-20261028/disclosure-timezone-kiritimati-c21a2c71.json",
+        "commit": "fb9d78e7af01332aba6ed9bb4a1231341fcb979a",
+        "sha256": "4ccb62cffe67a001d90e4b5f2ef10f48cfe47406a82ec41feaacd917879e0ca1"
+      },
+      {
+        "path": "tests/n44-mobile-live-20261028/disclosure-timezone-riyadh-c21a2c71.png",
+        "commit": "fb9d78e7af01332aba6ed9bb4a1231341fcb979a",
+        "sha256": "7624050f0bda2d2b1ed564d95c5ceb241e702e51726474b23fe9e2b297cc5d7d"
+      },
+      {
+        "path": "tests/n44-mobile-live-20261028/disclosure-timezone-kiritimati-c21a2c71.png",
+        "commit": "fb9d78e7af01332aba6ed9bb4a1231341fcb979a",
+        "sha256": "dd550cc8be4f820859a7e0d891da502b84c0750d99a6261b6bd13a9867cf6c3a"
+      },
+      {
+        "path": "tests/n44-mobile-live-20261028/disclosure-ui.mjs",
+        "commit": "fb9d78e7af01332aba6ed9bb4a1231341fcb979a",
+        "sha256": "cf746e407b6e1f58b034e1534385b1bcb595a423af0698e8853d6996cc0bad84"
+      }
+    ],
+    "renderedCases": [
+      {
+        "evidencePath": "tests/n44-mobile-live-20261028/disclosure-timezone-riyadh-c21a2c71.json",
+        "timezone": "Asia/Riyadh",
+        "viewportWidth": 390,
+        "status": "PASS",
+        "rtl": true,
+        "horizontalOverflow": false,
+        "ownerInvalidationClearsPrivateDom": true,
+        "staleSourceImmediateCalls": 0,
+        "externalRequests": 0,
+        "liveOperations": 0
+      },
+      {
+        "evidencePath": "tests/n44-mobile-live-20261028/disclosure-timezone-kiritimati-c21a2c71.json",
+        "timezone": "Pacific/Kiritimati",
+        "viewportWidth": 390,
+        "status": "PASS",
+        "rtl": true,
+        "horizontalOverflow": false,
+        "ownerInvalidationClearsPrivateDom": true,
+        "staleSourceImmediateCalls": 0,
+        "externalRequests": 0,
+        "liveOperations": 0
+      }
+    ]
+  },
+  "scopedAssertions": {
+    "syntax": {
+      "command": "node --check src/views/notification-settings.js",
+      "status": "PASS"
+    },
+    "exactReadOnlyFieldDelta": "PASS",
+    "newImports": 0,
+    "diffWhitespace": "PASS"
+  },
+  "changedPaths": [
+    "src/views/notification-settings.js",
+    "docs/automation-evidence/20261028/N44_TIMEZONE_READINESS_FRONTEND_DELIVERY.md",
+    "tests/n44-timezone-delivery-20261028/qualification.json"
+  ],
+  "checks": [
+    {
+      "name": "n44_timezone_exact_qualified_file_and_dependency_binding",
+      "status": "PASS",
+      "evidence": "Canonical preimage/postimage and patch hashes match the pinned packet; exact Git blob copied. All 19 dependency blobs and the src/styles tree match the tested composition, checkout and observed origin/main. node --check and exact markup-only delta assertion passed."
+    },
+    {
+      "name": "n44_timezone_actual_two_zone_display_and_owner_boundary",
+      "status": "PASS",
+      "evidence": "Reused hash-bound actual HTTP application DOM/CSS proofs at qualified source fb9d78e7af01332aba6ed9bb4a1231341fcb979a: Asia/Riyadh and Pacific/Kiritimati, RTL at 390px without overflow; owner invalidation clears private DOM and the timezone field, stale source action has no immediate call or external request. Both screenshots and harness hashes verified; no browser rerun."
+    },
+    {
+      "name": "n44_timezone_frontend_only_zero_live_operations",
+      "status": "PASS",
+      "evidence": "Only one read-only settings field plus this qualification and the safe delivery note. Exact source-delta assertion preserves imports, handlers and guards; app/SW/styles/N88/service/configuration remain unchanged. No original private worktree writes, live operations, grant preparation, clock activation, browser/server startup, push or deployment."
+    }
+  ],
+  "boundaries": {
+    "runtimeTimezoneIsSavedServerAcknowledgement": false,
+    "serviceUploadRequired": false,
+    "liveOperations": 0,
+    "originalPrivateWorktreeWrites": 0,
+    "grantPreparationRepeated": false,
+    "clockActivated": false,
+    "pushPerformed": false,
+    "deploymentPerformed": false
+  },
+  "resources": {
+    "browsersStarted": 0,
+    "serversStarted": 0,
+    "phaseLeasesAcquired": [],
+    "ownedResourcesRemaining": 0
+  },
+  "parentHistory": {
+    "modified": false,
+    "physicalPhoneChecks": "NOT_RUN",
+    "N44": "OPEN",
+    "D107": "OPEN"
+  },
+  "nextAction": "Original publisher builds and verifies the served settings postimage; only then the controller resumes the original mobile card/custodian for a fresh complete normal-UI receipt and current phone readiness."
+}

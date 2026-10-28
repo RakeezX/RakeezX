@@ -218,7 +218,8 @@ const view = {
         <details class="n44-preference card card--pad" data-n44-current-identity data-n44-disclosure="current-identity" ${disclosureOpen(disclosures, 'current-identity')} style="overflow-wrap:anywhere">
           <summary>هوية الحساب والجهاز الحالي</summary>
           <p>سياق الحساب المحلي الحالي. لا يثبت موافقة الخدمة أو تفعيل التذكيرات أو وصولها.</p>
-          <dl><dt>الحساب</dt><dd dir="ltr">${context.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${context.workspaceId}</dd><dt>الجهاز</dt><dd dir="ltr">${context.deviceId}</dd></dl>
+          <dl><dt>الحساب</dt><dd dir="ltr">${context.ownerId}</dd><dt>المساحة</dt><dd dir="ltr">${context.workspaceId}</dd><dt>الجهاز</dt><dd dir="ltr">${context.deviceId}</dd>
+            <dt>المنطقة الزمنية للتذكيرات على هذا الجهاز</dt><dd dir="ltr" data-n44-runtime-timezone>${Intl.DateTimeFormat().resolvedOptions().timeZone}</dd></dl>
         </details>
         ${push?.configOutcome ? html`<details class="n44-preference card card--pad" data-n44-config-outcome data-n44-disclosure="config-outcome" ${disclosureOpen(disclosures, 'config-outcome')} style="overflow-wrap:anywhere">
           <summary>نتيجة التحقق من إعداد تذكيرات الجهاز</summary>
