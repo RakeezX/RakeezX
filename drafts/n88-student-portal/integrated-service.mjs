@@ -1,5 +1,6 @@
 import {credentialStateRevision,reconcileIssuanceReceipts} from './receipt-reconciliation.mjs';
 import {cancelOriginalIntentTransaction} from './receipt-terminal-review.inactive.mjs';
+import {createPublicationV2Service,PUBLICATION_V2_PATHS} from './publication-v2-service.inactive.mjs';
 import {createCanonicalAdapter} from './canonical-adapter.mjs';
 import {readTaskGuidance,authorizedGuidanceSources,guidanceTeacherList,saveTaskGuidance} from './task-guidance.mjs';
 /** AI: inactive class/universal composition in the existing fenced PG transaction. */
@@ -113,6 +114,10 @@ function createStudentReadBoundary(createHandler,options) {
   };
 }
 export function createIntegratedService(options,adapter,baseRepository) {
+  // AI: isolated source prototype only. Live repositories/legacy student reads
+  // never receive these ports, even if a client supplies an enable flag.
+  const publicationV2=createPublicationV2Service({...options.publicationV2,
+    executionMode:options.executionMode,enabled:options.publicationV2Enabled===true,origin:options.origin});
   // Server construction only; no env/body/client switch. Inert unless separately
   // qualified and explicitly enabled by a future authorized service custodian.
   const negativeTerminalEnabled=options.terminalResolutionEnabled===true;
@@ -158,6 +163,7 @@ export function createIntegratedService(options,adapter,baseRepository) {
     return measure('projection',()=>projectStudentPortal({...inputFor(s,m),visibility:stored||null,taskGuidance}));
   }});
   return async request=>{
+    if(PUBLICATION_V2_PATHS.includes(request.path))return publicationV2(request);
     if(request.path.startsWith('/student/'))return student(request);
     const match=/^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)$/.exec(request.path);
     if(!match || request.method!=='POST')return deny();

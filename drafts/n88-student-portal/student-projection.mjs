@@ -3,7 +3,7 @@ import { canonicalGradeContext } from './canonical-grade-context.mjs';
 // AI: callable inactive server projection. Does not authorize a session or query.
 import { createHash } from 'node:crypto';
 import { itemScore, studentTotal, sectionLabel, sortByOrder } from '../../src/models.js';
-import { projectSubitemScore, subitemCompletionState, normalizeSubitemDatesAndPoints } from '../../src/lib/score-foundation.js';
+import { projectSubitemScore, subitemCompletionState, subitemSelectedPoints, normalizeSubitemDatesAndPoints } from '../../src/lib/score-foundation.js';
 import { validateVisibilityPolicy } from './visibility-policy.mjs';
 
 export const STUDENT_PROJECTION_VERSION = 'n88-student-v3';
@@ -159,6 +159,49 @@ export function projectStudentPortal(input) {
     const { startDate, dueDate } = normalizeSubitemDatesAndPoints(definition);
     const family = completionState !== 'unrecorded' ? 'completed' : startDate && startDate > s.today ? 'scheduled' : 'required';
     if (enabled(family)) out.work[family].push({ id: publication.publicationId, title: definition.name, startDate, dueDate, completionState, ...guidanceForStudent(input,definition,publication) });
+  }
+  return out;
+}
+
+/** AI: inactive V2 projection. Revalidates the actual current pupil in the same
+ * locked snapshot. No legacy group policy, parent aggregate, totals or raw rows.
+ * publications/draft are constructed by publication-v2-service, never HTTP data.
+ */
+export function projectStudentPublicationV2(input, draft, publications) {
+  const s = readScope(input);
+  if (draft.scope.ownerId !== input.ownerId || draft.scope.sectionId !== input.classId ||
+      draft.scope.termId !== input.termId || !s.teachings.some(t => t.id === draft.scope.teachingId && t.subjectId === draft.scope.subjectId)) deny();
+  const out = { work: [], grades: [] };
+  for (const row of draft.rows) {
+    const matches = publications.filter(p => p.rowId === row.id);
+    const p = matches.length === 1 ? matches[0] : null;
+    if (!p || p.tombstone || p.sourceRevision !== row.sourceRevision || p.publicationRevision < 1) continue;
+    const definition = row.kind === 'subitem' ? s.definitions.find(d => d.id === row.sourceId && d.itemId === row.itemId) : null;
+    if (definition) normalizeSubitemDatesAndPoints(definition); // existing score/date/late-points invariants
+    const completions = definition ? s.rows.scoreSubitemCompletions.filter(c => active(c) && c.studentId === input.studentId && c.subitemId === definition.id) : [];
+    if (completions.length > 1) deny('unique_student_subitem_completion');
+    const family = definition && subitemCompletionState(completions[0]) !== 'unrecorded' ? 'completed' : row.startDate && row.startDate > s.today ? 'scheduled' : 'required';
+    if (row.work && p.decisions[family]) out.work.push({ id: row.id, title: row.title, startDate: row.startDate,
+      dueDate: row.dueDate, categories: [family], description: row.description, link: row.link });
+    if (row.kind === 'manual' || !p.decisions.grade) continue;
+    let value;
+    if (definition) {
+      // One component only. Manual parent adjustments and sibling components
+      // cannot become a child's grade or disclose the parent's aggregate.
+      value = subitemCompletionState(completions[0]) === 'unrecorded' ? null : subitemSelectedPoints(definition, completions[0]);
+    } else {
+      const item = s.items.find(i => i.id === row.sourceId && i.teachingId === draft.scope.teachingId);
+      if (!item || item.scoreMode === 'subitems') deny();
+      const scores = s.rows.scores.filter(r => active(r) && r.studentId === input.studentId && r.itemId === item.id);
+      if (scores.length > 1) deny('unique_student_item_score');
+      const logs = s.rows.logs.filter(r => active(r) && r.teachingId === item.teachingId);
+      const sessions = s.rows.sessions.filter(r => active(r) && r.teachingId === item.teachingId);
+      value = itemScore(item, { ...canonicalGradeContext(s.rows, input.studentId, item.teachingId),
+        logs: logs.filter(r => r.studentId === input.studentId), classHasParticipation: logs.some(r => r.kind === 'participation'),
+        attendance: s.rows.attendance.filter(r => active(r) && r.studentId === input.studentId && r.teachingId === item.teachingId && sessions.some(session => session.id === r.sessionId)) });
+    }
+    if (value !== null && (typeof value !== 'number' || !Number.isFinite(value))) deny();
+    out.grades.push({ id: row.id, title: row.title, value });
   }
   return out;
 }
