@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-durable-store-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100013,
+      "scopeKey": "n88-durable-publication-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 120,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n88-item-after-negative-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+        "tests/n88-durable-store-1028/transactions.test.mjs",
+        "docs/automation-evidence/20261028/N88_DURABLE_PUBLICATION_STORAGE.md",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/canonical-adapter.mjs",
+        "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs",
+        "drafts/n88-student-portal/student-projection.mjs"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs"
+      ],
+      "requiredChecks": [
+        "n88_real_transaction_adapter_cas_and_immutable_receipts",
+        "n88_owner_isolation_source_tombstone_and_no_grade_leak",
+        "n88_rollback_lost_ack_concurrent_conflict_no_reissue",
+        "n88_storage_default_off_no_live_or_browser_access"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only durable publication adapter and unapplied SQL proposal"
+      },
+      "releaseAuthority": "Latest direct PO28October requests dedicated N88 worker now to achieve the existing stable teacher/student portal and resolve blockers. Implement the missing durable backend code locally and qualify with fabricated isolated data; sole publisher may deliver inactive source-only code. This is no hosted migration, Auth/RLS/grant change, service activation, real-account read, real credential issuance/closure or student disclosure. Exact live rollout remains separately scoped and must use original custodian. No spent allocation reset or tool-policy bypass.",
+      "objective": "Dedicated N88 implementation lane. Goal remains stable teacher code lifecycle, tasks and opt-in grades across refresh with owner/student isolation. Prior V2 source d7a32296/published9231e885 has only injected synthetic storage; its evidence explicitly identifies missing private durable publication/receipt/high-water storage. Implement the actual parameterized PostgreSQL transaction adapter behind the existing OFF service boundary, an UNAPPLIED private-schema SQL source proposal and focused real transaction tests where an existing isolated local PostgreSQL runtime is available. This is concrete missing backend implementation, not another prototype UI or audit. Reuse existing typed repository/canonical contracts; implement atomic CAS, immutable original request receipt, persistent tombstones/high-water revision and fresh ownership/source fences. Reject missing or malformed/legacy state; ACK only after COMMIT, unknown on lost ACK without replay, both race orders and stale session/source with 0/1/30/50 fabricated pupils, no hidden grades. Do not trust browser lease as server authority. Actual service defaults and routes remain OFF and unchanged until explicit activation. No positive issuance changes or real cancellation. Do not alter existing applied SQL, live databases, Auth/RLS/grants, native/provider/pins, browser/user session, N44 files, shared SW or public UI. New .inactive.sql is source proposal only; local scratch database must be demonstrably owned, loopback-only and contain only synthetic data. Do not use any production DSN or credentials or install paid services. If actual local PG is unavailable, finish the adapter/source with honest local unit evidence and document that independent-connection PG proof is NOT_RUN; never claim in-memory proof equals PG. Existing published evidence is reused. Enumerate exact remaining installation and readback prerequisites in final doc, without inventing new live authority. Only original controller runs sessions and publisher delivers source. Never alter queue/ledger or spawn workers. Scope includes the six existing dependent service modules only where necessary; no whole private branch merge. Return LOCAL_READY only for a verifiable completed inert implementation, or BLOCKED with a concrete defect and saved candidate; do not repeat identical failure twice.",
+      "acceptance": [
+        "Executable durable adapter and bounded inactive storage DDL, preserving existing service OFF behavior.",
+        "Affected CAS/receipt/rollback/privacy and deletion races with actual evidence; genuine PG proof distinguished from mocks.",
+        "No hosted service/data mutation, no secrets/public access, and clear exact rollout prerequisites."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "fd79f76a4847ccc6e69c8044714e030bb9cd3025",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/canonical-adapter.mjs",
+          "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs",
+          "drafts/n88-student-portal/student-projection.mjs",
+          "docs/automation-evidence/20261028/N88_PUBLICATION_V2_SERVICE_STAGE.md"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+          "tests/n88-durable-store-1028/transactions.test.mjs",
+          "docs/automation-evidence/20261028/N88_DURABLE_PUBLICATION_STORAGE.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+          "tests/n88-durable-store-1028/transactions.test.mjs",
+          "docs/automation-evidence/20261028/N88_DURABLE_PUBLICATION_STORAGE.md"
+        ],
+        "workerChecks": [
+          "n88_real_transaction_adapter_cas_and_immutable_receipts",
+          "n88_owner_isolation_source_tombstone_and_no_grade_leak",
+          "n88_rollback_lost_ack_concurrent_conflict_no_reissue",
+          "n88_storage_default_off_no_live_or_browser_access"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
