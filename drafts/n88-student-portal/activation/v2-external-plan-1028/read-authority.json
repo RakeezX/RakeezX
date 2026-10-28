@@ -1,0 +1,464 @@
+{
+  "version": 1,
+  "productId": "N88",
+  "taskId": "n88-authorized-read-preflight-1028",
+  "runId": "6c91874c-cfc8-4e2f-88e4-2e084980210a",
+  "authorityRef": "po-20261028-n88-read-authority/authority.json",
+  "evidencePath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261028-n88-read-authority/authority.json",
+  "evidenceSha256": "117927aeb8b003e31d662f76e1659b1b4784b2fac638166efc50d4987e952281",
+  "approved": true,
+  "approvedAt": "2026-10-28T20:46:51.023Z",
+  "scope": "nine-exact-read-only-metadata-statements",
+  "projectRef": "xlrubcwjqktzzunrvuns",
+  "provider": {
+    "tool": "Supabase.get_project",
+    "observedAt": "2026-10-28T20:50:15.441Z",
+    "projectRef": "xlrubcwjqktzzunrvuns",
+    "status": "ACTIVE_HEALTHY",
+    "region": "ap-south-1",
+    "databaseHost": "db.xlrubcwjqktzzunrvuns.supabase.co",
+    "databaseVersion": "17.6.1.166",
+    "postgresEngine": "17"
+  },
+  "providerEvidenceSha256": "0f93c24c07c46b188d1f4d4bed44e3e662f0db09072bca55c2eabb788afa6e56",
+  "phaseDeadline": "2026-10-28T22:38:35.817Z",
+  "maxDurationMs": 120000,
+  "queryPlanSha256": "fda7e7fdb72b79a80b4e33c4c0aef29da41c3a2aa60ccb27e849af744b74181b",
+  "installationAuthorized": false,
+  "allowIdentityDiscovery": true,
+  "operations": [
+    {
+      "id": "target-identity",
+      "sql": "select current_database() as database_name,(select oid::text from pg_database where datname=current_database()) as database_oid,current_user::text as current_role,session_user::text as session_role,host(inet_server_addr()) as server_address,inet_server_port() as server_port,current_setting('server_version_num') as server_version_num,(pg_control_system()).system_identifier::text as system_identifier",
+      "sha256": "06e7a2bc647807b361ff0e5ec6a0bad3f341efc0dccc7159662e0eb16a9c7773",
+      "maxRows": 1,
+      "maxBytes": 8192
+    },
+    {
+      "id": "roles-and-memberships",
+      "sql": "select r.rolname,r.rolsuper,r.rolbypassrls,r.rolinherit,r.rolcanlogin,r.rolcreatedb,r.rolcreaterole,(select jsonb_agg(jsonb_build_object('role',p.rolname,'admin',m.admin_option,'inherit',m.inherit_option,'set',m.set_option) order by p.rolname) from pg_auth_members m join pg_roles p on p.oid=m.roleid where m.member=r.oid) as memberships from pg_roles r where r.rolname in ('postgres','supabase_auth_admin','n88_backend','n88_guard','n88_v2_runtime','n88_v2_guard','anon','authenticated') order by r.rolname limit 9",
+      "sha256": "c11726020aec75969838a93bdcd26c0d02063f374e5bfe75636f58ff1250ecca",
+      "maxRows": 8,
+      "maxBytes": 32768
+    },
+    {
+      "id": "relation-identity",
+      "sql": "select n.nspname,c.relname,c.relkind,pg_get_userbyid(c.relowner) as owner,c.relrowsecurity,c.relforcerowsecurity,c.relacl::text as acl from pg_class c join pg_namespace n on n.oid=c.relnamespace where (n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) or (n.nspname='auth' and c.relname in ('users','sessions')) order by n.nspname,c.relname limit 65",
+      "sha256": "1c4ce0241aa019e7d8c64a4e9064f78a82d935e2a078a8d9b803a0633a763950",
+      "maxRows": 64,
+      "maxBytes": 65536
+    },
+    {
+      "id": "constraints-columns-policies",
+      "sql": "select n.nspname,c.relname,(select jsonb_agg(jsonb_build_object('name',a.attname,'type',format_type(a.atttypid,a.atttypmod),'required',a.attnotnull) order by a.attnum) from pg_attribute a where a.attrelid=c.oid and a.attnum>0 and not a.attisdropped) as columns,(select jsonb_agg(jsonb_build_object('name',k.conname,'definition',pg_get_constraintdef(k.oid),'validated',k.convalidated,'deferrable',k.condeferrable) order by k.conname) from pg_constraint k where k.conrelid=c.oid) as constraints,(select jsonb_agg(jsonb_build_object('name',p.polname,'roles',p.polroles::text,'command',p.polcmd,'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) order by p.polname) from pg_policy p where p.polrelid=c.oid) as policies from pg_class c join pg_namespace n on n.oid=c.relnamespace where (n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) or (n.nspname='auth' and c.relname in ('users','sessions')) order by n.nspname,c.relname limit 65",
+      "sha256": "c1c774c43129c8be23491337e28e46e264052b35cdaf7ff40192a5c7f13889cb",
+      "maxRows": 64,
+      "maxBytes": 524288
+    },
+    {
+      "id": "function-and-trigger-identity",
+      "sql": "select n.nspname,p.proname,pg_get_function_identity_arguments(p.oid) as arguments,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,p.prosecdef as definer,pg_get_userbyid(p.proowner) as owner,p.proconfig,p.proacl::text as acl from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='n88_private' and (p.proname in ('lock_current_session','lock_owner_key','lock_canonical_sources','lock_projection_sources','publication_v2_exact','publication_v2_scope','publication_v2_flags','publication_v2_manual','publication_v2_transition','publication_v2_retire_source') or p.proname in ('v2_0dad27a56bfdc5bfab552235','v2_23ccfc1e16cd0b122d0cb3c3','v2_3b143936c792a16ff5425c3d','v2_5d62e77b02ab6a1fb4e97688','v2_6d27c8049efec0665b9d1f91','v2_71a3e914da47cf1053850671','v2_74c4aa4d430911e99002af80','v2_7874a827dae2373223bc8adc','v2_94bb23dac56c2e002713130a','v2_a3e6d95cdff2d66f56ae84f6','v2_dbe074dae923ca8a3746d390','v2_e1b1c0927f6164faeccb760b','v2_f46afed1e023d013cdabf257','v2_f8a1689cd78951d7fc52ef91')) or n.nspname='rakeezx' and p.proname in ('apply_sync_v2_mutation','sync_v2_stamp_revision') order by n.nspname,p.proname,arguments limit 65",
+      "sha256": "089b41040ea77a109acc22f77d81cf29c1eb21faaa55d29f005c810485df5dec",
+      "maxRows": 64,
+      "maxBytes": 65536
+    },
+    {
+      "id": "trigger-and-index-identity",
+      "sql": "select n.nspname,c.relname,t.tgname as name,'trigger'::text as kind,pg_get_triggerdef(t.oid) as definition,t.tgenabled::text as enabled from pg_trigger t join pg_class c on c.oid=t.tgrelid join pg_namespace n on n.oid=c.relnamespace where not t.tgisinternal and ((n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts'))) union all select n.nspname,c.relname,i.relname as name,'index'::text as kind,pg_get_indexdef(i.oid) as definition,null::text as enabled from pg_index x join pg_class c on c.oid=x.indrelid join pg_class i on i.oid=x.indexrelid join pg_namespace n on n.oid=c.relnamespace where (n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) order by nspname,relname,name limit 257",
+      "sha256": "fe462bd8f0a8b38908aca24d904837e2f23458c145291ce89d26f643c0a8b8bc",
+      "maxRows": 256,
+      "maxBytes": 262144
+    },
+    {
+      "id": "effective-table-privileges",
+      "sql": "select n.nspname,c.relname,r.rolname,has_table_privilege(r.oid,c.oid,'SELECT') as table_select,has_any_column_privilege(r.oid,c.oid,'SELECT') as column_select,has_table_privilege(r.oid,c.oid,'INSERT') as insert,has_table_privilege(r.oid,c.oid,'UPDATE') as update,has_any_column_privilege(r.oid,c.oid,'UPDATE') as column_update,has_table_privilege(r.oid,c.oid,'DELETE') as delete,has_table_privilege(r.oid,c.oid,'TRUNCATE') as truncate from pg_class c join pg_namespace n on n.oid=c.relnamespace cross join pg_roles r where r.rolname in ('n88_v2_guard','n88_v2_runtime','anon','authenticated') and ((n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) or (n.nspname='auth' and c.relname in ('users','sessions'))) order by n.nspname,c.relname,r.rolname limit 129",
+      "sha256": "da7fbb557b64ab7946acd1d41ce00f6d437526f7f104afd875d8061690338265",
+      "maxRows": 128,
+      "maxBytes": 131072
+    },
+    {
+      "id": "exposure-and-effective-privileges",
+      "sql": "select n.nspname,pg_get_userbyid(n.nspowner) as owner,n.nspacl::text as acl,has_schema_privilege('anon',n.oid,'USAGE') as anon_usage,has_schema_privilege('authenticated',n.oid,'USAGE') as authenticated_usage,current_setting('pgrst.db_schemas',true) as configured_api_schemas from pg_namespace n where n.nspname in ('n88_private','rakeezx','auth') order by n.nspname limit 4",
+      "sha256": "2ed736aeec2a50344553d29957fa2bb723531ac4266c978096471d9a8e25cea1",
+      "maxRows": 3,
+      "maxBytes": 16384
+    },
+    {
+      "id": "baseline-inventory-digest",
+      "sql": "select encode(sha256(convert_to(jsonb_build_object('roles-and-memberships',(select coalesce(jsonb_agg(to_jsonb(q) order by to_jsonb(q)::text),'[]'::jsonb) from (select r.rolname,r.rolsuper,r.rolbypassrls,r.rolinherit,r.rolcanlogin,r.rolcreatedb,r.rolcreaterole,(select jsonb_agg(jsonb_build_object('role',p.rolname,'admin',m.admin_option,'inherit',m.inherit_option,'set',m.set_option) order by p.rolname) from pg_auth_members m join pg_roles p on p.oid=m.roleid where m.member=r.oid) as memberships from pg_roles r where r.rolname in ('postgres','supabase_auth_admin','n88_backend','n88_guard','n88_v2_runtime','n88_v2_guard','anon','authenticated') order by r.rolname limit 9) q),'relation-identity',(select coalesce(jsonb_agg(to_jsonb(q) order by to_jsonb(q)::text),'[]'::jsonb) from (select n.nspname,c.relname,c.relkind,pg_get_userbyid(c.relowner) as owner,c.relrowsecurity,c.relforcerowsecurity,c.relacl::text as acl from pg_class c join pg_namespace n on n.oid=c.relnamespace where (n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) or (n.nspname='auth' and c.relname in ('users','sessions')) order by n.nspname,c.relname limit 65) q),'constraints-columns-policies',(select coalesce(jsonb_agg(to_jsonb(q) order by to_jsonb(q)::text),'[]'::jsonb) from (select n.nspname,c.relname,(select jsonb_agg(jsonb_build_object('name',a.attname,'type',format_type(a.atttypid,a.atttypmod),'required',a.attnotnull) order by a.attnum) from pg_attribute a where a.attrelid=c.oid and a.attnum>0 and not a.attisdropped) as columns,(select jsonb_agg(jsonb_build_object('name',k.conname,'definition',pg_get_constraintdef(k.oid),'validated',k.convalidated,'deferrable',k.condeferrable) order by k.conname) from pg_constraint k where k.conrelid=c.oid) as constraints,(select jsonb_agg(jsonb_build_object('name',p.polname,'roles',p.polroles::text,'command',p.polcmd,'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) order by p.polname) from pg_policy p where p.polrelid=c.oid) as policies from pg_class c join pg_namespace n on n.oid=c.relnamespace where (n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) or (n.nspname='auth' and c.relname in ('users','sessions')) order by n.nspname,c.relname limit 65) q),'function-and-trigger-identity',(select coalesce(jsonb_agg(to_jsonb(q) order by to_jsonb(q)::text),'[]'::jsonb) from (select n.nspname,p.proname,pg_get_function_identity_arguments(p.oid) as arguments,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,p.prosecdef as definer,pg_get_userbyid(p.proowner) as owner,p.proconfig,p.proacl::text as acl from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='n88_private' and (p.proname in ('lock_current_session','lock_owner_key','lock_canonical_sources','lock_projection_sources','publication_v2_exact','publication_v2_scope','publication_v2_flags','publication_v2_manual','publication_v2_transition','publication_v2_retire_source') or p.proname in ('v2_0dad27a56bfdc5bfab552235','v2_23ccfc1e16cd0b122d0cb3c3','v2_3b143936c792a16ff5425c3d','v2_5d62e77b02ab6a1fb4e97688','v2_6d27c8049efec0665b9d1f91','v2_71a3e914da47cf1053850671','v2_74c4aa4d430911e99002af80','v2_7874a827dae2373223bc8adc','v2_94bb23dac56c2e002713130a','v2_a3e6d95cdff2d66f56ae84f6','v2_dbe074dae923ca8a3746d390','v2_e1b1c0927f6164faeccb760b','v2_f46afed1e023d013cdabf257','v2_f8a1689cd78951d7fc52ef91')) or n.nspname='rakeezx' and p.proname in ('apply_sync_v2_mutation','sync_v2_stamp_revision') order by n.nspname,p.proname,arguments limit 65) q),'trigger-and-index-identity',(select coalesce(jsonb_agg(to_jsonb(q) order by to_jsonb(q)::text),'[]'::jsonb) from (select n.nspname,c.relname,t.tgname as name,'trigger'::text as kind,pg_get_triggerdef(t.oid) as definition,t.tgenabled::text as enabled from pg_trigger t join pg_class c on c.oid=t.tgrelid join pg_namespace n on n.oid=c.relnamespace where not t.tgisinternal and ((n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts'))) union all select n.nspname,c.relname,i.relname as name,'index'::text as kind,pg_get_indexdef(i.oid) as definition,null::text as enabled from pg_index x join pg_class c on c.oid=x.indrelid join pg_class i on i.oid=x.indexrelid join pg_namespace n on n.oid=c.relnamespace where (n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) order by nspname,relname,name limit 257) q),'effective-table-privileges',(select coalesce(jsonb_agg(to_jsonb(q) order by to_jsonb(q)::text),'[]'::jsonb) from (select n.nspname,c.relname,r.rolname,has_table_privilege(r.oid,c.oid,'SELECT') as table_select,has_any_column_privilege(r.oid,c.oid,'SELECT') as column_select,has_table_privilege(r.oid,c.oid,'INSERT') as insert,has_table_privilege(r.oid,c.oid,'UPDATE') as update,has_any_column_privilege(r.oid,c.oid,'UPDATE') as column_update,has_table_privilege(r.oid,c.oid,'DELETE') as delete,has_table_privilege(r.oid,c.oid,'TRUNCATE') as truncate from pg_class c join pg_namespace n on n.oid=c.relnamespace cross join pg_roles r where r.rolname in ('n88_v2_guard','n88_v2_runtime','anon','authenticated') and ((n.nspname='n88_private' and c.relname in ('publication_v2_scopes','publication_v2_items','publication_v2_high_water','publication_v2_receipts','contexts','numeric_credentials','numeric_sessions')) or (n.nspname='rakeezx' and c.relname in ('years','terms','sections','students','enrollments','teachings','items','scores','score_subitems','score_subitem_completions','sessions','attendance','logs','sync_mutation_receipts')) or (n.nspname='auth' and c.relname in ('users','sessions'))) order by n.nspname,c.relname,r.rolname limit 129) q))::text,'UTF8')),'hex') as sha256",
+      "sha256": "9f6a6058d1259c3ee00f62c376714cfcc5aec813cb3b87f29e74603dd9d1edee",
+      "maxRows": 1,
+      "maxBytes": 1024
+    }
+  ],
+  "readback": {
+    "state": "READ_ONLY_COMPLETE",
+    "reportPath": "artifacts/n88-authorized-read-preflight-1028-6c91874c-cfc8-4e2f-88e4-2e084980210a.tmp/report.json",
+    "reportSha256": "7091f6d661c363a2b644005de89d61300acc6ca5dee35001f60f404a59698553",
+    "recordedAt": "2026-10-28T21:15:00.940Z",
+    "tool": "Supabase.execute_sql",
+    "connectionPlane": "original-supported-custodian-management-metadata; not application-backend health proof",
+    "actualDatabaseIdentity": {
+      "database_name": "postgres",
+      "database_oid": "5",
+      "current_role": "postgres",
+      "session_role": "postgres",
+      "server_address": "2406:da1a:314:7102:b56b:ec54:38ab:5060",
+      "server_port": 5432,
+      "server_version_num": "170006",
+      "system_identifier": "7678071634733212629"
+    },
+    "boundaryMode": "batch",
+    "queries": [
+      {
+        "id": "target-identity",
+        "rows": 1,
+        "sha256": "7bb2c77b31a7e42b79f66112eea7e0b04e0ceabc5d808df9fe799f8ddc374e36"
+      },
+      {
+        "id": "roles-and-memberships",
+        "rows": 6,
+        "sha256": "6d52e79dc1384fd0ca0023292a32b7f4ac8385b3ca9bde45f9a324dab36cf73a"
+      },
+      {
+        "id": "relation-identity",
+        "rows": 19,
+        "sha256": "df54b0cd740e1b63254b2b46b35e342f443b36bc597594a5256ca7e6950aa33e"
+      },
+      {
+        "id": "constraints-columns-policies",
+        "rows": 19,
+        "sha256": "61c05cca3003bab16973f817940909d55fbf7e0b0ed1f8f52b5c9064d96671fa"
+      },
+      {
+        "id": "function-and-trigger-identity",
+        "rows": 6,
+        "sha256": "51e86d791eac3c09ac9e448c6c327965d99f7ee92a7160d5c9fb7f6d6263bcac"
+      },
+      {
+        "id": "trigger-and-index-identity",
+        "rows": 173,
+        "sha256": "5515fdc569f83c906f821c2445176d447423bcf51c4e0a849fff5d9010c70008"
+      },
+      {
+        "id": "effective-table-privileges",
+        "rows": 38,
+        "sha256": "940f407007f30f1e72bcab04401c88889449dacfaec6184f1a3d41b6f36acc65"
+      },
+      {
+        "id": "exposure-and-effective-privileges",
+        "rows": 3,
+        "sha256": "18c1a5a24e2f851e5c9a6c346df39b0d7010d05d0b339440b29c02fae7077306"
+      },
+      {
+        "id": "baseline-inventory-digest",
+        "rows": 1,
+        "sha256": "ee639dc72298feb8328d2351ac6d0f888fedc0160b18a22101c5f202f353bef1"
+      }
+    ],
+    "baselineInventorySha256": "d5f9f0451c70076e67fc9adee68d672c2a42dc852a440b1995889a20db7b0b7f",
+    "roleReadback": [
+      {
+        "name": "anon",
+        "superuser": false,
+        "bypassRls": false,
+        "login": false,
+        "inherit": true,
+        "createRole": false,
+        "createDb": false
+      },
+      {
+        "name": "authenticated",
+        "superuser": false,
+        "bypassRls": false,
+        "login": false,
+        "inherit": true,
+        "createRole": false,
+        "createDb": false
+      },
+      {
+        "name": "n88_backend",
+        "superuser": false,
+        "bypassRls": false,
+        "login": true,
+        "inherit": false,
+        "createRole": false,
+        "createDb": false
+      },
+      {
+        "name": "n88_guard",
+        "superuser": false,
+        "bypassRls": false,
+        "login": false,
+        "inherit": false,
+        "createRole": false,
+        "createDb": false
+      },
+      {
+        "name": "postgres",
+        "superuser": false,
+        "bypassRls": true,
+        "login": true,
+        "inherit": true,
+        "createRole": true,
+        "createDb": true
+      },
+      {
+        "name": "supabase_auth_admin",
+        "superuser": false,
+        "bypassRls": false,
+        "login": true,
+        "inherit": false,
+        "createRole": true,
+        "createDb": false
+      }
+    ],
+    "functionReadback": [
+      {
+        "nspname": "n88_private",
+        "proname": "lock_canonical_sources",
+        "arguments": "p_owner uuid, p_max integer",
+        "definition": "9f58e60276c6f1a55a4650e7a7cb3a9c7d788930c7bc75cf05f69828fc3b1f54",
+        "definer": true,
+        "owner": "n88_guard",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "acl": "{n88_guard=X/n88_guard,n88_backend=X/n88_guard}"
+      },
+      {
+        "nspname": "n88_private",
+        "proname": "lock_current_session",
+        "arguments": "p_user uuid, p_session uuid",
+        "definition": "bf8790087827a61f9ac0f805a2c5907b6fcd9ab2037d421fb99d1f239eb47317",
+        "definer": true,
+        "owner": "postgres",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "acl": "{postgres=X/postgres,n88_backend=X/postgres}"
+      },
+      {
+        "nspname": "n88_private",
+        "proname": "lock_owner_key",
+        "arguments": "p_owner uuid",
+        "definition": "67a6f790e195a27fe02d95b9bd50ba4a58fa061cc21064bc3c5d7048fd816f55",
+        "definer": true,
+        "owner": "postgres",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "acl": "{postgres=X/postgres,n88_guard=X/postgres}"
+      },
+      {
+        "nspname": "n88_private",
+        "proname": "lock_projection_sources",
+        "arguments": "p_owner uuid, p_max integer",
+        "definition": "544fbe7f5d6758b065a9e3fcfd127edd23e73c0fd521a9b434cc36a36b70bd37",
+        "definer": true,
+        "owner": "n88_guard",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "acl": "{n88_guard=X/n88_guard,n88_backend=X/n88_guard}"
+      },
+      {
+        "nspname": "rakeezx",
+        "proname": "apply_sync_v2_mutation",
+        "arguments": "p_entity text, p_record_id text, p_mutation_id text, p_device_id text, p_base_revision bigint, p_patch jsonb, p_operation text, p_client_updated_at bigint",
+        "definition": "76084d0bb32cad6751c2f02a7ed03269cba7be374c2f7248aef305f2b66bda11",
+        "definer": true,
+        "owner": "postgres",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+      },
+      {
+        "nspname": "rakeezx",
+        "proname": "sync_v2_stamp_revision",
+        "arguments": "",
+        "definition": "9413ec533e02d14661af75047b228d0f7eb1b2fa377a6ec14c32410d46d0b835",
+        "definer": false,
+        "owner": "postgres",
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "acl": null
+      }
+    ],
+    "relationReadback": [
+      {
+        "schema": "auth",
+        "name": "sessions",
+        "owner": "supabase_auth_admin",
+        "rls": true,
+        "forceRls": false
+      },
+      {
+        "schema": "auth",
+        "name": "users",
+        "owner": "supabase_auth_admin",
+        "rls": true,
+        "forceRls": false
+      },
+      {
+        "schema": "n88_private",
+        "name": "contexts",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": false
+      },
+      {
+        "schema": "n88_private",
+        "name": "numeric_credentials",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": false
+      },
+      {
+        "schema": "n88_private",
+        "name": "numeric_sessions",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": false
+      },
+      {
+        "schema": "rakeezx",
+        "name": "attendance",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "enrollments",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "items",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "logs",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "score_subitem_completions",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "score_subitems",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "scores",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "sections",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "sessions",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "students",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "sync_mutation_receipts",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "teachings",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "terms",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      },
+      {
+        "schema": "rakeezx",
+        "name": "years",
+        "owner": "postgres",
+        "rls": true,
+        "forceRls": true
+      }
+    ],
+    "privateSchema": {
+      "nspname": "n88_private",
+      "owner": "postgres",
+      "acl": "{postgres=UC/postgres,n88_guard=U/postgres,n88_backend=U/postgres}",
+      "anon_usage": false,
+      "authenticated_usage": false,
+      "configured_api_schemas": null
+    },
+    "newV2Objects": {
+      "relations": 0,
+      "roles": 0,
+      "fixedFunctions": 0,
+      "supportFunctions": 0
+    },
+    "ownedCleanup": {
+      "disposed": true,
+      "processExited": true,
+      "relayFilesRemoved": true,
+      "integrationLease": "RELEASED"
+    },
+    "installationAuthorized": false,
+    "harnessHistory": [
+      {
+        "stage": "noninteractive-stdin",
+        "failure": "write_stdin failed: stdin is closed for this session; rerun exec_command with tty=true to keep stdin open",
+        "outcome": "local deadline; no nine-query metadata request dispatched; actual original catalog response preserved"
+      },
+      {
+        "stage": "PTY-relay",
+        "failure": "terminal wrapping duplicated characters in relayed SQL text; original role predicate was not byte-exact",
+        "outcome": "local deadline after identity and unreliable role result; role result discarded as proof; no service denial or writes; exact identity/catalog reused under same owned phase"
+      },
+      {
+        "stage": "owned-file-relay",
+        "correction": "queryIndex+hash token only; parent selected SQL from pinned authority.operations, never terminal text",
+        "outcome": "all nine original exact query results accepted, no SQL retries after real denial"
+      }
+    ]
+  }
+}

@@ -2,12 +2,13 @@
  * environment, installer execution or alternate transport. No application rows.
  * The original finite boundary is the ONLY SQL path; first denial stops the run.
  */
-import { readFile } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
+import { readFile, writeFile, mkdir, unlink } from 'node:fs/promises';
+import { createHash, randomUUID } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import manifest from './manifest.json' with { type: 'json' };
-import { assertVerifiedBoundary, privateQuery, verifiedBoundaryMode } from '../private-error-boundary.mjs';
+import readAuthority from './read-authority.json' with { type: 'json' };
+import { assertVerifiedBoundary, privateQuery, verifiedBoundaryMode, authorizeMetadataPreflight, closeMetadataPreflight, boundaryCatalogSql } from '../private-error-boundary.mjs';
 
 const sha = s => createHash('sha256').update(s).digest('hex');
 const normalized = b => b.toString('utf8').replaceAll('\r\n', '\n');
@@ -119,5 +120,79 @@ export async function runReadOnlyPreflight({ binding = manifest, approval = null
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href)
-  console.log(JSON.stringify(await runReadOnlyPreflight()));
+/** Explicit direct PO read authority supersedes the prior unbound proposal.
+ * Original supported custodian transport is injected, never acquired by DSN.
+ * Discovery binds observed DB/role facts to fresh provider project evidence;
+ * it does NOT fill or grant the installer's separate target/authority literals.
+ */
+export async function runAuthorizedReadPreflight({acquireOriginalCustodian,now=Date.now}={}) {
+  await verifyPinnedSources();
+  const bytes=await readFile(readAuthority.evidencePath),proof=JSON.parse(bytes);
+  if(sha(bytes)!==readAuthority.evidenceSha256||proof.approved!==true||proof.at!==readAuthority.approvedAt||
+    readAuthority.queryPlanSha256!==readOnlyQueryPlanSha256||sha(JSON.stringify(readAuthority.provider))!==readAuthority.providerEvidenceSha256||
+    readAuthority.provider.projectRef!==readAuthority.projectRef||now()>=Date.parse(readAuthority.phaseDeadline))throw Error('n88_authorized_read_evidence_mismatch');
+  if(typeof acquireOriginalCustodian!=='function')return {state:'NOT_RUN',readAuthorized:true,queried:false,missing:['original_supported_custodian_transport'],installationAuthorized:false};
+  const result={state:'DENIED',readAuthorized:true,queried:false,provider:readAuthority.provider,inventory:[],installationAuthorized:false,disposed:false};
+  let owned,live=true,timer,disposed=false;
+  const abort=new AbortController();
+  const dispose=async c=>{if(c&&!disposed){disposed=true;closeMetadataPreflight(c.client);await c.dispose();result.disposed=true;}};
+  const work=async()=>{
+    const lease=Promise.resolve().then(()=>acquireOriginalCustodian(abort.signal));
+    lease.then(c=>{if(!live)dispose(c).catch(()=>{});},()=>{});
+    owned=await lease;if(!live||!owned?.client||typeof owned.dispose!=='function')throw Error('n88_authorized_owned_transport_unavailable');
+    result.queried=true;await assertVerifiedBoundary(owned.client);
+    authorizeMetadataPreflight(owned.client,{authorityRef:readAuthority.authorityRef,evidenceSha256:readAuthority.evidenceSha256,
+      providerEvidenceSha256:readAuthority.providerEvidenceSha256,projectRef:readAuthority.projectRef});
+    result.boundaryMode=verifiedBoundaryMode(owned.client);
+    for(const q of readOnlyQueryPlan){
+      if(!live)throw Error('n88_authorized_read_deadline');
+      let r;try{r=await privateQuery(owned.client,q.sql,[]);}catch(e){result.denial={queryId:q.id,sqlSha256:q.sha256,
+        error:e.message==='n88_database_unavailable'?e.message:'n88_authorized_custodian_rejected',...(e.metadataDenial??{})};return result;}
+      if(q.id==='target-identity'){
+        const row=r.rows[0];
+        if(r.rows.length!==1||!row||!['database_name','database_oid','current_role','session_role','server_version_num','system_identifier'].every(k=>typeof row[k]==='string'&&row[k].length>0&&row[k].length<=128)||
+          !(row.server_address===null||typeof row.server_address==='string')||!(row.server_port===null||Number.isSafeInteger(row.server_port)))throw Error('n88_authorized_actual_identity_invalid');
+        result.actualDatabaseIdentity=structuredClone(row);result.networkIdentityComplete=row.server_address!==null&&row.server_port!==null;
+      }
+      result.inventory.push({queryId:q.id,rows:r.rows,sha256:sha(JSON.stringify(r.rows))});
+    }
+    result.state='READ_ONLY_COMPLETE';return result;
+  };
+  try{return await Promise.race([work(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('n88_authorized_read_deadline')),readAuthority.maxDurationMs);})]);}
+  catch(e){result.error=/^n88_[a-z_]+$/.test(e.message)?e.message:'n88_authorized_read_failed';return result;}
+  finally{live=false;clearTimeout(timer);abort.abort();let cleanup;try{await Promise.race([dispose(owned),new Promise((_,reject)=>{cleanup=setTimeout(reject,1000);})]);}catch{result.disposed=false;result.cleanup='owned_custodian_cleanup_required';}finally{clearTimeout(cleanup);}}
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href){
+  if(process.argv[2]==='--original-custodian-files'){
+    // Owned, noninteractive relay avoids terminal wrapping/closed stdin. Parent
+    // reads only short IDs and obtains SQL from the pinned plan, never terminal
+    // text. Responses/reports are technical metadata, not credentials/app data.
+    const root=fileURLToPath(new URL('../../../../',import.meta.url));
+    if(path.resolve(process.cwd())!==path.resolve(root))throw Error('n88_custodian_workspace_mismatch');
+    const phase=path.join(root,'artifacts',`${readAuthority.taskId}-${readAuthority.runId}.tmp`);
+    await mkdir(phase,{recursive:false});
+    const owner={taskId:readAuthority.taskId,runId:readAuthority.runId,pid:process.pid,token:randomUUID()};
+    await writeFile(path.join(phase,'owner.json'),JSON.stringify(owner),{flag:'wx'});
+    const owned=async()=>{if(JSON.stringify(JSON.parse(await readFile(path.join(phase,'owner.json'),'utf8')))!==JSON.stringify(owner))throw Error('n88_custodian_relay_owner_mismatch');};
+    let sequence=0,closed=false;const relayFiles=[];
+    const outcome=await runAuthorizedReadPreflight({acquireOriginalCustodian:async()=>({client:{query:async(sql,args=[])=>{
+      const index=sql===boundaryCatalogSql?-1:readOnlyQueryPlan.findIndex(q=>q.sql===sql);
+      if(args.length||index<0&&sql!==boundaryCatalogSql)throw Error('n88_custodian_statement_denied');
+      await owned();const id=++sequence,file=path.join(phase,`response-${id}.json`);relayFiles.push(file);
+      console.log(JSON.stringify({type:'custodian-read',id,queryIndex:index,sha256:sha(sql)}));
+      while(!closed){
+        try{const r=JSON.parse(await readFile(file,'utf8'));await owned();
+          if(r.id!==id)throw Error('n88_custodian_response_mismatch');
+          if(r.ok===true&&Array.isArray(r.rows))return {command:'SELECT',rowCount:r.rows.length,rows:r.rows};
+          const e=Error('n88_original_custodian_rejected');e.code=r.code;e.custodianError=typeof r.error==='string'?r.error.slice(0,512):null;throw e;
+        }catch(e){if(e.code!=='ENOENT')throw e;}
+        await new Promise(r=>setTimeout(r,25));
+      }throw Error('n88_custodian_closed');
+    }},dispose:async()=>{closed=true;}})});
+    await owned();await writeFile(path.join(phase,'report.json'),JSON.stringify(outcome,null,2)+'\n',{flag:'wx'});
+    for(const file of relayFiles){await owned();try{await unlink(file);}catch(e){if(e.code!=='ENOENT')throw e;}}
+    console.log(JSON.stringify({type:'custodian-result',state:outcome.state,reportPath:path.join(phase,'report.json')}));
+  }else if(process.argv[2])throw Error('n88_custodian_use_owned_file_relay');
+  else console.log(JSON.stringify(await runAuthorizedReadPreflight()));
+}
