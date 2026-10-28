@@ -37,9 +37,11 @@ function validate(html, robots, sitemap) {
   assert.deepEqual(data, {
     '@context': 'https://schema.org', '@type': 'WebApplication',
     name: 'رَكيز المعلم', url: canonical,
+    sameAs: ['https://www.instagram.com/rakeez.x/', 'https://www.tiktok.com/@rakeezx',
+      'https://x.com/RakeezX', 'https://www.youtube.com/@RakeezX'],
     applicationCategory: 'EducationalApplication', inLanguage: 'ar', description: meta('description'),
   });
-  assert.equal(robots.trim(), 'User-agent: *\nAllow: /\n\nSitemap: https://rakeezx.com/sitemap.xml');
+  assert.equal(robots.trim().replace(/\r\n/g, '\n'), 'User-agent: *\nAllow: /\n\nSitemap: https://rakeezx.com/sitemap.xml');
   // An exact singleton allowlist excludes every private/hash/UUID/account route.
   assert.match(sitemap, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
   assert.match(sitemap, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
