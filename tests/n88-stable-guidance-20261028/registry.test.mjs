@@ -1,0 +1,40 @@
+/** AI: affected syntax/registry/immutability checks, no full application build. */
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {sourceQueries} from '../../drafts/n88-student-portal/activation/build-error-boundary.mjs';
+import contract from '../../drafts/n88-student-portal/activation/error-boundary-contract.json' with {type:'json'};
+import typed from '../../drafts/n88-student-portal/activation/read-service-20261023/typed-read-operations.json' with {type:'json'};
+import catalog from '../../drafts/n88-student-portal/activation/official-source-catalog.json' with {type:'json'};
+import serialIdentities from '../../drafts/n88-student-portal/activation/error-boundary-identities.json' with {type:'json'};
+import typedIdentities from '../../drafts/n88-student-portal/activation/read-service-20261023/typed-identities.json' with {type:'json'};
+import {assertVerifiedBoundary,verifiedBoundaryMode,privateQuery} from '../../drafts/n88-student-portal/activation/private-error-boundary.mjs';
+const base='64174255c82b205227b8c878f8dc0ba097862933',root=process.cwd();
+const sha=s=>createHash('sha256').update(s).digest('hex');
+const normalized=async f=>(await readFile(f,'utf8')).replaceAll('\r\n','\n');
+const previous=JSON.parse(execFileSync('git',['show',base+':drafts/n88-student-portal/activation/error-boundary-contract.json'],{encoding:'utf8',maxBuffer:4*1024*1024}));
+const {guidanceClosure,...legacy}=contract;assert.deepEqual(legacy,previous);
+assert.equal(guidanceClosure.operations.length,1);assert.equal(guidanceClosure.identities.length,2);
+const inventory=await sourceQueries(root);
+const registered=new Set([...contract.operations,...typed,...guidanceClosure.operations].map(o=>o.sql));
+for(const sql of inventory.queries)assert(registered.has(sql),'unregistered current SQL: '+sql.slice(0,140));
+const operation=guidanceClosure.operations[0];assert.equal(operation.name,'boundary_'+sha(operation.sql).slice(0,24));
+for(const [mode,identities] of [['serial',serialIdentities],['batch',typedIdentities]]) {
+ const withoutExtension={query:async()=>({rows:identities})};
+ await assertVerifiedBoundary(withoutExtension);assert.equal(verifiedBoundaryMode(withoutExtension),mode);
+ await assert.rejects(()=>privateQuery(withoutExtension,operation.sql,['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','class','term']),/n88_database_unavailable/);
+ const partial={query:async()=>({rows:[...identities,guidanceClosure.identities[0]].sort((a,b)=>a.name.localeCompare(b.name))})};
+ await assert.rejects(()=>assertVerifiedBoundary(partial),/n88_database_unavailable/);
+}
+assert.equal(sha(await normalized(guidanceClosure.staging.path)),guidanceClosure.staging.sha256);
+assert.deepEqual(catalog.inactiveGuidanceClosure.identities,guidanceClosure.identities);
+const priorCatalog=JSON.parse(execFileSync('git',['show',base+':drafts/n88-student-portal/activation/official-source-catalog.json'],{encoding:'utf8',maxBuffer:4*1024*1024}));
+const {inactiveGuidanceClosure,...historicalCatalog}=catalog;assert.deepEqual(historicalCatalog,priorCatalog);
+const unchanged=['task-guidance.mjs','student-projection.mjs','canonical-adapter.mjs','postgres-repository.mjs','receipt-reconciliation.mjs','receipt-terminal-review.inactive.mjs','activation/error-boundary-identities.json','activation/read-service-20261023/typed-read-operations.json','activation/read-service-20261023/typed-identities.json'];
+for(const f of unchanged)assert.equal(await normalized('drafts/n88-student-portal/'+f),execFileSync('git',['show',base+':drafts/n88-student-portal/'+f],{encoding:'utf8',maxBuffer:4*1024*1024}).replaceAll('\r\n','\n'),f);
+const changedJS=['drafts/n88-student-portal/integrated-service.mjs','drafts/n88-student-portal/activation/private-error-boundary.mjs','drafts/n88-student-portal/activation/build-error-boundary.mjs',...['prepare.mjs','service.test.mjs','registry.test.mjs'].map(n=>'tests/n88-stable-guidance-20261028/'+n)];
+for(const f of changedJS)execFileSync(process.execPath,['--check',f],{encoding:'utf8'});
+execFileSync('git',['diff','--check'],{encoding:'utf8'});
+const report={status:'PASS',currentQueryCount:inventory.queries.length,registeredOperations:registered.size,legacyContractAndIdentitiesUnchanged:true,originalSerialAndTypedCatalogsAcceptedWithoutExtension:true,absentOrPartialClosureCannotDispatch:true,historicalCatalogUnchanged:true,unchangedSources:unchanged,syntax:changedJS,stagingSha256:guidanceClosure.staging.sha256,providerOperations:0};
+await writeFile('tests/n88-stable-guidance-20261028/registry-result.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

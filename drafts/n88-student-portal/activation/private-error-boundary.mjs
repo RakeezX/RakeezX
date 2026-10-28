@@ -8,6 +8,8 @@ import contract from './error-boundary-contract.json' with {type:'json'};
 import identities from './error-boundary-identities.json' with {type:'json'};
 const fail=()=>{throw Error('n88_database_unavailable');};
 const verified=new WeakMap();
+const guidanceVerified=new WeakSet();
+const guidanceOperations=new Map((contract.guidanceClosure?.operations??[]).map(o=>[o.sql,o]));
 const operations=new Map(contract.operations.map(o=>[o.sql,o]));
 const controls=new Set(contract.controls);
 const typedOperations=new Map([...contract.operations,...typedReads].map(o=>[o.sql,o]));
@@ -20,9 +22,17 @@ export const boundaryCatalogSql=`select p.proname as name,encode(sha256(convert_
     where n.nspname='n88_private' and p.proname like 'boundary_%' order by p.proname`;
 export async function assertVerifiedBoundary(client) {
   verified.delete(client);
+  guidanceVerified.delete(client);
   const r=await client.query(boundaryCatalogSql);
   if(identities.length!==76||operations.size!==76||typedIdentities.length!==78||typedOperations.size!==78)fail();
-  const rows=JSON.stringify(r.rows);
+  const extension=contract.guidanceClosure;
+  const extensionNames=new Set((extension?.identities??[]).map(r=>r.name));
+  const extra=r.rows.filter(r=>extensionNames.has(r.name));
+  if(extra.length) {
+    if(extension?.sourceOnly!==true||extension.version!==1||guidanceOperations.size!==1||extra.length!==2||JSON.stringify(extra)!==JSON.stringify(extension.identities))fail();
+    guidanceVerified.add(client);
+  }
+  const rows=JSON.stringify(r.rows.filter(r=>!extensionNames.has(r.name)));
   if(rows===JSON.stringify(identities))verified.set(client,'serial');
   else if(rows===JSON.stringify(typedIdentities))verified.set(client,'batch');
   else fail();
@@ -45,7 +55,7 @@ export async function privateQuery(client,sql,values=[]) {
     } else if(values.length)fail();
     return client.query(sql,values);
   }
-  const op=(verifiedBoundaryMode(client)==='batch'?typedOperations:operations).get(sql);
+  const op=(verifiedBoundaryMode(client)==='batch'?typedOperations:operations).get(sql)??(guidanceVerified.has(client)?guidanceOperations.get(sql):undefined);
   if(!op || values.length!==op.parameters.length)fail();
   const wire=values.map(encodeBoundaryParameter);
   const result=await client.query(`select * from n88_private.${op.name}(${wire.map((_,i)=>'$'+(i+1)+'::text').join(',')})`,wire);

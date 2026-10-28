@@ -1293,5 +1293,69 @@
   "migration": {
     "path": "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql",
     "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+  },
+  "guidanceClosure": {
+    "version": 1,
+    "sourceOnly": true,
+    "operations": [
+      {
+        "sql": "select table_index,payload from n88_private.boundary_guidance_sources_v1($1::uuid,$2::text,$3::text)",
+        "name": "boundary_fe813d4f5db3d68913a8d78d",
+        "parameters": [
+          "uuid",
+          "text",
+          "text"
+        ],
+        "output": [
+          {
+            "name": "table_index",
+            "type": "integer",
+            "oid": 23
+          },
+          {
+            "name": "payload",
+            "type": "text",
+            "oid": 25
+          }
+        ],
+        "effect": false,
+        "voidResult": false,
+        "command": "SELECT"
+      }
+    ],
+    "identities": [
+      {
+        "name": "boundary_fe813d4f5db3d68913a8d78d",
+        "definition": "966e9930febe3c973dc796bc44e1fb630309d70a831d9d9ddaf78d18591a6b8e",
+        "arguments": "p1 text, p2 text, p3 text",
+        "definer": false,
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog"
+        ],
+        "acl": [
+          "n88_backend:EXECUTE",
+          "postgres:EXECUTE"
+        ]
+      },
+      {
+        "name": "boundary_guidance_sources_v1",
+        "definition": "ccb0d3dbbdc047e28c4d644a7cfea8f486697faf2b0618fad1eb877ac5ba469f",
+        "arguments": "p_owner uuid, p_class text, p_term text",
+        "definer": true,
+        "owner": "n88_guard",
+        "config": [
+          "search_path=pg_catalog"
+        ],
+        "acl": [
+          "n88_backend:EXECUTE",
+          "n88_guard:EXECUTE"
+        ]
+      }
+    ],
+    "staging": {
+      "path": "drafts/n88-student-portal/guidance-closure.inactive.sql",
+      "sha256": "bce8f06b60a0a0bce7d93aa6c33e4b6306714bdc7815883f6c8be4c41d67e177"
+    }
   }
 }

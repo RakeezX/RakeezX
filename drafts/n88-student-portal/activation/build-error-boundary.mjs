@@ -47,6 +47,108 @@ function describe(query,sql) {
   });
 }
 const qi=s=>'"'+s.replaceAll('"','""')+'"';
+/** AI: append-only INACTIVE synthetic closure compiler. Original migrations and
+ * serial/typed identities are immutable. Never accepts a hosted connection.
+ * caller supplies the owned native fixture, not a provider/client URL.
+ */
+export async function compileGuidanceBoundary(root,fixture) {
+  if(!fixture?.phase?.includes('tests')||!fixture.identity||!Number.isInteger(fixture.port))throw Error('n88_local_fixture_required');
+  const query=fixture.fixtureQuery;
+  const integrated=(await readFile(root+'/'+base+'integrated-service.mjs','utf8')).replaceAll('\r\n','\n');
+  const {columns,sqlNames}=vm.runInNewContext(integrated.slice(integrated.indexOf('const sqlNames='),integrated.indexOf('export async function readCanonical'))+';({columns,sqlNames})');
+  const names=Object.keys(columns);
+  const select=(table,predicate)=>`select ${columns[table].replace(/\brevision\b/g,'revision::text as revision')} from rakeezx.${sqlNames[table]||table} where owner_id=p_owner and (${predicate}) order by id limit 2001 for update`;
+  const predicates=names.map((n,i)=>i<7?'true':n==='scoreSubitems'?'item_id=any(v_items)':n==='scores'?'student_id=any(v_students) and item_id=any(v_items)':n==='scoreSubitemCompletions'?'student_id=any(v_students) and subitem_id=any(v_subitems)':n==='attendance'?'student_id=any(v_students) and teaching_id=any(v_teachings)':'teaching_id=any(v_teachings)');
+  const sql='select table_index,payload from n88_private.boundary_guidance_sources_v1($1::uuid,$2::text,$3::text)';
+  const wrapper='boundary_'+hash(sql).slice(0,24);
+  let ddl=`-- AI: INACTIVE N88 guidance closure v1. Synthetic PG only, NEVER hosted.
+-- Not a migration. Original catalog/migrations remain immutable. No source writes.
+-- Owner FOR UPDATE blocks owner-FK inserts. Existing core rows FOR UPDATE block
+-- membership/teaching moves and child FK retargets; selected child row locks block
+-- value/revision/deletion changes. Lock/statement deadlines abort, never truncate.
+begin;
+set local lock_timeout='2s';
+set local statement_timeout='30s';
+`;
+  for(const n of names)ddl+=`grant select(${columns[n]}) on rakeezx.${sqlNames[n]||n} to n88_guard;\n`;
+  ddl+=`create function n88_private.boundary_guidance_sources_v1(p_owner uuid,p_class text,p_term text)
+returns table(table_index integer,payload text)
+language plpgsql security definer set search_path=pg_catalog as $n88_guidance$
+declare v_students text[];v_teachings text[];v_items text[];v_subitems text[];v_year text;v_grade integer;v_bytes integer:=0;v_count integer;state text;
+begin
+ if p_owner is null or p_class is null or p_term is null then raise exception 'n88_guidance_unavailable';end if;
+ perform n88_private.lock_canonical_sources(p_owner,2000);
+ select c.year_id,c.grade into strict v_year,v_grade from rakeezx.sections c
+ join rakeezx.years y on y.owner_id=c.owner_id and y.id=c.year_id
+ join rakeezx.terms t on t.owner_id=c.owner_id and t.year_id=c.year_id and t.id=p_term
+ where c.owner_id=p_owner and c.id=p_class and c.status='active' and c.deleted_at is null and c.archived_at is null
+ and y.status='active' and y.deleted_at is null and t.status='active' and t.deleted_at is null;
+ select coalesce(array_agg(distinct e.student_id),'{}') into v_students from rakeezx.enrollments e
+ join rakeezx.students s on s.owner_id=e.owner_id and s.id=e.student_id
+ where e.owner_id=p_owner and e.section_id=p_class and e.status='active' and e.end_date is null and e.deleted_at is null and s.status='active' and s.deleted_at is null;
+ -- Preserve all same-year enrollments/core rows for original uniqueness. Include
+ -- transferred teacher context, not an invented empty portable-grade context.
+ select coalesce(array_agg(t.id),'{}') into v_teachings from rakeezx.teachings t
+ join rakeezx.sections c on c.owner_id=t.owner_id and c.id=t.section_id
+ where t.owner_id=p_owner and t.term_id=p_term and (t.section_id=p_class or
+ (c.year_id=v_year and c.grade is not distinct from v_grade and exists(select 1 from rakeezx.enrollments e
+ where e.owner_id=p_owner and e.student_id=any(v_students) and e.section_id=c.id and e.status='transferred' and e.deleted_at is null)));
+ select coalesce(array_agg(i.id),'{}') into v_items from rakeezx.items i where i.owner_id=p_owner and i.teaching_id=any(v_teachings);
+`;
+  // Lock definitions before selecting dependent completion IDs; parent locks also
+  // exclude concurrent FK retargets. The owner key excludes new definitions.
+  ddl+=`perform id from rakeezx.score_subitems where owner_id=p_owner and item_id=any(v_items) order by id limit 2001 for update;
+ select coalesce(array_agg(id),'{}') into v_subitems from (select id from rakeezx.score_subitems where owner_id=p_owner and item_id=any(v_items) order by id limit 2001) x;
+ if cardinality(v_subitems)>2000 then raise exception 'n88_projection_bound';end if;
+`;
+  names.forEach((n,i)=>{
+    ddl+=`select count(*)::integer,coalesce(json_agg(x)::text,'[]') into v_count,payload from (${select(n,predicates[i])}) x;
+ v_bytes:=v_bytes+octet_length(payload);
+ if v_count>2000 or v_bytes>2097152 then raise exception 'n88_projection_bound';end if;
+ table_index:=${i};return next;\n`;
+  });
+  ddl+=`exception when others or query_canceled or assert_failure then
+ get stacked diagnostics state=returned_sqlstate;
+ raise exception using errcode=state,message='n88_private_database_error',detail='',hint='';
+end;
+$n88_guidance$;
+revoke all on function n88_private.boundary_guidance_sources_v1(uuid,text,text) from public,anon,authenticated;
+grant execute on function n88_private.boundary_guidance_sources_v1(uuid,text,text) to n88_backend;
+grant create on schema n88_private to n88_guard;
+grant n88_guard to postgres with set true;
+alter function n88_private.boundary_guidance_sources_v1(uuid,text,text) owner to n88_guard;
+grant n88_guard to postgres with set false;
+revoke create on schema n88_private from n88_guard;
+create function n88_private.${wrapper}(p1 text,p2 text,p3 text) returns table(table_index integer,payload text)
+language plpgsql security invoker set search_path=pg_catalog as $n88_wire$
+declare state text;
+begin
+ return query select * from n88_private.boundary_guidance_sources_v1(convert_from(decode(p1,'base64'),'UTF8')::uuid,convert_from(decode(p2,'base64'),'UTF8'),convert_from(decode(p3,'base64'),'UTF8'));
+exception when others or query_canceled or assert_failure then
+ get stacked diagnostics state=returned_sqlstate;
+ raise exception using errcode=state,message='n88_private_database_error',detail='',hint='';
+end;
+$n88_wire$;
+revoke all on function n88_private.${wrapper}(text,text,text) from public,anon,authenticated;
+grant execute on function n88_private.${wrapper}(text,text,text) to n88_backend;
+commit;
+`;
+  await query('set role postgres');
+  try{await query(ddl);}finally{await query('reset role');}
+  const {boundaryCatalogSql}=await import('./private-error-boundary.mjs');
+  const identities=(await query(boundaryCatalogSql)).rows.filter(r=>[wrapper,'boundary_guidance_sources_v1'].includes(r.name));
+  if(identities.length!==2)throw Error('n88_guidance_catalog_unavailable');
+  const contract=JSON.parse(await readFile(root+'/'+base+'activation/error-boundary-contract.json','utf8'));
+  contract.guidanceClosure={version:1,sourceOnly:true,operations:[{sql,name:wrapper,parameters:['uuid','text','text'],output:[{name:'table_index',type:'integer',oid:23},{name:'payload',type:'text',oid:25}],effect:false,voidResult:false,command:'SELECT'}],identities,staging:{path:base+'guidance-closure.inactive.sql',sha256:hash(ddl)}};
+  await writeFile(root+'/'+base+'guidance-closure.inactive.sql',ddl);
+  await writeFile(root+'/'+base+'activation/error-boundary-contract.json',JSON.stringify(contract,null,2)+'\n');
+  const catalog=JSON.parse(await readFile(root+'/'+base+'activation/official-source-catalog.json','utf8'));
+  // Preserve the historical provider capture verbatim; this addendum is LOCAL,
+  // not a claim of hosted presence or permission. Original identities stay pinned.
+  catalog.inactiveGuidanceClosure={qualification:'synthetic-native-pg17-only',providerOperations:0,sourceOnly:true,staging:contract.guidanceClosure.staging,identities,consumedColumns:columns,closure:'Complete bounded core; current class/term plus transferred grade context; raw scores retained. Owner key, core and selected child row locks until transaction completion.'};
+  await writeFile(root+'/'+base+'activation/official-source-catalog.json',JSON.stringify(catalog,null,2)+'\n');
+  return contract.guidanceClosure;
+}
 export async function compileBoundary(root,query) {
   const inventory=await sourceQueries(root),ops=[];let ddl=`-- AI-authored. Append-only N88 private typed error boundary. Original six migrations unchanged.
 begin;

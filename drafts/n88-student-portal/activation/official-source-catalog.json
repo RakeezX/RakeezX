@@ -3211,5 +3211,60 @@
       }
     ]
   },
-  "initialHarnessFailure": "Result parser matched the wrapper mention in prose rather than newline-delimited data; no source/SQL change, read-only query repeated once with corrected parsing."
+  "initialHarnessFailure": "Result parser matched the wrapper mention in prose rather than newline-delimited data; no source/SQL change, read-only query repeated once with corrected parsing.",
+  "inactiveGuidanceClosure": {
+    "qualification": "synthetic-native-pg17-only",
+    "providerOperations": 0,
+    "sourceOnly": true,
+    "staging": {
+      "path": "drafts/n88-student-portal/guidance-closure.inactive.sql",
+      "sha256": "bce8f06b60a0a0bce7d93aa6c33e4b6306714bdc7815883f6c8be4c41d67e177"
+    },
+    "identities": [
+      {
+        "name": "boundary_fe813d4f5db3d68913a8d78d",
+        "definition": "966e9930febe3c973dc796bc44e1fb630309d70a831d9d9ddaf78d18591a6b8e",
+        "arguments": "p1 text, p2 text, p3 text",
+        "definer": false,
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog"
+        ],
+        "acl": [
+          "n88_backend:EXECUTE",
+          "postgres:EXECUTE"
+        ]
+      },
+      {
+        "name": "boundary_guidance_sources_v1",
+        "definition": "ccb0d3dbbdc047e28c4d644a7cfea8f486697faf2b0618fad1eb877ac5ba469f",
+        "arguments": "p_owner uuid, p_class text, p_term text",
+        "definer": true,
+        "owner": "n88_guard",
+        "config": [
+          "search_path=pg_catalog"
+        ],
+        "acl": [
+          "n88_backend:EXECUTE",
+          "n88_guard:EXECUTE"
+        ]
+      }
+    ],
+    "consumedColumns": {
+      "years": "id,owner_id,revision,deleted_at,status",
+      "terms": "id,owner_id,revision,deleted_at,year_id,status,start_date,end_date",
+      "sections": "id,owner_id,revision,deleted_at,year_id,status,archived_at,grade,label,name",
+      "students": "id,owner_id,revision,deleted_at,status,name",
+      "enrollments": "id,owner_id,revision,deleted_at,student_id,section_id,status,start_date,end_date",
+      "teachings": "id,owner_id,revision,deleted_at,section_id,term_id,subject_id",
+      "items": "id,owner_id,revision,deleted_at,teaching_id,name,max,\"order\",auto,per_point,penalty,score_mode,portability_group_id",
+      "scores": "id,owner_id,revision,deleted_at,student_id,item_id,value,manual_value,derived_value",
+      "scoreSubitems": "id,owner_id,revision,deleted_at,item_id,name,value,\"order\",start_date,due_date,late_points",
+      "scoreSubitemCompletions": "id,owner_id,revision,deleted_at,student_id,subitem_id,checked,completion_state",
+      "sessions": "id,owner_id,revision,deleted_at,teaching_id,date,status",
+      "attendance": "id,owner_id,revision,deleted_at,student_id,teaching_id,session_id,status",
+      "logs": "id,owner_id,revision,deleted_at,student_id,teaching_id,kind,delta"
+    },
+    "closure": "Complete bounded core; current class/term plus transferred grade context; raw scores retained. Owner key, core and selected child row locks until transaction completion."
+  }
 }
