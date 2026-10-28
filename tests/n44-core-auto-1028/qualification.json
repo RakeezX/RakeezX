@@ -1,0 +1,47 @@
+{
+  "taskId": "n44-core-auto-1028",
+  "runId": "8d8f5ef4-fc62-486b-8965-63ddba37f0ac",
+  "baseSha": "deb8562669ac08a7bf50f7ab0a865cc114733109",
+  "state": "BLOCKED",
+  "checks": [
+    {
+      "name": "n44_core_automatic_lesson_due_timezone",
+      "status": "NOT_RUN",
+      "evidence": "No finite service composition implemented: required backend.mjs and existing-host.mjs are outside activated allowedPaths. Unchanged timing suites not repeated."
+    },
+    {
+      "name": "n44_core_quiet_preferences_dedup_revocation_owner",
+      "status": "NOT_RUN",
+      "evidence": "Existing delivery guards retained; finite scheduled composition acceptance requires the missing host integration. No synthetic or live acceptance claimed."
+    },
+    {
+      "name": "n44_core_existing_scheduler_bounded_activation_disabled",
+      "status": "NOT_RUN",
+      "evidence": "Inactive entry and staged worker each returned disabled with zero injected fetch calls. Finite activation/tick/send enforcement is not yet integrated, so this composite gate is NOT_RUN."
+    }
+  ],
+  "inspectionHashes": {
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "drafts/n44-push/backend.mjs": "5e4aefcddaa486dda0976429ff2caf47c07641f75bc226552fd035d381ca84d7",
+    "drafts/n44-push/existing-host.mjs": "84e05b4a8c6f8a5205c44509fc499a8332e26c56a3cbd7b9712af6f03fc430ef",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/one-device-test.mjs": "a1ead456eabade6cf4b7595867d8a56471f01b864ae7606ab6175f38dee8d9a0",
+    "drafts/n44-push/delivery.mjs": "1eebbc4ef28faf93101c6b2342dac12eb501631e6713c4d5754b8de38bd491bb",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/activation/bundle/scheduler/worker.mjs": "85c596cd37570867fff406f01fab790f4a1c36531e406dfee17b8c50ab27f433",
+    "drafts/n44-push/activation/scheduler.staged.toml": "39f8c3d3545c06abbe88eba92c0bd596acacd1d7d7c25b6a895d33c596e4d331",
+    "supabase/functions/n44-notifications/index.ts": "e315b5ce524361326cb98e832fcd1d8ac98f2e8e04c22917c82f6c8c752749e8"
+  },
+  "missingPaths": [
+    "drafts/n44-push/backend.mjs",
+    "drafts/n44-push/existing-host.mjs"
+  ],
+  "disabledSmoke": {
+    "status": "PASS",
+    "entryAndStagedDisabled": true,
+    "fetchCalls": 0
+  },
+  "liveOperations": 0,
+  "resourcesCreated": 0,
+  "implementationComplete": false
+}
