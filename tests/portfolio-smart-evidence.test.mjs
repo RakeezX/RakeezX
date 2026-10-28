@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {F09_EVIDENCE_GUIDE,buildPortfolioEvidenceSuggestions,guideForCriterion} from '../src/lib/portfolio-smart-evidence.js';
+import {F09_EVIDENCE_GUIDE,buildPortfolioEvidenceSuggestions,guideForCriterion,selectUnfiledPortfolioEvidence} from '../src/lib/portfolio-smart-evidence.js';
+import {buildAnnualPortfolioPlan} from '../src/lib/portfolio-annual-plan.js';
 
 test('the guide covers exactly eleven performance criteria with distinct manual follow-ups',()=>{
   assert.equal(F09_EVIDENCE_GUIDE.length,11);
@@ -172,4 +173,127 @@ test('term and archived boundaries, membership, malformed arrangements and uncer
   }
   const g=recordedInput();g.groupArrangements[0].updatedAt=Date.parse('2026-10-28');assert.equal(newSuggestions(g).length,2);
   const h=recordedInput();h.recordedScope.workspace={type:'legacy'};assert.deepEqual(newSuggestions(h),[]);
+});
+
+// AI N126: selector tests use the actual record fixtures and annual-plan engine.
+const inboxCriteria=()=>F09_EVIDENCE_GUIDE.map(c=>({number:c.criterion,title:c.title}));
+const inboxInput=()=>{
+  const data=recordedInput(),sources=buildPortfolioEvidenceSuggestions(data),criteria=inboxCriteria();
+  return {yearId:data.yearId,sources,criteria,annualEntries:buildAnnualPortfolioPlan({
+    yearId:data.yearId,sources,criteria,
+  }).entries};
+};
+
+test('unfiled selector requires exact year, annual entries and official visible criteria context',()=>{
+  const args=inboxInput();
+  for(const patch of [{yearId:null},{yearId:''},{yearId:' '},{yearId:' year'},
+    {annualEntries:undefined},{annualEntries:{}},{annualEntries:[null]},{annualEntries:[{id:'not-an-entry'}]},
+    {criteria:undefined},{criteria:[]},{sources:null}]){
+    const result=selectUnfiledPortfolioEvidence({...args,...patch});
+    assert.deepEqual(result,[]);assert.ok(Object.isFrozen(result));
+  }
+  for(const yearId of ['other','ear','year:extra'])assert.deepEqual(selectUnfiledPortfolioEvidence({...args,yearId}),[]);
+  assert.deepEqual(selectUnfiledPortfolioEvidence({...args,criteria:[{number:'12',title:'خاص'}]}),[]);
+  assert.deepEqual(selectUnfiledPortfolioEvidence({...args,criteria:[{number:'8',title:'غير رسمي'}]}),[]);
+  const onlyGoal=[{number:'08',title:'البيئة بعد إعادة التسمية'}];
+  const result=selectUnfiledPortfolioEvidence({...args,criteria:onlyGoal});
+  assert.equal(result.length,1);assert.equal(result[0].criterionTitle,onlyGoal[0].title);
+  assert.deepEqual(selectUnfiledPortfolioEvidence({...args,criteria:[...onlyGoal,...onlyGoal]}),[]);
+});
+
+test('unfiled review/automatic provenance is honest and actual annual plan prevents automatic nudges',()=>{
+  const args=inboxInput(),all=selectUnfiledPortfolioEvidence({...args,annualEntries:[]});
+  assert.equal(all.length,3);
+  assert.match(all.find(x=>x.sourceKind==='automatic').provenanceState,/تلقائي.*لا يثبت/);
+  assert.ok(all.filter(x=>x.sourceKind==='review').every(x=>/يحتاج مراجعة.*لا يثبت/.test(x.provenanceState)));
+  const pending=selectUnfiledPortfolioEvidence(args);
+  assert.equal(pending.length,2);assert.ok(pending.every(x=>x.sourceKind==='review'));
+  const sources=buildPortfolioEvidenceSuggestions(input()),criteria=inboxCriteria();
+  const annual=buildAnnualPortfolioPlan({yearId:'year-1',sources,criteria});
+  const unfiled=selectUnfiledPortfolioEvidence({yearId:'year-1',sources,criteria,annualEntries:annual.entries});
+  assert.deepEqual(unfiled.map(x=>x.id),['rakeez:timetable:year-1','rakeez:lessons:year-1','rakeez:rules:year-1']);
+  assert.ok(annual.entries.some(e=>e.proposal.id==='rakeez:attendance:year-1'));
+  assert.ok(annual.entries.some(e=>e.proposal.id==='rakeez:score-analysis:year-1'));
+});
+
+test('unfiled hidden, rejected, explicitly included and merged annual selections are omitted',()=>{
+  const args=inboxInput(),pending=selectUnfiledPortfolioEvidence(args),id=pending[0].id;
+  for(const key of ['hiddenWitnesses','excludedWitnesses','includedWitnesses']){
+    assert.deepEqual(selectUnfiledPortfolioEvidence({...args,[key]:new Set([id])}).map(x=>x.id),[pending[1].id]);
+  }
+  assert.deepEqual(selectUnfiledPortfolioEvidence({...args,hiddenCriteria:new Set(['08','09'])}),[]);
+  const included=new Set(pending.map(x=>x.id));
+  const annual=buildAnnualPortfolioPlan({...args,included,templates:[
+    {id:'template',criterion:'04',title:'نموذج',sourceKind:'template'},
+  ],custom:[{id:'custom',criterion:'08',title:'خاص',description:'شاهد شخصي',sourceKind:'custom'}]});
+  assert.equal(annual.entries.length,4,'real plan merges automatic, selected review and personal evidence');
+  assert.deepEqual(selectUnfiledPortfolioEvidence({...args,annualEntries:annual.entries}),[]);
+});
+
+test('unfiled selector denies uncertain provenance, fabricated IDs/types and duplicate/tombstone conflicts',()=>{
+  const args=inboxInput(),base=args.sources.find(x=>x.sourceKind==='review');
+  for(const patch of [{source:'مدرستي'},{source:'ركيز المعلم '},{source:undefined},
+    {sourceKind:'template'},{sourceKind:'custom'},{sourceKind:'unknown'},
+    {id:base.id+':foreign'},{id:base.id.replace('rakeez:','other:')},
+    {id:'rakeez:fabricated:year'},{criterion:'12'},{criterion:'09'},
+    {title:'إنجاز غير مثبت'},{deleted:true}]){
+    assert.deepEqual(selectUnfiledPortfolioEvidence({...args,sources:[{...base,...patch}]}),[],JSON.stringify(patch));
+  }
+  for(const duplicate of [base,{...base,deleted:true},{id:base.id,deleted:true},
+    {...base,source:'foreign'},{...base,title:'تعارض'}]){
+    for(const sources of [[base,duplicate],[duplicate,base]])
+      assert.deepEqual(selectUnfiledPortfolioEvidence({...args,sources}),[]);
+  }
+});
+
+test('unfiled ordering is stable by criterion and fixed evidence title regardless of edits/input order',()=>{
+  const args=inboxInput(),baseline=selectUnfiledPortfolioEvidence({...args,annualEntries:[]});
+  const titles=new Map(baseline.map((x,i)=>[x.id,'عنوان '+(9-i)]));
+  const reordered=selectUnfiledPortfolioEvidence({...args,annualEntries:[],sources:[...args.sources].reverse(),
+    criteria:[...args.criteria].reverse(),titles});
+  assert.deepEqual(reordered.map(x=>x.id),baseline.map(x=>x.id));
+  for(const x of reordered){
+    assert.equal(x.displayTitle,titles.get(x.id));assert.equal(x.title,baseline.find(b=>b.id===x.id).title);
+  }
+  const yearId='year:scoped',sources=buildPortfolioEvidenceSuggestions({...input(),yearId});
+  assert.equal(selectUnfiledPortfolioEvidence({yearId,sources,criteria:inboxCriteria(),annualEntries:[]}).length,7);
+});
+
+test('unfiled projection never reads references or private records, even enumerable/getter-backed references',()=>{
+  const args=inboxInput();
+  const sources=args.sources.map(s=>new Proxy(s,{
+    get(target,key){
+      if(['references','metrics','table','description','ownerId','studentId','attachments'].includes(key))
+        throw new Error('private field read: '+key);
+      return Reflect.get(target,key);
+    },ownKeys(){throw new Error('source enumeration forbidden');},
+  }));
+  const result=selectUnfiledPortfolioEvidence({...args,sources,annualEntries:[]});
+  assert.equal(result.length,3);
+  const source=args.sources[0];
+  const enumerable={id:source.id,criterion:source.criterion,title:source.title,source:source.source,sourceKind:source.sourceKind};
+  Object.defineProperty(enumerable,'references',{enumerable:true,get(){throw new Error('private getter');}});
+  assert.equal(selectUnfiledPortfolioEvidence({...args,sources:[enumerable],annualEntries:[]}).length,1);
+  assert.ok(args.sources.find(x=>x.references.type==='logs').references.ids.includes('private-student:log'));
+  assert.doesNotMatch(JSON.stringify(result),/private-student|اسم عائلة|owner-a|studentId|ownerId|references|metrics|delta|runId/);
+  for(const x of result){
+    assert.deepEqual(Object.keys(x).sort(),['id','criterion','criterionTitle','title','displayTitle','sourceKind','provenanceState'].sort());
+    assert.ok(Object.isFrozen(x));assert.throws(()=>{x.title='changed';},TypeError);
+  }
+  assert.ok(Object.isFrozen(result));assert.throws(()=>result.push({}),TypeError);
+});
+
+test('unfiled selector preserves records, source suggestions, annual entries and all local maps/sets',()=>{
+  const data=recordedInput(),before=structuredClone(data),args=inboxInput();
+  const baseline=buildPortfolioEvidenceSuggestions(data);
+  const sets={hiddenCriteria:new Set(['11']),hiddenWitnesses:new Set(['unrelated']),
+    excludedWitnesses:new Set(['excluded']),includedWitnesses:new Set(['included'])};
+  const titles=new Map([['rakeez:completed-goals:year','عنوان المعلم']]);
+  const snapshot=structuredClone({...args,...sets,titles});
+  const sourceRefs=structuredClone(args.sources.map(x=>x.references));
+  for(let i=0;i<2;i++)selectUnfiledPortfolioEvidence({...args,...sets,titles});
+  assert.deepEqual({...args,...sets,titles},snapshot);
+  assert.deepEqual(args.sources.map(x=>x.references),sourceRefs);
+  assert.deepEqual(data,before);assert.deepEqual(buildPortfolioEvidenceSuggestions(data),baseline);
+  assert.deepEqual(buildPortfolioEvidenceSuggestions(input()).map(x=>x.criterion),['01','06','08','09','10','11','11']);
 });

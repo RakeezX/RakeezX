@@ -114,6 +114,73 @@ export function buildPortfolioEvidenceSuggestions({
 }
 export const guideForCriterion = id => F09_EVIDENCE_GUIDE.find(x=>x.criterion===id)||null;
 
+// AI N126: only the existing derived source types, never arbitrary rakeez IDs.
+const UNFILED_SOURCE_TYPES = Object.freeze([
+  ['attendance','09','automatic','متابعة رصد حضور الطلاب'],
+  ['timetable','01','review','الجدول الدراسي الأسبوعي'],
+  ['lessons','06','review','متابعة الدروس المرتبطة بالحصص'],
+  ['rules','08','review','إعداد قواعد وتنظيمات الفصل'],
+  ['graded-items','11','automatic','تنفيذ بنود التقويم ورصد نتائجها'],
+  ['score-analysis','10','automatic','تحليل نتائج بنود التقويم'],
+  ['assignments','11','automatic','متابعة المهام التعليمية وتسليماتها'],
+  ['group-arrangements','09','review','تنظيم المجموعات المحفوظ'],
+  ['completed-goals','08','review','سجل الأهداف الصفية المكتملة'],
+  ['participation-logs','09','automatic','متابعة سجلات المشاركة المؤرخة'],
+].map(x=>Object.freeze(x)));
+
+/**
+ * Pure preparation for the future inbox; does not add or persist evidence.
+ * Caller MUST supply validated owner/year-scoped suggestions and entries from
+ * the current buildAnnualPortfolioPlan (including all automatically active sources).
+ * This projection cannot establish ownership from raw teacher/student records.
+ * title is the fixed source title; displayTitle honors the local title override.
+ * Never inspect/copy/enumerate references, metrics, records or attachments.
+ */
+export function selectUnfiledPortfolioEvidence({
+  yearId,sources,annualEntries,criteria,
+  hiddenCriteria=new Set(),hiddenWitnesses=new Set(),
+  excludedWitnesses=new Set(),includedWitnesses=new Set(),titles=new Map(),
+}={}) {
+  const empty=()=>Object.freeze([]);
+  if(typeof yearId!=='string'||!yearId.trim()||yearId!==yearId.trim()||
+    !Array.isArray(sources)||!Array.isArray(annualEntries)||!Array.isArray(criteria)||!criteria.length||
+    ![hiddenCriteria,hiddenWitnesses,excludedWitnesses,includedWitnesses].every(x=>x instanceof Set)||
+    !(titles instanceof Map)||annualEntries.some(e=>typeof e?.proposal?.id!=='string'||!e.proposal.id))return empty();
+  const labels=new Map(),ambiguousCriteria=new Set();
+  for(const c of criteria){
+    if(!F09_EVIDENCE_GUIDE.some(x=>x.criterion===c?.number)||typeof c.title!=='string'||!c.title.trim())continue;
+    if(labels.has(c.number))ambiguousCriteria.add(c.number);
+    labels.set(c.number,c.title.trim().slice(0,120));
+  }
+  // Count IDs before validation: an invalid/tombstoned duplicate must also deny
+  // its apparently valid counterpart. No serialization or source spreading.
+  const seen=new Set(),duplicates=new Set();
+  for(const s of sources){
+    if(typeof s?.id!=='string')continue;
+    if(seen.has(s.id))duplicates.add(s.id);
+    seen.add(s.id);
+  }
+  const filed=new Set(annualEntries.map(e=>e?.proposal?.id));
+  const result=[];
+  for(const s of sources){
+    if(!s||duplicates.has(s.id)||s.deleted||s.source!=='ركيز المعلم')continue;
+    const type=UNFILED_SOURCE_TYPES.find(([key,criterion,kind,title])=>
+      s.id==='rakeez:'+key+':'+yearId&&s.criterion===criterion&&s.sourceKind===kind&&s.title===title);
+    if(!type||!labels.has(s.criterion)||ambiguousCriteria.has(s.criterion)||hiddenCriteria.has(s.criterion)||
+      filed.has(s.id)||hiddenWitnesses.has(s.id)||excludedWitnesses.has(s.id)||includedWitnesses.has(s.id))continue;
+    const renamed=titles.get(s.id);
+    result.push(Object.freeze({
+      id:s.id,criterion:s.criterion,criterionTitle:labels.get(s.criterion),title:type[3],
+      displayTitle:typeof renamed==='string'&&renamed.trim()?renamed.trim().slice(0,120):type[3],
+      sourceKind:s.sourceKind,
+      provenanceState:s.sourceKind==='review'?'مصدر محفوظ في ركيز يحتاج مراجعة؛ لا يثبت التطبيق.':
+        'مصدر تلقائي من سجلات ركيز؛ لا يثبت تحقق التعلم.',
+    }));
+  }
+  return Object.freeze(result.sort((a,b)=>Number(a.criterion)-Number(b.criterion)||
+    a.title.localeCompare(b.title,'ar')||a.id.localeCompare(b.id,'en')));
+}
+
 /** AI N126: deny uncertain ancestry rather than treating a supplied teaching ID
  * or a current roster projection as proof. Account rows must have explicit
  * ownership; ownerless legacy/local rows are deliberately omitted here.
