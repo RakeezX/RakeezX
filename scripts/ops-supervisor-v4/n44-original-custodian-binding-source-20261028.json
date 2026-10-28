@@ -1,0 +1,311 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-original-custodian-binding-source-20261028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100130,
+      "scopeKey": "n44-same-custodian-adapter-source-only-v1",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "executionMode": "local",
+      "liveMutation": false,
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "budgetMinutes": 65,
+      "idleMinutes": 15,
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+        "tests/n44-custodian-binding-20261028/bindings.test.mjs",
+        "docs/automation-evidence/20261028/N44_CUSTODIAN_BINDING.md"
+      ],
+      "requiredChecks": [
+        "n44_exact_custodian_port_shapes_and_inactive_failclosed",
+        "n44_schedule_install_remove_and_receipt_adapter_contract",
+        "n44_no_live_calls_no_grant_consumed_and_no_peer_replay"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "PO 2026-10-28 explicitly requires continuing dedicated N44 and N88 Codex workers in parallel without shared files until full functional outcome. This card authorizes ONLY inert local source adapters and synthetic checks; preserve denied hosted service access, real data, owner isolation, expiry and budget limits. Publish changed INACTIVE SOURCE only via sole original controller/publisher with SHA readback. No real notification, device enrollment, schema, Auth/RLS, hosted SQL, session, student data or cloud/Sync state mutation, no alternative runner/publisher. [Exact inactive source-only classification; no hosted activation.]",
+      "acceptance": [
+        "Named original-custodian adapter surface exists with exact types and deterministic failing NOT_BOUND for missing external ports.",
+        "Synthetic original-port mocks pass install/config/receipt and teardown lifecycle without any network/provider/scheduler invocation.",
+        "All historical N44 live receipts, candidate and private grant remain unchanged; no live sends or duplicated grant.",
+        "Only inactive source commit delivered via one controller publisher; N44 remains open pending original real service readback."
+      ],
+      "objective": "Concrete CORRECTION of n44-core-live-1028 second recurring implementation blocker. Do NOT replay that failed original session unchanged. Read its result.json, phase-preparation-6ff59697, published original custodian and existing-host sources. Implement a small executable INACTIVE, dependency-injected adapter contract for original custodian schedule install/removal, published source/config readback and authenticated receipt readiness. Bind to known existing original-owned entry points only; if a required live port has no supported binding, represent it as NOT_BOUND and fail closed with typed error rather than inventing one. Demonstrate local mock-custodian lifecycle/cancellation, idempotent receipt and no-send/no-install default via affected tests, preserve secrets and DPAPI in original vault. Do not operate original service, phones, browser, Push, SQL, edge deploy, or provider. Save candidate and unblocked-vs-external status; source-only publication may proceed via existing publisher. Same original live task requires later separately authorized readback and a real quiet preference before a finite trial; this source-only card cannot certify N44 feature done.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "a980406d3e38d92a6386aa459be984b4411be6a1",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "scripts/n44-activation-custody.mjs"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+          "tests/n44-custodian-binding-20261028/bindings.test.mjs",
+          "docs/automation-evidence/20261028/N44_CUSTODIAN_BINDING.md"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+          "tests/n44-custodian-binding-20261028/bindings.test.mjs",
+          "docs/automation-evidence/20261028/N44_CUSTODIAN_BINDING.md"
+        ],
+        "workerChecks": [
+          "n44_exact_custodian_port_shapes_and_inactive_failclosed",
+          "n44_schedule_install_remove_and_receipt_adapter_contract",
+          "n44_no_live_calls_no_grant_consumed_and_no_peer_replay"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "reconcile_observed_publication",
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only verified adapter"
+      },
+      "verificationPaths": [
+        "drafts/n44-push/activation/core-v1-binding.inactive.mjs"
+      ],
+      "verificationRepair": {
+        "id": "n44-original-custodian-binding-source-20261028",
+        "source": "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+        "observedAt": "2026-10-28T19:08:31.338Z",
+        "observedReceipt": {
+          "version": 1,
+          "ticketId": "N44",
+          "taskId": "n44-original-custodian-binding-source-20261028",
+          "candidateSha": "3b97aad9fe8cd37d5e6616a74958d804945f0bc1",
+          "baseSha": "a980406d3e38d92a6386aa459be984b4411be6a1",
+          "publishedSha": "d16735c8a00a0920b4aa848ad09fbbb730fb1410",
+          "productionUrl": "https://rakeezx.com",
+          "at": "2026-10-28T18:20:38.168Z",
+          "status": "deployed",
+          "retryable": false,
+          "state": "DEPLOYED_AWAITING_PO",
+          "productionDeployed": true,
+          "verifiedAt": "2026-10-28T18:20:38.168Z",
+          "repository": "RakeezX/RakeezX",
+          "targetBranch": "main",
+          "deploymentId": "8b5632c2-d1ae-4ae9-8202-bd8c45e1389f",
+          "previewUrl": "https://8b5632c2.rakeezx.pages.dev",
+          "providerStatus": "SUCCESS",
+          "provider": {
+            "checkRunId": "123013360827",
+            "headSha": "d16735c8a00a0920b4aa848ad09fbbb730fb1410",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-28T18:20:15Z",
+            "completedAt": "2026-10-28T18:20:15Z",
+            "headBranch": null,
+            "deploymentId": "8b5632c2-d1ae-4ae9-8202-bd8c45e1389f",
+            "previewUrl": "https://8b5632c2.rakeezx.pages.dev",
+            "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/8b5632c2-d1ae-4ae9-8202-bd8c45e1389f"
+          },
+          "currentMainSha": "d16735c8a00a0920b4aa848ad09fbbb730fb1410",
+          "binding": {
+            "candidateSha": "3b97aad9fe8cd37d5e6616a74958d804945f0bc1",
+            "declaredBaseSha": "a980406d3e38d92a6386aa459be984b4411be6a1",
+            "mainAtPreparation": "a980406d3e38d92a6386aa459be984b4411be6a1",
+            "integrationSha": "3b97aad9fe8cd37d5e6616a74958d804945f0bc1",
+            "publishedSha": "d16735c8a00a0920b4aa848ad09fbbb730fb1410",
+            "candidateAncestorOfPublished": true,
+            "previousMainAncestorOfPublished": true,
+            "mainContainsPublished": true,
+            "checkHeadShaMatches": true,
+            "kind": "candidate-fast-forward"
+          },
+          "build": {
+            "status": "passed",
+            "startedAt": "2026-10-28T18:19:32.159Z",
+            "completedAt": "2026-10-28T18:19:39.886Z",
+            "integrationSha": "3b97aad9fe8cd37d5e6616a74958d804945f0bc1",
+            "publishedSha": "d16735c8a00a0920b4aa848ad09fbbb730fb1410",
+            "kind": "standard-build",
+            "validationTier": "STANDARD",
+            "reusedVerifiedBuildSha": null,
+            "generatedPathsChanged": [
+              "src/generated/build-meta.generated.js"
+            ],
+            "commands": [
+              {
+                "command": "node.exe",
+                "args": [
+                  "scripts/generate-build-meta.mjs"
+                ]
+              },
+              {
+                "command": "node.exe",
+                "args": [
+                  "node_modules/vite/bin/vite.js",
+                  "build"
+                ]
+              }
+            ]
+          },
+          "changedPaths": [
+            "docs/automation-evidence/20261028/N44_CUSTODIAN_BINDING.md",
+            "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+            "tests/n44-custodian-binding-20261028/bindings.test.mjs"
+          ],
+          "sourceOnlyPaths": [
+            "docs/automation-evidence/20261028/N44_CUSTODIAN_BINDING.md",
+            "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+            "tests/n44-custodian-binding-20261028/bindings.test.mjs"
+          ],
+          "changedAssets": [],
+          "productSourceChangeObserved": false,
+          "evidence": {
+            "immutable": {
+              "origin": "https://8b5632c2.rakeezx.pages.dev",
+              "checkedAt": "2026-10-28T18:20:32.104Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "observedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "bytes": 5711,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "observedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "bytes": 26353,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "e43d0b8c65f6f5d2b15638b065ad2fb1174fdf01e17aafa342e3efd904ea2c2a",
+                  "observedSha256": "e43d0b8c65f6f5d2b15638b065ad2fb1174fdf01e17aafa342e3efd904ea2c2a",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+                  "urlPath": "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "45cd6ac5b9f9101a21bf59a73e9558343965df8aa28f5da89989a1d9fbfe04da",
+                  "observedSha256": "45cd6ac5b9f9101a21bf59a73e9558343965df8aa28f5da89989a1d9fbfe04da",
+                  "bytes": 7638,
+                  "verified": true,
+                  "deleted": false
+                }
+              ]
+            },
+            "production": {
+              "origin": "https://rakeezx.com",
+              "checkedAt": "2026-10-28T18:20:32.551Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "observedSha256": "6cc9d6942f8a6a0aa17a253616316ead4c6223aa20f2c96b2b8d295cf514c3c6",
+                  "bytes": 7016,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "normalizedBytes": 5711,
+                  "removedProviderBytes": 1305,
+                  "removedSha256": "02d75f9e34e689bfd5355c81fa953bf4586ce717e9e440fb97828d835dd44300",
+                  "providerTransforms": [
+                    "cloudflare-jsd-v1",
+                    "cloudflare-analytics-20261017"
+                  ],
+                  "providerAddedWhitespaceBytes": 1
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "observedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "bytes": 26353,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "e43d0b8c65f6f5d2b15638b065ad2fb1174fdf01e17aafa342e3efd904ea2c2a",
+                  "observedSha256": "e43d0b8c65f6f5d2b15638b065ad2fb1174fdf01e17aafa342e3efd904ea2c2a",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+                  "urlPath": "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "45cd6ac5b9f9101a21bf59a73e9558343965df8aa28f5da89989a1d9fbfe04da",
+                  "observedSha256": "45cd6ac5b9f9101a21bf59a73e9558343965df8aa28f5da89989a1d9fbfe04da",
+                  "bytes": 7638,
+                  "verified": true,
+                  "deleted": false
+                }
+              ]
+            }
+          },
+          "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\n44-original-custodian-binding-source-20261028\\integration-3b97aad9fe8c-1-e2ab3b9f",
+          "pushRecovered": false,
+          "poPersonallyTested": false,
+          "closed": false
+        },
+        "originalReceiptSha256": "21b75205501b20e2b78522ffd920c1fba13568f073baad8a6972f21637bf3ed4",
+        "originalResultSha256": "be180f8839665c3f2b1f2e496f6100121653df6ab6168ce430979480c1145861",
+        "observation": {
+          "publishedSha": "2a6c92d4588340bd38f2726668529e6d45fb8510",
+          "at": "2026-10-28T19:08:31.338Z",
+          "evidence": {
+            "production": {
+              "assets": [
+                {
+                  "repoPath": "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+                  "urlPath": "drafts/n44-push/activation/core-v1-binding.inactive.mjs",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "45cd6ac5b9f9101a21bf59a73e9558343965df8aa28f5da89989a1d9fbfe04da",
+                  "observedSha256": "45cd6ac5b9f9101a21bf59a73e9558343965df8aa28f5da89989a1d9fbfe04da",
+                  "bytes": 7638,
+                  "verified": true,
+                  "deleted": false
+                }
+              ]
+            }
+          }
+        },
+        "observationSha256": "b7e74ee2938f8249b0fc6222d512b962670477e019c879d3d77ec8739cec6a0b"
+      }
+    }
+  ]
+}

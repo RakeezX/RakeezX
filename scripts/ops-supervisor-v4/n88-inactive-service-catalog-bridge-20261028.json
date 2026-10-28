@@ -1,0 +1,311 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-inactive-service-catalog-bridge-20261028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100140,
+      "scopeKey": "n88-v2-canonical-finite-service-bridge-inactive-v1",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "executionMode": "local",
+      "liveMutation": false,
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "budgetMinutes": 65,
+      "idleMinutes": 15,
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+        "tests/n88-inactive-service-bridge-20261028/bridge.test.mjs",
+        "docs/automation-evidence/20261028/N88_INACTIVE_BRIDGE.md"
+      ],
+      "requiredChecks": [
+        "n88_finite_catalogue_exact_service_adapter_parity",
+        "n88_inactive_no_hosted_calls_owner_session_limits",
+        "n88_source_only_no_status_or_data_mutation"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "PO 2026-10-28 explicitly requires continuing dedicated N44 and N88 Codex workers in parallel without shared files until full functional outcome. This card authorizes ONLY inert local source adapters and synthetic checks; preserve denied hosted service access, real data, owner isolation, expiry and budget limits. Publish changed INACTIVE SOURCE only via sole original controller/publisher with SHA readback. No real notification, device enrollment, schema, Auth/RLS, hosted SQL, session, student data or cloud/Sync state mutation, no alternative runner/publisher. [Exact inactive source-only classification; no hosted activation.]",
+      "acceptance": [
+        "Bridge is source-only and inaccessible from live network by default; no hosted SQL executed or provider mutation.",
+        "Strict binding to existing finite catalogue and canonical types, fail-closed source/owner mismatch.",
+        "Focused tests passing with synthetic fixtures, preserving previous immutable receipts and no-replay behavior.",
+        "One publisher delivers inactive source; controller continues only on separately qualified next hosted step."
+      ],
+      "objective": "Next necessary N88 LOCAL source step after finite catalogue 07f9424393d4 (verified delivered 047e4dde): integrate the exact existing 14 finite, typed operations into a strictly inactive, dependency-injected service bridge that shares owner/session/canonical limits with existing publication V2 service/canonical/postgres adapters. Reuse prior 17/17 focused tests instead of re-testing unchanged details, then add narrow positive/negative bridge checks incl. unauthorized owner/session, request mismatch, output bound, stale CAS, UNKNOWN no replay and absent hosted port. No private keys, no hosted Supabase SQL, Auth, RPC, migrations, RLS changes, Service Worker, real student IDs/grades or phone/push. Never remove the existing default OFF gate or accept caller-chosen SQL. Publish only inactive source via original Product publisher; full N88 student↔teacher service activation is separate, must be proven by an authorized hosted operation and real controlled readback, and N88 remains OPEN until functional proof.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "a980406d3e38d92a6386aa459be984b4411be6a1",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "tests/n88-inactive-service-bridge-20261028/bridge.test.mjs",
+          "docs/automation-evidence/20261028/N88_INACTIVE_BRIDGE.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "tests/n88-inactive-service-bridge-20261028/bridge.test.mjs",
+          "docs/automation-evidence/20261028/N88_INACTIVE_BRIDGE.md"
+        ],
+        "workerChecks": [
+          "n88_finite_catalogue_exact_service_adapter_parity",
+          "n88_inactive_no_hosted_calls_owner_session_limits",
+          "n88_source_only_no_status_or_data_mutation"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "reconcile_observed_publication",
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only verified adapter"
+      },
+      "verificationPaths": [
+        "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs"
+      ],
+      "verificationRepair": {
+        "id": "n88-inactive-service-catalog-bridge-20261028",
+        "source": "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+        "observedAt": "2026-10-28T19:08:32.038Z",
+        "observedReceipt": {
+          "version": 1,
+          "ticketId": "N88",
+          "taskId": "n88-inactive-service-catalog-bridge-20261028",
+          "candidateSha": "f5d739c3dccb4266e342fca5bb5b69b47368fff2",
+          "baseSha": "a980406d3e38d92a6386aa459be984b4411be6a1",
+          "publishedSha": "6042d71eeae023380cd5bf7e84061d98d574711b",
+          "productionUrl": "https://rakeezx.com",
+          "at": "2026-10-28T18:26:17.393Z",
+          "status": "deployed",
+          "retryable": false,
+          "state": "DEPLOYED_AWAITING_PO",
+          "productionDeployed": true,
+          "verifiedAt": "2026-10-28T18:26:17.393Z",
+          "repository": "RakeezX/RakeezX",
+          "targetBranch": "main",
+          "deploymentId": "9224a561-dbed-4699-b5ba-eabbc2b9ad38",
+          "previewUrl": "https://9224a561.rakeezx.pages.dev",
+          "providerStatus": "SUCCESS",
+          "provider": {
+            "checkRunId": "123016396310",
+            "headSha": "6042d71eeae023380cd5bf7e84061d98d574711b",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-28T18:25:46Z",
+            "completedAt": "2026-10-28T18:25:46Z",
+            "headBranch": null,
+            "deploymentId": "9224a561-dbed-4699-b5ba-eabbc2b9ad38",
+            "previewUrl": "https://9224a561.rakeezx.pages.dev",
+            "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/9224a561-dbed-4699-b5ba-eabbc2b9ad38"
+          },
+          "currentMainSha": "6042d71eeae023380cd5bf7e84061d98d574711b",
+          "binding": {
+            "candidateSha": "f5d739c3dccb4266e342fca5bb5b69b47368fff2",
+            "declaredBaseSha": "a980406d3e38d92a6386aa459be984b4411be6a1",
+            "mainAtPreparation": "d16735c8a00a0920b4aa848ad09fbbb730fb1410",
+            "integrationSha": "66c24bb1bd9d6941fbb2eb7bcefcaf3b036f98f1",
+            "publishedSha": "6042d71eeae023380cd5bf7e84061d98d574711b",
+            "candidateAncestorOfPublished": true,
+            "previousMainAncestorOfPublished": true,
+            "mainContainsPublished": true,
+            "checkHeadShaMatches": true,
+            "kind": "merge"
+          },
+          "build": {
+            "status": "passed",
+            "startedAt": "2026-10-28T18:24:56.441Z",
+            "completedAt": "2026-10-28T18:25:06.660Z",
+            "integrationSha": "66c24bb1bd9d6941fbb2eb7bcefcaf3b036f98f1",
+            "publishedSha": "6042d71eeae023380cd5bf7e84061d98d574711b",
+            "kind": "standard-build",
+            "validationTier": "STANDARD",
+            "reusedVerifiedBuildSha": null,
+            "generatedPathsChanged": [
+              "src/generated/build-meta.generated.js"
+            ],
+            "commands": [
+              {
+                "command": "node.exe",
+                "args": [
+                  "scripts/generate-build-meta.mjs"
+                ]
+              },
+              {
+                "command": "node.exe",
+                "args": [
+                  "node_modules/vite/bin/vite.js",
+                  "build"
+                ]
+              }
+            ]
+          },
+          "changedPaths": [
+            "docs/automation-evidence/20261028/N88_INACTIVE_BRIDGE.md",
+            "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+            "tests/n88-inactive-service-bridge-20261028/bridge.test.mjs"
+          ],
+          "sourceOnlyPaths": [
+            "docs/automation-evidence/20261028/N88_INACTIVE_BRIDGE.md",
+            "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+            "tests/n88-inactive-service-bridge-20261028/bridge.test.mjs"
+          ],
+          "changedAssets": [],
+          "productSourceChangeObserved": false,
+          "evidence": {
+            "immutable": {
+              "origin": "https://9224a561.rakeezx.pages.dev",
+              "checkedAt": "2026-10-28T18:26:10.953Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "observedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "bytes": 5711,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "observedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "bytes": 26353,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4813e36da25fdc15a3b142de4e4693ce9b6ed4e79a87c1993229a13d3b8bbf94",
+                  "observedSha256": "4813e36da25fdc15a3b142de4e4693ce9b6ed4e79a87c1993229a13d3b8bbf94",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+                  "urlPath": "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+                  "observedSha256": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+                  "bytes": 8138,
+                  "verified": true,
+                  "deleted": false
+                }
+              ]
+            },
+            "production": {
+              "origin": "https://rakeezx.com",
+              "checkedAt": "2026-10-28T18:26:11.638Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "observedSha256": "efeba08074c6af69b504eb755cce95656eba0eeaf54751039fb5ab95a09e1ab6",
+                  "bytes": 7016,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+                  "normalizedBytes": 5711,
+                  "removedProviderBytes": 1305,
+                  "removedSha256": "45897a6e66b93581194c3f7e0bd2cd7c8c65a9e921feb85b12c0e98d9f8bdfc2",
+                  "providerTransforms": [
+                    "cloudflare-jsd-v1",
+                    "cloudflare-analytics-20261017"
+                  ],
+                  "providerAddedWhitespaceBytes": 1
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "observedSha256": "3b2b3a6a7dddda97264da9f0e522a8b5b2df7a770bd499096de6eab2e193b6c7",
+                  "bytes": 26353,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4813e36da25fdc15a3b142de4e4693ce9b6ed4e79a87c1993229a13d3b8bbf94",
+                  "observedSha256": "4813e36da25fdc15a3b142de4e4693ce9b6ed4e79a87c1993229a13d3b8bbf94",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+                  "urlPath": "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+                  "observedSha256": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+                  "bytes": 8138,
+                  "verified": true,
+                  "deleted": false
+                }
+              ]
+            }
+          },
+          "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\n88-inactive-service-catalog-bridge-20261028\\integration-f5d739c3dccb-1-fad14ae6",
+          "pushRecovered": false,
+          "poPersonallyTested": false,
+          "closed": false
+        },
+        "originalReceiptSha256": "ba16c35e5ca907fab46575bb9e97e3a7f586523d8389e3ad7fc18b8f9ea42d47",
+        "originalResultSha256": "036a83bd27ba7534c31385f16ac46059086dbf1f06be3bf4b3424180c507ec62",
+        "observation": {
+          "publishedSha": "2a6c92d4588340bd38f2726668529e6d45fb8510",
+          "at": "2026-10-28T19:08:32.038Z",
+          "evidence": {
+            "production": {
+              "assets": [
+                {
+                  "repoPath": "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+                  "urlPath": "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+                  "observedSha256": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+                  "bytes": 8138,
+                  "verified": true,
+                  "deleted": false
+                }
+              ]
+            }
+          }
+        },
+        "observationSha256": "e0136a9d610c29cb3817ce1d1450794b01a2b651766130b7b5db268571f4b6d4"
+      }
+    }
+  ]
+}

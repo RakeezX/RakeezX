@@ -19,7 +19,7 @@
       "budgetMinutes": 110,
       "idleMinutes": 18,
       "dependsOn": [
-        "n88-finite-catalog-1028"
+        "n88-inactive-service-catalog-bridge-20261028"
       ],
       "allowedPaths": [
         "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
@@ -47,15 +47,16 @@
         "publicationScope": "inactive source-only backend integration and exact installation proposal"
       },
       "releaseAuthority": "PO continuing N88 goal authorizes local fabricated integration and inactive source-only packaging through original publisher. NO hosted installation/schema/Auth/RLS/live data/service activation authority is granted by this card.",
-      "objective": "Continue SAME session after finite catalogue17/17 verified047e4dde. Deliver ONE cohesive inactive backend integration/package candidate that can be reviewed for actual installation, not another isolated synthetic-only layer. Compose existing original Auth/numeric admission, canonical binding/locks, durable adapter and14fixed-operation catalogue in a single real native PostgreSQL transaction with exact backend capability ownership. Existing catalogue intentionally synthetic-only; do not bypass by relabeling a production client synthetic. Implement separate explicit inactive host assembly with validated owned capabilities, exact statement identities and defaultOFF, and qualify it against locally fabricated native PostgreSQL using actual repository schema/roles and independent connections. Prepare exact inactive genuine Sync/Delete transaction attachment proposal with original capture/complete/receipt order, parent/child rollback and restore-no-revival; no modification of live canonical writers. Package exact4table storage DDL, scoped roles/ACL/nonexposure checks, finite boundary additions and service/module hashes, install-once/readback/disable plan. Existing hosted private-error-boundary remains unchanged and denied statements are never sent there. New pack files cannot be executable against hosted services by default; require future exact external authority. No hosted SQL/Auth/RLS/schema/real data/token issuance/cancellation, secret printing or public UI/N44 overlap. Prior evidence reusable but perform native composition proof, including privilege denial and UNKNOWN/no replay. Keep positive installation scope small and reviewable with exact hashes and real missing decision/authorization clearly separate from engineering. Implement missing local adapters yourself within exact paths; do not stop just because existing ports are incomplete. Produce one LOCAL_READY integrated package plus minimal remaining live acceptance plan, not Product closure.",
+      "objective": "Continue SAME session after finite catalogue17/17 verified047e4dde. Deliver ONE cohesive inactive backend integration/package candidate that can be reviewed for actual installation, not another isolated synthetic-only layer. Compose existing original Auth/numeric admission, canonical binding/locks, durable adapter and14fixed-operation catalogue in a single real native PostgreSQL transaction with exact backend capability ownership. Existing catalogue intentionally synthetic-only; do not bypass by relabeling a production client synthetic. Implement separate explicit inactive host assembly with validated owned capabilities, exact statement identities and defaultOFF, and qualify it against locally fabricated native PostgreSQL using actual repository schema/roles and independent connections. Prepare exact inactive genuine Sync/Delete transaction attachment proposal with original capture/complete/receipt order, parent/child rollback and restore-no-revival; no modification of live canonical writers. Package exact4table storage DDL, scoped roles/ACL/nonexposure checks, finite boundary additions and service/module hashes, install-once/readback/disable plan. Existing hosted private-error-boundary remains unchanged and denied statements are never sent there. New pack files cannot be executable against hosted services by default; require future exact external authority. No hosted SQL/Auth/RLS/schema/real data/token issuance/cancellation, secret printing or public UI/N44 overlap. Prior evidence reusable but perform native composition proof, including privilege denial and UNKNOWN/no replay. Keep positive installation scope small and reviewable with exact hashes and real missing decision/authorization clearly separate from engineering. Implement missing local adapters yourself within exact paths; do not stop just because existing ports are incomplete. Produce one LOCAL_READY integrated package plus minimal remaining live acceptance plan, not Product closure. Reuse now-published6042d71e/ f5d739c3 service-catalog bridge directly: drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs. Do not implement competing bridge. Its11/11 plus prior17/17 evidence is reusable; next task closes real-native composition and concrete installation/lifecycle packet gap.",
       "preflight": {
         "version": 1,
-        "sourceCommit": "047e4ddecb7c95dab7148e0b75f431da923fed76",
+        "sourceCommit": "6042d71eeae023380cd5bf7e84061d98d574711b",
         "requiredSourcePaths": [
           "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
           "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
           "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
-          "docs/automation-evidence/20261028/N88_FINITE_CATALOG.md"
+          "docs/automation-evidence/20261028/N88_FINITE_CATALOG.md",
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs"
         ],
         "editPaths": [
           "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
