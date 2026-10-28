@@ -1,0 +1,13 @@
+{
+  "taskId": "n88-term-negative-1028",
+  "runId": "3b7b773c-82bc-4cd5-aade-9b265aa7c2d8",
+  "sourceOnly": true,
+  "realOperations": 0,
+  "cases": [],
+  "cleanup": {},
+  "failure": {
+    "stage": "lease",
+    "message": "Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/n88-term-negative-1028.json -RuntimeRoot C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4 -WaitSeconds 0 -OwnerToken 3b7b773c-82bc-4cd5-aade-9b265aa7c2d8",
+    "stack": "Error: Command failed: powershell.exe -NoProfile -NonInteractive -File C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1 -Name integration -Action acquire -TaskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/n88-term-negative-1028.json -RuntimeRoot C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4 -WaitSeconds 0 -OwnerToken 3b7b773c-82bc-4cd5-aade-9b265aa7c2d8\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at lease (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-term-negative-1028/tests/n88-terminal-negative-20261028/browser.mjs:9:21)\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/n88-term-negative-1028/tests/n88-terminal-negative-20261028/browser.mjs:12:15\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)"
+  }
+}

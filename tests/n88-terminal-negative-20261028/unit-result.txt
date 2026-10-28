@@ -1,0 +1,26 @@
+✔ negative terminal actual integrated service read-only/status and idempotent close (0) (90.3556ms)
+✔ actual integrated old issuer/terminal both serialized lock orders (0) (20.5987ms)
+✔ actual current class client synthetic transport original UNKNOWN -> close (0) (12.4985ms)
+✔ negative terminal actual integrated service read-only/status and idempotent close (28) (24.8675ms)
+✔ actual integrated old issuer/terminal both serialized lock orders (28) (38.2987ms)
+✔ actual current class client synthetic transport original UNKNOWN -> close (28) (9.8982ms)
+✔ negative terminal actual integrated service read-only/status and idempotent close (50) (17.1222ms)
+✔ actual integrated old issuer/terminal both serialized lock orders (50) (57.8682ms)
+✔ actual current class client synthetic transport original UNKNOWN -> close (50) (9.7689ms)
+✔ server authenticates signed current owner/session, never browser-local workspace proof (59.0349ms)
+✔ stale local response cannot settle the current client hint; no hidden retry (9.2387ms)
+✔ current client preserves UNKNOWN on legacy/read/rollback/lost ACK and allows only one explicit status recovery (66.2767ms)
+✔ source revision, membership ambiguity, drift and receipt mismatch fail closed (102.0638ms)
+✔ read failure, rollback, lost ACK and actual Auth commit guard never return provisional closed (42.7404ms)
+✔ actual partial original issuance stays UNKNOWN and untouched; normal selective actions stay protected (38.8729ms)
+✔ default OFF server switch and subtype shape never fall through to selective credential mutations (31.8319ms)
+✔ pure negative helper cannot attest browser fields, grant access, evict capacity or rewrite receipts (4.8339ms)
+✔ scoped source has no provider activation, SQL/schema edits or positive issuer changes (7.7086ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 841.9462
