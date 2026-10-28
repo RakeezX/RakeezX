@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-term-negative-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -8880,
+      "scopeKey": "n88-negative-only-terminal-close-authoritative-owner-session-canonical-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 115,
+      "idleMinutes": 16,
+      "dependsOn": [
+        "n88-pwa-sw-safe-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/class-credentials.mjs",
+        "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs",
+        "tests/n88-terminal-negative-20261028/**",
+        "docs/automation-evidence/20261028/N88_TERMINAL_NEGATIVE_ONLY_SOURCE_CORRECTION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs"
+      ],
+      "requiredChecks": [
+        "n88_negative_only_terminal_current_owner_session_source_verified_in_one_locked_transaction",
+        "n88_negative_only_local_workspace_lease_never_server_authority_and_stale_ui_fenced",
+        "n88_negative_only_close_blocks_delayed_original_issuance_and_never_issues",
+        "n88_negative_only_unknown_legacy_and_wrong_scope_fail_closed_and_current_client_contract",
+        "n88_negative_only_zero_real_service_schema_provider_and_default_off"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "objective": "SCOPE-CORRECTED SUCCESSOR of blocked n88-term-service-1028; preserve its authored blocker test and original candidate history, do not relabel. Real source finding: src/lib/student-portal-runtime.js produces leaseId from local writable workspace and contextRevision from local teaching/term; server auth-verifier returns verified ownerId/sessionId/current and postgres repository context holds namespace/owner/active only. Requiring server to attest the browser workspace lease is an invented stronger proof absent from the current N88 Product/Auth contract: DO NOT fabricate or trust it. In the existing N88 service, browser lease/context are ONLY local stale-UI fencing/receipt correlation; actual server authority remains verified current owner+session, canonical active teaching/section/term/membership and source/credential revisions inside the same locked transaction with commit guard and receipt key. The new terminal command is NEGATIVE-ONLY cancellation of an original issuance intent: no credential creation, no extra access grant, no grade/student writes or source disclosure. Implement a default-OFF server-only service adapter for /teacher/class/revoke resolutionVersion:1 resolution:'status'|'close', optional list feature only if qualified and enabled; reuse reviewed immutable original owner/request receipt slot, current issuer's same global advisory transaction, no SQL/schema or provider action. Authorize terminal close with ORIGINAL requestId and original expected roster/credential revision plus fresh authenticated owner/session and active canonical teaching/section/term and current membership/source guards. Treat the browser lease/context as untrusted opaque correlations checked by current client, not proof of server authority; never include them in an assertion of verified server workspace lease. The server must NOT allow a browser echo alone to authorize the terminal operation. If a truly server-side lease primitive is needed for any positive future issuance/write, return BLOCKED with exact evidence; DO NOT relax those positive-operation guards. Current original issue route remains unchanged and must reject delayed requests when the original key is durably closed. Status read-only; close idempotent and returns closed only after full COMMIT ACK. Receipt mismatch/old legacy/absent/read failures remain UNKNOWN, with no retry or hint clearing. Unit and actual createIntegratedService/current class client synthetic transport tests on 0/28/50, two lock orderings, signed current owner/session, stale local workspace UI, wrong class/term/teaching, version drift, lost ACK/rollback/partial/legacy records. Preserve all legacy issuance, selective rotate/revoke, guidance, student projection, owner isolation and 6-digit code protection. No live provider, SQL/Auth/RLS/schema, actual student/account operations, no edits to SW/N44, no alternate workers. Clearly document that this introduces only default-OFF negative-only terminal source, not the real service or actual resolution for 28 pupils. Original controller/publisher exclusively.",
+      "acceptance": [
+        "Differentiate **local** lease freshness from **server-authenticated** owner/session/canonical teaching: never manufacture server proof for a browser-sourced ID, never log or disclose identity, preserve original client stale-data fencing and all existing server Auth/membership/CAS guards.",
+        "Terminal status must be read-only and never conclude absent receipt means no earlier issuance. Terminal close is a deny-further-issuance operation on the original owner/request ID with exact roster/credential source checks, never mints, rotates, revokes active student credentials or reveals secrets, and cannot be issued by another owner/term.",
+        "Prove both actual old-issuer/terminal transaction lock orders with fabricated 0/28/50, stale replay, class/owner change, legacy receipt and unacknowledged commit; honest UNKNOWN where evidence is insufficient. Existing normal actions and client current-session check remain unchanged when server feature switch is OFF.",
+        "If implementing negative-only close genuinely requires an authoritative backend primitive that is missing, do not weaken guards; return BLOCKED with exact missing primitive, one safe remedy and no paid retry. Do not repeat n88-term-service-1028 unchanged.",
+        "Only repository/source test and inert publication permitted; real service cutover with provider readback/permission is separate. N88 Product remains open."
+      ],
+      "preparationAuthority": {
+        "kind": "po_20261028_correct_n88_source_terminal_self_imposed_lease_requirement",
+        "predecessorTask": "n88-term-service-1028",
+        "originalBlocker": "Server lacks server-attested browser workspace lease; actual existing server authority is current owner/session/canonical source.",
+        "correction": "Negative-only original-request cancellation uses server-verified current owner/session/canonical source and current receipt transaction. Client workspace lease is local response fence, never server authority.",
+        "sensitiveLiveMutations": 0,
+        "authRlsSchemaMigrations": 0,
+        "providerOps": 0,
+        "requireDefaultOff": true,
+        "publication": true,
+        "publicationScope": "inert inactive source-only N88 original issuance terminal cancellation"
+      },
+      "releaseAuthority": "User PO asks to finish N88 and explicitly reported unknown original issuance. This SOURCE-ONLY card corrects the predecessor's self-imposed requirement for server attestation of a browser-local workspace identifier, without changing real product data/owner authorization. It authorizes an INACTIVE negative-only original-intent cancellation source adapter with strict current server Auth+canonical source guards, tests and sole original publisher's inert-source delivery. It does NOT authorize applying backend SQL/Auth/RLS/schema, changing positive issuance semantics, any real student operation, or activating server capability. Real service activation and exact provider migration/readback remain separate.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "edaefa3dcd34232433cc4c6b2a25f88ac3b9dbb3",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/class-credentials.mjs",
+          "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs",
+          "drafts/n88-student-portal/receipt-reconciliation.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/auth-verifier.mjs",
+          "src/lib/student-portal-runtime.js",
+          "src/lib/student-portal-class-client.js"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/class-credentials.mjs",
+          "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs",
+          "tests/n88-terminal-negative-20261028/terminal-route.test.mjs",
+          "docs/automation-evidence/20261028/N88_TERMINAL_NEGATIVE_ONLY_SOURCE_CORRECTION.md"
+        ],
+        "newPaths": [
+          "tests/n88-terminal-negative-20261028/terminal-route.test.mjs",
+          "docs/automation-evidence/20261028/N88_TERMINAL_NEGATIVE_ONLY_SOURCE_CORRECTION.md"
+        ],
+        "workerChecks": [
+          "n88_negative_only_terminal_current_owner_session_source_verified_in_one_locked_transaction",
+          "n88_negative_only_local_workspace_lease_never_server_authority_and_stale_ui_fenced",
+          "n88_negative_only_close_blocks_delayed_original_issuance_and_never_issues",
+          "n88_negative_only_unknown_legacy_and_wrong_scope_fail_closed_and_current_client_contract",
+          "n88_negative_only_zero_real_service_schema_provider_and_default_off"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "reconcile_n88_negative_inert_source",
+      "verificationRepair": {
+        "version": 1,
+        "kind": "n88-exact-inactive-source-declaration-v1",
+        "sourceSha256": "b5de2677919fb9f681fe55d26a149c39adc80951b0769f5c75f67134e4d591b2",
+        "previousReceiptSha256": "504d00d1cabc26f3517c8fc264f1a34f836a9ad2cce680bf04a367756efa969e",
+        "publishedSha": "0c33b120b0baba74af8dd64c7425d7fb83de0411",
+        "reason": "Existing PO authority already approved a source-only inactive negative original-intent cancellation. The service is NOT activated. The old card omitted the publication declaration and included unrelated verification paths. Correct only classification with the same immutable provider proof and original all-PASS checks, without rerunning provider or changing any user data."
+      }
+    }
+  ]
+}
