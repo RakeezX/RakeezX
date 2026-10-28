@@ -259,6 +259,21 @@ export function verifiedSourcePathRepair(task,result,update) {
 // inert source-only publication. Preserve every provider/served/check proof.
 export function verifiedSourceOnlyDeclarationRepair(task, result, update) {
   const card=update.card, proof=card.verificationRepair, d=task.deliveryReceipt, a=card.preparationAuthority;
+  if(task.id==='n88-authorized-read-preflight-1028') {
+    const sameFields=Object.entries(card).every(([k,v])=>['completionMode','verificationRepair','releaseAuthority'].includes(k)||same(v,task[k]));
+    return card.completionMode==='reconcile_source_only_declaration' && task.status==='blocked'
+      && task.lastFailure==='Publisher returned incomplete or mismatched deployment proof'
+      && !task.liveMutation && !task.liveAuthorizationRef && sameFields
+      && card.releaseAuthority===task.releaseAuthority+' [Exact inactive source-only classification; no hosted activation.]'
+      && result.state==='LOCAL_READY' && result.runId==='6c91874c-cfc8-4e2f-88e4-2e084980210a'
+      && result.candidateSha==='81f88a201b1eacc5fa246d57729aa7c009235cf4'
+      && result.checks?.every(c=>c.status==='PASS') && !result.blocker && result.blockerType==='none'
+      && task.requiredChecks.every(n=>result.checks.some(c=>c.name===n&&c.status==='PASS'))
+      && d?.publishedSha==='6c3bca67523fb48157b1bfb7f7da6ca4f8068f41' && d.candidateSha===result.candidateSha
+      && proof?.priorReceiptSha256===sha256(bytes(d)) && proof.publishedSha===d.publishedSha
+      && proof.originalResultSha256===sha256(bytes(result)) && proof.reason?.length>=80
+      && verifiedDeployment({...task,...card},d);
+  }
   if(task.id==='n88-canonical-binding-1028') {
     const sameFields=Object.entries(card).every(([k,v])=>['completionMode','verificationRepair','releaseAuthority'].includes(k)||same(v,task[k]));
     return card.completionMode==='reconcile_source_only_declaration' && task.status==='blocked'
