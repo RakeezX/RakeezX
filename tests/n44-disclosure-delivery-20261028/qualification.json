@@ -1,0 +1,220 @@
+{
+  "taskId": "continuous-n44-disclosure-frontend-delivery-20261028",
+  "runId": "6a207d4f-4acf-44ac-ba18-00d8857c2b85",
+  "recordedAt": "2026-10-28T05:53:53.374Z",
+  "state": "LOCAL_READY",
+  "baseSha": "0a7c492875cb606e9928886a17189a3339fdfb6b",
+  "sourceCommit": "3a1beab612f32eba32a48e5078e62ddef573db4c",
+  "evidenceCommit": "12ef7535b877a00476be9f49f3175905c19378da",
+  "observedOriginMain": "0a7c492875cb606e9928886a17189a3339fdfb6b",
+  "file": {
+    "path": "src/views/notification-settings.js",
+    "preimageBlob": "9bf50edc293079e92b7cb4c24c141f26d1c7a656",
+    "preimageSha256": "eba6af139c08ff1ddf7ed712b7acdc1c936bf263e8be85d5e089703de5f998a6",
+    "postimageBlob": "d407c97b3b2945d79bac68c2a68f0e33cd2c7842",
+    "postimageSha256": "612a79f6af151ff061ef9856a59caa1be27020024d3e331c14fd9c3244ea2778"
+  },
+  "packet": {
+    "path": "tests/n44-mobile-live-20261028/disclosure-publisher-packet.json",
+    "commit": "12ef7535b877a00476be9f49f3175905c19378da",
+    "sha256": "7255ee14a0d16a2a03db3b07de4ca832e72c4696ed973f2452a07c510bcf3957",
+    "patchSha256": "3a03ee190ef0c6dff4e834c136605ae4d2a9fd4b76a6206b481856b9415c6a99",
+    "originalQualificationPath": "tests/n44-mobile-live-20261028/qualification.json",
+    "originalQualificationSha256": "537dab182e852fa1548b51ac92885b25f3d497712d863936a6421b2a4aa1bbf9"
+  },
+  "dependencies": [
+    {
+      "path": "index.html",
+      "testedBlob": "b9c07e1738c2bf1f3911e2f116646f1c5aa45602",
+      "currentBlob": "b9c07e1738c2bf1f3911e2f116646f1c5aa45602",
+      "review": "identical"
+    },
+    {
+      "path": "src/app.js",
+      "testedBlob": "0132fe2f57606df1d9c11c8a78eaf9f1c2ebefa6",
+      "currentBlob": "0132fe2f57606df1d9c11c8a78eaf9f1c2ebefa6",
+      "review": "identical"
+    },
+    {
+      "path": "src/store.js",
+      "testedBlob": "61f1f61cf226d9c17e2e7496652acb1e8c47c4e0",
+      "currentBlob": "61f1f61cf226d9c17e2e7496652acb1e8c47c4e0",
+      "review": "identical"
+    },
+    {
+      "path": "src/repaint.js",
+      "testedBlob": "3aa2c1f2abd3a7d73ab27d1c4f0f6f587af67849",
+      "currentBlob": "3aa2c1f2abd3a7d73ab27d1c4f0f6f587af67849",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/dom.js",
+      "testedBlob": "88fbca218a3d4af4acf8bbf9247aadf126262a87",
+      "currentBlob": "88fbca218a3d4af4acf8bbf9247aadf126262a87",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/cloud.js",
+      "testedBlob": "33c22a8e5b7107f7407bd13fa4884e1553ad6f53",
+      "currentBlob": "33c22a8e5b7107f7407bd13fa4884e1553ad6f53",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-events.js",
+      "testedBlob": "ff18feca8d7040f9e939c446314bccdd03b498d1",
+      "currentBlob": "ff18feca8d7040f9e939c446314bccdd03b498d1",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-center.js",
+      "testedBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+      "currentBlob": "67677eaac57ee6758aa8ffb2cdefe50f65f3773e",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-push-runtime.js",
+      "testedBlob": "d11bfb0647c625620535e78b67c85c5d7f0e9091",
+      "currentBlob": "d11bfb0647c625620535e78b67c85c5d7f0e9091",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-push-browser.js",
+      "testedBlob": "140a12fee6dda566c9f24ea786559b4d959588eb",
+      "currentBlob": "140a12fee6dda566c9f24ea786559b4d959588eb",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-push-client.js",
+      "testedBlob": "f1ac8ee88141b3231f7ac0af154905801d3bf79a",
+      "currentBlob": "f1ac8ee88141b3231f7ac0af154905801d3bf79a",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-push-gateway.js",
+      "testedBlob": "aff767fe17f5fe003a7c87d0f9ea66acdc12ba3d",
+      "currentBlob": "aff767fe17f5fe003a7c87d0f9ea66acdc12ba3d",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-state.js",
+      "testedBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99",
+      "currentBlob": "bb8abf64f4453b37123f1c3f4ddf8cbab5ed2a99",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-schedule.js",
+      "testedBlob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+      "currentBlob": "73f85d0b34ccc97d205477690cdf4cb74874c1ee",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/notification-preferences.js",
+      "testedBlob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+      "currentBlob": "2f0142fad9e6b15b36c004e1f9a2d45553e83d58",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/sync-ownership.js",
+      "testedBlob": "10e6be6e32bf23327cbf8d008a5a8077504e956f",
+      "currentBlob": "10e6be6e32bf23327cbf8d008a5a8077504e956f",
+      "review": "identical"
+    },
+    {
+      "path": "src/lib/offline-lease.js",
+      "testedBlob": "ba307f3677afe68981d79388f02ee017a6049565",
+      "currentBlob": "ba307f3677afe68981d79388f02ee017a6049565",
+      "review": "identical"
+    },
+    {
+      "path": "src/styles/notifications.css",
+      "testedBlob": "3240879f3d80af232432ca1e593ea249bf5e9ec8",
+      "currentBlob": "3240879f3d80af232432ca1e593ea249bf5e9ec8",
+      "review": "identical"
+    },
+    {
+      "path": "sw.js",
+      "testedBlob": "dd97b892eae944569ae05cd19adeafad02606bb9",
+      "currentBlob": "87ccef84e29d8e62c997ca47c1f844aaf4b51410",
+      "review": "Only cache VERSION v93 -> v94; shell entries and all handlers identical. Current main preserved; original browser proof blocked real SW."
+    }
+  ],
+  "sharedStyles": "All src/styles Git blobs unchanged from the actual rendered composition.",
+  "checks": [
+    {
+      "name": "n44_disclosure_exact_qualified_file_and_dependency_binding",
+      "status": "PASS",
+      "evidence": "Exact canonical preimage/postimage and saved packet/patch/evidence hashes verified. 18 dependency blobs identical; sw.js differs only by v93 -> v94. Shared styles unchanged. node --check passed."
+    },
+    {
+      "name": "n44_disclosure_actual_rtl_state_and_owner_boundary_proof",
+      "status": "PASS",
+      "evidence": "Reused actual HTTP app/store/DOM/CSS proof at 390/1100px: nested disclosure choices survive repaint/same-owner credential refresh and explicit close. Corrected targeted owner-invalidation proof clears private DOM synchronously and denies stale action calls. Original RED and harness-counter FAIL remain unchanged."
+    },
+    {
+      "name": "n44_disclosure_only_frontend_delta_and_zero_live_operations",
+      "status": "PASS",
+      "evidence": "One Product file transferred; only this safe doc and qualification added. No new imports; current app/SW/styles/N88/service/config preserved. No browser/server/private custody/service/account/provider/grant operation or publication."
+    }
+  ],
+  "reusedEvidence": [
+    {
+      "path": "tests/n44-mobile-live-20261028/disclosure-causal-checkpoint-red.json",
+      "commit": "12ef7535b877a00476be9f49f3175905c19378da",
+      "sha256": "6458576024024e1a43703ef6aeb6ad700230a7a9f5f7b01bbd9e7e275fe60d9f"
+    },
+    {
+      "path": "tests/n44-mobile-live-20261028/disclosure-green.json",
+      "commit": "12ef7535b877a00476be9f49f3175905c19378da",
+      "sha256": "9627c2a6c33833bef10b91ec91cd701f8a9b2a4245580bbd107d08c34dace4ff"
+    },
+    {
+      "path": "tests/n44-mobile-live-20261028/disclosure-guard-green.json",
+      "commit": "12ef7535b877a00476be9f49f3175905c19378da",
+      "sha256": "a88c9552dbde9e4645461393bc718c80e4d15b31488fd10e14b785475b6f0724"
+    },
+    {
+      "path": "tests/n44-mobile-live-20261028/disclosure-390.png",
+      "commit": "12ef7535b877a00476be9f49f3175905c19378da",
+      "sha256": "8cb8630710bef29d7532b13072911e569ef59bd5723b8363deef73c79619ac2f"
+    },
+    {
+      "path": "tests/n44-mobile-live-20261028/disclosure-1100.png",
+      "commit": "12ef7535b877a00476be9f49f3175905c19378da",
+      "sha256": "9cfd8b6e14aa669c4ac3aac273494e12f55f35207ca569649b5689daea780fb6"
+    },
+    {
+      "path": "tests/n44-mobile-live-20261028/disclosure-ui.mjs",
+      "commit": "12ef7535b877a00476be9f49f3175905c19378da",
+      "sha256": "543893d02167124c03a1c952e7be59b427d3fd35c778460f2c15ca75843b3bbe"
+    }
+  ],
+  "historicalContext": "Baseline disclosure FAIL and the later test-counter FAIL are preserved in the original checkout. The latter counted original asynchronous native-binding cleanup; its targeted corrected guard proof passes without weakening production guards. Parent56 and physical phone NOT_RUN remain separate, unchanged acceptance.",
+  "proofLimits": "Reused same-owner repaint/credential-refresh and real store deactivation/stale-action proof; no new physical account/device/Sync or offline-cache certification. Existing account/lease guard implementation and scroll/repaint behavior are unchanged.",
+  "publicationPayload": [
+    "src/views/notification-settings.js",
+    "docs/automation-evidence/20261028/N44_DISCLOSURE_FRONTEND_DELIVERY.md",
+    "tests/n44-disclosure-delivery-20261028/qualification.json"
+  ],
+  "verificationPaths": [
+    "src/views/notification-settings.js"
+  ],
+  "noNewStartupImports": true,
+  "existingOfflineShellPathPresent": true,
+  "operations": {
+    "browserPhases": 0,
+    "serversStarted": 0,
+    "leasesAcquired": 0,
+    "privateCustodyReads": 0,
+    "providerServiceOperations": 0,
+    "realAccountReads": 0,
+    "registrations": 0,
+    "sends": 0,
+    "grantActivations": 0,
+    "pushes": 0,
+    "deployments": 0
+  },
+  "originalPrivateCheckoutModified": false,
+  "N44": "OPEN",
+  "D107": "OPEN",
+  "nextAction": "Original publisher performs deterministic build and independent served-asset SHA verification. Only after verified publication may the controller resume the original phone card/custody/worktree."
+}
