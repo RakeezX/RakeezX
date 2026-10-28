@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
-  testMatch: 'ux-skills-pilot.spec.mjs',
+  testMatch: 'ux-skills-*.spec.mjs',
   fullyParallel: false,
   workers: 1,
   retries: 0,

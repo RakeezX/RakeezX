@@ -8628,3 +8628,101 @@
 @media (prefers-reduced-motion: reduce) {
   .class-hub .class-tool-card { transition: none; }
 }
+
+/* UX Skills Preview round 2: compact, keyboard-accessible teacher actions on phones. */
+.roster-populated-actions__primary { display: flex; flex-wrap: wrap; gap: var(--sp-2); min-inline-size: 0; }
+.roster-populated-actions__primary .btn { min-block-size: var(--tap); }
+@media screen and (max-width: 640px) {
+  .roster-populated-actions { display: grid; grid-template-columns: minmax(0,1fr); gap: 8px; }
+  .roster-populated-actions > .roster-populated-actions__primary,
+  .roster-populated-actions > .roster-entry-actions {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+    inline-size: 100%;
+    min-inline-size: 0;
+    grid-column: 1;
+    margin: 0;
+  }
+  .roster-populated-actions .btn {
+    min-block-size: 44px;
+    min-inline-size: 0;
+    padding-inline: 6px;
+    padding-block: 9px;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+    justify-content: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+@media screen and (max-width: 360px) {
+  .class-hub > .section.class-tools-section .quick-tools-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card {
+    grid-template-columns: 34px minmax(0,1fr);
+    min-block-size: 90px;
+    padding: 9px;
+    gap: 7px;
+    align-items: center;
+    min-inline-size: 0;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card .tile__icon {
+    inline-size: 34px;
+    block-size: 34px;
+    border-radius: 10px;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card .tile__icon svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+  .class-hub > .section.class-tools-section .class-tool-card .tile__title {
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+@media screen and (max-width: 520px) {
+  .class-hub .class-hub-stats .stat__label { font-size: 11px; line-height: 1.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .roster-populated-actions .btn { transition: none; }
+}
+
+/* UX Skills Preview round 2: 24-class mobile list without losing class identity. */
+@media screen and (max-width: 520px) {
+  .classes-page .class-cards-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+  }
+  .classes-page .class-card {
+    min-block-size: 106px;
+    min-inline-size: 0;
+  }
+  .classes-page .class-card__main {
+    padding: 11px 10px;
+    gap: 7px;
+    min-inline-size: 0;
+  }
+  .classes-page .class-card__title { font-size: 14px; }
+  .classes-page .class-card__body {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    align-items: start;
+    gap: 4px;
+    padding-block-start: 7px;
+    min-inline-size: 0;
+  }
+  .classes-page .class-card__sub { font-size: 11px; line-height: 1.4; }
+  .classes-page .class-card__count {
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .classes-page .class-card__count .tabular { font-size: 13px; }
+  .classes-page .class-cards-grid > [data-section-roster] { grid-column: 1 / -1; }
+}

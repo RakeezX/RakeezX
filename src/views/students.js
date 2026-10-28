@@ -171,9 +171,11 @@ export default {
 
   topActions: (p) => !canOpenRoster(p) || !store.teachingContext(p.id).roster.length ? '' : html`
     <div class="roster-populated-actions">
-    ${rosterFileActions(p)}
-    <button class="btn roster-toolbar-action" data-act="import">${icon('upload')} لصق الأسماء</button>
-    <button class="btn roster-toolbar-action" data-act="add">${icon('plus')} إضافة طالب</button>
+      <div class="roster-populated-actions__primary" role="group" aria-label="إضافة الطلاب">
+        <button type="button" class="btn roster-toolbar-action" data-act="add">${icon('plus')} إضافة طالب</button>
+        <button type="button" class="btn roster-toolbar-action" data-act="import">${icon('upload')} لصق الأسماء</button>
+      </div>
+      ${rosterFileActions(p)}
     </div>
   `,
 
