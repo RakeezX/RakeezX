@@ -1,3 +1,41 @@
+# N44 Core V1 packet — locally qualified, inactive
+
+AI continuation b0cdb94c-c3fe-4bd7-8679-7b4ca1ffafae on base fd79f76a4847ccc6e69c8044714e030bb9cd3025. Explicit scope repair authorized restoration of the exact nonsecret source graph. The original FAIL below remains historical evidence; this qualification applies to the corrected archive only.
+
+## Corrected result
+
+Restored only the 19 missing and eight differing source files named by the previous comparison from immutable d4e695d3f823a9ba57c13aad2baeb9763da04aab. Saved build/packet/archive/entry/import-map identities were verified locally. All 55 Native178 inputs are present; 53 retain the saved source semantics exactly (one historical CRLF-only source representation is normalized for comparison). Only backend.mjs and existing-host.mjs differ to carry the finite integration. The 56th input is the already-qualified core-teacher-scheduler.mjs. No private helper, custody, config state or whole branch was copied.
+
+Native transport nativeExchange forwarding, mobile peer-retention/COMMIT fences, signed ingress, typed SQL boundary, original source protection, owner checks and inactive defaults remain in their exact preserved modules. Backend keeps its original mobile composition and trace arguments; finite mode uses a separate fourth argument and rejects coexistence with mobile/device/disposal/inspection or general delivery configuration. Host passes the finite descriptor through its original guarded composition. No original service module outside the two integration points is redesigned.
+
+## Actual compiled evidence
+
+Archive: artifacts/build/n44-core-packet-1028/native-source.zip (ignored, local only).
+Archive SHA256: 977a0ef11e3592c7fd80ec32b6395e942d607e2d57f1236cddd65bf63addca85
+Edge SHA256: c4d969834891c728ec8d2a6997ab34b3b5a1bd684f48b45b3932665145f2a7f1
+Import-map SHA256: 50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421
+Qualification-export bundle SHA256: 0a8fbb32ed0fe94ebe12d50d7d917263e038b2a06264cef960c1ff9da59f0478
+
+Builder compiles twice with existing pinned esbuild0.28.1 and creates/roundtrips the fixed-timestamp two-entry ZIP twice; output hashes agree. The deployable archive contains only edge.mjs and import_map.json; no synthetic fixture or qualification bundle. Public manifest contains hashes/counts only. Native178 saved baseline archive and packet hashes remain as documented below. This is an installable source packet only after separate authority/readiness, NOT an installation or hosted verification claim.
+
+Three affected packet checks PASS after correction: exact graph/compiled/archive hash binding; preserved baseline graph with only two reviewed integration differences; OFF/null/empty-cron and nonsecret tracked-input checks. A separate actual compiled-bundle test reuses only the existing synthetic SQL fixture and exercises finite delivery -> UNKNOWN -> restart/no replay -> hard-end disable. The compiled original host OFF path returns503 after reading only N44_ENABLED, with no service/secret/environment access. Existing unchanged eight-test scheduler campaign and original Native178 evidence were not replayed. Synthetic SQL is not live PostgreSQL/TLS/RLS certification.
+
+During this continuation the first blob comparison detected CRLF-only pr6 source representation and was corrected by exact baseline-byte binding. The new Node proof first had an escaped-regex syntax error, then recursive resolution hooks and missing fresh-checkout packages. These harness failures were corrected using a pre-resolved mapping to the original already-installed package set. The targeted compiled proof then passed. No policy or global configuration was changed and no remote package install occurred.
+
+## Registration ordering prerequisite
+
+The finite scheduler consumes already registered pinned registration IDs; it does not expose a new enrollment capability. In finite-only mode push/config remains disabled by the preserved default device-discovery contract and new register requests are denied. Do not ask a phone to Enable while that is its only active mode. Any future trial proposal must explicitly include normal enrollment through the preserved mobile preparation path under a NEW compatible exact grant, with scheduler OFF, no sends, and both registration ACKs first. Then atomically retire that preparation descriptor/pin without revoking the retained registrations, bind the finite descriptor to their actual IDs and canonical source receipts, and enable scheduled ticks. Modes must never coexist; all phases share the one new hard end and immutable total budget, with no clock reset. Check the retained registration/session expiries cover the finite window. If that transition cannot be represented and read back through the original custodian's authorized configuration path, do not install/activate the trial; do not weaken the mutual-exclusion or register guard. This document grants none of these operations and the old grant is never a preparation option.
+
+## Future operations remain inactive
+
+The concrete proposal below remains applicable: at most two canonical event sources, four event/device tuples, two registrations, four provider attempts and twenty ticks in a <=20-minute window after readiness and new exact authority. Minimum fixture is lesson session plus item parent and due child under verified existing ancestry. These are three source records/two event sources; no grades or other contributions. Installation must use this corrected archive identity, not the historical failed archive. Original custodian must perform permitted fresh service/config identity readback and preserve peers before any separately authorized installation. No such read occurred here.
+
+Sole publisher may integrate these inert source changes and builder/manifest/document; it cannot substitute frontend deployment for Native/service installation. Reuse the original owned installation/readback path only under future exact authority. General delivery remains OFF, staged cron empty, flags false, descriptor null. Preserve spent grant60fc7d23, private candidate d4e695d3, original mutation receipt and read-only cleanup checkpoint described below. N44 Core V1 remains OPEN; teacher UI simplification waits for actual automatic stability. No browser, server, phase lease, account action, upload, clock, registration, send, deletion, SQL/schema/Auth change or child worker was used.
+
+---
+
+## Preserved failed checkpoint (superseded for corrected archive only)
+
 # N44 Core V1 local packet — NOT INSTALLABLE
 
 AI checkpoint, task n44-core-packet-1028, run 899544dd-d07a-47dd-ba3c-2ccd549d7458. Base fd79f76a4847ccc6e69c8044714e030bb9cd3025. No live service/account/browser/credential operations.

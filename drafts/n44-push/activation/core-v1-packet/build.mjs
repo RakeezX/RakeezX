@@ -33,9 +33,12 @@ export async function buildPacket(root=process.cwd()) {
   inputs[p]=sha(await fs.readFile(path.join(root,p)));
  }
  const out=path.join(root,'artifacts/build/n44-core-packet-1028');
+ const qualification=await compiler.build({...options,entryPoints:undefined,stdin:{resolveDir:root,contents:"import './drafts/n44-push/node-globals.mjs'; export {createExistingHost} from './drafts/n44-push/existing-host.mjs'; export {createBackend} from './drafts/n44-push/backend.mjs'; export {createWebEntry} from './drafts/n44-push/web-entry.mjs'; export {finiteScope,finiteGuards} from './drafts/n44-push/core-teacher-scheduler.mjs';"}});
+
  execFileSync('git',['check-ignore','artifacts/build/n44-core-packet-1028/native-source.zip'],{cwd:root});
  await fs.mkdir(out,{recursive:true});
  await fs.writeFile(path.join(out,'edge.mjs'),a.outputFiles[0].contents);
+ await fs.writeFile(path.join(out,'compiled.mjs'),qualification.outputFiles[0].contents);
  await fs.writeFile(path.join(out,'import_map.json'),map);
  const zipScript=`from pathlib import Path
 from zipfile import ZipFile,ZipInfo,ZIP_STORED
@@ -54,10 +57,16 @@ with ZipFile(p/'native-source.zip') as z:
  execFileSync('python',['-c',zipScript,out],{windowsHide:true});
  assert.equal(first,sha(await fs.readFile(path.join(out,'native-source.zip'))));
  const missing=Object.keys(baseline.sourceInputs).filter(p=>!(p in inputs));
- const changed=Object.keys(baseline.sourceInputs).filter(p=>p in inputs&&baseline.sourceInputs[p]!==inputs[p]);
+ const changed=[];
+ for(const p of Object.keys(baseline.sourceInputs)) {
+  const blob=execFileSync('git',['show','d4e695d3f823a9ba57c13aad2baeb9763da04aab:'+p],{cwd:root});
+  assert.ok(sha(blob)===baseline.sourceInputs[p]||sha(blob.toString().replace(/\r?\n/g,'\r\n'))===baseline.sourceInputs[p], 'saved source binding '+p);
+  if(p in inputs&&sha((await fs.readFile(path.join(root,p),'utf8')).replace(/\r\n/g,'\n'))!==sha(blob.toString().replace(/\r\n/g,'\n')))changed.push(p);
+ }
+
  const finite=a.outputFiles[0].text.includes('finite-due')&&a.outputFiles[0].text.includes('N44_FINITE_SCHEDULER_JSON');
  assert.ok(finite);
- const publicManifest={schema:1,counts:{inputs:Object.keys(inputs).length,baselineInputs:Object.keys(baseline.sourceInputs).length,missingBaselineInputs:missing.length,changedBaselineInputs:changed.length,archiveEntries:2},hashes:{edge:sha(a.outputFiles[0].contents),archive:first,importMap:sha(map),baselineEdge:sha(savedEdge),inputs:Object.values(inputs),missingBaselineInputs:missing.map(p=>baseline.sourceInputs[p])}};
+ const publicManifest={schema:1,counts:{inputs:Object.keys(inputs).length,baselineInputs:Object.keys(baseline.sourceInputs).length,missingBaselineInputs:missing.length,changedBaselineInputs:changed.length,archiveEntries:2},hashes:{qualification:sha(qualification.outputFiles[0].contents),edge:sha(a.outputFiles[0].contents),archive:first,importMap:sha(map),baselineEdge:sha(savedEdge),inputs:Object.values(inputs),missingBaselineInputs:missing.map(p=>baseline.sourceInputs[p])}};
  await fs.writeFile(path.join(root,'drafts/n44-push/activation/core-v1-packet/manifest.public.json'),JSON.stringify(publicManifest,null,2)+'\n');
  await fs.writeFile(path.join(out,'comparison.json'),JSON.stringify({missing,changed,inputs,finite},null,2)+'\n');
  return {publicManifest,missing,changed,out};
