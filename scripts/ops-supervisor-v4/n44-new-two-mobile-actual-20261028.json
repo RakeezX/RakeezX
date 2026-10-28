@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-two-mobile-actual-trial-20261028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100002,
+      "scopeKey": "n44-one-approved-current-device-test",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "live",
+      "liveMutation": true,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-one-approved-closed-page-push-20261019",
+      "baseSha": "61dbc4bc6cd66f7875ac3446e208dce1c5f3678b",
+      "candidateSha": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "executionProfile": {
+        "version": 1,
+        "authorityRef": "PO-20261027-N44-ASTRA-SINGLE-WORKER",
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "serviceTier": "priority",
+        "fastMode": true,
+        "singleAgent": true,
+        "ultraExcludedBecause": "Installed model describes Ultra as automatic task delegation; PO explicitly prefers highest supported single-worker effort in this case.",
+        "originalTaskId": "continuous-n44-one-approved-closed-page-push-20261019",
+        "originalSession": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "qualifiedSource": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5"
+      },
+      "dependsOn": [
+        "continuous-n44-d107-inert-source-delivery-20261028"
+      ],
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "supabase/functions/n44-notifications/**",
+        "tests/n44-instrumented-fourth-20261026/**",
+        "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_QUALIFICATION.md",
+        "tests/n44-instrumented-fourth-actual-20261026/**",
+        "docs/automation-evidence/20261026/N44_INSTRUMENTED_FOURTH_ACTUAL_OUTCOME.md",
+        "tests/n44-source4-reconciliation-20261026/**",
+        "docs/automation-evidence/20261026/N44_SOURCE4_RECONCILIATION.md",
+        "tests/n44-material-source4-completion-20261026/**",
+        "docs/automation-evidence/20261026/N44_MATERIAL_SOURCE4_COMPLETION.md",
+        "tests/n44-closed-fourth-successor-actual-20261026/**",
+        "docs/automation-evidence/20261026/N44_CLOSED_FOURTH_SUCCESSOR_ACTUAL.md",
+        "tests/n44-capacity-debugger-recovery-20261026/**",
+        "docs/automation-evidence/20261026/N44_CAPACITY_DEBUGGER_RECOVERY.md",
+        "tests/n44-user-closed-continuation-20261026/**",
+        "docs/automation-evidence/20261026/N44_USER_CLOSED_CONTINUATION.md",
+        "docs/automation-evidence/20261026/N44_REAL_PROVIDER_RAKEEZ_SW_20261026.md",
+        "docs/automation-evidence/20261026/N44_TAKEOVER_COMPATIBILITY_REVIEW.md",
+        "docs/automation-evidence/20261026/N44_WNS_PLATFORM_EXTENSION.md",
+        "drafts/n44-push/audited-sender.mjs",
+        "drafts/n44-push/provider-policy.mjs",
+        "drafts/n44-push/registration.mjs",
+        "drafts/n44-push/shared.mjs",
+        "src/lib/notification-push-browser.js",
+        "src/lib/notification-push-client.js",
+        "src/views/notification-settings.js",
+        "tests/fixtures/n44-crypto-sender/fixture.mjs",
+        "tests/n44-crypto-sender-import-guard.mjs",
+        "tests/n44-crypto-sender.mjs",
+        "tests/n44-local-notification-check-20261026.test.mjs",
+        "tests/n44-original-sw-real-webpush-20261026.mjs",
+        "tests/n44-provider-crossbrowser-20261026.test.mjs",
+        "tests/n44-push-preparation.test.mjs",
+        "tests/n44-real-browser-support-20261026.mjs",
+        "tests/n44-webkit-gesture-20261026.test.mjs",
+        "tests/n44-wns-webpush-20261026.test.mjs",
+        "tests/n44-pr6-completion-20261026/**",
+        "docs/automation-evidence/20261026/N44_PR6_COMPLETION_OUTCOME.md",
+        "sw.js",
+        "src/lib/notification-push-runtime.js",
+        "src/app.js",
+        "src/lib/notification-push-gateway.js",
+        "src/lib/notification-center.js",
+        "src/lib/notification-schedule.js",
+        "src/lib/notification-preferences.js",
+        "src/lib/sync-ownership.js",
+        "src/store.js",
+        "tests/n44-astra-continuation-20261027/**",
+        "docs/automation-evidence/20261027/N44_ASTRA_CONTINUATION.md",
+        "tests/n44-mobile-admin-inactive-20261027/**",
+        "docs/automation-evidence/20261027/N44_MOBILE_ADMIN_INACTIVE_CONTRACT.md",
+        "tests/n44-mobile-host-inactive-20261027/**",
+        "docs/automation-evidence/20261027/N44_MOBILE_HOST_INACTIVE_PACKET.md",
+        "tests/n44-mobile-live-20261027/**",
+        "docs/automation-evidence/20261027/N44_MOBILE_ACTUAL_OUTCOME.md",
+        "tests/n44-d107-continuation-20261028/**",
+        "docs/automation-evidence/20261027/N44_D107_CONTINUATION_20261028.md",
+        "docs/automation-evidence/20261027/N44_MOBILE_MORNING_HANDOFF_20261028.md",
+        "src/lib/notification-events.js",
+        "src/lib/notification-state.js",
+        "src/views/notifications.js",
+        "src/styles/notifications.css",
+        "tests/n44-mobile-live-20261028/**",
+        "docs/automation-evidence/20261028/N44_NEW_TWO_MOBILE_ACTUAL_OUTCOME.md"
+      ],
+      "verificationPaths": [
+        "src/views/notification-settings.js",
+        "src/lib/cloud.js"
+      ],
+      "requiredChecks": [
+        "n44_new_mobile_scope_native_identity_and_source_receipt",
+        "n44_android_new_actual_registered_arrival_and_click",
+        "n44_iphone_new_actual_registered_arrival_click_and_android_retained",
+        "n44_new_mobile_no_duplicate_or_foreign_device_delivery",
+        "n44_new_mobile_stop_order_exact_source_cleanup_and_off"
+      ],
+      "postDeliveryChecks": [],
+      "liveAuthorizationRef": {
+        "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261028-n44-new-two-mobile-authority.json",
+        "sha256": "686833f6c45c59c0d528228c537a587d63a07d160778675878d10f08d0c5e959",
+        "authorityRef": "PO-20261028-N44-NEW-TWO-MOBILE-TRIAL",
+        "grantId": "60fc7d23-8c87-4d8b-b97f-d9c9e289af94"
+      },
+      "releaseAuthority": "Explicit PO attachment c8384859 28Oct authorizes this new independent bounded two-phone trial through the same original custodian and publisher. Single new source, one registration and one send per phone; max one Native upload ONLY proven necessary; max60min activated after preparation/user readiness. No general delivery/cron/Auth/RLS/schema/real student mutation. Original histories and old closed grant immutable.",
+      "preparationAuthority": {
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "originalLiveHistoryPreserved": true,
+        "generalDelivery": false,
+        "cron": false,
+        "authSchemaRlsChanges": 0
+      },
+      "desktopUiRelay": {
+        "authorityPath": "artifacts/ops-supervisor-v4/intake-evidence/po-20261027-n44-desktop-ui-relay.json",
+        "authoritySha256": "1633490b0191af9579b81d90b6ed9d28f2f9a31b6b7106a525f180878e8be3da",
+        "rootChat": "01a1676a-5513-75f1-a7f6-445639e58709",
+        "solePrivateCustodian": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "newGrant": false,
+        "newBudget": false
+      },
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "c4e315a24aaf11c44dc6e8ea5aa3ec607d846db5",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/mobile-receipt-preflight.inactive.mjs",
+          "drafts/n44-push/activation/mobile-ui-target.mjs",
+          "drafts/n44-push/activation/two-mobile-live.mjs"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/two-mobile-live-20261028.mjs",
+          "docs/automation-evidence/20261028/N44_NEW_TWO_MOBILE_ACTUAL_OUTCOME.md",
+          "tests/n44-mobile-live-20261028/qualification.json"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/two-mobile-live-20261028.mjs",
+          "docs/automation-evidence/20261028/N44_NEW_TWO_MOBILE_ACTUAL_OUTCOME.md",
+          "tests/n44-mobile-live-20261028/qualification.json"
+        ],
+        "workerChecks": [
+          "n44_new_mobile_scope_native_identity_and_source_receipt",
+          "n44_android_new_actual_registered_arrival_and_click",
+          "n44_iphone_new_actual_registered_arrival_click_and_android_retained",
+          "n44_new_mobile_no_duplicate_or_foreign_device_delivery",
+          "n44_new_mobile_stop_order_exact_source_cleanup_and_off"
+        ],
+        "publisherChecks": []
+      },
+      "objective": "NEW explicit PO authority artifacts/ops-supervisor-v4/intake-evidence/po-20261028-n44-new-two-mobile-authority.json, grant 60fc7d23-8c87-4d8b-b97f-d9c9e289af94. SAME original session/worktree/candidate, separate bounded execution card as explicitly requested; do not touch original umbrella56 checks or old outcomes. User is PRESENT with both phones NOW. Prior source cleaned/old grant closed; Native178 and new receipt preflight already qualified, seven inert files already published39aa851. Do not rerun unchanged suites or publish completed work. Read new attachment and morning handoff/host packet/current state. First finish only required material grant wiring and read-only service/custody readiness, using existing sealed phone context inside original custodian only; no plaintext identities/keys. The old two-mobile-live.mjs and old grant state are immutable and MUST NOT execute. Use a new explicitly scoped helper/journal for the fresh grant, retaining old consumption without reset. Reuse qualified createInactiveMobileReceiptPreflight and canonical source/route/expiry derivation. Keep actual no-replay, owner/ancestry/SSL/typed-SQL/config/Auth guards. No manual main merge of private history; publisher only for any genuinely necessary qualified delta. New code preparation itself is not phone acceptance.\n\nCoordinate via deidentified progress.json in tests/n44-mobile-live-20261028 and handoff directory artifacts/ops-supervisor-v4/intake-evidence/n44-mobile-live-60fc7d23-8c87-4d8b-b97f-d9c9e289af94; Root approved UI relay remains available for normal teacher UI source creation/readback/deletion, original custodian alone owns secrets/config/service/budget/send. Prepare exact source request and receipt transport instructions for Root; never make Root decrypt private custody. One NEW source parent/child max, no previous source replay. Activate durable60min clock only when ready for bounded live steps and user ready; do not burn it on local preparation. Preserve honest ordering dependencies and do not require registered before allowing registration. Native178 should need no upload; conditional1 only if proven.\n\nThen signal one exact Android Enable step immediately; await actual user gesture, verify cloud registered, signal pages closed, await confirmation, send ONCE and provide actual Saudi time, await OS appearance/click/destination witness. Keep Android active. Repeat iPhone Home Screen gesture once, prove Android retention, close/send once/witness. UNKNOWN consumes permit; no resend. Stop iPhone first then Android with cloud/local receipts, exact source deletion normal UI/Sync and preferences restored, OFF/NULL/UNSET. General cron remainsOFF. Root forwards human replies as immutable witness files; elapsed time never proves gesture/receipt. Maintain pending phase across turns without paid unchanged loops.\n\nReturn five truthful scoped checks; any NOT_RUN/UNKNOWN blocks full new trial readiness, preserve previous56 history separately. After physical journey, identify D107 already completed local scope and prepare only genuinely missing authorized contracts/code; no new admin role/Auth/schema or general sends. Do not delay user phone trial for D107 redesign. N44/D107 remainOPEN until real acceptance. No second worker/model/session. No permission questions for operations exactly authorized here."
+    }
+  ]
+}
