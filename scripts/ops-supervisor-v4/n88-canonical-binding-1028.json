@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-canonical-binding-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100013,
+      "scopeKey": "n88-durable-publication-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "dependsOn": [
+        "n88-native-pg-1028"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+        "tests/n88-canonical-binding-1028/canonical.test.mjs",
+        "tests/n88-canonical-binding-1028/run-local.mjs",
+        "docs/automation-evidence/20261028/N88_CANONICAL_BINDING.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-storage.inactive.sql"
+      ],
+      "requiredChecks": [
+        "n88_actual_canonical_schema_and_session_contract_binding",
+        "n88_real_dependency_lock_membership_grade_source_races",
+        "n88_retirement_rollback_restore_and_no_disclosure",
+        "n88_finite_hosted_boundary_remains_closed_local_cleanup"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source only canonical/session/retirement adapter with local fabricated native PostgreSQL proof"
+      },
+      "releaseAuthority": "Latest direct PO requires sustained N88 goal implementation and resolving ordinary blockers. This card authorizes only inactive implementation and fabricated local qualification against repository actual canonical schema/contracts, then sole original publisher source delivery. NO hosted SQL/Auth/RLS/schema, actual account reads/writes, positive issuance, real cancellation, service activation or widening a hosted finite execution boundary. Preserve all actual tool refusals; not a substitute executor.",
+      "objective": "Continue same N88 implementation session after native13/13 qualification and verified9dea9ebf. Implement the next concrete missing seam from N88_NATIVE_PG_QUALIFICATION.md: replace injected fake snapshot/session row assumptions with reusable inactive adapters bound to actual repository canonical table/relationship, teacher Auth/current-session and own numeric-pupil session contracts, genuine dependency locking and retirement transaction coupling. Read existing canonical-adapter.mjs, canonical-grade-context.mjs, postgres-repository.mjs, auth-verifier.mjs, student sessions and exact canonical schema sources; preserve genuine IDs/revisions/ownership and fifteen-table closure. Reuse existing verified implementations rather than invent competing auth. Build local fabricated canonical tables with exact relevant repository schema/keys (not retired hosted fixtures), use existing owned portable PG17.6 native harness and independent connections; prove phantom membership/new source/grade races, canonical writer lock order, session expiry/revocation, owner isolation, hidden grades and parent aggregates, deletion parent/child atomic retirement, rollback/restore no revival, UNKNOWN receipts and no replay. Inactive callable transaction hook is allowed; do not edit live Sync/Delete or deploy triggers. If causal adapter fixes needed only listed sources; preserve default OFF, no public UI or N44/N134 shared files. Existing hosted finite private boundary still disallows V2: document exact typed operation catalogue/source identities and installation/readback prerequisites, but do not execute denied statements or introduce a general SQL port or synthetic substitute hosted executor. No live authorization is implied by source publication. Qualify useful concrete code locally rather than another review-only document; reuse unchanged13/13 source proof, rerun only affected native tests. Clean owned local cluster/leases by verified identity and keep evidence. Return LOCAL_READY for actual completed inactive adapter and affected proof; otherwise exact material blocker with saved candidate. Do not call full N88 done or ask PO for ordinary local fixture/config repair. Original controller and single publisher only; no manual workers/push.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "9dea9ebf4c55cc635b7921b5339cb8ed67eb17c0",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/canonical-adapter.mjs",
+          "drafts/n88-student-portal/canonical-grade-context.mjs",
+          "drafts/n88-student-portal/postgres-repository.mjs",
+          "drafts/n88-student-portal/auth-verifier.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "tests/n88-native-pg-1028/run-local.mjs",
+          "docs/automation-evidence/20261028/N88_NATIVE_PG_QUALIFICATION.md"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-storage.inactive.sql",
+          "tests/n88-canonical-binding-1028/canonical.test.mjs",
+          "tests/n88-canonical-binding-1028/run-local.mjs",
+          "docs/automation-evidence/20261028/N88_CANONICAL_BINDING.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "tests/n88-canonical-binding-1028/canonical.test.mjs",
+          "tests/n88-canonical-binding-1028/run-local.mjs",
+          "docs/automation-evidence/20261028/N88_CANONICAL_BINDING.md"
+        ],
+        "workerChecks": [
+          "n88_actual_canonical_schema_and_session_contract_binding",
+          "n88_real_dependency_lock_membership_grade_source_races",
+          "n88_retirement_rollback_restore_and_no_disclosure",
+          "n88_finite_hosted_boundary_remains_closed_local_cleanup"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
