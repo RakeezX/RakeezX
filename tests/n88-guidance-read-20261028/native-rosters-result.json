@@ -1,0 +1,48 @@
+{
+  "taskId": "n88-guidance-read-1028",
+  "runId": "f1d7a109-b3dc-47a4-a74d-126c5dc3e4e0",
+  "matrix": [
+    {
+      "members": 0,
+      "visibility": true,
+      "tasks": 0,
+      "status": 200
+    },
+    {
+      "members": 0,
+      "visibility": false,
+      "tasks": 0,
+      "status": 200
+    },
+    {
+      "members": 28,
+      "visibility": true,
+      "tasks": 4,
+      "status": 200
+    },
+    {
+      "members": 28,
+      "visibility": false,
+      "tasks": 0,
+      "status": 200
+    },
+    {
+      "members": 50,
+      "visibility": true,
+      "tasks": 4,
+      "status": 200
+    },
+    {
+      "members": 50,
+      "visibility": false,
+      "tasks": 0,
+      "status": 200
+    }
+  ],
+  "realOperations": 0,
+  "cleanup": {
+    "httpAndPgClosed": true,
+    "integration": "RELEASED integration"
+  },
+  "status": "PASS"
+}

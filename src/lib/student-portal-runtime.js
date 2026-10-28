@@ -121,6 +121,16 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     if(disposed)return;
     if(value===null){ownListFailure=null;root.removeAttribute('data-n88-list-response');return;}
     try{current(false);ownListFailure=value.outcome==='failure'?failureSnapshot(ownDiagnostic):null;root.setAttribute('data-n88-list-response',JSON.stringify(value));}catch{root.removeAttribute('data-n88-list-response');}
+  },onGuidanceDiagnostic:value=>{
+    root.querySelector('[data-n88-guidance-details]')?.remove();
+    if(disposed||!value)return;
+    try{current(false);}catch{return;}
+    // The client emits only fixed operational fields, never ACK data or request context.
+    const snapshot=Object.freeze({...value});
+    const details=root.ownerDocument.createElement('details');details.dataset.n88GuidanceDetails='';
+    const summary=root.ownerDocument.createElement('summary');summary.textContent='تفاصيل دعم قراءة التعليمات';
+    const text=root.ownerDocument.createElement('pre');text.dataset.n88FailureText='';details.append(summary,text);entryShell(root).append(details);
+    details.addEventListener('toggle',()=>{try{current(false);text.textContent=details.open?JSON.stringify(snapshot,null,2):'';}catch{details.remove();}});
   },onMutationDiagnostic:value=>{
     root.querySelector('[data-n88-mutation-details]')?.remove();
     if(disposed||!value)return;
@@ -167,6 +177,7 @@ function mountBoundClassService(root,{readiness,fetch:send,getBinding,subscribe,
     if(!response.ok)failure=[401,403].includes(response.status)?'denied':'connection';
     const region=path==='/api/n88/teacher/class/list'?classListRegion(response.headers?.get('x-n88-service-region')):'unknown';
     current(false);return {ok:response.ok,status:response.status,headers:new Headers({'x-n88-service-region':region,'x-n88-service-stage':stage}),async json(){const data=await response.json();if(signal.aborted)throw bindingError('context');current(false);
+      if(!data||typeof data!=='object'||Array.isArray(data))return data;
       // Server admission follows verified Auth/session/current source ownership.
       // Strip its rollout metadata before the existing exact ACK validator.
       if(path.endsWith('/list')){

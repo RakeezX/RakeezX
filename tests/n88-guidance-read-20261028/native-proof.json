@@ -1,0 +1,26 @@
+{
+  "hashes": {
+    "src/lib/student-portal-class-client.js": "6ee0a943759e5203bfe39c6b47cf3adb2665d98f845c892d90094d5a25f72a9e",
+    "src/lib/student-portal-task-guidance-client.js": "b8a9aab426d4e6c9da7586cfb3a0bb5b6b99a62111fe64e0801c1c61a5ecc8fa",
+    "drafts/n88-student-portal/integrated-service.mjs": "82c8cd0b3f7524092e18454b782c22baf88bf3ba6470404b31ccdfec5fce7dd7",
+    "drafts/n88-student-portal/task-guidance.mjs": "a3b929b13ce02d05a211cf9eb078cf3f3403a3ec6db04a7271f3c878741de88a"
+  },
+  "sourceEvidence": "failure-1793165733793.json",
+  "checks": [
+    {
+      "name": "n88_guidance_list_http200_independent_class_list_and_actual_ack_shape",
+      "status": "PASS",
+      "evidence": "Actual /api/n88/teacher/class routes, gateway, integrated service and restricted native PG: list/guidance 200; saved visibility ON has tasks, OFF empty; renamed task_guidance or revoked backend SELECT gives independent guidance 503/projection while roster succeeds. No provider inference."
+    },
+    {
+      "name": "n88_guidance_owner_session_draft_preservation_and_absent_table_fail_closed",
+      "status": "PASS",
+      "evidence": "Native table constraints reject malformed payload; anon/authenticated denied private table; absent table and missing SELECT fail closed. UI owner/session/term/draft checks recorded below."
+    },
+    {
+      "name": "n88_guidance_failure_timeout_503_401_invalid_ack_distinguished_without_personal_data",
+      "status": "PASS",
+      "evidence": "Actual client distinguishes 401/403/503 rejected, malformed/partial/null/invalid JSON ACK invalid_ack, full default 10-second deadline timeout, stale owner/session/term. Exact operational-only diagnostic key allowlist and bounded timing; no body, IDs, credentials."
+    }
+  ]
+}

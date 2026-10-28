@@ -1,0 +1,118 @@
+{
+  "hashes": {
+    "src/lib/student-portal-runtime.js": "c08fc019ad38b4ce0fc950b762bcbed3c80a87ef5e626e9a6109e539dd2e4471",
+    "src/lib/student-portal-class-client.js": "6ee0a943759e5203bfe39c6b47cf3adb2665d98f845c892d90094d5a25f72a9e",
+    "src/lib/student-portal-task-guidance-client.js": "b8a9aab426d4e6c9da7586cfb3a0bb5b6b99a62111fe64e0801c1c61a5ecc8fa",
+    "src/views/student-portal-class.js": "1e2bf4b6958930061c940c9454108f7e413c941bb1d7ed5e338b7ee9a5454c3f",
+    "src/styles/student-portal-class.css": "d06d26c3d07f9c51aafa16a71280f68b9ba88ec3492cae686f4656a805fc3e77",
+    "tests/n88-guidance-read-20261028/sw-server.mjs": "e2c446e6dceac7f9bcea88d6fcf50085ba0aa5ef6c54128865fc94ce8452e242",
+    "tests/n88-field-defaults-20261028/ports.js": "c30c8989b03cad0b712a8c2eb1a34cd6018e799943d23f14f2fc956856036b0a"
+  },
+  "sourceEvidence": "ui-pwa-failure-1793166256931.json",
+  "matrix": [
+    {
+      "members": 0,
+      "width": 320,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 0,
+      "width": 320,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 0,
+      "width": 390,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 0,
+      "width": 390,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 320,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 320,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 390,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 28,
+      "width": 390,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 320,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 320,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 390,
+      "theme": "light",
+      "saved": false,
+      "unknownPreserved": true,
+      "overflow": false
+    },
+    {
+      "members": 50,
+      "width": 390,
+      "theme": "dark",
+      "saved": true,
+      "unknownPreserved": true,
+      "overflow": false
+    }
+  ],
+  "faults": [
+    "401",
+    "403",
+    "503",
+    "partial",
+    "null",
+    "invalid JSON"
+  ]
+}
