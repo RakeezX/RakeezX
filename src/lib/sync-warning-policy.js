@@ -64,3 +64,17 @@ export function presentSyncWarning(summary, cycle, now) {
   }
   return { cycle: { ...cycle, failureSince: null }, quiet: true, strip: false, nextCheckAt: null };
 }
+
+
+/** Consolidate duplicate login notices only when a class-specific access gate
+ * already provides the same mandatory login action. Never hide other Sync errors.
+ * Pure presentation policy: does not change Auth, leases, owner or write gates.
+ */
+export function classAuthNoticeDedupe({ isClassRoute = false, classStatus = null,
+  syncStatus = 'idle', isLoggedIn = false } = {}) {
+  const hasClassAction = isClassRoute && classStatus === 'verification';
+  return {
+    suppressSyncStrip: hasClassAction && syncStatus === 'auth_required',
+    suppressLeaseNotice: hasClassAction && !isLoggedIn,
+  };
+}

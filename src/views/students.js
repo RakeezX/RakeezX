@@ -26,13 +26,13 @@ export function classAccessFeedback(params = {}) {
   const status = store.classOperationsStatus(params.id);
   if (!status) return '';
   const messages = {
-    verification: ['يلزم التحقق من الحساب', 'افتح الإعدادات وتحقق من تسجيل الدخول بالحساب الذي استُعيدت بياناته، ثم عد إلى الفصل.'],
+    verification: ['يلزم تسجيل الدخول لفتح هذا الفصل', 'سجّل الدخول بالحساب المرتبط بالفصل؛ بياناتك المحلية محفوظة. لن تُغيّر عملية الدخول هذه بيانات الطلاب.'],
     lease: ['انتهت صلاحية العمل دون اتصال', 'اتصل بالإنترنت واستخدم «التحقق من الحساب» أعلى الصفحة، ثم افتح الفصل مجددًا.'],
     archived: ['سياق الفصل مؤرشف أو مغلق', 'عد إلى الفصول واختر فصلًا في السنة والفصل الدراسي النشطين.'],
     ownership: ['تعذّر مطابقة الفصل مع الحساب النشط', 'عد إلى الفصول واختر فصلًا تابعًا للحساب الحالي. إذا استمرت المشكلة بعد الاستعادة، تحقق من الحساب في الإعدادات.'],
   };
   const [title, message] = messages[status];
-  return html`<section class="empty" role="status" data-class-access-status="${status}"><h2 class="empty__title" tabindex="-1">${title}</h2><p class="empty__text">${message}</p><a class="btn btn--quiet" href="#/classes">العودة للفصول</a></section>`;
+  return html`<section class="empty" role="status" data-class-access-status="${status}"><h2 class="empty__title" tabindex="-1">${title}</h2><p class="empty__text">${message}</p><div class="hstack justify-center gap-2 wrap">${status === 'verification' ? html`<button type="button" class="btn btn--primary" data-act="mini-hub-login">تسجيل الدخول</button>` : ''}<a class="btn btn--quiet" href="#/classes">العودة للفصول</a></div></section>`;
 }
 
 function requireRoster(params, workspace = store.getActiveWorkspace()) {
