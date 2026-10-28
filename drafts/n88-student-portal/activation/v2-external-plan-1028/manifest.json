@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "productId": "N88",
+  "taskId": "n88-external-plan-1028",
+  "runId": "0ea5387f-105a-4e92-b19c-57d72ba1d3a1",
+  "baseSha": "ac86b0315da113166bfd021d3f037151c4828ce6",
+  "inactive": true,
+  "execute": false,
+  "sourceEncoding": "utf8-lf-preserve-bom",
+  "verifiedBackendDelivery": "249f248ed075d0d395456614e1147bb693c5e99c",
+  "immutableSource": "51bca7c959bd6faf96764849a48fb8c79170dd43",
+  "target": null,
+  "preflightAuthority": null,
+  "installationAuthority": null,
+  "historicalTargetHint": {
+    "projectRef": "xlrubcwjqktzzunrvuns",
+    "source": "drafts/n88-student-portal/activation/manifest.json",
+    "status": "historical_only_not_a_current_target_attestation"
+  },
+  "fixedFunctionNames": [
+    "v2_0dad27a56bfdc5bfab552235",
+    "v2_23ccfc1e16cd0b122d0cb3c3",
+    "v2_3b143936c792a16ff5425c3d",
+    "v2_5d62e77b02ab6a1fb4e97688",
+    "v2_6d27c8049efec0665b9d1f91",
+    "v2_71a3e914da47cf1053850671",
+    "v2_74c4aa4d430911e99002af80",
+    "v2_7874a827dae2373223bc8adc",
+    "v2_94bb23dac56c2e002713130a",
+    "v2_a3e6d95cdff2d66f56ae84f6",
+    "v2_dbe074dae923ca8a3746d390",
+    "v2_e1b1c0927f6164faeccb760b",
+    "v2_f46afed1e023d013cdabf257",
+    "v2_f8a1689cd78951d7fc52ef91"
+  ],
+  "expectedFunctions": [
+    {
+      "name": "v2_0dad27a56bfdc5bfab552235",
+      "definition": "0aadee3865cb4c0575a3abe06ccd6fc1bce7e317da292c133145f6cc2117b91a",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_23ccfc1e16cd0b122d0cb3c3",
+      "definition": "277c6405d47dfe5f193982cb4d591889081f63aa403f1b53698da3cc963e6573",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_3b143936c792a16ff5425c3d",
+      "definition": "70ebe1fab16d248125ba9ba231e05e7d5385bddd91973031e5407f8b822564bb",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_5d62e77b02ab6a1fb4e97688",
+      "definition": "a70a8255124089753437b62447cb542fa21af059ee025fe7641f3e0a02454cf1",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_6d27c8049efec0665b9d1f91",
+      "definition": "ba27f79ab0a2aeab728a5695543ea64f660c9ee049847bcfa74f86c2badc8822",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_71a3e914da47cf1053850671",
+      "definition": "1d32ca5bbb74a3d9af199a378c9b71f5dca364db588fd47eadf9298203e9db28",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_74c4aa4d430911e99002af80",
+      "definition": "ccb5c0585d18d7e94f6765ca522a2426f0c0e4cc2ce363b23ffbd1d25dadbbda",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_7874a827dae2373223bc8adc",
+      "definition": "0f38db25d66389643b074dd8c46eab079aea0e3e25e8dd082bd58a327e26e533",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_94bb23dac56c2e002713130a",
+      "definition": "38a36af0320818a809b4dcca844098eadc71af5cf95912ed6aca49d9f89d34d3",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_a3e6d95cdff2d66f56ae84f6",
+      "definition": "f32fbd2a6ce1d8a3abb4503d67cee64f006d9af38c764ee8d2e0a9011fa6beb6",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_dbe074dae923ca8a3746d390",
+      "definition": "2b7cba6ba01cd276e76267da996f3a8a336e1e5d9ac1bad149698ff05908b5b5",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_e1b1c0927f6164faeccb760b",
+      "definition": "a8a31033f93b613376ac1c4695cc6839def54236794c8f698b000ba6605cb471",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_f46afed1e023d013cdabf257",
+      "definition": "17bd70bd63d76000de1a54906634e3cbecd9941350315af89d0210748ed45960",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    },
+    {
+      "name": "v2_f8a1689cd78951d7fc52ef91",
+      "definition": "ed645e03679e62e1bf90646037781c367e0b2f421583749b59bfc591df866e33",
+      "definer": true,
+      "owner": "n88_v2_guard",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n88_v2_guard:EXECUTE",
+        "n88_v2_runtime:EXECUTE"
+      ]
+    }
+  ],
+  "prerequisites": {
+    "drafts/n88-student-portal/publication-v2-host.inactive.mjs": "d87cd25fa4dc7e46d870479a31dc2e47d79a403c8314461f29b441c13d8bed9b",
+    "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs": "22a3b48ee4c5d20908e51a818cc0d68335b854456957d193948a2ef4dd2b48ae",
+    "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs": "e9dec5fb83b1897a229e328c6b57ffd8a30ff7bf15f3c4a79bc7a98aa7f1f780",
+    "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs": "71c3314ce80ad3508d8f8b83bfafcecb37d8b017d9bf9cc563e0fba62b83ecb0",
+    "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs": "0b38130ae2ecf097d72b92722d5157621f6dfa932b80b6079889c22b7edc32e0",
+    "drafts/n88-student-portal/publication-v2-service.inactive.mjs": "1950f6a195ac330c81d679fc90773bab84ee1d594e3a6c09a452bcfbc46c3cb6",
+    "drafts/n88-student-portal/publication-v2-storage.inactive.sql": "399f6d5f513bf0fd3bb3bb9f8a206018e451ed9d6cc5d9a9b7fa89b3a81525c0",
+    "drafts/n88-student-portal/auth-verifier.mjs": "6605b61c5422a090c8220a346f5a1e7c00aea5bedde212f62b54ed6f4592be2c",
+    "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
+    "drafts/n88-student-portal/canonical-grade-context.mjs": "1595f7588c9a683be570986bde907c2b6a3eb22ccdc3e00fa8cd43eb8c51152f",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/integrated-service.mjs": "6348d080dc6364d8741be4699afe0f8e71954e3ff6ae4dfb4a1b3c0532caaf64",
+    "drafts/n88-student-portal/student-projection.mjs": "b407eb68c492c6d861ceb2da9c8dafe24ab3736aa679174ff2539a881bb5d754",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "58ae1bb5f128cf31998ed8ccfa8e372e4980fdbfcc611f8aef61e9dc3098d49e",
+    "drafts/n88-student-portal/activation/error-boundary-contract.json": "19640c963f6696dbacfc68fbcac06ecc75765701686aaa08aed4fb52f1f753cb",
+    "drafts/n88-student-portal/activation/read-service-20261023/typed-read-operations.json": "ad5445a843afbfe464869fa6789b518d0f80fcb5518cd611c93442da768e9ccf",
+    "drafts/n88-student-portal/activation/v2-package-1028/schema.sql": "bf8fbd6c695338f478216f348de2a073cd2e942aed80517715f9945d2204008a",
+    "drafts/n88-student-portal/activation/v2-package-1028/boundary-operations.json": "202a22db6b07c212737dcc6bac36a3098b2e1344f4925398538ed624cfd7c553",
+    "drafts/n88-student-portal/activation/v2-package-1028/lifecycle-attach.inactive.mjs": "6f0e6b9ff819a43e948135d507227028731c7799d46d879e8e30d86b7a7453e2",
+    "drafts/n88-student-portal/activation/v2-package-1028/manifest.json": "8138a716764d4767ec34d40a295fcf31cf1d39ae7ca69db00328732d85f42dd0",
+    "drafts/n88-student-portal/activation/manifest.json": "ba7314426f288a56c93661b6d63acd366d42fa1b6d3ea254308686199bfe230d",
+    "drafts/n88-student-portal/auth-session.inactive.sql": "6200d9b7b72b92bae38b6c790234ee63367d0de990702e5b8c4261107e138aa5",
+    "drafts/n88-student-portal/canonical-lock.inactive.sql": "3930408d7396e222e3a6dbdbc670cfa597b9ba1dd585b8ffe04e2476c139e1a5",
+    "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
+    "drafts/n88-student-portal/six-digit-schema.inactive.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
+    "drafts/n88-student-portal/activation/error-boundary-identities.json": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4",
+    "drafts/n88-student-portal/activation/read-service-20261023/typed-identities.json": "1c9e9f0419bb2450acfab84996c9a6afc2566f07cb62398d2ae59a704f1dec04",
+    "supabase/migrations/0012_sync_v2_server_protocol.sql": "03b9abd0c904364ad6b9acdbf9315ab699782f3c8daa5a416a4828c7a67a2078"
+  },
+  "installerSha256": "49f6b904b6abc5511b2370490d70093d52d3a32463119cba285c91e707814271",
+  "readOnlyQueryPlanSha256": "fda7e7fdb72b79a80b4e33c4c0aef29da41c3a2aa60ccb27e849af744b74181b",
+  "deltaSha256": "9b0096b2ab45623e4168eee888fda9c2cfdb48fef2e87e2b7822506f782722bf",
+  "readOnlyQueries": [
+    {
+      "id": "target-identity",
+      "sha256": "06e7a2bc647807b361ff0e5ec6a0bad3f341efc0dccc7159662e0eb16a9c7773",
+      "maxRows": 1,
+      "maxBytes": 8192,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "roles-and-memberships",
+      "sha256": "c11726020aec75969838a93bdcd26c0d02063f374e5bfe75636f58ff1250ecca",
+      "maxRows": 8,
+      "maxBytes": 32768,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "relation-identity",
+      "sha256": "1c4ce0241aa019e7d8c64a4e9064f78a82d935e2a078a8d9b803a0633a763950",
+      "maxRows": 64,
+      "maxBytes": 65536,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "constraints-columns-policies",
+      "sha256": "c1c774c43129c8be23491337e28e46e264052b35cdaf7ff40192a5c7f13889cb",
+      "maxRows": 64,
+      "maxBytes": 524288,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "function-and-trigger-identity",
+      "sha256": "089b41040ea77a109acc22f77d81cf29c1eb21faaa55d29f005c810485df5dec",
+      "maxRows": 64,
+      "maxBytes": 65536,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "trigger-and-index-identity",
+      "sha256": "fe462bd8f0a8b38908aca24d904837e2f23458c145291ce89d26f643c0a8b8bc",
+      "maxRows": 256,
+      "maxBytes": 262144,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "effective-table-privileges",
+      "sha256": "da7fbb557b64ab7946acd1d41ce00f6d437526f7f104afd875d8061690338265",
+      "maxRows": 128,
+      "maxBytes": 131072,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "exposure-and-effective-privileges",
+      "sha256": "2ed736aeec2a50344553d29957fa2bb723531ac4266c978096471d9a8e25cea1",
+      "maxRows": 3,
+      "maxBytes": 16384,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    },
+    {
+      "id": "baseline-inventory-digest",
+      "sha256": "9f6a6058d1259c3ee00f62c376714cfcc5aec813cb3b87f29e74603dd9d1edee",
+      "maxRows": 1,
+      "maxBytes": 1024,
+      "currentBoundary": "NOT_ADMITTED_static_local_classification"
+    }
+  ],
+  "changeSet": {
+    "relations": [
+      "n88_private.publication_v2_scopes",
+      "n88_private.publication_v2_items",
+      "n88_private.publication_v2_high_water",
+      "n88_private.publication_v2_receipts"
+    ],
+    "roles": [
+      "n88_v2_guard",
+      "n88_v2_runtime"
+    ],
+    "fixedFunctions": [
+      "v2_0dad27a56bfdc5bfab552235",
+      "v2_23ccfc1e16cd0b122d0cb3c3",
+      "v2_3b143936c792a16ff5425c3d",
+      "v2_5d62e77b02ab6a1fb4e97688",
+      "v2_6d27c8049efec0665b9d1f91",
+      "v2_71a3e914da47cf1053850671",
+      "v2_74c4aa4d430911e99002af80",
+      "v2_7874a827dae2373223bc8adc",
+      "v2_94bb23dac56c2e002713130a",
+      "v2_a3e6d95cdff2d66f56ae84f6",
+      "v2_dbe074dae923ca8a3746d390",
+      "v2_e1b1c0927f6164faeccb760b",
+      "v2_f46afed1e023d013cdabf257",
+      "v2_f8a1689cd78951d7fc52ef91"
+    ],
+    "supportFunctions": [
+      "publication_v2_exact(jsonb,text[])",
+      "publication_v2_scope(jsonb,uuid)",
+      "publication_v2_flags(jsonb)",
+      "publication_v2_manual(jsonb)",
+      "publication_v2_transition()",
+      "publication_v2_retire_source(uuid,text,text,text,bigint)"
+    ],
+    "newImmutableTriggers": 8,
+    "canonicalSelectPolicies": 13,
+    "lookupLockPolicies": 6,
+    "storagePolicies": 4,
+    "originalHelperExecute": [
+      "lock_current_session(uuid,uuid)",
+      "lock_canonical_sources(uuid,integer)",
+      "lock_projection_sources(uuid,integer)"
+    ],
+    "sourceAndAuthRowsChanged": 0,
+    "canonicalWriterChanges": [],
+    "serviceActivation": false
+  },
+  "preflightSha256": "d3db12838b9c237c7d72b6939fcf0d33cf6c852569cd4ef9ae292844fd7edf17"
+}
