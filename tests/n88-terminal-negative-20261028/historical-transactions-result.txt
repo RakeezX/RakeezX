@@ -1,0 +1,18 @@
+✔ n88_terminal_unknown_not_absent_and_does_not_authorize_reissue (9.7531ms)
+✔ n88_terminal_close_late_inflight_original_request_cannot_recommit (0) (5.1065ms)
+✔ n88_terminal_close_late_inflight_original_request_cannot_recommit (28) (31.8459ms)
+✔ n88_terminal_close_late_inflight_original_request_cannot_recommit (50) (5.0448ms)
+✔ reviewed original holds lock before close; committed is never closed or issued twice (6.5836ms)
+✔ actual old original already inside issuance wins lock; closure preserves legacy UNKNOWN and real commit (29.4909ms)
+✔ n88_terminal_receipt_scope_owner_class_request_versions_and_ack (1.5569ms)
+✔ legacy, corrupted, partial and duplicate receipts remain UNKNOWN and immutable (5.9898ms)
+✔ failed COMMIT, lost ACK, expiry/owner change at commit and status recovery (2.9592ms)
+✔ concurrent distinct owners cannot settle or block each other; bounded receipts fail closed (5.706ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 257.6771

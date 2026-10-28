@@ -1,0 +1,44 @@
+{
+  "taskId": "n88-term-negative-1028",
+  "runId": "3b7b773c-82bc-4cd5-aade-9b265aa7c2d8",
+  "baseSha": "edaefa3dcd34232433cc4c6b2a25f88ac3b9dbb3",
+  "sourceOnly": true,
+  "realServiceOperations": 0,
+  "checks": [
+    {
+      "name": "n88_negative_only_terminal_current_owner_session_source_verified_in_one_locked_transaction",
+      "status": "PASS",
+      "evidence": "unit-result.txt: actual integrated source, official signed Auth/current-session verifier and commit guard, existing canonical source reader and serialized repository extension. Both actual issuer/close lock orders on 0/28/50. Synthetic query/ACK port; no PostgreSQL/provider certification."
+    },
+    {
+      "name": "n88_negative_only_local_workspace_lease_never_server_authority_and_stale_ui_fenced",
+      "status": "PASS",
+      "evidence": "unit-result.txt: opaque browser lease/context excluded from authoritative terminal digest; stale workspace ACK cannot settle current hint. browser-result.json: real classBinding/store owner switch retires delayed closure UI and retains original hint."
+    },
+    {
+      "name": "n88_negative_only_close_blocks_delayed_original_issuance_and_never_issues",
+      "status": "PASS",
+      "evidence": "unit-result.txt and historical-transactions-result.txt: existing issuer rejects same-key terminal digest before member issuance; issuer-first preserves original legacy/partial outcome as UNKNOWN. browser-result.json: 0/28/50 each leave one receipt and zero credentials. Original issuer blob c407db623c2db8c640e8c5a263a60706e37223b0 unchanged."
+    },
+    {
+      "name": "n88_negative_only_unknown_legacy_and_wrong_scope_fail_closed_and_current_client_contract",
+      "status": "PASS",
+      "evidence": "18/18 new Node tests: absent/legacy/partial/corrupt/duplicate receipts, wrong owner/session/class/term/teaching, revisions, membership ambiguity, rollback/read failure/lost ACK, exact ACK validation, one explicit status recovery, no repeated close/hint clearing. 10 unchanged historical transaction tests also pass; obsolete whole-source inert assertion excluded explicitly."
+    },
+    {
+      "name": "n88_negative_only_zero_real_service_schema_provider_and_default_off",
+      "status": "PASS",
+      "evidence": "Default-OFF constructor tested with omitted/false/null/string values and browser enable echo; no capability or mutation. No live service/provider/schema/Auth/RLS/SW/N44 operations. Five actual app loopback browser cases pass; browser/server closed and integration lease released in finally."
+    },
+    {
+      "name": "syntax_and_scoped_patch",
+      "status": "PASS",
+      "evidence": "node --check for both changed service modules and all five new JS/MJS test helpers; git diff --check. No public startup dependency or Vite build."
+    }
+  ],
+  "harnessHistory": {
+    "initialUnitRuns": "3/17 PASS, 14 failures: per-fixture keys reused the SDK cached JWKS kid. Unique issuer URL alone did not fix the default-storage-key cache; final fixture reuses one fabricated signing authority with independent response flags. No Auth implementation or guard changed.",
+    "browserFailures": "browser-failure-*.json retained. Missing JSON MIME, obsolete empty-fixture hub navigation, collapsed details control and a transient publisher-owned integration lease were corrected only in the harness or by acquiring a subsequently free lease.",
+    "predecessor": "n88-term-service-1028 remains BLOCKED at da29ac54e41f91dc13ba0d8200ae76ff05d113ad; original result/test/history untouched."
+  }
+}

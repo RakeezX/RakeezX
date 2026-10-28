@@ -1,4 +1,4 @@
-/** AI-authored INACTIVE transaction review. No runtime import, routes, I/O or activation.
+/** AI-authored INACTIVE transaction review. No I/O or activation.
  * These functions operate ONLY on an already locked transaction draft. `verified`
  * is a server-owned, synchronized snapshot, NOT a browser binding or Auth proof.
  * A repository must revalidate Auth/source at COMMIT and withhold every ACK until
@@ -97,4 +97,35 @@ export function recordReviewedCommit(db,verified,request,results,now) {
   if (Buffer.byteLength(JSON.stringify(receipt)) > 1048576) throw Error('n88_terminal_review_denied');
   db.classReceipts.push(receipt);
   return inspect(db,verified,request).ack;
+}
+
+/** AI: negative-only successor. The historical review above is preserved, including
+ * its stronger hypothetical issuer binding. This helper NEVER admits issuance.
+ * `authority` is built by the server from fresh Auth and locked canonical sources.
+ * Browser leaseId/contextRevision are deliberately absent: they remain client echo
+ * fences, not server evidence. Current session is required, not a historical claim
+ * that the original request ran in this session. No legacy receipt is reinterpreted.
+ */
+export function cancelOriginalIntentTransaction(db,authority,request,mode) {
+  const a=authority,r=request;
+  if(!['status','close'].includes(mode) || !exact(r,['requestId','expectedRosterRevision','expectedCredentialRevision']) ||
+    !requestId(r.requestId) || !hex(r.expectedRosterRevision) || !hex(r.expectedCredentialRevision) ||
+    a?.current!==true || !['ownerId','sessionId','teachingId','classId','termId'].every(k=>id(a[k])) ||
+    !Array.isArray(a.members) || a.members.length>2000 ||
+    a.members.some(m=>!id(m.studentId)||!id(m.enrollmentId)||m.ownerId!==a.ownerId||m.classId!==a.classId) ||
+    new Set(a.members.map(m=>m.studentId)).size!==a.members.length ||
+    new Set(a.members.map(m=>m.enrollmentId)).size!==a.members.length ||
+    !Array.isArray(db?.classReceipts) || db.classReceipts.length>10000 ||
+    a.rosterRevision!==r.expectedRosterRevision || a.credentialRevision!==r.expectedCredentialRevision) return unknown();
+  const binding=digest(['n88-negative-original-intent-closed-v1',a.ownerId,a.teachingId,a.classId,a.termId,
+    r.requestId,r.expectedRosterRevision,r.expectedCredentialRevision]);
+  const rows=db.classReceipts.filter(x=>x?.ownerId===a.ownerId&&x.requestId===r.requestId);
+  if(rows.length) return rows.length===1 && exact(rows[0],['ownerId','requestId','binding','results']) &&
+    rows[0].binding===binding && Array.isArray(rows[0].results) && rows[0].results.length===0 ? closed() : unknown();
+  if(mode==='status'||db.classReceipts.length===10000)return unknown();
+  db.classReceipts.push({ownerId:a.ownerId,requestId:r.requestId,binding,results:[]});
+  // Provisional ONLY. The caller must await the existing fenced COMMIT ACK.
+  // The unchanged issuer compares its batch digest at this same immutable key
+  // before any member operation and rejects this distinct terminal digest.
+  return closed();
 }

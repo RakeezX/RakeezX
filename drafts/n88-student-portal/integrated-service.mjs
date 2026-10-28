@@ -1,4 +1,6 @@
 import {credentialStateRevision,reconcileIssuanceReceipts} from './receipt-reconciliation.mjs';
+import {cancelOriginalIntentTransaction} from './receipt-terminal-review.inactive.mjs';
+import {createCanonicalAdapter} from './canonical-adapter.mjs';
 import {readTaskGuidance,authorizedGuidanceSources,guidanceTeacherList,saveTaskGuidance} from './task-guidance.mjs';
 /** AI: inactive class/universal composition in the existing fenced PG transaction. */
 import {createHash,randomUUID} from 'node:crypto';
@@ -89,6 +91,9 @@ function createStudentReadBoundary(createHandler,options) {
   };
 }
 export function createIntegratedService(options,adapter,baseRepository) {
+  // Server construction only; no env/body/client switch. Inert unless separately
+  // qualified and explicitly enabled by a future authorized service custodian.
+  const negativeTerminalEnabled=options.terminalResolutionEnabled===true;
   const rollout=options.rollout??createRolloutGuard();
   const repository=withCredentialRepository(baseRepository);
   const credentials=createNumericCredentialOperations({rollout,keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey});
@@ -130,6 +135,10 @@ export function createIntegratedService(options,adapter,baseRepository) {
     const match=/^\/teacher\/class\/(list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)$/.exec(request.path);
     if(!match || request.method!=='POST')return deny();
     const action=match[1],body=request.body||{},binding=body.binding;
+    const terminalRequest=Object.hasOwn(body,'resolutionVersion')||Object.hasOwn(body,'resolution');
+    if(terminalRequest && (!negativeTerminalEnabled || action!=='revoke' || body.resolutionVersion!==1 ||
+      !['status','close'].includes(body.resolution) || Object.keys(body).sort().join(',')!==
+      'binding,expectedCredentialRevision,expectedRosterRevision,requestId,resolution,resolutionVersion,teachingId'))return deny();
     if(action==='list'&&body.uiProtocol!==undefined&&body.uiProtocol!=='n88-public-ui-v1')return deny();
     if(!binding || Object.keys(binding).length!==bindingKeys.length || !bindingKeys.every(k=>typeof binding[k]==='string'&&binding[k].length>0&&binding[k].length<=200) || binding.teachingId!==body.teachingId)return deny();
     // The browser binding is only an echo fence. Auth/current canonical source decides authority.
@@ -141,9 +150,35 @@ export function createIntegratedService(options,adapter,baseRepository) {
       if(!s||s.classId!==binding.classId||s.termId!==binding.termId||!rollout.admitsTeacher(auth,s))return null;
       // First deliberate admitted teacher access may create its own private context.
       // An existing inactive context is never reactivated; no canonical/Auth write.
-      if(['pilot','public'].includes(rollout.mode)&&!db.contexts.some(c=>c.ownerId===auth.ownerId))db.contexts.push({namespace:(rollout.mode==='pilot'?'n88_pilot_':'n88_owner_')+randomUUID(),ownerId:auth.ownerId,active:true});
+      if(!terminalRequest&&['pilot','public'].includes(rollout.mode)&&!db.contexts.some(c=>c.ownerId===auth.ownerId))db.contexts.push({namespace:(rollout.mode==='pilot'?'n88_pilot_':'n88_owner_')+randomUUID(),ownerId:auth.ownerId,active:true});
       return s;
     });
+    if(terminalRequest) {
+      try{return await repository.transaction(async(db,ports)=>{
+        const h=request.headers||{},ingress=await adapter.verifyIngress(request,ports);
+        if(!ingress?.clientKey||h.origin!==options.origin||h['x-n88-csrf']!=='1'||h['content-type']!=='application/json'||
+          h['sec-fetch-site']&&h['sec-fetch-site']!=='same-origin'||typeof ports.beforeCommit!=='function')return deny();
+        const auth=await verifyTeacher(request,ports);
+        if(!auth?.ownerId||!auth.sessionId||auth.current!==true||!rollout.allowsOwner(auth.ownerId))return deny();
+        const s=await resolveClass(db,ports,auth,body.teachingId,body);if(!s)return deny();
+        // Reuse the canonical source reader/locks on a detached draft. Neither
+        // status nor close may flush synchronization, publication or session changes.
+        // Only a new immutable class receipt is eligible for the enclosing flush.
+        const current={contexts:structuredClone(db.contexts),memberships:structuredClone(db.memberships),sessions:[],publications:[]};
+        await createCanonicalAdapter({rollout})(current,ports,auth.ownerId);
+        const active=m=>m.status==='active'&&m.endDate===null&&m.studentActive===true&&m.classActive===true;
+        const members=current.memberships.filter(m=>m.ownerId===auth.ownerId&&m.classId===s.classId&&active(m)&&rollout.admitsStudent(m));
+        if(members.length>2000||new Set(members.map(m=>m.studentId)).size!==members.length||
+          members.some(m=>current.memberships.filter(x=>x.ownerId===m.ownerId&&x.studentId===m.studentId&&active(x)).length!==1))return deny();
+        members.sort((a,b)=>a.studentId.localeCompare(b.studentId));
+        const rosterRevision=hash([s.teachingId,s.revision,members.map(m=>[m.studentId,m.enrollmentId,m.revision,m.canonicalStamp])]);
+        const data=cancelOriginalIntentTransaction(db,{ownerId:auth.ownerId,sessionId:auth.sessionId,current:true,
+          teachingId:s.teachingId,classId:s.classId,termId:s.termId,members,rosterRevision,
+          credentialRevision:credentialStateRevision(db,members)},Object.fromEntries(
+          ['requestId','expectedRosterRevision','expectedCredentialRevision'].map(k=>[k,body[k]])),body.resolution);
+        return {status:200,body:{ack:true,binding,requestId:body.requestId,data},headers:PRIVATE_HEADERS};
+      });}catch{return {...deny(),status:503};}
+    }
     const ops=createClassCredentialOperations({rollout,repository,...credentials,...recovering,origin:options.origin,verifyIngress:adapter.verifyIngress,verifyTeacher,resolveClass});
     // Operations preserve their transaction/commit ACK. UI adaptation never exposes a precommit secret.
     if(action==='visibility' || action==='list' || action.startsWith('guidance-')) {
@@ -176,6 +211,8 @@ export function createIntegratedService(options,adapter,baseRepository) {
           if(body.reconciliationVersion!==1)return deny();
           data.credentialRevision=credentialStateRevision(db,members);
           data.reconciliation=reconcileIssuanceReceipts(db,s,members,body.reconcile??[]);
+          if(negativeTerminalEnabled&&body.terminalResolutionVersion===1)
+            data.terminalResolution='n88-terminal-no-issuance-v1';
         }
         // Legacy pilot list clients require their original response discriminator.
         // Operational mode and all admission decisions still use the actual guard.
