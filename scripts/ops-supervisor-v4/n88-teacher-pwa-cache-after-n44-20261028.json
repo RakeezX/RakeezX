@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n88-pwa-1028",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -8700,
+      "scopeKey": "n88-post-teacher-ux-sw-cache-generation-only-after-n44",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 50,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "continuous-n88-teacher-issuance-review-and-content-hub-20261028",
+        "continuous-n44-one-approved-closed-page-push-20261019"
+      ],
+      "allowedPaths": [
+        "sw.js",
+        "tests/n88-teacher-pwa-cache-20261028/**",
+        "docs/automation-evidence/20261028/N88_TEACHER_PWA_CACHE_AFTER_N44.md"
+      ],
+      "verificationPaths": [
+        "sw.js",
+        "src/views/student-portal-class.js",
+        "src/styles/student-portal-class.css",
+        "src/lib/student-portal-class-client.js"
+      ],
+      "requiredChecks": [
+        "n88_pwa_cached_teacher_assets_refreshed_after_verified_frontend",
+        "n88_pwa_retains_n44_push_and_offline_private_api_guards",
+        "n88_pwa_actual_synthetic_update_and_owner_secrecy"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "objective": "N88 urgent teacher UI revision published 2026-10-28 as 3fb70a8f91bfc5dbedbf6ae4ff29e608234815d1 modifies class view and CSS but keeps current SW cache generation rakeezx-v92. Installed PWA offline cache may continue serving stale teacher files. AFTER the current N44 SW owner card continuous-n44-one-approved-closed-page-push-20261019 reaches verified Production (not merely exits), and AFTER N88 current teacher UI reaches verified Production, take exact latest remote main and make one minimal new service worker cache generation for changed N88 public JS/CSS and existing student-portal-class-client.js, preserving all N44 push behavior and all other current SW assets/routes/private network-only exclusions. Preflight stale vs already updated: if another new SW version and current N88 files already cache-resolved, return NO_CHANGE with concrete observed proof. No human account, student operations, backend services, Auth/SQL/schema or provider writes. Use isolated controller-owned worktree, focused node+synthetic browser PWA install/update/offline refresh checks, scoped doc. Original sole controller/publisher only for actual merge and verified Production served SW+class asset hashes. This is a SW cache fix, not a student access code fix and not service activation. Never race active N44, never overwrite its changes, never modify canonical dirty root or launch a second worker.",
+      "acceptance": [
+        "No work before N44 card has verified published outcome and N88 teacher UI published. Use fresh remote main; inspect current SW and N88 view/CSS assets. If already corrected prove NO_CHANGE.",
+        "With owner scopes serialized, bump SW generation exactly once when required; preserve N44 registration/push/notification handling, existing offline shell and all private N88 API request exclusions without broad rewrites.",
+        "Run affected tests, synthetic current app SW install/update/offline teacher UI to prove fresh code after upgrade and no secret/private request offline caching; class session/owner privacy remains unchanged; report failing cases truthfully.",
+        "Return LOCAL_READY with exact task/run, candidate/base/source and checks, or actionable BLOCKED. The original publisher alone publishes and verifies the production SW and changed assets; do not call deployed until publisher receipt."
+      ],
+      "preparationAuthority": {
+        "kind": "po_20261028_n88_post_teacher_sw_cache_repair",
+        "syntheticOnly": true,
+        "realAccountOperations": 0,
+        "serviceOperations": 0,
+        "sensitiveAuthOrSchemaOperations": 0,
+        "sharedSwOwnerPredecessor": "continuous-n44-one-approved-closed-page-push-20261019"
+      },
+      "releaseAuthority": "PO authorized N88 teacher UI and stable installed student/teacher experience. The N88 current UI delivery documentation records a concrete stale-cache blocker for sw.js v92, while N44 owns SW. Source-only PWA generation and original verified Cloudflare Pages deployment are allowed strictly AFTER original N44 SW owner verified delivery; no registration/send/protocol/credentials/real-student/Auth/SQL changes.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "3fb70a8f91bfc5dbedbf6ae4ff29e608234815d1",
+        "requiredSourcePaths": [
+          "sw.js",
+          "src/views/student-portal-class.js",
+          "src/styles/student-portal-class.css",
+          "src/lib/student-portal-class-client.js"
+        ],
+        "editPaths": [
+          "sw.js",
+          "tests/n88-teacher-pwa-cache-20261028/cache.test.mjs",
+          "docs/automation-evidence/20261028/N88_TEACHER_PWA_CACHE_AFTER_N44.md"
+        ],
+        "newPaths": [
+          "tests/n88-teacher-pwa-cache-20261028/cache.test.mjs",
+          "docs/automation-evidence/20261028/N88_TEACHER_PWA_CACHE_AFTER_N44.md"
+        ],
+        "workerChecks": [
+          "n88_pwa_cached_teacher_assets_refreshed_after_verified_frontend",
+          "n88_pwa_retains_n44_push_and_offline_private_api_guards",
+          "n88_pwa_actual_synthetic_update_and_owner_secrecy"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "superseded_by_verified_delivery",
+      "supersededBy": "n88-pwa-sw-safe-1028",
+      "supersedingPublishedSha": "29000850bd7d23dc4a00ef29825301f2ca24cfbb"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n130-sync-context-supersession-20261027",
+      "productId": "N130",
+      "activationId": "po-20261012-continuous",
+      "priority": -5600,
+      "scopeKey": "n130-same-owner-sync-context-warning",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 100,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "continuous-n44-one-approved-closed-page-push-20261019"
+      ],
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-warning-policy.js",
+        "sw.js",
+        "tests/n130-sync-context-supersession-20261027/**",
+        "docs/automation-evidence/20261027/N130_SYNC_CONTEXT_SUPERSESSION.md"
+      ],
+      "verificationPaths": [
+        "src/lib/sync.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-warning-policy.js",
+        "src/lib/cloud.js",
+        "src/lib/remote-sync.js",
+        "src/lib/sync-ownership.js",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n130_context_supersession_same_owner_not_false_hard_failure",
+        "n130_owner_auth_rejection_protection_and_unknown_ack_preserved",
+        "n130_current_full_success_clears_stale_warning_without_masking_outbox",
+        "n130_pwa_sw_version_and_real_rendered_warning"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "acceptance": [
+        "Reproduce reported revision_validation / CONTEXT_CHANGED on an offline synthetic account with same owner, clean durable queue and session-object replacement; no real credentials, account or student data.",
+        "An obsolete sync attempt cannot certify success, issue ACK, replay an uncertain mutation or publish another workspace. Supersession may be pending or verified auth_required but not hard red absent a durable failure; preserve owner and revision guards.",
+        "A new confirmed full sync for the bound owner/context clears the stale failure detail; unresolved failed/rejected/blocked/ownership/auth conditions remain actionable and visible. Historical conflict count is never treated as active failure.",
+        "Source regression tests cover valid same-owner session renew, changed auth identity, logout/ownership deny, 403/rejected commands, marker regression, ignored-abort response and two-device fresh convergence; maintain no false success or duplicate sends.",
+        "Service Worker pre-cache contains sync.js: coordinate required sw.js generation update AFTER N44 finishes writing it, never edit N44 current SW in parallel. Source-integrated Production + PWA served-cache evidence via original publisher only."
+      ],
+      "preparationAuthority": {
+        "kind": "po_20261027_existing_sync_warning_bugfix",
+        "origin": "https://rakeezx.com",
+        "issue": "https://github.com/RakeezX/RakeezX/issues/10",
+        "productionPublication": true,
+        "noRealUserDataReadsOrMutations": true,
+        "noNewSchemaAuthRlsProvider": true,
+        "requiredSharedSwReleaseFrom": "continuous-n44-one-approved-closed-page-push-20261019"
+      },
+      "releaseAuthority": "PO 2026-10-27 directly requests diagnosis and correction of second-work-laptop PWA red transient CONTEXT_CHANGED warning. Authorized: narrowly scoped non-destructive Sync status/context-handling source repair, synthetic tests, existing sole publisher production publication after the current N44 SW lane is delivered. Not authorized: changing actual teacher/student cloud data, Auth policies/RLS/schema, bypassing context owner/lease/revision validation, silently accepting a failed sync, direct Product push or replacing the sole controller/publisher.",
+      "objective": "Implement one narrow robust source repair of the actual user-reported CONTEXT_CHANGED after laptop sign-in. Production src/lib/sync.js at revision_validation compares session object identity after safe remote marker validation and records hard error; stale lastSafeFailure remains after a later success. Reproduce with controlled same-owner session-object renewal during idle/full Sync (~14s actual elapsed) and any token/account changes, distinguish unambiguous harmless superseded validation from real blocked/401/auth and rejected/failed Outbox. Do not simply remove the guard: terminate invalid run without ACK/success, preserve idempotent outbox, request exactly one fresh guarded full pass in current context, prevent red if no real durable failure, clear past diagnostic only on validated matching fresh success. Preserve soft-error pending timeline, owner/lease, marker regression, restore/delete student tombstones; do not hide hard failures. Check actual rendered mobile/desktop banner and latest successful timestamp. Asset src/lib/sync.js belongs to PWA cache manifest; sw.js VERSION must update once after the currently running N44 worker releases SW; do not merge N44 files yourself. Work in controller-owned isolated worktree from fresh main. Synthetic tests only. Never operate on work laptop real records. Candidate is only LOCAL_READY after affected source, standalone context/owner/durable/UI/cache checks pass; publisher alone delivers and proves served PWA. Product not CLOSED until genuine acceptance.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "e2401c37acad308152e58d74efae240703b9244e",
+        "requiredSourcePaths": [
+          "src/lib/sync.js",
+          "src/lib/sync-status-severity.js",
+          "src/lib/sync-operational-ui.js",
+          "src/lib/sync-warning-policy.js",
+          "src/lib/cloud.js",
+          "src/lib/remote-sync.js",
+          "src/lib/sync-ownership.js",
+          "sw.js"
+        ],
+        "editPaths": [
+          "src/lib/sync.js",
+          "src/lib/sync-status-severity.js",
+          "src/lib/sync-operational-ui.js",
+          "src/lib/sync-warning-policy.js",
+          "sw.js",
+          "tests/n130-sync-context-supersession-20261027/cases.mjs",
+          "docs/automation-evidence/20261027/N130_SYNC_CONTEXT_SUPERSESSION.md"
+        ],
+        "newPaths": [
+          "tests/n130-sync-context-supersession-20261027/cases.mjs",
+          "docs/automation-evidence/20261027/N130_SYNC_CONTEXT_SUPERSESSION.md"
+        ],
+        "workerChecks": [
+          "n130_context_supersession_same_owner_not_false_hard_failure",
+          "n130_owner_auth_rejection_protection_and_unknown_ack_preserved",
+          "n130_current_full_success_clears_stale_warning_without_masking_outbox",
+          "n130_pwa_sw_version_and_real_rendered_warning"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "superseded_by_verified_delivery",
+      "supersededBy": "continuous-n130-sync-context-after-qualified-sw-20261027",
+      "supersedingPublishedSha": "6696d03518111134cbf855544c090d92496e3126"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-portal-content-priority-20261027",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -5450,
+      "scopeKey": "n88-teacher-student-content-first-ux",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 100,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "continuous-n130-sync-context-supersession-20261027"
+      ],
+      "allowedPaths": [
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal-login.css",
+        "sw.js",
+        "tests/n88-portal-content-priority-20261027/**",
+        "docs/automation-evidence/20261027/N88_PORTAL_CONTENT_PRIORITY_UX.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal-login.css",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n88_teacher_first_screen_accessible_actions_and_roster",
+        "n88_student_required_instructions_and_due_dates_visible",
+        "n88_published_data_privacy_session_and_owner_mutation_guards",
+        "n88_mobile_rtl_keyboard_dom_visual_order_and_sw_cache"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "objective": "Current N88 teacher page (src/views/student-portal-class.js) stacks lengthy header/status/explanatory text before the class roster; task guidance is at bottom. Current student page (src/views/student-portal-login.js) renders grades in DOM before required work, CSS reorders it, and hides per-work execution/delivery instructions under closed details. Implement 27 October PO requested direct UX fix: compact teacher class/title and meaningful student count, one primary create-missing action, easy visible roster with safe code/copy/share/revoke/rotate and accessible confirmation, and visibly navigable publication guidance + field settings. Student: compact identity then published required tasks with actual instructions, method of submission, dates, status shown WITHOUT expanding details, future tasks, published grades, completed work, while empty states are minimal. Use actual current app/components, no legacy invite lab. Maintain DOM/focus order = visual order, 320/390/768/1280px RTL/dark/light accessible tap targets. Retain owner/membership guards, 6-digit code, all timeouts/return & cancellation, no stale private DOM or grade disclosure, no HTTP or service change. Keep support behind secondary details. 1/30/50 fake-student fixture and representative published/unpublished work. Preserve exact current Student/Teacher APIs and retry/error handling. N44 active shared sw.js and N130 already pending; do not edit shared SW until N130 verified release. Bump SW cache generation on fresh main only once in this task; original publisher verifies source+SW PWA served assets. Worktree and Codex session are owned by original controller. No direct push/deployment, no new N44/N130 task or worker.",
+      "acceptance": [
+        "Teacher page displays relevant students and core actions before repeated instructions; codes are shown only to an authenticated current class context after owner read; no change to rotate/revoke protections or teacher publishing.",
+        "Student required/scheduled task title, execution instructions, delivery instructions, due dates and completion status are actually visible without expanding individual details. Visual reading/DOM/accessibility align, grades only if published, completed lower, no redundant empty cards.",
+        "Teacher guidance and field visibility remain editable and easy to reach with explicit labeled navigation, not nested hidden mandatory content. Preserve failed/unconfirmed operations and existing support copy.",
+        "Synthetic real-component tests on 320/390/768/1280, one and 30/50 students, long titles/multiline Arabic, focus/keyboard, mixed tasks and grades, dark/light and PWA offline; actual session context change removes all secrets and old responses.",
+        "No Auth/RLS/schema/scoring/student writes/Service APIs or new local persisted data. Use isolated current-main branch, affected tests and sole verified Production publisher, N88 remains open until PO acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "po_20261027_n88_content_priority_ui_source_only",
+        "issue": "https://github.com/RakeezX/RakeezX/issues/11",
+        "realAccountOperations": 0,
+        "serviceOperations": 0,
+        "sensitiveSchemaOrAuthWrites": 0,
+        "sharedSwAfter": "continuous-n130-sync-context-supersession-20261027"
+      },
+      "releaseAuthority": "PO explicitly rejects N88 teacher/student UI hierarchy on 2026-10-27 and authorizes simplification while recognizing prior speed improvement. Scoped frontend UI, tests, PWA SW cache generation after N44 and N130 shared SW releases; verified Production via existing sole controller/publisher. No new Auth/RLS/data/service/read-write scope, no personal browser or live student operations.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "e2401c37acad308152e58d74efae240703b9244e",
+        "requiredSourcePaths": [
+          "src/views/student-portal-class.js",
+          "src/views/student-portal-login.js",
+          "src/styles/student-portal-class.css",
+          "src/styles/student-portal-login.css",
+          "sw.js",
+          "src/lib/student-portal-task-guidance-client.js",
+          "src/lib/student-portal-unified-client.js"
+        ],
+        "editPaths": [
+          "src/views/student-portal-class.js",
+          "src/views/student-portal-login.js",
+          "src/styles/student-portal-class.css",
+          "src/styles/student-portal-login.css",
+          "sw.js",
+          "tests/n88-portal-content-priority-20261027/cases.mjs",
+          "docs/automation-evidence/20261027/N88_PORTAL_CONTENT_PRIORITY_UX.md"
+        ],
+        "newPaths": [
+          "tests/n88-portal-content-priority-20261027/cases.mjs",
+          "docs/automation-evidence/20261027/N88_PORTAL_CONTENT_PRIORITY_UX.md"
+        ],
+        "workerChecks": [
+          "n88_teacher_first_screen_accessible_actions_and_roster",
+          "n88_student_required_instructions_and_due_dates_visible",
+          "n88_published_data_privacy_session_and_owner_mutation_guards",
+          "n88_mobile_rtl_keyboard_dom_visual_order_and_sw_cache"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "superseded_by_verified_delivery",
+      "supersededBy": "continuous-n88-content-priority-after-n130-20261027",
+      "supersedingPublishedSha": "39274bf4d739f8eb36981051776f92edef75fca1"
+    }
+  ]
+}
