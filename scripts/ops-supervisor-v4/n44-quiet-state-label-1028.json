@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-quiet-state-label-1028",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100020,
+      "scopeKey": "n44-notification-settings-source",
+      "riskClass": "LOW",
+      "validationTier": "TARGETED",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "allowedPaths": [
+        "src/views/notification-settings.js",
+        "tests/n44-quiet-state-label-1028.test.mjs",
+        "docs/automation-evidence/20261028/N44_QUIET_STATE_LABEL.md"
+      ],
+      "verificationPaths": [
+        "src/views/notification-settings.js"
+      ],
+      "requiredChecks": [
+        "quiet_saved_state_visible_when_disabled",
+        "quiet_label_no_preference_or_delivery_mutation"
+      ],
+      "postDeliveryChecks": [],
+      "releaseAuthority": "Existing PO authorization for N44 UI readiness repair and ordinary source publication. Read-only label only; no live service activation, preference mutation or notifications.",
+      "objective": "Fix concrete readiness UI ambiguity confirmed by Android screenshot and identical iPhone report. Current quiet button is disabled while delivery unavailable and does not visibly distinguish its saved aria-checked value. In notification-settings.js render a concise Arabic saved-state text derived from the same existing readPushQuiet(context): وقت الهدوء المحفوظ: مفعّل or وقت الهدوء المحفوظ: غير مفعّل. Explain separately that editing is unavailable until device reminders available; do not imply service enabled. Preserve custom saved time semantics, current button and toggle behavior. No preference writes, defaults changes, permissions prompts, service registration, live calls, source data changes or private custody edits. Implement smallest UI-only patch and focused tests for null/non-null saved state with unavailable service, and visually inspect rendered output if available. Publish through original controller publisher then return to original core live task only after user reports new visible label. Screenshot evidence is artifacts/ops-supervisor-v4/intake-evidence/po-20261028-phone-quiet-screenshot/observation.json. This is a distinct frontend prerequisite while core-live is blocked, not a duplicate live worker. Do not rerun read-only cloud inventory or prior live trial. N44 remains OPEN.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "249f248ed075d0d395456614e1147bb693c5e99c",
+        "requiredSourcePaths": [
+          "src/views/notification-settings.js",
+          "src/lib/notification-push-runtime.js"
+        ],
+        "editPaths": [
+          "src/views/notification-settings.js",
+          "tests/n44-quiet-state-label-1028.test.mjs",
+          "docs/automation-evidence/20261028/N44_QUIET_STATE_LABEL.md"
+        ],
+        "newPaths": [
+          "tests/n44-quiet-state-label-1028.test.mjs",
+          "docs/automation-evidence/20261028/N44_QUIET_STATE_LABEL.md"
+        ],
+        "workerChecks": [
+          "quiet_saved_state_visible_when_disabled",
+          "quiet_label_no_preference_or_delivery_mutation"
+        ],
+        "publisherChecks": []
+      },
+      "acceptance": [
+        "Saved quiet ON/OFF plainly visible even when control disabled; no behavior changes.",
+        "Exact served source verified by publisher; no claim of phone state or live acceptance."
+      ]
+    }
+  ]
+}
