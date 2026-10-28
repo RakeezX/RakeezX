@@ -11,6 +11,17 @@ import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
 import studentsView, { canOpenRoster, classAccessFeedback } from './students.js';
 import teachingsView, { addSubjectToClass } from './teachings.js';
 
+// Loaded only after an explicit support action; not an offline startup dependency.
+function sourceReadinessSupport() {
+  return html`<details class="card card--pad mt-3" data-source-readiness style="min-width:0">
+    <summary>تشخيص مصادر التذكيرات للدعم</summary>
+    <p class="t-3 fs-sm">للدعم فقط: اختر ملف الطلب الموثوق من مسؤول التجربة. يُحفظ تقرير مشفّر محليًا دون أسماء الطلاب أو درجاتهم، ولا يُرسل تلقائيًا أو يفعّل التذكيرات.</p>
+    <label class="fs-sm">ملف طلب الدعم <input type="file" accept=".json,application/json" style="display:block;width:100%;min-width:0;max-width:100%" data-source-challenge></label>
+    <button type="button" class="btn btn--quiet mt-3" data-act="source-readiness-capture">حفظ تقرير مشفّر</button>
+    <p class="t-3 fs-sm" role="status" data-source-status></p>
+  </details>`;
+}
+
 const TOOLS = (id) => [
   { href: `#/teaching/${teachingRouteId(id)}/student-portal`, icon: 'students', title: 'مساحة الطلاب', sub: 'رموز الدخول والحقول المنشورة' },
   { href: `#/teaching/${teachingRouteId(id)}/class-rules`, icon: 'book', title: 'هدف وميثاق الصف', sub: 'الهدف الرئيسي والميثاق' },
@@ -118,6 +129,7 @@ export default {
         <div class="class-hub">
           ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
           ${activeGoalIndicator(tch.id, activeGoal)}
+          ${sourceReadinessSupport()}
           <div class="class-hub__empty empty">
             <div class="empty__icon">${icon('student')}</div>
             <div class="empty__title">لا يوجد طلاب في الفصل</div>
@@ -147,6 +159,7 @@ export default {
       <div class="class-hub">
       ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
       ${activeGoalIndicator(tch.id, activeGoal)}
+          ${sourceReadinessSupport()}
       <div class="section">
         <div class="section__head">
           <div class="section__title">حصص اليوم</div>
@@ -239,6 +252,27 @@ export default {
   },
 
   actions: {
+    async 'source-readiness-capture'(el, ev, params) {
+      const panel = el.closest('[data-source-readiness]'), status = panel?.querySelector('[data-source-status]');
+      if (!panel || el.dataset.sourceBusy === 'true') return;
+      const file = panel.querySelector('[data-source-challenge]').files?.[0];
+      if (!file || file.size > 8192) { status.textContent = 'اختر ملف طلب دعم صالحًا ومحدود الحجم.'; return; }
+      el.dataset.sourceBusy = 'true'; el.setAttribute('aria-busy','true'); delete status.dataset.sourceError; status.textContent = 'جارٍ التحقق وحفظ التقرير محليًا…';
+      let url;
+      try {
+        const raw = await file.text();
+        const { captureNotificationSourceReadiness } = await import('../lib/notification-source-readiness.js');
+        const receipt = await captureNotificationSourceReadiness(raw, params.id, panel);
+        if (!panel.isConnected) return;
+        url = URL.createObjectURL(new Blob([JSON.stringify(receipt)], {type:'application/json'}));
+        const link = document.createElement('a'); link.href = url; link.download = 'rakeez-source-readiness.encrypted.json';
+        link.click(); status.textContent = 'تم حفظ التقرير المشفّر. لا يعني ذلك تفعيل التذكيرات أو اجتياز التجربة.';
+      } catch (error) {
+        const codes = ['challenge_shape','challenge_size','challenge_authority','challenge_identity','challenge_expired','challenge_scope','challenge_time','challenge_key','context_unavailable','context_replaced','owner_changed','not_writable','draft_open','ancestry_unconfirmed','ancestry_inactive','source_bound','scope_mismatch','key_size','sync_pending','snapshot_changed','timezone','calendar','lesson_time','challenge_used','receipt_size'];
+        status.dataset.sourceError = codes.includes(error?.message) ? error.message : 'unavailable';
+        if (panel.isConnected) status.textContent = 'تعذّر إنشاء التقرير. تحقق من صلاحية طلب الدعم والحساب والفصل والمزامنة والتقويم، ثم اطلب طلبًا جديدًا من الدعم.';
+      } finally { if (url) setTimeout(() => URL.revokeObjectURL(url), 1000); delete el.dataset.sourceBusy; el.removeAttribute('aria-busy'); }
+    },
     'file-import': (el, ev, params) => studentsView.actions['file-import'](el, ev, params),
     'file-export': (el, ev, params) => studentsView.actions['file-export'](el, ev, params),
     'paste-names': (el, ev, params) => studentsView.actions.import(el, ev, params),
