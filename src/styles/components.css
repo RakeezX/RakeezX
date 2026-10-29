@@ -8946,10 +8946,19 @@
 .ql-controls button:disabled { opacity: .4; cursor: default; }
 .ql-controls button:focus-visible { outline: 3px solid var(--action-focus-ring); outline-offset: -3px; }
 @media (hover: hover) { .ql-controls button:enabled:hover { border-color: currentColor; } }
-.ql-controls button:enabled:active { transform: translateY(1px); filter: brightness(.93); }
+.ql-controls button:enabled:active { filter: brightness(.93); }
 .quicklog-page .qlcard__factor { padding: 0; font-size: 11px; }
 .ql-reasons .tag-pick { display: flex; gap: 8px; text-align: start; justify-content: flex-start; }
 .ql-reasons .tag-pick > :first-child { flex: none; }
+/* AI N140: reserve note/feedback/count geometry across saves and incoming updates. */
+.quicklog-page .quicklog__modes { width: max-content; max-width: 100%; flex: none; }
+.quicklog-page .quicklog__modes .segmented__btn { flex: 0 0 auto; white-space: nowrap; overflow-wrap: normal; }
+.quicklog-page .qlcard__note { display: block; block-size: 18px; line-height: 18px; }
+.quicklog-page .qlcard__incident { line-height: inherit; }
+.quicklog-page .qlcard__name { block-size: 2.8em; }
+.ql-controls { position: relative; padding-block-end: 18px; flex: none; }
+.ql-controls .ql-point { width: 46px; padding-inline: 4px; flex: none; }
+.ql-save-status { position: absolute; inset-block-end: 0; inset-inline: 0; block-size: 16px; line-height: 16px; font-size: 10px; color: var(--text-3); white-space: nowrap; }
 .n84-inline { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
 .graderow__auto:has(.ql-controls) { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .ql-grade-reason { display: inline-flex; min-height: 44px; margin-block: 4px; }

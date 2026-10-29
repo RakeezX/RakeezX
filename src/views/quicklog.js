@@ -7,7 +7,7 @@ import { html, icon } from '../lib/dom.js';
 import * as store from '../store.js';
 import { displayRoster, quickLogAttendanceState, todayISO, normalizeSearchText, logPointTotals, participationPointProjection } from '../models.js';
 import { repaint } from '../repaint.js';
-import { pointControls, runPointAction } from '../lib/quicklog-reason-sheet.js';
+import { pointControls, runPointAction, stablePointSurface } from '../lib/quicklog-reason-sheet.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
 
 let kind = 'participation';   // participation | behavior
@@ -47,7 +47,8 @@ export default {
     pendingPulse = null;
   },
 
-  render(p) {
+  render(p) { return stablePointSurface(() => this.renderContent(p)); },
+  renderContent(p) {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الرصد السابق محفوظ ولا يمكن إضافة رصد جديد.</div></div>`;
