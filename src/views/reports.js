@@ -118,6 +118,14 @@ function sortRoster(roster, items, ctx) {
     return sortStudents(arr);
   } else if (sortKey === 'roll') {
     arr.sort((a, b) => (a.displayNo ?? a.rollNo ?? 9999) - (b.displayNo ?? b.rollNo ?? 9999));
+  } else if (tab === 'grades' && (sortKey === 'score_desc' || sortKey === 'score_asc')) {
+    // AI N138: Grades display, print and CSV share earned-total order.
+    arr.sort((a, b) => {
+      const totalA = studentTotal(items, ctx[a.id]), totalB = studentTotal(items, ctx[b.id]);
+      const missingA = totalA.outOfGraded === 0, missingB = totalB.outOfGraded === 0;
+      if (missingA || missingB) return Number(missingA) - Number(missingB);
+      return sortKey === 'score_desc' ? totalB.earned - totalA.earned : totalA.earned - totalB.earned;
+    });
   } else if (sortKey === 'score_desc') {
     arr.sort((a, b) => (studentTotal(items, ctx[b.id]).pct ?? -1) - (studentTotal(items, ctx[a.id]).pct ?? -1));
   } else if (sortKey === 'score_asc') {

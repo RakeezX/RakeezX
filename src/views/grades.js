@@ -150,17 +150,17 @@ const gradesView = {
       processedRoster = sortStudents(processedRoster);
     } else if (sortKey === 'roll') {
       processedRoster.sort((a, b) => (a.displayNo ?? 9999) - (b.displayNo ?? 9999));
-    } else if (sortKey === 'score_desc') {
+    } else if (sortKey === 'score_desc' || sortKey === 'score_asc') {
+      // AI N138: compare earned totals; null alone denotes an ungraded student.
+      const score = (student) => {
+        if (mode === 'item') return itemScore(currentItem, ctx[student.id]);
+        const total = studentTotal(items, ctx[student.id]);
+        return total.outOfGraded === 0 ? null : total.earned;
+      };
       processedRoster.sort((a, b) => {
-        const scA = mode === 'item' ? (itemScore(currentItem, ctx[a.id]) ?? -1) : (studentTotal(items, ctx[a.id]).pct ?? -1);
-        const scB = mode === 'item' ? (itemScore(currentItem, ctx[b.id]) ?? -1) : (studentTotal(items, ctx[b.id]).pct ?? -1);
-        return scB - scA;
-      });
-    } else if (sortKey === 'score_asc') {
-      processedRoster.sort((a, b) => {
-        const scA = mode === 'item' ? (itemScore(currentItem, ctx[a.id]) ?? 9999) : (studentTotal(items, ctx[a.id]).pct ?? 9999);
-        const scB = mode === 'item' ? (itemScore(currentItem, ctx[b.id]) ?? 9999) : (studentTotal(items, ctx[b.id]).pct ?? 9999);
-        return scA - scB;
+        const scA = score(a), scB = score(b);
+        if (scA === null || scB === null) return Number(scA === null) - Number(scB === null);
+        return sortKey === 'score_desc' ? scB - scA : scA - scB;
       });
     }
 
