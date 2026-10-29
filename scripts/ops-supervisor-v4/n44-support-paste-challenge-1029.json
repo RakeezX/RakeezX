@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-support-paste-challenge-1029",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100030,
+      "scopeKey": "n44-source-ui-readonly-binding",
+      "riskClass": "LOW",
+      "validationTier": "TARGETED",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "n44-capture-runtime-fix-1029"
+      ],
+      "allowedPaths": [
+        "src/views/teaching-hub.js",
+        "src/lib/notification-source-readiness.js",
+        "tests/n44-source-ui-binding-1028.test.mjs",
+        "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+      ],
+      "verificationPaths": [
+        "src/views/teaching-hub.js",
+        "src/lib/notification-source-readiness.js"
+      ],
+      "requiredChecks": [
+        "mounted_context_capture_readonly_guards",
+        "encrypted_receipt_no_student_payload",
+        "browser_visible_support_binding_default_inert"
+      ],
+      "postDeliveryChecks": [],
+      "releaseAuthority": "Latest direct PO requests actual capture rejection repair; frontend fix and source-only publication authorized, no grant consumption or live notifications.",
+      "objective": "Resolve repeatedly observed supported browser file-chooser crash/timeouts by adding an explicit optional PASTE PUBLIC SUPPORT REQUEST path in the EXISTING collapsed support UI. User confirms Allow access to file URLs is ALREADY enabled. Do not ask again or repeat chooser; actual tests proved module capture under normal HTTP graph, so reuse successful proofs. Root actual browser page is readable until filechooser.setFiles then CDP times out and user reports page crash. Add compact labeled textarea for public support-request JSON (not private key or user records) under same support disclosure; existing capture button accepts exactly ONE input source, pasted JSON OR selected file, rejects ambiguity/oversize, no new form/global/window injection or background call. Both paths MUST go through identical captureNotificationSourceReadiness validation/encryption/durable nonce semantics without weakening owner/ancestry/Sync/calendar/freshness/security or echoing pasted content/errors. Keep existing file path for manual users and unchanged default inertness. Plain textarea paste is normal visible user UI and avoids broken automation upload mechanism; no arbitrary script execution or direct app-state probe. Preserve current bounded stage/category diagnostics. Limit verification to changed input-selection/empty/oversize/dual-source behavior and actual DOM handler invocation with public challenge using existing real-module fixture; no full native campaign or build. Publish actual frontend change via original sole publisher and verify served source. Do not consume live grant, issue challenge, send, create sources or claim phone readiness. Root will use supported visible textarea and original custodian challenge after deployment. Deliver code, not another plan or mock-only proof.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "37a25ac25ccb8c5e333be4ca23a4ccf1c01267ff",
+        "requiredSourcePaths": [
+          "src/views/teaching-hub.js",
+          "src/lib/notification-events.js",
+          "src/lib/sync-operational-ui.js"
+        ],
+        "editPaths": [
+          "src/views/teaching-hub.js",
+          "src/lib/notification-source-readiness.js",
+          "tests/n44-source-ui-binding-1028.test.mjs",
+          "docs/automation-evidence/20261028/N44_SOURCE_UI_BINDING.md"
+        ],
+        "newPaths": [],
+        "workerChecks": [
+          "mounted_context_capture_readonly_guards",
+          "encrypted_receipt_no_student_payload",
+          "browser_visible_support_binding_default_inert"
+        ],
+        "publisherChecks": []
+      },
+      "acceptance": [
+        "Saved quiet ON/OFF plainly visible even when control disabled; no behavior changes.",
+        "Exact served source verified by publisher; no claim of phone state or live acceptance."
+      ],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "source-only correction of actual capture UI runtime"
+      }
+    }
+  ]
+}
