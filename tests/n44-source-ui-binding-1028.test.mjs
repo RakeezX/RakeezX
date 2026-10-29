@@ -6,13 +6,13 @@ import {generateKeyPairSync,privateDecrypt,createDecipheriv,constants} from 'nod
 import {expect} from '@playwright/test';
 import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
 import {openReadyServedDemo} from './helpers/served-demo-readiness.mjs';
-const root=process.cwd(), requests=[];
+const root=process.cwd(), requests=[], pasteOnly=process.argv.includes('--paste-only');
 const mime={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
 const server=http.createServer(async(req,res)=>{const u=new URL(req.url,'http://127.0.0.1');requests.push(u.pathname);if(u.pathname.startsWith('/api/')){res.writeHead(200,{'content-type':'application/json'});return res.end('{"status":"disabled"}');}const file=path.resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();try{res.writeHead(200,{'content-type':mime[path.extname(file)]??'application/octet-stream'});res.end(await readFile(file));}catch{res.writeHead(404).end();}});
 const {publicKey,privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});const jwk=publicKey.export({format:'jwk'});
 try{
  await new Promise(ok=>server.listen(0,'127.0.0.1',ok));const base=`http://127.0.0.1:${server.address().port}`;
- await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/n44-capture-runtime-fix-1029.json',runId:'e26b457d-231d-4728-9c79-9caed6eacb37',url:base,timeoutMs:120000},async({createContext})=>{
+ await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+(pasteOnly?'n44-support-paste-challenge-1029':'n44-capture-runtime-fix-1029')+'.json',runId:pasteOnly?'f96c3987-e943-4c20-9327-2f9848989131':'e26b457d-231d-4728-9c79-9caed6eacb37',url:base,timeoutMs:120000},async({createContext})=>{
   const ctx=await createContext({viewport:{width:390,height:844},locale:'ar-SA',timezoneId:'Asia/Riyadh'});await ctx.addInitScript(()=>sessionStorage.setItem('rakeezx-demo-session-v1','preparing'));
   const page=await ctx.newPage();await openReadyServedDemo(page,base);
   await page.evaluate(async()=>{
@@ -34,8 +34,26 @@ try{
   await page.waitForFunction(async()=>{const s=await(await import('/src/lib/sync.js')).getSyncOperationalSummary();return s.state==='synced'&&s.cloudSyncHealthy;},{},{timeout:15000});
   const panel=page.locator('[data-source-readiness]');await panel.waitFor();await expect(panel).not.toHaveAttribute('open','');
   assert(!requests.includes('/src/lib/notification-source-readiness.js'));
+  await expect(panel.locator('textarea')).not.toBeVisible();
   await panel.locator('summary').click();await expect(panel.locator('input')).toBeVisible();
   await panel.locator('button').click();await expect(panel.locator('[role=status]')).toContainText('اختر ملف');
+  if(pasteOnly){
+   const pasted=panel.locator('[data-source-challenge-paste]'),status=panel.locator('[role=status]');
+   await expect(pasted).toBeVisible();
+   await expect(pasted).toHaveAccessibleName('أو الصق طلب الدعم العام (JSON، حتى 8192 حرفًا)');
+   await pasted.fill('   ');await panel.locator('button').click();await expect(status).toHaveAttribute('data-source-error','input_source');
+   await pasted.fill('PRIVATE_PASTE_'+'x'.repeat(8192));await panel.locator('button').click();await expect(status).toHaveAttribute('data-source-error','input_size');
+   assert(!(await status.textContent()).includes('PRIVATE_PASTE'));
+   await pasted.fill('{}');
+   await panel.locator('input').setInputFiles({name:'public.json',mimeType:'application/json',buffer:Buffer.from('{}')});
+   await panel.locator('button').click();await expect(status).toHaveAttribute('data-source-error','input_source');
+   await pasted.fill('');
+   await panel.locator('input').setInputFiles({name:'large.json',mimeType:'application/json',buffer:Buffer.alloc(8193,32)});
+   await panel.locator('button').click();await expect(status).toHaveAttribute('data-source-error','input_size');
+   await panel.locator('input').setInputFiles([]);
+   assert(!requests.includes('/src/lib/notification-source-readiness.js'),'input rejection stays inert before module import');
+   console.log('PASS paste/file selection: empty, whitespace, oversized paste/file, dual-source; no import or echoed content');
+  }
   const challenge=await page.evaluate(async publicKey=>{
    const m=await import('/src/lib/notification-source-readiness.js'),s=await import('/src/store.js'),c=await import('/src/lib/cloud.js');
    const context=(await import('/src/lib/notification-events.js')).currentNotificationContext(s,c);if(!context)throw Error('fixture owner checkpoint');
@@ -44,6 +62,7 @@ try{
    return {version:1,taskId:'n44-core-live-1028',grantId:'efedbcea-f227-4a91-bbab-79cad814fc81',runId:'11111111-1111-4111-8111-111111111111',nonce:'a'.repeat(64),issuedAt:Date.now(),expiresAt:Date.now()+240000,ownerHash:await m.readinessHash(context.ownerId),workspaceHash:await m.readinessHash(context.workspaceId),dueAt:due,publicKey};
   },{kty:jwk.kty,n:jwk.n,e:jwk.e});
   const upload=async c=>panel.locator('input').setInputFiles({name:'challenge.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(c))});
+  if(!pasteOnly){
   // Exercise failure reporting through the actual mounted handler and module graph.
   // Transport stays synthetic; messages resembling sensitive data must never render.
   await upload(challenge);
@@ -72,8 +91,16 @@ try{
   for(const change of [c=>c.expiresAt=0,c=>c.ownerHash='0'.repeat(64),c=>c.taskId='foreign',c=>c.publicKey.d='private']){
    const bad=structuredClone(challenge);change(bad);await upload(bad);await panel.locator('button').click();await expect(panel.locator('[role=status]')).toContainText('تعذّر');await expect(panel.locator('button')).not.toHaveAttribute('aria-busy','true');
   }
+  }
+  if(pasteOnly){
+   await panel.locator('textarea').fill('{PRIVATE_PASTE_MUST_NOT_RENDER');await panel.locator('button').click();
+   await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-stage','challenge');
+   await expect(panel.locator('[role=status]')).toHaveAttribute('data-source-category','SyntaxError');
+   assert(!(await panel.locator('[role=status]').textContent()).includes('PRIVATE_PASTE'));
+  }
   const before=await page.evaluate(async()=>{const s=await import('/src/store.js');return JSON.stringify(Object.fromEntries(['students','scores','items','scoreSubitems','sessions','teachings','sections','subjects'].map(k=>[k,s.state[k]])));});const apiBefore=requests.filter(x=>x.startsWith('/api/')).length;
-  await upload(challenge);await panel.locator('button').focus();
+  if(pasteOnly){await panel.locator('textarea').fill(JSON.stringify(challenge));}else{await upload(challenge);}
+  await panel.locator('button').focus();
   await page.waitForFunction(async()=>{const s=await(await import('/src/lib/sync.js')).getSyncOperationalSummary();if(s.state!=='synced'||!s.cloudSyncHealthy){window.syntheticSyncedSince=0;return false;}window.syntheticSyncedSince ||= performance.now();return performance.now()-window.syntheticSyncedSince>500;},{},{timeout:10000});
   let download;
   for(let attempt=0;attempt<2;attempt++){
@@ -94,6 +121,7 @@ try{
   await panel.locator('button').click();await expect(panel.locator('[role=status]')).toContainText('تعذّر');await expect(panel.locator('button')).not.toHaveAttribute('aria-busy','true');
   assert.equal(await panel.locator('[role=status]').getAttribute('data-source-error'),'challenge_used');
   assert(!JSON.stringify(receipt).includes(payload.ownerId));assert(!JSON.stringify(receipt).includes('n44-teaching'));
+  if(!pasteOnly){
   const negatives=await page.evaluate(async c=>{
    const m=await import('/src/lib/notification-source-readiness.js'),s=await import('/src/store.js'),db=await import('/src/lib/db.js'),cloud=await import('/src/lib/cloud.js');
    const panel=document.querySelector('[data-source-readiness]'),results=[];
@@ -117,7 +145,8 @@ try{
   assert.equal(negatives.find(x=>x[0]==='expired-lease')[1],'not_writable');
   assert.equal(negatives.find(x=>x[0]==='replaced-session')[1],'context_replaced');
   console.log('PASS guarded negative entries: '+negatives.map(x=>x.join(':')).join(', '));
-  for(const width of [320,390]){await page.setViewportSize({width,height:844});assert(await panel.evaluate(el=>el.getBoundingClientRect().width<=innerWidth&&getComputedStyle(el).display!=='none'));}
+  }
+  for(const width of [320,390]){await page.setViewportSize({width,height:844});assert(await panel.evaluate(el=>el.getBoundingClientRect().width<=innerWidth&&getComputedStyle(el).display!=='none'));if(pasteOnly)assert(await panel.locator('textarea').evaluate(el=>el.getBoundingClientRect().right<=innerWidth&&el.getBoundingClientRect().left>=0));}
   if(process.env.RAKEEZ_CAPTURE_SCREENSHOT)await panel.screenshot({path:process.env.RAKEEZ_CAPTURE_SCREENSHOT});
   console.log('PASS mounted_context_capture_readonly_guards; encrypted_receipt_no_student_payload; browser_visible_support_binding_default_inert');
  });

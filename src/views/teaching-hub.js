@@ -15,8 +15,10 @@ import teachingsView, { addSubjectToClass } from './teachings.js';
 function sourceReadinessSupport() {
   return html`<details class="card card--pad mt-3" data-source-readiness style="min-width:0">
     <summary>تشخيص مصادر التذكيرات للدعم</summary>
-    <p class="t-3 fs-sm">للدعم فقط: اختر ملف الطلب الموثوق من مسؤول التجربة. يُحفظ تقرير مشفّر محليًا دون أسماء الطلاب أو درجاتهم، ولا يُرسل تلقائيًا أو يفعّل التذكيرات.</p>
+    <p class="t-3 fs-sm">للدعم فقط: اختر ملف الطلب الموثوق من مسؤول التجربة أو الصق نص الطلب العام. يُحفظ تقرير مشفّر محليًا دون أسماء الطلاب أو درجاتهم، ولا يُرسل تلقائيًا أو يفعّل التذكيرات.</p>
     <label class="fs-sm">ملف طلب الدعم <input type="file" accept=".json,application/json" style="display:block;width:100%;min-width:0;max-width:100%" data-source-challenge></label>
+    <label class="fs-sm">أو الصق طلب الدعم العام (JSON، حتى 8192 حرفًا) <textarea rows="3" dir="ltr" spellcheck="false" autocomplete="off" autocapitalize="off" style="display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;resize:vertical" data-source-challenge-paste></textarea></label>
+    <p class="t-3 fs-sm">استخدم مصدرًا واحدًا فقط. لا تلصق مفتاحًا خاصًا أو بيانات مستخدمين.</p>
     <button type="button" class="btn btn--quiet mt-3" data-act="source-readiness-capture">حفظ تقرير مشفّر</button>
     <p class="t-3 fs-sm" role="status" data-source-status></p>
   </details>`;
@@ -255,12 +257,20 @@ export default {
     async 'source-readiness-capture'(el, ev, params) {
       const panel = el.closest('[data-source-readiness]'), status = panel?.querySelector('[data-source-status]');
       if (!panel || el.dataset.sourceBusy === 'true') return;
-      const file = panel.querySelector('[data-source-challenge]').files?.[0];
-      if (!file || file.size > 8192) { status.textContent = 'اختر ملف طلب دعم صالحًا ومحدود الحجم.'; return; }
-      el.dataset.sourceBusy = 'true'; el.setAttribute('aria-busy','true'); delete status.dataset.sourceError; delete status.dataset.sourceStage; delete status.dataset.sourceCategory; status.textContent = 'جارٍ التحقق وحفظ التقرير محليًا…';
-      let url, stage = 'file_read';
+      const files = panel.querySelector('[data-source-challenge]').files;
+      const file = files?.[0], pasted = panel.querySelector('[data-source-challenge-paste]').value;
+      const hasPaste = pasted.trim().length > 0;
+      delete status.dataset.sourceError; delete status.dataset.sourceStage; delete status.dataset.sourceCategory;
+      if (pasted.length > 8192 || file?.size > 8192 || (files?.length ?? 0) > 1 || Number(!!file) + Number(hasPaste) !== 1) {
+        status.dataset.sourceStage = 'input_selection'; status.dataset.sourceCategory = 'Error';
+        status.dataset.sourceError = pasted.length > 8192 || file?.size > 8192 ? 'input_size' : 'input_source';
+        status.textContent = 'اختر ملفًا أو الصق طلب الدعم العام، مصدرًا واحدًا فقط وبحد أقصى 8192 حرفًا للنص أو 8192 بايت للملف.';
+        return;
+      }
+      el.dataset.sourceBusy = 'true'; el.setAttribute('aria-busy','true'); status.textContent = 'جارٍ التحقق وحفظ التقرير محليًا…';
+      let url, stage = file ? 'file_read' : 'paste_read';
       try {
-        const raw = await file.text();
+        const raw = file ? await file.text() : pasted;
         stage = 'module_load';
         const { captureNotificationSourceReadiness } = await import('../lib/notification-source-readiness.js');
         stage = 'capture';
