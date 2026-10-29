@@ -305,9 +305,16 @@
   align-items: center;
 }
 
-/* Separate event counts keep a negative visible after later positive taps. */
-.quicklog-page .qlcard { height: 160px; }
-.quicklog-page .qlcard__hit { gap: 5px; }
+/* Point totals use the grade scope; independent Undo never nests in the hit button. */
+.quicklog-page .qlcard { height: auto; min-height: 196px; display: flex; flex-direction: column; }
+.quicklog-page .qlcard__hit { gap: 5px; min-height: 0; height: auto; flex: 1; }
+.quicklog-page .qlcard__name { margin-block-start: 16px; }
+.quicklog-page .qlcard__foot { padding: 0 8px; align-items: center; gap: 2px; }
+.qlcard__undo { flex: none; width: 32px; height: 36px; display: grid; place-items: center; color: var(--text-3); border-radius: 6px; touch-action: manipulation; }
+.qlcard__undo svg { width: 16px; height: 16px; }
+.qlcard__undo:disabled { opacity: .3; cursor: default; }
+.qlcard__undo:focus-visible { outline: 2px solid var(--brand-text); outline-offset: -2px; }
+.qlcard__factor { padding: 3px 8px 8px; font-size: 10px; color: var(--text-3); overflow-wrap: anywhere; }
 .qlcard__counts { display: flex; flex-wrap: wrap; gap: 6px; font-size: 16px; font-weight: 700; }
 .qlcard__positive, .qlcard__negative { padding: 2px 5px; border-radius: 5px; }
 .qlcard__positive { color: var(--ok); background: var(--ok-soft); }

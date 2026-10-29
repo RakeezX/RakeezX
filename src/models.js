@@ -970,6 +970,36 @@ export function netPoints(logs, kind = null) {
   return n;
 }
 
+/** Read-only point presentation; callers supply the canonical eligible log scope. */
+export function logPointTotals(logs, kind) {
+  const totals = { positive: 0, negative: 0 };
+  for (const log of new Map(logs.map(log => [log.id, log])).values()) {
+    if (log.deleted || log.kind !== kind) continue;
+    if (log.delta > 0) totals.positive += log.delta;
+    if (log.delta < 0) totals.negative -= log.delta;
+  }
+  return totals;
+}
+
+/** Use exactly the participation scope selected by itemScore, including uncertainty. */
+export function participationPointProjection(item, ctx) {
+  const hasProjection = Object.prototype.hasOwnProperty.call(ctx.automaticByItem ?? {}, item.id);
+  const automatic = hasProjection ? ctx.automaticByItem[item.id] : ctx;
+  return {
+    ...(automatic ? logPointTotals(automatic.logs ?? [], 'participation') : { positive: null, negative: null }),
+    factor: item.perPoint ?? 1,
+    score: itemScore(item, ctx),
+  };
+}
+
+/** Undo is deliberately narrower than the grade scope: this student, teaching and day. */
+export function latestQuickLog(logs, { studentId, teachingId, kind, date }) {
+  return [...new Map(logs.map(log => [log.id, log])).values()]
+    .filter(log => !log.deleted && log.studentId === studentId && log.teachingId === teachingId &&
+      log.kind === kind && log.date === date && Number.isFinite(log.delta) && log.delta !== 0)
+    .sort((a, b) => Number(b.updatedAt ?? 0) - Number(a.updatedAt ?? 0) || String(b.id).localeCompare(String(a.id)))[0] ?? null;
+}
+
 export const absenceCount = (records) => records.filter((a) => !a.deleted && a.status === 'absent').length;
 
 /**

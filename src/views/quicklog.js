@@ -5,7 +5,7 @@
 
 import { html, icon, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
-import { LOG_TAGS, quickLogAttendanceState, todayISO, normalizeSearchText } from '../models.js';
+import { LOG_TAGS, quickLogAttendanceState, todayISO, normalizeSearchText, logPointTotals, participationPointProjection, latestQuickLog } from '../models.js';
 import { repaint } from '../repaint.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
@@ -17,6 +17,7 @@ let filterStatus = 'all';     // all | logged | unlogged
 
 const KIND_LABEL = { participation: 'المشاركة', behavior: 'سجل السلوك فقط' };
 const emptyCounts = () => ({ positive: 0, negative: 0, todayCount: 0, latestNegative: null });
+const pendingUndo = new Set();
 
 function reasonSheet(kindKey, delta) {
   const tags = LOG_TAGS[kindKey][delta > 0 ? 'up' : 'down'];
@@ -62,10 +63,6 @@ export default {
   subtitle: (p) => `${KIND_LABEL[kind]} · ${store.getTeaching(p.id)?.name ?? ''}`,
   back: (p) => `#/teaching/${p.id}`,
 
-  topActions: () => html`
-    <button class="iconbtn" data-act="undo" aria-label="تراجع">${icon('back')}</button>
-  `,
-
   onMount() {
     kind = 'participation';
     withReason = false;
@@ -89,7 +86,8 @@ export default {
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الرصد السابق محفوظ ولا يمكن إضافة رصد جديد.</div></div>`;
 
-    const roster = store.students(cls.id);
+    const { roster, items, ctx } = store.teachingContext(cls.id);
+    const participationItem = items.find(item => item.auto === 'participation');
     if (!roster.length) {
       return html`
         <div class="empty">
@@ -101,18 +99,25 @@ export default {
     }
 
     const today = todayISO();
-    const allLogs = store.state.logs.filter((l) => !l.deleted && l.teachingId === cls.id && l.kind === kind);
+    const allLogs = [...new Map(store.state.logs.map(log => [log.id, log])).values()]
+      .filter((l) => !l.deleted && l.teachingId === cls.id && l.kind === kind);
     const byStudent = new Map();
     for (const l of allLogs) {
       const cur = byStudent.get(l.studentId) ?? emptyCounts();
-      if (l.delta > 0) cur.positive++;
       if (l.delta < 0) {
-        cur.negative++;
         if (!cur.latestNegative || l.date > cur.latestNegative.date ||
             (l.date === cur.latestNegative.date && l.updatedAt > cur.latestNegative.updatedAt)) cur.latestNegative = l;
       }
       if (l.date === today) cur.todayCount++;
       byStudent.set(l.studentId, cur);
+    }
+
+    for (const student of roster) {
+      const current = byStudent.get(student.id) ?? emptyCounts();
+      const points = kind === 'participation' && participationItem
+        ? participationPointProjection(participationItem, ctx[student.id])
+        : logPointTotals(allLogs.filter(log => log.studentId === student.id), kind);
+      byStudent.set(student.id, { ...current, ...points });
     }
 
     const todayTotal = allLogs.filter((l) => l.date === today).length;
@@ -187,6 +192,8 @@ export default {
             <div class="ql-grid" aria-label="طلاب الفصل">
               ${displayStudents.map(({ student: s, status, unavailable }) => {
                 const c = byStudent.get(s.id) ?? emptyCounts();
+                const undo = latestQuickLog(allLogs, { studentId: s.id, teachingId: cls.id, kind, date: today });
+                const undoBusy = pendingUndo.has(`${cls.id}:${s.id}`);
                 const tone = unavailable ? 'is-unavail' : c.negative > 0 ? 'is-neg' : c.positive > 0 ? 'is-pos' : '';
                 const incident = c.latestNegative;
                 const incidentLabel = incident ? `آخر رصدة سلبية: ${incident.tag || 'بلا سبب'} · ${incident.date}` : '';
@@ -202,16 +209,19 @@ export default {
                         </div>
                         <span class="qlcard__name">${s.name}</span>
                       </div>
-                      <div class="qlcard__foot">
-                        <span class="qlcard__counts tabular" id="ql-counts-${s.id}">
-                          <span class="qlcard__positive" aria-label="${c.positive} رصدات إيجابية"><bdi>+${c.positive}</bdi></span>
-                          <span class="qlcard__negative" aria-label="${c.negative} رصدات سلبية"><bdi>−${c.negative}</bdi></span>
-                        </span>
-                        <span class="qlcard__plus" aria-hidden="true">${icon('plus')}</span>
-                      </div>
+                      <span class="qlcard__plus" aria-hidden="true">${icon('plus')}</span>
                       <span class="qlcard__today tabular" id="ql-today-${s.id}">${c.todayCount ? `${c.todayCount} رصدة اليوم` : 'لم يُرصد اليوم'}</span>
                       ${incident ? html`<span class="qlcard__incident" id="ql-incident-${s.id}" title="${incidentLabel}" aria-label="${incidentLabel}"><span aria-hidden="true">⚠</span> ${incident.tag || 'بلا سبب'} · <bdi>${incident.date}</bdi></span>` : ''}
                     </button>
+                      <div class="qlcard__foot">
+                        <span class="qlcard__counts tabular" id="ql-counts-${s.id}">
+                          <span class="qlcard__positive" aria-label="${c.positive ?? 'غير محدد'} نقاط إيجابية"><bdi>${c.positive === null ? '—' : `+${c.positive}`}</bdi></span>
+                          <span class="qlcard__negative" aria-label="${c.negative ?? 'غير محدد'} نقاط سلبية"><bdi>${c.negative === null ? '—' : `−${c.negative}`}</bdi></span>
+                        </span>
+                        <button type="button" class="qlcard__undo" data-act="undo" data-id="${s.id}" ${!undo || undoBusy ? 'disabled' : ''}
+                          aria-label="تراجع عن آخر رصدة اليوم لـ ${s.name}" title="تراجع عن آخر رصدة اليوم" aria-busy="${undoBusy}">${icon('back')}</button>
+                      </div>
+                      ${kind === 'participation' && participationItem ? html`<span class="qlcard__factor">${participationItem.name} · ×<bdi>${c.factor}</bdi> · الدرجة <bdi>${c.score ?? '—'}/${participationItem.max}</bdi></span>` : ''}
                     <button class="qlcard__minus" data-act="minus" data-id="${s.id}"
                             aria-label="خصم من ${s.name}">${icon('minus')}</button>
                   </div>
@@ -220,8 +230,8 @@ export default {
             </div>
           `}
       <p class="t-3 fs-sm center mt-6">
-        ${kind === 'behavior' ? 'سجل السلوك للتوثيق فقط؛ لا يُخصم من الدرجات.' : 'نقرة على الطالب = نقطة. نقاط المشاركة تغذّي بند «المشاركة والتفاعل» في الدرجات تلقائيًا.'}
-        العدّادان لعدد الرصدات الإيجابية والسلبية، وليسا صافي الدرجة.
+        ${kind === 'behavior' ? 'سجل السلوك للتوثيق فقط؛ لا يُخصم من الدرجات.' : 'نقرة على الطالب = نقطة. نقاط المشاركة تغذّي بند المشاركة الآلي في الدرجات.'}
+        المؤشران لمجموع النقاط الإيجابية والسلبية. ${kind === 'participation' ? 'درجة البند حسب معامل النقطة وحدّه؛ يشمل النطاق الرصد المنقول المتوافق، والتراجع لرصد اليوم في هذا الفصل فقط.' : ''}
       </p>
       </div>
     `;
@@ -263,17 +273,24 @@ export default {
     },
 
     async undo(el, ev, params) {
-      const logs = store.state.logs
-        .filter((l) => !l.deleted && l.teachingId === params.id && l.kind === kind && l.date === todayISO())
-        .sort((a, b) => a.updatedAt - b.updatedAt);
-      const last = logs.at(-1);
-      if (!last) {
-        toast('لا شيء للتراجع عنه اليوم');
-        return;
-      }
-      const s = store.getStudent(last.studentId);
-      if (await store.patch('logs', last.id, { deleted: true })) {
-        toast(`أُلغيت آخر رصدة لـ ${s?.name ?? 'الطالب'}`);
+      const studentId = el.dataset.id;
+      const key = `${params.id}:${studentId}`;
+      if (pendingUndo.has(key) || !store.students(params.id).some(s => s.id === studentId) ||
+          store.isTeachingArchived(store.getTeaching(params.id))) return;
+      const last = latestQuickLog(store.state.logs, { studentId, teachingId: params.id, kind, date: todayISO() });
+      if (!last) return;
+      pendingUndo.add(key);
+      el.disabled = true;
+      try {
+        const result = await store.patch('logs', last.id, { deleted: true });
+        toast(result ? 'أُلغيت آخر رصدة للطالب' : 'تعذّر التراجع. حاول مرة أخرى.');
+      } catch {
+        toast('تعذّر التراجع. حاول مرة أخرى.');
+      } finally {
+        // Keep a rapid second tap from deleting the previous record after a fast local commit.
+        await new Promise(resolve => setTimeout(resolve, 350));
+        pendingUndo.delete(key);
+        repaint();
       }
     },
   },
