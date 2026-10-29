@@ -1,13 +1,13 @@
 /**
- * الرصد السريع: نقرة على الطالب = نقطة له.
+ * الرصد السريع: نقرة على شريحة النقاط = نقطة واحدة.
  * صُمّم ليُستعمل والهاتف بيد واحدة أثناء الحصة — لا حقول ولا حفظ يدوي.
  */
 
-import { html, icon, openSheet, toast } from '../lib/dom.js';
+import { html, icon } from '../lib/dom.js';
 import * as store from '../store.js';
-import { LOG_TAGS, quickLogAttendanceState, todayISO, normalizeSearchText, logPointTotals, participationPointProjection, latestQuickLog } from '../models.js';
+import { displayRoster, quickLogAttendanceState, todayISO, normalizeSearchText, logPointTotals, participationPointProjection } from '../models.js';
 import { repaint } from '../repaint.js';
-import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
+import { pointControls, runPointAction } from '../lib/quicklog-reason-sheet.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
 
 let kind = 'participation';   // participation | behavior
@@ -17,41 +17,6 @@ let filterStatus = 'all';     // all | logged | unlogged
 
 const KIND_LABEL = { participation: 'المشاركة', behavior: 'سجل السلوك فقط' };
 const emptyCounts = () => ({ positive: 0, negative: 0, todayCount: 0, latestNegative: null });
-const pendingUndo = new Set();
-
-function reasonSheet(kindKey, delta) {
-  const tags = LOG_TAGS[kindKey][delta > 0 ? 'up' : 'down'];
-  return openSheet({
-    title: delta > 0 ? 'سبب النقطة' : 'سبب الخصم',
-    desc: 'يظهر السبب في تقرير الطالب.',
-    body: html`
-      <div class="taglist">
-        ${tags.map((t) => html`<button class="btn btn--ghost tag-pick" data-tag="${t}">${t}</button>`)}
-      </div>
-      <label class="field mt-4">
-        <span class="field__label">أو اكتب سببًا</span>
-        <input class="input" id="tag-other" maxlength="60" autocomplete="off" placeholder="سبب آخر">
-      </label>
-    `,
-    foot: html`
-      <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" id="tag-go">سجّل بلا سبب</button>
-    `,
-    onMount: (root, done) => {
-      root.querySelectorAll('.tag-pick').forEach((b) =>
-        b.addEventListener('click', () => done({ tag: b.dataset.tag }))
-      );
-      const other = root.querySelector('#tag-other');
-      root.querySelector('#tag-go').addEventListener('click', () =>
-        done({ tag: other.value.trim() })
-      );
-      other.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') done({ tag: other.value.trim() });
-      });
-    },
-  });
-}
-
 /**
  * نبضة بصرية تؤكد التسجيل.
  * تُطبَّق بعد إعادة الرسم لا قبلها، لأن الرصد يعيد بناء الشبكة فيضيع أثرها.
@@ -69,6 +34,7 @@ export default {
     searchQuery = '';
     filterStatus = 'all';
     pendingPulse = null;
+    repaint(); // Reflect reset controls when returning from another classroom tool.
   },
 
   afterPaint(root) {
@@ -86,7 +52,8 @@ export default {
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الرصد السابق محفوظ ولا يمكن إضافة رصد جديد.</div></div>`;
 
-    const { roster, items, ctx } = store.teachingContext(cls.id);
+    const { roster: activeRoster, items, ctx } = store.teachingContext(cls.id);
+    const roster = displayRoster(activeRoster);
     const participationItem = items.find(item => item.auto === 'participation');
     if (!roster.length) {
       return html`
@@ -129,7 +96,7 @@ export default {
       const s = entry.student;
       if (q) {
         const matchesName = normalizeSearchText(s.name).includes(q);
-        const matchesRoll = s.rollNo != null && normalizeSearchText(s.rollNo).includes(q);
+        const matchesRoll = s.displayNo != null && normalizeSearchText(s.displayNo).includes(q);
         if (!matchesName && !matchesRoll) return false;
       }
       const c = byStudent.get(s.id) ?? emptyCounts();
@@ -192,45 +159,26 @@ export default {
             <div class="ql-grid" aria-label="طلاب الفصل">
               ${displayStudents.map(({ student: s, status, unavailable }) => {
                 const c = byStudent.get(s.id) ?? emptyCounts();
-                const undo = latestQuickLog(allLogs, { studentId: s.id, teachingId: cls.id, kind, date: today });
-                const undoBusy = pendingUndo.has(`${cls.id}:${s.id}`);
                 const tone = unavailable ? 'is-unavail' : c.negative > 0 ? 'is-neg' : c.positive > 0 ? 'is-pos' : '';
                 const incident = c.latestNegative;
                 const incidentLabel = incident ? `آخر رصدة سلبية: ${incident.tag || 'بلا سبب'} · ${incident.date}` : '';
                 const statusBadge = status === 'absent' ? html`<span class="qlcard__status badge badge--danger">غائب</span>` : status === 'excused' ? html`<span class="qlcard__status badge badge--warn">مستأذن</span>` : '';
                 return html`
                   <div class="qlcard ${tone}" id="ql-${s.id}">
-                    <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
-                            aria-label="نقطة لـ ${s.name}" aria-describedby="ql-counts-${s.id} ql-today-${s.id}${incident ? ` ql-incident-${s.id}` : ''}">
-                      <div class="qlcard__head">
-                        <div class="qlcard__meta">
-                          ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
-                          ${statusBadge}
-                        </div>
-                        <span class="qlcard__name">${s.name}</span>
-                      </div>
-                      <span class="qlcard__plus" aria-hidden="true">${icon('plus')}</span>
-                      <span class="qlcard__today tabular" id="ql-today-${s.id}">${c.todayCount ? `${c.todayCount} رصدة اليوم` : 'لم يُرصد اليوم'}</span>
-                      ${incident ? html`<span class="qlcard__incident" id="ql-incident-${s.id}" title="${incidentLabel}" aria-label="${incidentLabel}"><span aria-hidden="true">⚠</span> ${incident.tag || 'بلا سبب'} · <bdi>${incident.date}</bdi></span>` : ''}
-                    </button>
-                      <div class="qlcard__foot">
-                        <span class="qlcard__counts tabular" id="ql-counts-${s.id}">
-                          <span class="qlcard__positive" aria-label="${c.positive ?? 'غير محدد'} نقاط إيجابية"><bdi>${c.positive === null ? '—' : `+${c.positive}`}</bdi></span>
-                          <span class="qlcard__negative" aria-label="${c.negative ?? 'غير محدد'} نقاط سلبية"><bdi>${c.negative === null ? '—' : `−${c.negative}`}</bdi></span>
-                        </span>
-                        <button type="button" class="qlcard__undo" data-act="undo" data-id="${s.id}" ${!undo || undoBusy ? 'disabled' : ''}
-                          aria-label="تراجع عن آخر رصدة اليوم لـ ${s.name}" title="تراجع عن آخر رصدة اليوم" aria-busy="${undoBusy}">${icon('back')}</button>
-                      </div>
-                      ${kind === 'participation' && participationItem ? html`<span class="qlcard__factor">${participationItem.name} · ×<bdi>${c.factor}</bdi> · الدرجة <bdi>${c.score ?? '—'}/${participationItem.max}</bdi></span>` : ''}
-                    <button class="qlcard__minus" data-act="minus" data-id="${s.id}"
-                            aria-label="خصم من ${s.name}">${icon('minus')}</button>
+                    <div class="qlcard__head">
+                      <span class="qlcard__roll tabular">${s.displayNo}</span>${statusBadge}
+                      <span class="qlcard__name">${s.name}</span>
+                    </div>
+                    <span class="qlcard__note" title="${incidentLabel}">${incident ? html`<span class="qlcard__incident">⚠ ${incident.tag || 'رصد سلبي'} · <bdi>${incident.date}</bdi></span>` : c.todayCount ? `${c.todayCount} رصدة اليوم` : 'لم يُرصد اليوم'}</span>
+                    ${pointControls({ teachingId: cls.id, student: s, kind, points: c, action: 'point-log', undoAction: 'undo' })}
+                    ${kind === 'participation' && participationItem && c.factor !== 1 ? html`<span class="qlcard__factor">كل نقطة = <bdi>${c.factor}</bdi> درجة</span>` : ''}
                   </div>
                 `;
               })}
             </div>
           `}
       <p class="t-3 fs-sm center mt-6">
-        ${kind === 'behavior' ? 'سجل السلوك للتوثيق فقط؛ لا يُخصم من الدرجات.' : 'نقرة على الطالب = نقطة. نقاط المشاركة تغذّي بند المشاركة الآلي في الدرجات.'}
+        ${kind === 'behavior' ? 'سجل السلوك للتوثيق فقط؛ لا يُخصم من الدرجات.' : 'نقرة على الرقم الموجب أو السالب = نقطة واحدة. نقاط المشاركة تغذّي بند المشاركة الآلي في الدرجات.'}
         المؤشران لمجموع النقاط الإيجابية والسلبية. ${kind === 'participation' ? 'درجة البند حسب معامل النقطة وحدّه؛ يشمل النطاق الرصد المنقول المتوافق، والتراجع لرصد اليوم في هذا الفصل فقط.' : ''}
       </p>
       </div>
@@ -262,48 +210,19 @@ export default {
       withReason = el.checked;
     },
 
-    async plus(el, ev, params) {
-      playQuickLogPlus();
-      await record(params.id, el.dataset.id, +1);
-    },
-
-    async minus(el, ev, params) {
-      playQuickLogMinus();
-      await record(params.id, el.dataset.id, -1);
-    },
-
-    async undo(el, ev, params) {
-      const studentId = el.dataset.id;
-      const key = `${params.id}:${studentId}`;
-      if (pendingUndo.has(key) || !store.students(params.id).some(s => s.id === studentId) ||
-          store.isTeachingArchived(store.getTeaching(params.id))) return;
-      const last = latestQuickLog(store.state.logs, { studentId, teachingId: params.id, kind, date: todayISO() });
-      if (!last) return;
-      pendingUndo.add(key);
-      el.disabled = true;
-      try {
-        const result = await store.patch('logs', last.id, { deleted: true });
-        toast(result ? 'أُلغيت آخر رصدة للطالب' : 'تعذّر التراجع. حاول مرة أخرى.');
-      } catch {
-        toast('تعذّر التراجع. حاول مرة أخرى.');
-      } finally {
-        // Keep a rapid second tap from deleting the previous record after a fast local commit.
-        await new Promise(resolve => setTimeout(resolve, 350));
-        pendingUndo.delete(key);
+    async 'point-log'(el, ev, params) {
+      const currentKind = kind;
+      if (el.dataset.kind !== currentKind) return;
+      if (await runPointAction(el, params, { withReason, valid: () => kind === currentKind })) {
+        pendingPulse = { studentId: el.dataset.student, positive: Number(el.dataset.delta) > 0, delta: Number(el.dataset.delta) };
         repaint();
       }
     },
+
+    async undo(el, ev, params) {
+      const currentKind = kind;
+      if (el.dataset.kind !== currentKind) return;
+      await runPointAction(el, params, { undo: true, valid: () => kind === currentKind });
+    },
   },
 };
-
-async function record(teachingId, studentId, delta) {
-  let tag = '';
-  if (withReason) {
-    const res = await reasonSheet(kind, delta);
-    if (res === undefined) return;
-    tag = res.tag ?? '';
-  }
-  pendingPulse = { studentId, positive: delta > 0, delta };
-  if (navigator.vibrate) navigator.vibrate(delta > 0 ? 12 : [8, 40, 8]);
-  await store.addLog({ teachingId, studentId, kind, delta, tag });
-}

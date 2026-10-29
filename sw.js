@@ -205,6 +205,7 @@ const SHELL = [
   './src/lib/official-v6-subject-data.js',
   './src/lib/effects.js',
   './src/lib/sound.js',
+  './src/lib/quicklog-reason-sheet.js',
 
   './src/views/home.js',
   './src/views/notifications.js',

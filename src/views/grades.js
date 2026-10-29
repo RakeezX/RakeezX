@@ -7,13 +7,11 @@
 import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
 import { canOpenRoster } from './students.js';
-import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster, sortStudents } from '../models.js';
+import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster, sortStudents, participationPointProjection } from '../models.js';
 import { repaint } from '../repaint.js';
-import * as db from '../lib/db.js';
-import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
+import { pointControls, runPointAction } from '../lib/quicklog-reason-sheet.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
 import { subitemCompletionState, subitemSelectedPoints } from '../lib/score-foundation.js';
-import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 let mode = 'item';        // item | table
 let activeItemId = null;
 let sortKey = 'default';   // default | name | roll | score_desc | score_asc
@@ -21,6 +19,7 @@ let filterMissing = false;
 let bulkSelected = new Set();
 let bulkScoreVal = '';
 let query = '';
+let inlineWithReason = false;
 const scoreValidation = new Map();
 const AUTO_NOTE = {
   participation: 'يُحسب آليًا من الرصد السريع — لا يُدخل يدويًا.',
@@ -79,7 +78,9 @@ const gradesView = {
     bulkSelected = new Set();
     bulkScoreVal = '';
     query = '';
+    inlineWithReason = false;
     scoreValidation.clear();
+    repaint();
   },
 
 
@@ -165,22 +166,6 @@ const gradesView = {
     }
 
     return html`
-      <style>
-/* N84 isolated Work UI. N82 selector remains frozen. */
-.n84-inline { display:inline-flex; align-items:center; gap:2px; vertical-align:middle; }
-.n84-step { width:44px; height:44px; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--bg-sunk); color:var(--text-2); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
-.n84-step--plus { color:var(--brand-text); background:var(--brand-soft); }
-.n84-step svg { width:16px; height:16px; }
-.n84-step:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:-2px; }
-.n84-step:disabled { opacity:.5; cursor:wait; }
-.graderow__auto:has(.n84-inline) { display:flex; gap:5px; align-items:center; }
-.grades-01c__direct-row.is-auto:has(.n84-inline) { grid-template-columns:32px minmax(0,1fr) max-content; }
-@media(max-width:540px) {
- .grades-01c__direct-row.is-auto:has(.n84-inline) { grid-template-columns:24px minmax(0,1fr) max-content; gap:6px; padding:10px 8px; }
- .graderow__auto:has(.n84-inline) { gap:2px; }
- .graderow__auto:has(.n84-inline) .badge { padding-inline:5px; font-size:12px; }
-}
-</style>
       <div class="grades-01c">
       <section class="grades-01c__context">
       <div class="grades-01c__mode-bar"><div class="segmented" role="group" aria-label="طريقة عرض الدرجات">
@@ -226,6 +211,7 @@ const gradesView = {
         </div>
       </div>
 
+      ${mode === 'item' && currentItem.auto === 'participation' ? html`<label class="switch ql-grade-reason"><input type="checkbox" data-change="inline-reason" ${inlineWithReason ? 'checked' : ''}><span>مع سبب</span></label>` : ''}
       ${mode === 'item' ? itemMode(processedRoster, items, ctx, currentItem, roster) : tableMode(processedRoster, items, ctx)}
       </div>
     `;
@@ -235,6 +221,8 @@ const gradesView = {
 
   actions: {
     'n84-log': recordInlineQuickLog,
+    'point-undo': undoInlineQuickLog,
+    'inline-reason'(el) { inlineWithReason = el.checked; },
     mode(el) {
       mode = el.dataset.mode;
       bulkSelected.clear();
@@ -463,7 +451,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                   ${auto
                     ? html`
                         <span class="graderow__auto">
-                          ${inlineQuickLog(item, s)}
+                          ${inlineQuickLog(item, s, ctx[s.id])}
                           <span class="badge ${band.badge}" dir="ltr">
                             <span class="tabular">${fmtNum(value)}</span> / <span class="tabular">${item.max}</span>
                           </span>
@@ -610,46 +598,26 @@ function tableMode(roster, items, ctx) {
   `;
 }
 
-// N84 stays in this precached Product view: no new offline shell dependency.
-const pending = new Set();
+// AI N140: existing automatic participation only; writes remain log commands.
 let pulse = null;
-export function inlineQuickLog(item, student) {
+export function inlineQuickLog(item, student, context) {
   if (item.auto !== 'participation') return '';
-  const workspaceId = store.getActiveWorkspace()?.id;
-  const busy = pending.has(`${workspaceId}:${item.teachingId}:${student.id}`);
-  return html`<span class="n84-inline noprint" role="group" aria-label="رصد مشاركة ${student.name}">
-    <button type="button" class="n84-step" data-act="n84-log" data-workspace="${workspaceId}" data-student="${student.id}" data-item="${item.id}" data-delta="-1" data-fk="n84-${student.id}-${item.id}-minus" aria-label="خصم نقطة مشاركة من ${student.name}" ${busy?'disabled':''}>${icon('minus')}</button>
-    <button type="button" class="n84-step n84-step--plus" data-act="n84-log" data-workspace="${workspaceId}" data-student="${student.id}" data-item="${item.id}" data-delta="1" data-fk="n84-${student.id}-${item.id}-plus" aria-label="إضافة نقطة مشاركة إلى ${student.name}" ${busy?'disabled':''}>${icon('plus')}</button>
-  </span>`;
+  const points = participationPointProjection(item, context ?? store.teachingContext(item.teachingId).ctx[student.id]);
+  return html`<span class="n84-inline">${pointControls({ teachingId: item.teachingId, student, kind: 'participation', points, itemId: item.id, action: 'n84-log' })}${points.factor !== 1 ? html`<small class="qlcard__factor">كل نقطة = <bdi>${points.factor}</bdi> درجة</small>` : ''}</span>`;
 }
 export async function recordInlineQuickLog(el, event, params) {
-  const item = store.items(params.id).find(i=>i.id===el.dataset.item);
-  const studentId = el.dataset.student, delta = Number(el.dataset.delta);
-  if (!item || item.auto !== 'participation' || ![-1,1].includes(delta) || store.isTeachingArchived(store.getTeaching(params.id))) return;
-  if (!store.teachingContext(params.id).roster.some(s=>s.id===studentId)) return;
+  const selectedItem = activeItemId;
+  if (el.dataset.item !== selectedItem) return;
   const workspace = store.getActiveWorkspace();
-  if (!workspace || el.dataset.workspace !== workspace.id) return;
-  const access = runtimeSyncOwnershipGuard.enqueueAccess();
-  if (workspace.type !== 'demo' && (!access.allowed ||
-      (workspace.type === 'account' && access.workspaceOwnerId !== workspace.authUserId))) return;
-  const key = `${workspace.id}:${params.id}:${studentId}`;
-  if (pending.has(key)) return;
-  pending.add(key);
-  el.closest('.n84-inline').querySelectorAll('button').forEach(b=>b.disabled=true);
-  try {
-    // Existing Quick Log event command; never set an automatic score directly.
-    const log = await store.addLog({teachingId:params.id,studentId,kind:'participation',delta,tag:''});
-    // addLog returns its proposed record even when save rolls back a failed write.
-    // Confirm durability before acknowledging the action, in the same workspace.
-    if (store.getActiveWorkspace() !== workspace) return;
-    const recorded = await db.get('logs', log.id);
-    if (store.getActiveWorkspace() !== workspace) return;
-    if (!recorded || recorded.deleted) throw new Error('تعذر حفظ الرصدة');
-    pulse = {studentId,itemId:item.id,delta,workspace};
-    delta > 0 ? playQuickLogPlus() : playQuickLogMinus();
-    if (navigator.vibrate) navigator.vibrate(delta > 0 ? 12 : [8,40,8]);
-  } catch (error) { toast(error?.message || 'تعذر حفظ الرصدة','danger'); }
-  finally {pending.delete(key);repaint();}
+  if (await runPointAction(el, params, { withReason: inlineWithReason, valid: () => activeItemId === selectedItem && mode === 'item' })) {
+    pulse = { studentId: el.dataset.student, itemId: selectedItem, delta: Number(el.dataset.delta), workspace };
+    repaint();
+  }
+}
+async function undoInlineQuickLog(el, event, params) {
+  const selectedItem = activeItemId;
+  if (el.dataset.item !== selectedItem) return;
+  await runPointAction(el, params, { undo: true, valid: () => activeItemId === selectedItem && mode === 'item' });
 }
 export function flushInlineQuickLogEffect(root) {
   if (!pulse) return;

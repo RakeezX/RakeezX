@@ -8934,3 +8934,27 @@
 .command-search-result { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 10px 8px; border-radius: 8px; overflow-wrap: anywhere; color: var(--text); text-decoration: none; }
 .command-search-result .icon { flex-shrink: 0; }
 .command-search-result:hover, .command-search-result:focus-visible { background: var(--bg-elev); outline: 2px solid var(--brand); outline-offset: -2px; }
+/* AI N140: quiet signed controls, shared only by QuickLog and inline participation. */
+.quicklog-page .ql-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr)); }
+.quicklog-page .qlcard { min-height: 0; height: auto; padding: 10px; gap: 6px; }
+.quicklog-page .qlcard__head { display: flex; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px; }
+.quicklog-page .qlcard__name { margin: 0; flex: 1 1 100%; min-height: 2.8em; }
+.qlcard__note { min-width: 0; font-size: 11px; color: var(--text-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ql-controls { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; }
+.ql-controls .ql-point, .ql-controls .qlcard__undo { box-sizing: border-box; min-width: 44px; width: auto; min-height: 44px; height: 44px; padding: 4px 8px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 8px; font-size: 17px; font-weight: 700; line-height: 1; touch-action: manipulation; cursor: pointer; }
+.ql-controls .qlcard__undo { color: var(--text-2); background: var(--bg-sunk); font-size: 25px; font-weight: 400; }
+.ql-controls button:disabled { opacity: .4; cursor: default; }
+.ql-controls button:focus-visible { outline: 3px solid var(--action-focus-ring); outline-offset: -3px; }
+@media (hover: hover) { .ql-controls button:enabled:hover { border-color: currentColor; } }
+.ql-controls button:enabled:active { transform: translateY(1px); filter: brightness(.93); }
+.quicklog-page .qlcard__factor { padding: 0; font-size: 11px; }
+.ql-reasons .tag-pick { display: flex; gap: 8px; text-align: start; justify-content: flex-start; }
+.ql-reasons .tag-pick > :first-child { flex: none; }
+.n84-inline { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+.graderow__auto:has(.ql-controls) { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ql-grade-reason { display: inline-flex; min-height: 44px; margin-block: 4px; }
+.grades-01c__direct-row.is-auto:has(.ql-controls) { grid-template-columns: 32px minmax(0, 1fr) max-content; }
+@media (max-width: 540px) {
+  .grades-01c__direct-row.is-auto:has(.ql-controls) { grid-template-columns: 24px minmax(0, 1fr); }
+  .grades-01c__direct-row.is-auto:has(.ql-controls) .graderow__auto { grid-column: 2; }
+}
