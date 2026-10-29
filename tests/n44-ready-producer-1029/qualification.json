@@ -1,0 +1,17 @@
+{
+  "taskId":"n44-ready-producer-1029",
+  "runId":"462f9e8f-3364-4d9c-a24d-778d2860c050",
+  "mode":"synthetic",
+  "command":"node tests/n44-ready-producer-1029/producer.test.mjs",
+  "checks":{
+    "n44_actual_readiness_producer_owner_and_challenge":"PASS",
+    "n44_phone_server_peer_provenance_not_browser_claims":"PASS",
+    "n44_actual_ui_export_and_stale_rejection":"PASS"
+  },
+  "actualHttpDomAndModuleGraph":true,
+  "hostAssemblyEvidence":"fabricated second-phone and authenticated-host fixtures only",
+  "liveOperations":0,
+  "grantActivated":false,
+  "ownedBrowserAndServerClosed":true,
+  "servedSourceVerification":"publisher pending"
+}

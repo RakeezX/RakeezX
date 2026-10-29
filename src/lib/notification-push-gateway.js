@@ -196,3 +196,67 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
     },
   });
 }
+
+/** Host-only support admission. Never called by the browser runtime.
+ * privateKey is a custody-owned non-exported RSA-OAEP CryptoKey. claimOnce must
+ * append the nonce durably before decryption; UNKNOWN consumes it. The observed
+ * digest is supplied independently by the supported operator, not the download.
+ */
+export async function admitPhoneReadinessExport({bytes,challenge,observedSha256,scope,privateKey,claimOnce,now=Date.now()}) {
+  const check=(v)=>{if(!v)throw Error('readiness_admission_rejected');};
+  const hash=async b=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',b)),x=>x.toString(16).padStart(2,'0')).join('');
+  const enc=s=>new TextEncoder().encode(s),decode=s=>Uint8Array.from(atob(s.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));
+  check(bytes instanceof Uint8Array&&bytes.length<=262144&&typeof claimOnce==='function');
+  check(challenge.version===2&&challenge.kind==='n44-phone-readiness'&&challenge.taskId==='n44-core-live-1028'&&challenge.grantId==='efedbcea-f227-4a91-bbab-79cad814fc81');
+  check(Number.isSafeInteger(challenge.issuedAt)&&Number.isSafeInteger(challenge.expiresAt)&&challenge.issuedAt<=now&&now<challenge.expiresAt&&challenge.expiresAt-challenge.issuedAt<=300000);
+  check(challenge.ownerHash===await hash(enc(scope.ownerId))&&challenge.workspaceHash===await hash(enc(scope.workspaceId))&&challenge.deviceHash===await hash(enc(scope.deviceId)));
+  check(await hash(bytes)===observedSha256);
+  const challengeDigest=await hash(enc(JSON.stringify(challenge)));
+  await claimOnce({runId:challenge.runId,grantId:challenge.grantId,nonce:challenge.nonce,challengeDigest,receiptSha256:observedSha256});
+  const outer=JSON.parse(new TextDecoder().decode(bytes));let rawKey,plain;
+  try {
+    const e=outer.envelope;check(Object.keys(e).sort().join(',')==='ciphertext,iv,key,tag');
+    const iv=decode(e.iv),tag=decode(e.tag),cipher=decode(e.ciphertext);check(iv.length===12&&tag.length===16&&cipher.length<=131072);
+    rawKey=new Uint8Array(await crypto.subtle.decrypt({name:'RSA-OAEP'},privateKey,decode(e.key)));check(rawKey.length===32);
+    const aes=await crypto.subtle.importKey('raw',rawKey,{name:'AES-GCM'},false,['decrypt']);
+    plain=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv},aes,new Uint8Array([...cipher,...tag])));
+    const v=JSON.parse(new TextDecoder().decode(plain));
+    for(const k of ['version','kind','taskId','grantId','runId','nonce'])check(v[k]===challenge[k]&&outer[k]===challenge[k]);
+    check(v.challengeDigest===challengeDigest&&outer.challengeDigest===challengeDigest&&v.documentCheckpoint===outer.documentCheckpoint&&v.observedAt===outer.observedAt);
+    check(Number.isSafeInteger(v.observedAt)&&v.observedAt>=challenge.issuedAt&&v.observedAt<=now&&now-v.observedAt<=60000);
+    check(v.ownerId===scope.ownerId&&v.workspaceId===scope.workspaceId&&v.phone?.deviceId===scope.deviceId&&v.captureDevice?.deviceId===scope.deviceId);
+    check(v.phone.gesture==='trusted-support-click'&&v.clockStarted===false&&v.provenance?.serverProof===false&&v.provenance?.peerProof===false);
+    check(v.phone.runtime?.serverProof===false&&v.phone.runtime?.peerProof===false);
+    check(v.proposed?.dueAt===challenge.dueAt&&v.proposed.dateAllowed===true&&v.sync?.state==='synced');
+    for(const k of ['queuedCount','pendingCount','failedCount','blockedCount','rejectedCount'])check(v.sync[k]===0);
+    check(Date.now()<challenge.expiresAt&&Date.now()-v.observedAt<=60000);
+    return {value:v,challengeDigest,receiptSha256:observedSha256,admittedAt:Date.now()};
+  } finally { rawKey?.fill(0);plain?.fill(0); }
+}
+/** Original trusted host only. No network, mutations or inferred server facts.
+ * verifyHostReadback validates original authenticated receipts outside browser
+ * custody and returns their scope-bound facts. No callable crosses a wire.
+ */
+export async function assemblePhoneReadiness({reports,scope,runId,grantId,verifyHostReadback,now=Date.now()}) {
+  const check=v=>{if(!v)throw Error('readiness_assembly_rejected');};
+  check(Array.isArray(reports)&&reports.length===2&&scope.devices.length===2&&new Set(scope.devices).size===2);
+  check(new Set(reports.map(r=>r.challengeDigest)).size===2);
+  const values=scope.devices.map(deviceId=>{const matches=reports.filter(r=>r.value.phone.deviceId===deviceId);check(matches.length===1);return matches[0].value;});
+  for(const v of values){check(v.ownerId===scope.ownerId&&v.workspaceId===scope.workspaceId&&v.runId===runId&&v.grantId===grantId&&v.kind==='n44-phone-readiness');check(v.observedAt<=now&&now-v.observedAt<=60000);check(v.phone.gesture==='trusted-support-click'&&v.provenance.serverProof===false&&v.provenance.peerProof===false);}
+  check(JSON.stringify(values[0].ancestry)===JSON.stringify(values[1].ancestry)&&JSON.stringify(values[0].existingSourceIds)===JSON.stringify(values[1].existingSourceIds)&&values[0].proposed.dueAt===values[1].proposed.dueAt);
+  check(typeof verifyHostReadback==='function');
+  const host=await verifyHostReadback({scope,runId,grantId,receiptDigests:reports.map(r=>r.receiptSha256)});
+  // Absence/UNKNOWN is a precise pending result, never a browser-minted proof.
+  if(!host)return {status:'HOST_READBACK_REQUIRED',phoneReports:reports,activationReady:false,serverProof:false,peerProof:false};
+  check(host.runId===runId&&host.grantId===grantId&&host.ownerId===scope.ownerId&&host.workspaceId===scope.workspaceId);
+  check(host.observedAt<=now&&now-host.observedAt<=60000&&host.authenticated===true&&host.peerReadbackAuthenticated===true);
+  check(/^[a-f0-9]{64}$/.test(host.peerBeforeSha256)&&host.peerBeforeSha256===host.peerAfterSha256);
+  const hash=async v=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(v)))),x=>x.toString(16).padStart(2,'0')).join('');
+  check(Date.now()-host.observedAt<=60000&&values.every(v=>Date.now()-v.observedAt<=60000));
+  const phones=values.map(v=>{const h=host.devices?.find(d=>d.deviceId===v.phone.deviceId);check(h&&h.authenticated===true&&h.registrationEnabled===false&&h.receiveReceipt===null);return {deviceId:v.phone.deviceId,present:true,humanGesture:true,timezone:v.phone.timezone,syncHealthy:true,quietEnabled:v.phone.runtime.quiet!==null,lessonLeadMinutes:v.phone.preferences.lessonMinutes,dueOffsets:[...v.phone.preferences.dueDays].sort((a,b)=>a-b),serverReadbackAuthenticated:true,registrationEnabled:h.registrationEnabled,receiveReceipt:h.receiveReceipt,observedAt:Math.min(v.observedAt,host.observedAt)};});
+  const ancestryDigest=await hash(values[0].ancestry),existingSourceSetDigest=await hash(values[0].existingSourceIds);
+  check(Date.now()-host.observedAt<=60000&&values.every(v=>Date.now()-v.observedAt<=60000));
+  return {grantId,runId,ownerId:scope.ownerId,workspaceId:scope.workspaceId,hardEnd:null,authenticated:true,syncHealthy:true,observedAt:Math.min(host.observedAt,...values.map(v=>v.observedAt)),documentCheckpoint:host.documentCheckpoint,
+    ancestryDigest,existingSourceSetDigest,dueAt:values[0].proposed.dueAt,calendarStillEligible:true,
+    peerUnchanged:true,peerReadbackAuthenticated:true,peerBeforeSha256:host.peerBeforeSha256,peerAfterSha256:host.peerAfterSha256,phones};
+}

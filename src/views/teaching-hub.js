@@ -20,6 +20,7 @@ function sourceReadinessSupport() {
     <label class="fs-sm">أو الصق طلب الدعم العام (JSON، حتى 8192 حرفًا) <textarea rows="3" dir="ltr" spellcheck="false" autocomplete="off" autocapitalize="off" style="display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;resize:vertical" data-source-challenge-paste></textarea></label>
     <p class="t-3 fs-sm">استخدم مصدرًا واحدًا فقط. لا تلصق مفتاحًا خاصًا أو بيانات مستخدمين.</p>
     <button type="button" class="btn btn--quiet mt-3" data-act="source-readiness-capture">حفظ تقرير مشفّر</button>
+    <button type="button" class="btn btn--quiet mt-3" data-act="phone-readiness-capture">حفظ جاهزية هذا الجهاز مشفّرة</button>
     <p class="t-3 fs-sm" role="status" data-source-status></p>
   </details>`;
 }
@@ -86,7 +87,7 @@ function activeGoalIndicator(teachingId, activeGoal) {
   `;
 }
 
-export default {
+const teachingHub = {
   title: (p) => {
     const tch = store.getTeaching(p.id);
     return sectionLabel(store.getSection(tch?.sectionId)) || 'فصل';
@@ -254,6 +255,7 @@ export default {
   },
 
   actions: {
+    async 'phone-readiness-capture'(el, ev, params) { return teachingHub.actions['source-readiness-capture'](el, ev, params); },
     async 'source-readiness-capture'(el, ev, params) {
       const panel = el.closest('[data-source-readiness]'), status = panel?.querySelector('[data-source-status]');
       if (!panel || el.dataset.sourceBusy === 'true') return;
@@ -272,16 +274,17 @@ export default {
       try {
         const raw = file ? await file.text() : pasted;
         stage = 'module_load';
-        const { captureNotificationSourceReadiness } = await import('../lib/notification-source-readiness.js');
+        const { captureNotificationSourceReadiness, captureNotificationPhoneReadiness } = await import('../lib/notification-source-readiness.js');
         stage = 'capture';
-        const receipt = await captureNotificationSourceReadiness(raw, params.id, panel);
+        const phoneMode = el.dataset.act === 'phone-readiness-capture';
+        const receipt = phoneMode ? await captureNotificationPhoneReadiness(raw, params.id, panel, ev) : await captureNotificationSourceReadiness(raw, params.id, panel);
         if (!panel.isConnected) return;
         stage = 'download';
         url = URL.createObjectURL(new Blob([JSON.stringify(receipt)], {type:'application/json'}));
-        const link = document.createElement('a'); link.href = url; link.download = 'rakeez-source-readiness.encrypted.json';
+        const link = document.createElement('a'); link.href = url; link.download = phoneMode ? 'rakeez-phone-readiness.encrypted.json' : 'rakeez-source-readiness.encrypted.json';
         link.click(); status.textContent = 'تم حفظ التقرير المشفّر. لا يعني ذلك تفعيل التذكيرات أو اجتياز التجربة.';
       } catch (error) {
-        const codes = ['challenge_shape','challenge_size','challenge_authority','challenge_identity','challenge_expired','challenge_scope','challenge_time','challenge_key','context_unavailable','context_replaced','owner_changed','not_writable','draft_open','ancestry_unconfirmed','ancestry_inactive','source_bound','scope_mismatch','key_size','sync_pending','snapshot_changed','timezone','calendar','lesson_time','challenge_used','receipt_size'];
+        const codes = ['gesture_required','device_mismatch','runtime_unavailable','capture_stale','challenge_shape','challenge_size','challenge_authority','challenge_identity','challenge_expired','challenge_scope','challenge_time','challenge_key','context_unavailable','context_replaced','owner_changed','not_writable','draft_open','ancestry_unconfirmed','ancestry_inactive','source_bound','scope_mismatch','key_size','sync_pending','snapshot_changed','timezone','calendar','lesson_time','challenge_used','receipt_size'];
         status.dataset.sourceError = codes.includes(error?.message) ? error.message : 'unavailable';
         const stages = ['challenge','context','ancestry','scope','key_import','sync','calendar','reservation','encryption','final_checkpoint'];
         const categories = ['Error','TypeError','SyntaxError','RangeError','ReferenceError','DataError','OperationError','NotSupportedError','SecurityError','NotReadableError','AbortError','InvalidAccessError','InvalidStateError','QuotaExceededError'];
@@ -426,3 +429,5 @@ export default {
     }
   },
 };
+
+export default teachingHub;

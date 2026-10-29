@@ -484,6 +484,20 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   }
   return Object.freeze({
     refresh, invalidate, verifyReminder, readSourceStatus, recheckConfiguration,
+    // Read only: no refresh, permission request, worker or provider operation.
+    readinessSnapshot() {
+      const context = current(); if (!context || disposed) return null;
+      let quiet;
+      try {
+        const raw = storage.getItem('rakeezx-n44-quiet:' + JSON.stringify([context.ownerId,context.workspaceId,context.deviceId]));
+        quiet = raw == null ? null : JSON.parse(raw);
+        if (quiet !== null && (!quiet || Object.keys(quiet).sort().join(',') !== 'end,start' || ![quiet.start,quiet.end].every(n=>Number.isInteger(n)&&n>=0&&n<1440))) return null;
+      } catch { return null; }
+      const bound = binding && matches(binding), receipt = bound ? gateway?.registration() : undefined;
+      return {context:{...context}, permission:browser.permission(), quiet, status,
+        registration:receipt ? {state:'observed',registrationId:receipt.registrationId,expiresAt:receipt.expiresAt} : {state:'unknown'},
+        serverProof:false, peerProof:false};
+    },
     normalUiSnapshot() {
       const options = normalChoices();
       return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
