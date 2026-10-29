@@ -305,6 +305,25 @@
   align-items: center;
 }
 
+/* Separate event counts keep a negative visible after later positive taps. */
+.quicklog-page .qlcard { height: 160px; }
+.quicklog-page .qlcard__hit { gap: 5px; }
+.qlcard__counts { display: flex; flex-wrap: wrap; gap: 6px; font-size: 16px; font-weight: 700; }
+.qlcard__positive, .qlcard__negative { padding: 2px 5px; border-radius: 5px; }
+.qlcard__positive { color: var(--ok); background: var(--ok-soft); }
+.qlcard__negative { color: var(--danger); background: var(--danger-soft); }
+.qlcard__incident {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: start;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--danger);
+}
+
 .qlcard__minus {
   position: absolute;
   inset-block-start: 0;

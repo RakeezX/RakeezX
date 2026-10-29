@@ -5,7 +5,7 @@
 
 import { html, icon, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
-import { LOG_TAGS, netPoints, quickLogAttendanceState, todayISO, normalizeSearchText } from '../models.js';
+import { LOG_TAGS, quickLogAttendanceState, todayISO, normalizeSearchText } from '../models.js';
 import { repaint } from '../repaint.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
@@ -16,6 +16,7 @@ let searchQuery = '';
 let filterStatus = 'all';     // all | logged | unlogged
 
 const KIND_LABEL = { participation: 'المشاركة', behavior: 'سجل السلوك فقط' };
+const emptyCounts = () => ({ positive: 0, negative: 0, todayCount: 0, latestNegative: null });
 
 function reasonSheet(kindKey, delta) {
   const tags = LOG_TAGS[kindKey][delta > 0 ? 'up' : 'down'];
@@ -103,9 +104,14 @@ export default {
     const allLogs = store.state.logs.filter((l) => !l.deleted && l.teachingId === cls.id && l.kind === kind);
     const byStudent = new Map();
     for (const l of allLogs) {
-      const cur = byStudent.get(l.studentId) ?? { total: 0, today: 0 };
-      cur.total += l.delta;
-      if (l.date === today) cur.today += l.delta;
+      const cur = byStudent.get(l.studentId) ?? emptyCounts();
+      if (l.delta > 0) cur.positive++;
+      if (l.delta < 0) {
+        cur.negative++;
+        if (!cur.latestNegative || l.date > cur.latestNegative.date ||
+            (l.date === cur.latestNegative.date && l.updatedAt > cur.latestNegative.updatedAt)) cur.latestNegative = l;
+      }
+      if (l.date === today) cur.todayCount++;
       byStudent.set(l.studentId, cur);
     }
 
@@ -121,11 +127,11 @@ export default {
         const matchesRoll = s.rollNo != null && normalizeSearchText(s.rollNo).includes(q);
         if (!matchesName && !matchesRoll) return false;
       }
-      const c = byStudent.get(s.id) ?? { total: 0, today: 0 };
+      const c = byStudent.get(s.id) ?? emptyCounts();
       if (filterStatus === 'logged') {
-        if (c.today === 0) return false;
+        if (c.todayCount === 0) return false;
       } else if (filterStatus === 'unlogged') {
-        if (c.today !== 0) return false;
+        if (c.todayCount !== 0) return false;
       }
       return true;
     });
@@ -180,13 +186,15 @@ export default {
         : html`
             <div class="ql-grid" aria-label="طلاب الفصل">
               ${displayStudents.map(({ student: s, status, unavailable }) => {
-                const c = byStudent.get(s.id) ?? { total: 0, today: 0 };
-                const tone = unavailable ? 'is-unavail' : c.total > 0 ? 'is-pos' : c.total < 0 ? 'is-neg' : '';
+                const c = byStudent.get(s.id) ?? emptyCounts();
+                const tone = unavailable ? 'is-unavail' : c.negative > 0 ? 'is-neg' : c.positive > 0 ? 'is-pos' : '';
+                const incident = c.latestNegative;
+                const incidentLabel = incident ? `آخر رصدة سلبية: ${incident.tag || 'بلا سبب'} · ${incident.date}` : '';
                 const statusBadge = status === 'absent' ? html`<span class="qlcard__status badge badge--danger">غائب</span>` : status === 'excused' ? html`<span class="qlcard__status badge badge--warn">مستأذن</span>` : '';
                 return html`
                   <div class="qlcard ${tone}" id="ql-${s.id}">
                     <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
-                            aria-label="نقطة لـ ${s.name}">
+                            aria-label="نقطة لـ ${s.name}" aria-describedby="ql-counts-${s.id} ql-today-${s.id}${incident ? ` ql-incident-${s.id}` : ''}">
                       <div class="qlcard__head">
                         <div class="qlcard__meta">
                           ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
@@ -195,10 +203,14 @@ export default {
                         <span class="qlcard__name">${s.name}</span>
                       </div>
                       <div class="qlcard__foot">
-                        <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
-                        <span class="qlcard__today tabular">${c.today ? (c.today > 0 ? '+' : '') + c.today + ' اليوم' : ''}</span>
+                        <span class="qlcard__counts tabular" id="ql-counts-${s.id}">
+                          <span class="qlcard__positive" aria-label="${c.positive} رصدات إيجابية"><bdi>+${c.positive}</bdi></span>
+                          <span class="qlcard__negative" aria-label="${c.negative} رصدات سلبية"><bdi>−${c.negative}</bdi></span>
+                        </span>
                         <span class="qlcard__plus" aria-hidden="true">${icon('plus')}</span>
                       </div>
+                      <span class="qlcard__today tabular" id="ql-today-${s.id}">${c.todayCount ? `${c.todayCount} رصدة اليوم` : 'لم يُرصد اليوم'}</span>
+                      ${incident ? html`<span class="qlcard__incident" id="ql-incident-${s.id}" title="${incidentLabel}" aria-label="${incidentLabel}"><span aria-hidden="true">⚠</span> ${incident.tag || 'بلا سبب'} · <bdi>${incident.date}</bdi></span>` : ''}
                     </button>
                     <button class="qlcard__minus" data-act="minus" data-id="${s.id}"
                             aria-label="خصم من ${s.name}">${icon('minus')}</button>
@@ -208,7 +220,8 @@ export default {
             </div>
           `}
       <p class="t-3 fs-sm center mt-6">
-        نقرة على الطالب = نقطة. النقاط تغذّي بند «المشاركة والتفاعل» في الدرجات تلقائيًا.
+        ${kind === 'behavior' ? 'سجل السلوك للتوثيق فقط؛ لا يُخصم من الدرجات.' : 'نقرة على الطالب = نقطة. نقاط المشاركة تغذّي بند «المشاركة والتفاعل» في الدرجات تلقائيًا.'}
+        العدّادان لعدد الرصدات الإيجابية والسلبية، وليسا صافي الدرجة.
       </p>
       </div>
     `;
@@ -251,7 +264,7 @@ export default {
 
     async undo(el, ev, params) {
       const logs = store.state.logs
-        .filter((l) => !l.deleted && l.teachingId === params.id && l.date === todayISO())
+        .filter((l) => !l.deleted && l.teachingId === params.id && l.kind === kind && l.date === todayISO())
         .sort((a, b) => a.updatedAt - b.updatedAt);
       const last = logs.at(-1);
       if (!last) {
