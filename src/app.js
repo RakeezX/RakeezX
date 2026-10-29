@@ -8,6 +8,7 @@ import { displayIdentity, effectiveTheme } from './lib/display-identity.js';
 import { brandLockup } from './lib/brand.js';
 import { installVisibleViewport } from './lib/visible-viewport.js';
 import { ensureThmanyahFont } from './lib/thmanyah-font.js';
+import { commandSearchAction, installCommandSearch } from './lib/global-command-search.js';
 import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
 import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib/sync-warning-policy.js';
 import * as store from './store.js';
@@ -49,6 +50,7 @@ import {
 const app = document.getElementById('app');
 await ensureThmanyahFont();
 installVisibleViewport();
+installCommandSearch();
 const notificationStyles = document.createElement('link');
 notificationStyles.rel = 'stylesheet';
 notificationStyles.href = new URL('./styles/notifications.css', import.meta.url).href;
@@ -507,6 +509,7 @@ function topbar(v, params) {
         ` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
+        ${commandSearchAction()}
         ${isHome && notificationContext ? renderNotificationBell(notificationSnapshot(notificationState, notificationContext, Date.now()).unread) : ''}
         ${actions ?? ''}
         ${!inTeaching ? html`
