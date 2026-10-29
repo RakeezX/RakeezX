@@ -7950,7 +7950,8 @@
 .grades-01c__search input { inline-size:100%; min-inline-size:0; border:0; outline:0; background:transparent; color:var(--text); font:inherit; }
 .grades-01c__filters { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .grades-01c__sort { display:block; min-inline-size:0; }
-.grades-01c__sort .select { min-block-size:44px; border-radius:12px; background:var(--bg-sunk); }
+/* Let the Arabic line box and padding size the closed native select. */
+.grades-01c__sort .select { block-size:auto; min-block-size:44px; padding-block:8px; line-height:1.6; border-radius:12px; background-color:var(--bg-sunk); }
 .grades-01c__missing-filter { display:inline-flex; align-items:center; gap:7px; min-block-size:44px; color:var(--text-2); font-size:12px; white-space:nowrap; cursor:pointer; }
 .grades-01c__missing-filter input { inline-size:18px; block-size:18px; margin:0; flex:none; accent-color:var(--brand); }
 .grades-01c__missing-filter input:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
