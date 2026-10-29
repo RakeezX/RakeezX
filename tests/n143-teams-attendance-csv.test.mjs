@@ -1,6 +1,8 @@
 // AI N143: generated identities only; never load a real Teams report.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile, readdir } from 'node:fs/promises';
+import { runInNewContext } from 'node:vm';
 import { createServer } from 'vite';
 import { expect } from '@playwright/test';
 import { parseTeamsAttendance, matchTeamsAttendance, durationSeconds } from '../src/lib/teams-attendance-csv.js';
@@ -66,7 +68,7 @@ test('n143_user_confirmed_existing_session_only_unmarked_present_no_absence', {t
     await server.listen();
     await withIsolatedLocalBrowser({
       taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n143-teams-attendance-csv-20261029.json',
-      runId:process.env.RAKEEZ_RUN_ID || '22eb3123-0d81-419f-a67b-f4bedcbdd68b',url,timeoutMs:110000,
+      runId:process.env.RAKEEZ_RUN_ID || '7328bc2d-1454-486c-a479-e0b6d57bb139',url,timeoutMs:110000,
     }, async ({createContext}) => {
       const context = await createContext({viewport:{width:360,height:800},locale:'ar-SA',timezoneId:'Asia/Riyadh'});
       await context.addInitScript(() => sessionStorage.setItem('rakeezx-demo-session-v1','preparing'));
@@ -216,6 +218,162 @@ test('n143_user_confirmed_existing_session_only_unmarked_present_no_absence', {t
       const raced = await records('n143-s5');
       assert.equal(raced.memory.find(r => r.studentId === 'a').status,'excused', 'in-flight existing attendance must never be overwritten');
       assert.equal(raced.disk.find(r => r.studentId === 'a').status,'excused');
+      const repeated = await page.evaluate(async () => {
+        const s = await import('/src/store.js'), db = await import('/src/lib/db.js');
+        const before = await db.getAll('attendance');
+        const outcome = await s.fillSelectedAttendance('n143-s5',['a','b','b']);
+        return {outcome,before,after:await db.getAll('attendance'),outbox:await db.getAll('outbox')};
+      });
+      assert.deepEqual(repeated.outcome,{saved:0,skipped:2});
+      assert.deepEqual(repeated.after,repeated.before);
+      assert.equal(repeated.outbox.length,0);
+      await close();
+      // Unresolved pre-snapshot history is rejected; never use legacy save().
+      const legacy = await page.evaluate(async () => {
+        const s = await import('/src/store.js'), db = await import('/src/lib/db.js');
+        await s.setAttendance('n143-s2','a','absent');
+        const old = s.attendanceIn('n143-s2')[0];
+        await db.remove('sessionRosterSnapshots',s.sessionRosterSnapshotId('n143-s2'));
+        s.state.sessionRosterSnapshots = s.state.sessionRosterSnapshots.filter(r => r.sessionId !== 'n143-s2');
+        let rejected = false;
+        try { await s.fillSelectedAttendance('n143-s2',['a','b']); } catch { rejected = true; }
+        return {rejected,old,records:s.attendanceIn('n143-s2'),snapshot:s.sessionRosterSnapshot('n143-s2')};
+      });
+      assert.equal(legacy.snapshot,null);
+      assert.deepEqual(legacy.records.find(r => r.studentId === 'a'),legacy.old);
+      assert.equal(legacy.records.some(r => r.studentId === 'b'),false);
+      assert.equal(legacy.rejected,true);
+      const unsupported = await page.evaluate(async () => {
+        const s = await import('/src/store.js'), db = await import('/src/lib/db.js');
+        const workspace = s.getActiveWorkspace(), before = await db.getAll('attendance');
+        try {
+          s.activateWorkspace({...workspace,type:'legacy'});
+          let code;
+          try { await s.fillSelectedAttendance('n143-s2',['b']); } catch (error) { code = error.message; }
+          return {code,before,after:await db.getAll('attendance'),outbox:await db.getAll('outbox')};
+        } finally { s.activateWorkspace(workspace); }
+      });
+      assert.equal(unsupported.code,'TEAMS_SELECTED_SYNC_UNAVAILABLE');
+      assert.deepEqual(unsupported.before,unsupported.after);
+      assert.equal(unsupported.outbox.length,0);
     });
   } finally { await server.close(); }
+});
+
+test('n143_atomic_selected_fill_and_repeated_sync_no_overwrite', {timeout:120000}, async () => {
+  // Real existing engine and PostgreSQL fixture, never a service connection.
+  await import('fake-indexeddb/auto');
+  const db = await import('../src/lib/db.js');
+  const {createSyncV2Engine} = await import('../src/lib/sync-v2.js');
+  db.selectDatabase('rakeezx-demo');
+  const server = await createN143AttendanceServer();
+  let lose = true, clock = 1800000000000;
+  try {
+    const engine = createSyncV2Engine({ database:db,now:()=>++clock,
+      transport:{fetchRecords:entity=>server.fetchRecords(entity),applyFillAttendanceCommand:async envelope=>{
+        const receipt = await server.applyFillAttendanceCommand(envelope);
+        if (lose) { lose = false; throw Error('synthetic lost receipt'); }
+        return receipt;
+      }},
+    });
+    await engine.pullAll({stores:['students','sessions']});
+    await server.applyAttendanceCommand({mutationId:'n143-competing',deviceId:'n143-device',
+      attendanceId:'att:override-a:override-session',sessionId:'override-session',studentId:'override-a',
+      baseRevision:0,patch:{status:'excused'},clientUpdatedAt:++clock});
+    await engine.queueFillAttendanceCommand({sessionId:'override-session',status:'present',studentIds:['override-b']});
+    const queued = (await db.getAll('outbox'))[0];
+    assert.deepEqual(queued.patch.studentIds,['override-b']);
+    const first = await engine.dispatchPending();
+    assert.equal(first.failed,1);
+    assert.equal((await db.getAll('outbox'))[0].mutationId,queued.mutationId);
+    clock += 120000;
+    const retried = await engine.dispatchPending();
+    assert.equal(retried.acknowledged,1);
+    assert.equal((await db.getAll('outbox')).length,0);
+    const calls = server.calls.filter(c=>c.mutationId===queued.mutationId);
+    assert.equal(calls.length,2);
+    assert.deepEqual(calls[0],calls[1]);
+    const remote = await server.fetchRecords('attendance');
+    assert.equal(remote.find(r=>r.student_id==='override-a').status,'excused');
+    console.log('N143 selected Sync diagnostic:',JSON.stringify({requested:queued.patch.studentIds,
+      transported:calls[0].studentIds ?? null,remote:remote.map(r=>r.student_id).sort(),repeatedIdentity:true}));
+    assert.equal(remote.some(r=>r.student_id==='override-c'),false,
+      'selected receipt must not mark an unselected student; current transport/RPC fills the whole roster');
+  } finally {
+    await server.close();
+    (await db.openDB()).close();
+  }
+});
+
+// Narrow SQL fixture: the unchanged attendance RPC and its declared migrations.
+// The generic all-migrations helper fails before this gate on an unrelated N58
+// prerequisite (n58_guard_calendar_contract). Keep that original setup failure;
+// reproduce THIS protocol against its real SQL, without changing any SQL guard.
+async function createN143AttendanceServer() {
+  const {PGlite} = await import('@electric-sql/pglite');
+  const {installRealtimeFixture} = await import('./helpers/realtime-server-fixture.mjs');
+  const pg = new PGlite(), calls = [];
+  try {
+    await pg.exec(`create schema auth; create role authenticated; create role anon; create role service_role;
+      create table auth.users(id uuid primary key);
+      insert into auth.users values ('11111111-1111-4111-8111-111111111111');
+      create function auth.uid() returns uuid language sql stable as $$select '11111111-1111-4111-8111-111111111111'::uuid$$;`);
+    await installRealtimeFixture(pg);
+    const directory = new URL('../supabase/migrations/',import.meta.url);
+    for (const name of (await readdir(directory)).sort().filter(n=>/^\d.*\.sql$/.test(n) && Number(n.slice(0,4)) <= 17)) {
+      await pg.exec((await readFile(new URL(name,directory),'utf8')).replace(/^\uFEFF/,''));
+    }
+    await pg.exec(`insert into rakeezx.profile(owner_id) values (auth.uid());
+      insert into rakeezx.years(id,label,hijri_start,hijri_end,status) values ('override-year','اختبار',1450,1451,'active');
+      insert into rakeezx.terms(id,year_id,name,"index",status,start_date,end_date) values ('override-term','override-year','اختبار',1,'active','2026-08-01','2026-10-01');
+      insert into rakeezx.subjects(id,name,slug) values ('override-subject','اختبار','override-subject');
+      insert into rakeezx.sections(id,year_id,grade,label,name) values ('override-section','override-year',4,'اختبار','اختبار');
+      insert into rakeezx.teachings(id,section_id,subject_id,term_id) values ('override-teaching','override-section','override-subject','override-term');
+      insert into rakeezx.students(id,name,status) values ('override-a','طالب اصطناعي أ','active'),('override-b','طالب اصطناعي ب','active'),('override-c','طالب اصطناعي ج','active');
+      insert into rakeezx.enrollments(id,student_id,section_id,roll_no,status,start_date) values
+        ('en-a','override-a','override-section',1,'active','2026-08-01'),('en-b','override-b','override-section',2,'active','2026-08-01'),('en-c','override-c','override-section',3,'active','2026-08-01');
+      insert into rakeezx.sessions(id,teaching_id,date,period,status) values ('override-session','override-teaching','2026-09-06',1,'scheduled');`);
+    return {calls,close:()=>pg.close(),fetchRecords:async entity=>{
+      if (!['students','sessions','attendance'].includes(entity)) return [];
+      return (await pg.query(`select to_jsonb(t) as record from rakeezx.${entity} t where owner_id=auth.uid()`)).rows.map(r=>r.record);
+    },applyFillAttendanceCommand:async e=>{
+      calls.push(structuredClone(e));
+      return (await pg.query('select rakeezx.apply_sync_v2_fill_attendance_command($1,$2,$3,$4,$5) as result',
+        [e.mutationId,e.deviceId,e.sessionId,e.status,e.clientUpdatedAt])).rows[0].result;
+    },applyAttendanceCommand:async e=>{
+      return (await pg.query('select rakeezx.apply_sync_v2_attendance_command($1,$2,$3,$4,$5,$6,$7::jsonb,$8) as result',
+        [e.mutationId,e.deviceId,e.attendanceId,e.sessionId,e.studentId,e.baseRevision,JSON.stringify(e.patch),e.clientUpdatedAt])).rows[0].result;
+    }};
+  } catch (error) { await pg.close(); throw error; }
+}
+
+test('n143_offline_parser_dependency_in_shell', async () => {
+  // Execute the actual SW install and offline-fetch handlers in a cache harness.
+  // This checks the changed shell only, not browser SW lifecycle certification.
+  const source = await readFile(new URL('../sw.js',import.meta.url),'utf8');
+  const parser = await readFile(new URL('../src/lib/teams-attendance-csv.js',import.meta.url),'utf8');
+  const origin = 'https://synthetic.invalid', handlers = new Map(), entries = new Map();
+  const cacheNames = new Map(), requested = [];
+  const key = r => new URL(typeof r === 'string' ? r : r.url,origin+'/').href;
+  const caches = {keys:async()=>[...cacheNames.keys()],delete:async n=>cacheNames.delete(n),open:async name=>{
+    if (!cacheNames.has(name)) cacheNames.set(name,{
+      add:async request=>{ requested.push(key(request)); entries.set(key(request),new Response(key(request).endsWith('/src/lib/teams-attendance-csv.js') ? parser : 'synthetic shell resource')); },
+      put:async(request,response)=>entries.set(key(request),response),match:async request=>entries.get(key(request))?.clone(),
+    });
+    return cacheNames.get(name);
+  }};
+  class RelativeRequest extends Request { constructor(url,options){super(key(url),options);} }
+  runInNewContext(source,{self:{location:{origin},skipWaiting(){},addEventListener:(name,fn)=>handlers.set(name,fn)},
+    caches,URL,Request:RelativeRequest,Response,console,fetch:async()=>{throw Error('synthetic offline');},setTimeout,clearTimeout});
+  let installed;
+  handlers.get('install')({waitUntil:work=>{installed=work;}});
+  await installed;
+  assert.ok(cacheNames.has('rakeezx-v98'));
+  assert.equal(requested.filter(url=>url===origin+'/src/lib/teams-attendance-csv.js').length,1);
+  assert.ok(requested.includes(origin+'/src/models.js'));
+  let served;
+  handlers.get('fetch')({request:new RelativeRequest('/src/lib/teams-attendance-csv.js'),respondWith:work=>{served=work;}});
+  const response = await served;
+  assert.equal(response.status,200);
+  assert.equal(await response.text(),parser);
 });

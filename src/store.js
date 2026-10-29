@@ -2067,7 +2067,7 @@ function applyCommittedPuts(writes) {
   broadcast(changes);
 }
 
-async function mutateSnapshotAttendance(sesId, makeRecords, commandKind = 'record') {
+async function mutateSnapshotAttendance(sesId, makeRecords, commandKind = 'record', { selectedFill = false, verifyCurrent } = {}) {
   const knownSession = getSession(sesId);
   if (knownSession && isTeachingArchived(knownSession.teachingId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const stamp = now();
@@ -2078,6 +2078,7 @@ async function mutateSnapshotAttendance(sesId, makeRecords, commandKind = 'recor
       sessions: {}, teachings: {}, students: {}, enrollments: {}, attendance: {}, sessionRosterSnapshots: {}, outbox: {},
     }, {
       prepare(current) {
+        verifyCurrent?.(current);
         const ses = current.sessions.find((record) => record.id === sesId && !record.deleted);
         if (!ses || ['cancelled_holiday', 'cancelled'].includes(ses.status)) return {};
 
@@ -2088,6 +2089,9 @@ async function mutateSnapshotAttendance(sesId, makeRecords, commandKind = 'recor
           // Existing experimental attendance predates this feature. Keep its
           // current behavior; never manufacture a historical snapshot for it.
           if (existingAttendance.length) {
+            // Never route selected imports through legacy save(), or invent a
+            // historical roster. The existing server fill rejects this case too.
+            if (selectedFill) throw Error('TEAMS_LEGACY_ROSTER_UNRESOLVED');
             result = { kind: 'legacy', records: [] };
             return {};
           }
@@ -2107,7 +2111,7 @@ async function mutateSnapshotAttendance(sesId, makeRecords, commandKind = 'recor
           isNewSnapshot = true;
         }
 
-        const records = makeRecords(snapshot.members, existingAttendance, ses, stamp)
+        const records = makeRecords(snapshot.members, existingAttendance, ses, stamp, current)
           .map((record) => syncV2Record('attendance', record, {
             pendingCreate: !existingAttendance.some((candidate) => candidate.id === record.id),
           }));
@@ -5494,6 +5498,39 @@ export async function setAttendance(sesId, studentId, status) {
   // أول رصد حضور يعني أن الحصة نُفّذت
   if (rec && ses.status === 'scheduled') await setSessionStatus(sesId, 'held');
   return rec;
+}
+
+/** AI N143: atomic selected-only local preparation; no manual edit semantics change. */
+export async function fillSelectedAttendance(sesId, studentIds, { verifyCurrent } = {}) {
+  const workspace = activeWorkspace, ses = getSession(sesId);
+  if (!ses || !Array.isArray(studentIds) || studentIds.length > 300 ||
+      studentIds.some(id => typeof id !== 'string' || !id)) throw Error('TEAMS_SELECTION_INVALID');
+  assertClassOperationsAccess(ses.teachingId);
+  // Existing attendance:fill transport/RPC expands to the entire roster: its
+  // local studentIds are NOT sent. Never enqueue that command for real accounts.
+  // Remove this fail-closed boundary only after a separately authorized selected
+  // receipt implementation is verified end to end. No new protocol is guessed.
+  if (workspace?.type !== 'demo') throw Error('TEAMS_SELECTED_SYNC_UNAVAILABLE');
+  const ids = new Set(studentIds);
+  if (!ids.size) return { saved: 0, skipped: 0 };
+  const mutation = await mutateSnapshotAttendance(sesId, (members, existing, session, stamp, current) => {
+    const active = new Set(snapshotRosterFromCurrent(current, session)?.members.map(m => m.studentId));
+    if ([...ids].some(id => !active.has(id) || !members.some(m => m.studentId === id))) throw Error('TEAMS_ROSTER_CHANGED');
+    const recorded = new Set(existing.map(r => r.studentId));
+    return [...ids].filter(id => !recorded.has(id)).map(studentId => ({
+      id: attendanceId(studentId, sesId), studentId, sessionId: sesId,
+      teachingId: session.teachingId, date: session.date, status: 'present',
+      note: '', deleted: false, updatedAt: stamp,
+    }));
+  }, 'fill', { selectedFill: true, verifyCurrent(current) {
+    verifyCurrent?.(current);
+    assertClassOperationsAccess(ses.teachingId);
+    const session = current.sessions.find(r => r.id === sesId && !r.deleted);
+    if (activeWorkspace !== workspace || !session || session.teachingId !== ses.teachingId ||
+        session.date !== ses.date || ['cancelled', 'cancelled_holiday'].includes(session.status)) throw Error('TEAMS_CONTEXT_CHANGED');
+  } });
+  if (!['snapshot', 'empty'].includes(mutation.kind)) throw Error('TEAMS_WRITE_FAILED');
+  return { saved: mutation.records.length, skipped: ids.size - mutation.records.length };
 }
 
 /** يرصد كل الطلاب غير المرصودين في حصة بحالة واحدة. */

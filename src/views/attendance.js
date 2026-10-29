@@ -120,9 +120,12 @@ async function openTeamsImport(teachingId) {
                 .some(r => r.studentId === row.studentId && r.name === row.name);
               if (!stillMatches) throw Error('TEAMS_ROSTER_CHANGED');
               if (store.attendanceIn(sessionId).some(r => r.studentId === row.studentId)) { skipped++; continue; }
-              const result = await store.setAttendance(sessionId, row.studentId, 'present');
-              if (!result || result.status !== 'present') throw Error('TEAMS_WRITE_FAILED');
-              saved++;
+              const result = await store.fillSelectedAttendance(sessionId, [row.studentId], { verifyCurrent: () => {
+                current();
+                if (disposed || !root.isConnected) throw Error('TEAMS_CLOSED');
+              } });
+              saved += result.saved;
+              skipped += result.skipped;
             }
           } catch { failed = true; }
           // Never replay after partial success or expose raw exception/report data.
