@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n143-teams-attendance-csv-20261029",
+      "productId": "N143",
+      "activationId": "po-20261012-continuous",
+      "priority": -1150,
+      "scopeKey": "n143-user-import-teams-attendance-current-session",
+      "riskClass": "MEDIUM",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 65,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "continuous-n141-attendance-anchored-choice-20261029"
+      ],
+      "allowedPaths": [
+        "src/views/attendance.js",
+        "src/lib/teams-attendance-csv.js",
+        "tests/n143-teams-attendance-csv.test.mjs",
+        "docs/automation-evidence/20261029/N143_TEAMS_ATTENDANCE_IMPORT.md",
+        "src/store.js",
+        "sw.js"
+      ],
+      "verificationPaths": [
+        "src/views/attendance.js",
+        "src/lib/teams-attendance-csv.js",
+        "src/store.js",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n143_utf16le_tab_sections_dedup_organizer_and_duration",
+        "n143_unique_owner_roster_matching_preview_unmatched_and_short_duration",
+        "n143_user_confirmed_existing_session_only_unmarked_present_no_absence",
+        "n143_atomic_selected_fill_and_repeated_sync_no_overwrite",
+        "n143_offline_parser_dependency_in_shell"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "Direct PO 2026-10-29 requests uploading Microsoft Teams meeting attendance CSV to mark present students in RAKEEZ attendance. Approves preparing and releasing user-initiated, teacher-reviewed import in the current attendance session with explicit teacher confirmation, normal existing attendance owner/Sync gates only. Uploaded real student CSVs were inspected only privately in this chat; do not copy names/emails/UPNs or actual meeting rosters into repository/fixtures/logs/source evidence. No broad school import, actual login, Auth/RLS/schema/grade alteration or automatic live record mutation by worker. Reuse existing src/store.js attendance mutation API and preserve marked records. Sole original controller and publisher; no N44/N88 conflict. Must not begin until N141 anchored-menu revision is delivered due shared src/views/attendance.js. [PO-20261029-N143-SCOPE-CORRECTION] Existing attendance import approval also permits narrow update to src/store.js and sw.js because actual worker proved those two paths necessary to avoid overwriting attendance under concurrent writes and to support offline source. No other store schema, RPC, migration or data behavior may change; retain all existing owner/Sync/restore/grade safeguards.",
+      "preparationAuthority": {
+        "kind": "PO-20261029-attendance-UI",
+        "publication": true,
+        "scope": "N143",
+        "realDataActions": 0,
+        "rawStudentFilesSaved": false
+      },
+      "objective": "Implement N143 import Teams attendance file into EXISTING current attendance page after N141 corrective delivery. Source structures grounded in two PO-provided files, synthesized safely (NO PII BYTES): .csv is UTF-16LE with BOM FF FE, TAB delimiters, Arabic sections (1. الملخص with title, start/end MM/DD/YY local string, 2. المشاركون with 7 columns الاسم/وقت الانضمام الأول/وقت المغادرة الأخير/مدة الاجتماع/البريد الإلكتروني/معرّف المشارك (UPN)/الدور, 3. الأنشطة داخل الاجتماع with join/leave segments). PO files show 20 participants incl 1 organizer and 23 incl 1 organizer, extra segment rows on 2 and 1 participant respectively, one only 10 seconds long. Do NOT copy their names, UPNs, emails into public docs or synthetic test. Build small browser-local parser helper that decodes UTF-16LE BOM and UTF-8, safely parses tab CSV rows/quotes, chooses ONLY participant section 2 for attendance (not section 3 duplicate join rows), excludes organizer, dedups UPN/email if present, captures durations and marks very-short attendance under configurable UI warning (default 5m) WITHOUT silently treating participant as absent. Limit size <=1MB and rows <=300 consistent Rakeez existing file import policy. Teacher uses current selected teaching and date/session; compare Teams summary date to selected session and show clear mismatch rather than silently applying to wrong date. Match current active roster by exact unique normalized Arabic name; use existing normalizeSearchText/identity helpers, optionally identity matching only if Rakeez has explicit comparable email, avoid fuzzy false positive; ambiguous/unmatched rows remain visible but not auto-assigned, duplicate aliases do not create duplicate students. Display compact preview summary: found, unmatched, ambiguous, short duration, organizer ignored; let teacher uncheck short rows and review before one explicit button رصد الحاضرين المطابقين. Never auto-mark students ABSENT because absence from report is not proof of absence. Apply only explicit selected matched IDs that remain unrecorded in the SAME active session, using existing store.setAttendance(sessionId, studentId, present) with await and current session/owner/membership guards; no bulk replacement of already marked attendance; stop on genuine error and show partial counts truthfully, no replay/guess. Do not persist raw CSV, UPN or email in browser storage, Sync, logs or error telemetry, no network/file upload. No real PO file parsing in repository; generate artificial sample of 2–4 fake names/teacher, multi-join duplicate, 10s short, wrong date and owner-change negative fixture. Show import button near current attendance toolbar without cluttering original N141 choice; one small preview sheet is acceptable for IMPORT ONLY. Preserve existing N141 anchored popover; source touch only 4 declared files. Use 2-3 targeted unit / UI checks, no blanket suites, original publisher must confirm served JS and offline relative import integrity. Client-side user action does not constitute actual record writes until teacher chooses. Do not claim full instructor sync or that missing students are absent. [MATERIAL SCOPE REPAIR 2026-10-29] RESUME exact saved N143 session 01a1865a-5a54-7d83-94bf-35b5e948ba4e and candidate 0b56f401124fab73530c4d57718bab0f095fa4ae; preserve completed synthetic UTF-16 parser/name-match tests and existing UI. Worker-proved missing paths src/store.js and sw.js must now be edited. Implement only a selected-student atomic attendance fill API in existing store.js built on mutateSnapshotAttendance and existing selected studentIds receipt path; never overwrite any status recorded concurrently after the preview, preserve membership, owner, session, idempotency and outbox negative guards. Do not replace an existing present/absent/late/excused record. Offline source bundle must include src/lib/teams-attendance-csv.js in sw.js shell cache as established by existing offline policy; only that new asset. Add two focused new checks for real race/storage and cache parser availability, no broad suites/repeat original passes unless their relevant source changed. Do not weaken grade/Auth/RLS/Sync or record current pupils. No manual runner or alternative publisher. The previous BLOCKED check remains true until this materially changed code and required checks PASS.",
+      "acceptance": [
+        "UTF-16LE Teams two-section attendee parser handles Arabic fields and duplicate activity segments, skips organizer and flags short participants.",
+        "Teacher previews matched/ambiguous/unmatched and optional short meeting participation in selected class and session before one user-initiated action; wrong-date reports cannot auto apply.",
+        "Only matched selected current unmarked students set present using existing normal owner+Sync path; no automatic absences, no overwrite of already marked, no raw file/UPN persistence.",
+        "Synthetic minimal tests and served Production proof pass; actual teacher/import experience separately awaiting PO acceptance.",
+        "Concurrent new attendance record after preview is NOT overwritten by imported present; selected batch uses existing atomic owner/session receipt semantics and preserves all other students, including partial failure.",
+        "New Teams parser is available for previously installed PWA offline attendance screen via existing service-worker source cache."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "01b3f3444ec98e4a9087279afba849f970823b2e",
+        "requiredSourcePaths": [
+          "src/views/attendance.js",
+          "src/store.js",
+          "src/models.js",
+          "tests/attendance-completeness.test.mjs",
+          "sw.js"
+        ],
+        "editPaths": [
+          "src/views/attendance.js",
+          "src/lib/teams-attendance-csv.js",
+          "tests/n143-teams-attendance-csv.test.mjs",
+          "docs/automation-evidence/20261029/N143_TEAMS_ATTENDANCE_IMPORT.md",
+          "src/store.js",
+          "sw.js"
+        ],
+        "newPaths": [
+          "src/lib/teams-attendance-csv.js",
+          "tests/n143-teams-attendance-csv.test.mjs",
+          "docs/automation-evidence/20261029/N143_TEAMS_ATTENDANCE_IMPORT.md"
+        ],
+        "workerChecks": [
+          "n143_utf16le_tab_sections_dedup_organizer_and_duration",
+          "n143_unique_owner_roster_matching_preview_unmatched_and_short_duration",
+          "n143_user_confirmed_existing_session_only_unmarked_present_no_absence",
+          "n143_atomic_selected_fill_and_repeated_sync_no_overwrite",
+          "n143_offline_parser_dependency_in_shell"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
