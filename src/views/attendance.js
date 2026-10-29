@@ -228,8 +228,8 @@ export default {
                      value="${query}" placeholder="ابحث بالاسم أو الرقم" aria-label="بحث في قائمة الحضور" autocomplete="off">
               ${query ? html`<button class="iconbtn" data-act="clear-search" aria-label="مسح">${icon('x')}</button>` : ''}
             </div>
-            ${unmarked > 0 ? html`<button class="btn btn--primary" data-act="fill-present">
-              ${icon('check')} علّم الباقي (${unmarked}) حاضرين</button>` : ''}
+            ${unmarked > 0 ? html`<button class="btn btn--quiet" data-act="fill-remaining" aria-haspopup="dialog">
+              رصد الباقين (${unmarked}) <span aria-hidden="true">▾</span></button>` : ''}
             </div>
             <div class="attendance-01c__roster-head" aria-hidden="true"><span>الرقم</span><span>الطالب</span><span>ملاحظة</span><span>الحالة</span></div>
 
@@ -330,21 +330,40 @@ export default {
       await store.setAttendance(activeSessionId, el.dataset.id, el.dataset.status);
     },
 
-    async 'fill-present'() {
+    async 'fill-remaining'() {
       if (!activeSessionId) return;
       const sessionId = activeSessionId;
+      const session = store.getSession(sessionId);
+      if (!session) return;
+      const roster = store.sessionRoster(session).members;
+      const recorded = new Set(store.attendanceIn(sessionId).map(record => record.studentId));
+      const remaining = roster.filter(member => !recorded.has(member.id)).length;
+      if (!remaining) return;
+      const choice = await openSheet({
+        title: `رصد الباقين (${remaining})`,
+        desc: 'هؤلاء الطلاب غير المرصودين فقط. يشمل الرصد جميع غير المرصودين في الحصة، حتى خارج نتائج البحث.',
+        foot: html`
+          <button class="btn btn--quiet" data-attendance-choice="present">✓ حاضرين (${remaining})</button>
+          <button class="btn btn--quiet" data-attendance-choice="absent">× غائبين (${remaining})</button>`,
+        onMount: (root, done) => root.querySelectorAll('[data-attendance-choice]').forEach(button => {
+          button.addEventListener('click', () => done(button.dataset.attendanceChoice));
+        }),
+      });
+      if (!['present', 'absent'].includes(choice) || activeSessionId !== sessionId) return;
+      const label = choice === 'present' ? 'حاضرين' : 'غائبين';
       if (isBeforeScheduledStart(store.getSession(sessionId))) {
         const confirmed = await openSheet({
           title: 'رصد الحضور قبل بدء الحصة؟',
-          desc: 'لم يبدأ وقت الحصة بعد. هل تريد تعليم الطلاب غير المرصودين حاضرين الآن؟',
+          desc: `لم يبدأ وقت الحصة بعد. هل تريد رصد جميع الطلاب غير المرصودين في الحصة ${label} الآن؟`,
           foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-            <button class="btn btn--primary" data-confirm-present>نعم، رصد الحضور</button>`,
-          onMount: (root, done) => root.querySelector('[data-confirm-present]').addEventListener('click', () => done(true)),
+            <button class="btn btn--primary" data-confirm-attendance>نعم، رصدهم ${label}</button>`,
+          onMount: (root, done) => root.querySelector('[data-confirm-attendance]').addEventListener('click', () => done(true)),
         });
         if (!confirmed) return;
       }
-      const n = await store.fillAttendance(sessionId, 'present');
-      toast(`رُصد ${n} طالبًا حاضرين`);
+      if (activeSessionId !== sessionId) return;
+      const n = await store.fillAttendance(sessionId, choice);
+      toast(`رُصد ${n} طالبًا ${label}`);
     },
 
     async 'prev-day'(el, ev, params) {
