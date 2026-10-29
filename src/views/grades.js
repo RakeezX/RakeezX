@@ -9,7 +9,7 @@ import * as store from '../store.js';
 import { canOpenRoster } from './students.js';
 import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster, sortStudents, participationPointProjection } from '../models.js';
 import { repaint } from '../repaint.js';
-import { pointControls, runPointAction } from '../lib/quicklog-reason-sheet.js';
+import { pointControls, runPointAction, stablePointSurface } from '../lib/quicklog-reason-sheet.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
 import { subitemCompletionState, subitemSelectedPoints } from '../lib/score-foundation.js';
 let mode = 'item';        // item | table
@@ -84,7 +84,8 @@ const gradesView = {
   },
 
 
-  render(p) {
+  render(p) { return stablePointSurface(() => this.renderContent(p)); },
+  renderContent(p) {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الدرجات محفوظة، ولا يمكن تعديلها من مسار العمل النشط.</div></div>`;
