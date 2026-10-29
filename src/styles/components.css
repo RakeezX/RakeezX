@@ -7890,6 +7890,22 @@
 .attendance-01c__toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px; border-block-end:1px solid var(--att-line); }
 .attendance-01c__toolbar .attendance-search { flex:1; max-inline-size:440px; min-block-size:44px; margin:0; }
 .attendance-01c__toolbar>.btn { min-block-size:44px; }
+/* AI N141: filled trigger and native, non-modal anchored choices. */
+.attendance-fill-trigger { anchor-name:--attendance-fill; }
+.attendance-fill-choices {
+  position:fixed; inset:auto; top:var(--fill-top); right:var(--fill-right); margin:0;
+  inline-size:152px; max-inline-size:calc(100vw - 16px); padding:4px;
+  border:1px solid var(--border-strong); border-radius:var(--r-md);
+  background:var(--bg-elev); color:var(--text); box-shadow:0 6px 20px #0002;
+}
+.attendance-fill-choices:popover-open { display:grid; gap:2px; }
+.attendance-fill-choices .btn { min-block-size:44px; inline-size:100%; justify-content:flex-start; padding-inline:12px; }
+@supports (top:anchor(bottom)) {
+  .attendance-fill-choices {
+    position-anchor:--attendance-fill; top:calc(anchor(bottom) + 6px); right:anchor(right);
+    position-try-fallbacks:flip-block;
+  }
+}
 .attendance-01c__roster-head,.attendance-01c__row { display:grid; grid-template-columns:48px minmax(170px,1fr) 48px minmax(390px,.9fr); gap:12px; align-items:center; }
 .attendance-01c__roster-head { padding:10px 16px; border-block-end:1px solid var(--att-line); background:var(--bg-sunk); color:var(--text-3); font-size:11px; }
 .attendance-01c__list { display:block; gap:0; padding:0; }

@@ -228,8 +228,14 @@ export default {
                      value="${query}" placeholder="ابحث بالاسم أو الرقم" aria-label="بحث في قائمة الحضور" autocomplete="off">
               ${query ? html`<button class="iconbtn" data-act="clear-search" aria-label="مسح">${icon('x')}</button>` : ''}
             </div>
-            ${unmarked > 0 ? html`<button class="btn btn--quiet" data-act="fill-remaining" aria-haspopup="dialog">
-              رصد الباقين (${unmarked}) <span aria-hidden="true">▾</span></button>` : ''}
+            ${unmarked > 0 ? html`<button class="btn btn--primary attendance-fill-trigger" data-act="fill-remaining"
+              popovertarget="attendance-fill-choices" aria-controls="attendance-fill-choices">
+              رصد الباقين (${unmarked}) <span aria-hidden="true">▾</span></button>
+              <div id="attendance-fill-choices" class="attendance-fill-choices" popover="auto"
+                role="group" aria-label="رصد الباقين" data-session="${ses.id}">
+                <button class="btn btn--quiet" data-act="fill-choice" data-attendance-choice="present" autofocus>حاضرين</button>
+                <button class="btn btn--quiet" data-act="fill-choice" data-attendance-choice="absent">غائبين</button>
+              </div>` : ''}
             </div>
             <div class="attendance-01c__roster-head" aria-hidden="true"><span>الرقم</span><span>الطالب</span><span>ملاحظة</span><span>الحالة</span></div>
 
@@ -330,26 +336,30 @@ export default {
       await store.setAttendance(activeSessionId, el.dataset.id, el.dataset.status);
     },
 
-    async 'fill-remaining'() {
+    'fill-remaining'(el) {
+      // Native auto-popover owns light dismissal, Escape and focus restoration.
+      // CSS anchors follow scrolling; these coordinates support older engines.
+      const choices = document.getElementById('attendance-fill-choices');
+      if (!choices) return;
+      const rect = el.getBoundingClientRect();
+      choices.style.setProperty('--fill-top', `${rect.bottom + 6}px`);
+      choices.style.setProperty('--fill-right', `${Math.max(8, innerWidth - rect.right)}px`);
+    },
+
+    async 'fill-choice'(el, ev, params) {
+      const choices = el.closest('[popover]');
+      const sessionId = choices?.dataset.session;
+      const choice = el.dataset.attendanceChoice;
+      if (!choices?.matches(':popover-open')) return;
+      choices.hidePopover();
       if (!activeSessionId) return;
-      const sessionId = activeSessionId;
       const session = store.getSession(sessionId);
-      if (!session) return;
+      const isCurrent = () => activeSessionId === sessionId && store.getSession(sessionId)?.teachingId === params.id;
+      if (!session || !isCurrent() || !['present', 'absent'].includes(choice)) return;
       const roster = store.sessionRoster(session).members;
       const recorded = new Set(store.attendanceIn(sessionId).map(record => record.studentId));
       const remaining = roster.filter(member => !recorded.has(member.id)).length;
       if (!remaining) return;
-      const choice = await openSheet({
-        title: `رصد الباقين (${remaining})`,
-        desc: 'هؤلاء الطلاب غير المرصودين فقط. يشمل الرصد جميع غير المرصودين في الحصة، حتى خارج نتائج البحث.',
-        foot: html`
-          <button class="btn btn--quiet" data-attendance-choice="present">✓ حاضرين (${remaining})</button>
-          <button class="btn btn--quiet" data-attendance-choice="absent">× غائبين (${remaining})</button>`,
-        onMount: (root, done) => root.querySelectorAll('[data-attendance-choice]').forEach(button => {
-          button.addEventListener('click', () => done(button.dataset.attendanceChoice));
-        }),
-      });
-      if (!['present', 'absent'].includes(choice) || activeSessionId !== sessionId) return;
       const label = choice === 'present' ? 'حاضرين' : 'غائبين';
       if (isBeforeScheduledStart(store.getSession(sessionId))) {
         const confirmed = await openSheet({
@@ -361,7 +371,7 @@ export default {
         });
         if (!confirmed) return;
       }
-      if (activeSessionId !== sessionId) return;
+      if (!isCurrent()) return;
       const n = await store.fillAttendance(sessionId, choice);
       toast(`رُصد ${n} طالبًا ${label}`);
     },
