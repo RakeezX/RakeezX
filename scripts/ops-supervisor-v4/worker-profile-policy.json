@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "authorityRef": "PO-20261031-USER-UNIFORM-SOL-MEDIUM-STANDARD",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "speed": "Standard",
+  "serviceTier": "default",
+  "fastMode": false
+}

@@ -1,3 +1,4 @@
+import workerProfile from './worker-profile-policy.json' with {type:'json'};
 #!/usr/bin/env node
 /** One durable owner of the activated queue. No model planner and no PM polling. */
 import fs from 'node:fs/promises';
@@ -916,10 +917,11 @@ export class Controller {
     if (await this.paused()) { await this.save(task); return; }
     const runId = randomUUID(), directory = path.join(this.runtime, 'attempts', task.id, runId);
     await fs.mkdir(directory, { recursive: true });
-    const lane = this.config.models?.[task.riskClass ?? 'STANDARD'] ?? {};
+    // Latest PO profile applies to every lane and supersedes historical per-card model overrides.
+    if (workerProfile.version !== 1 || workerProfile.model !== 'gpt-6.1-sol' || workerProfile.effort !== 'medium' || workerProfile.fastMode !== false || workerProfile.serviceTier !== 'default') throw Error('Current PO worker profile mismatch');
     const spec = { version: 1, taskId: task.id, activationId: task.activationId, runId, taskFile: task.__file,
       cwd: task.worktreePath, baseSha: task.baseSha, codexPath: this.config.controller.codexPath,
-      model: task.model ?? lane.model ?? this.config.defaultModel, effort: task.effort ?? lane.effort ?? this.config.defaultEffort ?? 'medium',
+      model: workerProfile.model, effort: workerProfile.effort, profileAuthority: workerProfile.authorityRef,
       sessionId: task.sessionId ?? null, readOnly: task.readOnly === true,
       outputPath: path.join(directory, 'result.json'), jsonlPath: path.join(directory, 'events.jsonl'), stderrPath: path.join(directory, 'stderr.txt'),
       checkpointPath: path.join(directory, 'checkpoint.json'), promptPath: path.join(directory, 'prompt.txt'), schemaPath: path.join(this.runtime, 'worker-result.schema.json'),
