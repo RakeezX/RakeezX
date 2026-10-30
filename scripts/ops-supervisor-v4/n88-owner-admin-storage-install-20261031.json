@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-owner-admin-storage-install-20261031",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -2700,
+      "scopeKey": "n88-existing-admin-atomic-storage-install",
+      "riskClass": "HIGH",
+      "validationTier": "SENSITIVE",
+      "executionMode": "live",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 50,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/installer.inactive.sql",
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-bound.sql",
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-authority.json",
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs",
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs",
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/README.md",
+        "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+        "tests/n88-v2-owner-admin-install-20261031.test.mjs",
+        "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+        "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md"
+      ],
+      "requiredChecks": [
+        "n88_native_actual_actor_atomic_admin_qualification",
+        "n88_exact_original_target_authority_and_finite_admission",
+        "n88_actual_atomic_install_or_verified_no_change",
+        "n88_actual_postinstall_exact_privilege_and_storage_readback"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "liveAuthorizationRef": "PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION",
+        "publication": true,
+        "publicationScope": "source-only implementation and minimized verified storage receipt; generic frontend publisher does not execute SQL or enable service",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "maxAtomicInstallations": 1,
+        "originalSupportedCustodianOnly": true,
+        "temporaryExistingAdminSetEdge": true,
+        "exactHelperExecuteGrants": 3,
+        "oldMembershipRestoredBeforeCommit": true,
+        "sourceOnlyPublication": true,
+        "serviceEnabled": false,
+        "realDataMutations": 0,
+        "notificationSends": 0,
+        "newCredentials": 0,
+        "authorityEvidence": {
+          "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/window-continuation-authority.json",
+          "sha256": "e659fc0b19c97df3825638073400e0441120545ee7684a9a5eb5985c13e3f452"
+        },
+        "historicalAuthorityEvidence": {
+          "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/authority.json",
+          "sha256": "9d4df6d361c6c0aa90fa90f312d1236a28f3afc8f2560f204ac389298e8ed3d5"
+        },
+        "expiredAttemptPreserved": {
+          "runId": "f63d1781-5921-4fe4-9d60-5eeb7c27e823",
+          "sqlSha256": "05851eac5f25c24d99f8d8dafefd479c8b2e812695f2399dcd1f409cc5b4d97e",
+          "neverReplay": true
+        },
+        "maxNewQualifiedDispatches": 1,
+        "onlyAfterExactVerifiedNoChange": true,
+        "maxFreshToolWindowMinutes": 45,
+        "databaseTimeoutsUnchanged": true
+      },
+      "releaseAuthority": "Direct PO 31 October continues fixes, meaningful architectural improvement and alternatives; standing project authorization covers this specifically scoped legitimate administration using existing role ADMIN. This NEW card does not relax an old card, reissue a consumed denial, or infer missing owner rights. Qualification and the actual supported storage prerequisite precede LOCAL_READY. Source-only Product publication is authorized through the sole publisher; storage alone is not live N88 V2. Latest material continuation: complete saved readonly reconciliation using newly received actual terminal provider outcome, then only after exact VERIFIED_NO_CHANGE qualify the timing-contract repair and one freshly bound operation under PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION. Old consumed operation is immutable and never replayed; this is a new bounded phase under standing explicit user authorization to resolve blockers.",
+      "objective": "CURRENT MATERIAL CONTINUATION (supersedes only old8-minute handoff budget and old current-authority/run binding): Resume exact saved session and candidate34fc3b995badbbc01c8b73815c9a01429ec06dad. Root received actual supported apply_migration terminal response P0001 n88_external_exact_authority_mismatch after the bound22:27:39 expiry. Submission22:21:55 and response observed22:38:58 are recorded, but database execution timestamp was not independently measured. Say consistent with expiry, not proven backend timing. Read canonical late-provider-outcome.json SHA2563856056fa30065517fd1d6c065e35d44a69191d2bd8f3f7989a584a3bf5e36cd and NEW window-continuation-authority.json SHA256e659fc0b19c97df3825638073400e0441120545ee7684a9a5eb5985c13e3f452 in artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install. Preserve the original result, SQL hash05851eac, authority, intent, UNKNOWN timeout, old local-review hold and late response. Do NOT replay that request.\n\nFIRST, under available integration lease, finish exact original fixed-postSql READONLY reconciliation, using supported execute_sql or finite root read handoff; no DDL. Reconcile the saved original authority/record with the current observer run honestly, without relabelling old run identity or enabling old mutation. Its original scoped full snapshot equality is VERIFIED_NO_CHANGE; complete matching installed storage means readback-only success; any differing/incomplete state forbids another migration. Archive original bound SQL/authority/manifest/current exact source in owned immutable phase evidence before changing current binding.\n\nONLY IF exact VERIFIED_NO_CHANGE: correct actual timing contract in existing admission/relay. Separate bounded45-minute tool queue/response lifecycle from unchanged15s statement/idle and3s lock timeouts. A missing ACK must not let the worker release/finish while the explicitly owned original tool call is still pending; maintain precise pending/terminal outcome and readback disposition, no replay. Split combined first authority guard into finite expired vs target/delta/action mismatch reasons without dropping any predicate. Use fresh current-task/run authority and exact baseline binding under new reference; never edit/extend original request expiry. One named fresh migration phase is authorized, not repeatable. Root is sole migration tool operator for explicit handoff; worker may use supported metadata reads but must not concurrently dispatch migration. Claim ownership and emit only after all review/tests; keep worker/relay available for admitted45min response window, summarize progress and wait for root actual result.\n\nReuse completed actual-actor, six rollback and14-operation native proofs because storage/privilege behavior is unchanged. Check only new time-boundary rejection/acceptance and precise guard classification, exact unchanged qualified DDL/delta/function identities, preserved post-ACK restart-readback. No full native campaign again. New source/manifest hashes must reflect changed guard/relay, and existing byte-derived frozen admission remains required. Preserve current source-only publication/actual storage readback conditions: LOCAL_READY only after genuine installed storage readback, serviceEnabled:false. Original sole publisher delivers. Do not retry a second unchanged actual failure or bypass a genuine tool/policy permission denial.\n\nORIGINAL QUALIFIED SCOPE FOR CONTEXT (its expired phase is immutable; current authority above controls new operation):\nImplement and COMPLETE a newly qualified actual storage prerequisite, not another inactive-only packet. Start from current main df23c78126281b8625e2009df7cf3195abd7a482. Read the current intake authority at artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/authority.json and verify sha2569d4df6d361c6c0aa90fa90f312d1236a28f3afc8f2560f204ac389298e8ed3d5. Native PG17 actual actor is postgres LOGIN NOSUPERUSER CREATEROLE INHERIT BYPASSRLS with createrole_self_grant empty. Existing n88_guard edges are (grantor supabase_admin, member postgres, ADMIN true, INHERIT false, SET false) and (grantor postgres, member postgres, ADMIN false, INHERIT false, SET false). Existing ADMIN is lawful management authority, not current SET/EXECUTE. Two lock helpers lock_canonical_sources(uuid,integer) and lock_projection_sources(uuid,integer) are n88_guard-owned; lock_current_session(uuid,uuid) is postgres-owned.\n\nUse a NEW separate candidate directory. Keep original immutable v2-package-1028, v2-external-plan-1028, v2-actor-qualified-20261030, old native results, failed42501 and old consumed runs unchanged. Historical original relay/admission implementation is available read-only at C:/Users/Abody/Projects/RakeezX/.worktrees/n88-storage-live-install-1029, commit421f0a96173cb3ae35c70bb85337206f73cff171, saved session01a1822d-de76-76d3-89eb-78fb47247a17. Its install-original-custodian.mjs explicit --original-custodian-files finite file relay emits operation descriptors; root remains the supported connected-tool custodian (apply_migration for DDL, execute_sql for exact reads). New worker/session is legitimate; do NOT edit old queue/session or replay old spent storagePlan. Pin historical source bytes before reuse. A separate new finite admission module is preferred; shared private-error-boundary may only route the fresh named capability, leaving historical76/78/nine-read/storage/owner-probe contracts untouched.\n\nFix newly established actual-actor defects: earlier positive fixture precreated n88_v2_runtime as bootstrap, hiding PG17 creator ADMIN membership. New positive fixture bootstrap creates ONLY baseline/legacy topology; actual nonsuperuser postgres must create runtime and complete all stages. Permit ONLY exact mandatory creator ADMIN edges for V2 roles with SET/INHERIT false at completion; no general membership relaxation. Old wholesale legacy-function readback must permit exactly three new runtime EXECUTE ACL entries without grant option, while requiring old bodies/owners/config and all other ACLs identical.\n\nSequence in ONE bound atomic transaction: verify original physical target/actor/baseline/absent V2; create negative-attribute NOLOGIN runtime; as postgres grant its owned session helper EXECUTE; explicitly grant/update ONLY postgres-granted oldguard edge ADMIN false INHERIT false SET true; SET LOCAL ROLE n88_guard; grant exactly two owned helpers to runtime without grant option; SET LOCAL ROLE NONE and assert current_user=session_user=postgres; restore exact same original self-edge to all three false; verify both old edges exactly. Then reviewed V2 DDL/function grants/owner transfers with temporary NEW guard SET in correct order; restore effective SET/USAGE false. Original baseline is never recomputed after writes merely to pass. Before sole COMMIT verify exact 4 FORCE-RLS relations,14 fixed operations+6 helpers, expected function ACL identities, old helper/role invariants, dedicated runtime no raw private/Auth/canonical reads or writes and no PUBLIC/anon/authenticated execution. No new role membership in legacy backend/guard. Do not concatenate wrappers around the older BEGIN/COMMIT installer. Establish actual official apply_migration adapter transaction behavior and preserve single atomic rollback, including migration-history handling; document any genuine undocumented adapter limitation rather than claim invented guarantee.\n\nNative focused proof BEFORE hosted operation: old unchanged route fails; new actual actor path succeeds from observed two-edge baseline; fail injections after old SET, helper ACLs, partialV2DDL rollback EVERYTHING to original membership/ACL and no V2 roles/objects; all old role/body/Auth checks unchanged. Reuse unchanged earlier 14-operation business proofs; no broad redundant campaign. New finite admission consumes before dispatch, binds this run/task/authority/target/original baseline/new installer exact hash, bounded ordered reads and one migration, limits/deadline, fresh leases; deny tampered SQL/foreign run/second install. Support UNKNOWN readback only, no replay.\n\nAfter native qualification, emit exact scoped relay requests and root handoff paths while worker remains active; do not stop at BLOCKED merely because CLI worker lacks connected Supabase tools. Root can answer only the newly admitted exact supported requests. Reuse the saved actual provider nonexposure observation artifacts/ops-supervisor-v4/intake-evidence/po-20261029-n88-provider-config/observation.json (sha256199c9ca4360dfc894866647e99775a2a7989f4b7b482c398a704d6b92c5439fc) as historical independent evidence with its real timestamp, never label it fresh. Establish any required current validity through existing supported read capability; null pgrst.db_schemas alone is not proof. No foreground/personal browser interaction. Current catalogue/baseline reads should be only those necessary to bind materially changed operation; don't rerun unchanged nine-read/native campaigns.\n\nActual installation is once through supported apply_migration under original integration/live-mutation leases; true tool rejection remains binding and must be reported exactly, no alternate credential/tool fallback. Known failure rolls back; lost acknowledgement or preexisting/partial identity yields exact readonly reconciliation, never reset/drop or replay. Actual success readback and bounded sanitized receipt required before LOCAL_READY. Record serviceEnabled:false; remaining dedicated hosted runtime/transport and genuine transactional Sync/Delete writer attachment remain separate. No frontend/SW edits here. Keep artifacts minimal and no credentials or student content. Sol6.1 Medium Standard Fast off; sole original publisher delivers the source-only implementation and truthful evidence.\n\nAdapter qualification clarification: official MCP forwards supplied SQL to Management API, whose public docs do not specify transaction/history internals. Do not invent a provider guarantee or let documentation omission alone become an indefinite blocker. Qualify native explicit transaction both standalone and inside an outer transaction; enforce serializable isolation before any operational writes and same transaction identity through all stages. Fail before changes if adapter cannot admit required transaction setup. All admin/DDL must be before the sole COMMIT. Migration-history acknowledgement may be separate/unknown; reconcile actual exact installed identities through the finite read route and report that limit truthfully. Do not add unrelated production probe migrations or claim exactly-once replay safety.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "df23c78126281b8625e2009df7cf3195abd7a482",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/installer.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/actor-capabilities.mjs",
+          "drafts/n88-student-portal/activation/v2-package-1028/schema.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "tests/n88-v2-actor-qualified-20261030.test.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/installer.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-bound.sql",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-authority.json",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/README.md",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "tests/n88-v2-owner-admin-install-20261031.test.mjs",
+          "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/installer.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-bound.sql",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-authority.json",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs",
+          "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/README.md",
+          "tests/n88-v2-owner-admin-install-20261031.test.mjs",
+          "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md"
+        ],
+        "workerChecks": [
+          "n88_native_actual_actor_atomic_admin_qualification",
+          "n88_exact_original_target_authority_and_finite_admission",
+          "n88_actual_atomic_install_or_verified_no_change",
+          "n88_actual_postinstall_exact_privilege_and_storage_readback"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
