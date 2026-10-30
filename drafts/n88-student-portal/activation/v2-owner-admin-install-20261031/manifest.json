@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "taskId": "continuous-n88-owner-admin-storage-install-20261031",
+  "runId": "884fde26-bbeb-4f09-bac7-d2bd60a47ca5",
+  "baseSha": "df23c78126281b8625e2009df7cf3195abd7a482",
+  "projectRef": "xlrubcwjqktzzunrvuns",
+  "serviceEnabled": false,
+  "authorityRef": "PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION",
+  "authorityPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/window-continuation-authority.json",
+  "authoritySha256": "e659fc0b19c97df3825638073400e0441120545ee7684a9a5eb5985c13e3f452",
+  "providerPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261029-n88-provider-config/observation.json",
+  "providerSha256": "199c9ca4360dfc894866647e99775a2a7989f4b7b482c398a704d6b92c5439fc",
+  "providerObservedAt": "2026-10-28T22:26:13.288Z",
+  "installerSha256": "fb4201b1afacf7a5a9bfe56bcd57f6aaaecb472770e48e95056fd18b6e863ff0",
+  "deltaSha256": "6f0c21236d3a465f399b4b865a562247519c928d6d2a42575a81f6ac3f754026",
+  "historicalRelay": {
+    "commit": "421f0a96173cb3ae35c70bb85337206f73cff171",
+    "path": "drafts/n88-student-portal/activation/v2-external-plan-1028/install-original-custodian.mjs",
+    "sha256": "f622add0fb3b25a7d831dd2f3595c2fe0366a8f2dbacba08cf52f95d76187544"
+  },
+  "pinnedSources": {
+    "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/installer.inactive.sql": "0bca177df3827b414f8d1a6f48093644437dfdf88564ce140f39e11443841552",
+    "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs": "0f16d5eb1e569e0657643fca03569a9aed77428c102c7a9dff9d82f3490a6178",
+    "drafts/n88-student-portal/activation/v2-package-1028/manifest.json": "8138a716764d4767ec34d40a295fcf31cf1d39ae7ca69db00328732d85f42dd0",
+    "tests/n88-backend-package-1028/results.json": "0c69a2ebaa353cc0b1e9b12181f910d573c95ac29f1bfa2afe4f1c518a1f5f22"
+  },
+  "supportedPreflight": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823.tmp/supported-preflight.json",
+    "sha256": "c1a64fe7a4fbe489d34b02d8fbcdb0c2bb4a13a76b686b9df26432303c52da2d",
+    "sqlSha256": "9f470b703db8e4a827ddd908786a24535397c335b256261563cd0fd02d97642d"
+  },
+  "nativeQualification": [
+    {
+      "mode": "empty-outer",
+      "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-317b14df-f54b-40a0-b385-7c6cc4da1299.tmp/report.json",
+      "sha256": "26895a2f7e43166e62e69c62e27e369daf8f38d7c1d90c4cf9dbb2e44b4268e4"
+    },
+    {
+      "mode": "standalone",
+      "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-250f6614-1657-4d00-8a98-149a7742adbb.tmp/report.json",
+      "sha256": "9bd90648a06ab030f910d7e7e2eeb2d306a184254ed19093ff2bb849c3751731"
+    }
+  ],
+  "admissionSha256": "1efab11fc70be0c1bd529145904ebd2dd4886868bfcd5e869248ed68e40f5db1",
+  "testSha256": "570c75e6dc63b4b5ef450140e04af7a79c1b4179466193b0063e3a605fc1a78f",
+  "relaySha256": "f07ce1fde5ccaedea03c2bceed8966f435e12b07faa7c51fa686320572e9ba10",
+  "previousCandidate": "34fc3b995badbbc01c8b73815c9a01429ec06dad",
+  "previousRunId": "f63d1781-5921-4fe4-9d60-5eeb7c27e823",
+  "lateProviderOutcome": {
+    "path": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/late-provider-outcome.json",
+    "sha256": "3856056fa30065517fd1d6c065e35d44a69191d2bd8f3f7989a584a3bf5e36cd"
+  },
+  "originalArchive": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-original-reconcile.tmp/archive-manifest.json",
+    "sha256": "7c8c40ed4b947b88f9fa464d9bb27f92abb9dc18d35f2e12f4be39519c7731f4"
+  },
+  "originalReconciliation": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-original-reconcile.tmp/report.json",
+    "sha256": "8fce86e5d152f914b5e8785be82336f6dacb20259d3cb2abe66389e8a9cf9e12",
+    "state": "VERIFIED_NO_CHANGE"
+  },
+  "expiredAttempt": {
+    "state": "UNKNOWN",
+    "boundInstallerSha256": "05851eac5f25c24d99f8d8dafefd479c8b2e812695f2399dcd1f409cc5b4d97e",
+    "phaseReportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-qualified-v1.tmp/report.json",
+    "phaseReportSha256": "ce8c7d6292e4f6a7dd66e5f33b898fe8e05b71850a6e3ca676fd1b309b26a029",
+    "custodianClaimPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-qualified-v1.tmp/custodian-dispatch-claim.json",
+    "custodianClaimSha256": "53d0606a83a4e49a8fb7840ca11c0b25a95e47e20a9818cd7ddb1aeea1537938",
+    "migrationAcknowledged": false,
+    "providerReceipt": null,
+    "installationReplay": false,
+    "serviceEnabled": false,
+    "cleanup": {
+      "relayClosed": true,
+      "integrationReleased": true,
+      "liveMutationReleased": true
+    },
+    "reconciliation": {
+      "state": "NOT_RUN",
+      "reason": "integration lease occupied by another active worker",
+      "holderTaskId": "continuous-n44-current-projection-recovery-20261031",
+      "holderRunId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec",
+      "reportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-reconcile.tmp/report.json",
+      "reportSha256": "6956f88956726c5ed2a247000325501afcc254c4d6578ac35a326acda277fd72"
+    }
+  },
+  "maxToolWindowMs": 2700000,
+  "currentPreflight": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-current-preflight.tmp/response.json",
+    "sha256": "ac4a6fc3fa5ce4113664a7082df2c4b762350571912590fe86364d4b26a66841",
+    "sqlSha256": "9f470b703db8e4a827ddd908786a24535397c335b256261563cd0fd02d97642d"
+  },
+  "timingQualification": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-a75edf91-c8a3-47c3-9e88-efedfb3dd7c8.tmp/report.json",
+    "sha256": "ebedb611c0f857c34c8af485391229eeaee6df72f94c8f32b7b9b3f99b9c8cc7",
+    "storageCampaignRerun": false
+  },
+  "currentAttempt": {
+    "state": "INSTALLED_STORAGE_ONLY",
+    "phasePath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp",
+    "requestSha256": "e82e0f7da666fc57c43204e2bbb407be4482656c02ffed7ccd8dac226ecc3de6",
+    "boundInstallerSha256": "161bc8f7db21ffff7ba4532df78f5e654bef43fce7cee0924f7b6a7fc96e3b2d",
+    "claimPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/custodian-dispatch-claim.json",
+    "claimSha256": "70cc794bc02d838b1e8e1e445e062221496e0ed0d29afe462e5ba559a9a1ed3f",
+    "deadline": "2026-10-30T23:39:24.406Z",
+    "installationReplay": false,
+    "serviceEnabled": false,
+    "originalRelayReportState": "INSTALLED_READBACK_INCOMPLETE",
+    "originalRelayReadbackError": "n88_old_roles_changed",
+    "relayReportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/report.json",
+    "relayReportSha256": "d07ff0bfc7f2a689b020f4711a4ad538e6048a9daa454aae4916aee575fb0b89",
+    "migrationResponsePath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/response-1.json",
+    "migrationResponseSha256": "7176f25759f196beb093f86b4f37e911c78343da0d1d7e9167001daf8d26ebad",
+    "readbackResponsePath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/response-2.json",
+    "readbackResponseSha256": "330e8a903c952fb9e2943a92b38abf04f96ad40ca2fd2d8d98746080a2cfde4d",
+    "cleanup": {
+      "relayClosed": true,
+      "leases": [
+        {
+          "name": "live-mutation",
+          "result": "RELEASED live-mutation"
+        },
+        {
+          "name": "integration",
+          "result": "RELEASED integration"
+        }
+      ]
+    }
+  },
+  "actualInstallation": {
+    "state": "INSTALLED_STORAGE_ONLY",
+    "projectRef": "xlrubcwjqktzzunrvuns",
+    "runId": "884fde26-bbeb-4f09-bac7-d2bd60a47ca5",
+    "boundInstallerSha256": "161bc8f7db21ffff7ba4532df78f5e654bef43fce7cee0924f7b6a7fc96e3b2d",
+    "provider": "official-connected-supabase-apply_migration",
+    "migrationName": "n88_owner_admin_storage_window_20261031",
+    "submittedAt": "2026-10-30T22:55:49.680Z",
+    "providerSuccessObservedAt": "2026-10-30T22:55:52.657Z",
+    "providerSuccess": true,
+    "readbackProvider": "official-connected-supabase-execute_sql",
+    "readbackObservedAt": "2026-10-30T22:57:12.798Z",
+    "readbackSqlSha256": "b01fc0fb56e2eca96931e95b4a7b56d044990e1adda627dc249153fc91a67c0c",
+    "readbackResponseSha256": "330e8a903c952fb9e2943a92b38abf04f96ad40ca2fd2d8d98746080a2cfde4d",
+    "assessment": {
+      "relations": 4,
+      "fixedOperations": 14,
+      "helpers": 6,
+      "helperExecuteDelta": 3,
+      "oldMembershipRestored": true,
+      "runtimeRawPrivileges": false,
+      "serviceEnabled": false
+    },
+    "validation": "Exact saved native provider rows revalidated after membership-order-only correction; no repeated service read or mutation.",
+    "serviceEnabled": false,
+    "runtimeTransportEnabled": false,
+    "transactionalSyncDeleteWriterAttached": false,
+    "migrationHistoryGuarantee": "Provider success acknowledgement retained; no independently documented transaction/history-internal or exactly-once guarantee claimed."
+  },
+  "lifecycleReview": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-lifecycle-review-dfbf3e41-c184-43b9-85bb-4957290b1d20.tmp/report.json",
+    "sha256": "147409bb69fc24820f1cf62233d69552b746bca7eca7425b25c64d605edf8328",
+    "operatorReviewPath": "artifacts/operator-window-review-n88-20261031.json",
+    "operatorReviewSha256": "45a3c740e7b2c900bf7f0454d0bc31f9a922454e63414391245f457ff77f3678",
+    "requirementsResolved": [
+      "claim-at-deadline-observation-race",
+      "restart-no-change-disposition"
+    ],
+    "membershipComparison": "Exact complete multiset; no role/membership permission relaxation."
+  }
+}
