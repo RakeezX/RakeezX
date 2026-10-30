@@ -11,6 +11,31 @@ export const N44_CONFIG_SERVICE_PHASES = Object.freeze([
   'identity', 'set_role', 'private_session', 'source', 'ingress', 'query', 'deadline',
   'registration_input', 'registration_auth', 'registration_protect', 'registration_repository',
 ]);
+// AI: only an exact, bounded pre-mutation CAS rejection may reach project().
+async function readStaleProjection(stream, signal) {
+  if (!stream) return;
+  const reader = stream.getReader(), parts = []; let total = 0;
+  const cancel = () => { void reader.cancel().catch(() => {}); };
+  signal.addEventListener('abort', cancel, { once: true });
+  try {
+    for (;;) {
+      if (signal.aborted) return;
+      const { done, value } = await reader.read();
+      if (signal.aborted) return;
+      if (done) break;
+      total += value.byteLength;
+      if (total > 2048) return;
+      parts.push(value);
+    }
+    const bytes = new Uint8Array(total); let at = 0;
+    for (const part of parts) { bytes.set(part, at); at += part.byteLength; }
+    const body = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+    if (body && !Array.isArray(body) && Object.getPrototypeOf(body) === Object.prototype &&
+        Object.keys(body).sort().join(',') === 'sourceStamp,status' && body.status === 'stale' &&
+        (body.sourceStamp === null || typeof body.sourceStamp === 'string' && /^[a-f0-9]{64}$/.test(body.sourceStamp))) return body;
+  } catch { /* Invalid error bodies never authorize a corrected mutation. */ }
+  finally { signal.removeEventListener('abort', cancel); cancel(); reader.releaseLock(); }
+}
 // Reuse web-protocol.mjs readBytes algorithm locally: no draft/startup dependency.
 async function readConfigFailurePhase(stream, signal) {
   if (!stream) return;
@@ -60,7 +85,14 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
         headers: { 'content-type': 'application/json', 'x-n44-csrf': '1', authorization: cleanup ? cleanupAuthorization() : typeof authorization === 'function' ? authorization() : authorization }, body: JSON.stringify(body), signal: abort.signal });
       httpStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599 ? response.status : null;
       phase = !cleanup && !current() ? 'context' : 'http';
-      // The sole non-2xx body exception: this owned POST config action, JSON503.
+      // Two exact non-2xx exceptions: owned config JSON503 phase evidence,
+      // and events/update JSON400 stale CAS rejection (never generic error JSON).
+      if (path === 'events/update' && !cleanup && current() && response.status === 400 &&
+          response.headers?.get('content-type')?.split(';', 1)[0].trim().toLowerCase() === 'application/json') {
+        const stale = await readStaleProjection(response.body, abort.signal);
+        if (abort.signal.aborted || !current()) throw Error('unavailable');
+        if (stale) return stale;
+      }
       if (path === 'push/config' && !cleanup && valid() && response.status === 503 &&
           response.headers?.get('content-type')?.split(';', 1)[0].trim().toLowerCase() === 'application/json') {
         servicePhase = await readConfigFailurePhase(response.body, abort.signal);
