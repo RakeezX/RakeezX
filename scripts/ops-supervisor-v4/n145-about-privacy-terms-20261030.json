@@ -90,13 +90,6 @@
         "publisherChecks": [
           "production_publication"
         ]
-      },
-      "completionMode": "recheck_existing_publication",
-      "verificationRepair": {
-        "publishedSha": "116cb808cdf868cc6cc54a4f3be89ceefc1b36cf",
-        "priorReceiptSha256": "59fa9402cb859212543a10fc96c0b2db84f8cf3d95daaa19889e8623db230768",
-        "reviewedFixtureSha256": "3cba903babeff2306fa62a29b6e842140e4fc04672417312adebd2f415b74cc6",
-        "reason": "Observed 30 October Cloudflare JSD provider template changed its exact origin resolution and repeated ray query. The reviewed narrow normalizer accepts both pinned complete templates, binds both ray values and preserves exact immutable/application source SHA. Recheck the original successful provider publication; no Product implementation replay or redeployment."
       }
     }
   ]
