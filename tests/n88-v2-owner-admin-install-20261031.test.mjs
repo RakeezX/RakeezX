@@ -14,9 +14,10 @@ import { CANONICAL_PROJECTION_REQUIREMENTS } from '../drafts/n88-student-portal/
 
 
 import { evaluateActorCapabilities, requiredHelpers } from '../drafts/n88-student-portal/activation/v2-actor-qualified-20261030/actor-capabilities.mjs';
-import {preSql,postSql,bind,admit,validatePost,toolLifecycle,TOOL_WINDOW_MS} from '../drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs';
+import {preSql,postSql,bind,admit,validatePost,toolLifecycle,TOOL_WINDOW_MS,reconcileReadback,loadSavedRecord} from '../drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs';
 import { identitySql, baselineInventorySql } from '../drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs';
 import { publicationV2FunctionReadback } from '../drafts/n88-student-portal/publication-v2-host.inactive.mjs';
+if(process.argv.includes('--lifecycle-only')){await qualifyLifecycleOnly();process.exit(0);}
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 assert.equal(path.resolve(process.cwd()), root);
 const taskId = 'continuous-n88-owner-admin-storage-install-20261031', runId = '884fde26-bbeb-4f09-bac7-d2bd60a47ca5';
@@ -348,4 +349,38 @@ async function qualifyTiming({source,admin,report,candidateDir,candidateManifest
  clock=start;const unclaimed=toolLifecycle(start+TOOL_WINDOW_MS,{now:()=>clock});clock=start+TOOL_WINDOW_MS;assert.equal(unclaimed.tick(),'EXPIRED_UNCLAIMED');assert.equal(unclaimed.canRelease,true);assert.throws(()=>unclaimed.claim(),/expired_or_spent/);
  report.checks.push({name:'n88_timing_guard_and_tool_lifecycle',status:'PASS',evidence:'Actual native first-guard SQL: valid45min authority accepted; expired/null expiry classified separately; all 9 identity/binding tamper cases rejected. Same qualified DDL/privilege tail, delta hash and14 identities; 15s/3s settings byte-identical. Fake-clock admission accepts after old8min, retains late terminal ACK, preserves post-ACK/restart readonly, rejects foreign/tampered/repeated mutation and >45min authority. Claimed pending cannot release; unclaimed expiry can.'});
  report.reusedNativeQualification=candidateManifest.nativeQualification;report.authorityGuardRejections=rejected;report.storageCampaignRerun=false;
+}
+/** Local-only review regressions; reuses actual saved rows, no server or tool calls. */
+async function qualifyLifecycleOnly(){
+ const d='drafts/n88-student-portal/activation/v2-owner-admin-install-20261031';
+ const m=JSON.parse(await readFile(d+'/manifest.json','utf8'));
+ const phase='artifacts/'+m.taskId+'-'+m.runId+'-lifecycle-review-'+randomUUID()+'.tmp';await mkdir(phase);
+ const sha=b=>createHash('sha256').update(b).digest('hex');
+ const result={taskId:m.taskId,runId:m.runId,startedAt:new Date().toISOString(),serviceCalls:0,storageCampaignRerun:false,checks:[]};
+ try{
+  const start=Date.now(),end=start+TOOL_WINDOW_MS;let clock=start;
+  const delayed=toolLifecycle(end,{now:()=>clock});clock=end+1000;
+  assert.equal(delayed.claim({claimedAt:new Date(end-1000).toISOString()}),true);assert.equal(delayed.canRelease,false);assert.equal(delayed.tick(),'PENDING_AFTER_WINDOW');delayed.terminal();assert.equal(delayed.canRelease,true);
+  const malformed=toolLifecycle(clock+TOOL_WINDOW_MS,{now:()=>clock});assert.equal(malformed.claim({claimedAt:'invalid'}),false);assert.equal(malformed.canRelease,false);malformed.terminal();assert.equal(malformed.canRelease,true);
+  const unclaimed=toolLifecycle(clock+TOOL_WINDOW_MS,{now:()=>clock});clock+=TOOL_WINDOW_MS;assert.equal(unclaimed.tick(),'EXPIRED_UNCLAIMED');assert.throws(()=>unclaimed.claim(),/expired_or_spent/);assert.equal(unclaimed.canRelease,true);
+  const record=await loadSavedRecord();
+  const failedGuardReconciliation=await reconcileReadback(record,{snapshot:record.originalSnapshot});assert.equal(failedGuardReconciliation.state,'VERIFIED_NO_CHANGE');assert.equal(failedGuardReconciliation.serviceEnabled,false);
+  const responsePath='artifacts/'+m.taskId+'-'+m.runId+'-window-v1.tmp/response-2.json';const bytes=await readFile(responsePath);const response=JSON.parse(bytes);assert.equal(response.runId,m.runId);assert.equal(response.sha256,sha(postSql));assert.equal(response.rows.length,1);
+  const row=response.rows[0];const installed=await reconcileReadback(record,row);assert.equal(installed.state,'INSTALLED_STORAGE_ONLY');assert.equal(installed.readback.fixedOperations,14);
+  const reordered=structuredClone(row);reordered.snapshot['roles-and-memberships'].find(r=>r.rolname==='postgres').memberships.reverse();assert.equal((await reconcileReadback(record,reordered)).state,'INSTALLED_STORAGE_ONLY');
+  for(const key of ['admin','inherit','set']){
+   const bad=structuredClone(row),edge=bad.snapshot['roles-and-memberships'].find(r=>r.rolname==='postgres').memberships.find(e=>e.role==='n44_guard');edge[key]=!edge[key];assert.equal((await reconcileReadback(record,bad)).state,'READBACK_INCOMPLETE');
+  }
+  const duplicate=structuredClone(row);const memberships=duplicate.snapshot['roles-and-memberships'].find(r=>r.rolname==='postgres').memberships;memberships.push({...memberships[0]});assert.equal((await reconcileReadback(record,duplicate)).state,'READBACK_INCOMPLETE');
+  const missing=structuredClone(row);missing.snapshot['roles-and-memberships'].find(r=>r.rolname==='postgres').memberships.pop();assert.equal((await reconcileReadback(record,missing)).state,'READBACK_INCOMPLETE');
+  const foreignGrantor=structuredClone(row);foreignGrantor.snapshot.memberships.find(e=>e.role==='n88_guard').grantor='foreign';assert.equal((await reconcileReadback(record,foreignGrantor)).state,'READBACK_INCOMPLETE');
+  const acl=structuredClone(row);const f=acl.snapshot['function-and-trigger-identity'].find(f=>f.proname.startsWith('v2_'));f.acl=f.acl.replace('n88_v2_runtime=X/','n88_v2_runtime=X*/');assert.equal((await reconcileReadback(record,acl)).state,'READBACK_INCOMPLETE');
+  for(const name of ['lock_current_session','lock_canonical_sources','lock_projection_sources']){const bad=structuredClone(row);const f=bad.snapshot['function-and-trigger-identity'].find(f=>f.proname===name);f.acl='{'+f.acl.slice(1,-1).split(',').filter(v=>!v.startsWith('n88_v2_runtime=')).join(',')+'}';assert.equal((await reconcileReadback(record,bad)).state,'READBACK_INCOMPLETE');}
+  const exposedSupport=structuredClone(row);const support=exposedSupport.snapshot['function-and-trigger-identity'].find(f=>f.proname==='publication_v2_exact');support.acl=support.acl.replace('}',',authenticated=X/postgres}');assert.equal((await reconcileReadback(record,exposedSupport)).state,'READBACK_INCOMPLETE');
+  const incomplete=structuredClone(row);incomplete.snapshot['function-and-trigger-identity'].pop();assert.equal((await reconcileReadback(record,incomplete)).state,'READBACK_INCOMPLETE');
+  result.actualReadback={responsePath,responseSha256:sha(bytes),assessment:installed};
+  result.checks.push({name:'n88_late_claim_and_readonly_disposition_regressions',status:'PASS',evidence:'A recorded pre-deadline root claim observed after deadline marks pending before timestamp parsing and cannot release until terminal. Malformed matching claim also retains resources; expired unclaimed still refuses. Exact original snapshot => VERIFIED_NO_CHANGE; actual saved installed catalog => INSTALLED_STORAGE_ONLY; missing/changed state => READBACK_INCOMPLETE. Reordering membership rows accepted as identical multiset; changed ADMIN/INHERIT/SET, duplicates/removal, foreign grantor and EXECUTE grant option remain rejected. No SQL or service call.'});
+  result.status='PASS';
+ }catch(e){result.status='FAIL';result.error=e.message;throw e;}
+ finally{result.finishedAt=new Date().toISOString();result.sourceSha256={admission:sha(await readFile(d+'/admission.mjs')),relay:sha(await readFile(d+'/install-original-custodian.mjs'))};await writeFile(phase+'/report.json',JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({status:result.status,reportPath:phase+'/report.json',checks:result.checks,error:result.error}));}
 }

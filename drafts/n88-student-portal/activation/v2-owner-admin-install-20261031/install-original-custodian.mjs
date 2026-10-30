@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import manifest from './manifest.json' with {type:'json'};
-import {taskId,runId,projectRef,sha,preSql,postSql,verifySources,loadSavedRecord,validatePre,validateOriginalTarget,bind,admit,validatePost,toolLifecycle,TOOL_WINDOW_MS} from './admission.mjs';
+import {taskId,runId,projectRef,sha,preSql,postSql,verifySources,loadSavedRecord,validatePre,validateOriginalTarget,bind,admit,validatePost,reconcileReadback,toolLifecycle,TOOL_WINDOW_MS} from './admission.mjs';
 const root=fileURLToPath(new URL('../../../../',import.meta.url)),canonical='C:/Users/Abody/Projects/RakeezX';
 const psExe='C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
 const lease=(name,action)=>execFileSync(psExe,['-NoProfile','-NonInteractive','-ExecutionPolicy','RemoteSigned','-File',canonical+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name',name,'-Action',action,'-TaskFile',canonical+'/artifacts/ops-supervisor-v4/queue/'+taskId+'.json','-WaitSeconds','0','-OwnerToken',runId],{encoding:'utf8',windowsHide:true,timeout:15000}).trim();
@@ -41,7 +41,7 @@ const client={async query(sql,args=[]){
   await owned();const claim=await optional(path.join(phase,kind==='migration'?'custodian-dispatch-claim.json':'custodian-read-claim-'+id+'.json'));
   if(claim&&lifecycle.state==='AWAITING_CLAIM'){
    if(claim.taskId!==taskId||claim.runId!==runId||(claim.requestId??claim.id)!==id||(claim.sqlSha256??claim.sha256)!==request.sha256||claim.operator!=='root-connected-official-supabase-custodian')throw Error('n88_custodian_claim_binding');
-   lifecycle.claim();outcome.state='TOOL_PENDING';outcome.custodianClaim=claim;await checkpoint();
+   const claimTimeQualified=lifecycle.claim({claimedAt:claim.claimedAt});outcome.claimTimeQualified=claimTimeQualified;outcome.state=claimTimeQualified?'TOOL_PENDING':'TOOL_PENDING_CLAIM_TIME_UNRESOLVED';outcome.custodianClaim=claim;await checkpoint();
   }
   const response=await optional(path.join(phase,'response-'+id+'.json'));
   if(response){
@@ -74,7 +74,7 @@ try{
   admission=admit(wrapped,record,{taskId,runId});await admission.query(preSql);
   const result=await admission.query(record.operations[1].sql);outcome.migrationReceipt=result.receipt;outcome.migrationAcknowledged=true;await checkpoint();
  }
- const post=await admission.query(postSql);outcome.readbacks.push(post.rows[0]);outcome.readback=await validatePost(record,post.rows[0]);outcome.state='INSTALLED_STORAGE_ONLY';
+ const post=await admission.query(postSql);outcome.readbacks.push(post.rows[0]);const assessment=await reconcileReadback(record,post.rows[0]);Object.assign(outcome,assessment);
 }catch(e){outcome.state=installationEmitted?(outcome.terminalOutcome?.ok===false?'KNOWN_TERMINAL_FAILURE':outcome.migrationAcknowledged?'INSTALLED_READBACK_INCOMPLETE':'UNKNOWN'):'DENIED';outcome.error=e.message;outcome.exactDenial=e.exactDenial??null;}
 finally{
  // Even a local protocol/IO failure cannot dispose resources while the

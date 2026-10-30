@@ -41,9 +41,9 @@
       "sha256": "9bd90648a06ab030f910d7e7e2eeb2d306a184254ed19093ff2bb849c3751731"
     }
   ],
-  "admissionSha256": "a72c45b04a3517aab9904b8fb80c3c9283c276be8ae3cf7c4fed641cbc0dc9ce",
-  "testSha256": "35ee787a448b896787cea5fce6ee17a0b6f3e8e9d4adfbac1979861ce3c3f55f",
-  "relaySha256": "237f0af8e31ed3c8ba35e09a8f54ff83fb684520ec07fb3723c3e28843930bae",
+  "admissionSha256": "1efab11fc70be0c1bd529145904ebd2dd4886868bfcd5e869248ed68e40f5db1",
+  "testSha256": "570c75e6dc63b4b5ef450140e04af7a79c1b4179466193b0063e3a605fc1a78f",
+  "relaySha256": "f07ce1fde5ccaedea03c2bceed8966f435e12b07faa7c51fa686320572e9ba10",
   "previousCandidate": "34fc3b995badbbc01c8b73815c9a01429ec06dad",
   "previousRunId": "f63d1781-5921-4fe4-9d60-5eeb7c27e823",
   "lateProviderOutcome": {
@@ -96,7 +96,7 @@
     "storageCampaignRerun": false
   },
   "currentAttempt": {
-    "state": "TOOL_PENDING",
+    "state": "INSTALLED_STORAGE_ONLY",
     "phasePath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp",
     "requestSha256": "e82e0f7da666fc57c43204e2bbb407be4482656c02ffed7ccd8dac226ecc3de6",
     "boundInstallerSha256": "161bc8f7db21ffff7ba4532df78f5e654bef43fce7cee0924f7b6a7fc96e3b2d",
@@ -104,6 +104,67 @@
     "claimSha256": "70cc794bc02d838b1e8e1e445e062221496e0ed0d29afe462e5ba559a9a1ed3f",
     "deadline": "2026-10-30T23:39:24.406Z",
     "installationReplay": false,
-    "serviceEnabled": false
+    "serviceEnabled": false,
+    "originalRelayReportState": "INSTALLED_READBACK_INCOMPLETE",
+    "originalRelayReadbackError": "n88_old_roles_changed",
+    "relayReportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/report.json",
+    "relayReportSha256": "d07ff0bfc7f2a689b020f4711a4ad538e6048a9daa454aae4916aee575fb0b89",
+    "migrationResponsePath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/response-1.json",
+    "migrationResponseSha256": "7176f25759f196beb093f86b4f37e911c78343da0d1d7e9167001daf8d26ebad",
+    "readbackResponsePath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/response-2.json",
+    "readbackResponseSha256": "330e8a903c952fb9e2943a92b38abf04f96ad40ca2fd2d8d98746080a2cfde4d",
+    "cleanup": {
+      "relayClosed": true,
+      "leases": [
+        {
+          "name": "live-mutation",
+          "result": "RELEASED live-mutation"
+        },
+        {
+          "name": "integration",
+          "result": "RELEASED integration"
+        }
+      ]
+    }
+  },
+  "actualInstallation": {
+    "state": "INSTALLED_STORAGE_ONLY",
+    "projectRef": "xlrubcwjqktzzunrvuns",
+    "runId": "884fde26-bbeb-4f09-bac7-d2bd60a47ca5",
+    "boundInstallerSha256": "161bc8f7db21ffff7ba4532df78f5e654bef43fce7cee0924f7b6a7fc96e3b2d",
+    "provider": "official-connected-supabase-apply_migration",
+    "migrationName": "n88_owner_admin_storage_window_20261031",
+    "submittedAt": "2026-10-30T22:55:49.680Z",
+    "providerSuccessObservedAt": "2026-10-30T22:55:52.657Z",
+    "providerSuccess": true,
+    "readbackProvider": "official-connected-supabase-execute_sql",
+    "readbackObservedAt": "2026-10-30T22:57:12.798Z",
+    "readbackSqlSha256": "b01fc0fb56e2eca96931e95b4a7b56d044990e1adda627dc249153fc91a67c0c",
+    "readbackResponseSha256": "330e8a903c952fb9e2943a92b38abf04f96ad40ca2fd2d8d98746080a2cfde4d",
+    "assessment": {
+      "relations": 4,
+      "fixedOperations": 14,
+      "helpers": 6,
+      "helperExecuteDelta": 3,
+      "oldMembershipRestored": true,
+      "runtimeRawPrivileges": false,
+      "serviceEnabled": false
+    },
+    "validation": "Exact saved native provider rows revalidated after membership-order-only correction; no repeated service read or mutation.",
+    "serviceEnabled": false,
+    "runtimeTransportEnabled": false,
+    "transactionalSyncDeleteWriterAttached": false,
+    "migrationHistoryGuarantee": "Provider success acknowledgement retained; no independently documented transaction/history-internal or exactly-once guarantee claimed."
+  },
+  "lifecycleReview": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-lifecycle-review-dfbf3e41-c184-43b9-85bb-4957290b1d20.tmp/report.json",
+    "sha256": "147409bb69fc24820f1cf62233d69552b746bca7eca7425b25c64d605edf8328",
+    "operatorReviewPath": "artifacts/operator-window-review-n88-20261031.json",
+    "operatorReviewSha256": "45a3c740e7b2c900bf7f0454d0bc31f9a922454e63414391245f457ff77f3678",
+    "requirementsResolved": [
+      "claim-at-deadline-observation-race",
+      "restart-no-change-disposition"
+    ],
+    "membershipComparison": "Exact complete multiset; no role/membership permission relaxation."
   }
 }

@@ -86,14 +86,16 @@ export async function validatePost(record,row){
  const helpers=new Set(['lock_current_session','lock_canonical_sources','lock_projection_sources']);
  const aclParts=(acl,owner,name)=>(acl??`{=X/${owner},${owner}=X/${owner}}`).slice(1,-1).split(',').filter(v=>!helpers.has(name)||v!==`n88_v2_runtime=X/${owner}`).sort();
  const strip=acl=>(acl??'').replace(/,?n88_v2_runtime=X\/(?:n88_guard|postgres)(?=,|\})/g,'').replace('{,','{');
+ for(const name of helpers){const f=funcs.find(f=>f.nspname==='n88_private'&&f.proname===name);const grants=(f?.acl??'{}').slice(1,-1).split(',').filter(v=>v.startsWith('n88_v2_runtime='));if(!f||grants.length!==1||grants[0]!==`n88_v2_runtime=X/${f.owner}`)throw Error('n88_helper_runtime_execute_mismatch');}
  for(const f of old['function-and-trigger-identity']){const g=funcs.find(x=>x.nspname===f.nspname&&x.proname===f.proname&&x.arguments===f.arguments);if(!g||!exact({...g,acl:null},{...f,acl:null})||!exact(aclParts(g.acl,g.owner,g.proname),aclParts(f.acl,f.owner,f.proname)))throw Error('n88_old_function_changed');}
  const v2=s['roles-and-memberships'].filter(r=>r.rolname.startsWith('n88_v2_'));if(v2.length!==2||v2.some(r=>r.rolsuper||r.rolbypassrls||r.rolinherit||r.rolcanlogin||r.rolcreatedb||r.rolcreaterole))throw Error('n88_role_attributes');
- if(!exact(s['roles-and-memberships'].filter(r=>!r.rolname.startsWith('n88_v2_')).map(r=>r.rolname==='postgres'?{...r,memberships:r.memberships?.filter(m=>!['n88_v2_guard','n88_v2_runtime'].includes(m.role))??null}:r),old['roles-and-memberships']))throw Error('n88_old_roles_changed');
+ const normalizeRoles=rows=>rows.map(r=>({...r,memberships:r.memberships===null?null:[...r.memberships].sort((a,b)=>JSON.stringify(canonical(a)).localeCompare(JSON.stringify(canonical(b))))}));
+ if(!exact(normalizeRoles(s['roles-and-memberships'].filter(r=>!r.rolname.startsWith('n88_v2_')).map(r=>r.rolname==='postgres'?{...r,memberships:r.memberships?.filter(m=>!['n88_v2_guard','n88_v2_runtime'].includes(m.role))??null}:r)),normalizeRoles(old['roles-and-memberships'])))throw Error('n88_old_roles_changed');
  const fresh=s.memberships.filter(e=>e.role.startsWith('n88_v2_'));if(!exact(fresh,['n88_v2_guard','n88_v2_runtime'].map(role=>({role,member:'postgres',grantor:'supabase_admin',admin:true,inherit:false,set:false}))))throw Error('n88_creator_edges');
  if(!exact(s.memberships.filter(e=>!e.role.startsWith('n88_v2_')),old.memberships))throw Error('n88_old_memberships_changed');
  const tables=s['relation-identity'].filter(r=>r.relname.startsWith('publication_v2_'));if(tables.length!==4||tables.some(r=>r.owner!=='postgres'||!r.relrowsecurity||!r.relforcerowsecurity))throw Error('n88_storage_forced_rls');
  for(const p of s['effective-table-privileges'])if(p.rolname==='n88_v2_runtime'&&['table_select','column_select','insert','update','column_update','delete','truncate'].some(k=>p[k]))throw Error('n88_runtime_raw_privilege');
- const support=funcs.filter(f=>f.proname.startsWith('publication_v2_'));if(support.length!==6||support.some(f=>f.owner!=='postgres'||f.definer||/(?:\{|,)=X|EXECUTE\*/.test(f.acl??'')))throw Error('n88_support_functions');
+ const support=funcs.filter(f=>f.proname.startsWith('publication_v2_'));const checkHelpers=new Set(['publication_v2_exact','publication_v2_scope','publication_v2_flags','publication_v2_manual']);const supportNames=new Set([...checkHelpers,'publication_v2_transition','publication_v2_retire_source']);if(support.length!==6||support.some(f=>!supportNames.has(f.proname)||f.owner!=='postgres'||f.definer||!exact(f.proconfig,['search_path=pg_catalog'])||f.acl!==(checkHelpers.has(f.proname)?'{postgres=X/postgres,n88_v2_guard=X/postgres}':'{postgres=X/postgres}')))throw Error('n88_support_functions');
  const schema=s['exposure-and-effective-privileges'].find(r=>r.nspname==='n88_private');if(schema.anon_usage||schema.authenticated_usage)throw Error('n88_schema_exposed');
  return {relations:4,fixedOperations:14,helpers:6,helperExecuteDelta:3,oldMembershipRestored:true,runtimeRawPrivileges:false,serviceEnabled:false};
 }
@@ -102,5 +104,20 @@ export async function validatePost(record,row){
 export function toolLifecycle(deadlineMs,{now=Date.now}={}){
  if(!Number.isFinite(deadlineMs)||deadlineMs<=now()||deadlineMs-now()>TOOL_WINDOW_MS)throw Error('n88_tool_window_invalid');
  let state='AWAITING_CLAIM',pending=false;
- return {get state(){return state;},get canRelease(){return !pending;},claim(){if(state!=='AWAITING_CLAIM'||now()>=deadlineMs)throw Error('n88_tool_claim_expired_or_spent');pending=true;state='PENDING';},tick(){if(now()>=deadlineMs){if(pending)state='PENDING_AFTER_WINDOW';else if(state==='AWAITING_CLAIM')state='EXPIRED_UNCLAIMED';}return state;},terminal(){if(!pending)throw Error('n88_tool_terminal_without_claim');pending=false;state='TERMINAL';}};
+ return {get state(){return state;},get canRelease(){return !pending;},claim(observedClaim){
+  if(state!=='AWAITING_CLAIM'||!observedClaim&&now()>=deadlineMs)throw Error('n88_tool_claim_expired_or_spent');
+  // The relay has already matched root/task/run/operation/SQL. Mark ownership
+  // pending BEFORE parsing any timestamp, including malformed claim metadata.
+  pending=true;state='PENDING';
+  let stamp;try{stamp=observedClaim?Date.parse(observedClaim.claimedAt):now();}catch{}
+  if(!Number.isFinite(stamp)||stamp<deadlineMs-TOOL_WINDOW_MS||stamp>=deadlineMs){state='PENDING_CLAIM_TIME_UNRESOLVED';return false;}
+  return true;
+ },tick(){if(now()>=deadlineMs){if(pending)state='PENDING_AFTER_WINDOW';else if(state==='AWAITING_CLAIM')state='EXPIRED_UNCLAIMED';}return state;},terminal(){if(!pending)throw Error('n88_tool_terminal_without_claim');pending=false;state='TERMINAL';}};
+}
+
+/** Full original equality never grants mutation; partial state stays unresolved. */
+export async function reconcileReadback(record,row){
+ if(row?.snapshot&&exact(row.snapshot,record.originalSnapshot))return {state:'VERIFIED_NO_CHANGE',fullOriginalSnapshotEqual:true,serviceEnabled:false};
+ try{return {state:'INSTALLED_STORAGE_ONLY',readback:await validatePost(record,row),serviceEnabled:false};}
+ catch(e){return {state:'READBACK_INCOMPLETE',error:e.message,serviceEnabled:false};}
 }
