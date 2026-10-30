@@ -21,6 +21,22 @@ const PROVIDER_APP = 'cloudflare-workers-and-pages';
 const CF_JSD_TEMPLATE = `<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'CF_RAY_VALUE',t:'CF_TIME_VALUE'};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>`;
 const CF_JSD = new RegExp(CF_JSD_TEMPLATE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   .replace('CF_RAY_VALUE', '([a-f0-9]{16})').replace('CF_TIME_VALUE', '([A-Za-z0-9+/]{12,24}={0,2})'));
+const CF_JSD_20261030_TEMPLATE = `<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'CF_RAY_VALUE',t:'CF_TIME_VALUE'};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=CF_RAY_VALUE_SECOND',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>`;
+
+const CF_JSD_20261030 = new RegExp(CF_JSD_20261030_TEMPLATE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  .replace('CF_RAY_VALUE_SECOND', '\\1').replace('CF_RAY_VALUE', '([a-f0-9]{16})').replace('CF_TIME_VALUE', '([A-Za-z0-9+/]{12,24}={0,2})'));
+const CF_JSD_PINS = [
+  { expression: CF_JSD, kind: 'cloudflare-jsd-v1' },
+  { expression: CF_JSD_20261030, kind: 'cloudflare-jsd-20261030' },
+];
+function matchPinnedJsd(text) {
+  for (const pin of CF_JSD_PINS) {
+    const match=text.match(pin.expression);
+    if(match && match.index+match[0].length===text.length) return {match,kind:pin.kind};
+  }
+  return null;
+}
+
 // Pinned to PO-uploaded public source, not a generic script or provider-host allowlist.
 const CF_ANALYTICS_20261014 = "<script type=\"module\" src=\"https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920\" integrity=\"sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==\" data-cf-beacon='{\"version\":\"2024.11.0\",\"token\":\"29dff8015f9a492385ac7d9826d7acc3\",\"r\":1,\"spa\":2}' crossorigin=\"anonymous\"></script>";
 const CF_ANALYTICS_20261017 = "<script type=\"module\" src=\"https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092\" integrity=\"sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==\" data-cf-beacon='{\"version\":\"2024.11.0\",\"token\":\"29dff8015f9a492385ac7d9826d7acc3\",\"r\":1,\"spa\":2}' crossorigin=\"anonymous\"></script>";
@@ -218,7 +234,7 @@ export function normalizeCloudflareIndex(bytes, metadata) {
     // It is removed only with those scripts and remains subject to exact application SHA parity.
     if (providers.length === 1 && end > 0 && [9,10,12,13,32].includes(source.charCodeAt(end - 1))) {
       const before = source.slice(0,end - 1);
-      const priorJsd = before.match(CF_JSD);
+      const priorJsd = matchPinnedJsd(before)?.match;
       if (CF_ANALYTICS_PINS.some(pin => before.endsWith(pin.tag)) ||
           (priorJsd && priorJsd.index + priorJsd[0].length === before.length)) end--;
     }
@@ -237,17 +253,18 @@ export function normalizeCloudflareIndex(bytes, metadata) {
       if (!/^[0-9]{10}$/.test(time.toString('ascii')) || time.toString('base64') !== precursor[2]) return null;
       end = precursor.index; providers.unshift('cloudflare-precursor-popup-v1'); continue;
     }
-    const match = prefix.match(CF_JSD);
+    const jsd = matchPinnedJsd(prefix);
+    const match = jsd?.match;
     if (!match || match.index + match[0].length !== end) break;
     if (source.indexOf(marker) !== source.lastIndexOf(marker)) return null;
     const time = Buffer.from(match[2], 'base64');
     if (!/^[0-9]{10}$/.test(time.toString('ascii')) || time.toString('base64') !== match[2]) return null;
     end = match.index;
-    providers.unshift('cloudflare-jsd-v1');
+    providers.unshift(jsd.kind);
   }
   if (!providers.length || new Set(providers).size !== providers.length) return null;
   if (source.includes(analyticsMarker) && !CF_ANALYTICS_PINS.some(pin => providers.includes(pin.kind))) return null;
-  if (source.includes(marker) && !providers.some(kind => ['cloudflare-jsd-v1','cloudflare-precursor-popup-v1'].includes(kind))) return null;
+  if (source.includes(marker) && !providers.some(kind => ['cloudflare-jsd-v1','cloudflare-jsd-20261030','cloudflare-precursor-popup-v1'].includes(kind))) return null;
   const normalized = Buffer.concat([raw.subarray(0,end),raw.subarray(providerEnd)]);
   const closeAt = source.lastIndexOf('</body>');
   const suffix = raw.subarray(providerEnd,closeAt);

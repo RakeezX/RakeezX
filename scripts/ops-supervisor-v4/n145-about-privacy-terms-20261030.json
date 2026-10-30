@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n145-about-privacy-terms-20261030",
+      "productId": "N145",
+      "activationId": "po-20261012-continuous",
+      "priority": -2100,
+      "scopeKey": "n145-about-page-concise-legal-faq",
+      "riskClass": "LOW",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 45,
+      "idleMinutes": 15,
+      "dependsOn": [],
+      "allowedPaths": [
+        "src/views/about.js",
+        "src/views/settings.js",
+        "src/router.js",
+        "src/app.js",
+        "src/styles/components.css",
+        "sw.js",
+        "tests/n145-about-page.test.mjs",
+        "docs/automation-evidence/20261030/N145_ABOUT_LEGAL_FAQ.md"
+      ],
+      "verificationPaths": [
+        "src/views/about.js",
+        "src/views/settings.js",
+        "src/router.js",
+        "src/app.js",
+        "src/styles/components.css",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n145_full_page_route_and_settings_entry",
+        "n145_concise_truthful_privacy_terms_faq_and_contact",
+        "n145_rendered_mobile_desktop_navigation_and_offline_dependency"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "releaseAuthority": "Direct PO request 2026-10-30 in this ChatGPT task authorizes building and publishing a complete About Rakeez page containing concise FAQ, terms of use and privacy policy, simple truthful end-user content without unnecessary technical detail. Latest PO authorizes productive corrections and explicitly chooses a non-Astra model. Existing controller alone executes Product and sole publisher integrates and verifies Production. Static page/navigation only: no Auth/RLS/schema/grade/Sync behavior, real-data cleanup or outbound-message changes.",
+      "preparationAuthority": {
+        "kind": "PO-20261030-about-legal-page",
+        "publication": true,
+        "scope": "N145",
+        "realDataActions": 0
+      },
+      "objective": "Deliver a polished concise Arabic RTL full-page About Rakeez experience at #/about using existing brand/design and current origin/main, not stale canonical working-copy HEAD. Current settings action about-rakeez opens a short openSheet; replace it with normal page navigation. Create src/views/about.js and register it in src/router.js. Page must be reachable without requiring login or real workspace access; if needed add only a narrow public informational-route exception in app.js, never weaken access to protected routes. Show short introduction, FAQ, usage terms, privacy policy and existing genuine contact/support link; dynamic BUILD_META app version and static last-updated 30 October 2026. Use readable concise headings and accessible questions/answers; important policy content discoverable, no giant modal, no invented company/contact/address/retention duration/compliance certificate. Facts: app provides teacher classroom/student/attendance/grade/report work; normal local work can continue offline while cloud sync and notifications need connectivity; local save differs from confirmed cloud sync; deleting browser data before sync may lose device-only work. Privacy must accurately cover account/profile information, school/student/class/attendance/grade/attachments the teacher chooses to add, technical support data and actual minimal analytics found in source; processing for operating/sync/support/improvement, existing hosting/service providers with possible processing outside Saudi Arabia (main database region is ap-south-1), retention for service needs subject to deletion requests/legal obligations without claiming immediate wiping of backups, request access/copy/correction/deletion through existing support, account/link protection and version updates. Do not say all data stays on device or that no external service receives data; do not promise perfect security or verified legal compliance. State Rakeez is independent and users must have authority to enter/share educational data, review grades/reports before relying on them, protect account/student links and avoid abusive/unauthorized use; available features can evolve and service can have interruptions. No forced checkbox/extra confirmations or marketing popups. Read current actual support/contact/analytics code before composing factual assertions; use existing contact paths and public brand identity only. This is a brief usable policy, not a new legal or consent framework. Keep link actions user initiated; do not send any message. Add new view to existing SW shell cache and let original publisher own normal metadata/build. Keep style additions narrowly scoped to about page. Verification minimal: syntax/import and actual synthetic route/settings/back navigation/render in phone320-360px and desktop; verify sections/contact labels and no horizontal overflow. Reuse unchanged data/Sync evidence, do not run unrelated full suites or real-account tests. Save one concise source-bound evidence note. Return original LOCAL_READY schema with requiredChecks and exact candidate; publisher then proves served page. Do not mark Product CLOSED without truthful acceptance. Non-Astra gpt-6.1-sol medium Standard only.",
+      "acceptance": [
+        "Settings About entry opens a full #/about page with normal back navigation.",
+        "Arabic introduction, FAQ, usage terms, privacy policy, actual contact and version are concise, truthful and available without account data.",
+        "Phone and desktop actual rendered layout usable with keyboard, no horizontal overflow, and new source cached for offline navigation.",
+        "Only stated UI/copy/routes/styles/SW dependency change, original controller/publisher verified delivery."
+      ],
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "c159e1a1ea0985db178cfdc8f260e053e75f6f6f",
+        "requiredSourcePaths": [
+          "src/views/settings.js",
+          "src/router.js",
+          "src/app.js",
+          "src/styles/components.css",
+          "sw.js"
+        ],
+        "editPaths": [
+          "src/views/about.js",
+          "src/views/settings.js",
+          "src/router.js",
+          "src/app.js",
+          "src/styles/components.css",
+          "sw.js",
+          "tests/n145-about-page.test.mjs",
+          "docs/automation-evidence/20261030/N145_ABOUT_LEGAL_FAQ.md"
+        ],
+        "newPaths": [
+          "src/views/about.js",
+          "tests/n145-about-page.test.mjs",
+          "docs/automation-evidence/20261030/N145_ABOUT_LEGAL_FAQ.md"
+        ],
+        "workerChecks": [
+          "n145_full_page_route_and_settings_entry",
+          "n145_concise_truthful_privacy_terms_faq_and_contact",
+          "n145_rendered_mobile_desktop_navigation_and_offline_dependency"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "116cb808cdf868cc6cc54a4f3be89ceefc1b36cf",
+        "priorReceiptSha256": "59fa9402cb859212543a10fc96c0b2db84f8cf3d95daaa19889e8623db230768",
+        "reviewedFixtureSha256": "3cba903babeff2306fa62a29b6e842140e4fc04672417312adebd2f415b74cc6",
+        "reason": "Observed 30 October Cloudflare JSD provider template changed its exact origin resolution and repeated ray query. The reviewed narrow normalizer accepts both pinned complete templates, binds both ray values and preserves exact immutable/application source SHA. Recheck the original successful provider publication; no Product implementation replay or redeployment."
+      }
+    }
+  ]
+}
