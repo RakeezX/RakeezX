@@ -25,8 +25,8 @@ export function buildControllerReloadScript(options) {
   const encoded = Buffer.from(JSON.stringify(execution), 'utf8').toString('base64');
   return String.raw`
 $p = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${encoded}')) | ConvertFrom-Json
-$rt = [string]$p.runtimeRoot
-$repo = [string]$p.repoRoot
+$rt = [IO.Path]::GetFullPath([string]$p.runtimeRoot)
+$repo = [IO.Path]::GetFullPath([string]$p.repoRoot)
 $old = $p.reload.expectedIdentity
 $scriptPath = Join-Path $repo 'scripts\ops-supervisor-v4\controller.mjs'
 $startPath = Join-Path $repo 'scripts\ops-supervisor-v4\start-ops.ps1'
@@ -42,6 +42,15 @@ function Exact-Process($id) {
   if (!$proc) { return $null }
   if ($proc.CreationDate.ToUniversalTime().Ticks -ne ([DateTime]::Parse($id.createdAt)).ToUniversalTime().Ticks) { throw 'Controller PID reused; no process action permitted' }
   if ($proc.Name -ne 'node.exe' -or !$proc.CommandLine -or $proc.CommandLine.IndexOf($scriptPath,[StringComparison]::OrdinalIgnoreCase) -lt 0 -or $proc.CommandLine.IndexOf($rt,[StringComparison]::OrdinalIgnoreCase) -lt 0) { throw 'Controller command identity mismatch' }
+  return $proc
+}
+# Post-stop observation only: Windows may clear CommandLine before the process exits.
+# Missing command metadata means still present; it never authorizes another stop/start.
+function Observe-OriginalExit($id) {
+  $proc=Get-CimInstance Win32_Process -Filter ('ProcessId='+[int]$id.pid)
+  if (!$proc) { return $null }
+  if ($proc.CreationDate.ToUniversalTime().Ticks -ne ([DateTime]::Parse($id.createdAt)).ToUniversalTime().Ticks -or $proc.Name -ne 'node.exe') { throw 'Original process identity changed while waiting for exit' }
+  if ($proc.CommandLine -and ($proc.CommandLine.IndexOf($scriptPath,[StringComparison]::OrdinalIgnoreCase) -lt 0 -or $proc.CommandLine.IndexOf($rt,[StringComparison]::OrdinalIgnoreCase) -lt 0)) { throw 'Original process command changed while waiting for exit' }
   return $proc
 }
 function Check-Task {
@@ -107,12 +116,12 @@ try {
   }
   Save-Reload 'OLD_CONTROLLER_STOP_REQUESTED'
   for ($i=0;$i -lt 20;$i++) {
-    $remaining=Exact-Process $old
+    $remaining=Observe-OriginalExit $old
     $task=Check-Task
     if (!$remaining -and [string]$task.State -ne 'Running') { break }
     Start-Sleep -Milliseconds 250
   }
-  if ((Exact-Process $old) -or [string]$task.State -eq 'Running') { throw 'Old controller/task still active; no duplicate start' }
+  if ((Observe-OriginalExit $old) -or [string]$task.State -eq 'Running') { throw 'Old controller/task still active; no duplicate start' }
   Check-Ownership; Check-Hashes
   if (@(Controllers).Count -ne 0) { throw 'Unexpected controller exists; no duplicate start' }
   $actual=Get-Content -LiteralPath (Join-Path $rt 'CONTROLLER_IDENTITY.json') -Raw | ConvertFrom-Json
