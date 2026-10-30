@@ -484,7 +484,13 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     void win.navigator.permissions?.query({ name: 'notifications' }).then(value => {
       if (disposed) return;
       permissionState = value;
-      value.onchange = () => { invalidate(); void refresh(); };
+      value.onchange = () => {
+        // Native subscribe can grant permission before its promise resolves.
+        // Keep that client alive; refresh still fences changed owner/session,
+        // lease and consent bindings. Non-granted permission retires immediately.
+        if (browser.permission() !== 'granted') invalidate();
+        void refresh();
+      };
     }).catch(() => {});
   }
   return Object.freeze({
