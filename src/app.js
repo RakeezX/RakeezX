@@ -955,7 +955,28 @@ async function resolve() {
 
 /* ---------- الإقلاع ---------- */
 
+// AI N145: only this informational route can render before workspace/auth boot.
+// Leaving it resumes the original boot and all protected-route guards.
+let cleanupInformationNavigation = () => {};
 async function boot() {
+  cleanupInformationNavigation();
+  cleanupInformationNavigation = () => {};
+  if (currentPath().split('?')[0] === '/about') {
+    const { default: about } = await import('./views/about.js');
+    if (currentPath().split('?')[0] !== '/about') return boot();
+    render(app, html`<main class="page about-public" id="main">
+      <header class="about-public__bar"><a class="btn btn--ghost" href="#/" data-about-back>رجوع</a><h1>عن ركيز المعلم</h1></header>
+      ${about.render()}
+    </main>`);
+    about.afterPaint(app);
+    app.querySelector('[data-about-back]').addEventListener('click', event => {
+      event.preventDefault();
+      backWithinApp('/');
+    });
+    cleanupInformationNavigation = onNavigate(boot);
+    registerServiceWorker();
+    return;
+  }
   cleanupSessionAutoTriggers();
   // تبويب آخر يرقّي القاعدة: أعد التحميل بدل العمل على مخطط قديم
   db.setVersionChangeHandler(() => {
@@ -998,6 +1019,9 @@ async function boot() {
     if (workspaceRouting.status !== 'ready') {
       store.deactivateWorkspace(workspaceRouting.reason);
       mountWorkspaceGate(workspaceRouting);
+      cleanupInformationNavigation = onNavigate(() => {
+        if (currentPath().split('?')[0] === '/about') boot();
+      });
       registerServiceWorker();
       return;
     }

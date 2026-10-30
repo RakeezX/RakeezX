@@ -39,6 +39,7 @@ const ROUTES = [
   { path: '/settings/email-status',     load: () => import('./views/settings.js') },
   { path: '/settings/notifications',    load: () => import('./views/notification-settings.js') },
   { path: '/settings/backup',           load: () => import('./views/backup.js') },
+  { path: '/about',                     load: () => import('./views/about.js') },
   { path: '/support',                   load: () => import('./views/support.js') },
 ];
 

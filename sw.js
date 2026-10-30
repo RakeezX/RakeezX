@@ -236,6 +236,7 @@ const SHELL = [
   './src/views/calendar.js',
   './src/views/calendar-0417-ui.js',
   './src/views/settings.js',
+  './src/views/about.js',
   './src/views/notification-settings.js',
   './src/views/teacher-setup-import.js',
   './src/views/backup.js',

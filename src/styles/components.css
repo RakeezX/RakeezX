@@ -8967,3 +8967,26 @@
   .grades-01c__direct-row.is-auto:has(.ql-controls) { grid-template-columns: 24px minmax(0, 1fr); }
   .grades-01c__direct-row.is-auto:has(.ql-controls) .graderow__auto { grid-column: 2; }
 }
+
+/* AI N145: information page only, shared brand and theme tokens. */
+.about-page { max-inline-size: 820px; margin-inline: auto; color: var(--text); line-height: 1.85; overflow-wrap: anywhere; }
+.about-hero { padding-block: 24px; }
+.about-page .brand-lockup { max-inline-size: 100%; }
+.about-page .brand-lockup__image { max-inline-size: 100%; height: auto; }
+.about-hero h2 { font-size: clamp(21px, 4vw, 28px); line-height: 1.5; margin-block: 20px 12px; }
+.about-page p { margin-block: 10px; }
+.about-meta { display: flex; flex-wrap: wrap; gap: 4px 24px; color: var(--text-2); font-size: 13px; }
+.about-index { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 8px 24px; }
+.about-index a, .about-email { display: inline-flex; align-items: center; min-block-size: 44px; padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--r-md); color: var(--brand); background: var(--bg-elev); text-decoration: underline; text-underline-offset: 4px; }
+.about-section { padding: clamp(16px, 3vw, 28px); margin-block-end: 20px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elev); scroll-margin-block-start: 85px; }
+.about-section h2 { margin-block: 0 16px; font-size: 21px; }
+.about-section h3 { font-size: 17px; margin-block: 24px 6px; }
+.about-section ul { padding-inline-start: 22px; margin: 0; }
+.about-section li + li { margin-block-start: 12px; }
+.about-page details { border-block-start: 1px solid var(--border); padding-block: 8px; }
+.about-page summary { cursor: pointer; min-block-size: 44px; padding-block: 8px; font-weight: 700; }
+.about-page details p { color: var(--text-2); margin-block: 0 12px; }
+.about-page a:focus-visible, .about-page summary:focus-visible, .about-section:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+.about-public { max-inline-size: 900px; margin-inline: auto; }
+.about-public__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.about-public__bar h1 { font-size: 20px; margin: 0; }

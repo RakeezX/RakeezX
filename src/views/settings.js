@@ -1,8 +1,6 @@
 /** الإعدادات: بيانات المعلّم، والسنوات والفصول الدراسية، والمظهر، والبيانات. */
 
 import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib/dom.js';
-import { brandLockup } from '../lib/brand.js';
-import { BUILD_META } from '../lib/build-meta.js';
 import { educationDepartmentComplete, profileAttention, verifiedEmailFeedback } from '../lib/settings-profile-ui.js';
 import { EDUCATION_DEPARTMENTS, EDUCATION_DEPARTMENT_OPTIONS, isOfficialEducationDepartment, searchEducationDepartments } from '../lib/education-department-directory.js';
 import { currentInstallContext, INSTALL_COPY, openInstallGuide } from '../lib/install-guide-ui.js';
@@ -537,7 +535,7 @@ const settings = {
             <span class="row__main"><span class="row__title">تثبيت ركيز على جهازك</span><span class="row__sub">${INSTALL_COPY[install.state][1]}</span>${install.state === 'limited' ? html`<span class="row__sub">افتح ركيز في متصفح يدعم التثبيت</span>` : ''}</span>
             <span class="row__end">${install.state === 'native' ? 'تثبيت ركيز' : install.state === 'limited' ? 'اختر جهازك' : icon('chev')}</span>
           </button>`}
-          <button class="row settings-destination" type="button" data-act="about-rakeez"><span class="row__icon">${icon('note')}</span><span class="row__main"><span class="row__title">عن ركيز المعلم</span><span class="row__sub">معلومات التطبيق والإصدار</span></span><span class="row__end">${icon('chev')}</span></button>
+          <a class="row settings-destination" href="#/about"><span class="row__icon">${icon('note')}</span><span class="row__main"><span class="row__title">عن ركيز المعلم</span><span class="row__sub">الأسئلة الشائعة والاستخدام والخصوصية</span></span><span class="row__end">${icon('chev')}</span></a>
         </div>
       </section>
       </div>
@@ -818,16 +816,6 @@ const settings = {
 
     'install-guide'() {
       return openInstallGuide(() => settings.actions['pwa-prompt-install']());
-    },
-
-    'about-rakeez'() {
-      return openSheet({ title: 'عن ركيز المعلم', body: html`<div class="stack stack-2 settings-about-details">
-        ${brandLockup({ prominent: true })}
-        <div class="fw-7">مساحة العمل الرقمية للمعلم</div>
-        <div class="t-2 fs-sm">أقل وقت للإدارة. أكثر وقت للتعليم.</div>
-        <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>
-        <div class="t-3 fs-xs" data-about-version>الإصدار ${BUILD_META.appVersion}</div>
-      </div>` });
     },
 
     async 'pwa-prompt-install'() {
