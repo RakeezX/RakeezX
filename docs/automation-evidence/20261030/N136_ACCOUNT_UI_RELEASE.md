@@ -1,0 +1,29 @@
+# N136 account UI release qualification — 30 October 2026
+
+Task: `continuous-n136-account-warning-ui-20261030`
+Run: `0d1e026d-7469-4a10-9433-156ced013774`
+Base: `a4256f6631dc055e085f4d6c3f30160749ca0f85` (also observed via `git ls-remote origin refs/heads/main` during this attempt).
+Reviewed source: PR16 head `34a7cdb8f91f4309bf89638ab67b3be1a766c886`, exact nine-file commit diff.
+
+## Result and scope
+
+Local candidate ready for the independent publisher. The PR's app, sync-warning-policy and class-feedback hunks were applied to current files. The fourth Product change, N135 screen-only <=520px badge CSS, already exists on this base and is retained byte-for-byte. No wholesale old-file replacement. N147/current About, boot, navigation, sidebar and newer unrelated code remain intact. No new startup dependency; no store/cloud/coordinator/service/SQL/Auth guard changes.
+
+The class verification notice supplies the existing `mini-hub-login` action. Initial shell/status repaint hide an auth-only strip only alongside that exact actionable verification notice. The duplicate logged-out lease notice is suppressed in that context. Failed/rejected/blocked/ownership-related Sync evidence remains visible. This improves presentation/login discoverability; it does not establish a fix for actual account-session loss or blocked-account root cause.
+
+## Actual affected verification
+
+- **PASS — n136_auth_notice_dedupe_preserves_errors_and_class_gate:** `node --test tests/n136-auth-notice-policy.test.mjs`, 2/2 tests. Covers auth-only dedupe, logged-in lease negative, unrelated routes, ownership/lease/archived/null class states and error/blocked/rejected/offline/syncing negatives.
+- **PASS — n136_login_action_uses_existing_form:** `node tests/n136-class-login-action.e2e.mjs`. Actual app DOM/CSS and ordinary login handler: original missing-class Demo case opens `#mini-hub-login-form` and stays gated. Additional synthetic owner-bound account case checks the real store entry with matching workspace/database, absent in-memory identity and actual LIMITED lease (`owner-workspace-mismatch`). One class login action, hidden auth strip, no duplicate lease notice, and gate still visible after clicking login. Real pageshow repaint retains failed-count, rejected-count, blocked-count and ownership-conflict strips, then hides auth-only again; Settings retains its auth strip and lease notice.
+- **PASS — n135_mobile_class_name_and_badge_layout:** `node tests/n135-class-badge-layout.e2e.mjs`. Three actual store-created Demo fixtures (marked/today/no badge), six widths 320/360/390/430/520/768: 18 card observations. No horizontal document overflow. At <=520px compact names are unclipped and badges occupy their own row. At 768px full names remain visible. Existing title/ARIA, badge semantics, selection, header controls and class switcher checks pass.
+- **PASS — n136_about_boot_reload_regression:** existing `tests/n147-about-navigation.test.mjs` loaded with Node module hooks, with only in-memory scope substitutions: current task/run, port 53137 and the already-current generic hosting privacy wording in place of obsolete geographical copy assertions. No N147 test source edit. Passed public, Demo and synthetic account cases at 320/360/1280; four keyboard section jumps, reload, return to Settings, single shell/sidebar, fresh owner/database/receipt checkpoints, changed-owner fail-closed behavior and storage-failure protected-route guard. Original check title passed; 1/1 Node test.
+- **PASS — syntax/build:** `node --check` on app.js, sync-warning-policy.js and students.js; `node node_modules/vite/bin/vite.js build` (Vite 8.3.5, 179 modules, exit 0). This compiles the actual JS/CSS without modifying deterministic build metadata; the publisher owns metadata generation. `git diff --check` passed.
+- **NOT_RUN — Production publication/served assets:** explicitly owned by the independent controller/publisher. No push, deploy, provider check or live-account proof performed by this worker.
+
+## Fixture and harness limits
+
+All UI checks used canonical `withIsolatedLocalBrowser`, fresh disposable contexts, only task-owned HTTP origins 127.0.0.1:53136/53137, no credentials/profile reuse, external requests and Service Workers blocked. Vite servers close in finally; helper closes owned contexts/browser. No shared live-browser lease is required for this eligible isolated phase.
+
+The additional account DOM test controls only the synchronous read-only Sync summary via an in-memory Vite fixture transform. It uses the existing cloud `setMockAuth(null,null)` test seam after a synthetic registry/device receipt boot, then navigates with the real router. Class/owner/lease checks, presentation functions, DOM, CSS and login handler remain actual application code. No real identity, service response, Sync success, offline-cache certification or live data is claimed.
+
+Initial harness failures were preserved in the attempt output: DEV legacy auto-bootstrap invalidated the public-account setup (corrected to the existing N147 production define); a cached synthetic identity correctly produced ownership instead of verification (corrected by removing the fixture identity using the existing seam); the original N147 geographic text expectations predated current main's copy; the expanded 768px case initially expected the mobile-only label (corrected to the existing 640px responsive boundary). These corrections did not alter Product guards or CSS. One overlapping local server launch failed because this worker's prior phase owned port 53136; subsequent phases ran sequentially. Final affected checks passed. No denied tool action was bypassed. Expected blocked-network/Service Worker and synthetic storage-failure warnings are isolation/negative-fixture output, not Production evidence.

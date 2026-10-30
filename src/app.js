@@ -10,7 +10,7 @@ import { installVisibleViewport } from './lib/visible-viewport.js';
 import { ensureThmanyahFont } from './lib/thmanyah-font.js';
 import { commandSearchAction, installCommandSearch } from './lib/global-command-search.js';
 import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
-import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib/sync-warning-policy.js';
+import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning, classAuthNoticeDedupe } from './lib/sync-warning-policy.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
@@ -444,7 +444,10 @@ function shell(path, params) {
   const warning = getSyncWarning(syncInfo.summary);
   const stripInfo = warning.status
     ? syncOperationalPresentation({ ...syncInfo.summary, state: warning.status }) : syncInfo;
-  const showConnectionState = warning.strip;
+  const classStatus = inTeaching ? store.classOperationsStatus(params.id) : null;
+  const dedupe = classAuthNoticeDedupe({ isClassRoute: !!inTeaching, classStatus,
+    syncStatus: stripInfo.status, isLoggedIn: !!(cloud.session && cloud.user) });
+  const showConnectionState = warning.strip && !dedupe.suppressSyncStrip;
 
   return html`
     <a class="skip-link" href="#main" data-act="skip-to-content">انتقل إلى المحتوى</a>
@@ -734,7 +737,11 @@ function paintSyncStatus() {
     const warning = getSyncWarning(syncInfo.summary);
     const stripInfo = warning.status
       ? syncOperationalPresentation({ ...syncInfo.summary, state: warning.status }) : syncInfo;
-    statusStrip.className = `app-status-strip${warning.strip ? ` is-visible is-${stripInfo.status}` : ''}`;
+    const classContext = ctx?.params?.id && ctx.path?.startsWith('/teaching/');
+    const dedupe = classAuthNoticeDedupe({ isClassRoute: !!classContext,
+      classStatus: classContext ? store.classOperationsStatus(ctx.params.id) : null,
+      syncStatus: stripInfo.status, isLoggedIn: !!(cloud.session && cloud.user) });
+    statusStrip.className = `app-status-strip${warning.strip && !dedupe.suppressSyncStrip ? ` is-visible is-${stripInfo.status}` : ''}`;
     statusStrip.querySelector('[data-app-status-text]')?.replaceChildren(
       syncInfo.summary.reasonCategory === 'workspace_ownership_blocked' ? syncInfo.summary.reasonLabel : stripInfo.label
     );
@@ -874,6 +881,11 @@ function paint() {
 function renderOfflineLease() {
   const lease = store.getOfflineLeaseStatus();
   if (!['REMINDER', 'LIMITED'].includes(lease.state)) return '';
+  const inClass = ctx?.path?.startsWith('/teaching/') && ctx?.params?.id;
+  const classStatus = inClass ? store.classOperationsStatus(ctx.params.id) : null;
+  const dedupe = classAuthNoticeDedupe({ isClassRoute: !!inClass, classStatus,
+    syncStatus: getSyncState().status, isLoggedIn: !!(cloud.session && cloud.user) });
+  if (dedupe.suppressLeaseNotice) return '';
   // AI: an absent/rejected identity needs the existing login flow, not lease renewal.
   if (!cloud.session || !cloud.user || cloud.authStatus().state === 'auth_required') {
     return html`<aside class="offline-lease-notice noprint" dir="rtl" role="status" data-offline-lease="${lease.state}">
