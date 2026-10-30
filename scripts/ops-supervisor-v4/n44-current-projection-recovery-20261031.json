@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-current-projection-recovery-20261031",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -2690,
+      "scopeKey": "n44-authenticated-current-projection-recovery",
+      "riskClass": "HIGH",
+      "validationTier": "SENSITIVE",
+      "executionMode": "live",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261031-N44-CURRENT-PROJECTION-RECOVERY",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 55,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/canonical-source.mjs",
+        "drafts/n44-push/web-protocol.mjs",
+        "drafts/n44-push/web-entry.mjs",
+        "drafts/n44-push/cloudflare-entry.mjs",
+        "drafts/n44-push/existing-host.mjs",
+        "drafts/n44-push/activation/private-error-boundary.mjs",
+        "src/lib/notification-push-gateway.js",
+        "src/lib/notification-push-runtime.js",
+        "src/views/notification-settings.js",
+        "sw.js",
+        "drafts/n44-push/activation/current-projection-recovery-20261031/build.mjs",
+        "drafts/n44-push/activation/current-projection-recovery-20261031/service-admission.mjs",
+        "drafts/n44-push/activation/current-projection-recovery-20261031/manifest.json",
+        "drafts/n44-push/activation/current-projection-recovery-20261031/README.md",
+        "drafts/n44-push/activation/current-projection-recovery-20261031/service-readback.json",
+        "tests/n44-current-projection-recovery-20261031.test.mjs",
+        "tests/n44-current-projection-recovery-service-20261031.test.mjs",
+        "docs/automation-evidence/20261031/N44_CURRENT_PROJECTION_RECOVERY.md",
+        "drafts/n44-push/activation/current-projection-recovery-20261031/bundle/**"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-gateway.js",
+        "src/lib/notification-push-runtime.js",
+        "src/views/notification-settings.js",
+        "sw.js",
+        "drafts/n44-push/activation/current-projection-recovery-20261031/manifest.json"
+      ],
+      "requiredChecks": [
+        "n44_exact_authenticated_current_projection_read",
+        "n44_mounted_reload_recovery_without_write_replay",
+        "n44_changed_context_partial_and_unknown_stay_unresolved",
+        "n44_original_service_deployed_source_and_config_readback"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N44",
+        "liveAuthorizationRef": "PO-20261031-N44-CURRENT-PROJECTION-RECOVERY",
+        "publication": true,
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "authorityEvidence": {
+          "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n44-projection-recovery/authority.json",
+          "sha256": "9c61890ae28617d7155c411bb61a0d70e8e40d5e4ccffdd429e88a1deaacd77a"
+        },
+        "serviceMaintenance": {
+          "function": "n44-notifications",
+          "ingress": "n44-notifications-ingress",
+          "maxQualifiedFunctionUpdates": 1,
+          "maxQualifiedIngressUpdates": 1,
+          "sourceBindingUpdate": true,
+          "currentApprovalIdentityAndEffectivePolicyPreserved": true,
+          "deliveryEnabled": false,
+          "schedulerEnabled": false,
+          "cron": [],
+          "originalPrivateCustodianOnly": true
+        },
+        "phoneTrialActions": 0,
+        "spentGrantResets": 0,
+        "registrations": 0,
+        "projectionWrites": 0,
+        "sends": 0,
+        "sqlAuthSchemaRoleChanges": 0,
+        "newCredentials": 0,
+        "originalMcpContinuation": {
+          "evidence": {
+            "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n44-projection-recovery/original-mcp-connection-observation.json",
+            "sha256": "71b94d46de64410d350c551e3aba79dae8fb4149420ec22153b5a8d6a867e56d"
+          },
+          "server": "rakeez_cloudflare",
+          "tool": "mcp__rakeez_cloudflare__execute",
+          "configuredUrl": "https://mcp.cloudflare.com/mcp",
+          "authMetadataOnly": true,
+          "authenticatedGetStillRequired": true,
+          "sameUnconsumedServiceAllowances": true,
+          "noLoginOrCredentialExtraction": true,
+          "privateScopePurpose": "A separate named finite nonsending current-projection service-maintenance dispatch only; never alter historical spent/closed trial admission."
+        }
+      },
+      "releaseAuthority": "Direct PO31October authorizes continued concrete fixes and necessary architecture improvements. Scoped actual non-sending N44 service maintenance is an implementation prerequisite; the original supported private custodian installs and reads it back before LOCAL_READY. Sole publisher delivers frontend/Product source after that. Existing finite phone-trial budget and evidence remain unchanged; this is current-state recovery, not historical ACK or physical delivery proof. Current material continuation corrects the provider route to the existing configured OAuth MCP and explicitly includes four original private-custodian files for a separate finite nonsending capability. It creates no new service-write allowance or phone trial; same original authority and sole publisher apply.",
+      "objective": "CURRENT MATERIAL CONTINUATION: Resume exact saved session01a18edd-6aba-7ec3-bab1-33453d98e0fc and candidateb25be0e5eebc7899d4f3289ffc283c2a5d2d31ce. Root identified the original configured MCP connection that the failed Wrangler route did not use. Read artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n44-projection-recovery/original-mcp-connection-observation.json SHA25671b94d46de64410d350c551e3aba79dae8fb4149420ec22153b5a8d6a867e56d. Existing approved Codex mcp list --json reports rakeez_cloudflare enabled:true auth_status:o_auth, streamable_http, configured https://mcp.cloudflare.com/mcp. This is current configuration/OAuth metadata, NOT proof of an authenticated GET. Discover and use the ORIGINAL mcp__rakeez_cloudflare__search / execute capability in this CLI worker, through the original supported private-custodian boundary. Root ChatGPT tool catalog does not expose it; its absence there does not imply absence in this configured CLI worker. No new account, no token extraction, no login/refresh UI, no Wrangler init --from-dash retry. If actual MCP startup/auth is unavailable, preserve precise original error and block that dependency without claiming it fixed.\n\nFIRST acquire only the needed owned phase lease, then obtain the THREE saved exact ingress source/settings/schedules GETs in bundle/provider-read-requests.json for account1c9ae85e766968a4269a7ac505f9a693 and n44-notifications-ingress. Retain source and binding/config identity and empty cron. Use actual MCP responses; do not substitute old source as current. No other worker/account/routes. Raw responses remain in owned untracked artifacts where needed; never publish credentials or unsanitized secret values. Existing generated bundle/current-ingress directory was NOT removed: automatic review rejected the combined process-termination/recursive-delete command with blocked by policy. Preserve that rejection, do not retry the rejected cleanup through another command/tool, and keep generated directory uncommitted. Its presence is not a reason to abandon valid tracked candidate changes.\n\nThe four privateCustodyRepair paths now explicitly cover the ORIGINAL private custodian only. If a dispatcher currently recognizes only older named capabilities, add a SEPARATE finite current-projection-maintenance capability, bound to this current run/task/authority and qualified source. Preserve all old phase IDs, consumed trials, prior denial records, original device/session ownership and ACK history exactly. Do not reset or weaken a historical closed/spent admission. Keep private source outside public Git. Public build/admission fixes stay inside existing allowedPaths.\n\nThen qualify only the delta against freshly retrieved current ingress and preserved current Native181 Edge baseline; reuse the four focused service checks, real mounted HTTP DOM reload proof and previous three stale-projection checks where source is unchanged. Complete the already-authorized maximum ONE qualified update each of existing n44-notifications Edge and n44-notifications-ingress, exact source-binding update and real post-deploy source/settings/schedules readback, all through original supported custodian. Both service update allowances are unconsumed; no new allowance is created. Delivery remains false, scheduler false, cron[], registration/projection writes/sends/SQL/Auth/schema/roles/new credentials remain0. On a genuine provider/tool permission denial preserve it and do not reroute. On uncertain mutation result use exact readonly reconciliation, never retry mutation. Rebind new current run honestly while preserving old attempt/candidate and evidence. LOCAL_READY only after actual service prerequisite and bounded authenticated current-state recovery verification, not just local tests. If a root-supported Supabase operation is required, emit the exact finite handoff while waiting; do not stop merely because root tool and CLI tool catalogs differ. Then the existing sole publisher delivers the frontend and SWv102. Preserve current useful scope, grade4/owner/Sync guards and lack of physical phone proof.\n\nORIGINAL AUTHORIZED FEATURE AND SERVICE SCOPE:\nImplement and deliver a functional current-projection recovery through the mounted application AND actual service. Current main df23c78126281b8625e2009df7cf3195abd7a482. Intake authority artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n44-projection-recovery/authority.json sha2569c61890ae28617d7155c411bb61a0d70e8e40d5e4ccffdd429e88a1deaacd77a. Current notification-push-runtime persists only literal unknown marker, no operationId/durable server receipt; after reload original request ACK cannot be established. Do not label recovery as historical acknowledgement. Real benefit: explicit check of authoritative CURRENT stored projection unlocks verification only when it agrees with same current confirmed mounted source.\n\nAdd one authenticated events/read route using current ingress/Auth/current-session lock/owner isolation, exact current workspace/device/context/consent revision and existing active registration. Request accepts only bounded existing scope/sourceKind/sourceId/registration/consent plus fresh nonce; never caller-selected owner/action path/asserted stamp. Reuse authoritative canonical-source.readSource and existing owner-scoped finite SELECT * events ... order by workspace_id,device_id,event_id limit101. Check EXACT existing SQL shapes against actual private boundary; no schema/grant change. Ordinary ingress rate-budget debits remain, so only domain operation is read-only. For the exact scope/source compare COMPLETE currently relevant canonical event set with stored projection: source stamp, IDs, kinds, due/expiry and safe action path, not stamp alone. Return bounded finite verified/changed/absent/unknown, server-derived stamp and finite event identities, echoed nonce, current context/registration revisions and observation time; never endpoint/key/sealed subscription/unrelated source. Future events can be checked before due time; do not reuse due-only events/authorize to infer projection equality or authorize sends. Handle complete empty/deleted source intentionally without turning absence into success. Preserve source/owner locks and current registration expiry/revocation checks.\n\nFrontend: let explicit verifyReminder reconcile an unknown pending source rather than immediate short-circuit. Previously unknown verification can be explicitly checked again, but no automatic polling or unchanged-observation reads. Keep projectConfirmed unknown skip and all mutation/registration restrictions. Recovery never calls project/events/update. Correctly restored existingClickOnly registration can read without opt-in/re-enrollment. Snapshot owner/workspace/device, credential/generation, consent/registration, mounted source revision and CONFIRMED Sync checkpoint before read; recheck after each await; validate exact bounded response/nonce/binding/time. Clear marker and restore stamp only if complete authoritative projection VERIFIED and same mounted source/Sync still matches. If local current identities differ from server or source changed, retain marker and truthful changed/unresolved wording. Do not adopt server truth into unrelated local data or turn read into replay permission. Old string markers are present-state only. Short Arabic UI: explain checking current reminder state, no internal task/endpoint jargon.\n\nMeaningful proof using real runtime/gateway and mounted isolated loopback harness: saved projection+lost ACK, reload persisted marker, ONE explicit read verifies CURRENT projection/clears marker, zero events/update calls; write never committed remains absent/unknown with zero retry; partial set/sharedstamp/wrongfield/source change rejected; revoked/expired/foreignregistration/context/session/owner switch during read discarded; futureevent check works without send; malformed/oversized/stale/time-out response stays unknown; existingClickOnly read succeeds while enrollment and mutation stay blocked; repeated passive observation makes no calls. Reuse previous permission-race and exact HTTP400-stale behavior without broad full suite. Bound client body/timeouts and response schema. Add no unnecessary startup modules; update shared sw.js cache version once from current v101 after final code, preserving shell inventory except any actually needed file.\n\nActual service prerequisite: original N44 private custodian's preserved root C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019, saved session01a14fcd-032c-7ec0-8b0c-0e0395862c61; n44-core-live-1028 has additional newer source/evidence. Establish exact CURRENT installed Edge/ingress source first and compose narrowly over those current native changes, not blindly downgrade the current service to older main/backend. Public activation/device-custodian.mjs has dated/expired trial guards; never invoke old device/send trial as a shortcut. Find the original current private installer and source/config binding via those preserved task records. If paths differ, identify from exact original evidence; don't search credentials or launch unrelated sessions.\n\nPrepare a fresh named non-sending service-maintenance admission under this card, independent of old spent coreFinitePhoneV2/one-install/send grants. Do not reset/renew trial budget, alter phone approval identity, widen effective policy or fabricate actual device evidence. Qualified new service source, bundle manifest and source/session-policy binding must be updated through existing legitimate original custodian using supported existing official CLI/API capability. At most ONE qualified n44-notifications update and ONE existing ingress update after all local tests. New events/read route allowlist must exist in BOTH actual bundles. Keep delivery/scheduler false, cron empty, all original private transport/roles/credentials and registration/consent unchanged. Root can act as connected official tool operator if needed via precise finite admitted handoff; report owned request/response paths while active instead of quitting merely because worker lacks attached tool. No fallback around a real tool/policy rejection.\n\nBefore LOCAL_READY verify actual deployed bundle identity, source/session configuration and authenticated route behavior with existing permitted synthetic fixtures (no new real account/registration/projection/send). A public401 alone is not end-to-end positive proof; pair exact native installed-source parity with qualified real backend integration behavior and state any absence of authenticated live fixture. Keep old failure/spent/UNKNOWN records intact. If binding/approval cannot remain effective without a new real trial, report exact implementation constraint, do not claim operational completion or consume a trial slot. Generic frontend publisher cannot deploy service; it must not be used as substitute. Source-only service files plus user-facing frontend require actual prerequisite readback before publication readiness. Record exact success/limits and next actual phone proof separately, without treating server delivery rows as OS receipt.\n\nAll edits in fresh controller worktree only, disjoint from parallel N88. N88 uses integration/live-mutation lease for its single atomic database install; serialize only actual provider operations using existing leases, native/browser preparation can proceed concurrently. Sol6.1 Medium Standard Fast off; no personal Chrome foreground interaction, no direct push/main/reset. Original sole publisher verifies production.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "df23c78126281b8625e2009df7cf3195abd7a482",
+        "requiredSourcePaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/canonical-source.mjs",
+          "drafts/n44-push/web-protocol.mjs",
+          "drafts/n44-push/web-entry.mjs",
+          "drafts/n44-push/cloudflare-entry.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/activation/private-error-boundary.mjs",
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-runtime.js",
+          "src/views/notification-settings.js",
+          "sw.js",
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "drafts/n44-push/activation/build-request-runtime.mjs",
+          "drafts/n44-push/activation/build-ingress-transport.mjs",
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "tests/n44-stale-projection-http-20261031.test.mjs"
+        ],
+        "editPaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/canonical-source.mjs",
+          "drafts/n44-push/web-protocol.mjs",
+          "drafts/n44-push/web-entry.mjs",
+          "drafts/n44-push/cloudflare-entry.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/activation/private-error-boundary.mjs",
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-runtime.js",
+          "src/views/notification-settings.js",
+          "sw.js",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/build.mjs",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/service-admission.mjs",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/manifest.json",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/README.md",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/service-readback.json",
+          "tests/n44-current-projection-recovery-20261031.test.mjs",
+          "tests/n44-current-projection-recovery-service-20261031.test.mjs",
+          "docs/automation-evidence/20261031/N44_CURRENT_PROJECTION_RECOVERY.md"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/current-projection-recovery-20261031/build.mjs",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/service-admission.mjs",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/manifest.json",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/README.md",
+          "drafts/n44-push/activation/current-projection-recovery-20261031/service-readback.json",
+          "tests/n44-current-projection-recovery-20261031.test.mjs",
+          "tests/n44-current-projection-recovery-service-20261031.test.mjs",
+          "docs/automation-evidence/20261031/N44_CURRENT_PROJECTION_RECOVERY.md"
+        ],
+        "workerChecks": [
+          "n44_exact_authenticated_current_projection_read",
+          "n44_mounted_reload_recovery_without_write_replay",
+          "n44_changed_context_partial_and_unknown_stay_unresolved",
+          "n44_original_service_deployed_source_and_config_readback"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      },
+      "privateCustodyRepair": {
+        "root": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019",
+        "paths": [
+          "drafts/n44-push/activation/device-custodian.mjs",
+          "drafts/n44-push/activation/core-v1-live.mjs",
+          "drafts/n44-push/activation/core-v1-provider-adapters.mjs",
+          "drafts/n44-push/activation/core-v1-host-handoff.mjs"
+        ],
+        "publicCommit": false
+      }
+    }
+  ]
+}
